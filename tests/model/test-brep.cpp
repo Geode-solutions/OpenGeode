@@ -40,11 +40,15 @@
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
@@ -123,26 +127,20 @@ std::array< geode::uuid, 5 > add_surfaces(
     return uuids;
 }
 
-std::array< geode::uuid, 1 > add_blocks(
-    const geode::BRep& model, geode::BRepBuilder& builder )
+geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
 {
-    std::array< geode::uuid, 1 > uuids;
-    for( const auto b : geode::Range{ 1 } )
-    {
-        uuids[b] = builder.add_block();
-        builder.set_block_name( uuids[b], absl::StrCat( "block", b + 1 ) );
-    }
+    geode::uuid block_uuid = builder.add_block();
+    builder.set_block_name( block_uuid, "block1" );
     const auto& temp_block = model.block( builder.add_block(
         geode::OpenGeodePolyhedralSolid3D::impl_name_static() ) );
     builder.remove_block( temp_block );
-    const auto message =
-        absl::StrCat( "[Test] BRep should have ", 1, " block" );
+    const auto message = absl::StrCat( "[Test] BRep should have 1 block" );
     OPENGEODE_EXCEPTION( model.nb_blocks() == 1, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.blocks() ) == 1, message );
-    OPENGEODE_EXCEPTION(
-        model.block( uuids[0] ).name() == "block1", "[Test] Wrong Block name" );
-    return uuids;
+    OPENGEODE_EXCEPTION( model.block( block_uuid ).name() == "block1",
+        "[Test] Wrong Block name" );
+    return block_uuid;
 }
 
 std::array< geode::uuid, 3 > add_model_boundaries(
@@ -167,6 +165,107 @@ std::array< geode::uuid, 3 > add_model_boundaries(
     OPENGEODE_EXCEPTION( model.model_boundary( uuids[0] ).name() == "boundary1",
         "[Test] Wrong ModelBoundary name" );
     return uuids;
+}
+
+std::array< geode::uuid, 2 > add_corner_collections(
+    const geode::BRep& model, geode::BRepBuilder& builder )
+{
+    std::array< geode::uuid, 2 > uuids;
+    for( const auto mb : geode::Indices{ uuids } )
+    {
+        uuids[mb] = builder.add_corner_collection();
+        builder.set_corner_collection_name(
+            uuids[mb], absl::StrCat( "corner_collection", mb + 1 ) );
+    }
+    const auto& temp_collection =
+        model.corner_collection( builder.add_corner_collection() );
+    builder.remove_corner_collection( temp_collection );
+    const auto message = absl::StrCat(
+        "[Test] BRep should have ", uuids.size(), " corner collections" );
+    OPENGEODE_EXCEPTION(
+        model.nb_corner_collections() == uuids.size(), message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.corner_collections() )
+            == uuids.size(),
+        message );
+    OPENGEODE_EXCEPTION(
+        model.corner_collection( uuids[0] ).name() == "corner_collection1",
+        "[Test] Wrong CornerCollection name" );
+    return uuids;
+}
+
+std::array< geode::uuid, 2 > add_line_collections(
+    const geode::BRep& model, geode::BRepBuilder& builder )
+{
+    std::array< geode::uuid, 2 > uuids;
+    for( const auto mb : geode::Indices{ uuids } )
+    {
+        uuids[mb] = builder.add_line_collection();
+        builder.set_line_collection_name(
+            uuids[mb], absl::StrCat( "line_collection", mb + 1 ) );
+    }
+    const auto& temp_collection =
+        model.line_collection( builder.add_line_collection() );
+    builder.remove_line_collection( temp_collection );
+    const auto message = absl::StrCat(
+        "[Test] BRep should have ", uuids.size(), " line collections" );
+    OPENGEODE_EXCEPTION( model.nb_line_collections() == uuids.size(), message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.line_collections() )
+            == uuids.size(),
+        message );
+    OPENGEODE_EXCEPTION(
+        model.line_collection( uuids[0] ).name() == "line_collection1",
+        "[Test] Wrong LineCollection name" );
+    return uuids;
+}
+
+std::array< geode::uuid, 2 > add_surface_collections(
+    const geode::BRep& model, geode::BRepBuilder& builder )
+{
+    std::array< geode::uuid, 2 > uuids;
+    for( const auto mb : geode::Indices{ uuids } )
+    {
+        uuids[mb] = builder.add_surface_collection();
+        builder.set_surface_collection_name(
+            uuids[mb], absl::StrCat( "surface_collection", mb + 1 ) );
+    }
+    const auto& temp_collection =
+        model.surface_collection( builder.add_surface_collection() );
+    builder.remove_surface_collection( temp_collection );
+    const auto message = absl::StrCat(
+        "[Test] BRep should have ", uuids.size(), " surface collections" );
+    OPENGEODE_EXCEPTION(
+        model.nb_surface_collections() == uuids.size(), message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.surface_collections() )
+            == uuids.size(),
+        message );
+    OPENGEODE_EXCEPTION(
+        model.surface_collection( uuids[0] ).name() == "surface_collection1",
+        "[Test] Wrong SurfaceCollection name" );
+    return uuids;
+}
+
+geode::uuid add_block_collection(
+    const geode::BRep& model, geode::BRepBuilder& builder )
+{
+    geode::uuid block_uuid;
+    block_uuid = builder.add_block_collection();
+    builder.set_block_collection_name( block_uuid, "block_collection1" );
+    const auto& temp_collection =
+        model.block_collection( builder.add_block_collection() );
+    builder.remove_block_collection( temp_collection );
+    const auto message =
+        absl::StrCat( "[Test] BRep should have 1 block collections" );
+    OPENGEODE_EXCEPTION( model.nb_block_collections() == 1, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.block_collections() ) == 1,
+        message );
+    OPENGEODE_EXCEPTION(
+        model.block_collection( block_uuid ).name() == "block_collection1",
+        "[Test] Wrong BlockCollection name" );
+    return block_uuid;
 }
 
 void add_corner_line_boundary_relation( const geode::BRep& model,
@@ -295,13 +394,13 @@ void add_line_surface_boundary_relation( const geode::BRep& model,
 void add_surface_block_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
     absl::Span< const geode::uuid > surface_uuids,
-    absl::Span< const geode::uuid > block_uuids )
+    const geode::uuid& block_uuid )
 {
     for( const auto surface_id : geode::Range{ 3 } )
     {
         builder.add_surface_block_boundary_relationship(
             model.surface( surface_uuids[surface_id] ),
-            model.block( block_uuids.front() ) );
+            model.block( block_uuid ) );
     }
 
     for( const auto surface_id : geode::Range{ 3 } )
@@ -309,7 +408,7 @@ void add_surface_block_boundary_relation( const geode::BRep& model,
         for( const auto& incidence :
             model.incidences( model.surface( surface_uuids[surface_id] ) ) )
         {
-            OPENGEODE_EXCEPTION( block_uuids.front() == incidence.id(),
+            OPENGEODE_EXCEPTION( block_uuid == incidence.id(),
                 "[Test] Surfaces should be boundary to the first Block" );
         }
         OPENGEODE_EXCEPTION(
@@ -317,7 +416,7 @@ void add_surface_block_boundary_relation( const geode::BRep& model,
             "[Test] Surfaces should be connected to 1 Block" );
     }
 
-    OPENGEODE_EXCEPTION( model.nb_boundaries( block_uuids.front() ) == 3,
+    OPENGEODE_EXCEPTION( model.nb_boundaries( block_uuid ) == 3,
         "[Test] The Block should be incident to 3 Surfaces" );
 }
 
@@ -345,18 +444,107 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
     }
 }
 
+void add_corners_in_corner_collections( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    for( const auto i : geode::Range{ 4 } )
+    {
+        builder.add_corner_in_corner_collection(
+            model.corner( corner_uuids[i] ),
+            model.corner_collection( collection_uuids[0] ) );
+    }
+    for( const auto i : geode::Range{ 4, 6 } )
+    {
+        builder.add_corner_in_corner_collection(
+            model.corner( corner_uuids[i] ),
+            model.corner_collection( collection_uuids[1] ) );
+    }
+
+    for( const auto& corner_id : corner_uuids )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( corner_id ) == 1,
+            "[Test] All Corners should be in 1 collection (of type "
+            "CornerCollection)" );
+    }
+}
+
+void add_lines_in_line_collections( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    for( const auto i : geode::Range{ 4 } )
+    {
+        builder.add_line_in_line_collection( model.line( line_uuids[i] ),
+            model.line_collection( collection_uuids[0] ) );
+    }
+    for( const auto i : geode::Range{ 4, 9 } )
+    {
+        builder.add_line_in_line_collection( model.line( line_uuids[i] ),
+            model.line_collection( collection_uuids[1] ) );
+    }
+
+    for( const auto& line_id : line_uuids )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( line_id ) == 1,
+            "[Test] All Lines should be in 1 collection (of type "
+            "LineCollection)" );
+    }
+}
+
+void add_surfaces_in_surface_collections( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    for( const auto i : geode::Range{ 3 } )
+    {
+        builder.add_surface_in_surface_collection(
+            model.surface( surface_uuids[i] ),
+            model.surface_collection( collection_uuids[0] ) );
+    }
+    for( const auto i : geode::Range{ 3, 5 } )
+    {
+        builder.add_surface_in_surface_collection(
+            model.surface( surface_uuids[i] ),
+            model.surface_collection( collection_uuids[1] ) );
+    }
+
+    for( const auto& surface_id : surface_uuids )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( surface_id ) == 2,
+            "[Test] All Surfaces should be in 2 collection (of type "
+            "SurfaceCollection and ModelBoundary)" );
+    }
+}
+
+void add_block_in_block_collection( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    const geode::uuid& block_uuid,
+    const geode::uuid& collection_uuid )
+{
+    builder.add_block_in_block_collection(
+        model.block( block_uuid ), model.block_collection( collection_uuid ) );
+
+    OPENGEODE_EXCEPTION( model.nb_collections( block_uuid ) == 1,
+        "[Test] All Blocks should be in 1 collection (of type "
+        "BlockCollection)" );
+}
+
 void add_internal_corner_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
     absl::Span< const geode::uuid > corner_uuids,
     absl::Span< const geode::uuid > surface_uuids,
-    absl::Span< const geode::uuid > block_uuids )
+    const geode::uuid& block_uuid )
 {
     for( const auto& corner_id : corner_uuids )
     {
         builder.add_corner_surface_internal_relationship(
             model.corner( corner_id ), model.surface( surface_uuids.front() ) );
         builder.add_corner_block_internal_relationship(
-            model.corner( corner_id ), model.block( block_uuids.front() ) );
+            model.corner( corner_id ), model.block( block_uuid ) );
     }
 
     for( const auto& corner_id : corner_uuids )
@@ -373,7 +561,7 @@ void add_internal_corner_relations( const geode::BRep& model,
         for( const auto& embedding :
             model.embedding_blocks( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
+            OPENGEODE_EXCEPTION( block_uuid == embedding.id(),
                 "[Test] All Corners embedded blocks should be Blocks" );
             OPENGEODE_EXCEPTION(
                 model.nb_internal_corners( embedding ) == corner_uuids.size(),
@@ -394,7 +582,7 @@ void add_internal_line_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
     absl::Span< const geode::uuid > line_uuids,
     absl::Span< const geode::uuid > surface_uuids,
-    absl::Span< const geode::uuid > block_uuids )
+    const geode::uuid& block_uuid )
 {
     geode::index_t nb_boundaries{ 0 };
     for( const auto& line_id : line_uuids )
@@ -410,7 +598,7 @@ void add_internal_line_relations( const geode::BRep& model,
             nb_boundaries++;
         }
         builder.add_line_block_internal_relationship(
-            model.line( line_id ), model.block( block_uuids.front() ) );
+            model.line( line_id ), model.block( block_uuid ) );
     }
 
     for( const auto& line_id : line_uuids )
@@ -428,7 +616,7 @@ void add_internal_line_relations( const geode::BRep& model,
         for( const auto& embedding :
             model.embedding_blocks( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
+            OPENGEODE_EXCEPTION( block_uuid == embedding.id(),
                 "[Test] All Lines embedded blocks should be Blocks" );
             OPENGEODE_EXCEPTION(
                 model.nb_internal_lines( embedding ) == line_uuids.size(),
@@ -461,13 +649,13 @@ void add_internal_line_relations( const geode::BRep& model,
 void add_internal_surface_block_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
     absl::Span< const geode::uuid > surface_uuids,
-    absl::Span< const geode::uuid > block_uuids )
+    const geode::uuid& block_uuid )
 {
     for( const auto surface_id : geode::Range{ 3, surface_uuids.size() } )
     {
         builder.add_surface_block_internal_relationship(
             model.surface( surface_uuids[surface_id] ),
-            model.block( block_uuids.front() ) );
+            model.block( block_uuid ) );
     }
 
     for( const auto surface_id : geode::Range{ 3, surface_uuids.size() } )
@@ -479,7 +667,7 @@ void add_internal_surface_block_relations( const geode::BRep& model,
                                      == surface_uuids.size() - 3,
                 "[Test] Block should embed ", surface_uuids.size() - 3,
                 " Surfaces" );
-            OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
+            OPENGEODE_EXCEPTION( block_uuid == embedding.id(),
                 "[Test] Surfaces embeddings should be Blocks" );
         }
         OPENGEODE_EXCEPTION(
@@ -587,7 +775,7 @@ void test_boundary_ranges( const geode::BRep& model,
     absl::Span< const geode::uuid > corner_uuids,
     absl::Span< const geode::uuid > line_uuids,
     absl::Span< const geode::uuid > surface_uuids,
-    absl::Span< const geode::uuid > block_uuids )
+    const geode::uuid& block_uuid )
 {
     geode::index_t line_boundary_count{ 0 };
     for( const auto& line_boundary :
@@ -622,7 +810,7 @@ void test_boundary_ranges( const geode::BRep& model,
 
     geode::index_t block_boundary_count{ 0 };
     for( const auto& block_boundary :
-        model.boundaries( model.block( block_uuids[0] ) ) )
+        model.boundaries( model.block( block_uuid ) ) )
     {
         block_boundary_count++;
         OPENGEODE_EXCEPTION( block_boundary.id() == surface_uuids[0]
@@ -630,7 +818,7 @@ void test_boundary_ranges( const geode::BRep& model,
                                  || block_boundary.id() == surface_uuids[2],
             "[Test] BoundarySurfaceRange iteration result is not correct" );
         OPENGEODE_EXCEPTION(
-            model.is_boundary( block_boundary, model.block( block_uuids[0] ) ),
+            model.is_boundary( block_boundary, model.block( block_uuid ) ),
             "[Test] Surface should be boundary of Block" );
     }
     OPENGEODE_EXCEPTION( block_boundary_count == 3,
@@ -641,7 +829,7 @@ void test_incidence_ranges( const geode::BRep& model,
     absl::Span< const geode::uuid > corner_uuids,
     absl::Span< const geode::uuid > line_uuids,
     absl::Span< const geode::uuid > surface_uuids,
-    absl::Span< const geode::uuid > block_uuids )
+    const geode::uuid& block_uuid )
 {
     geode::index_t corner_incidence_count{ 0 };
     for( const auto& corner_incidence :
@@ -674,7 +862,7 @@ void test_incidence_ranges( const geode::BRep& model,
     for( const auto& surface_incidence : surface_incidences )
     {
         surface_incidence_count++;
-        OPENGEODE_EXCEPTION( surface_incidence.id() == block_uuids[0],
+        OPENGEODE_EXCEPTION( surface_incidence.id() == block_uuid,
             "[Test] IncidentBlockRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( surface_incidence_count == 1,
@@ -700,8 +888,95 @@ void test_item_ranges( const geode::BRep& model,
             "[Test] Surface should be item of ModelBoundary" );
     }
     OPENGEODE_EXCEPTION( boundary_item_count == 3,
-        "[Test] IncidentLineRange should iterates "
+        "[Test] ItemSurfaceRange should iterates "
         "on 3 Surfaces (Boundary 1)" );
+}
+
+void test_corner_collection_ranges( const geode::BRep& model,
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    const auto& collection_items = model.corner_collection_items(
+        model.corner_collection( collection_uuids[1] ) );
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : collection_items )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == corner_uuids[4]
+                                 || collection_item.id() == corner_uuids[5],
+            "[Test] ItemCornerRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION(
+            model.is_corner_collection_item( collection_item,
+                model.corner_collection( collection_uuids[1] ) ),
+            "[Test] Corner should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 2,
+        "[Test] ItemCornerRange should iterates on 2 Corners." );
+}
+
+void test_line_collection_ranges( const geode::BRep& model,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    const auto& collection_items = model.line_collection_items(
+        model.line_collection( collection_uuids[0] ) );
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : collection_items )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == line_uuids[0]
+                                 || collection_item.id() == line_uuids[1]
+                                 || collection_item.id() == line_uuids[2]
+                                 || collection_item.id() == line_uuids[3],
+            "[Test] ItemLineRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION( model.is_line_collection_item( collection_item,
+                                 model.line_collection( collection_uuids[0] ) ),
+            "[Test] Line should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 4,
+        "[Test] ItemLineRange should iterates on 4 Lines." );
+}
+
+void test_surface_collection_ranges( const geode::BRep& model,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    const auto& collection_items = model.surface_collection_items(
+        model.surface_collection( collection_uuids[1] ) );
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : collection_items )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == surface_uuids[3]
+                                 || collection_item.id() == surface_uuids[4],
+            "[Test] ItemSurfaceRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION(
+            model.is_surface_collection_item( collection_item,
+                model.surface_collection( collection_uuids[1] ) ),
+            "[Test] Surface should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 2,
+        "[Test] ItemSurfaceRange should iterates on 2 Surfaces." );
+}
+
+void test_block_collection_ranges( const geode::BRep& model,
+    const geode::uuid& block_uuid,
+    const geode::uuid& collection_uuid )
+{
+    const auto& collection_items = model.block_collection_items(
+        model.block_collection( collection_uuid ) );
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : collection_items )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == block_uuid,
+            "[Test] ItemBlockRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION( model.is_block_collection_item( collection_item,
+                                 model.block_collection( collection_uuid ) ),
+            "[Test] Block should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 1,
+        "[Test] ItemBlockRange should iterates on 1 Block." );
 }
 
 void test_compare_brep( const geode::BRep& model, const geode::BRep& model2 )
@@ -722,6 +997,22 @@ void test_compare_brep( const geode::BRep& model, const geode::BRep& model2 )
         model.nb_model_boundaries() == model2.nb_model_boundaries(),
         "[Test] Number of Boundaries in reloaded Model should be ",
         model.nb_model_boundaries() );
+    OPENGEODE_EXCEPTION(
+        model.nb_corner_collections() == model2.nb_corner_collections(),
+        "[Test] Number of CornerCollections in reloaded Model should be ",
+        model.nb_corner_collections() );
+    OPENGEODE_EXCEPTION(
+        model.nb_line_collections() == model2.nb_line_collections(),
+        "[Test] Number of LineCollections in reloaded Model should be ",
+        model.nb_line_collections() );
+    OPENGEODE_EXCEPTION(
+        model.nb_surface_collections() == model2.nb_surface_collections(),
+        "[Test] Number of SurfaceCollections in reloaded Model should be ",
+        model.nb_surface_collections() );
+    OPENGEODE_EXCEPTION(
+        model.nb_block_collections() == model2.nb_block_collections(),
+        "[Test] Number of BlockCollections in reloaded Model should be ",
+        model.nb_block_collections() );
     for( const auto& block : model.blocks() )
     {
         OPENGEODE_EXCEPTION( block.id() == block.mesh().id(),
@@ -795,6 +1086,14 @@ void test_clone( const geode::BRep& brep )
         brep2.nb_blocks() == 1, "[Test] BRep should have 1 block" );
     OPENGEODE_EXCEPTION( brep2.nb_model_boundaries() == 3,
         "[Test] BRep should have 3 model boundaries" );
+    OPENGEODE_EXCEPTION( brep2.nb_corner_collections() == 2,
+        "[Test] BRep should have 2 corner collections" );
+    OPENGEODE_EXCEPTION( brep2.nb_line_collections() == 2,
+        "[Test] BRep should have 2 line collections" );
+    OPENGEODE_EXCEPTION( brep2.nb_surface_collections() == 2,
+        "[Test] BRep should have 2 surface collections" );
+    OPENGEODE_EXCEPTION( brep2.nb_block_collections() == 1,
+        "[Test] BRep should have 2 block collections" );
 
     const auto mappings = builder.copy_components( brep );
     builder.copy_relationships( mappings, brep );
@@ -898,6 +1197,102 @@ void test_clone( const geode::BRep& brep )
                 "[Test] All ModelBoundaries incidences are not correct" );
         }
     }
+    for( const auto& corner_collection : brep.corner_collections() )
+    {
+        const auto& new_corner_collection = brep2.corner_collection(
+            mappings.at( geode::CornerCollection3D::component_type_static() )
+                .in2out( corner_collection.id() ) );
+        for( const auto& surface :
+            brep.corner_collection_items( corner_collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_corner :
+                brep2.corner_collection_items( new_corner_collection ) )
+            {
+                if( mappings.at( geode::Corner3D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_corner.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All CornerCollections items are not correct" );
+        }
+    }
+    for( const auto& line_collection : brep.line_collections() )
+    {
+        const auto& new_line_collection = brep2.line_collection(
+            mappings.at( geode::LineCollection3D::component_type_static() )
+                .in2out( line_collection.id() ) );
+        for( const auto& surface :
+            brep.line_collection_items( line_collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_line :
+                brep2.line_collection_items( new_line_collection ) )
+            {
+                if( mappings.at( geode::Line3D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_line.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All LineCollections items are not correct" );
+        }
+    }
+    for( const auto& surface_collection : brep.surface_collections() )
+    {
+        const auto& new_surface_collection = brep2.surface_collection(
+            mappings.at( geode::SurfaceCollection3D::component_type_static() )
+                .in2out( surface_collection.id() ) );
+        for( const auto& surface :
+            brep.surface_collection_items( surface_collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_surface :
+                brep2.surface_collection_items( new_surface_collection ) )
+            {
+                if( mappings.at( geode::Surface3D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_surface.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All SurfaceCollections items are not correct" );
+        }
+    }
+    for( const auto& block_collection : brep.block_collections() )
+    {
+        const auto& new_block_collection = brep2.block_collection(
+            mappings.at( geode::BlockCollection3D::component_type_static() )
+                .in2out( block_collection.id() ) );
+        for( const auto& surface :
+            brep.block_collection_items( block_collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_block :
+                brep2.block_collection_items( new_block_collection ) )
+            {
+                if( mappings.at( geode::Block3D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_block.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All BlockCollections items are not correct" );
+        }
+    }
 }
 
 void test_backward_io()
@@ -946,8 +1341,14 @@ void test()
     const auto corner_uuids = add_corners( model, builder );
     const auto line_uuids = add_lines( model, builder );
     const auto surface_uuids = add_surfaces( model, builder );
-    const auto block_uuids = add_blocks( model, builder );
+    const auto block_uuid = add_block( model, builder );
     const auto model_boundary_uuids = add_model_boundaries( model, builder );
+    const auto corner_collection_uuids =
+        add_corner_collections( model, builder );
+    const auto line_collection_uuids = add_line_collections( model, builder );
+    const auto surface_collection_uuids =
+        add_surface_collections( model, builder );
+    const auto block_collection_uuid = add_block_collection( model, builder );
 
     set_geometry( builder, corner_uuids, line_uuids, surface_uuids );
 
@@ -956,25 +1357,39 @@ void test()
     add_line_surface_boundary_relation(
         model, builder, line_uuids, surface_uuids );
     add_surface_block_boundary_relation(
-        model, builder, surface_uuids, block_uuids );
+        model, builder, surface_uuids, block_uuid );
     add_surfaces_in_model_boundaries(
         model, builder, surface_uuids, model_boundary_uuids );
+    add_corners_in_corner_collections(
+        model, builder, corner_uuids, corner_collection_uuids );
+    add_lines_in_line_collections(
+        model, builder, line_uuids, line_collection_uuids );
+    add_surfaces_in_surface_collections(
+        model, builder, surface_uuids, surface_collection_uuids );
+    add_block_in_block_collection(
+        model, builder, block_uuid, block_collection_uuid );
     add_internal_corner_relations(
-        model, builder, corner_uuids, surface_uuids, block_uuids );
+        model, builder, corner_uuids, surface_uuids, block_uuid );
     add_internal_line_relations(
-        model, builder, line_uuids, surface_uuids, block_uuids );
+        model, builder, line_uuids, surface_uuids, block_uuid );
     add_internal_surface_block_relations(
-        model, builder, surface_uuids, block_uuids );
-    OPENGEODE_EXCEPTION( model.nb_internals( block_uuids.front() )
+        model, builder, surface_uuids, block_uuid );
+    OPENGEODE_EXCEPTION( model.nb_internals( block_uuid )
                              == corner_uuids.size() + line_uuids.size()
                                     + surface_uuids.size() - 3,
         "[Test] The Block should embed all Corners & Lines & Surfaces "
         "(that are internal to the Block)" );
     test_boundary_ranges(
-        model, corner_uuids, line_uuids, surface_uuids, block_uuids );
+        model, corner_uuids, line_uuids, surface_uuids, block_uuid );
     test_incidence_ranges(
-        model, corner_uuids, line_uuids, surface_uuids, block_uuids );
+        model, corner_uuids, line_uuids, surface_uuids, block_uuid );
     test_item_ranges( model, surface_uuids, model_boundary_uuids );
+    test_corner_collection_ranges(
+        model, corner_uuids, corner_collection_uuids );
+    test_line_collection_ranges( model, line_uuids, line_collection_uuids );
+    test_surface_collection_ranges(
+        model, surface_uuids, surface_collection_uuids );
+    test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_clone( model );
 
     const auto file_io = absl::StrCat( "test.", model.native_extension() );

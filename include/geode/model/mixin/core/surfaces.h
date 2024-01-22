@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_id.h>
@@ -43,10 +44,10 @@ namespace geode
     class opengeode_model_api Surfaces
     {
         OPENGEODE_DISABLE_COPY( Surfaces );
+        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey );
 
     public:
         using Builder = SurfacesBuilder< dimension >;
-        friend Builder;
 
         class opengeode_model_api SurfaceRangeBase
         {
@@ -114,22 +115,27 @@ namespace geode
             Surface< dimension >& operator*() const;
         };
 
-    private:
-        const uuid& create_surface();
+    public:
+        const uuid& create_surface( SurfacesBuilderKey key );
 
-        const uuid& create_surface( const MeshImpl& impl );
+        const uuid& create_surface(
+            const MeshImpl& impl, SurfacesBuilderKey key );
 
-        void create_surface( uuid surface_id );
+        void create_surface( uuid surface_id, SurfacesBuilderKey key );
 
-        void create_surface( uuid surface_id, const MeshImpl& impl );
+        void create_surface(
+            uuid surface_id, const MeshImpl& impl, SurfacesBuilderKey key );
 
-        void delete_surface( const Surface< dimension >& surface );
+        void delete_surface(
+            const Surface< dimension >& surface, SurfacesBuilderKey key );
 
-        void load_surfaces( absl::string_view directory );
+        void load_surfaces(
+            absl::string_view directory, SurfacesBuilderKey key );
 
-        ModifiableSurfaceRange modifiable_surfaces();
+        ModifiableSurfaceRange modifiable_surfaces( SurfacesBuilderKey key );
 
-        Surface< dimension >& modifiable_surface( const uuid& id );
+        Surface< dimension >& modifiable_surface(
+            const uuid& id, SurfacesBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -83,7 +83,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >& Blocks< dimension >::modifiable_block( const uuid& id )
+    Block< dimension >& Blocks< dimension >::modifiable_block(
+        const uuid& id, BlocksBuilderKey /*unused*/ )
     {
         return impl_->component( id );
     }
@@ -140,7 +141,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::load_blocks( absl::string_view directory )
+    void Blocks< dimension >::load_blocks(
+        absl::string_view directory, BlocksBuilderKey /*unused*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
@@ -148,7 +150,7 @@ namespace geode
         Logger::set_level( Logger::Level::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
-        for( auto& block : modifiable_blocks() )
+        for( auto& block : modifiable_blocks( {} ) )
         {
             tasks[count++] = async::spawn( [&block, &mapping] {
                 const auto file = mapping.at( block.id().string() );
@@ -184,7 +186,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Blocks< dimension >::create_block()
+    const uuid& Blocks< dimension >::create_block( BlocksBuilderKey /*unused*/ )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
             new Block< dimension >{ typename Block< dimension >::BlocksKey() }
@@ -195,7 +197,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Blocks< dimension >::create_block( const MeshImpl& impl )
+    const uuid& Blocks< dimension >::create_block(
+        const MeshImpl& impl, BlocksBuilderKey /*unused*/ )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
             new Block< dimension >{ impl, {} }
@@ -206,7 +209,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::create_block( uuid block_id )
+    void Blocks< dimension >::create_block(
+        uuid block_id, BlocksBuilderKey /*unused*/ )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
             new Block< dimension >{ typename Block< dimension >::BlocksKey{} }
@@ -217,7 +221,7 @@ namespace geode
 
     template < index_t dimension >
     void Blocks< dimension >::create_block(
-        uuid block_id, const MeshImpl& impl )
+        uuid block_id, const MeshImpl& impl, BlocksBuilderKey /*unused*/ )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
             new Block< dimension >{ impl, {} }
@@ -227,7 +231,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::delete_block( const Block< dimension >& block )
+    void Blocks< dimension >::delete_block(
+        const Block< dimension >& block, BlocksBuilderKey /*unused*/ )
     {
         impl_->delete_component( block.id() );
     }
@@ -324,7 +329,7 @@ namespace geode
 
     template < index_t dimension >
     typename Blocks< dimension >::ModifiableBlockRange
-        Blocks< dimension >::modifiable_blocks()
+        Blocks< dimension >::modifiable_blocks( BlocksBuilderKey /*unused*/ )
     {
         return { *this };
     }

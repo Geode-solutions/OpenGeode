@@ -68,6 +68,10 @@ namespace geode
             },
             [&directory, &brep] {
                 brep.save_model_boundaries( directory );
+                brep.save_corner_collections( directory );
+                brep.save_line_collections( directory );
+                brep.save_surface_collections( directory );
+                brep.save_block_collections( directory );
             } );
     }
 

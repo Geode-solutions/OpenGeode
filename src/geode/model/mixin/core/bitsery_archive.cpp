@@ -27,10 +27,14 @@
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 
 namespace bitsery
@@ -42,7 +46,10 @@ namespace bitsery
             : PolymorphicDerivedClasses< geode::Corner2D,
                   geode::Line2D,
                   geode::Surface2D,
-                  geode::ModelBoundary2D >
+                  geode::ModelBoundary2D,
+                  geode::CornerCollection2D,
+                  geode::LineCollection2D,
+                  geode::SurfaceCollection2D >
         {
         };
 
@@ -52,7 +59,11 @@ namespace bitsery
                   geode::Line3D,
                   geode::Surface3D,
                   geode::Block3D,
-                  geode::ModelBoundary3D >
+                  geode::ModelBoundary3D,
+                  geode::CornerCollection3D,
+                  geode::LineCollection3D,
+                  geode::SurfaceCollection3D,
+                  geode::BlockCollection3D >
         {
         };
     } // namespace ext

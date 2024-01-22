@@ -34,46 +34,47 @@ namespace geode
     template < index_t dimension >
     const uuid& BlocksBuilder< dimension >::create_block()
     {
-        return blocks_.create_block();
+        return blocks_.create_block(
+            typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     const uuid& BlocksBuilder< dimension >::create_block( const MeshImpl& impl )
     {
-        return blocks_.create_block( impl );
+        return blocks_.create_block( impl, {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::create_block( uuid block_id )
     {
-        blocks_.create_block( std::move( block_id ) );
+        blocks_.create_block( std::move( block_id ), {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::create_block(
         uuid block_id, const MeshImpl& impl )
     {
-        blocks_.create_block( std::move( block_id ), impl );
+        blocks_.create_block( std::move( block_id ), impl, {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::delete_block(
         const Block< dimension >& block )
     {
-        blocks_.delete_block( block );
+        blocks_.delete_block( block, {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::load_blocks( absl::string_view directory )
     {
-        return blocks_.load_blocks( directory );
+        return blocks_.load_blocks( directory, {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_name(
         const uuid& id, absl::string_view name )
     {
-        blocks_.modifiable_block( id ).set_block_name( name, {} );
+        blocks_.modifiable_block( id, {} ).set_block_name( name, {} );
         block_mesh_builder( id )->set_name( name );
     }
 
@@ -81,7 +82,7 @@ namespace geode
     void BlocksBuilder< dimension >::set_block_mesh(
         const uuid& id, std::unique_ptr< SolidMesh< dimension > > mesh )
     {
-        blocks_.modifiable_block( id ).set_mesh( std::move( mesh ),
+        blocks_.modifiable_block( id, {} ).set_mesh( std::move( mesh ),
             typename Block< dimension >::BlocksBuilderKey{} );
     }
 
@@ -89,7 +90,7 @@ namespace geode
     SolidMesh< dimension >& BlocksBuilder< dimension >::modifiable_block_mesh(
         const uuid& id )
     {
-        return blocks_.modifiable_block( id ).modifiable_mesh(
+        return blocks_.modifiable_block( id, {} ).modifiable_mesh(
             typename Block< dimension >::BlocksBuilderKey{} );
     }
 
