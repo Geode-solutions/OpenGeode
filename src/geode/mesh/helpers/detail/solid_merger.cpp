@@ -26,6 +26,7 @@
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
+#include <geode/basic/algorithm.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
@@ -116,6 +117,8 @@ namespace geode
                 {
                     const auto old2new =
                         merger.builder().delete_polyhedra( to_delete );
+                    delete_vector_elements( to_delete, polyhedra_origins_ );
+                    delete_vector_elements( to_delete, solid_id_ );
                     for( const auto solid_id : Indices{ merger.meshes() } )
                     {
                         const auto& solid = merger.meshes()[solid_id].get();
