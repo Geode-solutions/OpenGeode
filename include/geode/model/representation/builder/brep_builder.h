@@ -27,16 +27,24 @@
 #include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
+#include <geode/model/mixin/builder/block_collections_builder.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
+#include <geode/model/mixin/builder/corner_collections_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
+#include <geode/model/mixin/builder/line_collections_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/model_boundaries_builder.h>
+#include <geode/model/mixin/builder/surface_collections_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
+#include <geode/model/mixin/core/block_collections.h>
 #include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/corner_collections.h>
 #include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/line_collections.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/model_boundaries.h>
+#include <geode/model/mixin/core/surface_collections.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 #include <geode/model/representation/core/mapping.h>
@@ -54,6 +62,10 @@ namespace geode
     ALIAS_3D( SolidMesh );
     ALIAS_3D( Line );
     ALIAS_3D( ModelBoundary );
+    ALIAS_3D( CornerCollection );
+    ALIAS_3D( LineCollection );
+    ALIAS_3D( SurfaceCollection );
+    ALIAS_3D( BlockCollection );
     ALIAS_3D( Surface );
     ALIAS_3D( SurfaceMesh );
     class BRep;
@@ -69,6 +81,10 @@ namespace geode
      * @extends SurfacesBuilder
      * @extends BlocksBuilder
      * @extends ModelBoundariesBuilder
+     * @extends CornerCollectionsBuilder3D
+     * @extends LineCollectionsBuilder3D
+     * @extends SurfaceCollectionsBuilder3D
+     * @extends BlockCollectionsBuilder3D
      */
     class opengeode_model_api BRepBuilder : public TopologyBuilder,
                                             public CornersBuilder3D,
@@ -76,6 +92,10 @@ namespace geode
                                             public SurfacesBuilder3D,
                                             public BlocksBuilder3D,
                                             public ModelBoundariesBuilder3D,
+                                            public CornerCollectionsBuilder3D,
+                                            public LineCollectionsBuilder3D,
+                                            public SurfaceCollectionsBuilder3D,
+                                            public BlockCollectionsBuilder3D,
                                             public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( BRepBuilder );
@@ -113,6 +133,14 @@ namespace geode
 
         const uuid& add_model_boundary();
 
+        const uuid& add_corner_collection();
+
+        const uuid& add_line_collection();
+
+        const uuid& add_surface_collection();
+
+        const uuid& add_block_collection();
+
         void add_corner( uuid corner_id );
 
         void add_corner( uuid corner_id, const MeshImpl& impl );
@@ -130,6 +158,14 @@ namespace geode
         void add_block( uuid block_id, const MeshImpl& impl );
 
         void add_model_boundary( uuid model_boundary_id );
+
+        void add_corner_collection( uuid corner_collection_id );
+
+        void add_line_collection( uuid line_collection_id );
+
+        void add_surface_collection( uuid surface_collection_id );
+
+        void add_block_collection( uuid block_collection_id );
 
         void update_corner_mesh(
             const Corner3D& corner, std::unique_ptr< PointSet3D > mesh );
@@ -152,6 +188,14 @@ namespace geode
         void remove_block( const Block3D& block );
 
         void remove_model_boundary( const ModelBoundary3D& boundary );
+
+        void remove_corner_collection( const CornerCollection3D& collection );
+
+        void remove_line_collection( const LineCollection3D& collection );
+
+        void remove_surface_collection( const SurfaceCollection3D& collection );
+
+        void remove_block_collection( const BlockCollection3D& collection );
 
         void add_corner_line_boundary_relationship(
             const Corner3D& corner, const Line3D& line );
@@ -179,6 +223,18 @@ namespace geode
 
         void add_surface_in_model_boundary(
             const Surface3D& surface, const ModelBoundary3D& boundary );
+
+        void add_corner_in_corner_collection(
+            const Corner3D& surface, const CornerCollection3D& collection );
+
+        void add_line_in_line_collection(
+            const Line3D& surface, const LineCollection3D& collection );
+
+        void add_surface_in_surface_collection(
+            const Surface3D& surface, const SurfaceCollection3D& collection );
+
+        void add_block_in_block_collection(
+            const Block3D& surface, const BlockCollection3D& collection );
 
     private:
         BRep& brep_;

@@ -68,7 +68,7 @@ namespace geode
     template < index_t dimension >
     ModelBoundary< dimension >&
         ModelBoundaries< dimension >::modifiable_model_boundary(
-            const uuid& id )
+            const uuid& id, ModelBoundariesBuilderKey )
     {
         return impl_->component( id );
     }
@@ -83,7 +83,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::load_model_boundaries(
-        absl::string_view directory )
+        absl::string_view directory, ModelBoundariesBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/model_boundaries" ) );
@@ -98,13 +98,15 @@ namespace geode
 
     template < index_t dimension >
     typename ModelBoundaries< dimension >::ModifiableModelBoundaryRange
-        ModelBoundaries< dimension >::modifiable_model_boundaries()
+        ModelBoundaries< dimension >::modifiable_model_boundaries(
+            ModelBoundariesBuilderKey )
     {
         return { *this };
     }
 
     template < index_t dimension >
-    const uuid& ModelBoundaries< dimension >::create_model_boundary()
+    const uuid& ModelBoundaries< dimension >::create_model_boundary(
+        ModelBoundariesBuilderKey )
     {
         typename ModelBoundaries< dimension >::Impl::ComponentPtr boundary{
             new ModelBoundary< dimension >{
@@ -117,7 +119,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::create_model_boundary(
-        uuid model_boundary_id )
+        uuid model_boundary_id, ModelBoundariesBuilderKey )
     {
         typename ModelBoundaries< dimension >::Impl::ComponentPtr
             model_boundary{ new ModelBoundary< dimension >{
@@ -129,7 +131,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::delete_model_boundary(
-        const ModelBoundary< dimension >& boundary )
+        const ModelBoundary< dimension >& boundary, ModelBoundariesBuilderKey )
     {
         impl_->delete_component( boundary.id() );
     }

@@ -49,7 +49,15 @@ namespace geode
             detail::add_to_message( message, brep.nb_lines(), " Lines, " );
             detail::add_to_message( message, brep.nb_corners(), " Corners, " );
             detail::add_to_message(
-                message, brep.nb_model_boundaries(), " ModelBoundaries" );
+                message, brep.nb_model_boundaries(), " ModelBoundaries," );
+            detail::add_to_message(
+                message, brep.nb_corner_collections(), " CornerCollections," );
+            detail::add_to_message(
+                message, brep.nb_line_collections(), " LineCollections," );
+            detail::add_to_message( message, brep.nb_surface_collections(),
+                " SurfaceCollections," );
+            detail::add_to_message(
+                message, brep.nb_block_collections(), " BlockCollections," );
             Logger::info( message );
             return brep;
         }

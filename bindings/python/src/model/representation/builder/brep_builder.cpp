@@ -24,10 +24,14 @@
 #include "../../../common.h"
 
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
 
@@ -37,7 +41,9 @@ namespace geode
     {
         pybind11::class_< BRepBuilder, TopologyBuilder, CornersBuilder3D,
             LinesBuilder3D, SurfacesBuilder3D, BlocksBuilder3D,
-            ModelBoundariesBuilder3D, IdentifierBuilder >(
+            ModelBoundariesBuilder3D, CornerCollectionsBuilder3D,
+            LineCollectionsBuilder3D, SurfaceCollectionsBuilder3D,
+            BlockCollectionsBuilder3D, IdentifierBuilder >(
             module, "BRepBuilder" )
             .def( pybind11::init< BRep& >() )
             .def( "copy", &BRepBuilder::copy )
@@ -52,11 +58,31 @@ namespace geode
             .def( "add_model_boundary",
                 static_cast< const uuid& (BRepBuilder::*) () >(
                     &BRepBuilder::add_model_boundary ) )
+            .def( "add_corner_collection",
+                static_cast< const uuid& (BRepBuilder::*) () >(
+                    &BRepBuilder::add_corner_collection ) )
+            .def( "add_line_collection",
+                static_cast< const uuid& (BRepBuilder::*) () >(
+                    &BRepBuilder::add_line_collection ) )
+            .def( "add_surface_collection",
+                static_cast< const uuid& (BRepBuilder::*) () >(
+                    &BRepBuilder::add_surface_collection ) )
+            .def( "add_block_collection",
+                static_cast< const uuid& (BRepBuilder::*) () >(
+                    &BRepBuilder::add_block_collection ) )
             .def( "remove_corner", &BRepBuilder::remove_corner )
             .def( "remove_line", &BRepBuilder::remove_line )
             .def( "remove_surface", &BRepBuilder::remove_surface )
             .def( "remove_block", &BRepBuilder::remove_block )
             .def( "remove_model_boundary", &BRepBuilder::remove_model_boundary )
+            .def( "remove_corner_collection",
+                &BRepBuilder::remove_corner_collection )
+            .def(
+                "remove_line_collection", &BRepBuilder::remove_line_collection )
+            .def( "remove_surface_collection",
+                &BRepBuilder::remove_surface_collection )
+            .def( "remove_block_collection",
+                &BRepBuilder::remove_block_collection )
             .def( "add_corner_line_boundary_relationship",
                 &BRepBuilder::add_corner_line_boundary_relationship )
             .def( "add_line_surface_boundary_relationship",
@@ -74,6 +100,14 @@ namespace geode
             .def( "add_surface_block_internal_relationship",
                 &BRepBuilder::add_surface_block_internal_relationship )
             .def( "add_surface_in_model_boundary",
-                &BRepBuilder::add_surface_in_model_boundary );
+                &BRepBuilder::add_surface_in_model_boundary )
+            .def( "add_corner_in_corner_collection",
+                &BRepBuilder::add_corner_in_corner_collection )
+            .def( "add_line_in_line_collection",
+                &BRepBuilder::add_line_in_line_collection )
+            .def( "add_surface_in_surface_collection",
+                &BRepBuilder::add_surface_in_surface_collection )
+            .def( "add_block_in_block_collection",
+                &BRepBuilder::add_block_in_block_collection );
     }
 } // namespace geode

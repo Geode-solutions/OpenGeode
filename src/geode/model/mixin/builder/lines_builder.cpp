@@ -34,38 +34,39 @@ namespace geode
     template < index_t dimension >
     const uuid& LinesBuilder< dimension >::create_line()
     {
-        return lines_.create_line();
+        return lines_.create_line(
+            typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     const uuid& LinesBuilder< dimension >::create_line( const MeshImpl& impl )
     {
-        return lines_.create_line( impl );
+        return lines_.create_line( impl, {} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::create_line( uuid line_id )
     {
-        lines_.create_line( std::move( line_id ) );
+        lines_.create_line( std::move( line_id ), {} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::create_line(
         uuid line_id, const MeshImpl& impl )
     {
-        lines_.create_line( std::move( line_id ), impl );
+        lines_.create_line( std::move( line_id ), impl, {} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::delete_line( const Line< dimension >& line )
     {
-        lines_.delete_line( line );
+        lines_.delete_line( line, {} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::load_lines( absl::string_view directory )
     {
-        return lines_.load_lines( directory );
+        return lines_.load_lines( directory, {} );
     }
 
     template < index_t dimension >
@@ -73,7 +74,7 @@ namespace geode
         LinesBuilder< dimension >::line_mesh_builder( const uuid& id )
     {
         return EdgedCurveBuilder< dimension >::create(
-            lines_.modifiable_line( id ).modifiable_mesh(
+            lines_.modifiable_line( id, {} ).modifiable_mesh(
                 typename Line< dimension >::LinesBuilderKey{} ) );
     }
 
@@ -81,7 +82,7 @@ namespace geode
     void LinesBuilder< dimension >::set_line_name(
         const uuid& id, absl::string_view name )
     {
-        lines_.modifiable_line( id ).set_line_name( name, {} );
+        lines_.modifiable_line( id, {} ).set_line_name( name, {} );
         line_mesh_builder( id )->set_name( name );
     }
 
@@ -89,7 +90,7 @@ namespace geode
     void LinesBuilder< dimension >::set_line_mesh(
         const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh )
     {
-        lines_.modifiable_line( id ).set_mesh(
+        lines_.modifiable_line( id, {} ).set_mesh(
             std::move( mesh ), typename Line< dimension >::LinesBuilderKey{} );
     }
 
@@ -97,7 +98,7 @@ namespace geode
     EdgedCurve< dimension >& LinesBuilder< dimension >::modifiable_line_mesh(
         const uuid& id )
     {
-        return lines_.modifiable_line( id ).modifiable_mesh(
+        return lines_.modifiable_line( id, {} ).modifiable_mesh(
             typename Line< dimension >::LinesBuilderKey{} );
     }
 

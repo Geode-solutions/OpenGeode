@@ -29,9 +29,12 @@
 #include <geode/basic/zip_file.h>
 
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/builder/detail/filter.h>
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
@@ -53,6 +56,9 @@ namespace geode
             },
             [&builder, &directory] {
                 builder.load_model_boundaries( directory );
+                builder.load_corner_collections( directory );
+                builder.load_line_collections( directory );
+                builder.load_surface_collections( directory );
             },
             [&builder, &directory] {
                 builder.load_relationships( directory );

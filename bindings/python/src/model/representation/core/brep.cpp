@@ -26,10 +26,14 @@
 #include <geode/geometry/bounding_box.h>
 
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/core/brep.h>
 
 namespace geode
@@ -37,7 +41,9 @@ namespace geode
     void define_brep( pybind11::module& module )
     {
         pybind11::class_< BRep, Topology, Corners3D, Lines3D, Surfaces3D,
-            Blocks3D, ModelBoundaries3D, Identifier >( module, "BRep" )
+            Blocks3D, ModelBoundaries3D, CornerCollections3D, LineCollections3D,
+            SurfaceCollections3D, BlockCollections3D, Identifier >(
+            module, "BRep" )
             .def( pybind11::init<>() )
             .def(
                 "boundary_corners",
@@ -263,6 +269,54 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
+            .def(
+                "corner_collection_items",
+                []( const BRep& brep, const CornerCollection3D& collection ) {
+                    std::vector< const Corner3D* > components;
+                    for( const auto& component :
+                        brep.corner_collection_items( collection ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
+            .def(
+                "line_collection_items",
+                []( const BRep& brep, const LineCollection3D& collection ) {
+                    std::vector< const Line3D* > components;
+                    for( const auto& component :
+                        brep.line_collection_items( collection ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
+            .def(
+                "surface_collection_items",
+                []( const BRep& brep, const SurfaceCollection3D& collection ) {
+                    std::vector< const Surface3D* > components;
+                    for( const auto& component :
+                        brep.surface_collection_items( collection ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
+            .def(
+                "block_collection_items",
+                []( const BRep& brep, const BlockCollection3D& collection ) {
+                    std::vector< const Block3D* > components;
+                    for( const auto& component :
+                        brep.block_collection_items( collection ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "is_line_closed",
                 static_cast< bool ( BRep::* )( const Line3D& ) const >(
                     &BRep::is_closed ) )
@@ -294,6 +348,12 @@ namespace geode
                 static_cast< bool ( BRep::* )( const Surface3D&,
                     const Block3D& ) const >( &BRep::is_internal ) )
             .def( "is_model_boundary_item", &BRep::is_model_boundary_item )
+            .def(
+                "is_corner_collection_item", &BRep::is_corner_collection_item )
+            .def( "is_line_collection_item", &BRep::is_line_collection_item )
+            .def( "is_surface_collection_item",
+                &BRep::is_surface_collection_item )
+            .def( "is_block_collection_item", &BRep::is_block_collection_item )
             .def( "bounding_box", &BRep::bounding_box )
             .def( "native_extension", &BRep::native_extension );
     }

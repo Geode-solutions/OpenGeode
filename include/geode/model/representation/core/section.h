@@ -27,9 +27,12 @@
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/corner_collections.h>
 #include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/line_collections.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/model_boundaries.h>
+#include <geode/model/mixin/core/surface_collections.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 
@@ -39,6 +42,9 @@ namespace geode
     ALIAS_2D( Line );
     ALIAS_2D( Surface );
     ALIAS_2D( ModelBoundary );
+    ALIAS_2D( CornerCollection );
+    ALIAS_2D( LineCollection );
+    ALIAS_2D( SurfaceCollection );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_2D( BoundingBox );
     class SectionBuilder;
@@ -55,19 +61,30 @@ namespace geode
      * @extends Lines
      * @extends Surfaces
      * @extends ModelBoundaries
+     * @extends CornerCollections
+     * @extends LineCollections
+     * @extends SurfaceCollections
      */
     class opengeode_model_api Section : public Topology,
                                         public Corners2D,
                                         public Lines2D,
                                         public Surfaces2D,
                                         public ModelBoundaries2D,
+                                        public CornerCollections2D,
+                                        public LineCollections2D,
+                                        public SurfaceCollections2D,
                                         public Identifier
     {
     public:
         static constexpr index_t dim{ 2 };
         using Builder = SectionBuilder;
-        using Components =
-            std::tuple< Corner2D, Line2D, Surface2D, ModelBoundary2D >;
+        using Components = std::tuple< Corner2D,
+            Line2D,
+            Surface2D,
+            ModelBoundary2D,
+            CornerCollection2D,
+            LineCollection2D,
+            SurfaceCollection2D >;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator
@@ -206,12 +223,33 @@ namespace geode
             const Section& section_;
         };
 
+        class opengeode_model_api ItemCornerRange
+            : public Relationships::ItemRangeIterator
+        {
+        public:
+            ItemCornerRange(
+                const Section& section, const CornerCollection2D& boundary );
+            ItemCornerRange( const ItemCornerRange& range );
+            ~ItemCornerRange();
+
+            const ItemCornerRange& begin() const;
+
+            const ItemCornerRange& end() const;
+
+            const Corner2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
         class opengeode_model_api ItemLineRange
             : public Relationships::ItemRangeIterator
         {
         public:
             ItemLineRange(
                 const Section& section, const ModelBoundary2D& boundary );
+            ItemLineRange(
+                const Section& section, const LineCollection2D& boundary );
             ItemLineRange( const ItemLineRange& range );
             ~ItemLineRange();
 
@@ -220,6 +258,25 @@ namespace geode
             const ItemLineRange& end() const;
 
             const Line2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
+        class opengeode_model_api ItemSurfaceRange
+            : public Relationships::ItemRangeIterator
+        {
+        public:
+            ItemSurfaceRange(
+                const Section& section, const SurfaceCollection2D& collection );
+            ItemSurfaceRange( const ItemSurfaceRange& range );
+            ~ItemSurfaceRange();
+
+            const ItemSurfaceRange& begin() const;
+
+            const ItemSurfaceRange& end() const;
+
+            const Surface2D& operator*() const;
 
         private:
             const Section& section_;
@@ -259,6 +316,15 @@ namespace geode
         ItemLineRange model_boundary_items(
             const ModelBoundary2D& boundary ) const;
 
+        ItemCornerRange corner_collection_items(
+            const CornerCollection2D& collection ) const;
+
+        ItemLineRange line_collection_items(
+            const LineCollection2D& collection ) const;
+
+        ItemSurfaceRange surface_collection_items(
+            const SurfaceCollection2D& collection ) const;
+
         bool is_closed( const Line2D& line ) const;
 
         bool is_boundary( const Corner2D& corner, const Line2D& line ) const;
@@ -272,6 +338,15 @@ namespace geode
 
         bool is_model_boundary_item(
             const Line2D& line, const ModelBoundary2D& boundary ) const;
+
+        bool is_corner_collection_item(
+            const Corner2D& surface, const CornerCollection2D& boundary ) const;
+
+        bool is_line_collection_item(
+            const Line2D& surface, const LineCollection2D& boundary ) const;
+
+        bool is_surface_collection_item( const Surface2D& surface,
+            const SurfaceCollection2D& boundary ) const;
 
         /*!
          * Compute the bounding box from component meshes

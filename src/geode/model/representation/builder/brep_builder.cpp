@@ -30,10 +30,14 @@
 #include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/brep.h>
 
@@ -46,6 +50,10 @@ namespace geode
           SurfacesBuilder3D( brep ),
           BlocksBuilder3D( brep ),
           ModelBoundariesBuilder3D( brep ),
+          CornerCollectionsBuilder3D( brep ),
+          LineCollectionsBuilder3D( brep ),
+          SurfaceCollectionsBuilder3D( brep ),
+          BlockCollectionsBuilder3D( brep ),
           IdentifierBuilder( brep ),
           brep_( brep )
     {
@@ -80,6 +88,14 @@ namespace geode
             brep, *this, mappings[Block3D::component_type_static()] );
         detail::copy_model_boundary_components(
             brep, *this, mappings[ModelBoundary3D::component_type_static()] );
+        detail::copy_corner_collection_components( brep, *this,
+            mappings[CornerCollection3D::component_type_static()] );
+        detail::copy_line_collection_components(
+            brep, *this, mappings[LineCollection3D::component_type_static()] );
+        detail::copy_surface_collection_components( brep, *this,
+            mappings[SurfaceCollection3D::component_type_static()] );
+        detail::copy_block_collection_components(
+            brep, *this, mappings[BlockCollection3D::component_type_static()] );
         return mappings;
     }
 
@@ -96,6 +112,14 @@ namespace geode
             brep, *this, mapping[Block3D::component_type_static()] );
         detail::copy_model_boundary_components(
             brep, *this, mapping[ModelBoundary3D::component_type_static()] );
+        detail::copy_corner_collection_components(
+            brep, *this, mapping[CornerCollection3D::component_type_static()] );
+        detail::copy_line_collection_components(
+            brep, *this, mapping[LineCollection3D::component_type_static()] );
+        detail::copy_surface_collection_components( brep, *this,
+            mapping[SurfaceCollection3D::component_type_static()] );
+        detail::copy_block_collection_components(
+            brep, *this, mapping[BlockCollection3D::component_type_static()] );
     }
 
     void BRepBuilder::copy_component_geometry(
@@ -177,6 +201,30 @@ namespace geode
         return id;
     }
 
+    const uuid& BRepBuilder::add_corner_collection()
+    {
+        const auto& id = create_corner_collection();
+        return id;
+    }
+
+    const uuid& BRepBuilder::add_line_collection()
+    {
+        const auto& id = create_line_collection();
+        return id;
+    }
+
+    const uuid& BRepBuilder::add_surface_collection()
+    {
+        const auto& id = create_surface_collection();
+        return id;
+    }
+
+    const uuid& BRepBuilder::add_block_collection()
+    {
+        const auto& id = create_block_collection();
+        return id;
+    }
+
     void BRepBuilder::add_corner( uuid corner_id )
     {
         create_corner( std::move( corner_id ) );
@@ -220,6 +268,26 @@ namespace geode
     void BRepBuilder::add_model_boundary( uuid model_boundary_id )
     {
         create_model_boundary( std::move( model_boundary_id ) );
+    }
+
+    void BRepBuilder::add_corner_collection( uuid corner_collection_id )
+    {
+        create_corner_collection( std::move( corner_collection_id ) );
+    }
+
+    void BRepBuilder::add_line_collection( uuid line_collection_id )
+    {
+        create_line_collection( std::move( line_collection_id ) );
+    }
+
+    void BRepBuilder::add_surface_collection( uuid surface_collection_id )
+    {
+        create_surface_collection( std::move( surface_collection_id ) );
+    }
+
+    void BRepBuilder::add_block_collection( uuid block_collection_id )
+    {
+        create_block_collection( std::move( block_collection_id ) );
     }
 
     void BRepBuilder::update_corner_mesh(
@@ -288,6 +356,34 @@ namespace geode
         delete_model_boundary( boundary );
     }
 
+    void BRepBuilder::remove_corner_collection(
+        const CornerCollection3D& collection )
+    {
+        unregister_component( collection.id() );
+        delete_corner_collection( collection );
+    }
+
+    void BRepBuilder::remove_line_collection(
+        const LineCollection3D& collection )
+    {
+        unregister_component( collection.id() );
+        delete_line_collection( collection );
+    }
+
+    void BRepBuilder::remove_surface_collection(
+        const SurfaceCollection3D& collection )
+    {
+        unregister_component( collection.id() );
+        delete_surface_collection( collection );
+    }
+
+    void BRepBuilder::remove_block_collection(
+        const BlockCollection3D& collection )
+    {
+        unregister_component( collection.id() );
+        delete_block_collection( collection );
+    }
+
     void BRepBuilder::add_corner_line_boundary_relationship(
         const Corner3D& corner, const Line3D& line )
     {
@@ -341,5 +437,33 @@ namespace geode
     {
         add_item_in_collection(
             surface.component_id(), boundary.component_id() );
+    }
+
+    void BRepBuilder::add_corner_in_corner_collection(
+        const Corner3D& corner, const CornerCollection3D& collection )
+    {
+        add_item_in_collection(
+            corner.component_id(), collection.component_id() );
+    }
+
+    void BRepBuilder::add_line_in_line_collection(
+        const Line3D& line, const LineCollection3D& collection )
+    {
+        add_item_in_collection(
+            line.component_id(), collection.component_id() );
+    }
+
+    void BRepBuilder::add_surface_in_surface_collection(
+        const Surface3D& surface, const SurfaceCollection3D& collection )
+    {
+        add_item_in_collection(
+            surface.component_id(), collection.component_id() );
+    }
+
+    void BRepBuilder::add_block_in_block_collection(
+        const Block3D& block, const BlockCollection3D& collection )
+    {
+        add_item_in_collection(
+            block.component_id(), collection.component_id() );
     }
 } // namespace geode

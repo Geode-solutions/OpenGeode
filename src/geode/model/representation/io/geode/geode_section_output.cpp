@@ -57,6 +57,9 @@ namespace geode
             },
             [&directory, &section] {
                 section.save_model_boundaries( directory );
+                section.save_corner_collections( directory );
+                section.save_line_collections( directory );
+                section.save_surface_collections( directory );
             } );
     }
 

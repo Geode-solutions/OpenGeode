@@ -56,7 +56,7 @@ namespace geode
         std::unique_ptr< typename Mesh::Builder > block_mesh_builder(
             const uuid& id )
         {
-            auto& mesh = blocks_.modifiable_block( id ).modifiable_mesh(
+            auto& mesh = blocks_.modifiable_block( id, {} ).modifiable_mesh(
                 typename Block< dimension >::BlocksBuilderKey{} );
             return MeshBuilderFactory::create_mesh_builder<
                 typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );

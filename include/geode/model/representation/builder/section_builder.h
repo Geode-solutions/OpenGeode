@@ -27,14 +27,20 @@
 #include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
+#include <geode/model/mixin/builder/corner_collections_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
+#include <geode/model/mixin/builder/line_collections_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/model_boundaries_builder.h>
+#include <geode/model/mixin/builder/surface_collections_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
+#include <geode/model/mixin/core/corner_collections.h>
 #include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/line_collections.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/model_boundaries.h>
+#include <geode/model/mixin/core/surface_collections.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 #include <geode/model/representation/core/mapping.h>
@@ -48,9 +54,12 @@ namespace geode
     ALIAS_2D( EdgedCurve );
     ALIAS_2D( PointSet );
     ALIAS_2D( Line );
-    ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
     ALIAS_2D( SurfaceMesh );
+    ALIAS_2D( ModelBoundary );
+    ALIAS_2D( CornerCollection );
+    ALIAS_2D( LineCollection );
+    ALIAS_2D( SurfaceCollection );
     class Section;
     struct uuid;
 } // namespace geode
@@ -63,13 +72,20 @@ namespace geode
      * @extends LinesBuilder
      * @extends SurfacesBuilder
      * @extends ModelBoundariesBuilder
+     * @extends CornerCollectionsBuilder2D
+     * @extends LineCollectionsBuilder2D
+     * @extends SurfaceCollectionsBuilder2D
      */
-    class opengeode_model_api SectionBuilder : public TopologyBuilder,
-                                               public CornersBuilder2D,
-                                               public LinesBuilder2D,
-                                               public SurfacesBuilder2D,
-                                               public ModelBoundariesBuilder2D,
-                                               public IdentifierBuilder
+    class opengeode_model_api SectionBuilder
+        : public TopologyBuilder,
+          public CornersBuilder2D,
+          public LinesBuilder2D,
+          public SurfacesBuilder2D,
+          public ModelBoundariesBuilder2D,
+          public CornerCollectionsBuilder2D,
+          public LineCollectionsBuilder2D,
+          public SurfaceCollectionsBuilder2D,
+          public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( SectionBuilder );
 
@@ -103,6 +119,12 @@ namespace geode
 
         const uuid& add_model_boundary();
 
+        const uuid& add_corner_collection();
+
+        const uuid& add_line_collection();
+
+        const uuid& add_surface_collection();
+
         void add_corner( uuid corner_id );
 
         void add_corner( uuid corner_id, const MeshImpl& impl );
@@ -116,6 +138,12 @@ namespace geode
         void add_surface( uuid surface_id, const MeshImpl& impl );
 
         void add_model_boundary( uuid model_boundary_id );
+
+        void add_corner_collection( uuid corner_collection_id );
+
+        void add_line_collection( uuid line_collection_id );
+
+        void add_surface_collection( uuid surface_collection_id );
 
         void update_corner_mesh(
             const Corner2D& corner, std::unique_ptr< PointSet2D > mesh );
@@ -134,6 +162,12 @@ namespace geode
 
         void remove_model_boundary( const ModelBoundary2D& boundary );
 
+        void remove_corner_collection( const CornerCollection2D& collection );
+
+        void remove_line_collection( const LineCollection2D& collection );
+
+        void remove_surface_collection( const SurfaceCollection2D& collection );
+
         void add_corner_line_boundary_relationship(
             const Corner2D& corner, const Line2D& line );
 
@@ -148,6 +182,15 @@ namespace geode
 
         void add_line_in_model_boundary(
             const Line2D& line, const ModelBoundary2D& boundary );
+
+        void add_corner_in_corner_collection(
+            const Corner2D& surface, const CornerCollection2D& collection );
+
+        void add_line_in_line_collection(
+            const Line2D& surface, const LineCollection2D& collection );
+
+        void add_surface_in_surface_collection(
+            const Surface2D& surface, const SurfaceCollection2D& collection );
 
     private:
         Section& section_;

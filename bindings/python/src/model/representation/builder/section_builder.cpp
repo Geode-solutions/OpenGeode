@@ -24,9 +24,12 @@
 #include "../../../common.h"
 
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 
@@ -36,7 +39,9 @@ namespace geode
     {
         pybind11::class_< SectionBuilder, TopologyBuilder, CornersBuilder2D,
             LinesBuilder2D, SurfacesBuilder2D, ModelBoundariesBuilder2D,
-            IdentifierBuilder >( module, "SectionBuilder" )
+            CornerCollectionsBuilder2D, LineCollectionsBuilder2D,
+            SurfaceCollectionsBuilder2D, IdentifierBuilder >(
+            module, "SectionBuilder" )
             .def( pybind11::init< Section& >() )
             .def( "copy", &SectionBuilder::copy )
             .def(
@@ -50,11 +55,26 @@ namespace geode
             .def( "add_model_boundary",
                 static_cast< const uuid& (SectionBuilder::*) () >(
                     &SectionBuilder::add_model_boundary ) )
+            .def( "add_corner_collection",
+                static_cast< const uuid& (SectionBuilder::*) () >(
+                    &SectionBuilder::add_corner_collection ) )
+            .def( "add_line_collection",
+                static_cast< const uuid& (SectionBuilder::*) () >(
+                    &SectionBuilder::add_line_collection ) )
+            .def( "add_surface_collection",
+                static_cast< const uuid& (SectionBuilder::*) () >(
+                    &SectionBuilder::add_surface_collection ) )
             .def( "remove_corner", &SectionBuilder::remove_corner )
             .def( "remove_line", &SectionBuilder::remove_line )
             .def( "remove_surface", &SectionBuilder::remove_surface )
             .def( "remove_model_boundary",
                 &SectionBuilder::remove_model_boundary )
+            .def( "remove_corner_collection",
+                &SectionBuilder::remove_corner_collection )
+            .def( "remove_line_collection",
+                &SectionBuilder::remove_line_collection )
+            .def( "remove_surface_collection",
+                &SectionBuilder::remove_surface_collection )
             .def( "add_corner_line_boundary_relationship",
                 &SectionBuilder::add_corner_line_boundary_relationship )
             .def( "add_line_surface_boundary_relationship",
@@ -64,6 +84,12 @@ namespace geode
             .def( "add_line_surface_internal_relationship",
                 &SectionBuilder::add_line_surface_internal_relationship )
             .def( "add_line_in_model_boundary",
-                &SectionBuilder::add_line_in_model_boundary );
+                &SectionBuilder::add_line_in_model_boundary )
+            .def( "add_corner_in_corner_collection",
+                &SectionBuilder::add_corner_in_corner_collection )
+            .def( "add_line_in_line_collection",
+                &SectionBuilder::add_line_in_line_collection )
+            .def( "add_surface_in_surface_collection",
+                &SectionBuilder::add_surface_in_surface_collection );
     }
 } // namespace geode

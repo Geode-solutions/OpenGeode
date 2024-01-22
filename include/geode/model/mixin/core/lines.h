@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_id.h>
@@ -43,10 +44,10 @@ namespace geode
     class opengeode_model_api Lines
     {
         OPENGEODE_DISABLE_COPY( Lines );
+        PASSKEY( LinesBuilder< dimension >, LinesBuilderKey );
 
     public:
         using Builder = LinesBuilder< dimension >;
-        friend Builder;
 
         class opengeode_model_api LineRangeBase
         {
@@ -114,22 +115,24 @@ namespace geode
             Line< dimension >& operator*() const;
         };
 
-    private:
-        const uuid& create_line();
+    public:
+        const uuid& create_line( LinesBuilderKey key );
 
-        const uuid& create_line( const MeshImpl& impl );
+        const uuid& create_line( const MeshImpl& impl, LinesBuilderKey key );
 
-        void create_line( uuid line_id );
+        void create_line( uuid line_id, LinesBuilderKey key );
 
-        void create_line( uuid line_id, const MeshImpl& impl );
+        void create_line(
+            uuid line_id, const MeshImpl& impl, LinesBuilderKey key );
 
-        void delete_line( const Line< dimension >& line );
+        void delete_line( const Line< dimension >& line, LinesBuilderKey key );
 
-        void load_lines( absl::string_view directory );
+        void load_lines( absl::string_view directory, LinesBuilderKey key );
 
-        ModifiableLineRange modifiable_lines();
+        ModifiableLineRange modifiable_lines( LinesBuilderKey key );
 
-        Line< dimension >& modifiable_line( const uuid& id );
+        Line< dimension >& modifiable_line(
+            const uuid& id, LinesBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
