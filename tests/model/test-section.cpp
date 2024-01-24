@@ -38,10 +38,13 @@
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_input.h>
@@ -128,6 +131,82 @@ std::array< geode::uuid, 2 > add_model_boundaries(
     OPENGEODE_EXCEPTION(
         section.model_boundary( uuids[0] ).name() == "boundary1",
         "[Test] Wrong ModelBoundary name" );
+    return uuids;
+}
+
+std::array< geode::uuid, 2 > add_corner_collections(
+    const geode::Section& section, geode::SectionBuilder& builder )
+{
+    std::array< geode::uuid, 2 > uuids;
+    for( auto mb : geode::Range{ 2 } )
+    {
+        uuids[mb] = builder.add_corner_collection();
+        builder.set_corner_collection_name(
+            uuids[mb], absl::StrCat( "collection", mb + 1 ) );
+    }
+    const auto& temp_collection =
+        section.corner_collection( builder.add_corner_collection() );
+    builder.remove_corner_collection( temp_collection );
+    const auto message =
+        absl::StrCat( "[Test] Section should have ", 2, " corner collections" );
+    OPENGEODE_EXCEPTION( section.nb_corner_collections() == 2, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( section.corner_collections() ) == 2,
+        message );
+    OPENGEODE_EXCEPTION(
+        section.corner_collection( uuids[0] ).name() == "collection1",
+        "[Test] Wrong CornerCollection name" );
+    return uuids;
+}
+
+std::array< geode::uuid, 2 > add_line_collections(
+    const geode::Section& section, geode::SectionBuilder& builder )
+{
+    std::array< geode::uuid, 2 > uuids;
+    for( auto mb : geode::Range{ 2 } )
+    {
+        uuids[mb] = builder.add_line_collection();
+        builder.set_line_collection_name(
+            uuids[mb], absl::StrCat( "collection", mb + 1 ) );
+    }
+    const auto& temp_collection =
+        section.line_collection( builder.add_line_collection() );
+    builder.remove_line_collection( temp_collection );
+    const auto message =
+        absl::StrCat( "[Test] Section should have ", 2, " line collections" );
+    OPENGEODE_EXCEPTION( section.nb_line_collections() == 2, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( section.line_collections() ) == 2,
+        message );
+    OPENGEODE_EXCEPTION(
+        section.line_collection( uuids[0] ).name() == "collection1",
+        "[Test] Wrong LineCollection name" );
+    return uuids;
+}
+
+std::array< geode::uuid, 2 > add_surface_collections(
+    const geode::Section& section, geode::SectionBuilder& builder )
+{
+    std::array< geode::uuid, 2 > uuids;
+    for( auto mb : geode::Range{ 2 } )
+    {
+        uuids[mb] = builder.add_surface_collection();
+        builder.set_surface_collection_name(
+            uuids[mb], absl::StrCat( "collection", mb + 1 ) );
+    }
+    const auto& temp_collection =
+        section.surface_collection( builder.add_surface_collection() );
+    builder.remove_surface_collection( temp_collection );
+    const auto message = absl::StrCat(
+        "[Test] Section should have ", 2, " surface collections" );
+    OPENGEODE_EXCEPTION( section.nb_surface_collections() == 2, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( section.surface_collections() )
+            == 2,
+        message );
+    OPENGEODE_EXCEPTION(
+        section.surface_collection( uuids[0] ).name() == "collection1",
+        "[Test] Wrong SurfaceCollection name" );
     return uuids;
 }
 
@@ -274,19 +353,94 @@ void add_lines_in_model_boundaries( const geode::Section& model,
 {
     builder.add_line_in_model_boundary( model.line( line_uuids[0] ),
         model.model_boundary( boundary_uuids[0] ) );
-    for( const auto i : geode::Range{ 1, 3 } )
+    for( const auto i : geode::Range{ 1, 5 } )
     {
         builder.add_line_in_model_boundary( model.line( line_uuids[i] ),
             model.model_boundary( boundary_uuids[1] ) );
     }
 
-    for( const auto i : geode::Range{ 3 } )
+    for( const auto i : geode::Range{ 5 } )
     {
         OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[i] ) == 1,
             "[Test] This Line should be in 1 collection (of type Boundary)" );
     }
-    OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[4] ) == 0,
-        "[Test] Last Line should be in no collection (of type Boundary)" );
+    OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[5] ) == 0,
+        "[Test] Last Line should be in no collection." );
+}
+
+void add_corners_in_corner_collections( const geode::Section& model,
+    geode::SectionBuilder& builder,
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    for( const auto i : geode::Range{ 2 } )
+    {
+        builder.add_corner_in_corner_collection(
+            model.corner( corner_uuids[i] ),
+            model.corner_collection( collection_uuids[0] ) );
+    }
+    for( const auto i : geode::Range{ 2, 4 } )
+    {
+        builder.add_corner_in_corner_collection(
+            model.corner( corner_uuids[i] ),
+            model.corner_collection( collection_uuids[1] ) );
+    }
+
+    for( const auto i : geode::Range{ 4 } )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( corner_uuids[i] ) == 1,
+            "[Test] This Corner should be in 1 collection (of type "
+            "CornerCollection)" );
+    }
+    OPENGEODE_EXCEPTION( model.nb_collections( corner_uuids[4] ) == 0,
+        "[Test] Last Corner should be in no collection (of type Collection)" );
+}
+
+void add_lines_in_line_collections( const geode::Section& model,
+    geode::SectionBuilder& builder,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    for( const auto i : geode::Range{ 2 } )
+    {
+        builder.add_line_in_line_collection( model.line( line_uuids[i] ),
+            model.line_collection( collection_uuids[0] ) );
+    }
+    for( const auto i : geode::Range{ 2, 5 } )
+    {
+        builder.add_line_in_line_collection( model.line( line_uuids[i] ),
+            model.line_collection( collection_uuids[1] ) );
+    }
+
+    for( const auto i : geode::Range{ 5 } )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[i] ) == 2,
+            "[Test] This Line should be in 2 collections (of type "
+            "Boundary and LineCollection), not ",
+            model.nb_collections( line_uuids[i] ) );
+    }
+    OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[5] ) == 0,
+        "[Test] Last Line should be in no collection." );
+}
+
+void add_surfaces_in_surface_collections( const geode::Section& model,
+    geode::SectionBuilder& builder,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    for( const auto i : geode::Range{ 2 } )
+    {
+        builder.add_surface_in_surface_collection(
+            model.surface( surface_uuids[i] ),
+            model.surface_collection( collection_uuids[i] ) );
+    }
+
+    for( const auto i : geode::Range{ 2 } )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( surface_uuids[i] ) == 1,
+            "[Test] This Surface should be in 1 collection (of type "
+            "SurfaceCollection)" );
+    }
 }
 
 void add_internal_corner_relations( const geode::Section& model,
@@ -434,14 +588,79 @@ void test_item_ranges( const geode::Section& model,
     {
         boundary_item_count++;
         OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]
-                                 || boundary_item.id() == line_uuids[2],
-            "[Test] ItemLineRange iteration result is not correct" );
+                                 || boundary_item.id() == line_uuids[2]
+                                 || boundary_item.id() == line_uuids[3]
+                                 || boundary_item.id() == line_uuids[4],
+            "[Test] LineItemRange iteration result is not correct" );
         OPENGEODE_EXCEPTION( model.is_model_boundary_item( boundary_item,
                                  model.model_boundary( boundary_uuids[1] ) ),
             "[Test] Line should be item of ModelBoundary" );
     }
-    OPENGEODE_EXCEPTION( boundary_item_count == 2,
-        "[Test] IncidentLineRange should iterates on 2 Lines (Boundary 1)" );
+    OPENGEODE_EXCEPTION( boundary_item_count == 4,
+        "[Test] LineItemRange should iterates on 2 Lines (Boundary 1)" );
+}
+
+void test_corner_collections_ranges( const geode::Section& model,
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : model.corner_collection_items(
+             model.corner_collection( collection_uuids[1] ) ) )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == corner_uuids[2]
+                                 || collection_item.id() == corner_uuids[3],
+            "[Test] CornerItemRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION(
+            model.is_corner_collection_item( collection_item,
+                model.corner_collection( collection_uuids[1] ) ),
+            "[Test] Corner should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 2,
+        "[Test] CornerItemRange should iterates on 2 Corners (Collection 1)" );
+}
+
+void test_line_collections_ranges( const geode::Section& model,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : model.line_collection_items(
+             model.line_collection( collection_uuids[1] ) ) )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == line_uuids[2]
+                                 || collection_item.id() == line_uuids[3]
+                                 || collection_item.id() == line_uuids[4],
+            "[Test] LineItemRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION( model.is_line_collection_item( collection_item,
+                                 model.line_collection( collection_uuids[1] ) ),
+            "[Test] Line should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 3,
+        "[Test] LineItemRange should iterates on 2 Lines (Collection 1)" );
+}
+
+void test_surface_collections_ranges( const geode::Section& model,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > collection_uuids )
+{
+    geode::index_t collection_item_count{ 0 };
+    for( const auto& collection_item : model.surface_collection_items(
+             model.surface_collection( collection_uuids[1] ) ) )
+    {
+        collection_item_count++;
+        OPENGEODE_EXCEPTION( collection_item.id() == surface_uuids[1],
+            "[Test] SurfaceItemRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION(
+            model.is_surface_collection_item( collection_item,
+                model.surface_collection( collection_uuids[1] ) ),
+            "[Test] Surface should be item of ModelCollection" );
+    }
+    OPENGEODE_EXCEPTION( collection_item_count == 1,
+        "[Test] SurfaceItemRange should iterates "
+        "on 1 Surfaces (Collection 1)" );
 }
 
 void test_clone( const geode::Section& section )
@@ -532,8 +751,79 @@ void test_clone( const geode::Section& section )
                     break;
                 }
             }
-            OPENGEODE_EXCEPTION( found,
-                "[Test] All ModelBoundaries incidences are not correct" );
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All ModelBoundaries items are not correct" );
+        }
+    }
+    for( const auto& collection : section.corner_collections() )
+    {
+        const auto& new_collection = section2.corner_collection(
+            mappings.at( geode::CornerCollection2D::component_type_static() )
+                .in2out( collection.id() ) );
+        for( const auto& corner :
+            section.corner_collection_items( collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_corner :
+                section2.corner_collection_items( new_collection ) )
+            {
+                if( mappings.at( geode::Corner2D::component_type_static() )
+                        .in2out( corner.id() )
+                    == new_corner.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All CornerCollections items are not correct" );
+        }
+    }
+    for( const auto& collection : section.line_collections() )
+    {
+        const auto& new_collection = section2.line_collection(
+            mappings.at( geode::LineCollection2D::component_type_static() )
+                .in2out( collection.id() ) );
+        for( const auto& line : section.line_collection_items( collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_line :
+                section2.line_collection_items( new_collection ) )
+            {
+                if( mappings.at( geode::Line2D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All LineCollections items are not correct" );
+        }
+    }
+    for( const auto& collection : section.surface_collections() )
+    {
+        const auto& new_collection = section2.surface_collection(
+            mappings.at( geode::SurfaceCollection2D::component_type_static() )
+                .in2out( collection.id() ) );
+        for( const auto& surface :
+            section.surface_collection_items( collection ) )
+        {
+            bool found = { false };
+            for( const auto& new_surface :
+                section2.surface_collection_items( new_collection ) )
+            {
+                if( mappings.at( geode::Surface2D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_surface.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All SurfaceCollections items are not correct" );
         }
     }
 }
@@ -554,6 +844,18 @@ void test_compare_section(
         model.nb_model_boundaries() == model2.nb_model_boundaries(),
         "[Test] Number of Boundaries in reloaded Model should be ",
         model.nb_model_boundaries() );
+    OPENGEODE_EXCEPTION(
+        model.nb_corner_collections() == model2.nb_corner_collections(),
+        "[Test] Number of CornerCollections in reloaded Model should be ",
+        model.nb_corner_collections() );
+    OPENGEODE_EXCEPTION(
+        model.nb_line_collections() == model2.nb_line_collections(),
+        "[Test] Number of LineCollections in reloaded Model should be ",
+        model.nb_line_collections() );
+    OPENGEODE_EXCEPTION(
+        model.nb_surface_collections() == model2.nb_surface_collections(),
+        "[Test] Number of SurfaceCollections in reloaded Model should be ",
+        model.nb_surface_collections() );
     for( const auto& surface : model.surfaces() )
     {
         OPENGEODE_EXCEPTION( surface.id() == surface.mesh().id(),
@@ -610,6 +912,11 @@ void test()
     const auto line_uuids = add_lines( model, builder );
     const auto surface_uuids = add_surfaces( model, builder );
     const auto model_boundary_uuids = add_model_boundaries( model, builder );
+    const auto corner_collection_uuids =
+        add_corner_collections( model, builder );
+    const auto line_collection_uuids = add_line_collections( model, builder );
+    const auto surface_collection_uuids =
+        add_surface_collections( model, builder );
 
     set_geometry( builder, corner_uuids, line_uuids, surface_uuids );
 
@@ -619,6 +926,12 @@ void test()
         model, builder, line_uuids, surface_uuids );
     add_lines_in_model_boundaries(
         model, builder, line_uuids, model_boundary_uuids );
+    add_corners_in_corner_collections(
+        model, builder, corner_uuids, corner_collection_uuids );
+    add_lines_in_line_collections(
+        model, builder, line_uuids, line_collection_uuids );
+    add_surfaces_in_surface_collections(
+        model, builder, surface_uuids, surface_collection_uuids );
     add_internal_corner_relations(
         model, builder, corner_uuids, surface_uuids );
     add_internal_line_relations( model, builder, line_uuids, surface_uuids );
@@ -629,6 +942,11 @@ void test()
     test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
     test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
     test_item_ranges( model, line_uuids, model_boundary_uuids );
+    test_corner_collections_ranges(
+        model, corner_uuids, corner_collection_uuids );
+    test_line_collections_ranges( model, line_uuids, line_collection_uuids );
+    test_surface_collections_ranges(
+        model, surface_uuids, surface_collection_uuids );
     test_clone( model );
 
     const auto file_io = absl::StrCat( "test.", model.native_extension() );

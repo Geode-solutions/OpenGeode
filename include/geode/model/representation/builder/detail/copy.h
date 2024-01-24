@@ -35,10 +35,14 @@
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 #include <geode/model/representation/core/mapping.h>
 
 namespace geode
@@ -256,6 +260,98 @@ namespace geode
                     builder_to.set_model_boundary_name(
                         id, model_boundary.name() );
                     mapping.map( model_boundary.id(), id );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename BuilderTo >
+        void copy_corner_collection_components(
+            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        {
+            for( const auto& corner_collection : from.corner_collections() )
+            {
+                if( mapping.has_mapping_input( corner_collection.id() ) )
+                {
+                    const auto& id = mapping.in2out( corner_collection.id() );
+                    builder_to.add_corner_collection( id );
+                    builder_to.set_corner_collection_name(
+                        id, corner_collection.name() );
+                }
+                else
+                {
+                    const auto& id = builder_to.add_corner_collection();
+                    builder_to.set_corner_collection_name(
+                        id, corner_collection.name() );
+                    mapping.map( corner_collection.id(), id );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename BuilderTo >
+        void copy_line_collection_components(
+            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        {
+            for( const auto& line_collection : from.line_collections() )
+            {
+                if( mapping.has_mapping_input( line_collection.id() ) )
+                {
+                    const auto& id = mapping.in2out( line_collection.id() );
+                    builder_to.add_line_collection( id );
+                    builder_to.set_line_collection_name(
+                        id, line_collection.name() );
+                }
+                else
+                {
+                    const auto& id = builder_to.add_line_collection();
+                    builder_to.set_line_collection_name(
+                        id, line_collection.name() );
+                    mapping.map( line_collection.id(), id );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename BuilderTo >
+        void copy_surface_collection_components(
+            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        {
+            for( const auto& surface_collection : from.surface_collections() )
+            {
+                if( mapping.has_mapping_input( surface_collection.id() ) )
+                {
+                    const auto& id = mapping.in2out( surface_collection.id() );
+                    builder_to.add_surface_collection( id );
+                    builder_to.set_surface_collection_name(
+                        id, surface_collection.name() );
+                }
+                else
+                {
+                    const auto& id = builder_to.add_surface_collection();
+                    builder_to.set_surface_collection_name(
+                        id, surface_collection.name() );
+                    mapping.map( surface_collection.id(), id );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename BuilderTo >
+        void copy_block_collection_components(
+            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        {
+            for( const auto& block_collection : from.block_collections() )
+            {
+                if( mapping.has_mapping_input( block_collection.id() ) )
+                {
+                    const auto& id = mapping.in2out( block_collection.id() );
+                    builder_to.add_block_collection( id );
+                    builder_to.set_block_collection_name(
+                        id, block_collection.name() );
+                }
+                else
+                {
+                    const auto& id = builder_to.add_block_collection();
+                    builder_to.set_block_collection_name(
+                        id, block_collection.name() );
+                    mapping.map( block_collection.id(), id );
                 }
             }
         }

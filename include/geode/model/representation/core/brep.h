@@ -26,10 +26,14 @@
 #include <geode/basic/identifier.h>
 
 #include <geode/model/common.h>
+#include <geode/model/mixin/core/block_collections.h>
 #include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/corner_collections.h>
 #include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/line_collections.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/model_boundaries.h>
+#include <geode/model/mixin/core/surface_collections.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 
@@ -37,6 +41,10 @@ namespace geode
 {
     ALIAS_3D( Block );
     ALIAS_3D( ModelBoundary );
+    ALIAS_3D( CornerCollection );
+    ALIAS_3D( LineCollection );
+    ALIAS_3D( SurfaceCollection );
+    ALIAS_3D( BlockCollection );
     ALIAS_3D( Corner );
     ALIAS_3D( Line );
     ALIAS_3D( Surface );
@@ -57,6 +65,10 @@ namespace geode
      * @extends Surfaces
      * @extends Blocks
      * @extends ModelBoundaries
+     * @extends CornerCollections
+     * @extends LineCollections
+     * @extends SurfaceCollections
+     * @extends BlockCollections
      */
     class opengeode_model_api BRep : public Topology,
                                      public Corners3D,
@@ -64,13 +76,24 @@ namespace geode
                                      public Surfaces3D,
                                      public Blocks3D,
                                      public ModelBoundaries3D,
+                                     public CornerCollections3D,
+                                     public LineCollections3D,
+                                     public SurfaceCollections3D,
+                                     public BlockCollections3D,
                                      public Identifier
     {
     public:
         static constexpr index_t dim{ 3 };
         using Builder = BRepBuilder;
-        using Components =
-            std::tuple< Corner3D, Line3D, Surface3D, Block3D, ModelBoundary3D >;
+        using Components = std::tuple< Corner3D,
+            Line3D,
+            Surface3D,
+            Block3D,
+            ModelBoundary3D,
+            CornerCollection3D,
+            LineCollection3D,
+            SurfaceCollection3D,
+            BlockCollection3D >;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator
@@ -285,12 +308,51 @@ namespace geode
             const BRep& brep_;
         };
 
+        class opengeode_model_api ItemCornerRange
+            : public Relationships::ItemRangeIterator
+        {
+        public:
+            ItemCornerRange(
+                const BRep& brep, const CornerCollection3D& boundary );
+            ItemCornerRange( const ItemCornerRange& range );
+            ~ItemCornerRange();
+
+            const ItemCornerRange& begin() const;
+
+            const ItemCornerRange& end() const;
+
+            const Corner3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
+        class opengeode_model_api ItemLineRange
+            : public Relationships::ItemRangeIterator
+        {
+        public:
+            ItemLineRange( const BRep& brep, const LineCollection3D& boundary );
+            ItemLineRange( const ItemLineRange& range );
+            ~ItemLineRange();
+
+            const ItemLineRange& begin() const;
+
+            const ItemLineRange& end() const;
+
+            const Line3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
         class opengeode_model_api ItemSurfaceRange
             : public Relationships::ItemRangeIterator
         {
         public:
             ItemSurfaceRange(
                 const BRep& brep, const ModelBoundary3D& boundary );
+            ItemSurfaceRange(
+                const BRep& brep, const SurfaceCollection3D& collection );
             ItemSurfaceRange( const ItemSurfaceRange& range );
             ~ItemSurfaceRange();
 
@@ -299,6 +361,25 @@ namespace geode
             const ItemSurfaceRange& end() const;
 
             const Surface3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
+        class opengeode_model_api ItemBlockRange
+            : public Relationships::ItemRangeIterator
+        {
+        public:
+            ItemBlockRange(
+                const BRep& brep, const BlockCollection3D& boundary );
+            ItemBlockRange( const ItemBlockRange& range );
+            ~ItemBlockRange();
+
+            const ItemBlockRange& begin() const;
+
+            const ItemBlockRange& end() const;
+
+            const Block3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -366,6 +447,18 @@ namespace geode
         ItemSurfaceRange model_boundary_items(
             const ModelBoundary3D& boundary ) const;
 
+        ItemCornerRange corner_collection_items(
+            const CornerCollection3D& collection ) const;
+
+        ItemLineRange line_collection_items(
+            const LineCollection3D& collection ) const;
+
+        ItemSurfaceRange surface_collection_items(
+            const SurfaceCollection3D& collection ) const;
+
+        ItemBlockRange block_collection_items(
+            const BlockCollection3D& collection ) const;
+
         bool is_closed( const Line3D& line ) const;
 
         bool is_closed( const Surface3D& surface ) const;
@@ -391,6 +484,18 @@ namespace geode
 
         bool is_model_boundary_item(
             const Surface3D& surface, const ModelBoundary3D& boundary ) const;
+
+        bool is_corner_collection_item(
+            const Corner3D& surface, const CornerCollection3D& boundary ) const;
+
+        bool is_line_collection_item(
+            const Line3D& surface, const LineCollection3D& boundary ) const;
+
+        bool is_surface_collection_item( const Surface3D& surface,
+            const SurfaceCollection3D& boundary ) const;
+
+        bool is_block_collection_item(
+            const Block3D& surface, const BlockCollection3D& boundary ) const;
 
         /*!
          * Compute the bounding box from component meshes

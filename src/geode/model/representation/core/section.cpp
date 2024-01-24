@@ -31,10 +31,13 @@
 #include <geode/mesh/core/polygonal_surface.h>
 
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 
 namespace
 {
@@ -384,9 +387,46 @@ namespace geode
             Relationships::EmbeddingRangeIterator::operator*().id() );
     }
 
+    Section::ItemCornerRange::ItemCornerRange(
+        const Section& section, const CornerCollection2D& collection )
+        : Relationships::ItemRangeIterator( section, collection.id() ),
+          section_( section )
+    {
+    }
+
+    Section::ItemCornerRange::ItemCornerRange( const ItemCornerRange& range )
+        : Relationships::ItemRangeIterator{ range }, section_( range.section_ )
+    {
+    }
+
+    Section::ItemCornerRange::~ItemCornerRange() = default;
+
+    auto Section::ItemCornerRange::begin() const -> const ItemCornerRange&
+    {
+        return *this;
+    }
+
+    auto Section::ItemCornerRange::end() const -> const ItemCornerRange&
+    {
+        return *this;
+    }
+
+    const Corner2D& Section::ItemCornerRange::operator*() const
+    {
+        return section_.corner(
+            Relationships::ItemRangeIterator::operator*().id() );
+    }
+
     Section::ItemLineRange::ItemLineRange(
         const Section& section, const ModelBoundary2D& boundary )
         : Relationships::ItemRangeIterator( section, boundary.id() ),
+          section_( section )
+    {
+    }
+
+    Section::ItemLineRange::ItemLineRange(
+        const Section& section, const LineCollection2D& collection )
+        : Relationships::ItemRangeIterator( section, collection.id() ),
           section_( section )
     {
     }
@@ -414,6 +454,36 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
+    Section::ItemSurfaceRange::ItemSurfaceRange(
+        const Section& section, const SurfaceCollection2D& collection )
+        : Relationships::ItemRangeIterator( section, collection.id() ),
+          section_( section )
+    {
+    }
+
+    Section::ItemSurfaceRange::ItemSurfaceRange( const ItemSurfaceRange& range )
+        : Relationships::ItemRangeIterator{ range }, section_( range.section_ )
+    {
+    }
+
+    Section::ItemSurfaceRange::~ItemSurfaceRange() = default;
+
+    auto Section::ItemSurfaceRange::begin() const -> const ItemSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto Section::ItemSurfaceRange::end() const -> const ItemSurfaceRange&
+    {
+        return *this;
+    }
+
+    const Surface2D& Section::ItemSurfaceRange::operator*() const
+    {
+        return section_.surface(
+            Relationships::ItemRangeIterator::operator*().id() );
+    }
+
     Section::Section() = default;
 
     Section::Section( Section&& section ) noexcept
@@ -422,6 +492,9 @@ namespace geode
           Lines2D{ std::move( section ) },
           Surfaces2D{ std::move( section ) },
           ModelBoundaries2D{ std::move( section ) },
+          CornerCollections2D{ std::move( section ) },
+          LineCollections2D{ std::move( section ) },
+          SurfaceCollections2D{ std::move( section ) },
           Identifier{ std::move( section ) }
     {
     }
@@ -433,6 +506,9 @@ namespace geode
         Lines2D::operator=( std::move( section ) );
         Surfaces2D::operator=( std::move( section ) );
         ModelBoundaries2D::operator=( std::move( section ) );
+        CornerCollections2D::operator=( std::move( section ) );
+        LineCollections2D::operator=( std::move( section ) );
+        SurfaceCollections2D::operator=( std::move( section ) );
         Identifier::operator=( std::move( section ) );
         return *this;
     }
@@ -443,6 +519,24 @@ namespace geode
         const ModelBoundary2D& boundary ) const
     {
         return { *this, boundary };
+    }
+
+    Section::ItemCornerRange Section::corner_collection_items(
+        const CornerCollection2D& collection ) const
+    {
+        return { *this, collection };
+    }
+
+    Section::ItemLineRange Section::line_collection_items(
+        const LineCollection2D& collection ) const
+    {
+        return { *this, collection };
+    }
+
+    Section::ItemSurfaceRange Section::surface_collection_items(
+        const SurfaceCollection2D& collection ) const
+    {
+        return { *this, collection };
     }
 
     index_t Section::nb_internal_corners( const Surface2D& surface ) const
@@ -498,6 +592,24 @@ namespace geode
         const Line2D& line, const ModelBoundary2D& boundary ) const
     {
         return Relationships::is_item( line.id(), boundary.id() );
+    }
+
+    bool Section::is_corner_collection_item(
+        const Corner2D& corner, const CornerCollection2D& collection ) const
+    {
+        return Relationships::is_item( corner.id(), collection.id() );
+    }
+
+    bool Section::is_line_collection_item(
+        const Line2D& line, const LineCollection2D& collection ) const
+    {
+        return Relationships::is_item( line.id(), collection.id() );
+    }
+
+    bool Section::is_surface_collection_item(
+        const Surface2D& surface, const SurfaceCollection2D& collection ) const
+    {
+        return Relationships::is_item( surface.id(), collection.id() );
     }
 
     BoundingBox2D Section::bounding_box() const

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_id.h>
@@ -40,13 +41,14 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class opengeode_model_api ModelBoundaries
+    class ModelBoundaries
     {
         OPENGEODE_DISABLE_COPY( ModelBoundaries );
+        PASSKEY(
+            ModelBoundariesBuilder< dimension >, ModelBoundariesBuilderKey );
 
     public:
         using Builder = ModelBoundariesBuilder< dimension >;
-        friend Builder;
 
         class opengeode_model_api ModelBoundaryRangeBase
         {
@@ -114,19 +116,23 @@ namespace geode
             ModelBoundary< dimension >& operator*() const;
         };
 
-    private:
-        const uuid& create_model_boundary();
+    public:
+        const uuid& create_model_boundary( ModelBoundariesBuilderKey key );
 
-        void create_model_boundary( uuid model_boundary_id );
+        void create_model_boundary(
+            uuid model_boundary_id, ModelBoundariesBuilderKey key );
 
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
+        void delete_model_boundary( const ModelBoundary< dimension >& boundary,
+            ModelBoundariesBuilderKey key );
 
-        void load_model_boundaries( absl::string_view directory );
+        void load_model_boundaries(
+            absl::string_view directory, ModelBoundariesBuilderKey key );
 
-        ModifiableModelBoundaryRange modifiable_model_boundaries();
+        ModifiableModelBoundaryRange modifiable_model_boundaries(
+            ModelBoundariesBuilderKey key );
 
-        ModelBoundary< dimension >& modifiable_model_boundary( const uuid& id );
+        ModelBoundary< dimension >& modifiable_model_boundary(
+            const uuid& id, ModelBoundariesBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

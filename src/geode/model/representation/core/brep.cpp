@@ -32,11 +32,15 @@
 #include <geode/mesh/core/polyhedral_solid.h>
 
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block_collection.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner_collection.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line_collection.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface_collection.h>
 
 namespace
 {
@@ -585,9 +589,75 @@ namespace geode
             Relationships::EmbeddingRangeIterator::operator*().id() );
     }
 
+    BRep::ItemCornerRange::ItemCornerRange(
+        const BRep& brep, const CornerCollection3D& collection )
+        : Relationships::ItemRangeIterator( brep, collection.id() ),
+          brep_( brep )
+    {
+    }
+
+    BRep::ItemCornerRange::ItemCornerRange( const ItemCornerRange& range )
+        : Relationships::ItemRangeIterator{ range }, brep_( range.brep_ )
+    {
+    }
+
+    BRep::ItemCornerRange::~ItemCornerRange() = default;
+
+    auto BRep::ItemCornerRange::begin() const -> const ItemCornerRange&
+    {
+        return *this;
+    }
+
+    auto BRep::ItemCornerRange::end() const -> const ItemCornerRange&
+    {
+        return *this;
+    }
+
+    const Corner3D& BRep::ItemCornerRange::operator*() const
+    {
+        return brep_.corner(
+            Relationships::ItemRangeIterator::operator*().id() );
+    }
+
+    BRep::ItemLineRange::ItemLineRange(
+        const BRep& brep, const LineCollection3D& collection )
+        : Relationships::ItemRangeIterator( brep, collection.id() ),
+          brep_( brep )
+    {
+    }
+
+    BRep::ItemLineRange::ItemLineRange( const ItemLineRange& range )
+        : Relationships::ItemRangeIterator{ range }, brep_( range.brep_ )
+    {
+    }
+
+    BRep::ItemLineRange::~ItemLineRange() = default;
+
+    auto BRep::ItemLineRange::begin() const -> const ItemLineRange&
+    {
+        return *this;
+    }
+
+    auto BRep::ItemLineRange::end() const -> const ItemLineRange&
+    {
+        return *this;
+    }
+
+    const Line3D& BRep::ItemLineRange::operator*() const
+    {
+        return brep_.line( Relationships::ItemRangeIterator::operator*().id() );
+    }
+
     BRep::ItemSurfaceRange::ItemSurfaceRange(
         const BRep& brep, const ModelBoundary3D& boundary )
         : Relationships::ItemRangeIterator( brep, boundary.id() ), brep_( brep )
+    {
+    }
+
+    BRep::ItemSurfaceRange::ItemSurfaceRange(
+        const BRep& brep, const SurfaceCollection3D& collection )
+        : Relationships::ItemRangeIterator( brep, collection.id() ),
+          brep_( brep )
     {
     }
 
@@ -614,6 +684,36 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
+    BRep::ItemBlockRange::ItemBlockRange(
+        const BRep& brep, const BlockCollection3D& collection )
+        : Relationships::ItemRangeIterator( brep, collection.id() ),
+          brep_( brep )
+    {
+    }
+
+    BRep::ItemBlockRange::ItemBlockRange( const ItemBlockRange& range )
+        : Relationships::ItemRangeIterator{ range }, brep_( range.brep_ )
+    {
+    }
+
+    BRep::ItemBlockRange::~ItemBlockRange() = default;
+
+    auto BRep::ItemBlockRange::begin() const -> const ItemBlockRange&
+    {
+        return *this;
+    }
+
+    auto BRep::ItemBlockRange::end() const -> const ItemBlockRange&
+    {
+        return *this;
+    }
+
+    const Block3D& BRep::ItemBlockRange::operator*() const
+    {
+        return brep_.block(
+            Relationships::ItemRangeIterator::operator*().id() );
+    }
+
     BRep::BRep() = default;
 
     BRep::BRep( BRep&& brep ) noexcept
@@ -623,6 +723,10 @@ namespace geode
           Surfaces3D{ std::move( brep ) },
           Blocks3D{ std::move( brep ) },
           ModelBoundaries3D{ std::move( brep ) },
+          CornerCollections3D{ std::move( brep ) },
+          LineCollections3D{ std::move( brep ) },
+          SurfaceCollections3D{ std::move( brep ) },
+          BlockCollections3D{ std::move( brep ) },
           Identifier{ std::move( brep ) }
     {
     }
@@ -635,6 +739,10 @@ namespace geode
         Surfaces3D::operator=( std::move( brep ) );
         Blocks3D::operator=( std::move( brep ) );
         ModelBoundaries3D::operator=( std::move( brep ) );
+        CornerCollections3D::operator=( std::move( brep ) );
+        LineCollections3D::operator=( std::move( brep ) );
+        SurfaceCollections3D::operator=( std::move( brep ) );
+        BlockCollections3D::operator=( std::move( brep ) );
         Identifier::operator=( std::move( brep ) );
         return *this;
     }
@@ -645,6 +753,30 @@ namespace geode
         const ModelBoundary3D& boundary ) const
     {
         return { *this, boundary };
+    }
+
+    BRep::ItemCornerRange BRep::corner_collection_items(
+        const CornerCollection3D& collection ) const
+    {
+        return { *this, collection };
+    }
+
+    BRep::ItemLineRange BRep::line_collection_items(
+        const LineCollection3D& collection ) const
+    {
+        return { *this, collection };
+    }
+
+    BRep::ItemSurfaceRange BRep::surface_collection_items(
+        const SurfaceCollection3D& collection ) const
+    {
+        return { *this, collection };
+    }
+
+    BRep::ItemBlockRange BRep::block_collection_items(
+        const BlockCollection3D& collection ) const
+    {
+        return { *this, collection };
     }
 
     index_t BRep::nb_internal_corners( const Surface3D& surface ) const
@@ -754,6 +886,30 @@ namespace geode
         const Surface3D& surface, const ModelBoundary3D& boundary ) const
     {
         return Relationships::is_item( surface.id(), boundary.id() );
+    }
+
+    bool BRep::is_corner_collection_item(
+        const Corner3D& corner, const CornerCollection3D& collection ) const
+    {
+        return Relationships::is_item( corner.id(), collection.id() );
+    }
+
+    bool BRep::is_line_collection_item(
+        const Line3D& line, const LineCollection3D& collection ) const
+    {
+        return Relationships::is_item( line.id(), collection.id() );
+    }
+
+    bool BRep::is_surface_collection_item(
+        const Surface3D& surface, const SurfaceCollection3D& collection ) const
+    {
+        return Relationships::is_item( surface.id(), collection.id() );
+    }
+
+    bool BRep::is_block_collection_item(
+        const Block3D& block, const BlockCollection3D& collection ) const
+    {
+        return Relationships::is_item( block.id(), collection.id() );
     }
 
     BoundingBox3D BRep::bounding_box() const

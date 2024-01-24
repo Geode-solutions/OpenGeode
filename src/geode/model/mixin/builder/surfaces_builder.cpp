@@ -34,48 +34,48 @@ namespace geode
     template < index_t dimension >
     const uuid& SurfacesBuilder< dimension >::create_surface()
     {
-        return surfaces_.create_surface();
+        return surfaces_.create_surface( {} );
     }
 
     template < index_t dimension >
     const uuid& SurfacesBuilder< dimension >::create_surface(
         const MeshImpl& impl )
     {
-        return surfaces_.create_surface( impl );
+        return surfaces_.create_surface( impl, {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::create_surface( uuid surface_id )
     {
-        surfaces_.create_surface( std::move( surface_id ) );
+        surfaces_.create_surface( std::move( surface_id ), {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::create_surface(
         uuid surface_id, const MeshImpl& impl )
     {
-        surfaces_.create_surface( std::move( surface_id ), impl );
+        surfaces_.create_surface( std::move( surface_id ), impl, {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::delete_surface(
         const Surface< dimension >& surface )
     {
-        surfaces_.delete_surface( surface );
+        surfaces_.delete_surface( surface, {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::load_surfaces(
         absl::string_view directory )
     {
-        return surfaces_.load_surfaces( directory );
+        return surfaces_.load_surfaces( directory, {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_name(
         const uuid& id, absl::string_view name )
     {
-        surfaces_.modifiable_surface( id ).set_surface_name( name, {} );
+        surfaces_.modifiable_surface( id, {} ).set_surface_name( name, {} );
         surface_mesh_builder( id )->set_name( name );
     }
 
@@ -83,7 +83,7 @@ namespace geode
     void SurfacesBuilder< dimension >::set_surface_mesh(
         const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh )
     {
-        surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ),
+        surfaces_.modifiable_surface( id, {} ).set_mesh( std::move( mesh ),
             typename Surface< dimension >::SurfacesBuilderKey{} );
     }
 
@@ -91,7 +91,7 @@ namespace geode
     SurfaceMesh< dimension >&
         SurfacesBuilder< dimension >::modifiable_surface_mesh( const uuid& id )
     {
-        return surfaces_.modifiable_surface( id ).modifiable_mesh(
+        return surfaces_.modifiable_surface( id, {} ).modifiable_mesh(
             typename Surface< dimension >::SurfacesBuilderKey{} );
     }
 

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_id.h>
@@ -46,10 +47,10 @@ namespace geode
     class opengeode_model_api Corners
     {
         OPENGEODE_DISABLE_COPY( Corners );
+        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey );
 
     public:
         using Builder = CornersBuilder< dimension >;
-        friend Builder;
 
         /*!
          * Base class for range-based iteration on Corners
@@ -129,22 +130,26 @@ namespace geode
             Corner< dimension >& operator*() const;
         };
 
-    private:
-        const uuid& create_corner();
+    public:
+        const uuid& create_corner( CornersBuilderKey key );
 
-        const uuid& create_corner( const MeshImpl& impl );
+        const uuid& create_corner(
+            const MeshImpl& impl, CornersBuilderKey key );
 
-        void create_corner( uuid corner_id );
+        void create_corner( uuid corner_id, CornersBuilderKey key );
 
-        void create_corner( uuid corner_id, const MeshImpl& impl );
+        void create_corner(
+            uuid corner_id, const MeshImpl& impl, CornersBuilderKey key );
 
-        void delete_corner( const Corner< dimension >& corner );
+        void delete_corner(
+            const Corner< dimension >& corner, CornersBuilderKey key );
 
-        void load_corners( absl::string_view directory );
+        void load_corners( absl::string_view directory, CornersBuilderKey key );
 
-        ModifiableCornerRange modifiable_corners();
+        ModifiableCornerRange modifiable_corners( CornersBuilderKey key );
 
-        Corner< dimension >& modifiable_corner( const uuid& id );
+        Corner< dimension >& modifiable_corner(
+            const uuid& id, CornersBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

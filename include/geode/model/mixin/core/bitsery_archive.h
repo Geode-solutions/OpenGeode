@@ -34,12 +34,20 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Line );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
+    FORWARD_DECLARATION_DIMENSION_CLASS( CornerCollection );
+    FORWARD_DECLARATION_DIMENSION_CLASS( LineCollection );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceCollection );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BlockCollection );
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     ALIAS_2D_AND_3D( Component );
     ALIAS_2D_AND_3D( Corner );
     ALIAS_2D_AND_3D( Line );
     ALIAS_2D_AND_3D( Surface );
     ALIAS_2D_AND_3D( ModelBoundary );
+    ALIAS_2D_AND_3D( CornerCollection );
+    ALIAS_2D_AND_3D( LineCollection );
+    ALIAS_2D_AND_3D( SurfaceCollection );
+    ALIAS_2D_AND_3D( BlockCollection );
     ALIAS_3D( Block );
 } // namespace geode
 
@@ -73,11 +81,18 @@ namespace bitsery
         BITSERY_CLASS_NAME( geode::Line2D, "Line2D" );
         BITSERY_CLASS_NAME( geode::Surface2D, "Surface2D" );
         BITSERY_CLASS_NAME( geode::ModelBoundary2D, "ModelBoundary2D" );
+        BITSERY_CLASS_NAME( geode::CornerCollection2D, "CornerCollection2D" );
+        BITSERY_CLASS_NAME( geode::LineCollection2D, "LineCollection2D" );
+        BITSERY_CLASS_NAME( geode::SurfaceCollection2D, "SurfaceCollection2D" );
         BITSERY_CLASS_NAME( geode::Component3D, "Component3D" );
         BITSERY_CLASS_NAME( geode::Corner3D, "Corner3D" );
         BITSERY_CLASS_NAME( geode::Line3D, "Line3D" );
         BITSERY_CLASS_NAME( geode::Surface3D, "Surface3D" );
         BITSERY_CLASS_NAME( geode::ModelBoundary3D, "ModelBoundary3D" );
+        BITSERY_CLASS_NAME( geode::CornerCollection3D, "CornerCollection3D" );
+        BITSERY_CLASS_NAME( geode::LineCollection3D, "LineCollection3D" );
+        BITSERY_CLASS_NAME( geode::SurfaceCollection3D, "SurfaceCollection3D" );
+        BITSERY_CLASS_NAME( geode::BlockCollection3D, "BlockCollection3D" );
         BITSERY_CLASS_NAME( geode::Block3D, "Block3D" );
     } // namespace ext
 } // namespace bitsery

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_id.h>
@@ -47,10 +48,10 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( Blocks );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
+        PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey );
 
     public:
         using Builder = BlocksBuilder< dimension >;
-        friend Builder;
 
         /*!
          * Base class for range-based iteration on Blocks
@@ -130,22 +131,25 @@ namespace geode
             Block< dimension >& operator*() const;
         };
 
-    private:
-        const uuid& create_block();
+    public:
+        const uuid& create_block( BlocksBuilderKey key );
 
-        const uuid& create_block( const MeshImpl& impl );
+        const uuid& create_block( const MeshImpl& impl, BlocksBuilderKey key );
 
-        void create_block( uuid block_id );
+        void create_block( uuid block_id, BlocksBuilderKey key );
 
-        void create_block( uuid block_id, const MeshImpl& impl );
+        void create_block(
+            uuid block_id, const MeshImpl& impl, BlocksBuilderKey key );
 
-        void delete_block( const Block< dimension >& block );
+        void delete_block(
+            const Block< dimension >& block, BlocksBuilderKey key );
 
-        void load_blocks( absl::string_view directory );
+        void load_blocks( absl::string_view directory, BlocksBuilderKey key );
 
-        ModifiableBlockRange modifiable_blocks();
+        ModifiableBlockRange modifiable_blocks( BlocksBuilderKey key );
 
-        Block< dimension >& modifiable_block( const uuid& id );
+        Block< dimension >& modifiable_block(
+            const uuid& id, BlocksBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
