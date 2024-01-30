@@ -381,7 +381,7 @@ namespace geode
                     grid.nb_cells_in_direction( d ) + 1 );
             }
             OPENGEODE_EXCEPTION(
-                nb_vertices_double < static_cast< double >( UINT_MAX ),
+                nb_vertices_double < static_cast< double >( std::numeric_limits<index_t>::max() ),
                 "[Grid] Creation of a grid for which the number of cell "
                 "vertices exceeds the unsigned int limit." );
             for( const auto d : LRange{ dimension } )
