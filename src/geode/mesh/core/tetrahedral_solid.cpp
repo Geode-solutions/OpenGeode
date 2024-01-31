@@ -284,6 +284,31 @@ namespace geode
     }
 
     template < index_t dimension >
+    typename SolidMesh< dimension >::VerticesAroundVertex
+        TetrahedralSolid< dimension >::vertices_around_vertex(
+            index_t vertex_id ) const
+    {
+        typename SolidMesh< dimension >::VerticesAroundVertex result;
+        for( const auto& poly_vertex :
+            this->polyhedra_around_vertex( vertex_id ) )
+        {
+            for( const auto l_vertex_id : LRange{ 4 } )
+            {
+                if( l_vertex_id != poly_vertex.vertex_id )
+                {
+                    const auto candidate = this->polyhedron_vertex(
+                        { poly_vertex.polyhedron_id, l_vertex_id } );
+                    if( absl::c_find( result, candidate ) == result.end() )
+                    {
+                        result.push_back( candidate );
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
         const std::array< index_t, 2 >& vertices ) const
     {

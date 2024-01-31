@@ -76,6 +76,9 @@ namespace geode
 
         std::unique_ptr< RegularGrid2D > clone() const;
 
+        SurfaceMesh< 2 >::VerticesAroundVertex vertices_around_vertex(
+            index_t vertex_id ) const final;
+
     protected:
         RegularGrid() = default;
         RegularGrid( RegularGrid&& other ) noexcept = default;

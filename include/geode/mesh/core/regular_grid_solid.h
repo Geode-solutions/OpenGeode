@@ -78,6 +78,9 @@ namespace geode
 
         std::unique_ptr< RegularGrid3D > clone() const;
 
+        SolidMesh< 3 >::VerticesAroundVertex vertices_around_vertex(
+            index_t vertex_id ) const final;
+
     protected:
         RegularGrid() = default;
         RegularGrid( RegularGrid&& other ) noexcept = default;

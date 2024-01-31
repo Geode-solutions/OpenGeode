@@ -88,6 +88,8 @@ namespace geode
         local_index_t vertex_id{ NO_LID };
     };
 
+    using CurveVerticesAroundVertex = absl::InlinedVector< index_t, 2 >;
+
     using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;
 
     /*!
@@ -142,6 +144,12 @@ namespace geode
          * @param[in] vertex_id Index of the vertex
          */
         const EdgesAroundVertex& edges_around_vertex( index_t vertex_id ) const;
+
+        /*!
+         * Returns the vertices linked by an edge to the given mesh vertex.
+         */
+        CurveVerticesAroundVertex vertices_around_vertex(
+            index_t vertex_id ) const;
 
         bool is_vertex_isolated( index_t vertex_id ) const;
 

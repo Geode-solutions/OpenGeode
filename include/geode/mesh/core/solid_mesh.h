@@ -234,6 +234,7 @@ namespace geode
     public:
         using Builder = SolidMeshBuilder< dimension >;
         static constexpr auto dim = dimension;
+        using VerticesAroundVertex = absl::InlinedVector< index_t, 20 >;
 
         /*!
          * Create a new SolidMesh using default data structure.
@@ -430,6 +431,12 @@ namespace geode
          */
         absl::optional< Vector3D > new_polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const;
+
+        /*!
+         * Returns the vertices linked by an edge to the given mesh vertex.
+         */
+        virtual VerticesAroundVertex vertices_around_vertex(
+            index_t vertex_id ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.

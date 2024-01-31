@@ -65,6 +65,25 @@ namespace geode
         return vertex_attribute_manager();
     }
 
+    SolidMesh< 3 >::VerticesAroundVertex
+        RegularGrid< 3 >::vertices_around_vertex( index_t vertex_id ) const
+    {
+        VerticesAroundVertex result;
+        const auto indices = this->vertex_indices( vertex_id );
+        for( const auto d : LRange{ 3 } )
+        {
+            if( const auto next = this->next_vertex( indices, d ) )
+            {
+                result.push_back( this->vertex_index( next.value() ) );
+            }
+            if( const auto previous = this->previous_vertex( indices, d ) )
+            {
+                result.push_back( this->vertex_index( previous.value() ) );
+            }
+        }
+        return result;
+    }
+
     template < typename Archive >
     void RegularGrid< 3 >::serialize( Archive& archive )
     {

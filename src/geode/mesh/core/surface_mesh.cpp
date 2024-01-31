@@ -228,6 +228,29 @@ namespace geode
         {
         }
 
+        VerticesAroundVertex vertices_around_vertex(
+            const SurfaceMesh< dimension >& mesh, index_t vertex_id ) const
+        {
+            VerticesAroundVertex result;
+            for( const auto& poly_vertex :
+                mesh.polygons_around_vertex( vertex_id ) )
+            {
+                const auto next_candidate = mesh.polygon_vertex(
+                    mesh.next_polygon_vertex( poly_vertex ) );
+                if( absl::c_find( result, next_candidate ) == result.end() )
+                {
+                    result.push_back( next_candidate );
+                }
+                const auto previous_candidate = mesh.polygon_vertex(
+                    mesh.previous_polygon_vertex( poly_vertex ) );
+                if( absl::c_find( result, previous_candidate ) == result.end() )
+                {
+                    result.push_back( previous_candidate );
+                }
+            }
+            return result;
+        }
+
         absl::optional< PolygonVertex > polygon_around_vertex(
             const index_t vertex_id ) const
         {
@@ -463,6 +486,13 @@ namespace geode
             }
         }
         return absl::nullopt;
+    }
+
+    template < index_t dimension >
+    auto SurfaceMesh< dimension >::vertices_around_vertex(
+        index_t vertex_id ) const -> VerticesAroundVertex
+    {
+        return impl_->vertices_around_vertex( *this, vertex_id );
     }
 
     template < index_t dimension >

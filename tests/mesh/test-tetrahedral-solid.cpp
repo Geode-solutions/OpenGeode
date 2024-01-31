@@ -107,6 +107,26 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
         "[Test] TetrahedralSolid should have 10 facets" );
     OPENGEODE_EXCEPTION( solid.edges().nb_edges() == 12,
         "[Test] TetrahedralSolid should have 12 edges" );
+
+    const auto around_0 = solid.vertices_around_vertex( 0 );
+    OPENGEODE_EXCEPTION( around_0.size() == 3,
+        "[Test] There should be 3 vertices around vertex 0, not ",
+        around_0.size() );
+    for( const auto vertex_id : around_0 )
+    {
+        OPENGEODE_EXCEPTION( vertex_id == 1 || vertex_id == 2 || vertex_id == 3,
+            "[Test] Wrong vertices around vertex 0." );
+    }
+    const auto around_1 = solid.vertices_around_vertex( 1 );
+    OPENGEODE_EXCEPTION( around_1.size() == 5,
+        "[Test] There should be 5 vertices around vertex 1, not ",
+        around_1.size() );
+    for( const auto vertex_id : around_1 )
+    {
+        OPENGEODE_EXCEPTION( vertex_id == 0 || vertex_id == 2 || vertex_id == 3
+                                 || vertex_id == 4 || vertex_id == 5,
+            "[Test] Wrong vertices around vertex 1." );
+    }
 }
 
 void test_is_on_border( const geode::TetrahedralSolid3D& solid )

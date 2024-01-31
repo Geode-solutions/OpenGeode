@@ -383,6 +383,37 @@ namespace geode
         {
         }
 
+        VerticesAroundVertex vertices_around_vertex(
+            const SolidMesh< dimension >& mesh, index_t vertex_id ) const
+        {
+            VerticesAroundVertex result;
+            for( const auto& poly_vertex :
+                mesh.polyhedra_around_vertex( vertex_id ) )
+            {
+                for( const auto& poly_edge : mesh.polyhedron_edges_vertices(
+                         poly_vertex.polyhedron_id ) )
+                {
+                    if( poly_edge[0] == vertex_id )
+                    {
+                        if( absl::c_find( result, poly_edge[1] )
+                            == result.end() )
+                        {
+                            result.push_back( poly_edge[1] );
+                        }
+                    }
+                    else if( poly_edge[1] == vertex_id )
+                    {
+                        if( absl::c_find( result, poly_edge[0] )
+                            == result.end() )
+                        {
+                            result.push_back( poly_edge[0] );
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         absl::optional< PolyhedronVertex > polyhedron_around_vertex(
             const index_t vertex_id ) const
         {
@@ -932,6 +963,13 @@ namespace geode
             }
         }
         return {};
+    }
+
+    template < index_t dimension >
+    auto SolidMesh< dimension >::vertices_around_vertex(
+        index_t vertex_id ) const -> VerticesAroundVertex
+    {
+        return impl_->vertices_around_vertex( *this, vertex_id );
     }
 
     template < index_t dimension >

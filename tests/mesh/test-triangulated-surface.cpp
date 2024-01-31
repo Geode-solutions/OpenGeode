@@ -82,6 +82,16 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
     surface.enable_edges();
     OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 7,
         "[Test] TriangulatedSurface should have 7 edges" );
+
+    const auto around_1 = surface.vertices_around_vertex( 1 );
+    OPENGEODE_EXCEPTION( around_1.size() == 3,
+        "[Test] There should be 3 vertices around vertex 1, not ",
+        around_1.size() );
+    for( const auto vertex_id : around_1 )
+    {
+        OPENGEODE_EXCEPTION( vertex_id == 0 || vertex_id == 2 || vertex_id == 3,
+            "[Test] Wrong vertices around vertex 1" );
+    }
 }
 
 void test_permutation( const geode::TriangulatedSurface3D& surface,

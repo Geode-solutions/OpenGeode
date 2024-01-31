@@ -94,6 +94,8 @@
         .def( "polygon_barycenter",                                            \
             &SurfaceMesh##dimension##D::polygon_barycenter )                   \
         .def( "polygon_area", &SurfaceMesh##dimension##D::polygon_area )       \
+        .def( "vertices_around_vertex",                                        \
+            &SurfaceMesh##dimension##D::vertices_around_vertex )               \
         .def( "polygon_around_vertex",                                         \
             &SurfaceMesh##dimension##D::polygon_around_vertex )                \
         .def( "polygons_around_vertex",                                        \
