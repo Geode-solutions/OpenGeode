@@ -65,6 +65,25 @@ namespace geode
         return vertex_attribute_manager();
     }
 
+    absl::flat_hash_set< index_t > RegularGrid< 2 >::vertices_around_vertex(
+        index_t vertex_id ) const
+    {
+        absl::flat_hash_set< index_t > result;
+        const auto indices = this->vertex_indices( vertex_id );
+        for( const auto d : LRange{ 2 } )
+        {
+            if( const auto next = this->next_vertex( indices, d ) )
+            {
+                result.emplace( this->vertex_index( next.value() ) );
+            }
+            if( const auto previous = this->previous_vertex( indices, d ) )
+            {
+                result.emplace( this->vertex_index( previous.value() ) );
+            }
+        }
+        return result;
+    }
+
     template < typename Archive >
     void RegularGrid< 2 >::serialize( Archive& archive )
     {

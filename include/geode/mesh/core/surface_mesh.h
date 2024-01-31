@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_set.h>
 #include <absl/container/inlined_vector.h>
 #include <absl/types/optional.h>
 
@@ -346,6 +347,12 @@ namespace geode
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
             polygon_vertex_normal( index_t vertex_id ) const;
+
+        /*!
+         * Returns the vertices linked by an edge to the given mesh vertex.
+         */
+        virtual absl::flat_hash_set< index_t > vertices_around_vertex(
+            index_t vertex_id ) const;
 
         /*!
          * Get all the polygons with one of the vertices matching given vertex.

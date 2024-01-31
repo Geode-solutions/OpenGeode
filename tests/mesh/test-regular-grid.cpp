@@ -450,6 +450,22 @@ void test_around_vertex( const geode::RegularGrid3D& grid )
             "[Test] Wrong number of polyhedra around vertex ", v, "(",
             nb_polyhedra_around, "/", nb_polyhedra, ")" );
     }
+    const auto around_0 = grid.vertices_around_vertex( 0 );
+    OPENGEODE_EXCEPTION( around_0.size() == 3,
+        "[Test] There should be 3 vertices around vertex 0, not ",
+        around_0.size() );
+    OPENGEODE_EXCEPTION( around_0.contains( 1 ) && around_0.contains( 6 )
+                             && around_0.contains( 66 ),
+        "[Test] Wrong value of vertices around vertex 0." );
+    const auto around_73 = grid.vertices_around_vertex( 73 );
+    OPENGEODE_EXCEPTION( around_73.size() == 6,
+        "[Test] There should be 6 vertices around vertex 73, not ",
+        around_73.size() );
+    OPENGEODE_EXCEPTION(
+        around_73.contains( 72 ) && around_73.contains( 74 )
+            && around_73.contains( 67 ) && around_73.contains( 79 )
+            && around_73.contains( 7 ) && around_73.contains( 139 ),
+        "[Test] Wrong value of vertices around vertex 73." );
 }
 
 void test_grid( const geode::RegularGrid3D& grid )

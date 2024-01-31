@@ -228,6 +228,21 @@ namespace geode
         {
         }
 
+        absl::flat_hash_set< index_t > vertices_around_vertex(
+            const SurfaceMesh< dimension >& mesh, index_t vertex_id ) const
+        {
+            absl::flat_hash_set< index_t > result;
+            for( const auto& poly_vertex :
+                mesh.polygons_around_vertex( vertex_id ) )
+            {
+                result.emplace( mesh.polygon_vertex(
+                    mesh.next_polygon_vertex( poly_vertex ) ) );
+                result.emplace( mesh.polygon_vertex(
+                    mesh.previous_polygon_vertex( poly_vertex ) ) );
+            }
+            return result;
+        }
+
         absl::optional< PolygonVertex > polygon_around_vertex(
             const index_t vertex_id ) const
         {
@@ -463,6 +478,14 @@ namespace geode
             }
         }
         return absl::nullopt;
+    }
+
+    template < index_t dimension >
+    absl::flat_hash_set< index_t >
+        SurfaceMesh< dimension >::vertices_around_vertex(
+            index_t vertex_id ) const
+    {
+        return impl_->vertices_around_vertex( *this, vertex_id );
     }
 
     template < index_t dimension >

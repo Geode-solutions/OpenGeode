@@ -25,6 +25,7 @@
 
 #include <vector>
 
+#include <absl/container/flat_hash_set.h>
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/passkey.h>
@@ -430,6 +431,12 @@ namespace geode
          */
         absl::optional< Vector3D > new_polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const;
+
+        /*!
+         * Returns the vertices linked by an edge to the given mesh vertex.
+         */
+        virtual absl::flat_hash_set< index_t > vertices_around_vertex(
+            index_t vertex_id ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.

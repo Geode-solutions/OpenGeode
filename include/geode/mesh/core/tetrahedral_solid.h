@@ -68,6 +68,9 @@ namespace geode
         PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
+        absl::flat_hash_set< index_t > vertices_around_vertex(
+            index_t vertex_id ) const final;
+
         PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const final;
 

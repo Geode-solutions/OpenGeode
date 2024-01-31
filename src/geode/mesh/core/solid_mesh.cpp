@@ -23,8 +23,6 @@
 
 #include <geode/mesh/core/solid_mesh.h>
 
-#include <absl/container/flat_hash_set.h>
-
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.h>
@@ -381,6 +379,29 @@ namespace geode
                           CachedPolyhedra >(
                           polyhedra_around_vertex_name, CachedPolyhedra{} ) )
         {
+        }
+
+        absl::flat_hash_set< index_t > vertices_around_vertex(
+            const SolidMesh< dimension >& mesh, index_t vertex_id ) const
+        {
+            absl::flat_hash_set< index_t > result;
+            for( const auto& poly_vertex :
+                mesh.polyhedra_around_vertex( vertex_id ) )
+            {
+                for( const auto& poly_edge : mesh.polyhedron_edges_vertices(
+                         poly_vertex.polyhedron_id ) )
+                {
+                    if( poly_edge[0] == vertex_id )
+                    {
+                        result.emplace( poly_edge[1] );
+                    }
+                    else if( poly_edge[1] == vertex_id )
+                    {
+                        result.emplace( poly_edge[0] );
+                    }
+                }
+            }
+            return result;
         }
 
         absl::optional< PolyhedronVertex > polyhedron_around_vertex(
@@ -932,6 +953,14 @@ namespace geode
             }
         }
         return {};
+    }
+
+    template < index_t dimension >
+    absl::flat_hash_set< index_t >
+        SolidMesh< dimension >::vertices_around_vertex(
+            index_t vertex_id ) const
+    {
+        return impl_->vertices_around_vertex( *this, vertex_id );
     }
 
     template < index_t dimension >

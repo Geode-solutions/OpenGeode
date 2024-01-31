@@ -173,6 +173,19 @@ namespace geode
         return impl_->texture_manager( *this );
     }
 
+    template < index_t dimension >
+    absl::flat_hash_set< index_t >
+        EdgedCurve< dimension >::vertices_around_vertex(
+            index_t vertex_id ) const
+    {
+        absl::flat_hash_set< index_t > result;
+        for( const auto& edge_v : this->edges_around_vertex( vertex_id ) )
+        {
+            result.emplace( this->edge_vertex( edge_v.opposite() ) );
+        }
+        return result;
+    }
+
     template class opengeode_mesh_api EdgedCurve< 2 >;
     template class opengeode_mesh_api EdgedCurve< 3 >;
 

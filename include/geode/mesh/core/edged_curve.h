@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -73,6 +75,12 @@ namespace geode
          * Compute the bounding box from mesh vertices
          */
         BoundingBox< dimension > bounding_box() const;
+
+        /*!
+         * Returns the vertices linked by an edge to the given mesh vertex.
+         */
+        absl::flat_hash_set< index_t > vertices_around_vertex(
+            index_t vertex_id ) const;
 
     protected:
         EdgedCurve();
