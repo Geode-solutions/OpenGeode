@@ -150,6 +150,7 @@ namespace geode
     public:
         using Builder = SurfaceMeshBuilder< dimension >;
         static constexpr auto dim = dimension;
+        using VerticesAroundVertex = absl::InlinedVector< index_t, 10 >;
 
         ~SurfaceMesh();
 
@@ -346,6 +347,12 @@ namespace geode
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
             polygon_vertex_normal( index_t vertex_id ) const;
+
+        /*!
+         * Returns the vertices linked by an edge to the given mesh vertex.
+         */
+        virtual VerticesAroundVertex vertices_around_vertex(
+            index_t vertex_id ) const;
 
         /*!
          * Get all the polygons with one of the vertices matching given vertex.

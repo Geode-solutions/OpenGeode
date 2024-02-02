@@ -192,6 +192,21 @@ namespace geode
         return impl_->edges_around_vertex( vertex_id );
     }
 
+    CurveVerticesAroundVertex Graph::vertices_around_vertex(
+        index_t vertex_id ) const
+    {
+        CurveVerticesAroundVertex result;
+        for( const auto& edge_v : this->edges_around_vertex( vertex_id ) )
+        {
+            const auto candidate = this->edge_vertex( edge_v.opposite() );
+            if( absl::c_find( result, candidate ) == result.end() )
+            {
+                result.push_back( candidate );
+            }
+        }
+        return result;
+    }
+
     bool Graph::is_vertex_isolated( index_t vertex_id ) const
     {
         return edges_around_vertex( vertex_id ).empty();

@@ -180,6 +180,24 @@ void test_create_edges( const geode::EdgedCurve3D& edged_curve,
         "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[2].vertex_id == 1,
         "[Test] edges_around_2 has wrong value" );
+
+    const auto vertices_around_1 = edged_curve.vertices_around_vertex( 1 );
+    OPENGEODE_EXCEPTION( vertices_around_1.size() == 2,
+        "[Test] vertices_around_1 should have 2 vertices, not ",
+        vertices_around_1.size() );
+    for( const auto vertex_id : vertices_around_1 )
+    {
+        OPENGEODE_EXCEPTION( vertex_id == 0 || vertex_id == 2,
+            "vertices_around_1 has wrong values." );
+    }
+    const auto vertices_around_2 = edged_curve.vertices_around_vertex( 2 );
+    OPENGEODE_EXCEPTION( vertices_around_2.size() == 3,
+        "[Test] vertices_around_2 should have 3 vertex" );
+    for( const auto vertex_id : vertices_around_2 )
+    {
+        OPENGEODE_EXCEPTION( vertex_id == 0 || vertex_id == 1 || vertex_id == 3,
+            "vertices_around_2 has wrong values." );
+    }
 }
 
 void test_delete_edge( const geode::EdgedCurve3D& edged_curve,
