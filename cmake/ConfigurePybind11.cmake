@@ -42,3 +42,5 @@ ExternalProject_Add(pybind11
         -DCMAKE_INSTALL_PREFIX:PATH=${PYBIND11_INSTALL_PREFIX}
         -DPYBIND11_CMAKECONFIG_INSTALL_DIR:STRING=lib/cmake/pybind11
 )
+
+ExternalProject_Add_StepTargets(pybind11 download)

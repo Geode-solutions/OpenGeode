@@ -42,3 +42,5 @@ ExternalProject_Add(nanoflann
         -DNANOFLANN_BUILD_EXAMPLES:BOOL=OFF
         -DNANOFLANN_BUILD_TESTS:BOOL=OFF
 )
+
+ExternalProject_Add_StepTargets(nanoflann download)

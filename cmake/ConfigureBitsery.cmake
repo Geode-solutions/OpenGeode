@@ -36,3 +36,5 @@ ExternalProject_Add(bitsery
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${BITSERY_INSTALL_PREFIX}
 )
+
+ExternalProject_Add_StepTargets(bitsery download)

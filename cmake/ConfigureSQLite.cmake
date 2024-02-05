@@ -43,3 +43,5 @@ ExternalProject_Add(sqlite
         -DCMAKE_INSTALL_PREFIX:PATH=${SQLITE_INSTALL_PREFIX}
         -DBUILD_SHELL:BOOL=ON
 )
+
+ExternalProject_Add_StepTargets(sqlite download)

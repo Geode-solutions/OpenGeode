@@ -42,3 +42,5 @@ ExternalProject_Add(asyncplusplus
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${ASYNCPLUSPLUS_INSTALL_PREFIX}
 )
+
+ExternalProject_Add_StepTargets(asyncplusplus download)

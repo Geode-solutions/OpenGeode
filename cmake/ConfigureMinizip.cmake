@@ -47,3 +47,5 @@ ExternalProject_Add(minizip
         -DMZ_LIBBSD:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=${MINIZIP_INSTALL_PREFIX}
 )
+
+ExternalProject_Add_StepTargets(minizip download)

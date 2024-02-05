@@ -39,3 +39,5 @@ ExternalProject_Add(spdlog
         -DSPDLOG_BUILD_TESTS:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=${SPDLOG_INSTALL_PREFIX}
 )
+
+ExternalProject_Add_StepTargets(spdlog download)
