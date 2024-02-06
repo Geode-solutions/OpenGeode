@@ -43,3 +43,5 @@ ExternalProject_Add(abseil
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${ABSEIL_INSTALL_PREFIX}
 )
+
+ExternalProject_Add_StepTargets(abseil download)

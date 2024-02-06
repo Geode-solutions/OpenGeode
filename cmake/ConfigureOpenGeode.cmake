@@ -55,7 +55,7 @@ ExternalProject_Add(opengeode
         -DSQLITE_INSTALL_PREFIX:PATH=${SQLITE_INSTALL_PREFIX}
         -DPYBIND11_INSTALL_PREFIX:PATH=${PYBIND11_INSTALL_PREFIX}
         -DPYBIND11_PYTHON_VERSION:STRING=${PYTHON_VERSION}
-        -DCMAKE_INSTALL_PREFIX:PATH=${OpenGeode_PATH_INSTALL}    
+        -DCMAKE_INSTALL_PREFIX:PATH=${OpenGeode_PATH_INSTALL}
     BINARY_DIR ${OpenGeode_PATH_BIN}
     DEPENDS
         abseil
@@ -75,3 +75,20 @@ add_custom_target(third_party
     DEPENDS
         opengeode-configure
 )
+
+add_custom_target(download
+    DEPENDS
+        abseil-download
+        asyncplusplus-download
+        bitsery-download
+        ghcFilesystem-download
+        gdal-download
+        minizip-download
+        nanoflann-download
+        proj-download
+        spdlog-download
+        sqlite-download
+)
+if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
+    add_dependencies(download pybind11-download)
+endif()

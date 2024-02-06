@@ -38,3 +38,5 @@ ExternalProject_Add(ghcFilesystem
         -DGHC_FILESYSTEM_BUILD_EXAMPLES:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=${FILESYSTEM_INSTALL_PREFIX}
 )
+
+ExternalProject_Add_StepTargets(ghcFilesystem download)

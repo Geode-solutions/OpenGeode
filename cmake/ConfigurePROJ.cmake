@@ -49,3 +49,5 @@ ExternalProject_Add(proj
     DEPENDS
         sqlite
 )
+
+ExternalProject_Add_StepTargets(proj download)

@@ -63,3 +63,5 @@ ExternalProject_Add(gdal
     DEPENDS
         proj
 )
+
+ExternalProject_Add_StepTargets(gdal download)
