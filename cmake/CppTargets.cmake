@@ -1,3 +1,9 @@
+include(CheckIPOSupported)
+check_ipo_supported(RESULT result OUTPUT output)
+if(result)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+endif()
+
 function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
