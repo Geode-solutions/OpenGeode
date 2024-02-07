@@ -70,6 +70,7 @@ namespace
     {
         const auto p =
             ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
+        if( p - point_to_v0_length <= geode::global_epsilon )
         {
             return absl::nullopt;
         }

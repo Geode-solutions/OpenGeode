@@ -55,12 +55,9 @@ namespace geode
         Deserializer archive{ context, file };
         Point< dimension > origin;
         std::array< index_t, dimension > cells_number;
+        cells_number.fill( 1 );
         std::array< double, dimension > cells_length;
-        for( const auto d : LRange{ dimension } )
-        {
-            cells_number[d] = 1;
-            cells_length[d] = 1;
-        }
+        cells_length.fill( 1 );
         LightRegularGrid< dimension > grid{ origin, cells_number,
             cells_length };
         archive.object( grid );

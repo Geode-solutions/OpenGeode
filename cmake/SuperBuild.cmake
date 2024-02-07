@@ -37,6 +37,14 @@ if("${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(CMAKE_CXX_STANDARD 11)
 endif()
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT result OUTPUT output)
+if(result)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+else()
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
+endif()
+
 # Additional cmake modules
 include(ExternalProject)
 
