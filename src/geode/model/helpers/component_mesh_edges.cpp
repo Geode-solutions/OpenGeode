@@ -63,13 +63,8 @@ namespace
         const geode::ComponentID& component_id,
         const std::array< geode::index_t, 2 >& edge_vertices )
     {
-        std::array< geode::index_t, 2 > edge_unique_vertices;
-        for( const auto v : geode::LRange{ 2 } )
-        {
-            edge_unique_vertices[v] =
-                model.unique_vertex( { component_id, edge_vertices[v] } );
-        }
-        return edge_unique_vertices;
+        return { model.unique_vertex( { component_id, edge_vertices[0] } ),
+            model.unique_vertex( { component_id, edge_vertices[1] } ) };
     }
 
     template < class ModelType >

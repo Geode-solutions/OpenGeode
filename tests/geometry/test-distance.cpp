@@ -77,7 +77,7 @@ void test_point_segment_distance_2d()
     distance = geode::point_segment_distance( q3, segment2D );
     const geode::Point2D result_q3{ { 0.0, 0.0 } };
     OPENGEODE_EXCEPTION(
-        distance == std::sqrt( 26 )
+        std::fabs( std::sqrt( 26 ) - distance ) < geode::global_epsilon
             && geode::point_segment_projection( q3, segment2D ) == result_q3,
         "[Test] Wrong result for point_segment_distance with query Point2D "
         "q3" );
@@ -86,7 +86,7 @@ void test_point_segment_distance_2d()
     distance = geode::point_segment_distance( q4, segment2D );
     const geode::Point2D result_q4{ { 0.5, 2.5 } };
     OPENGEODE_EXCEPTION(
-        distance == std::sqrt( 26 )
+        std::fabs( std::sqrt( 26 ) - distance ) < geode::global_epsilon
             && geode::point_segment_projection( q4, segment2D ) == result_q4,
         "[Test] Wrong result for point_segment_distance with query Point2D "
         "q4" );
@@ -143,7 +143,9 @@ void test_point_segment_distance_3d()
     distance = geode::point_segment_distance( q4, segment3D );
     const geode::Point3D result_q4{ { 0.45, 2.25, 0.9 } };
     OPENGEODE_EXCEPTION(
-        distance == std::sqrt( 5.05 * 5.05 + 0.75 * 0.75 + 0.65 * 0.65 )
+        std::fabs(
+            std::sqrt( 5.05 * 5.05 + 0.75 * 0.75 + 0.65 * 0.65 ) - distance )
+                < geode::global_epsilon
             && geode::point_segment_projection( q4, segment3D )
                    .inexact_equal( result_q4 ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
@@ -590,9 +592,10 @@ void test_point_line_distance_2d()
     const geode::Point2D q2{ { 5.0, -1.0 } };
     distance = geode::point_line_distance( q2, line2D );
     const geode::Point2D result_q2{ { 0.0, 0.0 } };
-    OPENGEODE_EXCEPTION( distance == std::sqrt( 26 )
-                             && geode::point_line_projection( q2, line2D )
-                                    .inexact_equal( result_q2 ),
+    OPENGEODE_EXCEPTION(
+        std::fabs( std::sqrt( 26 ) - distance ) < geode::global_epsilon
+            && geode::point_line_projection( q2, line2D )
+                   .inexact_equal( result_q2 ),
         "[Test] Wrong result for point_line_distance with query Point2D "
         "q2" );
 }
@@ -639,18 +642,20 @@ void test_point_line_signed_distance_2d()
     const geode::Point2D q3{ { 5.0, -1.0 } };
     distance = geode::point_line_signed_distance( q3, line2D );
     const geode::Point2D result_q3{ { 0.0, 0.0 } };
-    OPENGEODE_EXCEPTION( distance == std::sqrt( 26 )
-                             && geode::point_line_projection( q3, line2D )
-                                    .inexact_equal( result_q3 ),
+    OPENGEODE_EXCEPTION(
+        std::fabs( std::sqrt( 26 ) - distance ) < geode::global_epsilon
+            && geode::point_line_projection( q3, line2D )
+                   .inexact_equal( result_q3 ),
         "[Test] Wrong result for point_line_signed_distance with query Point2D "
         "q3" );
 
     const geode::Point2D q4{ { -5.0, 1.0 } };
     distance = geode::point_line_signed_distance( q4, line2D );
     const geode::Point2D result_q4{ { 0.0, 0.0 } };
-    OPENGEODE_EXCEPTION( distance == -std::sqrt( 26 )
-                             && geode::point_line_projection( q4, line2D )
-                                    .inexact_equal( result_q3 ),
+    OPENGEODE_EXCEPTION(
+        std::fabs( -std::sqrt( 26 ) - distance ) < geode::global_epsilon
+            && geode::point_line_projection( q4, line2D )
+                   .inexact_equal( result_q3 ),
         "[Test] Wrong result for point_line_signed_distance with query Point2D "
         "q4" );
 }
@@ -689,9 +694,10 @@ void test_point_line_distance_3d()
     const geode::Point3D q2{ { 5.0, -1.0, 0.0 } };
     distance = geode::point_line_distance( q2, line3D );
     const geode::Point3D result_q2{ { 0.0, 0.0, 0.0 } };
-    OPENGEODE_EXCEPTION( distance == std::sqrt( 26 )
-                             && geode::point_line_projection( q2, line3D )
-                                    .inexact_equal( result_q2 ),
+    OPENGEODE_EXCEPTION(
+        std::fabs( std::sqrt( 26 ) - distance ) < geode::global_epsilon
+            && geode::point_line_projection( q2, line3D )
+                   .inexact_equal( result_q2 ),
         "[Test] Wrong result for point_line_distance with query Point3D "
         "q2" );
 }
