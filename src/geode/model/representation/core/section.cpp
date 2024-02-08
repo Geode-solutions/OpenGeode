@@ -38,46 +38,7 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/surface_collection.h>
-
-namespace
-{
-    template < typename Filter, typename Iterator >
-    void next_filtered_internal_iterator( Iterator& iterator )
-    {
-        while(
-            iterator.operator!=( iterator )
-            && iterator.geode::Relationships::InternalRangeIterator::operator*()
-                       .type()
-                   != Filter::component_type_static() )
-        {
-            iterator.geode::Relationships::InternalRangeIterator::operator++();
-        }
-    }
-
-    template < typename Filter, typename Iterator >
-    void next_filtered_embedding_iterator( Iterator& iterator )
-    {
-        while( iterator.operator!=( iterator )
-               && iterator.geode::Relationships::EmbeddingRangeIterator::
-                          operator*()
-                              .type()
-                      != Filter::component_type_static() )
-        {
-            iterator.geode::Relationships::EmbeddingRangeIterator::operator++();
-        }
-    }
-
-    template < typename MeshComponentRange >
-    geode::BoundingBox2D meshes_bounding_box( MeshComponentRange range )
-    {
-        geode::BoundingBox2D box;
-        for( const auto& component : range )
-        {
-            box.add_box( component.mesh().bounding_box() );
-        }
-        return box;
-    }
-} // namespace
+#include <geode/model/representation/core/private/helpers.h>
 
 namespace geode
 {
@@ -246,7 +207,7 @@ namespace geode
         : Relationships::InternalRangeIterator( section, surface.id() ),
           section_( section )
     {
-        next_filtered_internal_iterator< Line2D >( *this );
+        detail::next_filtered_internal_iterator< Line2D >( *this );
     }
 
     Section::InternalLineRange::InternalLineRange(
@@ -271,7 +232,7 @@ namespace geode
     void Section::InternalLineRange::operator++()
     {
         Relationships::InternalRangeIterator::operator++();
-        next_filtered_internal_iterator< Line2D >( *this );
+        detail::next_filtered_internal_iterator< Line2D >( *this );
     }
 
     const Line2D& Section::InternalLineRange::operator*() const
@@ -291,7 +252,7 @@ namespace geode
         : Relationships::InternalRangeIterator( section, surface.id() ),
           section_( section )
     {
-        next_filtered_internal_iterator< Corner2D >( *this );
+        detail::next_filtered_internal_iterator< Corner2D >( *this );
     }
 
     Section::InternalCornerRange::InternalCornerRange(
@@ -317,7 +278,7 @@ namespace geode
     void Section::InternalCornerRange::operator++()
     {
         Relationships::InternalRangeIterator::operator++();
-        next_filtered_internal_iterator< Corner2D >( *this );
+        detail::next_filtered_internal_iterator< Corner2D >( *this );
     }
 
     const Corner2D& Section::InternalCornerRange::operator*() const
@@ -343,7 +304,7 @@ namespace geode
         : Relationships::EmbeddingRangeIterator( section, line.id() ),
           section_( section )
     {
-        next_filtered_embedding_iterator< Surface2D >( *this );
+        detail::next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
     Section::EmbeddingSurfaceRange::EmbeddingSurfaceRange(
@@ -351,7 +312,7 @@ namespace geode
         : Relationships::EmbeddingRangeIterator( section, corner.id() ),
           section_( section )
     {
-        next_filtered_embedding_iterator< Surface2D >( *this );
+        detail::next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
     Section::EmbeddingSurfaceRange::EmbeddingSurfaceRange(
@@ -378,7 +339,7 @@ namespace geode
     void Section::EmbeddingSurfaceRange::operator++()
     {
         Relationships::EmbeddingRangeIterator::operator++();
-        next_filtered_embedding_iterator< Surface2D >( *this );
+        detail::next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
     const Surface2D& Section::EmbeddingSurfaceRange::operator*() const
@@ -616,13 +577,12 @@ namespace geode
     {
         if( nb_lines() > 0 )
         {
-            return meshes_bounding_box( lines() );
+            return detail::meshes_bounding_box< 2 >( lines() );
         }
         if( nb_surfaces() > 0 )
         {
-            return meshes_bounding_box( surfaces() );
+            return detail::meshes_bounding_box< 2 >( surfaces() );
         }
-        return meshes_bounding_box( corners() );
+        return detail::meshes_bounding_box< 2 >( corners() );
     }
-
 } // namespace geode

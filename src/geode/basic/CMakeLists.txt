@@ -87,6 +87,8 @@ add_geode_library(
         "zip_file.h"
     ADVANCED_HEADERS
         "detail/bitsery_archive.h"
+        "detail/disable_debug_logger.h"
+        "detail/enable_debug_logger.h"
         "detail/geode_input_impl.h"
         "detail/geode_output_impl.h"
         "detail/mapping_after_deletion.h"
