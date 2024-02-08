@@ -21,6 +21,8 @@
  *
  */
 
+#pragma once
+
 #include <absl/container/fixed_array.h>
 
 #include <geode/basic/pimpl.h>

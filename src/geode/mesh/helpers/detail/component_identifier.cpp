@@ -56,89 +56,90 @@ namespace
         }
     }
 
-    template < typename Mesh >
-    class Propagator
-    {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Propagator< Mesh > );
-
-    public:
-        virtual ~Propagator() = default;
-
-        geode::index_t identifier( geode::index_t element ) const
-        {
-            OPENGEODE_ASSERT( element < identification_.size(),
-                "[Propagator::identifier] Wrong element index required" );
-            return identification_[element];
-        }
-
-        geode::index_t identify_elements()
-        {
-            for( const auto p : geode::Indices{ identification_ } )
-            {
-                if( identifier( p ) == geode::NO_ID )
-                {
-                    propagate( p, nb_components_ );
-                    nb_components_++;
-                }
-            }
-            return nb_components_;
-        }
-
-        absl::FixedArray< std::vector< geode::index_t > >
-            identified_components() const
-        {
-            absl::FixedArray< std::vector< geode::index_t > > components(
-                nb_components_ );
-            for( const auto p : geode::Indices{ identification_ } )
-            {
-                components[identifier( p )].push_back( p );
-            }
-            return components;
-        }
-
-    protected:
-        Propagator( const Mesh& mesh, geode::index_t nb_elements )
-            : mesh_( mesh ), identification_( nb_elements, geode::NO_ID )
-        {
-        }
-
-        const Mesh& mesh() const
-        {
-            return mesh_;
-        }
-
-    private:
-        void propagate( geode::index_t element_from, geode::index_t tag_id )
-        {
-            std::queue< geode::index_t > queue;
-            queue.emplace( element_from );
-            while( !queue.empty() )
-            {
-                const auto cur_el = queue.front();
-                queue.pop();
-                if( identifier( cur_el ) != geode::NO_ID )
-                {
-                    continue;
-                }
-                identification_[cur_el] = tag_id;
-                add_adjacents( cur_el, queue );
-            }
-        }
-
-        virtual void add_adjacents( geode::index_t element_id,
-            std::queue< geode::index_t >& queue ) const = 0;
-
-    private:
-        const Mesh& mesh_;
-        absl::FixedArray< geode::index_t > identification_;
-        geode::index_t nb_components_{ 0 };
-    };
 } // namespace
 
 namespace geode
 {
     namespace detail
     {
+        template < typename Mesh >
+        class Propagator
+        {
+            OPENGEODE_DISABLE_COPY_AND_MOVE( Propagator< Mesh > );
+
+        public:
+            virtual ~Propagator() = default;
+
+            index_t identifier( index_t element ) const
+            {
+                OPENGEODE_ASSERT( element < identification_.size(),
+                    "[Propagator::identifier] Wrong element index required" );
+                return identification_[element];
+            }
+
+            index_t identify_elements()
+            {
+                for( const auto p : Indices{ identification_ } )
+                {
+                    if( identifier( p ) == NO_ID )
+                    {
+                        propagate( p, nb_components_ );
+                        nb_components_++;
+                    }
+                }
+                return nb_components_;
+            }
+
+            absl::FixedArray< std::vector< index_t > >
+                identified_components() const
+            {
+                absl::FixedArray< std::vector< index_t > > components(
+                    nb_components_ );
+                for( const auto p : Indices{ identification_ } )
+                {
+                    components[identifier( p )].push_back( p );
+                }
+                return components;
+            }
+
+        protected:
+            Propagator( const Mesh& mesh, index_t nb_elements )
+                : mesh_( mesh ), identification_( nb_elements, NO_ID )
+            {
+            }
+
+            const Mesh& mesh() const
+            {
+                return mesh_;
+            }
+
+        private:
+            void propagate( index_t element_from, index_t tag_id )
+            {
+                std::queue< index_t > queue;
+                queue.emplace( element_from );
+                while( !queue.empty() )
+                {
+                    const auto cur_el = queue.front();
+                    queue.pop();
+                    if( identifier( cur_el ) != NO_ID )
+                    {
+                        continue;
+                    }
+                    identification_[cur_el] = tag_id;
+                    add_adjacents( cur_el, queue );
+                }
+            }
+
+            virtual void add_adjacents(
+                index_t element_id, std::queue< index_t >& queue ) const = 0;
+
+        private:
+            const Mesh& mesh_;
+            absl::FixedArray< index_t > identification_;
+            index_t nb_components_{ 0 };
+        };
+
         class GraphIdentifier::Impl : public Propagator< Graph >
         {
         public:

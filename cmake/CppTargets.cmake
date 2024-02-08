@@ -99,6 +99,7 @@ function(add_geode_library)
             OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
             DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
             FOLDER "Libraries"
+            UNITY_BUILD ON
     )
     source_group("Public Header Files" FILES "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}")
     source_group("Advanced Header Files" FILES "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}")

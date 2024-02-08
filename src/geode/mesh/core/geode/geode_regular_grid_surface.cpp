@@ -38,11 +38,11 @@
 namespace
 {
     static constexpr std::array< std::array< geode::local_index_t, 2 >, 4 >
-        cell_vertices_translations{ { { 0, 0 }, { 1, 0 }, { 1, 1 },
+        surface_cell_vertices_translations{ { { 0, 0 }, { 1, 0 }, { 1, 1 },
             { 0, 1 } } };
     static constexpr std::array< std::pair< bool, geode::index_t >, 4 >
-        cell_adjacent_directions{ { { false, 1 }, { true, 0 }, { true, 1 },
-            { false, 0 } } };
+        surface_cell_adjacent_directions{ { { false, 1 }, { true, 0 },
+            { true, 1 }, { false, 0 } } };
 } // namespace
 
 namespace geode
@@ -77,7 +77,8 @@ namespace geode
             for( const auto d : LRange{ 2 } )
             {
                 cell_vertex[d] +=
-                    cell_vertices_translations[polygon_vertex.vertex_id][d];
+                    surface_cell_vertices_translations[polygon_vertex.vertex_id]
+                                                      [d];
             }
             return vertex_index( grid, cell_vertex );
         }
@@ -86,7 +87,8 @@ namespace geode
             const RegularGrid2D& grid, const PolygonEdge& edge ) const
         {
             const auto cell = cell_indices( grid, edge.polygon_id );
-            const auto& direction = cell_adjacent_directions[edge.edge_id];
+            const auto& direction =
+                surface_cell_adjacent_directions[edge.edge_id];
             if( direction.first )
             {
                 if( const auto adj = grid.next_cell( cell, direction.second ) )
