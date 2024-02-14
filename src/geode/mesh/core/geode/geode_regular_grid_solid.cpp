@@ -39,13 +39,14 @@
 namespace
 {
     static constexpr std::array< std::array< geode::local_index_t, 3 >, 8 >
-        cell_vertices_translations{ { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 },
-            { 1, 1, 0 }, { 0, 0, 1 }, { 1, 0, 1 }, { 0, 1, 1 }, { 1, 1, 1 } } };
+        SOLID_CELL_VERTICES_TRANSLATIONS{ { { 0, 0, 0 }, { 1, 0, 0 },
+            { 0, 1, 0 }, { 1, 1, 0 }, { 0, 0, 1 }, { 1, 0, 1 }, { 0, 1, 1 },
+            { 1, 1, 1 } } };
 
     // -X +X -Y +Y -Z +Z
     static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
-        cell_facet_vertices{ { { 0, 2, 6, 4 }, { 1, 5, 7, 3 }, { 0, 4, 5, 1 },
-            { 2, 3, 7, 6 }, { 0, 1, 3, 2 }, { 4, 6, 7, 5 } } };
+        SOLID_CELL_FACET_VERTICES{ { { 0, 2, 6, 4 }, { 1, 5, 7, 3 },
+            { 0, 4, 5, 1 }, { 2, 3, 7, 6 }, { 0, 1, 3, 2 }, { 4, 6, 7, 5 } } };
 } // namespace
 
 namespace geode
@@ -81,7 +82,8 @@ namespace geode
             for( const auto d : LRange{ 3 } )
             {
                 cell_vertex[d] +=
-                    cell_vertices_translations[polyhedron_vertex.vertex_id][d];
+                    SOLID_CELL_VERTICES_TRANSLATIONS[polyhedron_vertex
+                                                         .vertex_id][d];
             }
             return vertex_index( grid, cell_vertex );
         }
@@ -91,8 +93,8 @@ namespace geode
         {
             const auto& facet = polyhedron_facet_vertex.polyhedron_facet;
             const auto vertex =
-                cell_facet_vertices[facet.facet_id]
-                                   [polyhedron_facet_vertex.vertex_id];
+                SOLID_CELL_FACET_VERTICES[facet.facet_id]
+                                         [polyhedron_facet_vertex.vertex_id];
             return { facet.polyhedron_id, vertex };
         }
 

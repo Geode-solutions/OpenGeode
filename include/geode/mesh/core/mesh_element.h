@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/uuid.h>
 
 #include <geode/mesh/common.h>
@@ -82,6 +84,45 @@ namespace geode
     {
         using MeshElement::MeshElement;
     };
+
+    template < typename MeshElementType >
+    struct MeshElementsInclusion
+    {
+        MeshElementsInclusion() = default;
+
+        absl::Span< const MeshElementType > query;
+        absl::Span< const MeshElementType > container;
+    };
+
+    struct MeshVerticesInclusion : public MeshElementsInclusion< MeshVertex >
+    {
+        using MeshElementsInclusion< MeshVertex >::MeshElementsInclusion;
+    };
+
+    struct MeshEdgesInclusion : public MeshElementsInclusion< MeshEdge >
+    {
+        using MeshElementsInclusion< MeshEdge >::MeshElementsInclusion;
+    };
+
+    struct MeshPolygonsInclusion : public MeshElementsInclusion< MeshPolygon >
+    {
+        using MeshElementsInclusion< MeshPolygon >::MeshElementsInclusion;
+    };
+
+    template < typename MeshElementType >
+    bool are_mesh_elements_included(
+        const MeshElementsInclusion< MeshElementType >& inclusion )
+    {
+        for( const auto& q : inclusion.query )
+        {
+            if( absl::c_find( inclusion.container, q )
+                == inclusion.container.end() )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 } // namespace geode
 
 namespace std

@@ -108,8 +108,7 @@ namespace geode
     };
 } // namespace geode
 
-#define DEBUG( a ) geode::Logger::debug( #a, " = ", a )
-#define SDEBUG( a ) geode::Logger::debug( #a, " = ", a.string() )
+#include <geode/basic/detail/enable_debug_logger.h>
 
 #ifdef OPENGEODE_DEBUG
 #    define DEBUG_LOGGER( ... ) geode::Logger::debug( __VA_ARGS__ )
