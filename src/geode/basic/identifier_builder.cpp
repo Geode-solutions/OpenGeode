@@ -43,6 +43,11 @@ namespace geode
         identifier_.set_name( name, {} );
     }
 
+    void IdentifierBuilder::copy_identifier( const Identifier& other )
+    {
+        identifier_.copy_identifier( other, {} );
+    }
+
     void IdentifierBuilder::load_identifier( absl::string_view directory )
     {
         identifier_.load_identifier( directory, {} );

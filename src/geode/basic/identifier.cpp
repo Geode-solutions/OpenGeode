@@ -147,6 +147,13 @@ namespace geode
         set_name( name );
     }
 
+    void Identifier::copy_identifier(
+        const Identifier& other, IdentifierKey /*unused*/ )
+    {
+        set_name( other.name() );
+        set_id( other.id() );
+    }
+
     void Identifier::set_id( const uuid& unique_id )
     {
         impl_->set_id( unique_id );

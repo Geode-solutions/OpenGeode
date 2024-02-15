@@ -1057,6 +1057,7 @@ namespace geode
     {
         auto clone = create( impl_name() );
         auto builder = SurfaceMeshBuilder< dimension >::create( *clone );
+        builder->copy_identifier( *this );
         builder->copy( *this );
         return clone;
     }
