@@ -23,30 +23,23 @@
 
 #pragma once
 
-#include <geode/basic/common.h>
+#include <geode/model/common.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
-    class Identifier;
-    struct uuid;
+    class Section;
+    class BRep;
 } // namespace geode
 
 namespace geode
 {
-    class opengeode_basic_api IdentifierBuilder
+    namespace detail
     {
-    public:
-        IdentifierBuilder( Identifier& identifier );
+        ModelCopyMapping opengeode_model_api section_clone_mapping(
+            const Section& model );
 
-        void set_id( const uuid& unique_id );
-
-        void set_name( absl::string_view name );
-
-        void copy_identifier( const Identifier& other );
-
-        void load_identifier( absl::string_view directory );
-
-    private:
-        Identifier& identifier_;
-    };
+        ModelCopyMapping opengeode_model_api brep_clone_mapping(
+            const BRep& model );
+    } // namespace detail
 } // namespace geode

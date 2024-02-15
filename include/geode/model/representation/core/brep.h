@@ -391,6 +391,8 @@ namespace geode
         BRep& operator=( BRep&& brep );
         ~BRep();
 
+        BRep clone() const;
+
         BoundaryCornerRange boundaries( const Line3D& line ) const;
 
         BoundaryLineRange boundaries( const Surface3D& surface ) const;

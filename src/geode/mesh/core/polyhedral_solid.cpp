@@ -57,6 +57,7 @@ namespace geode
     {
         auto clone = create( this->impl_name() );
         auto builder = PolyhedralSolidBuilder< dimension >::create( *clone );
+        builder->copy_identifier( *this );
         builder->copy( *this );
         return clone;
     }

@@ -59,6 +59,8 @@ namespace geode
 
         void load_identifier( absl::string_view directory, IdentifierKey );
 
+        void copy_identifier( const Identifier& other, IdentifierKey );
+
     protected:
         Identifier();
 
