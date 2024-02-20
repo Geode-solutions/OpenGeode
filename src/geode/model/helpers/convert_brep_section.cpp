@@ -171,13 +171,33 @@ namespace
 
         void create_surfaces()
         {
+            absl::flat_hash_map< geode::uuid, geode::uuid >
+                lines_to_model_boundaries;
+            for( const auto& model_boundary : section_.model_boundaries() )
+            {
+                const auto new_id = brep_builder_.add_model_boundary();
+                brep_builder_.set_model_boundary_name(
+                    new_id, model_boundary.name() );
+                for( const auto& item :
+                    section_.model_boundary_items( model_boundary ) )
+                {
+                    lines_to_model_boundaries[item.id()] = new_id;
+                }
+            }
             for( const auto& line : section_.lines() )
             {
-                extrude_line( line );
+                const auto surface_id = extrude_line( line );
+                if( lines_to_model_boundaries.contains( line.id() ) )
+                {
+                    brep_builder_.add_surface_in_model_boundary(
+                        brep_.surface( surface_id ),
+                        brep_.model_boundary(
+                            lines_to_model_boundaries.at( line.id() ) ) );
+                }
             }
         }
 
-        void extrude_line( const geode::Line2D& section_line )
+        geode::uuid extrude_line( const geode::Line2D& section_line )
         {
             const auto& line_slice0 = brep_.line( section_slice0_brep_mapping(
                 geode::Line3D::component_type_static(), section_line.id() ) );
@@ -208,6 +228,7 @@ namespace
                 surface_builder->create_polygon( pointids );
             }
             surface_builder->compute_polygon_adjacencies();
+            return surface.id();
         }
 
         geode::index_t find_or_create_surface_vertex( const geode::Line3D& line,
@@ -471,6 +492,12 @@ namespace geode
         BRepBuilder builder{ brep };
         auto mappings =
             copy_components< Section, BRepBuilder >( section, builder );
+        // Remove wrong transfer of Model Boundaries
+        mappings.remove( ModelBoundary3D::component_type_static() );
+        for( const auto& model_boundary : brep.model_boundaries() )
+        {
+            builder.remove_model_boundary( model_boundary );
+        }
         for( const auto& corner : section.corners() )
         {
             builder.update_corner_mesh(
