@@ -105,6 +105,7 @@ namespace
             section_slice0_mapping_ =
                 std::move( std::get< 1 >( slice0_conversion_output ) );
             brep_ = std::move( std::get< 0 >( slice0_conversion_output ) );
+            add_surfaces_in_model_boundaries();
 
             auto slice1_conversion_output = convert_section_into_brep(
                 section_, options.axis_to_extrude, options.max_coordinate );
@@ -113,6 +114,29 @@ namespace
             geode::BRepConcatener brep_concatener{ brep_ };
             slice1_brep_mapping_ = brep_concatener.concatenate(
                 std::get< 0 >( slice1_conversion_output ) );
+            add_surfaces_in_model_boundaries();
+        }
+
+        void add_surfaces_in_model_boundaries()
+        {
+            const auto model_boundary_id = brep_builder_.add_model_boundary();
+            bool surface_added{ false };
+            const auto& model_boundary =
+                brep_.model_boundary( model_boundary_id );
+            for( const auto& surface : brep_.surfaces() )
+            {
+                if( brep_.nb_collections( surface.id() ) > 0 )
+                {
+                    continue;
+                }
+                brep_builder_.add_surface_in_model_boundary(
+                    surface, model_boundary );
+                surface_added = true;
+            }
+            if( !surface_added )
+            {
+                brep_builder_.remove_model_boundary( model_boundary );
+            }
         }
 
         geode::uuid section_slice0_brep_mapping(
