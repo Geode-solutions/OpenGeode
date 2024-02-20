@@ -38,6 +38,8 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/surface_collection.h>
+#include <geode/model/representation/builder/section_builder.h>
+#include <geode/model/representation/core/detail/clone.h>
 #include <geode/model/representation/core/private/helpers.h>
 
 namespace geode
@@ -475,6 +477,18 @@ namespace geode
     }
 
     Section::~Section() = default;
+
+    Section Section::clone() const
+    {
+        Section model_clone;
+        SectionBuilder clone_builder{ model_clone };
+        clone_builder.copy_identifier( *this );
+        auto mappings = detail::section_clone_mapping( *this );
+        clone_builder.copy_components( mappings, *this );
+        clone_builder.copy_relationships( mappings, *this );
+        clone_builder.copy_component_geometry( mappings, *this );
+        return model_clone;
+    }
 
     Section::ItemLineRange Section::model_boundary_items(
         const ModelBoundary2D& boundary ) const

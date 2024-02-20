@@ -51,6 +51,7 @@ namespace geode
     {
         auto clone = create( this->impl_name() );
         auto builder = RegularGridBuilder< 2 >::create( *clone );
+        builder->copy_identifier( *this );
         builder->copy( *this );
         return clone;
     }

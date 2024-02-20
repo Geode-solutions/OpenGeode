@@ -288,6 +288,8 @@ namespace geode
         Section& operator=( Section&& section );
         ~Section();
 
+        Section clone() const;
+
         BoundaryCornerRange boundaries( const Line2D& line ) const;
 
         BoundaryLineRange boundaries( const Surface2D& surface ) const;
