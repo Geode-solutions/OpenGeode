@@ -45,6 +45,8 @@ namespace geode
         static constexpr auto dim = dimension;
         using CellIndices = typename Grid< dimension >::CellIndices;
         using VertexIndices = typename Grid< dimension >::VertexIndices;
+        using VerticesAroundVertex =
+            absl::InlinedVector< index_t, 2 * dimension >;
 
         LightRegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
@@ -74,6 +76,10 @@ namespace geode
         index_t cell_index( const CellIndices& index ) const override;
 
         CellIndices cell_indices( index_t index ) const override;
+
+        Point< dimension > point( index_t vertex_id ) const;
+
+        VerticesAroundVertex vertices_around_vertex( index_t vertex_id ) const;
 
         AttributeManager& cell_attribute_manager() const override;
 
