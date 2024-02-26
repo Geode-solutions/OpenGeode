@@ -164,9 +164,9 @@ namespace
                 const auto polyhedra = build_polyhedra( block );
                 set_polyhedra_adjacency( block, polyhedra );
             }
-            for( const auto& v2uv : model_.vertices() )
+            for( const auto& uv2v : model_.vertices() )
             {
-                attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
+                attribute_unique_vertex_->set_value( uv2v.second, uv2v.first );
             }
         }
 
@@ -345,9 +345,9 @@ namespace
                 const auto polygons = build_polygons( surface );
                 set_polygons_adjacency( surface, polygons );
             }
-            for( const auto& v2uv : model_.vertices() )
+            for( const auto& uv2v : model_.vertices() )
             {
-                attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
+                attribute_unique_vertex_->set_value( uv2v.second, uv2v.first );
             }
         }
 
@@ -471,9 +471,9 @@ namespace
             {
                 build_edges( line );
             }
-            for( const auto& v2uv : model_.vertices() )
+            for( const auto& uv2v : model_.vertices() )
             {
-                attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
+                attribute_unique_vertex_->set_value( uv2v.second, uv2v.first );
             }
         }
 
