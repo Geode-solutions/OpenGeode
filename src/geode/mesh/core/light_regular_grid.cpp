@@ -143,6 +143,33 @@ namespace geode
     }
 
     template < index_t dimension >
+    Point< dimension > LightRegularGrid< dimension >::point(
+        index_t vertex_id ) const
+    {
+        return this->grid_point( vertex_indices( vertex_id ) );
+    }
+
+    template < index_t dimension >
+    auto LightRegularGrid< dimension >::vertices_around_vertex(
+        index_t vertex_id ) const -> VerticesAroundVertex
+    {
+        VerticesAroundVertex result;
+        const auto indices = this->vertex_indices( vertex_id );
+        for( const auto d : LRange{ 2 } )
+        {
+            if( const auto next = this->next_vertex( indices, d ) )
+            {
+                result.push_back( this->vertex_index( next.value() ) );
+            }
+            if( const auto previous = this->previous_vertex( indices, d ) )
+            {
+                result.push_back( this->vertex_index( previous.value() ) );
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     AttributeManager&
         LightRegularGrid< dimension >::cell_attribute_manager() const
     {
