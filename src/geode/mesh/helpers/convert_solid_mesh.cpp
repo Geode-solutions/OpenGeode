@@ -33,6 +33,7 @@
 #include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/helpers/detail/element_identifier.h>
 #include <geode/mesh/helpers/detail/solid_merger.h>
 #include <geode/mesh/helpers/private/copy.h>
 
@@ -42,7 +43,7 @@ namespace
     {
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
-            if( solid.nb_polyhedron_vertices( p ) > 4 )
+            if( !geode::detail::solid_polyhedron_is_a_tetrahedron( solid, p ) )
             {
                 return false;
             }
@@ -140,51 +141,20 @@ namespace
     {
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
-            const auto nb_p_vertices = solid.nb_polyhedron_vertices( p );
-            if( nb_p_vertices == 4 )
+            if( geode::detail::solid_polyhedron_is_a_tetrahedron( solid, p ) )
             {
                 continue;
             }
-            if( nb_p_vertices == 5 )
+            if( geode::detail::solid_polyhedron_is_a_prism( solid, p ) )
             {
-                if( solid.nb_polyhedron_facets( p ) != 5 )
-                {
-                    return false;
-                }
                 continue;
             }
-            if( nb_p_vertices == 6 )
+            if( geode::detail::solid_polyhedron_is_a_pyramid( solid, p ) )
             {
-                const auto facets_vertices =
-                    solid.polyhedron_facets_vertices( p );
-                if( facets_vertices.size() != 8 )
-                {
-                    return false;
-                }
-                for( const auto& facet_vertices : facets_vertices )
-                {
-                    if( facet_vertices.size() != 3 )
-                    {
-                        return false;
-                    }
-                }
                 continue;
             }
-            if( nb_p_vertices == 8 )
+            if( geode::detail::solid_polyhedron_is_a_hexaedron( solid, p ) )
             {
-                const auto facets_vertices =
-                    solid.polyhedron_facets_vertices( p );
-                if( facets_vertices.size() != 6 )
-                {
-                    return false;
-                }
-                for( const auto& facet_vertices : facets_vertices )
-                {
-                    if( facet_vertices.size() != 4 )
-                    {
-                        return false;
-                    }
-                }
                 continue;
             }
             return false;
