@@ -200,7 +200,7 @@ function(_add_geode_executable exe_path folder_name)
     set_target_properties(${target_name}
         PROPERTIES
             FOLDER ${folder_name}
-            INSTALL_RPATH "${OS_RPATH}/../${CMAKE_INSTALL_LIBDIR}"
+            INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
     )
     set(target_name ${target_name} PARENT_SCOPE)
 endfunction()
