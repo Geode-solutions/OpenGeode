@@ -25,35 +25,38 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <typeinfo>
-
-#define PYTHON_ATTRIBUTE_TYPE( type, suffix )                                  \
-    const auto read##suffix = std::string{ "find_attribute_" } + #suffix;      \
-    manager.def(                                                               \
-        read##suffix.c_str(), &AttributeManager::find_attribute< type > );     \
-    const auto constant##suffix =                                              \
-        std::string{ "find_or_create_attribute_constant_" } + #suffix;         \
-    manager.def( constant##suffix.c_str(),                                     \
-        static_cast< std::shared_ptr< ConstantAttribute< type > > (            \
-            AttributeManager::* )( absl::string_view, type ) >(                \
-            &AttributeManager::find_or_create_attribute< ConstantAttribute,    \
-                type > ) );                                                    \
-    const auto variable##suffix =                                              \
-        std::string{ "find_or_create_attribute_variable_" } + #suffix;         \
-    manager.def( variable##suffix.c_str(),                                     \
-        static_cast< std::shared_ptr< VariableAttribute< type > > (            \
-            AttributeManager::* )( absl::string_view, type ) >(                \
-            &AttributeManager::find_or_create_attribute< VariableAttribute,    \
-                type > ) );                                                    \
-    const auto sparse##suffix =                                                \
-        std::string{ "find_or_create_attribute_sparse_" } + #suffix;           \
-    manager.def( sparse##suffix.c_str(),                                       \
-        static_cast< std::shared_ptr< SparseAttribute< type > > (              \
-            AttributeManager::* )( absl::string_view, type ) >(                \
-            &AttributeManager::find_or_create_attribute< SparseAttribute,      \
-                type > ) )
-
 namespace geode
 {
+    template < typename type >
+    void python_attribute_class( pybind11::class_< AttributeManager >& manager,
+        const std::string& suffix )
+    {
+        const auto read_suffix = absl::StrCat( "find_attribute_", suffix );
+        manager.def(
+            read_suffix.c_str(), &AttributeManager::find_attribute< type > );
+        const auto constant_suffix =
+            absl::StrCat( "find_or_create_attribute_constant_", suffix );
+        manager.def( constant_suffix.c_str(),
+            static_cast< std::shared_ptr< ConstantAttribute< type > > (
+                AttributeManager::* )( absl::string_view, type ) >(
+                &AttributeManager::find_or_create_attribute< ConstantAttribute,
+                    type > ) );
+        const auto variable_suffix =
+            absl::StrCat( "find_or_create_attribute_variable_", suffix );
+        manager.def( variable_suffix.c_str(),
+            static_cast< std::shared_ptr< VariableAttribute< type > > (
+                AttributeManager::* )( absl::string_view, type ) >(
+                &AttributeManager::find_or_create_attribute< VariableAttribute,
+                    type > ) );
+        const auto sparse_suffix =
+            absl::StrCat( "find_or_create_attribute_sparse_", suffix );
+        manager.def( sparse_suffix.c_str(),
+            static_cast< std::shared_ptr< SparseAttribute< type > > (
+                AttributeManager::* )( absl::string_view, type ) >(
+                &AttributeManager::find_or_create_attribute< SparseAttribute,
+                    type > ) );
+    }
+
     void define_attribute_manager( pybind11::module& module )
     {
         pybind11::class_< AttributeManager > manager(
@@ -73,10 +76,14 @@ namespace geode
             .def( "set_attribute_properties",
                 &AttributeManager::set_attribute_properties )
             .def( "delete_elements", &AttributeManager::delete_elements );
-        PYTHON_ATTRIBUTE_TYPE( bool, bool );
-        PYTHON_ATTRIBUTE_TYPE( int, int );
-        PYTHON_ATTRIBUTE_TYPE( unsigned int, uint );
-        PYTHON_ATTRIBUTE_TYPE( float, float );
-        PYTHON_ATTRIBUTE_TYPE( double, double );
+        python_attribute_class< bool >( manager, "bool" );
+        python_attribute_class< int >( manager, "int" );
+        python_attribute_class< unsigned int >( manager, "uint" );
+        python_attribute_class< float >( manager, "float" );
+        python_attribute_class< double >( manager, "double" );
+        python_attribute_class< std::array< double, 2 > >(
+            manager, "arraydouble2" );
+        python_attribute_class< std::array< double, 3 > >(
+            manager, "arraydouble3" );
     }
 } // namespace geode
