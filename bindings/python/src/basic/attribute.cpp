@@ -74,5 +74,7 @@ namespace geode
         PYTHON_ATTRIBUTE_CLASS( unsigned int, UInt );
         PYTHON_ATTRIBUTE_CLASS( float, Float );
         PYTHON_ATTRIBUTE_CLASS( double, Double );
+        PYTHON_ATTRIBUTE_CLASS( std::array< double, 2 >, ArrayDouble2 );
+        PYTHON_ATTRIBUTE_CLASS( std::array< double, 3 >, ArrayDouble3 );
     }
 } // namespace geode
