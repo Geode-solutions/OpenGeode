@@ -32,11 +32,7 @@ namespace geode
         bool opengeode_mesh_api solid_polyhedron_is_a_tetrahedron(
             const SolidMesh3D &solid, index_t polyhedron_id )
         {
-            if( solid.nb_polyhedron_vertices( polyhedron_id ) == 4 )
-            {
-                return true;
-            }
-            return false;
+            return ( solid.nb_polyhedron_vertices( polyhedron_id ) == 4 );
         }
 
         bool opengeode_mesh_api solid_polyhedron_is_a_hexaedron(
