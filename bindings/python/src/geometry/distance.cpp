@@ -33,6 +33,10 @@
 #include <geode/geometry/point.h>
 
 #define PYTHON_DISTANCE( dimension )                                           \
+    const auto point_point_distance##dimension =                               \
+        "point_point_distance" + std::to_string( dimension ) + "D";            \
+    module.def( point_point_distance##dimension.c_str(),                       \
+        &point_point_distance< dimension > );                                  \
     const auto point_segment_distance##dimension =                             \
         "point_segment_distance" + std::to_string( dimension ) + "D";          \
     module.def( point_segment_distance##dimension.c_str(),                     \
@@ -72,15 +76,20 @@ namespace geode
     {
         PYTHON_DISTANCE( 2 );
         PYTHON_DISTANCE( 3 );
-        module.def( "point_tetrahedron_distance", &point_tetrahedron_distance );
-        module.def( "point_plane_distance", &point_plane_distance );
         module.def(
-            "point_plane_signed_distance", &point_plane_signed_distance );
-        module.def( "point_circle_distance", &point_circle_distance );
+            "point_line_signed_distance2D", &point_line_signed_distance );
+        module.def( "point_triangle_signed_distance3D",
+            &point_triangle_signed_distance );
+        module.def( "line_triangle_distance3D", &line_triangle_distance );
+        module.def( "segment_triangle_distance3D", &segment_triangle_distance );
         module.def(
-            "point_circle_signed_distance", &point_circle_signed_distance );
-        module.def( "point_disk_distance", &point_disk_distance );
-        module.def( "line_triangle_distance", &line_triangle_distance );
-        module.def( "segment_triangle_distance", &segment_triangle_distance );
+            "point_tetrahedron_distance3D", &point_tetrahedron_distance );
+        module.def( "point_plane_distance3D", &point_plane_distance );
+        module.def(
+            "point_plane_signed_distance3D", &point_plane_signed_distance );
+        module.def( "point_circle_distance3D", &point_circle_distance );
+        module.def(
+            "point_circle_signed_distance3D", &point_circle_signed_distance );
+        module.def( "point_disk_distance3D", &point_disk_distance );
     }
 } // namespace geode
