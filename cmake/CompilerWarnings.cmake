@@ -40,18 +40,24 @@ else() # Clang/GCC
         -Wunused # warn on anything being unused
         -Woverloaded-virtual # warn if you overload (not override) a virtual function
         -Wpedantic # warn if non-standard C++ is used
-        # -Wnull-dereference # warn if a null dereference is detected
         -Wformat=2 # warn on security issues around functions that format output (ie printf)
-        # -Wimplicit-fallthrough # warn on statements that fallthrough without an explicit annotation
         -Wno-attributes # ignore attribute warnings
     )
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(
-            # -Wmisleading-indentation # warn if indentation implies blocks where blocks do not exist
-            # -Wduplicated-cond # warn if if / else chain has duplicated conditions
-            # -Wduplicated-branches # warn if if / else branches have duplicated code
             -Wlogical-op # warn about logical operations being used where bitwise were probably wanted
             -Wuseless-cast # warn if you perform a cast to the same type
         )
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 6.1)
+            add_compile_options(
+                -Wnull-dereference # warn if a null dereference is detected
+                -Wduplicated-cond # warn if if / else chain has duplicated conditions
+            )
+        endif()
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7.1)
+            add_compile_options(
+                -Wduplicated-branches # warn if if / else branches have duplicated code
+            )
+        endif()
     endif()
 endif()
