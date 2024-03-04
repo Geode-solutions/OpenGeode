@@ -34,6 +34,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/common.h>
 
@@ -214,6 +215,25 @@ namespace geode
         template < class EvalIntersection >
         void compute_segment_element_bbox_intersections(
             const Segment< dimension >& segment,
+            EvalIntersection& action ) const;
+
+        /*!
+         * @brief Computes the intersections between a given Triangle and
+         * all element boxes.
+         * @param[in] triangle The triangle to test.
+         * @param[in] action The functor to run when a box is intersected by the
+         * segment.
+         * @tparam EvalIntersection this functor should have an operator()
+         * defined like this:
+         * bool operator()( index_t cur_element_box ) ;
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the \p triangle.
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
+         */
+        template < class EvalIntersection >
+        void compute_triangle_element_bbox_intersections(
+            const Triangle< dimension >& triangle,
             EvalIntersection& action ) const;
 
     private:
