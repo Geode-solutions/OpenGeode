@@ -102,6 +102,14 @@ namespace geode
             ACTION& action ) const;
 
         template < typename ACTION >
+        bool triangle_intersect_recursive(
+            const Triangle< dimension >& triangle,
+            index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            ACTION& action ) const;
+
+        template < typename ACTION >
         bool self_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
@@ -230,6 +238,19 @@ namespace geode
 
     template < index_t dimension >
     template < class EvalIntersection >
+    void AABBTree< dimension >::compute_triangle_element_bbox_intersections(
+        const Triangle< dimension >& triangle, EvalIntersection& action ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
+        impl_->triangle_intersect_recursive(
+            triangle, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+    }
+
+    template < index_t dimension >
+    template < class EvalIntersection >
     void AABBTree< dimension >::compute_segment_element_bbox_intersections(
         const Segment< dimension >& segment, EvalIntersection& action ) const
     {
@@ -348,6 +369,41 @@ namespace geode
         }
         return bbox_intersect_recursive(
             box, it.child_right, it.middle_box, element_end, action );
+    }
+
+    template < index_t dimension >
+    template < typename ACTION >
+    bool AABBTree< dimension >::Impl::triangle_intersect_recursive(
+        const Triangle< dimension >& triangle,
+        index_t node_index,
+        index_t element_begin,
+        index_t element_end,
+        ACTION& action ) const
+    {
+        OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
+        OPENGEODE_ASSERT(
+            element_begin != element_end, "No iteration allowed start == end" );
+
+        // Prune sub-tree that does not have intersection
+        if( !node( node_index ).intersects( triangle ) )
+        {
+            return false;
+        }
+
+        if( is_leaf( element_begin, element_end ) )
+        {
+            return action( mapping_morton( element_begin ) );
+        }
+
+        const auto it =
+            get_recursive_iterators( node_index, element_begin, element_end );
+        if( triangle_intersect_recursive( triangle, it.child_left,
+                element_begin, it.middle_box, action ) )
+        {
+            return true;
+        }
+        return triangle_intersect_recursive(
+            triangle, it.child_right, it.middle_box, element_end, action );
     }
 
     template < index_t dimension >
