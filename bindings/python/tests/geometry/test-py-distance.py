@@ -250,13 +250,13 @@ def test_point_plane_distance():
     plane = triangle.plane()
 
     q1 = geom.Point3D([0.5, 0.5, 1])
-    distance, closest_point = geom.point_plane_distance(q1, plane)
+    distance, closest_point = geom.point_plane_distance3D(q1, plane)
     answer = geom.Point3D([0.5, 0.5, 0.0])
     if distance != 1.0 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_plane_distance with query point q1"
         )
-    distance, closest_point = geom.point_plane_signed_distance(q1, plane)
+    distance, closest_point = geom.point_plane_signed_distance3D(q1, plane)
     answer = geom.Point3D([0.5, 0.5, 0.0])
     if distance != 1.0 or closest_point != answer:
         raise ValueError(
@@ -264,13 +264,13 @@ def test_point_plane_distance():
         )
 
     q2 = geom.Point3D([0.5, 0.5, -1])
-    distance, closest_point = geom.point_plane_distance(q2, plane)
+    distance, closest_point = geom.point_plane_distance3D(q2, plane)
     answer = geom.Point3D([0.5, 0.5, 0.0])
     if distance != 1.0 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_plane_distance with query point q2"
         )
-    distance, closest_point = geom.point_plane_signed_distance(q2, plane)
+    distance, closest_point = geom.point_plane_signed_distance3D(q2, plane)
     answer = geom.Point3D([0.5, 0.5, 0.0])
     if distance != -1.0 or closest_point != answer:
         raise ValueError(
@@ -372,82 +372,82 @@ def test_point_circle_distance():
     circle_z = geom.Circle(plane_z, 2)
 
     q1 = geom.Point3D([2.0, 0.0, 1.0])
-    distance, closest_point = geom.point_circle_distance(q1, circle_x)
+    distance, closest_point = geom.point_circle_distance3D(q1, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != math.sqrt(8) or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_circle_distance with query Point3D q1 and circle_x"
         )
 
-    distance, closest_point = geom.point_circle_distance(q1, circle_z)
+    distance, closest_point = geom.point_circle_distance3D(q1, circle_z)
     if distance != 0 or closest_point != q1:
         raise ValueError(
             "[Test] Wrong result for point_circle_distance with query Point3D q1 and circle_z"
         )
 
-    distance, closest_point = geom.point_circle_signed_distance(q1, circle_x)
+    distance, closest_point = geom.point_circle_signed_distance3D(q1, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != -math.sqrt(8) or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_circle_signed_distance with query Point3D q1 and circle_x"
         )
 
-    distance, closest_point = geom.point_circle_signed_distance(q1, circle_z)
+    distance, closest_point = geom.point_circle_signed_distance3D(q1, circle_z)
     if distance != 0 or closest_point != q1:
         raise ValueError(
             "[Test] Wrong result for point_circle_signed_distance with query Point3D q1 and circle_z"
         )
 
-    distance, closest_point = geom.point_disk_distance(q1, circle_x)
+    distance, closest_point = geom.point_disk_distance3D(q1, circle_x)
     answer = geom.Point3D([0.0, 0.0, 1.0])
     if distance != 2 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_disk_distance with query Point3D q1 and circle_x"
         )
 
-    distance, closest_point = geom.point_disk_distance(q1, circle_z)
+    distance, closest_point = geom.point_disk_distance3D(q1, circle_z)
     if distance != 0 or closest_point != q1:
         raise ValueError(
             "[Test] Wrong result for point_disk_distance with query Point3D q1 and circle_z"
         )
 
     q2 = geom.Point3D([0.0, 3.0, 1.0])
-    distance, closest_point = geom.point_circle_distance(q2, circle_x)
+    distance, closest_point = geom.point_circle_distance3D(q2, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != 1 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_circle_distance with query Point3D q2 and circle_x"
         )
 
-    distance, closest_point = geom.point_circle_signed_distance(q2, circle_x)
+    distance, closest_point = geom.point_circle_signed_distance3D(q2, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != 1 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_circle_signed_distance with query Point3D q2 and circle_x"
         )
 
-    distance, closest_point = geom.point_disk_distance(q2, circle_x)
+    distance, closest_point = geom.point_disk_distance3D(q2, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != 1 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_disk_distance with query Point3D q2 and circle_x"
         )
 
-    distance, closest_point = geom.point_circle_distance(a, circle_x)
+    distance, closest_point = geom.point_circle_distance3D(a, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != 2 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_circle_distance with query Point3D a and circle_x"
         )
 
-    distance, closest_point = geom.point_circle_signed_distance(a, circle_x)
+    distance, closest_point = geom.point_circle_signed_distance3D(a, circle_x)
     answer = geom.Point3D([0.0, 2.0, 1.0])
     if distance != 2 or closest_point != answer:
         raise ValueError(
             "[Test] Wrong result for point_circle_signed_distance with query Point3D a and circle_x"
         )
 
-    distance, closest_point = geom.point_disk_distance(a, circle_x)
+    distance, closest_point = geom.point_disk_distance3D(a, circle_x)
     if distance != 0 or closest_point != a:
         raise ValueError(
             "[Test] Wrong result for point_disk_distance with query Point3D a and circle_x"
@@ -473,7 +473,7 @@ def test_line_triangle_distance():
     line_bz = geom.InfiniteLine3D(zdir, b)
     line_hx = geom.InfiniteLine3D(xdir, h)
 
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance(line_ab, cdg)
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(line_ab, cdg)
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
@@ -485,7 +485,7 @@ def test_line_triangle_distance():
             "[Test] Wrong result for line_triangle_distance with query line_ab"
         )
 
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance(line_ef, cdg)
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(line_ef, cdg)
     r00 = geom.Point3D([1.0, 1.0, 1.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
@@ -497,7 +497,7 @@ def test_line_triangle_distance():
             "[Test] Wrong result for line_triangle_distance with query line_ef"
         )
 
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance(line_bz, cdg)
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(line_bz, cdg)
     if (
         abs(distance) > og.global_epsilon
         or not closest_point0.inexact_equal(f)
@@ -507,7 +507,7 @@ def test_line_triangle_distance():
             "[Test] Wrong result for line_triangle_distance with query line_bz"
         )
 
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance(line_hx, cdg)
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(line_hx, cdg)
     r00 = geom.Point3D([3.0, 5.0, 1.0])
     if (
         abs(distance - 2) > og.global_epsilon
@@ -538,7 +538,7 @@ def test_segment_triangle_distance():
     seg_bz1 = geom.Segment3D(bminus, b)
     seg_hx = geom.Segment3D(h2, h)
 
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
         seg_ab, cdg
     )
     r00 = geom.Point3D([1.0, 1.0, 0.0])
@@ -552,7 +552,7 @@ def test_segment_triangle_distance():
             "[Test] Wrong result for segment_triangle_distance with query seg_ab"
         )
 
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
         seg_ef, cdg
     )
     r00 = geom.Point3D([1.0, 1.0, 1.0])
@@ -566,7 +566,7 @@ def test_segment_triangle_distance():
             "[Test] Wrong result for segment_triangle_distance with query seg_ef"
         )
 
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
         seg_bz0, cdg
     )
     if (
@@ -578,7 +578,7 @@ def test_segment_triangle_distance():
             "[Test] Wrong result for segment_triangle_distance with query seg_bz0"
         )
 
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
         seg_bz1, cdg
     )
     if (
@@ -590,7 +590,7 @@ def test_segment_triangle_distance():
             "[Test] Wrong result for segment_triangle_distance with query seg_bz1"
         )
 
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
         seg_hx, cdg
     )
     r00 = geom.Point3D([3.0, 5.0, 1.0])

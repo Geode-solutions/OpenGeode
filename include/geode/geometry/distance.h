@@ -110,8 +110,9 @@ namespace geode
      * @details the sign is given by the triangle normal (positive if in the
      * same plane).
      */
-    std::tuple< double, Point3D > point_triangle_signed_distance(
-        const Point3D& point, const Triangle3D& triangle );
+    std::tuple< double, Point3D >
+        opengeode_geometry_api point_triangle_signed_distance(
+            const Point3D& point, const Triangle3D& triangle );
 
     /*!
      * Compute the smallest distance between an infinite line and a triangle
