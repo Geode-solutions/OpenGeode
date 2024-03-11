@@ -46,7 +46,7 @@
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
                 double ) >(                                                    \
                 &RegularGridBuilder##dimension##D::initialize_grid ) )         \
-        .def( "initialize_grid_with directions",                               \
+        .def( "initialize_grid_with_directions",                               \
             static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 Point##dimension##D, std::array< index_t, dimension >,         \
                 std::array< Vector##dimension##D, dimension > ) >(             \
