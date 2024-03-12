@@ -47,6 +47,15 @@ namespace geode
             tetrahedron_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 },
                 { 1, 3 }, { 2, 3 } } };
 
+        static constexpr std::
+            array< std::array< std::array< geode::local_index_t, 2 >, 4 >, 4 >
+                TETRAHEDRON_OPPOSITE_EDGE_VERTICES{ {
+                    { { { NO_LID, NO_LID }, { 2, 3 }, { 1, 3 }, { 1, 2 } } },
+                    { { { 2, 3 }, { NO_LID, NO_LID }, { 0, 3 }, { 0, 2 } } },
+                    { { { 1, 3 }, { 0, 3 }, { NO_LID, NO_LID }, { 0, 1 } } },
+                    { { { 1, 2 }, { 0, 2 }, { 0, 1 }, { NO_LID, NO_LID } } },
+                } };
+
         static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
             hexahedron_facet_vertices{ { { 0, 4, 5, 1 }, { 2, 6, 7, 3 },
                 { 0, 3, 7, 4 }, { 1, 5, 6, 2 }, { 0, 1, 2, 3 },
