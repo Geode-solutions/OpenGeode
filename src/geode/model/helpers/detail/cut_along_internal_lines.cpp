@@ -27,6 +27,7 @@
 
 #include <absl/memory/memory.h>
 
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
@@ -236,6 +237,8 @@ namespace geode
             {
                 const auto new_vertex_id =
                     builder.create_point( mesh.point( vertex_id ) );
+                mesh.vertex_attribute_manager().copy_attribute_value(
+                    vertex_id, new_vertex_id );
                 builder.replace_vertex( vertex_id, new_vertex_id );
                 for( const auto& polygon_vertex : polygon_vertices )
                 {
