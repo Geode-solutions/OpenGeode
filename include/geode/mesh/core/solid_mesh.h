@@ -426,6 +426,13 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
+         * Return the area of a given PolyhedronFacet.
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
+         */
+        double polyhedron_facet_area(
+            const PolyhedronFacet& polyhedron_facet ) const;
+
+        /*!
          * Return the normal of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
