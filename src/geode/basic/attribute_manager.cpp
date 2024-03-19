@@ -101,6 +101,17 @@ namespace geode
             }
         }
 
+        void copy_attribute_value( index_t from_element,
+            index_t to_element,
+            const AttributeBase::AttributeKey &key )
+        {
+            for( auto &attribute_it : attributes_ )
+            {
+                attribute_it.second->compute_value(
+                    from_element, to_element, key );
+            }
+        }
+
         void interpolate_attribute_value(
             const AttributeLinearInterpolation &interpolation,
             index_t to_element,
@@ -365,6 +376,12 @@ namespace geode
         index_t from_element, index_t to_element )
     {
         impl_->assign_attribute_value( from_element, to_element, {} );
+    }
+
+    void AttributeManager::copy_attribute_value(
+        index_t from_element, index_t to_element )
+    {
+        impl_->copy_attribute_value( from_element, to_element, {} );
     }
 
     void AttributeManager::interpolate_attribute_value(

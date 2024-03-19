@@ -239,49 +239,42 @@ namespace geode
                 vertex2unique_vertex_
                     .at( component_vertex_id.component_id.id() )
                     ->value( component_vertex_id.vertex );
-            if( old_unique_id == unique_vertex_id )
-            {
-                return;
-            }
-
             if( old_unique_id != NO_ID )
             {
                 unset_unique_vertex( component_vertex_id, old_unique_id );
             }
             vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
                 ->set_value( component_vertex_id.vertex, unique_vertex_id );
-            const auto& vertices =
-                component_vertices_->value( unique_vertex_id );
-            if( absl::c_find( vertices, component_vertex_id )
-                == vertices.end() )
-            {
-                component_vertices_->modify_value( unique_vertex_id,
-                    [&component_vertex_id](
-                        std::vector< ComponentMeshVertex >& value ) {
+            component_vertices_->modify_value( unique_vertex_id,
+                [&component_vertex_id](
+                    std::vector< ComponentMeshVertex >& value ) {
+                    if( absl::c_find( value, component_vertex_id )
+                        == value.end() )
+                    {
                         value.emplace_back( std::move( component_vertex_id ) );
-                    } );
-                ;
-            }
+                    }
+                } );
         }
 
         void unset_unique_vertex(
             const ComponentMeshVertex& component_vertex_id,
             const index_t unique_vertex_id )
         {
+            vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
+                ->set_value( component_vertex_id.vertex, NO_ID );
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
             const auto it = absl::c_find( vertices, component_vertex_id );
-            OPENGEODE_EXCEPTION( it != vertices.end(),
-                "[VertexIdentifier::unset_unique_vertex] Unique vertex to "
-                "unset is not correct" );
+            if( it == vertices.end() )
+            {
+                return;
+            }
             component_vertices_->modify_value( unique_vertex_id,
                 [&it]( std::vector< ComponentMeshVertex >& value ) {
                     value.erase(
                         // workaround for gcc < 4.9
                         value.begin() + ( it - value.cbegin() ) );
                 } );
-            vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
-                ->set_value( component_vertex_id.vertex, NO_ID );
         }
 
         void update_unique_vertices( const ComponentID& component_id,
