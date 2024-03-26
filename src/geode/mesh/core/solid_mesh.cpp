@@ -801,6 +801,28 @@ namespace geode
     }
 
     template < index_t dimension >
+    double SolidMesh< dimension >::polyhedron_facet_area(
+        const PolyhedronFacet& polyhedron_facet ) const
+    {
+        if( nb_polyhedron_facet_vertices( polyhedron_facet ) < 3 )
+        {
+            return 0;
+        }
+        double area{ 0 };
+        const auto direction = new_polyhedron_facet_normal( polyhedron_facet )
+                                   .value_or( Vector3D{ { 0, 0, 1 } } );
+        const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
+        const auto& p1 = this->point( vertices[0] );
+        for( const auto i : LRange{ 1, vertices.size() - 1 } )
+        {
+            const auto& p2 = this->point( vertices[i] );
+            const auto& p3 = this->point( vertices[i + 1] );
+            area += triangle_signed_area( { p1, p2, p3 }, direction );
+        }
+        return area;
+    }
+
+    template < index_t dimension >
     Vector3D SolidMesh< dimension >::polyhedron_facet_normal(
         const PolyhedronFacet& polyhedron_facet ) const
     {
