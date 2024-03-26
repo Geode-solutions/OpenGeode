@@ -91,10 +91,10 @@ namespace geode
     absl::optional< std::string > goto_keyword_if_it_exists(
         std::ifstream& file, absl::string_view word )
     {
-        std::string line;
-        while( std::getline( file, line ) )
+        absl::optional< std::string > line;
+        while( std::getline( file, line.value() ) )
         {
-            if( string_starts_with( line, word ) )
+            if( string_starts_with( line.value(), word ) )
             {
                 return line;
             }
@@ -109,10 +109,10 @@ namespace geode
     absl::optional< std::string > next_keyword_if_it_exists(
         std::ifstream& file, absl::string_view word )
     {
-        std::string line;
+        absl::optional< std::string > line;
         const auto previous_position = file.tellg();
-        std::getline( file, line );
-        if( string_starts_with( line, word ) )
+        std::getline( file, line.value() );
+        if( string_starts_with( line.value(), word ) )
         {
             return line;
         }

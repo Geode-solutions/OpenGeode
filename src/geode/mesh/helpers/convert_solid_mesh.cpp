@@ -174,13 +174,14 @@ namespace geode
         }
         if( solid.type_name() == RegularGrid3D::type_name_static() )
         {
-            auto result = create_tetrahedral_solid_from_grid(
-                dynamic_cast< const RegularGrid3D& >( solid ) );
-            auto builder = geode::TetrahedralSolidBuilder3D::create( *result );
-            detail::copy_meta_info( solid, *builder );
-            return absl::optional< std::unique_ptr< TetrahedralSolid3D > >{
-                absl::in_place, std::move( result )
+            absl::optional< std::unique_ptr< TetrahedralSolid3D > > result{
+                create_tetrahedral_solid_from_grid(
+                    dynamic_cast< const RegularGrid3D& >( solid ) )
             };
+            auto builder =
+                geode::TetrahedralSolidBuilder3D::create( *result->get() );
+            detail::copy_meta_info( solid, *builder );
+            return result;
         }
         if( !all_polyhedra_are_simplex( solid ) )
         {
@@ -188,8 +189,10 @@ namespace geode
                           "SolidMesh is not made of only tetrahedra." );
             return absl::nullopt;
         }
-        auto tet_solid = TetrahedralSolid3D::create();
-        auto builder = TetrahedralSolidBuilder3D::create( *tet_solid );
+        absl::optional< std::unique_ptr< TetrahedralSolid3D > > tet_solid{
+            TetrahedralSolid3D::create()
+        };
+        auto builder = TetrahedralSolidBuilder3D::create( *tet_solid->get() );
         detail::copy_meta_info( solid, *builder );
         detail::copy_points( solid, *builder );
         builder->reserve_tetrahedra( solid.nb_polyhedra() );
@@ -215,12 +218,10 @@ namespace geode
             }
         }
         detail::copy_attributes( solid.vertex_attribute_manager(),
-            tet_solid->vertex_attribute_manager() );
+            tet_solid->get()->vertex_attribute_manager() );
         detail::copy_attributes( solid.polyhedron_attribute_manager(),
-            tet_solid->polyhedron_attribute_manager() );
-        return absl::optional< std::unique_ptr< TetrahedralSolid3D > >{
-            absl::in_place, std::move( tet_solid )
-        };
+            tet_solid->get()->polyhedron_attribute_manager() );
+        return tet_solid;
     }
 
     std::unique_ptr< TetrahedralSolid3D > convert_grid_into_tetrahedral_solid(
@@ -236,8 +237,10 @@ namespace geode
         {
             return absl::nullopt;
         }
-        auto hybrid_solid = HybridSolid3D::create();
-        auto builder = HybridSolidBuilder3D::create( *hybrid_solid );
+        absl::optional< std::unique_ptr< HybridSolid3D > > hybrid_solid{
+            HybridSolid3D::create()
+        };
+        auto builder = HybridSolidBuilder3D::create( *hybrid_solid->get() );
         detail::copy_meta_info( solid, *builder );
         detail::copy_points( solid, *builder );
         for( const auto p : Range{ solid.nb_polyhedra() } )
@@ -278,12 +281,10 @@ namespace geode
             }
         }
         detail::copy_attributes( solid.vertex_attribute_manager(),
-            hybrid_solid->vertex_attribute_manager() );
+            hybrid_solid->get()->vertex_attribute_manager() );
         detail::copy_attributes( solid.polyhedron_attribute_manager(),
-            hybrid_solid->polyhedron_attribute_manager() );
-        return absl::optional< std::unique_ptr< HybridSolid3D > >{
-            absl::in_place, std::move( hybrid_solid )
-        };
+            hybrid_solid->get()->polyhedron_attribute_manager() );
+        return hybrid_solid;
     }
 
     std::unique_ptr< SolidMesh3D > merge_solid_meshes(

@@ -874,10 +874,10 @@ namespace geode
             for( const auto f : LRange{
                      nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
             {
-                const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
-                    f };
+                absl::optional< PolyhedronFacet > facet{ absl::in_place,
+                    polyhedron_vertex.polyhedron_id, f };
                 detail::VertexCycle< PolyhedronFacetVertices > cur_vertices{
-                    polyhedron_facet_vertices( facet )
+                    polyhedron_facet_vertices( facet.value() )
                 };
                 if( vertices == cur_vertices )
                 {
