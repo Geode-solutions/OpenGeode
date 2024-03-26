@@ -87,7 +87,7 @@ void test_polyhedron_facet_area( const geode::TetrahedralSolid3D& solid )
 {
     for( const auto p : geode::Range{ solid.nb_polyhedra() } )
     {
-        for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(p) } )
+        for( const auto f : geode::LRange{ solid.nb_polyhedron_facets( p ) } )
         {
             auto actual = std::fabs( solid.polyhedron_facet_area( { p, f } ) );
             auto expected = geode::triangle_area( solid.triangle( { p, f } ) );

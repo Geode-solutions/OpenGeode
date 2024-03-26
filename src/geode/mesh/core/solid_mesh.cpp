@@ -810,7 +810,7 @@ namespace geode
         }
         double area{ 0 };
         const auto direction = new_polyhedron_facet_normal( polyhedron_facet )
-            .value_or( Vector3D{ { 0, 0, 1 } } );
+                                   .value_or( Vector3D{ { 0, 0, 1 } } );
         const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
         const auto& p1 = this->point( vertices[0] );
         for( const auto i : LRange{ 1, vertices.size() - 1 } )
