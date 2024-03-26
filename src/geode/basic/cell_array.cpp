@@ -58,9 +58,9 @@ namespace geode
         {
             if( index[direction] + 1 < nb_cells_in_direction( direction ) )
             {
-                auto next = index;
-                next[direction]++;
-                return next;
+                absl::optional< CellIndices > result{ index };
+                result->at( direction )++;
+                return result;
             }
             return absl::nullopt;
         }
@@ -70,9 +70,9 @@ namespace geode
         {
             if( index[direction] > 0 )
             {
-                auto prev = index;
-                prev[direction]--;
-                return prev;
+                absl::optional< CellIndices > result{ index };
+                result->at( direction )--;
+                return result;
             }
             return absl::nullopt;
         }

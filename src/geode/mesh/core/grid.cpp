@@ -198,9 +198,9 @@ namespace geode
             if( index[direction] + 1
                 < nb_vertices_in_direction( grid, direction ) )
             {
-                auto next = index;
-                next[direction]++;
-                return next;
+                absl::optional< VertexIndices > result{ index };
+                result->at( direction )++;
+                return result;
             }
             return absl::nullopt;
         }
@@ -210,9 +210,9 @@ namespace geode
         {
             if( index[direction] > 0 )
             {
-                auto prev = index;
-                prev[direction]--;
-                return prev;
+                absl::optional< VertexIndices > result{ index };
+                result->at( direction )--;
+                return result;
             }
             return absl::nullopt;
         }

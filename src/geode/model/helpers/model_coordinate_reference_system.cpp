@@ -62,11 +62,11 @@ namespace
             }
             const auto& crs_manager =
                 mesh.main_coordinate_reference_system_manager();
-            CRSMap crss;
+            absl::optional< CRSMap > crss{ absl::in_place };
             for( const auto& crs_name :
                 crs_manager.coordinate_reference_system_names() )
             {
-                crss.emplace(
+                crss->emplace(
                     crs_manager.find_coordinate_reference_system( crs_name )
                         .type_name(),
                     geode::to_string( crs_name ) );

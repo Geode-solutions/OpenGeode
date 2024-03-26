@@ -204,12 +204,12 @@ namespace geode
                 return absl::nullopt;
             }
             sort_results();
-            absl::FixedArray< RayTracing3D::PolygonDistance > closest_polygons{
-                std::min( size, static_cast< index_t >( results_.size() ) )
-            };
-            for( const auto i : Indices( closest_polygons ) )
+            absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+                closest_polygons{ std::min(
+                    size, static_cast< index_t >( results_.size() ) ) };
+            for( const auto i : Indices{ closest_polygons.value() } )
             {
-                closest_polygons[i] = results_[i];
+                closest_polygons->at( i ) = results_[i];
             }
             return closest_polygons;
         }

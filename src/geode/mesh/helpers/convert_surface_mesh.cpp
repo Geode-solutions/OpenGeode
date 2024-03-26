@@ -208,15 +208,15 @@ namespace geode
         if( surface.type_name()
             == RegularGrid< dimension >::type_name_static() )
         {
-            auto result = create_triangulated_surface_from_grid(
-                dynamic_cast< const RegularGrid< dimension >& >( surface ) );
-            auto builder =
-                TriangulatedSurfaceBuilder< dimension >::create( *result );
+            absl::optional<
+                std::unique_ptr< TriangulatedSurface< dimension > > >
+                result{ create_triangulated_surface_from_grid(
+                    dynamic_cast< const RegularGrid< dimension >& >(
+                        surface ) ) };
+            auto builder = TriangulatedSurfaceBuilder< dimension >::create(
+                *result->get() );
             detail::copy_meta_info( surface, *builder );
-            return absl::optional<
-                std::unique_ptr< TriangulatedSurface< dimension > > >{
-                absl::in_place, std::move( result )
-            };
+            return result;
         }
         if( !all_polygons_are_simplex( surface ) )
         {
@@ -224,12 +224,10 @@ namespace geode
                           "SurfaceMesh is not made of only triangles." );
             return absl::nullopt;
         }
-        auto tri_surface = TriangulatedSurface< dimension >::create();
-        convert_surface( surface, *tri_surface );
-        return absl::optional<
-            std::unique_ptr< TriangulatedSurface< dimension > > >{
-            absl::in_place, std::move( tri_surface )
-        };
+        absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
+            tri_surface{ TriangulatedSurface< dimension >::create() };
+        convert_surface( surface, *tri_surface->get() );
+        return tri_surface;
     }
 
     std::unique_ptr< TriangulatedSurface2D >
