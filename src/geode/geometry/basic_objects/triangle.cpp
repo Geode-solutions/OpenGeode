@@ -47,13 +47,13 @@ namespace
     {
         try
         {
-            PivotNormalResult result;
+            absl::optional< PivotNormalResult > result{ absl::in_place };
             for( const auto pivot : geode::LRange{ 3 } )
             {
                 const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
                 const geode::Vector3D edge{ points[pivot], points[next] };
-                result.lengths[pivot] = edge.length();
-                const auto edge0 = edge / result.lengths[pivot];
+                result->lengths[pivot] = edge.length();
+                const auto edge0 = edge / result->lengths[pivot];
                 const auto prev = pivot == 0 ? 2 : pivot - 1;
                 const auto edge1 =
                     geode::Vector3D{ points[pivot], points[prev] }.normalize();
@@ -62,8 +62,8 @@ namespace
                 const auto length = normal.length();
                 if( length > geode::global_angular_epsilon )
                 {
-                    result.pivot = pivot;
-                    result.normal = normal / length;
+                    result->pivot = pivot;
+                    result->normal = normal / length;
                     return result;
                 }
             }
@@ -192,7 +192,9 @@ namespace geode
         }
         if( result->pivot != NO_LID )
         {
-            return std::make_pair( result->pivot, result->normal );
+            return absl::optional< std::pair< local_index_t, Vector3D > >{
+                std::make_pair( result->pivot, result->normal )
+            };
         }
         const auto max = absl::c_max_element( result->lengths );
         const local_index_t longest_e =

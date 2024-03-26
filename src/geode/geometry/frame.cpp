@@ -31,7 +31,7 @@ namespace
     absl::optional< geode::Frame< dimension > > compute_inverse(
         geode::Frame< dimension > frame )
     {
-        geode::Frame< dimension > result;
+        absl::optional< geode::Frame< dimension > > result{ absl::in_place };
         for( const auto i : geode::LRange{ dimension } )
         {
             auto value = frame.direction( i ).value( i );
@@ -53,16 +53,16 @@ namespace
 
             if( index != i )
             {
-                auto temp_result = result.direction( i );
-                result.set_direction( i, result.direction( index ) );
-                result.set_direction( index, std::move( temp_result ) );
+                auto temp_result = result->direction( i );
+                result->set_direction( i, result->direction( index ) );
+                result->set_direction( index, std::move( temp_result ) );
                 auto temp_frame = frame.direction( i );
                 frame.set_direction( i, frame.direction( index ) );
                 frame.set_direction( index, std::move( temp_frame ) );
             }
 
             frame.set_direction( i, frame.direction( i ) / value );
-            result.set_direction( i, result.direction( i ) / value );
+            result->set_direction( i, result->direction( i ) / value );
 
             for( const auto j : geode::LRange{ dimension } )
             {
@@ -73,8 +73,8 @@ namespace
                 const auto scale = frame.direction( j ).value( i );
                 frame.set_direction(
                     j, frame.direction( j ) - frame.direction( i ) * scale );
-                result.set_direction(
-                    j, result.direction( j ) - result.direction( i ) * scale );
+                result->set_direction( j,
+                    result->direction( j ) - result->direction( i ) * scale );
             }
         }
 

@@ -155,9 +155,11 @@ namespace
         for( const auto e :
             geode::LRange{ surface.nb_polygon_edges( polygon_adj_id ) } )
         {
-            const geode::PolygonEdge adj_edge{ polygon_adj_id, e };
-            const auto adj_v0 = surface.polygon_vertex( adj_edge );
-            const auto adj_v1 = surface.polygon_edge_vertex( adj_edge, 1 );
+            absl::optional< geode::PolygonEdge > adj_edge{ absl::in_place,
+                polygon_adj_id, e };
+            const auto adj_v0 = surface.polygon_vertex( adj_edge.value() );
+            const auto adj_v1 =
+                surface.polygon_edge_vertex( adj_edge.value(), 1 );
             if( ( vertices[0] == adj_v1 && vertices[1] == adj_v0 )
                 || ( vertices[0] == adj_v0 && vertices[1] == adj_v1 ) )
             {
@@ -222,7 +224,7 @@ namespace
         const geode::PolygonEdge& polygon_edge,
         const std::array< geode::index_t, 2 >& vertices )
     {
-        const auto adj_edge =
+        auto adj_edge =
             find_polygon_adjacent_edge( surface, polygon_edge, vertices );
         if( !adj_edge )
         {
