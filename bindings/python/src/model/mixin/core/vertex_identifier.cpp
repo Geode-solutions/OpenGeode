@@ -49,6 +49,7 @@ namespace geode
         pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )
             .def( pybind11::init< ComponentID, index_t >() )
             .def( pybind11::self == pybind11::self )
+            .def( "string", &ComponentMeshVertex::string )
             .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
             .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
     }
