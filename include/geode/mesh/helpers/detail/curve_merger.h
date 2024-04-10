@@ -51,6 +51,11 @@ namespace geode
                 {
                 }
 
+                bool operator==( const EdgeOrigin& other ) const
+                {
+                    return curve == other.curve && edge == other.edge;
+                }
+
                 index_t curve;
                 index_t edge;
             };
