@@ -102,8 +102,13 @@ namespace geode
             if( cross02_03.length()
                 > global_angular_epsilon * edge02_length * edge03_length )
             {
-                return Vector3D{ vertices[v], vertices[v1] }.dot( cross02_03 )
-                       / 6.;
+                const Vector3D edge01{ vertices[v], vertices[v1] };
+                const auto edge01_length = edge01.length();
+                if( edge01_length == 0 )
+                {
+                    return 0;
+                }
+                return edge01.dot( cross02_03 ) / 6.;
             }
         }
         OPENGEODE_ASSERT_NOT_REACHED(
