@@ -51,7 +51,7 @@ namespace geode
                 {
                 }
 
-                bool operator==( const EdgeOrigin& other ) const
+                bool operator==( const PolyhedronOrigin& other ) const
                 {
                     return solid == other.solid
                            && polyhedron == other.polyhedron;
