@@ -71,12 +71,6 @@ void run_test_brep()
         "[Test] BRep - Wrong number of solid vertices" );
     OPENGEODE_EXCEPTION( solid->nb_polyhedra() == 0,
         "[Test] BRep - Wrong number of solid polyhedra" );
-    const auto new_solid =
-        std::get< 0 >( geode::new_convert_brep_into_solid( model ) );
-    OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 16,
-        "[Test] BRep - Wrong number of solid vertices" );
-    OPENGEODE_EXCEPTION( new_solid->nb_polyhedra() == 0,
-        "[Test] BRep - Wrong number of solid polyhedra" );
 }
 
 void run_test_section()
@@ -90,13 +84,6 @@ void run_test_section()
         "[Test] Section - Wrong number of curve vertices" );
     OPENGEODE_EXCEPTION( curve->nb_edges() == 0,
         "[Test] Section - Wrong number of curve edges" );
-    const auto new_curve =
-        std::get< 0 >( geode::new_convert_section_into_curve( model ) );
-    OPENGEODE_EXCEPTION( new_curve->nb_vertices() == 0,
-        "[Test] Section - Wrong number of curve vertices" );
-    OPENGEODE_EXCEPTION( new_curve->nb_edges() == 0,
-        "[Test] Section - Wrong number of curve edges" );
-
     const auto& surface = std::get< 1 >( output );
     OPENGEODE_EXCEPTION( surface->nb_vertices() == 4,
         "[Test] Section - Wrong number of surface vertices" );

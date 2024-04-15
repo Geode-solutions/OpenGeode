@@ -51,8 +51,11 @@ namespace geode
 
     struct ModelToMeshMappings
     {
-        MeshElementToIndexMapping mesh_element_mapping;
-        BijectiveMapping< geode::index_t > unique_vertex_mapping;
+        MeshElementToIndexMapping corner_vertices_mapping;
+        MeshElementToIndexMapping line_edges_mapping;
+        MeshElementToIndexMapping surface_polygons_mapping;
+        MeshElementToIndexMapping solid_polyhedra_mapping;
+        BijectiveMapping< geode::index_t > unique_vertices_mapping;
     };
 
     static constexpr auto uuid_from_conversion_attribute_name =
