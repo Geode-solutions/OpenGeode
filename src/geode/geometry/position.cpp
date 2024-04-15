@@ -178,11 +178,11 @@ namespace geode
             const auto volume = tetrahedron_signed_volume(
                 { vertices[facet_vertices[0]], vertices[facet_vertices[1]],
                     vertices[facet_vertices[2]], point } );
-            if( volume < -global_epsilon )
+            if( volume < -10 * global_epsilon )
             {
                 return Position::outside;
             }
-            if( volume < global_epsilon )
+            if( volume < 10 * global_epsilon )
             {
                 return point_tetrahedron_position_exact( point, tetra );
             }

@@ -51,6 +51,12 @@ namespace geode
                 {
                 }
 
+                bool operator==( const PolyhedronOrigin& other ) const
+                {
+                    return solid == other.solid
+                           && polyhedron == other.polyhedron;
+                }
+
                 index_t solid;
                 index_t polyhedron;
             };
