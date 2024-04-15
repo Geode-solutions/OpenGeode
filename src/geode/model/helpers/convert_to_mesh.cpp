@@ -555,8 +555,7 @@ namespace
     template < typename Model >
     void build_edges_from_model( const Model& model,
         geode::ModelToMeshMappings& model2mesh,
-        std::unique_ptr< geode::EdgedCurveBuilder< Model::dim > >&
-            mesh_builder )
+        geode::EdgedCurveBuilder< Model::dim >& mesh_builder )
     {
         for( const auto& line : model.lines() )
         {
@@ -577,7 +576,7 @@ namespace
                     }
                     else
                     {
-                        auto new_vertex_index = mesh_builder->create_point(
+                        const auto new_vertex_index = mesh_builder.create_point(
                             line_mesh.point( vertex ) );
                         vertices[v] = new_vertex_index;
                         model2mesh.unique_vertex_mapping.map(
@@ -585,7 +584,7 @@ namespace
                     }
                 }
                 const auto edge_index =
-                    mesh_builder->create_edge( vertices[0], vertices[1] );
+                    mesh_builder.create_edge( vertices[0], vertices[1] );
                 model2mesh.mesh_element_mapping.map(
                     { line.id(), e }, edge_index );
             }
@@ -601,7 +600,7 @@ namespace
         auto mesh = geode::EdgedCurve< Model::dim >::create();
         auto mesh_builder =
             geode::EdgedCurveBuilder< Model::dim >::create( *mesh );
-        build_edges_from_model( model, model2mesh, mesh_builder );
+        build_edges_from_model( model, model2mesh, *mesh_builder );
         return std::make_pair( std::move( mesh ), std::move( model2mesh ) );
     }
 
@@ -609,7 +608,7 @@ namespace
     void compute_polygons_surface_adjacencies(
         const absl::FixedArray< geode::index_t >& polygons,
         const geode::SurfaceMesh< dim >& surface_mesh,
-        std::unique_ptr< geode::SurfaceMeshBuilder< dim > >& mesh_builder )
+        geode::SurfaceMeshBuilder< dim >& mesh_builder )
     {
         for( const auto p : geode::Range{ surface_mesh.nb_polygons() } )
         {
@@ -618,7 +617,7 @@ namespace
             {
                 if( const auto adj = surface_mesh.polygon_adjacent( { p, e } ) )
                 {
-                    mesh_builder->set_polygon_adjacent(
+                    mesh_builder.set_polygon_adjacent(
                         { polygons[p], e }, polygons[adj.value()] );
                 }
             }
@@ -627,8 +626,7 @@ namespace
 
     template < typename Model >
     void build_polygons_from_model( const Model& model,
-        std::unique_ptr< geode::SurfaceMeshBuilder< Model::dim > >&
-            mesh_builder,
+        geode::SurfaceMeshBuilder< Model::dim >& mesh_builder,
         geode::ModelToMeshMappings& model2mesh )
     {
         for( const auto& surface : model.surfaces() )
@@ -654,14 +652,14 @@ namespace
                     }
                     else
                     {
-                        auto new_vertex_index = mesh_builder->create_point(
+                        const auto new_vertex_index = mesh_builder.create_point(
                             surface_mesh.point( vertex ) );
                         polygon[v] = new_vertex_index;
                         model2mesh.unique_vertex_mapping.map(
                             unique_vertex, new_vertex_index );
                     }
                 }
-                polygons[p] = mesh_builder->create_polygon( polygon );
+                polygons[p] = mesh_builder.create_polygon( polygon );
                 model2mesh.mesh_element_mapping.map(
                     { surface.id(), p }, polygons[p] );
             }
@@ -678,7 +676,7 @@ namespace
         auto mesh_builder =
             geode::SurfaceMeshBuilder< Model::dim >::create( *mesh );
         geode::ModelToMeshMappings model2mesh;
-        build_polygons_from_model( model, mesh_builder, model2mesh );
+        build_polygons_from_model( model, *mesh_builder, model2mesh );
         mesh_builder->compute_polygon_adjacencies();
         return std::make_pair( std::move( mesh ), std::move( model2mesh ) );
     }
@@ -686,7 +684,7 @@ namespace
     void compute_block_polyhedra_adjacencies(
         const absl::FixedArray< geode::index_t >& polyhedra,
         const geode::SolidMesh3D& block_mesh,
-        std::unique_ptr< geode::SolidMeshBuilder3D >& mesh_builder )
+        geode::SolidMeshBuilder3D& mesh_builder )
     {
         for( const auto p : geode::Range{ block_mesh.nb_polyhedra() } )
         {
@@ -696,7 +694,7 @@ namespace
                 if( const auto adj =
                         block_mesh.polyhedron_adjacent( { p, f } ) )
                 {
-                    mesh_builder->set_polyhedron_adjacent(
+                    mesh_builder.set_polyhedron_adjacent(
                         { polyhedra[p], f }, polyhedra[adj.value()] );
                 }
             }
@@ -704,7 +702,7 @@ namespace
     }
 
     void build_polyhedra_from_model( const geode::BRep& brep,
-        std::unique_ptr< geode::SolidMeshBuilder3D >& mesh_builder,
+        geode::SolidMeshBuilder3D& mesh_builder,
         geode::ModelToMeshMappings& brep2mesh )
     {
         for( const auto& block : brep.blocks() )
@@ -729,12 +727,12 @@ namespace
                         polyhedron_vertices[v] =
                             brep2mesh.unique_vertex_mapping.in2out(
                                 unique_vertex );
-                        mesh_builder->set_point( polyhedron_vertices[v],
+                        mesh_builder.set_point( polyhedron_vertices[v],
                             block_mesh.point( vertex ) );
                     }
                     else
                     {
-                        auto new_vertex_index = mesh_builder->create_point(
+                        auto new_vertex_index = mesh_builder.create_point(
                             block_mesh.point( vertex ) );
                         polyhedron_vertices[v] = new_vertex_index;
                         brep2mesh.unique_vertex_mapping.map(
@@ -761,7 +759,7 @@ namespace
                                 .value();
                     }
                 }
-                polyhedra[p] = mesh_builder->create_polyhedron(
+                polyhedra[p] = mesh_builder.create_polyhedron(
                     polyhedron_vertices, polyhedron_facet_vertices );
                 brep2mesh.mesh_element_mapping.map(
                     { block.id(), p }, polyhedra[p] );
@@ -878,25 +876,22 @@ namespace geode
         return new_convert_model_into_curve( brep );
     }
 
-    template < typename SurfaceType = SurfaceMesh3D >
-    std::tuple< std::unique_ptr< SurfaceType >, ModelToMeshMappings >
+    std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
         new_convert_brep_into_surface( const BRep& brep )
     {
-        return new_convert_model_into_surface< SurfaceType >( brep );
+        return new_convert_model_into_surface< SurfaceMesh3D >( brep );
     }
 
-    template < typename SurfaceType = SurfaceMesh2D >
-    std::tuple< std::unique_ptr< SurfaceType >, ModelToMeshMappings >
+    std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
         new_convert_section_into_surface( const Section& section )
     {
-        return new_convert_model_into_surface< SurfaceType >( section );
+        return new_convert_model_into_surface< SurfaceMesh2D >( section );
     }
 
-    template < typename SolidType = SolidMesh3D >
-    std::tuple< std::unique_ptr< SolidType >, ModelToMeshMappings >
+    std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
         new_convert_brep_into_solid( const BRep& brep )
     {
-        auto mesh = SolidType::create();
+        auto mesh = SolidMesh3D::create();
         auto mesh_builder = geode::SolidMeshBuilder< 3 >::create( *mesh );
         ModelToMeshMappings brep2mesh;
         for( const auto unique_vertex :
@@ -906,7 +901,7 @@ namespace geode
             brep2mesh.unique_vertex_mapping.map(
                 unique_vertex, new_vertex_index );
         }
-        build_polyhedra_from_model( brep, mesh_builder, brep2mesh );
+        build_polyhedra_from_model( brep, *mesh_builder, brep2mesh );
         return std::make_pair( std::move( mesh ), std::move( brep2mesh ) );
     }
 
@@ -917,17 +912,18 @@ namespace geode
     template std::unique_ptr< TriangulatedSurface2D > opengeode_model_api
         convert_section_into_surface( const Section& section );
 
-    template std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
-        opengeode_model_api new_convert_section_into_surface(
-            const Section& section );
-    template std::tuple< std::unique_ptr< PolygonalSurface2D >,
-        ModelToMeshMappings >
-        opengeode_model_api new_convert_section_into_surface(
-            const Section& section );
-    template std::tuple< std::unique_ptr< TriangulatedSurface2D >,
-        ModelToMeshMappings >
-        opengeode_model_api new_convert_section_into_surface(
-            const Section& section );
+    // template std::tuple< std::unique_ptr< SurfaceMesh2D >,
+    // ModelToMeshMappings >
+    //     opengeode_model_api new_convert_section_into_surface(
+    //         const Section& section );
+    // template std::tuple< std::unique_ptr< PolygonalSurface2D >,
+    //     ModelToMeshMappings >
+    //     opengeode_model_api new_convert_section_into_surface(
+    //         const Section& section );
+    // template std::tuple< std::unique_ptr< TriangulatedSurface2D >,
+    //     ModelToMeshMappings >
+    //     opengeode_model_api new_convert_section_into_surface(
+    //         const Section& section );
 
     template std::tuple< std::unique_ptr< EdgedCurve2D >,
         std::unique_ptr< SurfaceMesh2D > >
@@ -958,25 +954,28 @@ namespace geode
     template std::unique_ptr< HybridSolid3D >
         opengeode_model_api convert_brep_into_solid( const BRep& );
 
-    template std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_surface( const BRep& );
-    template std::tuple< std::unique_ptr< PolygonalSurface3D >,
-        ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_surface( const BRep& );
-    template std::tuple< std::unique_ptr< TriangulatedSurface3D >,
-        ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_surface( const BRep& );
+    // template std::tuple< std::unique_ptr< SurfaceMesh3D >,
+    // ModelToMeshMappings >
+    //     opengeode_model_api new_convert_brep_into_surface( const BRep& );
+    // template std::tuple< std::unique_ptr< PolygonalSurface3D >,
+    //     ModelToMeshMappings >
+    //     opengeode_model_api new_convert_brep_into_surface( const BRep& );
+    // template std::tuple< std::unique_ptr< TriangulatedSurface3D >,
+    //     ModelToMeshMappings >
+    //     opengeode_model_api new_convert_brep_into_surface( const BRep& );
 
-    template std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_solid( const BRep& );
-    template std::tuple< std::unique_ptr< PolyhedralSolid3D >,
-        ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_solid( const BRep& );
-    template std::tuple< std::unique_ptr< TetrahedralSolid3D >,
-        ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_solid( const BRep& );
-    template std::tuple< std::unique_ptr< HybridSolid3D >, ModelToMeshMappings >
-        opengeode_model_api new_convert_brep_into_solid( const BRep& );
+    // template std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings
+    // >
+    //     opengeode_model_api new_convert_brep_into_solid( const BRep& );
+    // template std::tuple< std::unique_ptr< PolyhedralSolid3D >,
+    //     ModelToMeshMappings >
+    //     opengeode_model_api new_convert_brep_into_solid( const BRep& );
+    // template std::tuple< std::unique_ptr< TetrahedralSolid3D >,
+    //     ModelToMeshMappings >
+    //     opengeode_model_api new_convert_brep_into_solid( const BRep& );
+    // template std::tuple< std::unique_ptr< HybridSolid3D >,
+    // ModelToMeshMappings >
+    //     opengeode_model_api new_convert_brep_into_solid( const BRep& );
 
     template std::tuple< std::unique_ptr< EdgedCurve3D >,
         std::unique_ptr< SurfaceMesh3D > >

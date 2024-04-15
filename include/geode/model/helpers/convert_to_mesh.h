@@ -55,10 +55,6 @@ namespace geode
         BijectiveMapping< geode::index_t > unique_vertex_mapping;
     };
 
-} // namespace geode
-
-namespace geode
-{
     static constexpr auto uuid_from_conversion_attribute_name =
         "uuid_from_conversion";
     using uuid_from_conversion_attribute_type = uuid;
@@ -81,8 +77,7 @@ namespace geode
     OPENGEODE_MODEL_DEPRECATED std::unique_ptr< SurfaceType >
         convert_section_into_surface( const Section& section );
 
-    template < typename SurfaceType = SurfaceMesh2D >
-    std::tuple< std::unique_ptr< SurfaceType >, ModelToMeshMappings >
+    std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
         opengeode_model_api new_convert_section_into_surface(
             const Section& section );
 
@@ -102,16 +97,14 @@ namespace geode
     std::unique_ptr< SurfaceType > OPENGEODE_MODEL_DEPRECATED
         convert_brep_into_surface( const BRep& brep );
 
-    template < typename SurfaceType = SurfaceMesh3D >
-    std::tuple< std::unique_ptr< SurfaceType >, ModelToMeshMappings >
+    std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
         new_convert_brep_into_surface( const BRep& brep );
 
     template < typename SolidType = SolidMesh3D >
     std::unique_ptr< SolidType >
         OPENGEODE_MODEL_DEPRECATED convert_brep_into_solid( const BRep& brep );
 
-    template < typename SolidType = SolidMesh3D >
-    std::tuple< std::unique_ptr< SolidType >, ModelToMeshMappings >
+    std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
         new_convert_brep_into_solid( const BRep& brep );
 
     template < typename SurfaceType = SurfaceMesh3D >
