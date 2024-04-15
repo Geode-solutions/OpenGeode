@@ -553,9 +553,6 @@ namespace
         builder.build_mesh();
         return builder.get_result();
     }
-} // namespace
-namespace
-{
 
     template < typename Model >
     void map_corner_vertices(
@@ -870,6 +867,7 @@ namespace
         }
     }
 } // namespace
+
 namespace geode
 {
     template < typename SolidType >

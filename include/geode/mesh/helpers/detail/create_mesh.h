@@ -20,9 +20,13 @@
  * SOFTWARE.
  *
  */
-#include <absl/types/span.h>
-#include <geode/mesh/opengeode_mesh_export.h>
+#pragma once
+
 #include <memory>
+
+#include <absl/types/span.h>
+
+#include <geode/mesh/common.h>
 
 namespace geode
 {
