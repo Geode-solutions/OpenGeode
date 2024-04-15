@@ -101,14 +101,14 @@ namespace geode
         convert_brep_into_surface( const BRep& brep );
 
     std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
-        new_convert_brep_into_surface( const BRep& brep );
+        opengeode_model_api new_convert_brep_into_surface( const BRep& brep );
 
     template < typename SolidType = SolidMesh3D >
     std::unique_ptr< SolidType >
         OPENGEODE_MODEL_DEPRECATED convert_brep_into_solid( const BRep& brep );
 
     std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
-        new_convert_brep_into_solid( const BRep& brep );
+        opengeode_model_api new_convert_brep_into_solid( const BRep& brep );
 
     template < typename SurfaceType = SurfaceMesh3D >
     std::tuple< std::unique_ptr< EdgedCurve3D >,
