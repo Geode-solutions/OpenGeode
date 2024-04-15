@@ -35,24 +35,7 @@
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
-
-namespace
-{
-    template < typename Mesh >
-    std::unique_ptr< Mesh > create_mesh(
-        absl::Span< const std::reference_wrapper< const Mesh > > meshes )
-    {
-        const auto type = meshes.front().get().type_name();
-        for( const auto& mesh : meshes )
-        {
-            if( mesh.get().type_name() != type )
-            {
-                return Mesh::create();
-            }
-        }
-        return Mesh::create( geode::MeshFactory::default_impl( type ) );
-    }
-} // namespace
+#include <geode/mesh/helpers/detail/create_mesh.h>
 
 namespace geode
 {

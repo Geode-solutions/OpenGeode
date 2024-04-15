@@ -49,6 +49,7 @@
 #include <geode/mesh/core/surface_mesh.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/helpers/detail/create_mesh.h>
 
 #include <geode/model/helpers/component_mesh_vertices.h>
 #include <geode/model/mixin/core/block.h>
@@ -597,7 +598,17 @@ namespace
         new_convert_model_into_curve( const Model& model )
     {
         geode::ModelToMeshMappings model2mesh;
-        auto mesh = geode::EdgedCurve< Model::dim >::create();
+        std::vector<
+            std::reference_wrapper< const geode::EdgedCurve< Model::dim > > >
+            meshes;
+        meshes.reserve( model.nb_lines() );
+        for( const auto& line : model.lines() )
+        {
+            meshes.emplace_back( line.mesh() );
+        }
+        auto mesh =
+            geode::detail::create_mesh< geode::EdgedCurve< Model::dim > >(
+                std::move( meshes ) );
         auto mesh_builder =
             geode::EdgedCurveBuilder< Model::dim >::create( *mesh );
         build_edges_from_model( model, model2mesh, *mesh_builder );
@@ -668,11 +679,22 @@ namespace
         }
     }
 
-    template < typename SurfaceType, typename Model >
-    std::tuple< std::unique_ptr< SurfaceType >, geode::ModelToMeshMappings >
+    template < typename Model >
+    std::tuple< std::unique_ptr< geode::SurfaceMesh< Model::dim > >,
+        geode::ModelToMeshMappings >
         new_convert_model_into_surface( const Model& model )
     {
-        auto mesh = SurfaceType::create();
+        std::vector<
+            std::reference_wrapper< const geode::SurfaceMesh< Model::dim > > >
+            meshes;
+        meshes.reserve( model.nb_surfaces() );
+        for( const auto& surface : model.surfaces() )
+        {
+            meshes.emplace_back( surface.mesh() );
+        }
+        auto mesh =
+            geode::detail::create_mesh< geode::SurfaceMesh< Model::dim > >(
+                meshes );
         auto mesh_builder =
             geode::SurfaceMeshBuilder< Model::dim >::create( *mesh );
         geode::ModelToMeshMappings model2mesh;
@@ -879,19 +901,26 @@ namespace geode
     std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
         new_convert_brep_into_surface( const BRep& brep )
     {
-        return new_convert_model_into_surface< SurfaceMesh3D >( brep );
+        return new_convert_model_into_surface( brep );
     }
 
     std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
         new_convert_section_into_surface( const Section& section )
     {
-        return new_convert_model_into_surface< SurfaceMesh2D >( section );
+        return new_convert_model_into_surface( section );
     }
 
     std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
         new_convert_brep_into_solid( const BRep& brep )
     {
-        auto mesh = SolidMesh3D::create();
+        std::vector< std::reference_wrapper< const geode::SolidMesh3D > >
+            meshes;
+        meshes.reserve( brep.nb_blocks() );
+        for( const auto& block : brep.blocks() )
+        {
+            meshes.emplace_back( block.mesh() );
+        }
+        auto mesh = geode::detail::create_mesh< SolidMesh3D >( meshes );
         auto mesh_builder = geode::SolidMeshBuilder< 3 >::create( *mesh );
         ModelToMeshMappings brep2mesh;
         for( const auto unique_vertex :
