@@ -23,9 +23,13 @@
 
 #pragma once
 
-#include <memory>
+#include <geode/basic/mapping.h>
+
+#include <geode/mesh/core/mesh_element.h>
 
 #include <geode/model/common.h>
+
+#include <memory>
 
 namespace geode
 {
@@ -38,11 +42,22 @@ namespace geode
     class BRep;
     class Section;
     struct uuid;
-    struct MeshElement;
 } // namespace geode
 
 namespace geode
 {
+
+    using MeshElementToIndexMapping = GenericMapping< MeshElement, index_t >;
+
+    struct ModelToMeshMappings
+    {
+        MeshElementToIndexMapping corner_vertices_mapping;
+        MeshElementToIndexMapping line_edges_mapping;
+        MeshElementToIndexMapping surface_polygons_mapping;
+        MeshElementToIndexMapping solid_polyhedra_mapping;
+        BijectiveMapping< geode::index_t > unique_vertices_mapping;
+    };
+
     static constexpr auto uuid_from_conversion_attribute_name =
         "uuid_from_conversion";
     using uuid_from_conversion_attribute_type = uuid;
@@ -53,27 +68,47 @@ namespace geode
         "mesh_elements_from_conversion";
     using mesh_elements_attribute_type = MeshElement;
 
-    std::unique_ptr< EdgedCurve2D > opengeode_model_api
+    std::unique_ptr< EdgedCurve2D >
+        opengeode_model_api OPENGEODE_MODEL_DEPRECATED
         convert_section_into_curve( const Section& section );
 
+    std::tuple< std::unique_ptr< EdgedCurve2D >, ModelToMeshMappings >
+        opengeode_model_api new_convert_section_into_curve(
+            const Section& section );
+
     template < typename SurfaceType = SurfaceMesh2D >
-    std::unique_ptr< SurfaceType > convert_section_into_surface(
-        const Section& section );
+    OPENGEODE_MODEL_DEPRECATED std::unique_ptr< SurfaceType >
+        convert_section_into_surface( const Section& section );
+
+    std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
+        opengeode_model_api new_convert_section_into_surface(
+            const Section& section );
 
     template < typename SurfaceType = SurfaceMesh2D >
     std::tuple< std::unique_ptr< EdgedCurve2D >,
         std::unique_ptr< SurfaceType > >
         convert_section_into_curve_and_surface( const Section& section );
 
-    std::unique_ptr< EdgedCurve3D > opengeode_model_api convert_brep_into_curve(
-        const BRep& brep );
+    std::unique_ptr< EdgedCurve3D >
+        opengeode_model_api OPENGEODE_MODEL_DEPRECATED convert_brep_into_curve(
+            const BRep& brep );
+
+    std::tuple< std::unique_ptr< EdgedCurve3D >, ModelToMeshMappings >
+        opengeode_model_api new_convert_brep_into_curve( const BRep& brep );
 
     template < typename SurfaceType = SurfaceMesh3D >
-    std::unique_ptr< SurfaceType > convert_brep_into_surface(
-        const BRep& brep );
+    std::unique_ptr< SurfaceType > OPENGEODE_MODEL_DEPRECATED
+        convert_brep_into_surface( const BRep& brep );
+
+    std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
+        opengeode_model_api new_convert_brep_into_surface( const BRep& brep );
 
     template < typename SolidType = SolidMesh3D >
-    std::unique_ptr< SolidType > convert_brep_into_solid( const BRep& brep );
+    std::unique_ptr< SolidType >
+        OPENGEODE_MODEL_DEPRECATED convert_brep_into_solid( const BRep& brep );
+
+    std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
+        opengeode_model_api new_convert_brep_into_solid( const BRep& brep );
 
     template < typename SurfaceType = SurfaceMesh3D >
     std::tuple< std::unique_ptr< EdgedCurve3D >,
@@ -91,5 +126,4 @@ namespace geode
         std::unique_ptr< SurfaceType >,
         std::unique_ptr< SolidType > >
         convert_brep_into_curve_and_surface_and_solid( const BRep& brep );
-
 } // namespace geode
