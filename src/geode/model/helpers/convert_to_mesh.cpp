@@ -577,33 +577,33 @@ namespace
         for( const auto& line : model.lines() )
         {
             const auto& line_mesh = line.mesh();
-            for( const auto& e : geode::Range{ line_mesh.nb_edges() } )
+            for( const auto& edge_id : geode::Range{ line_mesh.nb_edges() } )
             {
                 std::array< geode::index_t, 2 > vertices;
-                for( const auto v : geode::LRange{ 2 } )
+                for( const auto edge_vertex_id : geode::LRange{ 2 } )
                 {
-                    const auto vertex = line_mesh.edge_vertex( { e, v } );
+                    const auto vertex =
+                        line_mesh.edge_vertex( { edge_id, edge_vertex_id } );
                     const auto unique_vertex =
                         model.unique_vertex( { line.component_id(), vertex } );
                     if( model2mesh.unique_vertices_mapping.has_mapping_input(
                             unique_vertex ) )
                     {
-                        vertices[v] = model2mesh.unique_vertices_mapping.in2out(
-                            unique_vertex );
+                        vertices[edge_vertex_id] =
+                            model2mesh.unique_vertices_mapping.in2out(
+                                unique_vertex );
+                        continue;
                     }
-                    else
-                    {
-                        const auto new_vertex_index = mesh_builder.create_point(
-                            line_mesh.point( vertex ) );
-                        vertices[v] = new_vertex_index;
-                        model2mesh.unique_vertices_mapping.map(
-                            unique_vertex, new_vertex_index );
-                    }
+                    const auto new_vertex_index =
+                        mesh_builder.create_point( line_mesh.point( vertex ) );
+                    vertices[edge_vertex_id] = new_vertex_index;
+                    model2mesh.unique_vertices_mapping.map(
+                        unique_vertex, new_vertex_index );
                 }
                 const auto edge_index =
                     mesh_builder.create_edge( vertices[0], vertices[1] );
                 model2mesh.line_edges_mapping.map(
-                    { line.id(), e }, edge_index );
+                    { line.id(), edge_id }, edge_index );
             }
         }
     }
@@ -624,7 +624,7 @@ namespace
         }
         auto mesh =
             geode::detail::create_mesh< geode::EdgedCurve< Model::dim > >(
-                std::move( meshes ) );
+                meshes );
         auto mesh_builder =
             geode::EdgedCurveBuilder< Model::dim >::create( *mesh );
         build_edges_from_model( model, model2mesh, *mesh_builder );
@@ -633,20 +633,23 @@ namespace
     }
 
     template < geode::index_t dim >
-    void compute_polygons_surface_adjacencies(
+    void set_polygons_surface_adjacencies(
         const absl::FixedArray< geode::index_t >& polygons,
         const geode::SurfaceMesh< dim >& surface_mesh,
         geode::SurfaceMeshBuilder< dim >& mesh_builder )
     {
-        for( const auto p : geode::Range{ surface_mesh.nb_polygons() } )
+        for( const auto polygon_id :
+            geode::Range{ surface_mesh.nb_polygons() } )
         {
-            for( const auto e :
-                geode::LRange{ surface_mesh.nb_polygon_edges( p ) } )
+            for( const auto edge_id :
+                geode::LRange{ surface_mesh.nb_polygon_edges( polygon_id ) } )
             {
-                if( const auto adj = surface_mesh.polygon_adjacent( { p, e } ) )
+                if( const auto adj = surface_mesh.polygon_adjacent(
+                        { polygon_id, edge_id } ) )
                 {
                     mesh_builder.set_polygon_adjacent(
-                        { polygons[p], e }, polygons[adj.value()] );
+                        { polygons[polygon_id], edge_id },
+                        polygons[adj.value()] );
                 }
             }
         }
@@ -662,36 +665,39 @@ namespace
             const auto& surface_mesh = surface.mesh();
             absl::FixedArray< geode::index_t > polygons(
                 surface_mesh.nb_polygons() );
-            for( const auto p : geode::Range{ surface_mesh.nb_polygons() } )
+            for( const auto polygon_id :
+                geode::Range{ surface_mesh.nb_polygons() } )
             {
-                absl::FixedArray< geode::index_t > polygon(
-                    surface_mesh.nb_polygon_vertices( p ) );
-                for( const auto v :
-                    geode::LRange{ surface_mesh.nb_polygon_vertices( p ) } )
+                absl::FixedArray< geode::index_t > polygon_vertices(
+                    surface_mesh.nb_polygon_vertices( polygon_id ) );
+                for( const auto polygon_vertex :
+                    geode::LIndices{ polygon_vertices } )
                 {
-                    const auto vertex = surface_mesh.polygon_vertex( { p, v } );
+                    const auto vertex = surface_mesh.polygon_vertex(
+                        { polygon_id, polygon_vertex } );
                     const auto unique_vertex = model.unique_vertex(
                         { surface.component_id(), vertex } );
                     if( model2mesh.unique_vertices_mapping.has_mapping_input(
                             unique_vertex ) )
                     {
-                        polygon[v] = model2mesh.unique_vertices_mapping.in2out(
-                            unique_vertex );
+                        polygon_vertices[polygon_vertex] =
+                            model2mesh.unique_vertices_mapping.in2out(
+                                unique_vertex );
+                        continue;
                     }
-                    else
-                    {
-                        const auto new_vertex_index = mesh_builder.create_point(
-                            surface_mesh.point( vertex ) );
-                        polygon[v] = new_vertex_index;
-                        model2mesh.unique_vertices_mapping.map(
-                            unique_vertex, new_vertex_index );
-                    }
+
+                    const auto new_vertex_index = mesh_builder.create_point(
+                        surface_mesh.point( vertex ) );
+                    polygon_vertices[polygon_vertex] = new_vertex_index;
+                    model2mesh.unique_vertices_mapping.map(
+                        unique_vertex, new_vertex_index );
                 }
-                polygons[p] = mesh_builder.create_polygon( polygon );
+                polygons[polygon_id] =
+                    mesh_builder.create_polygon( polygon_vertices );
                 model2mesh.surface_polygons_mapping.map(
-                    { surface.id(), p }, polygons[p] );
+                    { surface.id(), polygon_id }, polygons[polygon_id] );
             }
-            compute_polygons_surface_adjacencies< Model::dim >(
+            set_polygons_surface_adjacencies< Model::dim >(
                 polygons, surface_mesh, mesh_builder );
         }
     }
@@ -743,27 +749,29 @@ namespace
             geode::SurfaceMeshBuilder< Model::dim >::create( *mesh );
         geode::ModelToMeshMappings model2mesh;
         build_polygons_from_model( model, *mesh_builder, model2mesh );
+        mesh_builder->compute_polygon_adjacencies();
         map_line_edges( model, model2mesh, *mesh );
         map_corner_vertices( model, model2mesh );
-        mesh_builder->compute_polygon_adjacencies();
         return std::make_pair( std::move( mesh ), std::move( model2mesh ) );
     }
 
-    void compute_block_polyhedra_adjacencies(
+    void set_block_polyhedra_adjacencies(
         const absl::FixedArray< geode::index_t >& polyhedra,
         const geode::SolidMesh3D& block_mesh,
         geode::SolidMeshBuilder3D& mesh_builder )
     {
-        for( const auto p : geode::Range{ block_mesh.nb_polyhedra() } )
+        for( const auto polyhedron_id :
+            geode::Range{ block_mesh.nb_polyhedra() } )
         {
-            for( const auto f :
-                geode::LRange{ block_mesh.nb_polyhedron_facets( p ) } )
+            for( const auto polyhedron_facet : geode::LRange{
+                     block_mesh.nb_polyhedron_facets( polyhedron_id ) } )
             {
-                if( const auto adj =
-                        block_mesh.polyhedron_adjacent( { p, f } ) )
+                if( const auto adj = block_mesh.polyhedron_adjacent(
+                        { polyhedron_id, polyhedron_facet } ) )
                 {
                     mesh_builder.set_polyhedron_adjacent(
-                        { polyhedra[p], f }, polyhedra[adj.value()] );
+                        { polyhedra[polyhedron_id], polyhedron_facet },
+                        polyhedra[adj.value()] );
                 }
             }
         }
@@ -778,61 +786,65 @@ namespace
             const auto& block_mesh = block.mesh();
             absl::FixedArray< geode::index_t > polyhedra(
                 block_mesh.nb_polyhedra() );
-            for( const auto p : geode::Range{ block_mesh.nb_polyhedra() } )
+            for( const auto polyhedron_id :
+                geode::Range{ block_mesh.nb_polyhedra() } )
             {
                 absl::FixedArray< geode::index_t > polyhedron_vertices(
-                    block_mesh.nb_polyhedron_vertices( p ) );
-                for( const auto v :
-                    geode::LRange{ block_mesh.nb_polyhedron_vertices( p ) } )
+                    block_mesh.nb_polyhedron_vertices( polyhedron_id ) );
+                for( const auto polyhedron_vertex : geode::LRange{
+                         block_mesh.nb_polyhedron_vertices( polyhedron_id ) } )
                 {
-                    const auto vertex =
-                        block_mesh.polyhedron_vertex( { p, v } );
+                    const auto vertex = block_mesh.polyhedron_vertex(
+                        { polyhedron_id, polyhedron_vertex } );
                     const auto unique_vertex =
                         brep.unique_vertex( { block.component_id(), vertex } );
                     if( brep2mesh.unique_vertices_mapping.has_mapping_input(
                             unique_vertex ) )
                     {
-                        polyhedron_vertices[v] =
+                        polyhedron_vertices[polyhedron_vertex] =
                             brep2mesh.unique_vertices_mapping.in2out(
                                 unique_vertex );
-                        mesh_builder.set_point( polyhedron_vertices[v],
+                        mesh_builder.set_point(
+                            polyhedron_vertices[polyhedron_vertex],
                             block_mesh.point( vertex ) );
+                        continue;
                     }
-                    else
-                    {
-                        auto new_vertex_index = mesh_builder.create_point(
-                            block_mesh.point( vertex ) );
-                        polyhedron_vertices[v] = new_vertex_index;
-                        brep2mesh.unique_vertices_mapping.map(
-                            unique_vertex, new_vertex_index );
-                    }
+                    auto new_vertex_index =
+                        mesh_builder.create_point( block_mesh.point( vertex ) );
+                    polyhedron_vertices[polyhedron_vertex] = new_vertex_index;
+                    brep2mesh.unique_vertices_mapping.map(
+                        unique_vertex, new_vertex_index );
                 }
                 absl::FixedArray< std::vector< geode::local_index_t > >
                     polyhedron_facet_vertices(
-                        block_mesh.nb_polyhedron_facets( p ) );
-                for( const auto f :
-                    geode::LRange{ block_mesh.nb_polyhedron_facets( p ) } )
+                        block_mesh.nb_polyhedron_facets( polyhedron_id ) );
+                for( const auto polyhedron_facet : geode::LRange{
+                         block_mesh.nb_polyhedron_facets( polyhedron_id ) } )
                 {
-                    auto& facet_vertices = polyhedron_facet_vertices[f];
+                    auto& facet_vertices =
+                        polyhedron_facet_vertices[polyhedron_facet];
                     facet_vertices.resize(
-                        block_mesh.nb_polyhedron_facet_vertices( { p, f } ) );
-                    for( const auto v :
+                        block_mesh.nb_polyhedron_facet_vertices(
+                            { polyhedron_id, polyhedron_facet } ) );
+                    for( const auto polyhedron_facet_vertex :
                         geode::LRange{ block_mesh.nb_polyhedron_facet_vertices(
-                            { p, f } ) } )
+                            { polyhedron_id, polyhedron_facet } ) } )
                     {
                         const auto vertex = block_mesh.polyhedron_facet_vertex(
-                            { { p, f }, v } );
-                        facet_vertices[v] =
-                            block_mesh.vertex_in_polyhedron( p, vertex )
+                            { { polyhedron_id, polyhedron_facet },
+                                polyhedron_facet_vertex } );
+                        facet_vertices[polyhedron_facet_vertex] =
+                            block_mesh
+                                .vertex_in_polyhedron( polyhedron_id, vertex )
                                 .value();
                     }
                 }
-                polyhedra[p] = mesh_builder.create_polyhedron(
+                polyhedra[polyhedron_id] = mesh_builder.create_polyhedron(
                     polyhedron_vertices, polyhedron_facet_vertices );
                 brep2mesh.solid_polyhedra_mapping.map(
-                    { block.id(), p }, polyhedra[p] );
+                    { block.id(), polyhedron_id }, polyhedra[polyhedron_id] );
             }
-            compute_block_polyhedra_adjacencies(
+            set_block_polyhedra_adjacencies(
                 polyhedra, block_mesh, mesh_builder );
         }
     }
@@ -974,16 +986,16 @@ namespace geode
         return new_convert_model_into_curve( brep );
     }
 
-    std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
-        new_convert_brep_into_surface( const BRep& brep )
-    {
-        return new_convert_model_into_surface( brep );
-    }
-
     std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
         new_convert_section_into_surface( const Section& section )
     {
         return new_convert_model_into_surface( section );
+    }
+
+    std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
+        new_convert_brep_into_surface( const BRep& brep )
+    {
+        return new_convert_model_into_surface( brep );
     }
 
     std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
@@ -1007,6 +1019,7 @@ namespace geode
                 unique_vertex, new_vertex_index );
         }
         build_polyhedra_from_model( brep, *mesh_builder, brep2mesh );
+        mesh_builder->compute_polyhedron_adjacencies();
         map_polygons_to_solid_facets( brep, brep2mesh, *mesh );
         map_line_edges( brep, brep2mesh, *mesh );
         map_corner_vertices( brep, brep2mesh );
