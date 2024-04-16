@@ -40,6 +40,10 @@ namespace geode
         std::unique_ptr< Mesh > create_mesh(
             absl::Span< const std::reference_wrapper< const Mesh > > meshes )
         {
+            if( meshes.empty() )
+            {
+                return Mesh::create();
+            }
             const auto type = meshes.front().get().type_name();
             for( const auto& mesh : meshes )
             {
