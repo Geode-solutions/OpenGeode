@@ -53,13 +53,10 @@ namespace geode
         const auto cell_length =
             std::max( min_cell_length, target_cell_length );
         std::array< index_t, dimension > cell_numbers;
-        for( const auto d : LRange{ dimension } )
-        {
-            cell_numbers[d] = std::ceil( diagonal.value( d ) / cell_length );
-        }
         std::array< double, dimension > cell_lengths;
         for( const auto d : LRange{ dimension } )
         {
+            cell_numbers[d] = std::ceil( diagonal.value( d ) / cell_length );
             cell_lengths[d] = diagonal.value( d ) / cell_numbers[d];
         }
         return { bbox.min(), std::move( cell_numbers ),
