@@ -59,18 +59,21 @@ function(add_geode_library)
     endforeach()
     set(PROJECT_LIB_NAME ${PROJECT_NAME}::${GEODE_LIB_NAME})
     set(VERSION_RC_FILE ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/version.rc)
-    configure_file(
-        ${PROJECT_SOURCE_DIR}/cmake/version.rc.in
-        ${VERSION_RC_FILE}
-        @ONLY
-    )
+    if(EXISTS ${VERSION_RC_FILE})
+        message(STATUS "Configuring version.rc")
+        configure_file(
+            ${PROJECT_SOURCE_DIR}/cmake/version.rc.in
+            ${VERSION_RC_FILE}
+            @ONLY
+        )
+        list(APPEND ABSOLUTE_GEODE_LIB_SOURCES ${VERSION_RC_FILE})
+    endif()
     if(${GEODE_LIB_STATIC})
         add_library(${GEODE_LIB_NAME} STATIC  
             "${ABSOLUTE_GEODE_LIB_SOURCES}"
             "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
-            "${VERSION_RC_FILE}"
         )
     else()
         add_library(${GEODE_LIB_NAME}  
@@ -78,7 +81,6 @@ function(add_geode_library)
             "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
-            "${VERSION_RC_FILE}"
         )
         if(CMAKE_STRIP AND BUILD_SHARED_LIBS AND CMAKE_BUILD_TYPE STREQUAL "Release")
             add_custom_command(TARGET ${GEODE_LIB_NAME} 
