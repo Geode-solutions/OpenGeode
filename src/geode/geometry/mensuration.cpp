@@ -83,7 +83,7 @@ namespace geode
         const auto& vertices = tetra.vertices();
         for( const auto v0 : LRange{ 3 } )
         {
-            for( const auto v1 : LRange{ v0, 4 } )
+            for( const auto v1 : LRange{ v0 + 1, 4 } )
             {
                 const Vector3D edge{ vertices[v0], vertices[v1] };
                 if( edge.length() == 0 )
