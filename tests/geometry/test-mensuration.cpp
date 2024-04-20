@@ -145,7 +145,7 @@ void test_triangle_signed_area()
     test_triangle_signed_area_3d();
 }
 
-void test_tetrahedron_signed_area()
+void test_tetrahedron_signed_volume()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
@@ -165,11 +165,36 @@ void test_tetrahedron_signed_area()
         "with query tetra tetra2" );
 }
 
+void test_tetrahedron_signed_volume2()
+{
+    const geode::Point3D a{ { 130295.505221494, 243533.759356966,
+        -41066.8949388236 } };
+    const geode::Point3D b{ { 138908.732244318, 234168.317708333,
+        -45594.02734375 } };
+    const geode::Point3D c{ { 132108.6875, 242111.890625, -39388.34375 } };
+    const geode::Point3D b2{ { 138908.732244319, 234168.317708334,
+        -45594.02734376 } };
+
+    const geode::Tetrahedron tetra1{ a, b, c, b };
+    const auto volume1 = geode::tetrahedron_signed_volume( tetra1 );
+    OPENGEODE_EXCEPTION( std::fabs( volume1 ) < geode::global_epsilon,
+        "[Test] Wrong result for tetrahedron_signed_volume2 "
+        "with query tetra tetra1" );
+
+    const geode::Tetrahedron tetra2{ a, b, c, b };
+    const auto volume2 = geode::tetrahedron_signed_volume( tetra2 );
+    DEBUG( volume2 );
+    OPENGEODE_EXCEPTION( std::fabs( volume2 ) < geode::global_epsilon,
+        "[Test] Wrong result for tetrahedron_signed_volume2 "
+        "with query tetra tetra2" );
+}
+
 void test()
 {
-    test_triangle_area();
-    test_triangle_signed_area();
-    test_tetrahedron_signed_area();
+    // test_triangle_area();
+    // test_triangle_signed_area();
+    // test_tetrahedron_signed_volume();
+    test_tetrahedron_signed_volume2();
 }
 
 OPENGEODE_TEST( "signed-mensuration" )

@@ -81,6 +81,17 @@ namespace geode
     double tetrahedron_signed_volume( const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
+        for( const auto v0 : LRange{ 3 } )
+        {
+            for( const auto v1 : LRange{ v0, 4 } )
+            {
+                const Vector3D edge{ vertices[v0], vertices[v1] };
+                if( edge.length() == 0 )
+                {
+                    return 0;
+                }
+            }
+        }
         for( const auto v : LRange{ 4 } )
         {
             const auto v1 = signed_volume_vertices_order[v][0];
@@ -88,26 +99,14 @@ namespace geode
             const auto v3 = signed_volume_vertices_order[v][2];
             const Vector3D edge02{ vertices[v], vertices[v2] };
             const auto edge02_length = edge02.length();
-            if( edge02_length == 0 )
-            {
-                return 0;
-            }
             const Vector3D edge03{ vertices[v], vertices[v3] };
             const auto edge03_length = edge03.length();
-            if( edge03_length == 0 )
-            {
-                return 0;
-            }
             const auto cross02_03 = edge02.cross( edge03 );
             if( cross02_03.length()
                 > global_angular_epsilon * edge02_length * edge03_length )
             {
                 const Vector3D edge01{ vertices[v], vertices[v1] };
                 const auto edge01_length = edge01.length();
-                if( edge01_length == 0 )
-                {
-                    return 0;
-                }
                 return edge01.dot( cross02_03 ) / 6.;
             }
         }
