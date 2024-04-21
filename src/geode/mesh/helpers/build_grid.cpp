@@ -27,7 +27,6 @@
 
 namespace geode
 {
-
     template < index_t dimension >
     LightRegularGrid< dimension >
         build_grid_from_bbox_target_length_and_maximum_cell_number(
@@ -41,22 +40,17 @@ namespace geode
         {
             numerator *= diagonal.value( d );
         }
-        const auto min_length =
-            std::pow( numerator / ( max_nb_cells - 1 ), 1. / dimension );
-        auto min_cell_length = min_length;
-        for( const auto d : LRange{ dimension } )
-        {
-            min_cell_length = std::max( ( diagonal.value( d ) + 2 * min_length )
-                                            / diagonal.value( d ) * min_length,
-                min_cell_length );
-        }
+        const auto min_cell_length =
+            std::pow( numerator / max_nb_cells, 1. / dimension );
         const auto cell_length =
             std::max( min_cell_length, target_cell_length );
         std::array< index_t, dimension > cell_numbers;
         std::array< double, dimension > cell_lengths;
         for( const auto d : LRange{ dimension } )
         {
-            cell_numbers[d] = std::ceil( diagonal.value( d ) / cell_length );
+            cell_numbers[d] = std::max( static_cast< index_t >( 1 ),
+                static_cast< index_t >(
+                    std::floor( diagonal.value( d ) / cell_length ) ) );
             cell_lengths[d] = diagonal.value( d ) / cell_numbers[d];
         }
         return { bbox.min(), std::move( cell_numbers ),
