@@ -42,7 +42,7 @@ namespace geode
         }
         const auto min_cell_length =
             std::pow( numerator / max_nb_cells, 1. / dimension );
-        const auto target_is_ok = target_cell_length < min_cell_length;
+        const auto target_is_ok = target_cell_length > min_cell_length;
         auto cell_length = std::max( min_cell_length, target_cell_length );
         std::array< index_t, dimension > cell_numbers;
         std::array< double, dimension > cell_lengths;
