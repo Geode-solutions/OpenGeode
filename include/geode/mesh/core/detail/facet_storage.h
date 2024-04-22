@@ -115,7 +115,7 @@ namespace geode
                 for( const auto e :
                     Range{ facet_attribute_manager_.nb_elements() } )
                 {
-                    to_delete[e] = !counter_->value( e );
+                    to_delete[e] = counter_->value( e ) == 0;
                 }
                 return delete_facets( to_delete );
             }

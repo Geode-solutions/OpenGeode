@@ -63,13 +63,6 @@ namespace geode
             };
 
         public:
-            Impl( BRep& model )
-                : model_( model ),
-                  builder_ptr_{ absl::make_unique< BRepBuilder >( model ) },
-                  builder_( *builder_ptr_ )
-            {
-            }
-
             Impl( const BRep& model, BRepBuilder& builder )
                 : model_( model ), builder_( builder )
             {
@@ -258,14 +251,8 @@ namespace geode
 
         private:
             const BRep& model_;
-            std::unique_ptr< BRepBuilder > builder_ptr_;
             BRepBuilder& builder_;
         };
-
-        CutAlongInternalSurfaces::CutAlongInternalSurfaces( BRep& model )
-            : impl_{ model }
-        {
-        }
 
         CutAlongInternalSurfaces::CutAlongInternalSurfaces(
             const BRep& model, BRepBuilder& builder )

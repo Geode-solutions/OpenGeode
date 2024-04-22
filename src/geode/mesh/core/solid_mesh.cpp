@@ -1142,6 +1142,7 @@ namespace geode
         }
         return result;
     }
+
     template < index_t dimension >
     absl::optional< index_t > SolidMesh< dimension >::polyhedron_around_edge(
         const std::array< index_t, 2 >& vertices ) const
