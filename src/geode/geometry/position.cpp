@@ -175,14 +175,15 @@ namespace geode
         {
             const auto& facet_vertices =
                 Tetrahedron::tetrahedron_facet_vertex[f];
-            const auto volume = tetrahedron_signed_volume(
-                { vertices[facet_vertices[0]], vertices[facet_vertices[1]],
-                    vertices[facet_vertices[2]], point } );
-            if( volume < -10 * global_epsilon )
+            const Triangle3D facet{ vertices[facet_vertices[0]],
+                vertices[facet_vertices[1]], vertices[facet_vertices[2]] };
+            const auto signed_distance =
+                std::get< 0 >( point_triangle_signed_distance( point, facet ) );
+            if( signed_distance < -global_epsilon )
             {
                 return Position::outside;
             }
-            if( volume < 10 * global_epsilon )
+            if( signed_distance < global_epsilon )
             {
                 return point_tetrahedron_position_exact( point, tetra );
             }

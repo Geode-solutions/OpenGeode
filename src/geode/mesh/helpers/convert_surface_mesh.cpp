@@ -131,10 +131,10 @@ namespace
     {
         builder.reserve_triangles( 2 * grid.nb_cells() );
         geode::GenericMapping< geode::index_t > old2new_mapping;
-        for( const auto j : geode::LRange{ grid.nb_cells_in_direction( 1 ) } )
+        for( const auto j : geode::Range{ grid.nb_cells_in_direction( 1 ) } )
         {
             for( const auto i :
-                geode::LRange{ grid.nb_cells_in_direction( 0 ) } )
+                geode::Range{ grid.nb_cells_in_direction( 0 ) } )
             {
                 const auto cell_vertices = grid.cell_vertices( { i, j } );
                 const auto cell = grid.cell_index( { i, j } );

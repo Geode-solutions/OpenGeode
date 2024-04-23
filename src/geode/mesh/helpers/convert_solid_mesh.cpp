@@ -58,13 +58,13 @@ namespace
     {
         builder.reserve_tetrahedra( 6 * grid.nb_cells() );
         geode::GenericMapping< geode::index_t > old2new_mapping;
-        for( const auto k : geode::LRange{ grid.nb_cells_in_direction( 2 ) } )
+        for( const auto k : geode::Range{ grid.nb_cells_in_direction( 2 ) } )
         {
             for( const auto j :
-                geode::LRange{ grid.nb_cells_in_direction( 1 ) } )
+                geode::Range{ grid.nb_cells_in_direction( 1 ) } )
             {
                 for( const auto i :
-                    geode::LRange{ grid.nb_cells_in_direction( 0 ) } )
+                    geode::Range{ grid.nb_cells_in_direction( 0 ) } )
                 {
                     const auto cell_vertices =
                         grid.cell_vertices( { i, j, k } );
