@@ -54,7 +54,7 @@ namespace geode
              * vertices and facets.
              */
             MeshesElementsMapping cut_solid_along_facets(
-                absl::Span< index_t > facets_list );
+                absl::Span< const PolyhedronFacet > facets_list );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

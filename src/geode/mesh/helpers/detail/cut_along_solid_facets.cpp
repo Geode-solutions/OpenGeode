@@ -32,8 +32,10 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/solid_edges_builder.h>
 #include <geode/mesh/builder/solid_facets_builder.h>
 #include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/solid_mesh.h>
 
@@ -61,40 +63,45 @@ namespace geode
             }
 
             MeshesElementsMapping cut_solid_along_facets(
-                absl::Span< index_t > facets_list )
+                absl::Span< const PolyhedronFacet > facets_list )
             {
-                const auto nb_initial_facets = solid_.facets().nb_facets();
+                bool facets_enabled = solid_.are_facets_enabled();
+                bool edges_enabled = solid_.are_edges_enabled();
+                const auto nb_initial_facets =
+                    facets_enabled ? solid_.facets().nb_facets() : 0;
+                const auto nb_initial_edges =
+                    edges_enabled ? solid_.edges().nb_edges() : 0;
                 const auto solid_info =
                     remove_adjacencies_along_facets( facets_list );
                 MeshesElementsMapping mapping;
                 mapping.vertices = duplicate_points( solid_info );
-                mapping.polygons =
-                    process_solid_facets( nb_initial_facets, mapping.vertices );
+                if( facets_enabled )
+                {
+                    mapping.polygons = process_solid_facets(
+                        nb_initial_facets, mapping.vertices );
+                }
+                if( edges_enabled )
+                {
+                    mapping.edges = process_solid_edges(
+                        nb_initial_edges, mapping.vertices );
+                }
                 return mapping;
             }
 
         private:
             SolidInfo remove_adjacencies_along_facets(
-                absl::Span< index_t > facets_list )
+                absl::Span< const PolyhedronFacet > facets_list )
             {
                 SolidInfo info{ solid_.nb_vertices() };
-                for( const auto facet_id : facets_list )
+                for( const auto solid_facet : facets_list )
                 {
-                    const auto facet_vertices =
-                        solid_.facets().facet_vertices( facet_id );
-                    const auto solid_facet =
-                        solid_.polyhedron_facet_from_vertices( facet_vertices );
-                    OPENGEODE_EXCEPTION( solid_facet,
-                        "[CutAlongSolidFacets::remove_adjacencies_"
-                        "along_facets] Should have found a "
-                        "PolyhedronFacet from facet vertices." );
-                    if( const auto adj = solid_.polyhedron_adjacent_facet(
-                            solid_facet.value() ) )
+                    if( const auto adj =
+                            solid_.polyhedron_adjacent_facet( solid_facet ) )
                     {
-                        builder_.unset_polyhedron_adjacent(
-                            solid_facet.value() );
+                        builder_.unset_polyhedron_adjacent( solid_facet );
                         builder_.unset_polyhedron_adjacent( adj.value() );
-                        for( const auto vertex_id : facet_vertices )
+                        for( const auto vertex_id :
+                            solid_.polyhedron_facet_vertices( solid_facet ) )
                         {
                             info.vertices_to_check[vertex_id] = true;
                         }
@@ -168,8 +175,9 @@ namespace geode
                     builder_.create_point( solid_.point( vertex_id ) );
                 solid_.vertex_attribute_manager().copy_attribute_value(
                     vertex_id, new_vertex_id );
-                /// Replaces vertex for all polyhedra around through current
-                /// adjacencies
+                /// Replaces vertex for polyhedra around through current
+                /// adjacencies -> for these polyhedra, removes facets on which
+                /// adjacency was removed
                 builder_.replace_vertex( vertex_id, new_vertex_id );
                 for( const auto& polyhedron_vertex : all_polyhedra_around )
                 {
@@ -234,7 +242,7 @@ namespace geode
                 absl::Span< const index_t > clean_mapping ) const
             {
                 ElementsMapping facets_mapping;
-                for( const auto solid2cut : solid2cut_mapping.in2out_map() )
+                for( const auto& solid2cut : solid2cut_mapping.in2out_map() )
                 {
                     for( const auto facet_after_cut : solid2cut.second )
                     {
@@ -243,6 +251,60 @@ namespace geode
                     }
                 }
                 return facets_mapping;
+            }
+
+            ElementsMapping process_solid_edges( index_t nb_initial_edges,
+                const ElementsMapping& vertices_mapping )
+            {
+                ElementsMapping edges_mapping;
+                auto edges_builder = builder_.edges_builder();
+                const auto& solid_edges = solid_.edges();
+                for( const auto edge_id : Range{ solid_edges.nb_edges() } )
+                {
+                    /// Recreate edges which were set to be deleted during
+                    /// duplication process by the replace_vertex method
+                    auto edge_vertices = solid_edges.edge_vertices( edge_id );
+                    if( solid_edges.is_edge_isolated( edge_id ) )
+                    {
+                        if( !solid_.polyhedron_facet_edge_from_vertices(
+                                edge_vertices ) )
+                        {
+                            continue;
+                        }
+                        edges_builder.find_or_create_edge(
+                            solid_edges.edge_vertices( edge_id ) );
+                    }
+                    if( edge_id < nb_initial_edges )
+                    {
+                        edges_mapping.map( edge_id, edge_id );
+                        continue;
+                    }
+                    for( auto& edge_vertex : edge_vertices )
+                    {
+                        edge_vertex = vertices_mapping.out2in( edge_vertex )[0];
+                    }
+                    edges_mapping.map(
+                        solid_edges.edge_from_vertices( edge_vertices ).value(),
+                        edge_id );
+                }
+                auto old2new = edges_builder.delete_isolated_edges();
+                return final_edges_mapping( edges_mapping, old2new );
+            }
+
+            ElementsMapping final_edges_mapping(
+                const ElementsMapping& solid2cut_mapping,
+                absl::Span< const index_t > clean_mapping ) const
+            {
+                ElementsMapping edges_mapping;
+                for( const auto& solid2cut : solid2cut_mapping.in2out_map() )
+                {
+                    for( const auto edge_after_cut : solid2cut.second )
+                    {
+                        edges_mapping.map(
+                            solid2cut.first, clean_mapping[edge_after_cut] );
+                    }
+                }
+                return edges_mapping;
             }
 
         private:
@@ -259,8 +321,9 @@ namespace geode
         CutAlongSolidFacets::~CutAlongSolidFacets() {}
 
         MeshesElementsMapping CutAlongSolidFacets::cut_solid_along_facets(
-            absl::Span< index_t > facets_list )
+            absl::Span< const PolyhedronFacet > facets_list )
         {
+            return impl_->cut_solid_along_facets( facets_list );
         }
     } // namespace detail
 } // namespace geode

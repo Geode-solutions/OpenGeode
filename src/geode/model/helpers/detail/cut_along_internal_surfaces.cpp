@@ -35,6 +35,7 @@
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/detail/cut_along_solid_facets.h>
 
 #include <geode/model/helpers/component_mesh_polygons.h>
 #include <geode/model/mixin/core/block.h>
@@ -51,16 +52,6 @@ namespace geode
             using CMVmapping =
                 std::pair< ComponentMeshVertex, ComponentMeshVertex >;
             using CMVmappings = std::vector< CMVmapping >;
-            using Task = async::task< CMVmappings >;
-            struct BlockInfo
-            {
-                BlockInfo( index_t nb_vertices )
-                    : polyhedron_vertices( nb_vertices )
-                {
-                }
-                absl::FixedArray< PolyhedraAroundVertex > polyhedron_vertices;
-                std::vector< index_t > vertices_to_check;
-            };
 
         public:
             Impl( const BRep& model, BRepBuilder& builder )
@@ -70,12 +61,22 @@ namespace geode
 
             CMVmappings cut()
             {
+                using Task =
+                    async::task< std::pair< uuid, MeshesElementsMapping > >;
                 absl::FixedArray< Task > tasks( model_.nb_blocks() );
                 index_t count{ 0 };
                 for( const auto& block : model_.blocks() )
                 {
                     tasks[count++] = async::spawn( [this, &block] {
-                        return split_points( block );
+                        const auto& mesh = block.mesh();
+                        auto builder =
+                            builder_.block_mesh_builder( block.id() );
+                        const auto facets_list =
+                            internal_surface_facets( block );
+                        CutAlongSolidFacets block_cutter{ mesh, *builder };
+                        return std::make_pair(
+                            block.id(), block_cutter.cut_solid_along_facets(
+                                            facets_list ) );
                     } );
                 }
                 CMVmappings mapping;
@@ -83,11 +84,18 @@ namespace geode
                     .then( [this, &mapping]( std::vector< Task > all_task ) {
                         for( auto& task : all_task )
                         {
-                            auto cmv_mappings = task.get();
-                            update_unique_vertices( cmv_mappings );
-                            mapping.insert( mapping.end(),
-                                std::make_move_iterator( cmv_mappings.begin() ),
-                                std::make_move_iterator( cmv_mappings.end() ) );
+                            const auto result = task.get();
+                            auto cmv_mapping = update_unique_vertices(
+                                model_.block( result.first ),
+                                result.second.vertices );
+                            if( !cmv_mapping.empty() )
+                            {
+                                mapping.insert( mapping.end(),
+                                    std::make_move_iterator(
+                                        cmv_mapping.begin() ),
+                                    std::make_move_iterator(
+                                        cmv_mapping.end() ) );
+                            }
                         }
                     } )
                     .get();
@@ -96,109 +104,45 @@ namespace geode
 
             CMVmappings cut_block( const Block3D& block )
             {
-                const auto mapping = split_points( block );
-                update_unique_vertices( mapping );
-                return mapping;
+                const auto& mesh = block.mesh();
+                auto builder = builder_.block_mesh_builder( block.id() );
+                const auto facets_list = internal_surface_facets( block );
+                CutAlongSolidFacets block_cutter{ mesh, *builder };
+                auto mapping =
+                    block_cutter.cut_solid_along_facets( facets_list );
+                return update_unique_vertices( block, mapping.vertices );
             }
 
         private:
-            void update_unique_vertices( const CMVmappings& mapping )
+            CMVmappings update_unique_vertices(
+                const Block3D& block, const ElementsMapping& mapping )
             {
-                for( const auto& cmv_mapping : mapping )
+                CMVmappings cmv_mapping;
+                for( const auto& vertex_mapping : mapping.in2out_map() )
                 {
+                    ComponentMeshVertex original_cmv{ block.component_id(),
+                        vertex_mapping.first };
                     const auto unique_vertex_id =
-                        model_.unique_vertex( cmv_mapping.first );
-                    builder_.set_unique_vertex(
-                        cmv_mapping.second, unique_vertex_id );
-                }
-            }
-
-            CMVmappings split_points( const Block3D& block )
-            {
-                auto builder = builder_.block_mesh_builder( block.id() );
-                remove_adjacencies_along_internal_surfaces( block, *builder );
-                return duplicate_points( block, *builder );
-            }
-
-            CMVmappings duplicate_points(
-                const Block3D& block, SolidMeshBuilder3D& builder )
-            {
-                const auto& mesh = block.mesh();
-                const auto info = compute_block_info( mesh );
-                CMVmappings mapping;
-                mapping.reserve( info.vertices_to_check.size() );
-                for( const auto vertex_id : info.vertices_to_check )
-                {
-                    auto polyhedra_around =
-                        mesh.polyhedra_around_vertex( vertex_id );
-                    const auto& polyhedron_vertices =
-                        info.polyhedron_vertices[vertex_id];
-                    auto nb_polyhedra_around = polyhedra_around.size();
-                    OPENGEODE_ASSERT(
-                        nb_polyhedra_around <= polyhedron_vertices.size(),
-                        "[CutAlongInternalSurfaces] Wrong size comparison" );
-                    PolyhedraAroundVertex total_polyhedra;
-                    while( nb_polyhedra_around != polyhedron_vertices.size() )
+                        model_.unique_vertex( original_cmv );
+                    for( const auto vertex_out : vertex_mapping.second )
                     {
-                        for( auto& polyhedron : polyhedra_around )
+                        if( vertex_out == vertex_mapping.first )
                         {
-                            total_polyhedra.emplace_back(
-                                std::move( polyhedron ) );
+                            continue;
                         }
-                        mapping.emplace_back(
-                            process_component( block, mesh, builder, vertex_id,
-                                total_polyhedra, polyhedron_vertices ) );
-                        polyhedra_around =
-                            mesh.polyhedra_around_vertex( vertex_id );
-                        nb_polyhedra_around += polyhedra_around.size();
+                        ComponentMeshVertex cmv_out{ block.component_id(),
+                            vertex_out };
+                        cmv_mapping.emplace_back( original_cmv, cmv_out );
+                        builder_.set_unique_vertex( cmv_out, unique_vertex_id );
                     }
                 }
-                return mapping;
+                return cmv_mapping;
             }
 
-            BlockInfo compute_block_info( const SolidMesh3D& mesh ) const
+            std::vector< PolyhedronFacet > internal_surface_facets(
+                const Block3D& block ) const
             {
-                BlockInfo info{ mesh.nb_vertices() };
-                std::vector< bool > vertex_to_check(
-                    mesh.nb_vertices(), false );
-                for( const auto p : Range{ mesh.nb_polyhedra() } )
-                {
-                    for( const auto f :
-                        LRange{ mesh.nb_polyhedron_facets( p ) } )
-                    {
-                        PolyhedronFacet facet{ p, f };
-                        if( mesh.is_polyhedron_facet_on_border( facet ) )
-                        {
-                            for( const auto vertex_id :
-                                mesh.polyhedron_facet_vertices( facet ) )
-                            {
-                                vertex_to_check[vertex_id] = true;
-                            }
-                        }
-                    }
-                    for( const auto v :
-                        LRange{ mesh.nb_polyhedron_vertices( p ) } )
-                    {
-                        PolyhedronVertex vertex{ p, v };
-                        const auto vertex_id = mesh.polyhedron_vertex( vertex );
-                        info.polyhedron_vertices[vertex_id].emplace_back(
-                            std::move( vertex ) );
-                    }
-                }
-                for( const auto v : Indices{ vertex_to_check } )
-                {
-                    if( vertex_to_check[v] )
-                    {
-                        info.vertices_to_check.push_back( v );
-                    }
-                }
-                return info;
-            }
-
-            void remove_adjacencies_along_internal_surfaces(
-                const Block3D& block, SolidMeshBuilder3D& builder )
-            {
-                std::vector< PolyhedronFacet > facets;
+                std::vector< PolyhedronFacet > result;
                 for( const auto& surface : model_.internal_surfaces( block ) )
                 {
                     const auto& mesh = surface.mesh();
@@ -208,45 +152,11 @@ namespace geode
                             block_mesh_polyhedra_from_surface_polygon(
                                 model_, block, surface, p ) )
                         {
-                            facets.emplace_back( std::move( facet ) );
+                            result.emplace_back( std::move( facet ) );
                         }
                     }
                 }
-                for( const auto& facet : facets )
-                {
-                    builder.unset_polyhedron_adjacent( facet );
-                }
-            }
-
-            CMVmapping process_component( const Block3D& block,
-                const SolidMesh3D& mesh,
-                SolidMeshBuilder3D& builder,
-                index_t vertex_id,
-                const PolyhedraAroundVertex& total_polyhedra,
-                const PolyhedraAroundVertex& polyhedron_vertices )
-            {
-                const auto new_vertex_id =
-                    builder.create_point( mesh.point( vertex_id ) );
-                mesh.vertex_attribute_manager().copy_attribute_value(
-                    vertex_id, new_vertex_id );
-                builder.replace_vertex( vertex_id, new_vertex_id );
-                for( const auto& polyhedron_vertex : polyhedron_vertices )
-                {
-                    if( absl::c_find( total_polyhedra, polyhedron_vertex )
-                        == total_polyhedra.end() )
-                    {
-                        builder.associate_polyhedron_vertex_to_vertex(
-                            polyhedron_vertex, vertex_id );
-                        break;
-                    }
-                }
-                OPENGEODE_ASSERT(
-                    !mesh.polyhedra_around_vertex( vertex_id ).empty(),
-                    "[BRepFromMeshBuilder::cut_block_by_surfaces] Lost "
-                    "polyhedron around vertex" );
-                return { ComponentMeshVertex{ block.component_id(), vertex_id },
-                    ComponentMeshVertex{
-                        block.component_id(), new_vertex_id } };
+                return result;
             }
 
         private:
