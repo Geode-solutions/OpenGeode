@@ -161,11 +161,31 @@ namespace geode
                 const auto& mesh = surface.mesh();
                 for( const auto& pair : surface_pair.second )
                 {
-                    for( auto& polygon_vertex :
-                        mesh.polygons_from_edge_vertices( pair ) )
+                    if( auto edge = mesh.polygon_edge_from_vertices(
+                            pair[0], pair[1] ) )
+
                     {
                         edges[surface.id()].emplace_back(
-                            std::move( polygon_vertex ) );
+                            std::move( edge.value() ) );
+                        if( auto adj =
+                                mesh.polygon_adjacent_edge( edge.value() ) )
+                        {
+                            edges[surface.id()].emplace_back(
+                                std::move( adj.value() ) );
+                        }
+                        continue;
+                    }
+                    if( auto edge = mesh.polygon_edge_from_vertices(
+                            pair[1], pair[0] ) )
+                    {
+                        edges[surface.id()].emplace_back(
+                            std::move( edge.value() ) );
+                        if( auto adj =
+                                mesh.polygon_adjacent_edge( edge.value() ) )
+                        {
+                            edges[surface.id()].emplace_back(
+                                std::move( adj.value() ) );
+                        }
                     }
                 }
             }
