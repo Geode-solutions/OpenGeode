@@ -167,12 +167,6 @@ namespace geode
                     {
                         edges[surface.id()].emplace_back(
                             std::move( edge.value() ) );
-                        if( auto adj =
-                                mesh.polygon_adjacent_edge( edge.value() ) )
-                        {
-                            edges[surface.id()].emplace_back(
-                                std::move( adj.value() ) );
-                        }
                         continue;
                     }
                     if( auto edge = mesh.polygon_edge_from_vertices(
@@ -180,12 +174,6 @@ namespace geode
                     {
                         edges[surface.id()].emplace_back(
                             std::move( edge.value() ) );
-                        if( auto adj =
-                                mesh.polygon_adjacent_edge( edge.value() ) )
-                        {
-                            edges[surface.id()].emplace_back(
-                                std::move( adj.value() ) );
-                        }
                     }
                 }
             }
