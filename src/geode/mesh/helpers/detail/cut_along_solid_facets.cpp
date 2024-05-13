@@ -23,10 +23,6 @@
 
 #include <geode/mesh/helpers/detail/cut_along_solid_facets.h>
 
-// #include <async++.h>
-
-// #include <absl/memory/memory.h>
-
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -93,7 +89,7 @@ namespace geode
                 absl::Span< const PolyhedronFacet > facets_list )
             {
                 SolidInfo info{ solid_.nb_vertices() };
-                for( const auto solid_facet : facets_list )
+                for( const auto& solid_facet : facets_list )
                 {
                     if( const auto adj =
                             solid_.polyhedron_adjacent_facet( solid_facet ) )
@@ -112,7 +108,7 @@ namespace geode
                     for( const auto local_vertex_id : LRange{
                              solid_.nb_polyhedron_vertices( polyhedron_id ) } )
                     {
-                        PolyhedronVertex vertex{ polyhedron_id,
+                        const PolyhedronVertex vertex{ polyhedron_id,
                             local_vertex_id };
                         const auto vertex_id =
                             solid_.polyhedron_vertex( vertex );
@@ -233,7 +229,7 @@ namespace geode
                             .value(),
                         facet_id );
                 }
-                auto old2new = facets_builder.delete_isolated_facets();
+                const auto old2new = facets_builder.delete_isolated_facets();
                 return final_facets_mapping( facets_mapping, old2new );
             }
 
@@ -287,7 +283,7 @@ namespace geode
                         solid_edges.edge_from_vertices( edge_vertices ).value(),
                         edge_id );
                 }
-                auto old2new = edges_builder.delete_isolated_edges();
+                const auto old2new = edges_builder.delete_isolated_edges();
                 return final_edges_mapping( edges_mapping, old2new );
             }
 
