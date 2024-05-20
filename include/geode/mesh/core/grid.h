@@ -170,4 +170,27 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
     ALIAS_2D_AND_3D( Grid );
+
+    namespace detail
+    {
+        static constexpr std::array< std::array< geode::local_index_t, 2 >, 12 >
+            CELL_EDGE_VERTICES_3D{ { { 0, 1 }, { 0, 2 }, { 2, 3 }, { 1, 3 },
+                { 4, 5 }, { 4, 6 }, { 6, 7 }, { 5, 7 }, { 0, 4 }, { 1, 5 },
+                { 2, 6 }, { 3, 7 } } };
+
+        static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
+            CELL_FACET_VERTICES_3D{ { { 0, 4, 6, 2 }, { 1, 5, 7, 3 },
+                { 0, 4, 5, 1 }, { 2, 3, 7, 6 }, { 0, 1, 3, 2 },
+                { 4, 6, 7, 5 } } };
+
+        static constexpr std::array< std::array< geode::local_index_t, 3 >, 8 >
+            CELL_EDGES_AROUND_VERTEX_3D{ { { 0, 1, 8 }, { 0, 3, 9 },
+                { 1, 2, 10 }, { 2, 3, 11 }, { 4, 5, 8 }, { 4, 7, 9 },
+                { 5, 6, 10 }, { 6, 7, 11 } } };
+
+        static constexpr std::array< std::array< geode::local_index_t, 3 >, 8 >
+            CELL_FACETS_AROUND_VERTEX_3D{ { { 0, 2, 4 }, { 1, 2, 4 },
+                { 0, 3, 4 }, { 1, 3, 4 }, { 0, 2, 5 }, { 1, 2, 5 }, { 0, 3, 5 },
+                { 1, 3, 5 } } };
+    } // namespace detail
 } // namespace geode
