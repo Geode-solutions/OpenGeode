@@ -38,29 +38,29 @@ namespace geode
     namespace detail
     {
         template < typename Model >
-        class CutAlongInternalLines
+        class SplitAlongSurfaceMeshBorders
         {
         public:
-            CutAlongInternalLines( Model& model );
-            CutAlongInternalLines(
+            SplitAlongSurfaceMeshBorders( Model& model );
+            SplitAlongSurfaceMeshBorders(
                 const Model& model, typename Model::Builder& builder );
-            ~CutAlongInternalLines();
+            ~SplitAlongSurfaceMeshBorders();
 
-            /* Cuts the surfaces along internal lines, and returns pairs of
+            /* Splits the surfaces along internal lines, and returns pairs of
              * component mesh vertices where the surfaces vertices were split
              * (first the initial cmv of the vertices, second the cmv of the
              * newly created vertex)
              */
             std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_all_surfaces();
+                split_all_surfaces();
 
-            /* Cuts the surface along internal lines, and returns pairs of
+            /* Splits the surface along internal lines, and returns pairs of
              * component mesh vertices where the surface vertices were split
              * (first the initial id of the vertices, second the id of the newly
              * created vertex)
              */
             std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_surface( const Surface< Model::dim >& surface );
+                split_surface( const Surface< Model::dim >& surface );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

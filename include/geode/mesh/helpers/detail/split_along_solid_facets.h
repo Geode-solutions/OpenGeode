@@ -23,44 +23,38 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/basic/pimpl.h>
 
-#include <geode/model/common.h>
+#include <geode/mesh/common.h>
+#include <geode/mesh/core/meshes_mapping.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
-    ALIAS_3D( Block );
-    class BRep;
-    class BRepBuilder;
-    struct ComponentMeshVertex;
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
+    ALIAS_3D( SolidMesh );
+    ALIAS_3D( SolidMeshBuilder );
 } // namespace geode
 
 namespace geode
 {
     namespace detail
     {
-        class opengeode_model_api CutAlongInternalSurfaces
+        class opengeode_mesh_api SplitAlongSolidFacets
         {
         public:
-            CutAlongInternalSurfaces( const BRep& model, BRepBuilder& builder );
-            ~CutAlongInternalSurfaces();
+            SplitAlongSolidFacets(
+                const SolidMesh3D& mesh, SolidMeshBuilder3D& builder );
+            ~SplitAlongSolidFacets();
 
-            /* Cuts the blocks along internal surfaces, and returns pairs of
-             * component mesh vertices where the blocks vertices were split
-             * (first the initial cmv of the vertices, second the cmv of the
-             * newly created vertex)
+            /*
+             * Splits the solid along given facets, and returns the mapping on
+             * vertices and facets.
              */
-            std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_all_blocks();
-
-            /* Cuts the block along internal surfaces, and returns pairs of
-             * component mesh vertices where the block vertices were split
-             * (first the initial id of the vertices, second the id of the newly
-             * created vertex)
-             */
-            std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_block( const Block3D& block );
+            MeshesElementsMapping split_solid_along_facets(
+                absl::Span< const PolyhedronFacet > facets_list );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/helpers/detail/cut_along_internal_surfaces.h>
+#include <geode/model/helpers/detail/split_along_block_mesh_borders.h>
 
 #include <async++.h>
 
@@ -35,7 +35,7 @@
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/detail/cut_along_solid_facets.h>
+#include <geode/mesh/helpers/detail/split_along_solid_facets.h>
 
 #include <geode/model/helpers/component_mesh_polygons.h>
 #include <geode/model/mixin/core/block.h>
@@ -47,7 +47,7 @@ namespace geode
 {
     namespace detail
     {
-        class CutAlongInternalSurfaces::Impl
+        class SplitAlongBlockMeshBorders::Impl
         {
             using CMVmapping =
                 std::pair< ComponentMeshVertex, ComponentMeshVertex >;
@@ -59,7 +59,7 @@ namespace geode
             {
             }
 
-            CMVmappings cut()
+            CMVmappings split()
             {
                 using Task =
                     async::task< std::pair< uuid, MeshesElementsMapping > >;
@@ -71,11 +71,10 @@ namespace geode
                         const auto& mesh = block.mesh();
                         auto builder =
                             builder_.block_mesh_builder( block.id() );
-                        const auto facets_list =
-                            internal_surface_facets( block );
-                        CutAlongSolidFacets block_cutter{ mesh, *builder };
+                        const auto facets_list = mesh_border_facets( block );
+                        SplitAlongSolidFacets block_splitter{ mesh, *builder };
                         return std::make_pair(
-                            block.id(), block_cutter.cut_solid_along_facets(
+                            block.id(), block_splitter.split_solid_along_facets(
                                             facets_list ) );
                     } );
                 }
@@ -102,14 +101,14 @@ namespace geode
                 return mapping;
             }
 
-            CMVmappings cut_block( const Block3D& block )
+            CMVmappings split_block( const Block3D& block )
             {
                 const auto& mesh = block.mesh();
                 auto builder = builder_.block_mesh_builder( block.id() );
-                const auto facets_list = internal_surface_facets( block );
-                CutAlongSolidFacets block_cutter{ mesh, *builder };
+                const auto facets_list = mesh_border_facets( block );
+                SplitAlongSolidFacets block_splitter{ mesh, *builder };
                 auto mapping =
-                    block_cutter.cut_solid_along_facets( facets_list );
+                    block_splitter.split_solid_along_facets( facets_list );
                 return update_unique_vertices( block, mapping.vertices );
             }
 
@@ -139,10 +138,11 @@ namespace geode
                 return cmv_mapping;
             }
 
-            std::vector< PolyhedronFacet > internal_surface_facets(
+            std::vector< PolyhedronFacet > mesh_border_facets(
                 const Block3D& block ) const
             {
                 std::vector< PolyhedronFacet > result;
+                const auto& block_mesh = block.mesh();
                 for( const auto& surface : model_.internal_surfaces( block ) )
                 {
                     const auto& mesh = surface.mesh();
@@ -152,7 +152,25 @@ namespace geode
                             block_mesh_polyhedra_from_surface_polygon(
                                 model_, block, surface, p ) )
                         {
-                            result.emplace_back( std::move( facet ) );
+                            if( !block_mesh.is_polyhedron_facet_on_border(
+                                    facet ) )
+                            {
+                                result.emplace_back( facet );
+                            }
+                        }
+                    }
+                }
+                for( const auto polyhedron_id :
+                    Range{ block_mesh.nb_polyhedra() } )
+                {
+                    for( const auto facet_id :
+                        LRange{
+                            block_mesh.nb_polyhedron_facets( polyhedron_id ) } )
+                    {
+                        PolyhedronFacet facet{ polyhedron_id, facet_id };
+                        if( block_mesh.is_polyhedron_facet_on_border( facet ) )
+                        {
+                            result.emplace_back( facet );
                         }
                     }
                 }
@@ -164,24 +182,24 @@ namespace geode
             BRepBuilder& builder_;
         };
 
-        CutAlongInternalSurfaces::CutAlongInternalSurfaces(
+        SplitAlongBlockMeshBorders::SplitAlongBlockMeshBorders(
             const BRep& model, BRepBuilder& builder )
             : impl_{ model, builder }
         {
         }
 
-        CutAlongInternalSurfaces::~CutAlongInternalSurfaces() {}
+        SplitAlongBlockMeshBorders::~SplitAlongBlockMeshBorders() = default;
 
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-            CutAlongInternalSurfaces::cut_all_blocks()
+            SplitAlongBlockMeshBorders::split_all_blocks()
         {
-            return impl_->cut();
+            return impl_->split();
         }
 
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-            CutAlongInternalSurfaces::cut_block( const Block3D& block )
+            SplitAlongBlockMeshBorders::split_block( const Block3D& block )
         {
-            return impl_->cut_block( block );
+            return impl_->split_block( block );
         }
     } // namespace detail
 } // namespace geode
