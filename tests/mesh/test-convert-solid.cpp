@@ -33,7 +33,7 @@
 #include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/helpers/detail/cut_along_solid_facets.h>
+#include <geode/mesh/helpers/detail/split_along_solid_facets.h>
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
 #include <geode/mesh/helpers/convert_solid_mesh.h>
@@ -81,9 +81,9 @@ void test()
 
     auto tet_builder =
         geode::TetrahedralSolidBuilder3D::create( *tet_solid_from_light_grid );
-    geode::detail::CutAlongSolidFacets cutter{ *tet_solid_from_light_grid,
+    geode::detail::SplitAlongSolidFacets splitter{ *tet_solid_from_light_grid,
         *tet_builder };
-    cutter.cut_solid_along_facets( {} );
+    splitter.split_solid_along_facets( {} );
 }
 
 OPENGEODE_TEST( "convert-solid" )

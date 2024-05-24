@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/cut_along_solid_facets.h>
+#include <geode/mesh/helpers/detail/split_along_solid_facets.h>
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
@@ -39,7 +39,7 @@ namespace geode
 {
     namespace detail
     {
-        class CutAlongSolidFacets::Impl
+        class SplitAlongSolidFacets::Impl
         {
             struct SolidInfo
             {
@@ -58,7 +58,7 @@ namespace geode
             {
             }
 
-            MeshesElementsMapping cut_solid_along_facets(
+            MeshesElementsMapping split_solid_along_facets(
                 absl::Span< const PolyhedronFacet > facets_list )
             {
                 bool facets_enabled = solid_.are_facets_enabled();
@@ -96,11 +96,11 @@ namespace geode
                     {
                         builder_.unset_polyhedron_adjacent( solid_facet );
                         builder_.unset_polyhedron_adjacent( adj.value() );
-                        for( const auto vertex_id :
-                            solid_.polyhedron_facet_vertices( solid_facet ) )
-                        {
-                            info.vertices_to_check[vertex_id] = true;
-                        }
+                    }
+                    for( const auto vertex_id :
+                        solid_.polyhedron_facet_vertices( solid_facet ) )
+                    {
+                        info.vertices_to_check[vertex_id] = true;
                     }
                 }
                 for( const auto polyhedron_id : Range{ solid_.nb_polyhedra() } )
@@ -142,7 +142,7 @@ namespace geode
                     auto nb_polyhedra_around = polyhedra_around.size();
                     OPENGEODE_ASSERT(
                         nb_polyhedra_around <= all_polyhedra_around.size(),
-                        "[CutAlongSolidFacets] Wrong size comparison" );
+                        "[SplitAlongSolidFacets] Wrong size comparison" );
                     /// Already processed polyhedra
                     PolyhedraAroundVertex processed_polyhedra;
                     while( nb_polyhedra_around != all_polyhedra_around.size() )
@@ -187,7 +187,7 @@ namespace geode
                 }
                 OPENGEODE_ASSERT(
                     !solid_.polyhedra_around_vertex( vertex_id ).empty(),
-                    "[BRepFromMeshBuilder::cut_block_by_surfaces] Lost "
+                    "[BRepFromMeshBuilder::split_block_by_surfaces] Lost "
                     "polyhedron around vertex" );
                 return new_vertex_id;
             }
@@ -234,16 +234,17 @@ namespace geode
             }
 
             ElementsMapping final_facets_mapping(
-                const ElementsMapping& solid2cut_mapping,
+                const ElementsMapping& solid2split_mapping,
                 absl::Span< const index_t > clean_mapping ) const
             {
                 ElementsMapping facets_mapping;
-                for( const auto& solid2cut : solid2cut_mapping.in2out_map() )
+                for( const auto& solid2split :
+                    solid2split_mapping.in2out_map() )
                 {
-                    for( const auto facet_after_cut : solid2cut.second )
+                    for( const auto facet_after_split : solid2split.second )
                     {
-                        facets_mapping.map(
-                            solid2cut.first, clean_mapping[facet_after_cut] );
+                        facets_mapping.map( solid2split.first,
+                            clean_mapping[facet_after_split] );
                     }
                 }
                 return facets_mapping;
@@ -288,16 +289,17 @@ namespace geode
             }
 
             ElementsMapping final_edges_mapping(
-                const ElementsMapping& solid2cut_mapping,
+                const ElementsMapping& solid2split_mapping,
                 absl::Span< const index_t > clean_mapping ) const
             {
                 ElementsMapping edges_mapping;
-                for( const auto& solid2cut : solid2cut_mapping.in2out_map() )
+                for( const auto& solid2split :
+                    solid2split_mapping.in2out_map() )
                 {
-                    for( const auto edge_after_cut : solid2cut.second )
+                    for( const auto edge_after_split : solid2split.second )
                     {
-                        edges_mapping.map(
-                            solid2cut.first, clean_mapping[edge_after_cut] );
+                        edges_mapping.map( solid2split.first,
+                            clean_mapping[edge_after_split] );
                     }
                 }
                 return edges_mapping;
@@ -308,18 +310,18 @@ namespace geode
             SolidMeshBuilder3D& builder_;
         };
 
-        CutAlongSolidFacets::CutAlongSolidFacets(
+        SplitAlongSolidFacets::SplitAlongSolidFacets(
             const SolidMesh3D& mesh, SolidMeshBuilder3D& builder )
             : impl_{ mesh, builder }
         {
         }
 
-        CutAlongSolidFacets::~CutAlongSolidFacets() {}
+        SplitAlongSolidFacets::~SplitAlongSolidFacets() {}
 
-        MeshesElementsMapping CutAlongSolidFacets::cut_solid_along_facets(
+        MeshesElementsMapping SplitAlongSolidFacets::split_solid_along_facets(
             absl::Span< const PolyhedronFacet > facets_list )
         {
-            return impl_->cut_solid_along_facets( facets_list );
+            return impl_->split_solid_along_facets( facets_list );
         }
     } // namespace detail
 } // namespace geode

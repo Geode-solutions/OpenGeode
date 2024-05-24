@@ -23,38 +23,47 @@
 
 #pragma once
 
-#include <absl/types/span.h>
-
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/meshes_mapping.h>
+#include <geode/model/common.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
-    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
-    ALIAS_3D( SolidMesh );
-    ALIAS_3D( SolidMeshBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
+    ALIAS_3D( Block );
+    class BRep;
+    class BRepBuilder;
+    struct ComponentMeshVertex;
 } // namespace geode
 
 namespace geode
 {
     namespace detail
     {
-        class opengeode_mesh_api CutAlongSolidFacets
+        class opengeode_model_api SplitAlongBlockMeshBorders
         {
         public:
-            CutAlongSolidFacets(
-                const SolidMesh3D& mesh, SolidMeshBuilder3D& builder );
-            ~CutAlongSolidFacets();
+            SplitAlongBlockMeshBorders(
+                const BRep& model, BRepBuilder& builder );
+            ~SplitAlongBlockMeshBorders();
 
-            /*
-             * Cuts the solid along given facets, and returns the mapping on
-             * vertices and facets.
+            /* Splits the blocks along internal surfaces, facets without
+             * adjacencies and non manifold vertices, and returns pairs of
+             * component mesh vertices where the blocks vertices were split
+             * (first the initial cmv of the vertices, second the cmv of the
+             * newly created vertex)
              */
-            MeshesElementsMapping cut_solid_along_facets(
-                absl::Span< const PolyhedronFacet > facets_list );
+            std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
+                split_all_blocks();
+
+            /* Splits the block along internal surfaces, facets without
+             * adjacencies and non manifold vertices, and returns pairs of
+             * component mesh vertices where the block vertices were split
+             * (first the initial id of the vertices, second the id of the newly
+             * created vertex)
+             */
+            std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
+                split_block( const Block3D& block );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
