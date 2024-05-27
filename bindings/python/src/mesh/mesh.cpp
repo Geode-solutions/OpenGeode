@@ -78,6 +78,7 @@ namespace geode
     void define_euclidean_distance_transform( pybind11::module& );
     void define_repair_polygon_orientations( pybind11::module& );
     void define_geometrical_operations_on_mesh( pybind11::module& );
+    void define_gradient_computation( pybind11::module& module );
     void define_mesh_crs_helper( pybind11::module& );
 
     void define_vertex_set_io( pybind11::module& );
@@ -159,6 +160,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_euclidean_distance_transform( module );
     geode::define_repair_polygon_orientations( module );
     geode::define_geometrical_operations_on_mesh( module );
+    geode::define_gradient_computation( module );
     geode::define_mesh_crs_helper( module );
 
     geode::define_vertex_set_io( module );

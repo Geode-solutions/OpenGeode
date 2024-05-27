@@ -21,19 +21,27 @@
  *
  */
 
-#pragma once
+#include "../../common.h"
 
-#include <geode/mesh/common.h>
+#include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/helpers/gradient_computation.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
-    ALIAS_3D( TriangulatedSurface );
-} // namespace geode
-
-namespace geode
-{
-    double opengeode_mesh_api hausdorff_distance(
-        const TriangulatedSurface3D& mesh_A,
-        const TriangulatedSurface3D& mesh_B );
+    void define_gradient_computation( pybind11::module& module )
+    {
+        module
+            .def( "compute_surface_scalar_function_gradient2D",
+                &compute_surface_scalar_function_gradient< 2 > )
+            .def( "compute_surface_scalar_function_gradient3D",
+                &compute_surface_scalar_function_gradient< 3 > )
+            .def( "compute_solid_scalar_function_gradient3D",
+                &compute_solid_scalar_function_gradient );
+    }
 } // namespace geode

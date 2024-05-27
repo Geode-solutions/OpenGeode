@@ -27,13 +27,19 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
-    ALIAS_3D( TriangulatedSurface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    ALIAS_2D_AND_3D( SurfaceMesh );
+    ALIAS_3D( SolidMesh );
 } // namespace geode
 
 namespace geode
 {
-    double opengeode_mesh_api hausdorff_distance(
-        const TriangulatedSurface3D& mesh_A,
-        const TriangulatedSurface3D& mesh_B );
+    template < index_t dimension >
+    std::string compute_surface_scalar_function_gradient(
+        const SurfaceMesh< dimension >& mesh,
+        absl::string_view scalar_function_name );
+
+    std::string opengeode_mesh_api compute_solid_scalar_function_gradient(
+        const SolidMesh3D& mesh, absl::string_view scalar_function_name );
 } // namespace geode

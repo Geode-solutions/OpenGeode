@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 namespace geode
 {
@@ -76,6 +77,12 @@ namespace geode
                 context, "Point2D" );
             AttributeManager::register_attribute_type< Point3D, Serializer >(
                 context, "Point3D" );
+            AttributeManager::register_attribute_type< Vector1D, Serializer >(
+                context, "Vector1D" );
+            AttributeManager::register_attribute_type< Vector2D, Serializer >(
+                context, "Vector2D" );
+            AttributeManager::register_attribute_type< Vector3D, Serializer >(
+                context, "Vector3D" );
             AttributeManager::register_attribute_type<
                 absl::InlinedVector< Point1D, 2 >, Serializer >(
                 context, absl::StrCat( "InlinedVector_Point1D_2" ) );
