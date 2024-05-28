@@ -68,6 +68,7 @@ add_geode_python_binding(
         "helpers/crs_helper.cpp"
         "helpers/euclidean_distance_transform.cpp"
         "helpers/geometrical_operations_on_mesh.cpp"
+        "helpers/gradient_computation.cpp"
         "helpers/repair_polygon_orientations.cpp"
         "io/edged_curve.cpp"
         "io/graph.cpp"
