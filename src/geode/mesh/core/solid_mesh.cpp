@@ -191,17 +191,21 @@ namespace
         const geode::SolidMesh< dimension >& solid,
         const std::array< geode::index_t, 2 >& vertices )
     {
-        for( const auto& polyhedron :
-            solid.polyhedra_around_vertex( vertices[0] ) )
+        for( const auto vertex : vertices )
         {
-            for( const auto& edge_vertices :
-                solid.polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
+            for( const auto& polyhedron :
+                solid.polyhedra_around_vertex( vertex ) )
             {
-                if( vertices == edge_vertices
-                    || ( vertices[0] == edge_vertices[1]
-                         && vertices[1] == edge_vertices[0] ) )
+                for( const auto& edge_vertices :
+                    solid.polyhedron_edges_vertices(
+                        polyhedron.polyhedron_id ) )
                 {
-                    return polyhedron.polyhedron_id;
+                    if( vertices == edge_vertices
+                        || ( vertices[0] == edge_vertices[1]
+                             && vertices[1] == edge_vertices[0] ) )
+                    {
+                        return polyhedron.polyhedron_id;
+                    }
                 }
             }
         }
@@ -1142,6 +1146,7 @@ namespace geode
         }
         return result;
     }
+
     template < index_t dimension >
     absl::optional< index_t > SolidMesh< dimension >::polyhedron_around_edge(
         const std::array< index_t, 2 >& vertices ) const

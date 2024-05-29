@@ -29,10 +29,7 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
-    ALIAS_3D( Block );
-    class BRep;
-    class BRepBuilder;
+    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
     struct ComponentMeshVertex;
 } // namespace geode
 
@@ -40,28 +37,30 @@ namespace geode
 {
     namespace detail
     {
-        class opengeode_model_api CutAlongInternalSurfaces
+        template < typename Model >
+        class SplitAlongSurfaceMeshBorders
         {
         public:
-            CutAlongInternalSurfaces( BRep& model );
-            CutAlongInternalSurfaces( const BRep& model, BRepBuilder& builder );
-            ~CutAlongInternalSurfaces();
+            SplitAlongSurfaceMeshBorders( Model& model );
+            SplitAlongSurfaceMeshBorders(
+                const Model& model, typename Model::Builder& builder );
+            ~SplitAlongSurfaceMeshBorders();
 
-            /* Cuts the blocks along internal surfaces, and returns pairs of
-             * component mesh vertices where the blocks vertices were split
+            /* Splits the surfaces along internal lines, and returns pairs of
+             * component mesh vertices where the surfaces vertices were split
              * (first the initial cmv of the vertices, second the cmv of the
              * newly created vertex)
              */
             std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_all_blocks();
+                split_all_surfaces();
 
-            /* Cuts the block along internal surfaces, and returns pairs of
-             * component mesh vertices where the block vertices were split
+            /* Splits the surface along internal lines, and returns pairs of
+             * component mesh vertices where the surface vertices were split
              * (first the initial id of the vertices, second the id of the newly
              * created vertex)
              */
             std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_block( const Block3D& block );
+                split_surface( const Surface< Model::dim >& surface );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

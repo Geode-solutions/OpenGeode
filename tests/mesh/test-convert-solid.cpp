@@ -29,9 +29,11 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
+#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/helpers/detail/split_along_solid_facets.h>
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
 #include <geode/mesh/helpers/convert_solid_mesh.h>
@@ -48,7 +50,7 @@ void test()
         geode::convert_grid_into_tetrahedral_solid( *mesh_grid );
     const geode::LightRegularGrid3D light_grid{ { { 1, 1.5, 1.1 } },
         { 5, 5, 5 }, { 5, 5, 5 } };
-    const auto tet_solid_from_light_grid =
+    auto tet_solid_from_light_grid =
         geode::convert_grid_into_tetrahedral_solid( *mesh_grid );
     const geode::index_t nb_vertices = 6 * 6 * 6;
     OPENGEODE_EXCEPTION(
@@ -76,6 +78,12 @@ void test()
         tet_solid_from_light_grid->nb_polyhedra() == nb_tetrahedra,
         "[Test] Number of tetrahedra in TetrahedralSolid3D from "
         "LightRegularGrid is not correct" );
+
+    auto tet_builder =
+        geode::TetrahedralSolidBuilder3D::create( *tet_solid_from_light_grid );
+    geode::detail::SplitAlongSolidFacets splitter{ *tet_solid_from_light_grid,
+        *tet_builder };
+    splitter.split_solid_along_facets( {} );
 }
 
 OPENGEODE_TEST( "convert-solid" )

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/helpers/detail/cut_along_internal_lines.h>
+#include <geode/model/helpers/detail/split_along_surface_mesh_borders.h>
 
 #include <async++.h>
 
@@ -49,7 +49,7 @@ namespace geode
     namespace detail
     {
         template < typename Model >
-        class CutAlongInternalLines< Model >::Impl
+        class SplitAlongSurfaceMeshBorders< Model >::Impl
         {
             using CMVmapping =
                 std::pair< ComponentMeshVertex, ComponentMeshVertex >;
@@ -80,7 +80,7 @@ namespace geode
             {
             }
 
-            CMVmappings cut()
+            CMVmappings split()
             {
                 absl::FixedArray< Task > tasks( model_.nb_surfaces() );
                 index_t count{ 0 };
@@ -106,7 +106,7 @@ namespace geode
                 return mapping;
             }
 
-            CMVmappings cut_surface( const Surface< dimension >& surface )
+            CMVmappings split_surface( const Surface< dimension >& surface )
             {
                 const auto mapping = split_points( surface );
                 update_unique_vertices( mapping );
@@ -148,7 +148,8 @@ namespace geode
                     auto nb_polygons_around = polygons_around.size();
                     OPENGEODE_ASSERT(
                         nb_polygons_around <= polygon_vertices.size(),
-                        "[CutAlongInternalLines] Wrong size comparison" );
+                        "[SplitAlongSurfaceMeshBorders] Wrong size "
+                        "comparison" );
                     PolygonsAroundVertex total_polygons;
                     while( nb_polygons_around != polygon_vertices.size() )
                     {
@@ -252,7 +253,7 @@ namespace geode
                 }
                 OPENGEODE_ASSERT(
                     !mesh.polygons_around_vertex( vertex_id ).empty(),
-                    "[ModelFromMeshBuilder::cut_surface_by_lines] Lost "
+                    "[ModelFromMeshBuilder::split_surface_by_lines] Lost "
                     "polygon around vertex" );
                 return {
                     ComponentMeshVertex{ surface.component_id(), vertex_id },
@@ -267,39 +268,41 @@ namespace geode
         };
 
         template < typename Model >
-        CutAlongInternalLines< Model >::CutAlongInternalLines( Model& model )
+        SplitAlongSurfaceMeshBorders< Model >::SplitAlongSurfaceMeshBorders(
+            Model& model )
             : impl_{ model }
         {
         }
 
         template < typename Model >
-        CutAlongInternalLines< Model >::CutAlongInternalLines(
+        SplitAlongSurfaceMeshBorders< Model >::SplitAlongSurfaceMeshBorders(
             const Model& model, typename Model::Builder& builder )
             : impl_{ model, builder }
         {
         }
 
         template < typename Model >
-        CutAlongInternalLines< Model >::~CutAlongInternalLines()
+        SplitAlongSurfaceMeshBorders< Model >::~SplitAlongSurfaceMeshBorders()
         {
         }
 
         template < typename Model >
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-            CutAlongInternalLines< Model >::cut_all_surfaces()
+            SplitAlongSurfaceMeshBorders< Model >::split_all_surfaces()
         {
-            return impl_->cut();
+            return impl_->split();
         }
 
         template < typename Model >
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-            CutAlongInternalLines< Model >::cut_surface(
+            SplitAlongSurfaceMeshBorders< Model >::split_surface(
                 const Surface< Model::dim >& surface )
         {
-            return impl_->cut_surface( surface );
+            return impl_->split_surface( surface );
         }
 
-        template class opengeode_model_api CutAlongInternalLines< Section >;
-        template class opengeode_model_api CutAlongInternalLines< BRep >;
+        template class opengeode_model_api
+            SplitAlongSurfaceMeshBorders< Section >;
+        template class opengeode_model_api SplitAlongSurfaceMeshBorders< BRep >;
     } // namespace detail
 } // namespace geode
