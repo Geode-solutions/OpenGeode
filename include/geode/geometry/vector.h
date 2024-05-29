@@ -132,4 +132,51 @@ namespace geode
         }
     };
     ALIAS_1D_AND_2D_AND_3D( Vector );
+
+    template < index_t dimension >
+    struct AttributeLinearInterpolationImpl< Vector< dimension > >
+    {
+        template < template < typename > class Attribute >
+        static Vector< dimension > compute(
+            const AttributeLinearInterpolation &interpolator,
+            const Attribute< Vector< dimension > > &attribute )
+        {
+            Vector< dimension > result;
+            for( const auto i : Indices{ interpolator.indices_ } )
+            {
+                result = result
+                         + attribute.value( interpolator.indices_[i] )
+                               * interpolator.lambdas_[i];
+            }
+            return result;
+        }
+    };
+
+    template < index_t dimension >
+    struct GenericAttributeConversion< Vector< dimension > >
+    {
+        static float converted_value( const Vector< dimension > &vector )
+        {
+            return converted_item_value( vector, 0 );
+        }
+
+        static float converted_item_value(
+            const Vector< dimension > &vector, local_index_t item )
+        {
+            OPENGEODE_ASSERT( item < nb_items(),
+                "[GenericAttributeConversion] Accessing "
+                "incorrect item value" );
+            return static_cast< float >( vector.value( item ) );
+        }
+
+        static bool is_genericable()
+        {
+            return true;
+        }
+
+        static local_index_t nb_items()
+        {
+            return dimension;
+        }
+    };
 } // namespace geode
