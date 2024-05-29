@@ -219,7 +219,25 @@ namespace geode
                         }
                         for( auto& edge : it->second )
                         {
-                            edges.emplace_back( std::move( edge ) );
+                            const auto& surface_mesh = surface.mesh();
+                            const auto& edge_vertices =
+                                surface_mesh.polygon_edge_vertices( edge );
+                            edges.emplace_back(
+                                surface_mesh
+                                    .polygon_edge_from_vertices(
+                                        edge_vertices[0], edge_vertices[1] )
+                                    .value() );
+                            if( surface_mesh
+                                    .polygon_edge_from_vertices(
+                                        edge_vertices[1], edge_vertices[0] )
+                                    .has_value() )
+                            {
+                                edges.emplace_back(
+                                    surface_mesh
+                                        .polygon_edge_from_vertices(
+                                            edge_vertices[1], edge_vertices[0] )
+                                        .value() );
+                            }
                         }
                     }
                 }
