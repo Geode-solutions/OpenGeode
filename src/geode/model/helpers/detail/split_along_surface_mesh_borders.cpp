@@ -227,11 +227,17 @@ namespace geode
                                     .polygon_edge_from_vertices(
                                         edge_vertices[0], edge_vertices[1] )
                                     .value() );
-                            edges.emplace_back(
-                                surface_mesh
+                            if( surface_mesh
                                     .polygon_edge_from_vertices(
                                         edge_vertices[1], edge_vertices[0] )
-                                    .value() );
+                                    .has_value() )
+                            {
+                                edges.emplace_back(
+                                    surface_mesh
+                                        .polygon_edge_from_vertices(
+                                            edge_vertices[1], edge_vertices[0] )
+                                        .value() );
+                            }
                         }
                     }
                 }
