@@ -230,8 +230,8 @@ namespace geode
         {
             return true;
         }
-        static local_index_t nb_items()
 
+        static local_index_t nb_items()
         {
             return dimension;
         }
