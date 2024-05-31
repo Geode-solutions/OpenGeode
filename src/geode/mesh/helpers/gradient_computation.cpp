@@ -87,16 +87,19 @@ namespace
                     const auto value_diff =
                         function_value
                         - scalar_function->value( vertex_around );
-                    const auto dist = position_diff.length();
-                    if( std::fabs( dist ) < geode::global_epsilon
-                        || std::fabs( position_diff.value( d ) )
-                               < geode::global_epsilon )
+                    const auto dist2 = position_diff.length2();
+                    if( std::fabs( dist2 ) < geode::global_epsilon
+                        || std::fabs(
+                               position_diff.value( d ) / std::sqrt( dist2 ) )
+                               < 0.1 )
                     {
                         continue;
                     }
-                    contribution_sum +=
-                        value_diff / position_diff.value( d ) / dist;
-                    inverse_dist_sum += 1 / dist;
+                    const double diff_sign{ position_diff.value( d ) < 0 ? -1.
+                                                                         : 1. };
+                    contribution_sum += value_diff * diff_sign / dist2;
+                    inverse_dist_sum +=
+                        diff_sign * position_diff.value( d ) / dist2;
                 }
                 OPENGEODE_EXCEPTION(
                     std::fabs( inverse_dist_sum ) > geode::global_epsilon,
