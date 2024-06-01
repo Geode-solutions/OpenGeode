@@ -64,12 +64,12 @@ To check out our live documentation, visit [docs.geode-solutions.com](https://do
 
 Installing OpenGeode is done:
 
-- either, by compiling the C++ source. Check [this documentation page](https://docs.geode-solutions.com/guides/how-to-compile) for more details.
-- or, by using pip command `pip install OpenGeode-core` and add `import opengeode` in your Python script. Check [this documentation page](https://docs.geode-solutions.com/guides/how-to-use-binding) for more details.
+- either, by compiling the C++ source. Check [this documentation page](https://docs.geode-solutions.com/guides/compile-opengeode.html) for more details.
+- or, by using pip command `pip install OpenGeode-core` and add `import opengeode` in your Python script. Check [this documentation page](https://docs.geode-solutions.com/guides/use-opengeode-binding.html) for more details.
 
 ## Questions
 
-For questions and support please use the official [slack](https://opengeode-slack-invite.herokuapp.com). The issue list of this repo is exclusively for bug reports and feature requests.
+For questions and support please use the official [slack](https://geode-solutions.com/#slack). The issue list of this repo is exclusively for bug reports and feature requests.
 
 ## Changelog
 
