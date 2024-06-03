@@ -82,6 +82,12 @@ namespace geode
             return mappings[type];
         }
 
+        const absl::flat_hash_map< ComponentType, Mapping >&
+            components_mappings()
+        {
+            return mappings;
+        }
+
     private:
         absl::flat_hash_map< ComponentType, Mapping > mappings;
     };
