@@ -70,6 +70,7 @@ add_geode_python_binding(
         "helpers/geometrical_operations_on_mesh.cpp"
         "helpers/gradient_computation.cpp"
         "helpers/repair_polygon_orientations.cpp"
+        "helpers/rasterize.cpp"
         "io/edged_curve.cpp"
         "io/graph.cpp"
         "io/hybrid_solid.cpp"
