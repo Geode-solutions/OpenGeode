@@ -83,6 +83,7 @@ namespace geode
     void define_model_component_filter( pybind11::module& );
     void define_model_concatener( pybind11::module& );
     void define_model_coordinate_reference_system( pybind11::module& );
+    void define_model_ray_tracing( pybind11::module& );
 } // namespace geode
 
 PYBIND11_MODULE( opengeode_py_model, module )

@@ -29,6 +29,7 @@ add_geode_python_binding(
         "helpers/model_component_filter.cpp"
         "helpers/model_concatener.cpp"
         "helpers/model_crs.cpp"
+        "helpers/ray_tracing.cpp"
         "mixin/builder/blocks_builder.cpp"
         "mixin/builder/block_collections_builder.cpp"
         "mixin/builder/corners_builder.cpp"
