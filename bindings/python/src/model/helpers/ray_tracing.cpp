@@ -21,36 +21,21 @@
  *
  */
 
-#pragma once
+#include "../../common.h"
 
-#include <absl/container/flat_hash_map.h>
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/representation/core/brep.h>
 
-#include <geode/mesh/helpers/ray_tracing.h>
-
-#include <geode/model/common.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
-    ALIAS_3D( Block );
-    class BRep;
-    struct uuid;
-} // namespace geode
+#include <geode/model/helpers/ray_tracing.h>
 
 namespace geode
 {
-    using BoundarySurfaceIntersections = absl::flat_hash_map< uuid,
-        std::vector< RayTracing3D::PolygonDistance > >;
-
-    BoundarySurfaceIntersections opengeode_model_api
-        find_intersections_with_boundaries( const InfiniteLine3D& infinite_line,
-            const BRep& brep,
-            const Block3D& block );
-
-    bool opengeode_model_api is_point_inside_block(
-        const BRep& brep, const Block3D& block, const Point3D& point );
-
-    absl::optional< uuid > opengeode_model_api block_containing_point(
-        const BRep& brep, const Point3D& point );
-
+    void define_model_ray_tracing( pybind11::module& module )
+    {
+        module
+            .def( "find_intersections_with_boundaries",
+                &find_intersections_with_boundaries )
+            .def( "is_point_inside_block", &is_point_inside_block )
+            .def( "block_containing_point", &block_containing_point );
+    }
 } // namespace geode
