@@ -35,7 +35,7 @@ namespace geode
         module
             .def( "find_intersections_with_boundaries",
                 &find_intersections_with_boundaries )
-            .def( "test_point_inside_block", &test_point_inside_block )
+            .def( "is_point_inside_block", &is_point_inside_block )
             .def( "block_containing_point", &block_containing_point );
     }
 } // namespace geode

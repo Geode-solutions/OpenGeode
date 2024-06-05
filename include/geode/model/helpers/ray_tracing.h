@@ -47,7 +47,7 @@ namespace geode
             const BRep& brep,
             const Block3D& block );
 
-    bool opengeode_model_api test_point_inside_block(
+    bool opengeode_model_api is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point );
 
     absl::optional< uuid > opengeode_model_api block_containing_point(

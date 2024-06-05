@@ -100,7 +100,7 @@ namespace geode
         return result;
     }
 
-    bool test_point_inside_block(
+    bool is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point )
     {
         std::array< Vector3D, 12 > directions = { { { { 0., 0., 1. } },
@@ -131,7 +131,7 @@ namespace geode
     {
         for( const auto& block : brep.blocks() )
         {
-            if( test_point_inside_block( brep, block, point ) )
+            if( is_point_inside_block( brep, block, point ) )
             {
                 return block.id();
             }

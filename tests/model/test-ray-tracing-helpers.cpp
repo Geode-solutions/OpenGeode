@@ -49,11 +49,11 @@ void test()
     // test point iside the block
     geode::Point3D inside( { 0.00001, 0.00001, 0.00001 } );
     geode::Point3D outside( { -0.00001, 0.00001, 0.00001 } );
-    OPENGEODE_EXCEPTION( geode::test_point_inside_block(
+    OPENGEODE_EXCEPTION( geode::is_point_inside_block(
                              brep, brep.block( block_id.value() ), inside ),
         "[Test] the point named inside should be inside the block." );
 
-    OPENGEODE_EXCEPTION( !geode::test_point_inside_block(
+    OPENGEODE_EXCEPTION( !geode::is_point_inside_block(
                              brep, brep.block( block_id.value() ), outside ),
         "[Test] the point named outside should be outside the block." );
 }
