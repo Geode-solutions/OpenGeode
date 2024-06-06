@@ -33,9 +33,11 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
+#include <geode/geometry/distance.h>
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/vector.h>
 
@@ -872,6 +874,52 @@ namespace geode
         {
             return absl::nullopt;
         }
+    }
+
+    template < index_t dimension >
+    bool SolidMesh< dimension >::is_polyhedron_degenerated(
+        index_t polyhedron_id ) const
+    {
+        double max_area{ 0. };
+        local_index_t max_area_facet{ 0 };
+        for( const auto f : LRange{ nb_polyhedron_facets( polyhedron_id ) } )
+        {
+            const auto cur_area = polyhedron_facet_area( { polyhedron_id, f } );
+            if( cur_area > max_area )
+            {
+                max_area = cur_area;
+                max_area_facet = f;
+            }
+        }
+        if( max_area < global_epsilon )
+        {
+            return true;
+        }
+        const auto vertices = polyhedron_vertices( polyhedron_id );
+        const auto normal =
+            new_polyhedron_facet_normal( { polyhedron_id, max_area_facet } );
+        if( !normal )
+        {
+            return true;
+        }
+        const auto facet_vertices =
+            polyhedron_facet_vertices( { polyhedron_id, max_area_facet } );
+        Plane plane{ normal.value(), this->point( facet_vertices[0] ) };
+        for( const auto vertex_id : vertices )
+        {
+            if( absl::c_find( facet_vertices, vertex_id )
+                != facet_vertices.end() )
+            {
+                continue;
+            }
+            if( std::get< 0 >(
+                    point_plane_distance( this->point( vertex_id ), plane ) )
+                > global_epsilon )
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     template < index_t dimension >

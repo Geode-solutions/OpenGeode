@@ -349,6 +349,12 @@ namespace geode
             polygon_vertex_normal( index_t vertex_id ) const;
 
         /*!
+         * Return if a polygon is degenerated (means stands into an
+         * epsilon-large segment)
+         */
+        bool is_polygon_degenerated( index_t polygon_id ) const;
+
+        /*!
          * Returns the vertices linked by an edge to the given mesh vertex.
          */
         virtual VerticesAroundVertex vertices_around_vertex(

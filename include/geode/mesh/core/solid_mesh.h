@@ -440,6 +440,12 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
+         * Return if a polyhedron is degenerated (means stands into an
+         * epsilon-large plane)
+         */
+        bool is_polyhedron_degenerated( index_t polyhedron_id ) const;
+
+        /*!
          * Returns the vertices linked by an edge to the given mesh vertex.
          */
         virtual VerticesAroundVertex vertices_around_vertex(

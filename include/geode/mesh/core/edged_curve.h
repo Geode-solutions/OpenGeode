@@ -65,6 +65,12 @@ namespace geode
 
         Point< dimension > edge_barycenter( index_t edge_id ) const;
 
+        /*!
+         * Return if an edge is degenerated (means stands into an
+         * epsilon-large ball)
+         */
+        bool is_edge_degenerated( index_t edge_id ) const;
+
         Segment< dimension > segment( index_t edge_id ) const;
 
         TextureManager1D texture_manager() const;

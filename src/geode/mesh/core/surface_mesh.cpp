@@ -28,12 +28,15 @@
 
 #include <bitsery/brief_syntax/array.h>
 
+#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/cached_value.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/distance.h>
@@ -41,6 +44,7 @@
 
 #include <geode/mesh/builder/surface_edges_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
@@ -48,6 +52,8 @@
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/texture2d.h>
 #include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/io/triangulated_surface_output.h>
 
 namespace
 {
@@ -99,6 +105,25 @@ namespace
     }
 
     template < geode::index_t dimension >
+    void output( const geode::SurfaceMesh< dimension >& mesh )
+    {
+        auto surf = geode::TriangulatedSurface< dimension >::create();
+        auto bui =
+            geode::TriangulatedSurfaceBuilder< dimension >::create( *surf );
+        for( const auto v : geode::Range{ mesh.nb_vertices() } )
+        {
+            bui->create_point( mesh.point( v ) );
+        }
+        for( const auto p : geode::Range{ mesh.nb_polygons() } )
+        {
+            const auto vertices = mesh.polygon_vertices( p );
+            bui->create_triangle( { vertices[0], vertices[1], vertices[2] } );
+        }
+        bui->delete_isolated_vertices();
+        geode::save_triangulated_surface( *surf, "output.og_tsf3d" );
+    }
+
+    template < geode::index_t dimension >
     geode::detail::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
         const geode::index_t& vertex_id,
@@ -146,6 +171,10 @@ namespace
                 cur_polygon_edge = mesh.polygon_adjacent_edge( next_edge );
                 safety_count++;
             }
+        }
+        if( safety_count >= MAX_SAFETY_COUNT )
+        {
+            output( mesh );
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
             "[SurfaceMesh::polygons_around_vertex] Too many polygons "
@@ -1049,6 +1078,48 @@ namespace geode
         {
             return absl::nullopt;
         }
+    }
+
+    template < index_t dimension >
+    bool SurfaceMesh< dimension >::is_polygon_degenerated(
+        index_t polygon_id ) const
+    {
+        double max_length{ 0. };
+        local_index_t max_length_edge{ 0 };
+        for( const auto e : LRange{ nb_polygon_edges( polygon_id ) } )
+        {
+            const auto cur_length = edge_length( PolygonEdge{ polygon_id, e } );
+            if( cur_length > max_length )
+            {
+                max_length = cur_length;
+                max_length_edge = e;
+            }
+        }
+        if( max_length < global_epsilon )
+        {
+            return true;
+        }
+        const auto vertices = polygon_vertices( polygon_id );
+        const auto next =
+            max_length_edge + 1 == nb_polygon_vertices( polygon_id )
+                ? 0
+                : max_length_edge + 1;
+        InfiniteLine< dimension > line{ Segment< dimension >{
+            this->point( vertices[max_length_edge] ),
+            this->point( vertices[next] ) } };
+        for( const auto v : LIndices{ vertices } )
+        {
+            if( v == max_length_edge || v == next )
+            {
+                continue;
+            }
+            if( point_line_distance( this->point( vertices[v] ), line )
+                > global_epsilon )
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     template < index_t dimension >
