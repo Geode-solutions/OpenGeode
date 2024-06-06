@@ -114,6 +114,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool EdgedCurve< dimension >::is_edge_degenerated( index_t edge_id ) const
+    {
+        return edge_length( edge_id ) <= global_epsilon;
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void EdgedCurve< dimension >::serialize( Archive& archive )
     {
