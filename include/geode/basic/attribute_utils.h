@@ -93,13 +93,18 @@ namespace geode
 
     struct AttributeLinearInterpolation
     {
-        AttributeLinearInterpolation( absl::FixedArray< index_t > indices,
-            absl::FixedArray< double > lambdas )
-            : indices_{ std::move( indices ) }, lambdas_{ std::move( lambdas ) }
+        AttributeLinearInterpolation( absl::Span< const index_t > indices,
+            absl::Span< const double > lambdas )
+            : indices_( indices.size() ), lambdas_( lambdas.size() )
         {
             OPENGEODE_EXCEPTION( indices_.size() == lambdas_.size(),
                 "[AttributeLinearInterpolation] Both arrays should have the "
                 "same size" );
+            for( const auto index : Indices{ indices } )
+            {
+                indices_[index] = indices[index];
+                lambdas_[index] = lambdas[index];
+            }
         }
 
         template < template < typename > class Attribute, typename T >
@@ -109,8 +114,8 @@ namespace geode
                 *this, attribute );
         }
 
-        const absl::FixedArray< index_t > indices_;
-        const absl::FixedArray< double > lambdas_;
+        absl::FixedArray< index_t > indices_;
+        absl::FixedArray< double > lambdas_;
     };
 
 #define IMPLICIT_ATTRIBUTE_LINEAR_INTERPOLATION( Type )                        \
