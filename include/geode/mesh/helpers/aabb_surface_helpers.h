@@ -37,6 +37,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
+    template < typename T >
+    class GenericMeshAABB;
 } // namespace geode
 
 namespace geode
@@ -61,4 +63,46 @@ namespace geode
         const TriangulatedSurface< dimension >& mesh_;
     };
     ALIAS_2D_AND_3D( DistanceToTriangle );
+
+    template < index_t dimension >
+    class GenericMeshAABB< SurfaceMesh< dimension > >
+    {
+    public:
+        GenericMeshAABB( const SurfaceMesh< dimension >& mesh )
+            : elements_tree_{ create_aabb_tree( mesh ) }
+        {
+        }
+
+    protected:
+        const AABBTree< dimension >& elements_aabb() const
+        {
+            return elements_tree_;
+        }
+
+    private:
+        AABBTree< dimension > elements_tree_;
+    };
+
+    template < index_t dimension >
+    class GenericMeshAABB< TriangulatedSurface< dimension > >
+        : public GenericMeshAABB< SurfaceMesh< dimension > >
+    {
+    public:
+        using Base = GenericMeshAABB< SurfaceMesh< dimension > >;
+
+        GenericMeshAABB( const TriangulatedSurface< dimension >& mesh )
+            : Base{ mesh }, distance_action_{ mesh }
+        {
+        }
+
+        std::tuple< index_t, Point< dimension >, double > closest_element(
+            const Point< dimension >& query ) const
+        {
+            return this->elements_aabb().closest_element_box(
+                query, distance_action_ );
+        }
+
+    private:
+        const DistanceToTriangle< dimension > distance_action_;
+    };
 } // namespace geode
