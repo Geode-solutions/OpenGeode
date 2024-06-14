@@ -47,9 +47,11 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    ALIAS_2D( Point );
     ALIAS_2D( Corner );
     ALIAS_2D( EdgedCurve );
     ALIAS_2D( PointSet );
@@ -191,6 +193,8 @@ namespace geode
 
         void add_surface_in_surface_collection(
             const Surface2D& surface, const SurfaceCollection2D& collection );
+
+        void set_point( index_t unique_vertex, const Point2D& point );
 
     private:
         Section& section_;

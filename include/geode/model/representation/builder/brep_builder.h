@@ -51,10 +51,12 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    ALIAS_3D( Point );
     ALIAS_3D( Block );
     ALIAS_3D( Corner );
     ALIAS_3D( EdgedCurve );
@@ -235,6 +237,8 @@ namespace geode
 
         void add_block_in_block_collection(
             const Block3D& surface, const BlockCollection3D& collection );
+
+        void set_point( index_t unique_vertex, const Point3D& point );
 
     private:
         BRep& brep_;
