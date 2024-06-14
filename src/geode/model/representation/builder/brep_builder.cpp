@@ -23,10 +23,16 @@
 
 #include <geode/model/representation/builder/brep_builder.h>
 
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/core/block.h>
@@ -465,5 +471,35 @@ namespace geode
     {
         add_item_in_collection(
             block.component_id(), collection.component_id() );
+    }
+
+    void BRepBuilder::set_point( index_t unique_vertex, const Point3D& point )
+    {
+        for( const auto& cmv : brep_.component_mesh_vertices( unique_vertex ) )
+        {
+            if( cmv.component_id.type() == Block3D::component_type_static() )
+            {
+                block_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+            else if( cmv.component_id.type()
+                     == Surface3D::component_type_static() )
+            {
+                surface_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+            else if( cmv.component_id.type()
+                     == Line3D::component_type_static() )
+            {
+                line_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+            else if( cmv.component_id.type()
+                     == Corner3D::component_type_static() )
+            {
+                corner_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+        }
     }
 } // namespace geode

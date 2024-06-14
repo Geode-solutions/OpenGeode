@@ -23,6 +23,11 @@
 
 #include <geode/model/representation/builder/section_builder.h>
 
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/point_set.h>
@@ -362,5 +367,31 @@ namespace geode
     {
         add_item_in_collection(
             surface.component_id(), collection.component_id() );
+    }
+
+    void SectionBuilder::set_point(
+        index_t unique_vertex, const Point2D& point )
+    {
+        for( const auto& cmv :
+            section_.component_mesh_vertices( unique_vertex ) )
+        {
+            if( cmv.component_id.type() == Surface2D::component_type_static() )
+            {
+                surface_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+            else if( cmv.component_id.type()
+                     == Line2D::component_type_static() )
+            {
+                line_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+            else if( cmv.component_id.type()
+                     == Corner2D::component_type_static() )
+            {
+                corner_mesh_builder( cmv.component_id.id() )
+                    ->set_point( cmv.vertex, point );
+            }
+        }
     }
 } // namespace geode
