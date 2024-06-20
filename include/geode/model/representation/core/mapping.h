@@ -83,7 +83,7 @@ namespace geode
         }
 
         const absl::flat_hash_map< ComponentType, Mapping >&
-            components_mappings()
+            components_mappings() const
         {
             return mappings;
         }
@@ -136,5 +136,19 @@ namespace geode
     struct BRepMeshesVertexMapping : public ModelMeshesVertexMapping
     {
         MeshVertexMapping blocks;
+    };
+
+    struct ModelMappings
+    {
+        ModelGenericMapping component_mapping;
+        ModelMeshesElementMapping mesh_element_mapping;
+        ModelMeshesVertexMapping mesh_vertices_mapping;
+    };
+
+    struct BRepMappings
+    {
+        ModelGenericMapping component_mapping;
+        BRepMeshesElementMapping mesh_element_mapping;
+        BRepMeshesVertexMapping mesh_vertices_mapping;
     };
 } // namespace geode
