@@ -30,18 +30,18 @@ namespace geode
 {
     namespace detail
     {
-        ModelGenericMapping merge_mappings(
+        ModelGenericMapping opengeode_model_api merge_mappings(
             const ModelGenericMapping& mappings1,
             const ModelCopyMapping& mappings2 );
 
-        ModelGenericMapping merge_mappings(
+        ModelGenericMapping opengeode_model_api merge_mappings(
             const ModelGenericMapping& mappings1,
             const ModelGenericMapping& mappings2 );
 
-        ModelGenericMapping copy_to_generic_mappings(
+        ModelGenericMapping opengeode_model_api copy_to_generic_mappings(
             const ModelCopyMapping& mappings2 );
 
-        ModelMappings merge_mappings(
+        ModelMappings opengeode_model_api merge_mappings(
             const ModelMappings& mappings1, const ModelMappings& mappings2 );
     } // namespace detail
 } // namespace geode
