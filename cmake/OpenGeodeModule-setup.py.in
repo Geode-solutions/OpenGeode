@@ -60,7 +60,7 @@ setup(
     package_data={
         '${project_name}': ['*/*.so', '*/*.dll', '*/*.pyd', 'share/*/*.db']
     },
-    python_requires='>= 3.8.0, < 3.12.0',
+    python_requires='>= 3.8, < 3.12',
     install_requires=install_requires,
     license='${GEODE_WHEEL_LICENSE}',
     zip_safe=False,
