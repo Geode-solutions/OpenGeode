@@ -27,7 +27,8 @@ ExternalProject_Add(gdal
     BINARY_DIR ${GDAL_PATH}/build
     STAMP_DIR ${GDAL_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/gdal
-    GIT_TAG 5c939ee0750f57e3261e211ed1658701e83feba8
+    GIT_TAG 20240621
+    GIT_SHALLOW ON
     GIT_PROGRESS ON
     GIT_CONFIG core.longpaths=true
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
