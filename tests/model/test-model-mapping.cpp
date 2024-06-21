@@ -24,6 +24,7 @@
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 
+#include <geode/model/helpers/detail/mappings_merger.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>
@@ -176,6 +177,59 @@ void test_components_mapping()
                     == value,
                 "[Test] Wrong mapping for elements (in2out)" );
         }
+    }
+}
+
+void test_merge_mappings()
+{
+    std::vector< geode::uuid > uuids_in( 3 );
+    std::vector< geode::uuid > uuids_mid( 3 );
+    std::vector< geode::uuid > uuids_out( 3 );
+
+    geode::ModelGenericMapping generic_mapping;
+    geode::GenericMapping< geode::uuid > first_mapping;
+    for( const auto i : geode::LRange{ 3 } )
+    {
+        for( const auto j : geode::Range{ i, 3 } )
+        {
+            first_mapping.map( uuids_in[i], uuids_mid[j] );
+        }
+    }
+    generic_mapping.emplace(
+        geode::Corner3D::component_type_static(), std::move( first_mapping ) );
+
+    geode::ModelCopyMapping copy_mapping;
+    geode::BijectiveMapping< geode::uuid > second_mapping;
+    for( const auto i : geode::LRange{ 3 } )
+    {
+        second_mapping.map( uuids_mid[i], uuids_out[i] );
+    }
+    copy_mapping.emplace(
+        geode::Corner3D::component_type_static(), std::move( second_mapping ) );
+
+    const auto merged_mapping =
+        geode::detail::merge_mappings( generic_mapping, copy_mapping );
+    OPENGEODE_EXCEPTION( !merged_mapping.has_mapping_type(
+                             geode::Surface3D::component_type_static() ),
+        "[Test] Generic mappings should not exist for Surfaces" );
+    OPENGEODE_EXCEPTION( generic_mapping.has_mapping_type(
+                             geode::Corner3D::component_type_static() ),
+        "[Test] Generic mappings should exist for Corners" );
+    const auto& corner_merged_mappings =
+        merged_mapping.at( geode::Corner3D::component_type_static() );
+    OPENGEODE_EXCEPTION( corner_merged_mappings.size_in() == 3,
+        "[Test] Wrong size for CopyMapping Corners in" );
+    OPENGEODE_EXCEPTION( corner_merged_mappings.size_out() == 3,
+        "[Test] Wrong size for CopyMapping Corners out" );
+    for( const auto i : geode::LRange{ 3 } )
+    {
+        OPENGEODE_EXCEPTION( corner_merged_mappings.in2out( uuids_in[i] ).size()
+                                 == static_cast< geode::index_t >( 3 - i ),
+            "[Test] Wrong mapping for CopyMapping Corners (in2out)" );
+        OPENGEODE_EXCEPTION(
+            corner_merged_mappings.out2in( uuids_out[i] ).size()
+                == static_cast< geode::index_t >( i + 1 ),
+            "[Test] Wrong mapping for CopyMapping Corners (out2in)" );
     }
 }
 
