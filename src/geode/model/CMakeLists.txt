@@ -41,6 +41,7 @@ add_geode_library(
         "helpers/surface_radial_sort.cpp"
         "helpers/ray_tracing.cpp"
         "helpers/detail/build_model_boundaries.cpp"
+        "helpers/detail/mappings_merger.cpp"
         "helpers/detail/split_along_surface_mesh_borders.cpp"
         "helpers/detail/split_along_block_mesh_borders.cpp"
         "mixin/builder/blocks_builder.cpp"
@@ -163,6 +164,7 @@ add_geode_library(
         "representation/io/geode/geode_section_output.h"
     ADVANCED_HEADERS
         "helpers/detail/build_model_boundaries.h"
+        "helpers/detail/mappings_merger.h"
         "helpers/detail/split_along_surface_mesh_borders.h"
         "helpers/detail/split_along_block_mesh_borders.h"
         "mixin/core/detail/components_storage.h"

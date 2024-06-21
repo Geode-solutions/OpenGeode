@@ -274,6 +274,7 @@ namespace geode
             result.mesh_vertices_mapping.surfaces =
                 merge_vertex_mappings( mappings1.mesh_vertices_mapping.surfaces,
                     mappings2.mesh_vertices_mapping.surfaces );
+            return result;
         }
     } // namespace detail
 } // namespace geode
