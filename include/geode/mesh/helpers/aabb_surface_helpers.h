@@ -82,6 +82,9 @@ namespace geode
     private:
         AABBTree< dimension > elements_tree_;
     };
+    template < index_t dimension >
+    using SurfaceMeshAABB = GenericMeshAABB< SurfaceMesh< dimension > >;
+    ALIAS_2D_AND_3D( SurfaceMeshAABB );
 
     template < index_t dimension >
     class GenericMeshAABB< TriangulatedSurface< dimension > >
@@ -105,4 +108,8 @@ namespace geode
     private:
         const DistanceToTriangle< dimension > distance_action_;
     };
+    template < index_t dimension >
+    using TriangulatedSurfaceAABB =
+        GenericMeshAABB< TriangulatedSurface< dimension > >;
+    ALIAS_2D_AND_3D( TriangulatedSurfaceAABB );
 } // namespace geode

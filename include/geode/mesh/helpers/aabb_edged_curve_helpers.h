@@ -84,4 +84,7 @@ namespace geode
         AABBTree< dimension > elements_tree_;
         const DistanceToEdge< dimension > distance_action_;
     };
+    template < index_t dimension >
+    using EdgedCurveAABB = GenericMeshAABB< EdgedCurve< dimension > >;
+    ALIAS_2D_AND_3D( EdgedCurveAABB );
 } // namespace geode

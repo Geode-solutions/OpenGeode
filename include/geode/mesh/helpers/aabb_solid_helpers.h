@@ -76,6 +76,9 @@ namespace geode
     private:
         AABBTree< dimension > elements_tree_;
     };
+    template < index_t dimension >
+    using SolidMeshAABB = GenericMeshAABB< SolidMesh< dimension > >;
+    ALIAS_3D( SolidMeshAABB );
 
     template < index_t dimension >
     class GenericMeshAABB< TetrahedralSolid< dimension > >
@@ -99,4 +102,8 @@ namespace geode
     private:
         const DistanceToTetrahedron< dimension > distance_action_;
     };
+    template < index_t dimension >
+    using TetrahedralSolidAABB =
+        GenericMeshAABB< TetrahedralSolid< dimension > >;
+    ALIAS_3D( TetrahedralSolidAABB );
 } // namespace geode
