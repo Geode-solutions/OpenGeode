@@ -23,7 +23,6 @@
 
 #include <geode/mesh/helpers/detail/point_set_merger.h>
 
-#include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/point_set.h>
 
 namespace geode
@@ -40,9 +39,7 @@ namespace geode
         }
 
         template < index_t dimension >
-        PointSetMerger< dimension >::~PointSetMerger()
-        {
-        }
+        PointSetMerger< dimension >::~PointSetMerger() = default;
 
         template < index_t dimension >
         std::unique_ptr< PointSet< dimension > >

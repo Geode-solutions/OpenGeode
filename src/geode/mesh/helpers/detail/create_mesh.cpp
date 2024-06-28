@@ -29,6 +29,7 @@
 
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 
@@ -55,11 +56,15 @@ namespace geode
             return Mesh::create( geode::MeshFactory::default_impl( type ) );
         }
 
+        template std::unique_ptr< PointSet2D > opengeode_mesh_api create_mesh(
+            absl::Span< const std::reference_wrapper< const PointSet2D > > );
         template std::unique_ptr< EdgedCurve2D > opengeode_mesh_api create_mesh(
             absl::Span< const std::reference_wrapper< const EdgedCurve2D > > );
         template std::unique_ptr< SurfaceMesh2D >
             opengeode_mesh_api create_mesh( absl::Span<
                 const std::reference_wrapper< const SurfaceMesh2D > > );
+        template std::unique_ptr< PointSet3D > opengeode_mesh_api create_mesh(
+            absl::Span< const std::reference_wrapper< const PointSet3D > > );
         template std::unique_ptr< EdgedCurve3D > opengeode_mesh_api create_mesh(
             absl::Span< const std::reference_wrapper< const EdgedCurve3D > > );
         template std::unique_ptr< SurfaceMesh3D >
