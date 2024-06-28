@@ -29,10 +29,12 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 #include <geode/mesh/helpers/detail/create_mesh.h>
@@ -214,6 +216,9 @@ namespace geode
         {
             impl_->create_points();
         }
+
+        template class opengeode_mesh_api VertexMerger< PointSet2D >;
+        template class opengeode_mesh_api VertexMerger< PointSet3D >;
 
         template class opengeode_mesh_api VertexMerger< EdgedCurve2D >;
         template class opengeode_mesh_api VertexMerger< EdgedCurve3D >;
