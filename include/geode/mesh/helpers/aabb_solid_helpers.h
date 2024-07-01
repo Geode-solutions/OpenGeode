@@ -31,6 +31,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
+    template < typename T >
+    class GenericMeshAABB;
 } // namespace geode
 
 namespace geode
@@ -55,4 +57,53 @@ namespace geode
         const TetrahedralSolid< dimension >& mesh_;
     };
     ALIAS_3D( DistanceToTetrahedron );
+
+    template < index_t dimension >
+    class GenericMeshAABB< SolidMesh< dimension > >
+    {
+    public:
+        GenericMeshAABB( const SolidMesh< dimension >& mesh )
+            : elements_tree_{ create_aabb_tree( mesh ) }
+        {
+        }
+
+    protected:
+        const AABBTree< dimension >& elements_aabb() const
+        {
+            return elements_tree_;
+        }
+
+    private:
+        AABBTree< dimension > elements_tree_;
+    };
+    template < index_t dimension >
+    using SolidMeshAABB = GenericMeshAABB< SolidMesh< dimension > >;
+    ALIAS_3D( SolidMeshAABB );
+
+    template < index_t dimension >
+    class GenericMeshAABB< TetrahedralSolid< dimension > >
+        : public GenericMeshAABB< SolidMesh< dimension > >
+    {
+    public:
+        using Base = GenericMeshAABB< SolidMesh< dimension > >;
+
+        GenericMeshAABB( const TetrahedralSolid< dimension >& mesh )
+            : Base{ mesh }, distance_action_{ mesh }
+        {
+        }
+
+        std::tuple< index_t, Point< dimension >, double > closest_element(
+            const Point< dimension >& query ) const
+        {
+            return this->elements_aabb().closest_element_box(
+                query, distance_action_ );
+        }
+
+    private:
+        const DistanceToTetrahedron< dimension > distance_action_;
+    };
+    template < index_t dimension >
+    using TetrahedralSolidAABB =
+        GenericMeshAABB< TetrahedralSolid< dimension > >;
+    ALIAS_3D( TetrahedralSolidAABB );
 } // namespace geode

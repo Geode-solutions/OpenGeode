@@ -36,6 +36,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    template < typename T >
+    class GenericMeshAABB;
 } // namespace geode
 
 namespace geode
@@ -60,4 +62,29 @@ namespace geode
         const EdgedCurve< dimension >& mesh_;
     };
     ALIAS_2D_AND_3D( DistanceToEdge );
+
+    template < index_t dimension >
+    class GenericMeshAABB< EdgedCurve< dimension > >
+    {
+    public:
+        GenericMeshAABB( const EdgedCurve< dimension >& mesh )
+            : elements_tree_{ create_aabb_tree( mesh ) },
+              distance_action_{ mesh }
+        {
+        }
+
+        std::tuple< index_t, Point< dimension >, double > closest_element(
+            const Point< dimension >& query ) const
+        {
+            return this->elements_aabb().closest_element_box(
+                query, distance_action_ );
+        }
+
+    private:
+        AABBTree< dimension > elements_tree_;
+        const DistanceToEdge< dimension > distance_action_;
+    };
+    template < index_t dimension >
+    using EdgedCurveAABB = GenericMeshAABB< EdgedCurve< dimension > >;
+    ALIAS_2D_AND_3D( EdgedCurveAABB );
 } // namespace geode
