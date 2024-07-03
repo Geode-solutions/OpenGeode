@@ -185,7 +185,7 @@ namespace
                        polyhedron_facet_vertices, ordered_vertices[1] )
                        != polyhedron_facet_vertices.end() )
             {
-                for( const auto& v_id :
+                for( const auto v_id :
                     geode::Indices( polyhedron_facet_vertices ) )
                 {
                     if( polyhedron_facet_vertices.at( v_id )
@@ -217,7 +217,7 @@ namespace
                        polyhedron_facet_vertices, ordered_vertices[5] )
                        != polyhedron_facet_vertices.end() )
             {
-                for( const auto& v_id :
+                for( const auto v_id :
                     geode::Indices( polyhedron_facet_vertices ) )
                 {
                     if( polyhedron_facet_vertices.at( v_id )
