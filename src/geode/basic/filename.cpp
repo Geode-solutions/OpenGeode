@@ -23,6 +23,8 @@
 
 #include <geode/basic/filename.h>
 
+#include <absl/strings/string_view.h>
+
 #include <ghc/filesystem.hpp>
 
 namespace geode
@@ -54,5 +56,18 @@ namespace geode
     absl::string_view extension_from_filename( absl::string_view filename )
     {
         return filename.substr( filename.find_last_of( '.' ) + 1 );
+    }
+
+    std::string expand_predefined_folders( absl::string_view path )
+    {
+        if( path.empty() )
+        {
+            return to_string( path );
+        }
+        if( path[0] == '~' )
+        {
+            return absl::StrCat( std::getenv( "HOME" ), path.substr( 1 ) );
+        }
+        return to_string( path );
     }
 } // namespace geode
