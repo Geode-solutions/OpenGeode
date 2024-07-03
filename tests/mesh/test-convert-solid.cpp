@@ -40,6 +40,8 @@
 
 #include <geode/mesh/helpers/convert_solid_mesh.h>
 
+// NOLINTBEGIN(*-magic-numbers)
+
 void test_tetrahedral_solid()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -151,6 +153,7 @@ void test_hybrid_solid()
     geode::save_hybrid_solid(
         *hybrid_solid_pyramid.value(), "hybrid_solid_pyramid.og_hso3d" );
 }
+
 void test()
 {
     test_tetrahedral_solid();
@@ -158,3 +161,4 @@ void test()
 }
 
 OPENGEODE_TEST( "convert-solid" )
+// NOLINTEND(*-magic-numbers)
