@@ -68,7 +68,8 @@ namespace geode
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            return Factory::create( extension, filename );
+            return Factory::create(
+                extension, expand_predefined_folders( filename ) );
         }
 
         template < typename Factory, typename... Args >
