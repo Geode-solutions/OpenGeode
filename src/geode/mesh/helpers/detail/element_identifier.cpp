@@ -81,13 +81,13 @@ namespace geode
             }
             const auto facets_vertices =
                 solid.polyhedron_facets_vertices( polyhedron_id );
-            if( facets_vertices.size() != 8 )
+            if( facets_vertices.size() != 5 )
             {
                 return false;
             }
             for( const auto &facet_vertices : facets_vertices )
             {
-                if( facet_vertices.size() != 3 )
+                if( facet_vertices.size() != 3 && facet_vertices.size() != 4 )
                 {
                     return false;
                 }
