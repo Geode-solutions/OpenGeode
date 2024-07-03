@@ -27,6 +27,7 @@
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/common.h>
+#include <geode/basic/filename.h>
 #include <geode/basic/logger.h>
 
 namespace geode
@@ -42,10 +43,13 @@ namespace geode
         }
 
     protected:
-        IOFile( absl::string_view filename ) : filename_( filename ) {}
+        IOFile( absl::string_view filename )
+            : filename_( expand_predefined_folders( filename ) )
+        {
+        }
 
     private:
-        absl::string_view filename_;
+        std::string filename_;
     };
 
     template < typename Factory >

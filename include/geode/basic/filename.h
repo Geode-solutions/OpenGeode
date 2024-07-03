@@ -41,4 +41,7 @@ namespace geode
 
     absl::string_view opengeode_basic_api extension_from_filename(
         absl::string_view filename );
+
+    std::string opengeode_basic_api expand_predefined_folders(
+        absl::string_view path );
 } // namespace geode
