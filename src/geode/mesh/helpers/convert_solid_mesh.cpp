@@ -172,7 +172,7 @@ namespace
         ordered_vertices[1] = first_polyhedron_facet_vertices[3];
         ordered_vertices[2] = first_polyhedron_facet_vertices[2];
         ordered_vertices[3] = first_polyhedron_facet_vertices[1];
-        for( const auto f : geode::Range( 1, 6 ) )
+        for( const auto f : geode::LRange( 1, 6 ) )
         {
             const auto polyhedron_facet_vertices =
                 solid.polyhedron_facet_vertices( { hexahedron_id, f } );
@@ -215,7 +215,7 @@ namespace
     {
         std::array< geode::index_t, 6 > ordered_vertices;
         geode::index_t already_used_facet{ 0 };
-        for( const auto f : geode::Range{ 5 } )
+        for( const auto f : geode::LRange{ 5 } )
         {
             if( solid.nb_polyhedron_facet_vertices( { prism_id, f } ) == 3 )
             {
@@ -228,7 +228,7 @@ namespace
                 break;
             }
         }
-        for( const auto f : geode::Range{ 5 } )
+        for( const auto f : geode::LRange{ 5 } )
         {
             if( f == already_used_facet )
             {
