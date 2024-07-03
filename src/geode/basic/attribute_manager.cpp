@@ -313,19 +313,30 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive &local_archive, Impl &impl ) {
-                        local_archive.value4b( impl.nb_elements_ );
-                        local_archive.ext( impl.attributes_,
-                            bitsery::ext::StdMap{ impl.attributes_.max_size() },
-                            []( Archive &local_archive2, std::string &name,
-                                std::shared_ptr< AttributeBase > &attribute ) {
-                                local_archive2.text1b( name, name.max_size() );
+            archive.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive &local_archive,
+                                                        Impl &impl ) {
+                    local_archive.value4b( impl.nb_elements_ );
+                    local_archive.ext( impl.attributes_,
+                        bitsery::ext::StdMap{ impl.attributes_.max_size() },
+                        []( Archive &local_archive2, std::string &name,
+                            std::shared_ptr< AttributeBase > &attribute ) {
+                            local_archive2.text1b( name, name.max_size() );
+                            try
+                            {
                                 local_archive2.ext(
                                     attribute, bitsery::ext::StdSmartPtr{} );
-                            } );
-                    } } } );
+                            }
+                            catch( ... )
+                            {
+                                throw OpenGeodeException{
+                                    "[AttributeManager::serialize] Cannot "
+                                    "serialize attribute ",
+                                    name, " holding type ", attribute->type()
+                                };
+                            }
+                        } );
+                } } } );
         }
 
     private:
