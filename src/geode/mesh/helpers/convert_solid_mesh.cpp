@@ -161,7 +161,147 @@ namespace
         }
         return true;
     }
+
+    std::array< geode::index_t, 8 > order_hexahedron_vertices(
+        const geode::index_t hexahedron_id, const geode::SolidMesh3D& solid )
+    {
+        std::array< geode::index_t, 8 > ordered_vertices;
+        const auto first_polyhedron_facet_vertices =
+            solid.polyhedron_facet_vertices( { hexahedron_id, 0 } );
+        ordered_vertices[0] = first_polyhedron_facet_vertices[0];
+        ordered_vertices[1] = first_polyhedron_facet_vertices[3];
+        ordered_vertices[2] = first_polyhedron_facet_vertices[2];
+        ordered_vertices[3] = first_polyhedron_facet_vertices[1];
+        for( const auto f : geode::LRange( 1, 6 ) )
+        {
+            const auto polyhedron_facet_vertices =
+                solid.polyhedron_facet_vertices( { hexahedron_id, f } );
+            const auto v_id_0 =
+                absl::c_find( polyhedron_facet_vertices, ordered_vertices[0] );
+            if( v_id_0 != polyhedron_facet_vertices.end()
+                && absl::c_find(
+                       polyhedron_facet_vertices, ordered_vertices[1] )
+                       != polyhedron_facet_vertices.end() )
+            {
+                const auto index_v_id_0 =
+                    std::distance( polyhedron_facet_vertices.begin(), v_id_0 );
+                ordered_vertices[4] =
+                    polyhedron_facet_vertices[( index_v_id_0 + 1 ) % 4];
+                ordered_vertices[5] =
+                    polyhedron_facet_vertices[( index_v_id_0 + 2 ) % 4];
+                continue;
+            }
+            const auto v_id_2 =
+                absl::c_find( polyhedron_facet_vertices, ordered_vertices[2] );
+            if( v_id_2 != polyhedron_facet_vertices.end()
+                && absl::c_find(
+                       polyhedron_facet_vertices, ordered_vertices[3] )
+                       != polyhedron_facet_vertices.end() )
+            {
+                const auto index_v_id_2 =
+                    std::distance( polyhedron_facet_vertices.begin(), v_id_2 );
+                ordered_vertices[6] =
+                    polyhedron_facet_vertices[( index_v_id_2 + 1 ) % 4];
+                ordered_vertices[7] =
+                    polyhedron_facet_vertices[( index_v_id_2 + 2 ) % 4];
+                continue;
+            }
+        }
+        return ordered_vertices;
+    }
+
+    std::array< geode::index_t, 6 > order_prism_vertices(
+        const geode::index_t prism_id, const geode::SolidMesh3D& solid )
+    {
+        std::array< geode::index_t, 6 > ordered_vertices;
+        geode::index_t already_used_facet{ 0 };
+        for( const auto f : geode::LRange{ 5 } )
+        {
+            if( solid.nb_polyhedron_facet_vertices( { prism_id, f } ) == 3 )
+            {
+                const auto vertices =
+                    solid.polyhedron_facet_vertices( { prism_id, f } );
+                ordered_vertices[0] = vertices[0];
+                ordered_vertices[1] = vertices[2];
+                ordered_vertices[2] = vertices[1];
+                already_used_facet = f;
+                break;
+            }
+        }
+        for( const auto f : geode::LRange{ 5 } )
+        {
+            if( f == already_used_facet )
+            {
+                continue;
+            }
+            const auto facet_vertices =
+                solid.polyhedron_facet_vertices( { prism_id, f } );
+            const auto v_id =
+                absl::c_find( facet_vertices, ordered_vertices[0] );
+            if( v_id == facet_vertices.end()
+                || absl::c_find( facet_vertices, ordered_vertices[2] )
+                       == facet_vertices.end() )
+            {
+                continue;
+            }
+            const auto index_v_id =
+                std::distance( facet_vertices.begin(), v_id );
+            ordered_vertices[3] = facet_vertices[( index_v_id + 1 ) % 4];
+            ordered_vertices[5] = facet_vertices[( index_v_id + 2 ) % 4];
+            break;
+        }
+        for( const auto v : geode::LRange{ 6 } )
+        {
+            const auto solid_vertex =
+                solid.polyhedron_vertex( { prism_id, v } );
+            if( ordered_vertices[1] == solid_vertex
+                || ordered_vertices[2] == solid_vertex
+                || ordered_vertices[3] == solid_vertex
+                || ordered_vertices[5] == solid_vertex
+                || ordered_vertices[0] == solid_vertex )
+            {
+                continue;
+            }
+            ordered_vertices[4] = solid_vertex;
+            break;
+        }
+        return ordered_vertices;
+    }
 } // namespace
+
+std::array< geode::index_t, 5 > order_pyramid_vertices(
+    const geode::index_t pyramid_id, const geode::SolidMesh3D& solid )
+{
+    std::array< geode::index_t, 5 > ordered_vertices;
+
+    for( const auto f : geode::LRange{ 5 } )
+    {
+        if( solid.nb_polyhedron_facet_vertices( { pyramid_id, f } ) == 4 )
+        {
+            const auto vertices =
+                solid.polyhedron_facet_vertices( { pyramid_id, f } );
+            ordered_vertices[0] = vertices[0];
+            ordered_vertices[1] = vertices[3];
+            ordered_vertices[2] = vertices[2];
+            ordered_vertices[3] = vertices[1];
+            break;
+        }
+    }
+    for( const auto v : geode::LRange{ 5 } )
+    {
+        const auto solid_vertex = solid.polyhedron_vertex( { pyramid_id, v } );
+        if( ordered_vertices[1] == solid_vertex
+            || ordered_vertices[2] == solid_vertex
+            || ordered_vertices[3] == solid_vertex
+            || ordered_vertices[0] == solid_vertex )
+        {
+            continue;
+        }
+        ordered_vertices[4] = solid_vertex;
+        break;
+    }
+    return ordered_vertices;
+}
 
 namespace geode
 {
@@ -253,19 +393,20 @@ namespace geode
             }
             else if( vertices.size() == 8 )
             {
-                builder->create_hexahedron(
-                    { vertices[0], vertices[1], vertices[2], vertices[3],
-                        vertices[4], vertices[5], vertices[6], vertices[7] } );
+                const auto ordered_vertices =
+                    order_hexahedron_vertices( p, solid );
+                builder->create_hexahedron( { ordered_vertices } );
             }
             else if( vertices.size() == 5 )
             {
-                builder->create_pyramid( { vertices[0], vertices[1],
-                    vertices[2], vertices[3], vertices[4] } );
+                const auto ordered_vertices =
+                    order_pyramid_vertices( p, solid );
+                builder->create_pyramid( ordered_vertices );
             }
             else if( vertices.size() == 6 )
             {
-                builder->create_prism( { vertices[0], vertices[1], vertices[2],
-                    vertices[3], vertices[4], vertices[5] } );
+                const auto ordered_vertices = order_prism_vertices( p, solid );
+                builder->create_prism( { ordered_vertices } );
             }
         }
         for( const auto p : Range{ solid.nb_polyhedra() } )
