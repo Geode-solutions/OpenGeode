@@ -250,7 +250,7 @@ namespace
             ordered_vertices[5] = facet_vertices[( index_v_id + 2 ) % 4];
             break;
         }
-        for( const auto v : geode::Range{ 6 } )
+        for( const auto v : geode::LRange{ 6 } )
         {
             const auto solid_vertex =
                 solid.polyhedron_vertex( { prism_id, v } );
@@ -274,7 +274,7 @@ std::array< geode::index_t, 5 > order_pyramid_vertices(
 {
     std::array< geode::index_t, 5 > ordered_vertices;
 
-    for( const auto f : geode::Range{ 5 } )
+    for( const auto f : geode::LRange{ 5 } )
     {
         if( solid.nb_polyhedron_facet_vertices( { pyramid_id, f } ) == 4 )
         {
@@ -287,7 +287,7 @@ std::array< geode::index_t, 5 > order_pyramid_vertices(
             break;
         }
     }
-    for( const auto v : geode::Range{ 5 } )
+    for( const auto v : geode::LRange{ 5 } )
     {
         const auto solid_vertex = solid.polyhedron_vertex( { pyramid_id, v } );
         if( ordered_vertices[1] == solid_vertex
@@ -395,11 +395,6 @@ namespace geode
             {
                 const auto ordered_vertices =
                     order_hexahedron_vertices( p, solid );
-                for( const auto vertex : ordered_vertices )
-                {
-                    DEBUG( vertex );
-                    SDEBUG( solid.point( vertex ) );
-                }
                 builder->create_hexahedron( { ordered_vertices } );
             }
             else if( vertices.size() == 5 )
