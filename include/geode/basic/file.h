@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include <absl/types/span.h>
 #include <optional>
+
+#include <absl/types/span.h>
 
 #include <geode/basic/common.h>
 

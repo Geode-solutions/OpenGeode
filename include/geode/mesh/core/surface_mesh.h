@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include <absl/container/inlined_vector.h>
 #include <optional>
+
+#include <absl/container/inlined_vector.h>
 
 #include <geode/basic/passkey.h>
 

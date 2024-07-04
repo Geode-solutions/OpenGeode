@@ -23,13 +23,13 @@
 
 #include <geode/model/helpers/model_coordinate_reference_system.h>
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <absl/container/fixed_array.h>
 #include <absl/container/flat_hash_set.h>
-#include <optional>
 
 #include <geode/mesh/core/coordinate_reference_system.h>
 #include <geode/mesh/core/coordinate_reference_system_manager.h>
