@@ -98,6 +98,7 @@ function(add_geode_python_wheel)
     endif()
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/OpenGeodeModule-setup.py.in" "${wheel_output_directory}/../setup.py")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel setuptools build)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -c 
 "from wheel.bdist_wheel import get_abi_tag, get_platform
