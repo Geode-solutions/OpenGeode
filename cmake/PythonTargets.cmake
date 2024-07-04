@@ -96,7 +96,8 @@ function(add_geode_python_wheel)
     if(NOT WHEEL_VERSION)
         set(WHEEL_VERSION "0.0.0")
     endif()
-    configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/OpenGeodeModule-setup.py.in" "${wheel_output_directory}/../setup.py")
+    configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/setup.py.in" "${wheel_output_directory}/../setup.py")
+    configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pyproject.toml.in" "${wheel_output_directory}/../pyproject.toml")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
     execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel setuptools build)
     execute_process(
@@ -110,19 +111,23 @@ platform=get_platform(None)
 print(name + version + '-' + abi + '-' + platform)"
         OUTPUT_VARIABLE wheel_sufix
         OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
+    ) 
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade build)
     string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
     set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
+    message(STATUS "Wheel file: ${wheel_file}")
     if(${GEODE_WHEEL_SUPERBUILD})
         set(wheel_config_folder "")
     else()
         set(wheel_config_folder "$<$<BOOL:${isMultiConfig}>:$<CONFIG>>")
     endif()
     add_custom_target(wheel
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "${wheel_output_path}"
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt" "${wheel_output_path}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
-        COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+        COMMAND ${PYTHON_EXECUTABLE} -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
     string(CONCAT import_test "import " "${project_name}")
