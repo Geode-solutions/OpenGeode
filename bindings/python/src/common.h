@@ -78,5 +78,5 @@ namespace pybind11
         {
         };
 
-        } // namespace detail
+    } // namespace detail
 } // namespace pybind11

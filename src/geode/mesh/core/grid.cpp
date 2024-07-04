@@ -530,8 +530,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cell_vertices(
-        const CellIndices& cell_id ) const -> CellVertices
+    auto Grid< dimension >::cell_vertices( const CellIndices& cell_id ) const
+        -> CellVertices
     {
         return impl_->cell_vertices( cell_id );
     }
@@ -578,15 +578,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells(
-        const Point< dimension >& query ) const -> CellsAroundVertex
+    auto Grid< dimension >::cells( const Point< dimension >& query ) const
+        -> CellsAroundVertex
     {
         return impl_->cells( *this, query );
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells_around(
-        VertexIndices vertex_indices ) const -> CellsAroundVertex
+    auto Grid< dimension >::cells_around( VertexIndices vertex_indices ) const
+        -> CellsAroundVertex
     {
         return impl_->cells_around( *this, vertex_indices );
     }
