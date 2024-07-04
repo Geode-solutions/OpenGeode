@@ -164,18 +164,18 @@ namespace geode
             return graph_->edge_attribute_manager();
         }
 
-        absl::optional< index_t > RelationshipsImpl::relation_edge_index(
+        std::optional< index_t > RelationshipsImpl::relation_edge_index(
             const uuid& component_id1, const uuid& component_id2 ) const
         {
             const auto index1 = vertex_id( component_id1 );
             if( !index1 )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             const auto index2 = vertex_id( component_id2 );
             if( !index2 )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return graph_->edge_from_vertices( index1.value(), index2.value() );
         }
@@ -239,7 +239,7 @@ namespace geode
                         "id", ComponentID{} );
         }
 
-        absl::optional< index_t > RelationshipsImpl::vertex_id(
+        std::optional< index_t > RelationshipsImpl::vertex_id(
             const uuid& component_id ) const
         {
             return uuid2index_.index( component_id );

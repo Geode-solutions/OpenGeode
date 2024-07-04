@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
+#include <optional>
 
 #include <geode/basic/pimpl.h>
 
@@ -77,9 +77,9 @@ namespace geode
         RayTracing3D( RayTracing3D&& other ) noexcept;
         ~RayTracing3D();
 
-        absl::optional< PolygonDistance > closest_polygon() const;
+        std::optional< PolygonDistance > closest_polygon() const;
 
-        absl::optional< absl::FixedArray< PolygonDistance > > closest_polygons(
+        std::optional< absl::FixedArray< PolygonDistance > > closest_polygons(
             index_t size ) const;
 
         std::vector< PolygonDistance > all_intersections() const;

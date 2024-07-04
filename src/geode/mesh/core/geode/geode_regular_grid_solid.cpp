@@ -98,7 +98,7 @@ namespace geode
             return { facet.polyhedron_id, vertex };
         }
 
-        absl::optional< index_t > cell_adjacent( const RegularGrid3D& grid,
+        std::optional< index_t > cell_adjacent( const RegularGrid3D& grid,
             const PolyhedronFacet& polyhedron_facet ) const
         {
             const auto cell =
@@ -119,7 +119,7 @@ namespace geode
                     return grid.cell_index( adj.value() );
                 }
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
     private:
@@ -184,9 +184,8 @@ namespace geode
         return impl_->get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
     }
 
-    absl::optional< index_t >
-        OpenGeodeRegularGrid< 3 >::get_polyhedron_adjacent(
-            const PolyhedronFacet& polyhedron_facet ) const
+    std::optional< index_t > OpenGeodeRegularGrid< 3 >::get_polyhedron_adjacent(
+        const PolyhedronFacet& polyhedron_facet ) const
     {
         return impl_->cell_adjacent( *this, polyhedron_facet );
     }

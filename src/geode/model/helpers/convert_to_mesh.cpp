@@ -92,15 +92,14 @@ namespace
             return model_;
         }
 
-        absl::optional< geode::index_t > vertex(
-            geode::index_t vertex_id ) const
+        std::optional< geode::index_t > vertex( geode::index_t vertex_id ) const
         {
             const auto it = vertices_.find( vertex_id );
             if( it != vertices_.end() )
             {
                 return it->second;
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         geode::index_t create_vertex( geode::index_t vertex_id )

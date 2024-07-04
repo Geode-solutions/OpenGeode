@@ -46,9 +46,9 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1u, { false, false } ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1u, { false, false } ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -63,7 +63,7 @@ namespace geode
                 return facet_attribute_manager_;
             }
 
-            absl::optional< index_t > find_facet(
+            std::optional< index_t > find_facet(
                 TypedVertexCycle vertices ) const
             {
                 const auto itr = facet_indices_.find( vertices );
@@ -71,7 +71,7 @@ namespace geode
                 {
                     return itr->second;
                 }
-                return absl::nullopt;
+                return std::nullopt;
             }
 
             index_t add_facet( TypedVertexCycle vertices )

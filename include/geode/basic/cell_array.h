@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
+#include <optional>
 
 #include <geode/basic/common.h>
 #include <geode/basic/pimpl.h>
@@ -60,10 +60,10 @@ namespace geode
 
         virtual CellIndices cell_indices( index_t index ) const = 0;
 
-        absl::optional< CellIndices > next_cell(
+        std::optional< CellIndices > next_cell(
             const CellIndices& index, index_t direction ) const;
 
-        absl::optional< CellIndices > previous_cell(
+        std::optional< CellIndices > previous_cell(
             const CellIndices& index, index_t direction ) const;
 
         bool is_cell_on_border( const CellIndices& cell_indices ) const;

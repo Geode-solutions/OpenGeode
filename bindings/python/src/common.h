@@ -28,8 +28,8 @@
 #include <absl/container/fixed_array.h>
 #include <absl/container/inlined_vector.h>
 #include <absl/strings/string_view.h>
-#include <absl/types/optional.h>
 #include <absl/types/span.h>
+#include <optional>
 
 namespace pybind11
 {
@@ -78,10 +78,5 @@ namespace pybind11
         {
         };
 
-        template < typename T >
-        struct type_caster< absl::optional< T > >
-            : public optional_caster< absl::optional< T > >
-        {
-        };
-    } // namespace detail
+        } // namespace detail
 } // namespace pybind11

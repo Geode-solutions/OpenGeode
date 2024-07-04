@@ -45,10 +45,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -212,7 +212,7 @@ namespace geode
         return edges_around_vertex( vertex_id ).empty();
     }
 
-    absl::optional< index_t > Graph::edge_from_vertices(
+    std::optional< index_t > Graph::edge_from_vertices(
         index_t v0, index_t v1 ) const
     {
         for( const auto& edge : edges_around_vertex( v0 ) )
@@ -223,7 +223,7 @@ namespace geode
                 return edge.edge_id;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     void Graph::set_edges_around_vertex(

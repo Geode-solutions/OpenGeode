@@ -141,7 +141,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::optional< geode::PolygonEdge > find_polygon_adjacent_edge(
+    std::optional< geode::PolygonEdge > find_polygon_adjacent_edge(
         const geode::SurfaceMesh< dimension >& surface,
         const geode::PolygonEdge& polygon_edge,
         const std::array< geode::index_t, 2 >& vertices )
@@ -149,13 +149,13 @@ namespace
         const auto polygon_adj = surface.polygon_adjacent( polygon_edge );
         if( !polygon_adj )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto polygon_adj_id = polygon_adj.value();
         for( const auto e :
             geode::LRange{ surface.nb_polygon_edges( polygon_adj_id ) } )
         {
-            absl::optional< geode::PolygonEdge > adj_edge{ absl::in_place,
+            std::optional< geode::PolygonEdge > adj_edge{ std::in_place,
                 polygon_adj_id, e };
             const auto adj_v0 = surface.polygon_vertex( adj_edge.value() );
             const auto adj_v1 =
@@ -166,7 +166,7 @@ namespace
                 return adj_edge;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >
@@ -219,7 +219,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::optional< geode::PolygonEdge > non_manifold_polygon_adjacent_edge(
+    std::optional< geode::PolygonEdge > non_manifold_polygon_adjacent_edge(
         const geode::SurfaceMesh< dimension >& surface,
         const geode::PolygonEdge& polygon_edge,
         const std::array< geode::index_t, 2 >& vertices )
@@ -228,19 +228,19 @@ namespace
             find_polygon_adjacent_edge( surface, polygon_edge, vertices );
         if( !adj_edge )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto polygon = surface.polygon_adjacent( adj_edge.value() );
         if( !polygon )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         // Non-manifold edge
         if( polygon != polygon_edge.polygon_id )
         {
             return adj_edge;
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >

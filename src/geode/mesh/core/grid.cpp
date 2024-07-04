@@ -190,7 +190,7 @@ namespace geode
             return result;
         }
 
-        absl::optional< VertexIndices > next_vertex(
+        std::optional< VertexIndices > next_vertex(
             const Grid< dimension >& grid,
             const VertexIndices& index,
             index_t direction ) const
@@ -198,23 +198,23 @@ namespace geode
             if( index[direction] + 1
                 < nb_vertices_in_direction( grid, direction ) )
             {
-                absl::optional< VertexIndices > result{ index };
+                std::optional< VertexIndices > result{ index };
                 result->at( direction )++;
                 return result;
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
-        absl::optional< VertexIndices > previous_vertex(
+        std::optional< VertexIndices > previous_vertex(
             const VertexIndices& index, index_t direction ) const
         {
             if( index[direction] > 0 )
             {
-                absl::optional< VertexIndices > result{ index };
+                std::optional< VertexIndices > result{ index };
                 result->at( direction )--;
                 return result;
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         bool contains( const Grid< dimension >& grid,
@@ -530,8 +530,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cell_vertices( const CellIndices& cell_id ) const
-        -> CellVertices
+    auto Grid< dimension >::cell_vertices(
+        const CellIndices& cell_id ) const -> CellVertices
     {
         return impl_->cell_vertices( cell_id );
     }
@@ -552,14 +552,14 @@ namespace geode
 
     template < index_t dimension >
     auto Grid< dimension >::next_vertex( const CellIndices& index,
-        index_t direction ) const -> absl::optional< CellIndices >
+        index_t direction ) const -> std::optional< CellIndices >
     {
         return impl_->next_vertex( *this, index, direction );
     }
 
     template < index_t dimension >
     auto Grid< dimension >::previous_vertex( const CellIndices& index,
-        index_t direction ) const -> absl::optional< CellIndices >
+        index_t direction ) const -> std::optional< CellIndices >
     {
         return impl_->previous_vertex( index, direction );
     }
@@ -578,15 +578,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells( const Point< dimension >& query ) const
-        -> CellsAroundVertex
+    auto Grid< dimension >::cells(
+        const Point< dimension >& query ) const -> CellsAroundVertex
     {
         return impl_->cells( *this, query );
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells_around( VertexIndices vertex_indices ) const
-        -> CellsAroundVertex
+    auto Grid< dimension >::cells_around(
+        VertexIndices vertex_indices ) const -> CellsAroundVertex
     {
         return impl_->cells_around( *this, vertex_indices );
     }

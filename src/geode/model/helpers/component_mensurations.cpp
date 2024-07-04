@@ -59,7 +59,7 @@ namespace
         }
         return volume;
     }
-    absl::optional< bool > find_surface_side( const geode::BRep& brep,
+    std::optional< bool > find_surface_side( const geode::BRep& brep,
         const geode::uuid& surface_uuid,
         const absl::flat_hash_map< geode::uuid, bool >& processed )
     {
@@ -90,7 +90,7 @@ namespace
                 return other_surface_itr->second != different_orientation;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     std::vector< std::pair< geode::uuid, bool > > sided_surfaces(

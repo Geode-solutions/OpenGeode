@@ -50,7 +50,7 @@ namespace
         return result;
     }
 
-    absl::optional< geode::index_t > count_real_intersections_with_boudaries(
+    std::optional< geode::index_t > count_real_intersections_with_boudaries(
         const geode::Ray3D& ray,
         const geode::BRep& brep,
         const geode::Block3D& block )
@@ -64,7 +64,7 @@ namespace
             {
                 if( intersection.position != geode::Position::inside )
                 {
-                    return absl::nullopt;
+                    return std::nullopt;
                 }
                 if( std::fabs( intersection.distance )
                     <= geode::global_epsilon )
@@ -126,7 +126,7 @@ namespace geode
         };
     }
 
-    absl::optional< uuid > block_containing_point(
+    std::optional< uuid > block_containing_point(
         const BRep& brep, const Point3D& point )
     {
         for( const auto& block : brep.blocks() )
@@ -136,7 +136,7 @@ namespace geode
                 return block.id();
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
 } // namespace geode

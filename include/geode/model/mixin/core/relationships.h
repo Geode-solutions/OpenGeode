@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -391,7 +393,7 @@ namespace geode
 
         AttributeManager& relation_attribute_manager() const;
 
-        absl::optional< index_t > relation_index(
+        std::optional< index_t > relation_index(
             const uuid& component_id1, const uuid& component_id2 ) const;
 
         std::tuple< ComponentID, ComponentID > relation_from_index(

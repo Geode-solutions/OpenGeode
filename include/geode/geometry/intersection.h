@@ -24,7 +24,7 @@
 #pragma once
 
 #include <absl/container/inlined_vector.h>
-#include <absl/types/optional.h>
+#include <optional>
 
 #include <geode/geometry/common.h>
 
@@ -98,9 +98,9 @@ namespace geode
             return has_intersection();
         }
 
-        absl::optional< Intersection > result;
+        std::optional< Intersection > result;
         IntersectionType type;
-        absl::optional< CorrectnessInfo< Intersection > > correctness;
+        std::optional< CorrectnessInfo< Intersection > > correctness;
     };
 
     /*!

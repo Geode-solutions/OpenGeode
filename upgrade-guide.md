@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v14.x.x to v15.0.0
+
+### Motivations
+
+
+
+### Breaking Changes
+
+- **Optional**: Replace abls::optional by is equivalent in C++17 std::optional.
+
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 
 ### Motivations

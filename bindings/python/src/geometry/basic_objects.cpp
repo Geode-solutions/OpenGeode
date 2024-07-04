@@ -92,10 +92,10 @@ namespace geode
         PYTHON_TRIANGLE( 2 );
         PYTHON_TRIANGLE( 3 )
             .def( "normal",
-                static_cast< absl::optional< Vector3D > ( Triangle< 3 >::* )()
+                static_cast< std::optional< Vector3D > ( Triangle< 3 >::* )()
                         const >( &Triangle3D::normal ) )
             .def( "plane",
-                static_cast< absl::optional< Plane > ( Triangle< 3 >::* )()
+                static_cast< std::optional< Plane > ( Triangle< 3 >::* )()
                         const >( &Triangle3D::plane ) );
 
         pybind11::class_< Plane >( module, "Plane" )

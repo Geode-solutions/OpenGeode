@@ -24,7 +24,7 @@
 #pragma once
 
 #include <absl/container/inlined_vector.h>
-#include <absl/types/optional.h>
+#include <optional>
 
 #include <geode/basic/passkey.h>
 
@@ -201,7 +201,7 @@ namespace geode
          * @return Index in [0,nb_polygon_vertices()[ if polygon is around
          * the given vertex
          */
-        absl::optional< local_index_t > vertex_in_polygon(
+        std::optional< local_index_t > vertex_in_polygon(
             index_t polygon_id, index_t vertex_id ) const;
 
         /*!
@@ -251,7 +251,7 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in polygon.
          * @return the index of the adjacent polygon if it exists.
          */
-        absl::optional< index_t > polygon_adjacent(
+        std::optional< index_t > polygon_adjacent(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -260,7 +260,7 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in polygon.
          * @return the index of the adjacent polygon edge if it exists.
          */
-        absl::optional< PolygonEdge > polygon_adjacent_edge(
+        std::optional< PolygonEdge > polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -338,14 +338,14 @@ namespace geode
          * Return the normal of a polygon
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
             polygon_normal( index_t polygon_id ) const;
 
         /*!
          * Return the normal at a polygon vertex
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
             polygon_vertex_normal( index_t vertex_id ) const;
 
         /*!
@@ -384,7 +384,7 @@ namespace geode
          * @param[in] to_vertex_id Index of the vertex to which ends the edge
          * @return Local index if the edge is found.
          */
-        absl::optional< PolygonEdge > polygon_edge_from_vertices(
+        std::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
         /*!
@@ -418,7 +418,7 @@ namespace geode
          * Return one polygon with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          */
-        absl::optional< PolygonVertex > polygon_around_vertex(
+        std::optional< PolygonVertex > polygon_around_vertex(
             index_t vertex_id ) const;
 
     public:
@@ -450,10 +450,10 @@ namespace geode
         virtual local_index_t get_nb_polygon_vertices(
             index_t polygon_id ) const = 0;
 
-        virtual absl::optional< index_t > get_polygon_adjacent(
+        virtual std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const = 0;
 
-        virtual absl::optional< PolygonVertex > get_polygon_around_vertex(
+        virtual std::optional< PolygonVertex > get_polygon_around_vertex(
             index_t vertex_id ) const;
 
     private:
