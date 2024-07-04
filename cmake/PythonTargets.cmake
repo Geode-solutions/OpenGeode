@@ -112,7 +112,6 @@ print(name + version + '-' + abi + '-' + platform)"
         OUTPUT_VARIABLE wheel_sufix
         OUTPUT_STRIP_TRAILING_WHITESPACE
     ) 
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade build)
     string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
     set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
     message(STATUS "Wheel file: ${wheel_file}")
