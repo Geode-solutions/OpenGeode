@@ -99,6 +99,7 @@ function(add_geode_python_wheel)
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/setup.py.in" "${wheel_output_directory}/../setup.py")
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pyproject.toml.in" "${wheel_output_directory}/../pyproject.toml")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel setuptools build)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -c 
 "from wheel.bdist_wheel import get_abi_tag, get_platform
@@ -111,7 +112,6 @@ print(name + version + '-' + abi + '-' + platform)"
         OUTPUT_VARIABLE wheel_sufix
         OUTPUT_STRIP_TRAILING_WHITESPACE
     ) 
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade build)
     string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
     set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
     message(STATUS "Wheel file: ${wheel_file}")
