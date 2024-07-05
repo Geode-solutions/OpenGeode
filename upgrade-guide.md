@@ -10,6 +10,8 @@ TODO.....
 
 - **C++**: upgrade from C++ standard requirment from C++11 to C++17
 
+- **Constructors**: Most single-parameter constructors have been set to "explicit", meaning their class cannot be constructed implicitely, also avoiding implicit conversions between the types. This change should mainly affect the construction of `Point<dimension>`, `Vector<dimension>`, `PolygonVertex` and `PolygonEdge`.
+
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 
 ### Motivations
