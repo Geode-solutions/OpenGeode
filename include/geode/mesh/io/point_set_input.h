@@ -69,7 +69,9 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        PointSetInput( absl::string_view filename ) : Base{ filename } {}
+        explicit PointSetInput( absl::string_view filename ) : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

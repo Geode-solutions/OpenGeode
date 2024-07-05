@@ -52,7 +52,7 @@ namespace geode
             values_.fill( 0 );
         }
 
-        Point( std::array< double, dimension > values )
+        explicit Point( std::array< double, dimension > values )
             : values_( std::move( values ) )
         {
         }
@@ -245,7 +245,7 @@ namespace geode
         explicit OpenGeodePointException(
             Point< dimension > point_in, const Args &...message )
             : OpenGeodeException{ absl::StrCat(
-                message..., " at ", point_in.string() ) },
+                  message..., " at ", point_in.string() ) },
               point{ std::move( point_in ) }
         {
         }

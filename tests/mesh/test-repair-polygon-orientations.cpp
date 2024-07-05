@@ -39,18 +39,18 @@ std::unique_ptr< geode::SurfaceMesh2D > build_bad_orientation_surface()
     auto surface = geode::SurfaceMesh2D::create();
     auto builder = geode::SurfaceMeshBuilder2D::create( *surface );
     builder->create_vertices( 12 );
-    builder->set_point( 0, { { 0, 0 } } );
-    builder->set_point( 1, { { 1, 0 } } );
-    builder->set_point( 2, { { 1, 1 } } );
-    builder->set_point( 3, { { 2, 0 } } );
-    builder->set_point( 4, { { 2, 1 } } );
-    builder->set_point( 5, { { 3, 2 } } );
-    builder->set_point( 6, { { 3, 1 } } );
-    builder->set_point( 7, { { 4, 1 } } );
-    builder->set_point( 8, { { 3, 0 } } );
-    builder->set_point( 9, { { 4, 0 } } );
-    builder->set_point( 10, { { 4, 2 } } );
-    builder->set_point( 11, { { 4, 3 } } );
+    builder->set_point( 0, geode::Point2D{ { 0, 0 } } );
+    builder->set_point( 1, geode::Point2D{ { 1, 0 } } );
+    builder->set_point( 2, geode::Point2D{ { 1, 1 } } );
+    builder->set_point( 3, geode::Point2D{ { 2, 0 } } );
+    builder->set_point( 4, geode::Point2D{ { 2, 1 } } );
+    builder->set_point( 5, geode::Point2D{ { 3, 2 } } );
+    builder->set_point( 6, geode::Point2D{ { 3, 1 } } );
+    builder->set_point( 7, geode::Point2D{ { 4, 1 } } );
+    builder->set_point( 8, geode::Point2D{ { 3, 0 } } );
+    builder->set_point( 9, geode::Point2D{ { 4, 0 } } );
+    builder->set_point( 10, geode::Point2D{ { 4, 2 } } );
+    builder->set_point( 11, geode::Point2D{ { 4, 3 } } );
     builder->create_polygon( { 0, 2, 1 } ); // -
     builder->create_polygon( { 1, 3, 2 } ); // +
     builder->create_polygon( { 2, 4, 3 } ); // -

@@ -54,7 +54,7 @@ namespace geode
                 bbox.add_point( mesh.point( mesh.edge_vertex( { e, 1 } ) ) );
                 box_vector[e] = std::move( bbox );
             } );
-        return { box_vector };
+        return AABBTree< dimension >{ box_vector };
     }
 
     template < index_t dimension >

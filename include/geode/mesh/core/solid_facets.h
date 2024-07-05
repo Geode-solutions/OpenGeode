@@ -49,7 +49,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         SolidFacets();
-        SolidFacets( const SolidMesh< dimension >& solid );
+        explicit SolidFacets( const SolidMesh< dimension >& solid );
         ~SolidFacets();
 
         index_t nb_facets() const;

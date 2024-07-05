@@ -98,12 +98,11 @@ namespace
         std::array< geode::Point2D, 3 > triangle_points_projection;
         for( const auto triangle_pt : geode::LRange{ 3 } )
         {
-            triangle_points_projection[triangle_pt] = {
-                { triangle.vertices()[triangle_pt].get().value(
-                      projection_axis[0] ),
+            triangle_points_projection[triangle_pt] =
+                geode::Point2D{ { triangle.vertices()[triangle_pt].get().value(
+                                      projection_axis[0] ),
                     triangle.vertices()[triangle_pt].get().value(
-                        projection_axis[1] ) }
-            };
+                        projection_axis[1] ) } };
         }
         geode::SegmentTriangleIntersection result{ geode::Position::outside,
             geode::Position::outside };

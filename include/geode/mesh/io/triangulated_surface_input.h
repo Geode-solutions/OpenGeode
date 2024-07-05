@@ -71,7 +71,7 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        TriangulatedSurfaceInput( absl::string_view filename )
+        explicit TriangulatedSurfaceInput( absl::string_view filename )
             : Base{ filename }
         {
         }

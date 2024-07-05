@@ -64,7 +64,7 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        GraphInput( absl::string_view filename ) : Base{ filename } {}
+        explicit GraphInput( absl::string_view filename ) : Base{ filename } {}
     };
 
     typename GraphInput::MissingFiles opengeode_mesh_api

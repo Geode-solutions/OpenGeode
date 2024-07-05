@@ -69,7 +69,10 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        EdgedCurveInput( absl::string_view filename ) : Base{ filename } {}
+        explicit EdgedCurveInput( absl::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

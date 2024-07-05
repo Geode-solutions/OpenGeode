@@ -65,7 +65,7 @@ namespace geode
         void set_surface_name( const uuid& id, absl::string_view name );
 
     protected:
-        SurfacesBuilder( Surfaces< dimension >& surfaces )
+        explicit SurfacesBuilder( Surfaces< dimension >& surfaces )
             : surfaces_( surfaces )
         {
         }

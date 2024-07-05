@@ -54,7 +54,7 @@ namespace geode
     class PointSetOutput : public Output< PointSet< dimension > >
     {
     protected:
-        PointSetOutput( absl::string_view filename )
+        explicit PointSetOutput( absl::string_view filename )
             : Output< PointSet< dimension > >{ filename }
         {
         }

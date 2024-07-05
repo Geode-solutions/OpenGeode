@@ -420,7 +420,7 @@ void test_adjacencies2D()
 {
     auto grid = geode::RegularGrid2D::create();
     auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 10, 10 }, 1 );
     for( const auto p : geode::Range{ grid->nb_polygons() } )
     {
         for( const auto ee : geode::LRange{ grid->nb_polygon_edges( p ) } )
@@ -495,7 +495,7 @@ void test()
 
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 },
+    builder->initialize_grid( geode::Point3D{ { 1.5, 0, 1 } }, { 5, 10, 15 },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
@@ -503,7 +503,7 @@ void test()
     auto grid_v12 = geode::load_regular_grid< 3 >(
         absl::StrCat( geode::data_path, "test_v12.og_rgd3d" ) );
     auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
-    builder_v12->update_origin_and_directions( { { 1.5, 0, 1 } },
+    builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid_v12 );

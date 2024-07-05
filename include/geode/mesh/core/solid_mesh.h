@@ -46,6 +46,7 @@ namespace geode
     ALIAS_2D_AND_3D( Vector );
 
     class AttributeManager;
+    struct PolyhedronFacet;
 } // namespace geode
 
 namespace geode
@@ -56,6 +57,7 @@ namespace geode
     struct opengeode_mesh_api PolyhedronVertex
     {
         PolyhedronVertex() = default;
+        explicit PolyhedronVertex( const PolyhedronFacet& facet );
         PolyhedronVertex( index_t polyhedron_id_in, local_index_t vertex_id_in )
             : polyhedron_id( polyhedron_id_in ), vertex_id( vertex_id_in )
         {
@@ -94,6 +96,7 @@ namespace geode
     struct opengeode_mesh_api PolyhedronFacet
     {
         PolyhedronFacet() = default;
+        explicit PolyhedronFacet( const PolyhedronVertex& vertex );
         PolyhedronFacet( index_t polyhedron_id_in, local_index_t facet_id_in )
             : polyhedron_id( polyhedron_id_in ), facet_id( facet_id_in )
         {

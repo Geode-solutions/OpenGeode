@@ -46,7 +46,8 @@ namespace geode
         void set_model_boundary_name( const uuid& id, absl::string_view name );
 
     protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
+        explicit ModelBoundariesBuilder(
+            ModelBoundaries< dimension >& boundaries )
             : model_boundaries_( boundaries )
         {
         }

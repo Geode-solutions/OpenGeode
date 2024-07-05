@@ -57,7 +57,7 @@ namespace geode
         : public Output< PolygonalSurface< dimension > >
     {
     protected:
-        PolygonalSurfaceOutput( absl::string_view filename )
+        explicit PolygonalSurfaceOutput( absl::string_view filename )
             : Output< PolygonalSurface< dimension > >{ filename }
         {
         }

@@ -157,7 +157,8 @@ namespace
         {
             absl::optional< geode::PolygonEdge > adj_edge{ absl::in_place,
                 polygon_adj_id, e };
-            const auto adj_v0 = surface.polygon_vertex( adj_edge.value() );
+            const auto adj_v0 = surface.polygon_vertex(
+                geode::PolygonVertex{ adj_edge.value() } );
             const auto adj_v1 =
                 surface.polygon_edge_vertex( adj_edge.value(), 1 );
             if( ( vertices[0] == adj_v1 && vertices[1] == adj_v0 )
@@ -292,7 +293,7 @@ namespace
         const auto previous_id = surface.polygon_vertex(
             surface.previous_polygon_vertex( polygon_vertex ) );
         const auto next_id = surface.polygon_vertex(
-            surface.next_polygon_edge( polygon_vertex ) );
+            surface.next_polygon_vertex( polygon_vertex ) );
         auto edges = builder.edges_builder();
         edges.update_edge_vertex(
             { old_vertex_id, next_id }, 0, new_vertex_id );
@@ -635,7 +636,7 @@ namespace geode
     SurfaceEdgesBuilder< dimension >
         SurfaceMeshBuilder< dimension >::edges_builder()
     {
-        return { surface_mesh_.edges( {} ) };
+        return SurfaceEdgesBuilder< dimension >{ surface_mesh_.edges( {} ) };
     }
 
     template < index_t dimension >

@@ -678,7 +678,7 @@ namespace geode
     SolidEdgesBuilder< dimension >
         SolidMeshBuilder< dimension >::edges_builder()
     {
-        return { solid_mesh_.edges( {} ) };
+        return SolidEdgesBuilder< dimension >{ solid_mesh_.edges( {} ) };
     }
 
     template < index_t dimension >
@@ -742,7 +742,7 @@ namespace geode
     SolidFacetsBuilder< dimension >
         SolidMeshBuilder< dimension >::facets_builder()
     {
-        return { solid_mesh_.facets( {} ) };
+        return SolidFacetsBuilder< dimension >{ solid_mesh_.facets( {} ) };
     }
 
     template < index_t dimension >

@@ -70,7 +70,7 @@ namespace geode
         void copy( const RegularGrid2D& grid );
 
     protected:
-        RegularGridBuilder( RegularGrid2D& grid );
+        explicit RegularGridBuilder( RegularGrid2D& grid );
 
     private:
         RegularGrid2D& grid_;

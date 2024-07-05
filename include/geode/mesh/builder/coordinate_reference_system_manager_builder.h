@@ -37,7 +37,7 @@ namespace geode
     class CoordinateReferenceSystemManagerBuilder
     {
     public:
-        CoordinateReferenceSystemManagerBuilder(
+        explicit CoordinateReferenceSystemManagerBuilder(
             CoordinateReferenceSystemManager< dimension >& crs_manager )
             : crs_manager_( crs_manager )
         {

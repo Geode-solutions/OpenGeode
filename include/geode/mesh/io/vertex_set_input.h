@@ -65,7 +65,9 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        VertexSetInput( absl::string_view filename ) : Base{ filename } {}
+        explicit VertexSetInput( absl::string_view filename ) : Base{ filename }
+        {
+        }
     };
 
     typename VertexSetInput::MissingFiles opengeode_mesh_api

@@ -57,7 +57,7 @@ namespace geode
         void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
 
     protected:
-        PolyhedralSolidBuilder( PolyhedralSolid< dimension >& mesh );
+        explicit PolyhedralSolidBuilder( PolyhedralSolid< dimension >& mesh );
 
     private:
         PolyhedralSolid< dimension >& polyhedral_solid_;

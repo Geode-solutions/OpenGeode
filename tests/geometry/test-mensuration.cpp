@@ -117,8 +117,7 @@ void test_triangle_signed_area_3d()
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 1.0, 1.0, 0.0 } };
-    const geode::Vector3D upward{ { { 0.0, 0.0, 0.0 } },
-        { { 0.0, 0.0, 1.0 } } };
+    const geode::Vector3D upward{ { 0.0, 0.0, 1.0 } };
 
     const geode::Triangle3D triangle3D_1{ a, b, c };
     const auto area1 = geode::triangle_signed_area( triangle3D_1, upward );

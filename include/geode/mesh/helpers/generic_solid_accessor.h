@@ -48,7 +48,7 @@ namespace geode
         using ElementFacet = PolyhedronFacet;
         using ElementFacetVertices = PolyhedronFacetVertices;
 
-        GenericMeshAccessor( const SolidMesh< dimension >& mesh )
+        explicit GenericMeshAccessor( const SolidMesh< dimension >& mesh )
             : mesh_( mesh )
         {
         }

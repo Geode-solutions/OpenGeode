@@ -69,11 +69,13 @@ namespace
         basis[0] = axis;
         if( std::fabs( axis.value( 0 ) ) > std::fabs( axis.value( 1 ) ) )
         {
-            basis[1] = { { -axis.value( 2 ), 0, axis.value( 0 ) } };
+            basis[1] =
+                geode::Vector3D{ { -axis.value( 2 ), 0, axis.value( 0 ) } };
         }
         else
         {
-            basis[1] = { { 0, axis.value( 2 ), -axis.value( 1 ) } };
+            basis[1] =
+                geode::Vector3D{ { 0, axis.value( 2 ), -axis.value( 1 ) } };
         }
         basis[2] = basis[0].cross( basis[1] );
         orthonormalize( basis );
@@ -526,7 +528,7 @@ namespace geode
         const auto cylinder_barycenter = cylinder.axis().barycenter();
 
         // Convert incoming line origin to capsule coordinates.
-        const auto diff = line.origin() - cylinder_barycenter;
+        const Vector3D diff{ cylinder_barycenter, line.origin() };
         Vector3D P{ { U.dot( diff ), V.dot( diff ), W.dot( diff ) } };
 
         // Get the z-value, in cylinder coordinates, of the incoming

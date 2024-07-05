@@ -39,12 +39,12 @@ namespace geode
     public:
         Vector() = default;
 
-        Vector( const Point< dimension > &vector )
+        explicit Vector( const Point< dimension > &vector )
             : Point< dimension >( vector )
         {
         }
 
-        Vector( std::array< double, dimension > values )
+        explicit Vector( std::array< double, dimension > values )
             : Point< dimension >( std::move( values ) )
         {
         }

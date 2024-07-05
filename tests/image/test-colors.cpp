@@ -52,7 +52,7 @@ void test_color_attribute()
         manager.find_or_create_attribute< geode::VariableAttribute,
             geode::GreyscaleColor >(
             "greyscale_color", geode::GreyscaleColor{} );
-    greyscale_attribute->set_value( 0, { 67 } );
+    greyscale_attribute->set_value( 0, geode::GreyscaleColor{ 67 } );
     OPENGEODE_EXCEPTION( rgb_attribute->is_genericable(),
         "[TEST] Attribute on RGBColor should be genericable." );
     OPENGEODE_EXCEPTION( greyscale_attribute->is_genericable(),

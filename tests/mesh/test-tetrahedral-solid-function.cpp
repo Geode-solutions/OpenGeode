@@ -45,14 +45,14 @@ void build_test_solid( geode::TetrahedralSolid3D& solid )
 {
     auto builder = geode::TetrahedralSolidBuilder3D::create( solid );
     builder->create_vertices( 8 );
-    builder->set_point( 0, { { 0, 0, 0 } } );
-    builder->set_point( 1, { { 1, 0, 0 } } );
-    builder->set_point( 2, { { 1, 1, 0 } } );
-    builder->set_point( 3, { { 0, 1, 0 } } );
-    builder->set_point( 4, { { 0, 0, 1 } } );
-    builder->set_point( 5, { { 1, 0, 1 } } );
-    builder->set_point( 6, { { 1, 1, 1 } } );
-    builder->set_point( 7, { { 0, 1, 1 } } );
+    builder->set_point( 0, geode::Point3D{ { 0, 0, 0 } } );
+    builder->set_point( 1, geode::Point3D{ { 1, 0, 0 } } );
+    builder->set_point( 2, geode::Point3D{ { 1, 1, 0 } } );
+    builder->set_point( 3, geode::Point3D{ { 0, 1, 0 } } );
+    builder->set_point( 4, geode::Point3D{ { 0, 0, 1 } } );
+    builder->set_point( 5, geode::Point3D{ { 1, 0, 1 } } );
+    builder->set_point( 6, geode::Point3D{ { 1, 1, 1 } } );
+    builder->set_point( 7, geode::Point3D{ { 0, 1, 1 } } );
     builder->create_tetrahedron( { 0, 4, 1, 3 } );
     builder->create_tetrahedron( { 1, 2, 3, 6 } );
     builder->create_tetrahedron( { 1, 4, 5, 6 } );
@@ -95,11 +95,11 @@ void test_scalar_function( geode::TetrahedralSolid3D& solid )
     OPENGEODE_EXCEPTION(
         inexact_equal( scalar_function.value( point, 1 ), 22, 1e-7 ),
         "[Test] Object function value 1 is wrong." );
-    point = { { 0., 0., 1. } };
+    point = geode::Point3D{ { 0., 0., 1. } };
     OPENGEODE_EXCEPTION(
         inexact_equal( scalar_function.value( point, 4 ), 26, 1e-7 ),
         "[Test] Object function value 2 is wrong." );
-    point = { { 0.5, 0.5, 0.5 } };
+    point = geode::Point3D{ { 0.5, 0.5, 0.5 } };
     OPENGEODE_EXCEPTION(
         inexact_equal( scalar_function.value( point, 4 ), 23, 1e-7 ),
         "[Test] Object function value 3 is wrong." );
@@ -109,8 +109,8 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
 {
     const auto function_name = "point_function";
     auto point_function = geode::TetrahedralSolidPointFunction3D::create(
-        solid, function_name, { { 26, 3, -10 } } );
-    point_function.set_value( 2, { { 22, -3, -20 } } );
+        solid, function_name, geode::Point3D{ { 26, 3, -10 } } );
+    point_function.set_value( 2, geode::Point3D{ { 22, -3, -20 } } );
     for( const auto i : geode::LRange{ 8 } )
     {
         if( i == 2 )
@@ -126,20 +126,22 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
                 "[Test] Object function value is wrong." );
         }
     }
-    point_function.set_value( 3, { { 22, -3, -20 } } );
-    point_function.set_value( 1, { { 22, -3, -20 } } );
-    point_function.set_value( 6, { { 22, -3, -20 } } );
+    point_function.set_value( 3, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( 1, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( 6, geode::Point3D{ { 22, -3, -20 } } );
     geode::Point3D point{ { 0.91, 0.87, 0.19 } };
     OPENGEODE_EXCEPTION(
-        point_function.value( point, 1 ).inexact_equal( { { 22, -3, -20 } } ),
+        point_function.value( point, 1 )
+            .inexact_equal( geode::Point3D{ { 22, -3, -20 } } ),
         "[Test] Object function value 1 is wrong." );
-    point = { { 0., 0., 1. } };
-    OPENGEODE_EXCEPTION(
-        point_function.value( point, 4 ).inexact_equal( { { 26, 3, -10 } } ),
-        "[Test] Object function value 2 is wrong." );
-    point = { { 0.5, 0.5, 0.5 } };
+    point = geode::Point3D{ { 0., 0., 1. } };
     OPENGEODE_EXCEPTION( point_function.value( point, 4 )
-                             .inexact_equal( { { 23, -1.5, -17.5 } } ),
+                             .inexact_equal( geode::Point3D{ { 26, 3, -10 } } ),
+        "[Test] Object function value 2 is wrong." );
+    point = geode::Point3D{ { 0.5, 0.5, 0.5 } };
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, 4 )
+            .inexact_equal( geode::Point3D{ { 23, -1.5, -17.5 } } ),
         "[Test] Object function value 3 is wrong." );
 }
 

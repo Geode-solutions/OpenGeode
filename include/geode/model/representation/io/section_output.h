@@ -52,7 +52,7 @@ namespace geode
     class SectionOutput : public Output< Section >
     {
     protected:
-        SectionOutput( absl::string_view filename )
+        explicit SectionOutput( absl::string_view filename )
             : Output< Section >{ filename }
         {
         }

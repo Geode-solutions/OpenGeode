@@ -118,7 +118,7 @@ namespace geode
         void copy( const Graph& graph );
 
     protected:
-        GraphBuilder( Graph& mesh );
+        explicit GraphBuilder( Graph& mesh );
 
         using VertexSetBuilder::delete_vertices;
 

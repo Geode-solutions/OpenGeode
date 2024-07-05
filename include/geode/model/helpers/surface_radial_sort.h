@@ -75,7 +75,7 @@ namespace geode
 
     struct opengeode_model_api SortedSurfaces
     {
-        SortedSurfaces( index_t nb_surfaces );
+        explicit SortedSurfaces( index_t nb_surfaces );
 
         absl::InlinedVector< index_t, 1 > find(
             const SidedSurface& surface ) const;

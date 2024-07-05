@@ -48,7 +48,7 @@ namespace geode
         using ElementFacet = PolygonEdge;
         using ElementFacetVertices = std::array< index_t, 2 >;
 
-        GenericMeshAccessor( const SurfaceMesh< dimension >& mesh )
+        explicit GenericMeshAccessor( const SurfaceMesh< dimension >& mesh )
             : mesh_( mesh )
         {
         }

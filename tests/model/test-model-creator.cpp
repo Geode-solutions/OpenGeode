@@ -45,19 +45,19 @@
 void test_create_brep_with_dangling_components()
 {
     std::vector< geode::Point3D > points{
-        { { 0, 0, 0 } }, // 0
-        { { 1, 0, 0 } }, // 1
-        { { 1, 1, 0 } }, // 2
-        { { 0, 1, 0 } }, // 3
-        { { 0, 0, 1 } }, // 4
-        { { 1, 0, 1 } }, // 5
-        { { 1, 1, 1 } }, // 6
-        { { 0, 1, 1 } }, // 7
-        { { 0, 0, 2 } }, // 8
-        { { 1, 0, 2 } }, // 9
-        { { 1, 1, 2 } }, // 10
-        { { 0, 1, 2 } }, // 11
-        { { 1, 0.5, 1.5 } }, // 12
+        geode::Point3D{ { 0, 0, 0 } }, // 0
+        geode::Point3D{ { 1, 0, 0 } }, // 1
+        geode::Point3D{ { 1, 1, 0 } }, // 2
+        geode::Point3D{ { 0, 1, 0 } }, // 3
+        geode::Point3D{ { 0, 0, 1 } }, // 4
+        geode::Point3D{ { 1, 0, 1 } }, // 5
+        geode::Point3D{ { 1, 1, 1 } }, // 6
+        geode::Point3D{ { 0, 1, 1 } }, // 7
+        geode::Point3D{ { 0, 0, 2 } }, // 8
+        geode::Point3D{ { 1, 0, 2 } }, // 9
+        geode::Point3D{ { 1, 1, 2 } }, // 10
+        geode::Point3D{ { 0, 1, 2 } }, // 11
+        geode::Point3D{ { 1, 0.5, 1.5 } }, // 12
     };
     geode::BRep brep;
     geode::SimplicialBRepCreator creator{ brep, points };
@@ -135,17 +135,17 @@ void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     std::vector< geode::Point2D > points{
-        { { 0, 0 } },
-        { { 1, 0 } },
-        { { 1, 1 } },
-        { { 0, 1 } },
-        { { 0.5, 0.2 } },
-        { { 0.5, 0.8 } },
-        { { 0, 0.5 } },
-        { { 0.5, 0 } },
-        { { 1, 0.5 } },
-        { { 0.5, 1 } },
-        { { 0.5, 0.5 } },
+        geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 1, 0 } },
+        geode::Point2D{ { 1, 1 } },
+        geode::Point2D{ { 0, 1 } },
+        geode::Point2D{ { 0.5, 0.2 } },
+        geode::Point2D{ { 0.5, 0.8 } },
+        geode::Point2D{ { 0, 0.5 } },
+        geode::Point2D{ { 0.5, 0 } },
+        geode::Point2D{ { 1, 0.5 } },
+        geode::Point2D{ { 0.5, 1 } },
+        geode::Point2D{ { 0.5, 0.5 } },
     };
     const auto nb_vertices = points.size();
     geode::Section section;

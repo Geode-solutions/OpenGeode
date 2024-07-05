@@ -37,13 +37,13 @@
 void test_create_vertices( const geode::EdgedCurve3D& edged_curve,
     geode::EdgedCurveBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 2,
         "[Test] EdgedCurve should have 2 vertices" );
     builder.create_vertices( 2 );
-    builder.set_point( 2, { { 7.5, 5.2, 6.3 } } );
-    builder.set_point( 3, { { 8.7, 1.4, 4.7 } } );
+    builder.set_point( 2, geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder.set_point( 3, geode::Point3D{ { 8.7, 1.4, 4.7 } } );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 4,
         "[Test] EdgedCurve should have 4 vertices" );
 }
@@ -262,8 +262,8 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
     OPENGEODE_EXCEPTION( edged_curve.edge_barycenter( 0 ).inexact_equal(
                              geode::Point3D( { 4.8, 7.3, 6.5 } ) ),
         "[Test] Edge barycenter is not correct" );
-    const auto p0 = builder.create_point( { { 1, 1, 1 } } );
-    const auto p1 = builder.create_point( { { 1, 4, -3 } } );
+    const auto p0 = builder.create_point( geode::Point3D{ { 1, 1, 1 } } );
+    const auto p1 = builder.create_point( geode::Point3D{ { 1, 4, -3 } } );
     OPENGEODE_EXCEPTION(
         edged_curve.edge_length( builder.create_edge( p0, p1 ) ) == 5,
         "[Test] Edge length is not correct" );

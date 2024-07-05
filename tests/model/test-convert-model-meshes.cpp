@@ -27,6 +27,8 @@
 #include <geode/basic/uuid.h>
 
 #include <geode/model/helpers/convert_model_meshes.h>
+#include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>
@@ -40,9 +42,9 @@ void run_test_brep()
 {
     auto model =
         geode::load_brep( absl::StrCat( geode::data_path, "layers.og_brep" ) );
-
-    geode::triangulate_surface_meshes( model );
-    geode::convert_surface_meshes_into_triangulated_surfaces( model );
+    geode::BRepBuilder builder{ model };
+    geode::triangulate_surface_meshes( model, builder );
+    geode::convert_surface_meshes_into_triangulated_surfaces( model, builder );
 
     const auto file_io =
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
@@ -55,9 +57,9 @@ void run_test_section()
 {
     auto model =
         geode::load_section( absl::StrCat( geode::data_path, "quad.og_sctn" ) );
-
-    geode::triangulate_surface_meshes( model );
-    geode::convert_surface_meshes_into_triangulated_surfaces( model );
+    geode::SectionBuilder builder{ model };
+    geode::triangulate_surface_meshes( model, builder );
+    geode::convert_surface_meshes_into_triangulated_surfaces( model, builder );
 
     const auto file_io =
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );

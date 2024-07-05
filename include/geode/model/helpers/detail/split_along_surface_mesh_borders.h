@@ -41,7 +41,7 @@ namespace geode
         class SplitAlongSurfaceMeshBorders
         {
         public:
-            SplitAlongSurfaceMeshBorders( Model& model );
+            explicit SplitAlongSurfaceMeshBorders( Model& model );
             SplitAlongSurfaceMeshBorders(
                 const Model& model, typename Model::Builder& builder );
             ~SplitAlongSurfaceMeshBorders();

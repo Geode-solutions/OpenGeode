@@ -658,8 +658,8 @@ namespace
             for( const auto v : geode::LRange{ 3 } )
             {
                 const auto& point = points_[vertices_order_[v]];
-                triangle_vertices[v] = { { point.value( 1 ),
-                    point.value( 2 ) } };
+                triangle_vertices[v] =
+                    geode::Point2D{ { point.value( 1 ), point.value( 2 ) } };
             }
             if( !is_triangle_counterclockwise( triangle_vertices ) )
             {
@@ -879,21 +879,21 @@ namespace
             if( result.position == geode::Position::edge0 )
             {
                 result.to_process = is_edge_valid( current_j, current_k,
-                    { { vertices_order_[order[0]],
+                    Edge{ { vertices_order_[order[0]],
                         vertices_order_[order[1]] } } );
                 return result;
             }
             if( result.position == geode::Position::edge1 )
             {
                 result.to_process = is_edge_valid( current_j, current_k,
-                    { { vertices_order_[order[1]],
+                    Edge{ { vertices_order_[order[1]],
                         vertices_order_[order[2]] } } );
                 return result;
             }
             if( result.position == geode::Position::edge2 )
             {
                 result.to_process = is_edge_valid( current_j, current_k,
-                    { { vertices_order_[order[2]],
+                    Edge{ { vertices_order_[order[2]],
                         vertices_order_[order[0]] } } );
                 return result;
             }

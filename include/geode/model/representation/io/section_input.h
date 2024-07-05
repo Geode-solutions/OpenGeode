@@ -54,7 +54,9 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        SectionInput( absl::string_view filename ) : Base{ filename } {}
+        explicit SectionInput( absl::string_view filename ) : Base{ filename }
+        {
+        }
     };
 
     typename SectionInput::MissingFiles opengeode_model_api

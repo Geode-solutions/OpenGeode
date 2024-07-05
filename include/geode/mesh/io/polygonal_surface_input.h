@@ -70,7 +70,8 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        PolygonalSurfaceInput( absl::string_view filename ) : Base{ filename }
+        explicit PolygonalSurfaceInput( absl::string_view filename )
+            : Base{ filename }
         {
         }
     };

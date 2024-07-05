@@ -54,7 +54,7 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        BRepInput( absl::string_view filename ) : Base{ filename } {}
+        explicit BRepInput( absl::string_view filename ) : Base{ filename } {}
     };
 
     typename BRepInput::MissingFiles opengeode_model_api

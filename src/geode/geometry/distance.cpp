@@ -1078,7 +1078,7 @@ namespace geode
         Point3D nearest_point;
         std::tie( distance, nearest_point ) =
             point_circle_distance( point, circle );
-        if( circle.plane().normal().dot( point ) < 0 )
+        if( circle.plane().normal().dot( Vector3D{ point } ) < 0 )
         {
             distance = -distance;
         }

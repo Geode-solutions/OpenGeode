@@ -184,11 +184,11 @@ void test()
     geode::Relationships relationships;
     const std::array< geode::uuid, 6 > uuids{
         geode::uuid{ "00000000-a9c9-4d4e-8000-0000d0ecddf1" },
-        { "00000000-f620-4987-8000-00007f488d1c" },
-        { "00000000-006a-4fc8-8000-00002970c6fd" },
-        { "00000000-c823-4e3c-8000-0000d5bbf79b" },
-        { "00000000-cb3b-4476-8000-0000b8510242" },
-        { "00000000-e7cb-4888-8000-0000afce2867" }
+        geode::uuid{ "00000000-f620-4987-8000-00007f488d1c" },
+        geode::uuid{ "00000000-006a-4fc8-8000-00002970c6fd" },
+        geode::uuid{ "00000000-c823-4e3c-8000-0000d5bbf79b" },
+        geode::uuid{ "00000000-cb3b-4476-8000-0000b8510242" },
+        geode::uuid{ "00000000-e7cb-4888-8000-0000afce2867" }
     };
 
     // This Relationships do not represent anything.

@@ -169,7 +169,7 @@ namespace geode
         void copy( const SurfaceMesh< dimension >& surface_mesh );
 
     protected:
-        SurfaceMeshBuilder( SurfaceMesh< dimension >& mesh );
+        explicit SurfaceMeshBuilder( SurfaceMesh< dimension >& mesh );
 
         using VertexSetBuilder::delete_vertices;
 

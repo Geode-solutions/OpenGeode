@@ -56,7 +56,7 @@ namespace geode
         void copy( const PolygonalSurface< dimension >& surface_mesh );
 
     protected:
-        PolygonalSurfaceBuilder( PolygonalSurface< dimension >& mesh );
+        explicit PolygonalSurfaceBuilder( PolygonalSurface< dimension >& mesh );
 
     private:
         PolygonalSurface< dimension >& polygonal_surface_;

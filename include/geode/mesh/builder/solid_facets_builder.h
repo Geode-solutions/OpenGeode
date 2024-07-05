@@ -41,7 +41,7 @@ namespace geode
     class SolidFacetsBuilder
     {
     public:
-        SolidFacetsBuilder( SolidFacets< dimension >& facets );
+        explicit SolidFacetsBuilder( SolidFacets< dimension >& facets );
 
         /*!
          * Delete all the isolated facets (not used as polyhedron facets)

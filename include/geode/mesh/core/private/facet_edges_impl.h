@@ -37,6 +37,7 @@ namespace geode
         template < index_t dimension >
         class FacetEdgesImpl : public FacetStorage< std::array< index_t, 2 > >
         {
+            using EdgesVertexCycle = VertexCycle< std::array< index_t, 2 > >;
             friend class bitsery::Access;
 
         public:
@@ -45,13 +46,14 @@ namespace geode
             absl::optional< index_t > find_edge(
                 const std::array< index_t, 2 >& edge_vertices ) const
             {
-                return this->find_facet( edge_vertices );
+                return this->find_facet( EdgesVertexCycle{ edge_vertices } );
             }
 
             index_t find_or_create_edge(
                 std::array< index_t, 2 > edge_vertices )
             {
-                return this->add_facet( std::move( edge_vertices ) );
+                return this->add_facet(
+                    EdgesVertexCycle{ std::move( edge_vertices ) } );
             }
 
             const std::array< index_t, 2 >& edge_vertices(
@@ -76,7 +78,8 @@ namespace geode
 
             void remove_edge( std::array< index_t, 2 > edge_vertices )
             {
-                this->remove_facet( std::move( edge_vertices ) );
+                this->remove_facet(
+                    EdgesVertexCycle{ std::move( edge_vertices ) } );
             }
 
             std::vector< index_t > delete_edges(

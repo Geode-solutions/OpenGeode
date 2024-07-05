@@ -37,7 +37,7 @@ namespace geode
                                                 public VertexIdentifierBuilder
     {
     protected:
-        TopologyBuilder( Topology& topology )
+        explicit TopologyBuilder( Topology& topology )
             : RelationshipsBuilder( topology ),
               VertexIdentifierBuilder( topology ){};
     };

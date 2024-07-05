@@ -72,7 +72,8 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        TetrahedralSolidInput( absl::string_view filename ) : Base{ filename }
+        explicit TetrahedralSolidInput( absl::string_view filename )
+            : Base{ filename }
         {
         }
     };

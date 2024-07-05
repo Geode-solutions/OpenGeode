@@ -33,11 +33,11 @@ std::unique_ptr< geode::TriangulatedSurface3D > create_surface()
 {
     auto surface = geode::TriangulatedSurface3D::create();
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
-    builder->create_point( { { 0.1, 0.2, 0.3 } } );
-    builder->create_point( { { 2.1, 9.4, 6.7 } } );
-    builder->create_point( { { 7.5, 5.2, 6.3 } } );
-    builder->create_point( { { 8.1, 1.4, 4.7 } } );
-    builder->create_point( { { 4.7, 2.1, 1.3 } } );
+    builder->create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder->create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
+    builder->create_point( geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder->create_point( geode::Point3D{ { 8.1, 1.4, 4.7 } } );
+    builder->create_point( geode::Point3D{ { 4.7, 2.1, 1.3 } } );
     builder->create_triangle( { 0, 1, 2 } );
     builder->create_triangle( { 1, 3, 2 } );
     builder->create_triangle( { 3, 4, 2 } );
@@ -49,41 +49,41 @@ void test_rescale( geode::TriangulatedSurface3D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
     geode::rescale_mesh( surface, *builder, { 2, -2, 0.1 } );
-    OPENGEODE_EXCEPTION(
-        surface.point( 0 ).inexact_equal( { { 0.2, -0.4, 0.03 } } ),
+    OPENGEODE_EXCEPTION( surface.point( 0 ).inexact_equal(
+                             geode::Point3D{ { 0.2, -0.4, 0.03 } } ),
         "[Test] Wrong rescale of vertex 0" );
-    OPENGEODE_EXCEPTION(
-        surface.point( 1 ).inexact_equal( { { 4.2, -18.8, 0.67 } } ),
+    OPENGEODE_EXCEPTION( surface.point( 1 ).inexact_equal(
+                             geode::Point3D{ { 4.2, -18.8, 0.67 } } ),
         "[Test] Wrong rescale of vertex 1" );
-    OPENGEODE_EXCEPTION(
-        surface.point( 2 ).inexact_equal( { { 15.0, -10.4, 0.63 } } ),
+    OPENGEODE_EXCEPTION( surface.point( 2 ).inexact_equal(
+                             geode::Point3D{ { 15.0, -10.4, 0.63 } } ),
         "[Test] Wrong rescale of vertex 2" );
-    OPENGEODE_EXCEPTION(
-        surface.point( 3 ).inexact_equal( { { 16.2, -2.8, 0.47 } } ),
+    OPENGEODE_EXCEPTION( surface.point( 3 ).inexact_equal(
+                             geode::Point3D{ { 16.2, -2.8, 0.47 } } ),
         "[Test] Wrong rescale of vertex 3" );
-    OPENGEODE_EXCEPTION(
-        surface.point( 4 ).inexact_equal( { { 9.4, -4.2, 0.13 } } ),
+    OPENGEODE_EXCEPTION( surface.point( 4 ).inexact_equal(
+                             geode::Point3D{ { 9.4, -4.2, 0.13 } } ),
         "[Test] Wrong rescale of vertex 4" );
 }
 
 void test_translate( geode::TriangulatedSurface3D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
-    geode::translate_mesh( surface, *builder, { { 2, -2, 1 } } );
-    OPENGEODE_EXCEPTION(
-        surface.point( 0 ).inexact_equal( { { 2.1, -1.8, 1.3 } } ),
+    geode::translate_mesh( surface, *builder, geode::Vector3D{ { 2, -2, 1 } } );
+    OPENGEODE_EXCEPTION( surface.point( 0 ).inexact_equal(
+                             geode::Point3D{ { 2.1, -1.8, 1.3 } } ),
         "[Test] Wrong translation of vertex 0" );
     OPENGEODE_EXCEPTION(
-        surface.point( 1 ).inexact_equal( { { 4.1, 7.4, 7.7 } } ),
+        surface.point( 1 ).inexact_equal( geode::Point3D{ { 4.1, 7.4, 7.7 } } ),
         "[Test] Wrong translation of vertex 1" );
     OPENGEODE_EXCEPTION(
-        surface.point( 2 ).inexact_equal( { { 9.5, 3.2, 7.3 } } ),
+        surface.point( 2 ).inexact_equal( geode::Point3D{ { 9.5, 3.2, 7.3 } } ),
         "[Test] Wrong translation of vertex 2" );
-    OPENGEODE_EXCEPTION(
-        surface.point( 3 ).inexact_equal( { { 10.1, -0.6, 5.7 } } ),
+    OPENGEODE_EXCEPTION( surface.point( 3 ).inexact_equal(
+                             geode::Point3D{ { 10.1, -0.6, 5.7 } } ),
         "[Test] Wrong translation of vertex 3" );
     OPENGEODE_EXCEPTION(
-        surface.point( 4 ).inexact_equal( { { 6.7, 0.1, 2.3 } } ),
+        surface.point( 4 ).inexact_equal( geode::Point3D{ { 6.7, 0.1, 2.3 } } ),
         "[Test] Wrong translation of vertex 4" );
 }
 

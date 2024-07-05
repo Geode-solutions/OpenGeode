@@ -79,14 +79,16 @@ namespace
                 const auto& surfaces_cmes =
                     geode::detail::surface_component_mesh_edges(
                         brep, unique_vertices );
-                const auto polygon_edge =
-                    surfaces_cmes.at( surface_uuid ).front();
-                const auto other_polygon_edge =
-                    surfaces_cmes.at( other_surface.id() ).front();
+                const geode::PolygonVertex polygon_vertex{
+                    surfaces_cmes.at( surface_uuid ).front()
+                };
+                const geode::PolygonVertex other_polygon_vertex{
+                    surfaces_cmes.at( other_surface.id() ).front()
+                };
                 const auto different_orientation =
-                    surface.mesh().polygon_vertex( polygon_edge )
+                    surface.mesh().polygon_vertex( polygon_vertex )
                     == other_surface.mesh().polygon_vertex(
-                        other_polygon_edge );
+                        other_polygon_vertex );
                 return other_surface_itr->second != different_orientation;
             }
         }

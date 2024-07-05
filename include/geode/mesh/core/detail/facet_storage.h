@@ -46,9 +46,9 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1u, { false, false } ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1u, { false, false } ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -149,8 +149,10 @@ namespace geode
             {
                 auto updated_facet_vertices = facet_vertices;
                 updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-                this->add_facet( std::move( updated_facet_vertices ) );
-                this->remove_facet( std::move( facet_vertices ) );
+                this->add_facet(
+                    TypedVertexCycle{ std::move( updated_facet_vertices ) } );
+                this->remove_facet(
+                    TypedVertexCycle{ std::move( facet_vertices ) } );
             }
 
             std::vector< index_t > update_facet_vertices(
@@ -177,7 +179,9 @@ namespace geode
                     {
                         const auto it =
                             std::get< 0 >( facet_indices_.try_emplace(
-                                std::move( updated_vertices ), cycle.second ) );
+                                TypedVertexCycle{
+                                    std::move( updated_vertices ) },
+                                cycle.second ) );
                         vertices_->set_value(
                             cycle.second, it->first.vertices() );
                     }

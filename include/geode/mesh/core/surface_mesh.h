@@ -60,7 +60,7 @@ namespace geode
             : polygon_id( polygon_id_in ), vertex_id( vertex_id_in )
         {
         }
-        PolygonVertex( PolygonEdge polygon_edge );
+        explicit PolygonVertex( const PolygonEdge& polygon_edge );
         bool operator==( const PolygonVertex& other ) const
         {
             return polygon_id == other.polygon_id
@@ -99,7 +99,7 @@ namespace geode
             : polygon_id( polygon_id_in ), edge_id( edge_id_in )
         {
         }
-        PolygonEdge( PolygonVertex polygon_vertex );
+        explicit PolygonEdge( const PolygonVertex& polygon_vertex );
         bool operator==( const PolygonEdge& other ) const
         {
             return polygon_id == other.polygon_id && edge_id == other.edge_id;

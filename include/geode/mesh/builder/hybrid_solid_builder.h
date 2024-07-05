@@ -81,7 +81,7 @@ namespace geode
         void copy( const HybridSolid< dimension >& hybrid_solid );
 
     protected:
-        HybridSolidBuilder( HybridSolid< dimension >& mesh );
+        explicit HybridSolidBuilder( HybridSolid< dimension >& mesh );
 
     private:
         void do_create_polyhedron( absl::Span< const index_t > vertices,

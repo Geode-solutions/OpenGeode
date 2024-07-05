@@ -35,7 +35,9 @@ namespace geode
         CoordinateReferenceSystemManagersBuilder<
             dimension >::coordinate_reference_system_manager_builder1D()
     {
-        return { crs_managers_.coordinate_reference_system_manager1D( {} ) };
+        return CoordinateReferenceSystemManagerBuilder1D{
+            crs_managers_.coordinate_reference_system_manager1D( {} )
+        };
     }
 
     template < index_t dimension >
@@ -43,7 +45,9 @@ namespace geode
         CoordinateReferenceSystemManagersBuilder<
             dimension >::coordinate_reference_system_manager_builder2D()
     {
-        return { crs_managers_.coordinate_reference_system_manager2D( {} ) };
+        return CoordinateReferenceSystemManagerBuilder2D{
+            crs_managers_.coordinate_reference_system_manager2D( {} )
+        };
     }
 
     template < index_t dimension >
@@ -51,7 +55,9 @@ namespace geode
         CoordinateReferenceSystemManagersBuilder<
             dimension >::coordinate_reference_system_manager_builder3D()
     {
-        return { crs_managers_.coordinate_reference_system_manager3D( {} ) };
+        return CoordinateReferenceSystemManagerBuilder3D{
+            crs_managers_.coordinate_reference_system_manager3D( {} )
+        };
     }
 
     template < index_t dimension >
@@ -59,7 +65,9 @@ namespace geode
         CoordinateReferenceSystemManagersBuilder<
             dimension >::main_coordinate_reference_system_manager_builder()
     {
-        return { crs_managers_.main_coordinate_reference_system_manager( {} ) };
+        return CoordinateReferenceSystemManagerBuilder< dimension >{
+            crs_managers_.main_coordinate_reference_system_manager( {} )
+        };
     }
 
     template < index_t dimension >
