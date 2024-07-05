@@ -194,7 +194,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
+    std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
         convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh< dimension >& surface )
     {
@@ -208,8 +208,7 @@ namespace geode
         if( surface.type_name()
             == RegularGrid< dimension >::type_name_static() )
         {
-            absl::optional<
-                std::unique_ptr< TriangulatedSurface< dimension > > >
+            std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
                 result{ create_triangulated_surface_from_grid(
                     dynamic_cast< const RegularGrid< dimension >& >(
                         surface ) ) };
@@ -222,9 +221,9 @@ namespace geode
         {
             Logger::info( "[convert_surface_mesh_into_triangulated_surface] "
                           "SurfaceMesh is not made of only triangles." );
-            return absl::nullopt;
+            return std::nullopt;
         }
-        absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
+        std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
             tri_surface{ TriangulatedSurface< dimension >::create() };
         convert_surface( surface, *tri_surface->get() );
         return tri_surface;
@@ -367,10 +366,10 @@ namespace geode
     template std::unique_ptr< PolygonalSurface3D > opengeode_mesh_api
         convert_surface_mesh_into_polygonal_surface( const SurfaceMesh3D& );
 
-    template absl::optional< std::unique_ptr< TriangulatedSurface2D > >
+    template std::optional< std::unique_ptr< TriangulatedSurface2D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh2D& );
-    template absl::optional< std::unique_ptr< TriangulatedSurface3D > >
+    template std::optional< std::unique_ptr< TriangulatedSurface3D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh3D& );
 

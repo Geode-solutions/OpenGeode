@@ -37,7 +37,7 @@
 namespace
 {
     template < geode::index_t dimension >
-    absl::optional< geode::PolyhedronFacet > tetrahedron_facet_from_vertices(
+    std::optional< geode::PolyhedronFacet > tetrahedron_facet_from_vertices(
         const geode::TetrahedralSolid< dimension >& solid,
         const geode::PolyhedronFacet& facet,
         const geode::PolyhedronVertices& vertices_adj,
@@ -78,7 +78,7 @@ namespace
             {
                 continue;
             }
-            return absl::optional< geode::PolyhedronFacet >{ absl::in_place,
+            return std::optional< geode::PolyhedronFacet >{ std::in_place,
                 polyhedron_adj, f };
         }
         throw geode::OpenGeodeException{
@@ -86,7 +86,7 @@ namespace
             "facet] Wrong adjacency with polyhedra: ",
             polyhedron, " and ", polyhedron_adj
         };
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >
@@ -437,7 +437,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< PolyhedronFacet >
+    std::optional< PolyhedronFacet >
         TetrahedralSolid< dimension >::polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const
     {
@@ -445,7 +445,7 @@ namespace geode
             this->polyhedron_adjacent( polyhedron_facet );
         if( !opt_polyhedron_adj )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto polyhedron_adj = opt_polyhedron_adj.value();
         const auto adj_vertices = this->polyhedron_vertices( polyhedron_adj );

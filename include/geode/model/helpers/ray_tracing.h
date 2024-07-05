@@ -50,7 +50,7 @@ namespace geode
     bool opengeode_model_api is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point );
 
-    absl::optional< uuid > opengeode_model_api block_containing_point(
+    std::optional< uuid > opengeode_model_api block_containing_point(
         const BRep& brep, const Point3D& point );
 
 } // namespace geode
