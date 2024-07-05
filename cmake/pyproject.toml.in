@@ -39,4 +39,4 @@ dependencies = {file = "requirements.txt"}
 readme = {file = "README.md", content-type = "text/markdown"}
 
 [tool.setuptools.package-data]
-"${project_name}" = ["*/*.so", "*/*.dll", "*/*.pyd", "share/*/*.db"]
+"${project_name}" = ["*/*.so", "*/*.so.*", "*/*.dll", "*/*.pyd", "share/*/*.db"]
