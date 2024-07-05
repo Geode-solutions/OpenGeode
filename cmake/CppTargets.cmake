@@ -60,7 +60,7 @@ function(add_geode_library)
     set(PROJECT_LIB_NAME ${PROJECT_NAME}::${GEODE_LIB_NAME})
     set(VERSION_RC_FILE_IN ${PROJECT_SOURCE_DIR}/cmake/version.rc.in)
     if(EXISTS ${VERSION_RC_FILE_IN})
-        message(STATUS "Configuring version.rc")
+        message(STATUS "Configuring ${GEODE_LIB_NAME} version.rc")
         set(VERSION_RC_FILE ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/version.rc)
         configure_file(
             ${VERSION_RC_FILE_IN}

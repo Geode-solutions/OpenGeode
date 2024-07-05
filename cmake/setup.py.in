@@ -17,11 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
+# Most project configs are in `pyproject.toml`
+# => Prefer to modify `pyproject.toml` over this file if possible.
 
 from setuptools import setup
 from setuptools.dist import Distribution
 from setuptools.command.install import install
-from os import path
 
 
 class BinaryDistribution(Distribution):
@@ -37,33 +39,7 @@ class InstallPlatlib(install):
         install.finalize_options(self)
         self.install_lib = self.install_platlib
 
-
-with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
-
-try:
-    with open('${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt') as f:
-        install_requires = f.read().strip().split('\n')
-except FileNotFoundError:
-    install_requires=""
-
 setup(
-    name='${GEODE_WHEEL_NAME}',
-    version='${WHEEL_VERSION}',
-    description='${GEODE_WHEEL_DESCRIPTION}',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Geode-solutions',
-    author_email='contact@geode-solutions.com',
-    url='https://github.com/Geode-solutions/${PROJECT_NAME}',
-    packages=['${project_name}'],
-    package_data={
-        '${project_name}': ['*/*.so', '*/*.dll', '*/*.pyd', 'share/*/*.db']
-    },
-    python_requires='>= 3.8, < 3.12',
-    install_requires=install_requires,
-    license='${GEODE_WHEEL_LICENSE}',
-    zip_safe=False,
     distclass=BinaryDistribution,
     cmdclass={'install': InstallPlatlib}
 )

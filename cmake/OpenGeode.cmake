@@ -79,7 +79,8 @@ endif()
 
 install(
     FILES 
-        "cmake/OpenGeodeModule-setup.py.in"
+        "cmake/setup.py.in"
+        "cmake/pyproject.toml.in"
         "cmake/GlobalOptions.cmake"
         "cmake/CompilerWarnings.cmake"
         "cmake/Sanitizers.cmake"
