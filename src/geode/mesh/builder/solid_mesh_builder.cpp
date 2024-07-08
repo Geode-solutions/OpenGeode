@@ -254,7 +254,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::optional< geode::index_t > polyhedron_vertex_in_facet(
+    std::optional< geode::index_t > polyhedron_vertex_in_facet(
         const geode::SolidMesh< dimension >& solid,
         const geode::PolyhedronFacet& facet,
         geode::local_index_t vertex_id )
@@ -268,7 +268,7 @@ namespace
                 return v;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >

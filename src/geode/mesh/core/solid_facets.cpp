@@ -80,7 +80,7 @@ namespace geode
             }
         }
 
-        absl::optional< index_t > find_facet(
+        std::optional< index_t > find_facet(
             const PolyhedronFacetVertices& facet_vertices ) const
         {
             return Facets::find_facet( FacetsVertexCycle{ facet_vertices } );
@@ -195,7 +195,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidFacets< dimension >::facet_from_vertices(
+    std::optional< index_t > SolidFacets< dimension >::facet_from_vertices(
         const PolyhedronFacetVertices& vertices ) const
     {
         return impl_->find_facet( vertices );

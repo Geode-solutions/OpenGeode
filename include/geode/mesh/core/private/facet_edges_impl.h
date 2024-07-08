@@ -43,7 +43,7 @@ namespace geode
         public:
             FacetEdgesImpl() = default;
 
-            absl::optional< index_t > find_edge(
+            std::optional< index_t > find_edge(
                 const std::array< index_t, 2 >& edge_vertices ) const
             {
                 return this->find_facet( EdgesVertexCycle{ edge_vertices } );

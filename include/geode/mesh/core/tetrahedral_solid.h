@@ -81,7 +81,7 @@ namespace geode
         PolyhedraAroundEdge polyhedra_around_edge(
             const PolyhedronFacetEdge& edge ) const final;
 
-        absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
+        std::optional< PolyhedronFacet > polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const final;
 
         /*

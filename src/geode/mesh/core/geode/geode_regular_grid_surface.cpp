@@ -83,7 +83,7 @@ namespace geode
             return vertex_index( grid, cell_vertex );
         }
 
-        absl::optional< index_t > cell_adjacent(
+        std::optional< index_t > cell_adjacent(
             const RegularGrid2D& grid, const PolygonEdge& edge ) const
         {
             const auto cell = cell_indices( grid, edge.polygon_id );
@@ -104,7 +104,7 @@ namespace geode
                     return grid.cell_index( adj.value() );
                 }
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
     private:
@@ -163,7 +163,7 @@ namespace geode
         return impl_->get_polygon_vertex( *this, polygon_vertex );
     }
 
-    absl::optional< index_t > OpenGeodeRegularGrid< 2 >::get_polygon_adjacent(
+    std::optional< index_t > OpenGeodeRegularGrid< 2 >::get_polygon_adjacent(
         const PolygonEdge& edge ) const
     {
         return impl_->cell_adjacent( *this, edge );

@@ -30,6 +30,8 @@ void test_bijective_mappings()
 {
     geode::BijectiveMapping< geode::index_t, double > bijective;
     bijective.map( 0, 42.1 );
+    bijective.clear();
+    bijective.map( 0, 42.1 );
     OPENGEODE_EXCEPTION( bijective.has_mapping_input( 0 ),
         "[Test] 0 should be a key for bijective inputs" );
     OPENGEODE_EXCEPTION( bijective.has_mapping_output( 42.1 ),

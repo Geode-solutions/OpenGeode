@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <absl/container/inlined_vector.h>
@@ -296,7 +297,7 @@ namespace geode
          * @return Index in [0,nb_polyhedron_vertices()[ if polyhedron is around
          * the given vertex
          */
-        absl::optional< local_index_t > vertex_in_polyhedron(
+        std::optional< local_index_t > vertex_in_polyhedron(
             index_t polyhedron_id, index_t vertex_id ) const;
 
         /*!
@@ -317,11 +318,11 @@ namespace geode
         std::array< index_t, 2 > polyhedron_facet_edge_vertices(
             const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
-        absl::optional< PolyhedronFacetEdge >
+        std::optional< PolyhedronFacetEdge >
             polyhedron_facet_edge_from_vertices(
                 const std::array< index_t, 2 >& edge_vertices ) const;
 
-        absl::optional< PolyhedronFacetEdge >
+        std::optional< PolyhedronFacetEdge >
             polyhedron_facet_edge_from_vertices(
                 const std::array< index_t, 2 >& edge_vertices,
                 index_t polyhedron_id ) const;
@@ -329,7 +330,7 @@ namespace geode
         virtual PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const;
 
-        absl::optional< PolyhedronFacet > polyhedron_facet_from_vertices(
+        std::optional< PolyhedronFacet > polyhedron_facet_from_vertices(
             PolyhedronFacetVertices polyhedron_facet_vertices ) const;
 
         PolyhedronFacetVertices polyhedron_facet_vertices(
@@ -346,7 +347,7 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return the index of the adjacent polyhedron if it exists.
          */
-        absl::optional< index_t > polyhedron_adjacent(
+        std::optional< index_t > polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -355,7 +356,7 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return the index of the adjacent polyhedron facet if it exists.
          */
-        virtual absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
+        virtual std::optional< PolyhedronFacet > polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -439,7 +440,7 @@ namespace geode
          * Return the normal of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        absl::optional< Vector3D > new_polyhedron_facet_normal(
+        std::optional< Vector3D > new_polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -517,7 +518,7 @@ namespace geode
          * @param[in] vertices Indices of edge vertices.
          * @pre This function needs that polyhedron adjacencies are computed
          */
-        absl::optional< index_t > polyhedron_around_edge(
+        std::optional< index_t > polyhedron_around_edge(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
@@ -580,7 +581,7 @@ namespace geode
          * Return one polyhedron with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          */
-        absl::optional< PolyhedronVertex > polyhedron_around_vertex(
+        std::optional< PolyhedronVertex > polyhedron_around_vertex(
             index_t vertex_id ) const;
 
     public:
@@ -624,10 +625,10 @@ namespace geode
         virtual PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
 
-        virtual absl::optional< index_t > get_polyhedron_adjacent(
+        virtual std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const = 0;
 
-        virtual absl::optional< PolyhedronVertex > get_polyhedron_around_vertex(
+        virtual std::optional< PolyhedronVertex > get_polyhedron_around_vertex(
             index_t vertex_id ) const;
 
     private:

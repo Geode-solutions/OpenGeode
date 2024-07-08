@@ -82,14 +82,14 @@ namespace geode
                 vertex_id };
         }
 
-        absl::optional< index_t > get_polyhedron_adjacent(
+        std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
             const auto adj = tetrahedron_adjacents_->value(
                 polyhedron_facet.polyhedron_id )[polyhedron_facet.facet_id];
             if( adj == NO_ID )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return adj;
         }
@@ -189,7 +189,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t >
+    std::optional< index_t >
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
     {

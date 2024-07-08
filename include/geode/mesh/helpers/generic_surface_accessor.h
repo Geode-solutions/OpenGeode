@@ -89,13 +89,13 @@ namespace geode
             return mesh_.polygon_edge_vertices( polygon_edge );
         }
 
-        absl::optional< index_t > element_adjacent(
+        std::optional< index_t > element_adjacent(
             const ElementFacet& polygon_edge ) const
         {
             return mesh_.polygon_adjacent( polygon_edge );
         }
 
-        absl::optional< ElementFacet > element_adjacent_facet(
+        std::optional< ElementFacet > element_adjacent_facet(
             const ElementFacet& polygon_edge ) const
         {
             return mesh_.polygon_adjacent_edge( polygon_edge );

@@ -23,13 +23,13 @@
 
 #include <geode/model/helpers/model_coordinate_reference_system.h>
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <absl/container/fixed_array.h>
 #include <absl/container/flat_hash_set.h>
-#include <absl/types/optional.h>
 
 #include <geode/mesh/core/coordinate_reference_system.h>
 #include <geode/mesh/core/coordinate_reference_system_manager.h>
@@ -51,7 +51,7 @@ namespace
     using CRSMap = absl::flat_hash_set< CRSMapValue >;
 
     template < typename Range >
-    absl::optional< CRSMap > get_first_components_crs( Range range )
+    std::optional< CRSMap > get_first_components_crs( Range range )
     {
         for( const auto& component : range )
         {
@@ -62,7 +62,7 @@ namespace
             }
             const auto& crs_manager =
                 mesh.main_coordinate_reference_system_manager();
-            absl::optional< CRSMap > crss{ absl::in_place };
+            std::optional< CRSMap > crss{ std::in_place };
             for( const auto& crs_name :
                 crs_manager.coordinate_reference_system_names() )
             {
@@ -73,7 +73,7 @@ namespace
             }
             return crss;
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < typename Range >
@@ -147,7 +147,7 @@ namespace
     }
 
     template < typename Model >
-    absl::optional< CRSMap > get_first_model_crs( const Model& model )
+    std::optional< CRSMap > get_first_model_crs( const Model& model )
     {
         if( auto crss = get_first_components_crs( model.corners() ) )
         {
@@ -161,7 +161,7 @@ namespace
         {
             return crss;
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < typename Model >

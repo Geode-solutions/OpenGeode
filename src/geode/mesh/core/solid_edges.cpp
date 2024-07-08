@@ -125,7 +125,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidEdges< dimension >::edge_from_vertices(
+    std::optional< index_t > SolidEdges< dimension >::edge_from_vertices(
         const std::array< index_t, 2 >& vertices ) const
     {
         return impl_->find_edge( vertices );

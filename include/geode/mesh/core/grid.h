@@ -102,10 +102,10 @@ namespace geode
         local_index_t cell_local_vertex(
             const CellIndices& cell_id, const VertexIndices& vertex_id ) const;
 
-        absl::optional< VertexIndices > next_vertex(
+        std::optional< VertexIndices > next_vertex(
             const VertexIndices& index, index_t direction ) const;
 
-        absl::optional< VertexIndices > previous_vertex(
+        std::optional< VertexIndices > previous_vertex(
             const VertexIndices& index, index_t direction ) const;
 
         bool is_grid_vertex_on_border( const VertexIndices& index ) const;

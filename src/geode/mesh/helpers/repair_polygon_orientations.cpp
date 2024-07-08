@@ -276,7 +276,7 @@ namespace
         {
             absl::FixedArray< geode::index_t > vertices(
                 mesh.nb_polygon_vertices( p ) );
-            absl::FixedArray< absl::optional< geode::index_t > > adjacents(
+            absl::FixedArray< std::optional< geode::index_t > > adjacents(
                 mesh.nb_polygon_edges( p ) );
             for( const auto v : geode::LRange{ mesh.nb_polygon_vertices( p ) } )
             {

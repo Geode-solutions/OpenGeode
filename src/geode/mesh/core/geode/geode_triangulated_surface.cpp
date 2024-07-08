@@ -68,7 +68,7 @@ namespace geode
                 .at( polygon_vertex.vertex_id );
         }
 
-        absl::optional< index_t > get_polygon_adjacent(
+        std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
         {
             const auto adj =
@@ -76,7 +76,7 @@ namespace geode
                     .at( polygon_edge.edge_id );
             if( adj == NO_ID )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return adj;
         }
@@ -165,7 +165,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t >
+    std::optional< index_t >
         OpenGeodeTriangulatedSurface< dimension >::get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
     {
