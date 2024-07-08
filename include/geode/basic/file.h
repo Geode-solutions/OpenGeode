@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
+#include <optional>
+
 #include <absl/types/span.h>
 
 #include <geode/basic/common.h>
@@ -44,9 +45,9 @@ namespace geode
     std::string opengeode_basic_api goto_keywords(
         std::ifstream& file, absl::Span< const absl::string_view > words );
 
-    absl::optional< std::string > opengeode_basic_api goto_keyword_if_it_exists(
+    std::optional< std::string > opengeode_basic_api goto_keyword_if_it_exists(
         std::ifstream& file, absl::string_view word );
 
-    absl::optional< std::string > opengeode_basic_api next_keyword_if_it_exists(
+    std::optional< std::string > opengeode_basic_api next_keyword_if_it_exists(
         std::ifstream& file, absl::string_view word );
 } // namespace geode

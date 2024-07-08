@@ -66,7 +66,7 @@ namespace geode
          * Get the index of facet corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        absl::optional< index_t > facet_from_vertices(
+        std::optional< index_t > facet_from_vertices(
             const PolyhedronFacetVertices& vertices ) const;
 
         /*!

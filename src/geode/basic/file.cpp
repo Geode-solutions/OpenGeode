@@ -88,10 +88,10 @@ namespace geode
         return "";
     }
 
-    absl::optional< std::string > goto_keyword_if_it_exists(
+    std::optional< std::string > goto_keyword_if_it_exists(
         std::ifstream& file, absl::string_view word )
     {
-        absl::optional< std::string > line{ absl::in_place };
+        std::optional< std::string > line{ std::in_place };
         while( std::getline( file, line.value() ) )
         {
             if( string_starts_with( line.value(), word ) )
@@ -103,13 +103,13 @@ namespace geode
             word, " in the file, returning to file begin." );
         file.clear();
         file.seekg( std::ios::beg );
-        return absl::nullopt;
+        return std::nullopt;
     }
 
-    absl::optional< std::string > next_keyword_if_it_exists(
+    std::optional< std::string > next_keyword_if_it_exists(
         std::ifstream& file, absl::string_view word )
     {
-        absl::optional< std::string > line{ absl::in_place };
+        std::optional< std::string > line{ std::in_place };
         const auto previous_position = file.tellg();
         std::getline( file, line.value() );
         if( string_starts_with( line.value(), word ) )
@@ -117,6 +117,6 @@ namespace geode
             return line;
         }
         file.seekg( previous_position );
-        return absl::nullopt;
+        return std::nullopt;
     }
 } // namespace geode

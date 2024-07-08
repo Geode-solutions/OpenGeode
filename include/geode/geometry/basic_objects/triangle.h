@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <geode/geometry/common.h>
 #include <geode/geometry/vector.h>
 
@@ -59,20 +61,20 @@ namespace geode
 
         Point< dimension > barycenter() const;
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
             normal() const;
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, absl::optional< Plane > >::type
+        typename std::enable_if< T == 3, std::optional< Plane > >::type
             plane() const;
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, absl::optional< OwnerPlane > >::type
+        typename std::enable_if< T == 3, std::optional< OwnerPlane > >::type
             owner_plane() const;
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
+        typename std::enable_if< T == 3, std::optional< local_index_t > >::type
             pivot() const;
         template < index_t T = dimension >
         typename std::enable_if< T == 3,
-            absl::optional< std::pair< local_index_t, Vector3D > > >::type
+            std::optional< std::pair< local_index_t, Vector3D > > >::type
             pivot_and_normal() const;
         void set_point( index_t vertex, PointType point );
         const std::array< PointType, 3 >& vertices() const;

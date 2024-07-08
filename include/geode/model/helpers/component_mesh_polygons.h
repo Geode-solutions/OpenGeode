@@ -117,8 +117,8 @@ namespace geode
             return counter;
         }
 
-        absl::optional< BlockPolyhedronFacet > oriented_polyhedron_facet;
-        absl::optional< BlockPolyhedronFacet > opposite_polyhedron_facet;
+        std::optional< BlockPolyhedronFacet > oriented_polyhedron_facet;
+        std::optional< BlockPolyhedronFacet > opposite_polyhedron_facet;
     };
 
     struct SurfacePolygonEdge
@@ -148,8 +148,8 @@ namespace geode
             return counter;
         }
 
-        absl::optional< SurfacePolygonEdge > oriented_edge;
-        absl::optional< SurfacePolygonEdge > opposite_edge;
+        std::optional< SurfacePolygonEdge > oriented_edge;
+        std::optional< SurfacePolygonEdge > opposite_edge;
     };
 
     PolyhedraAroundFacet opengeode_model_api

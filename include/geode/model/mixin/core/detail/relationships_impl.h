@@ -71,7 +71,7 @@ namespace geode
 
             AttributeManager& relation_attribute_manager() const;
 
-            absl::optional< index_t > relation_edge_index(
+            std::optional< index_t > relation_edge_index(
                 const uuid& component_id1, const uuid& component_id2 ) const;
 
             std::tuple< ComponentID, ComponentID >
@@ -85,7 +85,7 @@ namespace geode
 
             void initialize_attributes();
 
-            absl::optional< index_t > vertex_id(
+            std::optional< index_t > vertex_id(
                 const uuid& component_id ) const;
 
             const Graph& graph() const;

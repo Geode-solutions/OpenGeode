@@ -138,7 +138,7 @@ namespace geode
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
             const override;
 
-        absl::optional< index_t > get_polyhedron_adjacent(
+        std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
         PolyhedronEdgesVertices polyhedron_edges_vertices(

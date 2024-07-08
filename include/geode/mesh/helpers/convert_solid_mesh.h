@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
+#include <optional>
+
 #include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
@@ -42,13 +43,13 @@ namespace geode
 
 namespace geode
 {
-    absl::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
+    std::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid );
 
     std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
         convert_grid_into_tetrahedral_solid( const Grid3D& grid );
 
-    absl::optional< std::unique_ptr< HybridSolid3D > > opengeode_mesh_api
+    std::optional< std::unique_ptr< HybridSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid );
 
     std::unique_ptr< SolidMesh3D > opengeode_mesh_api merge_solid_meshes(

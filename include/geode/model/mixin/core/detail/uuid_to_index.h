@@ -42,14 +42,14 @@ namespace geode
                 return uuid2index_.size();
             }
 
-            absl::optional< index_t > index( const uuid& id ) const
+            std::optional< index_t > index( const uuid& id ) const
             {
                 const auto index = uuid2index_.find( id );
                 if( index != uuid2index_.end() )
                 {
                     return index->second;
                 }
-                return absl::nullopt;
+                return std::nullopt;
             }
 
             void erase( const uuid& id )
