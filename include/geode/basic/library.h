@@ -25,11 +25,10 @@
 
 #include <geode/basic/common.h>
 #include <geode/basic/pimpl.h>
-#include <geode/basic/singleton.h>
 
 namespace geode
 {
-    class opengeode_basic_api Library : public Singleton
+    class opengeode_basic_api Library
     {
     public:
         virtual ~Library();
@@ -55,15 +54,15 @@ namespace geode
     class export_api library_name##Library : public geode::Library             \
     {                                                                          \
     public:                                                                    \
-        static void initialize()                                               \
-        {                                                                      \
-            library_name##Library& library =                                   \
-                Singleton::instance< library_name##Library >();                \
-            library.call_initialize( #library_name );                          \
-        }                                                                      \
+        static inline void initialize();                                       \
                                                                                \
     private:                                                                   \
         void do_initialize() override;                                         \
+    };                                                                         \
+    inline library_name##Library library_name##_library{};                     \
+    void library_name##Library::initialize()                                   \
+    {                                                                          \
+        library_name##_library.call_initialize( #library_name );               \
     }
 
 /*!

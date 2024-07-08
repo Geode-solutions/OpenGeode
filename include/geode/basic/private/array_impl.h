@@ -26,10 +26,6 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 
-#include <geode/geometry/point.h>
-
-#include <geode/mesh/core/private/points_impl.h>
-
 namespace geode
 {
     namespace detail
