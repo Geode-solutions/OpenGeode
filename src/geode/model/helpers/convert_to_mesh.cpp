@@ -437,10 +437,13 @@ namespace geode
                 unique_vertex, new_vertex_index );
         }
         build_polyhedra_from_model( brep, *mesh_builder, brep2mesh );
-        mesh_builder->compute_polyhedron_adjacencies();
-        map_polygons_to_solid_facets( brep, brep2mesh, *mesh );
-        map_line_edges( brep, brep2mesh, *mesh );
-        map_corner_vertices( brep, brep2mesh );
+        if( mesh->nb_polyhedra() != 0 )
+        {
+            mesh_builder->compute_polyhedron_adjacencies();
+            map_polygons_to_solid_facets( brep, brep2mesh, *mesh );
+            map_line_edges( brep, brep2mesh, *mesh );
+            map_corner_vertices( brep, brep2mesh );
+        }
         return std::make_pair( std::move( mesh ), std::move( brep2mesh ) );
     }
 } // namespace geode
