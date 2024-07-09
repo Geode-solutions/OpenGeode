@@ -20,6 +20,7 @@
  * SOFTWARE.
  *
  */
+#include <stack>
 
 #include <geode/mesh/core/solid_mesh.h>
 
