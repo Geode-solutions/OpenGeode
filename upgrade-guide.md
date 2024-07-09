@@ -11,6 +11,8 @@
 
 - **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
 
+- **PolyhedronFacetNormal**: This method now returns an optional of her previous return type 
+
 TODO.....
 
 

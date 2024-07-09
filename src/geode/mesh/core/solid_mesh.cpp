@@ -377,10 +377,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -814,7 +814,7 @@ namespace geode
             return 0;
         }
         double area{ 0 };
-        const auto direction = new_polyhedron_facet_normal( polyhedron_facet )
+        const auto direction = polyhedron_facet_normal( polyhedron_facet )
                                    .value_or( Vector3D{ { 0, 0, 1 } } );
         const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
         const auto& p1 = this->point( vertices[0] );
@@ -828,26 +828,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Vector3D SolidMesh< dimension >::polyhedron_facet_normal(
+    std::optional< Vector3D > SolidMesh< dimension >::polyhedron_facet_normal(
         const PolyhedronFacet& polyhedron_facet ) const
-    {
-        Vector3D normal;
-        const auto facet_vertices =
-            polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p0 = this->point( facet_vertices[0] );
-        for( const auto v : LRange{ 2, facet_vertices.size() } )
-        {
-            const auto& p1 = this->point( facet_vertices[v - 1] );
-            const auto& p2 = this->point( facet_vertices[v] );
-            normal += Vector3D{ p1, p0 }.cross( { p2, p0 } );
-        }
-        return normal.normalize();
-    }
-
-    template < index_t dimension >
-    std::optional< Vector3D >
-        SolidMesh< dimension >::new_polyhedron_facet_normal(
-            const PolyhedronFacet& polyhedron_facet ) const
     {
         check_polyhedron_facet_id(
             *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
@@ -896,7 +878,7 @@ namespace geode
         }
         const auto vertices = polyhedron_vertices( polyhedron_id );
         const auto normal =
-            new_polyhedron_facet_normal( { polyhedron_id, max_area_facet } );
+            polyhedron_facet_normal( { polyhedron_id, max_area_facet } );
         if( !normal )
         {
             return true;

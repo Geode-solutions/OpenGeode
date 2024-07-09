@@ -95,8 +95,6 @@
             "polyhedron_volume", &SolidMesh##dimension##D::polyhedron_volume ) \
         .def( "polyhedron_facet_normal",                                       \
             &SolidMesh##dimension##D::polyhedron_facet_normal )                \
-        .def( "new_polyhedron_facet_normal",                                   \
-            &SolidMesh##dimension##D::new_polyhedron_facet_normal )            \
         .def( "vertices_around_vertex",                                        \
             &SolidMesh##dimension##D::vertices_around_vertex )                 \
         .def( "polyhedron_around_vertex",                                      \
