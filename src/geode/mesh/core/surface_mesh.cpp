@@ -830,7 +830,7 @@ namespace geode
         const auto nb_vertices = nb_polygon_vertices( polygon );
         const local_index_t vertex =
             edge + vertex_id == nb_vertices ? 0 : edge + vertex_id;
-        return polygon_vertex( { polygon, vertex } );
+        return polygon_vertex( PolygonVertex{ polygon, vertex } );
     }
 
     template < index_t dimension >
