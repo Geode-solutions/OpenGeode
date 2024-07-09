@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/solid_mesh.h>
 
+#include <stack>
+
 #include <absl/container/flat_hash_set.h>
 
 #include <bitsery/brief_syntax/array.h>
@@ -377,10 +379,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
