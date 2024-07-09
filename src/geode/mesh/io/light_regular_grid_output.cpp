@@ -63,15 +63,15 @@ namespace geode
         const auto type = absl::StrCat( "LightRegularGrid", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                LightRegularGridOutputFactory< dimension > >(
-                type, light_regular_grid, filename );
+            return detail::geode_object_output_impl(
+                light_regular_grid_output_factory< dimension >(), type,
+                light_regular_grid, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                LightRegularGridOutputFactory< dimension > >( type );
+            print_available_extensions(
+                light_regular_grid_output_factory< dimension >(), type );
             throw OpenGeodeException{ "Cannot save LightRegularGrid in file: ",
                 filename };
         }
@@ -82,8 +82,8 @@ namespace geode
         const LightRegularGrid< dimension >& light_regular_grid,
         absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            LightRegularGridOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            light_regular_grid_output_factory< dimension >(), filename );
         return output->is_saveable( light_regular_grid );
     }
 

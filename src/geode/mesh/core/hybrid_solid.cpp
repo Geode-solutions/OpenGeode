@@ -34,7 +34,7 @@ namespace geode
     std::unique_ptr< HybridSolid< dimension > >
         HybridSolid< dimension >::create()
     {
-        return MeshFactory::create_default_mesh< HybridSolid< dimension > >(
+        return mesh_factory.create_default_mesh< HybridSolid< dimension > >(
             HybridSolid< dimension >::type_name_static() );
     }
 
@@ -42,7 +42,7 @@ namespace geode
     std::unique_ptr< HybridSolid< dimension > >
         HybridSolid< dimension >::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< HybridSolid< dimension > >( impl );
+        return mesh_factory.create_mesh< HybridSolid< dimension > >( impl );
     }
 
     template < index_t dimension >

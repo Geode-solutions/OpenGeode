@@ -53,10 +53,11 @@ namespace geode
     };
 
     template < typename Factory >
-    void print_available_extensions( absl::string_view type )
+    void print_available_extensions(
+        const Factory& factory, absl::string_view type )
     {
         auto message = absl::StrCat( "Available ", type, " extensions:" );
-        for( const auto& extension : Factory::list_creators() )
+        for( const auto& extension : factory.list_creators() )
         {
             absl::StrAppend( &message, " ", extension );
         }

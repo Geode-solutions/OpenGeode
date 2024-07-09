@@ -58,8 +58,9 @@ namespace geode
         {
             auto& mesh = surfaces_.modifiable_surface( id, {} ).modifiable_mesh(
                 typename Surface< dimension >::SurfacesBuilderKey{} );
-            return MeshBuilderFactory::create_mesh_builder<
-                typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
+            return mesh_builder_factory
+                .create_mesh_builder< typename Mesh::Builder >(
+                    dynamic_cast< Mesh& >( mesh ) );
         }
 
         void set_surface_name( const uuid& id, absl::string_view name );

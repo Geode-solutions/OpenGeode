@@ -77,19 +77,20 @@ void verdict( bool is_instantiated, absl::string_view name )
 
 void test()
 {
-    using factory = geode::Factory< std::string, Base, A &, B & >;
-    factory::register_creator< Derived >( "Derived" );
+    using MyFactory = geode::Factory< std::string, Base, A &, B & >;
+    auto factory = MyFactory{};
+    factory.register_creator< Derived >( "Derived" );
 
-    const auto creators = factory::list_creators();
-    factory::register_creator< Derived >( "Derived" );
-    OPENGEODE_EXCEPTION( factory::list_creators().size() == creators.size(),
+    const auto creators = factory.list_creators();
+    factory.register_creator< Derived >( "Derived" );
+    OPENGEODE_EXCEPTION( factory.list_creators().size() == creators.size(),
         "[Test] Key registered twice" );
 
     A a;
     B b;
-    OPENGEODE_EXCEPTION( factory::has_creator( "Derived" ),
+    OPENGEODE_EXCEPTION( factory.has_creator( "Derived" ),
         "[Test] Key has not been registered" );
-    const auto d = factory::create( "Derived", a, b );
+    const auto d = factory.create( "Derived", a, b );
     verdict( d != nullptr, "Derived" );
 }
 

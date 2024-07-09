@@ -88,5 +88,5 @@ namespace geode
     using TetrahedralSolidInputFactory = Factory< std::string,
         TetrahedralSolidInput< dimension >,
         absl::string_view >;
-    ALIAS_3D( TetrahedralSolidInputFactory );
+    FACTORY_3D( TetrahedralSolidInputFactory, tetrahedral_solid_input_factory );
 } // namespace geode

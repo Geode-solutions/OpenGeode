@@ -75,7 +75,7 @@ geode::Section build_section()
 
     {
         const auto& surface_id =
-            builder.add_surface( geode::MeshFactory::default_impl(
+            builder.add_surface( geode::mesh_factory.default_impl(
                 geode::TriangulatedSurface2D::type_name_static() ) );
         auto surface_builder =
             builder.surface_mesh_builder< geode::TriangulatedSurface2D >(
@@ -102,7 +102,7 @@ geode::Section build_section()
 
     {
         const auto& surface_id =
-            builder.add_surface( geode::MeshFactory::default_impl(
+            builder.add_surface( geode::mesh_factory.default_impl(
                 geode::TriangulatedSurface2D::type_name_static() ) );
         auto surface_builder =
             builder.surface_mesh_builder< geode::TriangulatedSurface2D >(

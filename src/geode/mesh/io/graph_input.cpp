@@ -41,8 +41,8 @@ namespace geode
         constexpr auto TYPE = "Graph";
         try
         {
-            auto graph = detail::geode_object_input_impl< GraphInputFactory >(
-                TYPE, filename, impl );
+            auto graph = detail::geode_object_input_impl(
+                graph_input_factory, TYPE, filename, impl );
             Logger::info( TYPE, " has: ", graph->nb_vertices(), " vertices, ",
                 graph->nb_edges(), " edges" );
             return graph;
@@ -50,9 +50,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< GraphInputFactory >( TYPE );
+            print_available_extensions( graph_input_factory, TYPE );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot load Graph from file: ",
                 filename };
         }
@@ -61,21 +61,21 @@ namespace geode
     std::unique_ptr< Graph > load_graph( absl::string_view filename )
     {
         return load_graph(
-            MeshFactory::default_impl( Graph::type_name_static() ), filename );
+            mesh_factory.default_impl( Graph::type_name_static() ), filename );
     }
 
     typename GraphInput::MissingFiles check_graph_missing_files(
         absl::string_view filename )
     {
         const auto input =
-            detail::geode_object_input_reader< GraphInputFactory >( filename );
+            detail::geode_object_input_reader( graph_input_factory, filename );
         return input->check_missing_files();
     }
 
     bool is_graph_loadable( absl::string_view filename )
     {
         const auto input =
-            detail::geode_object_input_reader< GraphInputFactory >( filename );
+            detail::geode_object_input_reader( graph_input_factory, filename );
         return input->is_loadable();
     }
 } // namespace geode

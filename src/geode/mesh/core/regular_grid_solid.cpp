@@ -32,14 +32,14 @@ namespace geode
 {
     std::unique_ptr< RegularGrid< 3 > > RegularGrid< 3 >::create()
     {
-        return MeshFactory::create_default_mesh< RegularGrid< 3 > >(
+        return mesh_factory.create_default_mesh< RegularGrid< 3 > >(
             RegularGrid< 3 >::type_name_static() );
     }
 
     std::unique_ptr< RegularGrid< 3 > > RegularGrid< 3 >::create(
         const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< RegularGrid< 3 > >( impl );
+        return mesh_factory.create_mesh< RegularGrid< 3 > >( impl );
     }
 
     MeshType RegularGrid< 3 >::type_name_static()

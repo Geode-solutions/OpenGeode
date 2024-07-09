@@ -45,8 +45,8 @@ namespace geode
         PolyhedralSolidBuilder< dimension >::create(
             PolyhedralSolid< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            PolyhedralSolidBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< PolyhedralSolidBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

@@ -53,12 +53,12 @@ void test()
 {
     geode::MeshImpl impl{ "impl" };
     geode::MeshType type{ "type" };
-    geode::MeshFactory::register_mesh< MeshTest >( type, impl );
+    geode::mesh_factory.register_mesh< MeshTest >( type, impl );
 
     OPENGEODE_EXCEPTION(
-        geode::MeshFactory::type( impl ) == type, "Wrong type" );
+        geode::mesh_factory.type( impl ) == type, "Wrong type" );
 
-    geode::MeshFactory::create_mesh< MeshTest >( impl );
+    geode::mesh_factory.create_mesh< MeshTest >( impl );
 }
 
 OPENGEODE_TEST( "mesh-factory" )

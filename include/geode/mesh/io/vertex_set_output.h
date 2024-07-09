@@ -63,4 +63,5 @@ namespace geode
 
     using VertexSetOutputFactory =
         Factory< std::string, VertexSetOutput, absl::string_view >;
+    inline VertexSetOutputFactory vertex_set_output_factory{};
 } // namespace geode

@@ -37,8 +37,8 @@ namespace geode
         try
         {
             const auto type = absl::StrCat( "RasterImage", dimension, "D" );
-            auto raster = detail::geode_object_input_impl<
-                RasterImageInputFactory< dimension > >( type, filename );
+            auto raster = detail::geode_object_input_impl(
+                raster_image_input_factory< dimension >(), type, filename );
             Logger::info( type, " has: ", raster.nb_cells(), " cells" );
             return raster;
         }
@@ -54,16 +54,16 @@ namespace geode
     typename RasterImageInput< dimension >::MissingFiles
         check_raster_image_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            RasterImageInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            raster_image_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_raster_image_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            RasterImageInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            raster_image_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

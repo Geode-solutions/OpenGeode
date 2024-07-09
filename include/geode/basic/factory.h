@@ -36,7 +36,6 @@
 
 #include <geode/basic/common.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/singleton.h>
 
 namespace geode
 {
@@ -45,40 +44,40 @@ namespace geode
      * Example of use with A the base class and B, C derived classes
      *      // Instantiation
      *      using MyFactory = Factory< std::string, A, int, double >;
+     *      inline MyFactory my_factory{};
      *      // where: - std::string is the Key type
      *      //        - int and double are the constructor arguments required by
      *      //        the derived classes B and C
      *
      *      // Registration
-     *      MyFactory::register_creator< B >( "key_value_for_B" );
-     *      MyFactory::register_creator< C >( "key_value_for_C" );
+     *      my_factory.register_creator< B >( "key_value_for_B" );
+     *      my_factory.register_creator< C >( "key_value_for_C" );
      *      // B and C constructors take an int and a double
      *
      *      // Creation
-     *      auto c = MyFactory::create( "key_value_for_C", 2, 8.6 );
+     *      auto c = my_factory.create( "key_value_for_C", 2, 8.6 );
      *      // where c is a std::unique_ptr< A >
      */
     template < typename Key, typename BaseClassType, typename... Args >
-    class Factory : public Singleton
+    class Factory
     {
     public:
         using BaseClass = BaseClassType;
         using Creator = typename std::add_pointer< std::unique_ptr< BaseClass >(
             Args... ) >::type;
-        using FactoryStore = absl::flat_hash_map< Key, Creator >;
         static_assert( std::has_virtual_destructor< BaseClass >::value,
             "BaseClass must have a virtual destructor" );
 
+    public:
         template < typename DerivedClass >
-        static inline void register_creator( Key key )
+        inline void register_creator( Key key )
         {
             static_assert( std::is_base_of< BaseClass, DerivedClass >::value,
                 "DerivedClass is not a subclass of BaseClass" );
             static_assert(
                 std::is_constructible< DerivedClass, Args... >::value,
                 "DerivedClass is not constructible with Args..." );
-            auto &store = get_store();
-            if( !store
+            if( !store_
                      .emplace( std::move( key ),
                          Creator( create_function_impl< DerivedClass > ) )
                      .second )
@@ -88,33 +87,30 @@ namespace geode
             }
         }
 
-        static inline std::unique_ptr< BaseClass > create(
-            const Key &key, Args... args )
+        inline std::unique_ptr< BaseClass > create(
+            const Key& key, Args... args ) const
         {
-            const auto &store = get_store();
-            const auto creator = store.find( key );
-            OPENGEODE_EXCEPTION( creator != store.end(),
+            const auto creator = store_.find( key );
+            OPENGEODE_EXCEPTION( creator != store_.end(),
                 "[Factory::create] Factory does not "
                 "contain the requested key" );
             return creator->second( std::forward< Args >( args )... );
         }
 
-        static inline absl::FixedArray< Key > list_creators()
+        inline absl::FixedArray< Key > list_creators() const
         {
-            const auto &store = get_store();
-            absl::FixedArray< Key > creators( store.size() );
+            absl::FixedArray< Key > creators( store_.size() );
             index_t count{ 0 };
-            for( const auto &creator : store )
+            for( const auto& creator : store_ )
             {
                 creators[count++] = creator.first;
             }
             return creators;
         }
 
-        static inline bool has_creator( const Key &key )
+        inline bool has_creator( const Key& key ) const
         {
-            const auto &store = get_store();
-            return store.find( key ) != store.end();
+            return store_.find( key ) != store_.end();
         }
 
     private:
@@ -126,12 +122,33 @@ namespace geode
                 std::forward< Args >( args )... } };
         }
 
-        static inline FactoryStore &get_store()
-        {
-            return Singleton::instance< Factory >().store_;
-        }
-
     private:
-        FactoryStore store_;
+        absl::flat_hash_map< Key, Creator > store_;
     };
 } // namespace geode
+
+#define FACTORY( Type, Name )                                                  \
+    template < geode::index_t dimension >                                      \
+    constexpr const Type< dimension >& Name()
+
+#define FACTORY_2D( Type, Name )                                               \
+    FACTORY( Type, Name );                                                     \
+    inline Type< 2 > Name##_2d{};                                              \
+    template <>                                                                \
+    constexpr const Type< 2 >& Name< 2 >()                                     \
+    {                                                                          \
+        return Name##_2d;                                                      \
+    }
+
+#define FACTORY_3D( Type, Name )                                               \
+    FACTORY( Type, Name );                                                     \
+    inline Type< 3 > Name##_3d{};                                              \
+    template <>                                                                \
+    constexpr const Type< 3 >& Name< 3 >()                                     \
+    {                                                                          \
+        return Name##_3d;                                                      \
+    }
+
+#define FACTORY_2D_AND_3D( Type, Name )                                        \
+    FACTORY_2D( Type, Name );                                                  \
+    FACTORY_3D( Type, Name )

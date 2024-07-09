@@ -83,7 +83,7 @@ namespace geode
 
     std::unique_ptr< GraphBuilder > GraphBuilder::create( Graph& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder< GraphBuilder >( mesh );
+        return mesh_builder_factory.create_mesh_builder< GraphBuilder >( mesh );
     }
 
     void GraphBuilder::set_edge_vertex(

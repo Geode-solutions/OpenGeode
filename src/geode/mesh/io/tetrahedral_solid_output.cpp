@@ -46,17 +46,18 @@ namespace geode
         const auto type = absl::StrCat( "TetrahedralSolid", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                TetrahedralSolidOutputFactory< dimension > >(
-                type, tetrahedral_solid, filename );
+            return detail::geode_object_output_impl(
+                tetrahedral_solid_output_factory< dimension >(), type,
+                tetrahedral_solid, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                TetrahedralSolidOutputFactory< dimension > >( type );
+            print_available_extensions(
+                tetrahedral_solid_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save TetrahedralSolid in file: ",
                 filename };
         }
@@ -67,8 +68,8 @@ namespace geode
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            TetrahedralSolidOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            tetrahedral_solid_output_factory< dimension >(), filename );
         return output->is_saveable( tetrahedral_solid );
     }
 

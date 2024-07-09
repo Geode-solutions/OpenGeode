@@ -62,4 +62,5 @@ namespace geode
 
     using GraphOutputFactory =
         Factory< std::string, GraphOutput, absl::string_view >;
+    inline GraphOutputFactory graph_output_factory{};
 } // namespace geode

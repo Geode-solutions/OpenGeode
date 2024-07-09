@@ -155,16 +155,16 @@ namespace geode
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create()
     {
-        return MeshFactory::create_default_mesh<
-            TetrahedralSolid< dimension > >(
-            TetrahedralSolid< dimension >::type_name_static() );
+        return mesh_factory
+            .create_default_mesh< TetrahedralSolid< dimension > >(
+                TetrahedralSolid< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< TetrahedralSolid< dimension > >(
+        return mesh_factory.create_mesh< TetrahedralSolid< dimension > >(
             impl );
     }
 

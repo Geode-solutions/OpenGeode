@@ -40,57 +40,57 @@ namespace geode
 {
     void register_geode_mesh()
     {
-        MeshFactory::register_default_mesh< OpenGeodeVertexSet >(
+        mesh_factory.register_default_mesh< OpenGeodeVertexSet >(
             VertexSet::type_name_static(),
             OpenGeodeVertexSet::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodeGraph >(
+        mesh_factory.register_default_mesh< OpenGeodeGraph >(
             Graph::type_name_static(), OpenGeodeGraph::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodePointSet2D >(
+        mesh_factory.register_default_mesh< OpenGeodePointSet2D >(
             PointSet2D::type_name_static(),
             OpenGeodePointSet2D::impl_name_static() );
-        MeshFactory::register_default_mesh< OpenGeodePointSet3D >(
+        mesh_factory.register_default_mesh< OpenGeodePointSet3D >(
             PointSet3D::type_name_static(),
             OpenGeodePointSet3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodeEdgedCurve2D >(
+        mesh_factory.register_default_mesh< OpenGeodeEdgedCurve2D >(
             EdgedCurve2D::type_name_static(),
             OpenGeodeEdgedCurve2D::impl_name_static() );
-        MeshFactory::register_default_mesh< OpenGeodeEdgedCurve3D >(
+        mesh_factory.register_default_mesh< OpenGeodeEdgedCurve3D >(
             EdgedCurve3D::type_name_static(),
             OpenGeodeEdgedCurve3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodePolygonalSurface2D >(
+        mesh_factory.register_default_mesh< OpenGeodePolygonalSurface2D >(
             PolygonalSurface2D::type_name_static(),
             OpenGeodePolygonalSurface2D::impl_name_static() );
-        MeshFactory::register_default_mesh< OpenGeodePolygonalSurface3D >(
+        mesh_factory.register_default_mesh< OpenGeodePolygonalSurface3D >(
             PolygonalSurface3D::type_name_static(),
             OpenGeodePolygonalSurface3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodeTriangulatedSurface2D >(
+        mesh_factory.register_default_mesh< OpenGeodeTriangulatedSurface2D >(
             TriangulatedSurface2D::type_name_static(),
             OpenGeodeTriangulatedSurface2D::impl_name_static() );
-        MeshFactory::register_default_mesh< OpenGeodeTriangulatedSurface3D >(
+        mesh_factory.register_default_mesh< OpenGeodeTriangulatedSurface3D >(
             TriangulatedSurface3D::type_name_static(),
             OpenGeodeTriangulatedSurface3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodePolyhedralSolid3D >(
+        mesh_factory.register_default_mesh< OpenGeodePolyhedralSolid3D >(
             PolyhedralSolid3D::type_name_static(),
             OpenGeodePolyhedralSolid3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodeTetrahedralSolid3D >(
+        mesh_factory.register_default_mesh< OpenGeodeTetrahedralSolid3D >(
             TetrahedralSolid3D::type_name_static(),
             OpenGeodeTetrahedralSolid3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodeHybridSolid3D >(
+        mesh_factory.register_default_mesh< OpenGeodeHybridSolid3D >(
             HybridSolid3D::type_name_static(),
             OpenGeodeHybridSolid3D::impl_name_static() );
 
-        MeshFactory::register_default_mesh< OpenGeodeRegularGrid2D >(
+        mesh_factory.register_default_mesh< OpenGeodeRegularGrid2D >(
             RegularGrid2D::type_name_static(),
             OpenGeodeRegularGrid2D::impl_name_static() );
-        MeshFactory::register_default_mesh< OpenGeodeRegularGrid3D >(
+        mesh_factory.register_default_mesh< OpenGeodeRegularGrid3D >(
             RegularGrid3D::type_name_static(),
             OpenGeodeRegularGrid3D::impl_name_static() );
     }

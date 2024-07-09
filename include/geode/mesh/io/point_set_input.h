@@ -82,5 +82,5 @@ namespace geode
     template < index_t dimension >
     using PointSetInputFactory =
         Factory< std::string, PointSetInput< dimension >, absl::string_view >;
-    ALIAS_2D_AND_3D( PointSetInputFactory );
+    FACTORY_2D_AND_3D( PointSetInputFactory, point_set_input_factory );
 } // namespace geode

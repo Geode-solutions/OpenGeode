@@ -64,4 +64,5 @@ namespace geode
 
     using SectionInputFactory =
         Factory< std::string, SectionInput, absl::string_view >;
+    inline SectionInputFactory section_input_factory{};
 } // namespace geode

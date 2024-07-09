@@ -46,13 +46,13 @@ namespace geode
     {
     public:
         template < typename MeshBuilder >
-        static void register_mesh_builder( MeshImpl key )
+        void register_mesh_builder( MeshImpl key )
         {
             register_creator< MeshBuilder >( std::move( key ) );
         }
 
         template < typename MeshBuilder, typename Mesh >
-        static std::unique_ptr< MeshBuilder > create_mesh_builder( Mesh& mesh )
+        std::unique_ptr< MeshBuilder > create_mesh_builder( Mesh& mesh )
         {
             auto* builder = dynamic_cast< MeshBuilder* >(
                 create( mesh.impl_name(), mesh, {} ).release() );
@@ -62,4 +62,5 @@ namespace geode
             return std::unique_ptr< MeshBuilder >{ builder };
         }
     };
+    inline MeshBuilderFactory mesh_builder_factory{};
 } // namespace geode

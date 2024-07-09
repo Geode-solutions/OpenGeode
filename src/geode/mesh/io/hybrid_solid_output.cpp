@@ -46,17 +46,18 @@ namespace geode
         const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                HybridSolidOutputFactory< dimension > >(
-                type, hybrid_solid, filename );
+            return detail::geode_object_output_impl(
+                hybrid_solid_output_factory< dimension >(), type, hybrid_solid,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< HybridSolidOutputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                hybrid_solid_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save HybridSolid in file: ",
                 filename };
         }
@@ -66,8 +67,8 @@ namespace geode
     bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
         absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            HybridSolidOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            hybrid_solid_output_factory< dimension >(), filename );
         return output->is_saveable( hybrid_solid );
     }
 

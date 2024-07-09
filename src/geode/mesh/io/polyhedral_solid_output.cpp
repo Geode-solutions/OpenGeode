@@ -46,17 +46,18 @@ namespace geode
         const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                PolyhedralSolidOutputFactory< dimension > >(
-                type, polyhedral_solid, filename );
+            return detail::geode_object_output_impl(
+                polyhedral_solid_output_factory< dimension >(), type,
+                polyhedral_solid, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                PolyhedralSolidOutputFactory< dimension > >( type );
+            print_available_extensions(
+                polyhedral_solid_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save PolyhedralSolid in file: ",
                 filename };
         }
@@ -67,8 +68,8 @@ namespace geode
         const PolyhedralSolid< dimension >& polyhedral_solid,
         absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            PolyhedralSolidOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            polyhedral_solid_output_factory< dimension >(), filename );
         return output->is_saveable( polyhedral_solid );
     }
 

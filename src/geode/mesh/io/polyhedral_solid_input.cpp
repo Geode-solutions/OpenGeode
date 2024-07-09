@@ -43,9 +43,9 @@ namespace geode
         const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
         try
         {
-            auto polyhedral_solid = detail::geode_object_input_impl<
-                PolyhedralSolidInputFactory< dimension > >(
-                type, filename, impl );
+            auto polyhedral_solid = detail::geode_object_input_impl(
+                polyhedral_solid_input_factory< dimension >(), type, filename,
+                impl );
             Logger::info( type, " has: ", polyhedral_solid->nb_vertices(),
                 " vertices, ", polyhedral_solid->nb_polyhedra(), " polyhedra" );
             return polyhedral_solid;
@@ -53,10 +53,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                PolyhedralSolidInputFactory< dimension > >( type );
+            print_available_extensions(
+                polyhedral_solid_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot load PolyhedralSolid from file: ",
                 filename };
         }
@@ -67,7 +67,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_polyhedral_solid< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 PolyhedralSolid< dimension >::type_name_static() ),
             filename );
     }
@@ -76,16 +76,16 @@ namespace geode
     typename PolyhedralSolidInput< dimension >::MissingFiles
         check_polyhedral_solid_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PolyhedralSolidInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            polyhedral_solid_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_polyhedral_solid_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PolyhedralSolidInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            polyhedral_solid_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

@@ -53,7 +53,7 @@ namespace geode
                     return Mesh::create();
                 }
             }
-            return Mesh::create( geode::MeshFactory::default_impl( type ) );
+            return Mesh::create( geode::mesh_factory.default_impl( type ) );
         }
 
         template std::unique_ptr< PointSet2D > opengeode_mesh_api create_mesh(

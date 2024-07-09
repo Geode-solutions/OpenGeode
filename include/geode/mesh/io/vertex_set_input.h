@@ -76,4 +76,5 @@ namespace geode
 
     using VertexSetInputFactory =
         Factory< std::string, VertexSetInput, absl::string_view >;
+    inline VertexSetInputFactory vertex_set_input_factory{};
 } // namespace geode

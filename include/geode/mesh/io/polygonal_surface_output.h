@@ -72,5 +72,6 @@ namespace geode
     using PolygonalSurfaceOutputFactory = Factory< std::string,
         PolygonalSurfaceOutput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( PolygonalSurfaceOutputFactory );
+    FACTORY_2D_AND_3D(
+        PolygonalSurfaceOutputFactory, polygonal_surface_output_factory );
 } // namespace geode

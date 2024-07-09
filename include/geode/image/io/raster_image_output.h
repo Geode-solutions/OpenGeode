@@ -68,5 +68,5 @@ namespace geode
     using RasterImageOutputFactory = Factory< std::string,
         RasterImageOutput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( RasterImageOutputFactory );
+    FACTORY_2D_AND_3D( RasterImageOutputFactory, raster_image_output_factory );
 } // namespace geode

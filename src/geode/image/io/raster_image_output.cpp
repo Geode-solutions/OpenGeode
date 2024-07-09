@@ -42,15 +42,15 @@ namespace geode
         const auto type = absl::StrCat( "RasterImage", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                RasterImageOutputFactory< dimension > >(
-                type, raster, filename );
+            return detail::geode_object_output_impl(
+                raster_image_output_factory< dimension >(), type, raster,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< RasterImageOutputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                raster_image_output_factory< dimension >(), type );
             throw OpenGeodeException{ "Cannot save RasterImage in file: ",
                 filename };
         }
@@ -60,8 +60,8 @@ namespace geode
     bool is_raster_image_saveable(
         const RasterImage< dimension >& raster, absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            RasterImageOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            raster_image_output_factory< dimension >(), filename );
         return output->is_saveable( raster );
     }
 

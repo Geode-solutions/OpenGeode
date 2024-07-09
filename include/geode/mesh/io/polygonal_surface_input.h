@@ -86,5 +86,6 @@ namespace geode
     using PolygonalSurfaceInputFactory = Factory< std::string,
         PolygonalSurfaceInput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( PolygonalSurfaceInputFactory );
+    FACTORY_2D_AND_3D(
+        PolygonalSurfaceInputFactory, polygonal_surface_input_factory );
 } // namespace geode

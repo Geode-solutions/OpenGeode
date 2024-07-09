@@ -377,10 +377,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -657,7 +657,7 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< SolidMesh< dimension > > SolidMesh< dimension >::create()
     {
-        return MeshFactory::create_default_mesh< SolidMesh< dimension > >(
+        return mesh_factory.create_default_mesh< SolidMesh< dimension > >(
             PolyhedralSolid< dimension >::type_name_static() );
     }
 
@@ -665,7 +665,7 @@ namespace geode
     std::unique_ptr< SolidMesh< dimension > > SolidMesh< dimension >::create(
         const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< SolidMesh< dimension > >( impl );
+        return mesh_factory.create_mesh< SolidMesh< dimension > >( impl );
     }
 
     template < index_t dimension >

@@ -76,5 +76,6 @@ namespace geode
     using LightRegularGridOutputFactory = Factory< std::string,
         LightRegularGridOutput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( LightRegularGridOutputFactory );
+    FACTORY_2D_AND_3D(
+        LightRegularGridOutputFactory, light_regular_grid_output_factory );
 } // namespace geode

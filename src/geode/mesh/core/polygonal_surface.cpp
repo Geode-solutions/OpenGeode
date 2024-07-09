@@ -32,16 +32,16 @@ namespace geode
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create()
     {
-        return MeshFactory::create_default_mesh<
-            PolygonalSurface< dimension > >(
-            PolygonalSurface< dimension >::type_name_static() );
+        return mesh_factory
+            .create_default_mesh< PolygonalSurface< dimension > >(
+                PolygonalSurface< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< PolygonalSurface< dimension > >(
+        return mesh_factory.create_mesh< PolygonalSurface< dimension > >(
             impl );
     }
 

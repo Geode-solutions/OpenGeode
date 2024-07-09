@@ -326,7 +326,7 @@ add_geode_library(
         Bitsery::bitsery
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::image
     PRIVATE_DEPENDENCIES
         Async++
-        ${PROJECT_NAME}::image
 )

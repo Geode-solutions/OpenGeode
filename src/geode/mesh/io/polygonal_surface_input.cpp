@@ -43,9 +43,9 @@ namespace geode
         const auto type = absl::StrCat( "PolygonalSurface", dimension, "D" );
         try
         {
-            auto polygonal_surface = detail::geode_object_input_impl<
-                PolygonalSurfaceInputFactory< dimension > >(
-                type, filename, impl );
+            auto polygonal_surface = detail::geode_object_input_impl(
+                polygonal_surface_input_factory< dimension >(), type, filename,
+                impl );
             Logger::info( type, " has: ", polygonal_surface->nb_vertices(),
                 " vertices, ", polygonal_surface->nb_polygons(), " polygons" );
             return polygonal_surface;
@@ -53,10 +53,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                PolygonalSurfaceInputFactory< dimension > >( type );
+            print_available_extensions(
+                polygonal_surface_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{
                 "Cannot load PolygonalSurface from file: ", filename
             };
@@ -68,7 +68,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_polygonal_surface< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 PolygonalSurface< dimension >::type_name_static() ),
             filename );
     }
@@ -77,16 +77,16 @@ namespace geode
     typename PolygonalSurfaceInput< dimension >::MissingFiles
         check_polygonal_surface_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PolygonalSurfaceInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            polygonal_surface_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_polygonal_surface_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PolygonalSurfaceInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            polygonal_surface_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

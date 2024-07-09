@@ -42,8 +42,8 @@ namespace geode
     std::unique_ptr< PointSetBuilder< dimension > >
         PointSetBuilder< dimension >::create( PointSet< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            PointSetBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< PointSetBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

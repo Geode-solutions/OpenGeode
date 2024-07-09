@@ -69,5 +69,5 @@ namespace geode
     using EdgedCurveOutputFactory = Factory< std::string,
         EdgedCurveOutput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( EdgedCurveOutputFactory );
+    FACTORY_2D_AND_3D( EdgedCurveOutputFactory, edged_curve_output_factory );
 } // namespace geode

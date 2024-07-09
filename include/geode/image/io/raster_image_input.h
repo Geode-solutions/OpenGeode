@@ -69,5 +69,5 @@ namespace geode
     using RasterImageInputFactory = Factory< std::string,
         RasterImageInput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( RasterImageInputFactory );
+    FACTORY_2D_AND_3D( RasterImageInputFactory, raster_image_input_factory );
 } // namespace geode

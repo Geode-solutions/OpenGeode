@@ -42,8 +42,8 @@ namespace geode
     std::unique_ptr< RegularGridBuilder< 3 > > RegularGridBuilder< 3 >::create(
         RegularGrid3D& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            RegularGridBuilder< 3 > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< RegularGridBuilder< 3 > >( mesh );
     }
 
     void RegularGridBuilder< 3 >::initialize_grid( const Point3D& origin,

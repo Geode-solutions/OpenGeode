@@ -35,29 +35,29 @@ namespace
 {
     void register_brep_input()
     {
-        geode::BRepInputFactory::register_creator< geode::OpenGeodeBRepInput >(
+        geode::brep_input_factory.register_creator< geode::OpenGeodeBRepInput >(
             geode::OpenGeodeBRepOutput::extension().data() );
     }
 
     void register_section_input()
     {
-        geode::SectionInputFactory::register_creator<
-            geode::OpenGeodeSectionInput >(
-            geode::OpenGeodeSectionOutput::extension().data() );
+        geode::section_input_factory
+            .register_creator< geode::OpenGeodeSectionInput >(
+                geode::OpenGeodeSectionOutput::extension().data() );
     }
 
     void register_brep_output()
     {
-        geode::BRepOutputFactory::register_creator<
-            geode::OpenGeodeBRepOutput >(
-            geode::OpenGeodeBRepOutput::extension().data() );
+        geode::brep_output_factory
+            .register_creator< geode::OpenGeodeBRepOutput >(
+                geode::OpenGeodeBRepOutput::extension().data() );
     }
 
     void register_section_output()
     {
-        geode::SectionOutputFactory::register_creator<
-            geode::OpenGeodeSectionOutput >(
-            geode::OpenGeodeSectionOutput::extension().data() );
+        geode::section_output_factory
+            .register_creator< geode::OpenGeodeSectionOutput >(
+                geode::OpenGeodeSectionOutput::extension().data() );
     }
 } // namespace
 

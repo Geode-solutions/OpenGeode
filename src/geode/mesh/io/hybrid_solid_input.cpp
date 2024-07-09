@@ -43,8 +43,9 @@ namespace geode
         const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
         {
-            auto hybrid_solid = detail::geode_object_input_impl<
-                HybridSolidInputFactory< dimension > >( type, filename, impl );
+            auto hybrid_solid = detail::geode_object_input_impl(
+                hybrid_solid_input_factory< dimension >(), type, filename,
+                impl );
             Logger::info( type, " has: ", hybrid_solid->nb_vertices(),
                 " vertices, ", hybrid_solid->nb_polyhedra(), " polyhedra" );
             return hybrid_solid;
@@ -52,10 +53,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< HybridSolidInputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                hybrid_solid_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot load HybridSolid from file: ",
                 filename };
         }
@@ -66,7 +67,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_hybrid_solid< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 HybridSolid< dimension >::type_name_static() ),
             filename );
     }
@@ -75,16 +76,16 @@ namespace geode
     typename HybridSolidInput< dimension >::MissingFiles
         check_hybrid_solid_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            HybridSolidInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            hybrid_solid_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_hybrid_solid_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            HybridSolidInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            hybrid_solid_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

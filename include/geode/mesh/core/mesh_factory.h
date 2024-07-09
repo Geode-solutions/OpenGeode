@@ -35,11 +35,14 @@ namespace geode
     class opengeode_mesh_api MeshFactory : public Factory< MeshImpl, VertexSet >
     {
     public:
+        MeshFactory();
+        ~MeshFactory();
+
         /*!
          * Register a mesh implementation to a given mesh type
          */
         template < typename Mesh >
-        static void register_mesh( MeshType type, MeshImpl key )
+        void register_mesh( MeshType type, MeshImpl key )
         {
             register_type( std::move( type ), key );
             register_creator< Mesh >( std::move( key ) );
@@ -51,18 +54,18 @@ namespace geode
          * required.
          */
         template < typename Mesh >
-        static void register_default_mesh( MeshType type, MeshImpl key )
+        void register_default_mesh( MeshType type, MeshImpl key )
         {
             register_mesh< Mesh >( type, key );
             register_default( type, key );
         }
 
-        static const MeshType& type( const MeshImpl& key );
+        const MeshType& type( const MeshImpl& key );
 
-        static const MeshImpl& default_impl( const MeshType& type );
+        const MeshImpl& default_impl( const MeshType& type );
 
         template < typename Mesh >
-        static std::unique_ptr< Mesh > create_mesh( const MeshImpl& key )
+        std::unique_ptr< Mesh > create_mesh( const MeshImpl& key )
         {
             auto* mesh = dynamic_cast< Mesh* >( create( key ).release() );
             OPENGEODE_EXCEPTION(
@@ -71,23 +74,18 @@ namespace geode
         }
 
         template < typename Mesh >
-        static std::unique_ptr< Mesh > create_default_mesh(
-            const MeshType& type )
+        std::unique_ptr< Mesh > create_default_mesh( const MeshType& type )
         {
             return create_mesh< Mesh >( default_impl( type ) );
         }
 
     private:
-        MeshFactory();
-        ~MeshFactory();
+        void register_type( MeshType type, MeshImpl key );
 
-        static MeshFactory& instance();
-
-        static void register_type( MeshType type, MeshImpl key );
-
-        static void register_default( MeshType type, MeshImpl key );
+        void register_default( MeshType type, MeshImpl key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
+    inline MeshFactory mesh_factory{};
 } // namespace geode

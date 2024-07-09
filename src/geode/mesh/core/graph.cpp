@@ -45,10 +45,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -150,13 +150,13 @@ namespace geode
 
     std::unique_ptr< Graph > Graph::create()
     {
-        return MeshFactory::create_default_mesh< Graph >(
+        return mesh_factory.create_default_mesh< Graph >(
             Graph::type_name_static() );
     }
 
     std::unique_ptr< Graph > Graph::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< Graph >( impl );
+        return mesh_factory.create_mesh< Graph >( impl );
     }
 
     MeshType Graph::type_name_static()

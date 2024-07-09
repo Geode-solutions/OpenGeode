@@ -42,25 +42,27 @@ namespace geode
     {
         template < typename Factory >
         std::unique_ptr< typename Factory::BaseClass >
-            geode_object_output_writer( absl::string_view& filename )
+            geode_object_output_writer(
+                const Factory& factory, absl::string_view& filename )
         {
             filename = absl::StripAsciiWhitespace( filename );
             const auto extension =
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
+            OPENGEODE_EXCEPTION( factory.has_creator( extension ),
                 "Unknown extension: ", extension );
-            return Factory::create(
+            return factory.create(
                 extension, expand_predefined_folders( filename ) );
         }
 
         template < typename Factory, typename Object >
         std::vector< std::string > geode_object_output_impl(
+            const Factory& factory,
             absl::string_view type,
             const Object& object,
             absl::string_view filename )
         {
             const Timer timer;
-            auto output = geode_object_output_writer< Factory >( filename );
+            auto output = geode_object_output_writer( factory, filename );
             ghc::filesystem::create_directories(
                 filepath_without_filename( filename ) );
             auto result = output->write( object );

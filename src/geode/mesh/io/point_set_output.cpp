@@ -45,17 +45,18 @@ namespace geode
         const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                PointSetOutputFactory< dimension > >(
-                type, point_set, filename );
+            return detail::geode_object_output_impl(
+                point_set_output_factory< dimension >(), type, point_set,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< PointSetOutputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                point_set_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save PointSet in file: ",
                 filename };
         }
@@ -65,8 +66,8 @@ namespace geode
     bool is_point_set_saveable(
         const PointSet< dimension >& point_set, absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            PointSetOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            point_set_output_factory< dimension >(), filename );
         return output->is_saveable( point_set );
     }
 

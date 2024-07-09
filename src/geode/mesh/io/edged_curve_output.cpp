@@ -45,17 +45,18 @@ namespace geode
         const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                EdgedCurveOutputFactory< dimension > >(
-                type, edged_curve, filename );
+            return detail::geode_object_output_impl(
+                edged_curve_output_factory< dimension >(), type, edged_curve,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< EdgedCurveOutputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                edged_curve_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save EdgedCurve in file: ",
                 filename };
         }
@@ -65,8 +66,8 @@ namespace geode
     bool is_edged_curve_saveable(
         const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            EdgedCurveOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            edged_curve_output_factory< dimension >(), filename );
         return output->is_saveable( edged_curve );
     }
 

@@ -58,8 +58,9 @@ namespace geode
         {
             auto& mesh = blocks_.modifiable_block( id, {} ).modifiable_mesh(
                 typename Block< dimension >::BlocksBuilderKey{} );
-            return MeshBuilderFactory::create_mesh_builder<
-                typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
+            return mesh_builder_factory
+                .create_mesh_builder< typename Mesh::Builder >(
+                    dynamic_cast< Mesh& >( mesh ) );
         }
 
         void set_block_name( const uuid& id, absl::string_view name );

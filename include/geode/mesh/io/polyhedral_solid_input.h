@@ -86,5 +86,5 @@ namespace geode
     using PolyhedralSolidInputFactory = Factory< std::string,
         PolyhedralSolidInput< dimension >,
         absl::string_view >;
-    ALIAS_3D( PolyhedralSolidInputFactory );
+    FACTORY_3D( PolyhedralSolidInputFactory, polyhedral_solid_input_factory );
 } // namespace geode

@@ -322,8 +322,8 @@ namespace geode
         SurfaceMeshBuilder< dimension >::create(
             SurfaceMesh< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            SurfaceMeshBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< SurfaceMeshBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

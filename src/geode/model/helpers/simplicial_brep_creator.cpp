@@ -41,7 +41,7 @@ namespace geode
     public:
         Impl( BRep& brep, std::vector< Point3D > unique_points )
             : detail::SimplicialModelCreator< BRep >(
-                brep, std::move( unique_points ) )
+                  brep, std::move( unique_points ) )
         {
         }
 
@@ -53,7 +53,7 @@ namespace geode
             for( const auto& definition : definitions )
             {
                 const auto& block_id =
-                    builder().add_block( MeshFactory::default_impl(
+                    builder().add_block( mesh_factory.default_impl(
                         TetrahedralSolid3D::type_name_static() ) );
                 const auto& block = model().block( block_id );
                 auto mesh_builder =

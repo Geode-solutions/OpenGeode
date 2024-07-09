@@ -4,19 +4,15 @@
 
 ### Motivations
 
-
-
+TODO.....
 
 ### Breaking Changes
 
 - **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
 
-TODO.....
+- **C++**: upgrade from C++ standard requirment from C++11 to C++17.
 
-
-
-- **C++**: upgrade from C++ standard requirment from C++11 to C++17
-
+- **Singleton**: remove singleton files and replace them by inline variables. All factories are now inline variables.
 
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 
@@ -286,7 +282,7 @@ MeshFactory::register_default_mesh< OpenGeodePointSet2D >( PointSet2D::type_name
 
 and
 
-MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::impl_name_static() );
+mesh_builder_factory.register_mesh_builder< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::impl_name_static() );
 ```
 
 - **Embedding relationship**: renaming `BRep`and `Section` item-related methods for removing overloading of derived class method in the aim to simplify client code syntax

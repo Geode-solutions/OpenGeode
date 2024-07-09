@@ -69,5 +69,5 @@ namespace geode
     using RegularGridOutputFactory = Factory< std::string,
         RegularGridOutput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( RegularGridOutputFactory );
+    FACTORY_2D_AND_3D( RegularGridOutputFactory, regular_grid_output_factory );
 } // namespace geode

@@ -45,47 +45,66 @@
 #include <geode/mesh/io/geode/geode_vertex_set_input.h>
 #include <geode/mesh/io/light_regular_grid_input.h>
 
-#define BITSERY_INPUT_MESH_REGISTER_XD( Mesh, dimension )                      \
-    geode::Mesh##InputFactory##dimension##D::register_creator<                 \
-        geode::OpenGeode##Mesh##Input##dimension##D >(                         \
-        geode::OpenGeode##Mesh##dimension##D ::native_extension_static()       \
-            .data() )
-
-#define LIGHT_REGULAR_GRID_INPUT_REGISTER_XD( dimension )                      \
-    geode::LightRegularGridInputFactory##dimension##D::register_creator<       \
-        geode::LightRegularGridInput##dimension##D >(                          \
-        geode::LightRegularGrid##dimension##D ::native_extension_static()      \
-            .data() )
-
-#define BITSERY_INPUT_MESH_REGISTER_2D( Mesh )                                 \
-    BITSERY_INPUT_MESH_REGISTER_XD( Mesh, 2 )
-
-#define BITSERY_INPUT_MESH_REGISTER_3D( Mesh )                                 \
-    BITSERY_INPUT_MESH_REGISTER_XD( Mesh, 3 )
-
-#define BITSERY_INPUT_MESH_REGISTER_2D_3D( Mesh )                              \
-    BITSERY_INPUT_MESH_REGISTER_2D( Mesh );                                    \
-    BITSERY_INPUT_MESH_REGISTER_3D( Mesh )
-
 namespace geode
 {
     void register_geode_mesh_input()
     {
-        VertexSetInputFactory::register_creator< OpenGeodeVertexSetInput >(
+        vertex_set_input_factory.register_creator< OpenGeodeVertexSetInput >(
             OpenGeodeVertexSet::native_extension_static().data() );
-        GraphInputFactory::register_creator< OpenGeodeGraphInput >(
+
+        graph_input_factory.register_creator< OpenGeodeGraphInput >(
             OpenGeodeGraph::native_extension_static().data() );
 
-        BITSERY_INPUT_MESH_REGISTER_2D_3D( EdgedCurve );
-        BITSERY_INPUT_MESH_REGISTER_2D_3D( PointSet );
-        BITSERY_INPUT_MESH_REGISTER_2D_3D( PolygonalSurface );
-        BITSERY_INPUT_MESH_REGISTER_2D_3D( RegularGrid );
-        BITSERY_INPUT_MESH_REGISTER_2D_3D( TriangulatedSurface );
-        BITSERY_INPUT_MESH_REGISTER_3D( HybridSolid );
-        BITSERY_INPUT_MESH_REGISTER_3D( PolyhedralSolid );
-        BITSERY_INPUT_MESH_REGISTER_3D( TetrahedralSolid );
+        edged_curve_input_factory_2d
+            .register_creator< OpenGeodeEdgedCurveInput2D >(
+                OpenGeodeEdgedCurve2D::native_extension_static().data() );
+        edged_curve_input_factory_3d
+            .register_creator< OpenGeodeEdgedCurveInput3D >(
+                OpenGeodeEdgedCurve3D::native_extension_static().data() );
 
-        LIGHT_REGULAR_GRID_INPUT_REGISTER_XD( 2 );
-        LIGHT_REGULAR_GRID_INPUT_REGISTER_XD( 3 );
+        point_set_input_factory_2d.register_creator< OpenGeodePointSetInput2D >(
+            OpenGeodePointSet2D::native_extension_static().data() );
+        point_set_input_factory_3d.register_creator< OpenGeodePointSetInput3D >(
+            OpenGeodePointSet3D::native_extension_static().data() );
+
+        polygonal_surface_input_factory_2d
+            .register_creator< OpenGeodePolygonalSurfaceInput2D >(
+                OpenGeodePolygonalSurface2D::native_extension_static().data() );
+        polygonal_surface_input_factory_3d
+            .register_creator< OpenGeodePolygonalSurfaceInput3D >(
+                OpenGeodePolygonalSurface3D::native_extension_static().data() );
+
+        regular_grid_input_factory_2d
+            .register_creator< OpenGeodeRegularGridInput2D >(
+                OpenGeodeRegularGrid2D::native_extension_static().data() );
+        regular_grid_input_factory_3d
+            .register_creator< OpenGeodeRegularGridInput3D >(
+                OpenGeodeRegularGrid3D::native_extension_static().data() );
+
+        triangulated_surface_input_factory_2d.register_creator<
+            OpenGeodeTriangulatedSurfaceInput2D >(
+            OpenGeodeTriangulatedSurface2D::native_extension_static().data() );
+        triangulated_surface_input_factory_3d.register_creator<
+            OpenGeodeTriangulatedSurfaceInput3D >(
+            OpenGeodeTriangulatedSurface3D::native_extension_static().data() );
+
+        hybrid_solid_input_factory_3d
+            .register_creator< OpenGeodeHybridSolidInput3D >(
+                OpenGeodeHybridSolid3D::native_extension_static().data() );
+
+        polyhedral_solid_input_factory_3d
+            .register_creator< OpenGeodePolyhedralSolidInput3D >(
+                OpenGeodePolyhedralSolid3D::native_extension_static().data() );
+
+        tetrahedral_solid_input_factory_3d
+            .register_creator< OpenGeodeTetrahedralSolidInput3D >(
+                OpenGeodeTetrahedralSolid3D::native_extension_static().data() );
+
+        light_regular_grid_input_factory_2d
+            .register_creator< LightRegularGridInput2D >(
+                LightRegularGrid2D::native_extension_static().data() );
+        light_regular_grid_input_factory_3d
+            .register_creator< LightRegularGridInput3D >(
+                LightRegularGrid3D::native_extension_static().data() );
     }
 } // namespace geode

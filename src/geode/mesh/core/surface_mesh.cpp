@@ -245,10 +245,10 @@ namespace geode
     public:
         Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) ),
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) ),
               polygons_around_vertex_(
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -468,7 +468,7 @@ namespace geode
     std::unique_ptr< SurfaceMesh< dimension > >
         SurfaceMesh< dimension >::create()
     {
-        return MeshFactory::create_default_mesh< SurfaceMesh< dimension > >(
+        return mesh_factory.create_default_mesh< SurfaceMesh< dimension > >(
             PolygonalSurface< dimension >::type_name_static() );
     }
 
@@ -476,7 +476,7 @@ namespace geode
     std::unique_ptr< SurfaceMesh< dimension > >
         SurfaceMesh< dimension >::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< SurfaceMesh< dimension > >( impl );
+        return mesh_factory.create_mesh< SurfaceMesh< dimension > >( impl );
     }
 
     template < index_t dimension >

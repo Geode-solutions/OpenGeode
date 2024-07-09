@@ -64,7 +64,7 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner()
-        : Corner( MeshFactory::default_impl( Mesh::type_name_static() ) )
+        : Corner( mesh_factory.default_impl( Mesh::type_name_static() ) )
     {
     }
 
@@ -120,8 +120,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Corner< dimension >::modifiable_mesh( CornersBuilderKey /*unused*/ )
-        -> Mesh&
+    auto Corner< dimension >::modifiable_mesh(
+        CornersBuilderKey /*unused*/ ) -> Mesh&
     {
         return modifiable_mesh();
     }

@@ -47,17 +47,18 @@ namespace geode
         const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                RegularGridOutputFactory< dimension > >(
-                type, regular_grid, filename );
+            return detail::geode_object_output_impl(
+                regular_grid_output_factory< dimension >(), type, regular_grid,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< RegularGridOutputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                regular_grid_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save RegularGrid in file: ",
                 filename };
         }
@@ -67,8 +68,8 @@ namespace geode
     bool is_regular_grid_saveable( const RegularGrid< dimension >& regular_grid,
         absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            RegularGridOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            regular_grid_output_factory< dimension >(), filename );
         return output->is_saveable( regular_grid );
     }
 

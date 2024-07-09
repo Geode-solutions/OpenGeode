@@ -45,8 +45,9 @@ namespace geode
         TriangulatedSurfaceBuilder< dimension >::create(
             TriangulatedSurface< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            TriangulatedSurfaceBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< TriangulatedSurfaceBuilder< dimension > >(
+                mesh );
     }
 
     template < index_t dimension >

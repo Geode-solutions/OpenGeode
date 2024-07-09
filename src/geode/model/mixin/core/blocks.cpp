@@ -61,8 +61,8 @@ namespace geode
     Blocks< dimension >::~Blocks() = default;
 
     template < index_t dimension >
-    auto Blocks< dimension >::operator=( Blocks&& ) noexcept
-        -> Blocks& = default;
+    auto Blocks< dimension >::operator=(
+        Blocks&& ) noexcept -> Blocks& = default;
 
     template < index_t dimension >
     index_t Blocks< dimension >::nb_blocks() const
@@ -154,14 +154,14 @@ namespace geode
         {
             tasks[count++] = async::spawn( [&block, &mapping] {
                 const auto file = mapping.at( block.id().string() );
-                if( MeshFactory::type( block.mesh_type() )
+                if( mesh_factory.type( block.mesh_type() )
                     == TetrahedralSolid< dimension >::type_name_static() )
                 {
                     block.set_mesh( load_tetrahedral_solid< dimension >(
                                         block.mesh_type(), file ),
                         typename Block< dimension >::BlocksKey{} );
                 }
-                else if( MeshFactory::type( block.mesh_type() )
+                else if( mesh_factory.type( block.mesh_type() )
                          == HybridSolid< dimension >::type_name_static() )
                 {
                     block.set_mesh( load_hybrid_solid< dimension >(

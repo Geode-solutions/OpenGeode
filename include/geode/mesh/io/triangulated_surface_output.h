@@ -71,5 +71,6 @@ namespace geode
     using TriangulatedSurfaceOutputFactory = Factory< std::string,
         TriangulatedSurfaceOutput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( TriangulatedSurfaceOutputFactory );
+    FACTORY_2D_AND_3D(
+        TriangulatedSurfaceOutputFactory, triangulated_surface_output_factory );
 } // namespace geode

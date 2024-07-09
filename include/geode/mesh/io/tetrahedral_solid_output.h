@@ -73,5 +73,6 @@ namespace geode
     using TetrahedralSolidOutputFactory = Factory< std::string,
         TetrahedralSolidOutput< dimension >,
         absl::string_view >;
-    ALIAS_3D( TetrahedralSolidOutputFactory );
+    FACTORY_3D(
+        TetrahedralSolidOutputFactory, tetrahedral_solid_output_factory );
 } // namespace geode

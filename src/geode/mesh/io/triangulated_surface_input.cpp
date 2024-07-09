@@ -44,9 +44,9 @@ namespace geode
         const auto type = absl::StrCat( "TriangulatedSurface", dimension, "D" );
         try
         {
-            auto triangulated_surface = detail::geode_object_input_impl<
-                TriangulatedSurfaceInputFactory< dimension > >(
-                type, filename, impl );
+            auto triangulated_surface = detail::geode_object_input_impl(
+                triangulated_surface_input_factory< dimension >(), type,
+                filename, impl );
             Logger::info( type, " has: ", triangulated_surface->nb_vertices(),
                 " vertices, ", triangulated_surface->nb_polygons(),
                 " triangles" );
@@ -55,10 +55,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                TriangulatedSurfaceInputFactory< dimension > >( type );
+            print_available_extensions(
+                triangulated_surface_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{
                 "Cannot load TriangulatedSurface from file: ", filename
             };
@@ -70,7 +70,7 @@ namespace geode
         load_triangulated_surface( absl::string_view filename )
     {
         return load_triangulated_surface< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 TriangulatedSurface< dimension >::type_name_static() ),
             filename );
     }
@@ -79,16 +79,16 @@ namespace geode
     typename TriangulatedSurfaceInput< dimension >::MissingFiles
         check_triangulated_surface_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            TriangulatedSurfaceInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            triangulated_surface_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_triangulated_surface_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            TriangulatedSurfaceInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            triangulated_surface_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

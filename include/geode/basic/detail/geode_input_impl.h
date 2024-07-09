@@ -61,23 +61,27 @@ namespace geode
 
         template < typename Factory >
         std::unique_ptr< typename Factory::BaseClass >
-            geode_object_input_reader( absl::string_view& filename )
+            geode_object_input_reader(
+                const Factory& factory, absl::string_view& filename )
         {
             filename = absl::StripAsciiWhitespace( filename );
             const auto extension =
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
+            OPENGEODE_EXCEPTION( factory.has_creator( extension ),
                 "Unknown extension: ", extension );
-            return Factory::create(
+            return factory.create(
                 extension, expand_predefined_folders( filename ) );
         }
 
         template < typename Factory, typename... Args >
         typename Factory::BaseClass::InputData geode_object_input_impl(
-            absl::string_view type, absl::string_view filename, Args... args )
+            const Factory& fatory,
+            absl::string_view type,
+            absl::string_view filename,
+            Args... args )
         {
             const Timer timer;
-            auto input = geode_object_input_reader< Factory >( filename );
+            auto input = geode_object_input_reader( fatory, filename );
             auto object = input->read( std::forward< Args >( args )... );
             update_default_name( object, filename );
             Logger::info(

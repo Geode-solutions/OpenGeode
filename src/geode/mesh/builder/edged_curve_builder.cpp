@@ -43,8 +43,8 @@ namespace geode
     std::unique_ptr< EdgedCurveBuilder< dimension > >
         EdgedCurveBuilder< dimension >::create( EdgedCurve< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            EdgedCurveBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< EdgedCurveBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

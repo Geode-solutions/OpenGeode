@@ -34,7 +34,7 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::create()
     {
-        return MeshFactory::create_default_mesh< PolyhedralSolid< dimension > >(
+        return mesh_factory.create_default_mesh< PolyhedralSolid< dimension > >(
             PolyhedralSolid< dimension >::type_name_static() );
     }
 
@@ -42,7 +42,7 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< PolyhedralSolid< dimension > >( impl );
+        return mesh_factory.create_mesh< PolyhedralSolid< dimension > >( impl );
     }
 
     template < index_t dimension >

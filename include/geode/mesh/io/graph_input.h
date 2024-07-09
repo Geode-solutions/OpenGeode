@@ -74,4 +74,5 @@ namespace geode
 
     using GraphInputFactory =
         Factory< std::string, GraphInput, absl::string_view >;
+    inline GraphInputFactory graph_input_factory{};
 } // namespace geode

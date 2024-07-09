@@ -76,16 +76,17 @@ namespace geode
         const auto type = absl::StrCat( "LightRegularGrid", dimension, "D" );
         try
         {
-            auto grid = detail::geode_object_input_impl<
-                LightRegularGridInputFactory< dimension > >( type, filename );
+            auto grid = detail::geode_object_input_impl(
+                light_regular_grid_input_factory< dimension >(), type,
+                filename );
             Logger::info( type, " has: ", grid.nb_cells(), " cells" );
             return grid;
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                LightRegularGridInputFactory< dimension > >( type );
+            print_available_extensions(
+                light_regular_grid_input_factory< dimension >(), type );
             throw OpenGeodeException{
                 "Cannot load LightRegularGrid from file: ", filename
             };
@@ -96,16 +97,16 @@ namespace geode
     typename LightRegularGridInput< dimension >::MissingFiles
         check_light_regular_grid_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            LightRegularGridInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            light_regular_grid_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_light_regular_grid_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            LightRegularGridInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            light_regular_grid_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

@@ -36,16 +36,16 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::create()
     {
-        return MeshFactory::create_default_mesh<
-            TriangulatedSurface< dimension > >(
-            TriangulatedSurface< dimension >::type_name_static() );
+        return mesh_factory
+            .create_default_mesh< TriangulatedSurface< dimension > >(
+                TriangulatedSurface< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::create( const MeshImpl& type )
     {
-        return MeshFactory::create_mesh< TriangulatedSurface< dimension > >(
+        return mesh_factory.create_mesh< TriangulatedSurface< dimension > >(
             type );
     }
 

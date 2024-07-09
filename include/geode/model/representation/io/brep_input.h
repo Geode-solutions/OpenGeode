@@ -64,4 +64,5 @@ namespace geode
 
     using BRepInputFactory =
         Factory< std::string, BRepInput, absl::string_view >;
+    inline BRepInputFactory brep_input_factory{};
 } // namespace geode

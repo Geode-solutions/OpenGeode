@@ -43,8 +43,9 @@ namespace geode
         const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
         {
-            auto edged_curve = detail::geode_object_input_impl<
-                EdgedCurveInputFactory< dimension > >( type, filename, impl );
+            auto edged_curve = detail::geode_object_input_impl(
+                edged_curve_input_factory< dimension >(), type, filename,
+                impl );
             Logger::info( type, " has: ", edged_curve->nb_vertices(),
                 " vertices, ", edged_curve->nb_edges(), " edges" );
             return edged_curve;
@@ -52,10 +53,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< EdgedCurveInputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                edged_curve_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot load EdgedCurve from file: ",
                 filename };
         }
@@ -66,7 +67,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_edged_curve< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 EdgedCurve< dimension >::type_name_static() ),
             filename );
     }
@@ -75,16 +76,16 @@ namespace geode
     typename EdgedCurveInput< dimension >::MissingFiles
         check_edged_curve_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            EdgedCurveInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            edged_curve_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_edged_curve_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            EdgedCurveInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            edged_curve_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

@@ -36,7 +36,7 @@ namespace geode
     std::unique_ptr< VertexSet > load_vertex_set( absl::string_view filename )
     {
         return load_vertex_set(
-            MeshFactory::default_impl( VertexSet::type_name_static() ),
+            mesh_factory.default_impl( VertexSet::type_name_static() ),
             filename );
     }
 
@@ -46,9 +46,8 @@ namespace geode
         constexpr auto TYPE = "VertexSet";
         try
         {
-            auto vertex_set =
-                detail::geode_object_input_impl< VertexSetInputFactory >(
-                    TYPE, filename, impl );
+            auto vertex_set = detail::geode_object_input_impl(
+                vertex_set_input_factory, TYPE, filename, impl );
             Logger::info(
                 TYPE, " has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;
@@ -56,7 +55,7 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< VertexSetInputFactory >( TYPE );
+            print_available_extensions( vertex_set_input_factory, TYPE );
             throw OpenGeodeException{ "Cannot load VertexSet from file: ",
                 filename };
         }
@@ -65,17 +64,15 @@ namespace geode
     typename VertexSetInput::MissingFiles check_vertex_set_missing_files(
         absl::string_view filename )
     {
-        const auto input =
-            detail::geode_object_input_reader< VertexSetInputFactory >(
-                filename );
+        const auto input = detail::geode_object_input_reader(
+            vertex_set_input_factory, filename );
         return input->check_missing_files();
     }
 
     bool is_vertex_set_loadable( absl::string_view filename )
     {
-        const auto input =
-            detail::geode_object_input_reader< VertexSetInputFactory >(
-                filename );
+        const auto input = detail::geode_object_input_reader(
+            vertex_set_input_factory, filename );
         return input->is_loadable();
     }
 } // namespace geode

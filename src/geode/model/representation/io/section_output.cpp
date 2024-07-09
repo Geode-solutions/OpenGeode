@@ -42,13 +42,13 @@ namespace geode
         constexpr auto TYPE = "Section";
         try
         {
-            return detail::geode_object_output_impl< SectionOutputFactory >(
-                TYPE, section, filename );
+            return detail::geode_object_output_impl(
+                section_output_factory, TYPE, section, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< SectionOutputFactory >( TYPE );
+            print_available_extensions( section_output_factory, TYPE );
             throw OpenGeodeException{ "Cannot save Section in file: ",
                 filename };
         }
@@ -57,9 +57,8 @@ namespace geode
     bool is_section_saveable(
         const Section& section, absl::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< SectionOutputFactory >(
-                filename );
+        const auto output = detail::geode_object_output_writer(
+            section_output_factory, filename );
         return output->is_saveable( section );
     }
 } // namespace geode

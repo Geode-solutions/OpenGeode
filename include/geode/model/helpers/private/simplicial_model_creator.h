@@ -115,7 +115,7 @@ namespace geode
                 for( const auto& definition : definitions )
                 {
                     const auto& surface_id = builder_.add_surface(
-                        MeshFactory::default_impl( TriangulatedSurface<
+                        mesh_factory.default_impl( TriangulatedSurface<
                             dimension >::type_name_static() ) );
                     const auto& surface = model_.surface( surface_id );
                     auto mesh_builder =

@@ -63,4 +63,5 @@ namespace geode
 
     using SectionOutputFactory =
         Factory< std::string, SectionOutput, absl::string_view >;
+    inline SectionOutputFactory section_output_factory{};
 } // namespace geode

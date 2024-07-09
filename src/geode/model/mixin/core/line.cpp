@@ -63,7 +63,7 @@ namespace geode
 
     template < index_t dimension >
     Line< dimension >::Line()
-        : Line( MeshFactory::default_impl( Mesh::type_name_static() ) )
+        : Line( mesh_factory.default_impl( Mesh::type_name_static() ) )
     {
     }
 
@@ -153,8 +153,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Line< dimension >::modifiable_mesh( LinesBuilderKey /*unused*/ )
-        -> Mesh&
+    auto Line< dimension >::modifiable_mesh(
+        LinesBuilderKey /*unused*/ ) -> Mesh&
     {
         return modifiable_mesh();
     }

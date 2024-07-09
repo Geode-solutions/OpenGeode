@@ -43,8 +43,8 @@ namespace geode
         const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
         {
-            auto point_set = detail::geode_object_input_impl<
-                PointSetInputFactory< dimension > >( type, filename, impl );
+            auto point_set = detail::geode_object_input_impl(
+                point_set_input_factory< dimension >(), type, filename, impl );
             Logger::info(
                 type, " has: ", point_set->nb_vertices(), " vertices" );
             return point_set;
@@ -52,10 +52,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< PointSetInputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                point_set_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot load PointSet from file: ",
                 filename };
         }
@@ -66,7 +66,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_point_set< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 PointSet< dimension >::type_name_static() ),
             filename );
     }
@@ -75,16 +75,16 @@ namespace geode
     typename PointSetInput< dimension >::MissingFiles
         check_point_set_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PointSetInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            point_set_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_point_set_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PointSetInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            point_set_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

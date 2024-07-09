@@ -71,5 +71,5 @@ namespace geode
     using HybridSolidOutputFactory = Factory< std::string,
         HybridSolidOutput< dimension >,
         absl::string_view >;
-    ALIAS_3D( HybridSolidOutputFactory );
+    FACTORY_3D( HybridSolidOutputFactory, hybrid_solid_output_factory );
 } // namespace geode

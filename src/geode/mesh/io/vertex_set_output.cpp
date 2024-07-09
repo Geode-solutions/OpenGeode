@@ -41,13 +41,13 @@ namespace geode
         constexpr auto type = "VertexSet";
         try
         {
-            return detail::geode_object_output_impl< VertexSetOutputFactory >(
-                type, vertex_set, filename );
+            return detail::geode_object_output_impl(
+                vertex_set_output_factory, type, vertex_set, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< VertexSetOutputFactory >( type );
+            print_available_extensions( vertex_set_output_factory, type );
             throw OpenGeodeException{ "Cannot save VertexSet in file: ",
                 filename };
         }
@@ -56,9 +56,8 @@ namespace geode
     bool is_vertex_set_saveable(
         const VertexSet& vertex_set, absl::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< VertexSetOutputFactory >(
-                filename );
+        const auto output = detail::geode_object_output_writer(
+            vertex_set_output_factory, filename );
         return output->is_saveable( vertex_set );
     }
 } // namespace geode

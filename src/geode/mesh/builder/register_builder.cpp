@@ -51,55 +51,57 @@ namespace geode
 {
     void register_geode_builder()
     {
-        MeshBuilderFactory::register_mesh_builder< OpenGeodeVertexSetBuilder >(
+        mesh_builder_factory.register_mesh_builder< OpenGeodeVertexSetBuilder >(
             OpenGeodeVertexSet::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder< OpenGeodeGraphBuilder >(
+        mesh_builder_factory.register_mesh_builder< OpenGeodeGraphBuilder >(
             OpenGeodeGraph::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >(
-            OpenGeodePointSet2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder3D >(
-            OpenGeodePointSet3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodePointSetBuilder2D >(
+                OpenGeodePointSet2D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodePointSetBuilder3D >(
+                OpenGeodePointSet3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeEdgedCurveBuilder2D >(
-            OpenGeodeEdgedCurve2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeEdgedCurveBuilder3D >(
-            OpenGeodeEdgedCurve3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeEdgedCurveBuilder2D >(
+                OpenGeodeEdgedCurve2D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeEdgedCurveBuilder3D >(
+                OpenGeodeEdgedCurve3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodePolygonalSurfaceBuilder2D >(
-            OpenGeodePolygonalSurface2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodePolygonalSurfaceBuilder3D >(
-            OpenGeodePolygonalSurface3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodePolygonalSurfaceBuilder2D >(
+                OpenGeodePolygonalSurface2D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodePolygonalSurfaceBuilder3D >(
+                OpenGeodePolygonalSurface3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeTriangulatedSurfaceBuilder2D >(
-            OpenGeodeTriangulatedSurface2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeTriangulatedSurfaceBuilder3D >(
-            OpenGeodeTriangulatedSurface3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeTriangulatedSurfaceBuilder2D >(
+                OpenGeodeTriangulatedSurface2D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeTriangulatedSurfaceBuilder3D >(
+                OpenGeodeTriangulatedSurface3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeRegularGridBuilder2D >(
-            OpenGeodeRegularGrid2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeRegularGridBuilder3D >(
-            OpenGeodeRegularGrid3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeRegularGridBuilder2D >(
+                OpenGeodeRegularGrid2D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeRegularGridBuilder3D >(
+                OpenGeodeRegularGrid3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodePolyhedralSolidBuilder3D >(
-            OpenGeodePolyhedralSolid3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodePolyhedralSolidBuilder3D >(
+                OpenGeodePolyhedralSolid3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeTetrahedralSolidBuilder3D >(
-            OpenGeodeTetrahedralSolid3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeTetrahedralSolidBuilder3D >(
+                OpenGeodeTetrahedralSolid3D::impl_name_static() );
 
-        MeshBuilderFactory::register_mesh_builder<
-            OpenGeodeHybridSolidBuilder3D >(
-            OpenGeodeHybridSolid3D::impl_name_static() );
+        mesh_builder_factory
+            .register_mesh_builder< OpenGeodeHybridSolidBuilder3D >(
+                OpenGeodeHybridSolid3D::impl_name_static() );
     }
 } // namespace geode

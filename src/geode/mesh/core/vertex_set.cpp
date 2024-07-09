@@ -65,13 +65,13 @@ namespace geode
 
     std::unique_ptr< VertexSet > VertexSet::create()
     {
-        return MeshFactory::create_default_mesh< VertexSet >(
+        return mesh_factory.create_default_mesh< VertexSet >(
             VertexSet::type_name_static() );
     }
 
     std::unique_ptr< VertexSet > VertexSet::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< VertexSet >( impl );
+        return mesh_factory.create_mesh< VertexSet >( impl );
     }
 
     MeshType VertexSet::type_name_static()

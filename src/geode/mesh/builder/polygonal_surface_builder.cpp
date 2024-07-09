@@ -45,8 +45,9 @@ namespace geode
         PolygonalSurfaceBuilder< dimension >::create(
             PolygonalSurface< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            PolygonalSurfaceBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< PolygonalSurfaceBuilder< dimension > >(
+                mesh );
     }
 
     template < index_t dimension >

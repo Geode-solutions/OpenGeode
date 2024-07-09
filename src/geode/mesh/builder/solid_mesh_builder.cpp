@@ -362,8 +362,8 @@ namespace geode
     std::unique_ptr< SolidMeshBuilder< dimension > >
         SolidMeshBuilder< dimension >::create( SolidMesh< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            SolidMeshBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< SolidMeshBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

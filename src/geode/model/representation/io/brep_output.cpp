@@ -42,13 +42,13 @@ namespace geode
         constexpr auto TYPE = "BRep";
         try
         {
-            return detail::geode_object_output_impl< BRepOutputFactory >(
-                TYPE, brep, filename );
+            return detail::geode_object_output_impl(
+                brep_output_factory, TYPE, brep, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< BRepOutputFactory >( TYPE );
+            print_available_extensions( brep_output_factory, TYPE );
             throw OpenGeodeException{ "Cannot save BRep in file: ", filename };
         }
     }
@@ -56,7 +56,7 @@ namespace geode
     bool is_brep_saveable( const BRep& brep, absl::string_view filename )
     {
         const auto output =
-            detail::geode_object_output_writer< BRepOutputFactory >( filename );
+            detail::geode_object_output_writer( brep_output_factory, filename );
         return output->is_saveable( brep );
     }
 } // namespace geode

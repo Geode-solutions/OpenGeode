@@ -37,7 +37,7 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create()
     {
-        return MeshFactory::create_default_mesh< PointSet< dimension > >(
+        return mesh_factory.create_default_mesh< PointSet< dimension > >(
             PointSet< dimension >::type_name_static() );
     }
 
@@ -45,7 +45,7 @@ namespace geode
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create(
         const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< PointSet< dimension > >( impl );
+        return mesh_factory.create_mesh< PointSet< dimension > >( impl );
     }
 
     template < index_t dimension >

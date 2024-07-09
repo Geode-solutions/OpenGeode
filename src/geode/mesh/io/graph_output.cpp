@@ -43,24 +43,24 @@ namespace geode
         constexpr auto TYPE = "Graph";
         try
         {
-            return detail::geode_object_output_impl< GraphOutputFactory >(
-                TYPE, graph, filename );
+            return detail::geode_object_output_impl(
+                graph_output_factory, TYPE, graph, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< GraphOutputFactory >( TYPE );
+            print_available_extensions( graph_output_factory, TYPE );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
         }
     }
 
     bool is_graph_saveable( const Graph& graph, absl::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< GraphOutputFactory >(
-                filename );
+        const auto output = detail::geode_object_output_writer(
+            graph_output_factory, filename );
         return output->is_saveable( graph );
     }
 

@@ -38,7 +38,7 @@ namespace geode
     std::unique_ptr< VertexSetBuilder > VertexSetBuilder::create(
         VertexSet& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder< VertexSetBuilder >(
+        return mesh_builder_factory.create_mesh_builder< VertexSetBuilder >(
             mesh );
     }
 

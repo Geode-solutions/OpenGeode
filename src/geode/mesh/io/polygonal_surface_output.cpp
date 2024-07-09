@@ -46,17 +46,18 @@ namespace geode
         const auto type = absl::StrCat( "PolygonalSurface", dimension, "D" );
         try
         {
-            return detail::geode_object_output_impl<
-                PolygonalSurfaceOutputFactory< dimension > >(
-                type, polygonal_surface, filename );
+            return detail::geode_object_output_impl(
+                polygonal_surface_output_factory< dimension >(), type,
+                polygonal_surface, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                PolygonalSurfaceOutputFactory< dimension > >( type );
+            print_available_extensions(
+                polygonal_surface_output_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
+            print_available_extensions(
+                vertex_set_output_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot save PolygonalSurface in file: ",
                 filename };
         }
@@ -67,8 +68,8 @@ namespace geode
         const PolygonalSurface< dimension >& polygonal_surface,
         absl::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            PolygonalSurfaceOutputFactory< dimension > >( filename );
+        const auto output = detail::geode_object_output_writer(
+            polygonal_surface_output_factory< dimension >(), filename );
         return output->is_saveable( polygonal_surface );
     }
 

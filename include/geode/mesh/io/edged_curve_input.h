@@ -82,5 +82,5 @@ namespace geode
     template < index_t dimension >
     using EdgedCurveInputFactory =
         Factory< std::string, EdgedCurveInput< dimension >, absl::string_view >;
-    ALIAS_2D_AND_3D( EdgedCurveInputFactory );
+    FACTORY_2D_AND_3D( EdgedCurveInputFactory, edged_curve_input_factory );
 } // namespace geode

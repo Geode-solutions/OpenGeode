@@ -48,8 +48,9 @@ namespace geode
         TetrahedralSolidBuilder< dimension >::create(
             TetrahedralSolid< dimension >& mesh )
     {
-        return MeshBuilderFactory::create_mesh_builder<
-            TetrahedralSolidBuilder< dimension > >( mesh );
+        return mesh_builder_factory
+            .create_mesh_builder< TetrahedralSolidBuilder< dimension > >(
+                mesh );
     }
 
     template < index_t dimension >

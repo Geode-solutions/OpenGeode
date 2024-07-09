@@ -43,9 +43,9 @@ namespace geode
         const auto type = absl::StrCat( "TetrahedralSolid", dimension, "D" );
         try
         {
-            auto tetrahedral_solid = detail::geode_object_input_impl<
-                TetrahedralSolidInputFactory< dimension > >(
-                type, filename, impl );
+            auto tetrahedral_solid = detail::geode_object_input_impl(
+                tetrahedral_solid_input_factory< dimension >(), type, filename,
+                impl );
             Logger::info( type, " has: ", tetrahedral_solid->nb_vertices(),
                 " vertices, ", tetrahedral_solid->nb_polyhedra(),
                 " tetrahedra" );
@@ -54,10 +54,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions<
-                TetrahedralSolidInputFactory< dimension > >( type );
+            print_available_extensions(
+                tetrahedral_solid_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{
                 "Cannot load TetrahedralSolid from file: ", filename
             };
@@ -69,7 +69,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_tetrahedral_solid< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 TetrahedralSolid< dimension >::type_name_static() ),
             filename );
     }
@@ -78,16 +78,16 @@ namespace geode
     typename TetrahedralSolidInput< dimension >::MissingFiles
         check_tetrahedral_solid_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            TetrahedralSolidInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            tetrahedral_solid_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_tetrahedral_solid_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            TetrahedralSolidInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            tetrahedral_solid_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

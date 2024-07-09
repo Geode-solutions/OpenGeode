@@ -44,18 +44,19 @@ namespace geode
         const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
         try
         {
-            auto grid = detail::geode_object_input_impl<
-                RegularGridInputFactory< dimension > >( type, filename, impl );
+            auto grid = detail::geode_object_input_impl(
+                regular_grid_input_factory< dimension >(), type, filename,
+                impl );
             Logger::info( type, " has: ", grid->nb_cells(), " cells" );
             return grid;
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< RegularGridInputFactory< dimension > >(
-                type );
+            print_available_extensions(
+                regular_grid_input_factory< dimension >(), type );
             Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
+            print_available_extensions( vertex_set_input_factory, "VertexSet" );
             throw OpenGeodeException{ "Cannot load RegularGrid from file: ",
                 filename };
         }
@@ -66,7 +67,7 @@ namespace geode
         absl::string_view filename )
     {
         return load_regular_grid< dimension >(
-            MeshFactory::default_impl(
+            mesh_factory.default_impl(
                 RegularGrid< dimension >::type_name_static() ),
             filename );
     }
@@ -75,16 +76,16 @@ namespace geode
     typename RegularGridInput< dimension >::MissingFiles
         check_regular_grid_missing_files( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            RegularGridInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            regular_grid_input_factory< dimension >(), filename );
         return input->check_missing_files();
     }
 
     template < index_t dimension >
     bool is_regular_grid_loadable( absl::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            RegularGridInputFactory< dimension > >( filename );
+        const auto input = detail::geode_object_input_reader(
+            regular_grid_input_factory< dimension >(), filename );
         return input->is_loadable();
     }
 

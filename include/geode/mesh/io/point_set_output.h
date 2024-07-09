@@ -67,5 +67,5 @@ namespace geode
     template < index_t dimension >
     using PointSetOutputFactory =
         Factory< std::string, PointSetOutput< dimension >, absl::string_view >;
-    ALIAS_2D_AND_3D( PointSetOutputFactory );
+    FACTORY_2D_AND_3D( PointSetOutputFactory, point_set_output_factory );
 } // namespace geode

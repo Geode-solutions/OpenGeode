@@ -55,35 +55,27 @@ namespace geode
         absl::flat_hash_map< MeshType, MeshImpl > defaults_;
     };
 
-    MeshFactory::MeshFactory() {}
+    MeshFactory::MeshFactory() = default;
 
-    MeshFactory::~MeshFactory() {}
-
-    MeshFactory& MeshFactory::instance()
-    {
-        static MeshFactory mesh_factory;
-        return mesh_factory;
-    }
+    MeshFactory::~MeshFactory() = default;
 
     void MeshFactory::register_type( MeshType type, MeshImpl key )
     {
-        instance().impl_->register_type( std::move( type ), std::move( key ) );
+        impl_->register_type( std::move( type ), std::move( key ) );
     }
 
     const MeshType& MeshFactory::type( const MeshImpl& key )
     {
-        return instance().impl_->type( key );
+        return impl_->type( key );
     }
 
     const MeshImpl& MeshFactory::default_impl( const MeshType& type )
     {
-        return instance().impl_->default_impl( type );
+        return impl_->default_impl( type );
     }
 
     void MeshFactory::register_default( MeshType type, MeshImpl key )
     {
-        instance().impl_->register_default(
-            std::move( type ), std::move( key ) );
+        impl_->register_default( std::move( type ), std::move( key ) );
     }
-
 } // namespace geode

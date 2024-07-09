@@ -82,5 +82,5 @@ namespace geode
     using RegularGridInputFactory = Factory< std::string,
         RegularGridInput< dimension >,
         absl::string_view >;
-    ALIAS_2D_AND_3D( RegularGridInputFactory );
+    FACTORY_2D_AND_3D( RegularGridInputFactory, regular_grid_input_factory );
 } // namespace geode

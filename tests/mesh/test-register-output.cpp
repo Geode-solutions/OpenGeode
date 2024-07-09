@@ -42,9 +42,9 @@
 #include <geode/tests/common.h>
 
 template < typename GeodeFactory >
-void check_register( absl::string_view extension )
+void check_register( const GeodeFactory& factory, absl::string_view extension )
 {
-    OPENGEODE_EXCEPTION( GeodeFactory::has_creator( extension.data() ),
+    OPENGEODE_EXCEPTION( factory.has_creator( extension.data() ),
         "[Test] No creator for extension ", extension, " is not correct" );
 }
 
@@ -54,29 +54,29 @@ void test()
     geode::register_geode_mesh_output();
 
     /* Run checks */
-    check_register< geode::GraphOutputFactory >(
+    check_register( geode::graph_output_factory,
         geode::OpenGeodeGraph::native_extension_static().data() );
-    check_register< geode::PointSetOutputFactory2D >(
+    check_register( geode::point_set_output_factory_2d,
         geode::OpenGeodePointSet2D::native_extension_static().data() );
-    check_register< geode::PointSetOutputFactory3D >(
+    check_register( geode::point_set_output_factory_3d,
         geode::OpenGeodePointSet3D::native_extension_static().data() );
-    check_register< geode::EdgedCurveOutputFactory2D >(
+    check_register( geode::edged_curve_output_factory_2d,
         geode::OpenGeodeEdgedCurve2D::native_extension_static().data() );
-    check_register< geode::EdgedCurveOutputFactory3D >(
+    check_register( geode::edged_curve_output_factory_3d,
         geode::OpenGeodeEdgedCurve3D::native_extension_static().data() );
-    check_register< geode::PolygonalSurfaceOutputFactory2D >(
+    check_register( geode::polygonal_surface_output_factory_2d,
         geode::OpenGeodePolygonalSurface2D::native_extension_static().data() );
-    check_register< geode::PolygonalSurfaceOutputFactory3D >(
+    check_register( geode::polygonal_surface_output_factory_3d,
         geode::OpenGeodePolygonalSurface3D::native_extension_static().data() );
-    check_register< geode::TriangulatedSurfaceOutputFactory2D >(
+    check_register( geode::triangulated_surface_output_factory_2d,
         geode::OpenGeodeTriangulatedSurface2D::native_extension_static()
             .data() );
-    check_register< geode::TriangulatedSurfaceOutputFactory3D >(
+    check_register( geode::triangulated_surface_output_factory_3d,
         geode::OpenGeodeTriangulatedSurface3D::native_extension_static()
             .data() );
-    check_register< geode::PolyhedralSolidOutputFactory3D >(
+    check_register( geode::polyhedral_solid_output_factory_3d,
         geode::OpenGeodePolyhedralSolid3D::native_extension_static().data() );
-    check_register< geode::TetrahedralSolidOutputFactory3D >(
+    check_register( geode::tetrahedral_solid_output_factory_3d,
         geode::OpenGeodeTetrahedralSolid3D::native_extension_static().data() );
 }
 

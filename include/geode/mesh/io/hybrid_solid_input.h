@@ -85,5 +85,5 @@ namespace geode
     using HybridSolidInputFactory = Factory< std::string,
         HybridSolidInput< dimension >,
         absl::string_view >;
-    ALIAS_3D( HybridSolidInputFactory );
+    FACTORY_3D( HybridSolidInputFactory, hybrid_solid_input_factory );
 } // namespace geode
