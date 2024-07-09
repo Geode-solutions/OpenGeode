@@ -40,73 +40,10 @@ namespace geode
     void define_convert_to_mesh( pybind11::module& module )
     {
         module.def( "convert_section_into_curve", &convert_section_into_curve )
-            .def( "convert_section_into_triangulated_surface",
-                &convert_section_into_surface< TriangulatedSurface2D > )
-            .def( "convert_section_into_polygonal_surface",
-                &convert_section_into_surface< PolygonalSurface2D > )
-            .def( "convert_section_into_curve_and_triangulated_surface",
-                &convert_section_into_curve_and_surface<
-                    TriangulatedSurface2D > )
-            .def( "convert_section_into_curve_and_polygonal_surface",
-                &convert_section_into_curve_and_surface< PolygonalSurface2D > )
+            .def(
+                "convert_section_into_surface", &convert_section_into_surface )
             .def( "convert_brep_into_curve", &convert_brep_into_curve )
-            .def( "convert_brep_into_triangulated_surface",
-                &convert_brep_into_surface< TriangulatedSurface3D > )
-            .def( "convert_brep_into_polygonal_surface",
-                &convert_brep_into_surface< PolygonalSurface3D > )
-            .def( "convert_brep_into_tetrahedral_solid",
-                &convert_brep_into_solid< TetrahedralSolid3D > )
-            .def( "convert_brep_into_polyhedral_solid",
-                &convert_brep_into_solid< PolyhedralSolid3D > )
-            .def( "convert_brep_into_hybrid_solid",
-                &convert_brep_into_solid< HybridSolid3D > )
-            .def( "convert_brep_into_curve_and_triangulated_surface",
-                &convert_brep_into_curve_and_surface< TriangulatedSurface3D > )
-            .def( "convert_brep_into_curve_and_polygonal_surface",
-                &convert_brep_into_curve_and_surface< PolygonalSurface3D > )
-            .def(
-                "convert_brep_into_triangulated_surface_and_tetrahedral_solid",
-                &convert_brep_into_surface_and_solid< TriangulatedSurface3D,
-                    TetrahedralSolid3D > )
-            .def( "convert_brep_into_triangulated_surface_and_polyhedral_solid",
-                &convert_brep_into_surface_and_solid< TriangulatedSurface3D,
-                    PolyhedralSolid3D > )
-            .def(
-                "convert_brep_into_triangulated_surface_and_hybridhedral_solid",
-                &convert_brep_into_surface_and_solid< TriangulatedSurface3D,
-                    HybridSolid3D > )
-            .def( "convert_brep_into_polygonal_surface_and_tetrahedral_solid",
-                &convert_brep_into_surface_and_solid< PolygonalSurface3D,
-                    TetrahedralSolid3D > )
-            .def( "convert_brep_into_polygonal_surface_and_polyhedral_solid",
-                &convert_brep_into_surface_and_solid< PolygonalSurface3D,
-                    PolyhedralSolid3D > )
-            .def( "convert_brep_into_polygonal_surface_and_hybridhedral_solid",
-                &convert_brep_into_surface_and_solid< PolygonalSurface3D,
-                    HybridSolid3D > )
-            .def( "convert_brep_into_curve_and_triangulated_surface_and_"
-                  "tetrahedral_solid",
-                &convert_brep_into_curve_and_surface_and_solid<
-                    TriangulatedSurface3D, TetrahedralSolid3D > )
-            .def( "convert_brep_into_curve_and_triangulated_surface_and_"
-                  "polyhedral_solid",
-                &convert_brep_into_curve_and_surface_and_solid<
-                    TriangulatedSurface3D, PolyhedralSolid3D > )
-            .def( "convert_brep_into_curve_and_triangulated_surface_and_"
-                  "hybridhedral_solid",
-                &convert_brep_into_curve_and_surface_and_solid<
-                    TriangulatedSurface3D, HybridSolid3D > )
-            .def( "convert_brep_into_curve_and_polygonal_surface_and_"
-                  "tetrahedral_solid",
-                &convert_brep_into_curve_and_surface_and_solid<
-                    PolygonalSurface3D, TetrahedralSolid3D > )
-            .def( "convert_brep_into_curve_and_polygonal_surface_and_"
-                  "polyhedral_solid",
-                &convert_brep_into_curve_and_surface_and_solid<
-                    PolygonalSurface3D, PolyhedralSolid3D > )
-            .def( "convert_brep_into_curve_and_polygonal_surface_and_"
-                  "hybridhedral_solid",
-                &convert_brep_into_curve_and_surface_and_solid<
-                    PolygonalSurface3D, HybridSolid3D > );
+            .def( "convert_brep_into_surface", &convert_brep_into_surface )
+            .def( "convert_brep_into_solid", &convert_brep_into_solid );
     }
 } // namespace geode

@@ -159,7 +159,7 @@ namespace
             }
             else
             {
-                cur_polygon_vertex = absl::nullopt;
+                cur_polygon_vertex = std::nullopt;
                 break;
             }
         } while( cur_polygon_vertex != first_polygon
@@ -176,7 +176,7 @@ namespace
             }
             else
             {
-                cur_polygon_vertex = absl::nullopt;
+                cur_polygon_vertex = std::nullopt;
             }
             while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
             {
@@ -196,7 +196,7 @@ namespace
                         geode::PolygonVertex{ adj_edge.value() };
                     continue;
                 }
-                cur_polygon_vertex = absl::nullopt;
+                cur_polygon_vertex = std::nullopt;
             }
         }
         if( safety_count >= MAX_SAFETY_COUNT )
@@ -272,10 +272,10 @@ namespace geode
     public:
         Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) ),
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) ),
               polygons_around_vertex_(
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,

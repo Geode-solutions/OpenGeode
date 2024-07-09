@@ -42,31 +42,18 @@ void run_test_brep()
 {
     const auto model =
         geode::load_brep( absl::StrCat( geode::data_path, "layers.og_brep" ) );
-    const auto output =
-        geode::convert_brep_into_curve_and_surface_and_solid( model );
-    const auto& curve = std::get< 0 >( output );
+    const auto curve = std::get< 0 >( geode::convert_brep_into_curve( model ) );
     OPENGEODE_EXCEPTION( curve->nb_vertices() == 16,
         "[Test] BRep - Wrong number of curve vertices" );
     OPENGEODE_EXCEPTION(
         curve->nb_edges() == 28, "[Test] BRep - Wrong number of curve edges" );
-    const auto new_curve =
-        std::get< 0 >( geode::new_convert_brep_into_curve( model ) );
-    OPENGEODE_EXCEPTION( new_curve->nb_vertices() == 16,
-        "[Test] BRep - Wrong number of curve vertices" );
-    OPENGEODE_EXCEPTION( new_curve->nb_edges() == 28,
-        "[Test] BRep - Wrong number of curve edges" );
-    const auto& surface = std::get< 1 >( output );
+    const auto surface =
+        std::get< 0 >( geode::convert_brep_into_surface( model ) );
     OPENGEODE_EXCEPTION( surface->nb_vertices() == 16,
         "[Test] BRep - Wrong number of surface vertices" );
     OPENGEODE_EXCEPTION( surface->nb_polygons() == 16,
         "[Test] BRep - Wrong number of surface polygons" );
-    const auto new_surface =
-        std::get< 0 >( geode::new_convert_brep_into_surface( model ) );
-    OPENGEODE_EXCEPTION( new_surface->nb_vertices() == 16,
-        "[Test] BRep - Wrong number of surface vertices" );
-    OPENGEODE_EXCEPTION( new_surface->nb_polygons() == 16,
-        "[Test] BRep - Wrong number of surface polygons" );
-    const auto& solid = std::get< 2 >( output );
+    const auto solid = std::get< 0 >( geode::convert_brep_into_solid( model ) );
     OPENGEODE_EXCEPTION( solid->nb_vertices() == 16,
         "[Test] BRep - Wrong number of solid vertices" );
     OPENGEODE_EXCEPTION( solid->nb_polyhedra() == 0,
@@ -78,22 +65,17 @@ void run_test_section()
     const auto model =
         geode::load_section( absl::StrCat( geode::data_path, "quad.og_sctn" ) );
 
-    const auto output = geode::convert_section_into_curve_and_surface( model );
-    const auto& curve = std::get< 0 >( output );
+    const auto curve =
+        std::get< 0 >( geode::convert_section_into_curve( model ) );
     OPENGEODE_EXCEPTION( curve->nb_vertices() == 0,
         "[Test] Section - Wrong number of curve vertices" );
     OPENGEODE_EXCEPTION( curve->nb_edges() == 0,
         "[Test] Section - Wrong number of curve edges" );
-    const auto& surface = std::get< 1 >( output );
+    const auto surface =
+        std::get< 0 >( geode::convert_section_into_surface( model ) );
     OPENGEODE_EXCEPTION( surface->nb_vertices() == 4,
         "[Test] Section - Wrong number of surface vertices" );
     OPENGEODE_EXCEPTION( surface->nb_polygons() == 1,
-        "[Test] Section - Wrong number of surface polygons" );
-    const auto new_surface =
-        std::get< 0 >( geode::new_convert_section_into_surface( model ) );
-    OPENGEODE_EXCEPTION( new_surface->nb_vertices() == 4,
-        "[Test] Section - Wrong number of surface vertices" );
-    OPENGEODE_EXCEPTION( new_surface->nb_polygons() == 1,
         "[Test] Section - Wrong number of surface polygons" );
 }
 
