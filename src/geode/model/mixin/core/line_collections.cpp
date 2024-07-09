@@ -260,8 +260,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto LineCollections< dimension >::ModifiableLineCollectionRange::end()
-        const -> const ModifiableLineCollectionRange&
+    auto
+        LineCollections< dimension >::ModifiableLineCollectionRange::end() const
+        -> const ModifiableLineCollectionRange&
     {
         return *this;
     }

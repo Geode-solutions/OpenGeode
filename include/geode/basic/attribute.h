@@ -372,7 +372,7 @@ namespace geode
             AttributeProperties properties,
             AttributeBase::AttributeKey )
             : VariableAttribute(
-                  std::move( default_value ), std::move( properties ) )
+                std::move( default_value ), std::move( properties ) )
         {
         }
 
@@ -761,7 +761,7 @@ namespace geode
             AttributeProperties properties,
             AttributeBase::AttributeKey )
             : SparseAttribute(
-                  std::move( default_value ), std::move( properties ) )
+                std::move( default_value ), std::move( properties ) )
         {
         }
 
