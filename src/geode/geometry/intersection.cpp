@@ -916,7 +916,7 @@ namespace geode
             first_correctness;
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
             second_correctness;
-        const auto compute_correctness = [&result, &first_correctness,
+        const auto compute_correctness = [&first_correctness,
                                              &second_correctness, &plane,
                                              &circle](
                                              const Point3D& intersection ) {

@@ -104,25 +104,15 @@ namespace geode
     Tetrahedron::Tetrahedron( const Tetrahedron& other ) noexcept = default;
     Tetrahedron::Tetrahedron( const OwnerTetrahedron& other ) noexcept
         : Base( other.vertices()[0],
-            other.vertices()[1],
-            other.vertices()[2],
-            other.vertices()[3] )
+              other.vertices()[1],
+              other.vertices()[2],
+              other.vertices()[3] )
     {
     }
     Tetrahedron& Tetrahedron::operator=(
         const Tetrahedron& ) noexcept = default;
     Tetrahedron::Tetrahedron( Tetrahedron&& ) noexcept = default;
     Tetrahedron& Tetrahedron::operator=( Tetrahedron&& ) noexcept = default;
-
-    template < typename PointType >
-    constexpr std::array< std::array< index_t, 3 >, 4 >
-        GenericTetrahedron< PointType >::tetrahedron_facet_vertex;
-    template opengeode_geometry_api const
-        std::array< std::array< index_t, 3 >, 4 >
-            GenericTetrahedron< RefPoint< 3 > >::tetrahedron_facet_vertex;
-    template opengeode_geometry_api const
-        std::array< std::array< index_t, 3 >, 4 >
-            GenericTetrahedron< Point< 3 > >::tetrahedron_facet_vertex;
 
     template class opengeode_geometry_api GenericTetrahedron< Point< 3 > >;
     template class opengeode_geometry_api GenericTetrahedron< RefPoint< 3 > >;
