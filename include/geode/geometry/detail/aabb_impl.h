@@ -137,7 +137,31 @@ namespace geode
             absl::Span< const BoundingBox< dimension > > bboxes,
             index_t node_index,
             index_t element_begin,
-            index_t element_end );
+            index_t element_end )
+        {
+            OPENGEODE_ASSERT(
+                node_index < tree_.size(), "Node index out of tree" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "Begin and End indices should be different" );
+            if( is_leaf( element_begin, element_end ) )
+            {
+                tree_[node_index] = bboxes[mapping_morton_[element_begin]];
+                return;
+            }
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            OPENGEODE_ASSERT(
+                it.child_left < tree_.size(), "Left index out of tree" );
+            OPENGEODE_ASSERT(
+                it.child_right < tree_.size(), "Right index out of tree" );
+            initialize_tree_recursive(
+                bboxes, it.child_left, element_begin, it.middle_box );
+            initialize_tree_recursive(
+                bboxes, it.child_right, it.middle_box, element_end );
+            // before box_union
+            tree_[node_index].add_box( node( it.child_left ) );
+            tree_[node_index].add_box( node( it.child_right ) );
+        }
 
         template < typename ACTION >
         void closest_element_box_recursive( const Point< dimension >& query,
@@ -191,13 +215,57 @@ namespace geode
             ACTION& action ) const;
 
         index_t closest_element_box_hint(
-            const Point< dimension >& query ) const;
+            const Point< dimension >& query ) const
+        {
+            index_t box_begin{ 0 };
+            index_t box_end{ nb_bboxes() };
+            index_t node_index{ Impl::ROOT_INDEX };
+            while( !is_leaf( box_begin, box_end ) )
+            {
+                const auto it =
+                    get_recursive_iterators( node_index, box_begin, box_end );
+                if( node( it.child_left ).signed_distance( query )
+                    < node( it.child_right ).signed_distance( query ) )
+                {
+                    box_end = it.middle_box;
+                    node_index = it.child_left;
+                }
+                else
+                {
+                    box_begin = it.middle_box;
+                    node_index = it.child_right;
+                }
+            }
+
+            return mapping_morton( box_begin );
+        }
 
         void containing_boxes_recursive( index_t node_index,
             index_t element_begin,
             index_t element_end,
             const Point< dimension >& query,
-            std::vector< index_t >& result ) const;
+            std::vector< index_t >& result ) const
+        {
+            OPENGEODE_ASSERT(
+                node_index < tree_.size(), "Node index out of tree" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "Begin and End indices should be different" );
+            if( !node( node_index ).contains( query ) )
+            {
+                return;
+            }
+            if( is_leaf( element_begin, element_end ) )
+            {
+                result.push_back( mapping_morton( element_begin ) );
+                return;
+            }
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            containing_boxes_recursive(
+                it.child_left, element_begin, it.middle_box, query, result );
+            containing_boxes_recursive(
+                it.child_right, it.middle_box, element_end, query, result );
+        }
 
     private:
         std::vector< BoundingBox< dimension > > tree_;
