@@ -24,6 +24,7 @@
 #include <geode/basic/file.h>
 
 #include <fstream>
+#include <string_view>
 
 #include <ghc/filesystem.hpp>
 
@@ -108,7 +109,7 @@ namespace geode
     }
 
     std::optional< std::string > next_keyword_if_it_exists(
-        std::ifstream& file, absl::string_view word )
+        std::ifstream& file, std::string_view word )
     {
         std::optional< std::string > line{ std::in_place };
         const auto previous_position = file.tellg();
