@@ -89,13 +89,13 @@ namespace geode
             return mesh_.polyhedron_facet_vertices( polyhedron_facet );
         }
 
-        absl::optional< index_t > element_adjacent(
+        std::optional< index_t > element_adjacent(
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_adjacent( polyhedron_facet );
         }
 
-        absl::optional< ElementFacet > element_adjacent_facet(
+        std::optional< ElementFacet > element_adjacent_facet(
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_adjacent_facet( polyhedron_facet );

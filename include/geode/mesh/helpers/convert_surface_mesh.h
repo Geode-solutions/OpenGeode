@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
+#include <optional>
+
 #include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
@@ -49,7 +50,7 @@ namespace geode
             const SurfaceMesh< dimension >& surface );
 
     template < index_t dimension >
-    absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
+    std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
         convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh< dimension >& surface );
 

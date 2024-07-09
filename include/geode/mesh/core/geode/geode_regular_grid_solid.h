@@ -102,7 +102,7 @@ namespace geode
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
             const override;
 
-        absl::optional< index_t > get_polyhedron_adjacent(
+        std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
         index_t cell_index( const Grid3D::CellIndices& index ) const override;

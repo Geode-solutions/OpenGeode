@@ -81,13 +81,13 @@ namespace geode
                    - starting_facet_index( facet_id );
         }
 
-        absl::optional< index_t > get_polyhedron_adjacent(
+        std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
             const auto adj = get_polyhedron_adjacent_impl( polyhedron_facet );
             if( adj == NO_ID )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return adj;
         }
@@ -465,7 +465,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t >
+    std::optional< index_t >
         OpenGeodePolyhedralSolid< dimension >::get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
     {

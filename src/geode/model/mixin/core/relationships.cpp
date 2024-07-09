@@ -83,7 +83,7 @@ namespace geode
             return relation_type_->value( edge_id ) == ITEM_RELATION;
         }
 
-        absl::optional< index_t > check_relation_exists(
+        std::optional< index_t > check_relation_exists(
             const uuid& from, const uuid& to, const RelationType type ) const
         {
             if( const auto edge_id = relation_edge_index( from, to ) )
@@ -93,7 +93,7 @@ namespace geode
                     return edge_id;
                 }
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         bool is_boundary( const uuid& from, const uuid& to ) const
@@ -432,7 +432,7 @@ namespace geode
         return impl_->relation_attribute_manager();
     }
 
-    absl::optional< index_t > Relationships::relation_index(
+    std::optional< index_t > Relationships::relation_index(
         const uuid& component_id1, const uuid& component_id2 ) const
     {
         return impl_->relation_edge_index( component_id1, component_id2 );

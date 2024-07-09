@@ -21,6 +21,8 @@
  *
  */
 
+#include <optional>
+
 #include <geode/geometry/distance.h>
 
 #include <absl/algorithm/container.h>
@@ -64,7 +66,7 @@ namespace
                     && signed_area_3 >= 0 );
     }
 
-    absl::optional< double > compute_point_line_distance( double segment_length,
+    std::optional< double > compute_point_line_distance( double segment_length,
         double point_to_v0_length,
         double point_to_v1_length )
     {
@@ -72,15 +74,15 @@ namespace
             ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
         if( p - point_to_v0_length <= geode::global_epsilon )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         if( p - point_to_v1_length <= geode::global_epsilon )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         if( p - segment_length <= geode::global_epsilon )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto area2 = p * ( p - point_to_v0_length )
                            * ( p - point_to_v1_length )

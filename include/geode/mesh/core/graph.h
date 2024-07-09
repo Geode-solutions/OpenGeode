@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <absl/container/inlined_vector.h>
@@ -153,7 +154,7 @@ namespace geode
 
         bool is_vertex_isolated( index_t vertex_id ) const;
 
-        absl::optional< index_t > edge_from_vertices(
+        std::optional< index_t > edge_from_vertices(
             index_t v0, index_t v1 ) const;
 
     public:

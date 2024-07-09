@@ -305,7 +305,7 @@ std::array< geode::index_t, 5 > order_pyramid_vertices(
 
 namespace geode
 {
-    absl::optional< std::unique_ptr< TetrahedralSolid3D > >
+    std::optional< std::unique_ptr< TetrahedralSolid3D > >
         convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid )
     {
         if( solid.type_name() == TetrahedralSolid3D::type_name_static() )
@@ -314,7 +314,7 @@ namespace geode
         }
         if( solid.type_name() == RegularGrid3D::type_name_static() )
         {
-            absl::optional< std::unique_ptr< TetrahedralSolid3D > > result{
+            std::optional< std::unique_ptr< TetrahedralSolid3D > > result{
                 create_tetrahedral_solid_from_grid(
                     dynamic_cast< const RegularGrid3D& >( solid ) )
             };
@@ -327,9 +327,9 @@ namespace geode
         {
             Logger::info( "[convert_solid_mesh_into_tetrahedral_solid] "
                           "SolidMesh is not made of only tetrahedra." );
-            return absl::nullopt;
+            return std::nullopt;
         }
-        absl::optional< std::unique_ptr< TetrahedralSolid3D > > tet_solid{
+        std::optional< std::unique_ptr< TetrahedralSolid3D > > tet_solid{
             TetrahedralSolid3D::create()
         };
         auto builder = TetrahedralSolidBuilder3D::create( *tet_solid->get() );
@@ -370,14 +370,14 @@ namespace geode
         return create_tetrahedral_solid_from_grid( grid );
     }
 
-    absl::optional< std::unique_ptr< HybridSolid3D > >
+    std::optional< std::unique_ptr< HybridSolid3D > >
         convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid )
     {
         if( !all_polyhedra_are_hybrid( solid ) )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
-        absl::optional< std::unique_ptr< HybridSolid3D > > hybrid_solid{
+        std::optional< std::unique_ptr< HybridSolid3D > > hybrid_solid{
             HybridSolid3D::create()
         };
         auto builder = HybridSolidBuilder3D::create( *hybrid_solid->get() );

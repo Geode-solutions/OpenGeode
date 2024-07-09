@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
+#include <optional>
+
 #include <absl/types/span.h>
 
 #include <geode/basic/passkey.h>
@@ -69,7 +70,7 @@ namespace geode
          * Get the index of edge corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        absl::optional< index_t > edge_from_vertices(
+        std::optional< index_t > edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!

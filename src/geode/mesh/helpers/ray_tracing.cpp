@@ -186,25 +186,25 @@ namespace geode
         {
         }
 
-        absl::optional< PolygonDistance > closest_polygon() const
+        std::optional< PolygonDistance > closest_polygon() const
         {
             if( results_.empty() )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             sort_results();
             return results_.front();
         }
 
-        absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+        std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
             closest_polygons( index_t size ) const
         {
             if( results_.empty() )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             sort_results();
-            absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+            std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
                 closest_polygons{ std::min(
                     size, static_cast< index_t >( results_.size() ) ) };
             for( const auto i : Indices{ closest_polygons.value() } )
@@ -321,13 +321,13 @@ namespace geode
 
     RayTracing3D::~RayTracing3D() = default;
 
-    absl::optional< RayTracing3D::PolygonDistance >
+    std::optional< RayTracing3D::PolygonDistance >
         RayTracing3D::closest_polygon() const
     {
         return impl_->closest_polygon();
     }
 
-    absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+    std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
         RayTracing3D::closest_polygons( index_t size ) const
     {
         return impl_->closest_polygons( size );
