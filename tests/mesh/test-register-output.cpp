@@ -42,7 +42,7 @@
 #include <geode/tests/common.h>
 
 template < typename GeodeFactory >
-void check_register( absl::string_view extension )
+void check_register( std::string_view extension )
 {
     OPENGEODE_EXCEPTION( GeodeFactory::has_creator( extension.data() ),
         "[Test] No creator for extension ", extension, " is not correct" );

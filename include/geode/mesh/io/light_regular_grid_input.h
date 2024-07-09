@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -44,7 +44,7 @@ namespace geode
      */
     template < index_t dimension >
     LightRegularGrid< dimension > load_light_regular_grid(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class LightRegularGridInput : public Input< LightRegularGrid< dimension > >
@@ -54,7 +54,7 @@ namespace geode
         using Base::InputData;
         using Base::MissingFiles;
 
-        explicit LightRegularGridInput( absl::string_view filename )
+        explicit LightRegularGridInput( std::string_view filename )
             : Base{ filename }
         {
         }
@@ -65,14 +65,14 @@ namespace geode
 
     template < index_t dimension >
     typename LightRegularGridInput< dimension >::MissingFiles
-        check_light_regular_grid_missing_files( absl::string_view filename );
+        check_light_regular_grid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_light_regular_grid_loadable( absl::string_view filename );
+    bool is_light_regular_grid_loadable( std::string_view filename );
 
     template < index_t dimension >
     using LightRegularGridInputFactory = Factory< std::string,
         LightRegularGridInput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( LightRegularGridInputFactory );
 } // namespace geode

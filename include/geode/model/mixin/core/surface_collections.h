@@ -96,7 +96,7 @@ namespace geode
 
         SurfaceCollectionRange surface_collections() const;
 
-        void save_surface_collections( absl::string_view directory ) const;
+        void save_surface_collections( std::string_view directory ) const;
 
     protected:
         SurfaceCollections();
@@ -133,7 +133,7 @@ namespace geode
             SurfaceCollectionsBuilderKey key );
 
         void load_surface_collections(
-            absl::string_view directory, SurfaceCollectionsBuilderKey key );
+            std::string_view directory, SurfaceCollectionsBuilderKey key );
 
         ModifiableSurfaceCollectionRange modifiable_surface_collections(
             SurfaceCollectionsBuilderKey key );

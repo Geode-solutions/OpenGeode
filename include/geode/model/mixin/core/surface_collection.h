@@ -72,7 +72,7 @@ namespace geode
         SurfaceCollection( SurfaceCollectionsKey ) : SurfaceCollection() {}
 
         void set_surface_collection_name(
-            absl::string_view name, SurfaceCollectionsBuilderKey )
+            std::string_view name, SurfaceCollectionsBuilderKey )
         {
             this->set_name( name );
         }

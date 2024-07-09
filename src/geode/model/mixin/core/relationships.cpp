@@ -162,7 +162,7 @@ namespace geode
             initialize_relation_attribute();
         }
 
-        void save( absl::string_view directory ) const
+        void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
@@ -176,7 +176,7 @@ namespace geode
                 "[Relationships::save] Error while writing file: ", filename );
         }
 
-        void load( absl::string_view directory )
+        void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
@@ -409,7 +409,7 @@ namespace geode
         return impl_->is_item( item, collection );
     }
 
-    void Relationships::save_relationships( absl::string_view directory ) const
+    void Relationships::save_relationships( std::string_view directory ) const
     {
         impl_->save( directory );
     }
@@ -422,7 +422,7 @@ namespace geode
     }
 
     void Relationships::load_relationships(
-        absl::string_view directory, RelationshipsBuilderKey )
+        std::string_view directory, RelationshipsBuilderKey )
     {
         return impl_->load( directory );
     }
@@ -476,8 +476,8 @@ namespace geode
     Relationships::RelationRangeIterator::RelationRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -560,8 +560,8 @@ namespace geode
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -644,8 +644,8 @@ namespace geode
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -728,8 +728,8 @@ namespace geode
     Relationships::InternalRangeIterator::InternalRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -812,8 +812,8 @@ namespace geode
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -896,8 +896,8 @@ namespace geode
     Relationships::ItemRangeIterator::ItemRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -980,8 +980,8 @@ namespace geode
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
         const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( component_id ),
-            relationships.impl_->end_edge( component_id ) )
+              relationships.impl_->begin_edge( component_id ),
+              relationships.impl_->end_edge( component_id ) )
     {
     }
 

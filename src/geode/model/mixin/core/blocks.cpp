@@ -61,8 +61,8 @@ namespace geode
     Blocks< dimension >::~Blocks() = default;
 
     template < index_t dimension >
-    auto Blocks< dimension >::operator=( Blocks&& ) noexcept
-        -> Blocks& = default;
+    auto Blocks< dimension >::operator=(
+        Blocks&& ) noexcept -> Blocks& = default;
 
     template < index_t dimension >
     index_t Blocks< dimension >::nb_blocks() const
@@ -90,7 +90,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::save_blocks( absl::string_view directory ) const
+    void Blocks< dimension >::save_blocks( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
         const auto prefix = absl::StrCat(
@@ -142,7 +142,7 @@ namespace geode
 
     template < index_t dimension >
     void Blocks< dimension >::load_blocks(
-        absl::string_view directory, BlocksBuilderKey /*unused*/ )
+        std::string_view directory, BlocksBuilderKey /*unused*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );

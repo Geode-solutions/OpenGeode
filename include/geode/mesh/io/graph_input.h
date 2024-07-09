@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     std::unique_ptr< Graph > opengeode_mesh_api load_graph(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an Graph.
@@ -54,7 +54,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     std::unique_ptr< Graph > opengeode_mesh_api load_graph(
-        absl::string_view filename );
+        std::string_view filename );
 
     class GraphInput : public Input< std::unique_ptr< Graph >, MeshImpl >
     {
@@ -64,14 +64,14 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        GraphInput( absl::string_view filename ) : Base{ filename } {}
+        GraphInput( std::string_view filename ) : Base{ filename } {}
     };
 
     typename GraphInput::MissingFiles opengeode_mesh_api
-        check_graph_missing_files( absl::string_view filename );
+        check_graph_missing_files( std::string_view filename );
 
-    bool opengeode_mesh_api is_graph_loadable( absl::string_view filename );
+    bool opengeode_mesh_api is_graph_loadable( std::string_view filename );
 
     using GraphInputFactory =
-        Factory< std::string, GraphInput, absl::string_view >;
+        Factory< std::string, GraphInput, std::string_view >;
 } // namespace geode

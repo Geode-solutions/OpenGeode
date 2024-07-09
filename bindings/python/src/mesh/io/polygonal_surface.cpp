@@ -40,7 +40,7 @@
         "load_polygonal_surface" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolygonalSurface< dimension > > ( * )(   \
-            absl::string_view ) >( &load_polygonal_surface< dimension > ) );   \
+            std::string_view ) >( &load_polygonal_surface< dimension > ) );    \
     const auto check##dimension = "check_polygonal_surface_missing_files"      \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

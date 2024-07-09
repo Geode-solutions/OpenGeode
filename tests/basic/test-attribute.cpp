@@ -274,7 +274,7 @@ bool managers_have_same_attributes( const geode::AttributeManager& manager,
 template < typename T >
 void check_one_attribute_values( geode::AttributeManager& manager,
     geode::AttributeManager& reloaded_manager,
-    absl::string_view name )
+    std::string_view name )
 {
     const auto in_att = manager.find_attribute< T >( name );
     const auto out_att = reloaded_manager.find_attribute< T >( name );

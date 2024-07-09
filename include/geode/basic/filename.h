@@ -28,20 +28,20 @@
 namespace geode
 {
     std::string opengeode_basic_api filename_with_extension(
-        absl::string_view path );
+        std::string_view path );
 
     std::string opengeode_basic_api filename_without_extension(
-        absl::string_view path );
+        std::string_view path );
 
     std::string opengeode_basic_api filepath_without_extension(
-        absl::string_view path );
+        std::string_view path );
 
     std::string opengeode_basic_api filepath_without_filename(
-        absl::string_view path );
+        std::string_view path );
 
-    absl::string_view opengeode_basic_api extension_from_filename(
-        absl::string_view filename );
+    std::string_view opengeode_basic_api extension_from_filename(
+        std::string_view filename );
 
     std::string opengeode_basic_api expand_predefined_folders(
-        absl::string_view path );
+        std::string_view path );
 } // namespace geode

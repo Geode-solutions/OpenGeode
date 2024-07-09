@@ -82,7 +82,7 @@ void check_texture(
     }
 }
 
-void save( const geode::TextureStorage2D& storage, absl::string_view filename )
+void save( const geode::TextureStorage2D& storage, std::string_view filename )
 {
     std::ofstream file{ geode::to_string( filename ), std::ofstream::binary };
     geode::TContext context{};
@@ -97,7 +97,7 @@ void save( const geode::TextureStorage2D& storage, absl::string_view filename )
         "[Bitsery::write] Error while writing file: ", filename );
 }
 
-geode::TextureStorage2D load( absl::string_view filename )
+geode::TextureStorage2D load( std::string_view filename )
 {
     std::ifstream file{ geode::to_string( filename ), std::ifstream::binary };
     geode::TContext context{};

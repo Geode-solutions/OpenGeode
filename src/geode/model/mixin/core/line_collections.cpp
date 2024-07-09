@@ -75,7 +75,7 @@ namespace geode
 
     template < index_t dimension >
     void LineCollections< dimension >::save_line_collections(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/line_collections" ) );
@@ -83,7 +83,7 @@ namespace geode
 
     template < index_t dimension >
     void LineCollections< dimension >::load_line_collections(
-        absl::string_view directory, LineCollectionsBuilderKey )
+        std::string_view directory, LineCollectionsBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/line_collections" ) );
@@ -260,9 +260,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto
-        LineCollections< dimension >::ModifiableLineCollectionRange::end() const
-        -> const ModifiableLineCollectionRange&
+    auto LineCollections< dimension >::ModifiableLineCollectionRange::end()
+        const -> const ModifiableLineCollectionRange&
     {
         return *this;
     }

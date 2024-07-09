@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -46,7 +46,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an PolygonalSurface.
@@ -56,7 +56,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class PolygonalSurfaceInput
@@ -70,21 +70,19 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        PolygonalSurfaceInput( absl::string_view filename ) : Base{ filename }
-        {
-        }
+        PolygonalSurfaceInput( std::string_view filename ) : Base{ filename } {}
     };
 
     template < index_t dimension >
     typename PolygonalSurfaceInput< dimension >::MissingFiles
-        check_polygonal_surface_missing_files( absl::string_view filename );
+        check_polygonal_surface_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_polygonal_surface_loadable( absl::string_view filename );
+    bool is_polygonal_surface_loadable( std::string_view filename );
 
     template < index_t dimension >
     using PolygonalSurfaceInputFactory = Factory< std::string,
         PolygonalSurfaceInput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( PolygonalSurfaceInputFactory );
 } // namespace geode

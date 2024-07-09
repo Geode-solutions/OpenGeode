@@ -64,7 +64,7 @@ namespace geode
                 return points_->size();
             }
 
-            absl::string_view attribute_name() const
+            std::string_view attribute_name() const
             {
                 return points_->name();
             }
@@ -125,7 +125,7 @@ namespace geode
             }
 
             PointsImpl(
-                AttributeManager& manager, absl::string_view attribute_name )
+                AttributeManager& manager, std::string_view attribute_name )
                 : points_{
                       manager
                           .template find_or_create_attribute< VariableAttribute,

@@ -120,7 +120,7 @@ namespace geode
         return string;
     }
 
-    uuid::uuid( absl::string_view string )
+    uuid::uuid( std::string_view string )
     {
         OPENGEODE_EXCEPTION( string.size() == 36, "[uuid] wrong string size" );
         OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'

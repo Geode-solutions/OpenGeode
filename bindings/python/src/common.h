@@ -27,7 +27,6 @@
 
 #include <absl/container/fixed_array.h>
 #include <absl/container/inlined_vector.h>
-#include <absl/strings/string_view.h>
 #include <absl/types/span.h>
 
 namespace pybind11
@@ -70,12 +69,5 @@ namespace pybind11
 
             std::vector< typename std::remove_const< Type >::type > cpp_;
         };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-
     } // namespace detail
 } // namespace pybind11

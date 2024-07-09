@@ -46,7 +46,7 @@ namespace geode
     class BlocksBuilder
     {
     public:
-        void load_blocks( absl::string_view directory );
+        void load_blocks( std::string_view directory );
 
         /*!
          * Get a pointer to the builder of a Block mesh
@@ -62,7 +62,7 @@ namespace geode
                 typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
         }
 
-        void set_block_name( const uuid& id, absl::string_view name );
+        void set_block_name( const uuid& id, std::string_view name );
 
     protected:
         BlocksBuilder( Blocks< dimension >& blocks ) : blocks_( blocks ) {}

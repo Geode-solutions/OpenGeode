@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -49,14 +48,14 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_triangulated_surface(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class TriangulatedSurfaceOutput
         : public Output< TriangulatedSurface< dimension > >
     {
     protected:
-        TriangulatedSurfaceOutput( absl::string_view filename )
+        TriangulatedSurfaceOutput( std::string_view filename )
             : Output< TriangulatedSurface< dimension > >{ filename }
         {
         }
@@ -65,11 +64,11 @@ namespace geode
     template < index_t dimension >
     bool is_triangulated_surface_saveable(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     using TriangulatedSurfaceOutputFactory = Factory< std::string,
         TriangulatedSurfaceOutput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( TriangulatedSurfaceOutputFactory );
 } // namespace geode

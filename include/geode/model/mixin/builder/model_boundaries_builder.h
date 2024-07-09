@@ -41,9 +41,9 @@ namespace geode
     class ModelBoundariesBuilder
     {
     public:
-        void load_model_boundaries( absl::string_view directory );
+        void load_model_boundaries( std::string_view directory );
 
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
+        void set_model_boundary_name( const uuid& id, std::string_view name );
 
     protected:
         ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )

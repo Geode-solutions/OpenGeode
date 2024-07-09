@@ -40,11 +40,11 @@ namespace geode
 
         void set_id( const uuid& unique_id );
 
-        void set_name( absl::string_view name );
+        void set_name( std::string_view name );
 
         void copy_identifier( const Identifier& other );
 
-        void load_identifier( absl::string_view directory );
+        void load_identifier( std::string_view directory );
 
     private:
         Identifier& identifier_;

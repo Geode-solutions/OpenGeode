@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -47,20 +46,20 @@ namespace geode
      * @param[in] filename Path to the file where save the section.
      */
     std::vector< std::string > opengeode_model_api save_section(
-        const Section& section, absl::string_view filename );
+        const Section& section, std::string_view filename );
 
     class SectionOutput : public Output< Section >
     {
     protected:
-        SectionOutput( absl::string_view filename )
+        SectionOutput( std::string_view filename )
             : Output< Section >{ filename }
         {
         }
     };
 
     bool opengeode_model_api is_section_saveable(
-        const Section& section, absl::string_view filename );
+        const Section& section, std::string_view filename );
 
     using SectionOutputFactory =
-        Factory< std::string, SectionOutput, absl::string_view >;
+        Factory< std::string, SectionOutput, std::string_view >;
 } // namespace geode

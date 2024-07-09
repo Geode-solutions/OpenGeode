@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -50,14 +49,14 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_polygonal_surface(
         const PolygonalSurface< dimension >& polygonal_surface,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class PolygonalSurfaceOutput
         : public Output< PolygonalSurface< dimension > >
     {
     protected:
-        PolygonalSurfaceOutput( absl::string_view filename )
+        PolygonalSurfaceOutput( std::string_view filename )
             : Output< PolygonalSurface< dimension > >{ filename }
         {
         }
@@ -66,11 +65,11 @@ namespace geode
     template < index_t dimension >
     bool is_polygonal_surface_saveable(
         const PolygonalSurface< dimension >& polygonal_surface,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     using PolygonalSurfaceOutputFactory = Factory< std::string,
         PolygonalSurfaceOutput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( PolygonalSurfaceOutputFactory );
 } // namespace geode

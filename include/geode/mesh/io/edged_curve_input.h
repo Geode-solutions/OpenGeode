@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -46,7 +46,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an EdgedCurve.
@@ -56,7 +56,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class EdgedCurveInput
@@ -69,18 +69,18 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        EdgedCurveInput( absl::string_view filename ) : Base{ filename } {}
+        EdgedCurveInput( std::string_view filename ) : Base{ filename } {}
     };
 
     template < index_t dimension >
     typename EdgedCurveInput< dimension >::MissingFiles
-        check_edged_curve_missing_files( absl::string_view filename );
+        check_edged_curve_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_edged_curve_loadable( absl::string_view filename );
+    bool is_edged_curve_loadable( std::string_view filename );
 
     template < index_t dimension >
     using EdgedCurveInputFactory =
-        Factory< std::string, EdgedCurveInput< dimension >, absl::string_view >;
+        Factory< std::string, EdgedCurveInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveInputFactory );
 } // namespace geode

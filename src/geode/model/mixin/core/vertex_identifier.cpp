@@ -72,11 +72,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< ComponentMeshVertex > >(
-                        "component vertices",
-                        std::vector< ComponentMeshVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< ComponentMeshVertex > >(
+                          "component vertices",
+                          std::vector< ComponentMeshVertex >{} ) )
         {
         }
 
@@ -355,7 +355,7 @@ namespace geode
             return old2new;
         }
 
-        void save( absl::string_view directory ) const
+        void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
             std::ofstream file{ filename, std::ofstream::binary };
@@ -370,7 +370,7 @@ namespace geode
                 filename );
         }
 
-        void load( absl::string_view directory )
+        void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
             std::ifstream file{ filename, std::ifstream::binary };
@@ -557,13 +557,13 @@ namespace geode
     }
 
     void VertexIdentifier::save_unique_vertices(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save( directory );
     }
 
     void VertexIdentifier::load_unique_vertices(
-        absl::string_view directory, BuilderKey )
+        std::string_view directory, BuilderKey )
     {
         return impl_->load( directory );
     }

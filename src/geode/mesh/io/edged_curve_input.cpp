@@ -23,8 +23,9 @@
 
 #include <geode/mesh/io/edged_curve_input.h>
 
+#include <string_view>
+
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
 #include <geode/basic/io.h>
@@ -38,7 +39,7 @@ namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
-        const MeshImpl& impl, absl::string_view filename )
+        const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
@@ -63,7 +64,7 @@ namespace geode
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
-        absl::string_view filename )
+        std::string_view filename )
     {
         return load_edged_curve< dimension >(
             MeshFactory::default_impl(
@@ -73,7 +74,7 @@ namespace geode
 
     template < index_t dimension >
     typename EdgedCurveInput< dimension >::MissingFiles
-        check_edged_curve_missing_files( absl::string_view filename )
+        check_edged_curve_missing_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             EdgedCurveInputFactory< dimension > >( filename );
@@ -81,7 +82,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_edged_curve_loadable( absl::string_view filename )
+    bool is_edged_curve_loadable( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             EdgedCurveInputFactory< dimension > >( filename );
@@ -89,22 +90,22 @@ namespace geode
     }
 
     template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
-        load_edged_curve( const MeshImpl&, absl::string_view );
+        load_edged_curve( const MeshImpl&, std::string_view );
     template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
-        load_edged_curve( const MeshImpl&, absl::string_view );
+        load_edged_curve( const MeshImpl&, std::string_view );
 
     template std::unique_ptr< EdgedCurve< 2 > >
-        opengeode_mesh_api load_edged_curve( absl::string_view );
+        opengeode_mesh_api load_edged_curve( std::string_view );
     template std::unique_ptr< EdgedCurve< 3 > >
-        opengeode_mesh_api load_edged_curve( absl::string_view );
+        opengeode_mesh_api load_edged_curve( std::string_view );
 
     template EdgedCurveInput< 2 >::MissingFiles opengeode_mesh_api
-        check_edged_curve_missing_files< 2 >( absl::string_view );
+        check_edged_curve_missing_files< 2 >( std::string_view );
     template EdgedCurveInput< 3 >::MissingFiles opengeode_mesh_api
-        check_edged_curve_missing_files< 3 >( absl::string_view );
+        check_edged_curve_missing_files< 3 >( std::string_view );
 
     template bool opengeode_mesh_api is_edged_curve_loadable< 2 >(
-        absl::string_view );
+        std::string_view );
     template bool opengeode_mesh_api is_edged_curve_loadable< 3 >(
-        absl::string_view );
+        std::string_view );
 } // namespace geode

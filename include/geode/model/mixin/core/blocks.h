@@ -108,7 +108,7 @@ namespace geode
         /*!
          * Save each Block in a file located in the specified directory
          */
-        void save_blocks( absl::string_view directory ) const;
+        void save_blocks( std::string_view directory ) const;
 
     protected:
         Blocks();
@@ -144,7 +144,7 @@ namespace geode
         void delete_block(
             const Block< dimension >& block, BlocksBuilderKey key );
 
-        void load_blocks( absl::string_view directory, BlocksBuilderKey key );
+        void load_blocks( std::string_view directory, BlocksBuilderKey key );
 
         ModifiableBlockRange modifiable_blocks( BlocksBuilderKey key );
 

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    RasterImage< dimension > load_raster_image( absl::string_view filename );
+    RasterImage< dimension > load_raster_image( std::string_view filename );
 
     template < index_t dimension >
     class RasterImageInput : public Input< RasterImage< dimension > >
@@ -55,19 +55,18 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        RasterImageInput( absl::string_view filename ) : Base{ filename } {}
+        RasterImageInput( std::string_view filename ) : Base{ filename } {}
     };
 
     template < index_t dimension >
     typename RasterImageInput< dimension >::MissingFiles
-        check_raster_image_missing_files( absl::string_view filename );
+        check_raster_image_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_raster_image_loadable( absl::string_view filename );
+    bool is_raster_image_loadable( std::string_view filename );
 
     template < index_t dimension >
-    using RasterImageInputFactory = Factory< std::string,
-        RasterImageInput< dimension >,
-        absl::string_view >;
+    using RasterImageInputFactory =
+        Factory< std::string, RasterImageInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( RasterImageInputFactory );
 } // namespace geode

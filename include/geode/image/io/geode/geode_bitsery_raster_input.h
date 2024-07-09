@@ -34,7 +34,7 @@ namespace geode
     class OpenGeodeRasterImageInput : public RasterImageInput< dimension >
     {
     public:
-        OpenGeodeRasterImageInput( absl::string_view filename )
+        OpenGeodeRasterImageInput( std::string_view filename )
             : RasterImageInput< dimension >( filename )
         {
         }

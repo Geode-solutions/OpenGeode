@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      * @return Loaded BRep.
      */
-    BRep opengeode_model_api load_brep( absl::string_view filename );
+    BRep opengeode_model_api load_brep( std::string_view filename );
 
     class BRepInput : public Input< BRep >
     {
@@ -54,14 +54,14 @@ namespace geode
         using Base::MissingFiles;
 
     protected:
-        BRepInput( absl::string_view filename ) : Base{ filename } {}
+        BRepInput( std::string_view filename ) : Base{ filename } {}
     };
 
     typename BRepInput::MissingFiles opengeode_model_api
-        check_brep_missing_files( absl::string_view filename );
+        check_brep_missing_files( std::string_view filename );
 
-    bool opengeode_model_api is_brep_loadable( absl::string_view filename );
+    bool opengeode_model_api is_brep_loadable( std::string_view filename );
 
     using BRepInputFactory =
-        Factory< std::string, BRepInput, absl::string_view >;
+        Factory< std::string, BRepInput, std::string_view >;
 } // namespace geode

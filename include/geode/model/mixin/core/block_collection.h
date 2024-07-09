@@ -72,7 +72,7 @@ namespace geode
         BlockCollection( BlockCollectionsKey ) : BlockCollection() {}
 
         void set_block_collection_name(
-            absl::string_view name, BlockCollectionsBuilderKey )
+            std::string_view name, BlockCollectionsBuilderKey )
         {
             this->set_name( name );
         }

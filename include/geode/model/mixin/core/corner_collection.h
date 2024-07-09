@@ -72,7 +72,7 @@ namespace geode
         CornerCollection( CornerCollectionsKey ) : CornerCollection() {}
 
         void set_corner_collection_name(
-            absl::string_view name, CornerCollectionsBuilderKey )
+            std::string_view name, CornerCollectionsBuilderKey )
         {
             this->set_name( name );
         }

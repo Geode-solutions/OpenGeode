@@ -24,10 +24,10 @@
 #include <geode/mesh/io/triangulated_surface_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 #include <geode/basic/io.h>
@@ -41,7 +41,7 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_triangulated_surface(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto type = absl::StrCat( "TriangulatedSurface", dimension, "D" );
         try
@@ -66,7 +66,7 @@ namespace geode
     template < index_t dimension >
     bool is_triangulated_surface_saveable(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             TriangulatedSurfaceOutputFactory< dimension > >( filename );
@@ -75,13 +75,13 @@ namespace geode
 
     template std::vector< std::string >
         opengeode_mesh_api save_triangulated_surface(
-            const TriangulatedSurface< 2 >&, absl::string_view );
+            const TriangulatedSurface< 2 >&, std::string_view );
     template std::vector< std::string >
         opengeode_mesh_api save_triangulated_surface(
-            const TriangulatedSurface< 3 >&, absl::string_view );
+            const TriangulatedSurface< 3 >&, std::string_view );
 
     template bool opengeode_mesh_api is_triangulated_surface_saveable(
-        const TriangulatedSurface< 2 >&, absl::string_view );
+        const TriangulatedSurface< 2 >&, std::string_view );
     template bool opengeode_mesh_api is_triangulated_surface_saveable(
-        const TriangulatedSurface< 3 >&, absl::string_view );
+        const TriangulatedSurface< 3 >&, std::string_view );
 } // namespace geode
