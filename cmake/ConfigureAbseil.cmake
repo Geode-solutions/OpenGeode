@@ -42,6 +42,7 @@ ExternalProject_Add(abseil
         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${ABSEIL_INSTALL_PREFIX}
+        -DABSL_BUILD_TESTING:BOOL=OFF
 )
 
 ExternalProject_Add_StepTargets(abseil download)
