@@ -272,10 +272,10 @@ namespace geode
     public:
         Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) ),
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) ),
               polygons_around_vertex_(
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -830,7 +830,7 @@ namespace geode
         const auto nb_vertices = nb_polygon_vertices( polygon );
         const local_index_t vertex =
             edge + vertex_id == nb_vertices ? 0 : edge + vertex_id;
-        return polygon_vertex( PolygonVertex{ polygon, vertex } );
+        return polygon_vertex( { polygon, vertex } );
     }
 
     template < index_t dimension >
