@@ -62,7 +62,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block()
         : Block( mesh_factory.default_impl(
-              PolyhedralSolid< dimension >::type_name_static() ) )
+            PolyhedralSolid< dimension >::type_name_static() ) )
     {
     }
 

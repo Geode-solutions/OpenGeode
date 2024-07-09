@@ -153,8 +153,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Line< dimension >::modifiable_mesh(
-        LinesBuilderKey /*unused*/ ) -> Mesh&
+    auto Line< dimension >::modifiable_mesh( LinesBuilderKey /*unused*/ )
+        -> Mesh&
     {
         return modifiable_mesh();
     }
