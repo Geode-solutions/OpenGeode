@@ -32,6 +32,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/aabb.h>
+#include <geode/geometry/points_sort.h>
 
 namespace geode
 {
@@ -62,21 +63,75 @@ namespace geode
     public:
         Impl() = default;
 
-        Impl( absl::Span< const BoundingBox< dimension > > bboxes );
+        Impl( absl::Span< const BoundingBox< dimension > > bboxes )
+            : tree_( bboxes.empty() ? ROOT_INDEX
+                                    : max_node_index_recursive(
+                                          ROOT_INDEX, 0, bboxes.size() )
+                                          + ROOT_INDEX ),
+              mapping_morton_( [&bboxes]() {
+                  absl::FixedArray< geode::Point< dimension > > points(
+                      bboxes.size() );
+                  for( const auto i : Indices{ bboxes } )
+                  {
+                      points[i] = bboxes[i].min() + bboxes[i].max();
+                  }
+                  return geode::morton_mapping< dimension >( points );
+              }() )
+        {
+            if( !bboxes.empty() )
+            {
+                initialize_tree_recursive(
+                    bboxes, ROOT_INDEX, 0, bboxes.size() );
+            }
+        }
 
-        index_t nb_bboxes() const;
+        index_t nb_bboxes() const
+        {
+            return mapping_morton_.size();
+        }
 
-        static bool is_leaf( index_t box_begin, index_t box_end );
+        static bool is_leaf( index_t box_begin, index_t box_end )
+        {
+            return box_begin + 1 == box_end;
+        }
 
         static Iterator get_recursive_iterators(
-            index_t node_index, index_t box_begin, index_t box_end );
+            index_t node_index, index_t box_begin, index_t box_end )
+        {
+            Iterator it;
+            it.middle_box = box_begin + ( box_end - box_begin ) / 2;
+            it.child_left = 2 * node_index;
+            it.child_right = 2 * node_index + 1;
+            return it;
+        }
 
-        const BoundingBox< dimension >& node( index_t index ) const;
+        const BoundingBox< dimension >& node( index_t index ) const
+        {
+            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
+            return tree_[index];
+        }
 
-        index_t mapping_morton( index_t index ) const;
+        index_t mapping_morton( index_t index ) const
+        {
+            return mapping_morton_[index];
+        }
 
         static index_t max_node_index_recursive(
-            index_t node_index, index_t box_begin, index_t box_end );
+            index_t node_index, index_t box_begin, index_t box_end )
+        {
+            OPENGEODE_ASSERT( box_end > box_begin,
+                "End box index should be after Begin box index" );
+            if( is_leaf( box_begin, box_end ) )
+            {
+                return node_index;
+            }
+            const auto it =
+                get_recursive_iterators( node_index, box_begin, box_end );
+            return std::max( max_node_index_recursive(
+                                 it.child_left, box_begin, it.middle_box ),
+                max_node_index_recursive(
+                    it.child_right, it.middle_box, box_end ) );
+        }
 
         void initialize_tree_recursive(
             absl::Span< const BoundingBox< dimension > > bboxes,

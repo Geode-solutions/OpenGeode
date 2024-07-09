@@ -67,8 +67,8 @@ namespace geode
     public:
         using Base = Input< std::unique_ptr< TriangulatedSurface< dimension > >,
             MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
         TriangulatedSurfaceInput( absl::string_view filename )
