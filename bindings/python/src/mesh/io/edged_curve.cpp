@@ -54,8 +54,10 @@
         "is_edged_curve_saveable" + std::to_string( dimension ) + "D";         \
     module.def(                                                                \
         saveable##dimension.c_str(), &is_edged_curve_saveable< dimension > );  \
-    PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
-    PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D,                \
+        edged_curve_input_factory_##dimension##d );                            \
+    PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D,               \
+        edged_curve_output_factory_##dimension##d )
 
 namespace geode
 {

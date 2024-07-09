@@ -54,8 +54,10 @@
         "is_hybrid_solid_saveable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \
         saveable##dimension.c_str(), &is_hybrid_solid_saveable< dimension > ); \
-    PYTHON_FACTORY_CLASS( HybridSolidInputFactory##dimension##D );             \
-    PYTHON_FACTORY_CLASS( HybridSolidOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( HybridSolidInputFactory##dimension##D,               \
+        hybrid_solid_input_factory_##dimension##d );                           \
+    PYTHON_FACTORY_CLASS( HybridSolidOutputFactory##dimension##D,              \
+        hybrid_solid_output_factory_##dimension##d )
 
 namespace geode
 {

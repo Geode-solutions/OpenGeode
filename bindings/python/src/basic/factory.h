@@ -23,7 +23,8 @@
 
 #include <geode/basic/factory.h>
 
-#define PYTHON_FACTORY_CLASS( type )                                           \
+#define PYTHON_FACTORY_CLASS( type, name )                                     \
     pybind11::class_< type >( module, #type )                                  \
         .def( "list_creators", &type::list_creators )                          \
-        .def( "has_creator", &type::has_creator )
+        .def( "has_creator", &type::has_creator );                             \
+    module.attr( #name ) = name

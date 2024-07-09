@@ -57,8 +57,10 @@
                                      + std::to_string( dimension ) + "D";      \
     module.def( saveable##dimension.c_str(),                                   \
         &is_triangulated_surface_saveable< dimension > );                      \
-    PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
-    PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D,       \
+        triangulated_surface_input_factory_##dimension##d );                   \
+    PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D,      \
+        triangulated_surface_output_factory_##dimension##d )
 
 namespace geode
 {

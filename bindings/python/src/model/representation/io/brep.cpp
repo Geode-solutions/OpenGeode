@@ -39,7 +39,7 @@ namespace geode
         module.def( "is_brep_loadable", &is_brep_loadable );
         module.def( "is_brep_saveable", &is_brep_saveable );
         PYTHON_INPUT_CLASS( BRep, "BRep" );
-        PYTHON_FACTORY_CLASS( BRepInputFactory );
-        PYTHON_FACTORY_CLASS( BRepOutputFactory );
+        PYTHON_FACTORY_CLASS( BRepInputFactory, brep_input_factory );
+        PYTHON_FACTORY_CLASS( BRepOutputFactory, brep_output_factory );
     }
 } // namespace geode

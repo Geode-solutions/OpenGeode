@@ -53,8 +53,10 @@
         "is_raster_image_saveable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \
         saveable##dimension.c_str(), &is_raster_image_saveable< dimension > ); \
-    PYTHON_FACTORY_CLASS( RasterImageInputFactory##dimension##D );             \
-    PYTHON_FACTORY_CLASS( RasterImageOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( RasterImageInputFactory##dimension##D,               \
+        raster_image_input_factory_##dimension##d );                           \
+    PYTHON_FACTORY_CLASS( RasterImageOutputFactory##dimension##D,              \
+        raster_image_output_factory_##dimension##d )
 
 namespace geode
 {

@@ -55,8 +55,10 @@
         "is_light_regular_grid_saveable" + std::to_string( dimension ) + "D";  \
     module.def( saveable##dimension.c_str(),                                   \
         &is_light_regular_grid_saveable< dimension > );                        \
-    PYTHON_FACTORY_CLASS( LightRegularGridInputFactory##dimension##D );        \
-    PYTHON_FACTORY_CLASS( LightRegularGridOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( LightRegularGridInputFactory##dimension##D,          \
+        light_regular_grid_input_factory_##dimension##d );                     \
+    PYTHON_FACTORY_CLASS( LightRegularGridOutputFactory##dimension##D,         \
+        light_regular_grid_output_factory_##dimension##d )
 
 namespace geode
 {

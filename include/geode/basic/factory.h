@@ -133,6 +133,7 @@ namespace geode
 
 #define FACTORY_2D( Type, Name )                                               \
     FACTORY( Type, Name );                                                     \
+    ALIAS_2D( Type );                                                          \
     inline Type< 2 > Name##_2d{};                                              \
     template <>                                                                \
     constexpr const Type< 2 >& Name< 2 >()                                     \
@@ -142,6 +143,7 @@ namespace geode
 
 #define FACTORY_3D( Type, Name )                                               \
     FACTORY( Type, Name );                                                     \
+    ALIAS_3D( Type );                                                          \
     inline Type< 3 > Name##_3d{};                                              \
     template <>                                                                \
     constexpr const Type< 3 >& Name< 3 >()                                     \

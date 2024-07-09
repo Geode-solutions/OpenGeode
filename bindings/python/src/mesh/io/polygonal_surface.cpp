@@ -55,8 +55,10 @@
         "is_polygonal_surface_saveable" + std::to_string( dimension ) + "D";   \
     module.def( saveable##dimension.c_str(),                                   \
         &is_polygonal_surface_saveable< dimension > );                         \
-    PYTHON_FACTORY_CLASS( PolygonalSurfaceInputFactory##dimension##D );        \
-    PYTHON_FACTORY_CLASS( PolygonalSurfaceOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( PolygonalSurfaceInputFactory##dimension##D,          \
+        polygonal_surface_input_factory_##dimension##d );                      \
+    PYTHON_FACTORY_CLASS( PolygonalSurfaceOutputFactory##dimension##D,         \
+        polygonal_surface_output_factory_##dimension##d )
 
 namespace geode
 {

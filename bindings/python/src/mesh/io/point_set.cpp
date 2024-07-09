@@ -54,8 +54,10 @@
         "is_point_set_saveable" + std::to_string( dimension ) + "D";           \
     module.def(                                                                \
         saveable##dimension.c_str(), &is_point_set_saveable< dimension > );    \
-    PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D );                \
-    PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D,                  \
+        point_set_input_factory_##dimension##d );                              \
+    PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D,                 \
+        point_set_output_factory_##dimension##d )
 
 namespace geode
 {

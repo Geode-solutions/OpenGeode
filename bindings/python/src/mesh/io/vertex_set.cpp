@@ -42,7 +42,8 @@ namespace geode
         module.def( "is_vertex_set_loadable", &is_vertex_set_loadable );
         module.def( "is_vertex_set_saveable", &is_vertex_set_saveable );
         PYTHON_INPUT_MESH_CLASS( std::unique_ptr< VertexSet >, "VertexSet" );
-        PYTHON_FACTORY_CLASS( VertexSetInputFactory );
-        PYTHON_FACTORY_CLASS( VertexSetOutputFactory );
+        PYTHON_FACTORY_CLASS( VertexSetInputFactory, vertex_set_input_factory );
+        PYTHON_FACTORY_CLASS(
+            VertexSetOutputFactory, vertex_set_output_factory );
     }
 } // namespace geode

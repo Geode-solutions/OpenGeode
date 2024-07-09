@@ -41,7 +41,7 @@ namespace geode
         module.def( "is_graph_loadable", &is_graph_loadable );
         module.def( "is_graph_saveable", &is_graph_saveable );
         PYTHON_INPUT_MESH_CLASS( std::unique_ptr< Graph >, "Graph" );
-        PYTHON_FACTORY_CLASS( GraphInputFactory );
-        PYTHON_FACTORY_CLASS( GraphOutputFactory );
+        PYTHON_FACTORY_CLASS( GraphInputFactory, graph_input_factory );
+        PYTHON_FACTORY_CLASS( GraphOutputFactory, graph_output_factory );
     }
 } // namespace geode

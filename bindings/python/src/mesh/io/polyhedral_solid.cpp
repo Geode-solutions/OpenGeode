@@ -55,8 +55,10 @@
         "is_polyhedral_solid_saveable" + std::to_string( dimension ) + "D";    \
     module.def( saveable##dimension.c_str(),                                   \
         &is_polyhedral_solid_saveable< dimension > );                          \
-    PYTHON_FACTORY_CLASS( PolyhedralSolidInputFactory##dimension##D );         \
-    PYTHON_FACTORY_CLASS( PolyhedralSolidOutputFactory##dimension##D )
+    PYTHON_FACTORY_CLASS( PolyhedralSolidInputFactory##dimension##D,           \
+        polyhedral_solid_input_factory_##dimension##d );                       \
+    PYTHON_FACTORY_CLASS( PolyhedralSolidOutputFactory##dimension##D,          \
+        polyhedral_solid_output_factory_##dimension##d )
 
 namespace geode
 {

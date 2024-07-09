@@ -40,7 +40,7 @@ namespace geode
         module.def( "is_section_loadable", &is_section_loadable );
         module.def( "is_section_saveable", &is_section_saveable );
         PYTHON_INPUT_CLASS( Section, "Section" );
-        PYTHON_FACTORY_CLASS( SectionInputFactory );
-        PYTHON_FACTORY_CLASS( SectionOutputFactory );
+        PYTHON_FACTORY_CLASS( SectionInputFactory, section_input_factory );
+        PYTHON_FACTORY_CLASS( SectionOutputFactory, section_output_factory );
     }
 } // namespace geode
