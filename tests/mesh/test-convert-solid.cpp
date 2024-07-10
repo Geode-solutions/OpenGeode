@@ -47,13 +47,15 @@ void test_tetrahedral_solid()
     geode::OpenGeodeMeshLibrary::initialize();
     auto mesh_grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *mesh_grid );
-    builder->initialize_grid( { { 1, 1.5, 1.1 } }, { 5, 5, 5 }, 5 );
+    builder->initialize_grid(
+        geode::Point3D{ { 1, 1.5, 1.1 } }, { 5, 5, 5 }, 5 );
     const auto tet_solid_from_mesh_grid_1 =
         geode::convert_solid_mesh_into_tetrahedral_solid( *mesh_grid );
     const auto tet_solid_from_mesh_grid_2 =
         geode::convert_grid_into_tetrahedral_solid( *mesh_grid );
-    const geode::LightRegularGrid3D light_grid{ { { 1, 1.5, 1.1 } },
-        { 5, 5, 5 }, { 5, 5, 5 } };
+    const geode::LightRegularGrid3D light_grid{
+        geode::Point3D{ { 1, 1.5, 1.1 } }, { 5, 5, 5 }, { 5, 5, 5 }
+    };
     auto tet_solid_from_light_grid =
         geode::convert_grid_into_tetrahedral_solid( *mesh_grid );
     const geode::index_t nb_vertices = 6 * 6 * 6;
@@ -94,14 +96,14 @@ void test_hybrid_solid()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     std::vector< geode::Point3D > hex_points{
-        { { 0, 0, 0 } },
-        { { 1, 0, 0 } },
-        { { 0, 1, 0 } },
-        { { 1, 1, 0 } },
-        { { 0, 0, 1 } },
-        { { 1, 0, 1 } },
-        { { 0, 1, 1 } },
-        { { 1, 1, 1 } },
+        geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 1, 1, 0 } },
+        geode::Point3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 1, 0, 1 } },
+        geode::Point3D{ { 0, 1, 1 } },
+        geode::Point3D{ { 1, 1, 1 } },
     };
     auto hex = geode::SolidMesh3D::create();
     auto builder_hex = geode::SolidMeshBuilder3D::create( *hex );
@@ -116,12 +118,12 @@ void test_hybrid_solid()
     geode::save_hybrid_solid(
         *hybrid_solid_hex.value(), "hybrid_solid_hex.og_hso3d" );
     std::vector< geode::Point3D > prism_points{
-        { { 0, 0, 0 } },
-        { { 1, 0, 0 } },
-        { { 0, 1, 0 } },
-        { { 0, 0, 1 } },
-        { { 1, 0, 1 } },
-        { { 0, 1, 1 } },
+        geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 1, 0, 1 } },
+        geode::Point3D{ { 0, 1, 1 } },
     };
     auto prism = geode::SolidMesh3D::create();
     auto builder_prism = geode::SolidMeshBuilder3D::create( *prism );
@@ -136,9 +138,9 @@ void test_hybrid_solid()
         geode::convert_solid_mesh_into_hybrid_solid( *prism );
     geode::save_hybrid_solid(
         *hybrid_solid_prism.value(), "hybrid_solid_prism.og_hso3d" );
-    std::vector< geode::Point3D > pyramid_points{ { { 0, 0, 0 } },
-        { { 1, 0, 0 } }, { { 1, 1, 0 } }, { { 0, 1, 0 } },
-        { { 0.5, 0.5, 1 } } };
+    std::vector< geode::Point3D > pyramid_points{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 1, 1, 0 } },
+        geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0.5, 0.5, 1 } } };
     auto pyramid = geode::SolidMesh3D::create();
     auto builder_pyramid = geode::SolidMeshBuilder3D::create( *pyramid );
     for( const auto& point : pyramid_points )

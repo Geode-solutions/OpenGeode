@@ -41,14 +41,14 @@ void build_test_solid( geode::TetrahedralSolid3D& solid )
 {
     auto builder = geode::TetrahedralSolidBuilder3D::create( solid );
     builder->create_vertices( 8 );
-    builder->set_point( 0, { { 0, 0, 0 } } );
-    builder->set_point( 1, { { 1, 0, 0 } } );
-    builder->set_point( 2, { { 1, 1, 0 } } );
-    builder->set_point( 3, { { 0, 1, 0 } } );
-    builder->set_point( 4, { { 0, 0, 1 } } );
-    builder->set_point( 5, { { 1, 0, 1 } } );
-    builder->set_point( 6, { { 1, 1, 1 } } );
-    builder->set_point( 7, { { 0, 1, 1 } } );
+    builder->set_point( 0, geode::Point3D{ { 0, 0, 0 } } );
+    builder->set_point( 1, geode::Point3D{ { 1, 0, 0 } } );
+    builder->set_point( 2, geode::Point3D{ { 1, 1, 0 } } );
+    builder->set_point( 3, geode::Point3D{ { 0, 1, 0 } } );
+    builder->set_point( 4, geode::Point3D{ { 0, 0, 1 } } );
+    builder->set_point( 5, geode::Point3D{ { 1, 0, 1 } } );
+    builder->set_point( 6, geode::Point3D{ { 1, 1, 1 } } );
+    builder->set_point( 7, geode::Point3D{ { 0, 1, 1 } } );
     builder->create_tetrahedron( { 0, 4, 1, 3 } );
     builder->create_tetrahedron( { 1, 2, 3, 6 } );
     builder->create_tetrahedron( { 1, 4, 5, 6 } );
@@ -64,7 +64,8 @@ void check_solid_tree( const geode::AABBTree3D& tree,
     geode::Point3D nearest_point;
     double distance;
     std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box( { { 0, 0, 0 } }, distance_action );
+        tree.closest_element_box(
+            geode::Point3D{ { 0, 0, 0 } }, distance_action );
     OPENGEODE_EXCEPTION(
         tetrahedron_box_id == 0, "Wrong tetrahedron id on query 1" );
     OPENGEODE_EXCEPTION( ( nearest_point == geode::Point3D{ { 0, 0, 0 } } ),
@@ -73,7 +74,8 @@ void check_solid_tree( const geode::AABBTree3D& tree,
         inexact_equal( distance, 0., 1e-7 ), "Wrong distance on query 1" );
 
     std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box( { { 1, 0, 1 } }, distance_action );
+        tree.closest_element_box(
+            geode::Point3D{ { 1, 0, 1 } }, distance_action );
     OPENGEODE_EXCEPTION(
         tetrahedron_box_id == 2, "Wrong tetrahedron id on query 2" );
     OPENGEODE_EXCEPTION( ( nearest_point == geode::Point3D{ { 1, 0, 1 } } ),
@@ -82,14 +84,16 @@ void check_solid_tree( const geode::AABBTree3D& tree,
         inexact_equal( distance, 0., 1e-7 ), "Wrong distance on query 2" );
 
     std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box( { { 0.5, 0.5, 0.5 } }, distance_action );
+        tree.closest_element_box(
+            geode::Point3D{ { 0.5, 0.5, 0.5 } }, distance_action );
     OPENGEODE_EXCEPTION(
         tetrahedron_box_id == 4, "Wrong tetrahedron id on query 3" );
     OPENGEODE_EXCEPTION(
         inexact_equal( distance, 0., 1e-7 ), "Wrong distance on query 3" );
 
     std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box( { { -0.5, 0.5, 0.5 } }, distance_action );
+        tree.closest_element_box(
+            geode::Point3D{ { -0.5, 0.5, 0.5 } }, distance_action );
     OPENGEODE_EXCEPTION( ( nearest_point == geode::Point3D{ { 0, 0.5, 0.5 } } ),
         "Wrong nearest point on query 4" );
     OPENGEODE_EXCEPTION(

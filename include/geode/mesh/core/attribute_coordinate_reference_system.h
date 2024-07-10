@@ -42,7 +42,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        AttributeCoordinateReferenceSystem( AttributeManager& manager );
+        explicit AttributeCoordinateReferenceSystem(
+            AttributeManager& manager );
         AttributeCoordinateReferenceSystem(
             AttributeManager& manager, absl::string_view attribute_name );
         ~AttributeCoordinateReferenceSystem();

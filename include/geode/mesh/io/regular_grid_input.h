@@ -68,7 +68,10 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        RegularGridInput( absl::string_view filename ) : Base{ filename } {}
+        explicit RegularGridInput( absl::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

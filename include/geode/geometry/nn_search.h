@@ -60,7 +60,7 @@ namespace geode
         };
 
     public:
-        NNSearch( std::vector< Point< dimension > > points );
+        explicit NNSearch( std::vector< Point< dimension > > points );
         NNSearch( NNSearch&& other ) noexcept;
         ~NNSearch();
 

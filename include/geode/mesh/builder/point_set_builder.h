@@ -67,7 +67,7 @@ namespace geode
         void copy( const PointSet< dimension >& point_set );
 
     protected:
-        PointSetBuilder( PointSet< dimension >& mesh );
+        explicit PointSetBuilder( PointSet< dimension >& mesh );
 
     private:
         virtual void do_copy_points( const PointSet< dimension >& mesh ) = 0;

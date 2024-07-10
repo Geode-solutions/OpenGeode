@@ -72,7 +72,10 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        PolyhedralSolidInput( absl::string_view filename ) : Base{ filename } {}
+        explicit PolyhedralSolidInput( absl::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

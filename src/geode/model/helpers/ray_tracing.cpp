@@ -103,11 +103,13 @@ namespace geode
     bool is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point )
     {
-        std::array< Vector3D, 12 > directions = { { { { 0., 0., 1. } },
-            { { 0.1, 0., 1. } }, { { 0.3, 0., 1. } }, { { 0.5, 0., 1. } },
-            { { 0., 1., 0. } }, { { 0.1, 1., 0. } }, { { 0.3, 1., 0. } },
-            { { 0.5, 1., 0. } }, { { 1., 0., 0. } }, { { 1., 0., 0.1 } },
-            { { 1., 0., 0.3 } }, { { 1., 0., 0.5 } } } };
+        std::array< Vector3D, 12 > directions = { { Vector3D{ { 0., 0., 1. } },
+            Vector3D{ { 0.1, 0., 1. } }, Vector3D{ { 0.3, 0., 1. } },
+            Vector3D{ { 0.5, 0., 1. } }, Vector3D{ { 0., 1., 0. } },
+            Vector3D{ { 0.1, 1., 0. } }, Vector3D{ { 0.3, 1., 0. } },
+            Vector3D{ { 0.5, 1., 0. } }, Vector3D{ { 1., 0., 0. } },
+            Vector3D{ { 1., 0., 0.1 } }, Vector3D{ { 1., 0., 0.3 } },
+            Vector3D{ { 1., 0., 0.5 } } } };
 
         for( const auto& direction : directions )
         {

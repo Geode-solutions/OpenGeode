@@ -51,7 +51,7 @@ namespace geode
         OpenGeodeRegularGridBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodeRegularGridBuilder( OpenGeodeRegularGrid< 3 >& mesh );
+        explicit OpenGeodeRegularGridBuilder( OpenGeodeRegularGrid< 3 >& mesh );
 
     private:
         void update_origin( const Point3D& origin ) final;

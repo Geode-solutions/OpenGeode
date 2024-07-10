@@ -71,7 +71,10 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        HybridSolidInput( absl::string_view filename ) : Base{ filename } {}
+        explicit HybridSolidInput( absl::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

@@ -140,36 +140,63 @@ namespace
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         geode::detail::PolygonsAroundVertexImpl result;
-        auto cur_polygon_edge = first_polygon;
+        auto cur_polygon_vertex = first_polygon;
         do
         {
             OPENGEODE_ASSERT(
-                mesh.polygon_vertex( cur_polygon_edge.value() ) == vertex_id,
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex" );
-            result.polygons.push_back( cur_polygon_edge.value() );
-            const auto prev_edge =
-                mesh.previous_polygon_edge( cur_polygon_edge.value() );
-            cur_polygon_edge = mesh.polygon_adjacent_edge( prev_edge );
+            result.polygons.push_back( cur_polygon_vertex.value() );
+            const auto prev_vertex =
+                mesh.previous_polygon_vertex( cur_polygon_vertex.value() );
+            auto adj_edge =
+                mesh.polygon_adjacent_edge( geode::PolygonEdge{ prev_vertex } );
             safety_count++;
-        } while( cur_polygon_edge && cur_polygon_edge != first_polygon
+            if( adj_edge )
+            {
+                cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
+            }
+            else
+            {
+                cur_polygon_vertex = std::nullopt;
+                break;
+            }
+        } while( cur_polygon_vertex != first_polygon
                  && safety_count < MAX_SAFETY_COUNT );
 
-        result.vertex_is_on_border = cur_polygon_edge != first_polygon;
+        result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
         {
-            cur_polygon_edge =
-                mesh.polygon_adjacent_edge( first_polygon.value() );
-            while( cur_polygon_edge && safety_count < MAX_SAFETY_COUNT )
+            auto adj_edge = mesh.polygon_adjacent_edge(
+                geode::PolygonEdge{ first_polygon.value() } );
+            if( adj_edge )
             {
-                const auto next_edge =
-                    mesh.next_polygon_edge( cur_polygon_edge.value() );
-                OPENGEODE_ASSERT( mesh.polygon_vertex( next_edge ) == vertex_id,
+                cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
+            }
+            else
+            {
+                cur_polygon_vertex = std::nullopt;
+            }
+            while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
+            {
+                const geode::PolygonVertex next_vertex{ mesh.next_polygon_edge(
+                    geode::PolygonEdge{ cur_polygon_vertex.value() } ) };
+                OPENGEODE_ASSERT(
+                    mesh.polygon_vertex( next_vertex ) == vertex_id,
                     "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                     "around vertex" );
-                result.polygons.push_back( next_edge );
-                cur_polygon_edge = mesh.polygon_adjacent_edge( next_edge );
+                result.polygons.push_back( next_vertex );
                 safety_count++;
+                adj_edge = mesh.polygon_adjacent_edge(
+                    geode::PolygonEdge{ next_vertex } );
+                if( adj_edge )
+                {
+                    cur_polygon_vertex =
+                        geode::PolygonVertex{ adj_edge.value() };
+                    continue;
+                }
+                cur_polygon_vertex = std::nullopt;
             }
         }
         if( safety_count >= MAX_SAFETY_COUNT )
@@ -188,13 +215,13 @@ namespace
 
 namespace geode
 {
-    PolygonVertex::PolygonVertex( PolygonEdge polygon_edge )
+    PolygonVertex::PolygonVertex( const PolygonEdge& polygon_edge )
         : polygon_id( polygon_edge.polygon_id ),
           vertex_id( polygon_edge.edge_id )
     {
     }
 
-    PolygonEdge::PolygonEdge( PolygonVertex polygon_vertex )
+    PolygonEdge::PolygonEdge( const PolygonVertex& polygon_vertex )
         : polygon_id( polygon_vertex.polygon_id ),
           edge_id( polygon_vertex.vertex_id )
     {
@@ -641,7 +668,7 @@ namespace geode
             return std::nullopt;
         }
         const auto polygon_adj_id = polygon_adj.value();
-        const auto v0 = polygon_vertex( polygon_edge );
+        const auto v0 = polygon_vertex( PolygonVertex{ polygon_edge } );
         const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
         const auto adj_vertices = polygon_vertices( polygon_adj_id );
         const auto nb_edges = adj_vertices.size();
@@ -803,14 +830,14 @@ namespace geode
         const auto nb_vertices = nb_polygon_vertices( polygon );
         const local_index_t vertex =
             edge + vertex_id == nb_vertices ? 0 : edge + vertex_id;
-        return polygon_vertex( { polygon, vertex } );
+        return polygon_vertex( PolygonVertex{ polygon, vertex } );
     }
 
     template < index_t dimension >
     std::array< index_t, 2 > SurfaceMesh< dimension >::polygon_edge_vertices(
         const PolygonEdge& polygon_edge ) const
     {
-        return { polygon_vertex( polygon_edge ),
+        return { polygon_vertex( PolygonVertex{ polygon_edge } ),
             polygon_edge_vertex( polygon_edge, 1 ) };
     }
 
@@ -862,12 +889,13 @@ namespace geode
         SurfaceMesh< dimension >::polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const
     {
-        for( auto&& polygon_vertex : polygons_around_vertex( from_vertex_id ) )
+        for( const auto& polygon_vertex :
+            polygons_around_vertex( from_vertex_id ) )
         {
             const auto next_vertex = next_polygon_vertex( polygon_vertex );
             if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
-                return polygon_vertex;
+                return PolygonEdge{ polygon_vertex };
             }
         }
         return std::nullopt;

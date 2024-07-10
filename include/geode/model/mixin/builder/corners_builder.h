@@ -57,7 +57,10 @@ namespace geode
         void set_corner_name( const uuid& id, absl::string_view name );
 
     protected:
-        CornersBuilder( Corners< dimension >& corners ) : corners_( corners ) {}
+        explicit CornersBuilder( Corners< dimension >& corners )
+            : corners_( corners )
+        {
+        }
 
         const uuid& create_corner();
 

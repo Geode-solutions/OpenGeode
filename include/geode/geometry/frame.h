@@ -33,7 +33,8 @@ namespace geode
     {
     public:
         Frame();
-        Frame( std::array< Vector< dimension >, dimension > directions );
+        explicit Frame(
+            std::array< Vector< dimension >, dimension > directions );
 
         const Vector< dimension >& direction( local_index_t index ) const;
 

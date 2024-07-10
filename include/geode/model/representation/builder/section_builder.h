@@ -94,7 +94,7 @@ namespace geode
     public:
         static constexpr index_t dim{ 2 };
 
-        SectionBuilder( Section& section );
+        explicit SectionBuilder( Section& section );
         SectionBuilder( SectionBuilder&& other ) = default;
 
         ModelCopyMapping copy( const Section& section );

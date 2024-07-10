@@ -295,6 +295,16 @@ namespace
 
 namespace geode
 {
+    PolyhedronVertex::PolyhedronVertex( const PolyhedronFacet& facet )
+        : polyhedron_id( facet.polyhedron_id ), vertex_id( facet.facet_id )
+    {
+    }
+
+    PolyhedronFacet::PolyhedronFacet( const PolyhedronVertex& vertex )
+        : polyhedron_id( vertex.polyhedron_id ), facet_id( vertex.vertex_id )
+    {
+    }
+
     template < typename Archive >
     void PolyhedronVertex::serialize( Archive& archive )
     {

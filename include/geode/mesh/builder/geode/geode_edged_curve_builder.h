@@ -49,7 +49,8 @@ namespace geode
         OpenGeodeEdgedCurveBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodeEdgedCurveBuilder( OpenGeodeEdgedCurve< dimension >& mesh );
+        explicit OpenGeodeEdgedCurveBuilder(
+            OpenGeodeEdgedCurve< dimension >& mesh );
 
     private:
         void do_create_vertex() final;

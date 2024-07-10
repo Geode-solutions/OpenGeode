@@ -52,7 +52,8 @@ namespace geode
         OpenGeodeHybridSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodeHybridSolidBuilder( OpenGeodeHybridSolid< dimension >& mesh );
+        explicit OpenGeodeHybridSolidBuilder(
+            OpenGeodeHybridSolid< dimension >& mesh );
 
     private:
         void do_create_vertex() final;

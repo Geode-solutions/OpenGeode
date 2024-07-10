@@ -34,7 +34,7 @@ namespace geode
     class opengeode_model_api RelationshipsBuilder
     {
     public:
-        RelationshipsBuilder( Relationships& relationships );
+        explicit RelationshipsBuilder( Relationships& relationships );
 
         /*!
          * Remove a component from the set of components registered by the

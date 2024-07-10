@@ -67,7 +67,7 @@ namespace geode
     class GenericMeshAABB< EdgedCurve< dimension > >
     {
     public:
-        GenericMeshAABB( const EdgedCurve< dimension >& mesh )
+        explicit GenericMeshAABB( const EdgedCurve< dimension >& mesh )
             : elements_tree_{ create_aabb_tree( mesh ) },
               distance_action_{ mesh }
         {

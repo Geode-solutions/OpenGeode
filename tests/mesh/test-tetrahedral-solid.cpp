@@ -43,12 +43,12 @@
 void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
-    builder.create_point( { { 7.5, 5.2, 6.3 } } );
-    builder.create_point( { { 8.1, 1.4, 4.7 } } );
-    builder.create_point( { { 4.7, 2.1, 1.3 } } );
-    builder.create_point( { { 1.6, 8.7, 6.1 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder.create_point( geode::Point3D{ { 8.1, 1.4, 4.7 } } );
+    builder.create_point( geode::Point3D{ { 4.7, 2.1, 1.3 } } );
+    builder.create_point( geode::Point3D{ { 1.6, 8.7, 6.1 } } );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 6,
         "[Test] TetrahedralSolid should have 6 vertices" );
 }

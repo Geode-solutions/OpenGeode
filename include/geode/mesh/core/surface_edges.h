@@ -53,7 +53,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         SurfaceEdges();
-        SurfaceEdges( const SurfaceMesh< dimension >& surface );
+        explicit SurfaceEdges( const SurfaceMesh< dimension >& surface );
         ~SurfaceEdges();
 
         index_t nb_edges() const;

@@ -144,7 +144,7 @@ namespace geode
     Point< dimension > CoordinateSystem< dimension >::coordinates(
         const Point< dimension >& global_coordinates ) const
     {
-        const auto OP = global_coordinates - origin_;
+        const Vector< dimension > OP{ origin_, global_coordinates };
         return global_to_local_matrix_( frame_inverse_matrix, *this ) * OP;
     }
 

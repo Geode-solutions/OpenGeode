@@ -185,11 +185,11 @@ namespace geode
             "null (given vectors do not form a well-defined base)." );
 
         std::array< Vector3D, 3 > matrix_rows;
-        matrix_rows[0] = { { adj_coeff( *this, 0, 0 ),
+        matrix_rows[0] = Vector3D{ { adj_coeff( *this, 0, 0 ),
             -adj_coeff( *this, 0, 1 ), adj_coeff( *this, 0, 2 ) } };
-        matrix_rows[1] = { { -adj_coeff( *this, 1, 0 ),
+        matrix_rows[1] = Vector3D{ { -adj_coeff( *this, 1, 0 ),
             adj_coeff( *this, 1, 1 ), -adj_coeff( *this, 1, 2 ) } };
-        matrix_rows[2] = { { adj_coeff( *this, 2, 0 ),
+        matrix_rows[2] = Vector3D{ { adj_coeff( *this, 2, 0 ),
             -adj_coeff( *this, 2, 1 ), adj_coeff( *this, 2, 2 ) } };
         for( const auto d : LRange{ 3 } )
         {

@@ -42,7 +42,7 @@ namespace geode
     class CoordinateReferenceSystemManagersBuilder
     {
     public:
-        CoordinateReferenceSystemManagersBuilder(
+        explicit CoordinateReferenceSystemManagersBuilder(
             CoordinateReferenceSystemManagers< dimension >& crs_managers )
             : crs_managers_( crs_managers )
         {

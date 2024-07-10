@@ -49,7 +49,7 @@ namespace geode
                 }
                 box_vector[p] = std::move( bbox );
             } );
-        return { box_vector };
+        return AABBTree< dimension >{ box_vector };
     }
 
     template < index_t dimension >

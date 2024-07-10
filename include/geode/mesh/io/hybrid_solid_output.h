@@ -57,7 +57,7 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     protected:
-        HybridSolidOutput( absl::string_view filename )
+        explicit HybridSolidOutput( absl::string_view filename )
             : Output< HybridSolid< dimension > >{ filename }
         {
         }

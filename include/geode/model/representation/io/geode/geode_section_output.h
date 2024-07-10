@@ -40,7 +40,7 @@ namespace geode
         : public SectionOutput
     {
     public:
-        OpenGeodeSectionOutput( absl::string_view filename )
+        explicit OpenGeodeSectionOutput( absl::string_view filename )
             : SectionOutput( filename )
         {
         }

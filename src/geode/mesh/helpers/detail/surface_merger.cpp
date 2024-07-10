@@ -176,8 +176,9 @@ namespace geode
                             vertices[v] = merger.vertex_in_merged(
                                 s, surface.polygon_vertex( { p, v } ) );
                         }
-                        const auto it = polygons.try_emplace(
-                            vertices, merger.mesh().nb_polygons() );
+                        const auto it =
+                            polygons.try_emplace( TypedVertexCycle{ vertices },
+                                merger.mesh().nb_polygons() );
                         if( it.second )
                         {
                             const auto polygon_id =

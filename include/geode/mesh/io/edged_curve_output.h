@@ -55,7 +55,7 @@ namespace geode
     class EdgedCurveOutput : public Output< EdgedCurve< dimension > >
     {
     protected:
-        EdgedCurveOutput( absl::string_view filename )
+        explicit EdgedCurveOutput( absl::string_view filename )
             : Output< EdgedCurve< dimension > >{ filename }
         {
         }

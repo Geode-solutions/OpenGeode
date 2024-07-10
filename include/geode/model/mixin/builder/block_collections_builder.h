@@ -47,7 +47,8 @@ namespace geode
             const uuid& id, absl::string_view name );
 
     protected:
-        BlockCollectionsBuilder( BlockCollections< dimension >& collections )
+        explicit BlockCollectionsBuilder(
+            BlockCollections< dimension >& collections )
             : block_collections_( collections )
         {
         }

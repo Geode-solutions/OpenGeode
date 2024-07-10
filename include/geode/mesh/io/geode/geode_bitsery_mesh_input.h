@@ -57,7 +57,7 @@
     class OpenGeode##Mesh##Input : public Mesh##Input< dimension >             \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Input( absl::string_view filename )                   \
+        explicit OpenGeode##Mesh##Input( absl::string_view filename )          \
             : Mesh##Input< dimension >( filename )                             \
         {                                                                      \
         }                                                                      \
@@ -70,7 +70,7 @@
     class OpenGeode##Mesh##Input : public Mesh##Input                          \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Input( absl::string_view filename )                   \
+        explicit OpenGeode##Mesh##Input( absl::string_view filename )          \
             : Mesh##Input( filename )                                          \
         {                                                                      \
         }                                                                      \

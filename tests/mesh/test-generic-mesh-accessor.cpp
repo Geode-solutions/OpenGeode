@@ -44,9 +44,9 @@ std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
 {
     auto edged_curve = geode::EdgedCurve3D::create();
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
-    builder->create_point( { { 0, 0, 0 } } );
-    builder->create_point( { { 1, 0, 0 } } );
-    builder->create_point( { { 0, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
     builder->create_edge( 0, 1 );
     builder->create_edge( 0, 2 );
     auto attribute = edged_curve->edge_attribute_manager()
@@ -60,10 +60,10 @@ std::unique_ptr< geode::TriangulatedSurface2D > create_surface()
 {
     auto surface = geode::TriangulatedSurface2D::create();
     auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
-    builder->create_point( { { 0, 0 } } );
-    builder->create_point( { { 1, 0 } } );
-    builder->create_point( { { 0, 1 } } );
-    builder->create_point( { { 1, -1 } } );
+    builder->create_point( geode::Point2D{ { 0, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_point( geode::Point2D{ { 0, 1 } } );
+    builder->create_point( geode::Point2D{ { 1, -1 } } );
     builder->create_triangle( { 0, 1, 2 } );
     builder->create_triangle( { 0, 3, 1 } );
     builder->compute_polygon_adjacencies();
@@ -78,11 +78,11 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid()
 {
     auto solid = geode::TetrahedralSolid3D::create();
     auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
-    builder->create_point( { { 0, 0, 0 } } );
-    builder->create_point( { { 1, 0, 0 } } );
-    builder->create_point( { { 0, 1, 0 } } );
-    builder->create_point( { { 0, 0, 1 } } );
-    builder->create_point( { { 1, 1, 1 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 1 } } );
+    builder->create_point( geode::Point3D{ { 1, 1, 1 } } );
     builder->create_tetrahedron( { 0, 1, 2, 3 } );
     builder->create_tetrahedron( { 3, 2, 4, 1 } );
     builder->compute_polyhedron_adjacencies();
