@@ -65,8 +65,6 @@ endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
 
-install(DIRECTORY ${OpenGeode_PATH_INSTALL}/ DESTINATION .)
-
 #------------------------------------------------------------------------------------------------
 # Configure CPack
 set(CPACK_PACKAGE_NAME OpenGeode)
