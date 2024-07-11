@@ -53,7 +53,7 @@ namespace geode
     class PointSetOutput : public Output< PointSet< dimension > >
     {
     protected:
-        PointSetOutput( std::string_view filename )
+        explicit PointSetOutput( std::string_view filename )
             : Output< PointSet< dimension > >{ filename }
         {
         }

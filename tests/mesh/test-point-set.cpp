@@ -39,8 +39,8 @@
 void test_create_vertices(
     const geode::PointSet3D& point_set, geode::PointSetBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
     OPENGEODE_EXCEPTION( point_set.nb_vertices() == 2,
         "[Test] PointSet should have 2 vertices" );
     builder.create_vertices( 2 );
@@ -48,7 +48,7 @@ void test_create_vertices(
         "[Test] PointSet should have 4 vertices" );
     OPENGEODE_EXCEPTION( point_set.point( 2 ) == geode::Point3D(),
         "[Test] Default coordinates are not correct" );
-    builder.set_point( 2, { { 2.3, 5.0, -1.2 } } );
+    builder.set_point( 2, geode::Point3D{ { 2.3, 5.0, -1.2 } } );
     OPENGEODE_EXCEPTION(
         point_set.point( 2 ) == geode::Point3D( { 2.3, 5.0, -1.2 } ),
         "[Test] Point coordinates have not been correctly set" );

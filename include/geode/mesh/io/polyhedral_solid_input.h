@@ -68,11 +68,14 @@ namespace geode
     public:
         using Base =
             Input< std::unique_ptr< PolyhedralSolid< dimension > >, MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
-        PolyhedralSolidInput( std::string_view filename ) : Base{ filename } {}
+        explicit PolyhedralSolidInput( std::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

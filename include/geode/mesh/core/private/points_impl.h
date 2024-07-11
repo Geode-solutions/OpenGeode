@@ -113,13 +113,13 @@ namespace geode
             PointsImpl() = default;
 
             template < typename Mesh >
-            PointsImpl( Mesh& mesh )
+            explicit PointsImpl( Mesh& mesh )
                 : PointsImpl( mesh.vertex_attribute_manager() )
             {
                 register_as_active_crs( mesh );
             }
 
-            PointsImpl( AttributeManager& manager )
+            explicit PointsImpl( AttributeManager& manager )
                 : PointsImpl{ manager, POINTS_NAME }
             {
             }

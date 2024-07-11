@@ -57,7 +57,7 @@ namespace geode
         void set_line_name( const uuid& id, std::string_view name );
 
     protected:
-        LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
+        explicit LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
 
         const uuid& create_line();
 

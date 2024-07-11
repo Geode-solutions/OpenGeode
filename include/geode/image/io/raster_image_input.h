@@ -51,8 +51,8 @@ namespace geode
     {
     public:
         using Base = Input< RasterImage< dimension > >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
         RasterImageInput( std::string_view filename ) : Base{ filename } {}

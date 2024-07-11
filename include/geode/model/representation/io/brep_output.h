@@ -51,7 +51,10 @@ namespace geode
     class BRepOutput : public Output< BRep >
     {
     protected:
-        BRepOutput( std::string_view filename ) : Output< BRep >{ filename } {}
+        explicit BRepOutput( std::string_view filename )
+            : Output< BRep >{ filename }
+        {
+        }
     };
 
     bool opengeode_model_api is_brep_saveable(

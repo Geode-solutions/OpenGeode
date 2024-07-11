@@ -115,7 +115,7 @@ namespace geode
         OPENGEODE_ASSERT( std::fabs( result.value( 3 ) ) > global_epsilon,
             "[rotate] Error in computation" );
         const auto inverse = 1.0 / result.value( 3 );
-        return { { result.value( 0 ) * inverse, result.value( 1 ) * inverse,
-            result.value( 2 ) * inverse } };
+        return Point3D{ { result.value( 0 ) * inverse,
+            result.value( 1 ) * inverse, result.value( 2 ) * inverse } };
     }
 } // namespace geode

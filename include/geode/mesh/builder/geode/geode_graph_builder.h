@@ -44,7 +44,7 @@ namespace geode
     public:
         OpenGeodeGraphBuilder( VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodeGraphBuilder( OpenGeodeGraph& mesh );
+        explicit OpenGeodeGraphBuilder( OpenGeodeGraph& mesh );
 
     private:
         void do_create_vertex() final;

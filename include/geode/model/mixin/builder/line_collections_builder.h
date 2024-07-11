@@ -46,7 +46,8 @@ namespace geode
         void set_line_collection_name( const uuid& id, std::string_view name );
 
     protected:
-        LineCollectionsBuilder( LineCollections< dimension >& collections )
+        explicit LineCollectionsBuilder(
+            LineCollections< dimension >& collections )
             : line_collections_( collections )
         {
         }

@@ -71,7 +71,7 @@ namespace geode
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 
     protected:
-        TetrahedralSolidBuilder( TetrahedralSolid< dimension >& mesh );
+        explicit TetrahedralSolidBuilder( TetrahedralSolid< dimension >& mesh );
 
     private:
         void do_create_polyhedron( absl::Span< const index_t > vertices,

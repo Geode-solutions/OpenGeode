@@ -103,7 +103,7 @@ namespace geode
     {
     public:
         uuid();
-        uuid( std::string_view string );
+        explicit uuid( std::string_view string );
         uuid( const uuid & ) = default;
         uuid( uuid && ) = default;
         uuid &operator=( uuid &&other ) = default;

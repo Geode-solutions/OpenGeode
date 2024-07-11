@@ -63,6 +63,31 @@ namespace geode
         cd = ( cd & 0x3FFFFFFFFFFFFFFFULL ) | 0x8000000000000000ULL;
     }
 
+    uuid::uuid( absl::string_view string )
+    {
+        OPENGEODE_EXCEPTION( string.size() == 36, "[uuid] wrong string size" );
+        OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'
+                                 && string[18] == '-' && string[23] == '-',
+            "[uuid] unknown string format" );
+
+        for( const auto i : Range{ 18 } )
+        {
+            if( i == 8 || i == 13 )
+            {
+                continue;
+            }
+            ab = ab << 4 | decode( string[i] );
+        }
+        for( const auto i : Range{ 19, 36 } )
+        {
+            if( i == 23 )
+            {
+                continue;
+            }
+            cd = cd << 4 | decode( string[i] );
+        }
+    }
+
     bool uuid::operator==( const uuid &other ) const
     {
         return ab == other.ab && cd == other.cd;
@@ -118,30 +143,5 @@ namespace geode
         }
 
         return string;
-    }
-
-    uuid::uuid( std::string_view string )
-    {
-        OPENGEODE_EXCEPTION( string.size() == 36, "[uuid] wrong string size" );
-        OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'
-                                 && string[18] == '-' && string[23] == '-',
-            "[uuid] unknown string format" );
-
-        for( const auto i : Range{ 18 } )
-        {
-            if( i == 8 || i == 13 )
-            {
-                continue;
-            }
-            ab = ab << 4 | decode( string[i] );
-        }
-        for( const auto i : Range{ 19, 36 } )
-        {
-            if( i == 23 )
-            {
-                continue;
-            }
-            cd = cd << 4 | decode( string[i] );
-        }
     }
 } // namespace geode

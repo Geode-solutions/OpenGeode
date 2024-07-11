@@ -99,7 +99,8 @@ void test_distance_transform_3D( double cell_length )
 {
     const auto grid = geode::RegularGrid3D::create();
     const auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 0., 0., 0. } }, { 10, 10, 10 }, cell_length );
+    builder->initialize_grid(
+        geode::Point3D{ { 0., 0., 0. } }, { 10, 10, 10 }, cell_length );
     const std::array< const geode::Grid3D::CellIndices, 2 > objects_raster{
         { { 0, 0, 0 }, { 9, 9, 9 } }
     };

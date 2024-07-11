@@ -36,16 +36,16 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     std::vector< geode::Point3D > points{
-        { { -1, 0, 0 } },
-        { { -1, -1, -1 } },
-        { { 0, 0, 0 } },
-        { { 1, 0, 0 } },
-        { { 0, 1, 0 } },
-        { { 1, 1, 0 } },
-        { { 0, 0, 1 } },
-        { { 1, 0, 1 } },
-        { { 0, 1, 1 } },
-        { { 1, 1, 1 } },
+        geode::Point3D{ { -1, 0, 0 } },
+        geode::Point3D{ { -1, -1, -1 } },
+        geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 1, 1, 0 } },
+        geode::Point3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 1, 0, 1 } },
+        geode::Point3D{ { 0, 1, 1 } },
+        geode::Point3D{ { 1, 1, 1 } },
     };
 
     auto mesh0 = geode::SolidMesh3D::create();

@@ -229,7 +229,8 @@ namespace
         geode::detail::OrientedVertexCycle< geode::PolygonVertices >
             polygon_unique_vertices_cycle{ polygon_unique_vertices };
         if( polygon_unique_vertices_cycle.is_opposite(
-                { facets_unique_vertices[0].vertices } ) )
+                geode::detail::OrientedVertexCycle< geode::PolygonVertices >{
+                    facets_unique_vertices[0].vertices } ) )
         {
             return std::make_tuple( std::move( facets_block_vertices ),
                 std::move( facets_unique_vertices ), false );
@@ -237,7 +238,9 @@ namespace
         else if( facets_block_vertices.size() >= 2 )
         {
             OPENGEODE_ASSERT( polygon_unique_vertices_cycle.is_opposite(
-                                  { facets_unique_vertices[1].vertices } ),
+                                  geode::detail::OrientedVertexCycle<
+                                      geode::PolygonVertices >{
+                                      facets_unique_vertices[1].vertices } ),
                 "[block_vertices_from_surface_polygon] The block facets "
                 "found from the polygon vertices have the same "
                 "orientation." );

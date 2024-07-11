@@ -57,7 +57,8 @@ void create_texture(
     auto& texture = manager.find_or_create_texture( "texture" );
     for( const auto i : geode::Range{ 42 } )
     {
-        texture.set_texture_coordinates( { i, 0 }, { { i * 2., i * 3. } } );
+        texture.set_texture_coordinates(
+            { i, 0 }, geode::Point2D{ { i * 2., i * 3. } } );
     }
     texture.set_image( create_raster() );
 }

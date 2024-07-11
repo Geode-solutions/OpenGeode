@@ -147,8 +147,9 @@ namespace geode
                             vertices[v] = merger.vertex_in_merged(
                                 s, solid.polyhedron_vertex( { p, v } ) );
                         }
-                        const auto it = polyhedra.try_emplace(
-                            vertices, merger.mesh().nb_polyhedra() );
+                        const auto it =
+                            polyhedra.try_emplace( TypedVertexCycle{ vertices },
+                                merger.mesh().nb_polyhedra() );
                         if( it.second )
                         {
                             absl::FixedArray< std::vector< local_index_t > >

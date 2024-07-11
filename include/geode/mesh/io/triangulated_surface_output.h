@@ -55,7 +55,7 @@ namespace geode
         : public Output< TriangulatedSurface< dimension > >
     {
     protected:
-        TriangulatedSurfaceOutput( std::string_view filename )
+        explicit TriangulatedSurfaceOutput( std::string_view filename )
             : Output< TriangulatedSurface< dimension > >{ filename }
         {
         }

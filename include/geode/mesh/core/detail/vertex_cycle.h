@@ -85,7 +85,7 @@ namespace geode
             friend class bitsery::Access;
 
         public:
-            OrientedVertexCycle( Container vertices )
+            explicit OrientedVertexCycle( Container vertices )
                 : vertices_( std::move( vertices ) )
             {
                 oriented_rotate( vertices_ );
@@ -160,7 +160,7 @@ namespace geode
             friend class bitsery::Access;
 
         public:
-            VertexCycle( Container vertices )
+            explicit VertexCycle( Container vertices )
                 : OrientedVertexCycle< Container >( std::move( vertices ) )
             {
                 remove_orientation( this->modifiable_vertices() );

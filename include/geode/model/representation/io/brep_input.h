@@ -50,11 +50,11 @@ namespace geode
     {
     public:
         using Base = Input< BRep >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
-        BRepInput( std::string_view filename ) : Base{ filename } {}
+        explicit BRepInput( std::string_view filename ) : Base{ filename } {}
     };
 
     typename BRepInput::MissingFiles opengeode_model_api

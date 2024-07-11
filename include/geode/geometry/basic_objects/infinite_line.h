@@ -48,7 +48,8 @@ namespace geode
     public:
         GenericLine( const Vector< dimension >& direction, PointType origin );
 
-        GenericLine( const GenericSegment< PointType, dimension >& segment );
+        explicit GenericLine(
+            const GenericSegment< PointType, dimension >& segment );
         GenericLine( const GenericLine< PointType, dimension >& other );
         GenericLine< PointType, dimension >& operator=(
             const GenericLine< PointType, dimension >& other );

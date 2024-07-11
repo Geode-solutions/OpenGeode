@@ -53,7 +53,7 @@ namespace geode
     class EdgedCurveOutput : public Output< EdgedCurve< dimension > >
     {
     protected:
-        EdgedCurveOutput( std::string_view filename )
+        explicit EdgedCurveOutput( std::string_view filename )
             : Output< EdgedCurve< dimension > >{ filename }
         {
         }

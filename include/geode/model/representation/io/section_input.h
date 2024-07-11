@@ -50,11 +50,11 @@ namespace geode
     {
     public:
         using Base = Input< Section >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
-        SectionInput( std::string_view filename ) : Base{ filename } {}
+        explicit SectionInput( std::string_view filename ) : Base{ filename } {}
     };
 
     typename SectionInput::MissingFiles opengeode_model_api

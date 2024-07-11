@@ -40,11 +40,11 @@ void add_points( geode::PointSetBuilder3D& builder )
         {
             for( const auto k : geode::LRange{ 3 } )
             {
-                builder.create_point(
-                    { { static_cast< double >( i ), static_cast< double >( j ),
+                builder.create_point( geode::Point3D{
+                    { static_cast< double >( i ), static_cast< double >( j ),
                         static_cast< double >( k ) } } );
-                builder.create_point(
-                    { { static_cast< double >( i ), static_cast< double >( j ),
+                builder.create_point( geode::Point3D{
+                    { static_cast< double >( i ), static_cast< double >( j ),
                         static_cast< double >( k ) } } );
             }
         }

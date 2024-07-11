@@ -56,7 +56,7 @@ namespace geode
         : public Output< PolygonalSurface< dimension > >
     {
     protected:
-        PolygonalSurfaceOutput( std::string_view filename )
+        explicit PolygonalSurfaceOutput( std::string_view filename )
             : Output< PolygonalSurface< dimension > >{ filename }
         {
         }

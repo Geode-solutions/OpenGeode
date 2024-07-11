@@ -60,11 +60,11 @@ namespace geode
     {
     public:
         using Base = Input< std::unique_ptr< Graph >, MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
-        GraphInput( std::string_view filename ) : Base{ filename } {}
+        explicit GraphInput( std::string_view filename ) : Base{ filename } {}
     };
 
     typename GraphInput::MissingFiles opengeode_mesh_api

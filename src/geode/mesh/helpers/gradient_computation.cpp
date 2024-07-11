@@ -82,8 +82,9 @@ namespace
                 double inverse_dist_sum{ 0 };
                 for( const auto vertex_around : vertices_around )
                 {
-                    const geode::Vector< Mesh::dim > position_diff =
-                        position - mesh.point( vertex_around );
+                    const geode::Vector< Mesh::dim > position_diff{
+                        mesh.point( vertex_around ), position
+                    };
                     const auto value_diff =
                         function_value
                         - scalar_function->value( vertex_around );

@@ -43,7 +43,8 @@ void test_scalar_function()
 {
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
+    builder->initialize_grid(
+        geode::Point3D{ { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
     const auto function_name = "scalar_function";
     auto scalar_function =
         geode::RegularGridScalarFunction3D::create( *grid, function_name, 26 );
@@ -88,25 +89,25 @@ void test_scalar_function()
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 22, 1e-7 ),
         "[Test] Object function value 1 is wrong." );
-    point = { { 1.5, 0, 1 } };
+    point = geode::Point3D{ { 1.5, 0, 1 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 26, 1e-7 ),
         "[Test] Object function value 2 is wrong." );
-    point = { { 3, 4, 10 } };
+    point = geode::Point3D{ { 3, 4, 10 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 22, 1e-7 ),
         "[Test] Object function value 3 is wrong." );
-    point = { { 3, 5, 8.5 } };
+    point = geode::Point3D{ { 3, 5, 8.5 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 24, 1e-7 ),
         "[Test] Object function value 4 is wrong." );
-    point = { { 3.9, 7.4, 11.05 } };
+    point = geode::Point3D{ { 3.9, 7.4, 11.05 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION(
         inexact_equal(
@@ -118,11 +119,12 @@ void test_point_function()
 {
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
+    builder->initialize_grid(
+        geode::Point3D{ { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
     const auto function_name = "point_function";
     auto point_function = geode::RegularGridPointFunction3D::create(
-        *grid, function_name, { { 26, 2, -10 } } );
-    point_function.set_value( { 1, 2, 3 }, { { 22, -3, -20 } } );
+        *grid, function_name, geode::Point3D{ { 26, 2, -10 } } );
+    point_function.set_value( { 1, 2, 3 }, geode::Point3D{ { 22, -3, -20 } } );
     for( const auto i : geode::LRange{ 6 } )
     {
         for( const auto j : geode::LRange{ 11 } )
@@ -148,40 +150,44 @@ void test_point_function()
             }
         }
     }
-    point_function.set_value( 217, { { 22, -3, -20 } } );
+    point_function.set_value( 217, geode::Point3D{ { 22, -3, -20 } } );
     OPENGEODE_EXCEPTION(
         ( point_function.value( 217 ) == geode::Point3D{ { 22, -3, -20 } } ),
         "[Test] Point function value is wrong." );
-    point_function.set_value( { 1, 2, 4 }, { { 22, -3, -20 } } );
-    point_function.set_value( { 1, 3, 4 }, { { 22, -3, -20 } } );
-    point_function.set_value( { 2, 2, 3 }, { { 22, -3, -20 } } );
-    point_function.set_value( { 2, 3, 3 }, { { 22, -3, -20 } } );
-    point_function.set_value( { 2, 2, 4 }, { { 22, -3, -20 } } );
-    point_function.set_value( { 2, 3, 4 }, { { 22, -3, -20 } } );
+    point_function.set_value( { 1, 2, 4 }, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( { 1, 3, 4 }, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( { 2, 2, 3 }, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( { 2, 3, 3 }, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( { 2, 2, 4 }, geode::Point3D{ { 22, -3, -20 } } );
+    point_function.set_value( { 2, 3, 4 }, geode::Point3D{ { 22, -3, -20 } } );
     geode::Point3D point{ { 2.6, 4.1, 11.2 } };
     auto cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 22, -3, -20 } } ),
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, cell_indices[0] )
+            .inexact_equal( geode::Point3D{ { 22, -3, -20 } } ),
         "[Test] Point function value 1 is wrong." );
-    point = { { 1.5, 0, 1 } };
+    point = geode::Point3D{ { 1.5, 0, 1 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 26, 2, -10 } } ),
+                             .inexact_equal( geode::Point3D{ { 26, 2, -10 } } ),
         "[Test] Point function value 2 is wrong." );
-    point = { { 3, 4, 10 } };
+    point = geode::Point3D{ { 3, 4, 10 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 22, -3, -20 } } ),
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, cell_indices[0] )
+            .inexact_equal( geode::Point3D{ { 22, -3, -20 } } ),
         "[Test] Point function value 3 is wrong." );
-    point = { { 3, 5, 8.5 } };
+    point = geode::Point3D{ { 3, 5, 8.5 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 24, -0.5, -15 } } ),
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, cell_indices[0] )
+            .inexact_equal( geode::Point3D{ { 24, -0.5, -15 } } ),
         "[Test] Point function value 4 is wrong." );
-    point = { { 3.9, 7.4, 11.05 } };
+    point = geode::Point3D{ { 3.9, 7.4, 11.05 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 25.28, 1.1, -11.8 } } ),
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, cell_indices[0] )
+            .inexact_equal( geode::Point3D{ { 25.28, 1.1, -11.8 } } ),
         "[Test] Point function value 5 is wrong." );
 }
 

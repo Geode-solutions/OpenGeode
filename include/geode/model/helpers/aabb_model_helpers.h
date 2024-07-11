@@ -58,7 +58,7 @@ namespace geode
     template < index_t dimension >
     struct ModelMeshesAABBTree
     {
-        ModelMeshesAABBTree( index_t nb_components )
+        explicit ModelMeshesAABBTree( index_t nb_components )
             : mesh_trees_( nb_components ), uuids_( nb_components )
         {
             mesh_tree_ids_.reserve( nb_components );

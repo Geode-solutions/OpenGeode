@@ -52,7 +52,7 @@
     class OpenGeode##Mesh##Output : public Mesh##Output< dimension >           \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Output( std::string_view filename )                   \
+        explicit OpenGeode##Mesh##Output( std::string_view filename )          \
             : Mesh##Output< dimension >( filename )                            \
         {                                                                      \
         }                                                                      \
@@ -65,7 +65,7 @@
     class OpenGeode##Mesh##Output : public Mesh##Output                        \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Output( std::string_view filename )                   \
+        explicit OpenGeode##Mesh##Output( std::string_view filename )          \
             : Mesh##Output( filename )                                         \
         {                                                                      \
         }                                                                      \

@@ -47,7 +47,8 @@ namespace geode
             const uuid& id, std::string_view name );
 
     protected:
-        CornerCollectionsBuilder( CornerCollections< dimension >& collections )
+        explicit CornerCollectionsBuilder(
+            CornerCollections< dimension >& collections )
             : corner_collections_( collections )
         {
         }

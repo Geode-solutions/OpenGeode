@@ -65,7 +65,10 @@ namespace geode
         void set_block_name( const uuid& id, std::string_view name );
 
     protected:
-        BlocksBuilder( Blocks< dimension >& blocks ) : blocks_( blocks ) {}
+        explicit BlocksBuilder( Blocks< dimension >& blocks )
+            : blocks_( blocks )
+        {
+        }
 
         const uuid& create_block();
 

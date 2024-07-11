@@ -54,7 +54,7 @@ namespace geode
         OpenGeodeTetrahedralSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodeTetrahedralSolidBuilder(
+        explicit OpenGeodeTetrahedralSolidBuilder(
             OpenGeodeTetrahedralSolid< dimension >& mesh );
 
     private:

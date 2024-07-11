@@ -44,7 +44,7 @@ namespace geode
             value_ = 0;
         }
 
-        GreyscaleColor( local_index_t value ) : value_( value ) {}
+        explicit GreyscaleColor( local_index_t value ) : value_( value ) {}
 
         local_index_t value() const
         {
@@ -68,7 +68,7 @@ namespace geode
 
         GreyscaleColor operator+( const GreyscaleColor &other ) const
         {
-            return { static_cast< geode::local_index_t >(
+            return GreyscaleColor{ static_cast< geode::local_index_t >(
                 value() / 2 + other.value() / 2 ) };
         }
 
@@ -111,7 +111,7 @@ namespace geode
                 result += attribute.value( interpolator.indices_[i] ).value()
                           * interpolator.lambdas_[i];
             }
-            return { result };
+            return GreyscaleColor{ result };
         }
     };
 

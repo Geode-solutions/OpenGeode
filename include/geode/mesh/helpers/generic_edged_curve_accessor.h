@@ -47,7 +47,7 @@ namespace geode
         using ElementVertex = EdgeVertex;
         using ElementVertices = std::array< index_t, 2 >;
 
-        GenericMeshAccessor( const EdgedCurve< dimension >& mesh )
+        explicit GenericMeshAccessor( const EdgedCurve< dimension >& mesh )
             : mesh_( mesh )
         {
         }

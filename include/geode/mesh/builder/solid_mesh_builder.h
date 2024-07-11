@@ -175,7 +175,7 @@ namespace geode
         void copy( const SolidMesh< dimension >& solid_mesh );
 
     protected:
-        SolidMeshBuilder( SolidMesh< dimension >& mesh );
+        explicit SolidMeshBuilder( SolidMesh< dimension >& mesh );
 
         void update_polyhedron_info(
             index_t polyhedron_id, absl::Span< const index_t > vertices );

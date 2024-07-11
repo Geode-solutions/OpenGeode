@@ -55,7 +55,8 @@ namespace geode
          * tree which should match the index in its initial container.
          */
         AABBTree();
-        AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
+        explicit AABBTree(
+            absl::Span< const BoundingBox< dimension > > bboxes );
         AABBTree( AABBTree&& other ) noexcept;
         ~AABBTree();
 

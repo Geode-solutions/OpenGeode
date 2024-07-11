@@ -51,7 +51,7 @@ namespace geode
     class VertexSetOutput : public Output< VertexSet >
     {
     protected:
-        VertexSetOutput( std::string_view filename )
+        explicit VertexSetOutput( std::string_view filename )
             : Output< VertexSet >{ filename }
         {
         }

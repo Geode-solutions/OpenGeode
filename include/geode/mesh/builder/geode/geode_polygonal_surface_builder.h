@@ -51,7 +51,7 @@ namespace geode
         OpenGeodePolygonalSurfaceBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodePolygonalSurfaceBuilder(
+        explicit OpenGeodePolygonalSurfaceBuilder(
             OpenGeodePolygonalSurface< dimension >& mesh );
 
     private:

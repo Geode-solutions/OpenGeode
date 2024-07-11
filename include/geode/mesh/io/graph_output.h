@@ -51,7 +51,8 @@ namespace geode
     class GraphOutput : public Output< Graph >
     {
     protected:
-        GraphOutput( std::string_view filename ) : Output< Graph >{ filename }
+        explicit GraphOutput( std::string_view filename )
+            : Output< Graph >{ filename }
         {
         }
     };

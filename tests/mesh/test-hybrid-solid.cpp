@@ -42,17 +42,17 @@
 void test_create_vertices( const geode::HybridSolid3D& hybrid_solid,
     geode::HybridSolidBuilder3D& builder )
 {
-    builder.create_point( { { 0, 0, 0 } } );
-    builder.create_point( { { 1, 0, 0 } } );
-    builder.create_point( { { 2, 1, 0 } } );
-    builder.create_point( { { 1, 2, 0 } } );
-    builder.create_point( { { 0, 2, 0 } } );
-    builder.create_point( { { 0, 0, 1 } } );
-    builder.create_point( { { 1, 0, 1 } } );
-    builder.create_point( { { 2, 1, 1 } } );
-    builder.create_point( { { 1, 2, 1 } } );
-    builder.create_point( { { 0, 2, 1 } } );
-    builder.create_point( { { 1, 1, 2 } } );
+    builder.create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder.create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder.create_point( geode::Point3D{ { 2, 1, 0 } } );
+    builder.create_point( geode::Point3D{ { 1, 2, 0 } } );
+    builder.create_point( geode::Point3D{ { 0, 2, 0 } } );
+    builder.create_point( geode::Point3D{ { 0, 0, 1 } } );
+    builder.create_point( geode::Point3D{ { 1, 0, 1 } } );
+    builder.create_point( geode::Point3D{ { 2, 1, 1 } } );
+    builder.create_point( geode::Point3D{ { 1, 2, 1 } } );
+    builder.create_point( geode::Point3D{ { 0, 2, 1 } } );
+    builder.create_point( geode::Point3D{ { 1, 1, 2 } } );
     OPENGEODE_EXCEPTION( hybrid_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 11,

@@ -40,7 +40,7 @@ namespace geode
         : public SectionOutput
     {
     public:
-        OpenGeodeSectionOutput( std::string_view filename )
+        explicit OpenGeodeSectionOutput( std::string_view filename )
             : SectionOutput( filename )
         {
         }

@@ -51,7 +51,7 @@ namespace geode
     class SectionOutput : public Output< Section >
     {
     protected:
-        SectionOutput( std::string_view filename )
+        explicit SectionOutput( std::string_view filename )
             : Output< Section >{ filename }
         {
         }

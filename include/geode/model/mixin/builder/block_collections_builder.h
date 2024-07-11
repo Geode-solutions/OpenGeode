@@ -46,7 +46,8 @@ namespace geode
         void set_block_collection_name( const uuid& id, std::string_view name );
 
     protected:
-        BlockCollectionsBuilder( BlockCollections< dimension >& collections )
+        explicit BlockCollectionsBuilder(
+            BlockCollections< dimension >& collections )
             : block_collections_( collections )
         {
         }

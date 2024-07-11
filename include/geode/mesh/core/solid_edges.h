@@ -55,7 +55,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         SolidEdges();
-        SolidEdges( const SolidMesh< dimension >& solid );
+        explicit SolidEdges( const SolidMesh< dimension >& solid );
         ~SolidEdges();
 
         index_t nb_edges() const;

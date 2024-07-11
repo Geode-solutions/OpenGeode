@@ -46,7 +46,7 @@ namespace geode
         using CellIndices = typename CellArray< dimension >::CellIndices;
 
         RasterImage();
-        RasterImage( std::array< index_t, dimension > cells_number );
+        explicit RasterImage( std::array< index_t, dimension > cells_number );
         RasterImage( RasterImage&& other ) noexcept;
         RasterImage& operator=( RasterImage&& other ) noexcept;
         ~RasterImage();

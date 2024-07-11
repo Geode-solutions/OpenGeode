@@ -49,7 +49,8 @@ namespace geode
         OpenGeodePointSetBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodePointSetBuilder( OpenGeodePointSet< dimension >& mesh );
+        explicit OpenGeodePointSetBuilder(
+            OpenGeodePointSet< dimension >& mesh );
 
     private:
         void do_create_vertex() final;

@@ -24,27 +24,32 @@
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/nn_search.h>
+#include <geode/geometry/point.h>
 
 #include <geode/tests/common.h>
 
 void test()
 {
-    const geode::NNSearch2D search{ { { { 0.1, 4.2 } }, { { 5.9, 7.3 } },
-        { { 1.8, -5 } }, { { -7.3, -1.6 } } } };
+    const geode::NNSearch2D search{ { geode::Point2D{ { 0.1, 4.2 } },
+        geode::Point2D{ { 5.9, 7.3 } }, geode::Point2D{ { 1.8, -5 } },
+        geode::Point2D{ { -7.3, -1.6 } } } };
 
-    OPENGEODE_EXCEPTION( search.closest_neighbor( { { 0, 0 } } ) == 0,
+    OPENGEODE_EXCEPTION(
+        search.closest_neighbor( geode::Point2D{ { 0, 0 } } ) == 0,
         "[Test] Error in closest neighbor" );
-    OPENGEODE_EXCEPTION( search.closest_neighbor( { { 1, -4 } } ) == 2,
+    OPENGEODE_EXCEPTION(
+        search.closest_neighbor( geode::Point2D{ { 1, -4 } } ) == 2,
         "[Test] Error in closest neighbor" );
 
     const std::vector< geode::index_t > answer_radius{ 0, 2 };
     OPENGEODE_EXCEPTION(
-        search.radius_neighbors( { { 0, 0 } }, 5.4 ) == answer_radius,
+        search.radius_neighbors( geode::Point2D{ { 0, 0 } }, 5.4 )
+            == answer_radius,
         "[Test] Error in radius neighbors" );
 
     const std::vector< geode::index_t > answer_neighbors{ 2, 0 };
     OPENGEODE_EXCEPTION(
-        search.neighbors( { { -1, -1 } }, 2 ) == answer_neighbors,
+        search.neighbors( geode::Point2D{ { -1, -1 } }, 2 ) == answer_neighbors,
         "[Test] Error in neighbors" );
 
     const geode::Point3D p0{ { 0.1, 2.9, 5.4 } };

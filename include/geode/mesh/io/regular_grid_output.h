@@ -54,7 +54,7 @@ namespace geode
     class RegularGridOutput : public Output< RegularGrid< dimension > >
     {
     protected:
-        RegularGridOutput( std::string_view filename )
+        explicit RegularGridOutput( std::string_view filename )
             : Output< RegularGrid< dimension > >{ filename }
         {
         }

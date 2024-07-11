@@ -44,9 +44,11 @@ geode::Section build_section()
 {
     geode::Section section;
     geode::SectionBuilder builder{ section };
-    std::vector< geode::Point2D > points{ { { 0, 0 } }, { { 2, 0 } },
-        { { 4, 0 } }, { { 1, 1 } }, { { 3, 1 } }, { { 2, 2 } }, { { 1, -1 } },
-        { { 3, -1 } }, { { 2, -2 } } };
+    std::vector< geode::Point2D > points{ geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 4, 0 } },
+        geode::Point2D{ { 1, 1 } }, geode::Point2D{ { 3, 1 } },
+        geode::Point2D{ { 2, 2 } }, geode::Point2D{ { 1, -1 } },
+        geode::Point2D{ { 3, -1 } }, geode::Point2D{ { 2, -2 } } };
     builder.create_unique_vertices( points.size() );
 
     {

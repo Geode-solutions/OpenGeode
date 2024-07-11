@@ -39,7 +39,7 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepOutput final : public BRepOutput
     {
     public:
-        OpenGeodeBRepOutput( std::string_view filename )
+        explicit OpenGeodeBRepOutput( std::string_view filename )
             : BRepOutput( filename )
         {
         }

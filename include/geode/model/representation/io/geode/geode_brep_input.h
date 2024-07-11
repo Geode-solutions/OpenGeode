@@ -31,7 +31,8 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepInput final : public BRepInput
     {
     public:
-        OpenGeodeBRepInput( std::string_view filename ) : BRepInput( filename )
+        explicit OpenGeodeBRepInput( std::string_view filename )
+            : BRepInput( filename )
         {
         }
 

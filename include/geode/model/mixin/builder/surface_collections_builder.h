@@ -47,7 +47,7 @@ namespace geode
             const uuid& id, std::string_view name );
 
     protected:
-        SurfaceCollectionsBuilder(
+        explicit SurfaceCollectionsBuilder(
             SurfaceCollections< dimension >& collections )
             : surface_collections_( collections )
         {

@@ -333,8 +333,8 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
 
-    const geode::LightRegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 },
-        { 1, 2, 3 } };
+    const geode::LightRegularGrid3D grid{ geode::Point3D{ { 1.5, 0, 1 } },
+        { 5, 10, 15 }, { 1, 2, 3 } };
     test_cell_number( grid );
     test_cell_index( grid );
     test_vertex_number( grid );

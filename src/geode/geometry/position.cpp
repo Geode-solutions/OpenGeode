@@ -119,12 +119,15 @@ namespace geode
         const Vector3D& third_vector )
     {
         const auto& vertices = triangle.vertices();
-        const auto det0 = GEO::PCK::det_3d(
-            point - vertices[0], point - vertices[1], third_vector );
-        const auto det1 = GEO::PCK::det_3d(
-            point - vertices[1], point - vertices[2], third_vector );
-        const auto det2 = GEO::PCK::det_3d(
-            point - vertices[2], point - vertices[0], third_vector );
+        const Vector3D v0_to_point{ vertices[0], point };
+        const Vector3D v1_to_point{ vertices[1], point };
+        const Vector3D v2_to_point{ vertices[2], point };
+        const auto det0 =
+            GEO::PCK::det_3d( v0_to_point, v1_to_point, third_vector );
+        const auto det1 =
+            GEO::PCK::det_3d( v1_to_point, v2_to_point, third_vector );
+        const auto det2 =
+            GEO::PCK::det_3d( v2_to_point, v0_to_point, third_vector );
 
         if( det0 == GEO::ZERO && det1 == GEO::ZERO && det2 == GEO::ZERO )
         {
@@ -144,7 +147,8 @@ namespace geode
             return Position::outside;
         }
 
-        return compute_determinants( point, triangle, { { 1.0, 1.0, 1.0 } } );
+        return compute_determinants(
+            point, triangle, Vector3D{ { 1.0, 1.0, 1.0 } } );
     }
 
     Position point_tetrahedron_position_exact(

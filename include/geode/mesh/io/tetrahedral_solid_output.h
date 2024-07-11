@@ -57,7 +57,7 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     protected:
-        TetrahedralSolidOutput( std::string_view filename )
+        explicit TetrahedralSolidOutput( std::string_view filename )
             : Output< TetrahedralSolid< dimension > >{ filename }
         {
         }
