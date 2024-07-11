@@ -59,7 +59,7 @@ namespace geode
 {
     template < index_t dimension >
     class SolidEdges< dimension >::Impl
-        : public detail::FacetEdgesImpl< dimension >
+        : public internal::FacetEdgesImpl< dimension >
     {
         friend class bitsery::Access;
 
@@ -82,8 +82,9 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::FacetEdgesImpl< dimension > >{} );
+                    a.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  internal::FacetEdgesImpl< dimension > >{} );
                 } } } );
         }
     };

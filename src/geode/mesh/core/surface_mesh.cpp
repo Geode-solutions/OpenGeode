@@ -139,7 +139,7 @@ namespace
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
-        geode::detail::PolygonsAroundVertexImpl result;
+        geode::internal::PolygonsAroundVertexImpl result;
         auto cur_polygon_vertex = first_polygon;
         do
         {
@@ -265,17 +265,18 @@ namespace geode
     class SurfaceMesh< dimension >::Impl
     {
         friend class bitsery::Access;
-        using CachedPolygons = CachedValue< detail::PolygonsAroundVertexImpl >;
+        using CachedPolygons =
+            CachedValue< internal::PolygonsAroundVertexImpl >;
         static constexpr auto polygons_around_vertex_name =
             "polygons_around_vertex";
 
     public:
         Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) ),
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) ),
               polygons_around_vertex_(
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -448,10 +449,11 @@ namespace geode
                         } } } );
         }
 
-        const detail::PolygonsAroundVertexImpl& updated_polygons_around_vertex(
-            const SurfaceMesh< dimension >& mesh,
-            const index_t vertex_id,
-            const std::optional< PolygonVertex >& first_polygon ) const
+        const internal::PolygonsAroundVertexImpl&
+            updated_polygons_around_vertex(
+                const SurfaceMesh< dimension >& mesh,
+                const index_t vertex_id,
+                const std::optional< PolygonVertex >& first_polygon ) const
         {
             const auto& cached = polygons_around_vertex_->value( vertex_id );
             const auto& polygons = cached.value().polygons;

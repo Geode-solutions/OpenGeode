@@ -41,13 +41,13 @@ namespace geode
 {
     template < index_t dimension >
     class OpenGeodeTetrahedralSolid< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh ),
+            : internal::PointsImpl< dimension >( mesh ),
               tetrahedron_vertices_(
                   mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -132,7 +132,7 @@ namespace geode
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                     a.ext( impl.tetrahedron_vertices_,
                         bitsery::ext::StdSmartPtr{} );
                     a.ext( impl.tetrahedron_adjacents_,

@@ -253,10 +253,10 @@ namespace
             geode::PolyhedronVertex, Serializer >(
             context, "PolyhedronVertex" );
         geode::AttributeManager::register_attribute_type<
-            geode::CachedValue< geode::detail::PolygonsAroundVertexImpl >,
+            geode::CachedValue< geode::internal::PolygonsAroundVertexImpl >,
             Serializer >( context, "CachedPolygonsAroundVertexImpl" );
         geode::AttributeManager::register_attribute_type<
-            geode::CachedValue< geode::detail::PolyhedraAroundVertexImpl >,
+            geode::CachedValue< geode::internal::PolyhedraAroundVertexImpl >,
             Serializer >( context, "CachedPolyhedraAroundVertexImpl" );
         geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(

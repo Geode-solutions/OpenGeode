@@ -36,7 +36,7 @@ namespace geode
 {
     template < index_t dimension >
     class LightRegularGrid< dimension >::Impl
-        : public detail::GridImpl< dimension >
+        : public internal::GridImpl< dimension >
     {
     public:
         Impl() = default;
@@ -122,8 +122,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto LightRegularGrid< dimension >::vertex_indices( index_t index ) const
-        -> VertexIndices
+    auto LightRegularGrid< dimension >::vertex_indices(
+        index_t index ) const -> VertexIndices
     {
         return impl_->vertex_indices( *this, index );
     }
@@ -136,8 +136,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto LightRegularGrid< dimension >::cell_indices( index_t index ) const
-        -> CellIndices
+    auto LightRegularGrid< dimension >::cell_indices(
+        index_t index ) const -> CellIndices
     {
         return impl_->cell_indices( *this, index );
     }

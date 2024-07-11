@@ -249,7 +249,7 @@ namespace
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 40000 };
-        geode::detail::PolyhedraAroundVertexImpl result;
+        geode::internal::PolyhedraAroundVertexImpl result;
         result.vertex_is_on_border = false;
         absl::flat_hash_set< geode::index_t > polyhedra_visited;
         polyhedra_visited.reserve( 20 );
@@ -383,17 +383,17 @@ namespace geode
     {
         friend class bitsery::Access;
         using CachedPolyhedra =
-            CachedValue< detail::PolyhedraAroundVertexImpl >;
+            CachedValue< internal::PolyhedraAroundVertexImpl >;
         static constexpr auto polyhedra_around_vertex_name =
             "polyhedra_around_vertex";
 
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -586,7 +586,7 @@ namespace geode
                         polyhedra_around_vertex_name, CachedPolyhedra{} );
         }
 
-        const detail::PolyhedraAroundVertexImpl&
+        const internal::PolyhedraAroundVertexImpl&
             updated_polyhedra_around_vertex( const SolidMesh< dimension >& mesh,
                 const index_t vertex_id,
                 const std::optional< PolyhedronVertex >& first_polyhedron )

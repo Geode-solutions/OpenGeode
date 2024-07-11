@@ -32,17 +32,17 @@ namespace geode
 {
     template < index_t dimension >
     class AttributeCoordinateReferenceSystem< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         Impl( AttributeManager& manager )
-            : detail::PointsImpl< dimension >{ manager }
+            : internal::PointsImpl< dimension >{ manager }
         {
         }
         Impl( AttributeManager& manager, std::string_view attribute_name )
-            : detail::PointsImpl< dimension >{ manager, attribute_name }
+            : internal::PointsImpl< dimension >{ manager, attribute_name }
         {
         }
 
@@ -55,7 +55,7 @@ namespace geode
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
     };

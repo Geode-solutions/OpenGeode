@@ -32,7 +32,8 @@
 namespace geode
 {
     template < index_t dimension >
-    class RasterImage< dimension >::Impl : public detail::ArrayImpl< dimension >
+    class RasterImage< dimension >::Impl
+        : public internal::ArrayImpl< dimension >
     {
         friend class bitsery::Access;
 
@@ -70,7 +71,7 @@ namespace geode
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::ArrayImpl< dimension > >{} );
+                                     internal::ArrayImpl< dimension > >{} );
                     a.container( impl.colors_, impl.colors_.max_size() );
                 } } } );
         }
@@ -108,8 +109,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto RasterImage< dimension >::cell_indices( index_t index ) const
-        -> CellIndices
+    auto RasterImage< dimension >::cell_indices(
+        index_t index ) const -> CellIndices
     {
         return impl_->cell_indices( *this, index );
     }

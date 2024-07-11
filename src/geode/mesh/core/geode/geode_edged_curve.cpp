@@ -39,14 +39,15 @@ namespace geode
 {
     template < index_t dimension >
     class OpenGeodeEdgedCurve< dimension >::Impl
-        : public detail::EdgesImpl,
-          public detail::PointsImpl< dimension >
+        : public internal::EdgesImpl,
+          public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeEdgedCurve< dimension >& mesh )
-            : detail::EdgesImpl( mesh ), detail::PointsImpl< dimension >( mesh )
+            : internal::EdgesImpl( mesh ),
+              internal::PointsImpl< dimension >( mesh )
         {
         }
 
@@ -58,10 +59,10 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext(
-                        impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
+                    a.ext( impl,
+                        bitsery::ext::BaseClass< internal::EdgesImpl >{} );
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
     };

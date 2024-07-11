@@ -311,7 +311,7 @@ add_geode_library(
         "helpers/detail/solid_merger.h"
         "helpers/detail/surface_merger.h"
         "helpers/detail/vertex_merger.h"
-    PRIVATE_HEADERS
+    INTERNAL_HEADERS
         "core/internal/edges_impl.h"
         "core/internal/facet_edges_impl.h"
         "core/internal/grid_impl.h"

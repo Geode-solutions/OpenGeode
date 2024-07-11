@@ -88,7 +88,7 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/aabb_impl.h"
         "detail/bitsery_archive.h"
-    PRIVATE_HEADERS
+    INTERNAL_HEADERS
         "internal/intersection_from_sides.h"
         "internal/position_from_sides.h"
         "internal/predicates.h"
