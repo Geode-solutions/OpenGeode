@@ -68,8 +68,8 @@ namespace geode
     public:
         using Base =
             Input< std::unique_ptr< TetrahedralSolid< dimension > >, MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
         explicit TetrahedralSolidInput( absl::string_view filename )

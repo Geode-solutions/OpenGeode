@@ -283,7 +283,7 @@ namespace geode
         };
         const Vector3D box_center{ center() };
         const auto box_diagonal = diagonal();
-        const auto bbox_projection = [this, &box_center, &box_diagonal](
+        const auto bbox_projection = [&box_center, &box_diagonal](
                                          const Vector3D& normal ) {
             const auto origin = normal.dot( box_center );
             const auto maximum_extent =

@@ -76,6 +76,5 @@ namespace pybind11
             : string_caster< absl::string_view, true >
         {
         };
-
     } // namespace detail
 } // namespace pybind11

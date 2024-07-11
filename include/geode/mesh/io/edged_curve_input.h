@@ -65,8 +65,8 @@ namespace geode
     public:
         using Base =
             Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
         explicit EdgedCurveInput( absl::string_view filename )
