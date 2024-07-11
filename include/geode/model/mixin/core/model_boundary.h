@@ -72,7 +72,7 @@ namespace geode
         ModelBoundary( ModelBoundariesKey ) : ModelBoundary() {}
 
         void set_model_boundary_name(
-            absl::string_view name, ModelBoundariesBuilderKey )
+            std::string_view name, ModelBoundariesBuilderKey )
         {
             this->set_name( name );
         }

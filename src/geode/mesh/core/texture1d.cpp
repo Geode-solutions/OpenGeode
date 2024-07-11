@@ -40,7 +40,7 @@ namespace geode
 
     public:
         Impl() = default;
-        Impl( AttributeManager& manager, absl::string_view name )
+        Impl( AttributeManager& manager, std::string_view name )
             : detail::TextureImpl< 1 >{ manager, name }
         {
         }
@@ -69,7 +69,7 @@ namespace geode
         }
     };
 
-    Texture< 1 >::Texture( AttributeManager& manager, absl::string_view name )
+    Texture< 1 >::Texture( AttributeManager& manager, std::string_view name )
         : impl_{ manager, name }
     {
     }

@@ -41,13 +41,13 @@ namespace geode
     class BlockCollectionsBuilder
     {
     public:
-        void load_block_collections( absl::string_view directory );
+        void load_block_collections( std::string_view directory );
 
-        void set_block_collection_name(
-            const uuid& id, absl::string_view name );
+        void set_block_collection_name( const uuid& id, std::string_view name );
 
     protected:
-        BlockCollectionsBuilder( BlockCollections< dimension >& collections )
+        explicit BlockCollectionsBuilder(
+            BlockCollections< dimension >& collections )
             : block_collections_( collections )
         {
         }

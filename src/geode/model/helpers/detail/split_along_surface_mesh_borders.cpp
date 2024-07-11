@@ -181,7 +181,7 @@ namespace geode
                     {
                         PolygonVertex vertex{ p, v };
                         const auto vertex_id = mesh.polygon_vertex( vertex );
-                        if( mesh.is_edge_on_border( vertex ) )
+                        if( mesh.is_edge_on_border( PolygonEdge{ vertex } ) )
                         {
                             vertex_to_check[vertex_id] = true;
                         }

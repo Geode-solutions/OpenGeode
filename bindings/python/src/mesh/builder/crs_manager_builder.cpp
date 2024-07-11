@@ -36,7 +36,7 @@
             CoordinateReferenceSystemManager< dimension >& >() )               \
         .def( "register_coordinate_reference_system",                          \
             []( CoordinateReferenceSystemManagerBuilder< dimension >& manager, \
-                absl::string_view name,                                        \
+                std::string_view name,                                         \
                 std::shared_ptr< CoordinateReferenceSystem< dimension > >&     \
                     crs ) {                                                    \
                 manager.register_coordinate_reference_system(                  \

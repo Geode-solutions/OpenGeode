@@ -45,7 +45,8 @@ namespace geode
     class DistanceToTetrahedron
     {
     public:
-        DistanceToTetrahedron( const TetrahedralSolid< dimension >& mesh )
+        explicit DistanceToTetrahedron(
+            const TetrahedralSolid< dimension >& mesh )
             : mesh_( mesh )
         {
         }
@@ -62,7 +63,7 @@ namespace geode
     class GenericMeshAABB< SolidMesh< dimension > >
     {
     public:
-        GenericMeshAABB( const SolidMesh< dimension >& mesh )
+        explicit GenericMeshAABB( const SolidMesh< dimension >& mesh )
             : elements_tree_{ create_aabb_tree( mesh ) }
         {
         }
@@ -87,7 +88,7 @@ namespace geode
     public:
         using Base = GenericMeshAABB< SolidMesh< dimension > >;
 
-        GenericMeshAABB( const TetrahedralSolid< dimension >& mesh )
+        explicit GenericMeshAABB( const TetrahedralSolid< dimension >& mesh )
             : Base{ mesh }, distance_action_{ mesh }
         {
         }

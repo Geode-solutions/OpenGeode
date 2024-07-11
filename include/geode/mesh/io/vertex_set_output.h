@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -47,20 +46,20 @@ namespace geode
      * @param[in] filename Path to the file where save the VertexSet.
      */
     std::vector< std::string > opengeode_mesh_api save_vertex_set(
-        const VertexSet& vertex_set, absl::string_view filename );
+        const VertexSet& vertex_set, std::string_view filename );
 
     class VertexSetOutput : public Output< VertexSet >
     {
     protected:
-        VertexSetOutput( absl::string_view filename )
+        explicit VertexSetOutput( std::string_view filename )
             : Output< VertexSet >{ filename }
         {
         }
     };
 
     bool opengeode_mesh_api is_vertex_set_saveable(
-        const VertexSet& vertex_set, absl::string_view filename );
+        const VertexSet& vertex_set, std::string_view filename );
 
     using VertexSetOutputFactory =
-        Factory< std::string, VertexSetOutput, absl::string_view >;
+        Factory< std::string, VertexSetOutput, std::string_view >;
 } // namespace geode

@@ -37,12 +37,12 @@ namespace geode
     class Component< dimension >::Impl
     {
     public:
-        absl::string_view name() const
+        std::string_view name() const
         {
             return name_;
         }
 
-        void set_name( absl::string_view name )
+        void set_name( std::string_view name )
         {
             name_ = to_string( name );
         }

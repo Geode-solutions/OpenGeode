@@ -41,7 +41,7 @@ namespace geode
     class SolidEdgesBuilder
     {
     public:
-        SolidEdgesBuilder( SolidEdges< dimension >& edges );
+        explicit SolidEdgesBuilder( SolidEdges< dimension >& edges );
 
         /*!
          * Delete all the isolated edges (not used as polyhedron edges)

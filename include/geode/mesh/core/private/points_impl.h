@@ -64,7 +64,7 @@ namespace geode
                 return points_->size();
             }
 
-            absl::string_view attribute_name() const
+            std::string_view attribute_name() const
             {
                 return points_->name();
             }
@@ -113,19 +113,19 @@ namespace geode
             PointsImpl() = default;
 
             template < typename Mesh >
-            PointsImpl( Mesh& mesh )
+            explicit PointsImpl( Mesh& mesh )
                 : PointsImpl( mesh.vertex_attribute_manager() )
             {
                 register_as_active_crs( mesh );
             }
 
-            PointsImpl( AttributeManager& manager )
+            explicit PointsImpl( AttributeManager& manager )
                 : PointsImpl{ manager, POINTS_NAME }
             {
             }
 
             PointsImpl(
-                AttributeManager& manager, absl::string_view attribute_name )
+                AttributeManager& manager, std::string_view attribute_name )
                 : points_{
                       manager
                           .template find_or_create_attribute< VariableAttribute,

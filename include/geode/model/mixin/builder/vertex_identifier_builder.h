@@ -36,7 +36,7 @@ namespace geode
     class opengeode_model_api VertexIdentifierBuilder
     {
     public:
-        VertexIdentifierBuilder( VertexIdentifier& vertex_identifier );
+        explicit VertexIdentifierBuilder( VertexIdentifier& vertex_identifier );
 
         /*!
          * Add a component in the VertexIdentifier
@@ -101,7 +101,7 @@ namespace geode
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( absl::string_view directory );
+        void load_unique_vertices( std::string_view directory );
 
         /*!
          * Delete all unique vertices not associated with any component

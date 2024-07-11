@@ -43,7 +43,7 @@ namespace
     template < typename Mesh >
     void create_mesh_coordinate_system( const Mesh& mesh,
         typename Mesh::Builder& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const geode::CoordinateSystem2D& input,
         const geode::CoordinateSystem2D& output )
     {
@@ -77,7 +77,7 @@ namespace geode
     void create_edged_curve_coordinate_system(
         const EdgedCurve< dimension >& mesh,
         EdgedCurveBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output )
     {
@@ -88,7 +88,7 @@ namespace geode
     template < index_t dimension >
     void create_point_set_coordinate_system( const PointSet< dimension >& mesh,
         PointSetBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output )
     {
@@ -100,7 +100,7 @@ namespace geode
     void create_surface_mesh_coordinate_system(
         const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output )
     {
@@ -112,7 +112,7 @@ namespace geode
     void create_solid_mesh_coordinate_system(
         const SolidMesh< dimension >& mesh,
         SolidMeshBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output )
     {
@@ -123,44 +123,44 @@ namespace geode
     template void opengeode_mesh_api create_edged_curve_coordinate_system(
         const EdgedCurve< 2 >&,
         EdgedCurveBuilder< 2 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
     template void opengeode_mesh_api create_point_set_coordinate_system(
         const PointSet< 2 >&,
         PointSetBuilder< 2 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
     template void opengeode_mesh_api create_surface_mesh_coordinate_system(
         const SurfaceMesh< 2 >&,
         SurfaceMeshBuilder< 2 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
 
     template void opengeode_mesh_api create_edged_curve_coordinate_system(
         const EdgedCurve< 3 >&,
         EdgedCurveBuilder< 3 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
     template void opengeode_mesh_api create_point_set_coordinate_system(
         const PointSet< 3 >&,
         PointSetBuilder< 3 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
     template void opengeode_mesh_api create_surface_mesh_coordinate_system(
         const SurfaceMesh< 3 >&,
         SurfaceMeshBuilder< 3 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
     template void opengeode_mesh_api create_solid_mesh_coordinate_system(
         const SolidMesh< 3 >&,
         SolidMeshBuilder< 3 >&,
-        absl::string_view,
+        std::string_view,
         const CoordinateSystem2D&,
         const CoordinateSystem2D& );
 } // namespace geode

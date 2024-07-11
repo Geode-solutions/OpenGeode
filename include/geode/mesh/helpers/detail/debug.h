@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
+
 #include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
@@ -43,18 +44,18 @@ namespace geode
     {
         template < index_t dimension >
         void save_segment(
-            const Segment< dimension >& segment, absl::string_view suffix );
+            const Segment< dimension >& segment, std::string_view suffix );
 
         template < index_t dimension >
         void save_triangle(
-            const Triangle< dimension >& triangle, absl::string_view suffix );
+            const Triangle< dimension >& triangle, std::string_view suffix );
 
         void opengeode_mesh_api save_tetrahedron(
-            const Tetrahedron& tetrahedron, absl::string_view suffix );
+            const Tetrahedron& tetrahedron, std::string_view suffix );
 
         void opengeode_mesh_api save_tetrahedra(
             const TetrahedralSolid3D& solid,
             absl::Span< const index_t > indices,
-            absl::string_view suffix );
+            std::string_view suffix );
     } // namespace detail
 } // namespace geode

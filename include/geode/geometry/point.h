@@ -52,7 +52,7 @@ namespace geode
             values_.fill( 0 );
         }
 
-        Point( std::array< double, dimension > values )
+        explicit Point( std::array< double, dimension > values )
             : values_( std::move( values ) )
         {
         }

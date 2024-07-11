@@ -38,6 +38,6 @@ namespace geode
         {
             points.push_back( mesh.point( v ) );
         }
-        return { std::move( points ) };
+        return NNSearch< dimension >{ std::move( points ) };
     }
 } // namespace geode

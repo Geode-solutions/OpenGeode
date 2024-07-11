@@ -46,7 +46,8 @@ namespace
         const geode::Surface3D& surface, const geode::PolygonEdge& edge )
     {
         const auto& mesh = surface.mesh();
-        auto vertex = mesh.polygon_vertex( mesh.previous_polygon_edge( edge ) );
+        auto vertex = mesh.polygon_vertex(
+            mesh.previous_polygon_vertex( geode::PolygonVertex{ edge } ) );
         return mesh.point( vertex );
     }
 
@@ -240,6 +241,6 @@ namespace geode
         }
         OPENGEODE_ASSERT_NOT_REACHED(
             "[surface_radial_sort] Cannot find sorted surfaces on a Line" );
-        return { 0 };
+        return SortedSurfaces{ 0 };
     }
 } // namespace geode

@@ -90,7 +90,7 @@ namespace geode
             absl::Span< const index_t > permutation );
 
     protected:
-        VertexSetBuilder( VertexSet& vertex_set );
+        explicit VertexSetBuilder( VertexSet& vertex_set );
 
         friend class VertexSet;
         void copy( const VertexSet& vertex_set );

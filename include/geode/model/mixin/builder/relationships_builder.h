@@ -34,7 +34,7 @@ namespace geode
     class opengeode_model_api RelationshipsBuilder
     {
     public:
-        RelationshipsBuilder( Relationships& relationships );
+        explicit RelationshipsBuilder( Relationships& relationships );
 
         /*!
          * Remove a component from the set of components registered by the
@@ -72,7 +72,7 @@ namespace geode
         void copy_relationships( const ModelCopyMapping& mapping,
             const Relationships& relationships );
 
-        void load_relationships( absl::string_view directory );
+        void load_relationships( std::string_view directory );
 
     private:
         Relationships& relationships_;

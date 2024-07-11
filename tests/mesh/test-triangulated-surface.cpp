@@ -38,11 +38,11 @@
 void test_create_vertices( const geode::TriangulatedSurface3D& surface,
     geode::TriangulatedSurfaceBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
-    builder.create_point( { { 7.5, 5.2, 6.3 } } );
-    builder.create_point( { { 8.1, 1.4, 4.7 } } );
-    builder.create_point( { { 4.7, 2.1, 1.3 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder.create_point( geode::Point3D{ { 8.1, 1.4, 4.7 } } );
+    builder.create_point( geode::Point3D{ { 4.7, 2.1, 1.3 } } );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 5,
         "[Test] TriangulatedSurface should have 5 vertices" );
 }
@@ -193,7 +193,7 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
 }
 
 void test_io(
-    const geode::TriangulatedSurface3D& surface, absl::string_view filename )
+    const geode::TriangulatedSurface3D& surface, std::string_view filename )
 {
     geode::save_triangulated_surface( surface, filename );
     geode::load_triangulated_surface< 3 >( filename );

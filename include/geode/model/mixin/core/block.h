@@ -24,8 +24,7 @@
 #pragma once
 
 #include <memory>
-
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
@@ -107,7 +106,7 @@ namespace geode
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
-        void set_block_name( absl::string_view name, BlocksBuilderKey key );
+        void set_block_name( std::string_view name, BlocksBuilderKey key );
 
     private:
         Block();

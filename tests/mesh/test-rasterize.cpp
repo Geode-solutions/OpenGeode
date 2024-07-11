@@ -102,7 +102,7 @@ void test_conservative_rasterize_segment()
 {
     auto grid = geode::RegularGrid2D::create();
     auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 10, 10 }, 1 );
     geode::Point2D pt0{ { 2.5, 2.5 } };
     geode::Point2D pt1{ { 6.5, 6.5 } };
     geode::Segment2D segment{ pt0, pt1 };
@@ -137,7 +137,7 @@ void test_conservative_rasterize_triangle()
 {
     auto grid = geode::RegularGrid2D::create();
     auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 10, 10 }, 1 );
     geode::Point2D pt0{ { 2.5, 2.5 } };
     geode::Point2D pt1{ { 6.5, 6.5 } };
     geode::Point2D pt2{ { 2.5, 6.5 } };
@@ -171,7 +171,8 @@ void test_limit()
 {
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { -1, -1, -1 } }, { 3, 3, 3 }, 1 );
+    builder->initialize_grid(
+        geode::Point3D{ { -1, -1, -1 } }, { 3, 3, 3 }, 1 );
     const geode::Point3D pt000{ { 0, 0, 0 } };
     const geode::Point3D pt001{ { 0, 0, 1 } };
     const geode::Point3D pt010{ { 0, 1, 0 } };
@@ -217,7 +218,8 @@ void test()
     geode::OpenGeodeMeshLibrary::initialize();
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
+    builder->initialize_grid(
+        geode::Point3D{ { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
     geode::Point3D pt0{ { 2, 2, 2 } };
     geode::Point3D pt1{ { 3.55, 7.55, 3.55 } };
     geode::Point3D pt2{ { 6.55, 1.55, 5.55 } };

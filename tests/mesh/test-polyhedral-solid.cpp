@@ -42,14 +42,14 @@
 void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
-    builder.create_point( { { 7.5, 5.2, 6.3 } } );
-    builder.create_point( { { 8.1, 1.4, 4.7 } } );
-    builder.create_point( { { 4.7, 2.1, 1.3 } } );
-    builder.create_point( { { 9.3, 5.3, 6.7 } } );
-    builder.create_point( { { 7.5, 4.2, 2.8 } } );
-    builder.create_point( { { 2.2, 3.3, 4.4 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder.create_point( geode::Point3D{ { 8.1, 1.4, 4.7 } } );
+    builder.create_point( geode::Point3D{ { 4.7, 2.1, 1.3 } } );
+    builder.create_point( geode::Point3D{ { 9.3, 5.3, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 4.2, 2.8 } } );
+    builder.create_point( geode::Point3D{ { 2.2, 3.3, 4.4 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
@@ -396,12 +396,12 @@ void test_barycenters()
     const double a{ 0.6 };
     const double b{ 2.4 };
     const double c{ 1.8 };
-    builder->create_point( { { o, o, o } } );
-    builder->create_point( { { a, o, o } } );
-    builder->create_point( { { o, o, c } } );
-    builder->create_point( { { o, b, o } } );
-    builder->create_point( { { a, b, o } } );
-    builder->create_point( { { o, b, c } } );
+    builder->create_point( geode::Point3D{ { o, o, o } } );
+    builder->create_point( geode::Point3D{ { a, o, o } } );
+    builder->create_point( geode::Point3D{ { o, o, c } } );
+    builder->create_point( geode::Point3D{ { o, b, o } } );
+    builder->create_point( geode::Point3D{ { a, b, o } } );
+    builder->create_point( geode::Point3D{ { o, b, c } } );
     builder->create_polyhedron(
         { 0, 1, 2, 3, 4, 5 }, { { 0, 1, 2 }, { 0, 1, 4, 3 }, { 1, 2, 5, 4 },
                                   { 0, 3, 5, 2 }, { 3, 4, 5 } } );
@@ -427,12 +427,12 @@ void test_normals()
     const double a{ 0.6 };
     const double b{ 2.4 };
     const double c{ 1.8 };
-    builder->create_point( { { o, b, -c } } );
-    builder->create_point( { { o, o, o } } );
-    builder->create_point( { { a, o, o } } );
-    builder->create_point( { { a, b, o } } );
-    builder->create_point( { { o, b, o } } );
-    builder->create_point( { { o, b, c } } );
+    builder->create_point( geode::Point3D{ { o, b, -c } } );
+    builder->create_point( geode::Point3D{ { o, o, o } } );
+    builder->create_point( geode::Point3D{ { a, o, o } } );
+    builder->create_point( geode::Point3D{ { a, b, o } } );
+    builder->create_point( geode::Point3D{ { o, b, o } } );
+    builder->create_point( geode::Point3D{ { o, b, c } } );
     builder->create_polyhedron(
         { 0, 1, 2, 3, 4 }, { { 1, 2, 0 }, { 1, 2, 3, 4 }, { 2, 3, 0 },
                                { 3, 4, 0 }, { 4, 1, 0 } } );

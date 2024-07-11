@@ -873,8 +873,8 @@ void test_point_sphere_distance()
 void test_point_circle_distance()
 {
     const geode::Point3D a{ { 0.0, 0.0, 1.0 } };
-    const geode::Point3D normal_x{ { -1.0, 0.0, 0.0 } };
-    const geode::Point3D normal_z{ { 0.0, 0.0, 1.0 } };
+    const geode::Vector3D normal_x{ { -1.0, 0.0, 0.0 } };
+    const geode::Vector3D normal_z{ { 0.0, 0.0, 1.0 } };
     const geode::Plane plane_x{ normal_x, a };
     const geode::Plane plane_z{ normal_z, a };
     const geode::Circle circle_x{ plane_x, 2 };

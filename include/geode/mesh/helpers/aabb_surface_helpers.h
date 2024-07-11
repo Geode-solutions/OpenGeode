@@ -51,7 +51,8 @@ namespace geode
     class DistanceToTriangle
     {
     public:
-        DistanceToTriangle( const TriangulatedSurface< dimension >& mesh )
+        explicit DistanceToTriangle(
+            const TriangulatedSurface< dimension >& mesh )
             : mesh_( mesh )
         {
         }
@@ -68,7 +69,7 @@ namespace geode
     class GenericMeshAABB< SurfaceMesh< dimension > >
     {
     public:
-        GenericMeshAABB( const SurfaceMesh< dimension >& mesh )
+        explicit GenericMeshAABB( const SurfaceMesh< dimension >& mesh )
             : elements_tree_{ create_aabb_tree( mesh ) }
         {
         }

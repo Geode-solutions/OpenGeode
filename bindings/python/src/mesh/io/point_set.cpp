@@ -39,7 +39,7 @@
         "load_point_set" + std::to_string( dimension ) + "D";                  \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PointSet< dimension > > ( * )(           \
-            absl::string_view ) >( &load_point_set< dimension > ) );           \
+            std::string_view ) >( &load_point_set< dimension > ) );            \
     const auto check##dimension =                                              \
         "check_point_set_missing_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \

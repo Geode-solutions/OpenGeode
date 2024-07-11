@@ -45,7 +45,7 @@ namespace geode
     class CornersBuilder
     {
     public:
-        void load_corners( absl::string_view directory );
+        void load_corners( std::string_view directory );
 
         /*!
          * Get a pointer to the builder of a Corner mesh
@@ -54,10 +54,13 @@ namespace geode
         std::unique_ptr< PointSetBuilder< dimension > > corner_mesh_builder(
             const uuid& id );
 
-        void set_corner_name( const uuid& id, absl::string_view name );
+        void set_corner_name( const uuid& id, std::string_view name );
 
     protected:
-        CornersBuilder( Corners< dimension >& corners ) : corners_( corners ) {}
+        explicit CornersBuilder( Corners< dimension >& corners )
+            : corners_( corners )
+        {
+        }
 
         const uuid& create_corner();
 

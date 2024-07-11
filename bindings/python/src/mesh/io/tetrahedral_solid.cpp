@@ -40,7 +40,7 @@
         "load_tetrahedral_solid" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< TetrahedralSolid< dimension > > ( * )(   \
-            absl::string_view ) >( &load_tetrahedral_solid< dimension > ) );   \
+            std::string_view ) >( &load_tetrahedral_solid< dimension > ) );    \
     const auto check##dimension = "check_tetrahedral_solid_missing_files"      \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

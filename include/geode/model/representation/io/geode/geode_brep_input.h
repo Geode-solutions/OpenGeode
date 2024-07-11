@@ -31,16 +31,17 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepInput final : public BRepInput
     {
     public:
-        OpenGeodeBRepInput( absl::string_view filename ) : BRepInput( filename )
+        explicit OpenGeodeBRepInput( std::string_view filename )
+            : BRepInput( filename )
         {
         }
 
-        static absl::string_view extension()
+        static std::string_view extension()
         {
             return BRep::native_extension_static();
         }
 
-        void load_brep_files( BRep& brep, absl::string_view directory );
+        void load_brep_files( BRep& brep, std::string_view directory );
 
         BRep read() final;
     };

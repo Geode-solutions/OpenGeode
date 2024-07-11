@@ -42,7 +42,7 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
-        GridBuilder( Grid< dimension >& grid );
+        explicit GridBuilder( Grid< dimension >& grid );
 
         void set_grid_origin( Point< dimension > origin );
 

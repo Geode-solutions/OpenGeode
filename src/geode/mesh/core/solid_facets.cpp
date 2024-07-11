@@ -64,6 +64,8 @@ namespace geode
     {
         friend class bitsery::Access;
         using Facets = detail::FacetStorage< PolyhedronFacetVertices >;
+        using FacetsVertexCycle =
+            detail::VertexCycle< PolyhedronFacetVertices >;
 
     public:
         Impl() = default;
@@ -81,12 +83,13 @@ namespace geode
         std::optional< index_t > find_facet(
             const PolyhedronFacetVertices& facet_vertices ) const
         {
-            return Facets::find_facet( facet_vertices );
+            return Facets::find_facet( FacetsVertexCycle{ facet_vertices } );
         }
 
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices )
         {
-            return this->add_facet( std::move( facet_vertices ) );
+            return this->add_facet(
+                FacetsVertexCycle{ std::move( facet_vertices ) } );
         }
 
         const PolyhedronFacetVertices& get_facet_vertices(
@@ -111,7 +114,8 @@ namespace geode
 
         void remove_facet( PolyhedronFacetVertices facet_vertices )
         {
-            Facets::remove_facet( std::move( facet_vertices ) );
+            Facets::remove_facet(
+                FacetsVertexCycle{ std::move( facet_vertices ) } );
         }
 
         std::vector< index_t > delete_facets(

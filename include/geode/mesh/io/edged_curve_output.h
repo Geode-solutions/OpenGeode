@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -48,26 +47,24 @@ namespace geode
      */
     template < index_t dimension >
     std::vector< std::string > save_edged_curve(
-        const EdgedCurve< dimension >& edged_curve,
-        absl::string_view filename );
+        const EdgedCurve< dimension >& edged_curve, std::string_view filename );
 
     template < index_t dimension >
     class EdgedCurveOutput : public Output< EdgedCurve< dimension > >
     {
     protected:
-        EdgedCurveOutput( absl::string_view filename )
+        explicit EdgedCurveOutput( std::string_view filename )
             : Output< EdgedCurve< dimension > >{ filename }
         {
         }
     };
 
     template < index_t dimension >
-    bool is_edged_curve_saveable( const EdgedCurve< dimension >& edged_curve,
-        absl::string_view filename );
+    bool is_edged_curve_saveable(
+        const EdgedCurve< dimension >& edged_curve, std::string_view filename );
 
     template < index_t dimension >
-    using EdgedCurveOutputFactory = Factory< std::string,
-        EdgedCurveOutput< dimension >,
-        absl::string_view >;
+    using EdgedCurveOutputFactory =
+        Factory< std::string, EdgedCurveOutput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveOutputFactory );
 } // namespace geode

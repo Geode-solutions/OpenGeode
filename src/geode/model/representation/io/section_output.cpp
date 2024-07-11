@@ -24,9 +24,8 @@
 #include <geode/model/representation/io/section_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 #include <geode/basic/io.h>
@@ -37,7 +36,7 @@
 namespace geode
 {
     std::vector< std::string > save_section(
-        const Section& section, absl::string_view filename )
+        const Section& section, std::string_view filename )
     {
         constexpr auto TYPE = "Section";
         try
@@ -55,7 +54,7 @@ namespace geode
     }
 
     bool is_section_saveable(
-        const Section& section, absl::string_view filename )
+        const Section& section, std::string_view filename )
     {
         const auto output =
             detail::geode_object_output_writer< SectionOutputFactory >(

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -46,7 +46,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an HybridSolid.
@@ -56,7 +56,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class HybridSolidInput
@@ -67,23 +67,25 @@ namespace geode
     public:
         using Base =
             Input< std::unique_ptr< HybridSolid< dimension > >, MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
-        HybridSolidInput( absl::string_view filename ) : Base{ filename } {}
+        explicit HybridSolidInput( std::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >
     typename HybridSolidInput< dimension >::MissingFiles
-        check_hybrid_solid_missing_files( absl::string_view filename );
+        check_hybrid_solid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_hybrid_solid_loadable( absl::string_view filename );
+    bool is_hybrid_solid_loadable( std::string_view filename );
 
     template < index_t dimension >
-    using HybridSolidInputFactory = Factory< std::string,
-        HybridSolidInput< dimension >,
-        absl::string_view >;
+    using HybridSolidInputFactory =
+        Factory< std::string, HybridSolidInput< dimension >, std::string_view >;
     ALIAS_3D( HybridSolidInputFactory );
 } // namespace geode

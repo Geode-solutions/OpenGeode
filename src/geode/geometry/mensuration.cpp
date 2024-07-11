@@ -106,7 +106,6 @@ namespace geode
                 > global_angular_epsilon * edge02_length * edge03_length )
             {
                 const Vector3D edge01{ vertices[v], vertices[v1] };
-                const auto edge01_length = edge01.length();
                 return edge01.dot( cross02_03 ) / 6.;
             }
         }

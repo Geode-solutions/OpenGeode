@@ -133,8 +133,9 @@ namespace geode
                             vertices[v] = merger.vertex_in_merged(
                                 s, curve.edge_vertex( { e, v } ) );
                         }
-                        const auto it = edges.try_emplace(
-                            vertices, merger.mesh().nb_edges() );
+                        const auto it =
+                            edges.try_emplace( TypedVertexCycle{ vertices },
+                                merger.mesh().nb_edges() );
                         if( it.second )
                         {
                             const auto edge_id = merger.builder().create_edge(

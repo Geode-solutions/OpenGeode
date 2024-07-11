@@ -37,7 +37,7 @@ namespace geode
         class EdgesImpl
         {
         public:
-            EdgesImpl( Graph& graph )
+            explicit EdgesImpl( Graph& graph )
                 : edges_(
                     graph.edge_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,

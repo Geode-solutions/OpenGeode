@@ -63,7 +63,7 @@ namespace geode
         void copy( const EdgedCurve< dimension >& edged_curve );
 
     protected:
-        EdgedCurveBuilder( EdgedCurve< dimension >& mesh );
+        explicit EdgedCurveBuilder( EdgedCurve< dimension >& mesh );
 
     private:
         virtual void do_copy_points( const EdgedCurve< dimension >& mesh ) = 0;

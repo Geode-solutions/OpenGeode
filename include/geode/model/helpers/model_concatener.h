@@ -39,7 +39,7 @@ namespace geode
     class ModelConcatener
     {
     public:
-        ModelConcatener( Model& model );
+        explicit ModelConcatener( Model& model );
 
         ~ModelConcatener();
 

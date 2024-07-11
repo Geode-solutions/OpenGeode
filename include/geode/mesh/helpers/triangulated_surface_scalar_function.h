@@ -50,7 +50,7 @@ namespace geode
          */
         static TriangulatedSurfaceScalarFunction< dimension > create(
             const TriangulatedSurface< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value );
 
         /*!
@@ -60,7 +60,7 @@ namespace geode
          */
         static TriangulatedSurfaceScalarFunction< dimension > find(
             const TriangulatedSurface< dimension >& solid,
-            absl::string_view function_name );
+            std::string_view function_name );
 
         void set_value( index_t vertex_index, double value );
 
@@ -72,11 +72,11 @@ namespace geode
     private:
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& solid,
-            absl::string_view function_name );
+            std::string_view function_name );
 
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value );
 
     private:

@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -49,7 +48,7 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_polyhedral_solid(
         const PolyhedralSolid< dimension >& polyhedral_solid,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class PolyhedralSolidOutput : public Output< PolyhedralSolid< dimension > >
@@ -57,7 +56,7 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     protected:
-        PolyhedralSolidOutput( absl::string_view filename )
+        explicit PolyhedralSolidOutput( std::string_view filename )
             : Output< PolyhedralSolid< dimension > >{ filename }
         {
         }
@@ -66,11 +65,11 @@ namespace geode
     template < index_t dimension >
     bool is_polyhedral_solid_saveable(
         const PolyhedralSolid< dimension >& polyhedral_solid,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     using PolyhedralSolidOutputFactory = Factory< std::string,
         PolyhedralSolidOutput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_3D( PolyhedralSolidOutputFactory );
 } // namespace geode

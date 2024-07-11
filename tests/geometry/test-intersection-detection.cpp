@@ -441,7 +441,7 @@ void test_segment_plane_intersection_detection()
     const geode::Point3D o{ { 0.75, 0.25, 0.0 } };
     const geode::Point3D p{ { 0.75, -0.25, 0.0 } };
 
-    const geode::Plane plane{ { { 0.0, 0.0, 1.0 } }, a };
+    const geode::Plane plane{ geode::Vector3D{ { 0.0, 0.0, 1.0 } }, a };
 
     const geode::Segment3D segment_ab{ a, b };
     const geode::Segment3D segment_da{ d, a };

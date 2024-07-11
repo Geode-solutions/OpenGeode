@@ -41,13 +41,13 @@ namespace geode
     class SurfaceCollectionsBuilder
     {
     public:
-        void load_surface_collections( absl::string_view directory );
+        void load_surface_collections( std::string_view directory );
 
         void set_surface_collection_name(
-            const uuid& id, absl::string_view name );
+            const uuid& id, std::string_view name );
 
     protected:
-        SurfaceCollectionsBuilder(
+        explicit SurfaceCollectionsBuilder(
             SurfaceCollections< dimension >& collections )
             : surface_collections_( collections )
         {

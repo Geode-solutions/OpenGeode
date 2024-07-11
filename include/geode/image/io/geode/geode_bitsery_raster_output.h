@@ -36,7 +36,7 @@ namespace geode
     class OpenGeodeRasterImageOutput : public RasterImageOutput< dimension >
     {
     public:
-        OpenGeodeRasterImageOutput( absl::string_view filename )
+        OpenGeodeRasterImageOutput( std::string_view filename )
             : RasterImageOutput< dimension >( filename )
         {
         }

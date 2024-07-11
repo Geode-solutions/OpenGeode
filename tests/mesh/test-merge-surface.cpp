@@ -35,8 +35,10 @@
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
-    std::vector< geode::Point2D > points{ { { 0, 0 } }, { { 0, 1 } },
-        { { 0, 2 } }, { { 1, 0 } }, { { 1, 1 } }, { { 1, 2 } } };
+    std::vector< geode::Point2D > points{ geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 0, 1 } }, geode::Point2D{ { 0, 2 } },
+        geode::Point2D{ { 1, 0 } }, geode::Point2D{ { 1, 1 } },
+        geode::Point2D{ { 1, 2 } } };
 
     auto mesh0 = geode::SurfaceMesh2D::create();
     auto builder0 = geode::SurfaceMeshBuilder2D::create( *mesh0 );

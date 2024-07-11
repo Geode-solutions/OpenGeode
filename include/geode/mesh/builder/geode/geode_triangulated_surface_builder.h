@@ -51,7 +51,7 @@ namespace geode
         OpenGeodeTriangulatedSurfaceBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodeTriangulatedSurfaceBuilder(
+        explicit OpenGeodeTriangulatedSurfaceBuilder(
             OpenGeodeTriangulatedSurface< dimension >& mesh );
 
     private:

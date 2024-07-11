@@ -43,7 +43,7 @@ namespace geode
     class SurfaceEdgesBuilder
     {
     public:
-        SurfaceEdgesBuilder( SurfaceEdges< dimension >& edges );
+        explicit SurfaceEdgesBuilder( SurfaceEdges< dimension >& edges );
 
         /*!
          * Delete all the isolated edges (not used as polygon edges)

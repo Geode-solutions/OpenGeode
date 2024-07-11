@@ -53,7 +53,7 @@ namespace geode
         OpenGeodePolyhedralSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-        OpenGeodePolyhedralSolidBuilder(
+        explicit OpenGeodePolyhedralSolidBuilder(
             OpenGeodePolyhedralSolid< dimension >& mesh );
 
     private:

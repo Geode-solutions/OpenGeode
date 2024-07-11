@@ -77,7 +77,8 @@ namespace geode
             const TriangulatedSurface< dimension >& triangulated_surface );
 
     protected:
-        TriangulatedSurfaceBuilder( TriangulatedSurface< dimension >& mesh );
+        explicit TriangulatedSurfaceBuilder(
+            TriangulatedSurface< dimension >& mesh );
 
     private:
         void do_create_polygon( absl::Span< const index_t > vertices ) final;

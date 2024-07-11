@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -48,13 +47,13 @@ namespace geode
      */
     template < index_t dimension >
     std::vector< std::string > save_raster_image(
-        const RasterImage< dimension >& raster, absl::string_view filename );
+        const RasterImage< dimension >& raster, std::string_view filename );
 
     template < index_t dimension >
     class RasterImageOutput : public Output< RasterImage< dimension > >
     {
     protected:
-        RasterImageOutput( absl::string_view filename )
+        RasterImageOutput( std::string_view filename )
             : Output< RasterImage< dimension > >{ filename }
         {
         }
@@ -62,11 +61,11 @@ namespace geode
 
     template < index_t dimension >
     bool is_raster_image_saveable(
-        const RasterImage< dimension >& raster, absl::string_view filename );
+        const RasterImage< dimension >& raster, std::string_view filename );
 
     template < index_t dimension >
     using RasterImageOutputFactory = Factory< std::string,
         RasterImageOutput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( RasterImageOutputFactory );
 } // namespace geode

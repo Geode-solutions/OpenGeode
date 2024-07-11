@@ -39,7 +39,7 @@ namespace
 {
     template < typename Mesh >
     std::string compute_scalar_function_gradient(
-        const Mesh& mesh, absl::string_view scalar_function_name )
+        const Mesh& mesh, std::string_view scalar_function_name )
     {
         OPENGEODE_EXCEPTION( mesh.vertex_attribute_manager().attribute_exists(
                                  scalar_function_name ),
@@ -82,8 +82,9 @@ namespace
                 double inverse_dist_sum{ 0 };
                 for( const auto vertex_around : vertices_around )
                 {
-                    const geode::Vector< Mesh::dim > position_diff =
-                        position - mesh.point( vertex_around );
+                    const geode::Vector< Mesh::dim > position_diff{
+                        mesh.point( vertex_around ), position
+                    };
                     const auto value_diff =
                         function_value
                         - scalar_function->value( vertex_around );
@@ -123,21 +124,21 @@ namespace geode
     template < index_t dimension >
     std::string compute_surface_scalar_function_gradient(
         const SurfaceMesh< dimension >& mesh,
-        absl::string_view scalar_function_name )
+        std::string_view scalar_function_name )
     {
         return compute_scalar_function_gradient( mesh, scalar_function_name );
     }
 
     std::string compute_solid_scalar_function_gradient(
-        const SolidMesh3D& mesh, absl::string_view scalar_function_name )
+        const SolidMesh3D& mesh, std::string_view scalar_function_name )
     {
         return compute_scalar_function_gradient( mesh, scalar_function_name );
     }
 
     template std::string opengeode_mesh_api
         compute_surface_scalar_function_gradient(
-            const SurfaceMesh2D&, absl::string_view );
+            const SurfaceMesh2D&, std::string_view );
     template std::string opengeode_mesh_api
         compute_surface_scalar_function_gradient(
-            const SurfaceMesh3D&, absl::string_view );
+            const SurfaceMesh3D&, std::string_view );
 } // namespace geode

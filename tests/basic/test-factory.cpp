@@ -66,7 +66,7 @@ public:
     Derived( A &a, B &b ) : Base( a, b ) {}
 };
 
-void verdict( bool is_instantiated, absl::string_view name )
+void verdict( bool is_instantiated, std::string_view name )
 {
     if( !is_instantiated )
     {
