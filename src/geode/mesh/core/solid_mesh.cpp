@@ -901,7 +901,7 @@ namespace geode
                 max_area_facet = f;
             }
         }
-        if( max_area < global_epsilon )
+        if( max_area < GLOBAL_EPSILON )
         {
             return true;
         }
@@ -924,7 +924,7 @@ namespace geode
             }
             if( std::get< 0 >(
                     point_plane_distance( this->point( vertex_id ), plane ) )
-                > global_epsilon )
+                > GLOBAL_EPSILON )
             {
                 return false;
             }

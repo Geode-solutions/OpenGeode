@@ -135,31 +135,31 @@ void test_matrix_3x3()
 
     const auto inverse_matrix = matrix.inverse();
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 0, 0 ) - -1. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [0,0]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 0, 1 ) - 1. / 14 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [0,1]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 0, 2 ) - 3. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [0,2]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 1, 0 ) - -2. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [1,0]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 1, 1 ) - 8. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [1,1]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 1, 2 ) - 6. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [1,2]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 2, 0 ) - 4. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [2,0]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 2, 1 ) - -5.5 / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [2,1]" );
     OPENGEODE_EXCEPTION( std::fabs( inverse_matrix.value( 2, 2 ) - -5. / 7 )
-                             < geode::global_epsilon,
+                             < geode::GLOBAL_EPSILON,
         "[TEST] Wrong value for inverse matrix coeff [2,2]" );
 }
 

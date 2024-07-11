@@ -69,11 +69,11 @@ void test_line_sphere_intersection()
     OPENGEODE_EXCEPTION(
         std::fabs( intersection_points1.result.value().front().value( 0 ) - 2 )
                     - std::sqrt( 3 ) / 2
-                < geode::global_epsilon
+                < geode::GLOBAL_EPSILON
             && std::fabs(
                    intersection_points1.result.value().back().value( 0 ) - 2 )
                        - std::sqrt( 3 ) / 2
-                   < geode::global_epsilon
+                   < geode::GLOBAL_EPSILON
             && intersection_points1.result.value().front().value( 1 ) == 0.5
             && intersection_points1.result.value().back().value( 1 ),
         "[Test] Wrong result for line_sphere_intersection "
@@ -377,7 +377,7 @@ void test_segment_plane_intersection()
     geode::Point3D answer4{ { 0.5, 0.5, 0.0 } };
     double distance_to_answer =
         geode::point_point_distance( intersect4.result.value(), answer4 );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for segment_plane_intersection with "
         "query segment_hj" );
 
@@ -386,7 +386,7 @@ void test_segment_plane_intersection()
     geode::Point3D answer{ { 0.5, 0.25, 0.0 } };
     distance_to_answer =
         geode::point_point_distance( intersect5.result.value(), answer );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for segment_plane_intersection with "
         "query segment_ki" );
 
@@ -395,7 +395,7 @@ void test_segment_plane_intersection()
     geode::Point3D answer6{ { -4.5, 0.0, 0.0 } };
     distance_to_answer =
         geode::point_point_distance( intersect6.result.value(), answer6 );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for segment_plane_intersection with "
         "query segment_li" );
 

@@ -144,7 +144,7 @@ namespace
         const geode::RayTracing3D::PolygonDistance& polygon1 )
     {
         if( std::fabs( polygon0.distance - polygon1.distance )
-            > geode::global_epsilon )
+            > geode::GLOBAL_EPSILON )
         {
             return false;
         }

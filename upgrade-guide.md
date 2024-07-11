@@ -119,7 +119,7 @@ The whole design of this class has been reshaped to be more aligned with the oth
 ### Motivations
 
 This release is mostly to upgrade Microsoft Visual Studio version from 2017 to 2019. VS2022 is also part of the integration workflow.
-The other important change is the shift of the `global_epsilon` value from 1E-8 to 1E-6. This change was made after heavy testing on numerical approximation limits which showed 1E-8 was too low.
+The other important change is the shift of the `GLOBAL_EPSILON` value from 1E-8 to 1E-6. This change was made after heavy testing on numerical approximation limits which showed 1E-8 was too low.
 The `RegularGrid` interface was also upgraded for a simplified and more efficient use.
 
 ### Breaking Changes
@@ -132,7 +132,7 @@ The `RegularGrid` interface was also upgraded for a simplified and more efficien
 
 - **RegularGrid**: The grid accessors structures were renamed: `GridCellIndices` to `GridCellsAroundVertex`, `GridCellIndex` to `GridCellIndices`, `GridVertexIndex` to `GridVertexIndices`. The following functions were renamed accordingly: `cell_index(index_t)` to `cell_indices(index_t)`, `vertex_index(index_t)` to `vertex_indices(index_t)`. The deprecated `Index` and `Indices` structures were removed, as well as the deprecated function cell_size(index_t). The following functions were removed to avoid multiple definitions: is_vertex_on_border(index_t) and cell_vertex_index(index_t). In order to remove optionals of containers, the `cell(Point)` function now returns a `GridCellsAroundVertex` object instead of an optional to this object, and was renamed `cells(Point)`.
 
-- **global_epsilon**: The `global_epsilon` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use `global_epsilon` instead.
+- **GLOBAL_EPSILON**: The `GLOBAL_EPSILON` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use `GLOBAL_EPSILON` instead.
 
 - **Mesh**: The methods `isolated_XXX` (e.g. `isolated_vertex`) have been renamed `is_XXX_isolated`.
 

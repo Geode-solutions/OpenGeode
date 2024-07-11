@@ -97,7 +97,7 @@ namespace
         return geode::point_line_distance( opposite_point,
                    { geode::Segment3D{ mesh.point( edge_vertices[0] ),
                        mesh.point( edge_vertices[1] ) } } )
-               <= geode::global_epsilon;
+               <= geode::GLOBAL_EPSILON;
     }
 
     std::pair< bool, std::vector< BorderPolygon > > border_polygons(

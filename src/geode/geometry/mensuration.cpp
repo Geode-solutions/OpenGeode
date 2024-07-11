@@ -43,15 +43,15 @@ namespace geode
         const auto l1 = point_point_distance( tri_v[1].get(), tri_v[2].get() );
         const auto l2 = point_point_distance( tri_v[2].get(), tri_v[0].get() );
         const auto p = ( l0 + l1 + l2 ) / 2;
-        if( p - l0 <= global_epsilon )
+        if( p - l0 <= GLOBAL_EPSILON )
         {
             return 0;
         }
-        if( p - l1 <= global_epsilon )
+        if( p - l1 <= GLOBAL_EPSILON )
         {
             return 0;
         }
-        if( p - l2 <= global_epsilon )
+        if( p - l2 <= GLOBAL_EPSILON )
         {
             return 0;
         }

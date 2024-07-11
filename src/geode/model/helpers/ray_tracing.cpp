@@ -67,7 +67,7 @@ namespace
                     return std::nullopt;
                 }
                 if( std::fabs( intersection.distance )
-                    <= geode::global_epsilon )
+                    <= geode::GLOBAL_EPSILON )
                 {
                     continue;
                 }

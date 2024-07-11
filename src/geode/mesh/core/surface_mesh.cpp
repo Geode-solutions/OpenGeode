@@ -1123,7 +1123,7 @@ namespace geode
                 max_length_edge = e;
             }
         }
-        if( max_length < global_epsilon )
+        if( max_length < GLOBAL_EPSILON )
         {
             return true;
         }
@@ -1142,7 +1142,7 @@ namespace geode
                 continue;
             }
             if( point_line_distance( this->point( vertices[v] ), line )
-                > global_epsilon )
+                > GLOBAL_EPSILON )
             {
                 return false;
             }

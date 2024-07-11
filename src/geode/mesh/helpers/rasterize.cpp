@@ -321,7 +321,7 @@ namespace
         if( !normal_in_grid
             || absl::c_count_if( triangle_edges,
                    []( const geode::Segment3D& segment ) {
-                       return segment.length() <= geode::global_epsilon;
+                       return segment.length() <= geode::GLOBAL_EPSILON;
                    } )
                    > 0 )
         {
@@ -372,8 +372,8 @@ namespace
                     std::tie( p_plus_dist, std::ignore ) =
                         geode::point_plane_signed_distance(
                             p_plus, plane_in_grid );
-                    if( std::fabs( p_minus_dist ) > 2. * geode::global_epsilon
-                        && std::fabs( p_plus_dist ) > 2. * geode::global_epsilon
+                    if( std::fabs( p_minus_dist ) > 2. * geode::GLOBAL_EPSILON
+                        && std::fabs( p_plus_dist ) > 2. * geode::GLOBAL_EPSILON
                         && p_minus_dist * p_plus_dist > 0. )
                     {
                         continue;
@@ -383,17 +383,17 @@ namespace
                     const geode::Vector2D p_xy{ { point.value( 0 ),
                         point.value( 1 ) } };
                     if( xy_params[0].first.dot( p_xy ) + xy_params[0].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
                     if( xy_params[1].first.dot( p_xy ) + xy_params[1].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
                     if( xy_params[2].first.dot( p_xy ) + xy_params[2].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
@@ -401,17 +401,17 @@ namespace
                     const geode::Vector2D p_yz{ { point.value( 1 ),
                         point.value( 2 ) } };
                     if( yz_params[0].first.dot( p_yz ) + yz_params[0].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
                     if( yz_params[1].first.dot( p_yz ) + yz_params[1].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
                     if( yz_params[2].first.dot( p_yz ) + yz_params[2].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
@@ -419,17 +419,17 @@ namespace
                     const geode::Vector2D p_zx{ { point.value( 2 ),
                         point.value( 0 ) } };
                     if( zx_params[0].first.dot( p_zx ) + zx_params[0].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
                     if( zx_params[1].first.dot( p_zx ) + zx_params[1].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
                     if( zx_params[2].first.dot( p_zx ) + zx_params[2].second
-                        < -2. * geode::global_epsilon )
+                        < -2. * geode::GLOBAL_EPSILON )
                     {
                         continue;
                     }
@@ -512,7 +512,7 @@ namespace
         const geode::Segment2D& segment,
         const std::array< geode::Grid2D::CellsAroundVertex, 2 > vertex_cells )
     {
-        OPENGEODE_ASSERT( segment.length() > geode::global_epsilon,
+        OPENGEODE_ASSERT( segment.length() > geode::GLOBAL_EPSILON,
             "[conservative_voxelization_segment] Segment should be longer than "
             "epsilon" );
         std::vector< CellIndices< 2 > > cells;
@@ -556,8 +556,8 @@ namespace
                     1. + j - critical_point.value( 1 ) } };
                 const auto p_plus_dist = geode::point_line_signed_distance(
                     p_plus, { segment_in_grid } );
-                if( std::fabs( p_minus_dist ) > 2. * geode::global_epsilon
-                    && std::fabs( p_plus_dist ) > 2. * geode::global_epsilon
+                if( std::fabs( p_minus_dist ) > 2. * geode::GLOBAL_EPSILON
+                    && std::fabs( p_plus_dist ) > 2. * geode::GLOBAL_EPSILON
                     && p_minus_dist * p_plus_dist > 0. )
                 {
                     continue;

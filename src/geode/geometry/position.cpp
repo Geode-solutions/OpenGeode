@@ -183,11 +183,11 @@ namespace geode
                 vertices[facet_vertices[1]], vertices[facet_vertices[2]] };
             const auto signed_distance =
                 std::get< 0 >( point_triangle_signed_distance( point, facet ) );
-            if( signed_distance < -global_epsilon )
+            if( signed_distance < -GLOBAL_EPSILON )
             {
                 return Position::outside;
             }
-            if( signed_distance < global_epsilon )
+            if( signed_distance < GLOBAL_EPSILON )
             {
                 return point_tetrahedron_position_exact( point, tetra );
             }
@@ -202,21 +202,21 @@ namespace geode
         const auto& vertices = triangle.vertices();
         const auto area1 =
             triangle_signed_area( { point, vertices[0], vertices[1] } );
-        if( std::fabs( area1 ) < global_epsilon )
+        if( std::fabs( area1 ) < GLOBAL_EPSILON )
         {
             return point_triangle_position_exact( point, triangle );
         }
         const auto s1 = GEO::geo_sgn( area1 );
         const auto area2 =
             triangle_signed_area( { point, vertices[1], vertices[2] } );
-        if( std::fabs( area2 ) < global_epsilon )
+        if( std::fabs( area2 ) < GLOBAL_EPSILON )
         {
             return point_triangle_position_exact( point, triangle );
         }
         const auto s2 = GEO::geo_sgn( area2 );
         const auto area3 =
             triangle_signed_area( { point, vertices[2], vertices[0] } );
-        if( std::fabs( area3 ) < global_epsilon )
+        if( std::fabs( area3 ) < GLOBAL_EPSILON )
         {
             return point_triangle_position_exact( point, triangle );
         }
@@ -235,7 +235,7 @@ namespace geode
         double distance;
         std::tie( distance, std::ignore ) =
             point_triangle_distance( point, triangle );
-        if( distance < global_epsilon )
+        if( distance < GLOBAL_EPSILON )
         {
             return point_triangle_position_exact( point, triangle );
         }
@@ -246,7 +246,7 @@ namespace geode
     Position point_segment_position(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
-        if( point_segment_distance( point, segment ) > global_epsilon )
+        if( point_segment_distance( point, segment ) > GLOBAL_EPSILON )
         {
             return Position::outside;
         }
