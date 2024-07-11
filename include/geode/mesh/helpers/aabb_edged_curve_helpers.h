@@ -73,7 +73,7 @@ namespace geode
         {
         }
 
-        std::tuple< index_t, Point< dimension >, double > closest_element(
+        std::tuple< index_t, double > closest_element(
             const Point< dimension >& query ) const
         {
             return this->elements_aabb().closest_element_box(
