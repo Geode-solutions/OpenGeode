@@ -26,7 +26,7 @@ ExternalProject_Add(nanoflann
     BINARY_DIR ${NANOFLANN_PATH}/build
     STAMP_DIR ${NANOFLANN_PATH}/stamp
     GIT_REPOSITORY https://github.com/jlblancoc/nanoflann
-    GIT_TAG v1.3.2
+    GIT_TAG v1.5.5
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
