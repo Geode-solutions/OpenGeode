@@ -34,7 +34,7 @@
 namespace geode
 {
     static constexpr double GLOBAL_EPSILON{ 1E-6 };
-    static constexpr double global_angular_epsilon{ 1E-3 };
+    static constexpr double GLOBAL_ANGULAR_EPSILON{ 1E-3 };
 
     using index_t = unsigned int;
     using signed_index_t = int;

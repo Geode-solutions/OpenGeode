@@ -103,7 +103,7 @@ namespace geode
             const auto edge03_length = edge03.length();
             const auto cross02_03 = edge02.cross( edge03 );
             if( cross02_03.length()
-                > global_angular_epsilon * edge02_length * edge03_length )
+                > GLOBAL_ANGULAR_EPSILON * edge02_length * edge03_length )
             {
                 const Vector3D edge01{ vertices[v], vertices[v1] };
                 return edge01.dot( cross02_03 ) / 6.;
