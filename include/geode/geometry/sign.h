@@ -30,8 +30,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     ALIAS_2D_AND_3D( Triangle );
     class Tetrahedron;
-    enum struct Side;
-    using Sign = Side;
+    enum struct SIDE;
+    using Sign = SIDE;
 } // namespace geode
 
 namespace geode

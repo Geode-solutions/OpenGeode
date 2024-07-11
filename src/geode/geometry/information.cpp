@@ -29,26 +29,26 @@ namespace geode
 {
     namespace detail
     {
-        local_index_t position_to_index( Position position )
+        local_index_t position_to_index( POSITION position )
         {
-            static const absl::flat_hash_map< Position, local_index_t > map = {
-                { Position::vertex0, 0 },
-                { Position::vertex1, 1 },
-                { Position::vertex2, 2 },
-                { Position::vertex3, 3 },
-                { Position::edge0, 0 },
-                { Position::edge1, 1 },
-                { Position::edge2, 2 },
-                { Position::facet0, 0 },
-                { Position::facet1, 1 },
-                { Position::facet2, 2 },
-                { Position::facet3, 3 },
-                { Position::edge01, 0 },
-                { Position::edge02, 1 },
-                { Position::edge03, 2 },
-                { Position::edge12, 3 },
-                { Position::edge13, 4 },
-                { Position::edge23, 5 },
+            static const absl::flat_hash_map< POSITION, local_index_t > map = {
+                { POSITION::vertex0, 0 },
+                { POSITION::vertex1, 1 },
+                { POSITION::vertex2, 2 },
+                { POSITION::vertex3, 3 },
+                { POSITION::edge0, 0 },
+                { POSITION::edge1, 1 },
+                { POSITION::edge2, 2 },
+                { POSITION::facet0, 0 },
+                { POSITION::facet1, 1 },
+                { POSITION::facet2, 2 },
+                { POSITION::facet3, 3 },
+                { POSITION::edge01, 0 },
+                { POSITION::edge02, 1 },
+                { POSITION::edge03, 2 },
+                { POSITION::edge12, 3 },
+                { POSITION::edge13, 4 },
+                { POSITION::edge23, 5 },
             };
             const auto index_it = map.find( position );
             if( index_it == map.end() )

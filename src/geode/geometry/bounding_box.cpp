@@ -349,7 +349,7 @@ namespace geode
     bool BoundingBox< 2 >::intersects< 2 >(
         const Triangle< 2 >& triangle ) const
     {
-        if( point_triangle_position( center(), triangle ) == Position::inside )
+        if( point_triangle_position( center(), triangle ) == POSITION::inside )
         {
             return true;
         }
@@ -373,7 +373,7 @@ namespace geode
     typename std::enable_if< T == 3, bool >::type
         BoundingBox< dimension >::intersects( const Tetrahedron& tetra ) const
     {
-        if( point_tetrahedron_position( center(), tetra ) == Position::inside )
+        if( point_tetrahedron_position( center(), tetra ) == POSITION::inside )
         {
             return true;
         }

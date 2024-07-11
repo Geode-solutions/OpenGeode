@@ -104,7 +104,7 @@ namespace geode
         if( std::fabs( dot_directions ) <= GLOBAL_EPSILON )
         {
             // line is parallel to the plane
-            return { IntersectionType::PARALLEL };
+            return { INTERSECTION_TYPE::parallel };
         }
         const auto signed_distance =
             plane.normal().dot( Vector3D{ line.origin() } )
@@ -199,7 +199,7 @@ namespace geode
             return { std::move( results ),
                 { first_correctness, second_correctness } };
         }
-        return { IntersectionType::NONE }; // negative
+        return { INTERSECTION_TYPE::none }; // negative
     }
 
     template < index_t dimension >
@@ -223,7 +223,7 @@ namespace geode
             }
             if( segment_intersections.empty() )
             {
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
             return { std::move( segment_intersections ),
                 std::move( line_intersections.correctness.value() ) };
@@ -242,7 +242,7 @@ namespace geode
                     line_plane_result.result.value(), segment )
                 > GLOBAL_EPSILON )
             {
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
             const auto lambdas = safe_segment_barycentric_coordinates(
                 line_plane_result.result.value(), segment );
@@ -286,7 +286,7 @@ namespace geode
         else
         {
             // Segment and triangle are parallel
-            return { IntersectionType::PARALLEL };
+            return { INTERSECTION_TYPE::parallel };
         }
 
         const Vector3D diff{ vertices[0], seg_center };
@@ -331,7 +331,7 @@ namespace geode
             // else: b2 < 0, no intersection
         }
         // else: b1 < 0, no intersection
-        return { IntersectionType::NONE };
+        return { INTERSECTION_TYPE::none };
     }
 
     IntersectionResult< Point3D > line_triangle_intersection(
@@ -363,7 +363,7 @@ namespace geode
         else
         {
             // Segment and triangle are parallel
-            return { IntersectionType::PARALLEL };
+            return { INTERSECTION_TYPE::parallel };
         }
 
         const Vector3D diff{ vertices[0], line.origin() };
@@ -400,7 +400,7 @@ namespace geode
             // else: b2 < 0, no intersection
         }
         // else: b1 < 0, no intersection
-        return { IntersectionType::NONE };
+        return { INTERSECTION_TYPE::none };
     }
 
     IntersectionResult< Point2D > line_line_intersection(
@@ -423,7 +423,7 @@ namespace geode
         if( std::fabs( D0DotPerpD1 ) < 0. )
         {
             // The lines are parallel.
-            return { IntersectionType::PARALLEL };
+            return { INTERSECTION_TYPE::parallel };
         }
 
         const auto invD0DotPerpD1 = 1.0 / D0DotPerpD1;
@@ -454,13 +454,13 @@ namespace geode
                     line_intersection_result.result.value(), segment0 )
                 > GLOBAL_EPSILON )
             {
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
             if( point_segment_distance(
                     line_intersection_result.result.value(), segment1 )
                 > GLOBAL_EPSILON )
             {
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
             std::array< double, 2 > lambdas0;
             try
@@ -505,7 +505,7 @@ namespace geode
                     line_intersection_result.result.value(), segment )
                 > GLOBAL_EPSILON )
             {
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
             const auto lambdas = safe_segment_barycentric_coordinates(
                 line_intersection_result.result.value(), segment );
@@ -570,7 +570,7 @@ namespace geode
             else
             {
                 // else:  The line is outside the cylinder, no intersection.
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
         }
         else
@@ -618,7 +618,7 @@ namespace geode
                 else
                 { // else: The line is outside the planes of the cylinder end
                     // disks.
-                    return { IntersectionType::NONE };
+                    return { INTERSECTION_TYPE::none };
                 }
             }
 
@@ -740,7 +740,7 @@ namespace geode
 
         if( !result.intersect )
         {
-            return { IntersectionType::NONE };
+            return { INTERSECTION_TYPE::none };
         }
         absl::InlinedVector< Point3D, 2 > results;
         results.reserve( result.numIntersections );
@@ -832,7 +832,7 @@ namespace geode
             }
             if( segment_intersections.empty() )
             {
-                return { IntersectionType::NONE };
+                return { INTERSECTION_TYPE::none };
             }
             return { std::move( segment_intersections ),
                 std::move( line_intersections.correctness.value() ) };
@@ -847,7 +847,7 @@ namespace geode
         const auto plane = triangle.plane();
         if( !plane )
         {
-            return { IntersectionType::NONE };
+            return { INTERSECTION_TYPE::none };
         }
         const auto plane_intersection =
             plane_circle_intersection( plane.value(), circle );
@@ -878,7 +878,7 @@ namespace geode
         }
         if( result.empty() )
         {
-            return { IntersectionType::NONE };
+            return { INTERSECTION_TYPE::none };
         }
         return { std::move( result ),
             { first_correctness, second_correctness } };
@@ -911,7 +911,7 @@ namespace geode
         if( discr < 0. )
         {
             // No real roots, the circle does not intersect the plane.
-            return { IntersectionType::NONE };
+            return { INTERSECTION_TYPE::none };
         }
         absl::InlinedVector< Point3D, 2 > result;
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
@@ -981,10 +981,10 @@ namespace geode
             if( std::fabs( constant_diff ) == 0. )
             {
                 // The planes are coplanar.
-                return { IntersectionType::PARALLEL };
+                return { INTERSECTION_TYPE::parallel };
             }
             // The planes are parallel but distinct.
-            return { IntersectionType::NONE };
+            return { INTERSECTION_TYPE::none };
         }
         const auto invDet = 1. / ( 1. - dot * dot );
         const auto c0 = ( constant0 - dot * constant1 ) * invDet;

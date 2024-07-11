@@ -434,11 +434,11 @@ namespace GEO
 
         // =============== some general purpose functions =========
 
-        Sign sign() const
+        SIGN sign() const
         {
             if( length() == 0 )
             {
-                return ZERO;
+                return zero;
             }
             return geo_sgn( x_[length() - 1] );
         }
@@ -1604,7 +1604,7 @@ namespace GEO
 {
     // ============ orient2d ==============================================
 
-    Sign orient_2d_exact( const geode::Point2D& p0,
+    SIGN orient_2d_exact( const geode::Point2D& p0,
         const geode::Point2D& p1,
         const geode::Point2D& p2 )
     {
@@ -1621,7 +1621,7 @@ namespace GEO
 
     // ============ orient3d ==============================================
 
-    Sign orient_3d_exact( const geode::Point3D& p0,
+    SIGN orient_3d_exact( const geode::Point3D& p0,
         const geode::Point3D& p1,
         const geode::Point3D& p2,
         const geode::Point3D& p3 )
@@ -1646,7 +1646,7 @@ namespace GEO
 
     // ================================ det and dot =======================
 
-    Sign det_3d_exact( const geode::Vector3D& p0,
+    SIGN det_3d_exact( const geode::Vector3D& p0,
         const geode::Vector3D& p1,
         const geode::Vector3D& p2 )
     {
@@ -1686,7 +1686,7 @@ namespace GEO
         return ( N_0.sign() == 0 && N_1.sign() == 0 && N_2.sign() == 0 );
     }
 
-    Sign dot_3d_exact( const geode::Point3D& p0,
+    SIGN dot_3d_exact( const geode::Point3D& p0,
         const geode::Point3D& p1,
         const geode::Point3D& p2 )
     {
@@ -1707,7 +1707,7 @@ namespace GEO
         return Delta.sign();
     }
 
-    Sign dot_2d_exact( const geode::Point2D& p0,
+    SIGN dot_2d_exact( const geode::Point2D& p0,
         const geode::Point2D& p1,
         const geode::Point2D& p2 )
     {
@@ -1730,11 +1730,11 @@ namespace GEO
 {
     namespace PCK
     {
-        Sign orient_2d( const geode::Point2D& p0,
+        SIGN orient_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 )
         {
-            Sign result = Sign( orient_2d_filter( p0, p1, p2 ) );
+            SIGN result = SIGN( orient_2d_filter( p0, p1, p2 ) );
             if( result == 0 )
             {
                 result = orient_2d_exact( p0, p1, p2 );
@@ -1742,12 +1742,12 @@ namespace GEO
             return result;
         }
 
-        Sign orient_3d( const geode::Point3D& p0,
+        SIGN orient_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2,
             const geode::Point3D& p3 )
         {
-            Sign result = Sign( orient_3d_filter( p0, p1, p2, p3 ) );
+            SIGN result = SIGN( orient_3d_filter( p0, p1, p2, p3 ) );
             if( result == 0 )
             {
                 result = orient_3d_exact( p0, p1, p2, p3 );
@@ -1755,11 +1755,11 @@ namespace GEO
             return result;
         }
 
-        Sign det_3d( const geode::Vector3D& p0,
+        SIGN det_3d( const geode::Vector3D& p0,
             const geode::Vector3D& p1,
             const geode::Vector3D& p2 )
         {
-            Sign result = Sign( det_3d_filter( p0, p1, p2 ) );
+            SIGN result = SIGN( det_3d_filter( p0, p1, p2 ) );
             if( result == 0 )
             {
                 result = det_3d_exact( p0, p1, p2 );
@@ -1772,7 +1772,7 @@ namespace GEO
             const geode::Point3D& p2 )
         {
             /*
-            Sign result = Sign(
+            SIGN result = SIGN(
             aligned_3d_filter(p0,p1,p2)
             );
             if(result != 0) {
@@ -1782,11 +1782,11 @@ namespace GEO
             return aligned_3d_exact( p0, p1, p2 );
         }
 
-        Sign dot_3d( const geode::Point3D& p0,
+        SIGN dot_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2 )
         {
-            Sign result = Sign( dot_3d_filter( p0, p1, p2 ) );
+            SIGN result = SIGN( dot_3d_filter( p0, p1, p2 ) );
             if( result == 0 )
             {
                 result = dot_3d_exact( p0, p1, p2 );
@@ -1794,7 +1794,7 @@ namespace GEO
             return result;
         }
 
-        Sign dot_2d( const geode::Point2D& p0,
+        SIGN dot_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 )
         {

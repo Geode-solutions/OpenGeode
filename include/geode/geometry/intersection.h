@@ -49,28 +49,25 @@ namespace geode
 
 namespace geode
 {
-    enum struct IntersectionType
+    enum struct INTERSECTION_TYPE
     {
-        NONE,
-        INTERSECT,
-        PARALLEL,
-        INCORRECT
+        none,
+        intersect,
+        parallel,
+        incorrect
     };
 
     template < typename Intersection >
     struct CorrectnessInfo
     {
-        using Correctness = std::pair< bool, Intersection >;
-
-        CorrectnessInfo(
-            Correctness& first_correctness, Correctness& second_correctness )
-            : first{ std::move( first_correctness ) },
-              second{ std::move( second_correctness ) }
+        CorrectnessInfo() = default;
+        CorrectnessInfo( const Intersection& intersection )
+            : first{ false, intersection }, second{ false, intersection }
         {
         }
 
-        Correctness first;
-        Correctness second;
+        std::pair< bool, Intersection > first{ false, {} };
+        std::pair< bool, Intersection > second{ false, {} };
     };
 
     template < typename Intersection >
@@ -79,22 +76,22 @@ namespace geode
         IntersectionResult( Intersection intersection,
             CorrectnessInfo< Intersection > correctness_info )
             : result( std::move( intersection ) ),
-              type( IntersectionType::INTERSECT ),
+              type( INTERSECTION_TYPE::intersect ),
               correctness( std::move( correctness_info ) )
         {
             if( !correctness->first.first || !correctness->second.first )
             {
-                type = IntersectionType::INCORRECT;
+                type = INTERSECTION_TYPE::incorrect;
             }
         }
-        IntersectionResult( IntersectionType intersection_type )
+        IntersectionResult( INTERSECTION_TYPE intersection_type )
             : type( intersection_type )
         {
         }
 
         bool has_intersection() const
         {
-            return type == IntersectionType::INTERSECT;
+            return type == INTERSECTION_TYPE::intersect;
         }
 
         operator bool() const
@@ -103,7 +100,7 @@ namespace geode
         }
 
         std::optional< Intersection > result;
-        IntersectionType type;
+        INTERSECTION_TYPE type;
         std::optional< CorrectnessInfo< Intersection > > correctness;
     };
 

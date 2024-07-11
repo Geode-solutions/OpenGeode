@@ -673,7 +673,7 @@ namespace
         struct JKPointTrianglePosition
         {
             bool to_process{ false };
-            geode::Position position{ geode::Position::outside };
+            geode::POSITION position{ geode::POSITION::outside };
         };
 
         void fill_values( const geode::Triangle2D& triangle )
@@ -719,7 +719,7 @@ namespace
         std::array< geode::index_t, 2 > compute_i_coordinates(
             const geode::Point2D& point,
             const geode::Triangle2D& triangle,
-            geode::Position position ) const
+            geode::POSITION position ) const
         {
             std::array< geode::local_index_t, 3 > order{ 0, 1, 2 };
             if( !counter_clockwise_ )
@@ -731,21 +731,21 @@ namespace
                 return value / grid_.cell_length_in_direction( 0 );
             };
 
-            if( position == geode::Position::vertex0 )
+            if( position == geode::POSITION::vertex0 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[0]] );
                 const auto i_value = static_cast< geode::index_t >(
                     std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
                 return { i_value, i_value };
             }
-            if( position == geode::Position::vertex1 )
+            if( position == geode::POSITION::vertex1 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[1]] );
                 const auto i_value = static_cast< geode::index_t >(
                     std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
                 return { i_value, i_value };
             }
-            if( position == geode::Position::vertex2 )
+            if( position == geode::POSITION::vertex2 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[2]] );
                 const auto i_value = static_cast< geode::index_t >(
@@ -760,7 +760,7 @@ namespace
                 decimal_fabs(
                     points_.at( vertices_order_[order[2]] ).value( 0 ) )
             };
-            if( position == geode::Position::edge0 )
+            if( position == geode::POSITION::edge0 )
             {
                 const auto lambdas =
                     geode::safe_segment_barycentric_coordinates(
@@ -771,7 +771,7 @@ namespace
                     + i_values_triangle_vertices[1] * lambdas[1] ) );
                 return { i_value, i_value };
             }
-            if( position == geode::Position::edge1 )
+            if( position == geode::POSITION::edge1 )
             {
                 const auto lambdas =
                     geode::safe_segment_barycentric_coordinates(
@@ -782,7 +782,7 @@ namespace
                     + i_values_triangle_vertices[2] * lambdas[1] ) );
                 return { i_value, i_value };
             }
-            if( position == geode::Position::edge2 )
+            if( position == geode::POSITION::edge2 )
             {
                 const auto lambdas =
                     geode::safe_segment_barycentric_coordinates(
@@ -859,12 +859,12 @@ namespace
         {
             JKPointTrianglePosition result;
             result.position = geode::point_triangle_position( point, triangle );
-            if( result.position == geode::Position::outside
-                || result.position == geode::Position::parallel )
+            if( result.position == geode::POSITION::outside
+                || result.position == geode::POSITION::parallel )
             {
                 return result;
             }
-            if( result.position == geode::Position::inside )
+            if( result.position == geode::POSITION::inside )
             {
                 result.to_process = true;
                 return result;
@@ -876,40 +876,40 @@ namespace
                 order = { 0, 2, 1 };
             }
 
-            if( result.position == geode::Position::edge0 )
+            if( result.position == geode::POSITION::edge0 )
             {
                 result.to_process = is_edge_valid( current_j, current_k,
                     Edge{ { vertices_order_[order[0]],
                         vertices_order_[order[1]] } } );
                 return result;
             }
-            if( result.position == geode::Position::edge1 )
+            if( result.position == geode::POSITION::edge1 )
             {
                 result.to_process = is_edge_valid( current_j, current_k,
                     Edge{ { vertices_order_[order[1]],
                         vertices_order_[order[2]] } } );
                 return result;
             }
-            if( result.position == geode::Position::edge2 )
+            if( result.position == geode::POSITION::edge2 )
             {
                 result.to_process = is_edge_valid( current_j, current_k,
                     Edge{ { vertices_order_[order[2]],
                         vertices_order_[order[0]] } } );
                 return result;
             }
-            if( result.position == geode::Position::vertex0 )
+            if( result.position == geode::POSITION::vertex0 )
             {
                 result.to_process = is_vertex_valid(
                     current_j, current_k, vertices_order_[order[0]] );
                 return result;
             }
-            if( result.position == geode::Position::vertex1 )
+            if( result.position == geode::POSITION::vertex1 )
             {
                 result.to_process = is_vertex_valid(
                     current_j, current_k, vertices_order_[order[1]] );
                 return result;
             }
-            if( result.position == geode::Position::vertex2 )
+            if( result.position == geode::POSITION::vertex2 )
             {
                 result.to_process = is_vertex_valid(
                     current_j, current_k, vertices_order_[order[2]] );

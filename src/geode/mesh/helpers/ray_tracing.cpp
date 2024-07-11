@@ -61,15 +61,15 @@ namespace
         const geode::RayTracing3D::PolygonDistance& polygon1 )
     {
         geode::PolygonVertex polygon_vertex0{ polygon0.polygon, geode::NO_LID };
-        if( polygon0.position == geode::Position::vertex0 )
+        if( polygon0.position == geode::POSITION::vertex0 )
         {
             polygon_vertex0.vertex_id = 0;
         }
-        else if( polygon0.position == geode::Position::vertex1 )
+        else if( polygon0.position == geode::POSITION::vertex1 )
         {
             polygon_vertex0.vertex_id = 1;
         }
-        else if( polygon0.position == geode::Position::vertex2 )
+        else if( polygon0.position == geode::POSITION::vertex2 )
         {
             polygon_vertex0.vertex_id = 2;
         }
@@ -78,15 +78,15 @@ namespace
             return false;
         }
         geode::PolygonVertex polygon_vertex1{ polygon1.polygon, geode::NO_LID };
-        if( polygon1.position == geode::Position::vertex0 )
+        if( polygon1.position == geode::POSITION::vertex0 )
         {
             polygon_vertex1.vertex_id = 0;
         }
-        else if( polygon1.position == geode::Position::vertex1 )
+        else if( polygon1.position == geode::POSITION::vertex1 )
         {
             polygon_vertex1.vertex_id = 1;
         }
-        else if( polygon1.position == geode::Position::vertex2 )
+        else if( polygon1.position == geode::POSITION::vertex2 )
         {
             polygon_vertex1.vertex_id = 2;
         }
@@ -103,15 +103,15 @@ namespace
         const geode::RayTracing3D::PolygonDistance& polygon1 )
     {
         geode::PolygonEdge polygon_edge0{ polygon0.polygon, geode::NO_LID };
-        if( polygon0.position == geode::Position::edge0 )
+        if( polygon0.position == geode::POSITION::edge0 )
         {
             polygon_edge0.edge_id = 0;
         }
-        else if( polygon0.position == geode::Position::edge1 )
+        else if( polygon0.position == geode::POSITION::edge1 )
         {
             polygon_edge0.edge_id = 1;
         }
-        else if( polygon0.position == geode::Position::edge2 )
+        else if( polygon0.position == geode::POSITION::edge2 )
         {
             polygon_edge0.edge_id = 2;
         }
@@ -120,15 +120,15 @@ namespace
             return false;
         }
         geode::PolygonEdge polygon_edge1{ polygon1.polygon, geode::NO_LID };
-        if( polygon1.position == geode::Position::edge0 )
+        if( polygon1.position == geode::POSITION::edge0 )
         {
             polygon_edge1.edge_id = 0;
         }
-        else if( polygon1.position == geode::Position::edge1 )
+        else if( polygon1.position == geode::POSITION::edge1 )
         {
             polygon_edge1.edge_id = 1;
         }
-        else if( polygon1.position == geode::Position::edge2 )
+        else if( polygon1.position == geode::POSITION::edge2 )
         {
             polygon_edge1.edge_id = 2;
         }
@@ -148,13 +148,13 @@ namespace
         {
             return false;
         }
-        if( polygon0.position == geode::Position::inside
-            || polygon0.position == geode::Position::parallel )
+        if( polygon0.position == geode::POSITION::inside
+            || polygon0.position == geode::POSITION::parallel )
         {
             return false;
         }
-        if( polygon1.position == geode::Position::inside
-            || polygon1.position == geode::Position::parallel )
+        if( polygon1.position == geode::POSITION::inside
+            || polygon1.position == geode::POSITION::parallel )
         {
             return false;
         }
@@ -238,7 +238,7 @@ namespace geode
                     mesh_.point( edge_vertices.back() ) };
                 const auto result = segment_triangle_intersection_detection(
                     segment_, triangle );
-                if( result.first == Position::outside )
+                if( result.first == POSITION::outside )
                 {
                     continue;
                 }

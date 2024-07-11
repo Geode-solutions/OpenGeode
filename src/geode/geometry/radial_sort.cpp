@@ -75,11 +75,11 @@ namespace
                     points_[result[id]], { segment_.vertices()[0].get(),
                                              segment_.vertices()[1].get(),
                                              points_[result[begin]] } );
-                if( side == geode::Side::positive )
+                if( side == geode::SIDE::positive )
                 {
                     sorted[left_id++] = result[id];
                 }
-                else if( side == geode::Side::negative )
+                else if( side == geode::SIDE::negative )
                 {
                     sorted[right_id--] = result[id];
                 }
@@ -96,7 +96,7 @@ namespace
                     const auto position = geode::detail::point_segment_position(
                         geode::detail::side( dot0 ),
                         geode::detail::opposite_side( dot1 ) );
-                    if( position == geode::Position::inside )
+                    if( position == geode::POSITION::inside )
                     {
                         sorted[right_id--] = result[id];
                     }

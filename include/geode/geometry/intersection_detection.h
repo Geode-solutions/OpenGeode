@@ -36,13 +36,13 @@ namespace geode
     ALIAS_2D_AND_3D( Segment );
     ALIAS_3D( Triangle );
     class Plane;
-    enum struct Position;
+    enum struct POSITION;
 } // namespace geode
 
 namespace geode
 {
-    using SegmentSegmentIntersection = std::pair< Position, Position >;
-    using SegmentTriangleIntersection = std::pair< Position, Position >;
+    using SegmentSegmentIntersection = std::pair< POSITION, POSITION >;
+    using SegmentTriangleIntersection = std::pair< POSITION, POSITION >;
 
     /*!
      * Detect if there is an intersection between two 2D segments
@@ -69,7 +69,7 @@ namespace geode
      * Returns outside if there is no intersection or all points are
      * colinear
      */
-    Position opengeode_geometry_api segment_line_intersection_detection(
+    POSITION opengeode_geometry_api segment_line_intersection_detection(
         const Segment2D& segment, const InfiniteLine2D& line );
 
     /*!
@@ -78,7 +78,7 @@ namespace geode
      * Returns outside if there is no intersection or the line is
      * coplanar with the triangle
      */
-    Position opengeode_geometry_api line_triangle_intersection_detection(
+    POSITION opengeode_geometry_api line_triangle_intersection_detection(
         const InfiniteLine3D& line, const Triangle3D& triangle );
 
     /*!
@@ -97,6 +97,6 @@ namespace geode
      * Returns outside if there is no intersection or the segment is
      * coplanar with the plane
      */
-    Position opengeode_geometry_api segment_plane_intersection_detection(
+    POSITION opengeode_geometry_api segment_plane_intersection_detection(
         const Segment3D& segment, const Plane& plane );
 } // namespace geode
