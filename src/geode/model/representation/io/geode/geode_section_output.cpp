@@ -38,7 +38,7 @@
 namespace geode
 {
     void OpenGeodeSectionOutput::save_section_files(
-        const Section& section, absl::string_view directory ) const
+        const Section& section, std::string_view directory ) const
     {
         async::parallel_invoke(
             [&directory, &section] {

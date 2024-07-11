@@ -81,7 +81,7 @@ namespace geode
         }
 
     protected:
-        Input( absl::string_view filename ) : IOFile( filename ) {}
+        Input( std::string_view filename ) : IOFile( filename ) {}
 
         void need_to_inspect_result()
         {

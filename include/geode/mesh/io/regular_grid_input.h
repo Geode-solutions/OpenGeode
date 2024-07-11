@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -46,7 +46,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading a RegularGrid.
@@ -55,7 +55,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class RegularGridInput
@@ -68,7 +68,7 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        explicit RegularGridInput( absl::string_view filename )
+        explicit RegularGridInput( std::string_view filename )
             : Base{ filename }
         {
         }
@@ -76,14 +76,13 @@ namespace geode
 
     template < index_t dimension >
     typename RegularGridInput< dimension >::MissingFiles
-        check_regular_grid_missing_files( absl::string_view filename );
+        check_regular_grid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_regular_grid_loadable( absl::string_view filename );
+    bool is_regular_grid_loadable( std::string_view filename );
 
     template < index_t dimension >
-    using RegularGridInputFactory = Factory< std::string,
-        RegularGridInput< dimension >,
-        absl::string_view >;
+    using RegularGridInputFactory =
+        Factory< std::string, RegularGridInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( RegularGridInputFactory );
 } // namespace geode

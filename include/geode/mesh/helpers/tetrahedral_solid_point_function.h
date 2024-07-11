@@ -53,7 +53,7 @@ namespace geode
          */
         static TetrahedralSolidPointFunction< dimension, point_dimension >
             create( const TetrahedralSolid< dimension >& solid,
-                absl::string_view function_name,
+                std::string_view function_name,
                 Point< point_dimension > value );
 
         /*!
@@ -63,7 +63,7 @@ namespace geode
          */
         static TetrahedralSolidPointFunction< dimension, point_dimension > find(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name );
+            std::string_view function_name );
 
         void set_value( index_t vertex_index, Point< point_dimension > value );
 
@@ -75,11 +75,11 @@ namespace geode
     private:
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name );
+            std::string_view function_name );
 
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             Point< point_dimension > value );
 
     private:

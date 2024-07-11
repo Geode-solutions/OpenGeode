@@ -57,5 +57,5 @@ namespace geode
         const Grid< dimension >& grid,
         absl::Span< const typename Grid< dimension >::CellIndices >
             grid_cell_ids,
-        absl::string_view distance_map_name );
+        std::string_view distance_map_name );
 } // namespace geode

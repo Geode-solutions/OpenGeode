@@ -76,7 +76,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::save_surface_collections(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/surface_collections" ) );
@@ -84,7 +84,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::load_surface_collections(
-        absl::string_view directory, SurfaceCollectionsBuilderKey )
+        std::string_view directory, SurfaceCollectionsBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/surface_collections" ) );

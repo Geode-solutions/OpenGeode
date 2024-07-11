@@ -399,7 +399,7 @@ namespace geode
         std::tuple< ComponentID, ComponentID > relation_from_index(
             index_t component_id ) const;
 
-        void save_relationships( absl::string_view directory ) const;
+        void save_relationships( std::string_view directory ) const;
 
     public:
         /*!
@@ -445,7 +445,7 @@ namespace geode
             RelationshipsBuilderKey );
 
         void load_relationships(
-            absl::string_view directory, RelationshipsBuilderKey );
+            std::string_view directory, RelationshipsBuilderKey );
 
     protected:
         Relationships( Relationships&& other ) noexcept;

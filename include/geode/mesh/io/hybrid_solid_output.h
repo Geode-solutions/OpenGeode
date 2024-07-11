@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -49,7 +48,7 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_hybrid_solid(
         const HybridSolid< dimension >& hybrid_solid,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class HybridSolidOutput : public Output< HybridSolid< dimension > >
@@ -57,7 +56,7 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     protected:
-        explicit HybridSolidOutput( absl::string_view filename )
+        explicit HybridSolidOutput( std::string_view filename )
             : Output< HybridSolid< dimension > >{ filename }
         {
         }
@@ -65,11 +64,11 @@ namespace geode
 
     template < index_t dimension >
     bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     using HybridSolidOutputFactory = Factory< std::string,
         HybridSolidOutput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_3D( HybridSolidOutputFactory );
 } // namespace geode

@@ -84,7 +84,7 @@ namespace geode
                     } );
             }
 
-            TextureImpl( AttributeManager& manager, absl::string_view name )
+            TextureImpl( AttributeManager& manager, std::string_view name )
                 : coordinates_{
                       manager.find_or_create_attribute< VariableAttribute,
                           ElementTextureCoordinates >( name, {} )

@@ -23,42 +23,42 @@
 
 #include <geode/basic/filename.h>
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <ghc/filesystem.hpp>
 
 namespace geode
 {
-    std::string filename_with_extension( absl::string_view path )
+    std::string filename_with_extension( std::string_view path )
     {
         const ghc::filesystem::path filepath{ to_string( path ) };
         return filepath.filename().string();
     }
 
-    std::string filename_without_extension( absl::string_view path )
+    std::string filename_without_extension( std::string_view path )
     {
         const ghc::filesystem::path filepath{ to_string( path ) };
         return filepath.filename().replace_extension( "" ).string();
     }
 
-    std::string filepath_without_extension( absl::string_view path )
+    std::string filepath_without_extension( std::string_view path )
     {
         ghc::filesystem::path filepath{ to_string( path ) };
         return filepath.replace_extension( "" ).string();
     }
 
-    std::string filepath_without_filename( absl::string_view path )
+    std::string filepath_without_filename( std::string_view path )
     {
         ghc::filesystem::path filepath{ to_string( path ) };
         return filepath.replace_filename( "" ).string();
     }
 
-    absl::string_view extension_from_filename( absl::string_view filename )
+    std::string_view extension_from_filename( std::string_view filename )
     {
         return filename.substr( filename.find_last_of( '.' ) + 1 );
     }
 
-    std::string expand_predefined_folders( absl::string_view path )
+    std::string expand_predefined_folders( std::string_view path )
     {
         if( path.empty() )
         {

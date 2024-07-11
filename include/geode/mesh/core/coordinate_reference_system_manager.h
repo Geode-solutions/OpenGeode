@@ -55,35 +55,35 @@ namespace geode
         index_t nb_coordinate_reference_systems() const;
 
         const CoordinateReferenceSystem< dimension >&
-            find_coordinate_reference_system( absl::string_view name ) const;
+            find_coordinate_reference_system( std::string_view name ) const;
 
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const;
 
-        absl::string_view active_coordinate_reference_system_name() const;
+        std::string_view active_coordinate_reference_system_name() const;
 
-        absl::FixedArray< absl::string_view >
+        absl::FixedArray< std::string_view >
             coordinate_reference_system_names() const;
 
-        bool coordinate_reference_system_exists( absl::string_view name ) const;
+        bool coordinate_reference_system_exists( std::string_view name ) const;
 
     public:
-        void register_coordinate_reference_system( absl::string_view name,
+        void register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs,
             CRSManagerKey );
 
         void delete_coordinate_reference_system(
-            absl::string_view name, CRSManagerKey );
+            std::string_view name, CRSManagerKey );
 
         void set_active_coordinate_reference_system(
-            absl::string_view name, CRSManagerKey );
+            std::string_view name, CRSManagerKey );
 
         CoordinateReferenceSystem< dimension >&
             modifiable_active_coordinate_reference_system( CRSManagerKey );
 
         CoordinateReferenceSystem< dimension >&
             modifiable_coordinate_reference_system(
-                absl::string_view name, CRSManagerKey );
+                std::string_view name, CRSManagerKey );
 
     private:
         template < typename Archive >

@@ -24,10 +24,10 @@
 #include <geode/mesh/io/edged_curve_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 #include <geode/basic/io.h>
@@ -40,7 +40,7 @@ namespace geode
 {
     template < index_t dimension >
     std::vector< std::string > save_edged_curve(
-        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+        const EdgedCurve< dimension >& edged_curve, std::string_view filename )
     {
         const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
@@ -63,7 +63,7 @@ namespace geode
 
     template < index_t dimension >
     bool is_edged_curve_saveable(
-        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+        const EdgedCurve< dimension >& edged_curve, std::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             EdgedCurveOutputFactory< dimension > >( filename );
@@ -71,12 +71,12 @@ namespace geode
     }
 
     template std::vector< std::string > opengeode_mesh_api save_edged_curve(
-        const EdgedCurve< 2 >&, absl::string_view );
+        const EdgedCurve< 2 >&, std::string_view );
     template std::vector< std::string > opengeode_mesh_api save_edged_curve(
-        const EdgedCurve< 3 >&, absl::string_view );
+        const EdgedCurve< 3 >&, std::string_view );
 
     template bool opengeode_mesh_api is_edged_curve_saveable(
-        const EdgedCurve< 2 >&, absl::string_view );
+        const EdgedCurve< 2 >&, std::string_view );
     template bool opengeode_mesh_api is_edged_curve_saveable(
-        const EdgedCurve< 3 >&, absl::string_view );
+        const EdgedCurve< 3 >&, std::string_view );
 } // namespace geode

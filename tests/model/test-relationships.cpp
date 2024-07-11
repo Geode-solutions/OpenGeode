@@ -170,7 +170,7 @@ void test_attributes( const geode::Relationships& relations,
 }
 
 void test_io(
-    absl::string_view directory, absl::Span< const geode::uuid > uuids )
+    std::string_view directory, absl::Span< const geode::uuid > uuids )
 {
     geode::Relationships reloaded_relationships;
     geode::RelationshipsBuilder reloader{ reloaded_relationships };

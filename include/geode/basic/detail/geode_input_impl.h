@@ -24,9 +24,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <absl/strings/ascii.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/filename.h>
 #include <geode/basic/identifier.h>
@@ -39,7 +39,7 @@ namespace geode
     namespace detail
     {
         template < typename Object >
-        void update_default_name( Object& object, absl::string_view filename )
+        void update_default_name( Object& object, std::string_view filename )
         {
             if( object.name() == Identifier::DEFAULT_NAME )
             {
@@ -50,7 +50,7 @@ namespace geode
 
         template < typename Object >
         void update_default_name(
-            std::unique_ptr< Object >& object, absl::string_view filename )
+            std::unique_ptr< Object >& object, std::string_view filename )
         {
             if( object->name() == Identifier::DEFAULT_NAME )
             {
@@ -61,7 +61,7 @@ namespace geode
 
         template < typename Factory >
         std::unique_ptr< typename Factory::BaseClass >
-            geode_object_input_reader( absl::string_view& filename )
+            geode_object_input_reader( std::string_view& filename )
         {
             filename = absl::StripAsciiWhitespace( filename );
             const auto extension =
@@ -74,7 +74,7 @@ namespace geode
 
         template < typename Factory, typename... Args >
         typename Factory::BaseClass::InputData geode_object_input_impl(
-            absl::string_view type, absl::string_view filename, Args... args )
+            std::string_view type, std::string_view filename, Args... args )
         {
             const Timer timer;
             auto input = geode_object_input_reader< Factory >( filename );
@@ -87,7 +87,7 @@ namespace geode
 
         inline void add_to_message( std::string& message,
             geode::index_t nb_components,
-            absl::string_view component_text )
+            std::string_view component_text )
         {
             if( nb_components > 0 )
             {

@@ -23,8 +23,9 @@
 
 #include <geode/mesh/helpers/detail/debug.h>
 
+#include <string_view>
+
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 #include <absl/types/span.h>
 
 #include <geode/geometry/basic_objects/segment.h>
@@ -45,7 +46,7 @@ namespace geode
     {
         template < index_t dimension >
         void save_segment(
-            const Segment< dimension >& segment, absl::string_view suffix )
+            const Segment< dimension >& segment, std::string_view suffix )
         {
             auto curve = geode::EdgedCurve< dimension >::create();
             auto builder =
@@ -60,7 +61,7 @@ namespace geode
 
         template < index_t dimension >
         void save_triangle(
-            const Triangle< dimension >& triangle, absl::string_view suffix )
+            const Triangle< dimension >& triangle, std::string_view suffix )
         {
             auto surface = geode::TriangulatedSurface< dimension >::create();
             auto builder =
@@ -77,7 +78,7 @@ namespace geode
         }
 
         void save_tetrahedron(
-            const Tetrahedron& tetrahedron, absl::string_view suffix )
+            const Tetrahedron& tetrahedron, std::string_view suffix )
         {
             auto tetra = geode::TriangulatedSurface3D::create();
             auto builder =
@@ -97,7 +98,7 @@ namespace geode
 
         void save_tetrahedra( const TetrahedralSolid3D& solid,
             absl::Span< const index_t > indices,
-            absl::string_view suffix )
+            std::string_view suffix )
         {
             for( const auto index : indices )
             {
@@ -107,13 +108,13 @@ namespace geode
         }
 
         template void opengeode_mesh_api save_segment(
-            const Segment< 2 >&, absl::string_view );
+            const Segment< 2 >&, std::string_view );
         template void opengeode_mesh_api save_segment(
-            const Segment< 3 >&, absl::string_view );
+            const Segment< 3 >&, std::string_view );
 
         template void opengeode_mesh_api save_triangle(
-            const Triangle< 2 >&, absl::string_view );
+            const Triangle< 2 >&, std::string_view );
         template void opengeode_mesh_api save_triangle(
-            const Triangle< 3 >&, absl::string_view );
+            const Triangle< 3 >&, std::string_view );
     } // namespace detail
 } // namespace geode

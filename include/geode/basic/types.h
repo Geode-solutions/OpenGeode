@@ -28,8 +28,7 @@
 #endif
 
 #include <array>
-
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 namespace geode
 {
@@ -50,7 +49,7 @@ namespace geode
         return static_cast< unsigned char >( arg );
     }
 
-    inline std::string to_string( absl::string_view view )
+    inline std::string to_string( std::string_view view )
     {
         return static_cast< std::string >( view );
     }

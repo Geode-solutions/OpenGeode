@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -46,7 +46,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an TetrahedralSolid.
@@ -56,7 +56,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class TetrahedralSolidInput
@@ -72,7 +72,7 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        explicit TetrahedralSolidInput( absl::string_view filename )
+        explicit TetrahedralSolidInput( std::string_view filename )
             : Base{ filename }
         {
         }
@@ -80,14 +80,14 @@ namespace geode
 
     template < index_t dimension >
     typename TetrahedralSolidInput< dimension >::MissingFiles
-        check_tetrahedral_solid_missing_files( absl::string_view filename );
+        check_tetrahedral_solid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_tetrahedral_solid_loadable( absl::string_view filename );
+    bool is_tetrahedral_solid_loadable( std::string_view filename );
 
     template < index_t dimension >
     using TetrahedralSolidInputFactory = Factory< std::string,
         TetrahedralSolidInput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_3D( TetrahedralSolidInputFactory );
 } // namespace geode

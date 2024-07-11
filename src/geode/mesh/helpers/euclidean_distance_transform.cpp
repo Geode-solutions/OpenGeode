@@ -40,7 +40,7 @@ namespace geode
     public:
         EuclideanDistanceTransform( const Grid< dimension >& grid,
             absl::Span< const Index > grid_cell_id,
-            absl::string_view distance_map_name )
+            std::string_view distance_map_name )
             : grid_( grid ),
               squared_cell_length_{},
               distance_map_{
@@ -387,7 +387,7 @@ namespace geode
         const Grid< dimension >& grid,
         absl::Span< const typename Grid< dimension >::CellIndices >
             grid_cell_ids,
-        absl::string_view distance_map_name )
+        std::string_view distance_map_name )
     {
         EuclideanDistanceTransform< dimension > edt{ grid, grid_cell_ids,
             distance_map_name };
@@ -399,9 +399,9 @@ namespace geode
     template std::shared_ptr< VariableAttribute< double > >
         opengeode_mesh_api euclidean_distance_transform< 2 >( const Grid2D&,
             absl::Span< const Grid2D::CellIndices >,
-            absl::string_view );
+            std::string_view );
     template std::shared_ptr< VariableAttribute< double > >
         opengeode_mesh_api euclidean_distance_transform< 3 >( const Grid3D&,
             absl::Span< const Grid3D::CellIndices >,
-            absl::string_view );
+            std::string_view );
 } // namespace geode

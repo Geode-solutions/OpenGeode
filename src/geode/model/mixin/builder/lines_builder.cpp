@@ -64,7 +64,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void LinesBuilder< dimension >::load_lines( absl::string_view directory )
+    void LinesBuilder< dimension >::load_lines( std::string_view directory )
     {
         return lines_.load_lines( directory, {} );
     }
@@ -80,7 +80,7 @@ namespace geode
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         lines_.modifiable_line( id, {} ).set_line_name( name, {} );
         line_mesh_builder( id )->set_name( name );

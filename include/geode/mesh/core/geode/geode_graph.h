@@ -63,13 +63,13 @@ namespace geode
             return Graph::type_name_static();
         }
 
-        static absl::string_view native_extension_static()
+        static std::string_view native_extension_static()
         {
             static const auto extension = "og_grp";
             return extension;
         }
 
-        absl::string_view native_extension() const override
+        std::string_view native_extension() const override
         {
             return native_extension_static();
         }

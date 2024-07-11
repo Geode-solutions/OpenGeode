@@ -54,18 +54,18 @@ namespace geode
         index_t nb_textures( TextureManagerKey ) const;
 
         Texture< dimension >& find_or_create_texture( AttributeManager& manager,
-            absl::string_view name,
+            std::string_view name,
             TextureManagerKey );
 
         const Texture< dimension >& find_texture(
-            absl::string_view name, TextureManagerKey ) const;
+            std::string_view name, TextureManagerKey ) const;
 
-        absl::FixedArray< absl::string_view > texture_names(
+        absl::FixedArray< std::string_view > texture_names(
             TextureManagerKey ) const;
 
-        bool texture_exists( absl::string_view name, TextureManagerKey ) const;
+        bool texture_exists( std::string_view name, TextureManagerKey ) const;
 
-        void delete_texture( absl::string_view name, TextureManagerKey );
+        void delete_texture( std::string_view name, TextureManagerKey );
 
     private:
         template < typename Archive >

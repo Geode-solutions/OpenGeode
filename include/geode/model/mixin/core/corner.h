@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
@@ -92,7 +92,7 @@ namespace geode
 
         void set_mesh( std::unique_ptr< Mesh > mesh, CornersBuilderKey key );
 
-        void set_corner_name( absl::string_view name, CornersBuilderKey key );
+        void set_corner_name( std::string_view name, CornersBuilderKey key );
 
         Mesh& modifiable_mesh( CornersBuilderKey key );
 
