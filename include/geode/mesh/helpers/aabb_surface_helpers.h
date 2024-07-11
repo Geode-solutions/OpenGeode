@@ -57,7 +57,7 @@ namespace geode
         {
         }
 
-        std::tuple< double, Point< dimension > > operator()(
+        double operator()(
             const Point< dimension >& query, index_t cur_box ) const;
 
     private:

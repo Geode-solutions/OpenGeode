@@ -58,13 +58,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > >
-        DistanceToEdge< dimension >::operator()(
-            const Point< dimension >& query, index_t cur_box ) const
+    double DistanceToEdge< dimension >::operator()(
+        const Point< dimension >& query, index_t cur_box ) const
     {
         const auto segment = mesh_.segment( cur_box );
-        return std::make_tuple( point_segment_distance( query, segment ),
-            point_segment_projection( query, segment ) );
+        return point_segment_distance( query, segment );
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(

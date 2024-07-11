@@ -89,19 +89,16 @@ namespace geode
          * - the distance between the \p query and \p nearest_point.
          *
          * @tparam EvalDistance this functor should have an operator()
-         * defined like this: std::tuple< double, Point< dimension > >
-         * operator()( const Point< dimension >& query, index_t
-         * curent_element_box ) const ; the output tuple contains
-         * - a double to store the distance between the point \p query and
-         * the element stored in the \p curent_element_box.
-         * - a Point< dimension > to store the nearest point from \p query
-         * on the object stored in the \p curent_element_box.
+         * defined like this: double operator()( const Point< dimension >&
+         * query, index_t curent_element_box ) const ; the output is the
+         * distance between the point \p query and the element stored in the
+         * \p curent_element_box.
          *
          * @note if several elements box match the
          * distance computation, then one of them will be randomly returned.
          */
         template < typename EvalDistance >
-        std::tuple< index_t, Point< dimension >, double > closest_element_box(
+        std::tuple< index_t, double > closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const;
 
         /*!
