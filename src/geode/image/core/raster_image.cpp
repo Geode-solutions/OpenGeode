@@ -108,8 +108,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto RasterImage< dimension >::cell_indices(
-        index_t index ) const -> CellIndices
+    auto RasterImage< dimension >::cell_indices( index_t index ) const
+        -> CellIndices
     {
         return impl_->cell_indices( *this, index );
     }

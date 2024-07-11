@@ -41,7 +41,7 @@ namespace geode
     public:
         Impl( BRep& brep, std::vector< Point3D > unique_points )
             : internal::SimplicialModelCreator< BRep >(
-                  brep, std::move( unique_points ) )
+                brep, std::move( unique_points ) )
         {
         }
 
