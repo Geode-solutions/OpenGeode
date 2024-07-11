@@ -32,7 +32,7 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 
 namespace geode
 {

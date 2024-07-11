@@ -32,8 +32,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/core/private/grid_impl.h>
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/grid_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 
 namespace

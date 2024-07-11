@@ -31,7 +31,7 @@
 
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/helpers/private/regular_grid_shape_function.h>
+#include <geode/mesh/helpers/internal/regular_grid_shape_function.h>
 
 namespace geode
 {
@@ -108,7 +108,7 @@ namespace geode
                 point_value += function_attribute_->value( grid_.vertex_index(
                                    grid_.cell_vertex_indices(
                                        grid_cell_indices, node_id ) ) )
-                               * detail::shape_function_value< dimension >(
+                               * internal::shape_function_value< dimension >(
                                    grid_cell_indices, node_id, point_in_grid );
             }
             return point_value;

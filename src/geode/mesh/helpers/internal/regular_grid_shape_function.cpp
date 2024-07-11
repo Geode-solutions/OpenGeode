@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/helpers/private/regular_grid_shape_function.h>
+#include <geode/mesh/helpers/internal/regular_grid_shape_function.h>
 
 #include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/point.h>
@@ -60,7 +60,7 @@ namespace
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < index_t dimension >
         double shape_function_value(
@@ -95,5 +95,5 @@ namespace geode
             const Grid< 3 >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< 3 >& point );
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

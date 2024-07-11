@@ -46,9 +46,9 @@
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
+#include <geode/mesh/core/internal/surface_mesh_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/private/surface_mesh_impl.h>
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/texture2d.h>
 #include <geode/mesh/core/texture_storage.h>
@@ -124,7 +124,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    geode::detail::PolygonsAroundVertexImpl compute_polygons_around_vertex(
+    geode::internal::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
         const geode::index_t& vertex_id,
         const std::optional< geode::PolygonVertex >& first_polygon )
@@ -272,10 +272,10 @@ namespace geode
     public:
         Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) ),
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) ),
               polygons_around_vertex_(
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,

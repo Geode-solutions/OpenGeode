@@ -24,8 +24,8 @@
 #include <geode/image/core/raster_image.h>
 
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/internal/array_impl.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/private/array_impl.h>
 
 #include <geode/image/core/rgb_color.h>
 
@@ -108,8 +108,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto RasterImage< dimension >::cell_indices( index_t index ) const
-        -> CellIndices
+    auto RasterImage< dimension >::cell_indices(
+        index_t index ) const -> CellIndices
     {
         return impl_->cell_indices( *this, index );
     }

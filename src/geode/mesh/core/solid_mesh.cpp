@@ -24,6 +24,8 @@
 
 #include <geode/mesh/core/solid_mesh.h>
 
+#include <stack>
+
 #include <absl/container/flat_hash_set.h>
 
 #include <bitsery/brief_syntax/array.h>
@@ -48,9 +50,9 @@
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
+#include <geode/mesh/core/internal/solid_mesh_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/private/solid_mesh_impl.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/texture3d.h>
@@ -232,7 +234,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    geode::detail::PolyhedraAroundVertexImpl compute_polyhedra_around_vertex(
+    geode::internal::PolyhedraAroundVertexImpl compute_polyhedra_around_vertex(
         const geode::SolidMesh< dimension >& solid,
         const geode::index_t& vertex_id,
         const std::optional< geode::PolyhedronVertex >& first_polyhedron )
@@ -388,10 +390,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,

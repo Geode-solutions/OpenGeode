@@ -131,13 +131,13 @@ function(add_geode_library)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
         COMPONENT public
-        PATTERN "*/private" EXCLUDE
+        PATTERN "*/internal" EXCLUDE
     )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
         COMPONENT private
         FILES_MATCHING
-        PATTERN "*/private/*"
+        PATTERN "*/internal/*"
     )
     if(MSVC AND BUILD_SHARED_LIBS AND NOT ${GEODE_LIB_STATIC})
         install(FILES $<TARGET_PDB_FILE:${GEODE_LIB_NAME}> 

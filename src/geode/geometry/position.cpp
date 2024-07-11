@@ -31,10 +31,10 @@
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/distance.h>
+#include <geode/geometry/internal/position_from_sides.h>
+#include <geode/geometry/internal/predicates.h>
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/perpendicular.h>
-#include <geode/geometry/private/position_from_sides.h>
-#include <geode/geometry/private/predicates.h>
 
 namespace geode
 {
@@ -48,8 +48,8 @@ namespace geode
         }
         const auto dot0 = GEO::PCK::dot_3d( vertices[0], point, vertices[1] );
         const auto dot1 = GEO::PCK::dot_3d( vertices[1], point, vertices[0] );
-        return detail::point_segment_position(
-            detail::side( dot0 ), detail::opposite_side( dot1 ) );
+        return internal::point_segment_position(
+            internal::side( dot0 ), internal::opposite_side( dot1 ) );
     }
 
     Position point_segment_position_exact(
@@ -63,8 +63,8 @@ namespace geode
         }
         const auto dot0 = GEO::PCK::dot_2d( vertices[0], point, vertices[1] );
         const auto dot1 = GEO::PCK::dot_2d( vertices[1], point, vertices[0] );
-        return detail::point_segment_position(
-            detail::side( dot0 ), detail::opposite_side( dot1 ) );
+        return internal::point_segment_position(
+            internal::side( dot0 ), internal::opposite_side( dot1 ) );
     }
 
     template < index_t dimension >
@@ -111,7 +111,7 @@ namespace geode
         {
             return point_triangle_position_all_zero( point, triangle );
         }
-        return detail::point_triangle_position( s0, s1, s2 );
+        return internal::point_triangle_position( s0, s1, s2 );
     }
 
     Position compute_determinants( const Point3D& point,
@@ -133,8 +133,8 @@ namespace geode
         {
             return point_triangle_position_all_zero( point, triangle );
         }
-        return detail::point_triangle_position(
-            detail::side( det0 ), detail::side( det1 ), detail::side( det2 ) );
+        return internal::point_triangle_position( internal::side( det0 ),
+            internal::side( det1 ), internal::side( det2 ) );
     }
 
     Position point_triangle_position_exact(
@@ -168,7 +168,7 @@ namespace geode
                 return Position::outside;
             }
         }
-        return detail::point_tetrahedron_position( signs );
+        return internal::point_tetrahedron_position( signs );
     }
 
     Position point_tetrahedron_position(
@@ -256,7 +256,7 @@ namespace geode
     Side point_side_to_segment( const Point2D& point, const Segment2D& segment )
     {
         const auto& vertices = segment.vertices();
-        return detail::side(
+        return internal::side(
             GEO::PCK::orient_2d( point, vertices[0], vertices[1] ) );
     }
 
@@ -287,7 +287,7 @@ namespace geode
         const Point3D& point, const Triangle3D& triangle )
     {
         const auto& vertices = triangle.vertices();
-        return detail::side( GEO::PCK::orient_3d(
+        return internal::side( GEO::PCK::orient_3d(
             vertices[0], vertices[1], vertices[2], point ) );
     }
 
