@@ -61,12 +61,12 @@ namespace geode
 
         static MeshType type_name_static();
 
-        absl::string_view native_extension() const
+        std::string_view native_extension() const
         {
             return native_extension_static();
         }
 
-        static absl::string_view native_extension_static()
+        static std::string_view native_extension_static()
         {
             static const auto ext = "og_rgd3d";
             return ext;

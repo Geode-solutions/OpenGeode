@@ -44,6 +44,6 @@ namespace geode
         }
 
     protected:
-        Output( absl::string_view filename ) : IOFile( filename ) {}
+        Output( std::string_view filename ) : IOFile( filename ) {}
     };
 } // namespace geode

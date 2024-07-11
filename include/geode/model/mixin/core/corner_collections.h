@@ -95,7 +95,7 @@ namespace geode
 
         CornerCollectionRange corner_collections() const;
 
-        void save_corner_collections( absl::string_view directory ) const;
+        void save_corner_collections( std::string_view directory ) const;
 
     protected:
         CornerCollections();
@@ -130,7 +130,7 @@ namespace geode
             CornerCollectionsBuilderKey key );
 
         void load_corner_collections(
-            absl::string_view directory, CornerCollectionsBuilderKey key );
+            std::string_view directory, CornerCollectionsBuilderKey key );
 
         ModifiableCornerCollectionRange modifiable_corner_collections(
             CornerCollectionsBuilderKey key );

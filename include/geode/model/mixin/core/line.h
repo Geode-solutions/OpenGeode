@@ -24,8 +24,7 @@
 #pragma once
 
 #include <memory>
-
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
@@ -92,7 +91,7 @@ namespace geode
 
         void set_mesh( std::unique_ptr< Mesh > mesh, LinesBuilderKey key );
 
-        void set_line_name( absl::string_view name, LinesBuilderKey key );
+        void set_line_name( std::string_view name, LinesBuilderKey key );
 
         Mesh& modifiable_mesh( LinesBuilderKey key );
 

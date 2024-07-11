@@ -40,7 +40,7 @@ namespace geode
     {
     public:
         Impl( const Grid< dimension >& grid,
-            absl::string_view function_name,
+            std::string_view function_name,
             Point< point_dimension > value )
             : grid_( grid )
         {
@@ -56,7 +56,7 @@ namespace geode
                         function_name, std::move( value ), { false, true } );
         }
 
-        Impl( const Grid< dimension >& grid, absl::string_view function_name )
+        Impl( const Grid< dimension >& grid, std::string_view function_name )
             : grid_( grid )
         {
             OPENGEODE_EXCEPTION(
@@ -129,7 +129,7 @@ namespace geode
     RegularGridPointFunction< dimension,
         point_dimension >::RegularGridPointFunction( const Grid< dimension >&
                                                          grid,
-        absl::string_view function_name,
+        std::string_view function_name,
         Point< point_dimension > value )
         : impl_{ grid, function_name, value }
     {
@@ -139,7 +139,7 @@ namespace geode
     RegularGridPointFunction< dimension,
         point_dimension >::RegularGridPointFunction( const Grid< dimension >&
                                                          grid,
-        absl::string_view function_name )
+        std::string_view function_name )
         : impl_{ grid, function_name }
     {
     }
@@ -152,7 +152,7 @@ namespace geode
     RegularGridPointFunction< dimension, point_dimension >
         RegularGridPointFunction< dimension, point_dimension >::create(
             const Grid< dimension >& grid,
-            absl::string_view function_name,
+            std::string_view function_name,
             Point< point_dimension > value )
     {
         return { grid, function_name, value };
@@ -161,7 +161,7 @@ namespace geode
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension, point_dimension >
         RegularGridPointFunction< dimension, point_dimension >::find(
-            const Grid< dimension >& grid, absl::string_view function_name )
+            const Grid< dimension >& grid, std::string_view function_name )
     {
         return { grid, function_name };
     }

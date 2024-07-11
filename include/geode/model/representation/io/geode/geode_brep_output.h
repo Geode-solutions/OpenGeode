@@ -39,12 +39,12 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepOutput final : public BRepOutput
     {
     public:
-        explicit OpenGeodeBRepOutput( absl::string_view filename )
+        explicit OpenGeodeBRepOutput( std::string_view filename )
             : BRepOutput( filename )
         {
         }
 
-        static absl::string_view extension()
+        static std::string_view extension()
         {
             return BRep::native_extension_static();
         }
@@ -52,7 +52,7 @@ namespace geode
         void archive_brep_files( const ZipFile& zip_writer ) const;
 
         void save_brep_files(
-            const BRep& brep, absl::string_view directory ) const;
+            const BRep& brep, std::string_view directory ) const;
 
         std::vector< std::string > write( const BRep& brep ) const final;
     };

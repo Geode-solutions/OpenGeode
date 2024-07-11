@@ -41,7 +41,7 @@ namespace geode
             return id_;
         }
 
-        absl::string_view name() const
+        std::string_view name() const
         {
             return name_;
         }
@@ -51,12 +51,12 @@ namespace geode
             id_ = unique_id;
         }
 
-        void set_name( absl::string_view name )
+        void set_name( std::string_view name )
         {
             name_ = to_string( name );
         }
 
-        void save( absl::string_view directory ) const
+        void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/identifier" );
             std::ofstream file{ filename, std::ofstream::binary };
@@ -70,7 +70,7 @@ namespace geode
                 "[Identifier::save] Error while writing file: ", filename );
         }
 
-        void load( absl::string_view directory )
+        void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/identifier" );
             std::ifstream file{ filename, std::ifstream::binary };
@@ -120,18 +120,18 @@ namespace geode
         return impl_->id();
     }
 
-    absl::string_view Identifier::name() const
+    std::string_view Identifier::name() const
     {
         return impl_->name();
     }
 
-    void Identifier::save_identifier( absl::string_view directory ) const
+    void Identifier::save_identifier( std::string_view directory ) const
     {
         impl_->save( directory );
     }
 
     void Identifier::load_identifier(
-        absl::string_view directory, IdentifierKey /*unused*/ )
+        std::string_view directory, IdentifierKey /*unused*/ )
     {
         impl_->load( directory );
     }
@@ -141,8 +141,7 @@ namespace geode
         set_id( unique_id );
     }
 
-    void Identifier::set_name(
-        absl::string_view name, IdentifierKey /*unused*/ )
+    void Identifier::set_name( std::string_view name, IdentifierKey /*unused*/ )
     {
         set_name( name );
     }
@@ -159,7 +158,7 @@ namespace geode
         impl_->set_id( unique_id );
     }
 
-    void Identifier::set_name( absl::string_view name )
+    void Identifier::set_name( std::string_view name )
     {
         impl_->set_name( name );
     }

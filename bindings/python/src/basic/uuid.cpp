@@ -31,7 +31,7 @@ namespace geode
     {
         pybind11::class_< uuid >( module, "uuid" )
             .def( pybind11::init<>() )
-            .def( pybind11::init< absl::string_view >() )
+            .def( pybind11::init< std::string_view >() )
             .def( "string", &uuid::string );
     }
 } // namespace geode

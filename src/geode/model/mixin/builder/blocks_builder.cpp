@@ -65,14 +65,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    void BlocksBuilder< dimension >::load_blocks( absl::string_view directory )
+    void BlocksBuilder< dimension >::load_blocks( std::string_view directory )
     {
         return blocks_.load_blocks( directory, {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         blocks_.modifiable_block( id, {} ).set_block_name( name, {} );
         block_mesh_builder( id )->set_name( name );

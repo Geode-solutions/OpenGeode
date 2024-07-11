@@ -24,10 +24,9 @@
 #include <geode/model/mixin/core/block.h>
 
 #include <memory>
+#include <string_view>
 
 #include <bitsery/ext/inheritance.h>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
@@ -145,7 +144,7 @@ namespace geode
 
     template < index_t dimension >
     void Block< dimension >::set_block_name(
-        absl::string_view name, BlocksBuilderKey /*unused*/ )
+        std::string_view name, BlocksBuilderKey /*unused*/ )
     {
         this->set_name( name );
     }

@@ -76,7 +76,7 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollections< dimension >::save_corner_collections(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/corner_collections" ) );
@@ -84,7 +84,7 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollections< dimension >::load_corner_collections(
-        absl::string_view directory, CornerCollectionsBuilderKey )
+        std::string_view directory, CornerCollectionsBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/corner_collections" ) );

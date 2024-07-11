@@ -24,9 +24,8 @@
 #include <geode/mesh/io/graph_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 #include <geode/basic/io.h>
@@ -38,7 +37,7 @@
 namespace geode
 {
     std::vector< std::string > save_graph(
-        const Graph& graph, absl::string_view filename )
+        const Graph& graph, std::string_view filename )
     {
         constexpr auto TYPE = "Graph";
         try
@@ -56,7 +55,7 @@ namespace geode
         }
     }
 
-    bool is_graph_saveable( const Graph& graph, absl::string_view filename )
+    bool is_graph_saveable( const Graph& graph, std::string_view filename )
     {
         const auto output =
             detail::geode_object_output_writer< GraphOutputFactory >(

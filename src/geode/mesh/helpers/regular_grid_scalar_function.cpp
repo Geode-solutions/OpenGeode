@@ -40,7 +40,7 @@ namespace geode
     {
     public:
         Impl( const Grid< dimension >& grid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value )
             : grid_( grid )
         {
@@ -55,7 +55,7 @@ namespace geode
                         double >( function_name, value, { false, true } );
         }
 
-        Impl( const Grid< dimension >& grid, absl::string_view function_name )
+        Impl( const Grid< dimension >& grid, std::string_view function_name )
             : grid_( grid )
         {
             OPENGEODE_EXCEPTION(
@@ -124,7 +124,7 @@ namespace geode
     template < index_t dimension >
     RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
         const Grid< dimension >& grid,
-        absl::string_view function_name,
+        std::string_view function_name,
         double value )
         : impl_{ grid, function_name, value }
     {
@@ -132,7 +132,7 @@ namespace geode
 
     template < index_t dimension >
     RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
-        const Grid< dimension >& grid, absl::string_view function_name )
+        const Grid< dimension >& grid, std::string_view function_name )
         : impl_{ grid, function_name }
     {
     }
@@ -145,7 +145,7 @@ namespace geode
     RegularGridScalarFunction< dimension >
         RegularGridScalarFunction< dimension >::create(
             const Grid< dimension >& grid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value )
     {
         return { grid, function_name, value };
@@ -154,7 +154,7 @@ namespace geode
     template < index_t dimension >
     RegularGridScalarFunction< dimension >
         RegularGridScalarFunction< dimension >::find(
-            const Grid< dimension >& grid, absl::string_view function_name )
+            const Grid< dimension >& grid, std::string_view function_name )
     {
         return { grid, function_name };
     }

@@ -59,7 +59,7 @@ namespace geode
 
         template < typename Type, typename Serializer >
         static void register_coordinate_reference_system_type(
-            PContext& context, absl::string_view name )
+            PContext& context, std::string_view name )
         {
             context.registerSingleBaseBranch< Serializer,
                 CoordinateReferenceSystem, Type >( to_string( name ).c_str() );

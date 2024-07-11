@@ -162,7 +162,7 @@ namespace geode
             initialize_relation_attribute();
         }
 
-        void save( absl::string_view directory ) const
+        void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
@@ -176,7 +176,7 @@ namespace geode
                 "[Relationships::save] Error while writing file: ", filename );
         }
 
-        void load( absl::string_view directory )
+        void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
@@ -409,7 +409,7 @@ namespace geode
         return impl_->is_item( item, collection );
     }
 
-    void Relationships::save_relationships( absl::string_view directory ) const
+    void Relationships::save_relationships( std::string_view directory ) const
     {
         impl_->save( directory );
     }
@@ -422,7 +422,7 @@ namespace geode
     }
 
     void Relationships::load_relationships(
-        absl::string_view directory, RelationshipsBuilderKey )
+        std::string_view directory, RelationshipsBuilderKey )
     {
         return impl_->load( directory );
     }

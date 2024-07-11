@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      * @return Loaded Section.
      */
-    Section opengeode_model_api load_section( absl::string_view filename );
+    Section opengeode_model_api load_section( std::string_view filename );
 
     class SectionInput : public Input< Section >
     {
@@ -54,16 +54,14 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        explicit SectionInput( absl::string_view filename ) : Base{ filename }
-        {
-        }
+        explicit SectionInput( std::string_view filename ) : Base{ filename } {}
     };
 
     typename SectionInput::MissingFiles opengeode_model_api
-        check_section_missing_files( absl::string_view filename );
+        check_section_missing_files( std::string_view filename );
 
-    bool opengeode_model_api is_section_loadable( absl::string_view filename );
+    bool opengeode_model_api is_section_loadable( std::string_view filename );
 
     using SectionInputFactory =
-        Factory< std::string, SectionInput, absl::string_view >;
+        Factory< std::string, SectionInput, std::string_view >;
 } // namespace geode

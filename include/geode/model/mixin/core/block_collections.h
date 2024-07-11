@@ -94,7 +94,7 @@ namespace geode
 
         BlockCollectionRange block_collections() const;
 
-        void save_block_collections( absl::string_view directory ) const;
+        void save_block_collections( std::string_view directory ) const;
 
     protected:
         BlockCollections();
@@ -129,7 +129,7 @@ namespace geode
             BlockCollectionsBuilderKey key );
 
         void load_block_collections(
-            absl::string_view directory, BlockCollectionsBuilderKey key );
+            std::string_view directory, BlockCollectionsBuilderKey key );
 
         ModifiableBlockCollectionRange modifiable_block_collections(
             BlockCollectionsBuilderKey key );

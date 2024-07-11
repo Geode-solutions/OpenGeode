@@ -23,22 +23,23 @@
 
 #include <geode/basic/string.h>
 
+#include <absl/strings/ascii.h>
 #include <absl/strings/str_split.h>
 
 namespace geode
 {
-    std::vector< absl::string_view > string_split( absl::string_view string )
+    std::vector< std::string_view > string_split( std::string_view string )
     {
         return absl::StrSplit( absl::StripAsciiWhitespace( string ),
             absl::ByAnyChar( " 	" ) /* space + tab */, absl::SkipWhitespace() );
     }
 
-    bool string_starts_with( absl::string_view string, absl::string_view check )
+    bool string_starts_with( std::string_view string, std::string_view check )
     {
         return absl::StartsWith( string, check );
     }
 
-    index_t string_to_index( absl::string_view string )
+    index_t string_to_index( std::string_view string )
     {
         index_t value{ 0 };
         const auto status = absl::SimpleAtoi( string, &value );
@@ -48,7 +49,7 @@ namespace geode
         return value;
     }
 
-    int string_to_int( absl::string_view string )
+    int string_to_int( std::string_view string )
     {
         int value{ 0 };
         const auto status = absl::SimpleAtoi( string, &value );
@@ -57,7 +58,7 @@ namespace geode
         return value;
     }
 
-    float string_to_float( absl::string_view string )
+    float string_to_float( std::string_view string )
     {
         float value{ 0 };
         const auto status = absl::SimpleAtof( string, &value );
@@ -67,7 +68,7 @@ namespace geode
         return value;
     }
 
-    double string_to_double( absl::string_view string )
+    double string_to_double( std::string_view string )
     {
         double value{ 0 };
         const auto status = absl::SimpleAtod( string, &value );

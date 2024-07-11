@@ -75,7 +75,7 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollections< dimension >::save_block_collections(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/block_collections" ) );
@@ -83,7 +83,7 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollections< dimension >::load_block_collections(
-        absl::string_view directory, BlockCollectionsBuilderKey )
+        std::string_view directory, BlockCollectionsBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/block_collections" ) );

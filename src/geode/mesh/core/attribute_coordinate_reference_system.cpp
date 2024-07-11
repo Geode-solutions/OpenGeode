@@ -41,7 +41,7 @@ namespace geode
             : detail::PointsImpl< dimension >{ manager }
         {
         }
-        Impl( AttributeManager& manager, absl::string_view attribute_name )
+        Impl( AttributeManager& manager, std::string_view attribute_name )
             : detail::PointsImpl< dimension >{ manager, attribute_name }
         {
         }
@@ -76,7 +76,7 @@ namespace geode
     template < index_t dimension >
     AttributeCoordinateReferenceSystem< dimension >::
         AttributeCoordinateReferenceSystem(
-            AttributeManager& manager, absl::string_view attribute_name )
+            AttributeManager& manager, std::string_view attribute_name )
         : impl_{ manager, attribute_name }
     {
     }
@@ -103,7 +103,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::string_view
+    std::string_view
         AttributeCoordinateReferenceSystem< dimension >::attribute_name() const
     {
         return impl_->attribute_name();

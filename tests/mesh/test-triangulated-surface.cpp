@@ -193,7 +193,7 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
 }
 
 void test_io(
-    const geode::TriangulatedSurface3D& surface, absl::string_view filename )
+    const geode::TriangulatedSurface3D& surface, std::string_view filename )
 {
     geode::save_triangulated_surface( surface, filename );
     geode::load_triangulated_surface< 3 >( filename );

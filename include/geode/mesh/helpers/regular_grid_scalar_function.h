@@ -51,7 +51,7 @@ namespace geode
          */
         static RegularGridScalarFunction< dimension > create(
             const Grid< dimension >& grid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value );
 
         /*!
@@ -60,7 +60,7 @@ namespace geode
          * Throws an exception if no attribute with the same name exists.
          */
         static RegularGridScalarFunction< dimension > find(
-            const Grid< dimension >& grid, absl::string_view function_name );
+            const Grid< dimension >& grid, std::string_view function_name );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
@@ -80,10 +80,10 @@ namespace geode
 
     private:
         RegularGridScalarFunction(
-            const Grid< dimension >& grid, absl::string_view function_name );
+            const Grid< dimension >& grid, std::string_view function_name );
 
         RegularGridScalarFunction( const Grid< dimension >& grid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value );
 
     private:
