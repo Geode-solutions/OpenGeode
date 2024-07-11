@@ -57,7 +57,6 @@ namespace geode
         incorrect
     };
 
-
     template < typename Intersection >
     struct CorrectnessInfo
     {
