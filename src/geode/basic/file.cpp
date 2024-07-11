@@ -23,10 +23,9 @@
 
 #include <geode/basic/file.h>
 
+#include <filesystem>
 #include <fstream>
 #include <string_view>
-
-#include <ghc/filesystem.hpp>
 
 #include <absl/strings/match.h>
 #include <absl/strings/str_cat.h>
@@ -38,7 +37,7 @@ namespace geode
 {
     bool file_exists( std::string_view file_path )
     {
-        return ghc::filesystem::exists( to_string( file_path ) );
+        return std::filesystem::exists( to_string( file_path ) );
     }
 
     bool line_starts_with( std::ifstream& file, std::string_view check )

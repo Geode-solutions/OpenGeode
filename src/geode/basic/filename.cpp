@@ -23,33 +23,32 @@
 
 #include <geode/basic/filename.h>
 
+#include <filesystem>
 #include <string_view>
-
-#include <ghc/filesystem.hpp>
 
 namespace geode
 {
     std::string filename_with_extension( std::string_view path )
     {
-        const ghc::filesystem::path filepath{ to_string( path ) };
+        const std::filesystem::path filepath{ to_string( path ) };
         return filepath.filename().string();
     }
 
     std::string filename_without_extension( std::string_view path )
     {
-        const ghc::filesystem::path filepath{ to_string( path ) };
+        const std::filesystem::path filepath{ to_string( path ) };
         return filepath.filename().replace_extension( "" ).string();
     }
 
     std::string filepath_without_extension( std::string_view path )
     {
-        ghc::filesystem::path filepath{ to_string( path ) };
+        std::filesystem::path filepath{ to_string( path ) };
         return filepath.replace_extension( "" ).string();
     }
 
     std::string filepath_without_filename( std::string_view path )
     {
-        ghc::filesystem::path filepath{ to_string( path ) };
+        std::filesystem::path filepath{ to_string( path ) };
         return filepath.replace_filename( "" ).string();
     }
 
