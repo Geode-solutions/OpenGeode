@@ -59,40 +59,40 @@ void test_segment_segment_intersection_detection()
 
     result =
         geode::segment_segment_intersection_detection( segment_cf, segment_de );
-    answer.first = geode::Position::inside;
-    answer.second = geode::Position::inside;
+    answer.first = geode::POSITION::inside;
+    answer.second = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection "
         "with query segment_cf and segment_de" );
 
     result =
         geode::segment_segment_intersection_detection( segment_bc, segment_af );
-    answer.first = geode::Position::vertex0;
-    answer.second = geode::Position::inside;
+    answer.first = geode::POSITION::vertex0;
+    answer.second = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_bc and segment_af" );
 
     result =
         geode::segment_segment_intersection_detection( segment_cd, segment_df );
-    answer.first = geode::Position::vertex1;
-    answer.second = geode::Position::vertex0;
+    answer.first = geode::POSITION::vertex1;
+    answer.second = geode::POSITION::vertex0;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection "
         "with query segment_cd and segment_df" );
 
     result =
         geode::segment_segment_intersection_detection( segment_ab, segment_cd );
-    answer.first = geode::Position::outside;
-    answer.second = geode::Position::outside;
+    answer.first = geode::POSITION::outside;
+    answer.second = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_ab and segment_cd" );
 
     result = geode::segment_segment_intersection_detection(
         segment_ab, segment_ab2 );
-    answer.first = geode::Position::parallel;
-    answer.second = geode::Position::parallel;
+    answer.first = geode::POSITION::parallel;
+    answer.second = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_ab and segment_ab2" );
@@ -105,15 +105,15 @@ void test_segment_segment_intersection_detection()
 
     result =
         geode::segment_segment_intersection_detection( segment_ab, segment_ef );
-    answer.first = geode::Position::parallel;
-    answer.second = geode::Position::parallel;
+    answer.first = geode::POSITION::parallel;
+    answer.second = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_ab and segment_ef" );
     result = geode::colinear_segment_segment_intersection_detection(
         segment_ab, segment_ef );
-    answer.first = geode::Position::outside;
-    answer.second = geode::Position::outside;
+    answer.first = geode::POSITION::outside;
+    answer.second = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for "
         "colinear_segment_segment_intersection_detection with "
@@ -121,8 +121,8 @@ void test_segment_segment_intersection_detection()
 
     result =
         geode::segment_segment_intersection_detection( segment_ae, segment_bf );
-    answer.first = geode::Position::parallel;
-    answer.second = geode::Position::parallel;
+    answer.first = geode::POSITION::parallel;
+    answer.second = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_ae and segment_bf" );
@@ -135,15 +135,15 @@ void test_segment_segment_intersection_detection()
 
     result =
         geode::segment_segment_intersection_detection( segment_ae, segment_ef );
-    answer.first = geode::Position::parallel;
-    answer.second = geode::Position::parallel;
+    answer.first = geode::POSITION::parallel;
+    answer.second = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_ae and segment_ef" );
     result = geode::colinear_segment_segment_intersection_detection(
         segment_ae, segment_ef );
-    answer.first = geode::Position::vertex1;
-    answer.second = geode::Position::vertex0;
+    answer.first = geode::POSITION::vertex1;
+    answer.second = geode::POSITION::vertex0;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for "
         "colinear_segment_segment_intersection_detection with "
@@ -151,8 +151,8 @@ void test_segment_segment_intersection_detection()
 
     result =
         geode::segment_segment_intersection_detection( segment_bc, segment_df );
-    answer.first = geode::Position::outside;
-    answer.second = geode::Position::outside;
+    answer.first = geode::POSITION::outside;
+    answer.second = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_segment_intersection_detection with "
         "query segment_bc and segment_df" );
@@ -177,47 +177,47 @@ void test_segment_line_intersection_detection()
     const geode::Segment2D segment_df{ d, f };
     const geode::Segment2D segment_ef{ e, f };
 
-    geode::Position result;
+    geode::POSITION result;
 
     result = geode::segment_line_intersection_detection(
         segment_cf, geode::InfiniteLine2D{ segment_de } );
-    OPENGEODE_EXCEPTION( result == geode::Position::inside,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::inside,
         "[Test] Wrong result for segment_line_intersection_detection "
         "with query segment_cf and segment_de" );
 
     result = geode::segment_line_intersection_detection(
         segment_bc, geode::InfiniteLine2D{ segment_af } );
-    OPENGEODE_EXCEPTION( result == geode::Position::vertex0,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::vertex0,
         "[Test] Wrong result for segment_line_intersection_detection with "
         "query segment_bc and segment_af" );
 
     result = geode::segment_line_intersection_detection(
         segment_cd, geode::InfiniteLine2D{ segment_df } );
-    OPENGEODE_EXCEPTION( result == geode::Position::vertex1,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::vertex1,
         "[Test] Wrong result for segment_line_intersection_detection "
         "with query segment_cd and segment_df" );
 
     result = geode::segment_line_intersection_detection(
         segment_ab, geode::InfiniteLine2D{ segment_cd } );
-    OPENGEODE_EXCEPTION( result == geode::Position::outside,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::outside,
         "[Test] Wrong result for segment_line_intersection_detection with "
         "query segment_ab and segment_cd" );
 
     result = geode::segment_line_intersection_detection(
         segment_ab, geode::InfiniteLine2D{ segment_ab2 } );
-    OPENGEODE_EXCEPTION( result == geode::Position::parallel,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::parallel,
         "[Test] Wrong result for segment_line_intersection_detection with "
         "query segment_ab and segment_ab2" );
 
     result = geode::segment_line_intersection_detection(
         segment_ab, geode::InfiniteLine2D{ segment_ef } );
-    OPENGEODE_EXCEPTION( result == geode::Position::parallel,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::parallel,
         "[Test] Wrong result for segment_line_intersection_detection with "
         "query segment_ab and segment_ef" );
 
     result = geode::segment_line_intersection_detection(
         segment_bc, geode::InfiniteLine2D{ segment_df } );
-    OPENGEODE_EXCEPTION( result == geode::Position::outside,
+    OPENGEODE_EXCEPTION( result == geode::POSITION::outside,
         "[Test] Wrong result for segment_line_intersection_detection with "
         "query segment_bc and segment_df" );
 }
@@ -258,70 +258,70 @@ void test_segment_triangle_intersection_detection()
 
     result =
         geode::segment_triangle_intersection_detection( segment_ab, triangle );
-    answer = { geode::Position::parallel, geode::Position::parallel };
+    answer = { geode::POSITION::parallel, geode::POSITION::parallel };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_ab" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_da, triangle );
-    answer = { geode::Position::vertex1, geode::Position::vertex0 };
+    answer = { geode::POSITION::vertex1, geode::POSITION::vertex0 };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_da" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_fg, triangle );
-    answer = { geode::Position::outside, geode::Position::outside };
+    answer = { geode::POSITION::outside, geode::POSITION::outside };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_fg" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_hi, triangle );
-    answer = { geode::Position::inside, geode::Position::vertex0 };
+    answer = { geode::POSITION::inside, geode::POSITION::vertex0 };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_hi" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_hj, triangle );
-    answer = { geode::Position::inside, geode::Position::edge2 };
+    answer = { geode::POSITION::inside, geode::POSITION::edge2 };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_hj" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_ki, triangle );
-    answer = { geode::Position::inside, geode::Position::inside };
+    answer = { geode::POSITION::inside, geode::POSITION::inside };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_ki" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_li, triangle );
-    answer = { geode::Position::outside, geode::Position::outside };
+    answer = { geode::POSITION::outside, geode::POSITION::outside };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_li" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_kb, triangle );
-    answer = { geode::Position::vertex1, geode::Position::vertex1 };
+    answer = { geode::POSITION::vertex1, geode::POSITION::vertex1 };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_kb" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_mn, triangle );
-    answer = { geode::Position::outside, geode::Position::outside };
+    answer = { geode::POSITION::outside, geode::POSITION::outside };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_mn" );
 
     result =
         geode::segment_triangle_intersection_detection( segment_op, triangle );
-    answer = { geode::Position::parallel, geode::Position::parallel };
+    answer = { geode::POSITION::parallel, geode::POSITION::parallel };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_op" );
@@ -359,64 +359,64 @@ void test_line_triangle_intersection_detection()
     const geode::InfiniteLine3D line_mn{ geode::Segment3D{ m, n } };
     const geode::InfiniteLine3D line_op{ geode::Segment3D{ o, p } };
 
-    geode::Position result, answer;
+    geode::POSITION result, answer;
 
     result = geode::line_triangle_intersection_detection( line_ab, triangle );
-    answer = geode::Position::parallel;
+    answer = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_ab" );
 
     result = geode::line_triangle_intersection_detection( line_da, triangle );
-    answer = geode::Position::parallel;
+    answer = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_da" );
 
     result = geode::line_triangle_intersection_detection( line_fg, triangle );
-    answer = geode::Position::outside;
+    answer = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_fg" );
 
     result = geode::line_triangle_intersection_detection( line_hi, triangle );
-    answer = geode::Position::vertex0;
+    answer = geode::POSITION::vertex0;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_hi" );
 
     result = geode::line_triangle_intersection_detection( line_hj, triangle );
-    answer = geode::Position::edge2;
+    answer = geode::POSITION::edge2;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_hj" );
 
     result = geode::line_triangle_intersection_detection( line_ki, triangle );
-    answer = geode::Position::inside;
+    answer = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_ki" );
 
     result = geode::line_triangle_intersection_detection( line_li, triangle );
-    answer = geode::Position::outside;
+    answer = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_li" );
 
     result = geode::line_triangle_intersection_detection( line_kb, triangle );
-    answer = geode::Position::vertex1;
+    answer = geode::POSITION::vertex1;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_kb" );
 
     result = geode::line_triangle_intersection_detection( line_mn, triangle );
-    answer = geode::Position::inside;
+    answer = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_mn" );
 
     result = geode::line_triangle_intersection_detection( line_op, triangle );
-    answer = geode::Position::parallel;
+    answer = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for line_triangle_intersection_detection with "
         "query line_op" );
@@ -454,64 +454,64 @@ void test_segment_plane_intersection_detection()
     const geode::Segment3D segment_mn{ m, n };
     const geode::Segment3D segment_op{ o, p };
 
-    geode::Position result, answer;
+    geode::POSITION result, answer;
 
     result = geode::segment_plane_intersection_detection( segment_ab, plane );
-    answer = geode::Position::parallel;
+    answer = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_ab" );
 
     result = geode::segment_plane_intersection_detection( segment_da, plane );
-    answer = geode::Position::parallel;
+    answer = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_da" );
 
     result = geode::segment_plane_intersection_detection( segment_fg, plane );
-    answer = geode::Position::outside;
+    answer = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_fg" );
 
     result = geode::segment_plane_intersection_detection( segment_hi, plane );
-    answer = geode::Position::inside;
+    answer = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_hi" );
 
     result = geode::segment_plane_intersection_detection( segment_hj, plane );
-    answer = geode::Position::inside;
+    answer = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_hj" );
 
     result = geode::segment_plane_intersection_detection( segment_ki, plane );
-    answer = geode::Position::inside;
+    answer = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_ki" );
 
     result = geode::segment_plane_intersection_detection( segment_li, plane );
-    answer = geode::Position::inside;
+    answer = geode::POSITION::inside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_li" );
 
     result = geode::segment_plane_intersection_detection( segment_kb, plane );
-    answer = geode::Position::vertex1;
+    answer = geode::POSITION::vertex1;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_kb" );
 
     result = geode::segment_plane_intersection_detection( segment_mn, plane );
-    answer = geode::Position::outside;
+    answer = geode::POSITION::outside;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_mn" );
 
     result = geode::segment_plane_intersection_detection( segment_op, plane );
-    answer = geode::Position::parallel;
+    answer = geode::POSITION::parallel;
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_plane_intersection_detection with "
         "query segment_op" );

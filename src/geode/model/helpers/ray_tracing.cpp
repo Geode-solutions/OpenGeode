@@ -62,7 +62,7 @@ namespace
         {
             for( const auto& intersection : intersections.second )
             {
-                if( intersection.position != geode::Position::inside )
+                if( intersection.position != geode::POSITION::inside )
                 {
                     return std::nullopt;
                 }

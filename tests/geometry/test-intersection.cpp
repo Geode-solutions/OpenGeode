@@ -618,7 +618,7 @@ void test_plane_plane_intersection()
     const geode::Point3D O{ { 0, 0, 0 } };
     const geode::Plane planeZO{ Z, O };
     const auto OO_result = geode::plane_plane_intersection( planeZO, planeZO );
-    OPENGEODE_EXCEPTION( OO_result.type == geode::IntersectionType::PARALLEL,
+    OPENGEODE_EXCEPTION( OO_result.type == geode::INTERSECTION_TYPE::parallel,
         "[Test] Wrong intersection between planeZO, planeZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
@@ -648,7 +648,7 @@ void test_plane_circle_intersection()
     const geode::Circle circleZO{ planeZO, 42 };
     const auto OO_result =
         geode::plane_circle_intersection( planeZO, circleZO );
-    OPENGEODE_EXCEPTION( OO_result.type == geode::IntersectionType::PARALLEL,
+    OPENGEODE_EXCEPTION( OO_result.type == geode::INTERSECTION_TYPE::parallel,
         "[Test] Wrong intersection between planeZO, circleZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
@@ -705,7 +705,7 @@ void test_triangle_circle_intersection()
     const geode::Triangle3D triangleABC{ A, B, C };
     const auto Oabc_result =
         geode::triangle_circle_intersection( triangleABC, circleZO );
-    OPENGEODE_EXCEPTION( Oabc_result.type == geode::IntersectionType::PARALLEL,
+    OPENGEODE_EXCEPTION( Oabc_result.type == geode::INTERSECTION_TYPE::parallel,
         "[Test] Wrong intersection between triangleABC, circleZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };

@@ -57,17 +57,21 @@ namespace geode
         incorrect
     };
 
+
     template < typename Intersection >
     struct CorrectnessInfo
     {
-        CorrectnessInfo() = default;
-        CorrectnessInfo( const Intersection& intersection )
-            : first{ false, intersection }, second{ false, intersection }
+        using Correctness = std::pair< bool, Intersection >;
+
+        CorrectnessInfo(
+            Correctness& first_correctness, Correctness& second_correctness )
+            : first{ std::move( first_correctness ) },
+              second{ std::move( second_correctness ) }
         {
         }
 
-        std::pair< bool, Intersection > first{ false, {} };
-        std::pair< bool, Intersection > second{ false, {} };
+        Correctness first;
+        Correctness second;
     };
 
     template < typename Intersection >

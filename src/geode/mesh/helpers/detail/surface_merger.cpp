@@ -147,9 +147,10 @@ namespace geode
                         merger.builder().delete_polygons( to_delete );
                     delete_vector_elements( to_delete, polygons_origins_ );
                     delete_vector_elements( to_delete, surface_id_ );
+                    const auto& meshes = merger.meshes();
                     for( const auto surface_id : Indices{ merger.meshes() } )
                     {
-                        const auto& surface = merger.meshes()[surface_id].get();
+                        const auto& surface = meshes[surface_id].get();
                         for( const auto p : Range{ surface.nb_polygons() } )
                         {
                             const auto old = new_id_[surface_id][p];
@@ -164,9 +165,10 @@ namespace geode
             void create_polygons( SurfaceMeshMerger< dimension >& merger )
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > polygons;
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& surface = merger.meshes()[s].get();
+                    const auto& surface = meshes[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
                         Polygon vertices( surface.nb_polygon_vertices( p ) );
@@ -218,9 +220,10 @@ namespace geode
             {
                 absl::FixedArray< bool > visited_polygons(
                     merger.mesh().nb_polygons(), false );
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& surface = merger.meshes()[s].get();
+                    const auto& surface = meshes[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
                         const auto pv = surface.polygon_vertices( p );

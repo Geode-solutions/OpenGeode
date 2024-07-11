@@ -61,8 +61,8 @@ namespace geode
     Blocks< dimension >::~Blocks() = default;
 
     template < index_t dimension >
-    auto Blocks< dimension >::operator=( Blocks&& ) noexcept
-        -> Blocks& = default;
+    auto Blocks< dimension >::operator=(
+        Blocks&& ) noexcept -> Blocks& = default;
 
     template < index_t dimension >
     index_t Blocks< dimension >::nb_blocks() const
@@ -96,7 +96,7 @@ namespace geode
         const auto prefix = absl::StrCat(
             directory, "/", Block< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( const auto& block : blocks() )
@@ -147,7 +147,7 @@ namespace geode
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( auto& block : modifiable_blocks( {} ) )

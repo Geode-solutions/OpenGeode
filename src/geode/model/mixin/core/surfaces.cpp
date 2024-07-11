@@ -97,7 +97,7 @@ namespace geode
         const auto prefix = absl::StrCat( directory, "/",
             Surface< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_surfaces() );
         index_t count{ 0 };
         for( const auto& surface : surfaces() )
@@ -141,7 +141,7 @@ namespace geode
         impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_surfaces() );
         index_t count{ 0 };
         for( auto& surface : modifiable_surfaces( {} ) )

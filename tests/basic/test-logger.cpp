@@ -83,7 +83,7 @@ void test()
         absl::make_unique< CustomClient >() );
 
     test_logger();
-    geode::Logger::set_level( geode::Logger::Level::err );
+    geode::Logger::set_level( geode::Logger::LEVEL::err );
     test_logger();
 }
 
