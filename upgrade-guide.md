@@ -13,6 +13,8 @@
 
 - **String_View**: Replace absl::string_view by is equivalent in C++17 std::string_view.
 
+- **PolyhedronFacetNormal**: This method now returns an optional of her previous return type 
+
 TODO.....
 
 
