@@ -166,7 +166,6 @@ namespace geode
         template < typename ACTION >
         void closest_element_box_recursive( const Point< dimension >& query,
             index_t& nearest_box,
-            Point< dimension >& nearest_point,
             double& distance,
             index_t node_index,
             index_t element_begin,
@@ -274,23 +273,19 @@ namespace geode
 
     template < index_t dimension >
     template < typename EvalDistance >
-    std::tuple< index_t, Point< dimension >, double >
-        AABBTree< dimension >::closest_element_box(
-            const Point< dimension >& query, const EvalDistance& action ) const
+    std::tuple< index_t, double > AABBTree< dimension >::closest_element_box(
+        const Point< dimension >& query, const EvalDistance& action ) const
     {
         if( nb_bboxes() == 0 )
         {
-            return std::make_tuple( NO_ID, query, 0 );
+            return std::make_tuple( NO_ID, 0 );
         }
         auto nearest_box = impl_->closest_element_box_hint( query );
-        double distance;
-        Point< dimension > nearest_point;
-        std::tie( distance, nearest_point ) = action( query, nearest_box );
-
-        impl_->closest_element_box_recursive( query, nearest_box, nearest_point,
-            distance, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+        auto distance = action( query, nearest_box );
+        impl_->closest_element_box_recursive( query, nearest_box, distance,
+            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
         OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
-        return std::make_tuple( nearest_box, nearest_point, distance );
+        return std::make_tuple( nearest_box, distance );
     }
 
     template < index_t dimension >
@@ -390,7 +385,6 @@ namespace geode
     void AABBTree< dimension >::Impl::closest_element_box_recursive(
         const Point< dimension >& query,
         index_t& nearest_box,
-        Point< dimension >& nearest_point,
         double& distance,
         index_t node_index,
         index_t box_begin,
@@ -407,13 +401,10 @@ namespace geode
         {
             const auto cur_box = mapping_morton( box_begin );
             Point< dimension > cur_nearest_point;
-            double cur_distance;
-            std::tie( cur_distance, cur_nearest_point ) =
-                action( query, cur_box );
+            const auto cur_distance = action( query, cur_box );
             if( cur_distance < distance )
             {
                 nearest_box = cur_box;
-                nearest_point = cur_nearest_point;
                 distance = cur_distance;
             }
             return;
@@ -431,30 +422,26 @@ namespace geode
         {
             if( distance_left < distance )
             {
-                closest_element_box_recursive( query, nearest_box,
-                    nearest_point, distance, it.child_left, box_begin,
-                    it.middle_box, action );
+                closest_element_box_recursive( query, nearest_box, distance,
+                    it.child_left, box_begin, it.middle_box, action );
             }
             if( distance_right < distance )
             {
-                closest_element_box_recursive( query, nearest_box,
-                    nearest_point, distance, it.child_right, it.middle_box,
-                    box_end, action );
+                closest_element_box_recursive( query, nearest_box, distance,
+                    it.child_right, it.middle_box, box_end, action );
             }
         }
         else
         {
             if( distance_right < distance )
             {
-                closest_element_box_recursive( query, nearest_box,
-                    nearest_point, distance, it.child_right, it.middle_box,
-                    box_end, action );
+                closest_element_box_recursive( query, nearest_box, distance,
+                    it.child_right, it.middle_box, box_end, action );
             }
             if( distance_left < distance )
             {
-                closest_element_box_recursive( query, nearest_box,
-                    nearest_point, distance, it.child_left, box_begin,
-                    it.middle_box, action );
+                closest_element_box_recursive( query, nearest_box, distance,
+                    it.child_left, box_begin, it.middle_box, action );
             }
         }
     }

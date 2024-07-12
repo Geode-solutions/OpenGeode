@@ -49,7 +49,7 @@ namespace
             const auto& query = mesh_A.point( v );
             const auto closest_element =
                 mesh_B_tree.closest_element_box( query, distance_action );
-            const auto distance = std::get< 2 >( closest_element );
+            const auto distance = std::get< 1 >( closest_element );
             if( distance > min_dist )
             {
                 min_dist = distance;
