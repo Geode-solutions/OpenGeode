@@ -40,8 +40,7 @@ namespace geode
     class GridScalarFunction
     {
     public:
-        GridScalarFunction(
-            GridScalarFunction< dimension >&& other ) noexcept;
+        GridScalarFunction( GridScalarFunction< dimension >&& other ) noexcept;
         ~GridScalarFunction();
 
         /*!
