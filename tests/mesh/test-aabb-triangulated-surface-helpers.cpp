@@ -94,35 +94,26 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
             const auto query1 =
                 create_vertex< dimension >( i + offset, j + offset );
             geode::index_t triangle1;
-            geode::Point< dimension > nearest_point1;
-            std::tie( triangle1, nearest_point1, std::ignore ) =
+            std::tie( triangle1, std::ignore ) =
                 tree.closest_element_box( query1, distance_action );
             OPENGEODE_EXCEPTION(
                 triangle1 == id++, "[TEST] Wrong triangle found" );
-            OPENGEODE_EXCEPTION( nearest_point1.inexact_equal( query1 ),
-                "[TEST] Wrong nearest point found" );
 
             const auto query2 =
                 create_vertex< dimension >( i + 1 - offset, j + 1 - offset );
             geode::index_t triangle2;
-            geode::Point< dimension > nearest_point2;
-            std::tie( triangle2, nearest_point2, std::ignore ) =
+            std::tie( triangle2, std::ignore ) =
                 tree.closest_element_box( query2, distance_action );
             OPENGEODE_EXCEPTION(
                 triangle2 == id++, "[TEST] Wrong triangle found" );
-            OPENGEODE_EXCEPTION( nearest_point2.inexact_equal( query2 ),
-                "[TEST] Wrong nearest point found" );
         }
     }
 
     geode::Point< dimension > query;
     geode::index_t triangle;
-    geode::Point< dimension > nearest_point;
-    std::tie( triangle, nearest_point, std::ignore ) =
+    std::tie( triangle, std::ignore ) =
         tree.closest_element_box( query, distance_action );
     OPENGEODE_EXCEPTION( triangle == 0, "[TEST] Wrong triangle found" );
-    OPENGEODE_EXCEPTION( nearest_point == geode::Point< dimension >(),
-        "[TEST] Wrong nearest point found" );
 }
 
 template < geode::index_t dimension >
