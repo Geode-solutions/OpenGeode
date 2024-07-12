@@ -61,41 +61,30 @@ void check_solid_tree( const geode::AABBTree3D& tree,
     const geode::DistanceToTetrahedron3D& distance_action )
 {
     geode::index_t tetrahedron_box_id;
-    geode::Point3D nearest_point;
     double distance;
-    std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box(
-            geode::Point3D{ { 0, 0, 0 } }, distance_action );
+    std::tie( tetrahedron_box_id, distance ) = tree.closest_element_box(
+        geode::Point3D{ { 0, 0, 0 } }, distance_action );
     OPENGEODE_EXCEPTION(
         tetrahedron_box_id == 0, "Wrong tetrahedron id on query 1" );
-    OPENGEODE_EXCEPTION( ( nearest_point == geode::Point3D{ { 0, 0, 0 } } ),
-        "Wrong nearest point on query 1" );
     OPENGEODE_EXCEPTION(
         inexact_equal( distance, 0., 1e-7 ), "Wrong distance on query 1" );
 
-    std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box(
-            geode::Point3D{ { 1, 0, 1 } }, distance_action );
+    std::tie( tetrahedron_box_id, distance ) = tree.closest_element_box(
+        geode::Point3D{ { 1, 0, 1 } }, distance_action );
     OPENGEODE_EXCEPTION(
         tetrahedron_box_id == 2, "Wrong tetrahedron id on query 2" );
-    OPENGEODE_EXCEPTION( ( nearest_point == geode::Point3D{ { 1, 0, 1 } } ),
-        "Wrong nearest point on query 2" );
     OPENGEODE_EXCEPTION(
         inexact_equal( distance, 0., 1e-7 ), "Wrong distance on query 2" );
 
-    std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box(
-            geode::Point3D{ { 0.5, 0.5, 0.5 } }, distance_action );
+    std::tie( tetrahedron_box_id, distance ) = tree.closest_element_box(
+        geode::Point3D{ { 0.5, 0.5, 0.5 } }, distance_action );
     OPENGEODE_EXCEPTION(
         tetrahedron_box_id == 4, "Wrong tetrahedron id on query 3" );
     OPENGEODE_EXCEPTION(
         inexact_equal( distance, 0., 1e-7 ), "Wrong distance on query 3" );
 
-    std::tie( tetrahedron_box_id, nearest_point, distance ) =
-        tree.closest_element_box(
-            geode::Point3D{ { -0.5, 0.5, 0.5 } }, distance_action );
-    OPENGEODE_EXCEPTION( ( nearest_point == geode::Point3D{ { 0, 0.5, 0.5 } } ),
-        "Wrong nearest point on query 4" );
+    std::tie( tetrahedron_box_id, distance ) = tree.closest_element_box(
+        geode::Point3D{ { -0.5, 0.5, 0.5 } }, distance_action );
     OPENGEODE_EXCEPTION(
         inexact_equal( distance, 0.5, 1e-7 ), "Wrong distance on query 4" );
 }

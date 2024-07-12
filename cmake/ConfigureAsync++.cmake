@@ -25,8 +25,9 @@ ExternalProject_Add(asyncplusplus
     SOURCE_DIR ${ASYNCPLUSPLUS_PATH}/src
     BINARY_DIR ${ASYNCPLUSPLUS_PATH}/build
     STAMP_DIR ${ASYNCPLUSPLUS_PATH}/stamp
-    GIT_REPOSITORY https://github.com/Amanieu/asyncplusplus
-    GIT_TAG 756893feb9e69c098225d5a454a668a2c139e4be
+    GIT_REPOSITORY https://github.com/Geode-solutions/asyncplusplus
+    GIT_TAG 20240711
+    GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}

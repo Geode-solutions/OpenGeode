@@ -53,12 +53,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > >
-        DistanceToTetrahedron< dimension >::operator()(
-            const Point< dimension >& query, index_t cur_box ) const
+    double DistanceToTetrahedron< dimension >::operator()(
+        const Point< dimension >& query, index_t cur_box ) const
     {
-        return point_tetrahedron_distance(
-            query, mesh_.tetrahedron( cur_box ) );
+        return std::get< 0 >(
+            point_tetrahedron_distance( query, mesh_.tetrahedron( cur_box ) ) );
     }
 
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
