@@ -31,7 +31,7 @@
 namespace geode
 {
     static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
-        signed_volume_vertices_order{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
+        SIGNED_VOLUME_VERTICES_ORDER{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
             { 1, 0, 2 } } };
 
     template < index_t dimension >
@@ -94,9 +94,9 @@ namespace geode
         }
         for( const auto v : LRange{ 4 } )
         {
-            const auto v1 = signed_volume_vertices_order[v][0];
-            const auto v2 = signed_volume_vertices_order[v][1];
-            const auto v3 = signed_volume_vertices_order[v][2];
+            const auto v1 = SIGNED_VOLUME_VERTICES_ORDER[v][0];
+            const auto v2 = SIGNED_VOLUME_VERTICES_ORDER[v][1];
+            const auto v3 = SIGNED_VOLUME_VERTICES_ORDER[v][2];
             const Vector3D edge02{ vertices[v], vertices[v2] };
             const auto edge02_length = edge02.length();
             const Vector3D edge03{ vertices[v], vertices[v3] };

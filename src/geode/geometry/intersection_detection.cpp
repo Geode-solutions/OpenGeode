@@ -35,7 +35,7 @@
 
 namespace
 {
-    static constexpr std::array< geode::POSITION, 4 > vertex_id_to_position{
+    static constexpr std::array< geode::POSITION, 4 > VERTEX_ID_TO_POSITION{
         geode::POSITION::vertex0, geode::POSITION::vertex1,
         geode::POSITION::vertex2, geode::POSITION::vertex0
     };
@@ -127,7 +127,7 @@ namespace
             {
                 result.first = seg_edge_inter.first;
                 result.second =
-                    vertex_id_to_position[seg_edge_inter.second
+                    VERTEX_ID_TO_POSITION[seg_edge_inter.second
                                                   == geode::POSITION::vertex0
                                               ? edge_v0
                                               : edge_v0 + 1];

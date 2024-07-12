@@ -38,7 +38,7 @@
 
 namespace
 {
-    static constexpr std::array< geode::HybridSolid3D::Type, 9 > types_{
+    static constexpr std::array< geode::HybridSolid3D::Type, 9 > TYPES_{
         geode::HybridSolid3D::Type::UNKNOWN,
         geode::HybridSolid3D::Type::UNKNOWN,
         geode::HybridSolid3D::Type::UNKNOWN,
