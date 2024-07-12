@@ -148,12 +148,12 @@ namespace geode
         bool inexact_equal( const Point &other ) const
         {
             double square_length{ 0 };
-            static constexpr auto sqr_epsilon = GLOBAL_EPSILON * GLOBAL_EPSILON;
+            static constexpr auto SQR_EPSILON = GLOBAL_EPSILON * GLOBAL_EPSILON;
             for( const auto i : LRange{ dimension } )
             {
                 const double diff{ other.value( i ) - this->value( i ) };
                 square_length += diff * diff;
-                if( square_length > sqr_epsilon )
+                if( square_length > SQR_EPSILON )
                 {
                     return false;
                 }
@@ -245,7 +245,7 @@ namespace geode
         explicit OpenGeodePointException(
             Point< dimension > point_in, const Args &...message )
             : OpenGeodeException{ absl::StrCat(
-                message..., " at ", point_in.string() ) },
+                  message..., " at ", point_in.string() ) },
               point{ std::move( point_in ) }
         {
         }

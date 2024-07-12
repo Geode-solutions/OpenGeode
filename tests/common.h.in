@@ -31,7 +31,7 @@
 namespace geode
 {
     /* Absolute path to test source directory */
-    static constexpr auto data_path = "@DATA_DIRECTORY@/";
+    static constexpr auto DATA_PATH = "@DATA_DIRECTORY@/";
 } // namespace geode
 
 /*!

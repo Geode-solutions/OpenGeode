@@ -41,7 +41,7 @@
 void run_test_brep()
 {
     const auto model =
-        geode::load_brep( absl::StrCat( geode::data_path, "layers.og_brep" ) );
+        geode::load_brep( absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
     const auto output =
         geode::convert_brep_into_curve_and_surface_and_solid( model );
     const auto& curve = std::get< 0 >( output );
@@ -76,7 +76,7 @@ void run_test_brep()
 void run_test_section()
 {
     const auto model =
-        geode::load_section( absl::StrCat( geode::data_path, "quad.og_sctn" ) );
+        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
 
     const auto output = geode::convert_section_into_curve_and_surface( model );
     const auto& curve = std::get< 0 >( output );

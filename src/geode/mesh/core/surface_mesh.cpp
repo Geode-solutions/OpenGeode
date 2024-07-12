@@ -266,21 +266,21 @@ namespace geode
     {
         friend class bitsery::Access;
         using CachedPolygons = CachedValue< detail::PolygonsAroundVertexImpl >;
-        static constexpr auto polygons_around_vertex_name =
+        static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
             "polygons_around_vertex";
 
     public:
         Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) ),
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) ),
               polygons_around_vertex_(
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
-                          polygons_around_vertex_name, CachedPolygons{} ) )
+                          POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
         {
         }
 
@@ -412,7 +412,7 @@ namespace geode
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolygons >(
-                        polygons_around_vertex_name, CachedPolygons{} );
+                        POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} );
         }
 
     private:

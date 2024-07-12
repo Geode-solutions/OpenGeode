@@ -201,7 +201,7 @@ void test()
     test_attributes( relationships, uuids );
 
     relationships.save_relationships( "." );
-    test_io( absl::StrCat( geode::data_path, "relationships_v12" ), uuids );
+    test_io( absl::StrCat( geode::DATA_PATH, "relationships_v12" ), uuids );
     test_io( ".", uuids );
 }
 

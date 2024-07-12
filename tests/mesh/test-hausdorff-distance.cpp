@@ -15,11 +15,11 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     const auto initial_mesh_filename =
-        absl::StrCat( geode::data_path, "Armadillo.og_tsf3d" );
+        absl::StrCat( geode::DATA_PATH, "Armadillo.og_tsf3d" );
     const auto mesh_A =
         geode::load_triangulated_surface< 3 >( initial_mesh_filename );
     const auto simplified_mesh_filename =
-        absl::StrCat( geode::data_path, "modified_Armadillo.og_tsf3d" );
+        absl::StrCat( geode::DATA_PATH, "modified_Armadillo.og_tsf3d" );
     const auto mesh_B =
         geode::load_triangulated_surface< 3 >( simplified_mesh_filename );
 

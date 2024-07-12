@@ -382,21 +382,21 @@ namespace geode
         friend class bitsery::Access;
         using CachedPolyhedra =
             CachedValue< detail::PolyhedraAroundVertexImpl >;
-        static constexpr auto polyhedra_around_vertex_name =
+        static constexpr auto POLYHEDRA_AROUND_VERTEX_NAME =
             "polyhedra_around_vertex";
 
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolyhedra >(
-                          polyhedra_around_vertex_name, CachedPolyhedra{} ) )
+                          POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} ) )
         {
         }
 
@@ -581,7 +581,7 @@ namespace geode
                 solid.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolyhedra >(
-                        polyhedra_around_vertex_name, CachedPolyhedra{} );
+                        POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} );
         }
 
         const detail::PolyhedraAroundVertexImpl&

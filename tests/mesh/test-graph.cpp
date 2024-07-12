@@ -166,7 +166,7 @@ void test()
     test_create_edges( *graph, *builder );
     test_io( *graph, absl::StrCat( "test.", graph->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v7.", graph->native_extension() ) );
+        geode::DATA_PATH, "test_v7.", graph->native_extension() ) );
 
     test_delete_edge( *graph, *builder );
     test_clone( *graph );

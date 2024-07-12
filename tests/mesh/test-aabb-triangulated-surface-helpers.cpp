@@ -85,14 +85,14 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
     const geode::DistanceToTriangle< dimension >& distance_action,
     geode::index_t size )
 {
-    constexpr auto offset = 0.2;
+    constexpr auto OFFSET = 0.2;
     geode::index_t id{ 0 };
     for( const auto i : geode::Range{ size - 1 } )
     {
         for( const auto j : geode::Range{ size - 1 } )
         {
             const auto query1 =
-                create_vertex< dimension >( i + offset, j + offset );
+                create_vertex< dimension >( i + OFFSET, j + OFFSET );
             geode::index_t triangle1;
             geode::Point< dimension > nearest_point1;
             std::tie( triangle1, nearest_point1, std::ignore ) =
@@ -103,7 +103,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
                 "[TEST] Wrong nearest point found" );
 
             const auto query2 =
-                create_vertex< dimension >( i + 1 - offset, j + 1 - offset );
+                create_vertex< dimension >( i + 1 - OFFSET, j + 1 - OFFSET );
             geode::index_t triangle2;
             geode::Point< dimension > nearest_point2;
             std::tie( triangle2, nearest_point2, std::ignore ) =

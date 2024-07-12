@@ -501,7 +501,7 @@ void test()
     test_grid( *grid );
 
     auto grid_v12 = geode::load_regular_grid< 3 >(
-        absl::StrCat( geode::data_path, "test_v12.og_rgd3d" ) );
+        absl::StrCat( geode::DATA_PATH, "test_v12.og_rgd3d" ) );
     auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
     builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
