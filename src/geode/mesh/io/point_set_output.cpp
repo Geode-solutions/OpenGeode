@@ -24,10 +24,10 @@
 #include <geode/mesh/io/point_set_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 #include <geode/basic/io.h>
@@ -40,7 +40,7 @@ namespace geode
 {
     template < index_t dimension >
     std::vector< std::string > save_point_set(
-        const PointSet< dimension >& point_set, absl::string_view filename )
+        const PointSet< dimension >& point_set, std::string_view filename )
     {
         const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
@@ -63,7 +63,7 @@ namespace geode
 
     template < index_t dimension >
     bool is_point_set_saveable(
-        const PointSet< dimension >& point_set, absl::string_view filename )
+        const PointSet< dimension >& point_set, std::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             PointSetOutputFactory< dimension > >( filename );
@@ -71,12 +71,12 @@ namespace geode
     }
 
     template std::vector< std::string > opengeode_mesh_api save_point_set(
-        const PointSet< 2 >&, absl::string_view );
+        const PointSet< 2 >&, std::string_view );
     template std::vector< std::string > opengeode_mesh_api save_point_set(
-        const PointSet< 3 >&, absl::string_view );
+        const PointSet< 3 >&, std::string_view );
 
     template bool opengeode_mesh_api is_point_set_saveable(
-        const PointSet< 2 >&, absl::string_view );
+        const PointSet< 2 >&, std::string_view );
     template bool opengeode_mesh_api is_point_set_saveable(
-        const PointSet< 3 >&, absl::string_view );
+        const PointSet< 3 >&, std::string_view );
 } // namespace geode

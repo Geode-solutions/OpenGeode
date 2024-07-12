@@ -24,10 +24,10 @@
 #include <geode/image/io/raster_image_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 
@@ -37,7 +37,7 @@ namespace geode
 {
     template < index_t dimension >
     std::vector< std::string > save_raster_image(
-        const RasterImage< dimension >& raster, absl::string_view filename )
+        const RasterImage< dimension >& raster, std::string_view filename )
     {
         const auto type = absl::StrCat( "RasterImage", dimension, "D" );
         try
@@ -58,7 +58,7 @@ namespace geode
 
     template < index_t dimension >
     bool is_raster_image_saveable(
-        const RasterImage< dimension >& raster, absl::string_view filename )
+        const RasterImage< dimension >& raster, std::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             RasterImageOutputFactory< dimension > >( filename );
@@ -66,12 +66,12 @@ namespace geode
     }
 
     template std::vector< std::string > opengeode_image_api save_raster_image(
-        const RasterImage< 2 >&, absl::string_view );
+        const RasterImage< 2 >&, std::string_view );
     template std::vector< std::string > opengeode_image_api save_raster_image(
-        const RasterImage< 3 >&, absl::string_view );
+        const RasterImage< 3 >&, std::string_view );
 
     template bool opengeode_image_api is_raster_image_saveable(
-        const RasterImage< 2 >&, absl::string_view );
+        const RasterImage< 2 >&, std::string_view );
     template bool opengeode_image_api is_raster_image_saveable(
-        const RasterImage< 3 >&, absl::string_view );
+        const RasterImage< 3 >&, std::string_view );
 } // namespace geode

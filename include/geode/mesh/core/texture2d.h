@@ -47,7 +47,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Texture( AttributeManager& manager, absl::string_view name );
+        Texture( AttributeManager& manager, std::string_view name );
         Texture( Texture&& other ) noexcept;
         ~Texture();
 

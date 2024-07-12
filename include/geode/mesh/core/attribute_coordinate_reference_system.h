@@ -45,7 +45,7 @@ namespace geode
         explicit AttributeCoordinateReferenceSystem(
             AttributeManager& manager );
         AttributeCoordinateReferenceSystem(
-            AttributeManager& manager, absl::string_view attribute_name );
+            AttributeManager& manager, std::string_view attribute_name );
         ~AttributeCoordinateReferenceSystem();
 
         static CRSType type_name_static()
@@ -62,7 +62,7 @@ namespace geode
 
         void set_point( index_t point_id, Point< dimension > point ) override;
 
-        absl::string_view attribute_name() const;
+        std::string_view attribute_name() const;
 
         index_t nb_points() const;
 

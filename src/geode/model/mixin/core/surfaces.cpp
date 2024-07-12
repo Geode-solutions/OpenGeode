@@ -91,7 +91,7 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::save_surfaces(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
         const auto prefix = absl::StrCat( directory, "/",
@@ -136,7 +136,7 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::load_surfaces(
-        absl::string_view directory, SurfacesBuilderKey )
+        std::string_view directory, SurfacesBuilderKey )
     {
         impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
         const auto mapping = impl_->file_mapping( directory );

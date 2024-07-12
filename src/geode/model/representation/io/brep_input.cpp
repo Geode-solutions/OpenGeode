@@ -23,8 +23,9 @@
 
 #include <geode/model/representation/io/brep_input.h>
 
+#include <string_view>
+
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
 #include <geode/basic/io.h>
@@ -35,7 +36,7 @@
 
 namespace geode
 {
-    BRep load_brep( absl::string_view filename )
+    BRep load_brep( std::string_view filename )
     {
         constexpr auto TYPE = "BRep";
         try
@@ -71,14 +72,14 @@ namespace geode
     }
 
     typename BRepInput::MissingFiles check_brep_missing_files(
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< BRepInputFactory >( filename );
         return input->check_missing_files();
     }
 
-    bool is_brep_loadable( absl::string_view filename )
+    bool is_brep_loadable( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< BRepInputFactory >( filename );

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -46,7 +46,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an PolyhedralSolid.
@@ -56,7 +56,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class PolyhedralSolidInput
@@ -72,7 +72,7 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        explicit PolyhedralSolidInput( absl::string_view filename )
+        explicit PolyhedralSolidInput( std::string_view filename )
             : Base{ filename }
         {
         }
@@ -80,14 +80,14 @@ namespace geode
 
     template < index_t dimension >
     typename PolyhedralSolidInput< dimension >::MissingFiles
-        check_polyhedral_solid_missing_files( absl::string_view filename );
+        check_polyhedral_solid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_polyhedral_solid_loadable( absl::string_view filename );
+    bool is_polyhedral_solid_loadable( std::string_view filename );
 
     template < index_t dimension >
     using PolyhedralSolidInputFactory = Factory< std::string,
         PolyhedralSolidInput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_3D( PolyhedralSolidInputFactory );
 } // namespace geode

@@ -29,7 +29,7 @@ namespace geode
 {
     template < index_t dimension >
     void CoordinateReferenceSystemManagerBuilder< dimension >::
-        register_coordinate_reference_system( absl::string_view name,
+        register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs )
     {
         crs_manager_.register_coordinate_reference_system(
@@ -37,15 +37,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    void CoordinateReferenceSystemManagerBuilder< dimension >::
-        delete_coordinate_reference_system( absl::string_view name )
+    void CoordinateReferenceSystemManagerBuilder<
+        dimension >::delete_coordinate_reference_system( std::string_view name )
     {
         crs_manager_.delete_coordinate_reference_system( name, {} );
     }
 
     template < index_t dimension >
     void CoordinateReferenceSystemManagerBuilder< dimension >::
-        set_active_coordinate_reference_system( absl::string_view name )
+        set_active_coordinate_reference_system( std::string_view name )
     {
         crs_manager_.set_active_coordinate_reference_system( name, {} );
     }
@@ -61,7 +61,7 @@ namespace geode
     template < index_t dimension >
     CoordinateReferenceSystem< dimension >&
         CoordinateReferenceSystemManagerBuilder<
-            dimension >::coordinate_reference_system( absl::string_view name )
+            dimension >::coordinate_reference_system( std::string_view name )
     {
         return crs_manager_.modifiable_coordinate_reference_system( name, {} );
     }

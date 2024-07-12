@@ -44,7 +44,7 @@
 namespace geode
 {
     void OpenGeodeBRepInput::load_brep_files(
-        BRep& brep, absl::string_view directory )
+        BRep& brep, std::string_view directory )
     {
         BRepBuilder builder{ brep };
         async::parallel_invoke(

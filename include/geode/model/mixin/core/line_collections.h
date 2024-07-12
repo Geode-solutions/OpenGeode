@@ -93,7 +93,7 @@ namespace geode
 
         LineCollectionRange line_collections() const;
 
-        void save_line_collections( absl::string_view directory ) const;
+        void save_line_collections( std::string_view directory ) const;
 
     protected:
         LineCollections();
@@ -127,7 +127,7 @@ namespace geode
             LineCollectionsBuilderKey key );
 
         void load_line_collections(
-            absl::string_view directory, LineCollectionsBuilderKey key );
+            std::string_view directory, LineCollectionsBuilderKey key );
 
         ModifiableLineCollectionRange modifiable_line_collections(
             LineCollectionsBuilderKey key );

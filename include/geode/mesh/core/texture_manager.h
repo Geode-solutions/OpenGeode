@@ -49,16 +49,15 @@ namespace geode
 
         index_t nb_textures() const;
 
-        Texture< dimension >& find_or_create_texture( absl::string_view name );
+        Texture< dimension >& find_or_create_texture( std::string_view name );
 
-        const Texture< dimension >& find_texture(
-            absl::string_view name ) const;
+        const Texture< dimension >& find_texture( std::string_view name ) const;
 
-        absl::FixedArray< absl::string_view > texture_names() const;
+        absl::FixedArray< std::string_view > texture_names() const;
 
-        bool texture_exists( absl::string_view name ) const;
+        bool texture_exists( std::string_view name ) const;
 
-        void delete_texture( absl::string_view name );
+        void delete_texture( std::string_view name );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

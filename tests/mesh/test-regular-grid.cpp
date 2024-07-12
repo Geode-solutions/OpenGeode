@@ -399,7 +399,7 @@ void test_clone( const geode::RegularGrid3D& grid )
     }
 }
 
-void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
+void test_io( const geode::RegularGrid3D& grid, std::string_view filename )
 {
     geode::save_regular_grid( grid, filename );
     const auto reload = geode::load_regular_grid< 3 >( filename );

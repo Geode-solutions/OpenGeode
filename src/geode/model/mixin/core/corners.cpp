@@ -84,7 +84,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Corners< dimension >::save_corners( absl::string_view directory ) const
+    void Corners< dimension >::save_corners( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/corners" ) );
         const auto prefix = absl::StrCat( directory, "/",
@@ -113,7 +113,7 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::load_corners(
-        absl::string_view directory, CornersBuilderKey )
+        std::string_view directory, CornersBuilderKey )
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );

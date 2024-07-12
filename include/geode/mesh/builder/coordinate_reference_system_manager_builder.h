@@ -43,18 +43,18 @@ namespace geode
         {
         }
 
-        void register_coordinate_reference_system( absl::string_view name,
+        void register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs );
 
-        void delete_coordinate_reference_system( absl::string_view name );
+        void delete_coordinate_reference_system( std::string_view name );
 
-        void set_active_coordinate_reference_system( absl::string_view name );
+        void set_active_coordinate_reference_system( std::string_view name );
 
         CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system();
 
         CoordinateReferenceSystem< dimension >& coordinate_reference_system(
-            absl::string_view name );
+            std::string_view name );
 
     private:
         CoordinateReferenceSystemManager< dimension >& crs_manager_;

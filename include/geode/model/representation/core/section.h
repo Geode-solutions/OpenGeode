@@ -355,13 +355,13 @@ namespace geode
          */
         BoundingBox2D bounding_box() const;
 
-        static absl::string_view native_extension_static()
+        static std::string_view native_extension_static()
         {
             static const auto extension = "og_sctn";
             return extension;
         }
 
-        absl::string_view native_extension() const
+        std::string_view native_extension() const
         {
             return native_extension_static();
         }

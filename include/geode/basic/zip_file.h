@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
+
 #include <absl/types/span.h>
 
 #include <geode/basic/common.h>
@@ -36,13 +37,12 @@ namespace geode
     {
     public:
         ZipFile(
-            absl::string_view file, absl::string_view archive_temp_filename );
+            std::string_view file, std::string_view archive_temp_filename );
         ~ZipFile();
 
-        void archive_files(
-            absl::Span< const absl::string_view >& files ) const;
+        void archive_files( absl::Span< const std::string_view >& files ) const;
 
-        void archive_file( absl::string_view file ) const;
+        void archive_file( std::string_view file ) const;
 
         std::string directory() const;
 
@@ -54,7 +54,7 @@ namespace geode
     {
     public:
         UnzipFile(
-            absl::string_view file, absl::string_view unarchive_temp_filename );
+            std::string_view file, std::string_view unarchive_temp_filename );
         ~UnzipFile();
 
         void extract_all() const;
@@ -65,5 +65,5 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
 
-    bool opengeode_basic_api is_zip_file( absl::string_view file );
+    bool opengeode_basic_api is_zip_file( std::string_view file );
 } // namespace geode

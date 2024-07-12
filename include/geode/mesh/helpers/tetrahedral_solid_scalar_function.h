@@ -52,7 +52,7 @@ namespace geode
          */
         static TetrahedralSolidScalarFunction< dimension > create(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value );
 
         /*!
@@ -62,7 +62,7 @@ namespace geode
          */
         static TetrahedralSolidScalarFunction< dimension > find(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name );
+            std::string_view function_name );
 
         void set_value( index_t vertex_index, double value );
 
@@ -74,11 +74,11 @@ namespace geode
     private:
         TetrahedralSolidScalarFunction(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name );
+            std::string_view function_name );
 
         TetrahedralSolidScalarFunction(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value );
 
     private:

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -47,7 +47,7 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface(
-            const MeshImpl& impl, absl::string_view filename );
+            const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an TriangulatedSurface.
@@ -57,7 +57,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
-        load_triangulated_surface( absl::string_view filename );
+        load_triangulated_surface( std::string_view filename );
 
     template < index_t dimension >
     class TriangulatedSurfaceInput
@@ -71,7 +71,7 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        explicit TriangulatedSurfaceInput( absl::string_view filename )
+        explicit TriangulatedSurfaceInput( std::string_view filename )
             : Base{ filename }
         {
         }
@@ -79,14 +79,14 @@ namespace geode
 
     template < index_t dimension >
     typename TriangulatedSurfaceInput< dimension >::MissingFiles
-        check_triangulated_surface_missing_files( absl::string_view filename );
+        check_triangulated_surface_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_triangulated_surface_loadable( absl::string_view filename );
+    bool is_triangulated_surface_loadable( std::string_view filename );
 
     template < index_t dimension >
     using TriangulatedSurfaceInputFactory = Factory< std::string,
         TriangulatedSurfaceInput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( TriangulatedSurfaceInputFactory );
 } // namespace geode

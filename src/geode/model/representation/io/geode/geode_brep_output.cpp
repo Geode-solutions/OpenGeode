@@ -48,7 +48,7 @@ namespace geode
     }
 
     void OpenGeodeBRepOutput::save_brep_files(
-        const BRep& brep, absl::string_view directory ) const
+        const BRep& brep, std::string_view directory ) const
     {
         async::parallel_invoke(
             [&directory, &brep] {

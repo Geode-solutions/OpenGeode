@@ -27,17 +27,17 @@
 
 namespace geode
 {
-    std::vector< absl::string_view > opengeode_basic_api string_split(
-        absl::string_view string );
+    std::vector< std::string_view > opengeode_basic_api string_split(
+        std::string_view string );
 
     bool opengeode_basic_api string_starts_with(
-        absl::string_view string, absl::string_view check );
+        std::string_view string, std::string_view check );
 
-    index_t opengeode_basic_api string_to_index( absl::string_view string );
+    index_t opengeode_basic_api string_to_index( std::string_view string );
 
-    int opengeode_basic_api string_to_int( absl::string_view string );
+    int opengeode_basic_api string_to_int( std::string_view string );
 
-    float opengeode_basic_api string_to_float( absl::string_view string );
+    float opengeode_basic_api string_to_float( std::string_view string );
 
-    double opengeode_basic_api string_to_double( absl::string_view string );
+    double opengeode_basic_api string_to_double( std::string_view string );
 } // namespace geode

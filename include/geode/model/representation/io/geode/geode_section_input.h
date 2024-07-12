@@ -31,18 +31,17 @@ namespace geode
     class opengeode_model_api OpenGeodeSectionInput final : public SectionInput
     {
     public:
-        explicit OpenGeodeSectionInput( absl::string_view filename )
+        explicit OpenGeodeSectionInput( std::string_view filename )
             : SectionInput( filename )
         {
         }
 
-        static absl::string_view extension()
+        static std::string_view extension()
         {
             return Section::native_extension_static();
         }
 
-        void load_section_files(
-            Section& section, absl::string_view directory );
+        void load_section_files( Section& section, std::string_view directory );
 
         Section read() final;
     };

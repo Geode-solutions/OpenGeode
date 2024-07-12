@@ -48,16 +48,16 @@ namespace geode
 
         const uuid& id() const;
 
-        absl::string_view name() const;
+        std::string_view name() const;
 
-        void save_identifier( absl::string_view directory ) const;
+        void save_identifier( std::string_view directory ) const;
 
     public:
         void set_id( const uuid& unique_id, IdentifierKey );
 
-        void set_name( absl::string_view name, IdentifierKey );
+        void set_name( std::string_view name, IdentifierKey );
 
-        void load_identifier( absl::string_view directory, IdentifierKey );
+        void load_identifier( std::string_view directory, IdentifierKey );
 
         void copy_identifier( const Identifier& other, IdentifierKey );
 
@@ -68,7 +68,7 @@ namespace geode
 
         void set_id( const uuid& unique_id );
 
-        void set_name( absl::string_view name );
+        void set_name( std::string_view name );
 
     private:
         template < typename Archive >

@@ -101,16 +101,14 @@ public:
     }
     ~BoxAABBEvalDistance() = default;
 
-    std::tuple< double, geode::Point< dimension > > operator()(
-        const geode::Point< dimension >& query,
+    double operator()( const geode::Point< dimension >& query,
         geode::index_t current_element_box ) const
     {
         const auto box_center =
             ( bounding_boxes_[current_element_box].min()
                 + bounding_boxes_[current_element_box].max() )
             / 2.;
-        return std::make_tuple(
-            geode::point_point_distance( box_center, query ), box_center );
+        return geode::point_point_distance( box_center, query );
     }
 
 private:
@@ -143,16 +141,12 @@ void test_nearest_neighbor_search()
             query.set_value( 0, i + box_size / 2. );
             query.set_value( 1, j + box_size / 2. );
             geode::index_t box_id;
-            geode::Point< dimension > nearest_point;
             double distance;
-            std::tie( box_id, nearest_point, distance ) =
+            std::tie( box_id, distance ) =
                 aabb.closest_element_box( query, disteval );
 
             OPENGEODE_EXCEPTION( box_id == global_box_index( i, j, nb_boxes ),
                 "[Test]  Nearest box to point AABB - Wrong nearest box index" );
-            OPENGEODE_EXCEPTION( nearest_point == box_center,
-                "[Test]  Nearest box to point AABB - Wrong nearest box "
-                "center " );
             OPENGEODE_EXCEPTION(
                 distance == geode::point_point_distance( box_center, query ),
                 "[Test]  Nearest box to point AABB - Wrong distance to nearest "
