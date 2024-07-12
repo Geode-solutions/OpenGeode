@@ -135,7 +135,7 @@ function(add_geode_library)
     )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
-        COMPONENT internal
+        COMPONENT private
         FILES_MATCHING
         PATTERN "*/internal/*"
     )
