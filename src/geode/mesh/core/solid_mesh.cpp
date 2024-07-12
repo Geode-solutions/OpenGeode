@@ -388,10 +388,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                  solid.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolyhedronVertex >(
-                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                solid.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        PolyhedronVertex >(
+                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
