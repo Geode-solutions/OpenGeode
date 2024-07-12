@@ -15,6 +15,8 @@
 
 - **PolyhedronFacetNormal**: This method now returns an optional of her previous return type 
 
+- **Basic_Objects**: Change from index_t to local_index_t in set_point methods for Triangle, Tetrahedron and Segment
+
 TODO.....
 
 
