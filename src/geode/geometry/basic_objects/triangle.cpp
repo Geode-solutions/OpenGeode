@@ -228,7 +228,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     void GenericTriangle< PointType, dimension >::set_point(
-        index_t vertex, PointType point )
+        local_index_t vertex, PointType point )
     {
         vertices_[vertex] = point;
     }
