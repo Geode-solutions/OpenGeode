@@ -57,7 +57,7 @@ namespace geode
         Impl( std::string_view file, std::string_view archive_temp_filename )
         {
             directory_ = create_directory( file, archive_temp_filename );
-            mz_zip_writer_create( &writer_ );
+            writer_ = mz_zip_writer_create();
             mz_zip_writer_set_compress_method(
                 writer_, MZ_COMPRESS_METHOD_STORE );
             const auto status = mz_zip_writer_open_file(
@@ -135,7 +135,7 @@ namespace geode
         Impl( std::string_view file, std::string_view unarchive_temp_filename )
         {
             directory_ = create_directory( file, unarchive_temp_filename );
-            mz_zip_reader_create( &reader_ );
+            reader_ = mz_zip_reader_create();
             const auto status =
                 mz_zip_reader_open_file( reader_, to_string( file ).c_str() );
             OPENGEODE_EXCEPTION(
@@ -199,8 +199,7 @@ namespace geode
 
     bool is_zip_file( std::string_view file )
     {
-        void* reader{ nullptr };
-        mz_zip_reader_create( &reader );
+        void* reader = mz_zip_reader_create();
         const auto status =
             mz_zip_reader_open_file( reader, to_string( file ).c_str() );
         mz_zip_reader_close( reader );
