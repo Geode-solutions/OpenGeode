@@ -28,28 +28,30 @@
 
 namespace geode
 {
-    std::string filename_with_extension( std::string_view path )
+    std::filesystem::path filename_with_extension(
+        const std::filesystem::path& path )
     {
-        const std::filesystem::path filepath{ to_string( path ) };
-        return filepath.filename().string();
+        return path.filename();
     }
 
-    std::string filename_without_extension( std::string_view path )
+    std::filesystem::path filename_without_extension(
+        const std::filesystem::path& path )
     {
-        const std::filesystem::path filepath{ to_string( path ) };
-        return filepath.filename().replace_extension( "" ).string();
+        return path.filename().replace_extension( "" ).string();
     }
 
-    std::string filepath_without_extension( std::string_view path )
+    std::filesystem::path filepath_without_extension(
+        const std::filesystem::path& path )
     {
-        std::filesystem::path filepath{ to_string( path ) };
-        return filepath.replace_extension( "" ).string();
+        auto filepath = path;
+        return filepath.replace_extension( "" );
     }
 
-    std::string filepath_without_filename( std::string_view path )
+    std::filesystem::path filepath_without_filename(
+        const std::filesystem::path& path )
     {
-        std::filesystem::path filepath{ to_string( path ) };
-        return filepath.replace_filename( "" ).string();
+        auto filepath = path;
+        return filepath.remove_filename();
     }
 
     std::string_view extension_from_filename( std::string_view filename )
