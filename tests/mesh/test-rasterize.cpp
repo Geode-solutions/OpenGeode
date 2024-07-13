@@ -63,7 +63,7 @@ void test_rasterize_segment(
 void test_rasterize_triangle(
     const geode::RegularGrid3D& grid, const geode::Triangle3D& triangle )
 {
-    const auto cells = geode::rasterize_triangle( grid, triangle );
+    const auto cells = geode::conservative_rasterize_triangle( grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 111, 112, 121, 122, 211,
         212, 213, 221, 222, 223, 232, 233, 242, 243, 252, 253, 313, 314, 323,
         324, 333, 334, 343, 344, 352, 353, 354, 363, 364, 373, 414, 415, 424,
@@ -82,7 +82,7 @@ void test_rasterize_triangle(
 void test_rasterize_degenerate_triangle(
     const geode::RegularGrid3D& grid, const geode::Triangle3D& triangle )
 {
-    const auto cells = geode::rasterize_triangle( grid, triangle );
+    const auto cells = geode::conservative_rasterize_triangle( grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 111, 112, 121, 122, 211,
         212, 221, 222, 223, 232, 233, 322, 323, 332, 333, 334, 343, 344, 433,
         434, 443, 444, 445, 454, 455, 544, 545, 554, 555, 556, 565, 566, 655,
@@ -143,17 +143,19 @@ void test_conservative_rasterize_triangle()
     geode::Point2D pt2{ { 2.5, 6.5 } };
     geode::Triangle2D triangle{ pt0, pt1, pt2 };
 
-    const auto cells = geode::rasterize_triangle( *grid, triangle );
+    const auto cells =
+        geode::conservative_rasterize_triangle( *grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 22, 23, 32, 33, 34, 42,
         43, 44, 45, 52, 53, 54, 55, 56, 62, 63, 64, 65, 66 };
     OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells (rasterize_triangle): ",
+        "[Test] Wrong number of result cells "
+        "(conservative_rasterize_triangle): ",
         cells.size(), " instead of ", answer.size() );
     for( const auto cell : cells )
     {
         OPENGEODE_EXCEPTION(
             answer.find( grid->cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells (rasterize_triangle)" );
+            "[Test] Wrong result cells (conservative_rasterize_triangle)" );
     }
 }
 
@@ -161,7 +163,8 @@ void add_cells( absl::flat_hash_set< geode::Grid3D::CellIndices >& set,
     const geode::RegularGrid3D& grid,
     const geode::Triangle3D& triangle )
 {
-    for( const auto& cell : geode::rasterize_triangle( grid, triangle ) )
+    for( const auto& cell :
+        geode::conservative_rasterize_triangle( grid, triangle ) )
     {
         set.insert( cell );
     }
