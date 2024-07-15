@@ -33,8 +33,6 @@
 #include <mutex>
 #include <typeinfo>
 
-#include <absl/memory/memory.h>
-
 #include <geode/basic/common.h>
 #include <geode/basic/pimpl.h>
 
