@@ -58,7 +58,7 @@ namespace geode
                            } } } );
         }
 
-        bool assignable{ true };
+        bool assignable{ false };
         bool interpolable{ false };
     };
 
