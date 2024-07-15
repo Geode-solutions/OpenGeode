@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/helpers/regular_grid_scalar_function.h>
+#include <geode/mesh/helpers/grid_scalar_function.h>
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
@@ -29,14 +29,13 @@
 #include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/helpers/private/regular_grid_shape_function.h>
+#include <geode/mesh/core/grid.h>
+#include <geode/mesh/helpers/private/grid_shape_function.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class RegularGridScalarFunction< dimension >::Impl
+    class GridScalarFunction< dimension >::Impl
     {
     public:
         Impl( const Grid< dimension >& grid,
@@ -47,7 +46,7 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 !grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
-                "Cannot create RegularGridScalarFunction: attribute with name ",
+                "Cannot create GridScalarFunction: attribute with name ",
                 function_name, " already exists." );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
@@ -61,7 +60,7 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
-                "Cannot create RegularGridScalarFunction: attribute with name",
+                "Cannot create GridScalarFunction: attribute with name",
                 function_name, " does not exist." );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
@@ -118,11 +117,11 @@ namespace geode
     };
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
-        RegularGridScalarFunction< dimension >&& ) noexcept = default;
+    GridScalarFunction< dimension >::GridScalarFunction(
+        GridScalarFunction< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
+    GridScalarFunction< dimension >::GridScalarFunction(
         const Grid< dimension >& grid,
         std::string_view function_name,
         double value )
@@ -131,36 +130,33 @@ namespace geode
     }
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
+    GridScalarFunction< dimension >::GridScalarFunction(
         const Grid< dimension >& grid, std::string_view function_name )
         : impl_{ grid, function_name }
     {
     }
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >::~RegularGridScalarFunction() =
-        default;
+    GridScalarFunction< dimension >::~GridScalarFunction() = default;
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >
-        RegularGridScalarFunction< dimension >::create(
-            const Grid< dimension >& grid,
-            std::string_view function_name,
-            double value )
+    GridScalarFunction< dimension > GridScalarFunction< dimension >::create(
+        const Grid< dimension >& grid,
+        std::string_view function_name,
+        double value )
     {
         return { grid, function_name, value };
     }
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >
-        RegularGridScalarFunction< dimension >::find(
-            const Grid< dimension >& grid, std::string_view function_name )
+    GridScalarFunction< dimension > GridScalarFunction< dimension >::find(
+        const Grid< dimension >& grid, std::string_view function_name )
     {
         return { grid, function_name };
     }
 
     template < index_t dimension >
-    void RegularGridScalarFunction< dimension >::set_value(
+    void GridScalarFunction< dimension >::set_value(
         const typename Grid< dimension >::VertexIndices& vertex_index,
         double value )
     {
@@ -168,34 +164,33 @@ namespace geode
     }
 
     template < index_t dimension >
-    void RegularGridScalarFunction< dimension >::set_value(
+    void GridScalarFunction< dimension >::set_value(
         index_t vertex_index, double value )
     {
         impl_->set_value( vertex_index, value );
     }
 
     template < index_t dimension >
-    double RegularGridScalarFunction< dimension >::value(
+    double GridScalarFunction< dimension >::value(
         const typename Grid< dimension >::VertexIndices& vertex_index ) const
     {
         return impl_->value( vertex_index );
     }
 
     template < index_t dimension >
-    double RegularGridScalarFunction< dimension >::value(
-        index_t vertex_index ) const
+    double GridScalarFunction< dimension >::value( index_t vertex_index ) const
     {
         return impl_->value( vertex_index );
     }
 
     template < index_t dimension >
-    double RegularGridScalarFunction< dimension >::value(
+    double GridScalarFunction< dimension >::value(
         const Point< dimension >& point,
         const typename Grid< dimension >::CellIndices& grid_cell_indices ) const
     {
         return impl_->value( point, grid_cell_indices );
     }
 
-    template class opengeode_mesh_api RegularGridScalarFunction< 2 >;
-    template class opengeode_mesh_api RegularGridScalarFunction< 3 >;
+    template class opengeode_mesh_api GridScalarFunction< 2 >;
+    template class opengeode_mesh_api GridScalarFunction< 3 >;
 } // namespace geode

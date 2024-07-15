@@ -1093,7 +1093,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< CellIndices< dimension > > rasterize_triangle(
+    std::vector< CellIndices< dimension > > conservative_rasterize_triangle(
         const Grid< dimension >& grid, const Triangle< dimension >& triangle )
     {
         std::array< typename Grid< dimension >::CellsAroundVertex, 3 >
@@ -1103,7 +1103,7 @@ namespace geode
         {
             vertex_cells[v] = grid.cells( vertices[v].get() );
             OPENGEODE_EXCEPTION( !vertex_cells[v].empty(),
-                "[rasterize_triangle] Triangle is not included in "
+                "[conservative_rasterize_triangle] Triangle is not included in "
                 "the given Grid" );
         }
         if( vertex_cells[0] == vertex_cells[1]
@@ -1142,9 +1142,11 @@ namespace geode
     template std::vector< CellIndices< 3 > > opengeode_mesh_api
         conservative_rasterize_segment< 3 >( const Grid3D&, const Segment3D& );
 
-    template std::vector< CellIndices< 2 > > opengeode_mesh_api
-        rasterize_triangle< 2 >( const Grid2D&, const Triangle2D& );
+    template std::vector< CellIndices< 2 > >
+        opengeode_mesh_api conservative_rasterize_triangle< 2 >(
+            const Grid2D&, const Triangle2D& );
 
-    template std::vector< CellIndices< 3 > > opengeode_mesh_api
-        rasterize_triangle< 3 >( const Grid3D&, const Triangle3D& );
+    template std::vector< CellIndices< 3 > >
+        opengeode_mesh_api conservative_rasterize_triangle< 3 >(
+            const Grid3D&, const Triangle3D& );
 } // namespace geode

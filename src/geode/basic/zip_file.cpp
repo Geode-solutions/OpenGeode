@@ -23,6 +23,7 @@
 
 #include <geode/basic/zip_file.h>
 
+#include <filesystem>
 #include <fstream>
 #include <string_view>
 
@@ -31,20 +32,18 @@
 #include <mz_zip.h>
 #include <mz_zip_rw.h>
 
-#include <ghc/filesystem.hpp>
-
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace
 {
-    ghc::filesystem::path create_directory(
+    std::filesystem::path create_directory(
         std::string_view file, std::string_view temp_filename )
     {
         const auto file_string = geode::to_string( file );
-        auto directory = ghc::filesystem::path{ file_string }.parent_path()
+        auto directory = std::filesystem::path{ file_string }.parent_path()
                          / geode::to_string( temp_filename );
-        ghc::filesystem::create_directory( directory );
+        std::filesystem::create_directory( directory );
         return directory;
     }
 } // namespace
@@ -68,7 +67,7 @@ namespace geode
 
         ~Impl()
         {
-            ghc::filesystem::remove( directory_ );
+            std::filesystem::remove( directory_ );
             const auto status = mz_zip_writer_close( writer_ );
             if( status != MZ_OK )
             {
@@ -87,12 +86,12 @@ namespace geode
 
         void archive_file( std::string_view file ) const
         {
-            const ghc::filesystem::path file_path{ to_string( file ) };
+            const std::filesystem::path file_path{ to_string( file ) };
             const auto status = mz_zip_writer_add_path(
                 writer_, file_path.string().c_str(), nullptr, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
                 "[ZipFile::archive_file] Error adding path to zip" );
-            ghc::filesystem::remove( file_path );
+            std::filesystem::remove( file_path );
         }
 
         std::string directory() const
@@ -101,7 +100,7 @@ namespace geode
         }
 
     private:
-        ghc::filesystem::path directory_;
+        std::filesystem::path directory_;
         void* writer_{ nullptr };
     };
 
@@ -144,7 +143,7 @@ namespace geode
 
         ~Impl()
         {
-            ghc::filesystem::remove_all( directory_ );
+            std::filesystem::remove_all( directory_ );
             mz_zip_reader_close( reader_ );
             mz_zip_reader_delete( &reader_ );
         }
@@ -175,7 +174,7 @@ namespace geode
         }
 
     private:
-        ghc::filesystem::path directory_;
+        std::filesystem::path directory_;
         void* reader_{ nullptr };
     };
 

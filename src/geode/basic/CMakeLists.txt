@@ -97,7 +97,6 @@ add_geode_library(
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         absl::strings
-        ghcFilesystem::ghc_filesystem
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES
         Async++
