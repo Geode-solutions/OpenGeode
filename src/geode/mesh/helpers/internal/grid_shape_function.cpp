@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/helpers/internal/regular_grid_shape_function.h>
+#include <geode/mesh/helpers/internal/grid_shape_function.h>
 
 #include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/point.h>

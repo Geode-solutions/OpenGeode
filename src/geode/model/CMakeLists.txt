@@ -179,7 +179,6 @@ add_geode_library(
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery
-        ghcFilesystem::ghc_filesystem
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh

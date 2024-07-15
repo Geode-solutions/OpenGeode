@@ -31,63 +31,63 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
 } // namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
-    class RegularGridScalarFunction
+    template < index_t dimension, index_t point_dimension = dimension >
+    class GridPointFunction
     {
     public:
-        RegularGridScalarFunction(
-            RegularGridScalarFunction< dimension >&& other ) noexcept;
-        ~RegularGridScalarFunction();
+        GridPointFunction(
+            GridPointFunction< dimension, point_dimension >&& other ) noexcept;
+        ~GridPointFunction();
 
         /*!
-         * Create a new object function from a RegularGrid, a name, and a
+         * Create a new object function from a Grid, a name, and a
          * value.
          * Throws an exception if an attribute with the same name exists.
          */
-        static RegularGridScalarFunction< dimension > create(
+        static GridPointFunction< dimension, point_dimension > create(
             const Grid< dimension >& grid,
             std::string_view function_name,
-            double value );
+            Point< point_dimension > value );
 
         /*!
          * Finds an object function that already exists in the given
-         * RegularGrid, from its given name.
+         * Grid, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static RegularGridScalarFunction< dimension > find(
+        static GridPointFunction< dimension, point_dimension > find(
             const Grid< dimension >& grid, std::string_view function_name );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
-            double value );
+            Point< point_dimension > value );
 
-        void set_value( index_t vertex_index, double value );
+        void set_value( index_t vertex_index, Point< point_dimension > value );
 
-        double value(
+        const Point< point_dimension >& value(
             const typename Grid< dimension >::VertexIndices& vertex_index )
             const;
 
-        double value( index_t vertex_index ) const;
+        const Point< point_dimension >& value( index_t vertex_index ) const;
 
-        double value( const Point< dimension >& point,
+        Point< point_dimension > value( const Point< dimension >& point,
             const typename Grid< dimension >::CellIndices& grid_cell_indices )
             const;
 
     private:
-        RegularGridScalarFunction(
+        GridPointFunction(
             const Grid< dimension >& grid, std::string_view function_name );
 
-        RegularGridScalarFunction( const Grid< dimension >& grid,
+        GridPointFunction( const Grid< dimension >& grid,
             std::string_view function_name,
-            double value );
+            Point< point_dimension > value );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( RegularGridScalarFunction );
+    ALIAS_2D_AND_3D( GridPointFunction );
 } // namespace geode

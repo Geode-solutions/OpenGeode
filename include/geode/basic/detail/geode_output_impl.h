@@ -23,12 +23,11 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <ghc/filesystem.hpp>
 
 #include <absl/strings/ascii.h>
 
@@ -61,8 +60,11 @@ namespace geode
         {
             const Timer timer;
             auto output = geode_object_output_writer< Factory >( filename );
-            ghc::filesystem::create_directories(
-                filepath_without_filename( filename ) );
+            const auto directories = filepath_without_filename( filename );
+            if( !directories.empty() )
+            {
+                std::filesystem::create_directories( directories );
+            }
             auto result = output->write( object );
             Logger::info(
                 type, " saved in ", filename, " in ", timer.duration() );

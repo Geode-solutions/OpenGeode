@@ -62,7 +62,6 @@ ExternalProject_Add(opengeode
         asyncplusplus
         bitsery
         gdal
-        ghcFilesystem
         minizip
         nanoflann
         spdlog
@@ -81,7 +80,6 @@ add_custom_target(download
         abseil-download
         asyncplusplus-download
         bitsery-download
-        ghcFilesystem-download
         gdal-download
         minizip-download
         nanoflann-download

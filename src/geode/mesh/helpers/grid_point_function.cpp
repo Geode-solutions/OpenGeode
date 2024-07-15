@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/helpers/regular_grid_point_function.h>
+#include <geode/mesh/helpers/grid_point_function.h>
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
@@ -29,14 +29,13 @@
 #include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/helpers/internal/regular_grid_shape_function.h>
+#include <geode/mesh/core/grid.h>
+#include <geode/mesh/helpers/internal/grid_shape_function.h>
 
 namespace geode
 {
     template < index_t dimension, index_t point_dimension >
-    class RegularGridPointFunction< dimension, point_dimension >::Impl
+    class GridPointFunction< dimension, point_dimension >::Impl
     {
     public:
         Impl( const Grid< dimension >& grid,
@@ -47,7 +46,7 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 !grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
-                "Cannot create RegularGridPointFunction: attribute with name ",
+                "Cannot create GridPointFunction: attribute with name ",
                 function_name, " already exists." );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
@@ -62,7 +61,7 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
-                "Cannot create RegularGridPointFunction: attribute with name",
+                "Cannot create GridPointFunction: attribute with name",
                 function_name, " does not exist." );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
@@ -108,7 +107,7 @@ namespace geode
                 point_value += function_attribute_->value( grid_.vertex_index(
                                    grid_.cell_vertex_indices(
                                        grid_cell_indices, node_id ) ) )
-                               * internal::shape_function_value< dimension >(
+                               * detail::shape_function_value< dimension >(
                                    grid_cell_indices, node_id, point_in_grid );
             }
             return point_value;
@@ -121,14 +120,12 @@ namespace geode
     };
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension, point_dimension >::
-        RegularGridPointFunction( RegularGridPointFunction< dimension,
-            point_dimension >&& ) noexcept = default;
+    GridPointFunction< dimension, point_dimension >::GridPointFunction(
+        GridPointFunction< dimension, point_dimension >&& ) noexcept = default;
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension,
-        point_dimension >::RegularGridPointFunction( const Grid< dimension >&
-                                                         grid,
+    GridPointFunction< dimension, point_dimension >::GridPointFunction(
+        const Grid< dimension >& grid,
         std::string_view function_name,
         Point< point_dimension > value )
         : impl_{ grid, function_name, value }
@@ -136,21 +133,19 @@ namespace geode
     }
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension,
-        point_dimension >::RegularGridPointFunction( const Grid< dimension >&
-                                                         grid,
-        std::string_view function_name )
+    GridPointFunction< dimension, point_dimension >::GridPointFunction(
+        const Grid< dimension >& grid, std::string_view function_name )
         : impl_{ grid, function_name }
     {
     }
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension,
-        point_dimension >::~RegularGridPointFunction() = default;
+    GridPointFunction< dimension, point_dimension >::~GridPointFunction() =
+        default;
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension, point_dimension >
-        RegularGridPointFunction< dimension, point_dimension >::create(
+    GridPointFunction< dimension, point_dimension >
+        GridPointFunction< dimension, point_dimension >::create(
             const Grid< dimension >& grid,
             std::string_view function_name,
             Point< point_dimension > value )
@@ -159,15 +154,15 @@ namespace geode
     }
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension, point_dimension >
-        RegularGridPointFunction< dimension, point_dimension >::find(
+    GridPointFunction< dimension, point_dimension >
+        GridPointFunction< dimension, point_dimension >::find(
             const Grid< dimension >& grid, std::string_view function_name )
     {
         return { grid, function_name };
     }
 
     template < index_t dimension, index_t point_dimension >
-    void RegularGridPointFunction< dimension, point_dimension >::set_value(
+    void GridPointFunction< dimension, point_dimension >::set_value(
         const typename Grid< dimension >::VertexIndices& vertex_index,
         Point< point_dimension > value )
     {
@@ -175,7 +170,7 @@ namespace geode
     }
 
     template < index_t dimension, index_t point_dimension >
-    void RegularGridPointFunction< dimension, point_dimension >::set_value(
+    void GridPointFunction< dimension, point_dimension >::set_value(
         index_t vertex_index, Point< point_dimension > value )
     {
         impl_->set_value( vertex_index, value );
@@ -183,7 +178,7 @@ namespace geode
 
     template < index_t dimension, index_t point_dimension >
     const Point< point_dimension >&
-        RegularGridPointFunction< dimension, point_dimension >::value(
+        GridPointFunction< dimension, point_dimension >::value(
             const typename Grid< dimension >::VertexIndices& vertex_index )
             const
     {
@@ -192,22 +187,22 @@ namespace geode
 
     template < index_t dimension, index_t point_dimension >
     const Point< point_dimension >&
-        RegularGridPointFunction< dimension, point_dimension >::value(
+        GridPointFunction< dimension, point_dimension >::value(
             index_t vertex_index ) const
     {
         return impl_->value( vertex_index );
     }
 
     template < index_t dimension, index_t point_dimension >
-    Point< point_dimension > RegularGridPointFunction< dimension,
+    Point< point_dimension > GridPointFunction< dimension,
         point_dimension >::value( const Point< dimension >& point,
         const typename Grid< dimension >::CellIndices& grid_cell_indices ) const
     {
         return impl_->value( point, grid_cell_indices );
     }
 
-    template class opengeode_mesh_api RegularGridPointFunction< 2, 2 >;
-    template class opengeode_mesh_api RegularGridPointFunction< 2, 1 >;
-    template class opengeode_mesh_api RegularGridPointFunction< 3, 2 >;
-    template class opengeode_mesh_api RegularGridPointFunction< 3, 3 >;
+    template class opengeode_mesh_api GridPointFunction< 2, 2 >;
+    template class opengeode_mesh_api GridPointFunction< 2, 1 >;
+    template class opengeode_mesh_api GridPointFunction< 3, 2 >;
+    template class opengeode_mesh_api GridPointFunction< 3, 3 >;
 } // namespace geode

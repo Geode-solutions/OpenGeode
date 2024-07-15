@@ -44,7 +44,7 @@ namespace geode
             if( object.name() == Identifier::DEFAULT_NAME )
             {
                 IdentifierBuilder{ object }.set_name(
-                    filename_without_extension( filename ) );
+                    filename_without_extension( filename ).string() );
             }
         }
 
@@ -55,7 +55,7 @@ namespace geode
             if( object->name() == Identifier::DEFAULT_NAME )
             {
                 IdentifierBuilder{ *object }.set_name(
-                    filename_without_extension( filename ) );
+                    filename_without_extension( filename ).string() );
             }
         }
 
