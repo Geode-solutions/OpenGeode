@@ -23,21 +23,23 @@
 
 #pragma once
 
+#include <filesystem>
+
 #include <geode/basic/common.h>
 
 namespace geode
 {
-    std::string opengeode_basic_api filename_with_extension(
-        std::string_view path );
+    std::filesystem::path opengeode_basic_api filename_with_extension(
+        const std::filesystem::path& path );
 
-    std::string opengeode_basic_api filename_without_extension(
-        std::string_view path );
+    std::filesystem::path opengeode_basic_api filename_without_extension(
+        const std::filesystem::path& path );
 
-    std::string opengeode_basic_api filepath_without_extension(
-        std::string_view path );
+    std::filesystem::path opengeode_basic_api filepath_without_extension(
+        const std::filesystem::path& path );
 
-    std::string opengeode_basic_api filepath_without_filename(
-        std::string_view path );
+    std::filesystem::path opengeode_basic_api filepath_without_filename(
+        const std::filesystem::path& path );
 
     std::string_view opengeode_basic_api extension_from_filename(
         std::string_view filename );

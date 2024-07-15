@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 #include <memory>
 
@@ -30,8 +31,6 @@
 #include <absl/strings/match.h>
 
 #include <bitsery/ext/std_map.h>
-
-#include <ghc/filesystem.hpp>
 
 #include <geode/basic/bitsery_archive.h>
 
@@ -113,7 +112,7 @@ namespace geode
 
             void load_components( std::string_view filename )
             {
-                if( !ghc::filesystem::exists( to_string( filename ) ) )
+                if( !std::filesystem::exists( to_string( filename ) ) )
                 {
                     return;
                 }
@@ -138,7 +137,7 @@ namespace geode
                 std::string_view directory ) const
             {
                 absl::flat_hash_map< std::string, std::string > mapping;
-                for( const auto& file : ghc::filesystem::directory_iterator(
+                for( const auto& file : std::filesystem::directory_iterator(
                          to_string( directory ) ) )
                 {
                     auto path = file.path();

@@ -49,8 +49,9 @@ namespace geode
             const Segment< dimension >& segment );
 
     template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices > rasterize_triangle(
-        const Grid< dimension >& grid, const Triangle< dimension >& triangle );
+    std::vector< typename Grid< dimension >::CellIndices >
+        conservative_rasterize_triangle( const Grid< dimension >& grid,
+            const Triangle< dimension >& triangle );
 
     std::vector< typename Grid3D::CellIndices >
         opengeode_mesh_api rasterize_tetrahedron(
