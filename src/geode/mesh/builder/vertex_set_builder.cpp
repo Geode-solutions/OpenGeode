@@ -42,6 +42,12 @@ namespace geode
             mesh );
     }
 
+    void VertexSetBuilder::copy(
+        const VertexSet& vertex_set, VertexSetKey /*unused*/ )
+    {
+        copy( vertex_set );
+    }
+
     void VertexSetBuilder::copy( const VertexSet& vertex_set )
     {
         OPENGEODE_EXCEPTION( vertex_set_.nb_vertices() == 0,
