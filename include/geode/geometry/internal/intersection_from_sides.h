@@ -23,11 +23,11 @@
 
 #pragma once
 
-#include <geode/geometry/private/predicates.h>
+#include <geode/geometry/internal/predicates.h>
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         inline Position segment_intersection_detection(
             const Side& s0, const Side& s1 )
@@ -96,5 +96,5 @@ namespace geode
             }
             return Position::outside;
         }
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

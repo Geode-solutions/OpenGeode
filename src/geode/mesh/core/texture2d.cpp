@@ -30,18 +30,18 @@
 
 #include <geode/image/core/raster_image.h>
 
-#include <geode/mesh/core/private/texture_impl.h>
+#include <geode/mesh/core/internal/texture_impl.h>
 
 namespace geode
 {
-    class Texture< 2 >::Impl : public detail::TextureImpl< 2 >
+    class Texture< 2 >::Impl : public internal::TextureImpl< 2 >
     {
         friend class bitsery::Access;
 
     public:
         Impl() = default;
         Impl( AttributeManager& manager, std::string_view name )
-            : detail::TextureImpl< 2 >{ manager, name }
+            : internal::TextureImpl< 2 >{ manager, name }
         {
         }
 
@@ -62,11 +62,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< detail::TextureImpl< 2 > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass< internal::TextureImpl< 2 > >{} );
+            } } } );
         }
     };
 

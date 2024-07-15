@@ -34,7 +34,7 @@ function(add_geode_library)
     cmake_parse_arguments(GEODE_LIB
         "STATIC"
         "NAME;FOLDER"
-        "PUBLIC_HEADERS;ADVANCED_HEADERS;PRIVATE_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
+        "PUBLIC_HEADERS;ADVANCED_HEADERS;INTERNAL_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
         ${ARGN}
     )
     foreach(file ${GEODE_LIB_SOURCES})
@@ -52,8 +52,8 @@ function(add_geode_library)
             "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
         )
     endforeach()
-    foreach(file ${GEODE_LIB_PRIVATE_HEADERS})
-        list(APPEND ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS
+    foreach(file ${GEODE_LIB_INTERNAL_HEADERS})
+        list(APPEND ABSOLUTE_GEODE_LIB_INTERNAL_HEADERS
             "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
         )
     endforeach()
@@ -74,14 +74,14 @@ function(add_geode_library)
             "${ABSOLUTE_GEODE_LIB_SOURCES}"
             "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
-            "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
+            "${ABSOLUTE_GEODE_LIB_INTERNAL_HEADERS}"
         )
     else()
         add_library(${GEODE_LIB_NAME}  
             "${ABSOLUTE_GEODE_LIB_SOURCES}"
             "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
-            "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
+            "${ABSOLUTE_GEODE_LIB_INTERNAL_HEADERS}"
         )
         if(CMAKE_STRIP AND BUILD_SHARED_LIBS AND CMAKE_BUILD_TYPE STREQUAL "Release")
             add_custom_command(TARGET ${GEODE_LIB_NAME} 
@@ -106,7 +106,7 @@ function(add_geode_library)
     )
     source_group("Public Header Files" FILES "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}")
     source_group("Advanced Header Files" FILES "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}")
-    source_group("Private Header Files" FILES "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}")
+    source_group("Internal Header Files" FILES "${ABSOLUTE_GEODE_LIB_INTERNAL_HEADERS}")
     source_group("Source Files" FILES "${ABSOLUTE_GEODE_LIB_SOURCES}")
     target_include_directories(${GEODE_LIB_NAME}
         PUBLIC
@@ -131,13 +131,13 @@ function(add_geode_library)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
         COMPONENT public
-        PATTERN "*/private" EXCLUDE
+        PATTERN "*/internal" EXCLUDE
     )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
         COMPONENT private
         FILES_MATCHING
-        PATTERN "*/private/*"
+        PATTERN "*/internal/*"
     )
     if(MSVC AND BUILD_SHARED_LIBS AND NOT ${GEODE_LIB_STATIC})
         install(FILES $<TARGET_PDB_FILE:${GEODE_LIB_NAME}> 

@@ -32,8 +32,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/core/private/grid_impl.h>
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/grid_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 
 namespace
@@ -51,14 +51,14 @@ namespace
 
 namespace geode
 {
-    class OpenGeodeRegularGrid< 3 >::Impl : public detail::PointsImpl< 3 >,
-                                            public detail::GridImpl< 3 >
+    class OpenGeodeRegularGrid< 3 >::Impl : public internal::PointsImpl< 3 >,
+                                            public internal::GridImpl< 3 >
     {
         friend class bitsery::Access;
 
     public:
         Impl( OpenGeodeRegularGrid< 3 >& mesh )
-            : detail::PointsImpl< 3 >( mesh )
+            : internal::PointsImpl< 3 >( mesh )
         {
         }
 
@@ -128,13 +128,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< detail::PointsImpl< 3 > >{} );
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< detail::GridImpl< 3 > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass< internal::PointsImpl< 3 > >{} );
+                a.ext( impl,
+                    bitsery::ext::BaseClass< internal::GridImpl< 3 > >{} );
+            } } } );
         }
     };
 

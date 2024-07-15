@@ -593,7 +593,7 @@ namespace GEO
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         inline Side side( const GEO::Sign& sign )
         {
@@ -620,5 +620,5 @@ namespace geode
             }
             return Side::zero;
         }
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

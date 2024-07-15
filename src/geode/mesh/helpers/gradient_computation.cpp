@@ -33,7 +33,7 @@
 
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/private/grid_shape_function.h>
+#include <geode/mesh/helpers/internal/grid_shape_function.h>
 
 namespace
 {
