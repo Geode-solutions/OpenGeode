@@ -383,8 +383,8 @@ namespace geode
     {
         friend class bitsery::Access;
         using CachedPolyhedra =
-            CachedValue< internal::POLYHEDRA_AROUND_VERTEX_NAME >;
-        static constexpr auto polyhedra_around_vertex_name =
+            CachedValue< internal::PolyhedraAroundVertexImpl >;
+        static constexpr auto POLYHEDRA_AROUND_VERTEX_NAME =
 
             "polyhedra_around_vertex";
 
