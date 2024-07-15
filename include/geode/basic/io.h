@@ -23,8 +23,9 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/common.h>
 #include <geode/basic/filename.h>
@@ -37,13 +38,13 @@ namespace geode
     public:
         virtual ~IOFile() = default;
 
-        absl::string_view filename() const
+        std::string_view filename() const
         {
             return filename_;
         }
 
     protected:
-        IOFile( absl::string_view filename )
+        IOFile( std::string_view filename )
             : filename_( expand_predefined_folders( filename ) )
         {
         }
@@ -53,7 +54,7 @@ namespace geode
     };
 
     template < typename Factory >
-    void print_available_extensions( absl::string_view type )
+    void print_available_extensions( std::string_view type )
     {
         auto message = absl::StrCat( "Available ", type, " extensions:" );
         for( const auto& extension : Factory::list_creators() )

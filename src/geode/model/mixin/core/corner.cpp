@@ -24,10 +24,9 @@
 #include <geode/model/mixin/core/corner.h>
 
 #include <memory>
+#include <string_view>
 
 #include <bitsery/ext/inheritance.h>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
@@ -114,7 +113,7 @@ namespace geode
 
     template < index_t dimension >
     void Corner< dimension >::set_corner_name(
-        absl::string_view name, CornersBuilderKey /*unused*/ )
+        std::string_view name, CornersBuilderKey /*unused*/ )
     {
         this->set_name( name );
     }

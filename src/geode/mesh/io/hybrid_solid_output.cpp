@@ -24,10 +24,10 @@
 #include <geode/mesh/io/hybrid_solid_output.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
 #include <geode/basic/io.h>
@@ -41,7 +41,7 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_hybrid_solid(
         const HybridSolid< dimension >& hybrid_solid,
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
@@ -64,7 +64,7 @@ namespace geode
 
     template < index_t dimension >
     bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             HybridSolidOutputFactory< dimension > >( filename );
@@ -72,8 +72,8 @@ namespace geode
     }
 
     template std::vector< std::string > opengeode_mesh_api save_hybrid_solid(
-        const HybridSolid< 3 >&, absl::string_view );
+        const HybridSolid< 3 >&, std::string_view );
 
     template bool opengeode_mesh_api is_hybrid_solid_saveable(
-        const HybridSolid< 3 >&, absl::string_view );
+        const HybridSolid< 3 >&, std::string_view );
 } // namespace geode

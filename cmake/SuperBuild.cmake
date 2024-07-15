@@ -51,7 +51,6 @@ include(ExternalProject)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureAbseil.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureAsync++.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureBitsery.cmake)
-include(${PROJECT_SOURCE_DIR}/cmake/ConfigureFilesystem.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureMinizip.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureNanoflann.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureSpdlog.cmake)
@@ -64,8 +63,6 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
-
-install(DIRECTORY ${OpenGeode_PATH_INSTALL}/ DESTINATION .)
 
 #------------------------------------------------------------------------------------------------
 # Configure CPack

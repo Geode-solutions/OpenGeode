@@ -39,7 +39,7 @@ namespace geode
     {
     public:
         Impl( const TriangulatedSurface< dimension >& surface,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value )
             : surface_( surface )
         {
@@ -56,7 +56,7 @@ namespace geode
         }
 
         Impl( const TriangulatedSurface< dimension >& surface,
-            absl::string_view function_name )
+            std::string_view function_name )
             : surface_( surface )
         {
             OPENGEODE_EXCEPTION(
@@ -114,7 +114,7 @@ namespace geode
     TriangulatedSurfaceScalarFunction< dimension >::
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& surface,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value )
         : impl_{ surface, function_name, value }
     {
@@ -124,7 +124,7 @@ namespace geode
     TriangulatedSurfaceScalarFunction< dimension >::
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& surface,
-            absl::string_view function_name )
+            std::string_view function_name )
         : impl_{ surface, function_name }
     {
     }
@@ -137,7 +137,7 @@ namespace geode
     TriangulatedSurfaceScalarFunction< dimension >
         TriangulatedSurfaceScalarFunction< dimension >::create(
             const TriangulatedSurface< dimension >& surface,
-            absl::string_view function_name,
+            std::string_view function_name,
             double value )
     {
         return { surface, function_name, value };
@@ -147,7 +147,7 @@ namespace geode
     TriangulatedSurfaceScalarFunction< dimension >
         TriangulatedSurfaceScalarFunction< dimension >::find(
             const TriangulatedSurface< dimension >& surface,
-            absl::string_view function_name )
+            std::string_view function_name )
     {
         return { surface, function_name };
     }

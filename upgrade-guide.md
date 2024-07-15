@@ -12,9 +12,17 @@
 - **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
 
 - **convert_to_mesh**: conversions from BRep and Section to meshes now return tuples with mesh and mappings.
+- **String_View**: Replace absl::string_view by is equivalent in C++17 std::string_view.
+
+- **PolyhedronFacetNormal**: This method now returns an optional of her previous return type 
+
+TODO.....
+
+
 
 - **C++**: upgrade from C++ standard requirment from C++11 to C++17
 
+- **Constructors**: Most single-parameter constructors have been set to "explicit", meaning their class cannot be constructed implicitely, also avoiding implicit conversions between the types. This change should mainly affect the construction of `Point<dimension>`, `Vector<dimension>`, `PolygonVertex` and `PolygonEdge`.
 
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 

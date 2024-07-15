@@ -52,14 +52,14 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::load_corner_collections(
-        absl::string_view directory )
+        std::string_view directory )
     {
         return corner_collections_.load_corner_collections( directory, {} );
     }
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::set_corner_collection_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         corner_collections_.modifiable_corner_collection( id, {} )
             .set_corner_collection_name( name, {} );

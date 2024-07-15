@@ -45,14 +45,14 @@ namespace geode
     void create_edged_curve_coordinate_system(
         const EdgedCurve< dimension >& mesh,
         EdgedCurveBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output );
 
     template < index_t dimension >
     void create_point_set_coordinate_system( const PointSet< dimension >& mesh,
         PointSetBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output );
 
@@ -60,7 +60,7 @@ namespace geode
     void create_surface_mesh_coordinate_system(
         const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output );
 
@@ -68,7 +68,7 @@ namespace geode
     void create_solid_mesh_coordinate_system(
         const SolidMesh< dimension >& mesh,
         SolidMeshBuilder< dimension >& builder,
-        absl::string_view new_coordinate_system_name,
+        std::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output );
 } // namespace geode

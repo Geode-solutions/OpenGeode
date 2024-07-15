@@ -39,7 +39,7 @@
         "load_hybrid_solid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< HybridSolid< dimension > > ( * )(        \
-            absl::string_view ) >( &load_hybrid_solid< dimension > ) );        \
+            std::string_view ) >( &load_hybrid_solid< dimension > ) );         \
     const auto check##dimension = "check_hybrid_solid_missing_files"           \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

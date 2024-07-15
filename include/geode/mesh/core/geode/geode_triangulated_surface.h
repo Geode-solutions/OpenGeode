@@ -73,14 +73,14 @@ namespace geode
             return TriangulatedSurface< dimension >::type_name_static();
         }
 
-        static absl::string_view native_extension_static()
+        static std::string_view native_extension_static()
         {
             static const auto extension =
                 absl::StrCat( "og_tsf", dimension, "d" );
             return extension;
         }
 
-        absl::string_view native_extension() const override
+        std::string_view native_extension() const override
         {
             return native_extension_static();
         }

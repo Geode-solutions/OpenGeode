@@ -423,13 +423,6 @@ namespace geode
         double polyhedron_volume( index_t polyhedron_id ) const;
 
         /*!
-         * Return the normal of a given PolyhedronFacet.
-         * @param[in] polyhedron_facet Local index of facet in polyhedron.
-         */
-        Vector3D OPENGEODE_MESH_DEPRECATED polyhedron_facet_normal(
-            const PolyhedronFacet& polyhedron_facet ) const;
-
-        /*!
          * Return the area of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
@@ -440,7 +433,7 @@ namespace geode
          * Return the normal of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        std::optional< Vector3D > new_polyhedron_facet_normal(
+        std::optional< Vector3D > polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!

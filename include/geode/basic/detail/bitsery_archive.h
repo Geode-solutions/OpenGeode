@@ -36,7 +36,7 @@ namespace
 {
     template < typename Serializer, typename Type >
     void register_attribute_type_for_all_containers(
-        geode::PContext& context, absl::string_view name )
+        geode::PContext& context, std::string_view name )
     {
         geode::AttributeManager::register_attribute_type< std::vector< Type >,
             Serializer >( context, absl::StrCat( "vector_", name ) );

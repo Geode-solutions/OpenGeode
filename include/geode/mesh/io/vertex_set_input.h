@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
-        const MeshImpl& impl, absl::string_view filename );
+        const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an VertexSet.
@@ -54,28 +54,27 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
-        absl::string_view filename );
+        std::string_view filename );
 
     class VertexSetInput
         : public Input< std::unique_ptr< VertexSet >, MeshImpl >
     {
     public:
         using Base = Input< std::unique_ptr< VertexSet >, MeshImpl >;
-        using Base::InputData;
-        using Base::MissingFiles;
+        using typename Base::InputData;
+        using typename Base::MissingFiles;
 
     protected:
-        explicit VertexSetInput( absl::string_view filename ) : Base{ filename }
+        explicit VertexSetInput( std::string_view filename ) : Base{ filename }
         {
         }
     };
 
     typename VertexSetInput::MissingFiles opengeode_mesh_api
-        check_vertex_set_missing_files( absl::string_view filename );
+        check_vertex_set_missing_files( std::string_view filename );
 
-    bool opengeode_mesh_api is_vertex_set_loadable(
-        absl::string_view filename );
+    bool opengeode_mesh_api is_vertex_set_loadable( std::string_view filename );
 
     using VertexSetInputFactory =
-        Factory< std::string, VertexSetInput, absl::string_view >;
+        Factory< std::string, VertexSetInput, std::string_view >;
 } // namespace geode

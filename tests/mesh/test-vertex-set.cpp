@@ -69,7 +69,7 @@ void test_delete_vertex(
         "[Test] VertexSet should have 5 vertices" );
 }
 
-void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
+void test_io( const geode::VertexSet& vertex_set, std::string_view filename )
 {
     geode::save_vertex_set( vertex_set, filename );
     geode::load_vertex_set( filename );
