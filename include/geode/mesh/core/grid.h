@@ -61,10 +61,6 @@ namespace geode
 
         ~Grid();
 
-        OPENGEODE_MESH_DEPRECATED const Point< dimension >&
-            origin() const; /* Access the origin through the grid
-                                                        coordinate system*/
-
         const CoordinateSystem< dimension >& grid_coordinate_system() const;
 
         local_index_t nb_cell_vertices() const
