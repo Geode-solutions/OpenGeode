@@ -60,11 +60,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > >
-        DistanceToTriangle< dimension >::operator()(
-            const Point< dimension >& query, index_t cur_box ) const
+    double DistanceToTriangle< dimension >::operator()(
+        const Point< dimension >& query, index_t cur_box ) const
     {
-        return point_triangle_distance( query, mesh_.triangle( cur_box ) );
+        return std::get< 0 >(
+            point_triangle_distance( query, mesh_.triangle( cur_box ) ) );
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(

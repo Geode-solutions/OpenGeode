@@ -24,10 +24,10 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include <typeinfo>
 
 #include <absl/container/flat_hash_map.h>
-#include <absl/strings/string_view.h>
 
 #include <bitsery/bitsery.h>
 #include <bitsery/brief_syntax.h>
@@ -73,9 +73,9 @@ namespace geode
 
         virtual local_index_t nb_items() const = 0;
 
-        virtual absl::string_view type() = 0;
+        virtual std::string_view type() = 0;
 
-        absl::string_view name() const
+        std::string_view name() const
         {
             return name_;
         }
@@ -91,7 +91,7 @@ namespace geode
         }
 
     public:
-        void set_name( absl::string_view name, AttributeKey )
+        void set_name( std::string_view name, AttributeKey )
         {
             name_ = to_string( name );
         }
@@ -172,7 +172,7 @@ namespace geode
     public:
         virtual const T& value( index_t element ) const = 0;
 
-        absl::string_view type() final
+        std::string_view type() final
         {
             return typeid( T ).name();
         }

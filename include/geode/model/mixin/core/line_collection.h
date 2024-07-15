@@ -72,7 +72,7 @@ namespace geode
         LineCollection( LineCollectionsKey ) : LineCollection() {}
 
         void set_line_collection_name(
-            absl::string_view name, LineCollectionsBuilderKey )
+            std::string_view name, LineCollectionsBuilderKey )
         {
             this->set_name( name );
         }

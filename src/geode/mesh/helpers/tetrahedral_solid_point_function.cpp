@@ -39,7 +39,7 @@ namespace geode
     {
     public:
         Impl( const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             Point< point_dimension > value )
             : solid_( solid )
         {
@@ -57,7 +57,7 @@ namespace geode
         }
 
         Impl( const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name )
+            std::string_view function_name )
             : solid_( solid )
         {
             OPENGEODE_EXCEPTION(
@@ -120,7 +120,7 @@ namespace geode
     TetrahedralSolidPointFunction< dimension, point_dimension >::
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             Point< point_dimension > value )
         : impl_{ solid, function_name, value }
     {
@@ -130,7 +130,7 @@ namespace geode
     TetrahedralSolidPointFunction< dimension, point_dimension >::
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name )
+            std::string_view function_name )
         : impl_{ solid, function_name }
     {
     }
@@ -145,7 +145,7 @@ namespace geode
     TetrahedralSolidPointFunction< dimension, point_dimension >
         TetrahedralSolidPointFunction< dimension, point_dimension >::create(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
+            std::string_view function_name,
             Point< point_dimension > value )
     {
         return { solid, function_name, value };
@@ -155,7 +155,7 @@ namespace geode
     TetrahedralSolidPointFunction< dimension, point_dimension >
         TetrahedralSolidPointFunction< dimension, point_dimension >::find(
             const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name )
+            std::string_view function_name )
     {
         return { solid, function_name };
     }

@@ -41,9 +41,9 @@ namespace geode
     class LineCollectionsBuilder
     {
     public:
-        void load_line_collections( absl::string_view directory );
+        void load_line_collections( std::string_view directory );
 
-        void set_line_collection_name( const uuid& id, absl::string_view name );
+        void set_line_collection_name( const uuid& id, std::string_view name );
 
     protected:
         explicit LineCollectionsBuilder(

@@ -23,36 +23,37 @@
 
 #include <geode/basic/file.h>
 
+#include <filesystem>
 #include <fstream>
-
-#include <ghc/filesystem.hpp>
+#include <string_view>
 
 #include <absl/strings/match.h>
+#include <absl/strings/str_cat.h>
 
 #include <geode/basic/logger.h>
 #include <geode/basic/string.h>
 
 namespace geode
 {
-    bool file_exists( absl::string_view file_path )
+    bool file_exists( std::string_view file_path )
     {
-        return ghc::filesystem::exists( to_string( file_path ) );
+        return std::filesystem::exists( to_string( file_path ) );
     }
 
-    bool line_starts_with( std::ifstream& file, absl::string_view check )
+    bool line_starts_with( std::ifstream& file, std::string_view check )
     {
         std::string line;
         std::getline( file, line );
         return string_starts_with( line, check );
     }
 
-    void check_keyword( std::ifstream& file, absl::string_view keyword )
+    void check_keyword( std::ifstream& file, std::string_view keyword )
     {
         OPENGEODE_EXCEPTION( line_starts_with( file, keyword ),
             absl::StrCat( "Line should starts with \"", keyword, "\"" ) );
     }
 
-    std::string goto_keyword( std::ifstream& file, absl::string_view word )
+    std::string goto_keyword( std::ifstream& file, std::string_view word )
     {
         std::string line;
         while( std::getline( file, line ) )
@@ -69,7 +70,7 @@ namespace geode
     }
 
     std::string goto_keywords(
-        std::ifstream& file, absl::Span< const absl::string_view > words )
+        std::ifstream& file, absl::Span< const std::string_view > words )
     {
         std::string line;
         while( std::getline( file, line ) )
@@ -89,7 +90,7 @@ namespace geode
     }
 
     std::optional< std::string > goto_keyword_if_it_exists(
-        std::ifstream& file, absl::string_view word )
+        std::ifstream& file, std::string_view word )
     {
         std::optional< std::string > line{ std::in_place };
         while( std::getline( file, line.value() ) )
@@ -107,7 +108,7 @@ namespace geode
     }
 
     std::optional< std::string > next_keyword_if_it_exists(
-        std::ifstream& file, absl::string_view word )
+        std::ifstream& file, std::string_view word )
     {
         std::optional< std::string > line{ std::in_place };
         const auto previous_position = file.tellg();

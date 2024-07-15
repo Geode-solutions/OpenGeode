@@ -442,13 +442,13 @@ void test_normals()
 
     const geode::Point3D answer_facet_normal{ { 0, 0, 1 } };
     const auto polyhedron_facet_normal0 =
-        polyhedral_solid->new_polyhedron_facet_normal( { 0, 1 } ).value();
+        polyhedral_solid->polyhedron_facet_normal( { 0, 1 } ).value();
     OPENGEODE_EXCEPTION( polyhedron_facet_normal0 == answer_facet_normal,
         "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (0, "
         "1)" );
 
     const auto polyhedron_facet_normal1 =
-        polyhedral_solid->new_polyhedron_facet_normal( { 1, 1 } ).value();
+        polyhedral_solid->polyhedron_facet_normal( { 1, 1 } ).value();
     OPENGEODE_EXCEPTION( polyhedron_facet_normal1 == answer_facet_normal * -1.,
         "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (1, "
         "1)" );

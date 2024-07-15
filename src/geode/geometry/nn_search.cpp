@@ -60,8 +60,8 @@ namespace geode
             const Point< dimension >& point,
             const double threshold_distance ) const
         {
-            std::vector< std::pair< index_t, double > > results;
-            nanoflann::SearchParams params;
+            std::vector< nanoflann::ResultItem< index_t, double > > results;
+            nanoflann::SearchParameters params;
             params.sorted = true;
             const auto nb_results = nn_tree_.radiusSearch( &copy( point )[0],
                 threshold_distance * threshold_distance, results, params );

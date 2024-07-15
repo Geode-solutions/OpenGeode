@@ -32,7 +32,7 @@ class MeshTest : public geode::VertexSet
 public:
     MeshTest() = default;
 
-    absl::string_view native_extension() const override
+    std::string_view native_extension() const override
     {
         static auto ext = "ext";
         return ext;

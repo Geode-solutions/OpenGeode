@@ -31,23 +31,23 @@
 
 namespace geode
 {
-    bool opengeode_basic_api file_exists( absl::string_view file_path );
+    bool opengeode_basic_api file_exists( std::string_view file_path );
 
     void opengeode_basic_api check_keyword(
-        std::ifstream& file, absl::string_view keyword );
+        std::ifstream& file, std::string_view keyword );
 
     bool opengeode_basic_api line_starts_with(
-        std::ifstream& file, absl::string_view check );
+        std::ifstream& file, std::string_view check );
 
     std::string opengeode_basic_api goto_keyword(
-        std::ifstream& file, absl::string_view word );
+        std::ifstream& file, std::string_view word );
 
     std::string opengeode_basic_api goto_keywords(
-        std::ifstream& file, absl::Span< const absl::string_view > words );
+        std::ifstream& file, absl::Span< const std::string_view > words );
 
     std::optional< std::string > opengeode_basic_api goto_keyword_if_it_exists(
-        std::ifstream& file, absl::string_view word );
+        std::ifstream& file, std::string_view word );
 
     std::optional< std::string > opengeode_basic_api next_keyword_if_it_exists(
-        std::ifstream& file, absl::string_view word );
+        std::ifstream& file, std::string_view word );
 } // namespace geode

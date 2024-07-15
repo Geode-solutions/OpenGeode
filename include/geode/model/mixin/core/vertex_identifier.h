@@ -119,7 +119,7 @@ namespace geode
          * Save the VertexIdentifier into a file.
          * @param[in] directory Folder in which create the file.
          */
-        void save_unique_vertices( absl::string_view directory ) const;
+        void save_unique_vertices( std::string_view directory ) const;
 
     public:
         /*!
@@ -184,7 +184,7 @@ namespace geode
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( absl::string_view directory, BuilderKey );
+        void load_unique_vertices( std::string_view directory, BuilderKey );
 
         /*!
          * Delete all unique vertices not associated with any component

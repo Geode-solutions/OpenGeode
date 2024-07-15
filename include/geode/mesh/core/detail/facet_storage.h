@@ -202,7 +202,7 @@ namespace geode
             }
 
         protected:
-            static constexpr absl::string_view attribute_name()
+            static constexpr std::string_view attribute_name()
             {
                 return ATTRIBUTE_NAME;
             }

@@ -34,7 +34,7 @@ namespace geode
     {
 
         template < typename Type, typename Serializer >
-        void register_inlinedvector( PContext& context, absl::string_view type )
+        void register_inlinedvector( PContext& context, std::string_view type )
         {
             AttributeManager::register_attribute_type<
                 absl::InlinedVector< Type, 1 >, Serializer >(

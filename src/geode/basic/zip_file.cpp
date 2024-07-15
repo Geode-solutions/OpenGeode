@@ -23,29 +23,27 @@
 
 #include <geode/basic/zip_file.h>
 
+#include <filesystem>
 #include <fstream>
+#include <string_view>
 
 #include <mz.h>
 #include <mz_strm.h>
 #include <mz_zip.h>
 #include <mz_zip_rw.h>
 
-#include <ghc/filesystem.hpp>
-
-#include <absl/strings/string_view.h>
-
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace
 {
-    ghc::filesystem::path create_directory(
-        absl::string_view file, absl::string_view temp_filename )
+    std::filesystem::path create_directory(
+        std::string_view file, std::string_view temp_filename )
     {
         const auto file_string = geode::to_string( file );
-        auto directory = ghc::filesystem::path{ file_string }.parent_path()
+        auto directory = std::filesystem::path{ file_string }.parent_path()
                          / geode::to_string( temp_filename );
-        ghc::filesystem::create_directory( directory );
+        std::filesystem::create_directory( directory );
         return directory;
     }
 } // namespace
@@ -55,10 +53,10 @@ namespace geode
     class ZipFile::Impl
     {
     public:
-        Impl( absl::string_view file, absl::string_view archive_temp_filename )
+        Impl( std::string_view file, std::string_view archive_temp_filename )
         {
             directory_ = create_directory( file, archive_temp_filename );
-            mz_zip_writer_create( &writer_ );
+            writer_ = mz_zip_writer_create();
             mz_zip_writer_set_compress_method(
                 writer_, MZ_COMPRESS_METHOD_STORE );
             const auto status = mz_zip_writer_open_file(
@@ -69,7 +67,7 @@ namespace geode
 
         ~Impl()
         {
-            ghc::filesystem::remove( directory_ );
+            std::filesystem::remove( directory_ );
             const auto status = mz_zip_writer_close( writer_ );
             if( status != MZ_OK )
             {
@@ -78,7 +76,7 @@ namespace geode
             mz_zip_writer_delete( &writer_ );
         }
 
-        void archive_files( absl::Span< const absl::string_view >& files ) const
+        void archive_files( absl::Span< const std::string_view >& files ) const
         {
             for( const auto& file : files )
             {
@@ -86,14 +84,14 @@ namespace geode
             }
         }
 
-        void archive_file( absl::string_view file ) const
+        void archive_file( std::string_view file ) const
         {
-            const ghc::filesystem::path file_path{ to_string( file ) };
+            const std::filesystem::path file_path{ to_string( file ) };
             const auto status = mz_zip_writer_add_path(
                 writer_, file_path.string().c_str(), nullptr, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
                 "[ZipFile::archive_file] Error adding path to zip" );
-            ghc::filesystem::remove( file_path );
+            std::filesystem::remove( file_path );
         }
 
         std::string directory() const
@@ -102,25 +100,25 @@ namespace geode
         }
 
     private:
-        ghc::filesystem::path directory_;
+        std::filesystem::path directory_;
         void* writer_{ nullptr };
     };
 
     ZipFile::ZipFile(
-        absl::string_view file, absl::string_view archive_temp_filename )
+        std::string_view file, std::string_view archive_temp_filename )
         : impl_{ file, archive_temp_filename }
     {
     }
 
     ZipFile::~ZipFile() = default;
 
-    void ZipFile::archive_file( absl::string_view file ) const
+    void ZipFile::archive_file( std::string_view file ) const
     {
         impl_->archive_file( file );
     }
 
     void ZipFile::archive_files(
-        absl::Span< const absl::string_view >& files ) const
+        absl::Span< const std::string_view >& files ) const
     {
         impl_->archive_files( files );
     }
@@ -133,11 +131,10 @@ namespace geode
     class UnzipFile::Impl
     {
     public:
-        Impl(
-            absl::string_view file, absl::string_view unarchive_temp_filename )
+        Impl( std::string_view file, std::string_view unarchive_temp_filename )
         {
             directory_ = create_directory( file, unarchive_temp_filename );
-            mz_zip_reader_create( &reader_ );
+            reader_ = mz_zip_reader_create();
             const auto status =
                 mz_zip_reader_open_file( reader_, to_string( file ).c_str() );
             OPENGEODE_EXCEPTION(
@@ -146,7 +143,7 @@ namespace geode
 
         ~Impl()
         {
-            ghc::filesystem::remove_all( directory_ );
+            std::filesystem::remove_all( directory_ );
             mz_zip_reader_close( reader_ );
             mz_zip_reader_delete( &reader_ );
         }
@@ -177,12 +174,12 @@ namespace geode
         }
 
     private:
-        ghc::filesystem::path directory_;
+        std::filesystem::path directory_;
         void* reader_{ nullptr };
     };
 
     UnzipFile::UnzipFile(
-        absl::string_view filename, absl::string_view unarchive_temp_filename )
+        std::string_view filename, std::string_view unarchive_temp_filename )
         : impl_{ filename, unarchive_temp_filename }
     {
     }
@@ -199,10 +196,9 @@ namespace geode
         return impl_->directory();
     }
 
-    bool is_zip_file( absl::string_view file )
+    bool is_zip_file( std::string_view file )
     {
-        void* reader{ nullptr };
-        mz_zip_reader_create( &reader );
+        void* reader = mz_zip_reader_create();
         const auto status =
             mz_zip_reader_open_file( reader, to_string( file ).c_str() );
         mz_zip_reader_close( reader );

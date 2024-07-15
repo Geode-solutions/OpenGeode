@@ -90,7 +90,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::save_blocks( absl::string_view directory ) const
+    void Blocks< dimension >::save_blocks( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
         const auto prefix = absl::StrCat(
@@ -142,7 +142,7 @@ namespace geode
 
     template < index_t dimension >
     void Blocks< dimension >::load_blocks(
-        absl::string_view directory, BlocksBuilderKey /*unused*/ )
+        std::string_view directory, BlocksBuilderKey /*unused*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );

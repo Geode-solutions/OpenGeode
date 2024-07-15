@@ -101,7 +101,7 @@ namespace geode
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( absl::string_view directory );
+        void load_unique_vertices( std::string_view directory );
 
         /*!
          * Delete all unique vertices not associated with any component

@@ -24,10 +24,9 @@
 #include <geode/model/mixin/core/surface.h>
 
 #include <memory>
+#include <string_view>
 
 #include <bitsery/ext/inheritance.h>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
@@ -146,7 +145,7 @@ namespace geode
 
     template < index_t dimension >
     void Surface< dimension >::set_surface_name(
-        absl::string_view name, SurfacesBuilderKey /*unused*/ )
+        std::string_view name, SurfacesBuilderKey /*unused*/ )
     {
         this->set_name( name );
     }

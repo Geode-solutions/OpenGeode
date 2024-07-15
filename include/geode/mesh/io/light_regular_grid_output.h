@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -50,14 +49,14 @@ namespace geode
     template < index_t dimension >
     std::vector< std::string > save_light_regular_grid(
         const LightRegularGrid< dimension >& light_regular_grid,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     class LightRegularGridOutput
         : public Output< LightRegularGrid< dimension > >
     {
     public:
-        explicit LightRegularGridOutput( absl::string_view filename )
+        explicit LightRegularGridOutput( std::string_view filename )
             : Output< LightRegularGrid< dimension > >{ filename }
         {
         }
@@ -70,11 +69,11 @@ namespace geode
     template < index_t dimension >
     bool is_light_regular_grid_saveable(
         const LightRegularGrid< dimension >& light_regular_grid,
-        absl::string_view filename );
+        std::string_view filename );
 
     template < index_t dimension >
     using LightRegularGridOutputFactory = Factory< std::string,
         LightRegularGridOutput< dimension >,
-        absl::string_view >;
+        std::string_view >;
     ALIAS_2D_AND_3D( LightRegularGridOutputFactory );
 } // namespace geode

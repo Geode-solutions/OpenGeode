@@ -36,7 +36,7 @@ namespace geode
         module.def( "save_vertex_set", &save_vertex_set );
         module.def(
             "load_vertex_set", static_cast< std::unique_ptr< VertexSet > ( * )(
-                                   absl::string_view ) >( &load_vertex_set ) );
+                                   std::string_view ) >( &load_vertex_set ) );
         module.def(
             "check_vertex_set_missing_files", &check_vertex_set_missing_files );
         module.def( "is_vertex_set_loadable", &is_vertex_set_loadable );

@@ -83,7 +83,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Lines< dimension >::save_lines( absl::string_view directory ) const
+    void Lines< dimension >::save_lines( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/lines" ) );
         const auto prefix = absl::StrCat(
@@ -112,7 +112,7 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::load_lines(
-        absl::string_view directory, LinesBuilderKey )
+        std::string_view directory, LinesBuilderKey )
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );

@@ -46,7 +46,7 @@ namespace geode
     class SurfacesBuilder
     {
     public:
-        void load_surfaces( absl::string_view directory );
+        void load_surfaces( std::string_view directory );
 
         /*!
          * Get a pointer to the builder of a Surface mesh
@@ -62,7 +62,7 @@ namespace geode
                 typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
         }
 
-        void set_surface_name( const uuid& id, absl::string_view name );
+        void set_surface_name( const uuid& id, std::string_view name );
 
     protected:
         explicit SurfacesBuilder( Surfaces< dimension >& surfaces )

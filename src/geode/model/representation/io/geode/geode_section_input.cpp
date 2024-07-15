@@ -42,7 +42,7 @@
 namespace geode
 {
     void OpenGeodeSectionInput::load_section_files(
-        Section& section, absl::string_view directory )
+        Section& section, std::string_view directory )
     {
         SectionBuilder builder{ section };
         async::parallel_invoke(

@@ -38,8 +38,8 @@ namespace geode
     template < index_t dimension >
     std::string compute_surface_scalar_function_gradient(
         const SurfaceMesh< dimension >& mesh,
-        absl::string_view scalar_function_name );
+        std::string_view scalar_function_name );
 
     std::string opengeode_mesh_api compute_solid_scalar_function_gradient(
-        const SolidMesh3D& mesh, absl::string_view scalar_function_name );
+        const SolidMesh3D& mesh, std::string_view scalar_function_name );
 } // namespace geode

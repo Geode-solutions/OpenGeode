@@ -40,7 +40,7 @@
         "load_polyhedral_solid" + std::to_string( dimension ) + "D";           \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolyhedralSolid< dimension > > ( * )(    \
-            absl::string_view ) >( &load_polyhedral_solid< dimension > ) );    \
+            std::string_view ) >( &load_polyhedral_solid< dimension > ) );     \
     const auto check##dimension = "check_polyhedral_solid_missing_files"       \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

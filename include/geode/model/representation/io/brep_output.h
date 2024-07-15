@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -47,20 +46,20 @@ namespace geode
      * @param[in] filename Path to the file where save the brep.
      */
     std::vector< std::string > opengeode_model_api save_brep(
-        const BRep& brep, absl::string_view filename );
+        const BRep& brep, std::string_view filename );
 
     class BRepOutput : public Output< BRep >
     {
     protected:
-        explicit BRepOutput( absl::string_view filename )
+        explicit BRepOutput( std::string_view filename )
             : Output< BRep >{ filename }
         {
         }
     };
 
     bool opengeode_model_api is_brep_saveable(
-        const BRep& brep, absl::string_view filename );
+        const BRep& brep, std::string_view filename );
 
     using BRepOutputFactory =
-        Factory< std::string, BRepOutput, absl::string_view >;
+        Factory< std::string, BRepOutput, std::string_view >;
 } // namespace geode

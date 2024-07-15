@@ -40,7 +40,7 @@
         "load_triangulated_surface" + std::to_string( dimension ) + "D";       \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr<                                          \
-            TriangulatedSurface< dimension > > ( * )( absl::string_view ) >(   \
+            TriangulatedSurface< dimension > > ( * )( std::string_view ) >(    \
             &load_triangulated_surface< dimension > ) );                       \
     const auto check##dimension = "check_triangulated_surface_missing_files"   \
                                   + std::to_string( dimension ) + "D";         \

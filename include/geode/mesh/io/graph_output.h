@@ -24,9 +24,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
@@ -47,20 +46,20 @@ namespace geode
      * @param[in] filename Path to the file where save the Graph.
      */
     std::vector< std::string > opengeode_mesh_api save_graph(
-        const Graph& graph, absl::string_view filename );
+        const Graph& graph, std::string_view filename );
 
     class GraphOutput : public Output< Graph >
     {
     protected:
-        explicit GraphOutput( absl::string_view filename )
+        explicit GraphOutput( std::string_view filename )
             : Output< Graph >{ filename }
         {
         }
     };
 
     bool opengeode_mesh_api is_graph_saveable(
-        const Graph& graph, absl::string_view filename );
+        const Graph& graph, std::string_view filename );
 
     using GraphOutputFactory =
-        Factory< std::string, GraphOutput, absl::string_view >;
+        Factory< std::string, GraphOutput, std::string_view >;
 } // namespace geode

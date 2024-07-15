@@ -40,18 +40,18 @@ namespace geode
         : public SectionOutput
     {
     public:
-        explicit OpenGeodeSectionOutput( absl::string_view filename )
+        explicit OpenGeodeSectionOutput( std::string_view filename )
             : SectionOutput( filename )
         {
         }
 
-        static absl::string_view extension()
+        static std::string_view extension()
         {
             return Section::native_extension_static();
         }
 
         void save_section_files(
-            const Section& section, absl::string_view directory ) const;
+            const Section& section, std::string_view directory ) const;
 
         void archive_section_files( const ZipFile& zip_writer ) const;
 

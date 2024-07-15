@@ -97,7 +97,6 @@ add_geode_library(
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         absl::strings
-        ghcFilesystem::ghc_filesystem
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES
         Async++
@@ -106,3 +105,6 @@ add_geode_library(
         spdlog::spdlog_header_only
         MINIZIP::minizip-ng
 )
+if(WIN32)
+    target_link_libraries(basic PUBLIC absl::abseil_dll)
+endif()

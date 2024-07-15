@@ -23,14 +23,13 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include <ghc/filesystem.hpp>
-
 #include <absl/strings/ascii.h>
-#include <absl/strings/string_view.h>
 
 #include <geode/basic/filename.h>
 #include <geode/basic/logger.h>
@@ -42,7 +41,7 @@ namespace geode
     {
         template < typename Factory >
         std::unique_ptr< typename Factory::BaseClass >
-            geode_object_output_writer( absl::string_view& filename )
+            geode_object_output_writer( std::string_view& filename )
         {
             filename = absl::StripAsciiWhitespace( filename );
             const auto extension =
@@ -55,14 +54,17 @@ namespace geode
 
         template < typename Factory, typename Object >
         std::vector< std::string > geode_object_output_impl(
-            absl::string_view type,
+            std::string_view type,
             const Object& object,
-            absl::string_view filename )
+            std::string_view filename )
         {
             const Timer timer;
             auto output = geode_object_output_writer< Factory >( filename );
-            ghc::filesystem::create_directories(
-                filepath_without_filename( filename ) );
+            const auto directories = filepath_without_filename( filename );
+            if( !directories.empty() )
+            {
+                std::filesystem::create_directories( directories );
+            }
             auto result = output->write( object );
             Logger::info(
                 type, " saved in ", filename, " in ", timer.duration() );
