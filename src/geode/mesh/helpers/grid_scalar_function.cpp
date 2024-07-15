@@ -102,7 +102,7 @@ namespace geode
                 grid_.grid_coordinate_system().coordinates( point );
             for( const auto node_id : LRange{ grid_.nb_cell_vertices() } )
             {
-                point_value += detail::shape_function_value< dimension >(
+                point_value += internal::shape_function_value< dimension >(
                                    grid_cell_indices, node_id, point_in_grid )
                                * function_attribute_->value( grid_.vertex_index(
                                    grid_.cell_vertex_indices(

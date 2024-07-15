@@ -107,7 +107,7 @@ namespace geode
                 point_value += function_attribute_->value( grid_.vertex_index(
                                    grid_.cell_vertex_indices(
                                        grid_cell_indices, node_id ) ) )
-                               * detail::shape_function_value< dimension >(
+                               * internal::shape_function_value< dimension >(
                                    grid_cell_indices, node_id, point_in_grid );
             }
             return point_value;
