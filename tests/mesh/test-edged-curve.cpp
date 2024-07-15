@@ -313,7 +313,7 @@ void test()
     test_io( *edged_curve,
         absl::StrCat( "test.", edged_curve->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v12.", edged_curve->native_extension() ) );
+        geode::DATA_PATH, "test_v12.", edged_curve->native_extension() ) );
 
     test_permutation( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );

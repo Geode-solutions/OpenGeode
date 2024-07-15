@@ -107,9 +107,10 @@ namespace geode
                 {
                     const auto old2new =
                         merger.builder().delete_edges( to_delete );
+                    const auto& meshes = merger.meshes();
                     for( const auto curve_id : Indices{ merger.meshes() } )
                     {
-                        const auto& curve = merger.meshes()[curve_id].get();
+                        const auto& curve = meshes[curve_id].get();
                         for( const auto e : Range{ curve.nb_edges() } )
                         {
                             const auto old = new_id_[curve_id][e];
@@ -122,9 +123,10 @@ namespace geode
             void create_edges( EdgedCurveMerger< dimension >& merger )
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > edges;
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& curve = merger.meshes()[s].get();
+                    const auto& curve = meshes[s].get();
                     for( const auto e : Range{ curve.nb_edges() } )
                     {
                         Edge vertices;

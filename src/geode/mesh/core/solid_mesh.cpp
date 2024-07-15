@@ -384,7 +384,8 @@ namespace geode
         friend class bitsery::Access;
         using CachedPolyhedra =
             CachedValue< internal::PolyhedraAroundVertexImpl >;
-        static constexpr auto polyhedra_around_vertex_name =
+        static constexpr auto POLYHEDRA_AROUND_VERTEX_NAME =
+
             "polyhedra_around_vertex";
 
     public:
@@ -398,7 +399,7 @@ namespace geode
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolyhedra >(
-                          polyhedra_around_vertex_name, CachedPolyhedra{} ) )
+                          POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} ) )
         {
         }
 
@@ -583,7 +584,7 @@ namespace geode
                 solid.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolyhedra >(
-                        polyhedra_around_vertex_name, CachedPolyhedra{} );
+                        POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} );
         }
 
         const internal::PolyhedraAroundVertexImpl&
@@ -885,7 +886,7 @@ namespace geode
                 max_area_facet = f;
             }
         }
-        if( max_area < global_epsilon )
+        if( max_area < GLOBAL_EPSILON )
         {
             return true;
         }
@@ -908,7 +909,7 @@ namespace geode
             }
             if( std::get< 0 >(
                     point_plane_distance( this->point( vertex_id ), plane ) )
-                > global_epsilon )
+                > GLOBAL_EPSILON )
             {
                 return false;
             }

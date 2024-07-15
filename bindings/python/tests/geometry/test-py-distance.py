@@ -58,7 +58,7 @@ def test_point_segment_distance():
 
     q2 = geom.Point2D([10.0, 10.0])
     distance = geom.point_segment_distance2D(q2, segment2D)
-    if math.fabs(distance - math.sqrt(106)) > og.global_epsilon:
+    if math.fabs(distance - math.sqrt(106)) > og.GLOBAL_EPSILON:
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q2"
         )
@@ -66,7 +66,7 @@ def test_point_segment_distance():
     q3 = geom.Point2D([5.0, -1.0])
     distance = geom.point_segment_distance2D(q3, segment2D)
     result_q3 = geom.Point2D([0.0, 0.0])
-    if math.fabs(distance - math.sqrt(26)) > og.global_epsilon:
+    if math.fabs(distance - math.sqrt(26)) > og.GLOBAL_EPSILON:
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q3"
         )
@@ -74,7 +74,7 @@ def test_point_segment_distance():
     q4 = geom.Point2D([5.5, 1.5])
     distance = geom.point_segment_distance2D(q4, segment2D)
     result_q4 = geom.Point2D([0.5, 2.5])
-    if math.fabs(distance - math.sqrt(26)) > og.global_epsilon:
+    if math.fabs(distance - math.sqrt(26)) > og.GLOBAL_EPSILON:
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q4"
         )
@@ -100,7 +100,7 @@ def test_segment_segment_distance():
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -114,7 +114,7 @@ def test_segment_segment_distance():
     r00 = geom.Point3D([0.0, 0.0, 0.0])
     r01 = geom.Point3D([0.0, 0.0, 1.0])
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -126,7 +126,7 @@ def test_segment_segment_distance():
         segment_cd, segment_gh
     )
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(d)
         or not closest_point1.inexact_equal(g)
     ):
@@ -158,7 +158,7 @@ def test_segment_line_distance():
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -172,7 +172,7 @@ def test_segment_line_distance():
     r00 = geom.Point3D([0.0, 0.0, 0.0])
     r01 = geom.Point3D([0.0, 0.0, 1.0])
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -185,7 +185,7 @@ def test_segment_line_distance():
     )
     r01 = geom.Point3D([0.5, 2.5, 1.0])
     if (
-        abs(distance - math.sqrt(2) / 2.0) > og.global_epsilon
+        abs(distance - math.sqrt(2) / 2.0) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(c)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -477,7 +477,7 @@ def test_line_triangle_distance():
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -489,7 +489,7 @@ def test_line_triangle_distance():
     r00 = geom.Point3D([1.0, 1.0, 1.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
-        abs(distance) > og.global_epsilon
+        abs(distance) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -499,7 +499,7 @@ def test_line_triangle_distance():
 
     distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(line_bz, cdg)
     if (
-        abs(distance) > og.global_epsilon
+        abs(distance) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(f)
         or not closest_point1.inexact_equal(f)
     ):
@@ -510,7 +510,7 @@ def test_line_triangle_distance():
     distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(line_hx, cdg)
     r00 = geom.Point3D([3.0, 5.0, 1.0])
     if (
-        abs(distance - 2) > og.global_epsilon
+        abs(distance - 2) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(g)
     ):
@@ -544,7 +544,7 @@ def test_segment_triangle_distance():
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -558,7 +558,7 @@ def test_segment_triangle_distance():
     r00 = geom.Point3D([1.0, 1.0, 1.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if (
-        abs(distance) > og.global_epsilon
+        abs(distance) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(r01)
     ):
@@ -570,7 +570,7 @@ def test_segment_triangle_distance():
         seg_bz0, cdg
     )
     if (
-        abs(distance) > og.global_epsilon
+        abs(distance) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(f)
         or not closest_point1.inexact_equal(f)
     ):
@@ -582,7 +582,7 @@ def test_segment_triangle_distance():
         seg_bz1, cdg
     )
     if (
-        abs(distance - 1) > og.global_epsilon
+        abs(distance - 1) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(b)
         or not closest_point1.inexact_equal(f)
     ):
@@ -595,7 +595,7 @@ def test_segment_triangle_distance():
     )
     r00 = geom.Point3D([3.0, 5.0, 1.0])
     if (
-        abs(distance - 2) > og.global_epsilon
+        abs(distance - 2) > og.GLOBAL_EPSILON
         or not closest_point0.inexact_equal(r00)
         or not closest_point1.inexact_equal(g)
     ):

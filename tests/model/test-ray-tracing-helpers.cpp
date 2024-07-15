@@ -38,7 +38,7 @@ void test()
 
     // load a 40x40x40 aligned cubic box brep
     auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "box_brep.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
     geode::Point3D center( { 20., 20., 20. } );
 
     //  get the block

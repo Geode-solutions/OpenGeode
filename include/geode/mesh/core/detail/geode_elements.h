@@ -32,7 +32,7 @@ namespace geode
     namespace detail
     {
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 4 >
-            quadrangle_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 2, 3 },
+            QUADRANGLE_EDGE_VERTICES{ { { 0, 1 }, { 0, 2 }, { 2, 3 },
                 { 1, 3 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 4 >
@@ -40,11 +40,11 @@ namespace geode
                 { 2, 3 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
-            tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
+            TETRAHEDRON_FACET_VERTICES{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
                 { 0, 1, 2 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 6 >
-            tetrahedron_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 },
+            TETRAHEDRON_EDGE_VERTICES{ { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 },
                 { 1, 3 }, { 2, 3 } } };
 
         static constexpr std::
@@ -57,29 +57,29 @@ namespace geode
                 } };
 
         static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
-            hexahedron_facet_vertices{ { { 0, 4, 5, 1 }, { 2, 6, 7, 3 },
+            HEXAHEDRON_FACET_VERTICES{ { { 0, 4, 5, 1 }, { 2, 6, 7, 3 },
                 { 0, 3, 7, 4 }, { 1, 5, 6, 2 }, { 0, 1, 2, 3 },
                 { 4, 7, 6, 5 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 12 >
-            hexahedron_edge_vertices{ { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
+            HEXAHEDRON_EDGE_VERTICES{ { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
                 { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 }, { 0, 4 }, { 1, 5 },
                 { 2, 6 }, { 3, 7 } } };
 
         static const std::array< std::vector< geode::local_index_t >, 5 >
-            prism_facet_vertices{ { { 0, 1, 2 }, { 3, 5, 4 }, { 0, 3, 4, 1 },
+            PRISM_FACET_VERTICES{ { { 0, 1, 2 }, { 3, 5, 4 }, { 0, 3, 4, 1 },
                 { 1, 4, 5, 2 }, { 0, 2, 5, 3 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 9 >
-            prism_edge_vertices{ { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 3, 4 },
+            PRISM_EDGE_VERTICES{ { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 3, 4 },
                 { 4, 5 }, { 5, 3 }, { 0, 3 }, { 1, 4 }, { 2, 5 } } };
 
         static const std::array< std::vector< geode::local_index_t >, 5 >
-            pyramid_facet_vertices{ { { 0, 1, 2, 3 }, { 0, 4, 1 }, { 1, 4, 2 },
+            PYRAMID_FACET_VERTICES{ { { 0, 1, 2, 3 }, { 0, 4, 1 }, { 1, 4, 2 },
                 { 2, 4, 3 }, { 0, 3, 4 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 8 >
-            pyramid_edge_vertices{ { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
+            PYRAMID_EDGE_VERTICES{ { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
                 { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } } };
     } // namespace detail
 } // namespace geode

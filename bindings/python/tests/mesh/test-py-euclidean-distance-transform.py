@@ -79,7 +79,7 @@ def test_distance_transform_2D(cell_length):
         ([1, 8], cell_length * math.sqrt(65))
     ]
     for value in values:
-        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1] > basic.global_epsilon):
+        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1] > basic.GLOBAL_EPSILON):
             raise ValueError("[Test] Wrong 2D euclidean distance map")
 
 
@@ -111,7 +111,7 @@ def test_distance_transform_3D(cell_length):
     ]
 
     for value in values:
-        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1]) > basic.global_epsilon:
+        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1]) > basic.GLOBAL_EPSILON:
             raise ValueError("[Test] Wrong 3D euclidean distance map")
 
 

@@ -616,8 +616,8 @@ void test()
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v7.", polygonal_surface->native_extension() ) );
-    test_backward_io( absl::StrCat( geode::data_path, "test_v12.",
+        geode::DATA_PATH, "test_v7.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "test_v12.",
         polygonal_surface->native_extension() ) );
 
     test_permutation( *polygonal_surface, *builder );

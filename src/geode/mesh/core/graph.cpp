@@ -39,7 +39,7 @@ namespace geode
 {
     class Graph::Impl
     {
-        static constexpr auto attribute_name = "edges_around_vertex";
+        static constexpr auto ATTRIBUTE_NAME = "edges_around_vertex";
         friend class bitsery::Access;
 
     public:
@@ -48,7 +48,7 @@ namespace geode
                 graph.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                        ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
         {
         }
 

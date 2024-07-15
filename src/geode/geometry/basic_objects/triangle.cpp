@@ -62,7 +62,7 @@ namespace
 
                 const auto normal = edge0.cross( edge1 );
                 const auto length = normal.length();
-                if( length > geode::global_angular_epsilon )
+                if( length > geode::GLOBAL_ANGULAR_EPSILON )
                 {
                     result->pivot = pivot;
                     result->normal = normal / length;
@@ -89,7 +89,7 @@ namespace
             return false;
         }
         return result_left.normal.cross( result_right->normal ).length()
-               < geode::global_angular_epsilon;
+               < geode::GLOBAL_ANGULAR_EPSILON;
     }
 } // namespace
 
@@ -207,7 +207,7 @@ namespace geode
         const auto e2 = e1 == 2 ? 0 : e1 + 1;
         const Point3D& point2 = vertices_[e2];
         if( point_segment_distance( point2, { point0, point1 } )
-            > global_epsilon )
+            > GLOBAL_EPSILON )
         {
             const auto ratio = result->lengths[e2]
                                / ( result->lengths[e2] + result->lengths[e1] );

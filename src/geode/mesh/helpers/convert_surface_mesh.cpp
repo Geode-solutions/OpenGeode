@@ -361,7 +361,7 @@ namespace geode
             surfaces )
     {
         detail::SurfaceMeshMerger< dimension > merger{ surfaces,
-            global_epsilon };
+            GLOBAL_EPSILON };
         return merger.merge();
     }
 

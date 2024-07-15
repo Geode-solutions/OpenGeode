@@ -50,7 +50,7 @@ namespace geode
 
             PolygonDistance( index_t polygon_in,
                 double distance_in,
-                Position position_in,
+                POSITION position_in,
                 Point3D point_in )
                 : polygon{ polygon_in },
                   distance{ distance_in },
@@ -66,7 +66,7 @@ namespace geode
 
             index_t polygon{ NO_ID };
             double distance{ 0 };
-            Position position{ Position::outside };
+            POSITION position{ POSITION::outside };
             Point3D point;
         };
 
