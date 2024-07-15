@@ -114,7 +114,7 @@ namespace geode
                     const auto& id = mapping.in2out( surface.id() );
                     ModelFrom::dim == BuilderTo::dim
                         ? builder_to.add_surface(
-                              id, surface.mesh().impl_name() )
+                            id, surface.mesh().impl_name() )
                         : builder_to.add_surface( id );
                     builder_to.set_surface_name( id, surface.name() );
                 }
@@ -122,7 +122,7 @@ namespace geode
                 {
                     const auto& id = ModelFrom::dim == BuilderTo::dim
                                          ? builder_to.add_surface(
-                                               surface.mesh().impl_name() )
+                                             surface.mesh().impl_name() )
                                          : builder_to.add_surface();
                     builder_to.set_surface_name( id, surface.name() );
                     mapping.map( surface.id(), id );
