@@ -92,8 +92,8 @@ add_geode_library(
         "detail/geode_input_impl.h"
         "detail/geode_output_impl.h"
         "detail/mapping_after_deletion.h"
-    PRIVATE_HEADERS
-        "private/array_impl.h"
+    INTERNAL_HEADERS
+        "internal/array_impl.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         absl::strings

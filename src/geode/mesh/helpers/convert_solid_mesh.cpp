@@ -35,7 +35,7 @@
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/helpers/detail/element_identifier.h>
 #include <geode/mesh/helpers/detail/solid_merger.h>
-#include <geode/mesh/helpers/private/copy.h>
+#include <geode/mesh/helpers/internal/copy.h>
 
 namespace
 {
@@ -131,7 +131,7 @@ namespace
             builder->set_point(
                 v, grid.grid_point( grid.vertex_indices( v ) ) );
         }
-        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
+        geode::internal::copy_attributes( grid.grid_vertex_attribute_manager(),
             tet_solid->vertex_attribute_manager() );
         create_tetrahedra_from_grid_cells( *tet_solid, *builder, grid );
         return tet_solid;
@@ -320,7 +320,7 @@ namespace geode
             };
             auto builder =
                 geode::TetrahedralSolidBuilder3D::create( *result->get() );
-            detail::copy_meta_info( solid, *builder );
+            internal::copy_meta_info( solid, *builder );
             return result;
         }
         if( !all_polyhedra_are_simplex( solid ) )
@@ -333,8 +333,8 @@ namespace geode
             TetrahedralSolid3D::create()
         };
         auto builder = TetrahedralSolidBuilder3D::create( *tet_solid->get() );
-        detail::copy_meta_info( solid, *builder );
-        detail::copy_points( solid, *builder );
+        internal::copy_meta_info( solid, *builder );
+        internal::copy_points( solid, *builder );
         builder->reserve_tetrahedra( solid.nb_polyhedra() );
         for( const auto p : Range{ solid.nb_polyhedra() } )
         {
@@ -357,9 +357,9 @@ namespace geode
                 }
             }
         }
-        detail::copy_attributes( solid.vertex_attribute_manager(),
+        internal::copy_attributes( solid.vertex_attribute_manager(),
             tet_solid->get()->vertex_attribute_manager() );
-        detail::copy_attributes( solid.polyhedron_attribute_manager(),
+        internal::copy_attributes( solid.polyhedron_attribute_manager(),
             tet_solid->get()->polyhedron_attribute_manager() );
         return tet_solid;
     }
@@ -381,8 +381,8 @@ namespace geode
             HybridSolid3D::create()
         };
         auto builder = HybridSolidBuilder3D::create( *hybrid_solid->get() );
-        detail::copy_meta_info( solid, *builder );
-        detail::copy_points( solid, *builder );
+        internal::copy_meta_info( solid, *builder );
+        internal::copy_points( solid, *builder );
         for( const auto p : Range{ solid.nb_polyhedra() } )
         {
             const auto vertices = solid.polyhedron_vertices( p );
@@ -421,9 +421,9 @@ namespace geode
                 }
             }
         }
-        detail::copy_attributes( solid.vertex_attribute_manager(),
+        internal::copy_attributes( solid.vertex_attribute_manager(),
             hybrid_solid->get()->vertex_attribute_manager() );
-        detail::copy_attributes( solid.polyhedron_attribute_manager(),
+        internal::copy_attributes( solid.polyhedron_attribute_manager(),
             hybrid_solid->get()->polyhedron_attribute_manager() );
         return hybrid_solid;
     }

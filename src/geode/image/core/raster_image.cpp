@@ -24,15 +24,16 @@
 #include <geode/image/core/raster_image.h>
 
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/internal/array_impl.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/private/array_impl.h>
 
 #include <geode/image/core/rgb_color.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class RasterImage< dimension >::Impl : public detail::ArrayImpl< dimension >
+    class RasterImage< dimension >::Impl
+        : public internal::ArrayImpl< dimension >
     {
         friend class bitsery::Access;
 
@@ -70,7 +71,7 @@ namespace geode
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::ArrayImpl< dimension > >{} );
+                                     internal::ArrayImpl< dimension > >{} );
                     a.container( impl.colors_, impl.colors_.max_size() );
                 } } } );
         }

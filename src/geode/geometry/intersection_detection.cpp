@@ -27,11 +27,11 @@
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
+#include <geode/geometry/internal/intersection_from_sides.h>
+#include <geode/geometry/internal/predicates.h>
 #include <geode/geometry/intersection.h>
 #include <geode/geometry/point.h>
 #include <geode/geometry/position.h>
-#include <geode/geometry/private/intersection_from_sides.h>
-#include <geode/geometry/private/predicates.h>
 
 namespace
 {
@@ -333,8 +333,9 @@ namespace geode
         const auto sign20 = GEO::PCK::orient_3d( line.origin(),
             triangle.vertices()[2], triangle.vertices()[0], other );
 
-        return detail::triangle_intersection_detection( detail::side( sign01 ),
-            detail::side( sign12 ), detail::side( sign20 ) );
+        return internal::triangle_intersection_detection(
+            internal::side( sign01 ), internal::side( sign12 ),
+            internal::side( sign20 ) );
     }
 
     SegmentTriangleIntersection segment_triangle_intersection_detection(
@@ -368,13 +369,13 @@ namespace geode
                 triangle.vertices()[0], segment.vertices()[1] );
 
         const auto triangle_position =
-            detail::triangle_intersection_detection( detail::side( sign01 ),
-                detail::side( sign12 ), detail::side( sign20 ) );
+            internal::triangle_intersection_detection( internal::side( sign01 ),
+                internal::side( sign12 ), internal::side( sign20 ) );
         if( triangle_position == POSITION::outside )
         {
             return { POSITION::outside, POSITION::outside };
         }
-        return { detail::segment_intersection_detection( side0, side1 ),
+        return { internal::segment_intersection_detection( side0, side1 ),
             triangle_position };
     }
 
@@ -383,6 +384,6 @@ namespace geode
     {
         const auto side0 = point_side_to_plane( segment.vertices()[0], plane );
         const auto side1 = point_side_to_plane( segment.vertices()[1], plane );
-        return detail::segment_intersection_detection( side0, side1 );
+        return internal::segment_intersection_detection( side0, side1 );
     }
 } // namespace geode

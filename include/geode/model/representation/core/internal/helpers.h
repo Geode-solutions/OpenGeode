@@ -29,7 +29,7 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < typename Filter, typename Iterator >
         void next_filtered_internal_iterator( Iterator& iterator )
@@ -66,5 +66,5 @@ namespace geode
             }
             return box;
         }
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

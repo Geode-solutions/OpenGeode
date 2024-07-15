@@ -34,7 +34,7 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/geode_elements.h>
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 
 namespace
 {
@@ -94,14 +94,14 @@ namespace geode
 {
     template < index_t dimension >
     class OpenGeodeHybridSolid< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
         using Type = HybridSolid3D::Type;
 
     public:
         explicit Impl( OpenGeodeHybridSolid< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh )
+            : internal::PointsImpl< dimension >( mesh )
         {
             polyhedron_vertex_ptr_.emplace_back( 0 );
             polyhedron_adjacent_ptr_.emplace_back( 0 );
@@ -428,7 +428,7 @@ namespace geode
                     a.container4b( impl.polyhedron_adjacent_ptr_,
                         impl.polyhedron_adjacent_ptr_.max_size() );
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
 
