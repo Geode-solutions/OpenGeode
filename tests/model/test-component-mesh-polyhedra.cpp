@@ -42,7 +42,7 @@
 void test_component_mesh_polyhedra()
 {
     auto model = geode::load_brep(
-        absl::StrCat( geode::data_path, "test_mesh3.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
 
     for( const auto& block : model.blocks() )
     {

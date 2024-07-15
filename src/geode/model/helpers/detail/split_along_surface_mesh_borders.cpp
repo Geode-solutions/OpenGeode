@@ -25,7 +25,7 @@
 
 #include <async++.h>
 
-#include <absl/memory/memory.h>
+#include <memory>
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
@@ -70,7 +70,7 @@ namespace geode
         public:
             Impl( Model& model )
                 : model_( model ),
-                  builder_ptr_{ absl::make_unique< ModelBuilder >( model ) },
+                  builder_ptr_{ std::make_unique< ModelBuilder >( model ) },
                   builder_( *builder_ptr_ )
             {
             }

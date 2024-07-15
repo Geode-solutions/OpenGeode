@@ -62,12 +62,12 @@ namespace
         {
             for( const auto& intersection : intersections.second )
             {
-                if( intersection.position != geode::Position::inside )
+                if( intersection.position != geode::POSITION::inside )
                 {
                     return std::nullopt;
                 }
                 if( std::fabs( intersection.distance )
-                    <= geode::global_epsilon )
+                    <= geode::GLOBAL_EPSILON )
                 {
                     continue;
                 }

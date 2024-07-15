@@ -267,7 +267,8 @@ namespace geode
         friend class bitsery::Access;
         using CachedPolygons =
             CachedValue< internal::PolygonsAroundVertexImpl >;
-        static constexpr auto polygons_around_vertex_name =
+        static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
+
             "polygons_around_vertex";
 
     public:
@@ -281,7 +282,7 @@ namespace geode
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
-                          polygons_around_vertex_name, CachedPolygons{} ) )
+                          POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
         {
         }
 
@@ -413,7 +414,7 @@ namespace geode
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolygons >(
-                        polygons_around_vertex_name, CachedPolygons{} );
+                        POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} );
         }
 
     private:
@@ -1125,7 +1126,7 @@ namespace geode
                 max_length_edge = e;
             }
         }
-        if( max_length < global_epsilon )
+        if( max_length < GLOBAL_EPSILON )
         {
             return true;
         }
@@ -1144,7 +1145,7 @@ namespace geode
                 continue;
             }
             if( point_line_distance( this->point( vertices[v] ), line )
-                > global_epsilon )
+                > GLOBAL_EPSILON )
             {
                 return false;
             }

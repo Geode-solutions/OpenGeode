@@ -46,7 +46,7 @@
 void run_test_brep()
 {
     auto model = geode::load_brep(
-        absl::StrCat( geode::data_path, "test_mesh3.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
 
     for( const auto& block : model.blocks() )
     {
@@ -161,7 +161,7 @@ void run_test_brep()
 void run_test_section()
 {
     auto model =
-        geode::load_section( absl::StrCat( geode::data_path, "quad.og_sctn" ) );
+        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
 
     for( const auto& surface : model.surfaces() )
     {

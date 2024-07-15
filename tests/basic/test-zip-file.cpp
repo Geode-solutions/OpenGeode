@@ -31,11 +31,11 @@
 void test()
 {
     const auto is_not_a_zip = geode::is_zip_file(
-        absl::StrCat( geode::data_path, "triange.og_tsf3d" ) );
+        absl::StrCat( geode::DATA_PATH, "triange.og_tsf3d" ) );
     OPENGEODE_EXCEPTION(
         !is_not_a_zip, "[Test] Not a zip file detection failed" );
     const auto is_a_zip = geode::is_zip_file(
-        absl::StrCat( geode::data_path, "layers.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
     OPENGEODE_EXCEPTION( is_a_zip, "[Test] zip file detection failed" );
 }
 

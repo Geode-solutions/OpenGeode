@@ -31,7 +31,7 @@
 namespace geode
 {
     static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
-        signed_volume_vertices_order{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
+        SIGNED_VOLUME_VERTICES_ORDER{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
             { 1, 0, 2 } } };
 
     template < index_t dimension >
@@ -43,15 +43,15 @@ namespace geode
         const auto l1 = point_point_distance( tri_v[1].get(), tri_v[2].get() );
         const auto l2 = point_point_distance( tri_v[2].get(), tri_v[0].get() );
         const auto p = ( l0 + l1 + l2 ) / 2;
-        if( p - l0 <= global_epsilon )
+        if( p - l0 <= GLOBAL_EPSILON )
         {
             return 0;
         }
-        if( p - l1 <= global_epsilon )
+        if( p - l1 <= GLOBAL_EPSILON )
         {
             return 0;
         }
-        if( p - l2 <= global_epsilon )
+        if( p - l2 <= GLOBAL_EPSILON )
         {
             return 0;
         }
@@ -94,16 +94,16 @@ namespace geode
         }
         for( const auto v : LRange{ 4 } )
         {
-            const auto v1 = signed_volume_vertices_order[v][0];
-            const auto v2 = signed_volume_vertices_order[v][1];
-            const auto v3 = signed_volume_vertices_order[v][2];
+            const auto v1 = SIGNED_VOLUME_VERTICES_ORDER[v][0];
+            const auto v2 = SIGNED_VOLUME_VERTICES_ORDER[v][1];
+            const auto v3 = SIGNED_VOLUME_VERTICES_ORDER[v][2];
             const Vector3D edge02{ vertices[v], vertices[v2] };
             const auto edge02_length = edge02.length();
             const Vector3D edge03{ vertices[v], vertices[v3] };
             const auto edge03_length = edge03.length();
             const auto cross02_03 = edge02.cross( edge03 );
             if( cross02_03.length()
-                > global_angular_epsilon * edge02_length * edge03_length )
+                > GLOBAL_ANGULAR_EPSILON * edge02_length * edge03_length )
             {
                 const Vector3D edge01{ vertices[v], vertices[v1] };
                 return edge01.dot( cross02_03 ) / 6.;

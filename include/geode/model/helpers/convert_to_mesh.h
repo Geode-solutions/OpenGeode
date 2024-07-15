@@ -46,11 +46,11 @@ namespace geode
 
 namespace geode
 {
-
-    using MeshElementToIndexMapping = GenericMapping< MeshElement, index_t >;
-
     struct ModelToMeshMappings
     {
+        using MeshElementToIndexMapping =
+            GenericMapping< MeshElement, index_t >;
+
         MeshElementToIndexMapping corner_vertices_mapping;
         MeshElementToIndexMapping line_edges_mapping;
         MeshElementToIndexMapping surface_polygons_mapping;

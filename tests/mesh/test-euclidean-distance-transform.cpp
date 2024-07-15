@@ -91,7 +91,7 @@ void test_distance_transform_2D( double cell_length )
         OPENGEODE_EXCEPTION(
             std::fabs( distance_map->value( grid->cell_index( value.first ) )
                        - value.second )
-                < geode::global_epsilon,
+                < geode::GLOBAL_EPSILON,
             "[Test] Wrong 2D euclidean distance map" );
     }
 }
@@ -135,7 +135,7 @@ void test_distance_transform_3D( double cell_length )
         OPENGEODE_EXCEPTION(
             std::fabs( distance_map->value( grid->cell_index( value.first ) )
                        - value.second )
-                < geode::global_epsilon,
+                < geode::GLOBAL_EPSILON,
             "[Test] Wrong 3D euclidean distance map" );
     }
 }

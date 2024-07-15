@@ -119,9 +119,10 @@ namespace geode
                         merger.builder().delete_polyhedra( to_delete );
                     delete_vector_elements( to_delete, polyhedra_origins_ );
                     delete_vector_elements( to_delete, solid_id_ );
+                    const auto& meshes = merger.meshes();
                     for( const auto solid_id : Indices{ merger.meshes() } )
                     {
-                        const auto& solid = merger.meshes()[solid_id].get();
+                        const auto& solid = meshes[solid_id].get();
                         for( const auto p : Range{ solid.nb_polyhedra() } )
                         {
                             const auto old = new_id_[solid_id][p];
@@ -135,9 +136,10 @@ namespace geode
             void create_polyhedra( SolidMeshMerger< dimension >& merger )
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > polyhedra;
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& solid = merger.meshes()[s].get();
+                    const auto& solid = meshes[s].get();
                     for( const auto p : Range{ solid.nb_polyhedra() } )
                     {
                         Polyhedron vertices(
@@ -209,9 +211,10 @@ namespace geode
             {
                 absl::FixedArray< bool > visited_polyhedra(
                     merger.mesh().nb_polyhedra(), false );
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& solid = merger.meshes()[s].get();
+                    const auto& solid = meshes[s].get();
                     for( const auto p : Range{ solid.nb_polyhedra() } )
                     {
                         const auto new_id = new_id_[s][p];

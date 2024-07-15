@@ -72,15 +72,15 @@ namespace
     {
         const auto p =
             ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
-        if( p - point_to_v0_length <= geode::global_epsilon )
+        if( p - point_to_v0_length <= geode::GLOBAL_EPSILON )
         {
             return std::nullopt;
         }
-        if( p - point_to_v1_length <= geode::global_epsilon )
+        if( p - point_to_v1_length <= geode::GLOBAL_EPSILON )
         {
             return std::nullopt;
         }
-        if( p - segment_length <= geode::global_epsilon )
+        if( p - segment_length <= geode::GLOBAL_EPSILON )
         {
             return std::nullopt;
         }
@@ -363,7 +363,7 @@ namespace geode
         const auto length = segment.length();
         const auto length0 =
             point_point_distance( segment.vertices()[0].get(), point );
-        if( length <= global_epsilon )
+        if( length <= GLOBAL_EPSILON )
         {
             return length0;
         }
@@ -629,21 +629,21 @@ namespace geode
             segment1.vertices()[0].get() + Q1mQ0 * t;
         const auto distance =
             point_point_distance( closest_on_segment0, closest_on_segment1 );
-        if( distance < global_epsilon )
+        if( distance < GLOBAL_EPSILON )
         {
             return std::make_tuple(
                 distance, closest_on_segment0, closest_on_segment1 );
         }
         const auto distance_to_closest0 =
             point_segment_distance( closest_on_segment0, segment1 );
-        if( distance_to_closest0 < global_epsilon )
+        if( distance_to_closest0 < GLOBAL_EPSILON )
         {
             return std::make_tuple( distance_to_closest0, closest_on_segment0,
                 point_segment_projection( closest_on_segment0, segment1 ) );
         }
         const auto distance_to_closest1 =
             point_segment_distance( closest_on_segment1, segment0 );
-        if( distance_to_closest1 < global_epsilon )
+        if( distance_to_closest1 < GLOBAL_EPSILON )
         {
             return std::make_tuple( distance_to_closest1,
                 point_segment_projection( closest_on_segment1, segment0 ),
@@ -991,7 +991,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < global_epsilon )
+        if( center_to_point.length() < GLOBAL_EPSILON )
         {
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
@@ -1008,7 +1008,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < global_epsilon )
+        if( center_to_point.length() < GLOBAL_EPSILON )
         {
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
@@ -1042,7 +1042,7 @@ namespace geode
             point - circle.plane().normal() * distance_to_plane;
         const Vector3D center_to_projected_point{ circle.plane().origin(),
             projected_on_plane };
-        if( center_to_projected_point.length() < global_epsilon )
+        if( center_to_projected_point.length() < GLOBAL_EPSILON )
         {
             Vector3D other_direction{ { 1.0, 0.0, 0.0 } };
             if( circle.plane().normal().inexact_equal( other_direction )

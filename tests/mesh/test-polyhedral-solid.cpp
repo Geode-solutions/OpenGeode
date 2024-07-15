@@ -570,9 +570,9 @@ void test()
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v7.", polyhedral_solid->native_extension() ) );
+        geode::DATA_PATH, "test_v7.", polyhedral_solid->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v12.", polyhedral_solid->native_extension() ) );
+        geode::DATA_PATH, "test_v12.", polyhedral_solid->native_extension() ) );
 
     test_permutation( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );
