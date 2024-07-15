@@ -28,6 +28,7 @@
 #include <absl/types/span.h>
 
 #include <geode/basic/identifier_builder.h>
+#include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
@@ -46,6 +47,7 @@ namespace geode
     class opengeode_mesh_api VertexSetBuilder : public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetBuilder );
+        PASSKEY( VertexSet, VertexSetKey );
 
     public:
         virtual ~VertexSetBuilder() = default;
@@ -89,10 +91,12 @@ namespace geode
         std::vector< index_t > permute_vertices(
             absl::Span< const index_t > permutation );
 
+    public:
+        void copy( const VertexSet& vertex_set, VertexSetKey key );
+
     protected:
         explicit VertexSetBuilder( VertexSet& vertex_set );
 
-        friend class VertexSet;
         void copy( const VertexSet& vertex_set );
 
         virtual void do_create_vertex() = 0;
