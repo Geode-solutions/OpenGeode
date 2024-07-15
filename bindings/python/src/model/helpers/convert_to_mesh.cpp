@@ -39,11 +39,27 @@ namespace geode
 {
     void define_convert_to_mesh( pybind11::module& module )
     {
-        module.def( "convert_section_into_curve", &convert_section_into_curve )
-            .def(
-                "convert_section_into_surface", &convert_section_into_surface )
-            .def( "convert_brep_into_curve", &convert_brep_into_curve )
-            .def( "convert_brep_into_surface", &convert_brep_into_surface )
-            .def( "convert_brep_into_solid", &convert_brep_into_solid );
+        module
+            .def( "convert_section_into_curve",
+                []( const Section& section ) {
+                    return std::get< 0 >(
+                        convert_section_into_curve( section ) );
+                } )
+            .def( "convert_section_into_surface",
+                []( const Section& section ) {
+                    return std::get< 0 >(
+                        convert_section_into_surface( section ) );
+                } )
+            .def( "convert_brep_into_curve",
+                []( const BRep& brep ) {
+                    return std::get< 0 >( convert_brep_into_curve( brep ) );
+                } )
+            .def( "convert_brep_into_surface",
+                []( const BRep& brep ) {
+                    return std::get< 0 >( convert_brep_into_surface( brep ) );
+                } )
+            .def( "convert_brep_into_solid", []( const BRep& brep ) {
+                return std::get< 0 >( convert_brep_into_solid( brep ) );
+            } );
     }
 } // namespace geode
