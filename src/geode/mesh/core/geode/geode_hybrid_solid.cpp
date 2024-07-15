@@ -38,7 +38,7 @@
 
 namespace
 {
-    static constexpr std::array< geode::HybridSolid3D::Type, 9 > TYPES_{
+    static constexpr std::array< geode::HybridSolid3D::Type, 9 > TYPES{
         geode::HybridSolid3D::Type::UNKNOWN,
         geode::HybridSolid3D::Type::UNKNOWN,
         geode::HybridSolid3D::Type::UNKNOWN,
@@ -343,7 +343,7 @@ namespace geode
 
         Type polyhedron_type( index_t polyhedron_id ) const
         {
-            return TYPES_[get_nb_polyhedron_vertices( polyhedron_id )];
+            return TYPES[get_nb_polyhedron_vertices( polyhedron_id )];
         }
 
         void permute_polyhedra( absl::Span< const index_t > permutation )
