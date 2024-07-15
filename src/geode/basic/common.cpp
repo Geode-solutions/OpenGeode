@@ -22,7 +22,7 @@
  */
 #include <geode/basic/common.h>
 
-#include <absl/memory/memory.h>
+#include <memory>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/console_logger_client.h>
@@ -36,9 +36,9 @@ namespace geode
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeBasic )
     {
         LoggerManager::register_client(
-            absl::make_unique< ConsoleLoggerClient >() );
+            std::make_unique< ConsoleLoggerClient >() );
         ProgressLoggerManager::register_client(
-            absl::make_unique< ConsoleProgressLoggerClient >() );
+            std::make_unique< ConsoleProgressLoggerClient >() );
         BitseryExtensions::register_functions(
             register_basic_serialize_pcontext,
             register_basic_deserialize_pcontext );

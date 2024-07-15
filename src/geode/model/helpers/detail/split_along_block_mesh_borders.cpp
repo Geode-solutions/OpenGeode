@@ -25,8 +25,6 @@
 
 #include <async++.h>
 
-#include <absl/memory/memory.h>
-
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
 
