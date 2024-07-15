@@ -28,7 +28,7 @@
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
-#include <geode/model/helpers/private/simplicial_model_creator.h>
+#include <geode/model/helpers/internal/simplicial_model_creator.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
@@ -36,11 +36,11 @@
 namespace geode
 {
     class SimplicialBRepCreator::Impl
-        : public detail::SimplicialModelCreator< BRep >
+        : public internal::SimplicialModelCreator< BRep >
     {
     public:
         Impl( BRep& brep, std::vector< Point3D > unique_points )
-            : detail::SimplicialModelCreator< BRep >(
+            : internal::SimplicialModelCreator< BRep >(
                 brep, std::move( unique_points ) )
         {
         }

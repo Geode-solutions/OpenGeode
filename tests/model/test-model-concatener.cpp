@@ -56,9 +56,9 @@ void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "prism_curve.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" ) );
     const auto brep2 = geode::load_brep(
-        absl::StrCat( geode::data_path, "dangling.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
     std::array< geode::index_t, 5 > nb_components{ brep.nb_corners()
                                                        + brep2.nb_corners(),
         brep.nb_lines() + brep2.nb_lines(),

@@ -46,9 +46,9 @@
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
+#include <geode/mesh/core/internal/surface_mesh_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/private/surface_mesh_impl.h>
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/texture2d.h>
 #include <geode/mesh/core/texture_storage.h>
@@ -124,7 +124,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    geode::detail::PolygonsAroundVertexImpl compute_polygons_around_vertex(
+    geode::internal::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
         const geode::index_t& vertex_id,
         const std::optional< geode::PolygonVertex >& first_polygon )
@@ -139,7 +139,7 @@ namespace
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
-        geode::detail::PolygonsAroundVertexImpl result;
+        geode::internal::PolygonsAroundVertexImpl result;
         auto cur_polygon_vertex = first_polygon;
         do
         {
@@ -265,8 +265,10 @@ namespace geode
     class SurfaceMesh< dimension >::Impl
     {
         friend class bitsery::Access;
-        using CachedPolygons = CachedValue< detail::PolygonsAroundVertexImpl >;
-        static constexpr auto polygons_around_vertex_name =
+        using CachedPolygons =
+            CachedValue< internal::PolygonsAroundVertexImpl >;
+        static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
+
             "polygons_around_vertex";
 
     public:
@@ -280,7 +282,7 @@ namespace geode
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
-                          polygons_around_vertex_name, CachedPolygons{} ) )
+                          POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
         {
         }
 
@@ -412,7 +414,7 @@ namespace geode
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolygons >(
-                        polygons_around_vertex_name, CachedPolygons{} );
+                        POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} );
         }
 
     private:
@@ -448,10 +450,11 @@ namespace geode
                         } } } );
         }
 
-        const detail::PolygonsAroundVertexImpl& updated_polygons_around_vertex(
-            const SurfaceMesh< dimension >& mesh,
-            const index_t vertex_id,
-            const std::optional< PolygonVertex >& first_polygon ) const
+        const internal::PolygonsAroundVertexImpl&
+            updated_polygons_around_vertex(
+                const SurfaceMesh< dimension >& mesh,
+                const index_t vertex_id,
+                const std::optional< PolygonVertex >& first_polygon ) const
         {
             const auto& cached = polygons_around_vertex_->value( vertex_id );
             const auto& polygons = cached.value().polygons;
@@ -1123,7 +1126,7 @@ namespace geode
                 max_length_edge = e;
             }
         }
-        if( max_length < global_epsilon )
+        if( max_length < GLOBAL_EPSILON )
         {
             return true;
         }
@@ -1142,7 +1145,7 @@ namespace geode
                 continue;
             }
             if( point_line_distance( this->point( vertices[v] ), line )
-                > global_epsilon )
+                > GLOBAL_EPSILON )
             {
                 return false;
             }

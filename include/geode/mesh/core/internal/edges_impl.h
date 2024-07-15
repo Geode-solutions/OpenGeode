@@ -32,7 +32,7 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         class EdgesImpl
         {
@@ -91,5 +91,6 @@ namespace geode
             std::shared_ptr< VariableAttribute< std::array< index_t, 2 > > >
                 edges_;
         };
-    } // namespace detail
+
+    } // namespace internal
 } // namespace geode

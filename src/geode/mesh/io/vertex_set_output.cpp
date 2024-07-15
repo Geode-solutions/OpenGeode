@@ -37,16 +37,16 @@ namespace geode
     std::vector< std::string > save_vertex_set(
         const VertexSet& vertex_set, std::string_view filename )
     {
-        constexpr auto type = "VertexSet";
+        constexpr auto TYPE = "VertexSet";
         try
         {
             return detail::geode_object_output_impl< VertexSetOutputFactory >(
-                type, vertex_set, filename );
+                TYPE, vertex_set, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            print_available_extensions< VertexSetOutputFactory >( type );
+            print_available_extensions< VertexSetOutputFactory >( TYPE );
             throw OpenGeodeException{ "Cannot save VertexSet in file: ",
                 filename };
         }

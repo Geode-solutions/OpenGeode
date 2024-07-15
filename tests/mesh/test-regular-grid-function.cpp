@@ -29,8 +29,8 @@
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
 #include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/helpers/regular_grid_point_function.h>
-#include <geode/mesh/helpers/regular_grid_scalar_function.h>
+#include <geode/mesh/helpers/grid_point_function.h>
+#include <geode/mesh/helpers/grid_scalar_function.h>
 
 #include <geode/tests/common.h>
 
@@ -47,7 +47,7 @@ void test_scalar_function()
         geode::Point3D{ { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
     const auto function_name = "scalar_function";
     auto scalar_function =
-        geode::RegularGridScalarFunction3D::create( *grid, function_name, 26 );
+        geode::GridScalarFunction3D::create( *grid, function_name, 26 );
     scalar_function.set_value( { 1, 2, 3 }, 22 );
     for( const auto i : geode::LRange{ 6 } )
     {
@@ -122,7 +122,7 @@ void test_point_function()
     builder->initialize_grid(
         geode::Point3D{ { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
     const auto function_name = "point_function";
-    auto point_function = geode::RegularGridPointFunction3D::create(
+    auto point_function = geode::GridPointFunction3D::create(
         *grid, function_name, geode::Point3D{ { 26, 2, -10 } } );
     point_function.set_value( { 1, 2, 3 }, geode::Point3D{ { 22, -3, -20 } } );
     for( const auto i : geode::LRange{ 6 } )

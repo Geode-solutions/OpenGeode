@@ -427,20 +427,20 @@ namespace GEO
         };
     } // namespace Numeric
 
-    enum Sign
+    enum SIGN
     {
 
-        NEGATIVE = -1,
+        negative = -1,
 
-        ZERO = 0,
+        zero = 0,
 
-        POSITIVE = 1
+        positive = 1
     };
 
     template < class T >
-    inline Sign geo_sgn( const T& x )
+    inline SIGN geo_sgn( const T& x )
     {
-        return ( x > 0 ) ? POSITIVE : ( ( x < 0 ) ? NEGATIVE : ZERO );
+        return ( x > 0 ) ? positive : ( ( x < 0 ) ? negative : zero );
     }
 
     template < class T >
@@ -562,16 +562,16 @@ namespace GEO
 {
     namespace PCK
     {
-        Sign orient_2d( const geode::Point2D& p0,
+        SIGN orient_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 );
 
-        Sign orient_3d( const geode::Point3D& p0,
+        SIGN orient_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2,
             const geode::Point3D& p3 );
 
-        Sign det_3d( const geode::Vector3D& p0,
+        SIGN det_3d( const geode::Vector3D& p0,
             const geode::Vector3D& p1,
             const geode::Vector3D& p2 );
 
@@ -579,11 +579,11 @@ namespace GEO
             const geode::Point3D& p1,
             const geode::Point3D& p2 );
 
-        Sign dot_3d( const geode::Point3D& p0,
+        SIGN dot_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2 );
 
-        Sign dot_2d( const geode::Point2D& p0,
+        SIGN dot_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 );
 
@@ -593,32 +593,32 @@ namespace GEO
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
-        inline Side side( const GEO::Sign& sign )
+        inline SIDE side( const GEO::SIGN& sign )
         {
-            if( sign == GEO::POSITIVE )
+            if( sign == GEO::positive )
             {
-                return Side::positive;
+                return SIDE::positive;
             }
-            if( sign == GEO::NEGATIVE )
+            if( sign == GEO::negative )
             {
-                return Side::negative;
+                return SIDE::negative;
             }
-            return Side::zero;
+            return SIDE::zero;
         }
 
-        inline Side opposite_side( const GEO::Sign& sign )
+        inline SIDE opposite_side( const GEO::SIGN& sign )
         {
-            if( sign == GEO::POSITIVE )
+            if( sign == GEO::positive )
             {
-                return Side::negative;
+                return SIDE::negative;
             }
-            if( sign == GEO::NEGATIVE )
+            if( sign == GEO::negative )
             {
-                return Side::positive;
+                return SIDE::positive;
             }
-            return Side::zero;
+            return SIDE::zero;
         }
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

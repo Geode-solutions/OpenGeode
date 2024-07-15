@@ -90,7 +90,7 @@ namespace geode
         const auto prefix = absl::StrCat( directory, "/",
             Corner< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( const auto& corner : corners() )
@@ -118,7 +118,7 @@ namespace geode
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( auto& corner : modifiable_corners( {} ) )

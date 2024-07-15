@@ -174,12 +174,11 @@ add_geode_library(
         "mixin/core/detail/relationships_impl.h"
         "representation/builder/detail/copy.h"
         "representation/builder/detail/filter.h"
-    PRIVATE_HEADERS
-        "helpers/private/simplicial_model_creator.h"
+    INTERNAL_HEADERS
+        "helpers/internal/simplicial_model_creator.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery
-        ghcFilesystem::ghc_filesystem
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh

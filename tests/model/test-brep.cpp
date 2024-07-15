@@ -1298,7 +1298,7 @@ void test_clone( const geode::BRep& brep )
 void test_backward_io()
 {
     const auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "dangling.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
     for( const auto& block : brep.blocks() )
     {
         OPENGEODE_EXCEPTION( block.id() == block.mesh().id(),
@@ -1326,7 +1326,7 @@ void test_backward_io()
 void test_components_filter()
 {
     const auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "structural_model.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "structural_model.og_brep" ) );
     OPENGEODE_EXCEPTION( brep.nb_components_with_relations() == 9,
         "[Test] Wrong number of components with relations" );
 }

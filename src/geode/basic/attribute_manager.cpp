@@ -173,8 +173,8 @@ namespace geode
             const auto attribute_it = attributes_.find( name );
             if( attribute_it == attributes_.end() )
             {
-                static constexpr auto undefined = "undefined";
-                return undefined;
+                static constexpr auto UNDEFINED = "undefined";
+                return UNDEFINED;
             }
             return attribute_it->second->type();
         }

@@ -76,7 +76,7 @@ namespace geode
         typename std::enable_if< T == 3,
             std::optional< std::pair< local_index_t, Vector3D > > >::type
             pivot_and_normal() const;
-        void set_point( index_t vertex, PointType point );
+        void set_point( local_index_t vertex, PointType point );
         const std::array< PointType, 3 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;
         local_index_t longest_edge_index() const;

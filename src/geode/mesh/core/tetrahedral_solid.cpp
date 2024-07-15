@@ -396,7 +396,7 @@ namespace geode
             this->polyhedron_vertex( { polyhedron, 2 } ),
             this->polyhedron_vertex( { polyhedron, 3 } ) };
         PolyhedronEdgesVertices result;
-        for( const auto& edge : detail::tetrahedron_edge_vertices )
+        for( const auto& edge : detail::TETRAHEDRON_EDGE_VERTICES )
         {
             result.emplace_back( std::array< index_t, 2 >{
                 vertices[edge[0]], vertices[edge[1]] } );
@@ -410,7 +410,7 @@ namespace geode
     {
         PolyhedronFacets facets;
         for( const auto facet :
-            detail::tetrahedron_facet_vertices[polyhedron_vertex.vertex_id] )
+            detail::TETRAHEDRON_FACET_VERTICES[polyhedron_vertex.vertex_id] )
         {
             facets.emplace_back( polyhedron_vertex.polyhedron_id, facet );
         }
@@ -428,7 +428,7 @@ namespace geode
             this->polyhedron_vertex( { polyhedron, 2 } ),
             this->polyhedron_vertex( { polyhedron, 3 } ) };
         PolyhedronFacetsVertices result;
-        for( const auto& facet : detail::tetrahedron_facet_vertices )
+        for( const auto& facet : detail::TETRAHEDRON_FACET_VERTICES )
         {
             result.emplace_back( PolyhedronFacetVertices{
                 vertices[facet[0]], vertices[facet[1]], vertices[facet[2]] } );

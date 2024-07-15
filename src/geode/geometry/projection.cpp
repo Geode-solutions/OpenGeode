@@ -37,7 +37,7 @@ namespace geode
     {
         const auto barycenter = segment.barycenter();
         const auto length = segment.length();
-        if( length <= global_epsilon )
+        if( length <= GLOBAL_EPSILON )
         {
             return barycenter;
         }

@@ -33,7 +33,7 @@
 
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/private/regular_grid_shape_function.h>
+#include <geode/mesh/helpers/internal/grid_shape_function.h>
 
 namespace
 {
@@ -89,7 +89,7 @@ namespace
                         function_value
                         - scalar_function->value( vertex_around );
                     const auto dist2 = position_diff.length2();
-                    if( std::fabs( dist2 ) < geode::global_epsilon
+                    if( std::fabs( dist2 ) < geode::GLOBAL_EPSILON
                         || std::fabs(
                                position_diff.value( d ) / std::sqrt( dist2 ) )
                                < 0.1 )
@@ -103,7 +103,7 @@ namespace
                         diff_sign * position_diff.value( d ) / dist2;
                 }
                 OPENGEODE_EXCEPTION(
-                    std::fabs( inverse_dist_sum ) > geode::global_epsilon,
+                    std::fabs( inverse_dist_sum ) > geode::GLOBAL_EPSILON,
                     "[compute_scalar_function_gradient] Couldn't compute "
                     "gradient on vertex ",
                     vertex_id,

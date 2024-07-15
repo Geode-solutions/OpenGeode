@@ -32,12 +32,14 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < index_t dimension >
-        class FacetEdgesImpl : public FacetStorage< std::array< index_t, 2 > >
+        class FacetEdgesImpl
+            : public detail::FacetStorage< std::array< index_t, 2 > >
         {
-            using EdgesVertexCycle = VertexCycle< std::array< index_t, 2 > >;
+            using EdgesVertexCycle =
+                detail::VertexCycle< std::array< index_t, 2 > >;
             friend class bitsery::Access;
 
         public:
@@ -122,5 +124,5 @@ namespace geode
                         } } } );
             }
         };
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

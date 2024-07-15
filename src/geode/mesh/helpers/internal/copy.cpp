@@ -21,25 +21,24 @@
  *
  */
 
-#pragma once
+#include <geode/mesh/helpers/internal/copy.h>
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/grid.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
-} // namespace geode
+#include <async++.h>
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
-        template < index_t dimension >
-        double shape_function_value(
-            const typename Grid< dimension >::CellIndices& cell_id,
-            local_index_t node_id,
-            const Point< dimension >& point_in_grid );
-    } // namespace detail
+        void copy_attributes(
+            const AttributeManager& manager_in, AttributeManager& manager_out )
+        {
+            absl::FixedArray< index_t > old2new( manager_in.nb_elements() );
+            async::parallel_for(
+                async::irange( index_t{ 0 }, manager_in.nb_elements() ),
+                [&old2new]( index_t i ) {
+                    old2new[i] = i;
+                } );
+            manager_out.import( manager_in, old2new );
+        }
+    } // namespace internal
 } // namespace geode

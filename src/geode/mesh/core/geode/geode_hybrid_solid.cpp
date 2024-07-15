@@ -34,11 +34,11 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/geode_elements.h>
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 
 namespace
 {
-    static constexpr std::array< geode::HybridSolid3D::Type, 9 > types_{
+    static constexpr std::array< geode::HybridSolid3D::Type, 9 > TYPES{
         geode::HybridSolid3D::Type::UNKNOWN,
         geode::HybridSolid3D::Type::UNKNOWN,
         geode::HybridSolid3D::Type::UNKNOWN,
@@ -94,14 +94,14 @@ namespace geode
 {
     template < index_t dimension >
     class OpenGeodeHybridSolid< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
         using Type = HybridSolid3D::Type;
 
     public:
         explicit Impl( OpenGeodeHybridSolid< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh )
+            : internal::PointsImpl< dimension >( mesh )
         {
             polyhedron_vertex_ptr_.emplace_back( 0 );
             polyhedron_adjacent_ptr_.emplace_back( 0 );
@@ -139,11 +139,11 @@ namespace geode
                 case Type::HEXAHEDRON:
                     return 4;
                 case Type::PRISM:
-                    return detail::prism_facet_vertices[polyhedron_facet
+                    return detail::PRISM_FACET_VERTICES[polyhedron_facet
                                                             .facet_id]
                         .size();
                 case Type::PYRAMID:
-                    return detail::pyramid_facet_vertices[polyhedron_facet
+                    return detail::PYRAMID_FACET_VERTICES[polyhedron_facet
                                                               .facet_id]
                         .size();
                 case Type::UNKNOWN:
@@ -193,19 +193,19 @@ namespace geode
                 case Type::TETRAHEDRON:
                     return {
                         polyhedron_id,
-                        detail::tetrahedron_facet_vertices[facet_id][vertex_id]
+                        detail::TETRAHEDRON_FACET_VERTICES[facet_id][vertex_id]
                     };
                 case Type::HEXAHEDRON:
                     return {
                         polyhedron_id,
-                        detail::hexahedron_facet_vertices[facet_id][vertex_id]
+                        detail::HEXAHEDRON_FACET_VERTICES[facet_id][vertex_id]
                     };
                 case Type::PRISM:
                     return { polyhedron_id,
-                        detail::prism_facet_vertices[facet_id][vertex_id] };
+                        detail::PRISM_FACET_VERTICES[facet_id][vertex_id] };
                 case Type::PYRAMID:
                     return { polyhedron_id,
-                        detail::pyramid_facet_vertices[facet_id][vertex_id] };
+                        detail::PYRAMID_FACET_VERTICES[facet_id][vertex_id] };
                 case Type::UNKNOWN:
                     throw OpenGeodeException(
                         "[HybridSolid] Unknown polyhedron type" );
@@ -300,16 +300,16 @@ namespace geode
             {
                 case Type::TETRAHEDRON:
                     return ::polyhedron_edges_vertices(
-                        solid, polyhedron, detail::tetrahedron_edge_vertices );
+                        solid, polyhedron, detail::TETRAHEDRON_EDGE_VERTICES );
                 case Type::HEXAHEDRON:
                     return ::polyhedron_edges_vertices(
-                        solid, polyhedron, detail::hexahedron_edge_vertices );
+                        solid, polyhedron, detail::HEXAHEDRON_EDGE_VERTICES );
                 case Type::PRISM:
                     return ::polyhedron_edges_vertices(
-                        solid, polyhedron, detail::prism_edge_vertices );
+                        solid, polyhedron, detail::PRISM_EDGE_VERTICES );
                 case Type::PYRAMID:
                     return ::polyhedron_edges_vertices(
-                        solid, polyhedron, detail::pyramid_edge_vertices );
+                        solid, polyhedron, detail::PYRAMID_EDGE_VERTICES );
                 case Type::UNKNOWN:
                     throw OpenGeodeException(
                         "[HybridSolid] Unknown polyhedron type" );
@@ -324,16 +324,16 @@ namespace geode
             {
                 case Type::TETRAHEDRON:
                     return ::polyhedron_facets_vertices(
-                        solid, polyhedron, detail::tetrahedron_facet_vertices );
+                        solid, polyhedron, detail::TETRAHEDRON_FACET_VERTICES );
                 case Type::HEXAHEDRON:
                     return ::polyhedron_facets_vertices(
-                        solid, polyhedron, detail::hexahedron_facet_vertices );
+                        solid, polyhedron, detail::HEXAHEDRON_FACET_VERTICES );
                 case Type::PRISM:
                     return ::polyhedron_facets_vertices(
-                        solid, polyhedron, detail::prism_facet_vertices );
+                        solid, polyhedron, detail::PRISM_FACET_VERTICES );
                 case Type::PYRAMID:
                     return ::polyhedron_facets_vertices(
-                        solid, polyhedron, detail::pyramid_facet_vertices );
+                        solid, polyhedron, detail::PYRAMID_FACET_VERTICES );
                 case Type::UNKNOWN:
                     throw OpenGeodeException(
                         "[HybridSolid] Unknown polyhedron type" );
@@ -343,7 +343,7 @@ namespace geode
 
         Type polyhedron_type( index_t polyhedron_id ) const
         {
-            return types_[get_nb_polyhedron_vertices( polyhedron_id )];
+            return TYPES[get_nb_polyhedron_vertices( polyhedron_id )];
         }
 
         void permute_polyhedra( absl::Span< const index_t > permutation )
@@ -428,7 +428,7 @@ namespace geode
                     a.container4b( impl.polyhedron_adjacent_ptr_,
                         impl.polyhedron_adjacent_ptr_.max_size() );
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
 

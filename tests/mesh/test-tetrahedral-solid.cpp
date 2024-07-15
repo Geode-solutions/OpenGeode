@@ -78,7 +78,7 @@ void test_polyhedron_volumes( const geode::TetrahedralSolid3D& solid )
         OPENGEODE_EXCEPTION( std::fabs( solid.polyhedron_volume( p )
                                         - geode::tetrahedron_signed_volume(
                                             solid.tetrahedron( p ) ) )
-                                 < geode::global_epsilon,
+                                 < geode::GLOBAL_EPSILON,
             "[Test] Not correct tetrahedron volume computation" );
     }
 }
@@ -92,7 +92,7 @@ void test_polyhedron_facet_area( const geode::TetrahedralSolid3D& solid )
             auto actual = std::fabs( solid.polyhedron_facet_area( { p, f } ) );
             auto expected = geode::triangle_area( solid.triangle( { p, f } ) );
             OPENGEODE_EXCEPTION(
-                std::fabs( actual - expected ) < geode::global_epsilon,
+                std::fabs( actual - expected ) < geode::GLOBAL_EPSILON,
                 "[Test] Not correct tetrahedron facet area computation" );
         }
     }
