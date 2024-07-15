@@ -41,7 +41,7 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < typename Model >
         class SimplicialModelCreator
@@ -193,5 +193,5 @@ namespace geode
             ModelBuilder builder_;
             std::vector< Point< dimension > > unique_points_;
         };
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

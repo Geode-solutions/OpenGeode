@@ -30,13 +30,13 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/grid_builder.h>
-#include <geode/mesh/core/private/grid_impl.h>
+#include <geode/mesh/core/internal/grid_impl.h>
 
 namespace geode
 {
     template < index_t dimension >
     class LightRegularGrid< dimension >::Impl
-        : public detail::GridImpl< dimension >
+        : public internal::GridImpl< dimension >
     {
     public:
         Impl() = default;

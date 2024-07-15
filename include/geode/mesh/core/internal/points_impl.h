@@ -35,7 +35,7 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         /*!
          * This class implements the mesh points storage.
@@ -138,5 +138,5 @@ namespace geode
         private:
             std::shared_ptr< VariableAttribute< Point< dimension > > > points_;
         };
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

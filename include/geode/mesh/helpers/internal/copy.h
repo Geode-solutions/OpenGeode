@@ -34,7 +34,7 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < typename MeshFrom, typename Builder >
         void copy_points3d_into_2d(
@@ -93,5 +93,5 @@ namespace geode
 
         void copy_attributes(
             const AttributeManager& manager_in, AttributeManager& manager_out );
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

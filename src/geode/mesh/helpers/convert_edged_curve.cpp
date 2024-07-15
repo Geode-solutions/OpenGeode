@@ -30,7 +30,7 @@
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/helpers/detail/curve_merger.h>
-#include <geode/mesh/helpers/private/copy.h>
+#include <geode/mesh/helpers/internal/copy.h>
 
 namespace
 {
@@ -52,13 +52,13 @@ namespace geode
     {
         auto curve2d = EdgedCurve2D::create();
         auto builder2d = EdgedCurveBuilder2D::create( *curve2d );
-        detail::copy_points3d_into_2d( curve3d, *builder2d, axis_to_remove );
+        internal::copy_points3d_into_2d( curve3d, *builder2d, axis_to_remove );
         copy_edges( curve3d, builder2d );
-        detail::copy_attributes( curve3d.vertex_attribute_manager(),
+        internal::copy_attributes( curve3d.vertex_attribute_manager(),
             curve2d->vertex_attribute_manager() );
-        detail::copy_attributes( curve3d.edge_attribute_manager(),
+        internal::copy_attributes( curve3d.edge_attribute_manager(),
             curve2d->edge_attribute_manager() );
-        detail::copy_meta_info( curve3d, *builder2d );
+        internal::copy_meta_info( curve3d, *builder2d );
         return curve2d;
     }
 
@@ -69,14 +69,14 @@ namespace geode
     {
         auto curve3d = EdgedCurve3D::create();
         auto builder3d = EdgedCurveBuilder3D::create( *curve3d );
-        detail::copy_points2d_into_3d(
+        internal::copy_points2d_into_3d(
             curve2d, *builder3d, axis_to_add, axis_coordinate );
         copy_edges( curve2d, builder3d );
-        detail::copy_attributes( curve2d.vertex_attribute_manager(),
+        internal::copy_attributes( curve2d.vertex_attribute_manager(),
             curve3d->vertex_attribute_manager() );
-        detail::copy_attributes( curve2d.edge_attribute_manager(),
+        internal::copy_attributes( curve2d.edge_attribute_manager(),
             curve3d->edge_attribute_manager() );
-        detail::copy_meta_info( curve2d, *builder3d );
+        internal::copy_meta_info( curve2d, *builder3d );
         return curve3d;
     }
 

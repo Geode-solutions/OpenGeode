@@ -25,29 +25,29 @@
 
 #include <geode/basic/bitsery_archive.h>
 
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
-        struct PolyhedraAroundVertexImpl
+        struct PolygonsAroundVertexImpl
         {
-            PolyhedraAroundVertexImpl() = default;
-            PolyhedraAroundVertexImpl( PolyhedraAroundVertex polyhedra_in,
-                bool vertex_is_on_border_in )
-                : polyhedra{ std::move( polyhedra_in ) },
+            PolygonsAroundVertexImpl() = default;
+            PolygonsAroundVertexImpl(
+                PolygonsAroundVertex polygons_in, bool vertex_is_on_border_in )
+                : polygons{ std::move( polygons_in ) },
                   vertex_is_on_border{ vertex_is_on_border_in }
             {
             }
 
-            bool operator!=( const PolyhedraAroundVertexImpl& other ) const
+            bool operator!=( const PolygonsAroundVertexImpl& other ) const
             {
                 if( vertex_is_on_border != other.vertex_is_on_border )
                 {
                     return true;
                 }
-                return polyhedra != other.polyhedra;
+                return polygons != other.polygons;
             }
 
             friend class bitsery::Access;
@@ -55,16 +55,16 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    Growable< Archive, PolyhedraAroundVertexImpl >{
-                        { []( Archive& a, PolyhedraAroundVertexImpl& value ) {
+                    Growable< Archive, PolygonsAroundVertexImpl >{
+                        { []( Archive& a, PolygonsAroundVertexImpl& value ) {
                             a.container(
-                                value.polyhedra, value.polyhedra.max_size() );
+                                value.polygons, value.polygons.max_size() );
                             a.value1b( value.vertex_is_on_border );
                         } } } );
             }
 
-            PolyhedraAroundVertex polyhedra;
+            PolygonsAroundVertex polygons;
             bool vertex_is_on_border{ true };
         };
-    } // namespace detail
+    } // namespace internal
 } // namespace geode
