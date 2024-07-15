@@ -32,19 +32,19 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodePolyhedralSolid< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh )
+            : internal::PointsImpl< dimension >( mesh )
         {
             polyhedron_vertex_ptr_.emplace_back( 0 );
             polyhedron_facet_ptr_.emplace_back( 0 );
@@ -345,8 +345,9 @@ namespace geode
                              impl.polyhedron_adjacents_.max_size() );
                          a.container4b( impl.polyhedron_adjacent_ptr_,
                              impl.polyhedron_adjacent_ptr_.max_size() );
-                         a.ext( impl, bitsery::ext::BaseClass<
-                                          detail::PointsImpl< dimension > >{} );
+                         a.ext(
+                             impl, bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
                      },
                         []( Archive& a, Impl& impl ) {
                             a.container4b( impl.polyhedron_vertices_,
@@ -361,9 +362,9 @@ namespace geode
                                 impl.polyhedron_adjacents_.max_size() );
                             a.container4b( impl.polyhedron_adjacent_ptr_,
                                 impl.polyhedron_adjacent_ptr_.max_size() );
-                            a.ext(
-                                impl, bitsery::ext::BaseClass<
-                                          detail::PointsImpl< dimension > >{} );
+                            a.ext( impl,
+                                bitsery::ext::BaseClass<
+                                    internal::PointsImpl< dimension > >{} );
                         } } } );
         }
 

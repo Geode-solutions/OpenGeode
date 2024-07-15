@@ -37,9 +37,9 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/internal/facet_edges_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/private/facet_edges_impl.h>
 
 namespace
 {
@@ -58,7 +58,7 @@ namespace geode
 {
     template < index_t dimension >
     class SurfaceEdges< dimension >::Impl
-        : public detail::FacetEdgesImpl< dimension >
+        : public internal::FacetEdgesImpl< dimension >
     {
         friend class bitsery::Access;
 
@@ -82,8 +82,9 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::FacetEdgesImpl< dimension > >{} );
+                    a.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  internal::FacetEdgesImpl< dimension > >{} );
                 } } } );
         }
     };

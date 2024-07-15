@@ -28,16 +28,16 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
-#include <geode/mesh/core/private/edges_impl.h>
+#include <geode/mesh/core/internal/edges_impl.h>
 
 namespace geode
 {
-    class OpenGeodeGraph::Impl : public detail::EdgesImpl
+    class OpenGeodeGraph::Impl : public internal::EdgesImpl
     {
         friend class bitsery::Access;
 
     public:
-        explicit Impl( OpenGeodeGraph& mesh ) : detail::EdgesImpl( mesh ) {}
+        explicit Impl( OpenGeodeGraph& mesh ) : internal::EdgesImpl( mesh ) {}
 
     private:
         Impl() = default;
@@ -47,8 +47,8 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext(
-                        impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
+                    a.ext( impl,
+                        bitsery::ext::BaseClass< internal::EdgesImpl >{} );
                 } } } );
         }
     };

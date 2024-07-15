@@ -47,7 +47,7 @@ add_geode_library(
         "perpendicular.cpp"
         "points_sort.cpp"
         "position.cpp"
-        "private/predicates.cpp"
+        "internal/predicates.cpp"
         "projection.cpp"
         "radial_sort.cpp"
         "rotation.cpp"
@@ -88,10 +88,10 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/aabb_impl.h"
         "detail/bitsery_archive.h"
-    PRIVATE_HEADERS
-        "private/intersection_from_sides.h"
-        "private/position_from_sides.h"
-        "private/predicates.h"
+    INTERNAL_HEADERS
+        "internal/intersection_from_sides.h"
+        "internal/position_from_sides.h"
+        "internal/predicates.h"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
         Threads::Threads

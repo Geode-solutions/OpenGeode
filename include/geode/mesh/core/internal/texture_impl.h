@@ -34,7 +34,7 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < index_t dimension >
         class TextureImpl
@@ -111,5 +111,5 @@ namespace geode
             std::shared_ptr< VariableAttribute< ElementTextureCoordinates > >
                 coordinates_;
         };
-    } // namespace detail
+    } // namespace internal
 } // namespace geode

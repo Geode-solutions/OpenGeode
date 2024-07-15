@@ -27,17 +27,17 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/private/array_impl.h>
+#include <geode/basic/internal/array_impl.h>
 
 #include <geode/geometry/vector.h>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
         template < index_t dimension >
         class GridImpl : public ArrayImpl< dimension >
@@ -244,5 +244,5 @@ namespace geode
                 task.get();
             }
         }
-    } // namespace detail
+    } // namespace internal
 } // namespace geode
