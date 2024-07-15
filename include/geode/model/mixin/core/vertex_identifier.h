@@ -72,28 +72,6 @@ namespace geode
          */
         const std::vector< ComponentMeshVertex >& component_mesh_vertices(
             index_t unique_vertex_id ) const;
-
-        /*!
-         * Return the component vertices identified with an unique vertex
-         * only for vertices belonging to component of the specified type.
-         * @param[in] unique_vertex_id Indice of the unique vertex.
-         * @param[in] type Type of components used to filter returned vertices.
-         */
-        OPENGEODE_MODEL_DEPRECATED std::vector< ComponentMeshVertex >
-            component_mesh_vertices(
-                index_t unique_vertex_id, const ComponentType& type ) const;
-
-        /*!
-         * Return the component vertices identified with an unique vertex
-         * only for vertices belonging to one specified component.
-         * @param[in] unique_vertex_id Indice of the unique vertex.
-         * @param[in] component_id Component unique index used to filter
-         * returned vertices.
-         */
-        OPENGEODE_MODEL_DEPRECATED std::vector< index_t >
-            component_mesh_vertices(
-                index_t unique_vertex_id, const uuid& component_id ) const;
-
         /*!
          * Return the unique vertex index of a given component vertex.
          * @param[in] component_vertex Vertex index in a geometric component.
