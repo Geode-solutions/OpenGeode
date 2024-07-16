@@ -8,7 +8,9 @@
 
 - **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
 
-- **convert_to_mesh**: conversions from BRep and Section to meshes now return tuples with mesh and mappings.
+-**Make_unique**: Replace absl::make_unique by is equivalent in C++17 std::make_unique.
+
+- **Convert_to_mesh**: conversions from BRep and Section to meshes now return tuples with mesh and mappings.
 
 - **String_View**: Replace absl::string_view by is equivalent in C++17 std::string_view.
 
@@ -16,11 +18,27 @@
 
 - **Basic_Objects**: Change from index_t to local_index_t in set_point methods for Triangle, Tetrahedron and Segment
 
-TODO.....
+- **From_h_to_hpp**: Change all header files extension from .h to .hpp 
+
+- **BeginEnd**: Remove BeginEnd class.
+
+-**ComponentMeshVertices**: Remove overload of ComponentMeshVertices taking component_type or uuid as inputs.
+
+-**Enums**: Unify convention of Enums : use uppercase for the names and lower cases for the member 
+
+--**RegularGridFunctions**: Rename files regularGrid_XX_XX into grid_XX_XX if they take a grid as an input
 
 - **C++**: upgrade from C++ standard requirment from C++11 to C++17
 
 - **Constructors**: Most single-parameter constructors have been set to "explicit", meaning their class cannot be constructed implicitely, also avoiding implicit conversions between the types. This change should mainly affect the construction of `Point<dimension>`, `Vector<dimension>`, `PolygonVertex` and `PolygonEdge`.
+
+-**Static**: Use uppercase for static variables : GLOBAL_EPSILON
+
+-**Private_folders**: Rename private folders into internal folders and use namespace internal inside of them instead of detail
+
+-**AABB**: remove the returned point from AABBTree::closest_element_box
+
+-**Rasterize_triangle**: change rasterize_triangle name to conservative_rasterize_triangle
 
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 
