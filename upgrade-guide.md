@@ -4,11 +4,17 @@
 
 ### Motivations
 
+With the end of life of RHEL7, the entire ecosystem has been upgraded to RHEL8 compatible system.
+This upgrade implies the new RHEL compatible binaries are now generated on Alma8 and the C++ standard has been upgraded to C++17.
+
+Annual cleanup was also required to remove old API.
+To enforce C++ language convention, header file extensions has been renamed from .h to .hpp.
+
 ### Breaking Changes
 
 - **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
 
--**Make_unique**: Replace absl::make_unique by is equivalent in C++17 std::make_unique.
+- **Make_unique**: Replace absl::make_unique by is equivalent in C++17 std::make_unique.
 
 - **Convert_to_mesh**: conversions from BRep and Section to meshes now return tuples with mesh and mappings.
 
@@ -18,27 +24,27 @@
 
 - **Basic_Objects**: Change from index_t to local_index_t in set_point methods for Triangle, Tetrahedron and Segment
 
-- **From_h_to_hpp**: Change all header files extension from .h to .hpp 
+- **Headers**: Change all header files extension from .h to .hpp
 
 - **BeginEnd**: Remove BeginEnd class.
 
--**ComponentMeshVertices**: Remove overload of ComponentMeshVertices taking component_type or uuid as inputs.
+- **ComponentMeshVertices**: Remove overload of ComponentMeshVertices taking component_type or uuid as inputs.
 
--**Enums**: Unify convention of Enums : use uppercase for the names and lower cases for the member 
+- **Enums**: Unify convention of Enums : use uppercase for the names and lower cases for the member
 
---**RegularGridFunctions**: Rename files regularGrid_XX_XX into grid_XX_XX if they take a grid as an input
+- **RegularGridFunctions**: Rename files regularGrid_XX_XX into grid_XX_XX if they take a grid as an input
 
-- **C++**: upgrade from C++ standard requirment from C++11 to C++17
+- **C++**: upgrade from C++ standard requirement from C++11 to C++17
 
 - **Constructors**: Most single-parameter constructors have been set to "explicit", meaning their class cannot be constructed implicitely, also avoiding implicit conversions between the types. This change should mainly affect the construction of `Point<dimension>`, `Vector<dimension>`, `PolygonVertex` and `PolygonEdge`.
 
--**Static**: Use uppercase for static variables : GLOBAL_EPSILON
+- **Global variables**: Use uppercase for global variables (e.g. GLOBAL_EPSILON)
 
--**Private_folders**: Rename private folders into internal folders and use namespace internal inside of them instead of detail
+- **Private_folders**: Rename private folders into internal folders and use namespace internal inside of them instead of detail
 
--**AABB**: remove the returned point from AABBTree::closest_element_box
+- **AABB**: remove the returned point from AABBTree::closest_element_box
 
--**Rasterize_triangle**: change rasterize_triangle name to conservative_rasterize_triangle
+- **Rasterize_triangle**: change rasterize_triangle name to conservative_rasterize_triangle
 
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 
