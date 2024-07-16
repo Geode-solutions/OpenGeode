@@ -108,7 +108,7 @@ void test_scalar_function( geode::TetrahedralSolid3D& solid )
 void test_point_function( geode::TetrahedralSolid3D& solid )
 {
     const auto function_name = "point_function";
-    auto point_function = geode::TetrahedralSolidPointFunction3D::create(
+    auto point_function = geode::TetrahedralSolidPointFunction< 3, 3 >::create(
         solid, function_name, geode::Point3D{ { 26, 3, -10 } } );
     point_function.set_value( 2, geode::Point3D{ { 22, -3, -20 } } );
     for( const auto i : geode::LRange{ 8 } )

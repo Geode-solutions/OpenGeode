@@ -36,7 +36,7 @@ namespace geode
 
 namespace geode
 {
-    template < index_t dimension, index_t point_dimension = dimension >
+    template < index_t dimension, index_t point_dimension >
     class GridPointFunction
     {
     public:
@@ -89,5 +89,4 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( GridPointFunction );
 } // namespace geode

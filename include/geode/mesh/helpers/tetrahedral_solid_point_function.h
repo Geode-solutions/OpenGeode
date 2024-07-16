@@ -35,7 +35,7 @@ namespace geode
 
 namespace geode
 {
-    template < index_t dimension, index_t point_dimension = dimension >
+    template < index_t dimension, index_t point_dimension >
     class TetrahedralSolidPointFunction
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
@@ -85,5 +85,4 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_3D( TetrahedralSolidPointFunction );
 } // namespace geode
