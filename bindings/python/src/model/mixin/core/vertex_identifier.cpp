@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
 
 namespace geode
 {

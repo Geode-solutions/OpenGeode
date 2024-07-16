@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/representation/core/mapping.h>
+#include <geode/model/representation/core/mapping.hpp>
 
 namespace geode
 {

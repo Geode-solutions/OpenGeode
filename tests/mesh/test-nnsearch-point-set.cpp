@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/nn_search.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/nn_search.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/helpers/nnsearch_mesh.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/helpers/nnsearch_mesh.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void add_points( geode::PointSetBuilder3D& builder )
 {

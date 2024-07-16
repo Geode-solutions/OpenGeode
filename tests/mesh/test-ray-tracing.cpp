@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/aabb.h>
+#include <geode/geometry/aabb.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
-#include <geode/mesh/helpers/ray_tracing.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
+#include <geode/mesh/helpers/ray_tracing.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_ray_inside()
 {

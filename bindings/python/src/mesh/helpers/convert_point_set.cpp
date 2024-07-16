@@ -23,9 +23,9 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/point_set.hpp>
 
-#include <geode/mesh/helpers/convert_point_set.h>
+#include <geode/mesh/helpers/convert_point_set.hpp>
 
 namespace geode
 {

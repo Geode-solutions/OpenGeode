@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.hpp>
 
-#include <geode/mesh/builder/hybrid_solid_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/hybrid_solid_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {

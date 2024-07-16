@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.h>
+#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
 
 namespace geode
 {
@@ -35,8 +35,8 @@ namespace geode
         dimension >::OpenGeodePolygonalSurfaceBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
         : OpenGeodePolygonalSurfaceBuilder< dimension >(
-            dynamic_cast< OpenGeodePolygonalSurface< dimension >& >(
-                vertex_set ) )
+              dynamic_cast< OpenGeodePolygonalSurface< dimension >& >(
+                  vertex_set ) )
     {
     }
 

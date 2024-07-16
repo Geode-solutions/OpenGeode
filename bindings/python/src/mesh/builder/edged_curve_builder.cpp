@@ -23,10 +23,10 @@
 
 #include "../../common.h"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 
 #define PYTHON_EDGED_CURVE_BUILDER( dimension )                                \
     const auto name##dimension =                                               \

@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/segment.hpp>
 
 namespace geode
 {
@@ -78,7 +78,7 @@ namespace geode
     OwnerInfiniteLine< dimension >::OwnerInfiniteLine(
         const Segment< dimension >& segment )
         : OwnerInfiniteLine(
-            segment.normalized_direction(), segment.vertices()[0] )
+              segment.normalized_direction(), segment.vertices()[0] )
     {
     }
     template < index_t dimension >

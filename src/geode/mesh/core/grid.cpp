@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {
@@ -524,8 +524,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cell_vertices( const CellIndices& cell_id ) const
-        -> CellVertices
+    auto Grid< dimension >::cell_vertices(
+        const CellIndices& cell_id ) const -> CellVertices
     {
         return impl_->cell_vertices( cell_id );
     }
@@ -572,15 +572,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells( const Point< dimension >& query ) const
-        -> CellsAroundVertex
+    auto Grid< dimension >::cells(
+        const Point< dimension >& query ) const -> CellsAroundVertex
     {
         return impl_->cells( *this, query );
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells_around( VertexIndices vertex_indices ) const
-        -> CellsAroundVertex
+    auto Grid< dimension >::cells_around(
+        VertexIndices vertex_indices ) const -> CellsAroundVertex
     {
         return impl_->cells_around( *this, vertex_indices );
     }

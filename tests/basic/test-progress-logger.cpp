@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/basic/logger.h>
-#include <geode/basic/progress_logger.h>
-#include <geode/basic/range.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/progress_logger.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {

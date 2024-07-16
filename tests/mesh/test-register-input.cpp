@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/geode/geode_edged_curve.h>
-#include <geode/mesh/core/geode/geode_graph.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
-#include <geode/mesh/io/geode/geode_edged_curve_input.h>
-#include <geode/mesh/io/geode/geode_graph_input.h>
-#include <geode/mesh/io/geode/geode_point_set_input.h>
-#include <geode/mesh/io/geode/geode_polygonal_surface_input.h>
-#include <geode/mesh/io/geode/geode_polyhedral_solid_input.h>
-#include <geode/mesh/io/geode/geode_tetrahedral_solid_input.h>
-#include <geode/mesh/io/geode/geode_triangulated_surface_input.h>
-#include <geode/mesh/io/geode/register_input.h>
+#include <geode/mesh/core/geode/geode_edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
+#include <geode/mesh/io/geode/geode_edged_curve_input.hpp>
+#include <geode/mesh/io/geode/geode_graph_input.hpp>
+#include <geode/mesh/io/geode/geode_point_set_input.hpp>
+#include <geode/mesh/io/geode/geode_polygonal_surface_input.hpp>
+#include <geode/mesh/io/geode/geode_polyhedral_solid_input.hpp>
+#include <geode/mesh/io/geode/geode_tetrahedral_solid_input.hpp>
+#include <geode/mesh/io/geode/geode_triangulated_surface_input.hpp>
+#include <geode/mesh/io/geode/register_input.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < typename GeodeFactory >
 void check_register( std::string_view extension )

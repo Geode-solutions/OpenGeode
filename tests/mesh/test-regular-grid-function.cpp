@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/helpers/grid_point_function.h>
-#include <geode/mesh/helpers/grid_scalar_function.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/helpers/grid_point_function.hpp>
+#include <geode/mesh/helpers/grid_scalar_function.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 bool inexact_equal( double nb1, double nb2, double eps )
 {

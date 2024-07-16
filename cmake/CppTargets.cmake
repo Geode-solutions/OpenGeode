@@ -122,9 +122,9 @@ function(add_geode_library)
     generate_export_header(${GEODE_LIB_NAME}
         BASE_NAME ${project_name}_${GEODE_LIB_NAME}
         EXPORT_MACRO_NAME ${project_name}_${GEODE_LIB_NAME}_api
-        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
+        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.hpp
     )
-    install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
+    install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
         COMPONENT public
     )

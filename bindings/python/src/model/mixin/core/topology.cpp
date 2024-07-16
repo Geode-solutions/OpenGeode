@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/topology.h>
+#include <geode/model/mixin/core/topology.hpp>
 
 namespace geode
 {

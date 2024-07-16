@@ -23,7 +23,7 @@
 
 #include "../common.h"
 
-#include <geode/basic/attribute.h>
+#include <geode/basic/attribute.hpp>
 namespace geode
 {
     template < typename type >

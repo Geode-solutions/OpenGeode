@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/mesh/builder/grid_builder.h>
+#include <geode/mesh/builder/grid_builder.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 namespace geode
 {

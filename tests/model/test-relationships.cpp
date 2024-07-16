@@ -23,16 +23,16 @@
 
 #include <absl/types/span.h>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/range.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/model/mixin/builder/relationships_builder.h>
-#include <geode/model/mixin/core/relationships.h>
+#include <geode/model/mixin/builder/relationships_builder.hpp>
+#include <geode/model/mixin/core/relationships.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 geode::ComponentID component_id( const geode::uuid& id )
 {

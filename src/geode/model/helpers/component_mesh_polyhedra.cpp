@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/helpers/component_mesh_polyhedra.h>
+#include <geode/model/helpers/component_mesh_polyhedra.hpp>
 
 #include <functional>
 #include <vector>
@@ -29,13 +29,13 @@
 #include <absl/container/inlined_vector.h>
 #include <absl/types/span.h>
 
-#include <geode/basic/algorithm.h>
+#include <geode/basic/algorithm.hpp>
 
-#include <geode/mesh/core/detail/vertex_cycle.h>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
 
-#include <geode/model/helpers/component_mesh_vertices.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/helpers/component_mesh_vertices.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace
 {

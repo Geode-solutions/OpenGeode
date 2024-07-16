@@ -23,7 +23,7 @@
 
 #include "../common.h"
 
-#include <geode/basic/cell_array.h>
+#include <geode/basic/cell_array.hpp>
 
 #define PYTHON_ARRAY( dimension )                                              \
     const auto name##dimension =                                               \

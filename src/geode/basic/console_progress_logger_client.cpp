@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/basic/console_progress_logger_client.h>
+#include <geode/basic/console_progress_logger_client.hpp>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/timer.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/timer.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {

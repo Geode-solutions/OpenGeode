@@ -23,9 +23,9 @@
 
 #include "../../../common.h"
 
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/edged_curve.hpp>
 
-#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line.hpp>
 
 #define PYTHON_LINE( dimension )                                               \
     const auto name##dimension = "Line" + std::to_string( dimension ) + "D";   \

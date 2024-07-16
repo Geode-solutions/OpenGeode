@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/surface_collection.h>
+#include <geode/model/mixin/core/surface_collection.hpp>
 
 #define PYTHON_SURFACE_COLLECTION( dimension )                                 \
     const auto name##dimension =                                               \

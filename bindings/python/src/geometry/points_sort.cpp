@@ -23,8 +23,8 @@
 
 #include "../common.h"
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/points_sort.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/points_sort.hpp>
 
 #define PYTHON_SORT( dimension )                                               \
     const auto lexicographic_mapping##dimension =                              \

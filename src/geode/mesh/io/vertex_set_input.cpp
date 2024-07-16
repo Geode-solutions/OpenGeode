@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/vertex_set_input.hpp>
 
 #include <string_view>
 
-#include <geode/basic/detail/geode_input_impl.h>
-#include <geode/basic/io.h>
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/io.hpp>
 
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/vertex_set.h>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/vertex_set.hpp>
 
 namespace geode
 {

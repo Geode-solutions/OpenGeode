@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/geometry/sign.h>
+#include <geode/geometry/sign.hpp>
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/internal/position_from_sides.h>
-#include <geode/geometry/internal/predicates.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/internal/position_from_sides.hpp>
+#include <geode/geometry/internal/predicates.hpp>
 
 namespace
 {

@@ -23,7 +23,7 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/builder/solid_facets_builder.h>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
 
 #define PYTHON_SOLID_FACETS_BUILDER( dimension )                               \
     const auto name##dimension =                                               \

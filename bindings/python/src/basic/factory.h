@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/factory.h>
+#include <geode/basic/factory.hpp>
 
 #define PYTHON_FACTORY_CLASS( type )                                           \
     pybind11::class_< type >( module, #type )                                  \

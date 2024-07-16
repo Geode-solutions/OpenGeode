@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/relationships.h>
+#include <geode/model/mixin/core/relationships.hpp>
 
 namespace geode
 {

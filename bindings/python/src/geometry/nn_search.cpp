@@ -23,7 +23,7 @@
 
 #include "../common.h"
 
-#include <geode/geometry/nn_search.h>
+#include <geode/geometry/nn_search.hpp>
 
 #define PYTHON_NN_SEARCH( dimension )                                          \
     const auto name##dimension =                                               \

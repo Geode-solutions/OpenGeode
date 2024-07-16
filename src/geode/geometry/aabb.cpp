@@ -27,13 +27,13 @@
  * Applications (ASGA)
  */
 
-#include <geode/geometry/aabb.h>
+#include <geode/geometry/aabb.hpp>
 
 #include <async++.h>
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/points_sort.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/points_sort.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <algorithm>
 #include <numeric>

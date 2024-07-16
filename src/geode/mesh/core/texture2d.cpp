@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/core/texture2d.h>
+#include <geode/mesh/core/texture2d.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/image/core/raster_image.h>
+#include <geode/image/core/raster_image.hpp>
 
-#include <geode/mesh/core/internal/texture_impl.h>
+#include <geode/mesh/core/internal/texture_impl.hpp>
 
 namespace geode
 {

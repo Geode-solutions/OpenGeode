@@ -23,8 +23,8 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/lines.hpp>
 
 #define PYTHON_LINES( dimension )                                              \
     const auto name##dimension = "Lines" + std::to_string( dimension ) + "D";  \

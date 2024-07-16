@@ -23,7 +23,7 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
+#include <geode/mesh/builder/polyhedral_solid_builder.hpp>
 
 #define PYTHON_POLYHEDRAL_SOLID_BUILDER( dimension )                           \
     const auto name##dimension =                                               \

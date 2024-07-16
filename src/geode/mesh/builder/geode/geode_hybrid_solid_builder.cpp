@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_hybrid_solid_builder.h>
+#include <geode/mesh/builder/geode/geode_hybrid_solid_builder.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_hybrid_solid.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_hybrid_solid.hpp>
 
 namespace geode
 {
@@ -34,7 +34,7 @@ namespace geode
     OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodeHybridSolidBuilder< dimension >(
-            dynamic_cast< OpenGeodeHybridSolid< dimension >& >( vertex_set ) )
+              dynamic_cast< OpenGeodeHybridSolid< dimension >& >( vertex_set ) )
     {
     }
 

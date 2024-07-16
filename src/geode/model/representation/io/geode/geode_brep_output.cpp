@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/representation/io/geode/geode_brep_output.h>
+#include <geode/model/representation/io/geode/geode_brep_output.hpp>
 
 #include <filesystem>
 #include <string>
@@ -29,10 +29,10 @@
 
 #include <async++.h>
 
-#include <geode/basic/uuid.h>
-#include <geode/basic/zip_file.h>
+#include <geode/basic/uuid.hpp>
+#include <geode/basic/zip_file.hpp>
 
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace geode
 {

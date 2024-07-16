@@ -24,7 +24,7 @@
 #include "../common.h"
 #include <pybind11/iostream.h>
 
-#include <geode/mesh/common.h>
+#include <geode/mesh/common.hpp>
 
 namespace geode
 {

@@ -23,10 +23,10 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/helpers/convert_solid_mesh.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
 
 namespace geode
 {

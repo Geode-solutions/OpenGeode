@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_triangulated_surface_builder.h>
+#include <geode/mesh/builder/geode/geode_triangulated_surface_builder.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
 
 namespace geode
 {
@@ -35,8 +35,8 @@ namespace geode
         dimension >::OpenGeodeTriangulatedSurfaceBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
         : OpenGeodeTriangulatedSurfaceBuilder< dimension >(
-            dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
-                vertex_set ) )
+              dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
+                  vertex_set ) )
     {
     }
 

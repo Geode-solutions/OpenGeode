@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/common.h>
+#include <geode/mesh/common.hpp>
 
-#include <geode/geometry/common.h>
+#include <geode/geometry/common.hpp>
 
-#include <geode/image/common.h>
+#include <geode/image/common.hpp>
 
-#include <geode/mesh/builder/geode/register_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/geode/register_mesh.h>
-#include <geode/mesh/io/geode/register_input.h>
-#include <geode/mesh/io/geode/register_output.h>
+#include <geode/mesh/builder/geode/register_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/geode/register_mesh.hpp>
+#include <geode/mesh/io/geode/register_input.hpp>
+#include <geode/mesh/io/geode/register_output.hpp>
 
 namespace geode
 {

@@ -21,32 +21,32 @@
  *
  */
 
-#include <geode/mesh/helpers/rasterize.h>
+#include <geode/mesh/helpers/rasterize.hpp>
 
 #include <array>
 #include <queue>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/geometry/barycentric_coordinates.h>
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/perpendicular.h>
-#include <geode/geometry/position.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/geometry/barycentric_coordinates.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/perpendicular.hpp>
+#include <geode/geometry/position.hpp>
 
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/grid.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/grid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 namespace
 {

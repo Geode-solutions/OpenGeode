@@ -23,8 +23,8 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/line_collection.h>
-#include <geode/model/mixin/core/line_collections.h>
+#include <geode/model/mixin/core/line_collection.hpp>
+#include <geode/model/mixin/core/line_collections.hpp>
 
 #define PYTHON_LINE_COLLECTIONS( dimension )                                   \
     const auto name##dimension =                                               \

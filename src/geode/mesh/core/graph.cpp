@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/core/graph.h>
+#include <geode/mesh/core/graph.hpp>
 
 #include <algorithm>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/graph_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/graph_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {
@@ -45,10 +45,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
         {
         }
 

@@ -23,7 +23,7 @@
 
 #include "../common.h"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
 #define PYTHON_POINT( dimension )                                              \
     const auto name##dimension = "Point" + std::to_string( dimension ) + "D";  \

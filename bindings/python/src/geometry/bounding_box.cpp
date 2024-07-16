@@ -23,9 +23,9 @@
 
 #include "../common.h"
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
 
 #define PYTHON_BOUNDING_BOX( dimension )                                       \
     const auto name##dimension =                                               \

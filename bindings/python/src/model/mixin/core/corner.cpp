@@ -23,9 +23,9 @@
 
 #include "../../../common.h"
 
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/point_set.hpp>
 
-#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/corner.hpp>
 
 #define PYTHON_CORNER( dimension )                                             \
     const auto name##dimension = "Corner" + std::to_string( dimension ) + "D"; \

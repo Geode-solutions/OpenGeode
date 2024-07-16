@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/mesh/helpers/convert_solid_mesh.h>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/hybrid_solid_builder.h>
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/helpers/detail/element_identifier.h>
-#include <geode/mesh/helpers/detail/solid_merger.h>
-#include <geode/mesh/helpers/internal/copy.h>
+#include <geode/mesh/builder/hybrid_solid_builder.hpp>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/helpers/detail/element_identifier.hpp>
+#include <geode/mesh/helpers/detail/solid_merger.hpp>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 namespace
 {

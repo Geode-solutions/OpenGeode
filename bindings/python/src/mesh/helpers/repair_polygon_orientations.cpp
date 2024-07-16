@@ -23,8 +23,8 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/repair_polygon_orientations.h>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
 namespace geode
 {

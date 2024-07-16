@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/image/core/greyscale_color.h>
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/greyscale_color.hpp>
+#include <geode/image/core/rgb_color.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_comparison()
 {

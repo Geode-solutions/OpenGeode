@@ -21,29 +21,29 @@
  *
  */
 
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/core/brep.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/block_collection.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/corner_collection.h>
-#include <geode/model/mixin/core/detail/count_relationships.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/line_collection.h>
-#include <geode/model/mixin/core/model_boundary.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surface_collection.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/core/detail/clone.h>
-#include <geode/model/representation/core/internal/helpers.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/block_collection.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/core/detail/clone.hpp>
+#include <geode/model/representation/core/internal/helpers.hpp>
 
 namespace geode
 {
@@ -137,8 +137,8 @@ namespace geode
 
     BRep::BoundarySurfaceRange::~BoundarySurfaceRange() = default;
 
-    auto BRep::BoundarySurfaceRange::begin() const
-        -> const BoundarySurfaceRange&
+    auto
+        BRep::BoundarySurfaceRange::begin() const -> const BoundarySurfaceRange&
     {
         return *this;
     }
@@ -209,8 +209,8 @@ namespace geode
 
     BRep::IncidentSurfaceRange::~IncidentSurfaceRange() = default;
 
-    auto BRep::IncidentSurfaceRange::begin() const
-        -> const IncidentSurfaceRange&
+    auto
+        BRep::IncidentSurfaceRange::begin() const -> const IncidentSurfaceRange&
     {
         return *this;
     }
@@ -398,8 +398,8 @@ namespace geode
 
     BRep::InternalSurfaceRange::~InternalSurfaceRange() = default;
 
-    auto BRep::InternalSurfaceRange::begin() const
-        -> const InternalSurfaceRange&
+    auto
+        BRep::InternalSurfaceRange::begin() const -> const InternalSurfaceRange&
     {
         return *this;
     }
@@ -449,8 +449,8 @@ namespace geode
         return *this;
     }
 
-    auto BRep::EmbeddingSurfaceRange::end() const
-        -> const EmbeddingSurfaceRange&
+    auto
+        BRep::EmbeddingSurfaceRange::end() const -> const EmbeddingSurfaceRange&
     {
         return *this;
     }

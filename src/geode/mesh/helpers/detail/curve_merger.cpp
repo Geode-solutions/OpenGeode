@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/curve_merger.h>
+#include <geode/mesh/helpers/detail/curve_merger.hpp>
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 
 namespace geode
 {
@@ -207,8 +207,8 @@ namespace geode
         }
 
         template < index_t dimension >
-        auto EdgedCurveMerger< dimension >::edge_origins( index_t edge ) const
-            -> const EdgeOrigins&
+        auto EdgedCurveMerger< dimension >::edge_origins(
+            index_t edge ) const -> const EdgeOrigins&
         {
             return impl_->edge_origins( edge );
         }

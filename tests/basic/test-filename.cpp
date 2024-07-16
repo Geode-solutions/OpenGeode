@@ -23,10 +23,10 @@
 
 #include <memory>
 
-#include <geode/basic/filename.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/filename.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {

@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/basic/logger_manager.h>
+#include <geode/basic/logger_manager.hpp>
 
-#include <geode/basic/logger_client.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger_client.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

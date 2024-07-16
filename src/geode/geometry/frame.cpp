@@ -23,9 +23,9 @@
 
 #include <optional>
 
-#include <geode/geometry/frame.h>
+#include <geode/geometry/frame.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {

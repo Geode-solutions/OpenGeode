@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/model/helpers/simplicial_section_creator.h>
+#include <geode/model/helpers/simplicial_section_creator.hpp>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/model/helpers/internal/simplicial_model_creator.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/internal/simplicial_model_creator.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {
@@ -37,7 +37,7 @@ namespace geode
     public:
         Impl( Section& section, std::vector< Point2D > unique_points )
             : internal::SimplicialModelCreator< Section >(
-                section, std::move( unique_points ) )
+                  section, std::move( unique_points ) )
         {
         }
 

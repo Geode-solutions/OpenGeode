@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/attribute_coordinate_reference_system.h>
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
 
-#include <geode/model/helpers/model_coordinate_reference_system.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/section_input.h>
+#include <geode/model/helpers/model_coordinate_reference_system.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/section_input.hpp>
 
 void check_result(
     absl::Span< const std::pair< geode::CRSType, std::string > > crss )

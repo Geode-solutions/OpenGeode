@@ -27,9 +27,9 @@
 #include "../../basic/input.h"
 #include "../../common.h"
 
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/io/polygonal_surface_input.h>
-#include <geode/mesh/io/polygonal_surface_output.h>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/io/polygonal_surface_input.hpp>
+#include <geode/mesh/io/polygonal_surface_output.hpp>
 
 #define PYTHON_POLYGONAL_SURFACE_IO( dimension )                               \
     const auto save##dimension =                                               \

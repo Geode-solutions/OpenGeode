@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/corner_collection.h>
+#include <geode/model/mixin/core/corner_collection.hpp>
 
 #define PYTHON_CORNER_COLLECTION( dimension )                                  \
     const auto name##dimension =                                               \

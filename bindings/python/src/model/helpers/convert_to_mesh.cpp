@@ -23,17 +23,17 @@
 
 #include "../../common.h"
 
-#include <geode/model/helpers/convert_to_mesh.h>
+#include <geode/model/helpers/convert_to_mesh.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {

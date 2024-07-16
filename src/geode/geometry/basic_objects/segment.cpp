@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/segment.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
 
 namespace geode
 {

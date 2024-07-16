@@ -23,9 +23,9 @@
 
 #include "../common.h"
 
-#include <geode/basic/identifier.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/identifier.hpp>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {

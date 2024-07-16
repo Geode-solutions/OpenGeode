@@ -23,11 +23,11 @@
 
 #include "../../../common.h"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
 
-#include <geode/model/mixin/builder/lines_builder.h>
+#include <geode/model/mixin/builder/lines_builder.hpp>
 
 #define PYTHON_LINES_BUILDER( dimension )                                      \
     const auto name##dimension =                                               \

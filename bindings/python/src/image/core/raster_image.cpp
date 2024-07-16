@@ -23,8 +23,8 @@
 
 #include "../../common.h"
 
-#include <geode/image/core/raster_image.h>
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/raster_image.hpp>
+#include <geode/image/core/rgb_color.hpp>
 
 #define PYTHON_RASTER_IMAGE( dimension )                                       \
     const auto name##dimension =                                               \

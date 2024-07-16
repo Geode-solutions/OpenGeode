@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/grid_builder.h>
-#include <geode/mesh/core/internal/grid_impl.h>
+#include <geode/mesh/builder/grid_builder.hpp>
+#include <geode/mesh/core/internal/grid_impl.hpp>
 
 namespace geode
 {
@@ -122,8 +122,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto LightRegularGrid< dimension >::vertex_indices( index_t index ) const
-        -> VertexIndices
+    auto LightRegularGrid< dimension >::vertex_indices(
+        index_t index ) const -> VertexIndices
     {
         return impl_->vertex_indices( *this, index );
     }
@@ -136,8 +136,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto LightRegularGrid< dimension >::cell_indices( index_t index ) const
-        -> CellIndices
+    auto LightRegularGrid< dimension >::cell_indices(
+        index_t index ) const -> CellIndices
     {
         return impl_->cell_indices( *this, index );
     }

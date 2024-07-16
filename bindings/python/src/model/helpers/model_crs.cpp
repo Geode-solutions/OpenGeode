@@ -23,14 +23,14 @@
 
 #include "../../common.h"
 
-#include <geode/geometry/coordinate_system.h>
+#include <geode/geometry/coordinate_system.hpp>
 
-#include <geode/model/helpers/create_coordinate_system.h>
-#include <geode/model/helpers/model_coordinate_reference_system.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/create_coordinate_system.hpp>
+#include <geode/model/helpers/model_coordinate_reference_system.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {

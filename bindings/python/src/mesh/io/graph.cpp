@@ -25,9 +25,9 @@
 #include "../../basic/input.h"
 #include "../../common.h"
 
-#include <geode/mesh/core/graph.h>
-#include <geode/mesh/io/graph_input.h>
-#include <geode/mesh/io/graph_output.h>
+#include <geode/mesh/core/graph.hpp>
+#include <geode/mesh/io/graph_input.hpp>
+#include <geode/mesh/io/graph_output.hpp>
 
 namespace geode
 {

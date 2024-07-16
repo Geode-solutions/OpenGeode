@@ -21,23 +21,23 @@
  *
  */
 
-#include <geode/mesh/io/light_regular_grid_input.h>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
 
 #include <fstream>
 #include <string_view>
 
 #include <absl/strings/str_cat.h>
 
-#include <geode/basic/detail/geode_input_impl.h>
-#include <geode/basic/factory.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/factory.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
 
 namespace geode
 {

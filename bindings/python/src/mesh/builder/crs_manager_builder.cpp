@@ -23,9 +23,9 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/builder/coordinate_reference_system_manager_builder.h>
-#include <geode/mesh/core/coordinate_reference_system.h>
-#include <geode/mesh/core/coordinate_reference_system_manager.h>
+#include <geode/mesh/builder/coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system_manager.hpp>
 
 #define PYTHON_CRS_MANAGER_BUILDER( dimension )                                \
     const auto name##dimension = "CoordinateReferenceSystemManagerBuilder"     \

@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/core/coordinate_reference_system_manager.h>
+#include <geode/mesh/core/coordinate_reference_system_manager.hpp>
 
 #include <bitsery/ext/std_map.h>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/coordinate_reference_system.h>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
 
 namespace geode
 {

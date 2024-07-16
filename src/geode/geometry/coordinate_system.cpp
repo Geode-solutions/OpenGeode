@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/geometry/coordinate_system.h>
+#include <geode/geometry/coordinate_system.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/perpendicular.h>
+#include <geode/geometry/perpendicular.hpp>
 
 namespace
 {

@@ -27,9 +27,9 @@
 #include "../../basic/input.h"
 #include "../../common.h"
 
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/io/polyhedral_solid_input.h>
-#include <geode/mesh/io/polyhedral_solid_output.h>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/io/polyhedral_solid_input.hpp>
+#include <geode/mesh/io/polyhedral_solid_output.hpp>
 
 #define PYTHON_POLYHEDRAL_SOLID_IO( dimension )                                \
     const auto save##dimension =                                               \

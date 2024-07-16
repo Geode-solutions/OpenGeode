@@ -27,9 +27,9 @@
 #include "../../basic/input.h"
 #include "../../common.h"
 
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/io/hybrid_solid_input.h>
-#include <geode/mesh/io/hybrid_solid_output.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/io/hybrid_solid_input.hpp>
+#include <geode/mesh/io/hybrid_solid_output.hpp>
 
 #define PYTHON_HYBRID_SOLID_IO( dimension )                                    \
     const auto save##dimension =                                               \

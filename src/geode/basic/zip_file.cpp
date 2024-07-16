@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/zip_file.h>
+#include <geode/basic/zip_file.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -32,8 +32,8 @@
 #include <mz_zip.h>
 #include <mz_zip_rw.h>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace
 {

@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/model/mixin/core/detail/relationships_impl.h>
+#include <geode/model/mixin/core/detail/relationships_impl.hpp>
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
+#include <geode/geometry/bitsery_archive.hpp>
 
-#include <geode/mesh/builder/graph_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/io/graph_input.h>
-#include <geode/mesh/io/graph_output.h>
+#include <geode/mesh/builder/graph_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/io/graph_input.hpp>
+#include <geode/mesh/io/graph_output.hpp>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/bitsery_archive.hpp>
 
 namespace geode
 {

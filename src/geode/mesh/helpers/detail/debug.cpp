@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/debug.h>
+#include <geode/mesh/helpers/detail/debug.hpp>
 
 #include <string_view>
 
 #include <absl/strings/str_cat.h>
 #include <absl/types/span.h>
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/edged_curve_output.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/edged_curve_output.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
 namespace geode
 {

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/points_sort.h>
+#include <geode/geometry/points_sort.hpp>
 
 #include <algorithm>
 
@@ -29,7 +29,7 @@
 
 #include <absl/algorithm/container.h>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
 namespace
 {

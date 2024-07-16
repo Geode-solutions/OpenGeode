@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/file.h>
+#include <geode/basic/file.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -30,8 +30,8 @@
 #include <absl/strings/match.h>
 #include <absl/strings/str_cat.h>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/string.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/string.hpp>
 
 namespace geode
 {

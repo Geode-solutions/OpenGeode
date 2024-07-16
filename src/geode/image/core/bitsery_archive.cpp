@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/image/core/bitsery_archive.h>
+#include <geode/image/core/bitsery_archive.hpp>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/image/core/greyscale_color.h>
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/greyscale_color.hpp>
+#include <geode/image/core/rgb_color.hpp>
 
 namespace
 {

@@ -23,8 +23,8 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corners.hpp>
 
 #define PYTHON_CORNERS( dimension )                                            \
     const auto name##dimension =                                               \

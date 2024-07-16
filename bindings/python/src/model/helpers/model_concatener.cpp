@@ -23,10 +23,10 @@
 
 #include "../../common.h"
 
-#include <geode/model/helpers/model_concatener.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/mapping.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/model_concatener.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/mapping.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {

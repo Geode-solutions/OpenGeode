@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/coordinate_reference_system_managers_builder.h>
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/coordinate_reference_system_manager_builder.h>
-#include <geode/mesh/core/coordinate_reference_system_managers.h>
+#include <geode/mesh/builder/coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/core/coordinate_reference_system_managers.hpp>
 
 namespace geode
 {

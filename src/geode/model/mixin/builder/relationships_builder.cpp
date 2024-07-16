@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/mixin/builder/relationships_builder.h>
+#include <geode/model/mixin/builder/relationships_builder.hpp>
 
 namespace geode
 {

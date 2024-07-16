@@ -23,10 +23,10 @@
 
 #include "../../common.h"
 
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
-#include <geode/model/helpers/convert_brep_section.h>
+#include <geode/model/helpers/convert_brep_section.hpp>
 
 namespace geode
 {

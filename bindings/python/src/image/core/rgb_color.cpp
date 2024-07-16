@@ -23,7 +23,7 @@
 
 #include "../../common.h"
 
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/rgb_color.hpp>
 
 namespace geode
 {

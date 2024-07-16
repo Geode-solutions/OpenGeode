@@ -23,22 +23,22 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/bitsery_archive.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/image/core/bitsery_archive.h>
-#include <geode/image/core/raster_image.h>
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/bitsery_archive.hpp>
+#include <geode/image/core/raster_image.hpp>
+#include <geode/image/core/rgb_color.hpp>
 
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture_manager.h>
-#include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture_manager.hpp>
+#include <geode/mesh/core/texture_storage.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 geode::RasterImage2D create_raster()
 {

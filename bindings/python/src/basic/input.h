@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/input.h>
+#include <geode/basic/input.hpp>
 
 #define PYTHON_INPUT_CLASS( type, name )                                       \
     pybind11::class_< Input< type >::MissingFiles >(                           \

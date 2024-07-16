@@ -23,8 +23,8 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
 
 #define PYTHON_TETRAHEDRAL_SOLID_BUILDER( dimension )                          \
     const auto name##dimension =                                               \

@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/model/mixin/builder/corner_collections_builder.h>
+#include <geode/model/mixin/builder/corner_collections_builder.hpp>
 
-#include <geode/model/mixin/core/corner_collection.h>
-#include <geode/model/mixin/core/corner_collections.h>
+#include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/corner_collections.hpp>
 
 namespace geode
 {

@@ -23,8 +23,8 @@
 
 #include "../common.h"
 
-#include <geode/basic/mapping.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/mapping.hpp>
+#include <geode/basic/uuid.hpp>
 
 #define PYTHON_MAPPING( type )                                                 \
     const auto name##type = absl::StrCat( "BijectiveMapping", #type );         \

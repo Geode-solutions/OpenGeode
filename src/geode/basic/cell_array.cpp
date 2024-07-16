@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/basic/cell_array.h>
+#include <geode/basic/cell_array.hpp>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {
@@ -134,8 +134,8 @@ namespace geode
     CellArray< dimension >::CellArray( CellArray&& ) noexcept = default;
 
     template < index_t dimension >
-    auto CellArray< dimension >::operator=( CellArray&& ) noexcept
-        -> CellArray& = default;
+    auto CellArray< dimension >::operator=(
+        CellArray&& ) noexcept -> CellArray& = default;
 
     template < index_t dimension >
     CellArray< dimension >::~CellArray() = default;

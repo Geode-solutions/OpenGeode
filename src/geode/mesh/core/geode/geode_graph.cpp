@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_graph.h>
+#include <geode/mesh/core/geode/geode_graph.hpp>
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/internal/edges_impl.h>
+#include <geode/mesh/core/internal/edges_impl.hpp>
 
 namespace geode
 {

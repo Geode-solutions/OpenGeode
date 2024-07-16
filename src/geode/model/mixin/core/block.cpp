@@ -21,23 +21,23 @@
  *
  */
 
-#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block.hpp>
 
 #include <memory>
 #include <string_view>
 
 #include <bitsery/ext/inheritance.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/mesh_id.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/mesh_id.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
 
-#include <geode/model/mixin/core/component.h>
-#include <geode/model/mixin/core/detail/mesh_storage.h>
+#include <geode/model/mixin/core/component.hpp>
+#include <geode/model/mixin/core/detail/mesh_storage.hpp>
 
 namespace geode
 {
@@ -61,7 +61,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block()
         : Block( MeshFactory::default_impl(
-            PolyhedralSolid< dimension >::type_name_static() ) )
+              PolyhedralSolid< dimension >::type_name_static() ) )
     {
     }
 

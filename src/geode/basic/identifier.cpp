@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/basic/identifier.h>
+#include <geode/basic/identifier.hpp>
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {

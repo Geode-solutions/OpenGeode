@@ -23,14 +23,14 @@
 
 #include "../../common.h"
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/cell_array.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/cell_array.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 #define PYTHON_GRID( dimension )                                               \
     const auto name##dimension = "Grid" + std::to_string( dimension ) + "D";   \

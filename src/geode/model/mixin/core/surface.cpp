@@ -21,23 +21,23 @@
  *
  */
 
-#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surface.hpp>
 
 #include <memory>
 #include <string_view>
 
 #include <bitsery/ext/inheritance.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/mesh_id.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/mesh_id.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/mixin/core/component.h>
-#include <geode/model/mixin/core/detail/mesh_storage.h>
+#include <geode/model/mixin/core/component.hpp>
+#include <geode/model/mixin/core/detail/mesh_storage.hpp>
 
 namespace geode
 {
@@ -79,7 +79,7 @@ namespace geode
     template < index_t dimension >
     Surface< dimension >::Surface()
         : Surface( MeshFactory::default_impl(
-            PolygonalSurface< dimension >::type_name_static() ) )
+              PolygonalSurface< dimension >::type_name_static() ) )
     {
     }
 

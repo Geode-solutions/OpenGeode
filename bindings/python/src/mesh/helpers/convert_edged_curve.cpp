@@ -23,9 +23,9 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/edged_curve.hpp>
 
-#include <geode/mesh/helpers/convert_edged_curve.h>
+#include <geode/mesh/helpers/convert_edged_curve.hpp>
 
 namespace geode
 {

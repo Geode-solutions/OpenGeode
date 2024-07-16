@@ -1,15 +1,15 @@
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
-#include <geode/mesh/helpers/hausdorff_distance.h>
-#include <geode/mesh/io/triangulated_surface_input.h>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
+#include <geode/mesh/helpers/hausdorff_distance.hpp>
+#include <geode/mesh/io/triangulated_surface_input.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {

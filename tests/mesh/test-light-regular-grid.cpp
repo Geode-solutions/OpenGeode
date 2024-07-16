@@ -23,18 +23,18 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/io/light_regular_grid_input.h>
-#include <geode/mesh/io/light_regular_grid_output.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
+#include <geode/mesh/io/light_regular_grid_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_cell_number( const geode::LightRegularGrid3D& grid )
 {

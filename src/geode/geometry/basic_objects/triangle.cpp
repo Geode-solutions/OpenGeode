@@ -23,17 +23,17 @@
 
 #include <optional>
 
-#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
 #include <absl/algorithm/container.h>
 
-#include <geode/geometry/barycentric_coordinates.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
+#include <geode/geometry/barycentric_coordinates.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
 
 namespace
 {

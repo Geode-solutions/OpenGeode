@@ -26,7 +26,7 @@
 
 #include <gdal_priv.h>
 
-#include <geode/image/common.h>
+#include <geode/image/common.hpp>
 
 namespace geode
 {

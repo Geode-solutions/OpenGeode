@@ -27,9 +27,9 @@
 #include "../../basic/input.h"
 #include "../../common.h"
 
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/io/light_regular_grid_input.h>
-#include <geode/mesh/io/light_regular_grid_output.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
+#include <geode/mesh/io/light_regular_grid_output.hpp>
 
 #define PYTHON_LIGHT_REGULAR_GRID_IO( dimension )                              \
     const auto save##dimension =                                               \

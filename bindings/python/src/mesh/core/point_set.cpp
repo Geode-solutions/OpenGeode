@@ -23,10 +23,10 @@
 
 #include "../../common.h"
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/point_set.hpp>
 
 #define PYTHON_POINT_SET( dimension )                                          \
     const auto name##dimension =                                               \

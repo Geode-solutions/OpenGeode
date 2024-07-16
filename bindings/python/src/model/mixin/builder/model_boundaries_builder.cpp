@@ -23,9 +23,9 @@
 
 #include "../../../common.h"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/model/mixin/builder/model_boundaries_builder.h>
+#include <geode/model/mixin/builder/model_boundaries_builder.hpp>
 
 #define PYTHON_MODEL_BOUNDARIES_BUILDER( dimension )                           \
     const auto name##dimension =                                               \

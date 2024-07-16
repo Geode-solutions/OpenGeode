@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/basic/progress_logger_manager.h>
+#include <geode/basic/progress_logger_manager.hpp>
 
 #include <mutex>
 
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/progress_logger_client.h>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/progress_logger_client.hpp>
 
 namespace geode
 {

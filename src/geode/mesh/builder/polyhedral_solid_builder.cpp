@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
+#include <geode/mesh/builder/polyhedral_solid_builder.hpp>
 
 #include <numeric>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
 
 namespace geode
 {

@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/model/helpers/component_mesh_vertices.h>
+#include <geode/model/helpers/component_mesh_vertices.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
 namespace
 {

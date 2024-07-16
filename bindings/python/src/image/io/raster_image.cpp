@@ -28,9 +28,9 @@
 #include "../../basic/factory.h"
 #include "../../basic/input.h"
 
-#include <geode/image/core/raster_image.h>
-#include <geode/image/io/raster_image_input.h>
-#include <geode/image/io/raster_image_output.h>
+#include <geode/image/core/raster_image.hpp>
+#include <geode/image/io/raster_image_input.hpp>
+#include <geode/image/io/raster_image_output.hpp>
 
 #define PYTHON_RASTER_IMAGE_IO( dimension )                                    \
     const auto save##dimension =                                               \

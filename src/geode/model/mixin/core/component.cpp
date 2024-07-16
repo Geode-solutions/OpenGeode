@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/model/mixin/core/component.h>
+#include <geode/model/mixin/core/component.hpp>
 
 #include <algorithm>
 
 #include <bitsery/traits/string.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {

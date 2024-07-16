@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/circle.h>
+#include <geode/geometry/basic_objects/circle.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 namespace geode
 {
@@ -100,8 +100,8 @@ namespace geode
     }
     Circle::Circle( const Circle& ) = default;
     Circle::Circle( const OwnerCircle& other )
-        : Base(
-            { other.plane().normal(), other.plane().origin() }, other.radius() )
+        : Base( { other.plane().normal(), other.plane().origin() },
+              other.radius() )
     {
     }
     Circle& Circle::operator=( const Circle& ) = default;

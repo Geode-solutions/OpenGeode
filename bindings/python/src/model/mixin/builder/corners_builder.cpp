@@ -23,11 +23,11 @@
 
 #include "../../../common.h"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
 
-#include <geode/model/mixin/builder/corners_builder.h>
+#include <geode/model/mixin/builder/corners_builder.hpp>
 
 #define PYTHON_CORNERS_BUILDER( dimension )                                    \
     const auto name##dimension =                                               \

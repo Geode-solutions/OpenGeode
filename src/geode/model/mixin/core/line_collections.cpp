@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/model/mixin/core/line_collections.h>
+#include <geode/model/mixin/core/line_collections.hpp>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/line_collection.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
 
 namespace geode
 {
@@ -260,9 +260,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto
-        LineCollections< dimension >::ModifiableLineCollectionRange::end() const
-        -> const ModifiableLineCollectionRange&
+    auto LineCollections< dimension >::ModifiableLineCollectionRange::end()
+        const -> const ModifiableLineCollectionRange&
     {
         return *this;
     }

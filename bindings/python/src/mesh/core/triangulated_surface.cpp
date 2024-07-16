@@ -23,8 +23,8 @@
 
 #include "../../common.h"
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 #define PYTHON_TRIANGULATED_SURFACE( dimension )                               \
     const auto name##dimension =                                               \

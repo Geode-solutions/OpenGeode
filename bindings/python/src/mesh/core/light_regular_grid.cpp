@@ -23,12 +23,12 @@
 
 #include "../../common.h"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
 
 #define PYTHON_LIGHT_REGULAR_GRID( dimension )                                 \
     const auto name##dimension =                                               \

@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/points_sort.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/points_sort.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_lexicographic_mapping()
 {

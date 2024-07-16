@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/mesh/helpers/euclidean_distance_transform.h>
+#include <geode/mesh/helpers/euclidean_distance_transform.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/progress_logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/progress_logger.hpp>
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 namespace geode
 {

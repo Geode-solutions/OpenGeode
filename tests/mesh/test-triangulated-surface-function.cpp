@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/triangulated_surface_point_function.h>
-#include <geode/mesh/helpers/triangulated_surface_scalar_function.h>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/triangulated_surface_point_function.hpp>
+#include <geode/mesh/helpers/triangulated_surface_scalar_function.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 bool inexact_equal( double nb1, double nb2, double eps )
 {

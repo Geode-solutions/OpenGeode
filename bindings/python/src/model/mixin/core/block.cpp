@@ -23,11 +23,11 @@
 
 #include "../../../common.h"
 
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
 
-#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/block.hpp>
 
 #define PYTHON_BLOCK( dimension )                                              \
     const auto name##dimension = "Block" + std::to_string( dimension ) + "D";  \

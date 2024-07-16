@@ -23,9 +23,9 @@
 
 #include <memory>
 
-#include <geode/basic/factory.h>
+#include <geode/basic/factory.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 class A
 {

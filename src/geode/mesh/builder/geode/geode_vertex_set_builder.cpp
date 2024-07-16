@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_vertex_set_builder.h>
+#include <geode/mesh/builder/geode/geode_vertex_set_builder.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
 
 namespace geode
 {
     OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodeVertexSetBuilder(
-            dynamic_cast< OpenGeodeVertexSet& >( vertex_set ) )
+              dynamic_cast< OpenGeodeVertexSet& >( vertex_set ) )
     {
     }
 

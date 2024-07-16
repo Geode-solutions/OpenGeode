@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/helpers/convert_point_set.h>
+#include <geode/mesh/helpers/convert_point_set.hpp>
 
-#include <geode/basic/range.h>
+#include <geode/basic/range.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/helpers/internal/copy.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 namespace geode
 {

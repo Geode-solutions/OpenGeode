@@ -23,7 +23,7 @@
 
 #include "../../../common.h"
 
-#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/model_boundary.hpp>
 
 #define PYTHON_MODEL_BOUNDARY( dimension )                                     \
     const auto name##dimension =                                               \

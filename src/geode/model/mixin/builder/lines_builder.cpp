@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/model/mixin/builder/lines_builder.h>
+#include <geode/model/mixin/builder/lines_builder.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/lines.hpp>
 
 namespace geode
 {

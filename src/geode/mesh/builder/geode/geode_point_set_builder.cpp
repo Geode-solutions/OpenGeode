@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_point_set_builder.h>
+#include <geode/mesh/builder/geode/geode_point_set_builder.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
 
 namespace geode
 {
@@ -34,7 +34,7 @@ namespace geode
     OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodePointSetBuilder< dimension >(
-            dynamic_cast< OpenGeodePointSet< dimension >& >( vertex_set ) )
+              dynamic_cast< OpenGeodePointSet< dimension >& >( vertex_set ) )
     {
     }
 

@@ -23,9 +23,9 @@
 
 #include "../../common.h"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/mesh/core/solid_facets.h>
+#include <geode/mesh/core/solid_facets.hpp>
 
 #define PYTHON_SOLID_FACETS( dimension )                                       \
     const auto name##dimension =                                               \

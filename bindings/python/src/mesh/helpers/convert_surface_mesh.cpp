@@ -23,11 +23,11 @@
 
 #include "../../common.h"
 
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
 namespace geode
 {

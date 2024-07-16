@@ -21,22 +21,22 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/range.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/helpers/convert_to_mesh.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/section_input.h>
+#include <geode/model/helpers/convert_to_mesh.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/section_input.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void run_test_brep()
 {
