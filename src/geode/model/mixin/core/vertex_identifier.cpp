@@ -100,40 +100,6 @@ namespace geode
             return component_vertices_->value( unique_vertex_id );
         }
 
-        std::vector< ComponentMeshVertex > component_mesh_vertices(
-            index_t unique_vertex_id, const ComponentType& type ) const
-        {
-            const auto& component_vertices =
-                component_mesh_vertices( unique_vertex_id );
-            std::vector< ComponentMeshVertex > result;
-            result.reserve( component_vertices.size() );
-            for( const auto& component_vertex : component_vertices )
-            {
-                if( component_vertex.component_id.type() == type )
-                {
-                    result.push_back( component_vertex );
-                }
-            }
-            return result;
-        }
-
-        std::vector< index_t > component_mesh_vertices(
-            index_t unique_vertex_id, const uuid& component_id ) const
-        {
-            const auto& component_vertices =
-                component_mesh_vertices( unique_vertex_id );
-            std::vector< index_t > result;
-            result.reserve( component_vertices.size() );
-            for( const auto& component_vertex : component_vertices )
-            {
-                if( component_vertex.component_id.id() == component_id )
-                {
-                    result.push_back( component_vertex.vertex );
-                }
-            }
-            return result;
-        }
-
         index_t unique_vertex(
             const uuid& component_id, const index_t vertex_id ) const
         {
@@ -473,20 +439,6 @@ namespace geode
     {
         return impl_->component_mesh_vertices( unique_vertex_id );
     }
-
-    std::vector< ComponentMeshVertex >
-        VertexIdentifier::component_mesh_vertices(
-            index_t unique_vertex_id, const ComponentType& type ) const
-    {
-        return impl_->component_mesh_vertices( unique_vertex_id, type );
-    }
-
-    std::vector< index_t > VertexIdentifier::component_mesh_vertices(
-        index_t unique_vertex_id, const uuid& component_id ) const
-    {
-        return impl_->component_mesh_vertices( unique_vertex_id, component_id );
-    }
-
     index_t VertexIdentifier::unique_vertex(
         const ComponentMeshVertex& component_mesh_vertex ) const
     {

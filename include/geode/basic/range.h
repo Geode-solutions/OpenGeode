@@ -90,31 +90,6 @@ namespace geode
     };
 
     /*!
-     * Begin and end methods for range-based iteration on custom range.
-     * See derived classes for usage.
-     *
-     */
-    template < typename Type >
-    class OPENGEODE_BASIC_DEPRECATED BeginEnd
-    {
-    public:
-        constexpr explicit BeginEnd( const Type& type ) : type_( type ) {}
-
-        inline constexpr const Type& begin() const
-        {
-            return type_;
-        }
-
-        inline constexpr const Type& end() const
-        {
-            return type_;
-        }
-
-    private:
-        const Type& type_;
-    };
-
-    /*!
      * This class can be used to iterate over integer loop.
      * Example:
      *              = C++98 loop =

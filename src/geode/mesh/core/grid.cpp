@@ -471,12 +471,6 @@ namespace geode
     Grid< dimension >::~Grid() = default;
 
     template < index_t dimension >
-    const Point< dimension >& Grid< dimension >::origin() const
-    {
-        return grid_coordinate_system().origin();
-    }
-
-    template < index_t dimension >
     const CoordinateSystem< dimension >&
         Grid< dimension >::grid_coordinate_system() const
     {
