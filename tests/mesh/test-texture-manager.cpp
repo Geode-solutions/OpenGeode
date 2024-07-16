@@ -23,22 +23,22 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/bitsery_archive.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/image/core/bitsery_archive.h>
-#include <geode/image/core/raster_image.h>
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/bitsery_archive.hpp>
+#include <geode/image/core/raster_image.hpp>
+#include <geode/image/core/rgb_color.hpp>
 
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture_manager.h>
-#include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture_manager.hpp>
+#include <geode/mesh/core/texture_storage.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 geode::RasterImage2D create_raster()
 {
@@ -57,7 +57,8 @@ void create_texture(
     auto& texture = manager.find_or_create_texture( "texture" );
     for( const auto i : geode::Range{ 42 } )
     {
-        texture.set_texture_coordinates( { i, 0 }, { { i * 2., i * 3. } } );
+        texture.set_texture_coordinates(
+            { i, 0 }, geode::Point2D{ { i * 2., i * 3. } } );
     }
     texture.set_image( create_raster() );
 }
@@ -82,7 +83,7 @@ void check_texture(
     }
 }
 
-void save( const geode::TextureStorage2D& storage, absl::string_view filename )
+void save( const geode::TextureStorage2D& storage, std::string_view filename )
 {
     std::ofstream file{ geode::to_string( filename ), std::ofstream::binary };
     geode::TContext context{};
@@ -97,7 +98,7 @@ void save( const geode::TextureStorage2D& storage, absl::string_view filename )
         "[Bitsery::write] Error while writing file: ", filename );
 }
 
-geode::TextureStorage2D load( absl::string_view filename )
+geode::TextureStorage2D load( std::string_view filename )
 {
     std::ifstream file{ geode::to_string( filename ), std::ifstream::binary };
     geode::TContext context{};

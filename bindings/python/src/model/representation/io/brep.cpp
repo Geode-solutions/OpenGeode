@@ -21,13 +21,13 @@
  *
  */
 
-#include "../../../basic/factory.h"
-#include "../../../basic/input.h"
-#include "../../../common.h"
+#include "../../../basic/factory.hpp"
+#include "../../../basic/input.hpp"
+#include "../../../common.hpp"
 
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/brep_output.hpp>
 
 namespace geode
 {

@@ -21,11 +21,11 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/model/mixin/builder/corner_collections_builder.h>
+#include <geode/model/mixin/builder/corner_collections_builder.hpp>
 
 #define PYTHON_CORNER_COLLECTIONS_BUILDER( dimension )                         \
     const auto name##dimension =                                               \

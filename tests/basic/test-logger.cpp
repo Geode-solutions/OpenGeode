@@ -22,15 +22,14 @@
  */
 
 #include <iostream>
+#include <memory>
 
-#include <absl/memory/memory.h>
+#include <geode/basic/library.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/logger_client.hpp>
+#include <geode/basic/logger_manager.hpp>
 
-#include <geode/basic/library.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/logger_client.h>
-#include <geode/basic/logger_manager.h>
-
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 class CustomClient : public geode::LoggerClient
 {
@@ -79,11 +78,10 @@ void test_logger()
 void test()
 {
     geode::OpenGeodeBasicLibrary::initialize();
-    geode::LoggerManager::register_client(
-        absl::make_unique< CustomClient >() );
+    geode::LoggerManager::register_client( std::make_unique< CustomClient >() );
 
     test_logger();
-    geode::Logger::set_level( geode::Logger::Level::err );
+    geode::Logger::set_level( geode::Logger::LEVEL::err );
     test_logger();
 }
 

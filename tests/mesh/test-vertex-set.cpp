@@ -23,15 +23,15 @@
 
 #include <fstream>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/builder/geode/geode_vertex_set_builder.h>
-#include <geode/mesh/builder/vertex_set_builder.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
-#include <geode/mesh/io/vertex_set_input.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/builder/geode/geode_vertex_set_builder.hpp>
+#include <geode/mesh/builder/vertex_set_builder.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/io/vertex_set_input.hpp>
+#include <geode/mesh/io/vertex_set_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
@@ -69,7 +69,7 @@ void test_delete_vertex(
         "[Test] VertexSet should have 5 vertices" );
 }
 
-void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
+void test_io( const geode::VertexSet& vertex_set, std::string_view filename )
 {
     geode::save_vertex_set( vertex_set, filename );
     geode::load_vertex_set( filename );

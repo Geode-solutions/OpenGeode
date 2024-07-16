@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/builder/surface_edges_builder.h>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
 
 #define PYTHON_SURFACE_EDGES_BUILDER( dimension )                              \
     const auto name##dimension =                                               \

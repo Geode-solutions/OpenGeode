@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/vertex_set_input.hpp>
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
-#include <geode/basic/detail/geode_input_impl.h>
-#include <geode/basic/io.h>
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/io.hpp>
 
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/vertex_set.h>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/vertex_set.hpp>
 
 namespace geode
 {
-    std::unique_ptr< VertexSet > load_vertex_set( absl::string_view filename )
+    std::unique_ptr< VertexSet > load_vertex_set( std::string_view filename )
     {
         return load_vertex_set(
             MeshFactory::default_impl( VertexSet::type_name_static() ),
@@ -41,7 +41,7 @@ namespace geode
     }
 
     std::unique_ptr< VertexSet > load_vertex_set(
-        const MeshImpl& impl, absl::string_view filename )
+        const MeshImpl& impl, std::string_view filename )
     {
         constexpr auto TYPE = "VertexSet";
         try
@@ -63,7 +63,7 @@ namespace geode
     }
 
     typename VertexSetInput::MissingFiles check_vertex_set_missing_files(
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< VertexSetInputFactory >(
@@ -71,7 +71,7 @@ namespace geode
         return input->check_missing_files();
     }
 
-    bool is_vertex_set_loadable( absl::string_view filename )
+    bool is_vertex_set_loadable( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< VertexSetInputFactory >(

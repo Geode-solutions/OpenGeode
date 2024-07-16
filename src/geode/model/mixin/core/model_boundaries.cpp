@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/model/mixin/core/model_boundaries.h>
+#include <geode/model/mixin/core/model_boundaries.hpp>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
 
 namespace geode
 {
@@ -75,7 +75,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::save_model_boundaries(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/model_boundaries" ) );
@@ -83,7 +83,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::load_model_boundaries(
-        absl::string_view directory, ModelBoundariesBuilderKey )
+        std::string_view directory, ModelBoundariesBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/model_boundaries" ) );

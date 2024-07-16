@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/mesh/helpers/gradient_computation.h>
+#include <geode/mesh/helpers/gradient_computation.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/private/regular_grid_shape_function.h>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/internal/grid_shape_function.hpp>
 
 namespace
 {
     template < typename Mesh >
     std::string compute_scalar_function_gradient(
-        const Mesh& mesh, absl::string_view scalar_function_name )
+        const Mesh& mesh, std::string_view scalar_function_name )
     {
         OPENGEODE_EXCEPTION( mesh.vertex_attribute_manager().attribute_exists(
                                  scalar_function_name ),
@@ -82,13 +82,14 @@ namespace
                 double inverse_dist_sum{ 0 };
                 for( const auto vertex_around : vertices_around )
                 {
-                    const geode::Vector< Mesh::dim > position_diff =
-                        position - mesh.point( vertex_around );
+                    const geode::Vector< Mesh::dim > position_diff{
+                        mesh.point( vertex_around ), position
+                    };
                     const auto value_diff =
                         function_value
                         - scalar_function->value( vertex_around );
                     const auto dist2 = position_diff.length2();
-                    if( std::fabs( dist2 ) < geode::global_epsilon
+                    if( std::fabs( dist2 ) < geode::GLOBAL_EPSILON
                         || std::fabs(
                                position_diff.value( d ) / std::sqrt( dist2 ) )
                                < 0.1 )
@@ -102,7 +103,7 @@ namespace
                         diff_sign * position_diff.value( d ) / dist2;
                 }
                 OPENGEODE_EXCEPTION(
-                    std::fabs( inverse_dist_sum ) > geode::global_epsilon,
+                    std::fabs( inverse_dist_sum ) > geode::GLOBAL_EPSILON,
                     "[compute_scalar_function_gradient] Couldn't compute "
                     "gradient on vertex ",
                     vertex_id,
@@ -123,21 +124,21 @@ namespace geode
     template < index_t dimension >
     std::string compute_surface_scalar_function_gradient(
         const SurfaceMesh< dimension >& mesh,
-        absl::string_view scalar_function_name )
+        std::string_view scalar_function_name )
     {
         return compute_scalar_function_gradient( mesh, scalar_function_name );
     }
 
     std::string compute_solid_scalar_function_gradient(
-        const SolidMesh3D& mesh, absl::string_view scalar_function_name )
+        const SolidMesh3D& mesh, std::string_view scalar_function_name )
     {
         return compute_scalar_function_gradient( mesh, scalar_function_name );
     }
 
     template std::string opengeode_mesh_api
         compute_surface_scalar_function_gradient(
-            const SurfaceMesh2D&, absl::string_view );
+            const SurfaceMesh2D&, std::string_view );
     template std::string opengeode_mesh_api
         compute_surface_scalar_function_gradient(
-            const SurfaceMesh3D&, absl::string_view );
+            const SurfaceMesh3D&, std::string_view );
 } // namespace geode

@@ -23,13 +23,13 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/io/polygonal_surface_input.h>
-#include <geode/mesh/io/polygonal_surface_output.h>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/io/polygonal_surface_input.hpp>
+#include <geode/mesh/io/polygonal_surface_output.hpp>
 
 #define PYTHON_POLYGONAL_SURFACE_IO( dimension )                               \
     const auto save##dimension =                                               \
@@ -40,7 +40,7 @@
         "load_polygonal_surface" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolygonalSurface< dimension > > ( * )(   \
-            absl::string_view ) >( &load_polygonal_surface< dimension > ) );   \
+            std::string_view ) >( &load_polygonal_surface< dimension > ) );    \
     const auto check##dimension = "check_polygonal_surface_missing_files"      \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

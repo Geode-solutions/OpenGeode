@@ -21,24 +21,23 @@
  *
  */
 
-#include <geode/model/representation/io/geode/geode_section_output.h>
+#include <geode/model/representation/io/geode/geode_section_output.hpp>
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
 #include <async++.h>
 
-#include <ghc/filesystem.hpp>
+#include <geode/basic/uuid.hpp>
+#include <geode/basic/zip_file.hpp>
 
-#include <geode/basic/uuid.h>
-#include <geode/basic/zip_file.h>
-
-#include <geode/model/representation/core/section.h>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {
     void OpenGeodeSectionOutput::save_section_files(
-        const Section& section, absl::string_view directory ) const
+        const Section& section, std::string_view directory ) const
     {
         async::parallel_invoke(
             [&directory, &section] {
@@ -67,7 +66,7 @@ namespace geode
         const ZipFile& zip_writer ) const
     {
         for( const auto& file :
-            ghc::filesystem::directory_iterator( zip_writer.directory() ) )
+            std::filesystem::directory_iterator( zip_writer.directory() ) )
         {
             zip_writer.archive_file( file.path().string() );
         }

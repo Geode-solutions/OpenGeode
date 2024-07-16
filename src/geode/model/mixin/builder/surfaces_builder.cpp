@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/model/mixin/builder/surfaces_builder.h>
+#include <geode/model/mixin/builder/surfaces_builder.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surfaces.hpp>
 
 namespace geode
 {
@@ -66,14 +66,14 @@ namespace geode
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::load_surfaces(
-        absl::string_view directory )
+        std::string_view directory )
     {
         return surfaces_.load_surfaces( directory, {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         surfaces_.modifiable_surface( id, {} ).set_surface_name( name, {} );
         surface_mesh_builder( id )->set_name( name );

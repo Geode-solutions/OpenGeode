@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/segment.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
 
 namespace geode
 {
@@ -53,7 +53,7 @@ namespace geode
         GenericSegment< PointType, dimension >::direction() const
     {
         Vector< dimension > direction{ vertices_[0], vertices_[1] };
-        OPENGEODE_EXCEPTION( direction.length() > global_epsilon,
+        OPENGEODE_EXCEPTION( direction.length() > GLOBAL_EPSILON,
             "[Segment::direction] Segment length too small" );
         return direction;
     }
@@ -80,7 +80,7 @@ namespace geode
     }
     template < typename PointType, index_t dimension >
     void GenericSegment< PointType, dimension >::set_point(
-        index_t vertex, PointType point )
+        local_index_t vertex, PointType point )
     {
         vertices_[vertex] = point;
     }

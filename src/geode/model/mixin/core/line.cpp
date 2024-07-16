@@ -21,23 +21,22 @@
  *
  */
 
-#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/line.hpp>
 
 #include <memory>
+#include <string_view>
 
 #include <bitsery/ext/inheritance.h>
 
-#include <absl/strings/string_view.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/mesh_id.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/mesh_id.h>
-
-#include <geode/model/mixin/core/component.h>
-#include <geode/model/mixin/core/detail/mesh_storage.h>
+#include <geode/model/mixin/core/component.hpp>
+#include <geode/model/mixin/core/detail/mesh_storage.hpp>
 
 namespace geode
 {
@@ -147,7 +146,7 @@ namespace geode
 
     template < index_t dimension >
     void Line< dimension >::set_line_name(
-        absl::string_view name, LinesBuilderKey /*unused*/ )
+        std::string_view name, LinesBuilderKey /*unused*/ )
     {
         this->set_name( name );
     }

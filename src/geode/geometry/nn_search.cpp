@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/nn_search.h>
+#include <geode/geometry/nn_search.hpp>
 
 #include <numeric>
 
@@ -31,8 +31,8 @@
 
 #include <nanoflann.hpp>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {
@@ -60,8 +60,8 @@ namespace geode
             const Point< dimension >& point,
             const double threshold_distance ) const
         {
-            std::vector< std::pair< index_t, double > > results;
-            nanoflann::SearchParams params;
+            std::vector< nanoflann::ResultItem< index_t, double > > results;
+            nanoflann::SearchParameters params;
             params.sorted = true;
             const auto nb_results = nn_tree_.radiusSearch( &copy( point )[0],
                 threshold_distance * threshold_distance, results, params );
@@ -183,10 +183,10 @@ namespace geode
     typename NNSearch< dimension >::ColocatedInfo
         NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
     {
-        OPENGEODE_EXCEPTION( epsilon >= global_epsilon,
+        OPENGEODE_EXCEPTION( epsilon >= GLOBAL_EPSILON,
             "[NNSearch::colocated_index_mapping] Given epsilon too small, "
-            "should be bigger than global_epsilon (i.e. ",
-            global_epsilon, ")" );
+            "should be bigger than GLOBAL_EPSILON (i.e. ",
+            GLOBAL_EPSILON, ")" );
         std::vector< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),

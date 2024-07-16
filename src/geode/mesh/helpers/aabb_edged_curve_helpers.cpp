@@ -27,17 +27,17 @@
  * Applications (ASGA)
  */
 
-#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.hpp>
 
 #include <async++.h>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/projection.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/projection.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/edged_curve.hpp>
 
 namespace geode
 {
@@ -54,17 +54,15 @@ namespace geode
                 bbox.add_point( mesh.point( mesh.edge_vertex( { e, 1 } ) ) );
                 box_vector[e] = std::move( bbox );
             } );
-        return { box_vector };
+        return AABBTree< dimension >{ box_vector };
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > >
-        DistanceToEdge< dimension >::operator()(
-            const Point< dimension >& query, index_t cur_box ) const
+    double DistanceToEdge< dimension >::operator()(
+        const Point< dimension >& query, index_t cur_box ) const
     {
         const auto segment = mesh_.segment( cur_box );
-        return std::make_tuple( point_segment_distance( query, segment ),
-            point_segment_projection( query, segment ) );
+        return point_segment_distance( query, segment );
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(

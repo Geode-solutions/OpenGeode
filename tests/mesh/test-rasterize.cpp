@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 #include <absl/container/flat_hash_set.h>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/rasterize.h>
-#include <geode/mesh/io/regular_grid_input.h>
-#include <geode/mesh/io/triangulated_surface_input.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/rasterize.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/triangulated_surface_input.hpp>
 
 void test_rasterize_segment(
     const geode::RegularGrid3D& grid, const geode::Segment3D& segment )
@@ -63,7 +63,7 @@ void test_rasterize_segment(
 void test_rasterize_triangle(
     const geode::RegularGrid3D& grid, const geode::Triangle3D& triangle )
 {
-    const auto cells = geode::rasterize_triangle( grid, triangle );
+    const auto cells = geode::conservative_rasterize_triangle( grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 111, 112, 121, 122, 211,
         212, 213, 221, 222, 223, 232, 233, 242, 243, 252, 253, 313, 314, 323,
         324, 333, 334, 343, 344, 352, 353, 354, 363, 364, 373, 414, 415, 424,
@@ -82,7 +82,7 @@ void test_rasterize_triangle(
 void test_rasterize_degenerate_triangle(
     const geode::RegularGrid3D& grid, const geode::Triangle3D& triangle )
 {
-    const auto cells = geode::rasterize_triangle( grid, triangle );
+    const auto cells = geode::conservative_rasterize_triangle( grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 111, 112, 121, 122, 211,
         212, 221, 222, 223, 232, 233, 322, 323, 332, 333, 334, 343, 344, 433,
         434, 443, 444, 445, 454, 455, 544, 545, 554, 555, 556, 565, 566, 655,
@@ -102,7 +102,7 @@ void test_conservative_rasterize_segment()
 {
     auto grid = geode::RegularGrid2D::create();
     auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 10, 10 }, 1 );
     geode::Point2D pt0{ { 2.5, 2.5 } };
     geode::Point2D pt1{ { 6.5, 6.5 } };
     geode::Segment2D segment{ pt0, pt1 };
@@ -137,23 +137,25 @@ void test_conservative_rasterize_triangle()
 {
     auto grid = geode::RegularGrid2D::create();
     auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 10, 10 }, 1 );
     geode::Point2D pt0{ { 2.5, 2.5 } };
     geode::Point2D pt1{ { 6.5, 6.5 } };
     geode::Point2D pt2{ { 2.5, 6.5 } };
     geode::Triangle2D triangle{ pt0, pt1, pt2 };
 
-    const auto cells = geode::rasterize_triangle( *grid, triangle );
+    const auto cells =
+        geode::conservative_rasterize_triangle( *grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 22, 23, 32, 33, 34, 42,
         43, 44, 45, 52, 53, 54, 55, 56, 62, 63, 64, 65, 66 };
     OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells (rasterize_triangle): ",
+        "[Test] Wrong number of result cells "
+        "(conservative_rasterize_triangle): ",
         cells.size(), " instead of ", answer.size() );
     for( const auto cell : cells )
     {
         OPENGEODE_EXCEPTION(
             answer.find( grid->cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells (rasterize_triangle)" );
+            "[Test] Wrong result cells (conservative_rasterize_triangle)" );
     }
 }
 
@@ -161,7 +163,8 @@ void add_cells( absl::flat_hash_set< geode::Grid3D::CellIndices >& set,
     const geode::RegularGrid3D& grid,
     const geode::Triangle3D& triangle )
 {
-    for( const auto& cell : geode::rasterize_triangle( grid, triangle ) )
+    for( const auto& cell :
+        geode::conservative_rasterize_triangle( grid, triangle ) )
     {
         set.insert( cell );
     }
@@ -171,7 +174,8 @@ void test_limit()
 {
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { -1, -1, -1 } }, { 3, 3, 3 }, 1 );
+    builder->initialize_grid(
+        geode::Point3D{ { -1, -1, -1 } }, { 3, 3, 3 }, 1 );
     const geode::Point3D pt000{ { 0, 0, 0 } };
     const geode::Point3D pt001{ { 0, 0, 1 } };
     const geode::Point3D pt010{ { 0, 1, 0 } };
@@ -217,7 +221,8 @@ void test()
     geode::OpenGeodeMeshLibrary::initialize();
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
+    builder->initialize_grid(
+        geode::Point3D{ { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
     geode::Point3D pt0{ { 2, 2, 2 } };
     geode::Point3D pt1{ { 3.55, 7.55, 3.55 } };
     geode::Point3D pt2{ { 6.55, 1.55, 5.55 } };

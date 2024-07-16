@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/nn_search.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/nn_search.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/helpers/nnsearch_mesh.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/helpers/nnsearch_mesh.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void add_points( geode::PointSetBuilder3D& builder )
 {
@@ -40,11 +40,11 @@ void add_points( geode::PointSetBuilder3D& builder )
         {
             for( const auto k : geode::LRange{ 3 } )
             {
-                builder.create_point(
-                    { { static_cast< double >( i ), static_cast< double >( j ),
+                builder.create_point( geode::Point3D{
+                    { static_cast< double >( i ), static_cast< double >( j ),
                         static_cast< double >( k ) } } );
-                builder.create_point(
-                    { { static_cast< double >( i ), static_cast< double >( j ),
+                builder.create_point( geode::Point3D{
+                    { static_cast< double >( i ), static_cast< double >( j ),
                         static_cast< double >( k ) } } );
             }
         }
@@ -54,7 +54,7 @@ void add_points( geode::PointSetBuilder3D& builder )
 void check_nnsearch( const geode::NNSearch3D& nnsearch )
 {
     const auto mappings =
-        nnsearch.colocated_index_mapping( geode::global_epsilon );
+        nnsearch.colocated_index_mapping( geode::GLOBAL_EPSILON );
     OPENGEODE_EXCEPTION( nnsearch.nb_points() == 54,
         "[Test] Wrong computation of NNSearch points" );
     OPENGEODE_EXCEPTION( mappings.nb_unique_points() == 27,

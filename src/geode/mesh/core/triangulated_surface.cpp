@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {

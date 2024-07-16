@@ -21,23 +21,23 @@
  *
  */
 
-#include <geode/geometry/intersection_detection.h>
+#include <geode/geometry/intersection_detection.hpp>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/intersection.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/position.h>
-#include <geode/geometry/private/intersection_from_sides.h>
-#include <geode/geometry/private/predicates.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/internal/intersection_from_sides.hpp>
+#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/intersection.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/position.hpp>
 
 namespace
 {
-    static constexpr std::array< geode::Position, 4 > vertex_id_to_position{
-        geode::Position::vertex0, geode::Position::vertex1,
-        geode::Position::vertex2, geode::Position::vertex0
+    static constexpr std::array< geode::POSITION, 4 > VERTEX_ID_TO_POSITION{
+        geode::POSITION::vertex0, geode::POSITION::vertex1,
+        geode::POSITION::vertex2, geode::POSITION::vertex0
     };
 
     std::array< geode::local_index_t, 2 > best_projection_axis(
@@ -98,15 +98,14 @@ namespace
         std::array< geode::Point2D, 3 > triangle_points_projection;
         for( const auto triangle_pt : geode::LRange{ 3 } )
         {
-            triangle_points_projection[triangle_pt] = {
-                { triangle.vertices()[triangle_pt].get().value(
-                      projection_axis[0] ),
+            triangle_points_projection[triangle_pt] =
+                geode::Point2D{ { triangle.vertices()[triangle_pt].get().value(
+                                      projection_axis[0] ),
                     triangle.vertices()[triangle_pt].get().value(
-                        projection_axis[1] ) }
-            };
+                        projection_axis[1] ) } };
         }
-        geode::SegmentTriangleIntersection result{ geode::Position::outside,
-            geode::Position::outside };
+        geode::SegmentTriangleIntersection result{ geode::POSITION::outside,
+            geode::POSITION::outside };
         for( const auto edge_v0 : geode::LRange{ 3 } )
         {
             const auto seg_edge_inter =
@@ -116,25 +115,25 @@ namespace
                         triangle_points_projection[edge_v0 == 2
                                                        ? 0
                                                        : edge_v0 + 1] } );
-            if( seg_edge_inter.first == geode::Position::outside
-                || seg_edge_inter.first == geode::Position::parallel )
+            if( seg_edge_inter.first == geode::POSITION::outside
+                || seg_edge_inter.first == geode::POSITION::parallel )
             {
                 continue;
             }
-            if( ( seg_edge_inter.first == geode::Position::vertex0
-                    || seg_edge_inter.first == geode::Position::vertex1 )
-                && ( seg_edge_inter.second == geode::Position::vertex0
-                     || seg_edge_inter.second == geode::Position::vertex1 ) )
+            if( ( seg_edge_inter.first == geode::POSITION::vertex0
+                    || seg_edge_inter.first == geode::POSITION::vertex1 )
+                && ( seg_edge_inter.second == geode::POSITION::vertex0
+                     || seg_edge_inter.second == geode::POSITION::vertex1 ) )
             {
                 result.first = seg_edge_inter.first;
                 result.second =
-                    vertex_id_to_position[seg_edge_inter.second
-                                                  == geode::Position::vertex0
+                    VERTEX_ID_TO_POSITION[seg_edge_inter.second
+                                                  == geode::POSITION::vertex0
                                               ? edge_v0
                                               : edge_v0 + 1];
                 continue;
             }
-            return { geode::Position::parallel, geode::Position::parallel };
+            return { geode::POSITION::parallel, geode::POSITION::parallel };
         }
         const geode::Triangle2D triangle_projection{
             triangle_points_projection[0], triangle_points_projection[1],
@@ -142,12 +141,12 @@ namespace
         };
         if( geode::point_triangle_position(
                 segment_proj_p0, triangle_projection )
-                != geode::Position::outside
+                != geode::POSITION::outside
             && geode::point_triangle_position(
                    segment_proj_p1, triangle_projection )
-                   != geode::Position::outside )
+                   != geode::POSITION::outside )
         {
-            return { geode::Position::parallel, geode::Position::parallel };
+            return { geode::POSITION::parallel, geode::POSITION::parallel };
         }
         return result;
     }
@@ -168,45 +167,45 @@ namespace geode
             point_side_to_segment( segment1.vertices()[1], segment0 );
         if( s0_p0_side == s0_p1_side || s1_p0_side == s1_p1_side )
         {
-            if( s0_p0_side == Side::zero && s1_p0_side == Side::zero )
+            if( s0_p0_side == SIDE::zero && s1_p0_side == SIDE::zero )
             {
-                return std::make_pair( Position::parallel, Position::parallel );
+                return std::make_pair( POSITION::parallel, POSITION::parallel );
             }
-            return std::make_pair( Position::outside, Position::outside );
+            return std::make_pair( POSITION::outside, POSITION::outside );
         }
-        if( s0_p0_side == Side::zero )
+        if( s0_p0_side == SIDE::zero )
         {
-            if( s1_p0_side == Side::zero )
+            if( s1_p0_side == SIDE::zero )
             {
-                return std::make_pair( Position::vertex0, Position::vertex0 );
+                return std::make_pair( POSITION::vertex0, POSITION::vertex0 );
             }
-            if( s1_p1_side == Side::zero )
+            if( s1_p1_side == SIDE::zero )
             {
-                return std::make_pair( Position::vertex0, Position::vertex1 );
+                return std::make_pair( POSITION::vertex0, POSITION::vertex1 );
             }
-            return std::make_pair( Position::vertex0, Position::inside );
+            return std::make_pair( POSITION::vertex0, POSITION::inside );
         }
-        if( s0_p1_side == Side::zero )
+        if( s0_p1_side == SIDE::zero )
         {
-            if( s1_p0_side == Side::zero )
+            if( s1_p0_side == SIDE::zero )
             {
-                return std::make_pair( Position::vertex1, Position::vertex0 );
+                return std::make_pair( POSITION::vertex1, POSITION::vertex0 );
             }
-            if( s1_p1_side == Side::zero )
+            if( s1_p1_side == SIDE::zero )
             {
-                return std::make_pair( Position::vertex1, Position::vertex1 );
+                return std::make_pair( POSITION::vertex1, POSITION::vertex1 );
             }
-            return std::make_pair( Position::vertex1, Position::inside );
+            return std::make_pair( POSITION::vertex1, POSITION::inside );
         }
-        if( s1_p0_side == Side::zero )
+        if( s1_p0_side == SIDE::zero )
         {
-            return std::make_pair( Position::inside, Position::vertex0 );
+            return std::make_pair( POSITION::inside, POSITION::vertex0 );
         }
-        if( s1_p1_side == Side::zero )
+        if( s1_p1_side == SIDE::zero )
         {
-            return std::make_pair( Position::inside, Position::vertex1 );
+            return std::make_pair( POSITION::inside, POSITION::vertex1 );
         }
-        return std::make_pair( Position::inside, Position::inside );
+        return std::make_pair( POSITION::inside, POSITION::inside );
     }
 
     SegmentSegmentIntersection colinear_segment_segment_intersection_detection(
@@ -214,7 +213,7 @@ namespace geode
     {
         OPENGEODE_ASSERT(
             segment_segment_intersection_detection( segment0, segment1 )
-                == std::make_pair( Position::parallel, Position::parallel ),
+                == std::make_pair( POSITION::parallel, POSITION::parallel ),
             "[colinear_segment_segment_intersection_detection] Given segments "
             "are not colinear" );
         const auto s0_p0_position =
@@ -225,103 +224,103 @@ namespace geode
             point_segment_position< 2 >( segment1.vertices()[0], segment0 );
         const auto s1_p1_position =
             point_segment_position< 2 >( segment1.vertices()[1], segment0 );
-        if( s0_p0_position == Position::inside
-            || s0_p1_position == Position::inside
-            || s1_p0_position == Position::inside
-            || s1_p1_position == Position::inside )
+        if( s0_p0_position == POSITION::inside
+            || s0_p1_position == POSITION::inside
+            || s1_p0_position == POSITION::inside
+            || s1_p1_position == POSITION::inside )
         {
-            return std::make_pair( Position::parallel, Position::parallel );
+            return std::make_pair( POSITION::parallel, POSITION::parallel );
         }
-        if( s0_p0_position == Position::vertex0 )
+        if( s0_p0_position == POSITION::vertex0 )
         {
-            if( s0_p1_position == Position::outside
-                || s0_p1_position == Position::vertex0 )
+            if( s0_p1_position == POSITION::outside
+                || s0_p1_position == POSITION::vertex0 )
             {
-                return std::make_pair( Position::vertex0, Position::vertex0 );
+                return std::make_pair( POSITION::vertex0, POSITION::vertex0 );
             }
-            else // s0_p1_position == Position::vertex1
+            else // s0_p1_position == POSITION::vertex1
             {
-                return std::make_pair( Position::parallel, Position::parallel );
-            }
-        }
-        if( s0_p0_position == Position::vertex1 )
-        {
-            if( s0_p1_position == Position::outside
-                || s0_p1_position == Position::vertex1 )
-            {
-                return std::make_pair( Position::vertex0, Position::vertex1 );
-            }
-            else // s0_p1_position == Position::vertex0
-            {
-                return std::make_pair( Position::parallel, Position::parallel );
+                return std::make_pair( POSITION::parallel, POSITION::parallel );
             }
         }
-        if( s1_p0_position == Position::vertex0 )
+        if( s0_p0_position == POSITION::vertex1 )
         {
-            if( s1_p1_position == Position::outside
-                || s1_p1_position == Position::vertex0 )
+            if( s0_p1_position == POSITION::outside
+                || s0_p1_position == POSITION::vertex1 )
             {
-                return std::make_pair( Position::vertex0, Position::vertex0 );
+                return std::make_pair( POSITION::vertex0, POSITION::vertex1 );
             }
-            else // s1_p1_position == Position::vertex1
+            else // s0_p1_position == POSITION::vertex0
             {
-                return std::make_pair( Position::parallel, Position::parallel );
+                return std::make_pair( POSITION::parallel, POSITION::parallel );
             }
         }
-        if( s1_p0_position == Position::vertex1 )
+        if( s1_p0_position == POSITION::vertex0 )
         {
-            if( s1_p1_position == Position::outside
-                || s1_p1_position == Position::vertex1 )
+            if( s1_p1_position == POSITION::outside
+                || s1_p1_position == POSITION::vertex0 )
             {
-                return std::make_pair( Position::vertex1, Position::vertex0 );
+                return std::make_pair( POSITION::vertex0, POSITION::vertex0 );
             }
-            else // s1_p1_position == Position::vertex0
+            else // s1_p1_position == POSITION::vertex1
             {
-                return std::make_pair( Position::parallel, Position::parallel );
+                return std::make_pair( POSITION::parallel, POSITION::parallel );
             }
         }
-        return std::make_pair( Position::outside, Position::outside );
+        if( s1_p0_position == POSITION::vertex1 )
+        {
+            if( s1_p1_position == POSITION::outside
+                || s1_p1_position == POSITION::vertex1 )
+            {
+                return std::make_pair( POSITION::vertex1, POSITION::vertex0 );
+            }
+            else // s1_p1_position == POSITION::vertex0
+            {
+                return std::make_pair( POSITION::parallel, POSITION::parallel );
+            }
+        }
+        return std::make_pair( POSITION::outside, POSITION::outside );
     }
 
-    Position segment_line_intersection_detection(
+    POSITION segment_line_intersection_detection(
         const Segment2D& segment, const InfiniteLine2D& line )
     {
         const auto s0_side = point_side_to_line( segment.vertices()[0], line );
         const auto s1_side = point_side_to_line( segment.vertices()[1], line );
         if( s0_side == s1_side )
         {
-            if( s0_side == Side::zero )
+            if( s0_side == SIDE::zero )
             {
-                return Position::parallel;
+                return POSITION::parallel;
             }
-            return Position::outside;
+            return POSITION::outside;
         }
-        if( s0_side == Side::zero )
+        if( s0_side == SIDE::zero )
         {
-            return Position::vertex0;
+            return POSITION::vertex0;
         }
-        if( s1_side == Side::zero )
+        if( s1_side == SIDE::zero )
         {
-            return Position::vertex1;
+            return POSITION::vertex1;
         }
-        return Position::inside;
+        return POSITION::inside;
     }
 
-    Position line_triangle_intersection_detection(
+    POSITION line_triangle_intersection_detection(
         const InfiniteLine3D& line, const Triangle3D& triangle )
     {
         const auto v0_translated =
             triangle.vertices()[0].get() + line.direction();
         if( GEO::PCK::orient_3d( v0_translated, triangle.vertices()[0],
                 triangle.vertices()[1], triangle.vertices()[2] )
-            == GEO::ZERO )
+            == GEO::zero )
         {
             if( point_side_to_triangle( line.origin(), triangle )
-                == Side::zero )
+                == SIDE::zero )
             {
-                return geode::Position::parallel;
+                return geode::POSITION::parallel;
             }
-            return Position::outside;
+            return POSITION::outside;
         }
 
         const auto other = line.origin() + line.direction();
@@ -334,8 +333,9 @@ namespace geode
         const auto sign20 = GEO::PCK::orient_3d( line.origin(),
             triangle.vertices()[2], triangle.vertices()[0], other );
 
-        return detail::triangle_intersection_detection( detail::side( sign01 ),
-            detail::side( sign12 ), detail::side( sign20 ) );
+        return internal::triangle_intersection_detection(
+            internal::side( sign01 ), internal::side( sign12 ),
+            internal::side( sign20 ) );
     }
 
     SegmentTriangleIntersection segment_triangle_intersection_detection(
@@ -348,12 +348,12 @@ namespace geode
 
         if( side0 == side1 )
         {
-            if( side0 == Side::zero )
+            if( side0 == SIDE::zero )
             {
                 return segment_triangle_plane_intersection_detection(
                     segment, triangle );
             }
-            return { Position::outside, Position::outside };
+            return { POSITION::outside, POSITION::outside };
         }
 
         const auto sign01 =
@@ -369,21 +369,21 @@ namespace geode
                 triangle.vertices()[0], segment.vertices()[1] );
 
         const auto triangle_position =
-            detail::triangle_intersection_detection( detail::side( sign01 ),
-                detail::side( sign12 ), detail::side( sign20 ) );
-        if( triangle_position == Position::outside )
+            internal::triangle_intersection_detection( internal::side( sign01 ),
+                internal::side( sign12 ), internal::side( sign20 ) );
+        if( triangle_position == POSITION::outside )
         {
-            return { Position::outside, Position::outside };
+            return { POSITION::outside, POSITION::outside };
         }
-        return { detail::segment_intersection_detection( side0, side1 ),
+        return { internal::segment_intersection_detection( side0, side1 ),
             triangle_position };
     }
 
-    Position segment_plane_intersection_detection(
+    POSITION segment_plane_intersection_detection(
         const Segment3D& segment, const Plane& plane )
     {
         const auto side0 = point_side_to_plane( segment.vertices()[0], plane );
         const auto side1 = point_side_to_plane( segment.vertices()[1], plane );
-        return detail::segment_intersection_detection( side0, side1 );
+        return internal::segment_intersection_detection( side0, side1 );
     }
 } // namespace geode

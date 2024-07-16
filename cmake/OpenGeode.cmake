@@ -31,7 +31,6 @@ include(cmake/PythonTargets.cmake)
 find_package(absl REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ABSEIL_INSTALL_PREFIX})
 find_package(Async++ REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ASYNCPLUSPLUS_INSTALL_PREFIX})
 find_package(Bitsery REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${BITSERY_INSTALL_PREFIX})
-find_package(ghc_filesystem REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${FILESYSTEM_INSTALL_PREFIX})
 find_package(minizip-ng REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${MINIZIP_INSTALL_PREFIX})
 find_package(nanoflann REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${NANOFLANN_INSTALL_PREFIX})
 find_package(spdlog REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${SPDLOG_INSTALL_PREFIX})
@@ -43,7 +42,6 @@ install(
         ${ABSEIL_INSTALL_PREFIX}/
         ${ASYNCPLUSPLUS_INSTALL_PREFIX}/
         ${BITSERY_INSTALL_PREFIX}/
-        ${FILESYSTEM_INSTALL_PREFIX}/
         ${GDAL_INSTALL_PREFIX}/
         ${PROJ_INSTALL_PREFIX}/
     DESTINATION
@@ -79,7 +77,8 @@ endif()
 
 install(
     FILES 
-        "cmake/OpenGeodeModule-setup.py.in"
+        "cmake/setup.py.in"
+        "cmake/pyproject.toml.in"
         "cmake/GlobalOptions.cmake"
         "cmake/CompilerWarnings.cmake"
         "cmake/Sanitizers.cmake"

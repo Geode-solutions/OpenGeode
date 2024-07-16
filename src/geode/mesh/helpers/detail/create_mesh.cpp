@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/create_mesh.h>
+#include <geode/mesh/helpers/detail/create_mesh.hpp>
 
 #include <absl/types/span.h>
 
 #include <memory>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace geode
 {

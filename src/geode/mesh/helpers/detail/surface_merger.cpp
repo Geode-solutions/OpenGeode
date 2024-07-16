@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/surface_merger.h>
+#include <geode/mesh/helpers/detail/surface_merger.hpp>
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/repair_polygon_orientations.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
 namespace
 {
@@ -147,9 +147,10 @@ namespace geode
                         merger.builder().delete_polygons( to_delete );
                     delete_vector_elements( to_delete, polygons_origins_ );
                     delete_vector_elements( to_delete, surface_id_ );
+                    const auto& meshes = merger.meshes();
                     for( const auto surface_id : Indices{ merger.meshes() } )
                     {
-                        const auto& surface = merger.meshes()[surface_id].get();
+                        const auto& surface = meshes[surface_id].get();
                         for( const auto p : Range{ surface.nb_polygons() } )
                         {
                             const auto old = new_id_[surface_id][p];
@@ -164,9 +165,10 @@ namespace geode
             void create_polygons( SurfaceMeshMerger< dimension >& merger )
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > polygons;
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& surface = merger.meshes()[s].get();
+                    const auto& surface = meshes[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
                         Polygon vertices( surface.nb_polygon_vertices( p ) );
@@ -176,8 +178,9 @@ namespace geode
                             vertices[v] = merger.vertex_in_merged(
                                 s, surface.polygon_vertex( { p, v } ) );
                         }
-                        const auto it = polygons.try_emplace(
-                            vertices, merger.mesh().nb_polygons() );
+                        const auto it =
+                            polygons.try_emplace( TypedVertexCycle{ vertices },
+                                merger.mesh().nb_polygons() );
                         if( it.second )
                         {
                             const auto polygon_id =
@@ -217,9 +220,10 @@ namespace geode
             {
                 absl::FixedArray< bool > visited_polygons(
                     merger.mesh().nb_polygons(), false );
+                const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& surface = merger.meshes()[s].get();
+                    const auto& surface = meshes[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
                         const auto pv = surface.polygon_vertices( p );

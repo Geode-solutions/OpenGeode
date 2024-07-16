@@ -23,16 +23,16 @@
 
 #include <absl/types/span.h>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/range.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/model/mixin/builder/relationships_builder.h>
-#include <geode/model/mixin/core/relationships.h>
+#include <geode/model/mixin/builder/relationships_builder.hpp>
+#include <geode/model/mixin/core/relationships.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 geode::ComponentID component_id( const geode::uuid& id )
 {
@@ -170,7 +170,7 @@ void test_attributes( const geode::Relationships& relations,
 }
 
 void test_io(
-    absl::string_view directory, absl::Span< const geode::uuid > uuids )
+    std::string_view directory, absl::Span< const geode::uuid > uuids )
 {
     geode::Relationships reloaded_relationships;
     geode::RelationshipsBuilder reloader{ reloaded_relationships };
@@ -184,11 +184,11 @@ void test()
     geode::Relationships relationships;
     const std::array< geode::uuid, 6 > uuids{
         geode::uuid{ "00000000-a9c9-4d4e-8000-0000d0ecddf1" },
-        { "00000000-f620-4987-8000-00007f488d1c" },
-        { "00000000-006a-4fc8-8000-00002970c6fd" },
-        { "00000000-c823-4e3c-8000-0000d5bbf79b" },
-        { "00000000-cb3b-4476-8000-0000b8510242" },
-        { "00000000-e7cb-4888-8000-0000afce2867" }
+        geode::uuid{ "00000000-f620-4987-8000-00007f488d1c" },
+        geode::uuid{ "00000000-006a-4fc8-8000-00002970c6fd" },
+        geode::uuid{ "00000000-c823-4e3c-8000-0000d5bbf79b" },
+        geode::uuid{ "00000000-cb3b-4476-8000-0000b8510242" },
+        geode::uuid{ "00000000-e7cb-4888-8000-0000afce2867" }
     };
 
     // This Relationships do not represent anything.
@@ -201,7 +201,7 @@ void test()
     test_attributes( relationships, uuids );
 
     relationships.save_relationships( "." );
-    test_io( absl::StrCat( geode::data_path, "relationships_v12" ), uuids );
+    test_io( absl::StrCat( geode::DATA_PATH, "relationships_v12" ), uuids );
     test_io( ".", uuids );
 }
 

@@ -23,13 +23,13 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/triangulated_surface_input.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/triangulated_surface_input.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
 #define PYTHON_TRIANGULATED_SURFACE_IO( dimension )                            \
     const auto save##dimension =                                               \
@@ -40,7 +40,7 @@
         "load_triangulated_surface" + std::to_string( dimension ) + "D";       \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr<                                          \
-            TriangulatedSurface< dimension > > ( * )( absl::string_view ) >(   \
+            TriangulatedSurface< dimension > > ( * )( std::string_view ) >(    \
             &load_triangulated_surface< dimension > ) );                       \
     const auto check##dimension = "check_triangulated_surface_missing_files"   \
                                   + std::to_string( dimension ) + "D";         \

@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/lines.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/io/edged_curve_input.h>
-#include <geode/mesh/io/edged_curve_output.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/io/edged_curve_input.hpp>
+#include <geode/mesh/io/edged_curve_output.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/line.hpp>
 
 namespace geode
 {
@@ -83,13 +83,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Lines< dimension >::save_lines( absl::string_view directory ) const
+    void Lines< dimension >::save_lines( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/lines" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Line< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( const auto& line : lines() )
@@ -112,12 +112,12 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::load_lines(
-        absl::string_view directory, LinesBuilderKey )
+        std::string_view directory, LinesBuilderKey )
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( auto& line : modifiable_lines( {} ) )

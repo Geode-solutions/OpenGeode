@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {

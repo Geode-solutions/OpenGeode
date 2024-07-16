@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/basic/singleton.h>
+#include <geode/basic/singleton.hpp>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

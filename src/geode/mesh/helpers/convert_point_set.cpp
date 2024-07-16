@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/helpers/convert_point_set.h>
+#include <geode/mesh/helpers/convert_point_set.hpp>
 
-#include <geode/basic/range.h>
+#include <geode/basic/range.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/helpers/private/copy.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 namespace geode
 {
@@ -38,11 +38,11 @@ namespace geode
     {
         auto point_set2d = PointSet2D::create();
         auto builder2d = PointSetBuilder2D::create( *point_set2d );
-        detail::copy_points3d_into_2d(
+        internal::copy_points3d_into_2d(
             point_set3d, *builder2d, axis_to_remove );
-        detail::copy_attributes( point_set3d.vertex_attribute_manager(),
+        internal::copy_attributes( point_set3d.vertex_attribute_manager(),
             point_set2d->vertex_attribute_manager() );
-        detail::copy_meta_info( point_set3d, *builder2d );
+        internal::copy_meta_info( point_set3d, *builder2d );
         return point_set2d;
     }
 
@@ -53,11 +53,11 @@ namespace geode
     {
         auto point_set3d = PointSet3D::create();
         auto builder3d = PointSetBuilder3D::create( *point_set3d );
-        detail::copy_points2d_into_3d(
+        internal::copy_points2d_into_3d(
             point_set2d, *builder3d, axis_to_add, axis_coordinate );
-        detail::copy_attributes( point_set2d.vertex_attribute_manager(),
+        internal::copy_attributes( point_set2d.vertex_attribute_manager(),
             point_set3d->vertex_attribute_manager() );
-        detail::copy_meta_info( point_set2d, *builder3d );
+        internal::copy_meta_info( point_set2d, *builder3d );
         return point_set3d;
     }
 } // namespace geode

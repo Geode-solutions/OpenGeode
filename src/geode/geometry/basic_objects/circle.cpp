@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/circle.h>
+#include <geode/geometry/basic_objects/circle.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 namespace geode
 {
@@ -71,9 +71,9 @@ namespace geode
             }
             return std::sqrt( 1 - dP * dP );
         };
-        const auto x = sin_angle( { { 1, 0, 0 } } );
-        const auto y = sin_angle( { { 0, 1, 0 } } );
-        const auto z = sin_angle( { { 0, 0, 1 } } );
+        const auto x = sin_angle( Vector3D{ { 1, 0, 0 } } );
+        const auto y = sin_angle( Vector3D{ { 0, 1, 0 } } );
+        const auto z = sin_angle( Vector3D{ { 0, 0, 1 } } );
         const auto translation = Vector3D{ { x, y, z } } * radius_;
         BoundingBox3D bbox;
         bbox.add_point( plane_.origin() + translation );

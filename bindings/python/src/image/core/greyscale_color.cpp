@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/image/core/greyscale_color.h>
+#include <geode/image/core/greyscale_color.hpp>
 
 namespace geode
 {

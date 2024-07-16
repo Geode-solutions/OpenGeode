@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/helpers/euclidean_distance_transform.h>
+#include <geode/mesh/helpers/euclidean_distance_transform.hpp>
 
 namespace geode
 {

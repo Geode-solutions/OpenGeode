@@ -21,28 +21,28 @@
  *
  */
 
-#include <geode/mesh/core/attribute_coordinate_reference_system.h>
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class AttributeCoordinateReferenceSystem< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         Impl( AttributeManager& manager )
-            : detail::PointsImpl< dimension >{ manager }
+            : internal::PointsImpl< dimension >{ manager }
         {
         }
-        Impl( AttributeManager& manager, absl::string_view attribute_name )
-            : detail::PointsImpl< dimension >{ manager, attribute_name }
+        Impl( AttributeManager& manager, std::string_view attribute_name )
+            : internal::PointsImpl< dimension >{ manager, attribute_name }
         {
         }
 
@@ -55,7 +55,7 @@ namespace geode
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
     };
@@ -76,7 +76,7 @@ namespace geode
     template < index_t dimension >
     AttributeCoordinateReferenceSystem< dimension >::
         AttributeCoordinateReferenceSystem(
-            AttributeManager& manager, absl::string_view attribute_name )
+            AttributeManager& manager, std::string_view attribute_name )
         : impl_{ manager, attribute_name }
     {
     }
@@ -103,7 +103,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::string_view
+    std::string_view
         AttributeCoordinateReferenceSystem< dimension >::attribute_name() const
     {
         return impl_->attribute_name();

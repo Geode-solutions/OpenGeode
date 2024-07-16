@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/mesh/helpers/convert_solid_mesh.h>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/hybrid_solid_builder.h>
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/helpers/detail/element_identifier.h>
-#include <geode/mesh/helpers/detail/solid_merger.h>
-#include <geode/mesh/helpers/private/copy.h>
+#include <geode/mesh/builder/hybrid_solid_builder.hpp>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/helpers/detail/element_identifier.hpp>
+#include <geode/mesh/helpers/detail/solid_merger.hpp>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 namespace
 {
@@ -131,7 +131,7 @@ namespace
             builder->set_point(
                 v, grid.grid_point( grid.vertex_indices( v ) ) );
         }
-        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
+        geode::internal::copy_attributes( grid.grid_vertex_attribute_manager(),
             tet_solid->vertex_attribute_manager() );
         create_tetrahedra_from_grid_cells( *tet_solid, *builder, grid );
         return tet_solid;
@@ -305,7 +305,7 @@ std::array< geode::index_t, 5 > order_pyramid_vertices(
 
 namespace geode
 {
-    absl::optional< std::unique_ptr< TetrahedralSolid3D > >
+    std::optional< std::unique_ptr< TetrahedralSolid3D > >
         convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid )
     {
         if( solid.type_name() == TetrahedralSolid3D::type_name_static() )
@@ -314,27 +314,27 @@ namespace geode
         }
         if( solid.type_name() == RegularGrid3D::type_name_static() )
         {
-            absl::optional< std::unique_ptr< TetrahedralSolid3D > > result{
+            std::optional< std::unique_ptr< TetrahedralSolid3D > > result{
                 create_tetrahedral_solid_from_grid(
                     dynamic_cast< const RegularGrid3D& >( solid ) )
             };
             auto builder =
                 geode::TetrahedralSolidBuilder3D::create( *result->get() );
-            detail::copy_meta_info( solid, *builder );
+            internal::copy_meta_info( solid, *builder );
             return result;
         }
         if( !all_polyhedra_are_simplex( solid ) )
         {
             Logger::info( "[convert_solid_mesh_into_tetrahedral_solid] "
                           "SolidMesh is not made of only tetrahedra." );
-            return absl::nullopt;
+            return std::nullopt;
         }
-        absl::optional< std::unique_ptr< TetrahedralSolid3D > > tet_solid{
+        std::optional< std::unique_ptr< TetrahedralSolid3D > > tet_solid{
             TetrahedralSolid3D::create()
         };
         auto builder = TetrahedralSolidBuilder3D::create( *tet_solid->get() );
-        detail::copy_meta_info( solid, *builder );
-        detail::copy_points( solid, *builder );
+        internal::copy_meta_info( solid, *builder );
+        internal::copy_points( solid, *builder );
         builder->reserve_tetrahedra( solid.nb_polyhedra() );
         for( const auto p : Range{ solid.nb_polyhedra() } )
         {
@@ -357,9 +357,9 @@ namespace geode
                 }
             }
         }
-        detail::copy_attributes( solid.vertex_attribute_manager(),
+        internal::copy_attributes( solid.vertex_attribute_manager(),
             tet_solid->get()->vertex_attribute_manager() );
-        detail::copy_attributes( solid.polyhedron_attribute_manager(),
+        internal::copy_attributes( solid.polyhedron_attribute_manager(),
             tet_solid->get()->polyhedron_attribute_manager() );
         return tet_solid;
     }
@@ -370,19 +370,19 @@ namespace geode
         return create_tetrahedral_solid_from_grid( grid );
     }
 
-    absl::optional< std::unique_ptr< HybridSolid3D > >
+    std::optional< std::unique_ptr< HybridSolid3D > >
         convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid )
     {
         if( !all_polyhedra_are_hybrid( solid ) )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
-        absl::optional< std::unique_ptr< HybridSolid3D > > hybrid_solid{
+        std::optional< std::unique_ptr< HybridSolid3D > > hybrid_solid{
             HybridSolid3D::create()
         };
         auto builder = HybridSolidBuilder3D::create( *hybrid_solid->get() );
-        detail::copy_meta_info( solid, *builder );
-        detail::copy_points( solid, *builder );
+        internal::copy_meta_info( solid, *builder );
+        internal::copy_points( solid, *builder );
         for( const auto p : Range{ solid.nb_polyhedra() } )
         {
             const auto vertices = solid.polyhedron_vertices( p );
@@ -421,9 +421,9 @@ namespace geode
                 }
             }
         }
-        detail::copy_attributes( solid.vertex_attribute_manager(),
+        internal::copy_attributes( solid.vertex_attribute_manager(),
             hybrid_solid->get()->vertex_attribute_manager() );
-        detail::copy_attributes( solid.polyhedron_attribute_manager(),
+        internal::copy_attributes( solid.polyhedron_attribute_manager(),
             hybrid_solid->get()->polyhedron_attribute_manager() );
         return hybrid_solid;
     }
@@ -431,7 +431,7 @@ namespace geode
     std::unique_ptr< SolidMesh3D > merge_solid_meshes(
         absl::Span< const std::reference_wrapper< const SolidMesh3D > > solids )
     {
-        detail::SolidMeshMerger3D merger{ solids, global_epsilon };
+        detail::SolidMeshMerger3D merger{ solids, GLOBAL_EPSILON };
         return merger.merge();
     }
 } // namespace geode

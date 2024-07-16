@@ -38,7 +38,6 @@ endif()
 include(CMakeFindDependencyMacro)
 find_dependency(absl)
 find_dependency(Bitsery)
-find_dependency(ghc_filesystem)
 find_dependency(Threads)
 
 get_target_property(library_type OpenGeode::basic TYPE)

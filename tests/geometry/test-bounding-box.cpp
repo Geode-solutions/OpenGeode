@@ -21,26 +21,26 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_bbox()
 {
     geode::BoundingBox2D box;
-    box.add_point( { { -1, -1 } } );
-    box.add_point( { { 1, 1 } } );
+    box.add_point( geode::Point2D{ { -1, -1 } } );
+    box.add_point( geode::Point2D{ { 1, 1 } } );
 
     geode::BoundingBox2D box2;
-    box2.add_point( { { -2, -2 } } );
-    box2.add_point( { { -1, -1 } } );
+    box2.add_point( geode::Point2D{ { -2, -2 } } );
+    box2.add_point( geode::Point2D{ { -1, -1 } } );
 
     OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
         "[Test] Error in BoundingBox initialization" );
@@ -55,20 +55,20 @@ void test_bbox()
     OPENGEODE_EXCEPTION( box.intersects( box2 ), "[Test] BBox should overlap" );
 
     geode::BoundingBox2D box3;
-    box3.add_point( { { 2, 2 } } );
-    box3.add_point( { { 3, 3 } } );
+    box3.add_point( geode::Point2D{ { 2, 2 } } );
+    box3.add_point( geode::Point2D{ { 3, 3 } } );
     OPENGEODE_EXCEPTION(
         !box.intersects( box3 ), "[Test] BBox should not overlap" );
-    OPENGEODE_EXCEPTION( box3.contains( { { 2.5, 2.5 } } ),
+    OPENGEODE_EXCEPTION( box3.contains( geode::Point2D{ { 2.5, 2.5 } } ),
         "[Test] BBox should contain this point" );
-    OPENGEODE_EXCEPTION( !box3.contains( { { 10, 0 } } ),
+    OPENGEODE_EXCEPTION( !box3.contains( geode::Point2D{ { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
-    OPENGEODE_EXCEPTION( !box3.contains( { { 0, 0 } } ),
+    OPENGEODE_EXCEPTION( !box3.contains( geode::Point2D{ { 0, 0 } } ),
         "[Test] BBox should not contain that point" );
 
     geode::BoundingBox2D box_negative;
-    box_negative.add_point( { { -2, -2 } } );
-    box_negative.add_point( { { -1.5, -1.5 } } );
+    box_negative.add_point( geode::Point2D{ { -2, -2 } } );
+    box_negative.add_point( geode::Point2D{ { -1.5, -1.5 } } );
     OPENGEODE_EXCEPTION( box_negative.min() == geode::Point2D( { -2, -2 } ),
         "[Test] Error in BoundingBox initialization and point additions" );
     OPENGEODE_EXCEPTION( box_negative.max() == geode::Point2D( { -1.5, -1.5 } ),
@@ -97,18 +97,21 @@ void test_bbox()
 void test_ray_intersections()
 {
     geode::BoundingBox3D bbox;
-    bbox.add_point( { { -1, -1, -1 } } );
-    bbox.add_point( { { 1, 1, 1 } } );
+    bbox.add_point( geode::Point3D{ { -1, -1, -1 } } );
+    bbox.add_point( geode::Point3D{ { 1, 1, 1 } } );
 
-    const geode::OwnerRay3D ray_inside{ { { 0, 0, 1 } }, { { 0, 0, 0 } } };
+    const geode::OwnerRay3D ray_inside{ geode::Vector3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 0, 0, 0 } } };
     OPENGEODE_EXCEPTION(
         bbox.intersects( ray_inside ), "[Test] Wrong result with ray_inside" );
 
-    const geode::OwnerRay3D ray_up{ { { 0, 0, 1 } }, { { 0, 0, 2 } } };
+    const geode::OwnerRay3D ray_up{ geode::Vector3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 0, 0, 2 } } };
     OPENGEODE_EXCEPTION(
         !bbox.intersects( ray_up ), "[Test] Wrong result with ray_up" );
 
-    const geode::OwnerRay3D ray_down{ { { 0, 0, 1 } }, { { 0, 0, -2 } } };
+    const geode::OwnerRay3D ray_down{ geode::Vector3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 0, 0, -2 } } };
     OPENGEODE_EXCEPTION(
         bbox.intersects( ray_down ), "[Test] Wrong result with ray_down" );
 }
@@ -116,21 +119,22 @@ void test_ray_intersections()
 void test_line_intersections()
 {
     geode::BoundingBox3D bbox;
-    bbox.add_point( { { -1, -1, -1 } } );
-    bbox.add_point( { { 1, 1, 1 } } );
+    bbox.add_point( geode::Point3D{ { -1, -1, -1 } } );
+    bbox.add_point( geode::Point3D{ { 1, 1, 1 } } );
 
-    const geode::OwnerInfiniteLine3D line_inside{ { { 0, 0, 1 } },
-        { { 0, 0, 0 } } };
+    const geode::OwnerInfiniteLine3D line_inside{
+        geode::Vector3D{ { 0, 0, 1 } }, geode::Point3D{ { 0, 0, 0 } }
+    };
     OPENGEODE_EXCEPTION( bbox.intersects( line_inside ),
         "[Test] Wrong result with line_inside" );
 
-    const geode::OwnerInfiniteLine3D line_up{ { { 0, 0, 1 } },
-        { { 0, 0, 2 } } };
+    const geode::OwnerInfiniteLine3D line_up{ geode::Vector3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 0, 0, 2 } } };
     OPENGEODE_EXCEPTION(
         bbox.intersects( line_up ), "[Test] Wrong result with line_up" );
 
-    const geode::OwnerInfiniteLine3D line_down{ { { 0, 0, 1 } },
-        { { 0, 0, -2 } } };
+    const geode::OwnerInfiniteLine3D line_down{ geode::Vector3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 0, 0, -2 } } };
     OPENGEODE_EXCEPTION(
         bbox.intersects( line_down ), "[Test] Wrong result with line_down" );
 }
@@ -138,8 +142,8 @@ void test_line_intersections()
 void test_triangle2d_intersections()
 {
     geode::BoundingBox2D bbox;
-    bbox.add_point( { { -1, -1 } } );
-    bbox.add_point( { { 1, 1 } } );
+    bbox.add_point( geode::Point2D{ { -1, -1 } } );
+    bbox.add_point( geode::Point2D{ { 1, 1 } } );
 
     const geode::Point2D O{ { 0, 0 } };
     const geode::Point2D a{ { 0.5, 0.5 } };
@@ -192,8 +196,8 @@ void test_triangle2d_intersections()
 void test_triangle3d_intersections()
 {
     geode::BoundingBox3D bbox;
-    bbox.add_point( { { -1, -1, -1 } } );
-    bbox.add_point( { { 1, 1, 1 } } );
+    bbox.add_point( geode::Point3D{ { -1, -1, -1 } } );
+    bbox.add_point( geode::Point3D{ { 1, 1, 1 } } );
 
     const geode::Point3D O{ { 0, 0, 0 } };
     const geode::Point3D a{ { 0.5, 0.5, 0.5 } };
@@ -245,8 +249,8 @@ void test_triangle3d_intersections()
 void test_tetra_intersections()
 {
     geode::BoundingBox3D bbox;
-    bbox.add_point( { { -1, -1, -1 } } );
-    bbox.add_point( { { 1, 1, 1 } } );
+    bbox.add_point( geode::Point3D{ { -1, -1, -1 } } );
+    bbox.add_point( geode::Point3D{ { 1, 1, 1 } } );
 
     const geode::Point3D a{ { 0.5, 0.5, 0.5 } };
     const geode::Point3D b{ { 0.5, 0.5, -0.5 } };
@@ -270,8 +274,8 @@ void test_tetra_intersections()
 void test_segment_intersections()
 {
     geode::BoundingBox2D bbox;
-    bbox.add_point( { { -1, -1 } } );
-    bbox.add_point( { { 1, 1 } } );
+    bbox.add_point( geode::Point2D{ { -1, -1 } } );
+    bbox.add_point( geode::Point2D{ { 1, 1 } } );
 
     const geode::Point2D O{ { 0, 0 } };
     const geode::Point2D a{ { 0.5, 0.5 } };

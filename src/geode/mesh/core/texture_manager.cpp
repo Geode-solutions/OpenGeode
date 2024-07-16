@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/core/texture_manager.h>
+#include <geode/mesh/core/texture_manager.hpp>
 
 #include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/texture1d.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture3d.h>
-#include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/core/texture1d.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture3d.hpp>
+#include <geode/mesh/core/texture_storage.hpp>
 
 namespace geode
 {
@@ -51,27 +51,27 @@ namespace geode
             return textures_.nb_textures( {} );
         }
 
-        Texture< dimension >& find_or_create_texture( absl::string_view name )
+        Texture< dimension >& find_or_create_texture( std::string_view name )
         {
             return textures_.find_or_create_texture( manager_, name, {} );
         }
 
-        const Texture< dimension >& find_texture( absl::string_view name ) const
+        const Texture< dimension >& find_texture( std::string_view name ) const
         {
             return textures_.find_texture( name, {} );
         }
 
-        absl::FixedArray< absl::string_view > texture_names() const
+        absl::FixedArray< std::string_view > texture_names() const
         {
             return textures_.texture_names( {} );
         }
 
-        bool texture_exists( absl::string_view name ) const
+        bool texture_exists( std::string_view name ) const
         {
             return textures_.texture_exists( name, {} );
         }
 
-        void delete_texture( absl::string_view name )
+        void delete_texture( std::string_view name )
         {
             textures_.delete_texture( name, {} );
             manager_.delete_attribute( name );
@@ -104,20 +104,20 @@ namespace geode
 
     template < index_t dimension >
     Texture< dimension >& TextureManager< dimension >::find_or_create_texture(
-        absl::string_view name )
+        std::string_view name )
     {
         return impl_->find_or_create_texture( name );
     }
 
     template < index_t dimension >
     const Texture< dimension >& TextureManager< dimension >::find_texture(
-        absl::string_view name ) const
+        std::string_view name ) const
     {
         return impl_->find_texture( name );
     }
 
     template < index_t dimension >
-    absl::FixedArray< absl::string_view >
+    absl::FixedArray< std::string_view >
         TextureManager< dimension >::texture_names() const
     {
         return impl_->texture_names();
@@ -125,13 +125,13 @@ namespace geode
 
     template < index_t dimension >
     bool TextureManager< dimension >::texture_exists(
-        absl::string_view name ) const
+        std::string_view name ) const
     {
         return impl_->texture_exists( name );
     }
 
     template < index_t dimension >
-    void TextureManager< dimension >::delete_texture( absl::string_view name )
+    void TextureManager< dimension >::delete_texture( std::string_view name )
     {
         impl_->delete_texture( name );
     }

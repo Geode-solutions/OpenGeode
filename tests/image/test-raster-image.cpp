@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/image/core/raster_image.h>
-#include <geode/image/core/rgb_color.h>
-#include <geode/image/io/raster_image_input.h>
-#include <geode/image/io/raster_image_output.h>
+#include <geode/image/core/raster_image.hpp>
+#include <geode/image/core/rgb_color.hpp>
+#include <geode/image/io/raster_image_input.hpp>
+#include <geode/image/io/raster_image_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_raster( const geode::RasterImage2D& raster )
 {

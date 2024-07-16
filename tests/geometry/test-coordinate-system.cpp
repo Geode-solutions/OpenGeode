@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < geode::index_t dimension >
 void check_point( const geode::CoordinateSystem< dimension >& coord_system,
@@ -46,12 +46,16 @@ void acute_system2D()
     geode::Logger::info( "[Test] Acute system 2D" );
     const geode::CoordinateSystem2D coord_system{
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { 1, 1 } } },
-        { { 1, 1 } }
+        geode::Point2D{ { 1, 1 } }
     };
-    check_point( coord_system, { { 0, 1 } }, { { -1, 0 } } );
-    check_point( coord_system, { { 0, 0 } }, { { 0, -1 } } );
-    check_point( coord_system, { { -1, 0 } }, { { -1, -1 } } );
-    check_point( coord_system, { { 2, 0 } }, { { 2, -1 } } );
+    check_point(
+        coord_system, geode::Point2D{ { 0, 1 } }, geode::Point2D{ { -1, 0 } } );
+    check_point(
+        coord_system, geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 0, -1 } } );
+    check_point( coord_system, geode::Point2D{ { -1, 0 } },
+        geode::Point2D{ { -1, -1 } } );
+    check_point(
+        coord_system, geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 2, -1 } } );
 }
 
 void optuse_system2D()
@@ -59,12 +63,16 @@ void optuse_system2D()
     geode::Logger::info( "[Test] Optuse system 2D" );
     const geode::CoordinateSystem2D coord_system{
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { -1, 1 } } },
-        { { 1, 1 } }
+        geode::Point2D{ { 1, 1 } }
     };
-    check_point( coord_system, { { 0, 1 } }, { { -1, 0 } } );
-    check_point( coord_system, { { 0, 0 } }, { { -2, -1 } } );
-    check_point( coord_system, { { -1, 0 } }, { { -3, -1 } } );
-    check_point( coord_system, { { 2, 0 } }, { { 0, -1 } } );
+    check_point(
+        coord_system, geode::Point2D{ { 0, 1 } }, geode::Point2D{ { -1, 0 } } );
+    check_point( coord_system, geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { -2, -1 } } );
+    check_point( coord_system, geode::Point2D{ { -1, 0 } },
+        geode::Point2D{ { -3, -1 } } );
+    check_point(
+        coord_system, geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 0, -1 } } );
 }
 
 void orthonormal_system3D()
@@ -73,13 +81,18 @@ void orthonormal_system3D()
     const geode::CoordinateSystem3D coord_system{
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 0, 1, 0 } },
             geode::Vector3D{ { 0, 0, 1 } } },
-        { { 0, 0, 0 } }
+        geode::Point3D{ { 0, 0, 0 } }
     };
-    check_point( coord_system, { { 0, 1, 0 } }, { { 0, 1, 0 } } );
-    check_point( coord_system, { { 0, 0, 1 } }, { { 0, 0, 1 } } );
-    check_point( coord_system, { { 1, 1, 1 } }, { { 1, 1, 1 } } );
-    check_point( coord_system, { { 2, 2, 2 } }, { { 2, 2, 2 } } );
-    check_point( coord_system, { { -2, -2, -2 } }, { { -2, -2, -2 } } );
+    check_point( coord_system, geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 0, 1, 0 } } );
+    check_point( coord_system, geode::Point3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 0, 0, 1 } } );
+    check_point( coord_system, geode::Point3D{ { 1, 1, 1 } },
+        geode::Point3D{ { 1, 1, 1 } } );
+    check_point( coord_system, geode::Point3D{ { 2, 2, 2 } },
+        geode::Point3D{ { 2, 2, 2 } } );
+    check_point( coord_system, geode::Point3D{ { -2, -2, -2 } },
+        geode::Point3D{ { -2, -2, -2 } } );
 }
 
 void acute_system3D()
@@ -88,12 +101,16 @@ void acute_system3D()
     const geode::CoordinateSystem3D coord_system{
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 1, 1, 0 } },
             geode::Vector3D{ { 1, 1, 1 } } },
-        { { 1, 1, 1 } }
+        geode::Point3D{ { 1, 1, 1 } }
     };
-    check_point( coord_system, { { 1, 1, 1 } }, { { 0, 0, 0 } } );
-    check_point( coord_system, { { 4, 3, 2 } }, { { 1, 1, 1 } } );
-    check_point( coord_system, { { 0, -1, 0 } }, { { 1, -1, -1 } } );
-    check_point( coord_system, { { 4.75, 4.5, 0.5 } }, { { 0.25, 4, -0.5 } } );
+    check_point( coord_system, geode::Point3D{ { 1, 1, 1 } },
+        geode::Point3D{ { 0, 0, 0 } } );
+    check_point( coord_system, geode::Point3D{ { 4, 3, 2 } },
+        geode::Point3D{ { 1, 1, 1 } } );
+    check_point( coord_system, geode::Point3D{ { 0, -1, 0 } },
+        geode::Point3D{ { 1, -1, -1 } } );
+    check_point( coord_system, geode::Point3D{ { 4.75, 4.5, 0.5 } },
+        geode::Point3D{ { 0.25, 4, -0.5 } } );
 }
 
 void optuse_system3D()
@@ -102,12 +119,16 @@ void optuse_system3D()
     const geode::CoordinateSystem3D coord_system{
         { geode::Vector3D{ { -1, 0, 0 } }, geode::Vector3D{ { -2, -1, 0 } },
             geode::Vector3D{ { 1, 3, 2 } } },
-        { { -1, 1, -1 } }
+        geode::Point3D{ { -1, 1, -1 } }
     };
-    check_point( coord_system, { { -1, 1, -1 } }, { { 0, 0, 0 } } );
-    check_point( coord_system, { { -3, 3, 1 } }, { { 1, 1, 1 } } );
-    check_point( coord_system, { { -1, -1, -3 } }, { { 1, -1, -1 } } );
-    check_point( coord_system, { { -9.75, -4.5, -2 } }, { { 0.25, 4, -0.5 } } );
+    check_point( coord_system, geode::Point3D{ { -1, 1, -1 } },
+        geode::Point3D{ { 0, 0, 0 } } );
+    check_point( coord_system, geode::Point3D{ { -3, 3, 1 } },
+        geode::Point3D{ { 1, 1, 1 } } );
+    check_point( coord_system, geode::Point3D{ { -1, -1, -3 } },
+        geode::Point3D{ { 1, -1, -1 } } );
+    check_point( coord_system, geode::Point3D{ { -9.75, -4.5, -2 } },
+        geode::Point3D{ { 0.25, 4, -0.5 } } );
 }
 
 void test()

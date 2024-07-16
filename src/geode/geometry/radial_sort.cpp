@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/geometry/radial_sort.h>
+#include <geode/geometry/radial_sort.hpp>
 
 #include <absl/algorithm/container.h>
 
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/position.h>
-#include <geode/geometry/private/position_from_sides.h>
-#include <geode/geometry/private/predicates.h>
-#include <geode/geometry/projection.h>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/internal/position_from_sides.hpp>
+#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/position.hpp>
+#include <geode/geometry/projection.hpp>
 
 namespace
 {
@@ -75,11 +75,11 @@ namespace
                     points_[result[id]], { segment_.vertices()[0].get(),
                                              segment_.vertices()[1].get(),
                                              points_[result[begin]] } );
-                if( side == geode::Side::positive )
+                if( side == geode::SIDE::positive )
                 {
                     sorted[left_id++] = result[id];
                 }
-                else if( side == geode::Side::negative )
+                else if( side == geode::SIDE::negative )
                 {
                     sorted[right_id--] = result[id];
                 }
@@ -93,10 +93,11 @@ namespace
                         GEO::PCK::dot_3d( proj_begin, plane_.origin(), proj );
                     const auto dot1 =
                         GEO::PCK::dot_3d( proj, plane_.origin(), proj_begin );
-                    const auto position = geode::detail::point_segment_position(
-                        geode::detail::side( dot0 ),
-                        geode::detail::opposite_side( dot1 ) );
-                    if( position == geode::Position::inside )
+                    const auto position =
+                        geode::internal::point_segment_position(
+                            geode::internal::side( dot0 ),
+                            geode::internal::opposite_side( dot1 ) );
+                    if( position == geode::POSITION::inside )
                     {
                         sorted[right_id--] = result[id];
                     }

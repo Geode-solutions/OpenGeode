@@ -21,29 +21,29 @@
  *
  */
 
-#include <geode/mesh/io/geode/register_output.h>
+#include <geode/mesh/io/geode/register_output.hpp>
 
-#include <geode/mesh/core/geode/geode_edged_curve.h>
-#include <geode/mesh/core/geode/geode_graph.h>
-#include <geode/mesh/core/geode/geode_hybrid_solid.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/io/geode/geode_edged_curve_output.h>
-#include <geode/mesh/io/geode/geode_graph_output.h>
-#include <geode/mesh/io/geode/geode_hybrid_solid_output.h>
-#include <geode/mesh/io/geode/geode_point_set_output.h>
-#include <geode/mesh/io/geode/geode_polygonal_surface_output.h>
-#include <geode/mesh/io/geode/geode_polyhedral_solid_output.h>
-#include <geode/mesh/io/geode/geode_regular_grid_output.h>
-#include <geode/mesh/io/geode/geode_tetrahedral_solid_output.h>
-#include <geode/mesh/io/geode/geode_triangulated_surface_output.h>
-#include <geode/mesh/io/geode/geode_vertex_set_output.h>
-#include <geode/mesh/io/light_regular_grid_output.h>
+#include <geode/mesh/core/geode/geode_edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
+#include <geode/mesh/core/geode/geode_hybrid_solid.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/io/geode/geode_edged_curve_output.hpp>
+#include <geode/mesh/io/geode/geode_graph_output.hpp>
+#include <geode/mesh/io/geode/geode_hybrid_solid_output.hpp>
+#include <geode/mesh/io/geode/geode_point_set_output.hpp>
+#include <geode/mesh/io/geode/geode_polygonal_surface_output.hpp>
+#include <geode/mesh/io/geode/geode_polyhedral_solid_output.hpp>
+#include <geode/mesh/io/geode/geode_regular_grid_output.hpp>
+#include <geode/mesh/io/geode/geode_tetrahedral_solid_output.hpp>
+#include <geode/mesh/io/geode/geode_triangulated_surface_output.hpp>
+#include <geode/mesh/io/geode/geode_vertex_set_output.hpp>
+#include <geode/mesh/io/light_regular_grid_output.hpp>
 
 #define BITSERY_OUTPUT_MESH_REGISTER_XD( Mesh, dimension )                     \
     geode::Mesh##OutputFactory##dimension##D::register_creator<                \

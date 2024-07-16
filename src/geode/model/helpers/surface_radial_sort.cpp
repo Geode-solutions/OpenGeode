@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/model/helpers/surface_radial_sort.h>
+#include <geode/model/helpers/surface_radial_sort.hpp>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/radial_sort.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/radial_sort.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/helpers/component_mesh_vertices.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/vertex_identifier.h>
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/helpers/component_mesh_vertices.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace
 {
@@ -46,7 +46,8 @@ namespace
         const geode::Surface3D& surface, const geode::PolygonEdge& edge )
     {
         const auto& mesh = surface.mesh();
-        auto vertex = mesh.polygon_vertex( mesh.previous_polygon_edge( edge ) );
+        auto vertex = mesh.polygon_vertex(
+            mesh.previous_polygon_vertex( geode::PolygonVertex{ edge } ) );
         return mesh.point( vertex );
     }
 
@@ -96,7 +97,7 @@ namespace
         return geode::point_line_distance( opposite_point,
                    { geode::Segment3D{ mesh.point( edge_vertices[0] ),
                        mesh.point( edge_vertices[1] ) } } )
-               <= geode::global_epsilon;
+               <= geode::GLOBAL_EPSILON;
     }
 
     std::pair< bool, std::vector< BorderPolygon > > border_polygons(
@@ -240,6 +241,6 @@ namespace geode
         }
         OPENGEODE_ASSERT_NOT_REACHED(
             "[surface_radial_sort] Cannot find sorted surfaces on a Line" );
-        return { 0 };
+        return SortedSurfaces{ 0 };
     }
 } // namespace geode

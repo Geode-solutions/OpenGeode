@@ -21,30 +21,30 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
 
 #include <array>
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodePolygonalSurface< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodePolygonalSurface< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh )
+            : internal::PointsImpl< dimension >( mesh )
         {
             polygon_ptr_.emplace_back( 0 );
         }
@@ -61,13 +61,13 @@ namespace geode
                    - starting_index( polygon_id );
         }
 
-        absl::optional< index_t > get_polygon_adjacent(
+        std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
         {
             const auto adj = get_polygon_adjacent_impl( polygon_edge );
             if( adj == NO_ID )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return adj;
         }
@@ -193,7 +193,7 @@ namespace geode
                     a.container4b(
                         impl.polygon_ptr_, impl.polygon_ptr_.max_size() );
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
 
@@ -257,7 +257,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t >
+    std::optional< index_t >
         OpenGeodePolygonalSurface< dimension >::get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
     {

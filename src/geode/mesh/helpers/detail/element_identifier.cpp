@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/element_identifier.h>
+#include <geode/mesh/helpers/detail/element_identifier.hpp>
 
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace geode
 {

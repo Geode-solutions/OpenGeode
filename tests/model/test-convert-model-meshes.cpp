@@ -21,28 +21,30 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/range.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/model/helpers/convert_model_meshes.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
-#include <geode/model/representation/io/section_input.h>
-#include <geode/model/representation/io/section_output.h>
+#include <geode/model/helpers/convert_model_meshes.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/brep_output.hpp>
+#include <geode/model/representation/io/section_input.hpp>
+#include <geode/model/representation/io/section_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void run_test_brep()
 {
     auto model =
-        geode::load_brep( absl::StrCat( geode::data_path, "layers.og_brep" ) );
-
-    geode::triangulate_surface_meshes( model );
-    geode::convert_surface_meshes_into_triangulated_surfaces( model );
+        geode::load_brep( absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
+    geode::BRepBuilder builder{ model };
+    geode::triangulate_surface_meshes( model, builder );
+    geode::convert_surface_meshes_into_triangulated_surfaces( model, builder );
 
     const auto file_io =
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
@@ -54,10 +56,10 @@ void run_test_brep()
 void run_test_section()
 {
     auto model =
-        geode::load_section( absl::StrCat( geode::data_path, "quad.og_sctn" ) );
-
-    geode::triangulate_surface_meshes( model );
-    geode::convert_surface_meshes_into_triangulated_surfaces( model );
+        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    geode::SectionBuilder builder{ model };
+    geode::triangulate_surface_meshes( model, builder );
+    geode::convert_surface_meshes_into_triangulated_surfaces( model, builder );
 
     const auto file_io =
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );

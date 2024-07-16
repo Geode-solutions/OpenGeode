@@ -23,11 +23,11 @@
 
 #include <fstream>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/detail/vertex_cycle.h>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_single_vertex_cycle()
 {

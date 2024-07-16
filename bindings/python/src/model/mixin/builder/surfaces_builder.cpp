@@ -21,16 +21,16 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/mixin/builder/surfaces_builder.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/builder/surfaces_builder.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surfaces.hpp>
 
 #define PYTHON_SURFACES_BUILDER( dimension )                                   \
     const auto name##dimension =                                               \

@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/component_mesh_element.h>
+#include <geode/model/mixin/core/component_mesh_element.hpp>
 
 namespace geode
 {

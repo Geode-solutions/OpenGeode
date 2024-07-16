@@ -23,29 +23,29 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/gradient_computation.h>
-#include <geode/mesh/io/regular_grid_output.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/gradient_computation.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_gradient_grid2D()
 {
     auto grid = geode::RegularGrid< 2 >::create();
     auto builder = geode::RegularGridBuilder< 2 >::create( *grid );
-    builder->initialize_grid( { { 0, 0 } }, { 3, 3 },
+    builder->initialize_grid( geode::Point2D{ { 0, 0 } }, { 3, 3 },
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { 0, 1 } } } );
     const auto scalar_function_name = "scalar_function";
     auto attribute =
@@ -77,16 +77,16 @@ void test_gradient_triangulated_surface2D()
     auto surface = geode::TriangulatedSurface2D::create();
     auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
     builder->create_vertices( 10 );
-    builder->set_point( 0, { { 0, 0 } } );
-    builder->set_point( 1, { { 1, 0 } } );
-    builder->set_point( 2, { { 2, 0 } } );
-    builder->set_point( 3, { { 0, 1 } } );
-    builder->set_point( 4, { { 1, 1 } } );
-    builder->set_point( 5, { { 0, 2 } } );
-    builder->set_point( 6, { { 2, 2 } } );
-    builder->set_point( 7, { { 3, 2 } } );
-    builder->set_point( 8, { { 1, 3 } } );
-    builder->set_point( 9, { { 2, 4 } } );
+    builder->set_point( 0, geode::Point2D{ { 0, 0 } } );
+    builder->set_point( 1, geode::Point2D{ { 1, 0 } } );
+    builder->set_point( 2, geode::Point2D{ { 2, 0 } } );
+    builder->set_point( 3, geode::Point2D{ { 0, 1 } } );
+    builder->set_point( 4, geode::Point2D{ { 1, 1 } } );
+    builder->set_point( 5, geode::Point2D{ { 0, 2 } } );
+    builder->set_point( 6, geode::Point2D{ { 2, 2 } } );
+    builder->set_point( 7, geode::Point2D{ { 3, 2 } } );
+    builder->set_point( 8, geode::Point2D{ { 1, 3 } } );
+    builder->set_point( 9, geode::Point2D{ { 2, 4 } } );
     builder->create_polygon( { 0, 1, 3 } );
     builder->create_polygon( { 1, 2, 4 } );
     builder->create_polygon( { 1, 4, 3 } );
@@ -122,7 +122,7 @@ void test_gradient_grid3D()
 {
     auto grid = geode::RegularGrid< 3 >::create();
     auto builder = geode::RegularGridBuilder< 3 >::create( *grid );
-    builder->initialize_grid( { { 0, 0, 0 } }, { 2, 2, 2 },
+    builder->initialize_grid( geode::Point3D{ { 0, 0, 0 } }, { 2, 2, 2 },
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 0, 1, 0 } },
             geode::Vector3D{ { 0, 0, 1 } } } );
     const auto scalar_function_name = "scalar_function";

@@ -21,11 +21,11 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/mesh/core/vertex_set.h>
+#include <geode/mesh/core/vertex_set.hpp>
 
 namespace geode
 {

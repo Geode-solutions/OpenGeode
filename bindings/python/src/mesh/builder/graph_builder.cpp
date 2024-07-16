@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/builder/graph_builder.h>
+#include <geode/mesh/builder/graph_builder.hpp>
 
 namespace geode
 {

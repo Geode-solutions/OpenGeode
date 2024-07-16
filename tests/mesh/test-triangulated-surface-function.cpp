@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/triangulated_surface_point_function.h>
-#include <geode/mesh/helpers/triangulated_surface_scalar_function.h>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/triangulated_surface_point_function.hpp>
+#include <geode/mesh/helpers/triangulated_surface_scalar_function.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 bool inexact_equal( double nb1, double nb2, double eps )
 {
@@ -45,13 +45,13 @@ void build_test_surface( geode::TriangulatedSurface2D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder2D::create( surface );
     builder->create_vertices( 7 );
-    builder->set_point( 0, { { 0, 0 } } );
-    builder->set_point( 1, { { 1, 0 } } );
-    builder->set_point( 2, { { 0, 1 } } );
-    builder->set_point( 3, { { 1, 1 } } );
-    builder->set_point( 4, { { 2, 0.5 } } );
-    builder->set_point( 5, { { 1, 1.75 } } );
-    builder->set_point( 6, { { 1, 2 } } );
+    builder->set_point( 0, geode::Point2D{ { 0, 0 } } );
+    builder->set_point( 1, geode::Point2D{ { 1, 0 } } );
+    builder->set_point( 2, geode::Point2D{ { 0, 1 } } );
+    builder->set_point( 3, geode::Point2D{ { 1, 1 } } );
+    builder->set_point( 4, geode::Point2D{ { 2, 0.5 } } );
+    builder->set_point( 5, geode::Point2D{ { 1, 1.75 } } );
+    builder->set_point( 6, geode::Point2D{ { 1, 2 } } );
     builder->create_triangle( { 0, 1, 3 } );
     builder->create_triangle( { 0, 3, 2 } );
     builder->create_triangle( { 2, 3, 5 } );
@@ -95,11 +95,11 @@ void test_scalar_function( geode::TriangulatedSurface2D& surface )
     OPENGEODE_EXCEPTION(
         inexact_equal( scalar_function.value( point, 2 ), 26, 1e-7 ),
         "[Test] Scalar function value 1 is wrong." );
-    point = { { 1., 1.8 } };
+    point = geode::Point2D{ { 1., 1.8 } };
     OPENGEODE_EXCEPTION(
         inexact_equal( scalar_function.value( point, 5 ), 22, 1e-7 ),
         "[Test] Scalar function value 2 is wrong." );
-    point = { { 1., 1.375 } };
+    point = geode::Point2D{ { 1., 1.375 } };
     OPENGEODE_EXCEPTION(
         inexact_equal( scalar_function.value( point, 2 ), 24, 1e-7 ),
         "[Test] Scalar function value 3 is wrong." );
@@ -108,10 +108,11 @@ void test_scalar_function( geode::TriangulatedSurface2D& surface )
 void test_point_function( geode::TriangulatedSurface2D& surface )
 {
     const auto function_name = "point_function";
-    auto point_function = geode::TriangulatedSurfacePointFunction2D::create(
-        surface, function_name, { { 26, 3 } } );
-    point_function.set_value( 4, { { 22, -3 } } );
-    point_function.set_value( 6, { { 22, -3 } } );
+    auto point_function =
+        geode::TriangulatedSurfacePointFunction< 2, 2 >::create(
+            surface, function_name, geode::Point2D{ { 26, 3 } } );
+    point_function.set_value( 4, geode::Point2D{ { 22, -3 } } );
+    point_function.set_value( 6, geode::Point2D{ { 22, -3 } } );
     for( const auto i : geode::LRange{ 7 } )
     {
         if( i == 4 || i == 6 )
@@ -127,18 +128,18 @@ void test_point_function( geode::TriangulatedSurface2D& surface )
                 "[Test] Point function value is wrong." );
         }
     }
-    point_function.set_value( 5, { { 22, -3 } } );
+    point_function.set_value( 5, geode::Point2D{ { 22, -3 } } );
     geode::Point2D point{ { 1., 1. } };
-    OPENGEODE_EXCEPTION(
-        point_function.value( point, 2 ).inexact_equal( { { 26, 3 } } ),
+    OPENGEODE_EXCEPTION( point_function.value( point, 2 )
+                             .inexact_equal( geode::Point2D{ { 26, 3 } } ),
         "[Test] Point function value 1 is wrong." );
-    point = { { 1., 1.8 } };
-    OPENGEODE_EXCEPTION(
-        point_function.value( point, 5 ).inexact_equal( { { 22, -3 } } ),
+    point = geode::Point2D{ { 1., 1.8 } };
+    OPENGEODE_EXCEPTION( point_function.value( point, 5 )
+                             .inexact_equal( geode::Point2D{ { 22, -3 } } ),
         "[Test] Point function value 2 is wrong." );
-    point = { { 1., 1.375 } };
-    OPENGEODE_EXCEPTION(
-        point_function.value( point, 2 ).inexact_equal( { { 24, 0 } } ),
+    point = geode::Point2D{ { 1., 1.375 } };
+    OPENGEODE_EXCEPTION( point_function.value( point, 2 )
+                             .inexact_equal( geode::Point2D{ { 24, 0 } } ),
         "[Test] Point function value 3 is wrong." );
 }
 

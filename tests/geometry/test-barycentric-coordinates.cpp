@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/range.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/geometry/barycentric_coordinates.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/barycentric_coordinates.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < geode::index_t nb_coords >
 bool check_bary_coords( const std::array< double, nb_coords >& result,
@@ -41,7 +41,7 @@ bool check_bary_coords( const std::array< double, nb_coords >& result,
     double sum{ 0 };
     for( const auto i : geode::Range{ nb_coords } )
     {
-        if( std::fabs( result[i] - answer[i] ) > geode::global_epsilon )
+        if( std::fabs( result[i] - answer[i] ) > geode::GLOBAL_EPSILON )
         {
             geode::Logger::error( "Lambda ", i, " is incorrect." );
             geode::Logger::error(
@@ -50,7 +50,7 @@ bool check_bary_coords( const std::array< double, nb_coords >& result,
         }
         sum += result[i];
     }
-    if( std::fabs( sum - 1 ) > geode::global_epsilon )
+    if( std::fabs( sum - 1 ) > geode::GLOBAL_EPSILON )
     {
         geode::Logger::error( "Sum of all lambdas are different of 1" );
         return false;

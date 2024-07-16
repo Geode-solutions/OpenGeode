@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/mesh/helpers/ray_tracing.h>
+#include <geode/mesh/helpers/ray_tracing.hpp>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/intersection.h>
-#include <geode/geometry/intersection_detection.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/intersection.hpp>
+#include <geode/geometry/intersection_detection.hpp>
 
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
 {
@@ -61,15 +61,15 @@ namespace
         const geode::RayTracing3D::PolygonDistance& polygon1 )
     {
         geode::PolygonVertex polygon_vertex0{ polygon0.polygon, geode::NO_LID };
-        if( polygon0.position == geode::Position::vertex0 )
+        if( polygon0.position == geode::POSITION::vertex0 )
         {
             polygon_vertex0.vertex_id = 0;
         }
-        else if( polygon0.position == geode::Position::vertex1 )
+        else if( polygon0.position == geode::POSITION::vertex1 )
         {
             polygon_vertex0.vertex_id = 1;
         }
-        else if( polygon0.position == geode::Position::vertex2 )
+        else if( polygon0.position == geode::POSITION::vertex2 )
         {
             polygon_vertex0.vertex_id = 2;
         }
@@ -78,15 +78,15 @@ namespace
             return false;
         }
         geode::PolygonVertex polygon_vertex1{ polygon1.polygon, geode::NO_LID };
-        if( polygon1.position == geode::Position::vertex0 )
+        if( polygon1.position == geode::POSITION::vertex0 )
         {
             polygon_vertex1.vertex_id = 0;
         }
-        else if( polygon1.position == geode::Position::vertex1 )
+        else if( polygon1.position == geode::POSITION::vertex1 )
         {
             polygon_vertex1.vertex_id = 1;
         }
-        else if( polygon1.position == geode::Position::vertex2 )
+        else if( polygon1.position == geode::POSITION::vertex2 )
         {
             polygon_vertex1.vertex_id = 2;
         }
@@ -103,15 +103,15 @@ namespace
         const geode::RayTracing3D::PolygonDistance& polygon1 )
     {
         geode::PolygonEdge polygon_edge0{ polygon0.polygon, geode::NO_LID };
-        if( polygon0.position == geode::Position::edge0 )
+        if( polygon0.position == geode::POSITION::edge0 )
         {
             polygon_edge0.edge_id = 0;
         }
-        else if( polygon0.position == geode::Position::edge1 )
+        else if( polygon0.position == geode::POSITION::edge1 )
         {
             polygon_edge0.edge_id = 1;
         }
-        else if( polygon0.position == geode::Position::edge2 )
+        else if( polygon0.position == geode::POSITION::edge2 )
         {
             polygon_edge0.edge_id = 2;
         }
@@ -120,15 +120,15 @@ namespace
             return false;
         }
         geode::PolygonEdge polygon_edge1{ polygon1.polygon, geode::NO_LID };
-        if( polygon1.position == geode::Position::edge0 )
+        if( polygon1.position == geode::POSITION::edge0 )
         {
             polygon_edge1.edge_id = 0;
         }
-        else if( polygon1.position == geode::Position::edge1 )
+        else if( polygon1.position == geode::POSITION::edge1 )
         {
             polygon_edge1.edge_id = 1;
         }
-        else if( polygon1.position == geode::Position::edge2 )
+        else if( polygon1.position == geode::POSITION::edge2 )
         {
             polygon_edge1.edge_id = 2;
         }
@@ -144,17 +144,17 @@ namespace
         const geode::RayTracing3D::PolygonDistance& polygon1 )
     {
         if( std::fabs( polygon0.distance - polygon1.distance )
-            > geode::global_epsilon )
+            > geode::GLOBAL_EPSILON )
         {
             return false;
         }
-        if( polygon0.position == geode::Position::inside
-            || polygon0.position == geode::Position::parallel )
+        if( polygon0.position == geode::POSITION::inside
+            || polygon0.position == geode::POSITION::parallel )
         {
             return false;
         }
-        if( polygon1.position == geode::Position::inside
-            || polygon1.position == geode::Position::parallel )
+        if( polygon1.position == geode::POSITION::inside
+            || polygon1.position == geode::POSITION::parallel )
         {
             return false;
         }
@@ -186,25 +186,25 @@ namespace geode
         {
         }
 
-        absl::optional< PolygonDistance > closest_polygon() const
+        std::optional< PolygonDistance > closest_polygon() const
         {
             if( results_.empty() )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             sort_results();
             return results_.front();
         }
 
-        absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+        std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
             closest_polygons( index_t size ) const
         {
             if( results_.empty() )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             sort_results();
-            absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+            std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
                 closest_polygons{ std::min(
                     size, static_cast< index_t >( results_.size() ) ) };
             for( const auto i : Indices{ closest_polygons.value() } )
@@ -238,7 +238,7 @@ namespace geode
                     mesh_.point( edge_vertices.back() ) };
                 const auto result = segment_triangle_intersection_detection(
                     segment_, triangle );
-                if( result.first == Position::outside )
+                if( result.first == POSITION::outside )
                 {
                     continue;
                 }
@@ -321,13 +321,13 @@ namespace geode
 
     RayTracing3D::~RayTracing3D() = default;
 
-    absl::optional< RayTracing3D::PolygonDistance >
+    std::optional< RayTracing3D::PolygonDistance >
         RayTracing3D::closest_polygon() const
     {
         return impl_->closest_polygon();
     }
 
-    absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+    std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
         RayTracing3D::closest_polygons( index_t size ) const
     {
         return impl_->closest_polygons( size );

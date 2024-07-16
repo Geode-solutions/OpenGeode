@@ -21,10 +21,10 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/frame.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/frame.hpp>
+#include <geode/geometry/vector.hpp>
 
 #define PYTHON_FRAME( dimension )                                              \
     const auto name##dimension = "Frame" + std::to_string( dimension ) + "D";  \

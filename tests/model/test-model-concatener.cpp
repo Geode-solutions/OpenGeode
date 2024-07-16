@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/model/helpers/model_concatener.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
+#include <geode/model/helpers/model_concatener.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/brep_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void check_concatenation(
     const geode::BRep& brep, absl::Span< const geode::index_t > nb_components )
@@ -56,9 +56,9 @@ void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "prism_curve.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" ) );
     const auto brep2 = geode::load_brep(
-        absl::StrCat( geode::data_path, "dangling.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
     std::array< geode::index_t, 5 > nb_components{ brep.nb_corners()
                                                        + brep2.nb_corners(),
         brep.nb_lines() + brep2.nb_lines(),

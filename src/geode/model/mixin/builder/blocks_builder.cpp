@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/model/mixin/builder/blocks_builder.h>
+#include <geode/model/mixin/builder/blocks_builder.hpp>
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/builder/polyhedral_solid_builder.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/blocks.hpp>
 
 namespace geode
 {
@@ -65,14 +65,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    void BlocksBuilder< dimension >::load_blocks( absl::string_view directory )
+    void BlocksBuilder< dimension >::load_blocks( std::string_view directory )
     {
         return blocks_.load_blocks( directory, {} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         blocks_.modifiable_block( id, {} ).set_block_name( name, {} );
         block_mesh_builder( id )->set_name( name );

@@ -27,7 +27,7 @@
  * Copyright (c) 2012-2014, Bruno Levy
  */
 
-#include <geode/basic/permutation.h>
+#include <geode/basic/permutation.hpp>
 
 #include <async++.h>
 

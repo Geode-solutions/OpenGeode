@@ -23,14 +23,14 @@
 
 #include <bitsery/ext/inheritance.h>
 
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/point_set.hpp>
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {

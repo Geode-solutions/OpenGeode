@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/model/mixin/core/component.h>
+#include <geode/model/mixin/core/component.hpp>
 
 #include <algorithm>
 
 #include <bitsery/traits/string.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {
@@ -37,12 +37,12 @@ namespace geode
     class Component< dimension >::Impl
     {
     public:
-        absl::string_view name() const
+        std::string_view name() const
         {
             return name_;
         }
 
-        void set_name( absl::string_view name )
+        void set_name( std::string_view name )
         {
             name_ = to_string( name );
         }

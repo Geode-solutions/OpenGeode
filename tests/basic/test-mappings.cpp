@@ -21,14 +21,16 @@
  *
  */
 
-#include <geode/basic/logger.h>
-#include <geode/basic/mapping.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/mapping.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_bijective_mappings()
 {
     geode::BijectiveMapping< geode::index_t, double > bijective;
+    bijective.map( 0, 42.1 );
+    bijective.clear();
     bijective.map( 0, 42.1 );
     OPENGEODE_EXCEPTION( bijective.has_mapping_input( 0 ),
         "[Test] 0 should be a key for bijective inputs" );

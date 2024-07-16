@@ -21,22 +21,24 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/helpers/convert_edged_curve.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/helpers/convert_edged_curve.hpp>
 
 std::vector< std::unique_ptr< geode::EdgedCurve2D > > create_curves()
 {
-    std::vector< geode::Point2D > points{ { { 0, 0 } }, { { 2, 1 } },
-        { { 4, -1 } }, { { 4, 2 } }, { { 0, 4 } }, { { 3, 3 } }, { { 6, 3 } },
-        { { 9, 1 } } };
+    std::vector< geode::Point2D > points{ geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 2, 1 } }, geode::Point2D{ { 4, -1 } },
+        geode::Point2D{ { 4, 2 } }, geode::Point2D{ { 0, 4 } },
+        geode::Point2D{ { 3, 3 } }, geode::Point2D{ { 6, 3 } },
+        geode::Point2D{ { 9, 1 } } };
 
     auto mesh0 = geode::EdgedCurve2D::create();
     auto builder0 = geode::EdgedCurveBuilder2D::create( *mesh0 );

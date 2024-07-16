@@ -21,29 +21,29 @@
  *
  */
 
-#include <geode/mesh/io/geode/register_input.h>
+#include <geode/mesh/io/geode/register_input.hpp>
 
-#include <geode/mesh/core/geode/geode_edged_curve.h>
-#include <geode/mesh/core/geode/geode_graph.h>
-#include <geode/mesh/core/geode/geode_hybrid_solid.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/io/geode/geode_edged_curve_input.h>
-#include <geode/mesh/io/geode/geode_graph_input.h>
-#include <geode/mesh/io/geode/geode_hybrid_solid_input.h>
-#include <geode/mesh/io/geode/geode_point_set_input.h>
-#include <geode/mesh/io/geode/geode_polygonal_surface_input.h>
-#include <geode/mesh/io/geode/geode_polyhedral_solid_input.h>
-#include <geode/mesh/io/geode/geode_regular_grid_input.h>
-#include <geode/mesh/io/geode/geode_tetrahedral_solid_input.h>
-#include <geode/mesh/io/geode/geode_triangulated_surface_input.h>
-#include <geode/mesh/io/geode/geode_vertex_set_input.h>
-#include <geode/mesh/io/light_regular_grid_input.h>
+#include <geode/mesh/core/geode/geode_edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
+#include <geode/mesh/core/geode/geode_hybrid_solid.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/io/geode/geode_edged_curve_input.hpp>
+#include <geode/mesh/io/geode/geode_graph_input.hpp>
+#include <geode/mesh/io/geode/geode_hybrid_solid_input.hpp>
+#include <geode/mesh/io/geode/geode_point_set_input.hpp>
+#include <geode/mesh/io/geode/geode_polygonal_surface_input.hpp>
+#include <geode/mesh/io/geode/geode_polyhedral_solid_input.hpp>
+#include <geode/mesh/io/geode/geode_regular_grid_input.hpp>
+#include <geode/mesh/io/geode/geode_tetrahedral_solid_input.hpp>
+#include <geode/mesh/io/geode/geode_triangulated_surface_input.hpp>
+#include <geode/mesh/io/geode/geode_vertex_set_input.hpp>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
 
 #define BITSERY_INPUT_MESH_REGISTER_XD( Mesh, dimension )                      \
     geode::Mesh##InputFactory##dimension##D::register_creator<                 \

@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/mesh/core/solid_edges.h>
+#include <geode/mesh/core/solid_edges.hpp>
 
 #include <absl/container/flat_hash_set.h>
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/private/facet_edges_impl.h>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/internal/facet_edges_impl.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
 
 namespace
 {
@@ -59,7 +59,7 @@ namespace geode
 {
     template < index_t dimension >
     class SolidEdges< dimension >::Impl
-        : public detail::FacetEdgesImpl< dimension >
+        : public internal::FacetEdgesImpl< dimension >
     {
         friend class bitsery::Access;
 
@@ -82,8 +82,9 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::FacetEdgesImpl< dimension > >{} );
+                    a.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  internal::FacetEdgesImpl< dimension > >{} );
                 } } } );
         }
     };
@@ -125,7 +126,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidEdges< dimension >::edge_from_vertices(
+    std::optional< index_t > SolidEdges< dimension >::edge_from_vertices(
         const std::array< index_t, 2 >& vertices ) const
     {
         return impl_->find_edge( vertices );

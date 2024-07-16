@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.h>
+#include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_regular_grid_solid.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
 
 namespace geode
 {

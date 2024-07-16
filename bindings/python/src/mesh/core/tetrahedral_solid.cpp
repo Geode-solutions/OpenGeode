@@ -21,11 +21,11 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
 
 #define PYTHON_TETRAHEDRAL_SOLID( dimension )                                  \
     const auto name##dimension =                                               \

@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/model/helpers/convert_model_meshes.h>
+#include <geode/model/helpers/convert_model_meshes.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/convert_solid_mesh.h>
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {
@@ -197,12 +197,6 @@ namespace geode
         do_convert_surfaces_to_triangulated( brep, builder );
     }
 
-    void convert_surface_meshes_into_triangulated_surfaces( Section& section )
-    {
-        SectionBuilder builder{ section };
-        convert_surface_meshes_into_triangulated_surfaces( section, builder );
-    }
-
     void convert_surface_meshes_into_triangulated_surfaces(
         const Section& section, SectionBuilder& builder )
     {
@@ -217,12 +211,6 @@ namespace geode
         do_convert_block( model, builder, block, new_mesh_type );
     }
 
-    void convert_block_meshes_into_tetrahedral_solids( BRep& brep )
-    {
-        BRepBuilder builder{ brep };
-        convert_block_meshes_into_tetrahedral_solids( brep, builder );
-    }
-
     void convert_block_meshes_into_tetrahedral_solids(
         const BRep& brep, BRepBuilder& builder )
     {
@@ -233,21 +221,9 @@ namespace geode
         }
     }
 
-    void triangulate_surface_meshes( BRep& brep )
-    {
-        BRepBuilder builder{ brep };
-        triangulate_surface_meshes( brep, builder );
-    }
-
     void triangulate_surface_meshes( const BRep& brep, BRepBuilder& builder )
     {
         do_triangulate_surfaces( brep, builder );
-    }
-
-    void triangulate_surface_meshes( Section& section )
-    {
-        SectionBuilder builder{ section };
-        triangulate_surface_meshes( section, builder );
     }
 
     void triangulate_surface_meshes(

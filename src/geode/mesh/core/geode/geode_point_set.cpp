@@ -21,28 +21,28 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_point_set.h>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodePointSet< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodePointSet< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh )
+            : internal::PointsImpl< dimension >( mesh )
         {
         }
 
@@ -55,7 +55,7 @@ namespace geode
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
     };

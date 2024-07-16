@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/mesh/core/graph.h>
+#include <geode/mesh/core/graph.hpp>
 
 #include <algorithm>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/graph_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/graph_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {
     class Graph::Impl
     {
-        static constexpr auto attribute_name = "edges_around_vertex";
+        static constexpr auto ATTRIBUTE_NAME = "edges_around_vertex";
         friend class bitsery::Access;
 
     public:
@@ -48,7 +48,7 @@ namespace geode
                 graph.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                        ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
         {
         }
 
@@ -212,7 +212,7 @@ namespace geode
         return edges_around_vertex( vertex_id ).empty();
     }
 
-    absl::optional< index_t > Graph::edge_from_vertices(
+    std::optional< index_t > Graph::edge_from_vertices(
         index_t v0, index_t v1 ) const
     {
         for( const auto& edge : edges_around_vertex( v0 ) )
@@ -223,7 +223,7 @@ namespace geode
                 return edge.edge_id;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     void Graph::set_edges_around_vertex(

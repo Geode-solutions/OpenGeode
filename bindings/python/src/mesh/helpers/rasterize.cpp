@@ -21,16 +21,16 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/helpers/rasterize.h>
+#include <geode/mesh/helpers/rasterize.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
 
-#include <geode/mesh/core/grid.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/grid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 namespace geode
 {
@@ -42,8 +42,10 @@ namespace geode
             &conservative_rasterize_segment< 2 > );
         module.def( "conservative_rasterize_segment3D",
             &conservative_rasterize_segment< 3 > );
-        module.def( "rasterize_triangle2D", &rasterize_triangle< 2 > );
-        module.def( "rasterize_triangle3D", &rasterize_triangle< 3 > );
+        module.def( "conservative_rasterize_triangle2D",
+            &conservative_rasterize_triangle< 2 > );
+        module.def( "conservative_rasterize_triangle3D",
+            &conservative_rasterize_triangle< 3 > );
         module.def( "rasterize_tetrahedron", &rasterize_tetrahedron );
         module.def( "rasterize_closed_surface", &rasterize_closed_surface );
     }

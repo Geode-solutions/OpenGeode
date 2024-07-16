@@ -20,25 +20,25 @@
  * SOFTWARE.
  *
  */
-#include <geode/basic/common.h>
+#include <geode/basic/common.hpp>
 
-#include <absl/memory/memory.h>
+#include <memory>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/console_logger_client.h>
-#include <geode/basic/console_progress_logger_client.h>
-#include <geode/basic/library.h>
-#include <geode/basic/logger_manager.h>
-#include <geode/basic/progress_logger_manager.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/console_logger_client.hpp>
+#include <geode/basic/console_progress_logger_client.hpp>
+#include <geode/basic/library.hpp>
+#include <geode/basic/logger_manager.hpp>
+#include <geode/basic/progress_logger_manager.hpp>
 
 namespace geode
 {
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeBasic )
     {
         LoggerManager::register_client(
-            absl::make_unique< ConsoleLoggerClient >() );
+            std::make_unique< ConsoleLoggerClient >() );
         ProgressLoggerManager::register_client(
-            absl::make_unique< ConsoleProgressLoggerClient >() );
+            std::make_unique< ConsoleProgressLoggerClient >() );
         BitseryExtensions::register_functions(
             register_basic_serialize_pcontext,
             register_basic_deserialize_pcontext );

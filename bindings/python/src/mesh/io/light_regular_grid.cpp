@@ -23,13 +23,13 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/io/light_regular_grid_input.h>
-#include <geode/mesh/io/light_regular_grid_output.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
+#include <geode/mesh/io/light_regular_grid_output.hpp>
 
 #define PYTHON_LIGHT_REGULAR_GRID_IO( dimension )                              \
     const auto save##dimension =                                               \
@@ -40,7 +40,7 @@
         "load_light_regular_grid" + std::to_string( dimension ) + "D";         \
     module.def( load##dimension.c_str(),                                       \
         static_cast< LightRegularGrid< dimension > ( * )(                      \
-            absl::string_view ) >( &load_light_regular_grid< dimension > ) );  \
+            std::string_view ) >( &load_light_regular_grid< dimension > ) );   \
     const auto check##dimension = "check_light_regular_grid_missing_files"     \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

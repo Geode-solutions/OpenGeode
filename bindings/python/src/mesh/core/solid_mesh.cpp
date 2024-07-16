@@ -21,19 +21,19 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
 
 #define PYTHON_SOLID_MESH( dimension )                                         \
     const auto name##dimension =                                               \
@@ -95,8 +95,6 @@
             "polyhedron_volume", &SolidMesh##dimension##D::polyhedron_volume ) \
         .def( "polyhedron_facet_normal",                                       \
             &SolidMesh##dimension##D::polyhedron_facet_normal )                \
-        .def( "new_polyhedron_facet_normal",                                   \
-            &SolidMesh##dimension##D::new_polyhedron_facet_normal )            \
         .def( "vertices_around_vertex",                                        \
             &SolidMesh##dimension##D::vertices_around_vertex )                 \
         .def( "polyhedron_around_vertex",                                      \

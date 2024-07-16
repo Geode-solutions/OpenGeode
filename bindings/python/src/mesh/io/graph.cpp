@@ -21,13 +21,13 @@
  *
  */
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/graph.h>
-#include <geode/mesh/io/graph_input.h>
-#include <geode/mesh/io/graph_output.h>
+#include <geode/mesh/core/graph.hpp>
+#include <geode/mesh/io/graph_input.hpp>
+#include <geode/mesh/io/graph_output.hpp>
 
 namespace geode
 {
@@ -35,7 +35,7 @@ namespace geode
     {
         module.def( "save_graph", &save_graph );
         module.def( "load_graph",
-            static_cast< std::unique_ptr< Graph > ( * )( absl::string_view ) >(
+            static_cast< std::unique_ptr< Graph > ( * )( std::string_view ) >(
                 &load_graph ) );
         module.def( "check_graph_missing_files", &check_graph_missing_files );
         module.def( "is_graph_loadable", &is_graph_loadable );

@@ -20,22 +20,22 @@
  * SOFTWARE.
  *
  */
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/helpers/build_grid.h>
+#include <geode/mesh/helpers/build_grid.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     const geode::index_t max_nb_cells{ 100 };
     geode::BoundingBox2D bbox;
-    bbox.add_point( { { 0, 0 } } );
-    bbox.add_point( { { 1, 1 } } );
+    bbox.add_point( geode::Point2D{ { 0, 0 } } );
+    bbox.add_point( geode::Point2D{ { 1, 1 } } );
     const auto grid =
         geode::build_grid_from_bbox_target_length_and_maximum_cell_number(
             bbox, 0.01, max_nb_cells );
@@ -47,7 +47,7 @@ void test()
     OPENGEODE_EXCEPTION( grid.nb_cells() <= max_nb_cells,
         "[Test] Too much cells in built grid" );
 
-    bbox.add_point( { { 1, 10 } } );
+    bbox.add_point( geode::Point2D{ { 1, 10 } } );
     const auto grid2 =
         geode::build_grid_from_bbox_target_length_and_maximum_cell_number(
             bbox, 0.01, max_nb_cells );
@@ -59,7 +59,7 @@ void test()
     OPENGEODE_EXCEPTION( grid.nb_cells() <= max_nb_cells,
         "[Test] Too much cells in built grid2" );
 
-    bbox.add_point( { { 3, 10 } } );
+    bbox.add_point( geode::Point2D{ { 3, 10 } } );
     const auto grid3 =
         geode::build_grid_from_bbox_target_length_and_maximum_cell_number(
             bbox, 0.01, max_nb_cells );

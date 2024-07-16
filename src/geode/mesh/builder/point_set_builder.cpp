@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/point_set.hpp>
 
 namespace geode
 {

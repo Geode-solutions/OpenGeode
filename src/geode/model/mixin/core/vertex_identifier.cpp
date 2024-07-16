@@ -1,4 +1,4 @@
-#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
 
 #include <fstream>
 
@@ -6,27 +6,27 @@
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
+#include <geode/geometry/bitsery_archive.hpp>
 
-#include <geode/mesh/builder/geode/geode_vertex_set_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
-#include <geode/mesh/core/mesh_element.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/geode/geode_vertex_set_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/mesh_element.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/bitsery_archive.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
 
 namespace geode
 {
@@ -98,40 +98,6 @@ namespace geode
                 "unique_vertex_id is bigger than the number of unique "
                 "vertices." );
             return component_vertices_->value( unique_vertex_id );
-        }
-
-        std::vector< ComponentMeshVertex > component_mesh_vertices(
-            index_t unique_vertex_id, const ComponentType& type ) const
-        {
-            const auto& component_vertices =
-                component_mesh_vertices( unique_vertex_id );
-            std::vector< ComponentMeshVertex > result;
-            result.reserve( component_vertices.size() );
-            for( const auto& component_vertex : component_vertices )
-            {
-                if( component_vertex.component_id.type() == type )
-                {
-                    result.push_back( component_vertex );
-                }
-            }
-            return result;
-        }
-
-        std::vector< index_t > component_mesh_vertices(
-            index_t unique_vertex_id, const uuid& component_id ) const
-        {
-            const auto& component_vertices =
-                component_mesh_vertices( unique_vertex_id );
-            std::vector< index_t > result;
-            result.reserve( component_vertices.size() );
-            for( const auto& component_vertex : component_vertices )
-            {
-                if( component_vertex.component_id.id() == component_id )
-                {
-                    result.push_back( component_vertex.vertex );
-                }
-            }
-            return result;
         }
 
         index_t unique_vertex(
@@ -355,7 +321,7 @@ namespace geode
             return old2new;
         }
 
-        void save( absl::string_view directory ) const
+        void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
             std::ofstream file{ filename, std::ofstream::binary };
@@ -370,7 +336,7 @@ namespace geode
                 filename );
         }
 
-        void load( absl::string_view directory )
+        void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
             std::ifstream file{ filename, std::ifstream::binary };
@@ -473,20 +439,6 @@ namespace geode
     {
         return impl_->component_mesh_vertices( unique_vertex_id );
     }
-
-    std::vector< ComponentMeshVertex >
-        VertexIdentifier::component_mesh_vertices(
-            index_t unique_vertex_id, const ComponentType& type ) const
-    {
-        return impl_->component_mesh_vertices( unique_vertex_id, type );
-    }
-
-    std::vector< index_t > VertexIdentifier::component_mesh_vertices(
-        index_t unique_vertex_id, const uuid& component_id ) const
-    {
-        return impl_->component_mesh_vertices( unique_vertex_id, component_id );
-    }
-
     index_t VertexIdentifier::unique_vertex(
         const ComponentMeshVertex& component_mesh_vertex ) const
     {
@@ -557,13 +509,13 @@ namespace geode
     }
 
     void VertexIdentifier::save_unique_vertices(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save( directory );
     }
 
     void VertexIdentifier::load_unique_vertices(
-        absl::string_view directory, BuilderKey )
+        std::string_view directory, BuilderKey )
     {
         return impl_->load( directory );
     }

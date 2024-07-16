@@ -21,10 +21,10 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 #include <pybind11/iostream.h>
 
-#include <geode/model/common.h>
+#include <geode/model/common.hpp>
 
 namespace geode
 {

@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 #include <limits>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/perpendicular.h>
-#include <geode/geometry/position.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/perpendicular.hpp>
+#include <geode/geometry/position.hpp>
 
 namespace
 {
@@ -45,10 +45,11 @@ namespace
         const geode::GenericLine< geode::RefPoint< 3 >, 3 >& line )
     {
         const auto box_half_extent = box.diagonal() / 2.;
-        const auto line_translated_origin = line.origin() - box.center();
+        const geode::Vector3D line_translated_origin{ box.center(),
+            line.origin() };
         const auto origin_cross_direction =
             line.direction().cross( line_translated_origin );
-        const geode::Point3D abs_line_direction = {
+        const geode::Point3D abs_line_direction{
             { std::fabs( line.direction().value( 0 ) ),
                 std::fabs( line.direction().value( 1 ) ),
                 std::fabs( line.direction().value( 2 ) ) }
@@ -62,7 +63,7 @@ namespace
                             * abs_line_direction.value( iii )
                         + box_half_extent.value( iii )
                               * abs_line_direction.value( ii ) )
-                > geode::global_epsilon )
+                > geode::GLOBAL_EPSILON )
             {
                 return false;
             }
@@ -76,14 +77,15 @@ namespace
     {
         const auto box_center = box.center();
         const auto box_half_extent = box.diagonal() / 2.;
-        const auto line_translated_origin = line.origin() - box_center;
+        const geode::Vector2D line_translated_origin{ box_center,
+            line.origin() };
         const auto lhs = std::fabs(
             dot_perpendicular( line.direction(), line_translated_origin ) );
         const auto rhs = box_half_extent.value( 0 )
                              * std::fabs( line.direction().value( 1 ) )
                          + box_half_extent.value( 1 )
                                * std::fabs( line.direction().value( 0 ) );
-        return lhs - rhs <= geode::global_epsilon;
+        return lhs - rhs <= geode::GLOBAL_EPSILON;
     }
 
     template <>
@@ -204,9 +206,9 @@ namespace geode
         {
             if( std::fabs( ray_translated_origin.value( i ) )
                         - box_half_extent.value( i )
-                    > global_epsilon
+                    > GLOBAL_EPSILON
                 && ray_translated_origin.value( i ) * ray.direction().value( i )
-                       > global_epsilon )
+                       > GLOBAL_EPSILON )
             {
                 return false;
             }
@@ -233,7 +235,7 @@ namespace geode
                 return true;
             }
         }
-        if( segment.length() < global_epsilon )
+        if( segment.length() < GLOBAL_EPSILON )
         {
             return false;
         }
@@ -271,14 +273,17 @@ namespace geode
         }
         const auto triangle_projection = [&vertices]( const Vector3D& normal ) {
             BoundingBox1D interval;
-            interval.add_point( { { normal.dot( vertices[0].get() ) } } );
-            interval.add_point( { { normal.dot( vertices[1].get() ) } } );
-            interval.add_point( { { normal.dot( vertices[2].get() ) } } );
+            interval.add_point(
+                Point1D{ { normal.dot( Vector3D{ vertices[0].get() } ) } } );
+            interval.add_point(
+                Point1D{ { normal.dot( Vector3D{ vertices[1].get() } ) } } );
+            interval.add_point(
+                Point1D{ { normal.dot( Vector3D{ vertices[2].get() } ) } } );
             return interval;
         };
-        const auto box_center = center();
+        const Vector3D box_center{ center() };
         const auto box_diagonal = diagonal();
-        const auto bbox_projection = [this, &box_center, &box_diagonal](
+        const auto bbox_projection = [&box_center, &box_diagonal](
                                          const Vector3D& normal ) {
             const auto origin = normal.dot( box_center );
             const auto maximum_extent =
@@ -286,8 +291,8 @@ namespace geode
                     + std::fabs( normal.value( 1 ) * box_diagonal.value( 1 ) )
                     + std::fabs( normal.value( 2 ) * box_diagonal.value( 2 ) ) )
                 / 2.;
-            return BoundingBox1D{ { { origin - maximum_extent } },
-                { { origin + maximum_extent } } };
+            return BoundingBox1D{ Point1D{ { origin - maximum_extent } },
+                Point1D{ { origin + maximum_extent } } };
         };
         const std::array< Vector3D, 3 > edges{ Vector3D{ vertices[0].get(),
                                                    vertices[1].get() },
@@ -297,7 +302,8 @@ namespace geode
         // Test direction of triangle normal.
         const auto triangle_normal = edges[0].cross( edges[1] );
         if( !bbox_projection( triangle_normal )
-                 .contains( { { triangle_normal.dot( vertices[0].get() ) } } ) )
+                 .contains( Point1D{ { triangle_normal.dot(
+                     Vector3D{ vertices[0].get() } ) } } ) )
         {
             return false;
         }
@@ -310,8 +316,9 @@ namespace geode
             const auto triangle_interval = triangle_projection( axis );
             const auto center_value = box_center.value( i );
             const auto extent = box_diagonal.value( i ) / 2.;
-            const BoundingBox1D box_interval{ { { center_value - extent } },
-                { { center_value + extent } } };
+            const BoundingBox1D box_interval{ Point1D{
+                                                  { center_value - extent } },
+                Point1D{ { center_value + extent } } };
             if( !triangle_interval.intersects( box_interval ) )
             {
                 return false;
@@ -342,7 +349,7 @@ namespace geode
     bool BoundingBox< 2 >::intersects< 2 >(
         const Triangle< 2 >& triangle ) const
     {
-        if( point_triangle_position( center(), triangle ) == Position::inside )
+        if( point_triangle_position( center(), triangle ) == POSITION::inside )
         {
             return true;
         }
@@ -366,7 +373,7 @@ namespace geode
     typename std::enable_if< T == 3, bool >::type
         BoundingBox< dimension >::intersects( const Tetrahedron& tetra ) const
     {
-        if( point_tetrahedron_position( center(), tetra ) == Position::inside )
+        if( point_tetrahedron_position( center(), tetra ) == POSITION::inside )
         {
             return true;
         }

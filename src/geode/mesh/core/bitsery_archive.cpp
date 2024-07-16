@@ -21,30 +21,30 @@
  *
  */
 
-#include <geode/mesh/core/bitsery_archive.h>
+#include <geode/mesh/core/bitsery_archive.hpp>
 
 #include <bitsery/brief_syntax/vector.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/cached_value.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/cached_value.hpp>
 
-#include <geode/mesh/core/attribute_coordinate_reference_system.h>
-#include <geode/mesh/core/coordinate_reference_system.h>
-#include <geode/mesh/core/geode/geode_edged_curve.h>
-#include <geode/mesh/core/geode/geode_graph.h>
-#include <geode/mesh/core/geode/geode_hybrid_solid.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode/geode_regular_grid_solid.h>
-#include <geode/mesh/core/geode/geode_regular_grid_surface.h>
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
-#include <geode/mesh/core/mesh_element.h>
-#include <geode/mesh/core/private/solid_mesh_impl.h>
-#include <geode/mesh/core/private/surface_mesh_impl.h>
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
+#include <geode/mesh/core/geode/geode_edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
+#include <geode/mesh/core/geode/geode_hybrid_solid.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
+#include <geode/mesh/core/geode/geode_regular_grid_surface.hpp>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/internal/solid_mesh_impl.hpp>
+#include <geode/mesh/core/internal/surface_mesh_impl.hpp>
+#include <geode/mesh/core/mesh_element.hpp>
 
 namespace bitsery
 {
@@ -253,10 +253,10 @@ namespace
             geode::PolyhedronVertex, Serializer >(
             context, "PolyhedronVertex" );
         geode::AttributeManager::register_attribute_type<
-            geode::CachedValue< geode::detail::PolygonsAroundVertexImpl >,
+            geode::CachedValue< geode::internal::PolygonsAroundVertexImpl >,
             Serializer >( context, "CachedPolygonsAroundVertexImpl" );
         geode::AttributeManager::register_attribute_type<
-            geode::CachedValue< geode::detail::PolyhedraAroundVertexImpl >,
+            geode::CachedValue< geode::internal::PolyhedraAroundVertexImpl >,
             Serializer >( context, "CachedPolyhedraAroundVertexImpl" );
         geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(

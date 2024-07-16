@@ -21,22 +21,24 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
-    std::vector< geode::Point2D > points{ { { 0, 0 } }, { { 0, 1 } },
-        { { 0, 2 } }, { { 1, 0 } }, { { 1, 1 } }, { { 1, 2 } } };
+    std::vector< geode::Point2D > points{ geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 0, 1 } }, geode::Point2D{ { 0, 2 } },
+        geode::Point2D{ { 1, 0 } }, geode::Point2D{ { 1, 1 } },
+        geode::Point2D{ { 1, 2 } } };
 
     auto mesh0 = geode::SurfaceMesh2D::create();
     auto builder0 = geode::SurfaceMeshBuilder2D::create( *mesh0 );

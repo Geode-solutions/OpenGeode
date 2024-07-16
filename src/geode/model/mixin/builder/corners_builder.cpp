@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/model/mixin/builder/corners_builder.h>
+#include <geode/model/mixin/builder/corners_builder.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
 
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corners.hpp>
 
 namespace geode
 {
@@ -66,8 +66,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void CornersBuilder< dimension >::load_corners(
-        absl::string_view directory )
+    void CornersBuilder< dimension >::load_corners( std::string_view directory )
     {
         return corners_.load_corners( directory, {} );
     }
@@ -83,7 +82,7 @@ namespace geode
 
     template < index_t dimension >
     void CornersBuilder< dimension >::set_corner_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         corners_.modifiable_corner( id, {} ).set_corner_name( name, {} );
         corner_mesh_builder( id )->set_name( name );

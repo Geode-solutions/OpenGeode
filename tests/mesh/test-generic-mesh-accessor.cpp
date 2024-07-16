@@ -21,32 +21,32 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
-#include <geode/mesh/helpers/generic_edged_curve_accessor.h>
-#include <geode/mesh/helpers/generic_solid_accessor.h>
-#include <geode/mesh/helpers/generic_surface_accessor.h>
+#include <geode/mesh/helpers/generic_edged_curve_accessor.hpp>
+#include <geode/mesh/helpers/generic_solid_accessor.hpp>
+#include <geode/mesh/helpers/generic_surface_accessor.hpp>
 
 std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
 {
     auto edged_curve = geode::EdgedCurve3D::create();
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
-    builder->create_point( { { 0, 0, 0 } } );
-    builder->create_point( { { 1, 0, 0 } } );
-    builder->create_point( { { 0, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
     builder->create_edge( 0, 1 );
     builder->create_edge( 0, 2 );
     auto attribute = edged_curve->edge_attribute_manager()
@@ -60,10 +60,10 @@ std::unique_ptr< geode::TriangulatedSurface2D > create_surface()
 {
     auto surface = geode::TriangulatedSurface2D::create();
     auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
-    builder->create_point( { { 0, 0 } } );
-    builder->create_point( { { 1, 0 } } );
-    builder->create_point( { { 0, 1 } } );
-    builder->create_point( { { 1, -1 } } );
+    builder->create_point( geode::Point2D{ { 0, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_point( geode::Point2D{ { 0, 1 } } );
+    builder->create_point( geode::Point2D{ { 1, -1 } } );
     builder->create_triangle( { 0, 1, 2 } );
     builder->create_triangle( { 0, 3, 1 } );
     builder->compute_polygon_adjacencies();
@@ -78,11 +78,11 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid()
 {
     auto solid = geode::TetrahedralSolid3D::create();
     auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
-    builder->create_point( { { 0, 0, 0 } } );
-    builder->create_point( { { 1, 0, 0 } } );
-    builder->create_point( { { 0, 1, 0 } } );
-    builder->create_point( { { 0, 0, 1 } } );
-    builder->create_point( { { 1, 1, 1 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 1 } } );
+    builder->create_point( geode::Point3D{ { 1, 1, 1 } } );
     builder->create_tetrahedron( { 0, 1, 2, 3 } );
     builder->create_tetrahedron( { 3, 2, 4, 1 } );
     builder->compute_polyhedron_adjacencies();

@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {
@@ -190,7 +190,7 @@ namespace geode
             return result;
         }
 
-        absl::optional< VertexIndices > next_vertex(
+        std::optional< VertexIndices > next_vertex(
             const Grid< dimension >& grid,
             const VertexIndices& index,
             index_t direction ) const
@@ -198,23 +198,23 @@ namespace geode
             if( index[direction] + 1
                 < nb_vertices_in_direction( grid, direction ) )
             {
-                absl::optional< VertexIndices > result{ index };
+                std::optional< VertexIndices > result{ index };
                 result->at( direction )++;
                 return result;
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
-        absl::optional< VertexIndices > previous_vertex(
+        std::optional< VertexIndices > previous_vertex(
             const VertexIndices& index, index_t direction ) const
         {
             if( index[direction] > 0 )
             {
-                absl::optional< VertexIndices > result{ index };
+                std::optional< VertexIndices > result{ index };
                 result->at( direction )--;
                 return result;
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         bool contains( const Grid< dimension >& grid,
@@ -224,9 +224,9 @@ namespace geode
                 grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                if( query_in_grid.value( d ) < -global_epsilon
+                if( query_in_grid.value( d ) < -GLOBAL_EPSILON
                     || query_in_grid.value( d )
-                           > grid.nb_cells_in_direction( d ) + global_epsilon )
+                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
                 {
                     return false;
                 }
@@ -279,9 +279,9 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                if( value < -global_epsilon
+                if( value < -GLOBAL_EPSILON
                     || value
-                           > grid.nb_cells_in_direction( d ) + global_epsilon )
+                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
                 {
                     return {};
                 }
@@ -299,11 +299,11 @@ namespace geode
                 min[d] = integer_floor;
                 max[d] = integer_floor;
                 const auto remainder = value - floating_floor;
-                if( remainder < global_epsilon )
+                if( remainder < GLOBAL_EPSILON )
                 {
                     min[d] = integer_floor > 0 ? integer_floor - 1 : 0;
                 }
-                else if( remainder > 1 - global_epsilon )
+                else if( remainder > 1 - GLOBAL_EPSILON )
                 {
                     max[d] = std::min( integer_floor + 1,
                         grid.nb_cells_in_direction( d ) - 1 );
@@ -369,7 +369,7 @@ namespace geode
             cells_length_ = std::move( cells_length );
             for( const auto direction : LRange{ dimension } )
             {
-                OPENGEODE_EXCEPTION( cells_length_[direction] > global_epsilon,
+                OPENGEODE_EXCEPTION( cells_length_[direction] > GLOBAL_EPSILON,
                     "[Grid] Creation of a grid with a cell length smaller than "
                     "epsilon in direction ",
                     direction, "." );
@@ -471,12 +471,6 @@ namespace geode
     Grid< dimension >::~Grid() = default;
 
     template < index_t dimension >
-    const Point< dimension >& Grid< dimension >::origin() const
-    {
-        return grid_coordinate_system().origin();
-    }
-
-    template < index_t dimension >
     const CoordinateSystem< dimension >&
         Grid< dimension >::grid_coordinate_system() const
     {
@@ -552,14 +546,14 @@ namespace geode
 
     template < index_t dimension >
     auto Grid< dimension >::next_vertex( const CellIndices& index,
-        index_t direction ) const -> absl::optional< CellIndices >
+        index_t direction ) const -> std::optional< CellIndices >
     {
         return impl_->next_vertex( *this, index, direction );
     }
 
     template < index_t dimension >
     auto Grid< dimension >::previous_vertex( const CellIndices& index,
-        index_t direction ) const -> absl::optional< CellIndices >
+        index_t direction ) const -> std::optional< CellIndices >
     {
         return impl_->previous_vertex( index, direction );
     }

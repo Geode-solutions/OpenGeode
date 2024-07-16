@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/builder/polygonal_surface_builder.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
 
 #define PYTHON_POLYGONAL_SURFACE_BUILDER( dimension )                          \
     const auto name##dimension =                                               \

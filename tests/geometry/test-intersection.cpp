@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/circle.h>
-#include <geode/geometry/basic_objects/cylinder.h>
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/intersection.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/cylinder.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/sphere.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/intersection.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 /*
  * InfiniteLines in this test are all defined using two points (constructor
@@ -69,11 +69,11 @@ void test_line_sphere_intersection()
     OPENGEODE_EXCEPTION(
         std::fabs( intersection_points1.result.value().front().value( 0 ) - 2 )
                     - std::sqrt( 3 ) / 2
-                < geode::global_epsilon
+                < geode::GLOBAL_EPSILON
             && std::fabs(
                    intersection_points1.result.value().back().value( 0 ) - 2 )
                        - std::sqrt( 3 ) / 2
-                   < geode::global_epsilon
+                   < geode::GLOBAL_EPSILON
             && intersection_points1.result.value().front().value( 1 ) == 0.5
             && intersection_points1.result.value().back().value( 1 ),
         "[Test] Wrong result for line_sphere_intersection "
@@ -377,7 +377,7 @@ void test_segment_plane_intersection()
     geode::Point3D answer4{ { 0.5, 0.5, 0.0 } };
     double distance_to_answer =
         geode::point_point_distance( intersect4.result.value(), answer4 );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for segment_plane_intersection with "
         "query segment_hj" );
 
@@ -386,7 +386,7 @@ void test_segment_plane_intersection()
     geode::Point3D answer{ { 0.5, 0.25, 0.0 } };
     distance_to_answer =
         geode::point_point_distance( intersect5.result.value(), answer );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for segment_plane_intersection with "
         "query segment_ki" );
 
@@ -395,7 +395,7 @@ void test_segment_plane_intersection()
     geode::Point3D answer6{ { -4.5, 0.0, 0.0 } };
     distance_to_answer =
         geode::point_point_distance( intersect6.result.value(), answer6 );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for segment_plane_intersection with "
         "query segment_li" );
 
@@ -618,7 +618,7 @@ void test_plane_plane_intersection()
     const geode::Point3D O{ { 0, 0, 0 } };
     const geode::Plane planeZO{ Z, O };
     const auto OO_result = geode::plane_plane_intersection( planeZO, planeZO );
-    OPENGEODE_EXCEPTION( OO_result.type == geode::IntersectionType::PARALLEL,
+    OPENGEODE_EXCEPTION( OO_result.type == geode::INTERSECTION_TYPE::parallel,
         "[Test] Wrong intersection between planeZO, planeZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
@@ -648,7 +648,7 @@ void test_plane_circle_intersection()
     const geode::Circle circleZO{ planeZO, 42 };
     const auto OO_result =
         geode::plane_circle_intersection( planeZO, circleZO );
-    OPENGEODE_EXCEPTION( OO_result.type == geode::IntersectionType::PARALLEL,
+    OPENGEODE_EXCEPTION( OO_result.type == geode::INTERSECTION_TYPE::parallel,
         "[Test] Wrong intersection between planeZO, circleZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
@@ -705,7 +705,7 @@ void test_triangle_circle_intersection()
     const geode::Triangle3D triangleABC{ A, B, C };
     const auto Oabc_result =
         geode::triangle_circle_intersection( triangleABC, circleZO );
-    OPENGEODE_EXCEPTION( Oabc_result.type == geode::IntersectionType::PARALLEL,
+    OPENGEODE_EXCEPTION( Oabc_result.type == geode::INTERSECTION_TYPE::parallel,
         "[Test] Wrong intersection between triangleABC, circleZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };

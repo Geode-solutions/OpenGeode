@@ -20,30 +20,30 @@
  * SOFTWARE.
  *
  */
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 #include <iostream>
 
-#include <geode/basic/logger_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {
     class Logger::Impl
     {
     public:
-        Level level() const
+        LEVEL level() const
         {
             return level_;
         }
 
-        void set_level( Level level )
+        void set_level( LEVEL level )
         {
             level_ = level;
         }
 
         void log_trace( const std::string &message )
         {
-            if( level_ <= Level::trace )
+            if( level_ <= LEVEL::trace )
             {
                 LoggerManager::trace( message );
             }
@@ -51,7 +51,7 @@ namespace geode
 
         void log_debug( const std::string &message )
         {
-            if( level_ <= Level::debug )
+            if( level_ <= LEVEL::debug )
             {
                 LoggerManager::debug( message );
             }
@@ -59,7 +59,7 @@ namespace geode
 
         void log_info( const std::string &message )
         {
-            if( level_ <= Level::info )
+            if( level_ <= LEVEL::info )
             {
                 LoggerManager::info( message );
             }
@@ -67,7 +67,7 @@ namespace geode
 
         void log_warn( const std::string &message )
         {
-            if( level_ <= Level::warn )
+            if( level_ <= LEVEL::warn )
             {
                 LoggerManager::warn( message );
             }
@@ -75,7 +75,7 @@ namespace geode
 
         void log_error( const std::string &message )
         {
-            if( level_ <= Level::err )
+            if( level_ <= LEVEL::err )
             {
                 LoggerManager::error( message );
             }
@@ -83,14 +83,14 @@ namespace geode
 
         void log_critical( const std::string &message )
         {
-            if( level_ <= Level::critical )
+            if( level_ <= LEVEL::critical )
             {
                 LoggerManager::critical( message );
             }
         }
 
     private:
-        Level level_{ Level::trace };
+        LEVEL level_{ LEVEL::trace };
     };
 
     Logger::Logger() = default;
@@ -103,12 +103,12 @@ namespace geode
         return logger;
     }
 
-    Logger::Level Logger::level()
+    Logger::LEVEL Logger::level()
     {
         return instance().impl_->level();
     }
 
-    void Logger::set_level( Level level )
+    void Logger::set_level( LEVEL level )
     {
         instance().impl_->set_level( level );
     }

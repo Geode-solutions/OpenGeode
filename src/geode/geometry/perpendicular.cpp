@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/perpendicular.h>
+#include <geode/geometry/perpendicular.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
 namespace geode
 {

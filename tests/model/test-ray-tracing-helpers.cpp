@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/model/helpers/ray_tracing.h>
+#include <geode/model/helpers/ray_tracing.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/io/brep_input.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {
@@ -38,7 +38,7 @@ void test()
 
     // load a 40x40x40 aligned cubic box brep
     auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "box_brep.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
     geode::Point3D center( { 20., 20., 20. } );
 
     //  get the block

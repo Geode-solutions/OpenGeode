@@ -21,13 +21,13 @@
  *
  */
 
-#include "../../../basic/factory.h"
-#include "../../../basic/input.h"
-#include "../../../common.h"
+#include "../../../basic/factory.hpp"
+#include "../../../basic/input.hpp"
+#include "../../../common.hpp"
 
-#include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/section_input.h>
-#include <geode/model/representation/io/section_output.h>
+#include <geode/model/representation/core/section.hpp>
+#include <geode/model/representation/io/section_input.hpp>
+#include <geode/model/representation/io/section_output.hpp>
 
 namespace geode
 {

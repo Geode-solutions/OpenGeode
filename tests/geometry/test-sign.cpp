@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/sign.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/sign.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_triangle_sign_2d()
 {
@@ -39,7 +39,7 @@ void test_triangle_sign_2d()
     const geode::Triangle2D triangle2D{ a, b, c };
 
     const auto side = geode::triangle_area_sign( triangle2D );
-    OPENGEODE_EXCEPTION( side == geode::Side::positive,
+    OPENGEODE_EXCEPTION( side == geode::SIDE::positive,
         "[Test] Wrong result for triangle_area_sign" );
 }
 
@@ -51,16 +51,16 @@ void test_triangle_sign_3d()
     const geode::Triangle3D triangle3D{ a, b, c };
 
     const auto side_z = geode::triangle_area_sign( triangle3D, 2 );
-    OPENGEODE_EXCEPTION( side_z == geode::Side::positive,
+    OPENGEODE_EXCEPTION( side_z == geode::SIDE::positive,
         "[Test] Wrong result for triangle_area_sign and axis 2" );
 
     const auto side_y = geode::triangle_area_sign( triangle3D, 1 );
 
-    OPENGEODE_EXCEPTION( side_y == geode::Side::negative,
+    OPENGEODE_EXCEPTION( side_y == geode::SIDE::negative,
         "[Test] Wrong result for triangle_area_sign and axis 1" );
 
     const auto side_x = geode::triangle_area_sign( triangle3D, 0 );
-    OPENGEODE_EXCEPTION( side_x == geode::Side::negative,
+    OPENGEODE_EXCEPTION( side_x == geode::SIDE::negative,
         "[Test] Wrong result for triangle_area_sign and axis 0" );
 }
 

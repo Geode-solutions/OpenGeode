@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/corner_collection.h>
-#include <geode/model/mixin/core/corner_collections.h>
+#include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/corner_collections.hpp>
 
 #define PYTHON_CORNER_COLLECTIONS( dimension )                                 \
     const auto name##dimension =                                               \

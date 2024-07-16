@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/model/mixin/builder/block_collections_builder.h>
+#include <geode/model/mixin/builder/block_collections_builder.hpp>
 
-#include <geode/model/mixin/core/block_collection.h>
-#include <geode/model/mixin/core/block_collections.h>
+#include <geode/model/mixin/core/block_collection.hpp>
+#include <geode/model/mixin/core/block_collections.hpp>
 
 namespace geode
 {
@@ -51,14 +51,14 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::load_block_collections(
-        absl::string_view directory )
+        std::string_view directory )
     {
         return block_collections_.load_block_collections( directory, {} );
     }
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::set_block_collection_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         block_collections_.modifiable_block_collection( id, {} )
             .set_block_collection_name( name, {} );

@@ -21,23 +21,22 @@
  *
  */
 
-#include <geode/model/representation/io/brep_output.h>
+#include <geode/model/representation/io/brep_output.hpp>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include <absl/strings/string_view.h>
+#include <geode/basic/detail/geode_output_impl.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/basic/detail/geode_output_impl.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
-
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace geode
 {
     std::vector< std::string > save_brep(
-        const BRep& brep, absl::string_view filename )
+        const BRep& brep, std::string_view filename )
     {
         constexpr auto TYPE = "BRep";
         try
@@ -53,7 +52,7 @@ namespace geode
         }
     }
 
-    bool is_brep_saveable( const BRep& brep, absl::string_view filename )
+    bool is_brep_saveable( const BRep& brep, std::string_view filename )
     {
         const auto output =
             detail::geode_object_output_writer< BRepOutputFactory >( filename );

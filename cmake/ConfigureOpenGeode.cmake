@@ -62,7 +62,6 @@ ExternalProject_Add(opengeode
         asyncplusplus
         bitsery
         gdal
-        ghcFilesystem
         minizip
         nanoflann
         spdlog
@@ -81,7 +80,6 @@ add_custom_target(download
         abseil-download
         asyncplusplus-download
         bitsery-download
-        ghcFilesystem-download
         gdal-download
         minizip-download
         nanoflann-download
@@ -92,3 +90,14 @@ add_custom_target(download
 if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     add_dependencies(download pybind11-download)
 endif()
+
+add_custom_target(post_install 
+    ALL
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/bin ${PROJECT_BINARY_DIR}/bin
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/lib ${PROJECT_BINARY_DIR}/lib
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/cmake ${PROJECT_BINARY_DIR}/cmake
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/include ${PROJECT_BINARY_DIR}/include
+    DEPENDS
+        opengeode)
+
+install(DIRECTORY ${OpenGeode_PATH_INSTALL}/ DESTINATION .)

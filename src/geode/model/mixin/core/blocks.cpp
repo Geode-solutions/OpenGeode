@@ -21,27 +21,27 @@
  *
  */
 
-#include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/blocks.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/io/hybrid_solid_input.h>
-#include <geode/mesh/io/hybrid_solid_output.h>
-#include <geode/mesh/io/polyhedral_solid_input.h>
-#include <geode/mesh/io/polyhedral_solid_output.h>
-#include <geode/mesh/io/tetrahedral_solid_input.h>
-#include <geode/mesh/io/tetrahedral_solid_output.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/io/hybrid_solid_input.hpp>
+#include <geode/mesh/io/hybrid_solid_output.hpp>
+#include <geode/mesh/io/polyhedral_solid_input.hpp>
+#include <geode/mesh/io/polyhedral_solid_output.hpp>
+#include <geode/mesh/io/tetrahedral_solid_input.hpp>
+#include <geode/mesh/io/tetrahedral_solid_output.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
 
 namespace geode
 {
@@ -90,13 +90,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::save_blocks( absl::string_view directory ) const
+    void Blocks< dimension >::save_blocks( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Block< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( const auto& block : blocks() )
@@ -142,12 +142,12 @@ namespace geode
 
     template < index_t dimension >
     void Blocks< dimension >::load_blocks(
-        absl::string_view directory, BlocksBuilderKey /*unused*/ )
+        std::string_view directory, BlocksBuilderKey /*unused*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( auto& block : modifiable_blocks( {} ) )

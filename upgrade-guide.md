@@ -1,5 +1,51 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v14.x.x to v15.0.0
+
+### Motivations
+
+With the end of life of RHEL7, the entire ecosystem has been upgraded to RHEL8 compatible system.
+This upgrade implies the new RHEL compatible binaries are now generated on Alma8 and the C++ standard has been upgraded to C++17.
+
+Annual cleanup was also required to remove old API.
+To enforce C++ language convention, header file extensions has been renamed from .h to .hpp.
+
+### Breaking Changes
+
+- **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
+
+- **Make_unique**: Replace absl::make_unique by is equivalent in C++17 std::make_unique.
+
+- **Convert_to_mesh**: conversions from BRep and Section to meshes now return tuples with mesh and mappings.
+
+- **String_View**: Replace absl::string_view by is equivalent in C++17 std::string_view.
+
+- **PolyhedronFacetNormal**: This method now returns an optional of her previous return type
+
+- **Basic_Objects**: Change from index_t to local_index_t in set_point methods for Triangle, Tetrahedron and Segment
+
+- **Headers**: Change all header files extension from .h to .hpp
+
+- **BeginEnd**: Remove BeginEnd class.
+
+- **ComponentMeshVertices**: Remove overload of ComponentMeshVertices taking component_type or uuid as inputs.
+
+- **Enums**: Unify convention of Enums : use uppercase for the names and lower cases for the member
+
+- **RegularGridFunctions**: Rename files regularGrid_XX_XX into grid_XX_XX if they take a grid as an input
+
+- **C++**: upgrade from C++ standard requirement from C++11 to C++17
+
+- **Constructors**: Most single-parameter constructors have been set to "explicit", meaning their class cannot be constructed implicitely, also avoiding implicit conversions between the types. This change should mainly affect the construction of `Point<dimension>`, `Vector<dimension>`, `PolygonVertex` and `PolygonEdge`.
+
+- **Global variables**: Use uppercase for global variables (e.g. GLOBAL_EPSILON)
+
+- **Private_folders**: Rename private folders into internal folders and use namespace internal inside of them instead of detail
+
+- **AABB**: remove the returned point from AABBTree::closest_element_box
+
+- **Rasterize_triangle**: change rasterize_triangle name to conservative_rasterize_triangle
+
 ## Upgrading from OpenGeode v13.x.x to v14.0.0
 
 ### Motivations
@@ -51,7 +97,6 @@ The second important feature is the new Image library that introduces the `Raste
 
 - **Distance**: `point_segment_distance`, `point_line_distance` and `point_line_signed_distance` now return only the distance. Use projection functions to know the closest point.
 
-
 ## Upgrading from OpenGeode v11.x.x to v12.0.0
 
 ### Motivations
@@ -66,7 +111,7 @@ To allow this feature, each library needs to be explicitly initialized at the be
 
 - **Library**: Each library/OpenGeode module needs to use the new macro pairs `OPENGEODE_LIBRARY`/`OPENGEODE_LIBRARY_IMPLEMENTATION` defined in the basic/library.h header file. They replace the macro `OPENGEODE_LIBRARY_INITIALIZE`. Examples can be found in the common.h and common.cpp of each OpenGeode library.
 
-- **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no longer exists, use `<geode/model/representation/core/mapping.h>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the corresponding include in your files.
+- **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no longer exists, use `<geode/model/representation/core/mapping.hpp>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the corresponding include in your files.
 
 ## Upgrading from OpenGeode v10.x.x to v11.0.0
 
@@ -101,7 +146,7 @@ The whole design of this class has been reshaped to be more aligned with the oth
 ### Motivations
 
 This release is mostly to upgrade Microsoft Visual Studio version from 2017 to 2019. VS2022 is also part of the integration workflow.
-The other important change is the shift of the `global_epsilon` value from 1E-8 to 1E-6. This change was made after heavy testing on numerical approximation limits which showed 1E-8 was too low.
+The other important change is the shift of the `GLOBAL_EPSILON` value from 1E-8 to 1E-6. This change was made after heavy testing on numerical approximation limits which showed 1E-8 was too low.
 The `RegularGrid` interface was also upgraded for a simplified and more efficient use.
 
 ### Breaking Changes
@@ -114,7 +159,7 @@ The `RegularGrid` interface was also upgraded for a simplified and more efficien
 
 - **RegularGrid**: The grid accessors structures were renamed: `GridCellIndices` to `GridCellsAroundVertex`, `GridCellIndex` to `GridCellIndices`, `GridVertexIndex` to `GridVertexIndices`. The following functions were renamed accordingly: `cell_index(index_t)` to `cell_indices(index_t)`, `vertex_index(index_t)` to `vertex_indices(index_t)`. The deprecated `Index` and `Indices` structures were removed, as well as the deprecated function cell_size(index_t). The following functions were removed to avoid multiple definitions: is_vertex_on_border(index_t) and cell_vertex_index(index_t). In order to remove optionals of containers, the `cell(Point)` function now returns a `GridCellsAroundVertex` object instead of an optional to this object, and was renamed `cells(Point)`.
 
-- **global_epsilon**: The `global_epsilon` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use  `global_epsilon` instead.
+- **GLOBAL_EPSILON**: The `GLOBAL_EPSILON` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use `GLOBAL_EPSILON` instead.
 
 - **Mesh**: The methods `isolated_XXX` (e.g. `isolated_vertex`) have been renamed `is_XXX_isolated`.
 
@@ -127,7 +172,7 @@ The `RegularGrid` interface was also upgraded for a simplified and more efficien
 This release includes a revised version of the `Relationships` model mixin.
 The goal is to provide `Attributes` to ̀`Component` level, both on each `Component` (via `component_attribute_manager`) and each relationship between two `Components` (via `relation_attribute_manager`).
 
-Another addition is the `Identifier` class holding a `uuid` and a name. 
+Another addition is the `Identifier` class holding a `uuid` and a name.
 This new class is now the parent class of `VertexSet`, `Component`, `BRep` and ̀`Section`.
 All these derived classes can now be named and identified with a `uuid`.
 
@@ -137,21 +182,20 @@ All these derived classes can now be named and identified with a `uuid`.
 
 - **ModelCopyMapping**: The `ModelCopyMapping` has been move from `geode::detail` namespace to only `geode`.
 
-
 ## Upgrading from OpenGeode v7.x.x to v8.0.0
 
 ### Motivations
 
-The main goal of this release is to reduce memory consumption by introducting two new features: 
-1) a new type `local_index_t` which can be used for indexing inferior to 255. This type is now used in PolygonVertex, PolygonEdge, PolyhedronVertex and all other struct similar to these ones. 
-2) a new MeshType `HybridSolid` which can only stores tetrahedra, hexahedra, prisms and pyramids. This restriction allows several storage optimizations which highly reduce memory usage and increase performance.
+The main goal of this release is to reduce memory consumption by introducting two new features:
+
+1. a new type `local_index_t` which can be used for indexing inferior to 255. This type is now used in PolygonVertex, PolygonEdge, PolyhedronVertex and all other struct similar to these ones.
+2. a new MeshType `HybridSolid` which can only stores tetrahedra, hexahedra, prisms and pyramids. This restriction allows several storage optimizations which highly reduce memory usage and increase performance.
 
 ### Breaking Changes
 
 - **Mesh**: The introdcution of the `local_index_t` in all the struct can imply some changes in the client code to update the new type usage.
 
 - **Mesh helpers**: The `aabb_triangulated_surface_helpers` h/cpp files are renamed `aabb_surface_helpers`.
-
 
 ## Upgrading from OpenGeode v6.x.x to v7.0.0
 
@@ -167,7 +211,6 @@ There are two main goals in this new major release: 1) Simplifying the data mode
 
 - **Model loading**: model loading functions are now returning the model loaded from the filename.
 
-
 ## Upgrading from OpenGeode v5.x.x to v6.0.0
 
 ### Motivations
@@ -177,7 +220,6 @@ This new major release is to formalize PyPI support for OpenGeode.
 ### Breaking Changes
 
 - **CMake**: CMake minimum requirement has been upgraded to 3.14 to ease import of PyPI modules.
-
 
 ## Upgrading from OpenGeode v4.x.x to v5.0.0
 
@@ -193,7 +235,7 @@ A second change is to remove all usage of constant expression NO_ID in the API. 
 
 **How to upgrade**
 
-`ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`. 
+`ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`.
 
 `geode::detail::ModelCopyMapping` works as a map whose keys are `geode::ComponentType`. It implies to get access to a specific mapping using for example:
 
@@ -202,12 +244,14 @@ const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
 ```
 
 To add a mapping between two components, use:
+
 ```
 auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
 corner_mapping.emplace( uuid1, uuid2 );
 ```
 
 To get a mapping between two components, use:
+
 ```
 const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
 corner_mapping.in2out( uuid1 );
@@ -237,7 +281,7 @@ auto new_edged_curve = geode::EdgedCurve3D::create( geode::OpenGeodeEdgedCurve3D
 load_edged_curve( *new_edged_curve, filename );
 ```
 
-to 
+to
 
 ```
 auto new_edged_curve = geode::load_edged_curve< 3 >( filename );
@@ -261,7 +305,7 @@ and
 PointSetBuilderFactory2D::register_creator< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::type_name_static() );
 ```
 
-to 
+to
 
 ```
 MeshFactory::register_mesh< OpenGeodePointSet2D >( PointSet2D::type_name_static(), OpenGeodePointSet2D::impl_name_static() );
@@ -272,18 +316,18 @@ and
 
 MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::impl_name_static() );
 ```
+
 - **Embedding relationship**: renaming `BRep`and `Section` item-related methods for removing overloading of derived class method in the aim to simplify client code syntax
 
 **How to upgrade**
 
-For example, replace in `Section` and `BRep`: `geode::Section::items(...)` by `geode::Section::model_boundary_items(...)` 
-
+For example, replace in `Section` and `BRep`: `geode::Section::items(...)` by `geode::Section::model_boundary_items(...)`
 
 - **Embedding relationship**: renaming embedded relationship to embedding relationship for better meaning
 
 **How to upgrade**
 
-For example, replace in `Section` and `BRep`: `geode::Section::embedded_surfaces(...)` by `geode::Section::embedding_surfaces(...)` 
+For example, replace in `Section` and `BRep`: `geode::Section::embedded_surfaces(...)` by `geode::Section::embedding_surfaces(...)`
 
 ## Upgrading from OpenGeode v3.x.x to v4.0.0
 
@@ -309,8 +353,8 @@ Example
 from
 
 ```
-bool found;	    
-geode::PolygonEdge polygon_edge;	
+bool found;
+geode::PolygonEdge polygon_edge;
 std::tie( found, polygon_edge ) = polygonal_surface.polygon_edge_from_vertices( 3, 5 );
 if( found )
 {
@@ -318,7 +362,7 @@ if( found )
 }
 ```
 
-to 
+to
 
 ```
 auto polygon_edge = polygonal_surface.polygon_edge_from_vertices( 3, 5 );
@@ -343,7 +387,7 @@ Be careful on the lifetime of the `std::string` or `char*` you referenced in the
 
 **How to upgrade**
 
-Replace in `Section`: `geode::Section::embeddings(...)` by `geode::Section::embedded_surfaces(...)` 
+Replace in `Section`: `geode::Section::embeddings(...)` by `geode::Section::embedded_surfaces(...)`
 
 - **CMake**: redesign of CMake function `add_geode_library`
 
@@ -371,16 +415,16 @@ set(advanced_headers
     ...
 )
 target_link_libraries(${target_name}
-    PUBLIC	    
-        Bitsery::bitsery	       
-    PRIVATE	   
-        spdlog::spdlog_header_only	     
-        ghcFilesystem::ghc_filesystem	
-        MINIZIP::minizip	       
+    PUBLIC
+        Bitsery::bitsery
+    PRIVATE
+        spdlog::spdlog_header_only
+        ghcFilesystem::ghc_filesystem
+        MINIZIP::minizip
 )
 ```
 
-to 
+to
 
 ```
 add_subdirectory(src/geode/basic)
@@ -400,11 +444,11 @@ add_geode_library(
         "detail/mapping_after_deletion.h"
         ...
     PUBLIC_DEPENDENCIES
-        Bitsery::bitsery	       
+        Bitsery::bitsery
     PRIVATE_DEPENDENCIES
-        spdlog::spdlog_header_only	 
+        spdlog::spdlog_header_only
         ghcFilesystem::ghc_filesystem
-        MINIZIP::minizip	       
+        MINIZIP::minizip
 )
 ```
 
@@ -420,7 +464,7 @@ from
 add_geode_test(test-algorithm.cpp ${PROJECT_NAME}::basic)
 ```
 
-to 
+to
 
 ```
 add_geode_test(
@@ -438,13 +482,12 @@ For testing, there is nothing to upgrade, just run CTest or RUN_TESTS on Visual 
 
 For running a single executable, add the environment variables correponding to your operating system (e.g. PATH, LD_LIBRARY_PATH...).
 
-
 ## Upgrading from OpenGeode v2.x.x to v3.0.0
 
 ### Motivations
 
-OpenGeode evolves and will keep evolving. 
-To support this evolution, we introduce a full backward compatibility system to all our native file formats (.og_*). 
+OpenGeode evolves and will keep evolving.
+To support this evolution, we introduce a full backward compatibility system to all our native file formats (.og\_\*).
 Any file saved since v3 will be loadable in any new OpenGeode version.
 
 To increase the component relationships design flexibility, we allow relationships between any component types.
@@ -455,16 +498,16 @@ We provide new ways to modify in-place an attribute value.
 
 A new library named `geometry` was created to improve organization of C++ objects related to geometry concepts.
 
-
 ### Breaking Changes
 
-- **Serialization**: all native file formats (.og_*) saved before v3 are no longer compatible, don't worry it will be the last time ;-)
+- **Serialization**: all native file formats (.og\_\*) saved before v3 are no longer compatible, don't worry it will be the last time ;-)
 
 - **BRep / Section**: methods accessing iterators for internal/embedded Components are renamed more explicitly.
 
 **How to upgrade**
 
 Replace in `BRep` and `Section`:
+
 - `geode::BRep::internals(...)` by either `geode::BRep::internal_corners(...)` or `geode::BRep::internal_lines(...)` or `geode::BRep::internal_surfaces(...)`
 - `geode::BRep::embeddings(...)` by either `geode::BRep::embedded_surfaces(...)` or `geode::BRep::embedded_blocks(...)`
 
@@ -472,7 +515,7 @@ Replace in `BRep` and `Section`:
 
 **How to upgrade**
 
-Replace `id0` and `id1` in  `geode::RelationshipsBuilder::register_component( id0, id1 )` by their ComponentIDs.
+Replace `id0` and `id1` in `geode::RelationshipsBuilder::register_component( id0, id1 )` by their ComponentIDs.
 
 - **Solid Facets & Surface Edges**: Edge/Facet indices are used as parameters of methods like `PolygonalSurface< dimension >::edge_length`, `PolyhedralSolid< dimension >::facet_barycenter`.
 
@@ -487,7 +530,7 @@ PolygonEdge polygon_edge{ 0, 0 };
 auto edge_length = surface.polygon_edge_length( polygon_edge );
 ```
 
-to 
+to
 
 ```
 index_t edge_id = polygon_edge( { 0, 0 } );
@@ -505,22 +548,24 @@ Add `OpenGeode::geometry` to use this library. Update the path of OpenGeode file
 **How to upgrade**
 
 Example using `VariableAttribute< double >` and modifying the `index_t id` value to `double new_value`
+
 ```
 attribute.value( id ) = new_value;
 ```
 
-to 
+to
 
 ```
 attribute.set_value( id, new_value );
 ```
 
 Example using `VariableAttribute< std::vector< double > >` and modifying the `index_t id` value by adding `double new_value`
+
 ```
 attribute.value( id ).push_back( new_value );
 ```
 
-to 
+to
 
 ```
 attribute.modify_value( id, [&new_value]( std::vector< double >& values ) { values.push_back( new_value ); } );
@@ -530,20 +575,13 @@ attribute.modify_value( id, [&new_value]( std::vector< double >& values ) { valu
 
 **How to upgrade**
 
-Replace:
--`geode::SectionBuilder::add_corner_line_relationship(...)` by `geode::SectionBuilder::add_corner_line_boundary_relationship(...)`
--`geode::SectionBuilder::add_line_surface_relationship(...)` by `geode::SectionBuilder::add_line_surface_boundary_relationship(...)`
--`geode::BRepBuilder::add_corner_line_relationship(...)` by `geode::BRepBuilder::add_corner_line_boundary_relationship(...)`
--`geode::BRepBuilder::add_line_surface_relationship(...)` by `geode::BRepBuilder::add_line_surface_boundary_relationship(...)`
--`geode::BRepBuilder::add_surface_block_relationship(...)` by `geode::BRepBuilder::add_surface_block_boundary_relationship(...)`
-
+Replace: -`geode::SectionBuilder::add_corner_line_relationship(...)` by `geode::SectionBuilder::add_corner_line_boundary_relationship(...)` -`geode::SectionBuilder::add_line_surface_relationship(...)` by `geode::SectionBuilder::add_line_surface_boundary_relationship(...)` -`geode::BRepBuilder::add_corner_line_relationship(...)` by `geode::BRepBuilder::add_corner_line_boundary_relationship(...)` -`geode::BRepBuilder::add_line_surface_relationship(...)` by `geode::BRepBuilder::add_line_surface_boundary_relationship(...)` -`geode::BRepBuilder::add_surface_block_relationship(...)` by `geode::BRepBuilder::add_surface_block_boundary_relationship(...)`
 
 ## Upgrading from OpenGeode v1.x.x to v2.0.0
 
 ### Motivations
 
 In this new major version of OpenGeode, we aim at easing model objects conception. We organize basic features in independant mixins. Model conception is therefore very flexible ans extensible by combining mixins and/or defining new mixins.
-
 
 ### Breaking Changes
 
@@ -553,14 +591,13 @@ In this new major version of OpenGeode, we aim at easing model objects conceptio
 
 Replace `OpenGeode::georepresentation` by `OpenGeode::model` if you link with this library. Update the path of OpenGeode files you include.
 
-- **Relationships and VertexIdentifier**: `RelationshipManager` has been renamed into `Relationships`. Methods for registering and unregistering components in `Relationships` and in `VertexIdentifier` have been renamed.  This two classes are provided with associated Builders that are able to modify them: `RelationshipsBuilder` and `VertexIdentifierBuilder`
+- **Relationships and VertexIdentifier**: `RelationshipManager` has been renamed into `Relationships`. Methods for registering and unregistering components in `Relationships` and in `VertexIdentifier` have been renamed. This two classes are provided with associated Builders that are able to modify them: `RelationshipsBuilder` and `VertexIdentifierBuilder`
 
 **How to upgrade**
 
 Replace:
-- `geode::RelationshipManager` by `geode::Relationships`. 
--`geode::RelationshipManager::add_component(...)` by `geode::RelationshipsBuilder::register_component(...)`
--`geode::RelationshipManager::remove_component(...)` by `geode::RelationshipsBuilder::unregister_component(...)`
+
+- `geode::RelationshipManager` by `geode::Relationships`. -`geode::RelationshipManager::add_component(...)` by `geode::RelationshipsBuilder::register_component(...)` -`geode::RelationshipManager::remove_component(...)` by `geode::RelationshipsBuilder::unregister_component(...)`
 - `geode::VertexIdentifier::register_component(...)` by `geode::VertexIdentifierBuilder::register_mesh_component(...)`
 - `geode::VertexIdentifier::remove_component(...)` by `geode::VertexIdentifierBuilder::unregister_mesh_component(...)`
 
@@ -572,7 +609,7 @@ You must call these methods only from Builders since they modify either `Relatio
 
 **How to upgrade**
 
-BRep and Section have no more methods `relationships()` and `unique_vertex()`, but you can call (public) methods of `Relationships` and `VertexIdentifier` directly from an instance of `BRep` or `Section`, since they inherit from them. See `BRep` and `Section` definitions to have examples of `AddComponents` mixin usage. 
+BRep and Section have no more methods `relationships()` and `unique_vertex()`, but you can call (public) methods of `Relationships` and `VertexIdentifier` directly from an instance of `BRep` or `Section`, since they inherit from them. See `BRep` and `Section` definitions to have examples of `AddComponents` mixin usage.
 
 Replace `add_boundary_relation( ... )` by `add_x_y_relationships( const X& x, const Y& y)` with `x` and `y` being `corner`, `line`, `surface` or `block` depending of the case.
 
@@ -580,7 +617,7 @@ Replace `add_boundary_relation( ... )` by `add_x_y_relationships( const X& x, co
 
 ### Breaking Changes
 
-- **Bitsery 5.0.0**: upgrading to Bitsery 5.0.0 (serialization library). Previously saved OpenGeode objects may potentially not be reloaded. 
+- **Bitsery 5.0.0**: upgrading to Bitsery 5.0.0 (serialization library). Previously saved OpenGeode objects may potentially not be reloaded.
 
 - **VertexIdentifier**: the signature of VertexIdentifier::remove_component has changed from
 
@@ -588,24 +625,25 @@ Replace `add_boundary_relation( ... )` by `add_x_y_relationships( const X& x, co
 void remove_component( const uuid& component_id )
 ```
 
-to 
+to
 
 ```
-template < typename MeshComponent > 
+template < typename MeshComponent >
 void remove_component( const MeshComponent& component )
 ```
+
 **How to upgrade**
 
 To upgrade to OpenGeode v1.0.0. you have to modify your code as done in the following example.
 
-*v0.x.x:*
+_v0.x.x:_
 
 ```
 const geode::Line3D& line = get_a_line();
 vertex_identifier.remove_component( line.id() );
 ```
 
-*v1.0.0:*
+_v1.0.0:_
 
 ```
 const geode::Line3D& line = get_a_line();

@@ -21,28 +21,28 @@
  *
  */
 
-#include <geode/model/helpers/detail/split_along_surface_mesh_borders.h>
+#include <geode/model/helpers/detail/split_along_surface_mesh_borders.hpp>
 
 #include <async++.h>
 
-#include <absl/memory/memory.h>
+#include <memory>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/helpers/component_mesh_edges.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/component_mesh_edges.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {
@@ -70,7 +70,7 @@ namespace geode
         public:
             Impl( Model& model )
                 : model_( model ),
-                  builder_ptr_{ absl::make_unique< ModelBuilder >( model ) },
+                  builder_ptr_{ std::make_unique< ModelBuilder >( model ) },
                   builder_( *builder_ptr_ )
             {
             }
@@ -181,7 +181,7 @@ namespace geode
                     {
                         PolygonVertex vertex{ p, v };
                         const auto vertex_id = mesh.polygon_vertex( vertex );
-                        if( mesh.is_edge_on_border( vertex ) )
+                        if( mesh.is_edge_on_border( PolygonEdge{ vertex } ) )
                         {
                             vertex_to_check[vertex_id] = true;
                         }

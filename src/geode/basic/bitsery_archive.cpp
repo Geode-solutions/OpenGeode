@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.hpp>
 
 #include <absl/types/span.h>
 

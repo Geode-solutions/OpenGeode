@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/corners.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/io/point_set_input.h>
-#include <geode/mesh/io/point_set_output.h>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/io/point_set_input.hpp>
+#include <geode/mesh/io/point_set_output.hpp>
 
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
 
 namespace geode
 {
@@ -84,13 +84,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Corners< dimension >::save_corners( absl::string_view directory ) const
+    void Corners< dimension >::save_corners( std::string_view directory ) const
     {
         impl_->save_components( absl::StrCat( directory, "/corners" ) );
         const auto prefix = absl::StrCat( directory, "/",
             Corner< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( const auto& corner : corners() )
@@ -113,12 +113,12 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::load_corners(
-        absl::string_view directory, CornersBuilderKey )
+        std::string_view directory, CornersBuilderKey )
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( auto& corner : modifiable_corners( {} ) )

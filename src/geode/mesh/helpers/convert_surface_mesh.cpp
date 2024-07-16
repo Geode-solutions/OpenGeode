@@ -21,23 +21,23 @@
  *
  */
 
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/detail/surface_merger.h>
-#include <geode/mesh/helpers/private/copy.h>
+#include <geode/mesh/builder/polygonal_surface_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/detail/surface_merger.hpp>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 namespace
 {
@@ -87,27 +87,28 @@ namespace
         geode::SurfaceMesh< dimension >& output )
     {
         auto builder = geode::SurfaceMeshBuilder< dimension >::create( output );
-        geode::detail::copy_points( input, *builder );
+        geode::internal::copy_points( input, *builder );
         output.vertex_attribute_manager().copy(
             input.vertex_attribute_manager() );
         copy_polygons( input, *builder );
         output.polygon_attribute_manager().copy(
             input.polygon_attribute_manager() );
-        geode::detail::copy_meta_info( input, *builder );
+        geode::internal::copy_meta_info( input, *builder );
     }
 
     template < typename SurfaceIn, typename SurfaceOut >
     void copy_surface_attributes(
         const SurfaceIn& surface_in, const SurfaceOut& surface_out )
     {
-        geode::detail::copy_attributes( surface_in.vertex_attribute_manager(),
+        geode::internal::copy_attributes( surface_in.vertex_attribute_manager(),
             surface_out.vertex_attribute_manager() );
-        geode::detail::copy_attributes( surface_in.polygon_attribute_manager(),
+        geode::internal::copy_attributes(
+            surface_in.polygon_attribute_manager(),
             surface_out.polygon_attribute_manager() );
         if( surface_in.are_edges_enabled() )
         {
             surface_out.enable_edges();
-            geode::detail::copy_attributes(
+            geode::internal::copy_attributes(
                 surface_in.edges().edge_attribute_manager(),
                 surface_out.edges().edge_attribute_manager() );
         }
@@ -174,7 +175,7 @@ namespace
             builder->set_point(
                 v, grid.grid_point( grid.vertex_indices( v ) ) );
         }
-        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
+        geode::internal::copy_attributes( grid.grid_vertex_attribute_manager(),
             surface->vertex_attribute_manager() );
         create_triangles_from_grid_cells( *surface, *builder, grid );
         return surface;
@@ -194,7 +195,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
+    std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
         convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh< dimension >& surface )
     {
@@ -208,23 +209,22 @@ namespace geode
         if( surface.type_name()
             == RegularGrid< dimension >::type_name_static() )
         {
-            absl::optional<
-                std::unique_ptr< TriangulatedSurface< dimension > > >
+            std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
                 result{ create_triangulated_surface_from_grid(
                     dynamic_cast< const RegularGrid< dimension >& >(
                         surface ) ) };
             auto builder = TriangulatedSurfaceBuilder< dimension >::create(
                 *result->get() );
-            detail::copy_meta_info( surface, *builder );
+            internal::copy_meta_info( surface, *builder );
             return result;
         }
         if( !all_polygons_are_simplex( surface ) )
         {
             Logger::info( "[convert_surface_mesh_into_triangulated_surface] "
                           "SurfaceMesh is not made of only triangles." );
-            return absl::nullopt;
+            return std::nullopt;
         }
-        absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
+        std::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
             tri_surface{ TriangulatedSurface< dimension >::create() };
         convert_surface( surface, *tri_surface->get() );
         return tri_surface;
@@ -274,8 +274,8 @@ namespace geode
     {
         auto surface3d = SurfaceMesh3D::create();
         auto builder3d = SurfaceMeshBuilder3D::create( *surface3d );
-        detail::copy_meta_info( surface2d, *builder3d );
-        detail::copy_points2d_into_3d(
+        internal::copy_meta_info( surface2d, *builder3d );
+        internal::copy_points2d_into_3d(
             surface2d, *builder3d, axis_to_add, axis_coordinate );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
@@ -287,8 +287,9 @@ namespace geode
     {
         auto surface2d = SurfaceMesh2D::create();
         auto builder2d = SurfaceMeshBuilder2D::create( *surface2d );
-        detail::copy_meta_info( surface3d, *builder2d );
-        detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        internal::copy_meta_info( surface3d, *builder2d );
+        internal::copy_points3d_into_2d(
+            surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
         return surface2d;
@@ -301,8 +302,8 @@ namespace geode
     {
         auto surface3d = PolygonalSurface3D::create();
         auto builder3d = PolygonalSurfaceBuilder3D::create( *surface3d );
-        detail::copy_meta_info( surface2d, *builder3d );
-        detail::copy_points2d_into_3d(
+        internal::copy_meta_info( surface2d, *builder3d );
+        internal::copy_points2d_into_3d(
             surface2d, *builder3d, axis_to_add, axis_coordinate );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
@@ -314,8 +315,9 @@ namespace geode
     {
         auto surface2d = PolygonalSurface2D::create();
         auto builder2d = PolygonalSurfaceBuilder2D::create( *surface2d );
-        detail::copy_meta_info( surface3d, *builder2d );
-        detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        internal::copy_meta_info( surface3d, *builder2d );
+        internal::copy_points3d_into_2d(
+            surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
         return surface2d;
@@ -329,9 +331,9 @@ namespace geode
     {
         auto surface3d = TriangulatedSurface3D::create();
         auto builder3d = TriangulatedSurfaceBuilder3D::create( *surface3d );
-        detail::copy_points2d_into_3d(
+        internal::copy_points2d_into_3d(
             surface2d, *builder3d, axis_to_add, axis_coordinate );
-        detail::copy_meta_info( surface2d, *builder3d );
+        internal::copy_meta_info( surface2d, *builder3d );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
         return surface3d;
@@ -344,8 +346,9 @@ namespace geode
         auto surface2d = TriangulatedSurface2D::create();
         auto builder2d = TriangulatedSurfaceBuilder2D::create( *surface2d );
 
-        detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
-        detail::copy_meta_info( surface3d, *builder2d );
+        internal::copy_points3d_into_2d(
+            surface3d, *builder2d, axis_to_remove );
+        internal::copy_meta_info( surface3d, *builder2d );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
         return surface2d;
@@ -358,7 +361,7 @@ namespace geode
             surfaces )
     {
         detail::SurfaceMeshMerger< dimension > merger{ surfaces,
-            global_epsilon };
+            GLOBAL_EPSILON };
         return merger.merge();
     }
 
@@ -367,10 +370,10 @@ namespace geode
     template std::unique_ptr< PolygonalSurface3D > opengeode_mesh_api
         convert_surface_mesh_into_polygonal_surface( const SurfaceMesh3D& );
 
-    template absl::optional< std::unique_ptr< TriangulatedSurface2D > >
+    template std::optional< std::unique_ptr< TriangulatedSurface2D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh2D& );
-    template absl::optional< std::unique_ptr< TriangulatedSurface3D > >
+    template std::optional< std::unique_ptr< TriangulatedSurface3D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh3D& );
 

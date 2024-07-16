@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/model/mixin/core/line_collections.h>
+#include <geode/model/mixin/core/line_collections.hpp>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/line_collection.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
 
 namespace geode
 {
@@ -75,7 +75,7 @@ namespace geode
 
     template < index_t dimension >
     void LineCollections< dimension >::save_line_collections(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/line_collections" ) );
@@ -83,7 +83,7 @@ namespace geode
 
     template < index_t dimension >
     void LineCollections< dimension >::load_line_collections(
-        absl::string_view directory, LineCollectionsBuilderKey )
+        std::string_view directory, LineCollectionsBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/line_collections" ) );

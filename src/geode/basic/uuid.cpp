@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
 #include <iomanip>
 #include <sstream>
@@ -63,6 +63,31 @@ namespace geode
         cd = ( cd & 0x3FFFFFFFFFFFFFFFULL ) | 0x8000000000000000ULL;
     }
 
+    uuid::uuid( std::string_view string )
+    {
+        OPENGEODE_EXCEPTION( string.size() == 36, "[uuid] wrong string size" );
+        OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'
+                                 && string[18] == '-' && string[23] == '-',
+            "[uuid] unknown string format" );
+
+        for( const auto i : Range{ 18 } )
+        {
+            if( i == 8 || i == 13 )
+            {
+                continue;
+            }
+            ab = ab << 4 | decode( string[i] );
+        }
+        for( const auto i : Range{ 19, 36 } )
+        {
+            if( i == 23 )
+            {
+                continue;
+            }
+            cd = cd << 4 | decode( string[i] );
+        }
+    }
+
     bool uuid::operator==( const uuid &other ) const
     {
         return ab == other.ab && cd == other.cd;
@@ -93,7 +118,7 @@ namespace geode
     std::string uuid::string() const
     {
         char string[] = "00000000-0000-0000-0000-000000000000";
-        static constexpr char encode[] = "0123456789abcdef";
+        static constexpr char ENCODE[] = "0123456789abcdef";
 
         index_t bit = 15;
         for( const auto i : Range{ 18 } )
@@ -102,7 +127,7 @@ namespace geode
             {
                 continue;
             }
-            string[i] = encode[ab >> 4 * bit & 0x0f];
+            string[i] = ENCODE[ab >> 4 * bit & 0x0f];
             bit--;
         }
 
@@ -113,35 +138,10 @@ namespace geode
             {
                 continue;
             }
-            string[i] = encode[cd >> 4 * bit & 0x0f];
+            string[i] = ENCODE[cd >> 4 * bit & 0x0f];
             bit--;
         }
 
         return string;
-    }
-
-    uuid::uuid( absl::string_view string )
-    {
-        OPENGEODE_EXCEPTION( string.size() == 36, "[uuid] wrong string size" );
-        OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'
-                                 && string[18] == '-' && string[23] == '-',
-            "[uuid] unknown string format" );
-
-        for( const auto i : Range{ 18 } )
-        {
-            if( i == 8 || i == 13 )
-            {
-                continue;
-            }
-            ab = ab << 4 | decode( string[i] );
-        }
-        for( const auto i : Range{ 19, 36 } )
-        {
-            if( i == 23 )
-            {
-                continue;
-            }
-            cd = cd << 4 | decode( string[i] );
-        }
     }
 } // namespace geode

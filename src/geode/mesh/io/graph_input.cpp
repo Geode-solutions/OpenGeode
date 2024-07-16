@@ -21,22 +21,22 @@
  *
  */
 
-#include <geode/mesh/io/graph_input.h>
+#include <geode/mesh/io/graph_input.hpp>
 
-#include <absl/strings/string_view.h>
+#include <string_view>
 
-#include <geode/basic/detail/geode_input_impl.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/graph.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/graph.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/io/vertex_set_input.hpp>
 
 namespace geode
 {
     std::unique_ptr< Graph > load_graph(
-        const MeshImpl& impl, absl::string_view filename )
+        const MeshImpl& impl, std::string_view filename )
     {
         constexpr auto TYPE = "Graph";
         try
@@ -58,21 +58,21 @@ namespace geode
         }
     }
 
-    std::unique_ptr< Graph > load_graph( absl::string_view filename )
+    std::unique_ptr< Graph > load_graph( std::string_view filename )
     {
         return load_graph(
             MeshFactory::default_impl( Graph::type_name_static() ), filename );
     }
 
     typename GraphInput::MissingFiles check_graph_missing_files(
-        absl::string_view filename )
+        std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< GraphInputFactory >( filename );
         return input->check_missing_files();
     }
 
-    bool is_graph_loadable( absl::string_view filename )
+    bool is_graph_loadable( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< GraphInputFactory >( filename );

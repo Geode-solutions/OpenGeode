@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/model/helpers/model_component_filter.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/io/brep_input.h>
+#include <geode/model/helpers/model_component_filter.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void check_brep_prism( const geode::BRep& brep )
 {
@@ -66,12 +66,12 @@ void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "prism_curve.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" ) );
     geode::filter_brep_components_with_regards_to_blocks( brep );
     check_brep_prism( brep );
 
     auto brep2 = geode::load_brep(
-        absl::StrCat( geode::data_path, "dangling.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
     geode::filter_brep_components_with_regards_to_blocks( brep2 );
     check_brep_dangling( brep2 );
 }

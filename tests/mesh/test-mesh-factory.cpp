@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/mesh_factory.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 class MeshTest : public geode::VertexSet
 {
 public:
     MeshTest() = default;
 
-    absl::string_view native_extension() const override
+    std::string_view native_extension() const override
     {
         static auto ext = "ext";
         return ext;

@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/model/helpers/ray_tracing.h>
+#include <geode/model/helpers/ray_tracing.hpp>
 
-#include <geode/geometry/aabb.h>
+#include <geode/geometry/aabb.hpp>
 
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace
 {
@@ -50,7 +50,7 @@ namespace
         return result;
     }
 
-    absl::optional< geode::index_t > count_real_intersections_with_boudaries(
+    std::optional< geode::index_t > count_real_intersections_with_boudaries(
         const geode::Ray3D& ray,
         const geode::BRep& brep,
         const geode::Block3D& block )
@@ -62,12 +62,12 @@ namespace
         {
             for( const auto& intersection : intersections.second )
             {
-                if( intersection.position != geode::Position::inside )
+                if( intersection.position != geode::POSITION::inside )
                 {
-                    return absl::nullopt;
+                    return std::nullopt;
                 }
                 if( std::fabs( intersection.distance )
-                    <= geode::global_epsilon )
+                    <= geode::GLOBAL_EPSILON )
                 {
                     continue;
                 }
@@ -103,11 +103,13 @@ namespace geode
     bool is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point )
     {
-        std::array< Vector3D, 12 > directions = { { { { 0., 0., 1. } },
-            { { 0.1, 0., 1. } }, { { 0.3, 0., 1. } }, { { 0.5, 0., 1. } },
-            { { 0., 1., 0. } }, { { 0.1, 1., 0. } }, { { 0.3, 1., 0. } },
-            { { 0.5, 1., 0. } }, { { 1., 0., 0. } }, { { 1., 0., 0.1 } },
-            { { 1., 0., 0.3 } }, { { 1., 0., 0.5 } } } };
+        std::array< Vector3D, 12 > directions = { { Vector3D{ { 0., 0., 1. } },
+            Vector3D{ { 0.1, 0., 1. } }, Vector3D{ { 0.3, 0., 1. } },
+            Vector3D{ { 0.5, 0., 1. } }, Vector3D{ { 0., 1., 0. } },
+            Vector3D{ { 0.1, 1., 0. } }, Vector3D{ { 0.3, 1., 0. } },
+            Vector3D{ { 0.5, 1., 0. } }, Vector3D{ { 1., 0., 0. } },
+            Vector3D{ { 1., 0., 0.1 } }, Vector3D{ { 1., 0., 0.3 } },
+            Vector3D{ { 1., 0., 0.5 } } } };
 
         for( const auto& direction : directions )
         {
@@ -126,7 +128,7 @@ namespace geode
         };
     }
 
-    absl::optional< uuid > block_containing_point(
+    std::optional< uuid > block_containing_point(
         const BRep& brep, const Point3D& point )
     {
         for( const auto& block : brep.blocks() )
@@ -136,7 +138,7 @@ namespace geode
                 return block.id();
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
 } // namespace geode

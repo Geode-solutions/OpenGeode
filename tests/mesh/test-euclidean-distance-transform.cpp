@@ -24,18 +24,18 @@
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.h>
-#include <geode/mesh/builder/geode/geode_regular_grid_surface_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/helpers/euclidean_distance_transform.h>
-#include <geode/mesh/io/regular_grid_output.h>
+#include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/geode/geode_regular_grid_surface_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/helpers/euclidean_distance_transform.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 
 void test_distance_transform_2D( double cell_length )
 {
@@ -91,7 +91,7 @@ void test_distance_transform_2D( double cell_length )
         OPENGEODE_EXCEPTION(
             std::fabs( distance_map->value( grid->cell_index( value.first ) )
                        - value.second )
-                < geode::global_epsilon,
+                < geode::GLOBAL_EPSILON,
             "[Test] Wrong 2D euclidean distance map" );
     }
 }
@@ -99,7 +99,8 @@ void test_distance_transform_3D( double cell_length )
 {
     const auto grid = geode::RegularGrid3D::create();
     const auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 0., 0., 0. } }, { 10, 10, 10 }, cell_length );
+    builder->initialize_grid(
+        geode::Point3D{ { 0., 0., 0. } }, { 10, 10, 10 }, cell_length );
     const std::array< const geode::Grid3D::CellIndices, 2 > objects_raster{
         { { 0, 0, 0 }, { 9, 9, 9 } }
     };
@@ -134,7 +135,7 @@ void test_distance_transform_3D( double cell_length )
         OPENGEODE_EXCEPTION(
             std::fabs( distance_map->value( grid->cell_index( value.first ) )
                        - value.second )
-                < geode::global_epsilon,
+                < geode::GLOBAL_EPSILON,
             "[Test] Wrong 3D euclidean distance map" );
     }
 }

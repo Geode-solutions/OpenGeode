@@ -23,24 +23,24 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/geode/geode_point_set_builder.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
-#include <geode/mesh/io/point_set_input.h>
-#include <geode/mesh/io/point_set_output.h>
+#include <geode/mesh/builder/geode/geode_point_set_builder.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
+#include <geode/mesh/io/point_set_input.hpp>
+#include <geode/mesh/io/point_set_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_create_vertices(
     const geode::PointSet3D& point_set, geode::PointSetBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
     OPENGEODE_EXCEPTION( point_set.nb_vertices() == 2,
         "[Test] PointSet should have 2 vertices" );
     builder.create_vertices( 2 );
@@ -48,7 +48,7 @@ void test_create_vertices(
         "[Test] PointSet should have 4 vertices" );
     OPENGEODE_EXCEPTION( point_set.point( 2 ) == geode::Point3D(),
         "[Test] Default coordinates are not correct" );
-    builder.set_point( 2, { { 2.3, 5.0, -1.2 } } );
+    builder.set_point( 2, geode::Point3D{ { 2.3, 5.0, -1.2 } } );
     OPENGEODE_EXCEPTION(
         point_set.point( 2 ) == geode::Point3D( { 2.3, 5.0, -1.2 } ),
         "[Test] Point coordinates have not been correctly set" );
@@ -99,7 +99,7 @@ void test_delete_vertex(
         "[Test] PointSet vertex coordinates are not correct" );
 }
 
-void test_io( const geode::PointSet3D& point_set, absl::string_view filename )
+void test_io( const geode::PointSet3D& point_set, std::string_view filename )
 {
     geode::save_point_set( point_set, filename );
     geode::load_point_set< 3 >( filename );

@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/bitsery_archive.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/block_collection.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/corner_collection.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/line_collection.h>
-#include <geode/model/mixin/core/model_boundary.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surface_collection.h>
-#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/block_collection.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
 
 namespace bitsery
 {

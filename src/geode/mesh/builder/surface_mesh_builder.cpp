@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
 {
@@ -141,7 +141,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::optional< geode::PolygonEdge > find_polygon_adjacent_edge(
+    std::optional< geode::PolygonEdge > find_polygon_adjacent_edge(
         const geode::SurfaceMesh< dimension >& surface,
         const geode::PolygonEdge& polygon_edge,
         const std::array< geode::index_t, 2 >& vertices )
@@ -149,15 +149,16 @@ namespace
         const auto polygon_adj = surface.polygon_adjacent( polygon_edge );
         if( !polygon_adj )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto polygon_adj_id = polygon_adj.value();
         for( const auto e :
             geode::LRange{ surface.nb_polygon_edges( polygon_adj_id ) } )
         {
-            absl::optional< geode::PolygonEdge > adj_edge{ absl::in_place,
+            std::optional< geode::PolygonEdge > adj_edge{ std::in_place,
                 polygon_adj_id, e };
-            const auto adj_v0 = surface.polygon_vertex( adj_edge.value() );
+            const auto adj_v0 = surface.polygon_vertex(
+                geode::PolygonVertex{ adj_edge.value() } );
             const auto adj_v1 =
                 surface.polygon_edge_vertex( adj_edge.value(), 1 );
             if( ( vertices[0] == adj_v1 && vertices[1] == adj_v0 )
@@ -166,7 +167,7 @@ namespace
                 return adj_edge;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >
@@ -219,7 +220,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::optional< geode::PolygonEdge > non_manifold_polygon_adjacent_edge(
+    std::optional< geode::PolygonEdge > non_manifold_polygon_adjacent_edge(
         const geode::SurfaceMesh< dimension >& surface,
         const geode::PolygonEdge& polygon_edge,
         const std::array< geode::index_t, 2 >& vertices )
@@ -228,19 +229,19 @@ namespace
             find_polygon_adjacent_edge( surface, polygon_edge, vertices );
         if( !adj_edge )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto polygon = surface.polygon_adjacent( adj_edge.value() );
         if( !polygon )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         // Non-manifold edge
         if( polygon != polygon_edge.polygon_id )
         {
             return adj_edge;
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >
@@ -292,7 +293,7 @@ namespace
         const auto previous_id = surface.polygon_vertex(
             surface.previous_polygon_vertex( polygon_vertex ) );
         const auto next_id = surface.polygon_vertex(
-            surface.next_polygon_edge( polygon_vertex ) );
+            surface.next_polygon_vertex( polygon_vertex ) );
         auto edges = builder.edges_builder();
         edges.update_edge_vertex(
             { old_vertex_id, next_id }, 0, new_vertex_id );
@@ -635,7 +636,7 @@ namespace geode
     SurfaceEdgesBuilder< dimension >
         SurfaceMeshBuilder< dimension >::edges_builder()
     {
-        return { surface_mesh_.edges( {} ) };
+        return SurfaceEdgesBuilder< dimension >{ surface_mesh_.edges( {} ) };
     }
 
     template < index_t dimension >

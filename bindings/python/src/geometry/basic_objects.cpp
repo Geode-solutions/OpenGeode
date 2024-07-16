@@ -21,17 +21,17 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/basic_objects/circle.h>
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/information.h>
+#include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/sphere.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/information.hpp>
 
 #define PYTHON_SEGMENT( dimension )                                            \
     const auto segment##dimension =                                            \
@@ -92,10 +92,10 @@ namespace geode
         PYTHON_TRIANGLE( 2 );
         PYTHON_TRIANGLE( 3 )
             .def( "normal",
-                static_cast< absl::optional< Vector3D > ( Triangle< 3 >::* )()
+                static_cast< std::optional< Vector3D > ( Triangle< 3 >::* )()
                         const >( &Triangle3D::normal ) )
             .def( "plane",
-                static_cast< absl::optional< Plane > ( Triangle< 3 >::* )()
+                static_cast< std::optional< Plane > ( Triangle< 3 >::* )()
                         const >( &Triangle3D::plane ) );
 
         pybind11::class_< Plane >( module, "Plane" )
@@ -116,33 +116,33 @@ namespace geode
             .def( "radius", &Circle::radius )
             .def( "bounding_box", &Circle::bounding_box );
 
-        pybind11::enum_< Side >( module, "Side" )
-            .value( "positive", Side::positive )
-            .value( "negative", Side::negative )
-            .value( "zero", Side::zero )
+        pybind11::enum_< SIDE >( module, "Side" )
+            .value( "positive", SIDE::positive )
+            .value( "negative", SIDE::negative )
+            .value( "zero", SIDE::zero )
             .export_values();
 
-        pybind11::enum_< Position >( module, "Position" )
-            .value( "outside", Position::outside )
-            .value( "inside", Position::inside )
-            .value( "vertex0", Position::vertex0 )
-            .value( "vertex1", Position::vertex1 )
-            .value( "vertex2", Position::vertex2 )
-            .value( "vertex3", Position::vertex3 )
-            .value( "edge0", Position::edge0 )
-            .value( "edge1", Position::edge1 )
-            .value( "edge2", Position::edge2 )
-            .value( "edge01", Position::edge01 )
-            .value( "edge02", Position::edge02 )
-            .value( "edge03", Position::edge03 )
-            .value( "edge12", Position::edge12 )
-            .value( "edge13", Position::edge13 )
-            .value( "edge23", Position::edge23 )
-            .value( "facet0", Position::facet0 )
-            .value( "facet1", Position::facet1 )
-            .value( "facet2", Position::facet2 )
-            .value( "facet3", Position::facet3 )
-            .value( "parallel", Position::parallel )
+        pybind11::enum_< POSITION >( module, "Position" )
+            .value( "outside", POSITION::outside )
+            .value( "inside", POSITION::inside )
+            .value( "vertex0", POSITION::vertex0 )
+            .value( "vertex1", POSITION::vertex1 )
+            .value( "vertex2", POSITION::vertex2 )
+            .value( "vertex3", POSITION::vertex3 )
+            .value( "edge0", POSITION::edge0 )
+            .value( "edge1", POSITION::edge1 )
+            .value( "edge2", POSITION::edge2 )
+            .value( "edge01", POSITION::edge01 )
+            .value( "edge02", POSITION::edge02 )
+            .value( "edge03", POSITION::edge03 )
+            .value( "edge12", POSITION::edge12 )
+            .value( "edge13", POSITION::edge13 )
+            .value( "edge23", POSITION::edge23 )
+            .value( "facet0", POSITION::facet0 )
+            .value( "facet1", POSITION::facet1 )
+            .value( "facet2", POSITION::facet2 )
+            .value( "facet3", POSITION::facet3 )
+            .value( "parallel", POSITION::parallel )
             .export_values();
     }
 } // namespace geode

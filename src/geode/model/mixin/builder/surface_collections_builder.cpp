@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/model/mixin/builder/surface_collections_builder.h>
+#include <geode/model/mixin/builder/surface_collections_builder.hpp>
 
-#include <geode/model/mixin/core/surface_collection.h>
-#include <geode/model/mixin/core/surface_collections.h>
+#include <geode/model/mixin/core/surface_collection.hpp>
+#include <geode/model/mixin/core/surface_collections.hpp>
 
 namespace geode
 {
@@ -52,14 +52,14 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::load_surface_collections(
-        absl::string_view directory )
+        std::string_view directory )
     {
         return surface_collections_.load_surface_collections( directory, {} );
     }
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::set_surface_collection_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         surface_collections_.modifiable_surface_collection( id, {} )
             .set_surface_collection_name( name, {} );

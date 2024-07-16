@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/model/mixin/core/surface_collections.h>
+#include <geode/model/mixin/core/surface_collections.hpp>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/surface_collection.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
 
 namespace geode
 {
@@ -76,7 +76,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::save_surface_collections(
-        absl::string_view directory ) const
+        std::string_view directory ) const
     {
         impl_->save_components(
             absl::StrCat( directory, "/surface_collections" ) );
@@ -84,7 +84,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::load_surface_collections(
-        absl::string_view directory, SurfaceCollectionsBuilderKey )
+        std::string_view directory, SurfaceCollectionsBuilderKey )
     {
         impl_->load_components(
             absl::StrCat( directory, "/surface_collections" ) );

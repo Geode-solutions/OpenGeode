@@ -21,33 +21,33 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.h>
-#include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/io/polygonal_surface_input.h>
-#include <geode/mesh/io/polygonal_surface_output.h>
+#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.hpp>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/io/polygonal_surface_input.hpp>
+#include <geode/mesh/io/polygonal_surface_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
-    builder.create_point( { { 7.5, 5.2, 6.3 } } );
-    builder.create_point( { { 8.1, 1.4, 4.7 } } );
-    builder.create_point( { { 4.7, 2.1, 1.3 } } );
-    builder.create_point( { { 9.3, 5.3, 6.7 } } );
-    builder.create_point( { { 7.5, 4.2, 2.8 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder.create_point( geode::Point3D{ { 8.1, 1.4, 4.7 } } );
+    builder.create_point( geode::Point3D{ { 4.7, 2.1, 1.3 } } );
+    builder.create_point( geode::Point3D{ { 9.3, 5.3, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 4.2, 2.8 } } );
     OPENGEODE_EXCEPTION( polygonal_surface.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
@@ -74,7 +74,7 @@ void test_create_vertex_attribute(
     for( const auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
         attribute->set_value( v, geode::PolygonEdge{ v, 0 } );
-        OPENGEODE_EXCEPTION( geode::PolygonVertex{} != attribute->value( v ),
+        OPENGEODE_EXCEPTION( geode::PolygonEdge{} != attribute->value( v ),
             "[Test] PolygonalSurface attribute assignation is not correct" );
     }
 }
@@ -353,10 +353,10 @@ void test_polygon_area()
     const double b{ 8.0 };
     const double c{ 4.0 };
 
-    builder->create_point( { { 0.0, 0.0 } } );
-    builder->create_point( { { a, 0.0 } } );
-    builder->create_point( { { b, c } } );
-    builder->create_point( { { 0.0, c } } );
+    builder->create_point( geode::Point2D{ { 0.0, 0.0 } } );
+    builder->create_point( geode::Point2D{ { a, 0.0 } } );
+    builder->create_point( geode::Point2D{ { b, c } } );
+    builder->create_point( geode::Point2D{ { 0.0, c } } );
 
     builder->create_polygon( { 0, 1, 2, 3 } );
 
@@ -375,10 +375,10 @@ void test_polygon_normal()
     const double b{ 8.0 };
     const double c{ 4.0 };
 
-    builder->create_point( { { 0.0, 0.0, 0.0 } } );
-    builder->create_point( { { a, 0.0, 0.0 } } );
-    builder->create_point( { { b, c, 0.0 } } );
-    builder->create_point( { { 0.0, c, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { a, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { b, c, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, c, 0.0 } } );
 
     builder->create_polygon( { 0, 1, 2, 3 } );
 
@@ -395,10 +395,10 @@ void test_polygon_vertex_normal()
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 
-    builder->create_point( { { 0.0, 0.0, 0.0 } } );
-    builder->create_point( { { 1.0, 0.0, 0.0 } } );
-    builder->create_point( { { 0.0, 1.0, 1.0 } } );
-    builder->create_point( { { 0.0, -1.0, 1.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 1.0, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, 1.0, 1.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, -1.0, 1.0 } } );
 
     builder->create_polygon( { 0, 1, 2 } );
     builder->create_polygon( { 0, 3, 1 } );
@@ -616,8 +616,8 @@ void test()
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v7.", polygonal_surface->native_extension() ) );
-    test_backward_io( absl::StrCat( geode::data_path, "test_v12.",
+        geode::DATA_PATH, "test_v7.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "test_v12.",
         polygonal_surface->native_extension() ) );
 
     test_permutation( *polygonal_surface, *builder );

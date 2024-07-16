@@ -21,28 +21,28 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/geode/geode_edged_curve.h>
-#include <geode/mesh/core/geode/geode_graph.h>
-#include <geode/mesh/core/geode/geode_point_set.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
-#include <geode/mesh/io/geode/geode_edged_curve_output.h>
-#include <geode/mesh/io/geode/geode_graph_output.h>
-#include <geode/mesh/io/geode/geode_point_set_output.h>
-#include <geode/mesh/io/geode/geode_polygonal_surface_output.h>
-#include <geode/mesh/io/geode/geode_polyhedral_solid_output.h>
-#include <geode/mesh/io/geode/geode_tetrahedral_solid_output.h>
-#include <geode/mesh/io/geode/geode_triangulated_surface_output.h>
-#include <geode/mesh/io/geode/register_output.h>
+#include <geode/mesh/core/geode/geode_edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
+#include <geode/mesh/core/geode/geode_point_set.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
+#include <geode/mesh/io/geode/geode_edged_curve_output.hpp>
+#include <geode/mesh/io/geode/geode_graph_output.hpp>
+#include <geode/mesh/io/geode/geode_point_set_output.hpp>
+#include <geode/mesh/io/geode/geode_polygonal_surface_output.hpp>
+#include <geode/mesh/io/geode/geode_polyhedral_solid_output.hpp>
+#include <geode/mesh/io/geode/geode_tetrahedral_solid_output.hpp>
+#include <geode/mesh/io/geode/geode_triangulated_surface_output.hpp>
+#include <geode/mesh/io/geode/register_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < typename GeodeFactory >
-void check_register( absl::string_view extension )
+void check_register( std::string_view extension )
 {
     OPENGEODE_EXCEPTION( GeodeFactory::has_creator( extension.data() ),
         "[Test] No creator for extension ", extension, " is not correct" );

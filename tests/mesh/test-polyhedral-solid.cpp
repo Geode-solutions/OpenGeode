@@ -21,35 +21,35 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/geode/geode_polyhedral_solid_builder.h>
-#include <geode/mesh/builder/solid_edges_builder.h>
-#include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/io/polyhedral_solid_input.h>
-#include <geode/mesh/io/polyhedral_solid_output.h>
+#include <geode/mesh/builder/geode/geode_polyhedral_solid_builder.hpp>
+#include <geode/mesh/builder/solid_edges_builder.hpp>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/io/polyhedral_solid_input.hpp>
+#include <geode/mesh/io/polyhedral_solid_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
-    builder.create_point( { { 7.5, 5.2, 6.3 } } );
-    builder.create_point( { { 8.1, 1.4, 4.7 } } );
-    builder.create_point( { { 4.7, 2.1, 1.3 } } );
-    builder.create_point( { { 9.3, 5.3, 6.7 } } );
-    builder.create_point( { { 7.5, 4.2, 2.8 } } );
-    builder.create_point( { { 2.2, 3.3, 4.4 } } );
+    builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
+    builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 5.2, 6.3 } } );
+    builder.create_point( geode::Point3D{ { 8.1, 1.4, 4.7 } } );
+    builder.create_point( geode::Point3D{ { 4.7, 2.1, 1.3 } } );
+    builder.create_point( geode::Point3D{ { 9.3, 5.3, 6.7 } } );
+    builder.create_point( geode::Point3D{ { 7.5, 4.2, 2.8 } } );
+    builder.create_point( geode::Point3D{ { 2.2, 3.3, 4.4 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
@@ -396,12 +396,12 @@ void test_barycenters()
     const double a{ 0.6 };
     const double b{ 2.4 };
     const double c{ 1.8 };
-    builder->create_point( { { o, o, o } } );
-    builder->create_point( { { a, o, o } } );
-    builder->create_point( { { o, o, c } } );
-    builder->create_point( { { o, b, o } } );
-    builder->create_point( { { a, b, o } } );
-    builder->create_point( { { o, b, c } } );
+    builder->create_point( geode::Point3D{ { o, o, o } } );
+    builder->create_point( geode::Point3D{ { a, o, o } } );
+    builder->create_point( geode::Point3D{ { o, o, c } } );
+    builder->create_point( geode::Point3D{ { o, b, o } } );
+    builder->create_point( geode::Point3D{ { a, b, o } } );
+    builder->create_point( geode::Point3D{ { o, b, c } } );
     builder->create_polyhedron(
         { 0, 1, 2, 3, 4, 5 }, { { 0, 1, 2 }, { 0, 1, 4, 3 }, { 1, 2, 5, 4 },
                                   { 0, 3, 5, 2 }, { 3, 4, 5 } } );
@@ -427,12 +427,12 @@ void test_normals()
     const double a{ 0.6 };
     const double b{ 2.4 };
     const double c{ 1.8 };
-    builder->create_point( { { o, b, -c } } );
-    builder->create_point( { { o, o, o } } );
-    builder->create_point( { { a, o, o } } );
-    builder->create_point( { { a, b, o } } );
-    builder->create_point( { { o, b, o } } );
-    builder->create_point( { { o, b, c } } );
+    builder->create_point( geode::Point3D{ { o, b, -c } } );
+    builder->create_point( geode::Point3D{ { o, o, o } } );
+    builder->create_point( geode::Point3D{ { a, o, o } } );
+    builder->create_point( geode::Point3D{ { a, b, o } } );
+    builder->create_point( geode::Point3D{ { o, b, o } } );
+    builder->create_point( geode::Point3D{ { o, b, c } } );
     builder->create_polyhedron(
         { 0, 1, 2, 3, 4 }, { { 1, 2, 0 }, { 1, 2, 3, 4 }, { 2, 3, 0 },
                                { 3, 4, 0 }, { 4, 1, 0 } } );
@@ -442,13 +442,13 @@ void test_normals()
 
     const geode::Point3D answer_facet_normal{ { 0, 0, 1 } };
     const auto polyhedron_facet_normal0 =
-        polyhedral_solid->new_polyhedron_facet_normal( { 0, 1 } ).value();
+        polyhedral_solid->polyhedron_facet_normal( { 0, 1 } ).value();
     OPENGEODE_EXCEPTION( polyhedron_facet_normal0 == answer_facet_normal,
         "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (0, "
         "1)" );
 
     const auto polyhedron_facet_normal1 =
-        polyhedral_solid->new_polyhedron_facet_normal( { 1, 1 } ).value();
+        polyhedral_solid->polyhedron_facet_normal( { 1, 1 } ).value();
     OPENGEODE_EXCEPTION( polyhedron_facet_normal1 == answer_facet_normal * -1.,
         "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (1, "
         "1)" );
@@ -570,9 +570,9 @@ void test()
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v7.", polyhedral_solid->native_extension() ) );
+        geode::DATA_PATH, "test_v7.", polyhedral_solid->native_extension() ) );
     test_backward_io( absl::StrCat(
-        geode::data_path, "test_v12.", polyhedral_solid->native_extension() ) );
+        geode::DATA_PATH, "test_v12.", polyhedral_solid->native_extension() ) );
 
     test_permutation( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );

@@ -23,13 +23,13 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/io/point_set_input.h>
-#include <geode/mesh/io/point_set_output.h>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/io/point_set_input.hpp>
+#include <geode/mesh/io/point_set_output.hpp>
 
 #define PYTHON_POINT_SET_IO( dimension )                                       \
     const auto save##dimension =                                               \
@@ -39,7 +39,7 @@
         "load_point_set" + std::to_string( dimension ) + "D";                  \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PointSet< dimension > > ( * )(           \
-            absl::string_view ) >( &load_point_set< dimension > ) );           \
+            std::string_view ) >( &load_point_set< dimension > ) );            \
     const auto check##dimension =                                              \
         "check_point_set_missing_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \

@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/builder/solid_edges_builder.h>
-#include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/builder/solid_edges_builder.hpp>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace
 {
@@ -254,7 +254,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::optional< geode::index_t > polyhedron_vertex_in_facet(
+    std::optional< geode::index_t > polyhedron_vertex_in_facet(
         const geode::SolidMesh< dimension >& solid,
         const geode::PolyhedronFacet& facet,
         geode::local_index_t vertex_id )
@@ -268,7 +268,7 @@ namespace
                 return v;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < geode::index_t dimension >
@@ -678,7 +678,7 @@ namespace geode
     SolidEdgesBuilder< dimension >
         SolidMeshBuilder< dimension >::edges_builder()
     {
-        return { solid_mesh_.edges( {} ) };
+        return SolidEdgesBuilder< dimension >{ solid_mesh_.edges( {} ) };
     }
 
     template < index_t dimension >
@@ -742,7 +742,7 @@ namespace geode
     SolidFacetsBuilder< dimension >
         SolidMeshBuilder< dimension >::facets_builder()
     {
-        return { solid_mesh_.facets( {} ) };
+        return SolidFacetsBuilder< dimension >{ solid_mesh_.facets( {} ) };
     }
 
     template < index_t dimension >

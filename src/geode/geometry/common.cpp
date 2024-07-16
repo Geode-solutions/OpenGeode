@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/geometry/common.h>
+#include <geode/geometry/common.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
-#include <geode/geometry/private/predicates.h>
+#include <geode/geometry/bitsery_archive.hpp>
+#include <geode/geometry/internal/predicates.hpp>
 
 namespace geode
 {

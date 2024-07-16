@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/core/private/grid_impl.h>
-#include <geode/mesh/core/private/points_impl.h>
-#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/core/internal/grid_impl.hpp>
+#include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 
 namespace
 {
@@ -51,14 +51,14 @@ namespace
 
 namespace geode
 {
-    class OpenGeodeRegularGrid< 3 >::Impl : public detail::PointsImpl< 3 >,
-                                            public detail::GridImpl< 3 >
+    class OpenGeodeRegularGrid< 3 >::Impl : public internal::PointsImpl< 3 >,
+                                            public internal::GridImpl< 3 >
     {
         friend class bitsery::Access;
 
     public:
         Impl( OpenGeodeRegularGrid< 3 >& mesh )
-            : detail::PointsImpl< 3 >( mesh )
+            : internal::PointsImpl< 3 >( mesh )
         {
         }
 
@@ -98,7 +98,7 @@ namespace geode
             return { facet.polyhedron_id, vertex };
         }
 
-        absl::optional< index_t > cell_adjacent( const RegularGrid3D& grid,
+        std::optional< index_t > cell_adjacent( const RegularGrid3D& grid,
             const PolyhedronFacet& polyhedron_facet ) const
         {
             const auto cell =
@@ -119,7 +119,7 @@ namespace geode
                     return grid.cell_index( adj.value() );
                 }
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
     private:
@@ -128,13 +128,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< detail::PointsImpl< 3 > >{} );
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< detail::GridImpl< 3 > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass< internal::PointsImpl< 3 > >{} );
+                a.ext( impl,
+                    bitsery::ext::BaseClass< internal::GridImpl< 3 > >{} );
+            } } } );
         }
     };
 
@@ -184,9 +184,8 @@ namespace geode
         return impl_->get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
     }
 
-    absl::optional< index_t >
-        OpenGeodeRegularGrid< 3 >::get_polyhedron_adjacent(
-            const PolyhedronFacet& polyhedron_facet ) const
+    std::optional< index_t > OpenGeodeRegularGrid< 3 >::get_polyhedron_adjacent(
+        const PolyhedronFacet& polyhedron_facet ) const
     {
         return impl_->cell_adjacent( *this, polyhedron_facet );
     }

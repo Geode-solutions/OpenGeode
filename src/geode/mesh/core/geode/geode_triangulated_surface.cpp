@@ -21,32 +21,32 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
 
 #include <array>
 #include <fstream>
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodeTriangulatedSurface< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh ),
+            : internal::PointsImpl< dimension >( mesh ),
               triangle_vertices_(
                   mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -68,7 +68,7 @@ namespace geode
                 .at( polygon_vertex.vertex_id );
         }
 
-        absl::optional< index_t > get_polygon_adjacent(
+        std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
         {
             const auto adj =
@@ -76,7 +76,7 @@ namespace geode
                     .at( polygon_edge.edge_id );
             if( adj == NO_ID )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return adj;
         }
@@ -118,7 +118,7 @@ namespace geode
             archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
                                                                  Impl& impl ) {
                 a.ext( impl, bitsery::ext::BaseClass<
-                                 detail::PointsImpl< dimension > >{} );
+                                 internal::PointsImpl< dimension > >{} );
                 a.ext( impl.triangle_vertices_, bitsery::ext::StdSmartPtr{} );
                 a.ext( impl.triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
             } } } );
@@ -165,7 +165,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t >
+    std::optional< index_t >
         OpenGeodeTriangulatedSurface< dimension >::get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
     {

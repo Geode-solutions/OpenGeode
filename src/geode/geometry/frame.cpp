@@ -21,17 +21,19 @@
  *
  */
 
-#include <geode/geometry/frame.h>
+#include <optional>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/frame.hpp>
+
+#include <geode/geometry/vector.hpp>
 
 namespace
 {
     template < geode::index_t dimension >
-    absl::optional< geode::Frame< dimension > > compute_inverse(
+    std::optional< geode::Frame< dimension > > compute_inverse(
         geode::Frame< dimension > frame )
     {
-        absl::optional< geode::Frame< dimension > > result{ absl::in_place };
+        std::optional< geode::Frame< dimension > > result{ std::in_place };
         for( const auto i : geode::LRange{ dimension } )
         {
             auto value = frame.direction( i ).value( i );
@@ -48,7 +50,7 @@ namespace
 
             if( value == 0 )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
 
             if( index != i )

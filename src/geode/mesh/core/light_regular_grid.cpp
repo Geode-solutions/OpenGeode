@@ -21,22 +21,22 @@
  *
  */
 
-#include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/grid_builder.h>
-#include <geode/mesh/core/private/grid_impl.h>
+#include <geode/mesh/builder/grid_builder.hpp>
+#include <geode/mesh/core/internal/grid_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class LightRegularGrid< dimension >::Impl
-        : public detail::GridImpl< dimension >
+        : public internal::GridImpl< dimension >
     {
     public:
         Impl() = default;

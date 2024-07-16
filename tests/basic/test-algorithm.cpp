@@ -24,11 +24,11 @@
 #include <functional>
 #include <numeric>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 std::vector< bool > create_bool_vector()
 {

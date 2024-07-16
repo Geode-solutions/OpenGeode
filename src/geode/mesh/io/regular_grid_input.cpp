@@ -21,25 +21,26 @@
  *
  */
 
-#include <geode/mesh/io/regular_grid_input.h>
+#include <geode/mesh/io/regular_grid_input.hpp>
+
+#include <string_view>
 
 #include <absl/strings/str_cat.h>
-#include <absl/strings/string_view.h>
 
-#include <geode/basic/detail/geode_input_impl.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/io/vertex_set_input.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        const MeshImpl& impl, absl::string_view filename )
+        const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
         try
@@ -63,7 +64,7 @@ namespace geode
 
     template < index_t dimension >
     std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        absl::string_view filename )
+        std::string_view filename )
     {
         return load_regular_grid< dimension >(
             MeshFactory::default_impl(
@@ -73,7 +74,7 @@ namespace geode
 
     template < index_t dimension >
     typename RegularGridInput< dimension >::MissingFiles
-        check_regular_grid_missing_files( absl::string_view filename )
+        check_regular_grid_missing_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             RegularGridInputFactory< dimension > >( filename );
@@ -81,7 +82,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_regular_grid_loadable( absl::string_view filename )
+    bool is_regular_grid_loadable( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             RegularGridInputFactory< dimension > >( filename );
@@ -89,22 +90,22 @@ namespace geode
     }
 
     template std::unique_ptr< RegularGrid< 2 > > opengeode_mesh_api
-        load_regular_grid( const MeshImpl&, absl::string_view );
+        load_regular_grid( const MeshImpl&, std::string_view );
     template std::unique_ptr< RegularGrid< 3 > > opengeode_mesh_api
-        load_regular_grid( const MeshImpl&, absl::string_view );
+        load_regular_grid( const MeshImpl&, std::string_view );
 
     template std::unique_ptr< RegularGrid< 2 > >
-        opengeode_mesh_api load_regular_grid( absl::string_view );
+        opengeode_mesh_api load_regular_grid( std::string_view );
     template std::unique_ptr< RegularGrid< 3 > >
-        opengeode_mesh_api load_regular_grid( absl::string_view );
+        opengeode_mesh_api load_regular_grid( std::string_view );
 
     template RegularGridInput< 2 >::MissingFiles opengeode_mesh_api
-        check_regular_grid_missing_files< 2 >( absl::string_view );
+        check_regular_grid_missing_files< 2 >( std::string_view );
     template RegularGridInput< 3 >::MissingFiles opengeode_mesh_api
-        check_regular_grid_missing_files< 3 >( absl::string_view );
+        check_regular_grid_missing_files< 3 >( std::string_view );
 
     template bool opengeode_mesh_api is_regular_grid_loadable< 2 >(
-        absl::string_view );
+        std::string_view );
     template bool opengeode_mesh_api is_regular_grid_loadable< 3 >(
-        absl::string_view );
+        std::string_view );
 } // namespace geode

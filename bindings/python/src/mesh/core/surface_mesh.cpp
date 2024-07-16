@@ -21,17 +21,17 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 #define PYTHON_SURFACE_MESH( dimension )                                       \
     const auto name##dimension =                                               \

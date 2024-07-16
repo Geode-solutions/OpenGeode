@@ -21,9 +21,9 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {
@@ -31,7 +31,7 @@ namespace geode
     {
         pybind11::class_< uuid >( module, "uuid" )
             .def( pybind11::init<>() )
-            .def( pybind11::init< absl::string_view >() )
+            .def( pybind11::init< std::string_view >() )
             .def( "string", &uuid::string );
     }
 } // namespace geode

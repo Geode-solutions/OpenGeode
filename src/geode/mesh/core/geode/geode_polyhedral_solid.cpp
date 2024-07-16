@@ -21,30 +21,30 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.hpp>
 
 #include <array>
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodePolyhedralSolid< dimension >::Impl
-        : public detail::PointsImpl< dimension >
+        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
-            : detail::PointsImpl< dimension >( mesh )
+            : internal::PointsImpl< dimension >( mesh )
         {
             polyhedron_vertex_ptr_.emplace_back( 0 );
             polyhedron_facet_ptr_.emplace_back( 0 );
@@ -81,13 +81,13 @@ namespace geode
                    - starting_facet_index( facet_id );
         }
 
-        absl::optional< index_t > get_polyhedron_adjacent(
+        std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
             const auto adj = get_polyhedron_adjacent_impl( polyhedron_facet );
             if( adj == NO_ID )
             {
-                return absl::nullopt;
+                return std::nullopt;
             }
             return adj;
         }
@@ -345,8 +345,9 @@ namespace geode
                              impl.polyhedron_adjacents_.max_size() );
                          a.container4b( impl.polyhedron_adjacent_ptr_,
                              impl.polyhedron_adjacent_ptr_.max_size() );
-                         a.ext( impl, bitsery::ext::BaseClass<
-                                          detail::PointsImpl< dimension > >{} );
+                         a.ext(
+                             impl, bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
                      },
                         []( Archive& a, Impl& impl ) {
                             a.container4b( impl.polyhedron_vertices_,
@@ -361,9 +362,9 @@ namespace geode
                                 impl.polyhedron_adjacents_.max_size() );
                             a.container4b( impl.polyhedron_adjacent_ptr_,
                                 impl.polyhedron_adjacent_ptr_.max_size() );
-                            a.ext(
-                                impl, bitsery::ext::BaseClass<
-                                          detail::PointsImpl< dimension > >{} );
+                            a.ext( impl,
+                                bitsery::ext::BaseClass<
+                                    internal::PointsImpl< dimension > >{} );
                         } } } );
         }
 
@@ -465,7 +466,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t >
+    std::optional< index_t >
         OpenGeodePolyhedralSolid< dimension >::get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
     {

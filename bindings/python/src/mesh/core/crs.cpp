@@ -21,11 +21,11 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/coordinate_reference_system.h>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
 
 #define PYTHON_CRS( dimension )                                                \
     const auto name##dimension =                                               \

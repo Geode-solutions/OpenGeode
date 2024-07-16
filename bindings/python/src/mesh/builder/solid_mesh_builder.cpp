@@ -21,13 +21,13 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/solid_edges_builder.h>
-#include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/builder/solid_edges_builder.hpp>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
 
 #define PYTHON_SOLID_MESH_BUILDER( dimension )                                 \
     const auto name##dimension =                                               \

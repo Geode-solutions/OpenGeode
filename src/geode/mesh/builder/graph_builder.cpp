@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/mesh/builder/graph_builder.h>
+#include <geode/mesh/builder/graph_builder.hpp>
 
 #include <type_traits>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
 
 namespace
 {

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/mixin/builder/relationships_builder.h>
+#include <geode/model/mixin/builder/relationships_builder.hpp>
 
 namespace geode
 {
@@ -66,7 +66,7 @@ namespace geode
         relationships_.copy_relationships( mapping, relationships, {} );
     }
 
-    void RelationshipsBuilder::load_relationships( absl::string_view directory )
+    void RelationshipsBuilder::load_relationships( std::string_view directory )
     {
         relationships_.load_relationships( directory, {} );
     }

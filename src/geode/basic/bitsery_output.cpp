@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.hpp>
 
-#include <geode/basic/detail/bitsery_archive.h>
+#include <geode/basic/detail/bitsery_archive.hpp>
 
 namespace geode
 {

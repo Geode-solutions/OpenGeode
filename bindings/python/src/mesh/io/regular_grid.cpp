@@ -23,14 +23,14 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/io/regular_grid_input.h>
-#include <geode/mesh/io/regular_grid_output.h>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 
 #define PYTHON_REGULAR_GRID_IO( dimension )                                    \
     const auto save##dimension =                                               \
@@ -40,7 +40,7 @@
         "load_regular_grid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< RegularGrid< dimension > > ( * )(        \
-            absl::string_view ) >( &load_regular_grid< dimension > ) );        \
+            std::string_view ) >( &load_regular_grid< dimension > ) );         \
     const auto check##dimension = "check_regular_grid_missing_files"           \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

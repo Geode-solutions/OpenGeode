@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/blocks.hpp>
 
 #define PYTHON_BLOCKS( dimension )                                             \
     const auto name##dimension = "Blocks" + std::to_string( dimension ) + "D"; \

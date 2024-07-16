@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 namespace geode
 {
@@ -58,7 +58,7 @@ namespace geode
     }
     template < typename PointType >
     void GenericTetrahedron< PointType >::set_point(
-        index_t vertex, PointType point )
+        local_index_t vertex, PointType point )
     {
         vertices_[vertex] = point;
     }
@@ -113,16 +113,6 @@ namespace geode
         const Tetrahedron& ) noexcept = default;
     Tetrahedron::Tetrahedron( Tetrahedron&& ) noexcept = default;
     Tetrahedron& Tetrahedron::operator=( Tetrahedron&& ) noexcept = default;
-
-    template < typename PointType >
-    constexpr std::array< std::array< index_t, 3 >, 4 >
-        GenericTetrahedron< PointType >::tetrahedron_facet_vertex;
-    template opengeode_geometry_api const
-        std::array< std::array< index_t, 3 >, 4 >
-            GenericTetrahedron< RefPoint< 3 > >::tetrahedron_facet_vertex;
-    template opengeode_geometry_api const
-        std::array< std::array< index_t, 3 >, 4 >
-            GenericTetrahedron< Point< 3 > >::tetrahedron_facet_vertex;
 
     template class opengeode_geometry_api GenericTetrahedron< Point< 3 > >;
     template class opengeode_geometry_api GenericTetrahedron< RefPoint< 3 > >;

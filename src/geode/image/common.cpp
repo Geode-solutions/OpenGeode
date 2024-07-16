@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/image/common.h>
+#include <geode/image/common.hpp>
 
-#include <geode/basic/library.h>
+#include <geode/basic/library.hpp>
 
-#include <geode/image/core/bitsery_archive.h>
-#include <geode/image/core/raster_image.h>
-#include <geode/image/io/geode/geode_bitsery_raster_input.h>
-#include <geode/image/io/geode/geode_bitsery_raster_output.h>
-#include <geode/image/io/raster_image_input.h>
-#include <geode/image/io/raster_image_output.h>
+#include <geode/image/core/bitsery_archive.hpp>
+#include <geode/image/core/raster_image.hpp>
+#include <geode/image/io/geode/geode_bitsery_raster_input.hpp>
+#include <geode/image/io/geode/geode_bitsery_raster_output.hpp>
+#include <geode/image/io/raster_image_input.hpp>
+#include <geode/image/io/raster_image_output.hpp>
 
 #define BITSERY_INPUT_RASTER_REGISTER_XD( dimension )                          \
     geode::RasterImageInputFactory##dimension##D::register_creator<            \

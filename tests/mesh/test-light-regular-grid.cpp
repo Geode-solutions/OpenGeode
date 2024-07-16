@@ -23,18 +23,18 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/io/light_regular_grid_input.h>
-#include <geode/mesh/io/light_regular_grid_output.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
+#include <geode/mesh/io/light_regular_grid_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_cell_number( const geode::LightRegularGrid3D& grid )
 {
@@ -235,8 +235,8 @@ void test_cell_query( const geode::LightRegularGrid3D& grid )
             && result[6] == geode::Grid3D::CellIndices( { 2, 3, 2 } )
             && result[7] == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    geode::Point3D near_origin_point{ { 1.5 - geode::global_epsilon / 2,
-        -geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
+    geode::Point3D near_origin_point{ { 1.5 - geode::GLOBAL_EPSILON / 2,
+        -geode::GLOBAL_EPSILON / 2, 1 - geode::GLOBAL_EPSILON / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( near_origin_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -245,8 +245,8 @@ void test_cell_query( const geode::LightRegularGrid3D& grid )
         result.size() == 1
             && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } ),
         "[Test] Wrong query result for point near origin." );
-    geode::Point3D grid_furthest_point{ { 6.5 + geode::global_epsilon / 2,
-        20 + geode::global_epsilon / 2, 46 + geode::global_epsilon / 2 } };
+    geode::Point3D grid_furthest_point{ { 6.5 + geode::GLOBAL_EPSILON / 2,
+        20 + geode::GLOBAL_EPSILON / 2, 46 + geode::GLOBAL_EPSILON / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( grid_furthest_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -333,8 +333,8 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
 
-    const geode::LightRegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 },
-        { 1, 2, 3 } };
+    const geode::LightRegularGrid3D grid{ geode::Point3D{ { 1.5, 0, 1 } },
+        { 5, 10, 15 }, { 1, 2, 3 } };
     test_cell_number( grid );
     test_cell_index( grid );
     test_vertex_number( grid );

@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/basic/assert.h>
+#include <geode/basic/assert.hpp>
 
 #include <cassert>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
 namespace geode
 {
-    void geode_assertion_failed( absl::string_view condition,
-        absl::string_view message,
-        absl::string_view file,
+    void geode_assertion_failed( std::string_view condition,
+        std::string_view message,
+        std::string_view file,
         int line )
     {
         Logger::error( "File: ", file );

@@ -23,13 +23,13 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/io/hybrid_solid_input.h>
-#include <geode/mesh/io/hybrid_solid_output.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/io/hybrid_solid_input.hpp>
+#include <geode/mesh/io/hybrid_solid_output.hpp>
 
 #define PYTHON_HYBRID_SOLID_IO( dimension )                                    \
     const auto save##dimension =                                               \
@@ -39,7 +39,7 @@
         "load_hybrid_solid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< HybridSolid< dimension > > ( * )(        \
-            absl::string_view ) >( &load_hybrid_solid< dimension > ) );        \
+            std::string_view ) >( &load_hybrid_solid< dimension > ) );         \
     const auto check##dimension = "check_hybrid_solid_missing_files"           \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

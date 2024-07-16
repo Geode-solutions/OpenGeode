@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/coordinate_reference_system.h>
-#include <geode/mesh/core/coordinate_reference_system_manager.h>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system_manager.hpp>
 
 #define PYTHON_CRS_MANAGER( dimension )                                        \
     const auto name##dimension = "CoordinateReferenceSystemManager"            \

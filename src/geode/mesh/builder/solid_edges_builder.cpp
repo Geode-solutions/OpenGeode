@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/builder/solid_edges_builder.h>
+#include <geode/mesh/builder/solid_edges_builder.hpp>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace geode
 {

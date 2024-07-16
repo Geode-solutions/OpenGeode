@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/mixin/builder/vertex_identifier_builder.h>
+#include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
 
 namespace geode
 {
@@ -63,7 +63,7 @@ namespace geode
     }
 
     void VertexIdentifierBuilder::load_unique_vertices(
-        absl::string_view directory )
+        std::string_view directory )
     {
         vertex_identifier_.load_unique_vertices( directory, {} );
     }

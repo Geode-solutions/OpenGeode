@@ -23,20 +23,20 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/io/regular_grid_input.h>
-#include <geode/mesh/io/regular_grid_output.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_cell_number( const geode::RegularGrid3D& grid )
 {
@@ -251,8 +251,8 @@ void test_cell_query( const geode::RegularGrid3D& grid )
             && result[6] == geode::Grid3D::CellIndices( { 2, 3, 2 } )
             && result[7] == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    geode::Point3D near_origin_point{ { 1.5 + geode::global_epsilon / 2,
-        geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
+    geode::Point3D near_origin_point{ { 1.5 + geode::GLOBAL_EPSILON / 2,
+        geode::GLOBAL_EPSILON / 2, 1 - geode::GLOBAL_EPSILON / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( near_origin_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -261,8 +261,8 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         result.size() == 1
             && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } ),
         "[Test] Wrong query result for point near origin." );
-    geode::Point3D grid_furthest_point{ { -18.5 - geode::global_epsilon / 2,
-        -45 - geode::global_epsilon / 2, 6 + geode::global_epsilon / 2 } };
+    geode::Point3D grid_furthest_point{ { -18.5 - geode::GLOBAL_EPSILON / 2,
+        -45 - geode::GLOBAL_EPSILON / 2, 6 + geode::GLOBAL_EPSILON / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( grid_furthest_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -399,7 +399,7 @@ void test_clone( const geode::RegularGrid3D& grid )
     }
 }
 
-void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
+void test_io( const geode::RegularGrid3D& grid, std::string_view filename )
 {
     geode::save_regular_grid( grid, filename );
     const auto reload = geode::load_regular_grid< 3 >( filename );
@@ -420,7 +420,7 @@ void test_adjacencies2D()
 {
     auto grid = geode::RegularGrid2D::create();
     auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 10, 10 }, 1 );
     for( const auto p : geode::Range{ grid->nb_polygons() } )
     {
         for( const auto ee : geode::LRange{ grid->nb_polygon_edges( p ) } )
@@ -495,15 +495,15 @@ void test()
 
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 },
+    builder->initialize_grid( geode::Point3D{ { 1.5, 0, 1 } }, { 5, 10, 15 },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
 
     auto grid_v12 = geode::load_regular_grid< 3 >(
-        absl::StrCat( geode::data_path, "test_v12.og_rgd3d" ) );
+        absl::StrCat( geode::DATA_PATH, "test_v12.og_rgd3d" ) );
     auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
-    builder_v12->update_origin_and_directions( { { 1.5, 0, 1 } },
+    builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid_v12 );

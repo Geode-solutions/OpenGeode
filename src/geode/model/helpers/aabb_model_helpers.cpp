@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/model/helpers/aabb_model_helpers.h>
+#include <geode/model/helpers/aabb_model_helpers.hpp>
 
 #include <async++.h>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/bounding_box.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
-#include <geode/mesh/helpers/aabb_solid_helpers.h>
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.hpp>
+#include <geode/mesh/helpers/aabb_solid_helpers.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {

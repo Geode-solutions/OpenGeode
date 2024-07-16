@@ -21,25 +21,25 @@
  *
  */
 
-#include <geode/model/mixin/core/relationships.h>
+#include <geode/model/mixin/core/relationships.hpp>
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
+#include <geode/geometry/bitsery_archive.hpp>
 
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/geode/geode_graph.h>
-#include <geode/mesh/io/graph_input.h>
-#include <geode/mesh/io/graph_output.h>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
+#include <geode/mesh/io/graph_input.hpp>
+#include <geode/mesh/io/graph_output.hpp>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
-#include <geode/model/mixin/core/detail/count_relationships.h>
-#include <geode/model/mixin/core/detail/relationships_impl.h>
+#include <geode/model/mixin/core/bitsery_archive.hpp>
+#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/detail/relationships_impl.hpp>
 
 namespace geode
 {
@@ -83,7 +83,7 @@ namespace geode
             return relation_type_->value( edge_id ) == ITEM_RELATION;
         }
 
-        absl::optional< index_t > check_relation_exists(
+        std::optional< index_t > check_relation_exists(
             const uuid& from, const uuid& to, const RelationType type ) const
         {
             if( const auto edge_id = relation_edge_index( from, to ) )
@@ -93,7 +93,7 @@ namespace geode
                     return edge_id;
                 }
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         bool is_boundary( const uuid& from, const uuid& to ) const
@@ -162,7 +162,7 @@ namespace geode
             initialize_relation_attribute();
         }
 
-        void save( absl::string_view directory ) const
+        void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
@@ -176,7 +176,7 @@ namespace geode
                 "[Relationships::save] Error while writing file: ", filename );
         }
 
-        void load( absl::string_view directory )
+        void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
@@ -409,7 +409,7 @@ namespace geode
         return impl_->is_item( item, collection );
     }
 
-    void Relationships::save_relationships( absl::string_view directory ) const
+    void Relationships::save_relationships( std::string_view directory ) const
     {
         impl_->save( directory );
     }
@@ -422,7 +422,7 @@ namespace geode
     }
 
     void Relationships::load_relationships(
-        absl::string_view directory, RelationshipsBuilderKey )
+        std::string_view directory, RelationshipsBuilderKey )
     {
         return impl_->load( directory );
     }
@@ -432,7 +432,7 @@ namespace geode
         return impl_->relation_attribute_manager();
     }
 
-    absl::optional< index_t > Relationships::relation_index(
+    std::optional< index_t > Relationships::relation_index(
         const uuid& component_id1, const uuid& component_id2 ) const
     {
         return impl_->relation_edge_index( component_id1, component_id2 );

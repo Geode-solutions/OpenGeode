@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 
 namespace geode
 {

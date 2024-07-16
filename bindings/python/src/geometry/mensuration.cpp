@@ -21,11 +21,11 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/mensuration.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/mensuration.hpp>
 
 #define PYTHON_MENSURATION( dimension )                                        \
     const auto triangle_area##dimension =                                      \

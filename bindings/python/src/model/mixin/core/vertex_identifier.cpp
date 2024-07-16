@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
 
 namespace geode
 {
@@ -35,14 +35,6 @@ namespace geode
             .def( "component_mesh_vertices",
                 static_cast< const std::vector< ComponentMeshVertex >& (
                     VertexIdentifier::*) ( index_t ) const >(
-                    &VertexIdentifier::component_mesh_vertices ) )
-            .def( "filtered_component_mesh_vertices_by_type",
-                static_cast< std::vector< ComponentMeshVertex > (
-                    VertexIdentifier::* )( index_t, const ComponentType& )
-                        const >( &VertexIdentifier::component_mesh_vertices ) )
-            .def( "filtered_component_mesh_vertices_by_id",
-                static_cast< std::vector< index_t > ( VertexIdentifier::* )(
-                    index_t, const uuid& ) const >(
                     &VertexIdentifier::component_mesh_vertices ) )
             .def( "unique_vertex", &VertexIdentifier::unique_vertex );
 

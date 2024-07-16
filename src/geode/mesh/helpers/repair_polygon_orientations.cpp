@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/mesh/helpers/repair_polygon_orientations.h>
+#include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
 #include <queue>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/sign.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/sign.hpp>
 
-#include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
 {
@@ -276,7 +276,7 @@ namespace
         {
             absl::FixedArray< geode::index_t > vertices(
                 mesh.nb_polygon_vertices( p ) );
-            absl::FixedArray< absl::optional< geode::index_t > > adjacents(
+            absl::FixedArray< std::optional< geode::index_t > > adjacents(
                 mesh.nb_polygon_edges( p ) );
             for( const auto v : geode::LRange{ mesh.nb_polygon_vertices( p ) } )
             {

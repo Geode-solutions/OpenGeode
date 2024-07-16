@@ -21,39 +21,39 @@
  *
  */
 
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 #include <algorithm>
 #include <stack>
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/cached_value.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/cached_value.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/mensuration.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/mensuration.hpp>
 
-#include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/detail/facet_storage.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/private/surface_mesh_impl.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture_storage.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/detail/facet_storage.hpp>
+#include <geode/mesh/core/internal/surface_mesh_impl.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture_storage.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
 namespace
 {
@@ -124,10 +124,10 @@ namespace
     }
 
     template < geode::index_t dimension >
-    geode::detail::PolygonsAroundVertexImpl compute_polygons_around_vertex(
+    geode::internal::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
         const geode::index_t& vertex_id,
-        const absl::optional< geode::PolygonVertex >& first_polygon )
+        const std::optional< geode::PolygonVertex >& first_polygon )
     {
         if( !first_polygon )
         {
@@ -139,37 +139,64 @@ namespace
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
-        geode::detail::PolygonsAroundVertexImpl result;
-        auto cur_polygon_edge = first_polygon;
+        geode::internal::PolygonsAroundVertexImpl result;
+        auto cur_polygon_vertex = first_polygon;
         do
         {
             OPENGEODE_ASSERT(
-                mesh.polygon_vertex( cur_polygon_edge.value() ) == vertex_id,
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex" );
-            result.polygons.push_back( cur_polygon_edge.value() );
-            const auto prev_edge =
-                mesh.previous_polygon_edge( cur_polygon_edge.value() );
-            cur_polygon_edge = mesh.polygon_adjacent_edge( prev_edge );
+            result.polygons.push_back( cur_polygon_vertex.value() );
+            const auto prev_vertex =
+                mesh.previous_polygon_vertex( cur_polygon_vertex.value() );
+            auto adj_edge =
+                mesh.polygon_adjacent_edge( geode::PolygonEdge{ prev_vertex } );
             safety_count++;
-        } while( cur_polygon_edge && cur_polygon_edge != first_polygon
+            if( adj_edge )
+            {
+                cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
+            }
+            else
+            {
+                cur_polygon_vertex = std::nullopt;
+                break;
+            }
+        } while( cur_polygon_vertex != first_polygon
                  && safety_count < MAX_SAFETY_COUNT );
 
-        result.vertex_is_on_border = cur_polygon_edge != first_polygon;
+        result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
         {
-            cur_polygon_edge =
-                mesh.polygon_adjacent_edge( first_polygon.value() );
-            while( cur_polygon_edge && safety_count < MAX_SAFETY_COUNT )
+            auto adj_edge = mesh.polygon_adjacent_edge(
+                geode::PolygonEdge{ first_polygon.value() } );
+            if( adj_edge )
             {
-                const auto next_edge =
-                    mesh.next_polygon_edge( cur_polygon_edge.value() );
-                OPENGEODE_ASSERT( mesh.polygon_vertex( next_edge ) == vertex_id,
+                cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
+            }
+            else
+            {
+                cur_polygon_vertex = std::nullopt;
+            }
+            while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
+            {
+                const geode::PolygonVertex next_vertex{ mesh.next_polygon_edge(
+                    geode::PolygonEdge{ cur_polygon_vertex.value() } ) };
+                OPENGEODE_ASSERT(
+                    mesh.polygon_vertex( next_vertex ) == vertex_id,
                     "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                     "around vertex" );
-                result.polygons.push_back( next_edge );
-                cur_polygon_edge = mesh.polygon_adjacent_edge( next_edge );
+                result.polygons.push_back( next_vertex );
                 safety_count++;
+                adj_edge = mesh.polygon_adjacent_edge(
+                    geode::PolygonEdge{ next_vertex } );
+                if( adj_edge )
+                {
+                    cur_polygon_vertex =
+                        geode::PolygonVertex{ adj_edge.value() };
+                    continue;
+                }
+                cur_polygon_vertex = std::nullopt;
             }
         }
         if( safety_count >= MAX_SAFETY_COUNT )
@@ -188,13 +215,13 @@ namespace
 
 namespace geode
 {
-    PolygonVertex::PolygonVertex( PolygonEdge polygon_edge )
+    PolygonVertex::PolygonVertex( const PolygonEdge& polygon_edge )
         : polygon_id( polygon_edge.polygon_id ),
           vertex_id( polygon_edge.edge_id )
     {
     }
 
-    PolygonEdge::PolygonEdge( PolygonVertex polygon_vertex )
+    PolygonEdge::PolygonEdge( const PolygonVertex& polygon_vertex )
         : polygon_id( polygon_vertex.polygon_id ),
           edge_id( polygon_vertex.vertex_id )
     {
@@ -238,8 +265,10 @@ namespace geode
     class SurfaceMesh< dimension >::Impl
     {
         friend class bitsery::Access;
-        using CachedPolygons = CachedValue< detail::PolygonsAroundVertexImpl >;
-        static constexpr auto polygons_around_vertex_name =
+        using CachedPolygons =
+            CachedValue< internal::PolygonsAroundVertexImpl >;
+        static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
+
             "polygons_around_vertex";
 
     public:
@@ -253,7 +282,7 @@ namespace geode
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
-                          polygons_around_vertex_name, CachedPolygons{} ) )
+                          POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
         {
         }
 
@@ -280,7 +309,7 @@ namespace geode
             return result;
         }
 
-        absl::optional< PolygonVertex > polygon_around_vertex(
+        std::optional< PolygonVertex > polygon_around_vertex(
             const index_t vertex_id ) const
         {
             const auto& value = polygon_around_vertex_->value( vertex_id );
@@ -288,7 +317,7 @@ namespace geode
             {
                 return value;
             }
-            return absl::nullopt;
+            return std::nullopt;
         }
 
         void reset_polygons_around_vertex( index_t vertex_id )
@@ -302,7 +331,7 @@ namespace geode
         const PolygonsAroundVertex& polygons_around_vertex(
             const SurfaceMesh< dimension >& mesh,
             index_t vertex_id,
-            const absl::optional< PolygonVertex >& first_polygon ) const
+            const std::optional< PolygonVertex >& first_polygon ) const
         {
             return updated_polygons_around_vertex(
                 mesh, vertex_id, first_polygon )
@@ -311,7 +340,7 @@ namespace geode
 
         bool is_vertex_on_border( const SurfaceMesh< dimension >& mesh,
             index_t vertex_id,
-            const absl::optional< PolygonVertex >& first_polygon ) const
+            const std::optional< PolygonVertex >& first_polygon ) const
         {
             return updated_polygons_around_vertex(
                 mesh, vertex_id, first_polygon )
@@ -385,7 +414,7 @@ namespace geode
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolygons >(
-                        polygons_around_vertex_name, CachedPolygons{} );
+                        POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} );
         }
 
     private:
@@ -421,10 +450,11 @@ namespace geode
                         } } } );
         }
 
-        const detail::PolygonsAroundVertexImpl& updated_polygons_around_vertex(
-            const SurfaceMesh< dimension >& mesh,
-            const index_t vertex_id,
-            const absl::optional< PolygonVertex >& first_polygon ) const
+        const internal::PolygonsAroundVertexImpl&
+            updated_polygons_around_vertex(
+                const SurfaceMesh< dimension >& mesh,
+                const index_t vertex_id,
+                const std::optional< PolygonVertex >& first_polygon ) const
         {
             const auto& cached = polygons_around_vertex_->value( vertex_id );
             const auto& polygons = cached.value().polygons;
@@ -503,7 +533,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< local_index_t > SurfaceMesh< dimension >::vertex_in_polygon(
+    std::optional< local_index_t > SurfaceMesh< dimension >::vertex_in_polygon(
         index_t polygon_id, index_t vertex_id ) const
     {
         for( const auto v : LRange{ nb_polygon_vertices( polygon_id ) } )
@@ -514,7 +544,7 @@ namespace geode
                 return v;
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < index_t dimension >
@@ -525,7 +555,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< PolygonVertex >
+    std::optional< PolygonVertex >
         SurfaceMesh< dimension >::polygon_around_vertex(
             index_t vertex_id ) const
     {
@@ -534,7 +564,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< PolygonVertex >
+    std::optional< PolygonVertex >
         SurfaceMesh< dimension >::get_polygon_around_vertex(
             index_t vertex_id ) const
     {
@@ -621,7 +651,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SurfaceMesh< dimension >::polygon_adjacent(
+    std::optional< index_t > SurfaceMesh< dimension >::polygon_adjacent(
         const PolygonEdge& polygon_edge ) const
     {
         check_polygon_id( *this, polygon_edge.polygon_id );
@@ -631,17 +661,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< PolygonEdge >
+    std::optional< PolygonEdge >
         SurfaceMesh< dimension >::polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const
     {
         const auto polygon_adj = polygon_adjacent( polygon_edge );
         if( !polygon_adj )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto polygon_adj_id = polygon_adj.value();
-        const auto v0 = polygon_vertex( polygon_edge );
+        const auto v0 = polygon_vertex( PolygonVertex{ polygon_edge } );
         const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
         const auto adj_vertices = polygon_vertices( polygon_adj_id );
         const auto nb_edges = adj_vertices.size();
@@ -663,7 +693,7 @@ namespace geode
                             polygon_edge.polygon_id, " and ", polygon_adj_id,
                             " (v0 = ", this->point( v0 ).string(),
                             ", v1 = ", this->point( v1 ).string(), ")" ) );
-                    return absl::optional< PolygonEdge >{ absl::in_place,
+                    return std::optional< PolygonEdge >{ std::in_place,
                         polygon_adj_id, e };
                 }
             }
@@ -683,7 +713,7 @@ namespace geode
                             polygon_edge.polygon_id, " and ", polygon_adj_id,
                             " (v0 = ", this->point( v0 ).string(),
                             ", v1 = ", this->point( v1 ).string(), ")" ) );
-                    return absl::optional< PolygonEdge >{ absl::in_place,
+                    return std::optional< PolygonEdge >{ std::in_place,
                         polygon_adj_id, e };
                 }
             }
@@ -695,7 +725,7 @@ namespace geode
             " (v0 = ", this->point( v0 ).string(),
             ", v1 = ", this->point( v1 ).string(), ")"
         };
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < index_t dimension >
@@ -803,14 +833,14 @@ namespace geode
         const auto nb_vertices = nb_polygon_vertices( polygon );
         const local_index_t vertex =
             edge + vertex_id == nb_vertices ? 0 : edge + vertex_id;
-        return polygon_vertex( { polygon, vertex } );
+        return polygon_vertex( PolygonVertex{ polygon, vertex } );
     }
 
     template < index_t dimension >
     std::array< index_t, 2 > SurfaceMesh< dimension >::polygon_edge_vertices(
         const PolygonEdge& polygon_edge ) const
     {
-        return { polygon_vertex( polygon_edge ),
+        return { polygon_vertex( PolygonVertex{ polygon_edge } ),
             polygon_edge_vertex( polygon_edge, 1 ) };
     }
 
@@ -858,19 +888,20 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< PolygonEdge >
+    std::optional< PolygonEdge >
         SurfaceMesh< dimension >::polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const
     {
-        for( auto&& polygon_vertex : polygons_around_vertex( from_vertex_id ) )
+        for( const auto& polygon_vertex :
+            polygons_around_vertex( from_vertex_id ) )
         {
             const auto next_vertex = next_polygon_vertex( polygon_vertex );
             if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
-                return polygon_vertex;
+                return PolygonEdge{ polygon_vertex };
             }
         }
-        return absl::nullopt;
+        return std::nullopt;
     }
 
     template < index_t dimension >
@@ -1029,7 +1060,7 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
         SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
@@ -1052,13 +1083,13 @@ namespace geode
         }
         catch( const OpenGeodeException& /*unused*/ )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
     }
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
         SurfaceMesh< dimension >::polygon_vertex_normal(
             index_t vertex_id ) const
     {
@@ -1076,7 +1107,7 @@ namespace geode
         }
         catch( const OpenGeodeException& /*unused*/ )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
     }
 
@@ -1095,7 +1126,7 @@ namespace geode
                 max_length_edge = e;
             }
         }
-        if( max_length < global_epsilon )
+        if( max_length < GLOBAL_EPSILON )
         {
             return true;
         }
@@ -1114,7 +1145,7 @@ namespace geode
                 continue;
             }
             if( point_line_distance( this->point( vertices[v] ), line )
-                > global_epsilon )
+                > GLOBAL_EPSILON )
             {
                 return false;
             }
@@ -1142,9 +1173,9 @@ namespace geode
     template class opengeode_mesh_api SurfaceMesh< 2 >;
     template class opengeode_mesh_api SurfaceMesh< 3 >;
 
-    template opengeode_mesh_api absl::optional< Vector3D >
+    template opengeode_mesh_api std::optional< Vector3D >
         SurfaceMesh< 3 >::polygon_normal< 3 >( index_t ) const;
-    template opengeode_mesh_api absl::optional< Vector3D >
+    template opengeode_mesh_api std::optional< Vector3D >
         SurfaceMesh< 3 >::polygon_vertex_normal< 3 >( index_t ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolygonVertex );

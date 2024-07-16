@@ -21,24 +21,26 @@
  *
  */
 
-#include <geode/geometry/distance.h>
+#include <optional>
+
+#include <geode/geometry/distance.hpp>
 
 #include <absl/algorithm/container.h>
 
-#include <geode/geometry/barycentric_coordinates.h>
-#include <geode/geometry/basic_objects/circle.h>
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/perpendicular.h>
-#include <geode/geometry/projection.h>
-#include <geode/geometry/sign.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/barycentric_coordinates.hpp>
+#include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/sphere.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/perpendicular.hpp>
+#include <geode/geometry/projection.hpp>
+#include <geode/geometry/sign.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {
@@ -64,23 +66,23 @@ namespace
                     && signed_area_3 >= 0 );
     }
 
-    absl::optional< double > compute_point_line_distance( double segment_length,
+    std::optional< double > compute_point_line_distance( double segment_length,
         double point_to_v0_length,
         double point_to_v1_length )
     {
         const auto p =
             ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
-        if( p - point_to_v0_length <= geode::global_epsilon )
+        if( p - point_to_v0_length <= geode::GLOBAL_EPSILON )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
-        if( p - point_to_v1_length <= geode::global_epsilon )
+        if( p - point_to_v1_length <= geode::GLOBAL_EPSILON )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
-        if( p - segment_length <= geode::global_epsilon )
+        if( p - segment_length <= geode::GLOBAL_EPSILON )
         {
-            return absl::nullopt;
+            return std::nullopt;
         }
         const auto area2 = p * ( p - point_to_v0_length )
                            * ( p - point_to_v1_length )
@@ -361,7 +363,7 @@ namespace geode
         const auto length = segment.length();
         const auto length0 =
             point_point_distance( segment.vertices()[0].get(), point );
-        if( length <= global_epsilon )
+        if( length <= GLOBAL_EPSILON )
         {
             return length0;
         }
@@ -627,21 +629,21 @@ namespace geode
             segment1.vertices()[0].get() + Q1mQ0 * t;
         const auto distance =
             point_point_distance( closest_on_segment0, closest_on_segment1 );
-        if( distance < global_epsilon )
+        if( distance < GLOBAL_EPSILON )
         {
             return std::make_tuple(
                 distance, closest_on_segment0, closest_on_segment1 );
         }
         const auto distance_to_closest0 =
             point_segment_distance( closest_on_segment0, segment1 );
-        if( distance_to_closest0 < global_epsilon )
+        if( distance_to_closest0 < GLOBAL_EPSILON )
         {
             return std::make_tuple( distance_to_closest0, closest_on_segment0,
                 point_segment_projection( closest_on_segment0, segment1 ) );
         }
         const auto distance_to_closest1 =
             point_segment_distance( closest_on_segment1, segment0 );
-        if( distance_to_closest1 < global_epsilon )
+        if( distance_to_closest1 < GLOBAL_EPSILON )
         {
             return std::make_tuple( distance_to_closest1,
                 point_segment_projection( closest_on_segment1, segment0 ),
@@ -989,7 +991,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < global_epsilon )
+        if( center_to_point.length() < GLOBAL_EPSILON )
         {
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
@@ -1006,7 +1008,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < global_epsilon )
+        if( center_to_point.length() < GLOBAL_EPSILON )
         {
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
@@ -1040,7 +1042,7 @@ namespace geode
             point - circle.plane().normal() * distance_to_plane;
         const Vector3D center_to_projected_point{ circle.plane().origin(),
             projected_on_plane };
-        if( center_to_projected_point.length() < global_epsilon )
+        if( center_to_projected_point.length() < GLOBAL_EPSILON )
         {
             Vector3D other_direction{ { 1.0, 0.0, 0.0 } };
             if( circle.plane().normal().inexact_equal( other_direction )
@@ -1078,7 +1080,7 @@ namespace geode
         Point3D nearest_point;
         std::tie( distance, nearest_point ) =
             point_circle_distance( point, circle );
-        if( circle.plane().normal().dot( point ) < 0 )
+        if( circle.plane().normal().dot( Vector3D{ point } ) < 0 )
         {
             distance = -distance;
         }

@@ -21,27 +21,27 @@
  *
  */
 
-#include <geode/mesh/core/texture1d.h>
+#include <geode/mesh/core/texture1d.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/image/core/raster_image.h>
+#include <geode/image/core/raster_image.hpp>
 
-#include <geode/mesh/core/private/texture_impl.h>
+#include <geode/mesh/core/internal/texture_impl.hpp>
 
 namespace geode
 {
-    class Texture< 1 >::Impl : public detail::TextureImpl< 1 >
+    class Texture< 1 >::Impl : public internal::TextureImpl< 1 >
     {
         friend class bitsery::Access;
 
     public:
         Impl() = default;
-        Impl( AttributeManager& manager, absl::string_view name )
-            : detail::TextureImpl< 1 >{ manager, name }
+        Impl( AttributeManager& manager, std::string_view name )
+            : internal::TextureImpl< 1 >{ manager, name }
         {
         }
 
@@ -61,15 +61,15 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< detail::TextureImpl< 1 > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass< internal::TextureImpl< 1 > >{} );
+            } } } );
         }
     };
 
-    Texture< 1 >::Texture( AttributeManager& manager, absl::string_view name )
+    Texture< 1 >::Texture( AttributeManager& manager, std::string_view name )
         : impl_{ manager, name }
     {
     }

@@ -21,32 +21,33 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_edged_curve.h>
+#include <geode/mesh/core/geode/geode_edged_curve.hpp>
 
 #include <array>
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/private/edges_impl.h>
-#include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/internal/edges_impl.hpp>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodeEdgedCurve< dimension >::Impl
-        : public detail::EdgesImpl,
-          public detail::PointsImpl< dimension >
+        : public internal::EdgesImpl,
+          public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeEdgedCurve< dimension >& mesh )
-            : detail::EdgesImpl( mesh ), detail::PointsImpl< dimension >( mesh )
+            : internal::EdgesImpl( mesh ),
+              internal::PointsImpl< dimension >( mesh )
         {
         }
 
@@ -58,10 +59,10 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext(
-                        impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
+                    a.ext( impl,
+                        bitsery::ext::BaseClass< internal::EdgesImpl >{} );
                     a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
+                                     internal::PointsImpl< dimension > >{} );
                 } } } );
         }
     };

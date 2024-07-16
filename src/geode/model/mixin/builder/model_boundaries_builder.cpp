@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/model/mixin/builder/model_boundaries_builder.h>
+#include <geode/model/mixin/builder/model_boundaries_builder.hpp>
 
-#include <geode/model/mixin/core/model_boundaries.h>
-#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/model_boundaries.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
 
 namespace geode
 {
@@ -51,14 +51,14 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::load_model_boundaries(
-        absl::string_view directory )
+        std::string_view directory )
     {
         return model_boundaries_.load_model_boundaries( directory, {} );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::set_model_boundary_name(
-        const uuid& id, absl::string_view name )
+        const uuid& id, std::string_view name )
     {
         model_boundaries_.modifiable_model_boundary( id, {} )
             .set_model_boundary_name( name, {} );

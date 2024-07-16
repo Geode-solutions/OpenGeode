@@ -21,22 +21,21 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/cell_array.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/cell_array.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 #define PYTHON_GRID( dimension )                                               \
     const auto name##dimension = "Grid" + std::to_string( dimension ) + "D";   \
     pybind11::class_< Grid##dimension##D, CellArray##dimension##D >(           \
         module, name##dimension.c_str() )                                      \
-        .def( "origin", &Grid##dimension##D::origin )                          \
         .def( "grid_coordinate_system",                                        \
             &Grid##dimension##D::grid_coordinate_system )                      \
         .def( "nb_cell_vertices", &Grid##dimension##D::nb_cell_vertices )      \
