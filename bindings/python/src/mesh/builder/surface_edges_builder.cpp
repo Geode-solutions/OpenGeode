@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/builder/surface_edges_builder.hpp>
 

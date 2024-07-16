@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/builder/hybrid_solid_builder.hpp>

@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/builder/polyhedral_solid_builder.hpp>
 

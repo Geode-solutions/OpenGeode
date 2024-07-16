@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/core/texture1d.hpp>
 #include <geode/mesh/core/texture2d.hpp>

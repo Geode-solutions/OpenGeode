@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/model/helpers/model_component_filter.hpp>
 #include <geode/model/representation/core/brep.hpp>

@@ -21,7 +21,7 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>

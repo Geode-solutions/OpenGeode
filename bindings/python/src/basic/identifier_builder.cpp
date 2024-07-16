@@ -21,7 +21,7 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
 #include <geode/basic/identifier.hpp>
 #include <geode/basic/identifier_builder.hpp>

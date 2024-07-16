@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/blocks.hpp>

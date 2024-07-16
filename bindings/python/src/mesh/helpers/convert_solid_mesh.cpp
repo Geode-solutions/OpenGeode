@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>

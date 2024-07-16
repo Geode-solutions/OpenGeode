@@ -21,7 +21,7 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 #include <pybind11/iostream.h>
 
 #include <geode/basic/library.hpp>

@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/cell_array.hpp>

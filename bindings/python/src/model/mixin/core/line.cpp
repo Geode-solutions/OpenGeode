@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
 #include <geode/mesh/core/edged_curve.hpp>
 

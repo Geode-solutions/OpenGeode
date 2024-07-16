@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/builder/vertex_set_builder.hpp>
 #include <geode/mesh/core/vertex_set.hpp>

@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/core/coordinate_reference_system.hpp>
 #include <geode/mesh/core/coordinate_reference_system_manager.hpp>

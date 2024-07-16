@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/image/core/raster_image.hpp>
 #include <geode/image/core/rgb_color.hpp>

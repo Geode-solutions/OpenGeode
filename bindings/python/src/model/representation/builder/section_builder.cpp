@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>

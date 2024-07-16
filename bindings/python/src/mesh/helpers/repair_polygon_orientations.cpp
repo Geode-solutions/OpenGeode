@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/repair_polygon_orientations.hpp>

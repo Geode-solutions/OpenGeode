@@ -23,10 +23,10 @@
 
 #include <string>
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
 
 #include <geode/image/core/raster_image.hpp>
 #include <geode/image/io/raster_image_input.hpp>

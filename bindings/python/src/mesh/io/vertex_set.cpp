@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
 #include <geode/mesh/core/vertex_set.hpp>
 #include <geode/mesh/io/vertex_set_input.hpp>

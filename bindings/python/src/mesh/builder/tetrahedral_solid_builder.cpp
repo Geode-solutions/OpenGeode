@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>

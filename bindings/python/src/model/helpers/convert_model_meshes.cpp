@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/model/helpers/convert_model_meshes.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>

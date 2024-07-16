@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>

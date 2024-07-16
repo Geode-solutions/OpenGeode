@@ -21,7 +21,7 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/bounding_box.hpp>

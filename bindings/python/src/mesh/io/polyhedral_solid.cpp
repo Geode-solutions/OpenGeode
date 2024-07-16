@@ -23,9 +23,9 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
 #include <geode/mesh/core/polyhedral_solid.hpp>
 #include <geode/mesh/io/polyhedral_solid_input.hpp>
