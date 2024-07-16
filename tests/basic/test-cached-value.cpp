@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/basic/cached_value.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/cached_value.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 geode::index_t nb_computed{ 0 };
 

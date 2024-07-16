@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/io/graph_input.h>
+#include <geode/mesh/io/graph_input.hpp>
 
 #include <string_view>
 
-#include <geode/basic/detail/geode_input_impl.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/graph.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/graph.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/io/vertex_set_input.hpp>
 
 namespace geode
 {

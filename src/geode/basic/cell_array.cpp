@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/basic/cell_array.h>
+#include <geode/basic/cell_array.hpp>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

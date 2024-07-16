@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/model/mixin/builder/line_collections_builder.h>
+#include <geode/model/mixin/builder/line_collections_builder.hpp>
 
-#include <geode/model/mixin/core/line_collection.h>
-#include <geode/model/mixin/core/line_collections.h>
+#include <geode/model/mixin/core/line_collection.hpp>
+#include <geode/model/mixin/core/line_collections.hpp>
 
 namespace geode
 {

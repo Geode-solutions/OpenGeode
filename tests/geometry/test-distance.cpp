@@ -21,22 +21,22 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/geometry/basic_objects/circle.h>
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/projection.h>
+#include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/sphere.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/projection.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_point_segment_distance_2d()
 {

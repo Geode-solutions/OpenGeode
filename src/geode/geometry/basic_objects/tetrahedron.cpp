@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 namespace geode
 {

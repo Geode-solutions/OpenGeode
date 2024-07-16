@@ -27,17 +27,17 @@
  * Applications (ASGA)
  */
 
-#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.hpp>
 
 #include <async++.h>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/projection.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/projection.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/edged_curve.hpp>
 
 namespace geode
 {

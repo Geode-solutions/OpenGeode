@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/model/mixin/builder/model_boundaries_builder.h>
+#include <geode/model/mixin/builder/model_boundaries_builder.hpp>
 
-#include <geode/model/mixin/core/model_boundaries.h>
-#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/model_boundaries.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
 
 namespace geode
 {

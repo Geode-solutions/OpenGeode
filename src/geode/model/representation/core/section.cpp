@@ -21,26 +21,26 @@
  *
  */
 
-#include <geode/model/representation/core/section.h>
+#include <geode/model/representation/core/section.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
 
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/corner_collection.h>
-#include <geode/model/mixin/core/detail/count_relationships.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/line_collection.h>
-#include <geode/model/mixin/core/model_boundary.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surface_collection.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/detail/clone.h>
-#include <geode/model/representation/core/internal/helpers.h>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/detail/clone.hpp>
+#include <geode/model/representation/core/internal/helpers.hpp>
 
 namespace geode
 {

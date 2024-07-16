@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/model/representation/core/detail/clone.h>
+#include <geode/model/representation/core/detail/clone.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/block_collection.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/corner_collection.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/line_collection.h>
-#include <geode/model/mixin/core/model_boundary.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surface_collection.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/block_collection.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {

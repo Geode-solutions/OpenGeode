@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/surface_merger.h>
+#include <geode/mesh/helpers/detail/surface_merger.hpp>
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/repair_polygon_orientations.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
 namespace
 {

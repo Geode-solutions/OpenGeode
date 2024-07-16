@@ -25,11 +25,11 @@
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 struct Foo
 {

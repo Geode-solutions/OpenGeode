@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
 
 #include <algorithm>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 namespace geode
 {

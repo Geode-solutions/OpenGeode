@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/block_collection.h>
-#include <geode/model/mixin/core/block_collections.h>
+#include <geode/model/mixin/core/block_collection.hpp>
+#include <geode/model/mixin/core/block_collections.hpp>
 
 #define PYTHON_BLOCK_COLLECTIONS( dimension )                                  \
     const auto name##dimension =                                               \

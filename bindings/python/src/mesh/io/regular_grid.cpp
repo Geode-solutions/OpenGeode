@@ -23,14 +23,14 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/io/regular_grid_input.h>
-#include <geode/mesh/io/regular_grid_output.h>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 
 #define PYTHON_REGULAR_GRID_IO( dimension )                                    \
     const auto save##dimension =                                               \

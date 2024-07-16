@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {

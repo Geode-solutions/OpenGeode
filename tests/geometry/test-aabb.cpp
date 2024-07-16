@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>

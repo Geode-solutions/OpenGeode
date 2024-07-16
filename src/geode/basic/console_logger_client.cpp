@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/console_logger_client.h>
+#include <geode/basic/console_logger_client.hpp>
 
 // clang-format off
 #include <spdlog/spdlog.h>
@@ -29,8 +29,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 // clang-format on
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

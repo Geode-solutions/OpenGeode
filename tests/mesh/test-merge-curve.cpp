@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/helpers/convert_edged_curve.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/helpers/convert_edged_curve.hpp>
 
 std::vector< std::unique_ptr< geode::EdgedCurve2D > > create_curves()
 {

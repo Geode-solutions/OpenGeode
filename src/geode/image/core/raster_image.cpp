@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/image/core/raster_image.h>
+#include <geode/image/core/raster_image.hpp>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/internal/array_impl.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/internal/array_impl.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/rgb_color.hpp>
 
 namespace geode
 {

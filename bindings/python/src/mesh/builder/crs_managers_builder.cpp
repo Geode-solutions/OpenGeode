@@ -21,13 +21,13 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/coordinate_reference_system_manager_builder.h>
-#include <geode/mesh/builder/coordinate_reference_system_managers_builder.h>
-#include <geode/mesh/core/coordinate_reference_system_managers.h>
+#include <geode/mesh/builder/coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.hpp>
+#include <geode/mesh/core/coordinate_reference_system_managers.hpp>
 
 #define PYTHON_CRS_MANAGERS_BUILDER( dimension )                               \
     const auto name##dimension = "CoordinateReferenceSystemManagersBuilder"    \

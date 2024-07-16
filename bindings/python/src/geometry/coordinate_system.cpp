@@ -21,9 +21,9 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/coordinate_system.h>
+#include <geode/geometry/coordinate_system.hpp>
 
 #define PYTHON_COORDINATE_SYSTEM( dimension )                                  \
     const auto name##dimension =                                               \

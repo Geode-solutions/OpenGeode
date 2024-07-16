@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/helpers/internal/grid_shape_function.h>
+#include <geode/mesh/helpers/internal/grid_shape_function.hpp>
 
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/grid.hpp>
 
 namespace
 {

@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/geometry/square_matrix.h>
+#include <geode/geometry/square_matrix.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {

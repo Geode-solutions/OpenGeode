@@ -21,14 +21,14 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/projection.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/projection.hpp>
 
 #define PYTHON_PROJECTION( dimension )                                         \
     const auto point_segment_projection##dimension =                           \

@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/mesh/builder/surface_edges_builder.h>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
 
-#include <geode/mesh/core/surface_edges.h>
+#include <geode/mesh/core/surface_edges.hpp>
 
 namespace geode
 {

@@ -21,14 +21,14 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 
 #define PYTHON_REGULAR_GRID_BUILDER( Base, dimension )                         \
     const auto name##dimension =                                               \

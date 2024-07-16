@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/helpers/convert_solid_mesh.h>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
 
 void test()
 {

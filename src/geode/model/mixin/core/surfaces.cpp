@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/core/surfaces.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/polygonal_surface_input.h>
-#include <geode/mesh/io/polygonal_surface_output.h>
-#include <geode/mesh/io/triangulated_surface_input.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/polygonal_surface_input.hpp>
+#include <geode/mesh/io/polygonal_surface_output.hpp>
+#include <geode/mesh/io/triangulated_surface_input.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/surface.hpp>
 
 namespace geode
 {

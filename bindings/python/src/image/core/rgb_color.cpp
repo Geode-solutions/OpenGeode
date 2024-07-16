@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/image/core/rgb_color.h>
+#include <geode/image/core/rgb_color.hpp>
 
 namespace geode
 {

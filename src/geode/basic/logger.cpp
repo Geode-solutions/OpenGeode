@@ -20,11 +20,11 @@
  * SOFTWARE.
  *
  */
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 #include <iostream>
 
-#include <geode/basic/logger_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

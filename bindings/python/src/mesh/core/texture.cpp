@@ -21,15 +21,15 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/image/core/raster_image.h>
+#include <geode/image/core/raster_image.hpp>
 
-#include <geode/mesh/core/texture1d.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture3d.h>
+#include <geode/mesh/core/texture1d.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture3d.hpp>
 
 #define PYTHON_TEXTURE( dimension )                                            \
     const auto name##dimension =                                               \

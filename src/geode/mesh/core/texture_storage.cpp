@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/core/texture_storage.hpp>
 
 #include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/texture1d.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture3d.h>
+#include <geode/mesh/core/texture1d.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture3d.hpp>
 
 namespace geode
 {

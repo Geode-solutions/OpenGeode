@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/rotation.h>
+#include <geode/geometry/rotation.hpp>
 
 namespace
 {

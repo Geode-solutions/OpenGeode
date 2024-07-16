@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/mesh/helpers/repair_polygon_orientations.h>
+#include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
 #include <queue>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/sign.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/sign.hpp>
 
-#include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/surface_edges_builder.hpp>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
 {

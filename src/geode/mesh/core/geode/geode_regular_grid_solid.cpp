@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/core/internal/grid_impl.h>
-#include <geode/mesh/core/internal/points_impl.h>
-#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/core/internal/grid_impl.hpp>
+#include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 
 namespace
 {

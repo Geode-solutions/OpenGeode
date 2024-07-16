@@ -22,7 +22,7 @@
  */
 #include <stack>
 
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 #include <stack>
 
@@ -30,35 +30,35 @@
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/cached_value.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/cached_value.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/solid_edges_builder.h>
-#include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/internal/solid_mesh_impl.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/core/texture3d.h>
-#include <geode/mesh/core/texture_storage.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/builder/solid_edges_builder.hpp>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/internal/solid_mesh_impl.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/core/texture3d.hpp>
+#include <geode/mesh/core/texture_storage.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
 namespace
 {

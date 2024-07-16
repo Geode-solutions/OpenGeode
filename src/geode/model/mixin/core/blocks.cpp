@@ -21,27 +21,27 @@
  *
  */
 
-#include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/core/blocks.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/io/hybrid_solid_input.h>
-#include <geode/mesh/io/hybrid_solid_output.h>
-#include <geode/mesh/io/polyhedral_solid_input.h>
-#include <geode/mesh/io/polyhedral_solid_output.h>
-#include <geode/mesh/io/tetrahedral_solid_input.h>
-#include <geode/mesh/io/tetrahedral_solid_output.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/io/hybrid_solid_input.hpp>
+#include <geode/mesh/io/hybrid_solid_output.hpp>
+#include <geode/mesh/io/polyhedral_solid_input.hpp>
+#include <geode/mesh/io/polyhedral_solid_output.hpp>
+#include <geode/mesh/io/tetrahedral_solid_input.hpp>
+#include <geode/mesh/io/tetrahedral_solid_output.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
 
 namespace geode
 {

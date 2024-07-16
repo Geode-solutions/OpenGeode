@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/helpers/internal/copy.h>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 #include <async++.h>
 

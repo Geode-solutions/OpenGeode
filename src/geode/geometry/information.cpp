@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/information.h>
+#include <geode/geometry/information.hpp>
 
 #include <absl/container/flat_hash_map.h>
 

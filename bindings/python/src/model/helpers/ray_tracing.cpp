@@ -21,12 +21,12 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/representation/core/brep.hpp>
 
-#include <geode/model/helpers/ray_tracing.h>
+#include <geode/model/helpers/ray_tracing.hpp>
 
 namespace geode
 {

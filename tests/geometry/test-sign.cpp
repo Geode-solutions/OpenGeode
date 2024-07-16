@@ -21,15 +21,15 @@
  *
  */
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/sign.h>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/sign.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_triangle_sign_2d()
 {

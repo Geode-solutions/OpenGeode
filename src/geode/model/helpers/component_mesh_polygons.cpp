@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/model/helpers/component_mesh_polygons.h>
+#include <geode/model/helpers/component_mesh_polygons.hpp>
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/algorithm.h>
+#include <geode/basic/algorithm.hpp>
 
-#include <geode/mesh/core/detail/vertex_cycle.h>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
 
-#include <geode/model/helpers/component_mesh_edges.h>
-#include <geode/model/helpers/component_mesh_vertices.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/component_mesh_edges.hpp>
+#include <geode/model/helpers/component_mesh_vertices.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {

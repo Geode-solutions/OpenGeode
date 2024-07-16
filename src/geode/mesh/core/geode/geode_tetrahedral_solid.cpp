@@ -21,21 +21,21 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
 
 #include <array>
 #include <fstream>
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/detail/geode_elements.h>
-#include <geode/mesh/core/internal/points_impl.h>
+#include <geode/mesh/core/detail/geode_elements.hpp>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {

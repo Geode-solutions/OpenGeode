@@ -27,16 +27,16 @@
  * Applications (ASGA)
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.hpp>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < geode::index_t dimension >
 geode::Point< dimension > create_vertex( double i, double j )

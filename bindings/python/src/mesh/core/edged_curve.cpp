@@ -21,12 +21,12 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/bounding_box.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/edged_curve.hpp>
 
 #define PYTHON_EDGED_CURVE( dimension )                                        \
     const auto name##dimension =                                               \

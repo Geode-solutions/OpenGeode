@@ -21,9 +21,9 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/rotation.h>
+#include <geode/geometry/rotation.hpp>
 
 namespace geode
 {

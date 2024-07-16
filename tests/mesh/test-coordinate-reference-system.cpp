@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/coordinate_reference_system_manager_builder.h>
-#include <geode/mesh/core/attribute_coordinate_reference_system.h>
-#include <geode/mesh/core/coordinate_reference_system.h>
-#include <geode/mesh/core/coordinate_reference_system_manager.h>
+#include <geode/mesh/builder/coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system_manager.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {

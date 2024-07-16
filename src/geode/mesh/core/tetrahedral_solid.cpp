@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
 
 #include <array>
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.hpp>
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
 
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/core/detail/geode_elements.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/core/detail/geode_elements.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace
 {

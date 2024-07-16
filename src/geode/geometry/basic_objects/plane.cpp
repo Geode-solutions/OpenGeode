@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/basic_objects/plane.h>
+#include <geode/geometry/basic_objects/plane.hpp>
 
 namespace geode
 {

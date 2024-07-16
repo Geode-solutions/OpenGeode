@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
-#include <geode/mesh/helpers/generic_edged_curve_accessor.h>
-#include <geode/mesh/helpers/generic_solid_accessor.h>
-#include <geode/mesh/helpers/generic_surface_accessor.h>
+#include <geode/mesh/helpers/generic_edged_curve_accessor.hpp>
+#include <geode/mesh/helpers/generic_solid_accessor.hpp>
+#include <geode/mesh/helpers/generic_surface_accessor.hpp>
 
 std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
 {

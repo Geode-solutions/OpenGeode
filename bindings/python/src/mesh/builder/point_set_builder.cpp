@@ -21,12 +21,12 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
 
 #define PYTHON_POINT_SET_BUILDER( dimension )                                  \
     const auto name##dimension =                                               \

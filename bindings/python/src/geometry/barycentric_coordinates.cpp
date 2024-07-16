@@ -21,13 +21,13 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/barycentric_coordinates.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/barycentric_coordinates.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/point.hpp>
 
 #define PYTHON_BARYCENTRIC( dimension )                                        \
     const auto triangle_barycentric_coordinates##dimension =                   \

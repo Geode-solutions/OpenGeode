@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/geode/geode_tetrahedral_solid_builder.h>
-#include <geode/mesh/builder/solid_edges_builder.h>
-#include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/io/tetrahedral_solid_input.h>
-#include <geode/mesh/io/tetrahedral_solid_output.h>
+#include <geode/mesh/builder/geode/geode_tetrahedral_solid_builder.hpp>
+#include <geode/mesh/builder/solid_edges_builder.hpp>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/io/tetrahedral_solid_input.hpp>
+#include <geode/mesh/io/tetrahedral_solid_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )

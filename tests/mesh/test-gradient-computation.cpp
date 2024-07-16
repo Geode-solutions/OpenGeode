@@ -23,23 +23,23 @@
 
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/regular_grid_solid_builder.h>
-#include <geode/mesh/builder/regular_grid_surface_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/gradient_computation.h>
-#include <geode/mesh/io/regular_grid_output.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/gradient_computation.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test_gradient_grid2D()
 {

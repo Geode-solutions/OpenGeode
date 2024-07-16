@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polygonal_surface.hpp>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/builder/polygonal_surface_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {

@@ -21,16 +21,16 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 
-#include <geode/model/mixin/builder/blocks_builder.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/blocks.h>
+#include <geode/model/mixin/builder/blocks_builder.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/blocks.hpp>
 
 #define PYTHON_BLOCKS_BUILDER( dimension )                                     \
     const auto name##dimension =                                               \

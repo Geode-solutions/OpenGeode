@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/io/light_regular_grid_output.h>
+#include <geode/mesh/io/light_regular_grid_output.hpp>
 
 #include <fstream>
 #include <string>
@@ -30,11 +30,11 @@
 
 #include <absl/strings/str_cat.h>
 
-#include <geode/basic/detail/geode_output_impl.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/detail/geode_output_impl.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/core/light_regular_grid.hpp>
 
 namespace geode
 {

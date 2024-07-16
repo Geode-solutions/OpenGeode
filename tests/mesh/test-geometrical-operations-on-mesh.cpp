@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/geometrical_operations_on_mesh.h>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/geometrical_operations_on_mesh.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 std::unique_ptr< geode::TriangulatedSurface3D > create_surface()
 {

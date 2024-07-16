@@ -23,10 +23,10 @@
 
 #include <absl/strings/str_cat.h>
 
-#include <geode/basic/assert.h>
-#include <geode/basic/zip_file.h>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/zip_file.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 void test()
 {

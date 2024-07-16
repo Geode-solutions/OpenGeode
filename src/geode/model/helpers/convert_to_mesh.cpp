@@ -23,44 +23,44 @@
 
 #include <memory>
 
-#include <geode/model/helpers/convert_to_mesh.h>
+#include <geode/model/helpers/convert_to_mesh.hpp>
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/attribute.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/mapping.h>
-#include <geode/basic/range.h>
+#include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/mapping.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/solid_edges.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/detail/create_mesh.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/detail/create_mesh.hpp>
 
-#include <geode/model/helpers/component_mesh_edges.h>
-#include <geode/model/helpers/component_mesh_polygons.h>
-#include <geode/model/helpers/component_mesh_vertices.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/component_mesh_edges.hpp>
+#include <geode/model/helpers/component_mesh_polygons.hpp>
+#include <geode/model/helpers/component_mesh_vertices.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {

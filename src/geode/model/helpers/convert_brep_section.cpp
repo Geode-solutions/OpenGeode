@@ -21,31 +21,31 @@
  *
  */
 
-#include <geode/model/helpers/convert_brep_section.h>
+#include <geode/model/helpers/convert_brep_section.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/geode/geode_edged_curve_builder.h>
-#include <geode/mesh/builder/geode/geode_hybrid_solid_builder.h>
-#include <geode/mesh/builder/geode/geode_point_set_builder.h>
-#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.h>
-#include <geode/mesh/core/geode/geode_hybrid_solid.h>
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
-#include <geode/mesh/helpers/convert_edged_curve.h>
-#include <geode/mesh/helpers/convert_point_set.h>
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/builder/geode/geode_edged_curve_builder.hpp>
+#include <geode/mesh/builder/geode/geode_hybrid_solid_builder.hpp>
+#include <geode/mesh/builder/geode/geode_point_set_builder.hpp>
+#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.hpp>
+#include <geode/mesh/core/geode/geode_hybrid_solid.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/helpers/convert_edged_curve.hpp>
+#include <geode/mesh/helpers/convert_point_set.hpp>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-#include <geode/model/helpers/model_concatener.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/model_boundaries.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/vertex_identifier.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/detail/copy.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/model_concatener.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/model_boundaries.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/detail/copy.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {

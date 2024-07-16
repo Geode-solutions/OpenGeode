@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/uuid.h>
+#include <geode/basic/uuid.hpp>
 
 #include <iomanip>
 #include <sstream>

@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/model/mixin/core/block_collections.h>
+#include <geode/model/mixin/core/block_collections.hpp>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/model/mixin/core/block_collection.h>
-#include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/block_collection.hpp>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
 
 namespace geode
 {

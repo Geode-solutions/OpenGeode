@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/hybrid_solid.hpp>
 
 #define PYTHON_HYBRID_SOLID( dimension )                                       \
     const auto name##dimension =                                               \

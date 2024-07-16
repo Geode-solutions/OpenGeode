@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surfaces.hpp>
 
 #define PYTHON_SURFACES( dimension )                                           \
     const auto name##dimension =                                               \

@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/component_identifier.h>
+#include <geode/mesh/helpers/detail/component_identifier.hpp>
 
 #include <queue>
 
-#include <geode/basic/attribute.h>
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/generic_solid_accessor.h>
-#include <geode/mesh/helpers/generic_surface_accessor.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/generic_solid_accessor.hpp>
+#include <geode/mesh/helpers/generic_surface_accessor.hpp>
 
 namespace
 {

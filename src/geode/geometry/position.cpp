@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/geometry/position.h>
+#include <geode/geometry/position.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/internal/position_from_sides.h>
-#include <geode/geometry/internal/predicates.h>
-#include <geode/geometry/mensuration.h>
-#include <geode/geometry/perpendicular.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/internal/position_from_sides.hpp>
+#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/perpendicular.hpp>
 
 namespace geode
 {

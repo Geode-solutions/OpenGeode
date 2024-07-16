@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/internal/predicates.h>
+#include <geode/geometry/internal/predicates.hpp>
 
 /*
  *  Copyright (c) 2012-2014, Bruno Levy

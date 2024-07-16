@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/cylinder.h>
+#include <geode/geometry/basic_objects/cylinder.hpp>
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
 namespace geode
 {

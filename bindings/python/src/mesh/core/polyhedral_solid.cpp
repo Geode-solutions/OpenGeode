@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/polyhedral_solid.hpp>
 
 #define PYTHON_POLYHEDRAL_SOLID( dimension )                                   \
     const auto name##dimension =                                               \

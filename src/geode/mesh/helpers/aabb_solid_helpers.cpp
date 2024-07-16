@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/mesh/helpers/aabb_solid_helpers.h>
+#include <geode/mesh/helpers/aabb_solid_helpers.hpp>
 
 #include <async++.h>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/basic_objects/tetrahedron.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
 
 namespace geode
 {

@@ -21,10 +21,10 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/builder/vertex_set_builder.h>
-#include <geode/mesh/core/vertex_set.h>
+#include <geode/mesh/builder/vertex_set_builder.hpp>
+#include <geode/mesh/core/vertex_set.hpp>
 
 namespace geode
 {

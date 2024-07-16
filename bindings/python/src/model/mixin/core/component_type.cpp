@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/component_type.h>
+#include <geode/model/mixin/core/component_type.hpp>
 
 namespace geode
 {

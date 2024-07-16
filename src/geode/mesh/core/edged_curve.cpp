@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/edged_curve.hpp>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/texture1d.h>
-#include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/texture1d.hpp>
+#include <geode/mesh/core/texture_storage.hpp>
 
 namespace geode
 {

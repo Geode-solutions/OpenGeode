@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/nn_search.h>
+#include <geode/geometry/nn_search.hpp>
 
 #include <numeric>
 
@@ -31,8 +31,8 @@
 
 #include <nanoflann.hpp>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

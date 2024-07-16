@@ -21,12 +21,12 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/texture1d.h>
-#include <geode/mesh/core/texture2d.h>
-#include <geode/mesh/core/texture3d.h>
-#include <geode/mesh/core/texture_manager.h>
+#include <geode/mesh/core/texture1d.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture3d.hpp>
+#include <geode/mesh/core/texture_manager.hpp>
 
 #define PYTHON_TEXTURE_MANAGER( dimension )                                    \
     const auto name##dimension =                                               \

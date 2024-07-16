@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../../common.h"
+#include "../../../common.hpp"
 
-#include <geode/model/mixin/core/component.h>
+#include <geode/model/mixin/core/component.hpp>
 
 #define PYTHON_COMPONENT( dimension )                                          \
     const auto name##dimension =                                               \

@@ -21,9 +21,9 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polygonal_surface.hpp>
 
 #define PYTHON_POLYGONAL_SURFACE( dimension )                                  \
     const auto name##dimension =                                               \

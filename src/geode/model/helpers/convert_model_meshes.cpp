@@ -21,24 +21,24 @@
  *
  */
 
-#include <geode/model/helpers/convert_model_meshes.h>
+#include <geode/model/helpers/convert_model_meshes.hpp>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/convert_solid_mesh.h>
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/hybrid_solid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {

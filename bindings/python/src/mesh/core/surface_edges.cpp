@@ -21,11 +21,11 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/mesh/core/surface_edges.h>
+#include <geode/mesh/core/surface_edges.hpp>
 
 #define PYTHON_SURFACE_EDGES( dimension )                                      \
     const auto name##dimension =                                               \

@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/mesh/builder/coordinate_reference_system_manager_builder.h>
+#include <geode/mesh/builder/coordinate_reference_system_manager_builder.hpp>
 
-#include <geode/mesh/core/coordinate_reference_system_manager.h>
+#include <geode/mesh/core/coordinate_reference_system_manager.hpp>
 
 namespace geode
 {

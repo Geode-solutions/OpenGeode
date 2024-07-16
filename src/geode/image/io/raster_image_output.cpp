@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/image/io/raster_image_output.h>
+#include <geode/image/io/raster_image_output.hpp>
 
 #include <string>
 #include <string_view>
@@ -29,9 +29,9 @@
 
 #include <absl/strings/str_cat.h>
 
-#include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/detail/geode_output_impl.hpp>
 
-#include <geode/image/core/raster_image.h>
+#include <geode/image/core/raster_image.hpp>
 
 namespace geode
 {

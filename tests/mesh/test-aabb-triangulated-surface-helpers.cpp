@@ -27,17 +27,17 @@
  * Applications (ASGA)
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < geode::index_t dimension >
 geode::Point< dimension > create_vertex( double i, double j )

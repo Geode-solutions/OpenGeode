@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
 #include <algorithm>
 
@@ -29,8 +29,8 @@
 
 #include <bitsery/traits/string.h>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

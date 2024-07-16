@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/mesh/helpers/ray_tracing.h>
+#include <geode/mesh/helpers/ray_tracing.hpp>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/information.h>
-#include <geode/geometry/intersection.h>
-#include <geode/geometry/intersection_detection.h>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/intersection.hpp>
+#include <geode/geometry/intersection_detection.hpp>
 
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
 {

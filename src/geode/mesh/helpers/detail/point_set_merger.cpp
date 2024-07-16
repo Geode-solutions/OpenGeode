@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/point_set_merger.h>
+#include <geode/mesh/helpers/detail/point_set_merger.hpp>
 
-#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/point_set.hpp>
 
 namespace geode
 {

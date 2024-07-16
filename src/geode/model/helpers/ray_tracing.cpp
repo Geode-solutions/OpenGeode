@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/model/helpers/ray_tracing.h>
+#include <geode/model/helpers/ray_tracing.hpp>
 
-#include <geode/geometry/aabb.h>
+#include <geode/geometry/aabb.hpp>
 
-#include <geode/mesh/core/surface_mesh.h>
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/core/brep.h>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace
 {

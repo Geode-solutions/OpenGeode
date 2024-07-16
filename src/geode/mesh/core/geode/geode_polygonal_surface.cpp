@@ -21,18 +21,18 @@
  *
  */
 
-#include <geode/mesh/core/geode/geode_polygonal_surface.h>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
 
 #include <array>
 #include <fstream>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/internal/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {

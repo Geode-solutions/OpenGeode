@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/mesh/helpers/detail/solid_merger.h>
+#include <geode/mesh/helpers/detail/solid_merger.hpp>
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
-#include <geode/basic/algorithm.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/algorithm.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace geode
 {

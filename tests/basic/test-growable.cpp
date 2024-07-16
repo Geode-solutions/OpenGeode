@@ -23,10 +23,10 @@
 
 #include <fstream>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 #define CHECK( arg, value )                                                    \
     OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for ", arg );

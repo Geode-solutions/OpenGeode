@@ -21,16 +21,16 @@
  *
  */
 
-#include <geode/basic/progress_logger.h>
+#include <geode/basic/progress_logger.hpp>
 
 #include <mutex>
 
 #include <absl/time/clock.h>
 
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/progress_logger_manager.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/progress_logger_manager.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace
 {

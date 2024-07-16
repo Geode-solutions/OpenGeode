@@ -21,9 +21,9 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/vector.hpp>
 
 #define PYTHON_VECTOR( dimension )                                             \
     const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \

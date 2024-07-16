@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/string.h>
+#include <geode/basic/string.hpp>
 
 #include <absl/strings/ascii.h>
 #include <absl/strings/str_split.h>

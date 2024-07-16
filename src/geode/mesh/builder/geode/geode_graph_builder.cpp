@@ -21,10 +21,10 @@
  *
  */
 
-#include <geode/mesh/builder/geode/geode_graph_builder.h>
+#include <geode/mesh/builder/geode/geode_graph_builder.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/geode/geode_graph.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/geode/geode_graph.hpp>
 
 namespace geode
 {

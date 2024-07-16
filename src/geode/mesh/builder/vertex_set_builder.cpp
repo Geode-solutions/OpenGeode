@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/builder/vertex_set_builder.h>
+#include <geode/mesh/builder/vertex_set_builder.hpp>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/vertex_set.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/vertex_set.hpp>
 
 namespace geode
 {

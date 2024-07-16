@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/circle.h>
+#include <geode/geometry/basic_objects/circle.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 namespace geode
 {

@@ -23,13 +23,13 @@
 
 #include <string>
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include "../../basic/factory.hpp"
+#include "../../basic/input.hpp"
+#include "../../common.hpp"
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/io/edged_curve_input.h>
-#include <geode/mesh/io/edged_curve_output.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/io/edged_curve_input.hpp>
+#include <geode/mesh/io/edged_curve_output.hpp>
 
 #define PYTHON_EDGED_CURVE_IO( dimension )                                     \
     const auto save##dimension =                                               \

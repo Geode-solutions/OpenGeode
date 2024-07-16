@@ -21,9 +21,9 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 #include <typeinfo>
 namespace geode
 {

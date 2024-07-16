@@ -21,17 +21,17 @@
  *
  */
 
-#include <geode/geometry/intersection_detection.h>
+#include <geode/geometry/intersection_detection.hpp>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/internal/intersection_from_sides.h>
-#include <geode/geometry/internal/predicates.h>
-#include <geode/geometry/intersection.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/position.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/internal/intersection_from_sides.hpp>
+#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/intersection.hpp>
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/position.hpp>
 
 namespace
 {

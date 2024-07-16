@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/lines.hpp>
 
 #include <async++.h>
 
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/pimpl_impl.h>
-#include <geode/basic/range.h>
+#include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/range.hpp>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/io/edged_curve_input.h>
-#include <geode/mesh/io/edged_curve_output.h>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/io/edged_curve_input.hpp>
+#include <geode/mesh/io/edged_curve_output.hpp>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/line.hpp>
 
 namespace geode
 {

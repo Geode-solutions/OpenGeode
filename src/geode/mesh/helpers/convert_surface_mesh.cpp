@@ -21,23 +21,23 @@
  *
  */
 
-#include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/light_regular_grid.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
-#include <geode/mesh/core/surface_edges.h>
-#include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/helpers/detail/surface_merger.h>
-#include <geode/mesh/helpers/internal/copy.h>
+#include <geode/mesh/builder/polygonal_surface_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/core/surface_edges.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/detail/surface_merger.hpp>
+#include <geode/mesh/helpers/internal/copy.hpp>
 
 namespace
 {

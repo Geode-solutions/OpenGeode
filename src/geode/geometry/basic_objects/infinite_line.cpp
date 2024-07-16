@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
 
-#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/segment.hpp>
 
 namespace geode
 {

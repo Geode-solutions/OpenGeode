@@ -21,13 +21,13 @@
  *
  */
 
-#include "../../common.h"
+#include "../../common.hpp"
 
-#include <geode/model/helpers/convert_model_meshes.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/helpers/convert_model_meshes.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {

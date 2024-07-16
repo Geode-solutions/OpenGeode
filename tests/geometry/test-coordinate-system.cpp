@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/basic/logger.h>
+#include <geode/basic/logger.hpp>
 
-#include <geode/geometry/coordinate_system.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/coordinate_system.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/tests/common.h>
+#include <geode/tests/common.hpp>
 
 template < geode::index_t dimension >
 void check_point( const geode::CoordinateSystem< dimension >& coord_system,

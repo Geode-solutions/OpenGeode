@@ -27,16 +27,16 @@
  * Applications (ASGA)
  */
 
-#include <geode/mesh/helpers/aabb_surface_helpers.h>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
 #include <async++.h>
 
-#include <geode/geometry/aabb.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/point.hpp>
 
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 namespace geode
 {

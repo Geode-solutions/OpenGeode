@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/basic/timer.h>
+#include <geode/basic/timer.hpp>
 
 #include <absl/time/clock.h>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/mesh/helpers/build_grid.h>
+#include <geode/mesh/helpers/build_grid.hpp>
 
-#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/bounding_box.hpp>
 
 namespace geode
 {

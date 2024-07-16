@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/io/tetrahedral_solid_output.h>
+#include <geode/mesh/io/tetrahedral_solid_output.hpp>
 
 #include <string>
 #include <string_view>
@@ -29,12 +29,12 @@
 
 #include <absl/strings/str_cat.h>
 
-#include <geode/basic/detail/geode_output_impl.h>
-#include <geode/basic/io.h>
-#include <geode/basic/logger.h>
+#include <geode/basic/detail/geode_output_impl.hpp>
+#include <geode/basic/io.hpp>
+#include <geode/basic/logger.hpp>
 
-#include <geode/mesh/core/tetrahedral_solid.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/io/vertex_set_output.hpp>
 
 namespace geode
 {

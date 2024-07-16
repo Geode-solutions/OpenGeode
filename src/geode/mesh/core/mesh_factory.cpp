@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/mesh_factory.hpp>
 
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/pimpl_impl.hpp>
 
 namespace geode
 {

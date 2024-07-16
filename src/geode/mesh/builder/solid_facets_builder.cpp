@@ -21,13 +21,13 @@
  *
  */
 
-#include <geode/mesh/builder/solid_facets_builder.h>
+#include <geode/mesh/builder/solid_facets_builder.hpp>
 
-#include <geode/basic/attribute_manager.h>
+#include <geode/basic/attribute_manager.hpp>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/builder/mesh_builder_factory.hpp>
+#include <geode/mesh/core/solid_facets.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace geode
 {

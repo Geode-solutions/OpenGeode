@@ -21,9 +21,9 @@
  *
  */
 
-#include "../common.h"
+#include "../common.hpp"
 
-#include <geode/basic/attribute.h>
+#include <geode/basic/attribute.hpp>
 namespace geode
 {
     template < typename type >

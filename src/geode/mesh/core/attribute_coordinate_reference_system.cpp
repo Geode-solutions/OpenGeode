@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/mesh/core/attribute_coordinate_reference_system.h>
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/mesh/core/internal/points_impl.h>
+#include <geode/mesh/core/internal/points_impl.hpp>
 
 namespace geode
 {

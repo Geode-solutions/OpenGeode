@@ -1,4 +1,4 @@
-#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/model/mixin/core/vertex_identifier.hpp>
 
 #include <fstream>
 
@@ -6,27 +6,27 @@
 
 #include <absl/container/flat_hash_map.h>
 
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
+#include <geode/basic/pimpl_impl.hpp>
 
-#include <geode/geometry/bitsery_archive.h>
+#include <geode/geometry/bitsery_archive.hpp>
 
-#include <geode/mesh/builder/geode/geode_vertex_set_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/geode/geode_vertex_set.h>
-#include <geode/mesh/core/mesh_element.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/solid_mesh.h>
-#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/builder/geode/geode_vertex_set_builder.hpp>
+#include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/mesh_element.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/bitsery_archive.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
 
 namespace geode
 {
