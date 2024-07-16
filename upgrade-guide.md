@@ -4,22 +4,19 @@
 
 ### Motivations
 
-
-
-
 ### Breaking Changes
 
 - **Optional**: Replace absl::optional by is equivalent in C++17 std::optional.
 
+- **convert_to_mesh**: conversions from BRep and Section to meshes now return tuples with mesh and mappings.
+
 - **String_View**: Replace absl::string_view by is equivalent in C++17 std::string_view.
 
-- **PolyhedronFacetNormal**: This method now returns an optional of her previous return type 
+- **PolyhedronFacetNormal**: This method now returns an optional of her previous return type
 
 - **Basic_Objects**: Change from index_t to local_index_t in set_point methods for Triangle, Tetrahedron and Segment
 
 TODO.....
-
-
 
 - **C++**: upgrade from C++ standard requirment from C++11 to C++17
 

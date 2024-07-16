@@ -24,6 +24,8 @@
 #include "../../common.h"
 
 #include <geode/model/helpers/convert_model_meshes.h>
+#include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 
@@ -33,19 +35,32 @@ namespace geode
     {
         module
             .def( "triangulate_section_surface_meshes",
-                static_cast< void ( * )( Section& ) >(
-                    &triangulate_surface_meshes ) )
+                []( Section& model ) {
+                    SectionBuilder builder{ model };
+                    triangulate_surface_meshes( model, builder );
+                } )
             .def( "triangulate_brep_surface_meshes",
-                static_cast< void ( * )( BRep& ) >(
-                    &triangulate_surface_meshes ) )
+                []( BRep& model ) {
+                    BRepBuilder builder{ model };
+                    triangulate_surface_meshes( model, builder );
+                } )
             .def( "convert_section_surface_meshes_into_triangulated_surfaces",
-                static_cast< void ( * )( Section& ) >(
-                    &convert_surface_meshes_into_triangulated_surfaces ) )
+                []( Section& model ) {
+                    SectionBuilder builder{ model };
+                    convert_surface_meshes_into_triangulated_surfaces(
+                        model, builder );
+                } )
             .def( "convert_brep_surface_meshes_into_triangulated_surfaces",
-                static_cast< void ( * )( BRep& ) >(
-                    &convert_surface_meshes_into_triangulated_surfaces ) )
+                []( BRep& model ) {
+                    BRepBuilder builder{ model };
+                    convert_surface_meshes_into_triangulated_surfaces(
+                        model, builder );
+                } )
             .def( "convert_brep_block_meshes_into_tetrahedral_solids",
-                static_cast< void ( * )( BRep& ) >(
-                    &convert_block_meshes_into_tetrahedral_solids ) );
+                []( BRep& model ) {
+                    BRepBuilder builder{ model };
+                    convert_block_meshes_into_tetrahedral_solids(
+                        model, builder );
+                } );
     }
 } // namespace geode
