@@ -36,8 +36,9 @@ def run_test_brep():
         test_dir, "../../../../tests/data"))
     brep = model.load_brep(os.path.join(data_dir, "layers.og_brep"))
 
-    curve, surface, solid = model.convert_brep_into_curve_and_polygonal_surface_and_polyhedral_solid(
-        brep)
+    curve = model.convert_brep_into_curve(brep)
+    surface = model.convert_brep_into_surface(brep)
+    solid = model.convert_brep_into_solid(brep)
     if curve.nb_vertices() != 16:
         raise ValueError("[Test] BRep - Wrong number of curve vertices")
     if curve.nb_edges() != 28:
@@ -60,8 +61,8 @@ def run_test_section():
         test_dir, "../../../../tests/data"))
     section = model.load_section(os.path.join(data_dir, "quad.og_sctn"))
 
-    curve, surface = model.convert_section_into_curve_and_polygonal_surface(
-        section)
+    curve = model.convert_section_into_curve(section)
+    surface = model.convert_section_into_surface(section)
     if curve.nb_vertices() != 0:
         raise ValueError("[Test] Section - Wrong number of curve vertices")
     if curve.nb_edges() != 0:

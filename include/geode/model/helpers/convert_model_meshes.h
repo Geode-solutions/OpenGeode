@@ -49,13 +49,9 @@ namespace geode
         const geode::Surface3D& surface,
         const geode::MeshType& mesh_type );
 
-    void OPENGEODE_MODEL_DEPRECATED_EXPORT
-        convert_surface_meshes_into_triangulated_surfaces( BRep& brep );
     void opengeode_model_api convert_surface_meshes_into_triangulated_surfaces(
         const BRep& brep, BRepBuilder& builder );
 
-    void OPENGEODE_MODEL_DEPRECATED_EXPORT
-        convert_surface_meshes_into_triangulated_surfaces( Section& section );
     void opengeode_model_api convert_surface_meshes_into_triangulated_surfaces(
         const Section& section, SectionBuilder& builder );
 
@@ -64,17 +60,12 @@ namespace geode
         const Block3D& block,
         const MeshType& new_mesh_type );
 
-    void OPENGEODE_MODEL_DEPRECATED_EXPORT
-        convert_block_meshes_into_tetrahedral_solids( BRep& brep );
     void opengeode_model_api convert_block_meshes_into_tetrahedral_solids(
         const BRep& brep, BRepBuilder& builder );
 
-    void OPENGEODE_MODEL_DEPRECATED_EXPORT triangulate_surface_meshes(
-        BRep& brep );
     void opengeode_model_api triangulate_surface_meshes(
         const BRep& brep, BRepBuilder& builder );
 
-    void opengeode_model_api triangulate_surface_meshes( Section& section );
     void opengeode_model_api triangulate_surface_meshes(
         const Section& section, SectionBuilder& builder );
 } // namespace geode
