@@ -34,7 +34,7 @@ namespace geode
     OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodeHybridSolidBuilder< dimension >(
-              dynamic_cast< OpenGeodeHybridSolid< dimension >& >( vertex_set ) )
+            dynamic_cast< OpenGeodeHybridSolid< dimension >& >( vertex_set ) )
     {
     }
 

@@ -37,7 +37,7 @@ namespace geode
     public:
         Impl( Section& section, std::vector< Point2D > unique_points )
             : internal::SimplicialModelCreator< Section >(
-                  section, std::move( unique_points ) )
+                section, std::move( unique_points ) )
         {
         }
 

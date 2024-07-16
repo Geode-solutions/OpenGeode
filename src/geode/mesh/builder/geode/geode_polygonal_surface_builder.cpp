@@ -35,8 +35,8 @@ namespace geode
         dimension >::OpenGeodePolygonalSurfaceBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
         : OpenGeodePolygonalSurfaceBuilder< dimension >(
-              dynamic_cast< OpenGeodePolygonalSurface< dimension >& >(
-                  vertex_set ) )
+            dynamic_cast< OpenGeodePolygonalSurface< dimension >& >(
+                vertex_set ) )
     {
     }
 

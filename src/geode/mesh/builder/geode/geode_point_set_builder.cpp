@@ -34,7 +34,7 @@ namespace geode
     OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodePointSetBuilder< dimension >(
-              dynamic_cast< OpenGeodePointSet< dimension >& >( vertex_set ) )
+            dynamic_cast< OpenGeodePointSet< dimension >& >( vertex_set ) )
     {
     }
 

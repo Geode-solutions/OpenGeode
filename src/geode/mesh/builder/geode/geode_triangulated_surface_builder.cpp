@@ -35,8 +35,8 @@ namespace geode
         dimension >::OpenGeodeTriangulatedSurfaceBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
         : OpenGeodeTriangulatedSurfaceBuilder< dimension >(
-              dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
-                  vertex_set ) )
+            dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
+                vertex_set ) )
     {
     }
 

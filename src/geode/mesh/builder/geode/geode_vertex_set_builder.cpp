@@ -31,7 +31,7 @@ namespace geode
     OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodeVertexSetBuilder(
-              dynamic_cast< OpenGeodeVertexSet& >( vertex_set ) )
+            dynamic_cast< OpenGeodeVertexSet& >( vertex_set ) )
     {
     }
 

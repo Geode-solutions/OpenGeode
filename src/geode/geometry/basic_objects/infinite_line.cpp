@@ -78,7 +78,7 @@ namespace geode
     OwnerInfiniteLine< dimension >::OwnerInfiniteLine(
         const Segment< dimension >& segment )
         : OwnerInfiniteLine(
-              segment.normalized_direction(), segment.vertices()[0] )
+            segment.normalized_direction(), segment.vertices()[0] )
     {
     }
     template < index_t dimension >

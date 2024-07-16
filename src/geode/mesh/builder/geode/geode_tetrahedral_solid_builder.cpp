@@ -35,8 +35,8 @@ namespace geode
         dimension >::OpenGeodeTetrahedralSolidBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
         : OpenGeodeTetrahedralSolidBuilder< dimension >(
-              dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >(
-                  vertex_set ) )
+            dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >(
+                vertex_set ) )
     {
     }
 

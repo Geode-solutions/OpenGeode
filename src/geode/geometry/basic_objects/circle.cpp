@@ -100,8 +100,8 @@ namespace geode
     }
     Circle::Circle( const Circle& ) = default;
     Circle::Circle( const OwnerCircle& other )
-        : Base( { other.plane().normal(), other.plane().origin() },
-              other.radius() )
+        : Base(
+            { other.plane().normal(), other.plane().origin() }, other.radius() )
     {
     }
     Circle& Circle::operator=( const Circle& ) = default;

@@ -35,8 +35,8 @@ namespace geode
         dimension >::OpenGeodePolyhedralSolidBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
         : OpenGeodePolyhedralSolidBuilder< dimension >(
-              dynamic_cast< OpenGeodePolyhedralSolid< dimension >& >(
-                  vertex_set ) )
+            dynamic_cast< OpenGeodePolyhedralSolid< dimension >& >(
+                vertex_set ) )
     {
     }
 

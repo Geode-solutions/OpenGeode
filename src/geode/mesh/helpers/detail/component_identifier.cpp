@@ -194,7 +194,7 @@ namespace geode
         public:
             explicit Impl( const EdgedCurve< dimension >& curve )
                 : Propagator< EdgedCurve< dimension > >(
-                      curve, curve.nb_edges() )
+                    curve, curve.nb_edges() )
             {
             }
 
@@ -256,7 +256,7 @@ namespace geode
         public:
             explicit Impl( const SurfaceMesh< dimension >& surface )
                 : Propagator< SurfaceMesh< dimension > >(
-                      surface, surface.nb_polygons() )
+                    surface, surface.nb_polygons() )
             {
             }
 

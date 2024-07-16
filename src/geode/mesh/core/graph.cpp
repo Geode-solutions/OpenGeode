@@ -45,10 +45,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                  graph.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          EdgesAroundVertex >(
-                          ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
+                graph.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        EdgesAroundVertex >(
+                        ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
         {
         }
 

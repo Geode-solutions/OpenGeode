@@ -104,9 +104,9 @@ namespace geode
     Tetrahedron::Tetrahedron( const Tetrahedron& other ) noexcept = default;
     Tetrahedron::Tetrahedron( const OwnerTetrahedron& other ) noexcept
         : Base( other.vertices()[0],
-              other.vertices()[1],
-              other.vertices()[2],
-              other.vertices()[3] )
+            other.vertices()[1],
+            other.vertices()[2],
+            other.vertices()[3] )
     {
     }
     Tetrahedron& Tetrahedron::operator=(

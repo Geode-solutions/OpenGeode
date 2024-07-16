@@ -34,7 +34,7 @@ namespace geode
     OpenGeodeEdgedCurveBuilder< dimension >::OpenGeodeEdgedCurveBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
         : OpenGeodeEdgedCurveBuilder< dimension >(
-              dynamic_cast< OpenGeodeEdgedCurve< dimension >& >( vertex_set ) )
+            dynamic_cast< OpenGeodeEdgedCurve< dimension >& >( vertex_set ) )
     {
     }
 
