@@ -57,7 +57,7 @@ namespace geode
         Vector< dimension > normalized_direction() const;
         Point< dimension > barycenter() const;
         double length() const;
-        void set_point( index_t vertex, PointType point );
+        void set_point( local_index_t vertex, PointType point );
         const std::array< PointType, 2 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;
 

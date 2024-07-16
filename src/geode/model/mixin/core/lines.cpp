@@ -89,7 +89,7 @@ namespace geode
         const auto prefix = absl::StrCat(
             directory, "/", Line< dimension >::component_type_static().get() );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( const auto& line : lines() )
@@ -117,7 +117,7 @@ namespace geode
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
-        Logger::set_level( Logger::Level::warn );
+        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( auto& line : modifiable_lines( {} ) )

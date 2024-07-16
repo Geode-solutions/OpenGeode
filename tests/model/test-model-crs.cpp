@@ -52,7 +52,7 @@ void check_result(
 void test_brep_crs()
 {
     const auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "random_dfn.og_brep" ) );
     const auto crss = geode::brep_coordinate_reference_systems( brep );
     check_result( crss );
 }
@@ -60,7 +60,7 @@ void test_brep_crs()
 void test_section_crs()
 {
     const auto section = geode::load_section(
-        absl::StrCat( geode::data_path, "fractures.og_sctn" ) );
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
     const auto crss = geode::section_coordinate_reference_systems( section );
     check_result( crss );
 }

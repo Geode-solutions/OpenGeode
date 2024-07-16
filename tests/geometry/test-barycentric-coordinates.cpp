@@ -41,7 +41,7 @@ bool check_bary_coords( const std::array< double, nb_coords >& result,
     double sum{ 0 };
     for( const auto i : geode::Range{ nb_coords } )
     {
-        if( std::fabs( result[i] - answer[i] ) > geode::global_epsilon )
+        if( std::fabs( result[i] - answer[i] ) > geode::GLOBAL_EPSILON )
         {
             geode::Logger::error( "Lambda ", i, " is incorrect." );
             geode::Logger::error(
@@ -50,7 +50,7 @@ bool check_bary_coords( const std::array< double, nb_coords >& result,
         }
         sum += result[i];
     }
-    if( std::fabs( sum - 1 ) > geode::global_epsilon )
+    if( std::fabs( sum - 1 ) > geode::GLOBAL_EPSILON )
     {
         geode::Logger::error( "Sum of all lambdas are different of 1" );
         return false;

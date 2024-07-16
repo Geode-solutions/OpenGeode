@@ -27,16 +27,16 @@
 
 namespace geode
 {
-    enum struct Side
+    enum struct SIDE
     {
         positive,
         negative,
         zero
     };
 
-    using Sign = Side;
+    using Sign = SIDE;
 
-    enum struct Position
+    enum struct POSITION
     {
         // Strictly outside
         outside,
@@ -70,6 +70,6 @@ namespace geode
     namespace detail
     {
         local_index_t opengeode_geometry_api position_to_index(
-            Position position );
+            POSITION position );
     } // namespace detail
 } // namespace geode

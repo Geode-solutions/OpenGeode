@@ -26,7 +26,7 @@ ExternalProject_Add(abseil
     BINARY_DIR ${ABSEIL_PATH}/build
     STAMP_DIR ${ABSEIL_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/abseil-cpp
-    GIT_TAG 20240710
+    GIT_TAG 20240715
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}

@@ -52,7 +52,7 @@ if __name__ == '__main__':
     p3 = geom.Point3D([3.1, 9.4, 9.7])
     colocator = geom.NNSearch3D([p0, p0, p1, p0, p2, p1, p3])
 
-    colocated_info = colocator.colocated_index_mapping(basic.global_epsilon)
+    colocated_info = colocator.colocated_index_mapping(basic.GLOBAL_EPSILON)
     if colocated_info.nb_colocated_points() != 3:
         raise ValueError("[Test] Should be 3 colocated points")
     mapping_answer = [0, 0, 1, 0, 2, 1, 3]

@@ -29,72 +29,72 @@ namespace geode
 {
     namespace internal
     {
-        inline Position segment_intersection_detection(
-            const Side& s0, const Side& s1 )
+        inline POSITION segment_intersection_detection(
+            const SIDE& s0, const SIDE& s1 )
         {
-            if( s0 == Side::zero && s1 == Side::zero )
+            if( s0 == SIDE::zero && s1 == SIDE::zero )
             {
-                return Position::parallel;
+                return POSITION::parallel;
             }
-            if( s0 == Side::zero )
+            if( s0 == SIDE::zero )
             {
-                return Position::vertex0;
+                return POSITION::vertex0;
             }
-            if( s1 == Side::zero )
+            if( s1 == SIDE::zero )
             {
-                return Position::vertex1;
+                return POSITION::vertex1;
             }
             if( s0 != s1 )
             {
-                return Position::inside;
+                return POSITION::inside;
             }
-            return Position::outside;
+            return POSITION::outside;
         }
 
-        inline Position triangle_intersection_detection(
-            const Side s0, const Side s1, const Side s2 )
+        inline POSITION triangle_intersection_detection(
+            const SIDE s0, const SIDE s1, const SIDE s2 )
         {
-            if( s0 == Side::zero )
+            if( s0 == SIDE::zero )
             {
-                if( s1 == Side::zero )
+                if( s1 == SIDE::zero )
                 {
-                    return Position::vertex1;
+                    return POSITION::vertex1;
                 }
-                if( s2 == Side::zero )
+                if( s2 == SIDE::zero )
                 {
-                    return Position::vertex0;
+                    return POSITION::vertex0;
                 }
                 if( s1 == s2 )
                 {
-                    return Position::edge0;
+                    return POSITION::edge0;
                 }
-                return Position::outside;
+                return POSITION::outside;
             }
-            if( s1 == Side::zero )
+            if( s1 == SIDE::zero )
             {
-                if( s2 == Side::zero )
+                if( s2 == SIDE::zero )
                 {
-                    return Position::vertex2;
+                    return POSITION::vertex2;
                 }
                 if( s0 == s2 )
                 {
-                    return Position::edge1;
+                    return POSITION::edge1;
                 }
-                return Position::outside;
+                return POSITION::outside;
             }
-            if( s2 == Side::zero )
+            if( s2 == SIDE::zero )
             {
                 if( s0 == s1 )
                 {
-                    return Position::edge2;
+                    return POSITION::edge2;
                 }
-                return Position::outside;
+                return POSITION::outside;
             }
             if( s0 == s1 && s1 == s2 )
             {
-                return Position::inside;
+                return POSITION::inside;
             }
-            return Position::outside;
+            return POSITION::outside;
         }
     } // namespace internal
 } // namespace geode

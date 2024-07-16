@@ -35,7 +35,7 @@
 void test_convert_brep_section()
 {
     auto brep = geode::load_brep(
-        absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
+        absl::StrCat( geode::DATA_PATH, "random_dfn.og_brep" ) );
     const auto section =
         std::get< 0 >( geode::convert_brep_into_section( brep, 2 ) );
 
@@ -60,7 +60,7 @@ void test_convert_brep_section()
 void test_extrusion_section_to_brep()
 {
     const auto section = geode::load_section(
-        absl::StrCat( geode::data_path, "fractures.og_sctn" ) );
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
     geode::SectionExtruderOptions options;
     options.axis_to_extrude = 2;
     options.min_coordinate = 0.;

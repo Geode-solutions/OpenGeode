@@ -110,7 +110,7 @@ namespace geode
 
         /*!
          * Return true if the query point is inside the grid, up to a
-         * global_epsilon away from the grid bounding box.
+         * GLOBAL_EPSILON away from the grid bounding box.
          */
         bool contains( const Point< dimension >& query ) const;
 

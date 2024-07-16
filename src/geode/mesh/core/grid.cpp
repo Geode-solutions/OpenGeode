@@ -224,9 +224,9 @@ namespace geode
                 grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                if( query_in_grid.value( d ) < -global_epsilon
+                if( query_in_grid.value( d ) < -GLOBAL_EPSILON
                     || query_in_grid.value( d )
-                           > grid.nb_cells_in_direction( d ) + global_epsilon )
+                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
                 {
                     return false;
                 }
@@ -279,9 +279,9 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                if( value < -global_epsilon
+                if( value < -GLOBAL_EPSILON
                     || value
-                           > grid.nb_cells_in_direction( d ) + global_epsilon )
+                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
                 {
                     return {};
                 }
@@ -299,11 +299,11 @@ namespace geode
                 min[d] = integer_floor;
                 max[d] = integer_floor;
                 const auto remainder = value - floating_floor;
-                if( remainder < global_epsilon )
+                if( remainder < GLOBAL_EPSILON )
                 {
                     min[d] = integer_floor > 0 ? integer_floor - 1 : 0;
                 }
-                else if( remainder > 1 - global_epsilon )
+                else if( remainder > 1 - GLOBAL_EPSILON )
                 {
                     max[d] = std::min( integer_floor + 1,
                         grid.nb_cells_in_direction( d ) - 1 );
@@ -369,7 +369,7 @@ namespace geode
             cells_length_ = std::move( cells_length );
             for( const auto direction : LRange{ dimension } )
             {
-                OPENGEODE_EXCEPTION( cells_length_[direction] > global_epsilon,
+                OPENGEODE_EXCEPTION( cells_length_[direction] > GLOBAL_EPSILON,
                     "[Grid] Creation of a grid with a cell length smaller than "
                     "epsilon in direction ",
                     direction, "." );

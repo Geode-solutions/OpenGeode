@@ -39,7 +39,7 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     const auto surface2d = geode::load_triangulated_surface< 2 >(
-        absl::StrCat( geode::data_path, "3patches.og_tsf2d" ) );
+        absl::StrCat( geode::DATA_PATH, "3patches.og_tsf2d" ) );
     const auto surface3d =
         geode::convert_triangulated_surface2d_into_3d( *surface2d, 2, 0. );
     OPENGEODE_EXCEPTION( surface2d->nb_vertices() == surface3d->nb_vertices(),

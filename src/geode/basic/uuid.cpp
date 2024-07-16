@@ -118,7 +118,7 @@ namespace geode
     std::string uuid::string() const
     {
         char string[] = "00000000-0000-0000-0000-000000000000";
-        static constexpr char encode[] = "0123456789abcdef";
+        static constexpr char ENCODE[] = "0123456789abcdef";
 
         index_t bit = 15;
         for( const auto i : Range{ 18 } )
@@ -127,7 +127,7 @@ namespace geode
             {
                 continue;
             }
-            string[i] = encode[ab >> 4 * bit & 0x0f];
+            string[i] = ENCODE[ab >> 4 * bit & 0x0f];
             bit--;
         }
 
@@ -138,7 +138,7 @@ namespace geode
             {
                 continue;
             }
-            string[i] = encode[cd >> 4 * bit & 0x0f];
+            string[i] = ENCODE[cd >> 4 * bit & 0x0f];
             bit--;
         }
 

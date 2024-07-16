@@ -148,12 +148,12 @@ namespace geode
         bool inexact_equal( const Point &other ) const
         {
             double square_length{ 0 };
-            static constexpr auto sqr_epsilon = global_epsilon * global_epsilon;
+            static constexpr auto SQR_EPSILON = GLOBAL_EPSILON * GLOBAL_EPSILON;
             for( const auto i : LRange{ dimension } )
             {
                 const double diff{ other.value( i ) - this->value( i ) };
                 square_length += diff * diff;
-                if( square_length > sqr_epsilon )
+                if( square_length > SQR_EPSILON )
                 {
                     return false;
                 }

@@ -39,7 +39,7 @@ namespace geode
     class opengeode_basic_api Logger
     {
     public:
-        enum struct Level
+        enum struct LEVEL
         {
             trace,
             debug,
@@ -50,9 +50,9 @@ namespace geode
             off
         };
 
-        static Level level();
+        static LEVEL level();
 
-        static void set_level( Level level );
+        static void set_level( LEVEL level );
 
         template < typename... Args >
         static void trace( const Args &...args )

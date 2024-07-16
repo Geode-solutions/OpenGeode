@@ -58,7 +58,7 @@ namespace geode
     }
     template < typename PointType >
     void GenericTetrahedron< PointType >::set_point(
-        index_t vertex, PointType point )
+        local_index_t vertex, PointType point )
     {
         vertices_[vertex] = point;
     }

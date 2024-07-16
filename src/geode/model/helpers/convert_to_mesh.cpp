@@ -198,14 +198,14 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::uuid_from_conversion_attribute_type >(
-                          geode::uuid_from_conversion_attribute_name, {} )
+                          geode::UUID_FROM_CONVERSION_ATTRIBUTE_NAME, {} )
               },
               attribute_unique_vertex_{
                   mesh_->vertex_attribute_manager()
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::unique_vertex_from_conversion_attribute_type >(
-                          geode::unique_vertex_from_conversion_attribute_name,
+                          geode::UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME,
                           geode::NO_ID )
               },
               mesh_element_mapping_{
@@ -320,14 +320,14 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::uuid_from_conversion_attribute_type >(
-                          geode::uuid_from_conversion_attribute_name, {} )
+                          geode::UUID_FROM_CONVERSION_ATTRIBUTE_NAME, {} )
               },
               attribute_unique_vertex_{
                   mesh_->vertex_attribute_manager()
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::unique_vertex_from_conversion_attribute_type >(
-                          geode::unique_vertex_from_conversion_attribute_name,
+                          geode::UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME,
                           geode::NO_ID )
               },
               mesh_element_mapping_{
@@ -457,14 +457,14 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::uuid_from_conversion_attribute_type >(
-                          geode::uuid_from_conversion_attribute_name, {} )
+                          geode::UUID_FROM_CONVERSION_ATTRIBUTE_NAME, {} )
               },
               attribute_unique_vertex_{
                   mesh_->vertex_attribute_manager()
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::unique_vertex_from_conversion_attribute_type >(
-                          geode::unique_vertex_from_conversion_attribute_name,
+                          geode::UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME,
                           geode::NO_ID )
               },
               mesh_element_mapping_{

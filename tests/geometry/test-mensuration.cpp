@@ -40,13 +40,13 @@ void test_triangle_area_2d()
 
     const geode::Triangle2D triangle2D_1{ a, b, c };
     const auto area1 = geode::triangle_area( triangle2D_1 );
-    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_area "
         "with query triangle triangle2D_1" );
 
     const geode::Triangle2D triangle2D_2{ a, b, a };
     const auto area2 = geode::triangle_area( triangle2D_2 );
-    OPENGEODE_EXCEPTION( std::fabs( area2 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area2 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_area "
         "with query triangle triangle2D_2" );
 }
@@ -59,13 +59,13 @@ void test_triangle_area_3d()
 
     const geode::Triangle3D triangle3D_1{ a, b, c };
     const auto area1 = geode::triangle_area( triangle3D_1 );
-    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_area "
         "with query triangle triangle3D_1" );
 
     const geode::Triangle3D triangle3D_2{ a, b, a };
     const auto area2 = geode::triangle_area( triangle3D_2 );
-    OPENGEODE_EXCEPTION( std::fabs( area2 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area2 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_area "
         "with query triangle triangle3D_2" );
 
@@ -75,7 +75,7 @@ void test_triangle_area_3d()
         -0.300000011920929 } };
     const geode::Triangle3D triangle3D_3{ d, e, f };
     const auto area3 = geode::triangle_area( triangle3D_3 );
-    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_area "
         "with query triangle triangle3D_3" );
 }
@@ -94,20 +94,20 @@ void test_triangle_signed_area_2d()
 
     const geode::Triangle2D triangle2D_1{ a, b, c };
     const auto area1 = geode::triangle_signed_area( triangle2D_1 );
-    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle2D_1 : result: ",
         area1, " | expected: 0.5" );
 
     const geode::Triangle2D triangle2D_2{ a, c, b };
     const auto area2 = geode::triangle_signed_area( triangle2D_2 );
-    OPENGEODE_EXCEPTION( std::fabs( area2 + 0.5 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area2 + 0.5 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle2D_2" );
 
     const geode::Triangle2D triangle2D_3{ a, b, a };
     const auto area3 = geode::triangle_signed_area( triangle2D_3 );
-    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle2D_3" );
 }
@@ -121,19 +121,19 @@ void test_triangle_signed_area_3d()
 
     const geode::Triangle3D triangle3D_1{ a, b, c };
     const auto area1 = geode::triangle_signed_area( triangle3D_1, upward );
-    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area1 - 0.5 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle3D_1" );
 
     const geode::Triangle3D triangle3D_2{ a, c, b };
     const auto area2 = geode::triangle_signed_area( triangle3D_2, upward );
-    OPENGEODE_EXCEPTION( std::fabs( area2 + 0.5 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area2 + 0.5 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle3D_2" );
 
     const geode::Triangle3D triangle3D_3{ a, b, a };
     const auto area3 = geode::triangle_signed_area( triangle3D_3, upward );
-    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle3D_3" );
 }
@@ -153,13 +153,13 @@ void test_tetrahedron_signed_volume()
 
     const geode::Tetrahedron tetra1{ a, b, c, d };
     const auto volume1 = geode::tetrahedron_signed_volume( tetra1 );
-    OPENGEODE_EXCEPTION( std::fabs( volume1 - 1. / 6. ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( volume1 - 1. / 6. ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for tetrahedron_signed_volume "
         "with query tetra tetra1" );
 
     const geode::Tetrahedron tetra2{ a, b, d, c };
     const auto volume2 = geode::tetrahedron_signed_volume( tetra2 );
-    OPENGEODE_EXCEPTION( std::fabs( volume2 + 1. / 6. ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( volume2 + 1. / 6. ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for tetrahedron_signed_volume "
         "with query tetra tetra2" );
 }
@@ -176,14 +176,14 @@ void test_tetrahedron_signed_volume2()
 
     const geode::Tetrahedron tetra1{ a, b, c, b };
     const auto volume1 = geode::tetrahedron_signed_volume( tetra1 );
-    OPENGEODE_EXCEPTION( std::fabs( volume1 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( volume1 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for tetrahedron_signed_volume2 "
         "with query tetra tetra1" );
 
     const geode::Tetrahedron tetra2{ a, b, c, b };
     const auto volume2 = geode::tetrahedron_signed_volume( tetra2 );
     DEBUG( volume2 );
-    OPENGEODE_EXCEPTION( std::fabs( volume2 ) < geode::global_epsilon,
+    OPENGEODE_EXCEPTION( std::fabs( volume2 ) < geode::GLOBAL_EPSILON,
         "[Test] Wrong result for tetrahedron_signed_volume2 "
         "with query tetra tetra2" );
 }

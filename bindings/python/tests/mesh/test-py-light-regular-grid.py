@@ -186,13 +186,13 @@ def test_cell_query( grid ):
     result = grid.cells( geom.Point3D([ 4.5, 6, 7 - 1e-10 ] ) )
     if len( result ) != 8 or result[0] != [ 2, 2, 1 ] or result[1] != [ 3, 2, 1 ] or result[2] != [ 2, 3, 1 ] or result[3] != [ 3, 3, 1 ] or result[4] != [ 2, 2, 2 ] or result[5] != [ 3, 2, 2 ] or result[6] != [ 2, 3, 2 ] or result[7] != [ 3, 3, 2 ]:
         raise ValueError( "[Test] Wrong query result" )
-    near_origin_point = geom.Point3D([ 1.5 - geode.global_epsilon / 2, -geode.global_epsilon / 2, 1 - geode.global_epsilon / 2 ])
+    near_origin_point = geom.Point3D([ 1.5 - geode.GLOBAL_EPSILON / 2, -geode.GLOBAL_EPSILON / 2, 1 - geode.GLOBAL_EPSILON / 2 ])
     if not grid.contains( near_origin_point ):
         raise ValueError( "[Test] Wrong result on contain: point is shown outside of grid when it should be inside." )
     result = grid.cells( near_origin_point )
     if len( result ) != 1 or result[0] != [ 0, 0, 0 ]:
         raise ValueError( "[Test] Wrong query result for point near origin." )
-    grid_furthest_point = geom.Point3D([ 6.5 + geode.global_epsilon / 2, 20 + geode.global_epsilon / 2, 46 + geode.global_epsilon / 2 ])
+    grid_furthest_point = geom.Point3D([ 6.5 + geode.GLOBAL_EPSILON / 2, 20 + geode.GLOBAL_EPSILON / 2, 46 + geode.GLOBAL_EPSILON / 2 ])
     if not grid.contains( grid_furthest_point ):
         raise ValueError( "[Test] Wrong result on contain: point is shown outside of grid when it should be inside." )
     result = grid.cells( grid_furthest_point )

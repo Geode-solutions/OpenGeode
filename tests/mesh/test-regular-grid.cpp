@@ -251,8 +251,8 @@ void test_cell_query( const geode::RegularGrid3D& grid )
             && result[6] == geode::Grid3D::CellIndices( { 2, 3, 2 } )
             && result[7] == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    geode::Point3D near_origin_point{ { 1.5 + geode::global_epsilon / 2,
-        geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
+    geode::Point3D near_origin_point{ { 1.5 + geode::GLOBAL_EPSILON / 2,
+        geode::GLOBAL_EPSILON / 2, 1 - geode::GLOBAL_EPSILON / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( near_origin_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -261,8 +261,8 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         result.size() == 1
             && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } ),
         "[Test] Wrong query result for point near origin." );
-    geode::Point3D grid_furthest_point{ { -18.5 - geode::global_epsilon / 2,
-        -45 - geode::global_epsilon / 2, 6 + geode::global_epsilon / 2 } };
+    geode::Point3D grid_furthest_point{ { -18.5 - geode::GLOBAL_EPSILON / 2,
+        -45 - geode::GLOBAL_EPSILON / 2, 6 + geode::GLOBAL_EPSILON / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( grid_furthest_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -501,7 +501,7 @@ void test()
     test_grid( *grid );
 
     auto grid_v12 = geode::load_regular_grid< 3 >(
-        absl::StrCat( geode::data_path, "test_v12.og_rgd3d" ) );
+        absl::StrCat( geode::DATA_PATH, "test_v12.og_rgd3d" ) );
     auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
     builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },

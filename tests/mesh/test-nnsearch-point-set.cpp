@@ -54,7 +54,7 @@ void add_points( geode::PointSetBuilder3D& builder )
 void check_nnsearch( const geode::NNSearch3D& nnsearch )
 {
     const auto mappings =
-        nnsearch.colocated_index_mapping( geode::global_epsilon );
+        nnsearch.colocated_index_mapping( geode::GLOBAL_EPSILON );
     OPENGEODE_EXCEPTION( nnsearch.nb_points() == 54,
         "[Test] Wrong computation of NNSearch points" );
     OPENGEODE_EXCEPTION( mappings.nb_unique_points() == 27,

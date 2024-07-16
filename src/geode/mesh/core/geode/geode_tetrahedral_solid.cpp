@@ -75,7 +75,7 @@ namespace geode
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
-            const auto vertex_id = detail::tetrahedron_facet_vertices
+            const auto vertex_id = detail::TETRAHEDRON_FACET_VERTICES
                 [polyhedron_facet_vertex.polyhedron_facet.facet_id]
                 [polyhedron_facet_vertex.vertex_id];
             return { polyhedron_facet_vertex.polyhedron_facet.polyhedron_id,
