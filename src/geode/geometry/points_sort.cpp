@@ -70,7 +70,7 @@ namespace
      *  the two halves
      */
     template < typename Compare >
-    itr split( const itr& begin, const itr& end, const Compare& cmp )
+    itr split_container( const itr& begin, const itr& end, const Compare& cmp )
     {
         if( begin >= end )
         {
@@ -108,13 +108,13 @@ namespace
 
         const auto m0 = begin;
         const auto m8 = end;
-        const auto m4 = split( m0, m8, compX );
-        const auto m2 = split( m0, m4, compY );
-        const auto m1 = split( m0, m2, compZ );
-        const auto m3 = split( m2, m4, compZ );
-        const auto m6 = split( m4, m8, compY );
-        const auto m5 = split( m4, m6, compZ );
-        const auto m7 = split( m6, m8, compZ );
+        const auto m4 = split_container( m0, m8, compX );
+        const auto m2 = split_container( m0, m4, compY );
+        const auto m1 = split_container( m0, m2, compZ );
+        const auto m3 = split_container( m2, m4, compZ );
+        const auto m6 = split_container( m4, m8, compY );
+        const auto m5 = split_container( m4, m6, compZ );
+        const auto m7 = split_container( m6, m8, compZ );
         morton_mapping< COORDZ >( points, m0, m1 );
         morton_mapping< COORDY >( points, m1, m2 );
         morton_mapping< COORDY >( points, m2, m3 );
@@ -142,9 +142,9 @@ namespace
 
         const auto m0 = begin;
         const auto m4 = end;
-        const auto m2 = split( m0, m4, compX );
-        const auto m1 = split( m0, m2, compY );
-        const auto m3 = split( m2, m4, compY );
+        const auto m2 = split_container( m0, m4, compX );
+        const auto m1 = split_container( m0, m2, compY );
+        const auto m3 = split_container( m2, m4, compY );
         morton_mapping< COORDY >( points, m0, m1 );
         morton_mapping< COORDX >( points, m1, m2 );
         morton_mapping< COORDX >( points, m2, m3 );
