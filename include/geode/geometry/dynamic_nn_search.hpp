@@ -58,7 +58,7 @@ namespace geode
         std::vector< index_t > radius_neighbors(
             const Point< dimension >& point, double threshold_distance ) const;
 
-        void addPoint( const Point< dimension >& point );
+        void add_point( const Point< dimension >& point );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

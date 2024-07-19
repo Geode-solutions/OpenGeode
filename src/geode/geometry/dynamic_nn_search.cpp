@@ -75,7 +75,7 @@ namespace geode
             return indices;
         }
 
-        void addPoint( const Point< dimension >& point )
+        void add_point( const Point< dimension >& point )
         {
             const auto nb_points = cloud_.kdtree_get_point_count();
             cloud_.points.emplace_back( point );
@@ -165,10 +165,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void DynamicNNSearch< dimension >::addPoint(
+    void DynamicNNSearch< dimension >::add_point(
         const Point< dimension >& point )
     {
-        return impl_->addPoint( point );
+        return impl_->add_point( point );
     }
 
     template class opengeode_geometry_api DynamicNNSearch< 2 >;

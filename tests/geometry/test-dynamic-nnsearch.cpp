@@ -101,7 +101,7 @@ void test()
     // test with the add point method
     // with pt1(0.1,0.1)
     geode::Point2D pt1{ { 0.1, 0.1 } };
-    search.addPoint( pt1 );
+    search.add_point( pt1 );
     const auto result5 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius4 );
     OPENGEODE_EXCEPTION( search.nb_points() == 5,
@@ -126,7 +126,7 @@ void test()
 
     // with pt2(10,10)
     geode::Point2D pt2{ { 10, 10 } };
-    search.addPoint( pt2 );
+    search.add_point( pt2 );
     const auto result6 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius4 );
     OPENGEODE_EXCEPTION( search.nb_points() == 6,
