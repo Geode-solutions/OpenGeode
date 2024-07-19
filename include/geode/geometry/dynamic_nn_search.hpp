@@ -37,7 +37,6 @@ namespace geode
     class DynamicNNSearch
     {
         OPENGEODE_DISABLE_COPY( DynamicNNSearch );
-        // OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( DynamicNNSearch );
 
     public:
         explicit DynamicNNSearch( std::vector< Point< dimension > > points );
@@ -47,6 +46,7 @@ namespace geode
         index_t nb_points() const;
 
         const Point< dimension >& point( index_t index ) const;
+        void add_point( const Point< dimension >& point );
 
         /*!
          * Get the neighbors closer than a given distance from the given point
@@ -57,8 +57,6 @@ namespace geode
          */
         std::vector< index_t > radius_neighbors(
             const Point< dimension >& point, double threshold_distance ) const;
-
-        void add_point( const Point< dimension >& point );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

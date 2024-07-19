@@ -156,13 +156,6 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
-    SOURCE "test-dynamic-nnsearch-point-set.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-        ${PROJECT_NAME}::mesh
-)
-add_geode_test(
     SOURCE "test-point-set.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

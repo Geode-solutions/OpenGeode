@@ -23,13 +23,9 @@
 
 #include <geode/geometry/dynamic_nn_search.hpp>
 
-#include <numeric>
+#include <nanoflann.hpp>
 
 #include <absl/algorithm/container.h>
-
-#include <async++.h>
-
-#include <nanoflann.hpp>
 
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
@@ -64,8 +60,7 @@ namespace geode
             nanoflann::RadiusResultSet< double, index_t > resultSet(
                 threshold_distance * threshold_distance, results );
             dynamic_nn_tree_.findNeighbors( resultSet, &copy( point )[0] );
-            std::sort(
-                results.begin(), results.end(), nanoflann::IndexDist_Sorter() );
+            absl::c_sort( results, nanoflann::IndexDist_Sorter() );
             std::vector< index_t > indices;
             indices.reserve( results.size() );
             for( const auto& result : results )
@@ -93,6 +88,7 @@ namespace geode
             }
             return result;
         }
+
         struct PointCloud
         {
             std::vector< Point< dimension > > points;
@@ -133,7 +129,7 @@ namespace geode
     template < index_t dimension >
     DynamicNNSearch< dimension >::DynamicNNSearch(
         std::vector< Point< dimension > > points )
-        : impl_( std::move( points ) )
+        : impl_{ std::move( points ) }
     {
     }
 

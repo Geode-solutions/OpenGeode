@@ -61,6 +61,12 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-dynamic-nnsearch.cpp" 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-intersection.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -82,12 +88,6 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-nnsearch.cpp" 
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-)
-add_geode_test(
-    SOURCE "test-dynamic-nnsearch.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
