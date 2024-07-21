@@ -48,7 +48,8 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::critical( "OpenGeodeException: ", e.what() );
+            Logger::critical(
+                "OpenGeodeException: ", e.what(), "\n", e.stack_trace() );
         }
         catch( const std::exception& e )
         {
