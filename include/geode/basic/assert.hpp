@@ -53,17 +53,18 @@ namespace geode
     {
         static constexpr int MAX_STACK_DEPTH = 10;
         static constexpr int NB_SKIPPED_STACKS = 1;
+        static constexpr int SYMBOL_SIZE = 1024;
 
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args&... message )
             : std::runtime_error{ absl::StrCat( message... ) },
               stack_size_{ absl::GetStackTrace(
-                  stack_, MAX_STACK_DEPTH, NB_SKIPPED_STACKS ) }
+                  stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS ) }
         {
         }
 
-        virtual ~OpenGeodeException() noexcept = default;
+        ~OpenGeodeException() noexcept override = default;
 
         std::string stack_trace() const
         {
@@ -71,21 +72,22 @@ namespace geode
             for( auto frame = 0; frame < stack_size_; ++frame )
             {
                 absl::StrAppend( &stack_string, "  ", frame, ": " );
-                if( char symbol[1024];
-                    absl::Symbolize( stack_[frame], symbol, sizeof( symbol ) ) )
+                if( std::array< char, SYMBOL_SIZE > symbol; absl::Symbolize(
+                        stack_[frame], symbol.data(), sizeof( symbol ) ) )
                 {
-                    absl::StrAppend( &stack_string, symbol, "\n" );
+                    absl::StrAppend( &stack_string, symbol.data() );
                 }
                 else
                 {
-                    absl::StrAppend( &stack_string, "Unknown \n" );
+                    absl::StrAppend( &stack_string, "Unknown" );
                 }
+                absl::StrAppend( &stack_string, "\n" );
             }
             return stack_string;
         }
 
     private:
-        void* stack_[MAX_STACK_DEPTH];
+        std::array< void*, MAX_STACK_DEPTH > stack_;
         int stack_size_;
     };
 
