@@ -23,11 +23,14 @@
 
 #pragma once
 
+#include <array>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
 #include <absl/base/optimization.h>
+#include <absl/debugging/stacktrace.h>
+#include <absl/debugging/symbolize.h>
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/opengeode_basic_export.hpp>
@@ -49,13 +52,44 @@ namespace geode
      */
     class OpenGeodeException : public std::runtime_error
     {
+        static constexpr int MAX_STACK_DEPTH = 10;
+        static constexpr int NB_SKIPPED_STACKS = 1;
+        static constexpr int SYMBOL_SIZE = 1024;
+
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args&... message )
-            : std::runtime_error{ absl::StrCat( message... ) }
+            : std::runtime_error{ absl::StrCat( message... ) },
+              stack_size_{ absl::GetStackTrace(
+                  stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS ) }
         {
         }
-        virtual ~OpenGeodeException() noexcept {}
+
+        ~OpenGeodeException() noexcept override = default;
+
+        std::string stack_trace() const
+        {
+            std::string stack_string;
+            for( auto frame = 0; frame < stack_size_; ++frame )
+            {
+                absl::StrAppend( &stack_string, "  ", frame, ": " );
+                if( std::array< char, SYMBOL_SIZE > symbol; absl::Symbolize(
+                        stack_[frame], symbol.data(), sizeof( symbol ) ) )
+                {
+                    absl::StrAppend( &stack_string, symbol.data() );
+                }
+                else
+                {
+                    absl::StrAppend( &stack_string, "Unknown" );
+                }
+                absl::StrAppend( &stack_string, "\n" );
+            }
+            return stack_string;
+        }
+
+    private:
+        std::array< void*, MAX_STACK_DEPTH > stack_;
+        int stack_size_;
     };
 
     void opengeode_basic_api geode_assertion_failed( std::string_view condition,

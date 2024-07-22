@@ -33,9 +33,7 @@ namespace geode
             .def( pybind11::init<>() )
             .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
             .def( "component_mesh_vertices",
-                static_cast< const std::vector< ComponentMeshVertex >& (
-                    VertexIdentifier::*) ( index_t ) const >(
-                    &VertexIdentifier::component_mesh_vertices ) )
+                &VertexIdentifier::component_mesh_vertices )
             .def( "unique_vertex", &VertexIdentifier::unique_vertex );
 
         pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )
