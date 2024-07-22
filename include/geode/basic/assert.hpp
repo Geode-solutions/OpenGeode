@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <array>
 #include <sstream>
 #include <stdexcept>
 #include <string>
