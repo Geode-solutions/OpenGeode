@@ -33,6 +33,7 @@
 #include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/solid_edges.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
 #include <geode/mesh/helpers/detail/split_along_solid_facets.hpp>
 #include <geode/mesh/io/hybrid_solid_output.hpp>
@@ -112,7 +113,7 @@ void test_hybrid_solid()
         builder_hex->create_point( point );
     }
     builder_hex->create_polyhedron( { 0, 1, 2, 3, 4, 5, 6, 7 },
-        { { 0, 2, 3, 1 }, { 0, 4, 5, 1 }, { 3, 1, 5, 7 }, { 4, 6, 7, 5 },
+        { { 0, 1, 3, 2 }, { 0, 4, 5, 1 }, { 3, 1, 5, 7 }, { 4, 6, 7, 5 },
             { 2, 3, 7, 6 }, { 0, 2, 6, 4 } } );
     auto hybrid_solid_hex = geode::convert_solid_mesh_into_hybrid_solid( *hex );
     geode::save_hybrid_solid(
@@ -120,10 +121,10 @@ void test_hybrid_solid()
     std::vector< geode::Point3D > prism_points{
         geode::Point3D{ { 0, 0, 0 } },
         geode::Point3D{ { 1, 0, 0 } },
-        geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 0.5, 1, 0 } },
         geode::Point3D{ { 0, 0, 1 } },
         geode::Point3D{ { 1, 0, 1 } },
-        geode::Point3D{ { 0, 1, 1 } },
+        geode::Point3D{ { 0.5, 1, 1 } },
     };
     auto prism = geode::SolidMesh3D::create();
     auto builder_prism = geode::SolidMeshBuilder3D::create( *prism );
@@ -132,8 +133,8 @@ void test_hybrid_solid()
         builder_prism->create_point( point );
     }
     builder_prism->create_polyhedron(
-        { 0, 1, 2, 3, 4, 5 }, { { 0, 2, 1 }, { 3, 5, 4 }, { 0, 3, 4, 1 },
-                                  { 0, 3, 5, 2 }, { 1, 4, 5, 2 } } );
+        { 0, 1, 2, 3, 4, 5 }, { { 0, 1, 2 }, { 3, 5, 4 }, { 0, 3, 4, 1 },
+                                  { 0, 2, 5, 3 }, { 1, 4, 5, 2 } } );
     auto hybrid_solid_prism =
         geode::convert_solid_mesh_into_hybrid_solid( *prism );
     geode::save_hybrid_solid(
@@ -148,8 +149,8 @@ void test_hybrid_solid()
         builder_pyramid->create_point( point );
     }
     builder_pyramid->create_polyhedron(
-        { 0, 1, 2, 3, 4 }, { { 0, 4, 1 }, { 0, 4, 3 }, { 1, 4, 2 }, { 4, 3, 2 },
-                               { 0, 3, 2, 1 } } );
+        { 0, 1, 2, 3, 4 }, { { 0, 4, 1 }, { 3, 4, 0 }, { 1, 4, 2 }, { 4, 3, 2 },
+                               { 0, 1, 2, 3 } } );
     auto hybrid_solid_pyramid =
         geode::convert_solid_mesh_into_hybrid_solid( *pyramid );
     geode::save_hybrid_solid(

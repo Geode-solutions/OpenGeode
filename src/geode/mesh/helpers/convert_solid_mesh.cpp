@@ -169,9 +169,9 @@ namespace
         const auto first_polyhedron_facet_vertices =
             solid.polyhedron_facet_vertices( { hexahedron_id, 0 } );
         ordered_vertices[0] = first_polyhedron_facet_vertices[0];
-        ordered_vertices[1] = first_polyhedron_facet_vertices[3];
+        ordered_vertices[1] = first_polyhedron_facet_vertices[1];
         ordered_vertices[2] = first_polyhedron_facet_vertices[2];
-        ordered_vertices[3] = first_polyhedron_facet_vertices[1];
+        ordered_vertices[3] = first_polyhedron_facet_vertices[3];
         for( const auto f : geode::LRange( 1, 6 ) )
         {
             const auto polyhedron_facet_vertices =
