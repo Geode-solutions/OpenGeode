@@ -188,9 +188,7 @@ namespace geode
         }
 
         template < index_t dimension >
-        EdgedCurveMerger< dimension >::~EdgedCurveMerger()
-        {
-        }
+        EdgedCurveMerger< dimension >::~EdgedCurveMerger() = default;
 
         template < index_t dimension >
         std::unique_ptr< EdgedCurve< dimension > >

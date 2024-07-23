@@ -168,9 +168,7 @@ namespace geode
         }
 
         template < typename Mesh >
-        VertexMerger< Mesh >::~VertexMerger()
-        {
-        }
+        VertexMerger< Mesh >::~VertexMerger() = default;
 
         template < typename Mesh >
         index_t VertexMerger< Mesh >::vertex_in_merged(

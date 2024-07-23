@@ -675,8 +675,10 @@ namespace geode
         const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
         const auto adj_vertices = polygon_vertices( polygon_adj_id );
         const auto nb_edges = adj_vertices.size();
+        std::vector< PolygonEdge > failed_edges;
         for( const auto e : LRange{ nb_edges } )
         {
+            const PolygonEdge polygon_adj_edge{ polygon_adj_id, e };
             if( v0 == adj_vertices[e] )
             {
                 const auto enext = e == nb_edges - 1
@@ -684,17 +686,12 @@ namespace geode
                                        : static_cast< local_index_t >( e + 1 );
                 if( v1 == adj_vertices[enext] )
                 {
-                    OPENGEODE_EXCEPTION(
-                        polygon_adjacent( { polygon_adj_id, e } )
-                            == polygon_edge.polygon_id,
-                        absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
-                                      "edge] Wrong adjacency with polygons "
-                                      "(bijectivity): ",
-                            polygon_edge.polygon_id, " and ", polygon_adj_id,
-                            " (v0 = ", this->point( v0 ).string(),
-                            ", v1 = ", this->point( v1 ).string(), ")" ) );
-                    return std::optional< PolygonEdge >{ std::in_place,
-                        polygon_adj_id, e };
+                    if( polygon_adjacent( polygon_adj_edge )
+                        == polygon_edge.polygon_id )
+                    {
+                        return polygon_adj_edge;
+                    }
+                    failed_edges.emplace_back( polygon_adj_edge );
                 }
             }
             else if( v1 == adj_vertices[e] )
@@ -704,28 +701,34 @@ namespace geode
                                        : static_cast< local_index_t >( e + 1 );
                 if( v0 == adj_vertices[enext] )
                 {
-                    OPENGEODE_EXCEPTION(
-                        polygon_adjacent( { polygon_adj_id, e } )
-                            == polygon_edge.polygon_id,
-                        absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
-                                      "edge] Wrong adjacency with polygons "
-                                      "(bijectivity): ",
-                            polygon_edge.polygon_id, " and ", polygon_adj_id,
-                            " (v0 = ", this->point( v0 ).string(),
-                            ", v1 = ", this->point( v1 ).string(), ")" ) );
-                    return std::optional< PolygonEdge >{ std::in_place,
-                        polygon_adj_id, e };
+                    if( polygon_adjacent( polygon_adj_edge )
+                        == polygon_edge.polygon_id )
+                    {
+                        return polygon_adj_edge;
+                    }
+                    failed_edges.emplace_back( polygon_adj_edge );
                 }
             }
         }
-        throw OpenGeodeException{
-            "[SurfaceMesh::polygon_adjacent_edge] Wrong "
-            "adjacency with polygons (different vertices): ",
-            polygon_edge.polygon_id, " and ", polygon_adj_id,
-            " (v0 = ", this->point( v0 ).string(),
-            ", v1 = ", this->point( v1 ).string(), ")"
-        };
-        return std::nullopt;
+        if( failed_edges.empty() )
+        {
+            throw OpenGeodeException{
+                "[SurfaceMesh::polygon_adjacent_edge] Wrong "
+                "adjacency with polygons (different vertices): ",
+                polygon_edge.string(), " and ", polygon_adj_id,
+                " (v0 = ", this->point( v0 ).string(),
+                ", v1 = ", this->point( v1 ).string(), ")"
+            };
+        }
+        auto message = absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
+                                     "edge] Wrong adjacency with polygons "
+                                     "(bijectivity): ",
+            polygon_edge.string() );
+        for( const auto& edge : failed_edges )
+        {
+            absl::StrAppend( &message, " and ", edge.string() );
+        }
+        throw OpenGeodeException{ message };
     }
 
     template < index_t dimension >

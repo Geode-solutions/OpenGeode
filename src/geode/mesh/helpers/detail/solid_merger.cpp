@@ -275,9 +275,7 @@ namespace geode
         }
 
         template < index_t dimension >
-        SolidMeshMerger< dimension >::~SolidMeshMerger()
-        {
-        }
+        SolidMeshMerger< dimension >::~SolidMeshMerger() = default;
 
         template < index_t dimension >
         std::unique_ptr< SolidMesh< dimension > >
