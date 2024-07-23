@@ -168,9 +168,7 @@ namespace geode
         }
 
         template < typename Mesh >
-        VertexMerger< Mesh >::~VertexMerger()
-        {
-        }
+        VertexMerger< Mesh >::~VertexMerger() = default;
 
         template < typename Mesh >
         index_t VertexMerger< Mesh >::vertex_in_merged(
@@ -180,8 +178,8 @@ namespace geode
         }
 
         template < typename Mesh >
-        auto VertexMerger< Mesh >::vertex_origins( index_t vertex ) const
-            -> const VertexOrigins&
+        auto VertexMerger< Mesh >::vertex_origins(
+            index_t vertex ) const -> const VertexOrigins&
         {
             return impl_->vertex_origins( vertex );
         }

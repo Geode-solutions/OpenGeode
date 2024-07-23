@@ -301,9 +301,7 @@ namespace geode
         }
 
         template < index_t dimension >
-        SurfaceMeshMerger< dimension >::~SurfaceMeshMerger()
-        {
-        }
+        SurfaceMeshMerger< dimension >::~SurfaceMeshMerger() = default;
 
         template < index_t dimension >
         std::unique_ptr< SurfaceMesh< dimension > >
