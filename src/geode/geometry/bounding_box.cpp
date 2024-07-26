@@ -408,6 +408,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    double BoundingBox< dimension >::smallest_length() const
+    {
+        auto length = std::numeric_limits< double >::max();
+        const auto diag = diagonal();
+        for( const auto i : LRange{ dimension } )
+        {
+            length = std::min( length, diag.value( i ) );
+        }
+        return length;
+    }
+
+    template < index_t dimension >
     double BoundingBox< dimension >::signed_distance(
         const Point< dimension >& point ) const
     {
