@@ -80,6 +80,12 @@ namespace geode
                 query, distance_action_ );
         }
 
+    protected:
+        const AABBTree< dimension >& elements_aabb() const
+        {
+            return elements_tree_;
+        }
+
     private:
         AABBTree< dimension > elements_tree_;
         const DistanceToEdge< dimension > distance_action_;
