@@ -901,7 +901,8 @@ namespace geode
             const auto next_vertex = next_polygon_vertex( polygon_vertex );
             if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
-                return PolygonEdge{ polygon_vertex };
+                return std::optional< PolygonEdge >{ std::in_place,
+                    polygon_vertex };
             }
         }
         return std::nullopt;

@@ -101,6 +101,8 @@ namespace geode
 
         Vector< dimension > diagonal() const;
 
+        double smallest_length() const;
+
     private:
         Point< dimension > min_;
         Point< dimension > max_;
