@@ -34,8 +34,10 @@
     pybind11::class_< TextureManager< dimension > >(                           \
         module, name##dimension.c_str() )                                      \
         .def( "find_or_create_texture",                                        \
-            &TextureManager< dimension >::find_or_create_texture )             \
-        .def( "find_texture", &TextureManager< dimension >::find_texture )     \
+            &TextureManager< dimension >::find_or_create_texture,              \
+            pybind11::return_value_policy::reference )                         \
+        .def( "find_texture", &TextureManager< dimension >::find_texture,      \
+            pybind11::return_value_policy::reference )                         \
         .def( "texture_names", &TextureManager< dimension >::texture_names )   \
         .def( "texture_exists", &TextureManager< dimension >::texture_exists ) \
         .def( "delete_texture", &TextureManager< dimension >::delete_texture )
