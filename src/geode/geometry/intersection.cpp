@@ -374,11 +374,11 @@ namespace geode
         const Vector3D diff{ vertices[0], line.origin() };
         const auto d_dot_q_cross_e2 =
             sign * line.direction().dot( diff.cross( edge2 ) );
-        if( d_dot_q_cross_e2 >= 0 )
+        if( d_dot_q_cross_e2 >= -GLOBAL_EPSILON )
         {
             const auto d_dot_e1_cross_q =
                 sign * line.direction().dot( edge1.cross( diff ) );
-            if( d_dot_e1_cross_q >= 0
+            if( d_dot_e1_cross_q >= -GLOBAL_EPSILON
                 && d_dot_q_cross_e2 + d_dot_e1_cross_q <= d_dot_n )
             {
                 // InfiniteLine intersects triangle.
