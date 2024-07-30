@@ -292,46 +292,51 @@ namespace geode
         const Vector3D diff{ vertices[0], seg_center };
         const auto DdQxE2 =
             sign * segment_normalized_direction.dot( diff.cross( edge2 ) );
-        if( DdQxE2 >= 0 )
+        if( DdQxE2 < -GLOBAL_EPSILON )
         {
-            const auto DdE1xQ =
-                sign * segment_normalized_direction.dot( edge1.cross( diff ) );
-            if( DdE1xQ >= 0 && DdQxE2 + DdE1xQ <= DdN )
-            {
-                // InfiniteLine intersects triangle, check if segment does.
-                const auto QdN = -sign * diff.dot( normal );
-                const auto extDdN = segment.length() * DdN / 2.;
-                if( -extDdN <= QdN && QdN <= extDdN )
-                {
-                    // Segment intersects triangle.
-                    const auto inv = 1. / DdN;
-                    const auto seg_parameter = QdN * inv;
-
-                    auto result =
-                        seg_center
-                        + segment_normalized_direction * seg_parameter;
-                    CorrectnessInfo< Point3D >::Correctness first_correctness{
-                        point_segment_distance( result, segment )
-                            <= GLOBAL_EPSILON,
-                        point_segment_projection( result, segment )
-                    };
-                    const auto point_to_triangle_distance =
-                        point_triangle_distance( result, triangle );
-                    CorrectnessInfo< Point3D >::Correctness second_correctness{
-                        std::get< 0 >( point_to_triangle_distance )
-                            <= GLOBAL_EPSILON,
-                        std::get< 1 >( point_to_triangle_distance )
-                    };
-                    return { std::move( result ),
-                        { first_correctness, second_correctness } };
-                }
-                // else: |t| > extent, no intersection
-            }
-            // else: b1+b2 > 1, no intersection
-            // else: b2 < 0, no intersection
+            // b1 < 0, no intersection
+            return { INTERSECTION_TYPE::none };
         }
-        // else: b1 < 0, no intersection
-        return { INTERSECTION_TYPE::none };
+        const auto DdE1xQ =
+            sign * segment_normalized_direction.dot( edge1.cross( diff ) );
+        if( DdE1xQ < -GLOBAL_EPSILON )
+        {
+            // b2 < 0, no intersection
+            return { INTERSECTION_TYPE::none };
+        }
+
+        if( DdQxE2 + DdE1xQ - DdN > GLOBAL_EPSILON )
+        {
+            // b1+b2 > 1, no intersection
+            return { INTERSECTION_TYPE::none };
+        }
+
+        // InfiniteLine intersects triangle, check if segment does.
+        const auto QdN = -sign * diff.dot( normal );
+        const auto extDdN = segment.length() * DdN / 2.;
+
+        if( -extDdN > QdN || QdN > extDdN )
+        {
+            // else: |t| > extent, no intersection
+            return { INTERSECTION_TYPE::none };
+        }
+        // Segment intersects triangle.
+        const auto inv = 1. / DdN;
+        const auto seg_parameter = QdN * inv;
+
+        auto result = seg_center + segment_normalized_direction * seg_parameter;
+        CorrectnessInfo< Point3D >::Correctness first_correctness{
+            point_segment_distance( result, segment ) <= GLOBAL_EPSILON,
+            point_segment_projection( result, segment )
+        };
+        const auto point_to_triangle_distance =
+            point_triangle_distance( result, triangle );
+        CorrectnessInfo< Point3D >::Correctness second_correctness{
+            std::get< 0 >( point_to_triangle_distance ) <= GLOBAL_EPSILON,
+            std::get< 1 >( point_to_triangle_distance )
+        };
+        return { std::move( result ),
+            { first_correctness, second_correctness } };
     }
 
     IntersectionResult< Point3D > line_triangle_intersection(
