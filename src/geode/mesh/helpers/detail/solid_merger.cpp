@@ -89,6 +89,7 @@ namespace geode
             {
                 merger.create_points();
                 create_polyhedra( merger );
+                create_adjacencies( merger );
                 clean_solid( merger );
                 solid_id_.clear();
                 return merger.steal_mesh();
@@ -198,7 +199,90 @@ namespace geode
                         }
                     }
                 }
+            }
+
+            void create_adjacencies( SolidMeshMerger< dimension >& merger )
+            {
                 merger.builder().compute_polyhedron_adjacencies();
+                for( const auto p : Range{ merger.mesh().nb_polyhedra() } )
+                {
+                    for( const auto f :
+                        LRange{ merger.mesh().nb_polyhedron_facets( p ) } )
+                    {
+                        const PolyhedronFacet facet{ p, f };
+                        const auto adj =
+                            merger.mesh().polyhedron_adjacent_facet( facet );
+                        if( !adj )
+                        {
+                            continue;
+                        }
+                        const auto facet_vertices =
+                            merger.mesh().polyhedron_facet_vertices( facet );
+                        bool keep_adj{ false };
+                        for( const auto& origin : polyhedra_origins_[p] )
+                        {
+                            const auto facet_origin = find_facet_origin(
+                                merger, facet_vertices, origin, f );
+                            const auto& solid =
+                                merger.meshes()[origin.solid].get();
+                            if( !solid.is_polyhedron_facet_on_border(
+                                    facet_origin ) )
+                            {
+                                keep_adj = true;
+                                break;
+                            }
+                        }
+                        if( !keep_adj )
+                        {
+                            merger.builder().unset_polyhedron_adjacent( facet );
+                            merger.builder().unset_polyhedron_adjacent(
+                                adj.value() );
+                        }
+                    }
+                }
+            }
+
+            PolyhedronFacet find_facet_origin(
+                SolidMeshMerger< dimension >& merger,
+                const PolyhedronFacetVertices& merged_facet_vertices,
+                const PolyhedronOrigin& origin,
+                local_index_t hint ) const
+            {
+                using Facet = VertexCycle< PolyhedronFacetVertices >;
+                const Facet merged_cycle{ merged_facet_vertices };
+                const auto& solid = merger.meshes()[origin.solid].get();
+                const auto is_same_facet = [&merger, &merged_cycle, &solid,
+                                               &origin]( const auto& facet ) {
+                    PolyhedronFacetVertices updated_vertices;
+                    for( const auto vertex :
+                        solid.polyhedron_facet_vertices( facet ) )
+                    {
+                        updated_vertices.push_back(
+                            merger.vertex_in_merged( origin.solid, vertex ) );
+                    }
+                    return Facet{ updated_vertices } == merged_cycle;
+                };
+                const PolyhedronFacet hint_facet{ origin.polyhedron, hint };
+                if( is_same_facet( hint_facet ) )
+                {
+                    return hint_facet;
+                }
+                for( const auto& f :
+                    LRange{ solid.nb_polyhedron_facets( origin.polyhedron ) } )
+                {
+                    if( f == hint )
+                    {
+                        continue;
+                    }
+                    const PolyhedronFacet facet{ origin.polyhedron, f };
+                    if( is_same_facet( facet ) )
+                    {
+                        return facet;
+                    }
+                }
+                OPENGEODE_ASSERT_NOT_REACHED(
+                    "[SolidMerger::find_facet_origin] Facet not found" );
+                return hint_facet;
             }
 
             void separate_solids( SolidMeshMerger< dimension >& merger )
