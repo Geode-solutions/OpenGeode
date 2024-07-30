@@ -28,6 +28,15 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    ALIAS_2D_AND_3D( PointSet );
+    ALIAS_2D_AND_3D( EdgedCurve );
+    ALIAS_2D_AND_3D( SurfaceMesh );
+    ALIAS_2D_AND_3D( SolidMesh );
+
     class Section;
     class SectionBuilder;
     class BRep;
@@ -45,6 +54,33 @@ namespace geode
         void opengeode_model_api transfer_section_metadata(
             const Section& old_section,
             SectionBuilder& new_brep_builder,
+            const ModelGenericMapping& component_mapping );
+
+        template < typename ModelBuilder >
+        void transfer_pointsets_metadata(
+            absl::Span< const std::reference_wrapper<
+                const PointSet< ModelBuilder::dim > > > pointsets,
+            ModelBuilder& model_builder,
+            const ModelGenericMapping& component_mapping );
+
+        template < typename ModelBuilder >
+        void transfer_curves_metadata(
+            absl::Span< const std::reference_wrapper<
+                const EdgedCurve< ModelBuilder::dim > > > curves,
+            ModelBuilder& model_builder,
+            const ModelGenericMapping& component_mapping );
+
+        template < typename ModelBuilder >
+        void transfer_surfaces_metadata(
+            absl::Span< const std::reference_wrapper<
+                const SurfaceMesh< ModelBuilder::dim > > > surfaces,
+            ModelBuilder& model_builder,
+            const ModelGenericMapping& component_mapping );
+
+        void opengeode_model_api transfer_solids_metadata(
+            absl::Span< const std::reference_wrapper< const SolidMesh3D > >
+                solids,
+            BRepBuilder& model_builder,
             const ModelGenericMapping& component_mapping );
     } // namespace detail
 } // namespace geode
