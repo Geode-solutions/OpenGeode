@@ -33,6 +33,30 @@
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
+namespace
+{
+    bool is_polyhedron_degenerated(
+        absl::Span< const geode::index_t > vertices )
+    {
+        for( const auto v : geode::LIndices{ vertices } )
+        {
+            const auto vertex = vertices[v];
+            for( const auto other_v : geode::LIndices{ vertices } )
+            {
+                if( v == other_v )
+                {
+                    continue;
+                }
+                if( vertex == vertices[other_v] )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+} // namespace
+
 namespace geode
 {
     namespace detail
@@ -65,7 +89,6 @@ namespace geode
             {
                 merger.create_points();
                 create_polyhedra( merger );
-                create_adjacencies( merger );
                 clean_solid( merger );
                 solid_id_.clear();
                 return merger.steal_mesh();
@@ -96,40 +119,6 @@ namespace geode
         private:
             void clean_solid( SolidMeshMerger< dimension >& merger )
             {
-                bool delete_needed{ false };
-                std::vector< bool > to_delete(
-                    merger.mesh().nb_polyhedra(), false );
-                for( const auto p : Range{ merger.mesh().nb_polyhedra() } )
-                {
-                    const auto vertices =
-                        merger.mesh().polyhedron_vertices( p );
-                    for( const auto v : LIndices{ vertices } )
-                    {
-                        if( vertices[v]
-                            == vertices[v == vertices.size() - 1 ? 0 : v + 1] )
-                        {
-                            to_delete[p] = true;
-                            delete_needed = true;
-                        }
-                    }
-                }
-                if( delete_needed )
-                {
-                    const auto old2new =
-                        merger.builder().delete_polyhedra( to_delete );
-                    delete_vector_elements( to_delete, polyhedra_origins_ );
-                    delete_vector_elements( to_delete, solid_id_ );
-                    const auto& meshes = merger.meshes();
-                    for( const auto solid_id : Indices{ merger.meshes() } )
-                    {
-                        const auto& solid = meshes[solid_id].get();
-                        for( const auto p : Range{ solid.nb_polyhedra() } )
-                        {
-                            const auto old = new_id_[solid_id][p];
-                            new_id_[solid_id][p] = old2new[old];
-                        }
-                    }
-                }
                 separate_solids( merger );
             }
 
@@ -148,6 +137,10 @@ namespace geode
                         {
                             vertices[v] = merger.vertex_in_merged(
                                 s, solid.polyhedron_vertex( { p, v } ) );
+                        }
+                        if( is_polyhedron_degenerated( vertices ) )
+                        {
+                            continue;
                         }
                         const auto it =
                             polyhedra.try_emplace( TypedVertexCycle{ vertices },
@@ -205,37 +198,7 @@ namespace geode
                         }
                     }
                 }
-            }
-
-            void create_adjacencies( SolidMeshMerger< dimension >& merger )
-            {
-                absl::FixedArray< bool > visited_polyhedra(
-                    merger.mesh().nb_polyhedra(), false );
-                const auto& meshes = merger.meshes();
-                for( const auto s : Indices{ merger.meshes() } )
-                {
-                    const auto& solid = meshes[s].get();
-                    for( const auto p : Range{ solid.nb_polyhedra() } )
-                    {
-                        const auto new_id = new_id_[s][p];
-                        if( visited_polyhedra[new_id] )
-                        {
-                            continue;
-                        }
-                        visited_polyhedra[new_id] = true;
-                        for( const auto f :
-                            LRange{ solid.nb_polyhedron_facets( p ) } )
-                        {
-                            if( const auto adj =
-                                    solid.polyhedron_adjacent( { p, f } ) )
-                            {
-                                const auto new_adj_id = new_id_[s][adj.value()];
-                                merger.builder().set_polyhedron_adjacent(
-                                    { new_id, f }, new_adj_id );
-                            }
-                        }
-                    }
-                }
+                merger.builder().compute_polyhedron_adjacencies();
             }
 
             void separate_solids( SolidMeshMerger< dimension >& merger )

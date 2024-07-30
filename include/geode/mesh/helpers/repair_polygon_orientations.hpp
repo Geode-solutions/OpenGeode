@@ -34,7 +34,8 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    void repair_polygon_orientations( SurfaceMesh< dimension >& mesh );
+    void OPENGEODE_MESH_DEPRECATED repair_polygon_orientations(
+        SurfaceMesh< dimension >& mesh );
 
     template < index_t dimension >
     void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,

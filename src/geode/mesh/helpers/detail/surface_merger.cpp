@@ -62,6 +62,26 @@ namespace
         }
         return polygons_around_edges;
     }
+
+    bool is_polygon_degenerated( absl::Span< const geode::index_t > vertices )
+    {
+        for( const auto v : geode::LIndices{ vertices } )
+        {
+            const auto vertex = vertices[v];
+            for( const auto other_v : geode::LIndices{ vertices } )
+            {
+                if( v == other_v )
+                {
+                    continue;
+                }
+                if( vertex == vertices[other_v] )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 } // namespace
 
 namespace geode
@@ -96,7 +116,6 @@ namespace geode
             {
                 merger.create_points();
                 create_polygons( merger );
-                create_adjacencies( merger );
                 clean_surface( merger );
                 surface_id_.clear();
                 return merger.steal_mesh();
@@ -125,39 +144,6 @@ namespace geode
         private:
             void clean_surface( SurfaceMeshMerger< dimension >& merger )
             {
-                bool delete_needed{ false };
-                std::vector< bool > to_delete(
-                    merger.mesh().nb_polygons(), false );
-                for( const auto p : Range{ merger.mesh().nb_polygons() } )
-                {
-                    const auto vertices = merger.mesh().polygon_vertices( p );
-                    for( const auto v : LIndices{ vertices } )
-                    {
-                        if( vertices[v]
-                            == vertices[v == vertices.size() - 1 ? 0 : v + 1] )
-                        {
-                            to_delete[p] = true;
-                            delete_needed = true;
-                        }
-                    }
-                }
-                if( delete_needed )
-                {
-                    const auto old2new =
-                        merger.builder().delete_polygons( to_delete );
-                    delete_vector_elements( to_delete, polygons_origins_ );
-                    delete_vector_elements( to_delete, surface_id_ );
-                    const auto& meshes = merger.meshes();
-                    for( const auto surface_id : Indices{ merger.meshes() } )
-                    {
-                        const auto& surface = meshes[surface_id].get();
-                        for( const auto p : Range{ surface.nb_polygons() } )
-                        {
-                            const auto old = new_id_[surface_id][p];
-                            new_id_[surface_id][p] = old2new[old];
-                        }
-                    }
-                }
                 separate_surfaces( merger );
                 repair_polygon_orientations( merger.mesh(), merger.builder() );
             }
@@ -177,6 +163,10 @@ namespace geode
                         {
                             vertices[v] = merger.vertex_in_merged(
                                 s, surface.polygon_vertex( { p, v } ) );
+                        }
+                        if( is_polygon_degenerated( vertices ) )
+                        {
+                            continue;
                         }
                         const auto it =
                             polygons.try_emplace( TypedVertexCycle{ vertices },
@@ -214,42 +204,7 @@ namespace geode
                         }
                     }
                 }
-            }
-
-            void create_adjacencies( SurfaceMeshMerger< dimension >& merger )
-            {
-                absl::FixedArray< bool > visited_polygons(
-                    merger.mesh().nb_polygons(), false );
-                const auto& meshes = merger.meshes();
-                for( const auto s : Indices{ merger.meshes() } )
-                {
-                    const auto& surface = meshes[s].get();
-                    for( const auto p : Range{ surface.nb_polygons() } )
-                    {
-                        const auto pv = surface.polygon_vertices( p );
-                        const auto new_id = new_id_[s][p];
-                        if( visited_polygons[new_id] )
-                        {
-                            continue;
-                        }
-                        visited_polygons[new_id] = true;
-                        for( const auto e :
-                            LRange{ surface.nb_polygon_edges( p ) } )
-                        {
-                            if( const auto adj =
-                                    surface.polygon_adjacent( { p, e } ) )
-                            {
-                                const auto new_adj_id = new_id_[s][adj.value()];
-                                if( new_adj_id == new_id )
-                                {
-                                    continue;
-                                }
-                                merger.builder().set_polygon_adjacent(
-                                    { new_id, e }, new_adj_id );
-                            }
-                        }
-                    }
-                }
+                merger.builder().compute_polygon_adjacencies();
             }
 
             void separate_surfaces( SurfaceMeshMerger< dimension >& merger )
