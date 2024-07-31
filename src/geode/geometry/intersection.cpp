@@ -273,12 +273,14 @@ namespace geode
         const auto segment_normalized_direction =
             segment.normalized_direction();
         auto d_dot_n = segment_normalized_direction.dot( normal );
+        auto d_dot_n_normalized =
+            segment_normalized_direction.dot( normal.normalize() );
         signed_index_t sign;
-        if( d_dot_n > 0. )
+        if( d_dot_n_normalized > GLOBAL_EPSILON )
         {
             sign = 1;
         }
-        else if( d_dot_n < -0. )
+        else if( d_dot_n_normalized < -GLOBAL_EPSILON )
         {
             sign = -1;
             d_dot_n = -d_dot_n;
@@ -355,12 +357,13 @@ namespace geode
         //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
         //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
         auto d_dot_n = line.direction().dot( normal );
+        auto d_dot_n_normalized = line.direction().dot( normal.normalize() );
         signed_index_t sign;
-        if( d_dot_n > 0. )
+        if( d_dot_n_normalized > GLOBAL_EPSILON )
         {
             sign = 1;
         }
-        else if( d_dot_n < -0. )
+        else if( d_dot_n_normalized < -GLOBAL_EPSILON )
         {
             sign = -1;
             d_dot_n = -d_dot_n;
@@ -427,7 +430,7 @@ namespace geode
         const Vector2D diff{ line0.origin(), line1.origin() };
         const auto D0DotPerpD1 =
             dot_perpendicular( line0.direction(), line1.direction() );
-        if( std::fabs( D0DotPerpD1 ) < 0. )
+        if( std::fabs( D0DotPerpD1 ) < GLOBAL_EPSILON )
         {
             // The lines are parallel.
             return { INTERSECTION_TYPE::parallel };
@@ -985,7 +988,7 @@ namespace geode
             // The planes are parallel.  Check if they are coplanar.
             const auto constant_diff =
                 dot >= 0. ? constant0 - constant1 : constant0 + constant1;
-            if( std::fabs( constant_diff ) == 0. )
+            if( std::fabs( constant_diff ) < GLOBAL_EPSILON )
             {
                 // The planes are coplanar.
                 return { INTERSECTION_TYPE::parallel };
