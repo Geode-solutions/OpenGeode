@@ -39,7 +39,7 @@ namespace geode
         const Vector3D edge_ac{ vertices[0], vertices[2] };
         const Vector3D edge_ad{ vertices[0], vertices[3] };
         const auto absolute_det =
-            std::abs( edge_ab.dot( edge_ac.cross( edge_ad ) ) );
+            std::fabs( edge_ab.dot( edge_ac.cross( edge_ad ) ) );
         if( absolute_det < GLOBAL_EPSILON )
         {
             return std::numeric_limits< double >::max();
@@ -53,19 +53,15 @@ namespace geode
         const auto edge_ad_l2 = edge_ad.length2();
         const auto edge_bd_l2 = edge_bd.length2();
         const auto edge_cd_l2 = edge_cd.length2();
-        const auto A = edge_ab_l2 > edge_bc_l2 ? edge_ab_l2 : edge_bc_l2;
-        const auto B = edge_ac_l2 > edge_ad_l2 ? edge_ac_l2 : edge_ad_l2;
-        const auto C = edge_bd_l2 > edge_cd_l2 ? edge_bd_l2 : edge_cd_l2;
-        const auto D = A > B ? A : B;
-        const auto longest_edge_length = D > C ? std::sqrt( D ) : std::sqrt( C );
-        const auto A_area2 = edge_ab.cross( edge_bc ).length();
-        const auto B_area2 = edge_ab.cross( edge_ad ).length();
-        const auto C_area2 = edge_ac.cross( edge_ad ).length();
-        const auto D_area2 = edge_bc.cross( edge_cd ).length();
+        const auto longest_edge_length = std::sqrt( std::max( { edge_ab_l2,
+            edge_bc_l2, edge_ac_l2, edge_ad_l2, edge_bd_l2, edge_cd_l2 } ) );
+        const auto total_area2 = edge_ab.cross( edge_bc ).length()
+                                 + edge_ab.cross( edge_ad ).length()
+                                 + edge_ac.cross( edge_ad ).length()
+                                 + edge_bc.cross( edge_cd ).length();
         const auto constant = std::sqrt( 6 ) / 12.;
-        const auto aspect_ratio = constant * longuest_edge
-                                  * ( A_area2 + B_area2 + C_area2 + D_area2 )
-                                  / absolute_det;
+        const auto aspect_ratio =
+            constant * longest_edge_length * total_area2 / absolute_det;
         return aspect_ratio;
     }
 } // namespace geode
