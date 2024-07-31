@@ -57,7 +57,7 @@ namespace geode
         const auto B = edge_ac_l2 > edge_ad_l2 ? edge_ac_l2 : edge_ad_l2;
         const auto C = edge_bd_l2 > edge_cd_l2 ? edge_bd_l2 : edge_cd_l2;
         const auto D = A > B ? A : B;
-        const auto longuest_edge = D > C ? std::sqrt( D ) : std::sqrt( C );
+        const auto longest_edge_length = D > C ? std::sqrt( D ) : std::sqrt( C );
         const auto A_area2 = edge_ab.cross( edge_bc ).length();
         const auto B_area2 = edge_ab.cross( edge_ad ).length();
         const auto C_area2 = edge_ac.cross( edge_ad ).length();
