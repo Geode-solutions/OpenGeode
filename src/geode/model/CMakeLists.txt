@@ -81,6 +81,8 @@ add_geode_library(
         "representation/builder/brep_builder.cpp"
         "representation/builder/section_builder.cpp"
         "representation/core/detail/clone.cpp"
+        "representation/core/detail/transfer_collections.cpp"
+        "representation/core/detail/transfer_metadata.cpp"
         "representation/core/brep.cpp"
         "representation/core/section.cpp"
         "representation/io/brep_input.cpp"
@@ -150,7 +152,6 @@ add_geode_library(
         "mixin/core/vertex_identifier.hpp"
         "representation/builder/brep_builder.hpp"
         "representation/builder/section_builder.hpp"
-        "representation/core/detail/clone.hpp"
         "representation/core/brep.hpp"
         "representation/core/section.hpp"
         "representation/core/mapping.hpp"
@@ -174,6 +175,9 @@ add_geode_library(
         "mixin/core/detail/relationships_impl.hpp"
         "representation/builder/detail/copy.hpp"
         "representation/builder/detail/filter.hpp"
+        "representation/core/detail/clone.hpp"
+        "representation/core/detail/transfer_collections.hpp"
+        "representation/core/detail/transfer_metadata.hpp"
     INTERNAL_HEADERS
         "helpers/internal/simplicial_model_creator.hpp"
     PUBLIC_DEPENDENCIES

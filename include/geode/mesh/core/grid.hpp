@@ -175,7 +175,7 @@ namespace geode
                 { 2, 6 }, { 3, 7 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
-            CELL_FACET_VERTICES_3D{ { { 0, 4, 6, 2 }, { 1, 5, 7, 3 },
+            CELL_FACET_VERTICES_3D{ { { 0, 2, 6, 4 }, { 1, 5, 7, 3 },
                 { 0, 4, 5, 1 }, { 2, 3, 7, 6 }, { 0, 1, 3, 2 },
                 { 4, 6, 7, 5 } } };
 
