@@ -103,6 +103,8 @@ namespace geode
 
         double smallest_length() const;
 
+        local_index_t largest_dimension() const;
+
     private:
         Point< dimension > min_;
         Point< dimension > max_;

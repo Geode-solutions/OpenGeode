@@ -420,6 +420,23 @@ namespace geode
     }
 
     template < index_t dimension >
+    local_index_t BoundingBox< dimension >::largest_dimension() const
+    {
+        const auto diag = diagonal();
+        local_index_t dim{ 0 };
+        auto length = diag.value( dim );
+        for( const auto i : LRange{ 1, dimension } )
+        {
+            if( length < diag.value( i ) )
+            {
+                length = diag.value( i );
+                dim = i;
+            }
+        }
+        return dim;
+    }
+
+    template < index_t dimension >
     double BoundingBox< dimension >::signed_distance(
         const Point< dimension >& point ) const
     {
