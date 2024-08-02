@@ -113,6 +113,14 @@ namespace geode
         in.erase( last, in.end() );
     }
 
+    template < typename Container, typename Comparison >
+    void sort_unique( Container& in, Comparison comp )
+    {
+        absl::c_sort( in, comp );
+        const auto last = std::unique( in.begin(), in.end(), comp );
+        in.erase( last, in.end() );
+    }
+
     /*!
      * Concatenate tuples into a single tuple.
      */
