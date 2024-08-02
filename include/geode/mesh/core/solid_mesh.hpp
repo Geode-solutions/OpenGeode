@@ -333,6 +333,10 @@ namespace geode
         std::optional< PolyhedronFacet > polyhedron_facet_from_vertices(
             PolyhedronFacetVertices polyhedron_facet_vertices ) const;
 
+        std::optional< PolyhedronFacet > polyhedron_facet_from_vertices(
+            PolyhedronFacetVertices polyhedron_facet_vertices,
+            index_t polyhedron_id ) const;
+
         PolyhedronFacetVertices polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const;
 

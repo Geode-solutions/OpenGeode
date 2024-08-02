@@ -293,6 +293,28 @@ namespace
             "adjacencies." );
         return result;
     }
+
+    template < geode::index_t dimension >
+    std::optional< geode::PolyhedronFacet > polyhedron_facet_from_vertices(
+        const geode::SolidMesh< dimension >& mesh,
+        const geode::detail::VertexCycle< geode::PolyhedronFacetVertices >&
+            vertices,
+        geode::index_t polyhedron_id )
+    {
+        for( const auto f :
+            geode::LRange{ mesh.nb_polyhedron_facets( polyhedron_id ) } )
+        {
+            std::optional< geode::PolyhedronFacet > facet{ std::in_place,
+                polyhedron_id, f };
+            geode::detail::VertexCycle< geode::PolyhedronFacetVertices >
+                cur_vertices{ mesh.polyhedron_facet_vertices( facet.value() ) };
+            if( vertices == cur_vertices )
+            {
+                return facet;
+            }
+        }
+        return std::nullopt;
+    }
 } // namespace
 
 namespace geode
@@ -391,10 +413,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
@@ -940,21 +962,25 @@ namespace geode
         for( const auto& polyhedron_vertex :
             polyhedra_around_vertex( vertices.vertices()[0] ) )
         {
-            for( const auto f : LRange{
-                     nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+            if( auto result = ::polyhedron_facet_from_vertices(
+                    *this, vertices, polyhedron_vertex.polyhedron_id ) )
             {
-                std::optional< PolyhedronFacet > facet{ std::in_place,
-                    polyhedron_vertex.polyhedron_id, f };
-                detail::VertexCycle< PolyhedronFacetVertices > cur_vertices{
-                    polyhedron_facet_vertices( facet.value() )
-                };
-                if( vertices == cur_vertices )
-                {
-                    return facet;
-                }
+                return result;
             }
         }
         return std::nullopt;
+    }
+
+    template < index_t dimension >
+    std::optional< PolyhedronFacet >
+        SolidMesh< dimension >::polyhedron_facet_from_vertices(
+            PolyhedronFacetVertices facet_vertices,
+            index_t polyhedron_id ) const
+    {
+        detail::VertexCycle< PolyhedronFacetVertices > vertices{ std::move(
+            facet_vertices ) };
+        return ::polyhedron_facet_from_vertices(
+            *this, vertices, polyhedron_id );
     }
 
     template < index_t dimension >
