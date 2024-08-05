@@ -102,11 +102,11 @@ function(add_geode_python_wheel)
     execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel setuptools build)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -c 
-"from wheel.bdist_wheel import get_platform
+"from sysconfig import get_platform
 from wheel.vendored.packaging import tags
 name=tags.interpreter_name()
 version=tags.interpreter_version()
-platform=get_platform(None)
+platform=get_platform().replace("-", "_").replace(".", "_")
 print(name + version + '-' + name + version + '-' + platform)"
         OUTPUT_VARIABLE wheel_sufix
         OUTPUT_STRIP_TRAILING_WHITESPACE
