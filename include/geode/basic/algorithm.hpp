@@ -117,8 +117,7 @@ namespace geode
     void sort_unique( Container& container, Comparison comp )
     {
         absl::c_sort( container, comp );
-        const auto last =
-            std::unique( container.begin(), container.end(), comp );
+        const auto last = std::unique( container.begin(), container.end() );
         container.erase( last, container.end() );
     }
 
