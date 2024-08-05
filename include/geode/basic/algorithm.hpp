@@ -103,22 +103,23 @@ namespace geode
     /*!
      * Modify the container by removing every duplicated values inside
      * @tparam Container Type of container.
-     * @param[in] in container in which perform the search.
+     * @param[in] container container in which perform the search.
      */
     template < typename Container >
-    void sort_unique( Container& in )
+    void sort_unique( Container& container )
     {
-        absl::c_sort( in );
-        const auto last = std::unique( in.begin(), in.end() );
-        in.erase( last, in.end() );
+        absl::c_sort( container );
+        const auto last = std::unique( container.begin(), container.end() );
+        container.erase( last, container.end() );
     }
 
     template < typename Container, typename Comparison >
-    void sort_unique( Container& in, Comparison comp )
+    void sort_unique( Container& container, Comparison comp )
     {
-        absl::c_sort( in, comp );
-        const auto last = std::unique( in.begin(), in.end(), comp );
-        in.erase( last, in.end() );
+        absl::c_sort( container, comp );
+        const auto last =
+            std::unique( container.begin(), container.end(), comp );
+        container.erase( last, container.end() );
     }
 
     /*!
