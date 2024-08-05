@@ -106,8 +106,9 @@ function(add_geode_python_wheel)
 from wheel.vendored.packaging import tags
 name=tags.interpreter_name()
 version=tags.interpreter_version()
-platform=get_platform().replace("-", "_").replace(".", "_")
-print(name + version + '-' + name + version + '-' + platform)"
+platform=get_platform()
+modified_platform=platform.replace("-", "_")
+print(name + version + '-' + name + version + '-' + modified_platform)"
         OUTPUT_VARIABLE wheel_sufix
         OUTPUT_STRIP_TRAILING_WHITESPACE
     ) 
