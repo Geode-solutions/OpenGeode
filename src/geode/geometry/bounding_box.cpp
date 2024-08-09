@@ -98,6 +98,24 @@ namespace
         }
         return line.origin().value( 0 ) > box.max().value( 0 );
     }
+
+    template < geode::index_t dimension, typename Condition >
+    std::tuple< geode::local_index_t, double > test_axes(
+        const geode::Vector< dimension >& diagonal,
+        double length,
+        Condition predicate )
+    {
+        geode::local_index_t axis{ 0 };
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            if( predicate( diagonal.value( i ), length ) )
+            {
+                length = diagonal.value( i );
+                axis = i;
+            }
+        }
+        return std::make_tuple( axis, length );
+    }
 } // namespace
 
 namespace geode
@@ -408,15 +426,25 @@ namespace geode
     }
 
     template < index_t dimension >
-    double BoundingBox< dimension >::smallest_length() const
+    std::tuple< local_index_t, double >
+        BoundingBox< dimension >::smallest_length() const
     {
         auto length = std::numeric_limits< double >::max();
-        const auto diag = diagonal();
-        for( const auto i : LRange{ dimension } )
-        {
-            length = std::min( length, diag.value( i ) );
-        }
-        return length;
+        return test_axes(
+            diagonal(), length, []( double diagonal_value, double min_value ) {
+                return diagonal_value < min_value;
+            } );
+    }
+
+    template < index_t dimension >
+    std::tuple< local_index_t, double >
+        BoundingBox< dimension >::largest_length() const
+    {
+        double length{ 0 };
+        return test_axes(
+            diagonal(), length, []( double diagonal_value, double max_value ) {
+                return diagonal_value > max_value;
+            } );
     }
 
     template < index_t dimension >
