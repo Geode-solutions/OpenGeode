@@ -101,7 +101,9 @@ namespace geode
 
         Vector< dimension > diagonal() const;
 
-        double smallest_length() const;
+        std::tuple< local_index_t, double > smallest_length() const;
+
+        std::tuple< local_index_t, double > largest_length() const;
 
     private:
         Point< dimension > min_;

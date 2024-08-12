@@ -48,7 +48,8 @@
         .def( "max", &BoundingBox##dimension##D::max )                         \
         .def( "center", &BoundingBox##dimension##D::center )                   \
         .def( "diagonal", &BoundingBox##dimension##D::diagonal )               \
-        .def( "smallest_length", &BoundingBox##dimension##D::smallest_length )
+        .def( "smallest_length", &BoundingBox##dimension##D::smallest_length ) \
+        .def( "largest_length", &BoundingBox##dimension##D::largest_length )
 
 namespace geode
 {
