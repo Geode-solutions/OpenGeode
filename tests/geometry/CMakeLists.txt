@@ -123,6 +123,12 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-quality.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-rotation.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
