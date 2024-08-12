@@ -937,16 +937,10 @@ namespace geode
         const auto& facet_vertices =
             Tetrahedron::tetrahedron_facet_vertex[facet];
         const auto& vertices = tetra.vertices();
-        const auto output = point_triangle_signed_distance( point,
+        const auto output = point_triangle_distance( point,
             Triangle3D{ vertices[facet_vertices[0]],
                 vertices[facet_vertices[1]], vertices[facet_vertices[2]] } );
-        // Tetra facet normals point towards inside
-        if( tetrahedron_volume_sign( tetra ) == Sign::negative )
-        {
-            return output;
-        }
-        return std::make_tuple(
-            -std::get< 0 >( output ), std::get< 1 >( output ) );
+        return output;
     }
 
     std::tuple< double, Point3D > point_triangle_signed_distance(
