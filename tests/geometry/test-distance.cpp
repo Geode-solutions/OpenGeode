@@ -748,16 +748,14 @@ void test_point_tetrahedron_distance()
             geode::point_tetrahedron_distance( q1, tetra );
         OPENGEODE_EXCEPTION( distance == 0 && closest_point == q1,
             "[Test] Wrong result for point_tetrahedron_distance with query "
-            "Point3D "
-            "q1" );
+            "Point3D q1" );
 
         const geode::Point3D q2{ { 0.25, 0.25, 0.0 } };
         std::tie( distance, closest_point ) =
             geode::point_tetrahedron_distance( q2, tetra );
         OPENGEODE_EXCEPTION( distance == 0 && closest_point == q2,
             "[Test] Wrong result for point_tetrahedron_distance with query "
-            "Point3D "
-            "q2" );
+            "Point3D q2" );
 
         const geode::Point3D q3{ { 2.5, 2.5, 0.0 } };
         std::tie( distance, closest_point ) =
@@ -766,8 +764,7 @@ void test_point_tetrahedron_distance()
         OPENGEODE_EXCEPTION(
             distance == std::sqrt( 8 ) && closest_point.inexact_equal( answer ),
             "[Test] Wrong result for point_tetrahedron_distance with query "
-            "Point3D "
-            "q3" );
+            "Point3D q3" );
     };
 
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
