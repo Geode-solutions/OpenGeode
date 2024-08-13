@@ -25,25 +25,22 @@
 
 #include <mutex>
 
-#include <absl/time/clock.h>
-
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/progress_logger_manager.hpp>
 #include <geode/basic/uuid.hpp>
-
-namespace
-{
-    constexpr absl::Duration SLEEP = absl::Seconds( 1 );
-} // namespace
 
 namespace geode
 {
     class ProgressLogger::Impl
     {
     public:
-        Impl( const std::string& message, index_t nb_steps )
-            : nb_steps_( nb_steps ), current_time_{ absl::Now() }
+        Impl( const std::string& message,
+            index_t nb_steps,
+            absl::Duration refresh_interval )
+            : nb_steps_( nb_steps ),
+              current_time_{ absl::Now() },
+              refresh_interval_{ refresh_interval }
         {
             ProgressLoggerManager::start( id_, message, nb_steps_ );
         }
@@ -65,7 +62,7 @@ namespace geode
             const std::lock_guard< std::mutex > locking{ lock_ };
             current_ += nb_increments;
             auto now = absl::Now();
-            if( now - current_time_ > SLEEP )
+            if( now - current_time_ > refresh_interval_ )
             {
                 current_time_ = now;
                 ProgressLoggerManager::update( id_, current_, nb_steps_ );
@@ -85,12 +82,14 @@ namespace geode
         index_t nb_steps_;
         index_t current_{ 0 };
         absl::Time current_time_;
+        absl::Duration refresh_interval_;
         std::mutex lock_;
     };
 
-    ProgressLogger::ProgressLogger(
-        const std::string& message, index_t nb_steps )
-        : impl_( message, nb_steps )
+    ProgressLogger::ProgressLogger( const std::string& message,
+        index_t nb_steps,
+        absl::Duration refresh_interval )
+        : impl_( message, nb_steps, refresh_interval )
     {
     }
 
