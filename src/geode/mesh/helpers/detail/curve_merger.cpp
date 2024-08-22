@@ -135,6 +135,10 @@ namespace geode
                             vertices[v] = merger.vertex_in_merged(
                                 s, curve.edge_vertex( { e, v } ) );
                         }
+                        if( vertices[0] == vertices[1] )
+                        {
+                            continue;
+                        }
                         const auto it =
                             edges.try_emplace( TypedVertexCycle{ vertices },
                                 merger.mesh().nb_edges() );
@@ -205,8 +209,8 @@ namespace geode
         }
 
         template < index_t dimension >
-        auto EdgedCurveMerger< dimension >::edge_origins( index_t edge ) const
-            -> const EdgeOrigins&
+        auto EdgedCurveMerger< dimension >::edge_origins(
+            index_t edge ) const -> const EdgeOrigins&
         {
             return impl_->edge_origins( edge );
         }
