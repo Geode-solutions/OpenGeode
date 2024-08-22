@@ -135,6 +135,10 @@ namespace geode
                             vertices[v] = merger.vertex_in_merged(
                                 s, curve.edge_vertex( { e, v } ) );
                         }
+                        if( vertices[0] == vertices[1] )
+                        {
+                            continue;
+                        }
                         const auto it =
                             edges.try_emplace( TypedVertexCycle{ vertices },
                                 merger.mesh().nb_edges() );
