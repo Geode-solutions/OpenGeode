@@ -33,6 +33,18 @@
 
 namespace geode
 {
+    template < typename Container >
+    void concatenate( Container& container, const Container& values )
+    {
+        absl::c_copy( values, std::back_inserter( container ) );
+    }
+
+    template < typename Container >
+    void concatenate( Container& container, Container&& values )
+    {
+        absl::c_move( std::move( values ), std::back_inserter( container ) );
+    }
+
     /*!
      * Delete some elements from a given vector.
      * @param[in] to_delete Vector of the same size than values. If to_delete[i]
