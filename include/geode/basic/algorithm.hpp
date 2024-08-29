@@ -33,6 +33,12 @@
 
 namespace geode
 {
+    template < typename Container >
+    void concatenate( Container& container, const Container& values )
+    {
+        container.insert( container.end(), values.begin(), values.end() );
+    }
+
     /*!
      * Delete some elements from a given vector.
      * @param[in] to_delete Vector of the same size than values. If to_delete[i]
