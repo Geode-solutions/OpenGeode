@@ -42,7 +42,7 @@ namespace geode
     template < typename Container >
     void concatenate( Container& container, Container&& values )
     {
-        absl::c_move( values, std::back_inserter( container ) );
+        absl::c_move( std::move( values ), std::back_inserter( container ) );
     }
 
     /*!
