@@ -27,7 +27,6 @@
 
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/aabb_surface_helpers.hpp>
-#include <geode/mesh/helpers/detail/surface_merger.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/surface.hpp>
@@ -35,6 +34,16 @@
 
 namespace
 {
+    static std::array< geode::Vector3D, 12 > directions = { { geode::Vector3D{
+                                                                  { 1., 0.,
+                                                                      0. } },
+        geode::Vector3D{ { 1., 0., 0.1 } }, geode::Vector3D{ { 1., 0., 0.3 } },
+        geode::Vector3D{ { 1., 0., 0.5 } }, geode::Vector3D{ { 0., 1., 0. } },
+        geode::Vector3D{ { 0.1, 1., 0. } }, geode::Vector3D{ { 0.3, 1., 0. } },
+        geode::Vector3D{ { 0.5, 1., 0. } }, geode::Vector3D{ { 0., 0., 1. } },
+        geode::Vector3D{ { 0., 0.1, 1. } }, geode::Vector3D{ { 0., 0.3, 1. } },
+        geode::Vector3D{ { 0., 0.5, 1. } } } };
+
     std::vector< geode::RayTracing3D::PolygonDistance >
         find_intersections_with_boundaries(
             const geode::Ray3D& ray, const geode::SurfaceMesh3D& surface )
@@ -91,36 +100,25 @@ namespace geode
     bool is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point )
     {
-        std::array< Vector3D, 12 > directions = { { geode::Vector3D{
-                                                        { 1., 0., 0. } },
-            geode::Vector3D{ { 1., 0., 0.1 } },
-            geode::Vector3D{ { 1., 0., 0.3 } },
-            geode::Vector3D{ { 1., 0., 0.5 } },
-            geode::Vector3D{ { 0., 1., 0. } },
-            geode::Vector3D{ { 0.1, 1., 0. } },
-            geode::Vector3D{ { 0.3, 1., 0. } },
-            geode::Vector3D{ { 0.5, 1., 0. } },
-            geode::Vector3D{ { 0., 0., 1. } },
-            geode::Vector3D{ { 0., 0.1, 1. } },
-            geode::Vector3D{ { 0., 0.3, 1. } },
-            geode::Vector3D{ { 0., 0.5, 1. } } } };
-        std::vector< std::reference_wrapper< const geode::SurfaceMesh3D > >
-            border_to_merge;
-        for( const auto& surface : brep.boundaries( block ) )
-        {
-            border_to_merge.emplace_back( surface.mesh() );
-        }
-        geode::detail::SurfaceMeshMerger3D border_merger{ border_to_merge,
-            geode::GLOBAL_EPSILON };
-        const auto& merged_border_mesh = border_merger.merge();
         for( const auto& direction : directions )
         {
             const Ray3D ray{ direction, point };
-            auto nb_intersections = count_real_intersections_with_boundaries(
-                ray, *merged_border_mesh );
-            if( nb_intersections.has_value() )
+            geode::index_t nb_intersections{ 0 };
+            geode::index_t could_not_determine{ 0 };
+            for( const auto& surface : brep.boundaries( block ) )
             {
-                return ( nb_intersections.value() % 2 == 1 );
+                auto intersections = count_real_intersections_with_boundaries(
+                    ray, surface.mesh() );
+                if( intersections.has_value() )
+                {
+                    nb_intersections += intersections.value();
+                    continue;
+                }
+                could_not_determine++;
+            }
+            if( could_not_determine != brep.nb_boundaries( block.id() ) )
+            {
+                return ( nb_intersections % 2 == 1 );
             }
         }
         throw OpenGeodeException{
@@ -132,20 +130,6 @@ namespace geode
     bool is_point_inside_closed_surface(
         const SurfaceMesh3D& surface, const Point3D& point )
     {
-        std::array< Vector3D, 12 > directions = { { geode::Vector3D{
-                                                        { 1., 0., 0. } },
-            geode::Vector3D{ { 1., 0., 0.1 } },
-            geode::Vector3D{ { 1., 0., 0.3 } },
-            geode::Vector3D{ { 1., 0., 0.5 } },
-            geode::Vector3D{ { 0., 1., 0. } },
-            geode::Vector3D{ { 0.1, 1., 0. } },
-            geode::Vector3D{ { 0.3, 1., 0. } },
-            geode::Vector3D{ { 0.5, 1., 0. } },
-            geode::Vector3D{ { 0., 0., 1. } },
-            geode::Vector3D{ { 0., 0.1, 1. } },
-            geode::Vector3D{ { 0., 0.3, 1. } },
-            geode::Vector3D{ { 0., 0.5, 1. } } } };
-
         for( const auto& direction : directions )
         {
             const Ray3D ray{ direction, point };
