@@ -33,6 +33,8 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     ALIAS_3D( Block );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    ALIAS_3D( Surface );
     class BRep;
     struct uuid;
 } // namespace geode
@@ -49,6 +51,9 @@ namespace geode
 
     bool opengeode_model_api is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point );
+
+    bool opengeode_model_api is_point_inside_closed_surface(
+        const SurfaceMesh3D& surface, const Point3D& point );
 
     std::optional< uuid > opengeode_model_api block_containing_point(
         const BRep& brep, const Point3D& point );

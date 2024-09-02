@@ -27,6 +27,7 @@
 
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/aabb_surface_helpers.hpp>
+#include <geode/mesh/helpers/detail/surface_merger.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/surface.hpp>
@@ -34,47 +35,34 @@
 
 namespace
 {
-    geode::BoundarySurfaceIntersections find_intersections_with_boundaries(
-        const geode::Ray3D& ray,
-        const geode::BRep& brep,
-        const geode::Block3D& block )
+    std::vector< geode::RayTracing3D::PolygonDistance >
+        find_intersections_with_boundaries(
+            const geode::Ray3D& ray, const geode::SurfaceMesh3D& surface )
     {
-        geode::BoundarySurfaceIntersections result;
-        for( const auto& surface : brep.boundaries( block ) )
-        {
-            const auto aabb = geode::create_aabb_tree( surface.mesh() );
-            geode::RayTracing3D ray_tracing{ surface.mesh(), ray };
-            aabb.compute_ray_element_bbox_intersections( ray, ray_tracing );
-            result[surface.id()] = ray_tracing.all_intersections();
-        }
-        return result;
+        const auto aabb = geode::create_aabb_tree( surface );
+        geode::RayTracing3D ray_tracing{ surface, ray };
+        aabb.compute_ray_element_bbox_intersections( ray, ray_tracing );
+        return ray_tracing.all_intersections();
     }
 
-    std::optional< geode::index_t > count_real_intersections_with_boudaries(
-        const geode::Ray3D& ray,
-        const geode::BRep& brep,
-        const geode::Block3D& block )
+    std::optional< geode::index_t > count_real_intersections_with_boundaries(
+        const geode::Ray3D& ray, const geode::SurfaceMesh3D& surface )
     {
         geode::index_t nb_intersections{ 0 };
-        const auto tracing =
-            find_intersections_with_boundaries( ray, brep, block );
-        for( const auto& intersections : tracing )
+        const auto tracing = find_intersections_with_boundaries( ray, surface );
+        for( const auto& intersection : tracing )
         {
-            for( const auto& intersection : intersections.second )
+            if( intersection.position != geode::POSITION::inside )
             {
-                if( intersection.position != geode::POSITION::inside )
-                {
-                    return std::nullopt;
-                }
-                if( std::fabs( intersection.distance )
-                    <= geode::GLOBAL_EPSILON )
-                {
-                    continue;
-                }
-                else
-                {
-                    nb_intersections += 1;
-                }
+                return std::nullopt;
+            }
+            if( std::fabs( intersection.distance ) <= geode::GLOBAL_EPSILON )
+            {
+                continue;
+            }
+            else
+            {
+                nb_intersections += 1;
             }
         }
         return nb_intersections;
@@ -116,13 +104,53 @@ namespace geode
             geode::Vector3D{ { 0., 0.1, 1. } },
             geode::Vector3D{ { 0., 0.3, 1. } },
             geode::Vector3D{ { 0., 0.5, 1. } } } };
+        std::vector< std::reference_wrapper< const geode::SurfaceMesh3D > >
+            border_to_merge;
+        for( const auto& surface : brep.boundaries( block ) )
+        {
+            border_to_merge.emplace_back( surface.mesh() );
+        }
+        geode::detail::SurfaceMeshMerger3D border_merger{ border_to_merge,
+            geode::GLOBAL_EPSILON };
+        const auto& merged_border_mesh = border_merger.merge();
+        for( const auto& direction : directions )
+        {
+            const Ray3D ray{ direction, point };
+            auto nb_intersections = count_real_intersections_with_boundaries(
+                ray, *merged_border_mesh );
+            if( nb_intersections.has_value() )
+            {
+                return ( nb_intersections.value() % 2 == 1 );
+            }
+        }
+        throw OpenGeodeException{
+            "Cannot determine the point is inside the block or not "
+            "(ambigous intersection with rays)."
+        };
+    }
+
+    bool is_point_inside_closed_surface(
+        const SurfaceMesh3D& surface, const Point3D& point )
+    {
+        std::array< Vector3D, 12 > directions = { { geode::Vector3D{
+                                                        { 1., 0., 0. } },
+            geode::Vector3D{ { 1., 0., 0.1 } },
+            geode::Vector3D{ { 1., 0., 0.3 } },
+            geode::Vector3D{ { 1., 0., 0.5 } },
+            geode::Vector3D{ { 0., 1., 0. } },
+            geode::Vector3D{ { 0.1, 1., 0. } },
+            geode::Vector3D{ { 0.3, 1., 0. } },
+            geode::Vector3D{ { 0.5, 1., 0. } },
+            geode::Vector3D{ { 0., 0., 1. } },
+            geode::Vector3D{ { 0., 0.1, 1. } },
+            geode::Vector3D{ { 0., 0.3, 1. } },
+            geode::Vector3D{ { 0., 0.5, 1. } } } };
 
         for( const auto& direction : directions )
         {
             const Ray3D ray{ direction, point };
             auto nb_intersections =
-                count_real_intersections_with_boudaries( ray, brep, block );
-
+                count_real_intersections_with_boundaries( ray, surface );
             if( nb_intersections.has_value() )
             {
                 return ( nb_intersections.value() % 2 == 1 );
