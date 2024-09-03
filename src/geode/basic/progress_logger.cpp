@@ -32,11 +32,6 @@
 #include <geode/basic/progress_logger_manager.hpp>
 #include <geode/basic/uuid.hpp>
 
-namespace
-{
-    constexpr absl::Duration SLEEP = absl::Seconds( 1 );
-} // namespace
-
 namespace geode
 {
     class ProgressLogger::Impl
@@ -65,7 +60,7 @@ namespace geode
             const std::lock_guard< std::mutex > locking{ lock_ };
             current_ += nb_increments;
             auto now = absl::Now();
-            if( now - current_time_ > SLEEP )
+            if( now - current_time_ > refresh_interval_ )
             {
                 current_time_ = now;
                 ProgressLoggerManager::update( id_, current_, nb_steps_ );
@@ -80,12 +75,18 @@ namespace geode
             return nb_steps_;
         }
 
+        void set_refresh_interval( absl::Duration refresh_interval )
+        {
+            refresh_interval_ = std::move( refresh_interval );
+        }
+
     private:
         uuid id_;
         index_t nb_steps_;
         index_t current_{ 0 };
         absl::Time current_time_;
         std::mutex lock_;
+        absl::Duration refresh_interval_{ absl::Seconds( 1 ) };
     };
 
     ProgressLogger::ProgressLogger(
@@ -114,5 +115,10 @@ namespace geode
     index_t ProgressLogger::increment_nb_steps( index_t nb_steps )
     {
         return impl_->increment_nb_steps( nb_steps );
+    }
+
+    void ProgressLogger::set_refresh_interval( absl::Duration refresh_interval )
+    {
+        impl_->set_refresh_interval( std::move( refresh_interval ) );
     }
 } // namespace geode
