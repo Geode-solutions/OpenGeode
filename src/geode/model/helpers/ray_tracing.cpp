@@ -120,7 +120,7 @@ namespace geode
                 }
                 nb_intersections += intersections.value();
             }
-            if( could_not_determine != 0 )
+            if( could_not_determine == 0 )
             {
                 return ( nb_intersections % 2 == 1 );
             }
