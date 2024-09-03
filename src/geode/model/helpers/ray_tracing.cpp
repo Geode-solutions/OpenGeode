@@ -34,15 +34,19 @@
 
 namespace
 {
-    static std::array< geode::Vector3D, 12 > directions = { { geode::Vector3D{
-                                                                  { 1., 0.,
-                                                                      0. } },
-        geode::Vector3D{ { 1., 0., 0.1 } }, geode::Vector3D{ { 1., 0., 0.3 } },
-        geode::Vector3D{ { 1., 0., 0.5 } }, geode::Vector3D{ { 0., 1., 0. } },
-        geode::Vector3D{ { 0.1, 1., 0. } }, geode::Vector3D{ { 0.3, 1., 0. } },
-        geode::Vector3D{ { 0.5, 1., 0. } }, geode::Vector3D{ { 0., 0., 1. } },
-        geode::Vector3D{ { 0., 0.1, 1. } }, geode::Vector3D{ { 0., 0.3, 1. } },
-        geode::Vector3D{ { 0., 0.5, 1. } } } };
+    static const std::array< geode::Vector3D, 12 > directions = {
+        { geode::Vector3D{ { 1., 0., 0. } }, geode::Vector3D{ { 1., 0., 0.1 } },
+            geode::Vector3D{ { 1., 0., 0.3 } },
+            geode::Vector3D{ { 1., 0., 0.5 } },
+            geode::Vector3D{ { 0., 1., 0. } },
+            geode::Vector3D{ { 0.1, 1., 0. } },
+            geode::Vector3D{ { 0.3, 1., 0. } },
+            geode::Vector3D{ { 0.5, 1., 0. } },
+            geode::Vector3D{ { 0., 0., 1. } },
+            geode::Vector3D{ { 0., 0.1, 1. } },
+            geode::Vector3D{ { 0., 0.3, 1. } },
+            geode::Vector3D{ { 0., 0.5, 1. } } }
+    };
 
     std::vector< geode::RayTracing3D::PolygonDistance >
         find_intersections_with_boundaries(
@@ -109,14 +113,14 @@ namespace geode
             {
                 auto intersections = count_real_intersections_with_boundaries(
                     ray, surface.mesh() );
-                if( intersections.has_value() )
+                if( !intersections.has_value() )
                 {
-                    nb_intersections += intersections.value();
-                    continue;
+                    could_not_determine++;
+                    break;
                 }
-                could_not_determine++;
+                nb_intersections += intersections.value();
             }
-            if( could_not_determine != brep.nb_boundaries( block.id() ) )
+            if( could_not_determine != 0 )
             {
                 return ( nb_intersections % 2 == 1 );
             }
