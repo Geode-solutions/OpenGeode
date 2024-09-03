@@ -34,19 +34,15 @@
 
 namespace
 {
-    static const std::array< geode::Vector3D, 12 > directions = {
-        { geode::Vector3D{ { 1., 0., 0. } }, geode::Vector3D{ { 1., 0., 0.1 } },
-            geode::Vector3D{ { 1., 0., 0.3 } },
-            geode::Vector3D{ { 1., 0., 0.5 } },
-            geode::Vector3D{ { 0., 1., 0. } },
-            geode::Vector3D{ { 0.1, 1., 0. } },
-            geode::Vector3D{ { 0.3, 1., 0. } },
-            geode::Vector3D{ { 0.5, 1., 0. } },
-            geode::Vector3D{ { 0., 0., 1. } },
-            geode::Vector3D{ { 0., 0.1, 1. } },
-            geode::Vector3D{ { 0., 0.3, 1. } },
-            geode::Vector3D{ { 0., 0.5, 1. } } }
-    };
+    const std::array< geode::Vector3D, 12 > directions = { { geode::Vector3D{
+                                                                 { 1., 0.,
+                                                                     0. } },
+        geode::Vector3D{ { 1., 0., 0.1 } }, geode::Vector3D{ { 1., 0., 0.3 } },
+        geode::Vector3D{ { 1., 0., 0.5 } }, geode::Vector3D{ { 0., 1., 0. } },
+        geode::Vector3D{ { 0.1, 1., 0. } }, geode::Vector3D{ { 0.3, 1., 0. } },
+        geode::Vector3D{ { 0.5, 1., 0. } }, geode::Vector3D{ { 0., 0., 1. } },
+        geode::Vector3D{ { 0., 0.1, 1. } }, geode::Vector3D{ { 0., 0.3, 1. } },
+        geode::Vector3D{ { 0., 0.5, 1. } } } };
 
     std::vector< geode::RayTracing3D::PolygonDistance >
         find_intersections_with_boundaries(
