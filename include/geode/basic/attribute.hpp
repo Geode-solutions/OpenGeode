@@ -283,7 +283,8 @@ namespace geode
             set_value( std::move( value ) );
         }
 
-        ConstantAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ){};
+        ConstantAttribute()
+            : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -425,7 +426,8 @@ namespace geode
             values_.reserve( 10 );
         }
 
-        VariableAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ){};
+        VariableAttribute()
+            : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -549,7 +551,7 @@ namespace geode
 
     private:
         T default_value_;
-        std::vector< T > values_;
+        std::vector< T > values_{};
     };
 
     /*!
@@ -620,7 +622,7 @@ namespace geode
         }
 
         VariableAttribute()
-            : ReadOnlyAttribute< bool >( AttributeProperties{} ){};
+            : ReadOnlyAttribute< bool >( AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -744,7 +746,7 @@ namespace geode
 
     private:
         unsigned char default_value_;
-        std::vector< unsigned char > values_;
+        std::vector< unsigned char > values_{};
     };
 
     /*!
@@ -819,7 +821,7 @@ namespace geode
             values_.reserve( 10 );
         }
 
-        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ){};
+        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -960,6 +962,6 @@ namespace geode
 
     private:
         T default_value_;
-        absl::flat_hash_map< index_t, T > values_;
+        absl::flat_hash_map< index_t, T > values_{};
     };
 } // namespace geode
