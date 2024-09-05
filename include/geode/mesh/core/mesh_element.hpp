@@ -123,6 +123,33 @@ namespace geode
         }
         return true;
     }
+
+    template < typename MeshElementType, typename SkipMeshElement >
+    bool are_mesh_elements_included(
+        const MeshElementsInclusion< MeshElementType >& inclusion,
+        const SkipMeshElement& skip )
+    {
+        for( const auto& q : inclusion.query )
+        {
+            if( skip( q ) )
+            {
+                continue;
+            }
+            const auto predicate = [&q, &skip]( const auto& value ) {
+                if( skip( value ) )
+                {
+                    return false;
+                }
+                return q == value;
+            };
+            if( absl::c_find_if( inclusion.container, predicate )
+                == inclusion.container.end() )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 } // namespace geode
 
 namespace std
