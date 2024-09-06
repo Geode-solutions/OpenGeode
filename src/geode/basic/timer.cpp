@@ -37,9 +37,14 @@ namespace geode
             reset();
         }
 
+        absl::Duration raw_duration() const
+        {
+            return absl::Now() - start_time_;
+        }
+
         std::string duration() const
         {
-            return absl::FormatDuration( absl::Now() - start_time_ );
+            return absl::FormatDuration( raw_duration() );
         }
 
         void reset()
@@ -56,6 +61,11 @@ namespace geode
     Timer::Timer( Timer&& ) noexcept = default;
 
     Timer::~Timer() = default;
+
+    absl::Duration Timer::raw_duration() const
+    {
+        return impl_->raw_duration();
+    }
 
     std::string Timer::duration() const
     {
