@@ -28,6 +28,11 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/pimpl.hpp>
 
+namespace absl
+{
+    class Duration;
+} // namespace absl
+
 namespace geode
 {
     class opengeode_basic_api ProgressLogger
@@ -43,6 +48,8 @@ namespace geode
         index_t increment_nb_steps();
 
         index_t increment_nb_steps( index_t nb_steps );
+
+        void set_refresh_interval( absl::Duration refresh_interval );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
