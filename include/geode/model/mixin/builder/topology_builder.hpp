@@ -39,6 +39,6 @@ namespace geode
     protected:
         explicit TopologyBuilder( Topology& topology )
             : RelationshipsBuilder( topology ),
-              VertexIdentifierBuilder( topology ){};
+              VertexIdentifierBuilder( topology ) {};
     };
 } // namespace geode
