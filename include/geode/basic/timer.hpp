@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/time/time.h>
+
 #include <geode/basic/common.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -34,6 +36,8 @@ namespace geode
         Timer();
         Timer( Timer&& other ) noexcept;
         ~Timer();
+
+        absl::Duration raw_duration() const;
 
         std::string duration() const;
 
