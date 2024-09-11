@@ -56,9 +56,11 @@ namespace geode
 
         [[nodiscard]] index_t nb_cells_in_direction( index_t direction ) const;
 
-        [[nodiscard]] virtual index_t cell_index( const CellIndices& index ) const = 0;
+        [[nodiscard]] virtual index_t cell_index(
+            const CellIndices& index ) const = 0;
 
-        [[nodiscard]] virtual CellIndices cell_indices( index_t index ) const = 0;
+        [[nodiscard]] virtual CellIndices cell_indices(
+            index_t index ) const = 0;
 
         [[nodiscard]] std::optional< CellIndices > next_cell(
             const CellIndices& index, index_t direction ) const;
@@ -66,7 +68,8 @@ namespace geode
         [[nodiscard]] std::optional< CellIndices > previous_cell(
             const CellIndices& index, index_t direction ) const;
 
-        [[nodiscard]] bool is_cell_on_border( const CellIndices& cell_indices ) const;
+        [[nodiscard]] bool is_cell_on_border(
+            const CellIndices& cell_indices ) const;
 
     protected:
         CellArray();

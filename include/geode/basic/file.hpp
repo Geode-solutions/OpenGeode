@@ -31,7 +31,8 @@
 
 namespace geode
 {
-    [[nodiscard]] bool opengeode_basic_api file_exists( std::string_view file_path );
+    [[nodiscard]] bool opengeode_basic_api file_exists(
+        std::string_view file_path );
 
     void opengeode_basic_api check_keyword(
         std::ifstream& file, std::string_view keyword );

@@ -73,8 +73,9 @@ namespace geode
         }
 
         template < typename Factory, typename... Args >
-        [[nodiscard]]typename Factory::BaseClass::InputData geode_object_input_impl(
-            std::string_view type, std::string_view filename, Args... args )
+        [[nodiscard]] typename Factory::BaseClass::InputData
+            geode_object_input_impl(
+                std::string_view type, std::string_view filename, Args... args )
         {
             const Timer timer;
             auto input = geode_object_input_reader< Factory >( filename );

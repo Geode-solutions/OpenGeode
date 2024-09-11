@@ -31,13 +31,15 @@ namespace geode
     namespace detail
     {
         template < typename Last >
-      [[nodiscard]]  bool is_component_supported( const ComponentType& component_type )
+        [[nodiscard]] bool is_component_supported(
+            const ComponentType& component_type )
         {
             return component_type == Last::component_type_static();
         }
 
         template < typename First, typename Second, typename... Components >
-     [[nodiscard]]   bool is_component_supported( const ComponentType& component_type )
+        [[nodiscard]] bool is_component_supported(
+            const ComponentType& component_type )
         {
             if( component_type == First::component_type_static() )
             {
@@ -55,7 +57,7 @@ namespace geode
         template < typename... Components >
         struct ComponentsTypesChecker< std::tuple< Components... > >
         {
-           bool apply( const ComponentType& component_type ) const
+            bool apply( const ComponentType& component_type ) const
             {
                 return is_component_supported< Components... >(
                     component_type );

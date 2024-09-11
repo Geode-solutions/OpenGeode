@@ -82,9 +82,6 @@ void test_delete_vector_elements()
     geode::delete_vector_elements( to_delete, toto_vector );
     OPENGEODE_EXCEPTION( toto_vector.size() == 3,
         "[Test] Delete elements result (size) for double is not correct" );
-    toto_vector[0].front();
-    toto_vector[1].front();
-    toto_vector[2].front();
     OPENGEODE_EXCEPTION( ( toto_vector[0].front().second == 0 )
                              && ( toto_vector[1].front().second == 2 )
                              && ( toto_vector[2].front().second == 3 ),

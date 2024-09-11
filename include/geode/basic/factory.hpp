@@ -119,8 +119,8 @@ namespace geode
 
     private:
         template < typename DerivedClass >
-        [[nodiscard]] static inline std::unique_ptr< BaseClass > create_function_impl(
-            Args... args )
+        [[nodiscard]] static inline std::unique_ptr< BaseClass >
+            create_function_impl( Args... args )
         {
             return std::unique_ptr< BaseClass >{ new DerivedClass{
                 std::forward< Args >( args )... } };

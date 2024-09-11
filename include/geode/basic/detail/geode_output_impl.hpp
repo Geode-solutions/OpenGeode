@@ -40,7 +40,7 @@ namespace geode
     namespace detail
     {
         template < typename Factory >
-        [[nodiscard]]std::unique_ptr< typename Factory::BaseClass >
+        [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
             geode_object_output_writer( std::string_view& filename )
         {
             filename = absl::StripAsciiWhitespace( filename );
