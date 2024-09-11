@@ -50,7 +50,7 @@ namespace geode
         Component( Component&& other ) noexcept;
         virtual ~Component();
 
-     [[nodiscard]]   virtual ComponentType component_type() const = 0;
+        [[nodiscard]] virtual ComponentType component_type() const = 0;
 
     protected:
         Component();

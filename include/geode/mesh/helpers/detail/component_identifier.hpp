@@ -51,7 +51,7 @@ namespace geode
 
             ~GraphIdentifier();
 
-            [[nodiscard]] index_t identify_vertices();
+            index_t identify_vertices();
 
             [[nodiscard]] index_t vertex_identifier( index_t vertex_id ) const;
 
@@ -73,7 +73,7 @@ namespace geode
 
             ~EdgedCurveIdentifier();
 
-            [[nodiscard]] index_t identify_edges();
+            index_t identify_edges();
 
             [[nodiscard]] index_t edge_identifier( index_t edge_id ) const;
 
@@ -96,7 +96,7 @@ namespace geode
 
             ~SurfaceIdentifier();
 
-            [[nodiscard]] index_t identify_polygons();
+            index_t identify_polygons();
 
             [[nodiscard]] index_t polygon_identifier( index_t polygon ) const;
 
@@ -117,7 +117,7 @@ namespace geode
 
             ~SolidIdentifier();
 
-            [[nodiscard]] index_t identify_polyhedra();
+            index_t identify_polyhedra();
 
             [[nodiscard]] index_t polyhedron_identifier(
                 index_t polyhedron ) const;
