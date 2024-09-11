@@ -46,7 +46,7 @@ namespace geode
             using VertexIndices = typename Grid< dimension >::VertexIndices;
 
         public:
-            index_t vertex_index( const Grid< dimension >& grid,
+            [[nodiscard]] index_t vertex_index( const Grid< dimension >& grid,
                 const VertexIndices& index ) const
             {
                 index_t vertex_id{ 0 };
@@ -66,7 +66,7 @@ namespace geode
                 return vertex_id;
             }
 
-            VertexIndices vertex_indices(
+            [[nodiscard]] VertexIndices vertex_indices(
                 const Grid< dimension >& grid, index_t index ) const
             {
                 OPENGEODE_ASSERT( index < grid.nb_grid_vertices(),

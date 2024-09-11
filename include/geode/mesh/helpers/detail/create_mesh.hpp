@@ -33,7 +33,7 @@ namespace geode
     namespace detail
     {
         template < typename Mesh >
-        std::unique_ptr< Mesh > create_mesh(
+        [[nodiscard]] std::unique_ptr< Mesh > create_mesh(
             absl::Span< const std::reference_wrapper< const Mesh > > meshes );
     } // namespace detail
 } // namespace geode

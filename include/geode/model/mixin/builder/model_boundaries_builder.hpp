@@ -52,7 +52,7 @@ namespace geode
         {
         }
 
-        const uuid& create_model_boundary();
+        [[nodiscard]] const uuid& create_model_boundary();
 
         void create_model_boundary( uuid model_boundary_id );
 

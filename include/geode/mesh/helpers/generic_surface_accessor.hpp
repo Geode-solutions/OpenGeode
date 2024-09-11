@@ -53,65 +53,68 @@ namespace geode
         {
         }
 
-        index_t nb_elements() const
+        [[nodiscard]] index_t nb_elements() const
         {
             return mesh_.nb_polygons();
         }
 
-        index_t nb_element_vertices( index_t polygon_id ) const
+        [[nodiscard]] index_t nb_element_vertices( index_t polygon_id ) const
         {
             return mesh_.nb_polygon_vertices( polygon_id );
         }
 
-        index_t nb_element_facets( index_t polygon_id ) const
+        [[nodiscard]] index_t nb_element_facets( index_t polygon_id ) const
         {
             return mesh_.nb_polygon_edges( polygon_id );
         }
 
-        index_t element_vertex( const ElementVertex& polygon_vertex ) const
+        [[nodiscard]] index_t element_vertex(
+            const ElementVertex& polygon_vertex ) const
         {
             return mesh_.polygon_vertex( polygon_vertex );
         }
 
-        ElementVertices element_vertices( index_t polygon_id ) const
+        [[nodiscard]] ElementVertices element_vertices(
+            index_t polygon_id ) const
         {
             return mesh_.polygon_vertices( polygon_id );
         }
 
-        Point< dimension > element_barycenter( index_t polygon_id ) const
+        [[nodiscard]] Point< dimension > element_barycenter(
+            index_t polygon_id ) const
         {
             return mesh_.polygon_barycenter( polygon_id );
         }
 
-        ElementFacetVertices element_facet_vertices(
+        [[nodiscard]] ElementFacetVertices element_facet_vertices(
             const ElementFacet& polygon_edge ) const
         {
             return mesh_.polygon_edge_vertices( polygon_edge );
         }
 
-        std::optional< index_t > element_adjacent(
+        [[nodiscard]] std::optional< index_t > element_adjacent(
             const ElementFacet& polygon_edge ) const
         {
             return mesh_.polygon_adjacent( polygon_edge );
         }
 
-        std::optional< ElementFacet > element_adjacent_facet(
+        [[nodiscard]] std::optional< ElementFacet > element_adjacent_facet(
             const ElementFacet& polygon_edge ) const
         {
             return mesh_.polygon_adjacent_edge( polygon_edge );
         }
 
-        const uuid& id() const
+        [[nodiscard]] const uuid& id() const
         {
             return mesh_.id();
         }
 
-        const Point< dimension >& point( index_t vertex_id ) const
+        [[nodiscard]] const Point< dimension >& point( index_t vertex_id ) const
         {
             return mesh_.point( vertex_id );
         }
 
-        AttributeManager& element_attribute_manager() const
+        [[nodiscard]] AttributeManager& element_attribute_manager() const
         {
             return mesh_.polygon_attribute_manager();
         }
@@ -132,12 +135,13 @@ namespace geode
         using ElementFacet = typename Base::ElementFacet;
         using ElementFacetVertices = typename Base::ElementFacetVertices;
 
-        GenericMeshAccessor( const TriangulatedSurface< dimension >& mesh )
+        explicit GenericMeshAccessor(
+            const TriangulatedSurface< dimension >& mesh )
             : Base{ mesh }, mesh_( mesh )
         {
         }
 
-        Element element( index_t triangle_id ) const
+        [[nodiscard]] Element element( index_t triangle_id ) const
         {
             return mesh_.triangle( triangle_id );
         }

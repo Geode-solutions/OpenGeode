@@ -48,7 +48,7 @@ namespace geode
          * value.
          * Throws an exception if an attribute with the same name exists.
          */
-        static GridScalarFunction< dimension > create(
+        [[nodiscard]] static GridScalarFunction< dimension > create(
             const Grid< dimension >& grid,
             std::string_view function_name,
             double value );
@@ -58,7 +58,7 @@ namespace geode
          * Grid, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static GridScalarFunction< dimension > find(
+        [[nodiscard]] static GridScalarFunction< dimension > find(
             const Grid< dimension >& grid, std::string_view function_name );
 
         void set_value(
@@ -67,13 +67,13 @@ namespace geode
 
         void set_value( index_t vertex_index, double value );
 
-        double value(
+        [[nodiscard]] double value(
             const typename Grid< dimension >::VertexIndices& vertex_index )
             const;
 
-        double value( index_t vertex_index ) const;
+        [[nodiscard]] double value( index_t vertex_index ) const;
 
-        double value( const Point< dimension >& point,
+        [[nodiscard]] double value( const Point< dimension >& point,
             const typename Grid< dimension >::CellIndices& grid_cell_indices )
             const;
 

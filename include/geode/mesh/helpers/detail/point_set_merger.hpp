@@ -46,7 +46,7 @@ namespace geode
                 double epsilon );
             ~PointSetMerger();
 
-            std::unique_ptr< PointSet< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge();
         };
         ALIAS_2D_AND_3D( PointSetMerger );
     } // namespace detail

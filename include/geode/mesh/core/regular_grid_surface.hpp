@@ -49,35 +49,37 @@ namespace geode
         /*!
          * Create a new RegularGrid using default data structure.
          */
-        static std::unique_ptr< RegularGrid2D > create();
+        [[nodiscard]] static std::unique_ptr< RegularGrid2D > create();
 
         /*!
          * Create a new RegularGrid using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< RegularGrid2D > create( const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< RegularGrid2D > create(
+            const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::string_view native_extension() const
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto ext = "og_rgd2d";
             return ext;
         }
 
-        AttributeManager& cell_attribute_manager() const override;
+        [[nodiscard]] AttributeManager& cell_attribute_manager() const override;
 
-        AttributeManager& grid_vertex_attribute_manager() const override;
+        [[nodiscard]] AttributeManager&
+            grid_vertex_attribute_manager() const override;
 
-        std::unique_ptr< RegularGrid2D > clone() const;
+        [[nodiscard]] std::unique_ptr< RegularGrid2D > clone() const;
 
-        SurfaceMesh< 2 >::VerticesAroundVertex vertices_around_vertex(
-            index_t vertex_id ) const final;
+        [[nodiscard]] SurfaceMesh< 2 >::VerticesAroundVertex
+            vertices_around_vertex( index_t vertex_id ) const final;
 
     protected:
         RegularGrid() = default;
@@ -88,7 +90,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        local_index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final
+        [[nodiscard]] local_index_t get_nb_polygon_vertices(
+            index_t /*unused*/ ) const final
         {
             return nb_cell_vertices();
         }

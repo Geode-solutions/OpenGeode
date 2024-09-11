@@ -51,7 +51,7 @@ namespace geode
                 {
                 }
 
-                bool operator==( const EdgeOrigin& other ) const
+                [[nodiscard]] bool operator==( const EdgeOrigin& other ) const
                 {
                     return curve == other.curve && edge == other.edge;
                 }
@@ -66,11 +66,12 @@ namespace geode
                 double epsilon );
             ~EdgedCurveMerger();
 
-            std::unique_ptr< EdgedCurve< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge();
 
-            index_t edge_in_merged( index_t curve, index_t edge ) const;
+            [[nodiscard]] index_t edge_in_merged(
+                index_t curve, index_t edge ) const;
 
-            const EdgeOrigins& edge_origins( index_t edge ) const;
+            [[nodiscard]] const EdgeOrigins& edge_origins( index_t edge ) const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

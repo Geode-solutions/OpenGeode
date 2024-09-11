@@ -52,37 +52,37 @@ namespace geode
         {
         }
 
-        const uuid& id() const&
+        [[nodiscard]] const uuid& id() const&
         {
             return id_;
         }
 
-        uuid&& id() &&
+        [[nodiscard]] uuid&& id() &&
         {
             return std::move( id_ );
         }
 
-        const ComponentType& type() const&
+        [[nodiscard]] const ComponentType& type() const&
         {
             return type_;
         }
 
-        ComponentType&& type() &&
+        [[nodiscard]] ComponentType&& type() &&
         {
             return std::move( type_ );
         }
 
-        bool operator!=( const ComponentID& other ) const
+        [[nodiscard]] bool operator!=( const ComponentID& other ) const
         {
             return !( *this == other );
         }
 
-        bool operator==( const ComponentID& other ) const
+        [[nodiscard]] bool operator==( const ComponentID& other ) const
         {
             return type_.get() == other.type_.get() && id_ == other.id_;
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( type_.get(), " ", id_.string() );
         }

@@ -57,7 +57,7 @@ namespace geode
         }
     };
 
-    bool opengeode_mesh_api is_graph_saveable(
+    [[nodiscard]] bool opengeode_mesh_api is_graph_saveable(
         const Graph& graph, std::string_view filename );
 
     using GraphOutputFactory =

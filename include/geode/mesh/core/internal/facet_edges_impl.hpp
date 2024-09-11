@@ -45,7 +45,7 @@ namespace geode
         public:
             FacetEdgesImpl() = default;
 
-            std::optional< index_t > find_edge(
+            [[nodiscard]] std::optional< index_t > find_edge(
                 const std::array< index_t, 2 >& edge_vertices ) const
             {
                 return this->find_facet( EdgesVertexCycle{ edge_vertices } );
@@ -58,7 +58,7 @@ namespace geode
                     EdgesVertexCycle{ std::move( edge_vertices ) } );
             }
 
-            const std::array< index_t, 2 >& edge_vertices(
+            [[nodiscard]] const std::array< index_t, 2 >& edge_vertices(
                 const index_t edge_id ) const
             {
                 return this->get_facet_vertices( edge_id );
@@ -95,12 +95,12 @@ namespace geode
                 return this->clean_facets();
             }
 
-            bool is_edge_isolated( index_t edge_id ) const
+            [[nodiscard]] bool is_edge_isolated( index_t edge_id ) const
             {
                 return this->get_counter( edge_id ) == 0;
             }
 
-            AttributeManager& edge_attribute_manager() const
+            [[nodiscard]] AttributeManager& edge_attribute_manager() const
             {
                 return facet_attribute_manager();
             }

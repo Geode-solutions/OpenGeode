@@ -51,7 +51,8 @@ namespace geode
                 {
                 }
 
-                bool operator==( const PolyhedronOrigin& other ) const
+                [[nodiscard]] bool operator==(
+                    const PolyhedronOrigin& other ) const
                 {
                     return solid == other.solid
                            && polyhedron == other.polyhedron;
@@ -68,12 +69,12 @@ namespace geode
                 double epsilon );
             ~SolidMeshMerger();
 
-            std::unique_ptr< SolidMesh< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge();
 
-            index_t polyhedron_in_merged(
+            [[nodiscard]] index_t polyhedron_in_merged(
                 index_t solid, index_t polyhedron ) const;
 
-            const PolyhedronOrigins& polyhedron_origins(
+            [[nodiscard]] const PolyhedronOrigins& polyhedron_origins(
                 index_t polyhedron ) const;
 
         private:

@@ -53,71 +53,74 @@ namespace geode
         {
         }
 
-        index_t nb_elements() const
+        [[nodiscard]] index_t nb_elements() const
         {
             return mesh_.nb_polyhedra();
         }
 
-        index_t nb_element_vertices( index_t polyhedron_id ) const
+        [[nodiscard]] index_t nb_element_vertices( index_t polyhedron_id ) const
         {
             return mesh_.nb_polyhedron_vertices( polyhedron_id );
         }
 
-        index_t nb_element_facets( index_t polyhedron_id ) const
+        [[nodiscard]] index_t nb_element_facets( index_t polyhedron_id ) const
         {
             return mesh_.nb_polyhedron_facets( polyhedron_id );
         }
 
-        index_t element_vertex( const ElementVertex& polyhedron_vertex ) const
+        [[nodiscard]] index_t element_vertex(
+            const ElementVertex& polyhedron_vertex ) const
         {
             return mesh_.polyhedron_vertex( polyhedron_vertex );
         }
 
-        ElementVertices element_vertices( index_t polyhedron_id ) const
+        [[nodiscard]] ElementVertices element_vertices(
+            index_t polyhedron_id ) const
         {
             return mesh_.polyhedron_vertices( polyhedron_id );
         }
 
-        Point< dimension > element_barycenter( index_t polyhedron_id ) const
+        [[nodiscard]] Point< dimension > element_barycenter(
+            index_t polyhedron_id ) const
         {
             return mesh_.polyhedron_barycenter( polyhedron_id );
         }
 
-        ElementFacetVertices element_facet_vertices(
+        [[nodiscard]] ElementFacetVertices element_facet_vertices(
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_facet_vertices( polyhedron_facet );
         }
 
-        std::optional< index_t > element_adjacent(
+        [[nodiscard]] std::optional< index_t > element_adjacent(
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_adjacent( polyhedron_facet );
         }
 
-        std::optional< ElementFacet > element_adjacent_facet(
+        [[nodiscard]] std::optional< ElementFacet > element_adjacent_facet(
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_adjacent_facet( polyhedron_facet );
         }
 
-        const uuid& id() const
+        [[nodiscard]] const uuid& id() const
         {
             return mesh_.id();
         }
 
-        const Point< dimension >& point( index_t vertex_id ) const
+        [[nodiscard]] const Point< dimension >& point( index_t vertex_id ) const
         {
             return mesh_.point( vertex_id );
         }
 
-        AttributeManager& element_attribute_manager() const
+        [[nodiscard]] AttributeManager& element_attribute_manager() const
         {
             return mesh_.polyhedron_attribute_manager();
         }
 
     protected:
-        const SolidMesh< dimension >& mesh() const
+        [[nodiscard]] const SolidMesh< dimension >& mesh() const
         {
             return mesh_;
         }
@@ -138,12 +141,13 @@ namespace geode
         using ElementFacet = typename Base::ElementFacet;
         using ElementFacetVertices = typename Base::ElementFacetVertices;
 
-        GenericMeshAccessor( const TetrahedralSolid< dimension >& mesh )
+        explicit GenericMeshAccessor(
+            const TetrahedralSolid< dimension >& mesh )
             : Base{ mesh }, mesh_( mesh )
         {
         }
 
-        Element element( index_t tetrahedron_id ) const
+        [[nodiscard]] Element element( index_t tetrahedron_id ) const
         {
             return this->mesh().tetrahedron( tetrahedron_id );
         }

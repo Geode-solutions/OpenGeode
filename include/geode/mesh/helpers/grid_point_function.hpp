@@ -49,18 +49,19 @@ namespace geode
          * value.
          * Throws an exception if an attribute with the same name exists.
          */
-        static GridPointFunction< dimension, point_dimension > create(
-            const Grid< dimension >& grid,
-            std::string_view function_name,
-            Point< point_dimension > value );
+        [[nodiscard]] static GridPointFunction< dimension, point_dimension >
+            create( const Grid< dimension >& grid,
+                std::string_view function_name,
+                Point< point_dimension > value );
 
         /*!
          * Finds an object function that already exists in the given
          * Grid, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static GridPointFunction< dimension, point_dimension > find(
-            const Grid< dimension >& grid, std::string_view function_name );
+        [[nodiscard]] static GridPointFunction< dimension, point_dimension >
+            find(
+                const Grid< dimension >& grid, std::string_view function_name );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
@@ -68,13 +69,15 @@ namespace geode
 
         void set_value( index_t vertex_index, Point< point_dimension > value );
 
-        const Point< point_dimension >& value(
+        [[nodiscard]] const Point< point_dimension >& value(
             const typename Grid< dimension >::VertexIndices& vertex_index )
             const;
 
-        const Point< point_dimension >& value( index_t vertex_index ) const;
+        [[nodiscard]] const Point< point_dimension >& value(
+            index_t vertex_index ) const;
 
-        Point< point_dimension > value( const Point< dimension >& point,
+        [[nodiscard]] Point< point_dimension > value(
+            const Point< dimension >& point,
             const typename Grid< dimension >::CellIndices& grid_cell_indices )
             const;
 

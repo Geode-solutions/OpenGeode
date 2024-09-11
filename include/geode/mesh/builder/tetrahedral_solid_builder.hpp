@@ -44,8 +44,9 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
-        static std::unique_ptr< TetrahedralSolidBuilder< dimension > > create(
-            TetrahedralSolid< dimension >& mesh );
+        [[nodiscard]] static std::unique_ptr<
+            TetrahedralSolidBuilder< dimension > >
+            create( TetrahedralSolid< dimension >& mesh );
 
         /*!
          * Create a new tetrahedron from four vertices.

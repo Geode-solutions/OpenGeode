@@ -44,8 +44,8 @@ namespace geode
      * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
-    std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
-        const MeshImpl& impl, std::string_view filename );
+    [[nodiscard]] std::unique_ptr< VertexSet > opengeode_mesh_api
+        load_vertex_set( const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an VertexSet.
@@ -53,8 +53,8 @@ namespace geode
      * Default data structure implémentation is used.
      * @param[in] filename Path to the file to load.
      */
-    std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
-        std::string_view filename );
+    [[nodiscard]] std::unique_ptr< VertexSet >
+        opengeode_mesh_api load_vertex_set( std::string_view filename );
 
     class VertexSetInput
         : public Input< std::unique_ptr< VertexSet >, MeshImpl >
@@ -70,10 +70,11 @@ namespace geode
         }
     };
 
-    typename VertexSetInput::MissingFiles opengeode_mesh_api
+    [[nodiscard]] typename VertexSetInput::MissingFiles opengeode_mesh_api
         check_vertex_set_missing_files( std::string_view filename );
 
-    bool opengeode_mesh_api is_vertex_set_loadable( std::string_view filename );
+    [[nodiscard]] bool opengeode_mesh_api is_vertex_set_loadable(
+        std::string_view filename );
 
     using VertexSetInputFactory =
         Factory< std::string, VertexSetInput, std::string_view >;

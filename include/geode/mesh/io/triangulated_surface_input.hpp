@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< TriangulatedSurface< dimension > >
+    [[nodiscard]] std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface(
             const MeshImpl& impl, std::string_view filename );
 
@@ -56,7 +56,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< TriangulatedSurface< dimension > >
+    [[nodiscard]] std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface( std::string_view filename );
 
     template < index_t dimension >
@@ -78,11 +78,12 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename TriangulatedSurfaceInput< dimension >::MissingFiles
+    [[nodiscard]] typename TriangulatedSurfaceInput< dimension >::MissingFiles
         check_triangulated_surface_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_triangulated_surface_loadable( std::string_view filename );
+    [[nodiscard]] bool is_triangulated_surface_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     using TriangulatedSurfaceInputFactory = Factory< std::string,

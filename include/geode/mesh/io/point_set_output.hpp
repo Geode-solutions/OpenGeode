@@ -60,7 +60,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_point_set_saveable(
+    [[nodiscard]] bool is_point_set_saveable(
         const PointSet< dimension >& point_set, std::string_view filename );
 
     template < index_t dimension >

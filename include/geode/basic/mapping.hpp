@@ -54,32 +54,34 @@ namespace geode
             out2in_.clear();
         }
 
-        bool has_mapping_input( const T1& value ) const
+        [[nodiscard]] bool has_mapping_input( const T1& value ) const
         {
             return in2out_.contains( value );
         }
 
-        bool has_mapping_output( const T2& value ) const
+        [[nodiscard]] bool has_mapping_output( const T2& value ) const
         {
             return out2in_.contains( value );
         }
 
-        const Storage< T2 >& in2out( const T1& in ) const
+        [[nodiscard]] const Storage< T2 >& in2out( const T1& in ) const
         {
             return in2out_.at( in );
         }
 
-        const Storage< T1 >& out2in( const T2& out ) const
+        [[nodiscard]] const Storage< T1 >& out2in( const T2& out ) const
         {
             return out2in_.at( out );
         }
 
-        const absl::flat_hash_map< T1, Storage< T2 > >& in2out_map() const
+        [[nodiscard]] const absl::flat_hash_map< T1, Storage< T2 > >&
+            in2out_map() const
         {
             return in2out_;
         }
 
-        const absl::flat_hash_map< T2, Storage< T1 > >& out2in_map() const
+        [[nodiscard]] const absl::flat_hash_map< T2, Storage< T1 > >&
+            out2in_map() const
         {
             return out2in_;
         }
@@ -89,22 +91,22 @@ namespace geode
         MappingBase( MappingBase&& other ) = default;
         MappingBase& operator=( MappingBase&& other ) = default;
 
-        index_t size_input() const
+        [[nodiscard]] index_t size_input() const
         {
             return static_cast< index_t >( in2out_.size() );
         }
 
-        index_t size_output() const
+        [[nodiscard]] index_t size_output() const
         {
             return static_cast< index_t >( out2in_.size() );
         }
 
-        absl::flat_hash_map< T1, Storage< T2 > >& in2out_mapping()
+        [[nodiscard]] absl::flat_hash_map< T1, Storage< T2 > >& in2out_mapping()
         {
             return in2out_;
         }
 
-        absl::flat_hash_map< T2, Storage< T1 > >& out2in_mapping()
+        [[nodiscard]] absl::flat_hash_map< T2, Storage< T1 > >& out2in_mapping()
         {
             return out2in_;
         }
@@ -159,7 +161,7 @@ namespace geode
             this->out2in_mapping().erase( out );
         }
 
-        index_t size() const
+        [[nodiscard]] index_t size() const
         {
             return this->size_input();
         }
@@ -226,12 +228,12 @@ namespace geode
             this->out2in_mapping().erase( out );
         }
 
-        index_t size_in() const
+        [[nodiscard]] index_t size_in() const
         {
             return this->size_input();
         }
 
-        index_t size_out() const
+        [[nodiscard]] index_t size_out() const
         {
             return this->size_output();
         }

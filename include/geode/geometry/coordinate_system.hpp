@@ -43,20 +43,20 @@ namespace geode
         CoordinateSystem( Point< dimension > origin,
             const std::array< Point< dimension >, dimension >& other_points );
 
-        const Point< dimension >& origin() const;
+        [[nodiscard]] const Point< dimension >& origin() const;
 
         void set_origin( Point< dimension > origin );
 
         void set_directions(
             std::array< Vector< dimension >, dimension > directions );
 
-        Point< dimension > coordinates(
+        [[nodiscard]] Point< dimension > coordinates(
             const Point< dimension >& global_coordinates ) const;
 
-        Point< dimension > global_coordinates(
+        [[nodiscard]] Point< dimension > global_coordinates(
             const Point< dimension >& coordinates ) const;
 
-        std::string string() const;
+        [[nodiscard]] std::string string() const;
 
     private:
         friend class bitsery::Access;

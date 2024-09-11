@@ -51,11 +51,11 @@ namespace geode
 
             ~GraphIdentifier();
 
-            index_t identify_vertices();
+            [[nodiscard]] index_t identify_vertices();
 
-            index_t vertex_identifier( index_t vertex_id ) const;
+            [[nodiscard]] index_t vertex_identifier( index_t vertex_id ) const;
 
-            absl::FixedArray< std::vector< index_t > >
+            [[nodiscard]] absl::FixedArray< std::vector< index_t > >
                 identified_connected_vertices() const;
 
         private:
@@ -73,11 +73,11 @@ namespace geode
 
             ~EdgedCurveIdentifier();
 
-            index_t identify_edges();
+            [[nodiscard]] index_t identify_edges();
 
-            index_t edge_identifier( index_t edge_id ) const;
+            [[nodiscard]] index_t edge_identifier( index_t edge_id ) const;
 
-            absl::FixedArray< std::vector< index_t > >
+            [[nodiscard]] absl::FixedArray< std::vector< index_t > >
                 identified_connected_edges() const;
 
         private:
@@ -96,11 +96,11 @@ namespace geode
 
             ~SurfaceIdentifier();
 
-            index_t identify_polygons();
+            [[nodiscard]] index_t identify_polygons();
 
-            index_t polygon_identifier( index_t polygon ) const;
+            [[nodiscard]] index_t polygon_identifier( index_t polygon ) const;
 
-            absl::FixedArray< std::vector< index_t > >
+            [[nodiscard]] absl::FixedArray< std::vector< index_t > >
                 identified_connected_polygons() const;
 
         private:
@@ -117,11 +117,12 @@ namespace geode
 
             ~SolidIdentifier();
 
-            index_t identify_polyhedra();
+            [[nodiscard]] index_t identify_polyhedra();
 
-            index_t polyhedron_identifier( index_t polyhedron ) const;
+            [[nodiscard]] index_t polyhedron_identifier(
+                index_t polyhedron ) const;
 
-            absl::FixedArray< std::vector< index_t > >
+            [[nodiscard]] absl::FixedArray< std::vector< index_t > >
                 identified_connected_polyhedra() const;
 
         private:

@@ -52,7 +52,7 @@ namespace geode
         {
         }
 
-        const uuid& create_block_collection();
+        [[nodiscard]] const uuid& create_block_collection();
 
         void create_block_collection( uuid block_collection_id );
 

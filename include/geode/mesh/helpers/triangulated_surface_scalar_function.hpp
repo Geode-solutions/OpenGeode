@@ -48,25 +48,25 @@ namespace geode
          * a value. Throws an exception if an attribute with the same name
          * exists.
          */
-        static TriangulatedSurfaceScalarFunction< dimension > create(
-            const TriangulatedSurface< dimension >& solid,
-            std::string_view function_name,
-            double value );
+        [[nodiscard]] static TriangulatedSurfaceScalarFunction< dimension >
+            create( const TriangulatedSurface< dimension >& solid,
+                std::string_view function_name,
+                double value );
 
         /*!
          * Finds an object function that already exists in the given
          * TriangulatedSurface, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static TriangulatedSurfaceScalarFunction< dimension > find(
-            const TriangulatedSurface< dimension >& solid,
-            std::string_view function_name );
+        [[nodiscard]] static TriangulatedSurfaceScalarFunction< dimension >
+            find( const TriangulatedSurface< dimension >& solid,
+                std::string_view function_name );
 
         void set_value( index_t vertex_index, double value );
 
-        double value( index_t vertex_index ) const;
+        [[nodiscard]] double value( index_t vertex_index ) const;
 
-        double value(
+        [[nodiscard]] double value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
     private:

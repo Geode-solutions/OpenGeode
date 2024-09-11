@@ -62,16 +62,16 @@ namespace geode
         {
         }
         explicit PolygonVertex( const PolygonEdge& polygon_edge );
-        bool operator==( const PolygonVertex& other ) const
+        [[nodiscard]] bool operator==( const PolygonVertex& other ) const
         {
             return polygon_id == other.polygon_id
                    && vertex_id == other.vertex_id;
         }
-        bool operator!=( const PolygonVertex& other ) const
+        [[nodiscard]] bool operator!=( const PolygonVertex& other ) const
         {
             return !( *this == other );
         }
-        bool operator<( const PolygonVertex& other ) const
+        [[nodiscard]] bool operator<( const PolygonVertex& other ) const
         {
             if( polygon_id != other.polygon_id )
             {
@@ -79,7 +79,7 @@ namespace geode
             }
             return vertex_id < other.vertex_id;
         }
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( "(", polygon_id, ", ", vertex_id, ")" );
         }
@@ -101,15 +101,15 @@ namespace geode
         {
         }
         explicit PolygonEdge( const PolygonVertex& polygon_vertex );
-        bool operator==( const PolygonEdge& other ) const
+        [[nodiscard]] bool operator==( const PolygonEdge& other ) const
         {
             return polygon_id == other.polygon_id && edge_id == other.edge_id;
         }
-        bool operator!=( const PolygonEdge& other ) const
+        [[nodiscard]] bool operator!=( const PolygonEdge& other ) const
         {
             return !( *this == other );
         }
-        bool operator<( const PolygonEdge& other ) const
+        [[nodiscard]] bool operator<( const PolygonEdge& other ) const
         {
             if( polygon_id != other.polygon_id )
             {
@@ -117,7 +117,7 @@ namespace geode
             }
             return edge_id < other.edge_id;
         }
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( "(", polygon_id, ", ", edge_id, ")" );
         }
@@ -158,42 +158,47 @@ namespace geode
         /*!
          * Create a new SurfaceMesh using default data structure.
          */
-        static std::unique_ptr< SurfaceMesh< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< SurfaceMesh< dimension > >
+            create();
 
         /*!
          * Create a new SurfaceMesh using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< SurfaceMesh< dimension > > create(
+        [[nodiscard]] static std::unique_ptr< SurfaceMesh< dimension > > create(
             const MeshImpl& impl );
 
-        std::unique_ptr< SurfaceMesh< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > clone() const;
 
-        index_t nb_polygons() const;
+        [[nodiscard]] index_t nb_polygons() const;
 
-        bool is_vertex_isolated( index_t vertex_id ) const;
+        [[nodiscard]] bool is_vertex_isolated( index_t vertex_id ) const;
 
         /*!
          * Return the number of vertices in a polygon
          */
-        local_index_t nb_polygon_vertices( index_t polygon_id ) const;
+        [[nodiscard]] local_index_t nb_polygon_vertices(
+            index_t polygon_id ) const;
 
         /*!
          * Return the number of edges in a polygon
          */
-        local_index_t nb_polygon_edges( index_t polygon_id ) const;
+        [[nodiscard]] local_index_t nb_polygon_edges(
+            index_t polygon_id ) const;
 
         /*!
          * Return the index in the mesh of a local vertex in a polygon
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
-        index_t polygon_vertex( const PolygonVertex& polygon_vertex ) const;
+        [[nodiscard]] index_t polygon_vertex(
+            const PolygonVertex& polygon_vertex ) const;
 
         /*!
          * Return all the indices in the mesh of polygon vertices.
          * @param[in] polygon_id Index of polygon.
          */
-        PolygonVertices polygon_vertices( index_t polygon_id ) const;
+        [[nodiscard]] PolygonVertices polygon_vertices(
+            index_t polygon_id ) const;
 
         /*!
          * Return the local index in the polygon of a vertex in the mesh.
@@ -202,7 +207,7 @@ namespace geode
          * @return Index in [0,nb_polygon_vertices()[ if polygon is around
          * the given vertex
          */
-        std::optional< local_index_t > vertex_in_polygon(
+        [[nodiscard]] std::optional< local_index_t > vertex_in_polygon(
             index_t polygon_id, index_t vertex_id ) const;
 
         /*!
@@ -210,41 +215,42 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @param[in] vertex_id Local index of vertex in the edge (0 or 1).
          */
-        index_t polygon_edge_vertex(
+        [[nodiscard]] index_t polygon_edge_vertex(
             const PolygonEdge& polygon_edge, local_index_t vertex_id ) const;
 
         /*!
          * Return the indices in the mesh of the two polygon edge vertices.
          * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        std::array< index_t, 2 > polygon_edge_vertices(
+        [[nodiscard]] std::array< index_t, 2 > polygon_edge_vertices(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the next vertex in a polygon (local indexation)
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
-        PolygonVertex next_polygon_vertex(
+        [[nodiscard]] PolygonVertex next_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const;
 
         /*!
          * Return the previous vertex in a polygon (local indexation)
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
-        PolygonVertex previous_polygon_vertex(
+        [[nodiscard]] PolygonVertex previous_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const;
 
         /*!
          * Return the next edge in a polygon (local indexation)
          * @param[in] polygon_edge Local index of edge in polygon
          */
-        PolygonEdge next_polygon_edge( const PolygonEdge& polygon_edge ) const;
+        [[nodiscard]] PolygonEdge next_polygon_edge(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the previous edge in a polygon (local indexation)
          * @param[in] polygon_edge Local index of edge in polygon
          */
-        PolygonEdge previous_polygon_edge(
+        [[nodiscard]] PolygonEdge previous_polygon_edge(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -252,7 +258,7 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in polygon.
          * @return the index of the adjacent polygon if it exists.
          */
-        std::optional< index_t > polygon_adjacent(
+        [[nodiscard]] std::optional< index_t > polygon_adjacent(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -261,7 +267,7 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in polygon.
          * @return the index of the adjacent polygon edge if it exists.
          */
-        std::optional< PolygonEdge > polygon_adjacent_edge(
+        [[nodiscard]] std::optional< PolygonEdge > polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -269,26 +275,27 @@ namespace geode
          * around this vertex and on the border.
          * @param[in] vertex_id Index the vertex.
          */
-        bool is_vertex_on_border( index_t vertex_id ) const;
+        [[nodiscard]] bool is_vertex_on_border( index_t vertex_id ) const;
 
         /*!
          * Return true if the edge is on border, i.e. if the polygon has no
          * adjacent through the specified edge.
          * @param[in] polygon_edge Local index of edge in polygon.
          */
-        bool is_edge_on_border( const PolygonEdge& polygon_edge ) const;
+        [[nodiscard]] bool is_edge_on_border(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return true if at least one of the polygon edges is on border
          * @param[in] polygon_id Index of a polygon
          */
-        bool is_polygon_on_border( index_t polygon_id ) const;
+        [[nodiscard]] bool is_polygon_on_border( index_t polygon_id ) const;
 
         /*!
          * Return all the edges of a polygon that are on border
          * @param[in] polygon_id Index of a polygon
          */
-        PolygonEdgesOnBorder polygon_edges_on_border(
+        [[nodiscard]] PolygonEdgesOnBorder polygon_edges_on_border(
             index_t polygon_id ) const;
 
         /*!
@@ -296,49 +303,54 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @pre The given polygon edge should be on border.
          */
-        PolygonEdge next_on_border( const PolygonEdge& polygon_edge ) const;
+        [[nodiscard]] PolygonEdge next_on_border(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the previous edge on the border (local indexation).
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @pre The given polygon edge should be on border.
          */
-        PolygonEdge previous_on_border( const PolygonEdge& polygon_edge ) const;
+        [[nodiscard]] PolygonEdge previous_on_border(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the length of a given edge.
          * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        double edge_length( const PolygonEdge& polygon_edge ) const;
-        double edge_length(
+        [[nodiscard]] double edge_length(
+            const PolygonEdge& polygon_edge ) const;
+        [[nodiscard]] double edge_length(
             const std::array< index_t, 2 >& polygon_edge_vertices ) const;
 
         /*!
          * Return the coordinates of the barycenter of a given edge.
          * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        Point< dimension > edge_barycenter(
+        [[nodiscard]] Point< dimension > edge_barycenter(
             const PolygonEdge& polygon_edge ) const;
-        Point< dimension > edge_barycenter(
+        [[nodiscard]] Point< dimension > edge_barycenter(
             const std::array< index_t, 2 >& polygon_edge_vertices ) const;
 
         /*!
          * Return the barycenter of a polygon
          * @param[in] polygon_id Index of a polygon
          */
-        Point< dimension > polygon_barycenter( index_t polygon_id ) const;
+        [[nodiscard]] Point< dimension > polygon_barycenter(
+            index_t polygon_id ) const;
 
         /*!
          * Return the area of a polygon.
          * @param[in] polygon_id Index of a polygon.
          * @warning Result guaranteed only for convex polygon.
          */
-        double polygon_area( index_t polygon_id ) const;
+        [[nodiscard]] double polygon_area( index_t polygon_id ) const;
 
         /*!
          * Return the normal of a polygon
          */
         template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< Vector3D > >::type
             polygon_normal( index_t polygon_id ) const;
 
@@ -346,6 +358,7 @@ namespace geode
          * Return the normal at a polygon vertex
          */
         template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< Vector3D > >::type
             polygon_vertex_normal( index_t vertex_id ) const;
 
@@ -353,12 +366,12 @@ namespace geode
          * Return if a polygon is degenerated (means stands into an
          * epsilon-large segment)
          */
-        bool is_polygon_degenerated( index_t polygon_id ) const;
+        [[nodiscard]] bool is_polygon_degenerated( index_t polygon_id ) const;
 
         /*!
          * Returns the vertices linked by an edge to the given mesh vertex.
          */
-        virtual VerticesAroundVertex vertices_around_vertex(
+        [[nodiscard]] virtual VerticesAroundVertex vertices_around_vertex(
             index_t vertex_id ) const;
 
         /*!
@@ -366,7 +379,7 @@ namespace geode
          * @param[in] vertex_id Index of the vertex.
          * @pre This function needs that polygon adjacencies are computed
          */
-        const PolygonsAroundVertex& polygons_around_vertex(
+        [[nodiscard]] const PolygonsAroundVertex& polygons_around_vertex(
             index_t vertex_id ) const;
 
         /*!
@@ -374,7 +387,7 @@ namespace geode
          * @param[in] polygon_vertex Local index of vertex in polygon.
          * @pre This function needs that polygon adjacencies are computed
          */
-        const PolygonsAroundVertex& polygons_around_vertex(
+        [[nodiscard]] const PolygonsAroundVertex& polygons_around_vertex(
             const PolygonVertex& vertex ) const;
 
         /*!
@@ -385,41 +398,41 @@ namespace geode
          * @param[in] to_vertex_id Index of the vertex to which ends the edge
          * @return Local index if the edge is found.
          */
-        std::optional< PolygonEdge > polygon_edge_from_vertices(
+        [[nodiscard]] std::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
         /*!
          * Find the polygon edges corresponding to a pair of vertex indices.
          * @return Local indices of the edges found
          */
-        PolygonsAroundEdge polygons_from_edge_vertices(
+        [[nodiscard]] PolygonsAroundEdge polygons_from_edge_vertices(
             absl::Span< const index_t > edge_vertices ) const;
 
-        bool are_edges_enabled() const;
+        [[nodiscard]] bool are_edges_enabled() const;
 
         void enable_edges() const;
 
         void disable_edges() const;
 
-        const SurfaceEdges< dimension >& edges() const;
+        [[nodiscard]] const SurfaceEdges< dimension >& edges() const;
 
         /*!
          * Access to the manager of attributes associated with polygons.
          */
-        AttributeManager& polygon_attribute_manager() const;
+        [[nodiscard]] AttributeManager& polygon_attribute_manager() const;
 
-        TextureManager2D texture_manager() const;
+        [[nodiscard]] TextureManager2D texture_manager() const;
 
         /*!
          * Compute the bounding box from mesh vertices
          */
-        BoundingBox< dimension > bounding_box() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
         /*!
          * Return one polygon with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          */
-        std::optional< PolygonVertex > polygon_around_vertex(
+        [[nodiscard]] std::optional< PolygonVertex > polygon_around_vertex(
             index_t vertex_id ) const;
 
     public:
@@ -430,7 +443,7 @@ namespace geode
 
         void reset_polygons_around_vertex( index_t vertex_id, SurfaceMeshKey );
 
-        SurfaceEdges< dimension >& edges( SurfaceMeshKey );
+        [[nodiscard]] SurfaceEdges< dimension >& edges( SurfaceMeshKey );
 
         void copy_edges(
             const SurfaceMesh< dimension >& surface_mesh, SurfaceMeshKey );
@@ -445,17 +458,17 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        virtual index_t get_polygon_vertex(
+        [[nodiscard]] virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;
 
-        virtual local_index_t get_nb_polygon_vertices(
+        [[nodiscard]] virtual local_index_t get_nb_polygon_vertices(
             index_t polygon_id ) const = 0;
 
-        virtual std::optional< index_t > get_polygon_adjacent(
+        [[nodiscard]] virtual std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const = 0;
 
-        virtual std::optional< PolygonVertex > get_polygon_around_vertex(
-            index_t vertex_id ) const;
+        [[nodiscard]] virtual std::optional< PolygonVertex >
+            get_polygon_around_vertex( index_t vertex_id ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -47,7 +47,7 @@ namespace geode
     public:
         static constexpr index_t dim{ 2 };
 
-        static std::unique_ptr< RegularGridBuilder< 2 > > create(
+        [[nodiscard]] static std::unique_ptr< RegularGridBuilder< 2 > > create(
             RegularGrid2D& grid );
 
         void initialize_grid( const Point2D& origin,

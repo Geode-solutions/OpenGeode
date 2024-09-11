@@ -54,32 +54,32 @@ namespace geode
         {
         }
 
-        double length2() const
+        [[nodiscard]] double length2() const
         {
             return dot( *this );
         }
 
-        double length() const
+        [[nodiscard]] double length() const
         {
             return std::sqrt( length2() );
         }
 
-        Vector operator*( double multiplier ) const
+        [[nodiscard]] Vector operator*( double multiplier ) const
         {
             return detail::coords_multiply( *this, multiplier );
         }
 
-        Vector operator/( double divider ) const
+        [[nodiscard]] Vector operator/( double divider ) const
         {
             return detail::coords_divide( *this, divider );
         }
 
-        Vector operator+( const Vector &other ) const
+        [[nodiscard]] Vector operator+( const Vector &other ) const
         {
             return detail::coords_add( *this, other );
         }
 
-        Vector operator-( const Vector &other ) const
+        [[nodiscard]] Vector operator-( const Vector &other ) const
         {
             return detail::coords_substract( *this, other );
         }
@@ -104,12 +104,12 @@ namespace geode
             detail::coords_substract_equal( *this, other );
         }
 
-        Vector normalize() const
+        [[nodiscard]] Vector normalize() const
         {
             return *this / length();
         }
 
-        double dot( const Vector &other ) const
+        [[nodiscard]] double dot( const Vector &other ) const
         {
             double result{ 0 };
             for( const auto i : LRange{ dimension } )
@@ -119,7 +119,7 @@ namespace geode
             return result;
         }
 
-        Vector cross( const Vector &other ) const
+        [[nodiscard]] Vector cross( const Vector &other ) const
         {
             static_assert(
                 dimension == 3, "Cross product only possible in 3D" );

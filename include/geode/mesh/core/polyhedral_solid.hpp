@@ -55,18 +55,20 @@ namespace geode
         /*!
          * Create a new PolyhedralSolid using default data structure.
          */
-        static std::unique_ptr< PolyhedralSolid< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< PolyhedralSolid< dimension > >
+            create();
 
         /*!
          * Create a new PolyhedralSolid using a specified data structure.
          * @param[in] impl Data structure implementation.
          */
-        static std::unique_ptr< PolyhedralSolid< dimension > > create(
-            const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< PolyhedralSolid< dimension > >
+            create( const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< PolyhedralSolid< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< PolyhedralSolid< dimension > >
+            clone() const;
 
     protected:
         PolyhedralSolid() = default;

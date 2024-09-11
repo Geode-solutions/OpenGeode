@@ -92,7 +92,7 @@ namespace geode
         {
         }
 
-        bool has_intersection() const
+        [[nodiscard]] bool has_intersection() const
         {
             return type == INTERSECTION_TYPE::intersect;
         }
@@ -111,7 +111,7 @@ namespace geode
      * Compute the intersection between a plane and an infinite line
      * @return an optional of the intersection.
      */
-    IntersectionResult< Point3D >
+    [[nodiscard]] IntersectionResult< Point3D >
         opengeode_geometry_api line_plane_intersection(
             const InfiniteLine3D& line, const Plane& plane );
 
@@ -120,7 +120,8 @@ namespace geode
      * @return an optional of the intersection points.
      */
     template < index_t dimension >
-    IntersectionResult< absl::InlinedVector< Point< dimension >, 2 > >
+    [[nodiscard]] IntersectionResult<
+        absl::InlinedVector< Point< dimension >, 2 > >
         line_sphere_intersection( const InfiniteLine< dimension >& line,
             const Sphere< dimension >& sphere );
 
@@ -130,7 +131,8 @@ namespace geode
      * @return an optional of the intersection points.
      */
     template < index_t dimension >
-    IntersectionResult< absl::InlinedVector< Point< dimension >, 2 > >
+    [[nodiscard]] IntersectionResult<
+        absl::InlinedVector< Point< dimension >, 2 > >
         segment_sphere_intersection( const Segment< dimension >& segment,
             const Sphere< dimension >& sphere );
 
@@ -139,7 +141,7 @@ namespace geode
      * @return an optional of the intersection point.
      * @warning if the segment is included in the plane nothing is returned
      */
-    IntersectionResult< Point3D >
+    [[nodiscard]] IntersectionResult< Point3D >
         opengeode_geometry_api segment_plane_intersection(
             const Segment3D& segment, const Plane& plane );
 
@@ -149,7 +151,7 @@ namespace geode
      * @warning if the segment is included in the triangle plane nothing is
      * returned
      */
-    IntersectionResult< Point3D >
+    [[nodiscard]] IntersectionResult< Point3D >
         opengeode_geometry_api segment_triangle_intersection(
             const Segment3D& segment, const Triangle3D& triangle );
 
@@ -159,7 +161,7 @@ namespace geode
      * @warning if the segment is included in the triangle plane nothing is
      * returned
      */
-    IntersectionResult< Point3D >
+    [[nodiscard]] IntersectionResult< Point3D >
         opengeode_geometry_api line_triangle_intersection(
             const InfiniteLine3D& line, const Triangle3D& triangle );
 
@@ -167,14 +169,15 @@ namespace geode
      * Compute the intersection between two infinite lines
      * @return an optional of the intersection point.
      */
-    IntersectionResult< Point2D > opengeode_geometry_api line_line_intersection(
-        const InfiniteLine2D& line0, const InfiniteLine2D& line1 );
+    [[nodiscard]] IntersectionResult< Point2D >
+        opengeode_geometry_api line_line_intersection(
+            const InfiniteLine2D& line0, const InfiniteLine2D& line1 );
 
     /*!
      * Compute the intersection between two segments
      * @return an optional of the intersection point.
      */
-    IntersectionResult< Point2D >
+    [[nodiscard]] IntersectionResult< Point2D >
         opengeode_geometry_api segment_segment_intersection(
             const Segment2D& segment0, const Segment2D& segment1 );
 
@@ -182,7 +185,7 @@ namespace geode
      * Compute the intersection between a segment and an infinite line
      * @return an optional of the intersection point.
      */
-    IntersectionResult< Point2D >
+    [[nodiscard]] IntersectionResult< Point2D >
         opengeode_geometry_api segment_line_intersection(
             const Segment2D& segment, const InfiniteLine2D& line );
 
@@ -190,7 +193,7 @@ namespace geode
      * Compute the intersection between a segment and a cylinder
      * @return an optional of the intersection points.
      */
-    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+    [[nodiscard]] IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api segment_cylinder_intersection(
             const Segment3D& segment, const Cylinder& cylinder );
 
@@ -198,7 +201,7 @@ namespace geode
      * Compute the intersection between a line and a cylinder
      * @return an optional of the intersection points.
      */
-    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+    [[nodiscard]] IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api line_cylinder_intersection(
             const InfiniteLine3D& line, const Cylinder& cylinder );
 
@@ -206,7 +209,7 @@ namespace geode
      * Compute the intersection between a triangle and a circle
      * @return an optional of the intersection points.
      */
-    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+    [[nodiscard]] IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api triangle_circle_intersection(
             const Triangle3D& triangle, const Circle& circle );
 
@@ -214,7 +217,7 @@ namespace geode
      * Compute the intersection between a plane and a circle
      * @return an optional of the intersection points.
      */
-    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+    [[nodiscard]] IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api plane_circle_intersection(
             const Plane& plane, const Circle& circle );
 
@@ -222,6 +225,7 @@ namespace geode
      * Compute the intersection between two planes
      * @return an optional of the intersection line.
      */
-    IntersectionResult< OwnerInfiniteLine3D > opengeode_geometry_api
-        plane_plane_intersection( const Plane& plane0, const Plane& plane1 );
+    [[nodiscard]] IntersectionResult< OwnerInfiniteLine3D >
+        opengeode_geometry_api plane_plane_intersection(
+            const Plane& plane0, const Plane& plane1 );
 } // namespace geode

@@ -47,15 +47,17 @@ namespace geode
         TextureManager( TextureManager&& other ) noexcept;
         ~TextureManager();
 
-        index_t nb_textures() const;
+        [[nodiscard]] index_t nb_textures() const;
 
         Texture< dimension >& find_or_create_texture( std::string_view name );
 
-        const Texture< dimension >& find_texture( std::string_view name ) const;
+        [[nodiscard]] const Texture< dimension >& find_texture(
+            std::string_view name ) const;
 
-        absl::FixedArray< std::string_view > texture_names() const;
+        [[nodiscard]] absl::FixedArray< std::string_view >
+            texture_names() const;
 
-        bool texture_exists( std::string_view name ) const;
+        [[nodiscard]] bool texture_exists( std::string_view name ) const;
 
         void delete_texture( std::string_view name );
 

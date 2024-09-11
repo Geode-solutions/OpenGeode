@@ -60,7 +60,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_edged_curve_saveable(
+    [[nodiscard]] bool is_edged_curve_saveable(
         const EdgedCurve< dimension >& edged_curve, std::string_view filename );
 
     template < index_t dimension >

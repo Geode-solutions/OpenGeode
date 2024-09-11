@@ -53,17 +53,17 @@ namespace geode
         ModelBoundary( ModelBoundary&& other ) noexcept = default;
         ~ModelBoundary() = default;
 
-        static ComponentType component_type_static()
+        [[nodiscard]] static ComponentType component_type_static()
         {
             return ComponentType{ "ModelBoundary" };
         }
 
-        ComponentType component_type() const override
+        [[nodiscard]] ComponentType component_type() const override
         {
             return component_type_static();
         }
 
-        ComponentID component_id() const
+        [[nodiscard]] ComponentID component_id() const
         {
             return { this->component_type_static(), this->id() };
         };

@@ -43,16 +43,19 @@ namespace geode
 
 namespace geode
 {
-    std::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
-        convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid );
+    [[nodiscard]] std::optional< std::unique_ptr< TetrahedralSolid3D > >
+        opengeode_mesh_api convert_solid_mesh_into_tetrahedral_solid(
+            const SolidMesh3D& solid );
 
-    std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
+    [[nodiscard]] std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
         convert_grid_into_tetrahedral_solid( const Grid3D& grid );
 
-    std::optional< std::unique_ptr< HybridSolid3D > > opengeode_mesh_api
-        convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid );
+    [[nodiscard]] std::optional< std::unique_ptr< HybridSolid3D > >
+        opengeode_mesh_api convert_solid_mesh_into_hybrid_solid(
+            const SolidMesh3D& solid );
 
-    std::unique_ptr< SolidMesh3D > opengeode_mesh_api merge_solid_meshes(
-        absl::Span< const std::reference_wrapper< const SolidMesh3D > >
-            solids );
+    [[nodiscard]] std::unique_ptr< SolidMesh3D >
+        opengeode_mesh_api merge_solid_meshes(
+            absl::Span< const std::reference_wrapper< const SolidMesh3D > >
+                solids );
 } // namespace geode

@@ -38,8 +38,8 @@ namespace geode
         Cylinder( Cylinder&& other ) noexcept;
         Cylinder& operator=( Cylinder&& other ) noexcept;
 
-        const Segment3D& axis() const;
-        double radius() const;
+        [[nodiscard]] const Segment3D& axis() const;
+        [[nodiscard]] double radius() const;
 
     private:
         Segment3D axis_;

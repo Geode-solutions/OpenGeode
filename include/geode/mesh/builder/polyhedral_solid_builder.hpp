@@ -51,8 +51,9 @@ namespace geode
          * Create the builder associated with a PolyhedralSolid.
          * @param[in] mesh The PolyhedralSolid to build/modify
          */
-        static std::unique_ptr< PolyhedralSolidBuilder< dimension > > create(
-            PolyhedralSolid< dimension >& mesh );
+        [[nodiscard]] static std::unique_ptr<
+            PolyhedralSolidBuilder< dimension > >
+            create( PolyhedralSolid< dimension >& mesh );
 
         void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
 

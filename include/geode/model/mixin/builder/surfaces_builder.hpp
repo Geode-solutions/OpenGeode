@@ -53,8 +53,8 @@ namespace geode
          * @param[in] id Unique index of the Surface
          */
         template < typename Mesh = SurfaceMesh< dimension > >
-        std::unique_ptr< typename Mesh::Builder > surface_mesh_builder(
-            const uuid& id )
+        [[nodiscard]] std::unique_ptr< typename Mesh::Builder >
+            surface_mesh_builder( const uuid& id )
         {
             auto& mesh = surfaces_.modifiable_surface( id, {} ).modifiable_mesh(
                 typename Surface< dimension >::SurfacesBuilderKey{} );
@@ -70,9 +70,9 @@ namespace geode
         {
         }
 
-        const uuid& create_surface();
+        [[nodiscard]] const uuid& create_surface();
 
-        const uuid& create_surface( const MeshImpl& impl );
+        [[nodiscard]] const uuid& create_surface( const MeshImpl& impl );
 
         void create_surface( uuid surface_id );
 
@@ -83,7 +83,8 @@ namespace geode
         void set_surface_mesh(
             const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh );
 
-        SurfaceMesh< dimension >& modifiable_surface_mesh( const uuid& id );
+        [[nodiscard]] SurfaceMesh< dimension >& modifiable_surface_mesh(
+            const uuid& id );
 
     private:
         Surfaces< dimension >& surfaces_;

@@ -36,10 +36,10 @@ namespace geode
 {
     namespace detail
     {
-        ModelCopyMapping opengeode_model_api section_clone_mapping(
-            const Section& model );
+        [[nodiscard]] ModelCopyMapping opengeode_model_api
+            section_clone_mapping( const Section& model );
 
-        ModelCopyMapping opengeode_model_api brep_clone_mapping(
+        [[nodiscard]] ModelCopyMapping opengeode_model_api brep_clone_mapping(
             const BRep& model );
     } // namespace detail
 } // namespace geode

@@ -55,7 +55,8 @@ namespace geode
         public:
             ~BlockCollectionRangeBase();
 
-            bool operator!=( const BlockCollectionRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const BlockCollectionRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -77,22 +78,22 @@ namespace geode
             BlockCollectionRange( const BlockCollectionRange& range );
             ~BlockCollectionRange();
 
-            const BlockCollectionRange& begin() const;
+            [[nodiscard]] const BlockCollectionRange& begin() const;
 
-            const BlockCollectionRange& end() const;
+            [[nodiscard]] const BlockCollectionRange& end() const;
 
-            const BlockCollection< dimension >& operator*() const;
+            [[nodiscard]] const BlockCollection< dimension >& operator*() const;
         };
 
     public:
         ~BlockCollections();
 
-        index_t nb_block_collections() const;
+        [[nodiscard]] index_t nb_block_collections() const;
 
-        const BlockCollection< dimension >& block_collection(
+        [[nodiscard]] const BlockCollection< dimension >& block_collection(
             const uuid& id ) const;
 
-        BlockCollectionRange block_collections() const;
+        [[nodiscard]] BlockCollectionRange block_collections() const;
 
         void save_block_collections( std::string_view directory ) const;
 
@@ -111,15 +112,16 @@ namespace geode
                 const ModifiableBlockCollectionRange& range );
             ~ModifiableBlockCollectionRange();
 
-            const ModifiableBlockCollectionRange& begin() const;
+            [[nodiscard]] const ModifiableBlockCollectionRange& begin() const;
 
-            const ModifiableBlockCollectionRange& end() const;
+            [[nodiscard]] const ModifiableBlockCollectionRange& end() const;
 
-            BlockCollection< dimension >& operator*() const;
+            [[nodiscard]] BlockCollection< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_block_collection( BlockCollectionsBuilderKey key );
+        [[nodiscard]] const uuid& create_block_collection(
+            BlockCollectionsBuilderKey key );
 
         void create_block_collection(
             uuid block_collection_id, BlockCollectionsBuilderKey key );
@@ -131,10 +133,10 @@ namespace geode
         void load_block_collections(
             std::string_view directory, BlockCollectionsBuilderKey key );
 
-        ModifiableBlockCollectionRange modifiable_block_collections(
-            BlockCollectionsBuilderKey key );
+        [[nodiscard]] ModifiableBlockCollectionRange
+            modifiable_block_collections( BlockCollectionsBuilderKey key );
 
-        BlockCollection< dimension >& modifiable_block_collection(
+        [[nodiscard]] BlockCollection< dimension >& modifiable_block_collection(
             const uuid& id, BlockCollectionsBuilderKey key );
 
     private:

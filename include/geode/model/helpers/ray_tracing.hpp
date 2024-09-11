@@ -44,18 +44,17 @@ namespace geode
     using BoundarySurfaceIntersections = absl::flat_hash_map< uuid,
         std::vector< RayTracing3D::PolygonDistance > >;
 
-    BoundarySurfaceIntersections opengeode_model_api
+    [[nodiscard]] BoundarySurfaceIntersections opengeode_model_api
         find_intersections_with_boundaries( const InfiniteLine3D& infinite_line,
             const BRep& brep,
             const Block3D& block );
 
-    bool opengeode_model_api is_point_inside_block(
+    [[nodiscard]] bool opengeode_model_api is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point );
 
-    bool opengeode_model_api is_point_inside_closed_surface(
+    [[nodiscard]] bool opengeode_model_api is_point_inside_closed_surface(
         const SurfaceMesh3D& surface, const Point3D& point );
 
-    std::optional< uuid > opengeode_model_api block_containing_point(
-        const BRep& brep, const Point3D& point );
-
+    [[nodiscard]] std::optional< uuid > opengeode_model_api
+        block_containing_point( const BRep& brep, const Point3D& point );
 } // namespace geode

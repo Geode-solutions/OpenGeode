@@ -327,7 +327,8 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     const std::string& filename )
 {
     geode::save_polyhedral_solid( polyhedral_solid, filename );
-    geode::load_polyhedral_solid< 3 >( filename );
+    const auto reloaded = geode::load_polyhedral_solid< 3 >( filename );
+    geode_unused( reloaded );
     const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
         geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
 

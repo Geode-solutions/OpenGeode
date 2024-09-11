@@ -40,15 +40,19 @@ namespace geode
 
 namespace geode
 {
-    absl::FixedArray< std::pair< CRSType, std::string > > opengeode_model_api
-        brep_coordinate_reference_systems( const BRep& brep );
+    [[nodiscard]] absl::FixedArray< std::pair< CRSType, std::string > >
+        opengeode_model_api brep_coordinate_reference_systems(
+            const BRep& brep );
 
-    absl::FixedArray< std::pair< CRSType, std::string > > opengeode_model_api
-        section_coordinate_reference_systems( const Section& section );
+    [[nodiscard]] absl::FixedArray< std::pair< CRSType, std::string > >
+        opengeode_model_api section_coordinate_reference_systems(
+            const Section& section );
 
-    absl::FixedArray< std::pair< CRSType, std::string > > opengeode_model_api
-        brep_active_coordinate_reference_systems( const BRep& brep );
+    [[nodiscard]] absl::FixedArray< std::pair< CRSType, std::string > >
+        opengeode_model_api brep_active_coordinate_reference_systems(
+            const BRep& brep );
 
-    absl::FixedArray< std::pair< CRSType, std::string > > opengeode_model_api
-        section_active_coordinate_reference_systems( const Section& section );
+    [[nodiscard]] absl::FixedArray< std::pair< CRSType, std::string > >
+        opengeode_model_api section_active_coordinate_reference_systems(
+            const Section& section );
 } // namespace geode

@@ -107,25 +107,25 @@ namespace geode
         void copy_component_geometry(
             const ModelCopyMapping& mapping, const Section& section );
 
-        const uuid& add_corner();
+        [[nodiscard]] const uuid& add_corner();
 
-        const uuid& add_corner( const MeshImpl& impl );
+        [[nodiscard]] const uuid& add_corner( const MeshImpl& impl );
 
-        const uuid& add_line();
+        [[nodiscard]] const uuid& add_line();
 
-        const uuid& add_line( const MeshImpl& impl );
+        [[nodiscard]] const uuid& add_line( const MeshImpl& impl );
 
-        const uuid& add_surface();
+        [[nodiscard]] const uuid& add_surface();
 
-        const uuid& add_surface( const MeshImpl& impl );
+        [[nodiscard]] const uuid& add_surface( const MeshImpl& impl );
 
-        const uuid& add_model_boundary();
+        [[nodiscard]] const uuid& add_model_boundary();
 
-        const uuid& add_corner_collection();
+        [[nodiscard]] const uuid& add_corner_collection();
 
-        const uuid& add_line_collection();
+        [[nodiscard]] const uuid& add_line_collection();
 
-        const uuid& add_surface_collection();
+        [[nodiscard]] const uuid& add_surface_collection();
 
         void add_corner( uuid corner_id );
 

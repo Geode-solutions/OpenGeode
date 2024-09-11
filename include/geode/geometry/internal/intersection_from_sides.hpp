@@ -29,7 +29,7 @@ namespace geode
 {
     namespace internal
     {
-        inline POSITION segment_intersection_detection(
+        [[nodiscard]] inline POSITION segment_intersection_detection(
             const SIDE& s0, const SIDE& s1 )
         {
             if( s0 == SIDE::zero && s1 == SIDE::zero )
@@ -51,7 +51,7 @@ namespace geode
             return POSITION::outside;
         }
 
-        inline POSITION triangle_intersection_detection(
+        [[nodiscard]] inline POSITION triangle_intersection_detection(
             const SIDE s0, const SIDE s1, const SIDE s2 )
         {
             if( s0 == SIDE::zero )

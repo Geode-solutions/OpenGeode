@@ -53,8 +53,8 @@ namespace geode
          * @param[in] id Unique index of the Block
          */
         template < typename Mesh = SolidMesh< dimension > >
-        std::unique_ptr< typename Mesh::Builder > block_mesh_builder(
-            const uuid& id )
+        [[nodiscard]] std::unique_ptr< typename Mesh::Builder >
+            block_mesh_builder( const uuid& id )
         {
             auto& mesh = blocks_.modifiable_block( id, {} ).modifiable_mesh(
                 typename Block< dimension >::BlocksBuilderKey{} );
@@ -70,9 +70,9 @@ namespace geode
         {
         }
 
-        const uuid& create_block();
+        [[nodiscard]] const uuid& create_block();
 
-        const uuid& create_block( const MeshImpl& impl );
+        [[nodiscard]] const uuid& create_block( const MeshImpl& impl );
 
         void create_block( uuid block_id );
 
@@ -83,7 +83,8 @@ namespace geode
         void set_block_mesh(
             const uuid& id, std::unique_ptr< SolidMesh< dimension > > mesh );
 
-        SolidMesh< dimension >& modifiable_block_mesh( const uuid& id );
+        [[nodiscard]] SolidMesh< dimension >& modifiable_block_mesh(
+            const uuid& id );
 
     private:
         Blocks< dimension >& blocks_;

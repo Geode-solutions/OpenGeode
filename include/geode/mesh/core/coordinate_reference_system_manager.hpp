@@ -52,20 +52,22 @@ namespace geode
             CoordinateReferenceSystemManager&& other ) noexcept;
         ~CoordinateReferenceSystemManager();
 
-        index_t nb_coordinate_reference_systems() const;
+        [[nodiscard]] index_t nb_coordinate_reference_systems() const;
 
-        const CoordinateReferenceSystem< dimension >&
+        [[nodiscard]] const CoordinateReferenceSystem< dimension >&
             find_coordinate_reference_system( std::string_view name ) const;
 
-        const CoordinateReferenceSystem< dimension >&
+        [[nodiscard]] const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const;
 
-        std::string_view active_coordinate_reference_system_name() const;
+        [[nodiscard]] std::string_view
+            active_coordinate_reference_system_name() const;
 
-        absl::FixedArray< std::string_view >
+        [[nodiscard]] absl::FixedArray< std::string_view >
             coordinate_reference_system_names() const;
 
-        bool coordinate_reference_system_exists( std::string_view name ) const;
+        [[nodiscard]] bool coordinate_reference_system_exists(
+            std::string_view name ) const;
 
     public:
         void register_coordinate_reference_system( std::string_view name,
@@ -78,10 +80,10 @@ namespace geode
         void set_active_coordinate_reference_system(
             std::string_view name, CRSManagerKey );
 
-        CoordinateReferenceSystem< dimension >&
+        [[nodiscard]] CoordinateReferenceSystem< dimension >&
             modifiable_active_coordinate_reference_system( CRSManagerKey );
 
-        CoordinateReferenceSystem< dimension >&
+        [[nodiscard]] CoordinateReferenceSystem< dimension >&
             modifiable_coordinate_reference_system(
                 std::string_view name, CRSManagerKey );
 

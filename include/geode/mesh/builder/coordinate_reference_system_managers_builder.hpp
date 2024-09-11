@@ -48,16 +48,16 @@ namespace geode
         {
         }
 
-        CoordinateReferenceSystemManagerBuilder1D
+        [[nodiscard]] CoordinateReferenceSystemManagerBuilder1D
             coordinate_reference_system_manager_builder1D();
 
-        CoordinateReferenceSystemManagerBuilder2D
+        [[nodiscard]] CoordinateReferenceSystemManagerBuilder2D
             coordinate_reference_system_manager_builder2D();
 
-        CoordinateReferenceSystemManagerBuilder3D
+        [[nodiscard]] CoordinateReferenceSystemManagerBuilder3D
             coordinate_reference_system_manager_builder3D();
 
-        CoordinateReferenceSystemManagerBuilder< dimension >
+        [[nodiscard]] CoordinateReferenceSystemManagerBuilder< dimension >
             main_coordinate_reference_system_manager_builder();
 
         /*!

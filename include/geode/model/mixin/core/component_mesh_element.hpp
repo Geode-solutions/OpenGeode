@@ -43,12 +43,12 @@ namespace geode
         {
         }
 
-        MeshElement mesh_element() const
+        [[nodiscard]] MeshElement mesh_element() const
         {
             return { component_id.id(), element_id };
         }
 
-        bool operator==( const ComponentMeshElement& other ) const
+        [[nodiscard]] bool operator==( const ComponentMeshElement& other ) const
         {
             return component_id == other.component_id
                    && element_id == other.element_id;
@@ -65,7 +65,7 @@ namespace geode
                            } } } );
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat(
                 "[", component_id.string(), " ", element_id, "]" );

@@ -60,7 +60,8 @@ namespace geode
         public:
             ~CornerRangeBase();
 
-            bool operator!=( const CornerRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const CornerRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -83,26 +84,26 @@ namespace geode
             CornerRange( const CornerRange& range );
             ~CornerRange();
 
-            const CornerRange& begin() const;
+            [[nodiscard]] const CornerRange& begin() const;
 
-            const CornerRange& end() const;
+            [[nodiscard]] const CornerRange& end() const;
 
-            const Corner< dimension >& operator*() const;
+            [[nodiscard]] const Corner< dimension >& operator*() const;
         };
 
     public:
         ~Corners();
 
-        index_t nb_corners() const;
+        [[nodiscard]] index_t nb_corners() const;
 
-        bool has_corner( const uuid& id ) const;
+        [[nodiscard]] bool has_corner( const uuid& id ) const;
 
         /*!
          * Access to an unmodifiable Corner by its unique index
          */
-        const Corner< dimension >& corner( const uuid& id ) const;
+        [[nodiscard]] const Corner< dimension >& corner( const uuid& id ) const;
 
-        CornerRange corners() const;
+        [[nodiscard]] CornerRange corners() const;
 
         /*!
          * Save each Corner in a file located in the specified directory
@@ -123,17 +124,17 @@ namespace geode
             ModifiableCornerRange( const ModifiableCornerRange& range );
             ~ModifiableCornerRange();
 
-            const ModifiableCornerRange& begin() const;
+            [[nodiscard]] const ModifiableCornerRange& begin() const;
 
-            const ModifiableCornerRange& end() const;
+            [[nodiscard]] const ModifiableCornerRange& end() const;
 
-            Corner< dimension >& operator*() const;
+            [[nodiscard]] Corner< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_corner( CornersBuilderKey key );
+        [[nodiscard]] const uuid& create_corner( CornersBuilderKey key );
 
-        const uuid& create_corner(
+        [[nodiscard]] const uuid& create_corner(
             const MeshImpl& impl, CornersBuilderKey key );
 
         void create_corner( uuid corner_id, CornersBuilderKey key );
@@ -146,9 +147,10 @@ namespace geode
 
         void load_corners( std::string_view directory, CornersBuilderKey key );
 
-        ModifiableCornerRange modifiable_corners( CornersBuilderKey key );
+        [[nodiscard]] ModifiableCornerRange modifiable_corners(
+            CornersBuilderKey key );
 
-        Corner< dimension >& modifiable_corner(
+        [[nodiscard]] Corner< dimension >& modifiable_corner(
             const uuid& id, CornersBuilderKey key );
 
     private:

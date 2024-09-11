@@ -65,12 +65,12 @@ namespace geode
             computed_ = false;
         }
 
-        bool computed() const
+        [[nodiscard]] bool computed() const
         {
             return computed_;
         }
 
-        const ReturnType& value() const
+        [[nodiscard]] const ReturnType& value() const
         {
             return value_;
         }

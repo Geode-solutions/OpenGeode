@@ -57,7 +57,7 @@ namespace geode
         }
     };
 
-    bool opengeode_mesh_api is_vertex_set_saveable(
+    [[nodiscard]] bool opengeode_mesh_api is_vertex_set_saveable(
         const VertexSet& vertex_set, std::string_view filename );
 
     using VertexSetOutputFactory =

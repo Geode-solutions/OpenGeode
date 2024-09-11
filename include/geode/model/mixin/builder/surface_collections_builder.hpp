@@ -53,7 +53,7 @@ namespace geode
         {
         }
 
-        const uuid& create_surface_collection();
+        [[nodiscard]] const uuid& create_surface_collection();
 
         void create_surface_collection( uuid surface_collection_id );
 

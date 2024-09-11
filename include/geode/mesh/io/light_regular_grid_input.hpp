@@ -43,7 +43,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    LightRegularGrid< dimension > load_light_regular_grid(
+    [[nodiscard]] LightRegularGrid< dimension > load_light_regular_grid(
         std::string_view filename );
 
     template < index_t dimension >
@@ -59,16 +59,17 @@ namespace geode
         {
         }
 
-        LightRegularGrid< dimension > read();
+        [[nodiscard]] LightRegularGrid< dimension > read() override;
     };
     ALIAS_2D_AND_3D( LightRegularGridInput );
 
     template < index_t dimension >
-    typename LightRegularGridInput< dimension >::MissingFiles
+    [[nodiscard]] typename LightRegularGridInput< dimension >::MissingFiles
         check_light_regular_grid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_light_regular_grid_loadable( std::string_view filename );
+    [[nodiscard]] bool is_light_regular_grid_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     using LightRegularGridInputFactory = Factory< std::string,

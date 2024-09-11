@@ -36,10 +36,10 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    std::vector< index_t > lexicographic_mapping(
+    [[nodiscard]] std::vector< index_t > lexicographic_mapping(
         absl::Span< const Point< dimension > > points );
 
     template < index_t dimension >
-    std::vector< index_t > morton_mapping(
+    [[nodiscard]] std::vector< index_t > morton_mapping(
         absl::Span< const Point< dimension > > points );
 } // namespace geode

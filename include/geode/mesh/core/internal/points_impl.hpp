@@ -49,7 +49,8 @@ namespace geode
         public:
             static constexpr auto POINTS_NAME = "points";
 
-            const Point< dimension >& get_point( index_t vertex_id ) const
+            [[nodiscard]] const Point< dimension >& get_point(
+                index_t vertex_id ) const
             {
                 return points_->value( vertex_id );
             }
@@ -59,12 +60,12 @@ namespace geode
                 points_->set_value( vertex_id, std::move( point ) );
             }
 
-            index_t nb_points() const
+            [[nodiscard]] index_t nb_points() const
             {
                 return points_->size();
             }
 
-            std::string_view attribute_name() const
+            [[nodiscard]] std::string_view attribute_name() const
             {
                 return points_->name();
             }

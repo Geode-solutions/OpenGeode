@@ -55,7 +55,7 @@ namespace geode
         public:
             ~SurfaceCollectionRangeBase();
 
-            bool operator!=(
+            [[nodiscard]] bool operator!=(
                 const SurfaceCollectionRangeBase& /*unused*/ ) const;
 
             void operator++();
@@ -79,22 +79,23 @@ namespace geode
             SurfaceCollectionRange( const SurfaceCollectionRange& range );
             ~SurfaceCollectionRange();
 
-            const SurfaceCollectionRange& begin() const;
+            [[nodiscard]] const SurfaceCollectionRange& begin() const;
 
-            const SurfaceCollectionRange& end() const;
+            [[nodiscard]] const SurfaceCollectionRange& end() const;
 
-            const SurfaceCollection< dimension >& operator*() const;
+            [[nodiscard]] const SurfaceCollection< dimension >&
+                operator*() const;
         };
 
     public:
         ~SurfaceCollections();
 
-        index_t nb_surface_collections() const;
+        [[nodiscard]] index_t nb_surface_collections() const;
 
-        const SurfaceCollection< dimension >& surface_collection(
+        [[nodiscard]] const SurfaceCollection< dimension >& surface_collection(
             const uuid& id ) const;
 
-        SurfaceCollectionRange surface_collections() const;
+        [[nodiscard]] SurfaceCollectionRange surface_collections() const;
 
         void save_surface_collections( std::string_view directory ) const;
 
@@ -114,15 +115,15 @@ namespace geode
                 const ModifiableSurfaceCollectionRange& range );
             ~ModifiableSurfaceCollectionRange();
 
-            const ModifiableSurfaceCollectionRange& begin() const;
+            [[nodiscard]] const ModifiableSurfaceCollectionRange& begin() const;
 
-            const ModifiableSurfaceCollectionRange& end() const;
+            [[nodiscard]] const ModifiableSurfaceCollectionRange& end() const;
 
-            SurfaceCollection< dimension >& operator*() const;
+            [[nodiscard]] SurfaceCollection< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_surface_collection(
+        [[nodiscard]] const uuid& create_surface_collection(
             SurfaceCollectionsBuilderKey key );
 
         void create_surface_collection(
@@ -135,11 +136,12 @@ namespace geode
         void load_surface_collections(
             std::string_view directory, SurfaceCollectionsBuilderKey key );
 
-        ModifiableSurfaceCollectionRange modifiable_surface_collections(
-            SurfaceCollectionsBuilderKey key );
+        [[nodiscard]] ModifiableSurfaceCollectionRange
+            modifiable_surface_collections( SurfaceCollectionsBuilderKey key );
 
-        SurfaceCollection< dimension >& modifiable_surface_collection(
-            const uuid& id, SurfaceCollectionsBuilderKey key );
+        [[nodiscard]] SurfaceCollection< dimension >&
+            modifiable_surface_collection(
+                const uuid& id, SurfaceCollectionsBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

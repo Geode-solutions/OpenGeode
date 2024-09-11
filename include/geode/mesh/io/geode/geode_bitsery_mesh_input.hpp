@@ -32,7 +32,7 @@
 #include <geode/mesh/core/bitsery_archive.hpp>
 
 #define BITSERY_READ( Mesh )                                                   \
-    std::unique_ptr< Mesh > read( const MeshImpl& impl ) final                 \
+    [[nodiscard]] std::unique_ptr< Mesh > read( const MeshImpl& impl ) final   \
     {                                                                          \
         std::ifstream file{ to_string( this->filename() ),                     \
             std::ifstream::binary };                                           \

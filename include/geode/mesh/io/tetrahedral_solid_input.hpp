@@ -45,8 +45,9 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
-        const MeshImpl& impl, std::string_view filename );
+    [[nodiscard]] std::unique_ptr< TetrahedralSolid< dimension > >
+        load_tetrahedral_solid(
+            const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an TetrahedralSolid.
@@ -55,8 +56,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
-        std::string_view filename );
+    [[nodiscard]] std::unique_ptr< TetrahedralSolid< dimension > >
+        load_tetrahedral_solid( std::string_view filename );
 
     template < index_t dimension >
     class TetrahedralSolidInput
@@ -79,11 +80,12 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename TetrahedralSolidInput< dimension >::MissingFiles
+    [[nodiscard]] typename TetrahedralSolidInput< dimension >::MissingFiles
         check_tetrahedral_solid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_tetrahedral_solid_loadable( std::string_view filename );
+    [[nodiscard]] bool is_tetrahedral_solid_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     using TetrahedralSolidInputFactory = Factory< std::string,

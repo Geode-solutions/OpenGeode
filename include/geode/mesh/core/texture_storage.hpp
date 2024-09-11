@@ -51,19 +51,20 @@ namespace geode
         ~TextureStorage();
 
     public:
-        index_t nb_textures( TextureManagerKey ) const;
+        [[nodiscard]] index_t nb_textures( TextureManagerKey ) const;
 
         Texture< dimension >& find_or_create_texture( AttributeManager& manager,
             std::string_view name,
             TextureManagerKey );
 
-        const Texture< dimension >& find_texture(
+        [[nodiscard]] const Texture< dimension >& find_texture(
             std::string_view name, TextureManagerKey ) const;
 
-        absl::FixedArray< std::string_view > texture_names(
+        [[nodiscard]] absl::FixedArray< std::string_view > texture_names(
             TextureManagerKey ) const;
 
-        bool texture_exists( std::string_view name, TextureManagerKey ) const;
+        [[nodiscard]] bool texture_exists(
+            std::string_view name, TextureManagerKey ) const;
 
         void delete_texture( std::string_view name, TextureManagerKey );
 

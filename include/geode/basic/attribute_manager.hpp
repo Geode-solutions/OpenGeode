@@ -59,7 +59,7 @@ namespace geode
          * @param[in] name The associated attribute name to look for.
          * @return nullptr if no attribute matches the given name.
          */
-        std::shared_ptr< AttributeBase > find_generic_attribute(
+        [[nodiscard]] std::shared_ptr< AttributeBase > find_generic_attribute(
             std::string_view name ) const
         {
             return find_attribute_base( name );
@@ -72,7 +72,7 @@ namespace geode
          * @exception OpenGeodeException if no Attribute found
          */
         template < typename T >
-        std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
+        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
             std::string_view name ) const
         {
             auto attribute =
@@ -103,10 +103,10 @@ namespace geode
          * @exception OpenGeodeException if the Attribute replacement failed
          */
         template < template < typename > class Attribute, typename T >
-        std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            std::string_view name,
-            T default_value,
-            AttributeProperties properties )
+        [[nodiscard]] std::shared_ptr< Attribute< T > >
+            find_or_create_attribute( std::string_view name,
+                T default_value,
+                AttributeProperties properties )
         {
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
@@ -127,8 +127,8 @@ namespace geode
         }
 
         template < template < typename > class Attribute, typename T >
-        std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            std::string_view name, T default_value )
+        [[nodiscard]] std::shared_ptr< Attribute< T > >
+            find_or_create_attribute( std::string_view name, T default_value )
         {
             return find_or_create_attribute< Attribute, T >(
                 name, std::move( default_value ), AttributeProperties{} );
@@ -173,20 +173,21 @@ namespace geode
             const AttributeLinearInterpolation& interpolation,
             index_t to_element );
 
-        bool has_assignable_attributes() const;
+        [[nodiscard]] bool has_assignable_attributes() const;
 
-        bool has_interpolable_attributes() const;
+        [[nodiscard]] bool has_interpolable_attributes() const;
 
         /*!
          * Get all the associated attribute names
          */
-        absl::FixedArray< std::string_view > attribute_names() const;
+        [[nodiscard]] absl::FixedArray< std::string_view >
+            attribute_names() const;
 
         /*!
          * Return true if an attribute matching the given name.
          * @param[in] name The attribute name to use
          */
-        bool attribute_exists( std::string_view name ) const;
+        [[nodiscard]] bool attribute_exists( std::string_view name ) const;
 
         /*!
          * Delete the attribute matching the given name.
@@ -199,7 +200,8 @@ namespace geode
          * Get the typeid name of the attribute type
          * @param[in] name The attribute name to use
          */
-        std::string_view attribute_type( std::string_view name ) const;
+        [[nodiscard]] std::string_view attribute_type(
+            std::string_view name ) const;
 
         void rename_attribute(
             std::string_view old_name, std::string_view new_name );
@@ -235,7 +237,7 @@ namespace geode
         /*!
          * Get the number of elements in each attribute
          */
-        index_t nb_elements() const;
+        [[nodiscard]] index_t nb_elements() const;
 
         void copy( const AttributeManager& attribute_manager );
 
@@ -281,7 +283,7 @@ namespace geode
          * @return The associated store. If the name was not found,
          * the shared pointer is empty.
          */
-        std::shared_ptr< AttributeBase > find_attribute_base(
+        [[nodiscard]] std::shared_ptr< AttributeBase > find_attribute_base(
             std::string_view name ) const;
 
         /*!

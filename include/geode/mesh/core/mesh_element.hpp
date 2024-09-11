@@ -40,12 +40,12 @@ namespace geode
         {
         }
 
-        bool operator==( const MeshElement& other ) const
+        [[nodiscard]] bool operator==( const MeshElement& other ) const
         {
             return mesh_id == other.mesh_id && element_id == other.element_id;
         }
 
-        bool operator!=( const MeshElement& other ) const
+        [[nodiscard]] bool operator!=( const MeshElement& other ) const
         {
             return mesh_id != other.mesh_id || element_id != other.element_id;
         }
@@ -61,7 +61,7 @@ namespace geode
                            } } } );
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( "[", mesh_id.string(), " ", element_id, "]" );
         }
@@ -110,7 +110,7 @@ namespace geode
     };
 
     template < typename MeshElementType >
-    bool are_mesh_elements_included(
+    [[nodiscard]] bool are_mesh_elements_included(
         const MeshElementsInclusion< MeshElementType >& inclusion )
     {
         for( const auto& q : inclusion.query )

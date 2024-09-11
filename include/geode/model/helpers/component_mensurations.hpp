@@ -37,12 +37,12 @@ namespace geode
 
 namespace geode
 {
-    double opengeode_model_api block_volume(
+    [[nodiscard]] double opengeode_model_api block_volume(
         const BRep& brep, const Block3D& block );
 
-    BoundingBox3D opengeode_model_api block_bounding_box(
+    [[nodiscard]] BoundingBox3D opengeode_model_api block_bounding_box(
         const BRep& brep, const Block3D& block );
 
     template < index_t dimension >
-    double surface_area( const Surface< dimension >& surface );
+    [[nodiscard]] double surface_area( const Surface< dimension >& surface );
 } // namespace geode

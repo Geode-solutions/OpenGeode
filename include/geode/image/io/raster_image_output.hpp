@@ -53,14 +53,14 @@ namespace geode
     class RasterImageOutput : public Output< RasterImage< dimension > >
     {
     protected:
-        RasterImageOutput( std::string_view filename )
+        explicit RasterImageOutput( std::string_view filename )
             : Output< RasterImage< dimension > >{ filename }
         {
         }
     };
 
     template < index_t dimension >
-    bool is_raster_image_saveable(
+    [[nodiscard]] bool is_raster_image_saveable(
         const RasterImage< dimension >& raster, std::string_view filename );
 
     template < index_t dimension >

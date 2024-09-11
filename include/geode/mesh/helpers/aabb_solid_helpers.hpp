@@ -38,7 +38,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    AABBTree< dimension > create_aabb_tree(
+    [[nodiscard]] AABBTree< dimension > create_aabb_tree(
         const SolidMesh< dimension >& mesh );
 
     template < index_t dimension >
@@ -51,7 +51,7 @@ namespace geode
         {
         }
 
-        double operator()(
+        [[nodiscard]] double operator()(
             const Point< dimension >& query, index_t cur_box ) const;
 
     private:
@@ -69,7 +69,7 @@ namespace geode
         }
 
     protected:
-        const AABBTree< dimension >& elements_aabb() const
+        [[nodiscard]] const AABBTree< dimension >& elements_aabb() const
         {
             return elements_tree_;
         }
@@ -93,7 +93,7 @@ namespace geode
         {
         }
 
-        std::tuple< index_t, double > closest_element(
+        [[nodiscard]] std::tuple< index_t, double > closest_element(
             const Point< dimension >& query ) const
         {
             return this->elements_aabb().closest_element_box(

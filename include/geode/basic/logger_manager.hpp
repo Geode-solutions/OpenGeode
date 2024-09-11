@@ -55,7 +55,7 @@ namespace geode
     private:
         LoggerManager();
 
-        static LoggerManager &instance();
+        [[nodiscard]] static LoggerManager &instance();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

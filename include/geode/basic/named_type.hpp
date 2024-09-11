@@ -50,7 +50,7 @@ namespace geode
 
         explicit NamedType( Type value ) : value_( std::move( value ) ) {}
 
-        const Type& get() const
+        [[nodiscard]] const Type& get() const
         {
             return value_;
         }

@@ -57,7 +57,7 @@ namespace geode
         }
     };
 
-    bool opengeode_model_api is_section_saveable(
+    [[nodiscard]] bool opengeode_model_api is_section_saveable(
         const Section& section, std::string_view filename );
 
     using SectionOutputFactory =

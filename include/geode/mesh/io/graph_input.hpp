@@ -44,7 +44,7 @@ namespace geode
      * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
-    std::unique_ptr< Graph > opengeode_mesh_api load_graph(
+    [[nodiscard]] std::unique_ptr< Graph > opengeode_mesh_api load_graph(
         const MeshImpl& impl, std::string_view filename );
 
     /*!
@@ -53,7 +53,7 @@ namespace geode
      * Default data structure implémentation is used.
      * @param[in] filename Path to the file to load.
      */
-    std::unique_ptr< Graph > opengeode_mesh_api load_graph(
+    [[nodiscard]] std::unique_ptr< Graph > opengeode_mesh_api load_graph(
         std::string_view filename );
 
     class GraphInput : public Input< std::unique_ptr< Graph >, MeshImpl >
@@ -67,10 +67,11 @@ namespace geode
         explicit GraphInput( std::string_view filename ) : Base{ filename } {}
     };
 
-    typename GraphInput::MissingFiles opengeode_mesh_api
+    [[nodiscard]] typename GraphInput::MissingFiles opengeode_mesh_api
         check_graph_missing_files( std::string_view filename );
 
-    bool opengeode_mesh_api is_graph_loadable( std::string_view filename );
+    [[nodiscard]] bool opengeode_mesh_api is_graph_loadable(
+        std::string_view filename );
 
     using GraphInputFactory =
         Factory< std::string, GraphInput, std::string_view >;

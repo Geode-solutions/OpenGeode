@@ -44,7 +44,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    RasterImage< dimension > load_raster_image( std::string_view filename );
+    [[nodiscard]] RasterImage< dimension > load_raster_image(
+        std::string_view filename );
 
     template < index_t dimension >
     class RasterImageInput : public Input< RasterImage< dimension > >
@@ -55,15 +56,18 @@ namespace geode
         using typename Base::MissingFiles;
 
     protected:
-        RasterImageInput( std::string_view filename ) : Base{ filename } {}
+        explicit RasterImageInput( std::string_view filename )
+            : Base{ filename }
+        {
+        }
     };
 
     template < index_t dimension >
-    typename RasterImageInput< dimension >::MissingFiles
+    [[nodiscard]] typename RasterImageInput< dimension >::MissingFiles
         check_raster_image_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_raster_image_loadable( std::string_view filename );
+    [[nodiscard]] bool is_raster_image_loadable( std::string_view filename );
 
     template < index_t dimension >
     using RasterImageInputFactory =

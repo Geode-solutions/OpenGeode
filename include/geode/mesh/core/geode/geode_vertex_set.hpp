@@ -42,28 +42,28 @@ namespace geode
     public:
         using Builder = OpenGeodeVertexSetBuilder;
 
-        static MeshImpl impl_name_static()
+        [[nodiscard]] static MeshImpl impl_name_static()
         {
             return MeshImpl{ "OpenGeodeVertexSet" };
         }
 
-        MeshImpl impl_name() const override
+        [[nodiscard]] MeshImpl impl_name() const override
         {
             return impl_name_static();
         }
 
-        MeshType type_name() const override
+        [[nodiscard]] MeshType type_name() const override
         {
             return VertexSet::type_name_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension = "og_vts";
             return extension;
         }
 
-        std::string_view native_extension() const override
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }

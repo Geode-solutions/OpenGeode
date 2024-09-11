@@ -72,9 +72,12 @@ void test_delete_vertex(
 void test_io( const geode::VertexSet& vertex_set, std::string_view filename )
 {
     geode::save_vertex_set( vertex_set, filename );
-    geode::load_vertex_set( filename );
-    geode::load_vertex_set(
+    const auto reload = geode::load_vertex_set( filename );
+    geode_unused( reload );
+    const auto vertex_set2 = geode::load_vertex_set(
         geode::OpenGeodeVertexSet::impl_name_static(), filename );
+    OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 6,
+        "[Test] Reloaded VertexSet should have 6 vertices" );
 }
 
 void test_clone( const geode::VertexSet& vertex_set )

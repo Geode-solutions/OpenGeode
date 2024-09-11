@@ -48,36 +48,37 @@ namespace geode
     public:
         using Builder = VertexSetBuilder;
 
+        virtual ~VertexSet();
+
         /*!
          * Create a new VertexSet
          */
-        static std::unique_ptr< VertexSet > create();
+        [[nodiscard]] static std::unique_ptr< VertexSet > create();
 
         /*!
          * Create a new VertexSet using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< VertexSet > create( const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< VertexSet > create(
+            const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< VertexSet > clone() const;
+        [[nodiscard]] std::unique_ptr< VertexSet > clone() const;
 
-        virtual ~VertexSet();
+        [[nodiscard]] virtual std::string_view native_extension() const = 0;
 
-        virtual std::string_view native_extension() const = 0;
-
-        index_t nb_vertices() const;
+        [[nodiscard]] index_t nb_vertices() const;
 
         /*!
          * Access to the attribute manager.
          * Attributes are associated with vertices.
          */
-        AttributeManager& vertex_attribute_manager() const;
+        [[nodiscard]] AttributeManager& vertex_attribute_manager() const;
 
-        virtual MeshImpl impl_name() const = 0;
+        [[nodiscard]] virtual MeshImpl impl_name() const = 0;
 
-        virtual MeshType type_name() const = 0;
+        [[nodiscard]] virtual MeshType type_name() const = 0;
 
     protected:
         VertexSet();

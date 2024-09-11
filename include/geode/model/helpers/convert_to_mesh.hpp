@@ -58,20 +58,23 @@ namespace geode
         BijectiveMapping< geode::index_t > unique_vertices_mapping;
     };
 
-    std::tuple< std::unique_ptr< EdgedCurve2D >, ModelToMeshMappings >
-        opengeode_model_api convert_section_into_curve(
-            const Section& section );
+    [[nodiscard]] std::tuple< std::unique_ptr< EdgedCurve2D >,
+        ModelToMeshMappings > opengeode_model_api
+        convert_section_into_curve( const Section& section );
 
-    std::tuple< std::unique_ptr< SurfaceMesh2D >, ModelToMeshMappings >
-        opengeode_model_api convert_section_into_surface(
-            const Section& section );
+    [[nodiscard]] std::tuple< std::unique_ptr< SurfaceMesh2D >,
+        ModelToMeshMappings > opengeode_model_api
+        convert_section_into_surface( const Section& section );
 
-    std::tuple< std::unique_ptr< EdgedCurve3D >, ModelToMeshMappings >
+    [[nodiscard]] std::tuple< std::unique_ptr< EdgedCurve3D >,
+        ModelToMeshMappings >
         opengeode_model_api convert_brep_into_curve( const BRep& brep );
 
-    std::tuple< std::unique_ptr< SurfaceMesh3D >, ModelToMeshMappings >
+    [[nodiscard]] std::tuple< std::unique_ptr< SurfaceMesh3D >,
+        ModelToMeshMappings >
         opengeode_model_api convert_brep_into_surface( const BRep& brep );
 
-    std::tuple< std::unique_ptr< SolidMesh3D >, ModelToMeshMappings >
+    [[nodiscard]] std::tuple< std::unique_ptr< SolidMesh3D >,
+        ModelToMeshMappings >
         opengeode_model_api convert_brep_into_solid( const BRep& brep );
 } // namespace geode

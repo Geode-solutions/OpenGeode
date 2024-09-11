@@ -44,7 +44,7 @@ namespace geode
      * the tetrahedron vertices.
      * @exception throws if the tetrahedron is degenerated
      */
-    std::array< double, 4 >
+    [[nodiscard]] std::array< double, 4 >
         opengeode_geometry_api tetrahedron_barycentric_coordinates(
             const Point3D& point, const Tetrahedron& tetrahedron );
 
@@ -56,7 +56,7 @@ namespace geode
      * @return an array containing the parametric coordinates corresponding to
      * the tetrahedron vertices.
      */
-    std::array< double, 4 >
+    [[nodiscard]] std::array< double, 4 >
         opengeode_geometry_api safe_tetrahedron_barycentric_coordinates(
             const Point3D& point, const Tetrahedron& tetrahedron ) noexcept;
 
@@ -67,7 +67,7 @@ namespace geode
      * @exception throws if the triangle is degenerated
      */
     template < index_t dimension >
-    std::array< double, 3 > triangle_barycentric_coordinates(
+    [[nodiscard]] std::array< double, 3 > triangle_barycentric_coordinates(
         const Point< dimension >& point,
         const Triangle< dimension >& triangle );
 
@@ -79,7 +79,7 @@ namespace geode
      * the triangle vertices.
      */
     template < index_t dimension >
-    std::array< double, 3 > safe_triangle_barycentric_coordinates(
+    [[nodiscard]] std::array< double, 3 > safe_triangle_barycentric_coordinates(
         const Point< dimension >& point,
         const Triangle< dimension >& triangle ) noexcept;
 
@@ -90,7 +90,7 @@ namespace geode
      * @exception throws if the segment is degenerated
      */
     template < index_t dimension >
-    std::array< double, 2 > segment_barycentric_coordinates(
+    [[nodiscard]] std::array< double, 2 > segment_barycentric_coordinates(
         const Point< dimension >& point, const Segment< dimension >& segment );
 
     /*!
@@ -100,7 +100,7 @@ namespace geode
      * the segment vertices.
      */
     template < index_t dimension >
-    std::array< double, 2 > safe_segment_barycentric_coordinates(
+    [[nodiscard]] std::array< double, 2 > safe_segment_barycentric_coordinates(
         const Point< dimension >& point,
         const Segment< dimension >& segment ) noexcept;
 

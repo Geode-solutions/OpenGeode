@@ -49,40 +49,43 @@ namespace geode
         /*!
          * Create a new TetrahedralSolid using default data structure.
          */
-        static std::unique_ptr< TetrahedralSolid< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< TetrahedralSolid< dimension > >
+            create();
 
         /*!
          * Create a new TetrahedralSolid using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< TetrahedralSolid< dimension > > create(
-            const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< TetrahedralSolid< dimension > >
+            create( const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< TetrahedralSolid< dimension > >
+            clone() const;
 
-        PolyhedronEdgesVertices polyhedron_edges_vertices(
+        [[nodiscard]] PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const final;
 
-        PolyhedronFacetsVertices polyhedron_facets_vertices(
+        [[nodiscard]] PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
-        typename SolidMesh< dimension >::VerticesAroundVertex
+        [[nodiscard]] typename SolidMesh< dimension >::VerticesAroundVertex
             vertices_around_vertex( index_t vertex_id ) const final;
 
-        PolyhedraAroundEdge polyhedra_around_edge(
+        [[nodiscard]] PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const final;
 
-        PolyhedraAroundEdge polyhedra_around_edge(
+        [[nodiscard]] PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices,
             index_t first_polyhedron ) const final;
 
-        PolyhedraAroundEdge polyhedra_around_edge(
+        [[nodiscard]] PolyhedraAroundEdge polyhedra_around_edge(
             const PolyhedronFacetEdge& edge ) const final;
 
-        std::optional< PolyhedronFacet > polyhedron_adjacent_facet(
-            const PolyhedronFacet& polyhedron_facet ) const final;
+        [[nodiscard]] std::optional< PolyhedronFacet >
+            polyhedron_adjacent_facet(
+                const PolyhedronFacet& polyhedron_facet ) const final;
 
         /*
          * Return the two other tetrahedron vertices not given as input.
@@ -91,7 +94,8 @@ namespace geode
          * @warning do not check that the given edge_vertices are in tetrahedron
          * vertices.
          */
-        std::array< index_t, 2 > opposite_edge_vertices( index_t tetrahedron_id,
+        [[nodiscard]] std::array< index_t, 2 > opposite_edge_vertices(
+            index_t tetrahedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const;
 
         /*!
@@ -102,7 +106,7 @@ namespace geode
          * @warning throw an exception if edge_vertices are not tetrahedron
          * vertices.
          */
-        std::array< PolyhedronFacet, 2 > edge_incident_facets(
+        [[nodiscard]] std::array< PolyhedronFacet, 2 > edge_incident_facets(
             index_t tetrahedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const;
 
@@ -114,19 +118,20 @@ namespace geode
          * @warning throw an exception if edge_vertices are not tetrahedron
          * vertices.
          */
-        std::array< PolyhedronFacet, 2 > opposite_edge_incident_facets(
-            index_t tetrahedron_id,
-            const std::array< index_t, 2 >& edge_vertices ) const;
+        [[nodiscard]] std::array< PolyhedronFacet, 2 >
+            opposite_edge_incident_facets( index_t tetrahedron_id,
+                const std::array< index_t, 2 >& edge_vertices ) const;
 
         /*!
          * Return a geometrical Tetra from an element of the mesh.
          */
-        Tetrahedron tetrahedron( index_t tetrahedron_id ) const;
+        [[nodiscard]] Tetrahedron tetrahedron( index_t tetrahedron_id ) const;
 
         /*!
          * Return a geometrical Triangle from a tetrahedron facet of the mesh.
          */
-        Triangle< dimension > triangle( const PolyhedronFacet& facet ) const;
+        [[nodiscard]] Triangle< dimension > triangle(
+            const PolyhedronFacet& facet ) const;
 
     protected:
         TetrahedralSolid() = default;
@@ -139,24 +144,25 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        local_index_t get_nb_polyhedron_vertices(
+        [[nodiscard]] local_index_t get_nb_polyhedron_vertices(
             index_t /*unused*/ ) const final
         {
             return 4;
         }
 
-        local_index_t get_nb_polyhedron_facets( index_t /*unused*/ ) const final
+        [[nodiscard]] local_index_t get_nb_polyhedron_facets(
+            index_t /*unused*/ ) const final
         {
             return 4;
         }
 
-        local_index_t get_nb_polyhedron_facet_vertices(
+        [[nodiscard]] local_index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& /*unused*/ ) const final
         {
             return 3;
         }
 
-        PolyhedronFacets polyhedron_vertex_facets(
+        [[nodiscard]] PolyhedronFacets polyhedron_vertex_facets(
             const PolyhedronVertex& polyhedron_vertex ) const final;
     };
     ALIAS_3D( TetrahedralSolid );

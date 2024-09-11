@@ -36,7 +36,7 @@ namespace geode
         friend class MeshBuilderFactory;
 
     private:
-        MeshBuilderFactoryKey() {}
+        MeshBuilderFactoryKey() = default;
     };
 
     class MeshBuilderFactory : public Factory< MeshImpl,
@@ -52,7 +52,8 @@ namespace geode
         }
 
         template < typename MeshBuilder, typename Mesh >
-        static std::unique_ptr< MeshBuilder > create_mesh_builder( Mesh& mesh )
+        [[nodiscard]] static std::unique_ptr< MeshBuilder > create_mesh_builder(
+            Mesh& mesh )
         {
             auto* builder = dynamic_cast< MeshBuilder* >(
                 create( mesh.impl_name(), mesh, {} ).release() );

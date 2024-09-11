@@ -36,20 +36,21 @@ namespace geode
         explicit Frame(
             std::array< Vector< dimension >, dimension > directions );
 
-        const Vector< dimension >& direction( local_index_t index ) const;
+        [[nodiscard]] const Vector< dimension >& direction(
+            local_index_t index ) const;
 
         void set_direction(
             local_index_t index, Vector< dimension > direction );
 
-        Frame inverse() const;
+        [[nodiscard]] Frame inverse() const;
 
         Frame operator+( const Frame& rhs ) const;
 
         Vector< dimension > operator*( const Vector< dimension >& rhs ) const;
 
-        Frame rescale( double length ) const;
+        [[nodiscard]] Frame rescale( double length ) const;
 
-        std::string string() const;
+        [[nodiscard]] std::string string() const;
 
     private:
         friend class bitsery::Access;

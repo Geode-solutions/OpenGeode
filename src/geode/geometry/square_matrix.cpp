@@ -149,7 +149,7 @@ namespace geode
                 matrix_rows[d1].set_value( d2, value( d2, d1 ) );
             }
         }
-        return { std::move( matrix_rows ) };
+        return SquareMatrix< dimension >{ std::move( matrix_rows ) };
     }
 
     template < index_t dimension >
@@ -173,7 +173,7 @@ namespace geode
         matrix_rows[0].set_value( 1, -value( 0, 1 ) / det );
         matrix_rows[1].set_value( 0, -value( 1, 0 ) / det );
         matrix_rows[1].set_value( 1, value( 0, 0 ) / det );
-        return { std::move( matrix_rows ) };
+        return SquareMatrix< 2 >{ std::move( matrix_rows ) };
     }
 
     template <>
@@ -195,7 +195,7 @@ namespace geode
         {
             matrix_rows[d] /= det;
         }
-        return { std::move( matrix_rows ) };
+        return SquareMatrix< 3 >{ std::move( matrix_rows ) };
     }
 
     template class opengeode_geometry_api SquareMatrix< 2 >;

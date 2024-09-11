@@ -91,12 +91,13 @@ namespace geode
                 oriented_rotate( vertices_ );
             }
 
-            const Container& vertices() const
+            [[nodiscard]] const Container& vertices() const
             {
                 return vertices_;
             }
 
-            bool is_opposite( const OrientedVertexCycle& other ) const
+            [[nodiscard]] bool is_opposite(
+                const OrientedVertexCycle& other ) const
             {
                 const auto& other_vertices = other.vertices();
                 if( vertices().size() != other_vertices.size()
@@ -116,17 +117,20 @@ namespace geode
                 return true;
             }
 
-            bool operator==( const OrientedVertexCycle& other ) const
+            [[nodiscard]] bool operator==(
+                const OrientedVertexCycle& other ) const
             {
                 return this->vertices() == other.vertices();
             }
 
-            bool operator!=( const OrientedVertexCycle& other ) const
+            [[nodiscard]] bool operator!=(
+                const OrientedVertexCycle& other ) const
             {
                 return !operator==( other );
             }
 
-            bool operator<( const OrientedVertexCycle& other ) const
+            [[nodiscard]] bool operator<(
+                const OrientedVertexCycle& other ) const
             {
                 return this->vertices() < other.vertices();
             }
@@ -134,7 +138,7 @@ namespace geode
         protected:
             OrientedVertexCycle() = default;
 
-            Container& modifiable_vertices()
+            [[nodiscard]] Container& modifiable_vertices()
             {
                 return vertices_;
             }

@@ -67,7 +67,7 @@ namespace geode
 
         ~OpenGeodeException() noexcept override = default;
 
-        std::string stack_trace() const
+        [[nodiscard]] std::string stack_trace() const
         {
             std::string stack_string;
             for( auto frame = 0; frame < stack_size_; ++frame )

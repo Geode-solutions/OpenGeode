@@ -52,30 +52,30 @@ namespace geode
         OpenGeodeEdgedCurve& operator=( OpenGeodeEdgedCurve&& other ) noexcept;
         ~OpenGeodeEdgedCurve();
 
-        static MeshImpl impl_name_static()
+        [[nodiscard]] static MeshImpl impl_name_static()
         {
             return MeshImpl{ absl::StrCat(
                 "OpenGeodeEdgedCurve", dimension, "D" ) };
         }
 
-        MeshImpl impl_name() const override
+        [[nodiscard]] MeshImpl impl_name() const override
         {
             return impl_name_static();
         }
 
-        MeshType type_name() const override
+        [[nodiscard]] MeshType type_name() const override
         {
             return EdgedCurve< dimension >::type_name_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension =
                 absl::StrCat( "og_edc", dimension, "d" );
             return extension;
         }
 
-        std::string_view native_extension() const override
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }
@@ -92,7 +92,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        index_t get_edge_vertex( const EdgeVertex& edge_vertex ) const override;
+        [[nodiscard]] index_t get_edge_vertex(
+            const EdgeVertex& edge_vertex ) const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

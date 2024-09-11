@@ -53,9 +53,9 @@ namespace geode
      * @return the created attribute
      */
     template < index_t dimension >
-    std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
-        const Grid< dimension >& grid,
-        absl::Span< const typename Grid< dimension >::CellIndices >
-            grid_cell_ids,
-        std::string_view distance_map_name );
+    [[nodiscard]] std::shared_ptr< VariableAttribute< double > >
+        euclidean_distance_transform( const Grid< dimension >& grid,
+            absl::Span< const typename Grid< dimension >::CellIndices >
+                grid_cell_ids,
+            std::string_view distance_map_name );
 } // namespace geode

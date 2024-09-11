@@ -52,33 +52,35 @@ namespace geode
 
         ~EdgedCurve();
 
-        static std::unique_ptr< EdgedCurve< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< EdgedCurve< dimension > >
+            create();
 
-        static std::unique_ptr< EdgedCurve< dimension > > create(
+        [[nodiscard]] static std::unique_ptr< EdgedCurve< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< EdgedCurve< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > clone() const;
 
-        double edge_length( index_t edge_id ) const;
+        [[nodiscard]] double edge_length( index_t edge_id ) const;
 
-        Point< dimension > edge_barycenter( index_t edge_id ) const;
+        [[nodiscard]] Point< dimension > edge_barycenter(
+            index_t edge_id ) const;
 
         /*!
          * Return if an edge is degenerated (means stands into an
          * epsilon-large ball)
          */
-        bool is_edge_degenerated( index_t edge_id ) const;
+        [[nodiscard]] bool is_edge_degenerated( index_t edge_id ) const;
 
-        Segment< dimension > segment( index_t edge_id ) const;
+        [[nodiscard]] Segment< dimension > segment( index_t edge_id ) const;
 
-        TextureManager1D texture_manager() const;
+        [[nodiscard]] TextureManager1D texture_manager() const;
 
         /*!
          * Compute the bounding box from mesh vertices
          */
-        BoundingBox< dimension > bounding_box() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
     protected:
         EdgedCurve();

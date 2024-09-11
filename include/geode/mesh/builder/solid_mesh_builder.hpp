@@ -57,12 +57,12 @@ namespace geode
          * Create the builder associated with a SolidMesh.
          * @param[in] mesh The SolidMesh to build/modify
          */
-        static std::unique_ptr< SolidMeshBuilder< dimension > > create(
-            SolidMesh< dimension >& mesh );
+        [[nodiscard]] static std::unique_ptr< SolidMeshBuilder< dimension > >
+            create( SolidMesh< dimension >& mesh );
 
-        SolidEdgesBuilder< dimension > edges_builder();
+        [[nodiscard]] SolidEdgesBuilder< dimension > edges_builder();
 
-        SolidFacetsBuilder< dimension > facets_builder();
+        [[nodiscard]] SolidFacetsBuilder< dimension > facets_builder();
 
         /*!
          * Create a new point with associated coordinates.

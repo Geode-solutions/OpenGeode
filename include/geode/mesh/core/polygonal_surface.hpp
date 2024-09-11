@@ -50,18 +50,20 @@ namespace geode
         /*!
          * Create a new PolygonalSurface using default data structure.
          */
-        static std::unique_ptr< PolygonalSurface< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< PolygonalSurface< dimension > >
+            create();
 
         /*!
          * Create a new PolygonalSurface using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< PolygonalSurface< dimension > > create(
-            const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< PolygonalSurface< dimension > >
+            create( const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< PolygonalSurface< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< PolygonalSurface< dimension > >
+            clone() const;
 
     protected:
         PolygonalSurface() = default;

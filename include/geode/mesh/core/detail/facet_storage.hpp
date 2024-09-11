@@ -58,12 +58,12 @@ namespace geode
             {
             }
 
-            AttributeManager& facet_attribute_manager() const
+            [[nodiscard]] AttributeManager& facet_attribute_manager() const
             {
                 return facet_attribute_manager_;
             }
 
-            std::optional< index_t > find_facet(
+            [[nodiscard]] std::optional< index_t > find_facet(
                 TypedVertexCycle vertices ) const
             {
                 const auto itr = facet_indices_.find( vertices );
@@ -196,7 +196,8 @@ namespace geode
                 return cycle_old2new;
             }
 
-            const VertexContainer& get_facet_vertices( index_t facet_id ) const
+            [[nodiscard]] const VertexContainer& get_facet_vertices(
+                index_t facet_id ) const
             {
                 return vertices_->value( facet_id );
             }
@@ -215,7 +216,7 @@ namespace geode
                         attribute_name(), VertexContainer{} );
             }
 
-            index_t get_counter( index_t facet_id ) const
+            [[nodiscard]] index_t get_counter( index_t facet_id ) const
             {
                 return counter_->value( facet_id );
             }

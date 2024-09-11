@@ -65,11 +65,12 @@ namespace geode
             RelationRangeIterator( const RelationRangeIterator& other );
             ~RelationRangeIterator();
 
-            bool operator!=( const RelationRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const RelationRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -84,12 +85,12 @@ namespace geode
             {
             }
 
-            const RelationRange& begin() const
+            [[nodiscard]] const RelationRange& begin() const
             {
                 return *this;
             }
 
-            const RelationRange& end() const
+            [[nodiscard]] const RelationRange& end() const
             {
                 return *this;
             }
@@ -107,11 +108,12 @@ namespace geode
             BoundaryRangeIterator( const BoundaryRangeIterator& other );
             ~BoundaryRangeIterator();
 
-            bool operator!=( const BoundaryRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const BoundaryRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -126,12 +128,12 @@ namespace geode
             {
             }
 
-            const BoundaryRange& begin() const
+            [[nodiscard]] const BoundaryRange& begin() const
             {
                 return *this;
             }
 
-            const BoundaryRange& end() const
+            [[nodiscard]] const BoundaryRange& end() const
             {
                 return *this;
             }
@@ -149,11 +151,12 @@ namespace geode
             IncidenceRangeIterator( const IncidenceRangeIterator& other );
             ~IncidenceRangeIterator();
 
-            bool operator!=( const IncidenceRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const IncidenceRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -168,12 +171,12 @@ namespace geode
             {
             }
 
-            const IncidenceRange& begin() const
+            [[nodiscard]] const IncidenceRange& begin() const
             {
                 return *this;
             }
 
-            const IncidenceRange& end() const
+            [[nodiscard]] const IncidenceRange& end() const
             {
                 return *this;
             }
@@ -191,11 +194,12 @@ namespace geode
             InternalRangeIterator( const InternalRangeIterator& other );
             ~InternalRangeIterator();
 
-            bool operator!=( const InternalRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const InternalRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -210,12 +214,12 @@ namespace geode
             {
             }
 
-            const InternalRange& begin() const
+            [[nodiscard]] const InternalRange& begin() const
             {
                 return *this;
             }
 
-            const InternalRange& end() const
+            [[nodiscard]] const InternalRange& end() const
             {
                 return *this;
             }
@@ -233,11 +237,12 @@ namespace geode
             EmbeddingRangeIterator( const EmbeddingRangeIterator& other );
             ~EmbeddingRangeIterator();
 
-            bool operator!=( const EmbeddingRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const EmbeddingRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -252,12 +257,12 @@ namespace geode
             {
             }
 
-            const EmbeddingRange& begin() const
+            [[nodiscard]] const EmbeddingRange& begin() const
             {
                 return *this;
             }
 
-            const EmbeddingRange& end() const
+            [[nodiscard]] const EmbeddingRange& end() const
             {
                 return *this;
             }
@@ -275,11 +280,12 @@ namespace geode
             ItemRangeIterator( const ItemRangeIterator& other );
             ~ItemRangeIterator();
 
-            bool operator!=( const ItemRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const ItemRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -294,12 +300,12 @@ namespace geode
             {
             }
 
-            const ItemRange& begin() const
+            [[nodiscard]] const ItemRange& begin() const
             {
                 return *this;
             }
 
-            const ItemRange& end() const
+            [[nodiscard]] const ItemRange& end() const
             {
                 return *this;
             }
@@ -317,11 +323,12 @@ namespace geode
             CollectionRangeIterator( const CollectionRangeIterator& other );
             ~CollectionRangeIterator();
 
-            bool operator!=( const CollectionRangeIterator& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const CollectionRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const ComponentID& operator*() const;
+            [[nodiscard]] const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
@@ -337,12 +344,12 @@ namespace geode
             {
             }
 
-            const CollectionRange& begin() const
+            [[nodiscard]] const CollectionRange& begin() const
             {
                 return *this;
             }
 
-            const CollectionRange& end() const
+            [[nodiscard]] const CollectionRange& end() const
             {
                 return *this;
             }
@@ -352,52 +359,59 @@ namespace geode
         Relationships();
         ~Relationships();
 
-        index_t nb_components_with_relations() const;
+        [[nodiscard]] index_t nb_components_with_relations() const;
 
-        const ComponentID& component_with_relation(
+        [[nodiscard]] const ComponentID& component_with_relation(
             index_t relation_component_id ) const;
 
-        index_t nb_relations( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_relations( const uuid& component_id ) const;
 
-        RelationRange relations( const uuid& component_id ) const;
+        [[nodiscard]] RelationRange relations( const uuid& component_id ) const;
 
-        index_t nb_boundaries( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_boundaries( const uuid& component_id ) const;
 
-        BoundaryRange boundaries( const uuid& component_id ) const;
+        [[nodiscard]] BoundaryRange boundaries(
+            const uuid& component_id ) const;
 
-        index_t nb_incidences( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_incidences( const uuid& component_id ) const;
 
-        IncidenceRange incidences( const uuid& component_id ) const;
+        [[nodiscard]] IncidenceRange incidences(
+            const uuid& component_id ) const;
 
-        index_t nb_internals( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_internals( const uuid& component_id ) const;
 
-        InternalRange internals( const uuid& component_id ) const;
+        [[nodiscard]] InternalRange internals( const uuid& component_id ) const;
 
-        index_t nb_embeddings( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_embeddings( const uuid& component_id ) const;
 
-        EmbeddingRange embeddings( const uuid& component_id ) const;
+        [[nodiscard]] EmbeddingRange embeddings(
+            const uuid& component_id ) const;
 
-        index_t nb_items( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_items( const uuid& component_id ) const;
 
-        ItemRange items( const uuid& component_id ) const;
+        [[nodiscard]] ItemRange items( const uuid& component_id ) const;
 
-        index_t nb_collections( const uuid& component_id ) const;
+        [[nodiscard]] index_t nb_collections( const uuid& component_id ) const;
 
-        CollectionRange collections( const uuid& component_id ) const;
+        [[nodiscard]] CollectionRange collections(
+            const uuid& component_id ) const;
 
-        bool is_boundary( const uuid& boundary, const uuid& incidence ) const;
+        [[nodiscard]] bool is_boundary(
+            const uuid& boundary, const uuid& incidence ) const;
 
-        bool is_internal( const uuid& internal, const uuid& embedding ) const;
+        [[nodiscard]] bool is_internal(
+            const uuid& internal, const uuid& embedding ) const;
 
-        bool is_item( const uuid& item, const uuid& collection ) const;
+        [[nodiscard]] bool is_item(
+            const uuid& item, const uuid& collection ) const;
 
-        AttributeManager& relation_attribute_manager() const;
+        [[nodiscard]] AttributeManager& relation_attribute_manager() const;
 
-        std::optional< index_t > relation_index(
+        [[nodiscard]] std::optional< index_t > relation_index(
             const uuid& component_id1, const uuid& component_id2 ) const;
 
-        std::tuple< ComponentID, ComponentID > relation_from_index(
-            index_t component_id ) const;
+        [[nodiscard]] std::tuple< ComponentID, ComponentID >
+            relation_from_index( index_t component_id ) const;
 
         void save_relationships( std::string_view directory ) const;
 

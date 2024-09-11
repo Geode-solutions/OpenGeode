@@ -38,13 +38,13 @@ namespace geode
     public:
         virtual ~IOFile() = default;
 
-        std::string_view filename() const
+        [[nodiscard]] std::string_view filename() const
         {
             return filename_;
         }
 
     protected:
-        IOFile( std::string_view filename )
+        explicit IOFile( std::string_view filename )
             : filename_( expand_predefined_folders( filename ) )
         {
         }

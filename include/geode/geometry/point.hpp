@@ -57,7 +57,7 @@ namespace geode
         {
         }
 
-        double value( local_index_t index ) const
+        [[nodiscard]] double value( local_index_t index ) const
         {
             return values_[index];
         }
@@ -67,7 +67,7 @@ namespace geode
             values_[index] = coordinate;
         }
 
-        bool operator==( const Point &other ) const
+        [[nodiscard]] bool operator==( const Point &other ) const
         {
             for( const auto i : LRange{ dimension } )
             {
@@ -79,12 +79,12 @@ namespace geode
             return true;
         }
 
-        bool operator!=( const Point &other ) const
+        [[nodiscard]] bool operator!=( const Point &other ) const
         {
             return !( *this == other );
         }
 
-        bool operator<( const Point &other ) const
+        [[nodiscard]] bool operator<( const Point &other ) const
         {
             for( const auto i : LRange{ dimension } )
             {
@@ -100,27 +100,27 @@ namespace geode
             return false;
         }
 
-        bool operator<=( const Point &other ) const
+        [[nodiscard]] bool operator<=( const Point &other ) const
         {
             return operator<( other ) || operator==( other );
         }
 
-        Point operator*( double multiplier ) const
+        [[nodiscard]] Point operator*( double multiplier ) const
         {
             return detail::coords_multiply( *this, multiplier );
         }
 
-        Point operator/( double divider ) const
+        [[nodiscard]] Point operator/( double divider ) const
         {
             return detail::coords_divide( *this, divider );
         }
 
-        Point operator+( const Point &other ) const
+        [[nodiscard]] Point operator+( const Point &other ) const
         {
             return detail::coords_add( *this, other );
         }
 
-        Point operator-( const Point &other ) const
+        [[nodiscard]] Point operator-( const Point &other ) const
         {
             return detail::coords_substract( *this, other );
         }
@@ -145,7 +145,7 @@ namespace geode
             detail::coords_substract_equal( *this, other );
         }
 
-        bool inexact_equal( const Point &other ) const
+        [[nodiscard]] bool inexact_equal( const Point &other ) const
         {
             double square_length{ 0 };
             static constexpr auto SQR_EPSILON = GLOBAL_EPSILON * GLOBAL_EPSILON;
@@ -161,7 +161,7 @@ namespace geode
             return true;
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             std::ostringstream oss;
             oss.precision( std::numeric_limits< double >::digits10 );

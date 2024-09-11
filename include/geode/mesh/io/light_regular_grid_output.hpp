@@ -62,12 +62,12 @@ namespace geode
         }
 
         std::vector< std::string > write(
-            const LightRegularGrid< dimension >& grid ) const;
+            const LightRegularGrid< dimension >& grid ) const override;
     };
     ALIAS_2D_AND_3D( LightRegularGridOutput );
 
     template < index_t dimension >
-    bool is_light_regular_grid_saveable(
+    [[nodiscard]] bool is_light_regular_grid_saveable(
         const LightRegularGrid< dimension >& light_regular_grid,
         std::string_view filename );
 

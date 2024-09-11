@@ -60,10 +60,10 @@ namespace geode
         GenericTetrahedron( GenericTetrahedron&& other ) noexcept;
         GenericTetrahedron& operator=( GenericTetrahedron&& other ) noexcept;
 
-        Point3D barycenter() const;
+        [[nodiscard]] Point3D barycenter() const;
         void set_point( local_index_t vertex, PointType point );
-        const std::array< PointType, 4 >& vertices() const;
-        BoundingBox3D bounding_box() const;
+        [[nodiscard]] const std::array< PointType, 4 >& vertices() const;
+        [[nodiscard]] BoundingBox3D bounding_box() const;
 
     private:
         std::array< PointType, 4 > vertices_;

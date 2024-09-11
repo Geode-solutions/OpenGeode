@@ -46,7 +46,7 @@ namespace geode
             const Point< dimension > DEFAULT_COORD;
 
         public:
-            const RasterImage< dimension >& image() const
+            [[nodiscard]] const RasterImage< dimension >& image() const
             {
                 return image_;
             }
@@ -57,7 +57,7 @@ namespace geode
             }
 
         protected:
-            const Point< dimension >& texture_coordinates_impl(
+            [[nodiscard]] const Point< dimension >& texture_coordinates_impl(
                 index_t element, local_index_t vertex ) const
             {
                 const auto& element_coordinates =

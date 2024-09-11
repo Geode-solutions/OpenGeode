@@ -53,7 +53,7 @@ namespace geode
         {
         }
 
-        const uuid& create_corner_collection();
+        [[nodiscard]] const uuid& create_corner_collection();
 
         void create_corner_collection( uuid corner_collection_id );
 

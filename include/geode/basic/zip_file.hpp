@@ -44,7 +44,7 @@ namespace geode
 
         void archive_file( std::string_view file ) const;
 
-        std::string directory() const;
+        [[nodiscard]] std::string directory() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
@@ -59,11 +59,11 @@ namespace geode
 
         void extract_all() const;
 
-        std::string directory() const;
+        [[nodiscard]] std::string directory() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
 
-    bool opengeode_basic_api is_zip_file( std::string_view file );
+    [[nodiscard]] bool opengeode_basic_api is_zip_file( std::string_view file );
 } // namespace geode

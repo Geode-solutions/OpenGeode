@@ -47,7 +47,8 @@ namespace geode
             {
             }
 
-            index_t get_edge_vertex( const EdgeVertex& edge_vertex ) const
+            [[nodiscard]] index_t get_edge_vertex(
+                const EdgeVertex& edge_vertex ) const
             {
                 return edges_->value(
                     edge_vertex.edge_id )[edge_vertex.vertex_id];

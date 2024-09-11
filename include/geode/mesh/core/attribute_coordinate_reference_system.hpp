@@ -48,23 +48,24 @@ namespace geode
             AttributeManager& manager, std::string_view attribute_name );
         ~AttributeCoordinateReferenceSystem();
 
-        static CRSType type_name_static()
+        [[nodiscard]] static CRSType type_name_static()
         {
             return CRSType{ "AttributeCoordinateReferenceSystem" };
         }
 
-        CRSType type_name() const override
+        [[nodiscard]] CRSType type_name() const override
         {
             return type_name_static();
         }
 
-        const Point< dimension >& point( index_t point_id ) const override;
+        [[nodiscard]] const Point< dimension >& point(
+            index_t point_id ) const override;
 
         void set_point( index_t point_id, Point< dimension > point ) override;
 
-        std::string_view attribute_name() const;
+        [[nodiscard]] std::string_view attribute_name() const;
 
-        index_t nb_points() const;
+        [[nodiscard]] index_t nb_points() const;
 
     protected:
         AttributeCoordinateReferenceSystem();

@@ -57,12 +57,14 @@ namespace geode
             register_default( type, key );
         }
 
-        static const MeshType& type( const MeshImpl& key );
+        [[nodiscard]] static const MeshType& type( const MeshImpl& key );
 
-        static const MeshImpl& default_impl( const MeshType& type );
+        [[nodiscard]] static const MeshImpl& default_impl(
+            const MeshType& type );
 
         template < typename Mesh >
-        static std::unique_ptr< Mesh > create_mesh( const MeshImpl& key )
+        [[nodiscard]] static std::unique_ptr< Mesh > create_mesh(
+            const MeshImpl& key )
         {
             auto* mesh = dynamic_cast< Mesh* >( create( key ).release() );
             OPENGEODE_EXCEPTION(
@@ -71,7 +73,7 @@ namespace geode
         }
 
         template < typename Mesh >
-        static std::unique_ptr< Mesh > create_default_mesh(
+        [[nodiscard]] static std::unique_ptr< Mesh > create_default_mesh(
             const MeshType& type )
         {
             return create_mesh< Mesh >( default_impl( type ) );
@@ -81,7 +83,7 @@ namespace geode
         MeshFactory();
         ~MeshFactory();
 
-        static MeshFactory& instance();
+        [[nodiscard]] static MeshFactory& instance();
 
         static void register_type( MeshType type, MeshImpl key );
 

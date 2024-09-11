@@ -108,7 +108,7 @@ namespace geode
         }
 
         template < template < typename > class Attribute, typename T >
-        T compute_value( const Attribute< T >& attribute ) const
+        [[nodiscard]] T compute_value( const Attribute< T >& attribute ) const
         {
             return AttributeLinearInterpolationImpl< T >::compute(
                 *this, attribute );
@@ -123,7 +123,8 @@ namespace geode
     struct AttributeLinearInterpolationImpl< Type >                            \
     {                                                                          \
         template < template < typename > class Attribute >                     \
-        static Type compute( const AttributeLinearInterpolation& interpolator, \
+        [[nodiscard]] static Type compute(                                     \
+            const AttributeLinearInterpolation& interpolator,                  \
             const Attribute< Type >& attribute )                               \
         {                                                                      \
             Type result{ 0 };                                                  \
@@ -155,23 +156,24 @@ namespace geode
     template < typename AttributeType >
     struct GenericAttributeConversion
     {
-        static float converted_value( const AttributeType& /*unused*/ )
+        [[nodiscard]] static float converted_value(
+            const AttributeType& /*unused*/ )
         {
             return 0.;
         }
 
-        static float converted_item_value(
+        [[nodiscard]] static float converted_item_value(
             const AttributeType& /*unused*/, local_index_t /*unused*/ )
         {
             return 0.;
         }
 
-        static bool is_genericable()
+        [[nodiscard]] static bool is_genericable()
         {
             return false;
         }
 
-        static local_index_t nb_items()
+        [[nodiscard]] static local_index_t nb_items()
         {
             return 1;
         }
@@ -181,23 +183,23 @@ namespace geode
     template <>                                                                \
     struct GenericAttributeConversion< Type >                                  \
     {                                                                          \
-        static float converted_value( const Type& value )                      \
+        [[nodiscard]] static float converted_value( const Type& value )        \
         {                                                                      \
             return static_cast< float >( value );                              \
         }                                                                      \
                                                                                \
-        static float converted_item_value(                                     \
+        [[nodiscard]] static float converted_item_value(                       \
             const Type& value, local_index_t /*unused*/ )                      \
         {                                                                      \
             return converted_value( value );                                   \
         }                                                                      \
                                                                                \
-        static bool is_genericable()                                           \
+        [[nodiscard]] static bool is_genericable()                             \
         {                                                                      \
             return true;                                                       \
         }                                                                      \
                                                                                \
-        static local_index_t nb_items()                                        \
+        [[nodiscard]] static local_index_t nb_items()                          \
         {                                                                      \
             return 1;                                                          \
         }                                                                      \
@@ -215,12 +217,12 @@ namespace geode
     struct GenericAttributeConversion< std::array< Type, size > >              \
     {                                                                          \
         using Container = std::array< Type, size >;                            \
-        static float converted_value( const Container& value )                 \
+        [[nodiscard]] static float converted_value( const Container& value )   \
         {                                                                      \
             return converted_item_value( value, 0 );                           \
         }                                                                      \
                                                                                \
-        static float converted_item_value(                                     \
+        [[nodiscard]] static float converted_item_value(                       \
             const Container& value, local_index_t item )                       \
         {                                                                      \
             OPENGEODE_ASSERT( item < nb_items(),                               \
@@ -229,12 +231,12 @@ namespace geode
             return static_cast< float >( value[item] );                        \
         }                                                                      \
                                                                                \
-        static bool is_genericable()                                           \
+        [[nodiscard]] static bool is_genericable()                             \
         {                                                                      \
             return true;                                                       \
         }                                                                      \
                                                                                \
-        static local_index_t nb_items()                                        \
+        [[nodiscard]] static local_index_t nb_items()                          \
         {                                                                      \
             return size;                                                       \
         }                                                                      \
