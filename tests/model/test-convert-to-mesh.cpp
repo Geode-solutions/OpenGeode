@@ -40,23 +40,23 @@
 
 void run_test_brep()
 {
-    const auto model =
-        geode::load_brep( absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
+    auto model = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
     const auto curve = std::get< 0 >( geode::convert_brep_into_curve( model ) );
-    OPENGEODE_EXCEPTION( curve->nb_vertices() == 16,
+    OPENGEODE_EXCEPTION( curve->nb_vertices() == 154,
         "[Test] BRep - Wrong number of curve vertices" );
     OPENGEODE_EXCEPTION(
-        curve->nb_edges() == 28, "[Test] BRep - Wrong number of curve edges" );
+        curve->nb_edges() == 162, "[Test] BRep - Wrong number of curve edges" );
     const auto surface =
         std::get< 0 >( geode::convert_brep_into_surface( model ) );
-    OPENGEODE_EXCEPTION( surface->nb_vertices() == 16,
+    OPENGEODE_EXCEPTION( surface->nb_vertices() == 840,
         "[Test] BRep - Wrong number of surface vertices" );
-    OPENGEODE_EXCEPTION( surface->nb_polygons() == 16,
+    OPENGEODE_EXCEPTION( surface->nb_polygons() == 1716,
         "[Test] BRep - Wrong number of surface polygons" );
     const auto solid = std::get< 0 >( geode::convert_brep_into_solid( model ) );
-    OPENGEODE_EXCEPTION( solid->nb_vertices() == 16,
+    OPENGEODE_EXCEPTION( solid->nb_vertices() == 1317,
         "[Test] BRep - Wrong number of solid vertices" );
-    OPENGEODE_EXCEPTION( solid->nb_polyhedra() == 0,
+    OPENGEODE_EXCEPTION( solid->nb_polyhedra() == 5709,
         "[Test] BRep - Wrong number of solid polyhedra" );
 }
 

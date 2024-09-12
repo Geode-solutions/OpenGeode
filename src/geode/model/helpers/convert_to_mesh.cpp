@@ -432,19 +432,10 @@ namespace geode
         for( const auto unique_vertex :
             geode::Range{ brep.nb_unique_vertices() } )
         {
-            bool is_in_block{ false };
-            for( const auto& component :
-                brep.component_mesh_vertices( unique_vertex ) )
-            {
-                if( component.component_id.type()
-                    == geode::Block3D::component_type_static() )
-                {
-                    is_in_block = true;
-                    break;
-                }
-            }
             OPENGEODE_EXCEPTION(
-                is_in_block, "The model contains a vertex not in a block." );
+                brep.has_component_mesh_vertices(
+                    unique_vertex, geode::Block3D::component_type_static() ),
+                "The model contains a vertex not in a block." );
         }
         for( const auto unique_vertex :
             geode::Range{ brep.nb_unique_vertices() } )
