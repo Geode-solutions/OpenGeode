@@ -60,6 +60,9 @@ public:                                                                        \
     static_assert(                                                             \
         ( type ) == 2 || type == 3, #type " template should be 2 or 3" )
 
+#define OPENGEODE_TEMPLATE_ASSERT_2D( type )                                   \
+    static_assert( ( type ) == 2, #type " template should be 2" )
+
 #define OPENGEODE_TEMPLATE_ASSERT_3D( type )                                   \
     static_assert( ( type ) == 3, #type " template should be 3" )
 
