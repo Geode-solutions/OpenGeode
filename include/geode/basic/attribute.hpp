@@ -551,7 +551,7 @@ namespace geode
 
     private:
         T default_value_;
-        std::vector< T > values_;
+        std::vector< T > values_{};
     };
 
     /*!
@@ -746,7 +746,7 @@ namespace geode
 
     private:
         unsigned char default_value_;
-        std::vector< unsigned char > values_;
+        std::vector< unsigned char > values_{};
     };
 
     /*!
@@ -962,6 +962,6 @@ namespace geode
 
     private:
         T default_value_;
-        absl::flat_hash_map< index_t, T > values_;
+        absl::flat_hash_map< index_t, T > values_{};
     };
 } // namespace geode
