@@ -135,14 +135,7 @@ namespace geode
             {
                 continue;
             }
-            const auto predicate = [&q, &skip]( const auto& value ) {
-                if( skip( value ) )
-                {
-                    return false;
-                }
-                return q == value;
-            };
-            if( absl::c_find_if( inclusion.container, predicate )
+            if( absl::c_find( inclusion.container, q )
                 == inclusion.container.end() )
             {
                 return false;
