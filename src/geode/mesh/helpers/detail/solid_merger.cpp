@@ -223,8 +223,8 @@ namespace geode
                         {
                             const auto facet_origin = find_facet_origin(
                                 merger, facet_vertices, origin, f );
-                            const auto& solid =
-                                merger.meshes()[origin.solid].get();
+                            const auto& meshes = merger.meshes();
+                            const auto& solid = meshes[origin.solid].get();
                             if( !solid.is_polyhedron_facet_on_border(
                                     facet_origin ) )
                             {
@@ -250,7 +250,8 @@ namespace geode
             {
                 using Facet = VertexCycle< PolyhedronFacetVertices >;
                 const Facet merged_cycle{ merged_facet_vertices };
-                const auto& solid = merger.meshes()[origin.solid].get();
+                const auto& meshes = merger.meshes();
+                const auto& solid = meshes[origin.solid].get();
                 const auto is_same_facet = [&merger, &merged_cycle, &solid,
                                                &origin]( const auto& facet ) {
                     PolyhedronFacetVertices updated_vertices;
