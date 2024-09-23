@@ -33,7 +33,7 @@ namespace geode
 
 namespace geode
 {
-    double opengeode_mesh_api hausdorff_distance(
+    [[nodiscard]] double opengeode_mesh_api hausdorff_distance(
         const TriangulatedSurface3D& mesh_A,
         const TriangulatedSurface3D& mesh_B );
 } // namespace geode

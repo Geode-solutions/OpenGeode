@@ -42,14 +42,16 @@ namespace geode
     public:
         struct ColocatedInfo
         {
-            index_t nb_unique_points() const
+            [[nodiscard]] index_t nb_unique_points() const
             {
                 return unique_points.size();
             }
-            index_t nb_colocated_points() const
+
+            [[nodiscard]] index_t nb_colocated_points() const
             {
                 return colocated_mapping.size() - nb_unique_points();
             }
+
             /*!
              * This list has the size of the number of points in the tree.
              * Each index is pointing to its new unique point stored in the
@@ -64,16 +66,17 @@ namespace geode
         NNSearch( NNSearch&& other ) noexcept;
         ~NNSearch();
 
-        index_t nb_points() const;
+        [[nodiscard]] index_t nb_points() const;
 
-        const Point< dimension >& point( index_t index ) const;
+        [[nodiscard]] const Point< dimension >& point( index_t index ) const;
 
         /*!
          * Get the closest neighbor from the given point
          * @param[in] point The requested point
          * @return the index of the closest point
          */
-        index_t closest_neighbor( const Point< dimension >& point ) const;
+        [[nodiscard]] index_t closest_neighbor(
+            const Point< dimension >& point ) const;
 
         /*!
          * Get the neighbors closer than a given distance from the given point
@@ -82,7 +85,7 @@ namespace geode
          * @param[in] threshold_distance The radius of the sphere
          * @return the list of points inside this distance
          */
-        std::vector< index_t > radius_neighbors(
+        [[nodiscard]] std::vector< index_t > radius_neighbors(
             const Point< dimension >& point, double threshold_distance ) const;
 
         /*!
@@ -93,7 +96,7 @@ namespace geode
          * number of neighbors if there is less neighbors than points in the
          * tree
          */
-        std::vector< index_t > neighbors(
+        [[nodiscard]] std::vector< index_t > neighbors(
             const Point< dimension >& point, index_t nb_neighbors ) const;
 
         /*!
@@ -102,7 +105,8 @@ namespace geode
          * are identical
          * @return The information related to this colocated operation
          */
-        ColocatedInfo colocated_index_mapping( double epsilon ) const;
+        [[nodiscard]] ColocatedInfo colocated_index_mapping(
+            double epsilon ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

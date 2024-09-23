@@ -51,7 +51,8 @@ namespace geode
          * value.
          * Throws an exception if an attribute with the same name exists.
          */
-        static TetrahedralSolidPointFunction< dimension, point_dimension >
+        [[nodiscard]] static TetrahedralSolidPointFunction< dimension,
+            point_dimension >
             create( const TetrahedralSolid< dimension >& solid,
                 std::string_view function_name,
                 Point< point_dimension > value );
@@ -61,15 +62,17 @@ namespace geode
          * TetrahedralSolid, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static TetrahedralSolidPointFunction< dimension, point_dimension > find(
-            const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name );
+        [[nodiscard]] static TetrahedralSolidPointFunction< dimension,
+            point_dimension >
+            find( const TetrahedralSolid< dimension >& solid,
+                std::string_view function_name );
 
         void set_value( index_t vertex_index, Point< point_dimension > value );
 
-        const Point< point_dimension >& value( index_t vertex_index ) const;
+        [[nodiscard]] const Point< point_dimension >& value(
+            index_t vertex_index ) const;
 
-        Point< point_dimension > value(
+        [[nodiscard]] Point< point_dimension > value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
     private:

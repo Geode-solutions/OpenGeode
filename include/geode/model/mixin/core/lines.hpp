@@ -54,7 +54,8 @@ namespace geode
         public:
             ~LineRangeBase();
 
-            bool operator!=( const LineRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const LineRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -74,23 +75,23 @@ namespace geode
             LineRange( const LineRange& range );
             ~LineRange();
 
-            const LineRange& begin() const;
+            [[nodiscard]] const LineRange& begin() const;
 
-            const LineRange& end() const;
+            [[nodiscard]] const LineRange& end() const;
 
-            const Line< dimension >& operator*() const;
+            [[nodiscard]] const Line< dimension >& operator*() const;
         };
 
     public:
         ~Lines();
 
-        index_t nb_lines() const;
+        [[nodiscard]] index_t nb_lines() const;
 
-        bool has_line( const uuid& id ) const;
+        [[nodiscard]] bool has_line( const uuid& id ) const;
 
-        const Line< dimension >& line( const uuid& id ) const;
+        [[nodiscard]] const Line< dimension >& line( const uuid& id ) const;
 
-        LineRange lines() const;
+        [[nodiscard]] LineRange lines() const;
 
         void save_lines( std::string_view directory ) const;
 
@@ -108,17 +109,18 @@ namespace geode
             ModifiableLineRange( const ModifiableLineRange& range );
             ~ModifiableLineRange();
 
-            const ModifiableLineRange& begin() const;
+            [[nodiscard]] const ModifiableLineRange& begin() const;
 
-            const ModifiableLineRange& end() const;
+            [[nodiscard]] const ModifiableLineRange& end() const;
 
-            Line< dimension >& operator*() const;
+            [[nodiscard]] Line< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_line( LinesBuilderKey key );
+        [[nodiscard]] const uuid& create_line( LinesBuilderKey key );
 
-        const uuid& create_line( const MeshImpl& impl, LinesBuilderKey key );
+        [[nodiscard]] const uuid& create_line(
+            const MeshImpl& impl, LinesBuilderKey key );
 
         void create_line( uuid line_id, LinesBuilderKey key );
 
@@ -129,9 +131,10 @@ namespace geode
 
         void load_lines( std::string_view directory, LinesBuilderKey key );
 
-        ModifiableLineRange modifiable_lines( LinesBuilderKey key );
+        [[nodiscard]] ModifiableLineRange modifiable_lines(
+            LinesBuilderKey key );
 
-        Line< dimension >& modifiable_line(
+        [[nodiscard]] Line< dimension >& modifiable_line(
             const uuid& id, LinesBuilderKey key );
 
     private:

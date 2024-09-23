@@ -46,13 +46,13 @@ namespace geode
 
 namespace geode
 {
-    PolygonVertices opengeode_model_api polygon_unique_vertices(
+    [[nodiscard]] PolygonVertices opengeode_model_api polygon_unique_vertices(
         const Section& model, const Surface2D& surface, index_t polygon_id );
 
-    PolygonVertices opengeode_model_api polygon_unique_vertices(
+    [[nodiscard]] PolygonVertices opengeode_model_api polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id );
 
-    PolygonVertices opengeode_model_api polygon_unique_vertices(
+    [[nodiscard]] PolygonVertices opengeode_model_api polygon_unique_vertices(
         const BRep& model, const Block3D& block, const PolyhedronFacet& facet );
 
     struct ModelComponentMeshPolygons
@@ -66,12 +66,14 @@ namespace geode
     {
     };
 
-    SectionComponentMeshPolygons opengeode_model_api component_mesh_polygons(
-        const Section& section,
-        const PolygonVertices& polygon_unique_vertices );
+    [[nodiscard]] SectionComponentMeshPolygons opengeode_model_api
+        component_mesh_polygons( const Section& section,
+            const PolygonVertices& polygon_unique_vertices );
 
-    SectionComponentMeshPolygons opengeode_model_api component_mesh_polygons(
-        const Section& section, const Surface2D& surface, index_t polygon_id );
+    [[nodiscard]] SectionComponentMeshPolygons opengeode_model_api
+        component_mesh_polygons( const Section& section,
+            const Surface2D& surface,
+            index_t polygon_id );
 
     struct BRepComponentMeshPolygons : public ModelComponentMeshPolygons
     {
@@ -80,14 +82,18 @@ namespace geode
         BlockPolygons block_polygons;
     };
 
-    BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
-        const BRep& brep, const PolygonVertices& polygon_unique_vertices );
+    [[nodiscard]] BRepComponentMeshPolygons opengeode_model_api
+        component_mesh_polygons(
+            const BRep& brep, const PolygonVertices& polygon_unique_vertices );
 
-    BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
-        const BRep& brep, const Surface3D& surface, index_t polygon_id );
+    [[nodiscard]] BRepComponentMeshPolygons opengeode_model_api
+        component_mesh_polygons(
+            const BRep& brep, const Surface3D& surface, index_t polygon_id );
 
-    BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
-        const BRep& brep, const Block3D& block, const PolyhedronFacet& facet );
+    [[nodiscard]] BRepComponentMeshPolygons opengeode_model_api
+        component_mesh_polygons( const BRep& brep,
+            const Block3D& block,
+            const PolyhedronFacet& facet );
 
     struct BlockPolyhedronFacet
     {
@@ -103,7 +109,7 @@ namespace geode
 
     struct BlockPolyhedraFacetVertices
     {
-        index_t nb_facets() const
+        [[nodiscard]] index_t nb_facets() const
         {
             index_t counter{ 0 };
             if( oriented_polyhedron_facet )
@@ -134,7 +140,7 @@ namespace geode
 
     struct SurfacePolygonsEdgeVertices
     {
-        index_t nb_edges() const
+        [[nodiscard]] index_t nb_edges() const
         {
             index_t counter{ 0 };
             if( oriented_edge )
@@ -152,43 +158,45 @@ namespace geode
         std::optional< SurfacePolygonEdge > opposite_edge;
     };
 
-    PolyhedraAroundFacet opengeode_model_api
+    [[nodiscard]] PolyhedraAroundFacet opengeode_model_api
         block_mesh_polyhedra_from_surface_polygon( const BRep& model,
             const Block3D& block,
             const Surface3D& surface,
             index_t polygon_id );
 
-    absl::InlinedVector< BlockPolyhedronFacet, 2 > opengeode_model_api
-        block_vertices_from_surface_polygon( const BRep& model,
+    [[nodiscard]] absl::InlinedVector< BlockPolyhedronFacet, 2 >
+        opengeode_model_api block_vertices_from_surface_polygon(
+            const BRep& model,
             const Block3D& block,
             const Surface3D& surface,
             index_t polygon_id );
 
-    BlockPolyhedraFacetVertices opengeode_model_api
+    [[nodiscard]] BlockPolyhedraFacetVertices opengeode_model_api
         oriented_block_vertices_from_surface_polygon( const BRep& model,
             const Block3D& block,
             const Surface3D& surface,
             index_t polygon_id );
 
-    absl::InlinedVector< SurfacePolygonEdge, 2 >
+    [[nodiscard]] absl::InlinedVector< SurfacePolygonEdge, 2 >
         opengeode_model_api surface_vertices_from_line_edge( const BRep& model,
             const Surface3D& surface,
             const Line3D& line,
             index_t edge_id );
 
-    SurfacePolygonsEdgeVertices opengeode_model_api
+    [[nodiscard]] SurfacePolygonsEdgeVertices opengeode_model_api
         oriented_surface_vertices_from_line_edge( const BRep& model,
             const Surface3D& surface,
             const Line3D& line,
             index_t edge_id );
 
-    absl::InlinedVector< SurfacePolygonEdge, 2 > opengeode_model_api
-        surface_vertices_from_line_edge( const Section& model,
+    [[nodiscard]] absl::InlinedVector< SurfacePolygonEdge, 2 >
+        opengeode_model_api surface_vertices_from_line_edge(
+            const Section& model,
             const Surface2D& surface,
             const Line2D& line,
             index_t edge_id );
 
-    SurfacePolygonsEdgeVertices opengeode_model_api
+    [[nodiscard]] SurfacePolygonsEdgeVertices opengeode_model_api
         oriented_surface_vertices_from_line_edge( const Section& model,
             const Surface2D& surface,
             const Line2D& line,
@@ -197,11 +205,12 @@ namespace geode
     namespace detail
     {
         template < typename Model >
-        ModelComponentMeshPolygons::SurfacePolygons
+        [[nodiscard]] ModelComponentMeshPolygons::SurfacePolygons
             surface_component_mesh_polygons( const Model& model,
                 const PolygonVertices& polygon_unique_vertices );
 
-        BRepComponentMeshPolygons::BlockPolygons opengeode_model_api
+        [[nodiscard]] BRepComponentMeshPolygons::BlockPolygons
+            opengeode_model_api
             block_component_mesh_polygons( const BRep& brep,
                 const PolygonVertices& polygon_unique_vertices );
     } // namespace detail

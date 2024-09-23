@@ -56,7 +56,8 @@ namespace geode
          * Create the builder associated with a VertexSet.
          * @param[in] mesh The VertexSet to build/modify
          */
-        static std::unique_ptr< VertexSetBuilder > create( VertexSet& mesh );
+        [[nodiscard]] static std::unique_ptr< VertexSetBuilder > create(
+            VertexSet& mesh );
 
         /*!
          * Create a new vertex.

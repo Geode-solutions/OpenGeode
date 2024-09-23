@@ -57,8 +57,8 @@ namespace geode
         GenericLine< PointType, dimension >& operator=(
             GenericLine< PointType, dimension >&& other ) noexcept;
 
-        const Point< dimension >& origin() const;
-        const Vector< dimension >& direction() const;
+        [[nodiscard]] const Point< dimension >& origin() const;
+        [[nodiscard]] const Vector< dimension >& direction() const;
 
     private:
         Vector< dimension > direction_;

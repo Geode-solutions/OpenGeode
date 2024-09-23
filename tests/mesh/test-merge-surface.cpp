@@ -78,7 +78,8 @@ void test()
     {
         for( const auto e : geode::LRange{ 3 } )
         {
-            merged->polygon_adjacent_edge( { p, e } );
+            const auto adj = merged->polygon_adjacent_edge( { p, e } );
+            geode_unused( adj );
         }
     }
 

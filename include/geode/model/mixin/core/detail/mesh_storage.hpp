@@ -49,17 +49,17 @@ namespace geode
                 mesh_builder.set_id( std::move( new_mesh_uuid ) );
             }
 
-            const Mesh& mesh() const
+            [[nodiscard]] const Mesh& mesh() const
             {
                 return *mesh_;
             }
 
-            Mesh& modifiable_mesh()
+            [[nodiscard]] Mesh& modifiable_mesh()
             {
                 return *mesh_;
             }
 
-            const MeshImpl& mesh_type() const
+            [[nodiscard]] const MeshImpl& mesh_type() const
             {
                 return mesh_type_;
             }

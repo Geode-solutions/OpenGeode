@@ -32,6 +32,6 @@ namespace geode
 
 namespace geode
 {
-    double opengeode_geometry_api tetrahedron_aspect_ratio(
+    [[nodiscard]] double opengeode_geometry_api tetrahedron_aspect_ratio(
         const Tetrahedron& tetra );
 } // namespace geode

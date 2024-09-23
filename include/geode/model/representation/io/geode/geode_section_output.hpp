@@ -45,7 +45,7 @@ namespace geode
         {
         }
 
-        static std::string_view extension()
+        [[nodiscard]] static std::string_view extension()
         {
             return Section::native_extension_static();
         }

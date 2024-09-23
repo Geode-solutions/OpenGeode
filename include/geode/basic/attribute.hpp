@@ -64,23 +64,23 @@ namespace geode
 
         virtual ~AttributeBase() = default;
 
-        virtual float generic_value( index_t element ) const = 0;
+        [[nodiscard]] virtual float generic_value( index_t element ) const = 0;
 
-        virtual float generic_item_value(
+        [[nodiscard]] virtual float generic_item_value(
             index_t element, local_index_t item ) const = 0;
 
-        virtual bool is_genericable() const = 0;
+        [[nodiscard]] virtual bool is_genericable() const = 0;
 
-        virtual local_index_t nb_items() const = 0;
+        [[nodiscard]] virtual local_index_t nb_items() const = 0;
 
-        virtual std::string_view type() = 0;
+        [[nodiscard]] virtual std::string_view type() = 0;
 
-        std::string_view name() const
+        [[nodiscard]] std::string_view name() const
         {
             return name_;
         }
 
-        const AttributeProperties& properties() const
+        [[nodiscard]] const AttributeProperties& properties() const
         {
             return properties_;
         }
@@ -96,19 +96,19 @@ namespace geode
             name_ = to_string( name );
         }
 
-        virtual std::shared_ptr< AttributeBase > clone(
+        [[nodiscard]] virtual std::shared_ptr< AttributeBase > clone(
             AttributeKey ) const = 0;
 
         virtual void copy( const AttributeBase& attribute,
             index_t nb_elements,
             AttributeKey ) = 0;
 
-        virtual std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] virtual std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
             AttributeKey ) const = 0;
 
-        virtual std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] virtual std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
             AttributeKey ) const = 0;
@@ -170,32 +170,32 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        virtual const T& value( index_t element ) const = 0;
+        [[nodiscard]] virtual const T& value( index_t element ) const = 0;
 
-        std::string_view type() final
+        [[nodiscard]] std::string_view type() final
         {
             return typeid( T ).name();
         }
 
-        float generic_value( index_t element ) const final
+        [[nodiscard]] float generic_value( index_t element ) const final
         {
             return GenericAttributeConversion< T >::converted_value(
                 value( element ) );
         }
 
-        float generic_item_value(
+        [[nodiscard]] float generic_item_value(
             index_t element, local_index_t item ) const final
         {
             return GenericAttributeConversion< T >::converted_item_value(
                 value( element ), item );
         }
 
-        bool is_genericable() const final
+        [[nodiscard]] bool is_genericable() const final
         {
             return GenericAttributeConversion< T >::is_genericable();
         }
 
-        local_index_t nb_items() const final
+        [[nodiscard]] local_index_t nb_items() const final
         {
             return GenericAttributeConversion< T >::nb_items();
         }
@@ -237,12 +237,12 @@ namespace geode
         {
         }
 
-        const T& value( index_t /*unused*/ ) const override
+        [[nodiscard]] const T& value( index_t /*unused*/ ) const override
         {
             return value_;
         }
 
-        const T& value() const
+        [[nodiscard]] const T& value() const
         {
             return value_;
         }
@@ -252,7 +252,7 @@ namespace geode
             value_ = std::move( value );
         }
 
-        const T& default_value() const
+        [[nodiscard]] const T& default_value() const
         {
             return value();
         }
@@ -317,7 +317,7 @@ namespace geode
         {
         }
 
-        std::shared_ptr< AttributeBase > clone(
+        [[nodiscard]] std::shared_ptr< AttributeBase > clone(
             AttributeBase::AttributeKey ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
@@ -334,7 +334,7 @@ namespace geode
                          .value();
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > /* unused */,
             index_t /* unused */,
             AttributeBase::AttributeKey ) const override
@@ -345,7 +345,7 @@ namespace geode
             return attribute;
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& /* unused */,
             index_t /* unused */,
             AttributeBase::AttributeKey ) const override
@@ -377,7 +377,7 @@ namespace geode
         {
         }
 
-        const T& value( index_t element ) const override
+        [[nodiscard]] const T& value( index_t element ) const override
         {
             return values_[element];
         }
@@ -387,7 +387,7 @@ namespace geode
             values_[element] = std::move( value );
         }
 
-        const T& default_value() const
+        [[nodiscard]] const T& default_value() const
         {
             return default_value_;
         }
@@ -398,7 +398,7 @@ namespace geode
             modifier( values_[element] );
         }
 
-        index_t size() const
+        [[nodiscard]] index_t size() const
         {
             return values_.size();
         }
@@ -475,7 +475,7 @@ namespace geode
             permute( values_, permutation );
         }
 
-        std::shared_ptr< AttributeBase > clone(
+        [[nodiscard]] std::shared_ptr< AttributeBase > clone(
             AttributeBase::AttributeKey ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
@@ -502,7 +502,7 @@ namespace geode
             }
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
             AttributeBase::AttributeKey ) const override
@@ -526,7 +526,7 @@ namespace geode
             return attribute;
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
             AttributeBase::AttributeKey ) const override
@@ -572,7 +572,7 @@ namespace geode
         {
         }
 
-        const bool& value( index_t element ) const override
+        [[nodiscard]] const bool& value( index_t element ) const override
         {
             return reinterpret_cast< const bool& >( values_[element] );
         }
@@ -582,7 +582,7 @@ namespace geode
             values_[element] = std::move( value );
         }
 
-        bool default_value() const
+        [[nodiscard]] bool default_value() const
         {
             return default_value_;
         }
@@ -593,7 +593,7 @@ namespace geode
             modifier( reinterpret_cast< bool& >( values_[element] ) );
         }
 
-        index_t size() const
+        [[nodiscard]] index_t size() const
         {
             return values_.size();
         }
@@ -667,7 +667,7 @@ namespace geode
             permute( values_, permutation );
         }
 
-        std::shared_ptr< AttributeBase > clone(
+        [[nodiscard]] std::shared_ptr< AttributeBase > clone(
             AttributeBase::AttributeKey ) const override
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
@@ -695,7 +695,7 @@ namespace geode
             }
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
             AttributeBase::AttributeKey ) const override
@@ -720,7 +720,7 @@ namespace geode
             return attribute;
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
             AttributeBase::AttributeKey ) const override
@@ -767,7 +767,7 @@ namespace geode
         {
         }
 
-        const T& value( index_t element ) const override
+        [[nodiscard]] const T& value( index_t element ) const override
         {
             const auto it = values_.find( element );
             if( it != values_.end() )
@@ -782,7 +782,7 @@ namespace geode
             values_[element] = std::move( value );
         }
 
-        const T& default_value() const
+        [[nodiscard]] const T& default_value() const
         {
             return default_value_;
         }
@@ -882,7 +882,7 @@ namespace geode
             }
         }
 
-        std::shared_ptr< AttributeBase > clone(
+        [[nodiscard]] std::shared_ptr< AttributeBase > clone(
             AttributeBase::AttributeKey ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
@@ -911,7 +911,7 @@ namespace geode
             }
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
             AttributeBase::AttributeKey ) const override
@@ -934,7 +934,7 @@ namespace geode
             return attribute;
         }
 
-        std::shared_ptr< AttributeBase > extract(
+        [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
             AttributeBase::AttributeKey ) const override

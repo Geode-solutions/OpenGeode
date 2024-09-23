@@ -50,14 +50,14 @@ namespace geode
      * Compute the Euclidean distance between a two points
      */
     template < index_t dimension >
-    double point_point_distance(
+    [[nodiscard]] double point_point_distance(
         const Point< dimension >& point0, const Point< dimension >& point1 );
 
     /*!
      * Compute the smallest distance between a point and a segment
      */
     template < index_t dimension >
-    double point_segment_distance(
+    [[nodiscard]] double point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment );
 
     /*!
@@ -68,12 +68,12 @@ namespace geode
      * - the closest point on the second segment.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension >, Point< dimension > >
+    [[nodiscard]] std::tuple< double, Point< dimension >, Point< dimension > >
         segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 );
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension >, Point< dimension > >
+    [[nodiscard]] std::tuple< double, Point< dimension >, Point< dimension > >
         segment_line_distance( const Segment< dimension >& segment,
             const InfiniteLine< dimension >& line );
 
@@ -81,14 +81,14 @@ namespace geode
      * Compute the smallest distance between a point and an infinite line
      */
     template < index_t dimension >
-    double point_line_distance( const Point< dimension >& point,
+    [[nodiscard]] double point_line_distance( const Point< dimension >& point,
         const InfiniteLine< dimension >& line );
 
     /*!
      * Compute the smallest signed distance between a point and an infinite line
      * in 2D
      */
-    double opengeode_geometry_api point_line_signed_distance(
+    [[nodiscard]] double opengeode_geometry_api point_line_signed_distance(
         const Point2D& point, const InfiniteLine2D& line );
 
     /*!
@@ -98,9 +98,9 @@ namespace geode
      * - the closest point on the triangle.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_triangle_distance(
-        const Point< dimension >& point,
-        const Triangle< dimension >& triangle );
+    [[nodiscard]] std::tuple< double, Point< dimension > >
+        point_triangle_distance( const Point< dimension >& point,
+            const Triangle< dimension >& triangle );
 
     /*!
      * Compute the signed distance between a point and a triangle
@@ -110,7 +110,7 @@ namespace geode
      * @details the sign is given by the triangle normal (positive if in the
      * same plane).
      */
-    std::tuple< double, Point3D >
+    [[nodiscard]] std::tuple< double, Point3D >
         opengeode_geometry_api point_triangle_signed_distance(
             const Point3D& point, const Triangle3D& triangle );
 
@@ -121,7 +121,7 @@ namespace geode
      * - the closest point on the line.
      * - the closest point on the triangle.
      */
-    std::tuple< double, Point3D, Point3D >
+    [[nodiscard]] std::tuple< double, Point3D, Point3D >
         opengeode_geometry_api line_triangle_distance(
             const InfiniteLine3D& line, const Triangle3D& triangle );
 
@@ -132,7 +132,7 @@ namespace geode
      * - the closest point on the segment.
      * - the closest point on the triangle.
      */
-    std::tuple< double, Point3D, Point3D >
+    [[nodiscard]] std::tuple< double, Point3D, Point3D >
         opengeode_geometry_api segment_triangle_distance(
             const Segment3D& segment, const Triangle3D& triangle );
 
@@ -142,7 +142,7 @@ namespace geode
      * - the smallest distance.
      * - the nearest point on the tetrahedron.
      */
-    std::tuple< double, Point3D >
+    [[nodiscard]] std::tuple< double, Point3D >
         opengeode_geometry_api point_tetrahedron_distance(
             const Point3D& point, const Tetrahedron& tetra );
 
@@ -152,8 +152,8 @@ namespace geode
      * - the smallest distance.
      * - the nearest point on the plane.
      */
-    std::tuple< double, Point3D > opengeode_geometry_api point_plane_distance(
-        const Point3D& point, const Plane& plane );
+    [[nodiscard]] std::tuple< double, Point3D > opengeode_geometry_api
+        point_plane_distance( const Point3D& point, const Plane& plane );
 
     /*!
      * Compute the signed distance between a point and a plane
@@ -161,7 +161,7 @@ namespace geode
      * - the signed distance (sign is given by the plane normal direction).
      * - the nearest point on the plane.
      */
-    std::tuple< double, Point3D > opengeode_geometry_api
+    [[nodiscard]] std::tuple< double, Point3D > opengeode_geometry_api
         point_plane_signed_distance( const Point3D& point, const Plane& plane );
 
     /*!
@@ -171,8 +171,9 @@ namespace geode
      * - the closest point on the sphere.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_sphere_distance(
-        const Point< dimension >& point, const Sphere< dimension >& sphere );
+    [[nodiscard]] std::tuple< double, Point< dimension > >
+        point_sphere_distance( const Point< dimension >& point,
+            const Sphere< dimension >& sphere );
 
     /*!
      * Compute the smallest signed distance between a point and a sphere
@@ -182,8 +183,9 @@ namespace geode
      * @details the sign is positive outside the sphere, negative inside.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_sphere_signed_distance(
-        const Point< dimension >& point, const Sphere< dimension >& sphere );
+    [[nodiscard]] std::tuple< double, Point< dimension > >
+        point_sphere_signed_distance( const Point< dimension >& point,
+            const Sphere< dimension >& sphere );
 
     /*!
      * Compute the smallest distance between a point and a ball
@@ -194,7 +196,7 @@ namespace geode
      * the returned distance is 0.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_ball_distance(
+    [[nodiscard]] std::tuple< double, Point< dimension > > point_ball_distance(
         const Point< dimension >& point, const Ball< dimension >& sphere );
 
     /*!
@@ -203,8 +205,8 @@ namespace geode
      * - the smallest distance.
      * - the closest point on the circle.
      */
-    std::tuple< double, Point3D > opengeode_geometry_api point_circle_distance(
-        const Point3D& point, const Circle& circle );
+    [[nodiscard]] std::tuple< double, Point3D > opengeode_geometry_api
+        point_circle_distance( const Point3D& point, const Circle& circle );
 
     /*!
      * Compute the smallest signed distance between a point and a circle
@@ -213,7 +215,7 @@ namespace geode
      * - the closest point on the circle.
      * @details the sign is positive outside the circle, negative inside.
      */
-    std::tuple< double, Point3D >
+    [[nodiscard]] std::tuple< double, Point3D >
         opengeode_geometry_api point_circle_signed_distance(
             const Point3D& point, const Circle& circle );
 
@@ -225,6 +227,6 @@ namespace geode
      * @details Result is always positive or null. If point is inside the disk,
      * the returned distance is 0.
      */
-    std::tuple< double, Point3D > opengeode_geometry_api point_disk_distance(
-        const Point3D& point, const Disk& disk );
+    [[nodiscard]] std::tuple< double, Point3D > opengeode_geometry_api
+        point_disk_distance( const Point3D& point, const Disk& disk );
 } // namespace geode

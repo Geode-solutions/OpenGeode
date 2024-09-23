@@ -28,7 +28,7 @@ namespace geode
     namespace detail
     {
         template < typename Range >
-        index_t count_relationships( const Range& range )
+        [[nodiscard]] index_t count_relationships( const Range& range )
         {
             index_t nb{ 0 };
             for( const auto& unused : range )

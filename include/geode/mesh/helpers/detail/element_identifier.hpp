@@ -36,16 +36,16 @@ namespace geode
 {
     namespace detail
     {
-        bool opengeode_mesh_api solid_polyhedron_is_a_tetrahedron(
+        [[nodiscard]] bool opengeode_mesh_api solid_polyhedron_is_a_tetrahedron(
             const SolidMesh3D &solid, index_t polyhedron_id );
 
-        bool opengeode_mesh_api solid_polyhedron_is_a_hexaedron(
+        [[nodiscard]] bool opengeode_mesh_api solid_polyhedron_is_a_hexaedron(
             const SolidMesh3D &solid, index_t polyhedron_id );
 
-        bool opengeode_mesh_api solid_polyhedron_is_a_pyramid(
+        [[nodiscard]] bool opengeode_mesh_api solid_polyhedron_is_a_pyramid(
             const SolidMesh3D &solid, index_t polyhedron_id );
 
-        bool opengeode_mesh_api solid_polyhedron_is_a_prism(
+        [[nodiscard]] bool opengeode_mesh_api solid_polyhedron_is_a_prism(
             const SolidMesh3D &solid, index_t polyhedron_id );
     } // namespace detail
 } // namespace geode

@@ -37,12 +37,12 @@ namespace geode
         class UuidToIndex
         {
         public:
-            index_t nb_mappings() const
+            [[nodiscard]] index_t nb_mappings() const
             {
                 return uuid2index_.size();
             }
 
-            std::optional< index_t > index( const uuid& id ) const
+            [[nodiscard]] std::optional< index_t > index( const uuid& id ) const
             {
                 const auto index = uuid2index_.find( id );
                 if( index != uuid2index_.end() )

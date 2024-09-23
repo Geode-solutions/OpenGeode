@@ -53,9 +53,9 @@ namespace geode
         GenericCircle( GenericCircle&& other ) noexcept;
         GenericCircle& operator=( GenericCircle&& other ) noexcept;
 
-        const PlaneType& plane() const;
-        double radius() const;
-        BoundingBox3D bounding_box() const;
+        [[nodiscard]] const PlaneType& plane() const;
+        [[nodiscard]] double radius() const;
+        [[nodiscard]] BoundingBox3D bounding_box() const;
 
     private:
         PlaneType plane_;

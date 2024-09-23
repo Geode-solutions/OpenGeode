@@ -44,7 +44,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      * @return Loaded BRep.
      */
-    BRep opengeode_model_api load_brep( std::string_view filename );
+    [[nodiscard]] BRep opengeode_model_api load_brep(
+        std::string_view filename );
 
     class BRepInput : public Input< BRep >
     {
@@ -57,10 +58,11 @@ namespace geode
         explicit BRepInput( std::string_view filename ) : Base{ filename } {}
     };
 
-    typename BRepInput::MissingFiles opengeode_model_api
+    [[nodiscard]] typename BRepInput::MissingFiles opengeode_model_api
         check_brep_missing_files( std::string_view filename );
 
-    bool opengeode_model_api is_brep_loadable( std::string_view filename );
+    [[nodiscard]] bool opengeode_model_api is_brep_loadable(
+        std::string_view filename );
 
     using BRepInputFactory =
         Factory< std::string, BRepInput, std::string_view >;

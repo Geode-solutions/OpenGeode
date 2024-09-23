@@ -51,15 +51,15 @@ namespace geode
             : edge_id( edge_id_in ), vertex_id( vertex_id_in )
         {
         }
-        bool operator==( const EdgeVertex& other ) const
+        [[nodiscard]] bool operator==( const EdgeVertex& other ) const
         {
             return edge_id == other.edge_id && vertex_id == other.vertex_id;
         }
-        bool operator!=( const EdgeVertex& other ) const
+        [[nodiscard]] bool operator!=( const EdgeVertex& other ) const
         {
             return !( *this == other );
         }
-        bool operator<( const EdgeVertex& other ) const
+        [[nodiscard]] bool operator<( const EdgeVertex& other ) const
         {
             if( edge_id != other.edge_id )
             {
@@ -67,12 +67,12 @@ namespace geode
             }
             return vertex_id < other.vertex_id;
         }
-        EdgeVertex opposite() const
+        [[nodiscard]] EdgeVertex opposite() const
         {
             const local_index_t opposite = vertex_id == 0 ? 1 : 0;
             return { edge_id, opposite };
         }
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( "(", edge_id, ", ", vertex_id, ")" );
         }
@@ -104,57 +104,61 @@ namespace geode
     public:
         using Builder = GraphBuilder;
 
+        ~Graph();
+
         /*!
          * Create a new Graph using default data structure.
          */
-        static std::unique_ptr< Graph > create();
+        [[nodiscard]] static std::unique_ptr< Graph > create();
 
         /*!
          * Create a new Graph using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< Graph > create( const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< Graph > create(
+            const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< Graph > clone() const;
-
-        ~Graph();
+        [[nodiscard]] std::unique_ptr< Graph > clone() const;
 
         /*!
          * Return the vertex index corresponding to an edge endpoint
          * @param[in] edge_vertex Edge endpoint
          */
-        index_t edge_vertex( const EdgeVertex& edge_vertex ) const;
+        [[nodiscard]] index_t edge_vertex(
+            const EdgeVertex& edge_vertex ) const;
 
         /*!
          * Return the indices of the two edge vertices
          * @param[in] edge_id Index of the edge
          */
-        std::array< index_t, 2 > edge_vertices( index_t edge_id ) const;
+        [[nodiscard]] std::array< index_t, 2 > edge_vertices(
+            index_t edge_id ) const;
 
-        index_t nb_edges() const;
+        [[nodiscard]] index_t nb_edges() const;
 
         /*!
          * Access to the manager of attributes associated with edges.
          */
-        AttributeManager& edge_attribute_manager() const;
+        [[nodiscard]] AttributeManager& edge_attribute_manager() const;
 
         /*!
          * Get all edge endpoints corresponding to a given vertex
          * @param[in] vertex_id Index of the vertex
          */
-        const EdgesAroundVertex& edges_around_vertex( index_t vertex_id ) const;
+        [[nodiscard]] const EdgesAroundVertex& edges_around_vertex(
+            index_t vertex_id ) const;
 
         /*!
          * Returns the vertices linked by an edge to the given mesh vertex.
          */
-        CurveVerticesAroundVertex vertices_around_vertex(
+        [[nodiscard]] CurveVerticesAroundVertex vertices_around_vertex(
             index_t vertex_id ) const;
 
-        bool is_vertex_isolated( index_t vertex_id ) const;
+        [[nodiscard]] bool is_vertex_isolated( index_t vertex_id ) const;
 
-        std::optional< index_t > edge_from_vertices(
+        [[nodiscard]] std::optional< index_t > edge_from_vertices(
             index_t v0, index_t v1 ) const;
 
     public:
@@ -177,7 +181,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        virtual index_t get_edge_vertex(
+        [[nodiscard]] virtual index_t get_edge_vertex(
             const EdgeVertex& edge_vertex ) const = 0;
 
     private:

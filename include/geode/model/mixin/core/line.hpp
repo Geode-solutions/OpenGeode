@@ -61,26 +61,26 @@ namespace geode
         Line( Line&& other ) noexcept;
         ~Line();
 
-        static ComponentType component_type_static()
+        [[nodiscard]] static ComponentType component_type_static()
         {
             return ComponentType{ "Line" };
         }
 
-        ComponentType component_type() const final
+        [[nodiscard]] ComponentType component_type() const final
         {
             return component_type_static();
         }
 
-        ComponentID component_id() const
+        [[nodiscard]] ComponentID component_id() const
         {
             return { this->component_type_static(), this->id() };
         };
 
-        const Mesh& mesh() const;
+        [[nodiscard]] const Mesh& mesh() const;
 
-        const MeshImpl& mesh_type() const;
+        [[nodiscard]] const MeshImpl& mesh_type() const;
 
-        Mesh& modifiable_mesh( LinesKey key );
+        [[nodiscard]] Mesh& modifiable_mesh( LinesKey key );
 
     public:
         explicit Line( LinesKey key );
@@ -93,14 +93,14 @@ namespace geode
 
         void set_line_name( std::string_view name, LinesBuilderKey key );
 
-        Mesh& modifiable_mesh( LinesBuilderKey key );
+        [[nodiscard]] Mesh& modifiable_mesh( LinesBuilderKey key );
 
     private:
         Line();
 
         explicit Line( const MeshImpl& impl );
 
-        Mesh& modifiable_mesh();
+        [[nodiscard]] Mesh& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

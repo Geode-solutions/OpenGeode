@@ -50,7 +50,7 @@ namespace geode
      * Returns outside-outside if there is no intersection or parallel-pallel
      * if all points are colinear
      */
-    SegmentSegmentIntersection opengeode_geometry_api
+    [[nodiscard]] SegmentSegmentIntersection opengeode_geometry_api
         segment_segment_intersection_detection(
             const Segment2D& segment0, const Segment2D& segment1 );
 
@@ -59,7 +59,7 @@ namespace geode
      * @return the position of the intersection on the two segments.
      * Returns parallel-pallel if there is segment overlap
      */
-    SegmentSegmentIntersection opengeode_geometry_api
+    [[nodiscard]] SegmentSegmentIntersection opengeode_geometry_api
         colinear_segment_segment_intersection_detection(
             const Segment2D& segment0, const Segment2D& segment1 );
 
@@ -69,8 +69,9 @@ namespace geode
      * Returns outside if there is no intersection or all points are
      * colinear
      */
-    POSITION opengeode_geometry_api segment_line_intersection_detection(
-        const Segment2D& segment, const InfiniteLine2D& line );
+    [[nodiscard]] POSITION opengeode_geometry_api
+        segment_line_intersection_detection(
+            const Segment2D& segment, const InfiniteLine2D& line );
 
     /*!
      * Detect if there is an intersection between a line and a triangle
@@ -78,8 +79,9 @@ namespace geode
      * Returns outside if there is no intersection or the line is
      * coplanar with the triangle
      */
-    POSITION opengeode_geometry_api line_triangle_intersection_detection(
-        const InfiniteLine3D& line, const Triangle3D& triangle );
+    [[nodiscard]] POSITION opengeode_geometry_api
+        line_triangle_intersection_detection(
+            const InfiniteLine3D& line, const Triangle3D& triangle );
 
     /*!
      * Detect if there is an intersection between a segment and a triangle
@@ -87,7 +89,7 @@ namespace geode
      * triangle. Returns outside if there is no intersection or the segment is
      * coplanar with the triangle
      */
-    SegmentTriangleIntersection opengeode_geometry_api
+    [[nodiscard]] SegmentTriangleIntersection opengeode_geometry_api
         segment_triangle_intersection_detection(
             const Segment3D& segment, const Triangle3D& triangle );
 
@@ -97,6 +99,7 @@ namespace geode
      * Returns outside if there is no intersection or the segment is
      * coplanar with the plane
      */
-    POSITION opengeode_geometry_api segment_plane_intersection_detection(
-        const Segment3D& segment, const Plane& plane );
+    [[nodiscard]] POSITION opengeode_geometry_api
+        segment_plane_intersection_detection(
+            const Segment3D& segment, const Plane& plane );
 } // namespace geode

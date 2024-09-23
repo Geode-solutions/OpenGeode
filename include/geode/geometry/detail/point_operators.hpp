@@ -30,7 +30,7 @@ namespace geode
     namespace detail
     {
         template < template < index_t > class Coords, index_t dimension >
-        Coords< dimension > coords_multiply(
+        [[nodiscard]] Coords< dimension > coords_multiply(
             const Coords< dimension > &input, double multiplier )
         {
             auto result = input;
@@ -42,7 +42,7 @@ namespace geode
         }
 
         template < template < index_t > class Coords, index_t dimension >
-        Coords< dimension > coords_divide(
+        [[nodiscard]] Coords< dimension > coords_divide(
             const Coords< dimension > &input, double divider )
         {
             OPENGEODE_EXCEPTION( std::fabs( divider ) > 1e-30,
@@ -57,7 +57,7 @@ namespace geode
         }
 
         template < template < index_t > class Coords, index_t dimension >
-        Coords< dimension > coords_add(
+        [[nodiscard]] Coords< dimension > coords_add(
             const Coords< dimension > &input, const Coords< dimension > &other )
         {
             auto result = input;
@@ -69,7 +69,7 @@ namespace geode
         }
 
         template < template < index_t > class Coords, index_t dimension >
-        Coords< dimension > coords_substract(
+        [[nodiscard]] Coords< dimension > coords_substract(
             const Coords< dimension > &input, const Coords< dimension > &other )
         {
             auto result = input;

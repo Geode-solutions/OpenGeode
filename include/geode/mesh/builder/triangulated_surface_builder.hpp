@@ -49,7 +49,8 @@ namespace geode
          * Create the builder associated with a TriangulatedSurface.
          * @param[in] mesh The TriangulatedSurface to build/modify
          */
-        static std::unique_ptr< TriangulatedSurfaceBuilder< dimension > >
+        [[nodiscard]] static std::unique_ptr<
+            TriangulatedSurfaceBuilder< dimension > >
             create( TriangulatedSurface< dimension >& mesh );
 
         /*!

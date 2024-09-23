@@ -42,31 +42,34 @@ namespace geode
 
         virtual ~CellArray();
 
-        local_index_t nb_cell_neighbors() const
+        [[nodiscard]] local_index_t nb_cell_neighbors() const
         {
             return nb_cell_neighbors_static();
         }
 
-        static constexpr local_index_t nb_cell_neighbors_static()
+        [[nodiscard]] static constexpr local_index_t nb_cell_neighbors_static()
         {
             return 2 * dimension;
         }
 
-        index_t nb_cells() const;
+        [[nodiscard]] index_t nb_cells() const;
 
-        index_t nb_cells_in_direction( index_t direction ) const;
+        [[nodiscard]] index_t nb_cells_in_direction( index_t direction ) const;
 
-        virtual index_t cell_index( const CellIndices& index ) const = 0;
+        [[nodiscard]] virtual index_t cell_index(
+            const CellIndices& index ) const = 0;
 
-        virtual CellIndices cell_indices( index_t index ) const = 0;
+        [[nodiscard]] virtual CellIndices cell_indices(
+            index_t index ) const = 0;
 
-        std::optional< CellIndices > next_cell(
+        [[nodiscard]] std::optional< CellIndices > next_cell(
             const CellIndices& index, index_t direction ) const;
 
-        std::optional< CellIndices > previous_cell(
+        [[nodiscard]] std::optional< CellIndices > previous_cell(
             const CellIndices& index, index_t direction ) const;
 
-        bool is_cell_on_border( const CellIndices& cell_indices ) const;
+        [[nodiscard]] bool is_cell_on_border(
+            const CellIndices& cell_indices ) const;
 
     protected:
         CellArray();

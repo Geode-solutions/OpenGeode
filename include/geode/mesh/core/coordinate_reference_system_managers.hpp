@@ -49,31 +49,31 @@ namespace geode
     public:
         ~CoordinateReferenceSystemManagers();
 
-        const CoordinateReferenceSystemManager1D&
+        [[nodiscard]] const CoordinateReferenceSystemManager1D&
             coordinate_reference_system_manager1D() const;
 
-        const CoordinateReferenceSystemManager2D&
+        [[nodiscard]] const CoordinateReferenceSystemManager2D&
             coordinate_reference_system_manager2D() const;
 
-        const CoordinateReferenceSystemManager3D&
+        [[nodiscard]] const CoordinateReferenceSystemManager3D&
             coordinate_reference_system_manager3D() const;
 
-        const CoordinateReferenceSystemManager< dimension >&
+        [[nodiscard]] const CoordinateReferenceSystemManager< dimension >&
             main_coordinate_reference_system_manager() const;
 
-        const Point< dimension >& point( index_t vertex ) const;
+        [[nodiscard]] const Point< dimension >& point( index_t vertex ) const;
 
     public:
-        CoordinateReferenceSystemManager1D&
+        [[nodiscard]] CoordinateReferenceSystemManager1D&
             coordinate_reference_system_manager1D( CRSManagersKey );
 
-        CoordinateReferenceSystemManager2D&
+        [[nodiscard]] CoordinateReferenceSystemManager2D&
             coordinate_reference_system_manager2D( CRSManagersKey );
 
-        CoordinateReferenceSystemManager3D&
+        [[nodiscard]] CoordinateReferenceSystemManager3D&
             coordinate_reference_system_manager3D( CRSManagersKey );
 
-        CoordinateReferenceSystemManager< dimension >&
+        [[nodiscard]] CoordinateReferenceSystemManager< dimension >&
             main_coordinate_reference_system_manager( CRSManagersKey );
 
         void set_point(

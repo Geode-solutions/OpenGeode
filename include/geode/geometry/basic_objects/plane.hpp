@@ -49,9 +49,9 @@ namespace geode
         GenericPlane( GenericPlane&& other ) noexcept;
         GenericPlane& operator=( GenericPlane&& other ) noexcept;
 
-        const Vector3D& normal() const;
-        const Point3D& origin() const;
-        double plane_constant() const;
+        [[nodiscard]] const Vector3D& normal() const;
+        [[nodiscard]] const Point3D& origin() const;
+        [[nodiscard]] double plane_constant() const;
 
     private:
         Vector3D normal_;

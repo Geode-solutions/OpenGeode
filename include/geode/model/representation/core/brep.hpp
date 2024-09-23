@@ -103,11 +103,11 @@ namespace geode
             BoundaryCornerRange( const BoundaryCornerRange& range );
             ~BoundaryCornerRange();
 
-            const BoundaryCornerRange& begin() const;
+            [[nodiscard]] const BoundaryCornerRange& begin() const;
 
-            const BoundaryCornerRange& end() const;
+            [[nodiscard]] const BoundaryCornerRange& end() const;
 
-            const Corner3D& operator*() const;
+            [[nodiscard]] const Corner3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -121,11 +121,11 @@ namespace geode
             BoundaryLineRange( const BoundaryLineRange& range );
             ~BoundaryLineRange();
 
-            const BoundaryLineRange& begin() const;
+            [[nodiscard]] const BoundaryLineRange& begin() const;
 
-            const BoundaryLineRange& end() const;
+            [[nodiscard]] const BoundaryLineRange& end() const;
 
-            const Line3D& operator*() const;
+            [[nodiscard]] const Line3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -139,11 +139,11 @@ namespace geode
             BoundarySurfaceRange( const BoundarySurfaceRange& range );
             ~BoundarySurfaceRange();
 
-            const BoundarySurfaceRange& begin() const;
+            [[nodiscard]] const BoundarySurfaceRange& begin() const;
 
-            const BoundarySurfaceRange& end() const;
+            [[nodiscard]] const BoundarySurfaceRange& end() const;
 
-            const Surface3D& operator*() const;
+            [[nodiscard]] const Surface3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -157,11 +157,11 @@ namespace geode
             IncidentLineRange( const IncidentLineRange& range );
             ~IncidentLineRange();
 
-            const IncidentLineRange& begin() const;
+            [[nodiscard]] const IncidentLineRange& begin() const;
 
-            const IncidentLineRange& end() const;
+            [[nodiscard]] const IncidentLineRange& end() const;
 
-            const Line3D& operator*() const;
+            [[nodiscard]] const Line3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -175,11 +175,11 @@ namespace geode
             IncidentSurfaceRange( const IncidentSurfaceRange& range );
             ~IncidentSurfaceRange();
 
-            const IncidentSurfaceRange& begin() const;
+            [[nodiscard]] const IncidentSurfaceRange& begin() const;
 
-            const IncidentSurfaceRange& end() const;
+            [[nodiscard]] const IncidentSurfaceRange& end() const;
 
-            const Surface3D& operator*() const;
+            [[nodiscard]] const Surface3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -193,11 +193,11 @@ namespace geode
             IncidentBlockRange( const IncidentBlockRange& range );
             ~IncidentBlockRange();
 
-            const IncidentBlockRange& begin() const;
+            [[nodiscard]] const IncidentBlockRange& begin() const;
 
-            const IncidentBlockRange& end() const;
+            [[nodiscard]] const IncidentBlockRange& end() const;
 
-            const Block3D& operator*() const;
+            [[nodiscard]] const Block3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -212,13 +212,13 @@ namespace geode
             InternalCornerRange( const InternalCornerRange& range );
             ~InternalCornerRange();
 
-            const InternalCornerRange& begin() const;
+            [[nodiscard]] const InternalCornerRange& begin() const;
 
-            const InternalCornerRange& end() const;
+            [[nodiscard]] const InternalCornerRange& end() const;
 
             void operator++();
 
-            const Corner3D& operator*() const;
+            [[nodiscard]] const Corner3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -233,13 +233,13 @@ namespace geode
             InternalLineRange( const InternalLineRange& range );
             ~InternalLineRange();
 
-            const InternalLineRange& begin() const;
+            [[nodiscard]] const InternalLineRange& begin() const;
 
-            const InternalLineRange& end() const;
+            [[nodiscard]] const InternalLineRange& end() const;
 
             void operator++();
 
-            const Line3D& operator*() const;
+            [[nodiscard]] const Line3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -253,13 +253,13 @@ namespace geode
             InternalSurfaceRange( const InternalSurfaceRange& range );
             ~InternalSurfaceRange();
 
-            const InternalSurfaceRange& begin() const;
+            [[nodiscard]] const InternalSurfaceRange& begin() const;
 
-            const InternalSurfaceRange& end() const;
+            [[nodiscard]] const InternalSurfaceRange& end() const;
 
             void operator++();
 
-            const Surface3D& operator*() const;
+            [[nodiscard]] const Surface3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -274,13 +274,13 @@ namespace geode
             EmbeddingSurfaceRange( const EmbeddingSurfaceRange& range );
             ~EmbeddingSurfaceRange();
 
-            const EmbeddingSurfaceRange& begin() const;
+            [[nodiscard]] const EmbeddingSurfaceRange& begin() const;
 
-            const EmbeddingSurfaceRange& end() const;
+            [[nodiscard]] const EmbeddingSurfaceRange& end() const;
 
             void operator++();
 
-            const Surface3D& operator*() const;
+            [[nodiscard]] const Surface3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -296,13 +296,13 @@ namespace geode
             EmbeddingBlockRange( const EmbeddingBlockRange& range );
             ~EmbeddingBlockRange();
 
-            const EmbeddingBlockRange& begin() const;
+            [[nodiscard]] const EmbeddingBlockRange& begin() const;
 
-            const EmbeddingBlockRange& end() const;
+            [[nodiscard]] const EmbeddingBlockRange& end() const;
 
             void operator++();
 
-            const Block3D& operator*() const;
+            [[nodiscard]] const Block3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -317,11 +317,11 @@ namespace geode
             ItemCornerRange( const ItemCornerRange& range );
             ~ItemCornerRange();
 
-            const ItemCornerRange& begin() const;
+            [[nodiscard]] const ItemCornerRange& begin() const;
 
-            const ItemCornerRange& end() const;
+            [[nodiscard]] const ItemCornerRange& end() const;
 
-            const Corner3D& operator*() const;
+            [[nodiscard]] const Corner3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -335,11 +335,11 @@ namespace geode
             ItemLineRange( const ItemLineRange& range );
             ~ItemLineRange();
 
-            const ItemLineRange& begin() const;
+            [[nodiscard]] const ItemLineRange& begin() const;
 
-            const ItemLineRange& end() const;
+            [[nodiscard]] const ItemLineRange& end() const;
 
-            const Line3D& operator*() const;
+            [[nodiscard]] const Line3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -356,11 +356,11 @@ namespace geode
             ItemSurfaceRange( const ItemSurfaceRange& range );
             ~ItemSurfaceRange();
 
-            const ItemSurfaceRange& begin() const;
+            [[nodiscard]] const ItemSurfaceRange& begin() const;
 
-            const ItemSurfaceRange& end() const;
+            [[nodiscard]] const ItemSurfaceRange& end() const;
 
-            const Surface3D& operator*() const;
+            [[nodiscard]] const Surface3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -375,11 +375,11 @@ namespace geode
             ItemBlockRange( const ItemBlockRange& range );
             ~ItemBlockRange();
 
-            const ItemBlockRange& begin() const;
+            [[nodiscard]] const ItemBlockRange& begin() const;
 
-            const ItemBlockRange& end() const;
+            [[nodiscard]] const ItemBlockRange& end() const;
 
-            const Block3D& operator*() const;
+            [[nodiscard]] const Block3D& operator*() const;
 
         private:
             const BRep& brep_;
@@ -391,126 +391,149 @@ namespace geode
         BRep& operator=( BRep&& brep );
         ~BRep();
 
-        BRep clone() const;
+        [[nodiscard]] BRep clone() const;
 
-        BoundaryCornerRange boundaries( const Line3D& line ) const;
+        [[nodiscard]] BoundaryCornerRange boundaries(
+            const Line3D& line ) const;
 
-        BoundaryLineRange boundaries( const Surface3D& surface ) const;
+        [[nodiscard]] BoundaryLineRange boundaries(
+            const Surface3D& surface ) const;
 
-        BoundarySurfaceRange boundaries( const Block3D& block ) const;
+        [[nodiscard]] BoundarySurfaceRange boundaries(
+            const Block3D& block ) const;
 
-        IncidentLineRange incidences( const Corner3D& corner ) const;
-
-        IncidentSurfaceRange incidences( const Line3D& line ) const;
-
-        IncidentBlockRange incidences( const Surface3D& surface ) const;
-
-        index_t nb_internal_corners( const Surface3D& surface ) const;
-
-        InternalCornerRange internal_corners( const Surface3D& surface ) const;
-
-        index_t nb_internal_lines( const Surface3D& surface ) const;
-
-        InternalLineRange internal_lines( const Surface3D& surface ) const;
-
-        index_t nb_internal_corners( const Block3D& block ) const;
-
-        InternalCornerRange internal_corners( const Block3D& block ) const;
-
-        index_t nb_internal_lines( const Block3D& block ) const;
-
-        InternalLineRange internal_lines( const Block3D& block ) const;
-
-        index_t nb_internal_surfaces( const Block3D& block ) const;
-
-        InternalSurfaceRange internal_surfaces( const Block3D& block ) const;
-
-        index_t nb_embedding_surfaces( const Corner3D& corner ) const;
-
-        EmbeddingSurfaceRange embedding_surfaces(
+        [[nodiscard]] IncidentLineRange incidences(
             const Corner3D& corner ) const;
 
-        index_t nb_embedding_surfaces( const Line3D& line ) const;
+        [[nodiscard]] IncidentSurfaceRange incidences(
+            const Line3D& line ) const;
 
-        EmbeddingSurfaceRange embedding_surfaces( const Line3D& line ) const;
+        [[nodiscard]] IncidentBlockRange incidences(
+            const Surface3D& surface ) const;
 
-        index_t nb_embedding_blocks( const Corner3D& corner ) const;
+        [[nodiscard]] index_t nb_internal_corners(
+            const Surface3D& surface ) const;
 
-        EmbeddingBlockRange embedding_blocks( const Corner3D& corner ) const;
+        [[nodiscard]] InternalCornerRange internal_corners(
+            const Surface3D& surface ) const;
 
-        index_t nb_embedding_blocks( const Line3D& line ) const;
+        [[nodiscard]] index_t nb_internal_lines(
+            const Surface3D& surface ) const;
 
-        EmbeddingBlockRange embedding_blocks( const Line3D& line ) const;
+        [[nodiscard]] InternalLineRange internal_lines(
+            const Surface3D& surface ) const;
 
-        index_t nb_embedding_blocks( const Surface3D& surface ) const;
+        [[nodiscard]] index_t nb_internal_corners( const Block3D& block ) const;
 
-        EmbeddingBlockRange embedding_blocks( const Surface3D& surface ) const;
+        [[nodiscard]] InternalCornerRange internal_corners(
+            const Block3D& block ) const;
 
-        ItemSurfaceRange model_boundary_items(
+        [[nodiscard]] index_t nb_internal_lines( const Block3D& block ) const;
+
+        [[nodiscard]] InternalLineRange internal_lines(
+            const Block3D& block ) const;
+
+        [[nodiscard]] index_t nb_internal_surfaces(
+            const Block3D& block ) const;
+
+        [[nodiscard]] InternalSurfaceRange internal_surfaces(
+            const Block3D& block ) const;
+
+        [[nodiscard]] index_t nb_embedding_surfaces(
+            const Corner3D& corner ) const;
+
+        [[nodiscard]] EmbeddingSurfaceRange embedding_surfaces(
+            const Corner3D& corner ) const;
+
+        [[nodiscard]] index_t nb_embedding_surfaces( const Line3D& line ) const;
+
+        [[nodiscard]] EmbeddingSurfaceRange embedding_surfaces(
+            const Line3D& line ) const;
+
+        [[nodiscard]] index_t nb_embedding_blocks(
+            const Corner3D& corner ) const;
+
+        [[nodiscard]] EmbeddingBlockRange embedding_blocks(
+            const Corner3D& corner ) const;
+
+        [[nodiscard]] index_t nb_embedding_blocks( const Line3D& line ) const;
+
+        [[nodiscard]] EmbeddingBlockRange embedding_blocks(
+            const Line3D& line ) const;
+
+        [[nodiscard]] index_t nb_embedding_blocks(
+            const Surface3D& surface ) const;
+
+        [[nodiscard]] EmbeddingBlockRange embedding_blocks(
+            const Surface3D& surface ) const;
+
+        [[nodiscard]] ItemSurfaceRange model_boundary_items(
             const ModelBoundary3D& boundary ) const;
 
-        ItemCornerRange corner_collection_items(
+        [[nodiscard]] ItemCornerRange corner_collection_items(
             const CornerCollection3D& collection ) const;
 
-        ItemLineRange line_collection_items(
+        [[nodiscard]] ItemLineRange line_collection_items(
             const LineCollection3D& collection ) const;
 
-        ItemSurfaceRange surface_collection_items(
+        [[nodiscard]] ItemSurfaceRange surface_collection_items(
             const SurfaceCollection3D& collection ) const;
 
-        ItemBlockRange block_collection_items(
+        [[nodiscard]] ItemBlockRange block_collection_items(
             const BlockCollection3D& collection ) const;
 
-        bool is_closed( const Line3D& line ) const;
+        [[nodiscard]] bool is_closed( const Line3D& line ) const;
 
-        bool is_closed( const Surface3D& surface ) const;
+        [[nodiscard]] bool is_closed( const Surface3D& surface ) const;
 
-        bool is_boundary( const Corner3D& corner, const Line3D& line ) const;
+        [[nodiscard]] bool is_boundary(
+            const Corner3D& corner, const Line3D& line ) const;
 
-        bool is_boundary( const Line3D& line, const Surface3D& surface ) const;
+        [[nodiscard]] bool is_boundary(
+            const Line3D& line, const Surface3D& surface ) const;
 
-        bool is_boundary(
+        [[nodiscard]] bool is_boundary(
             const Surface3D& surface, const Block3D& block ) const;
 
-        bool is_internal(
+        [[nodiscard]] bool is_internal(
             const Corner3D& corner, const Surface3D& surface ) const;
 
-        bool is_internal( const Line3D& line, const Surface3D& surface ) const;
+        [[nodiscard]] bool is_internal(
+            const Line3D& line, const Surface3D& surface ) const;
 
-        bool is_internal( const Corner3D& corner, const Block3D& block ) const;
+        [[nodiscard]] bool is_internal(
+            const Corner3D& corner, const Block3D& block ) const;
 
-        bool is_internal( const Line3D& line, const Block3D& block ) const;
+        [[nodiscard]] bool is_internal(
+            const Line3D& line, const Block3D& block ) const;
 
-        bool is_internal(
+        [[nodiscard]] bool is_internal(
             const Surface3D& surface, const Block3D& block ) const;
 
-        bool is_model_boundary_item(
+        [[nodiscard]] bool is_model_boundary_item(
             const Surface3D& surface, const ModelBoundary3D& boundary ) const;
 
-        bool is_corner_collection_item(
+        [[nodiscard]] bool is_corner_collection_item(
             const Corner3D& surface, const CornerCollection3D& boundary ) const;
 
-        bool is_line_collection_item(
+        [[nodiscard]] bool is_line_collection_item(
             const Line3D& surface, const LineCollection3D& boundary ) const;
 
-        bool is_surface_collection_item( const Surface3D& surface,
+        [[nodiscard]] bool is_surface_collection_item( const Surface3D& surface,
             const SurfaceCollection3D& boundary ) const;
 
-        bool is_block_collection_item(
+        [[nodiscard]] bool is_block_collection_item(
             const Block3D& surface, const BlockCollection3D& boundary ) const;
 
-        /*!
-         * Compute the bounding box from component meshes
-         */
-        BoundingBox3D bounding_box() const;
+        [[nodiscard]] BoundingBox3D bounding_box() const;
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension = "og_brep";
             return extension;
         }
 
-        std::string_view native_extension() const
+        [[nodiscard]] std::string_view native_extension() const
         {
             return native_extension_static();
         }

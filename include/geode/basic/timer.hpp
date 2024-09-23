@@ -37,9 +37,9 @@ namespace geode
         Timer( Timer&& other ) noexcept;
         ~Timer();
 
-        absl::Duration raw_duration() const;
+        [[nodiscard]] absl::Duration raw_duration() const;
 
-        std::string duration() const;
+        [[nodiscard]] std::string duration() const;
 
         void reset();
 

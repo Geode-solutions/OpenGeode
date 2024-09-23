@@ -59,51 +59,57 @@ namespace geode
 
         bool contains( const Point< dimension >& point ) const;
 
-        bool intersects( const BoundingBox< dimension >& bbox ) const;
+        [[nodiscard]] bool intersects(
+            const BoundingBox< dimension >& bbox ) const;
 
-        bool intersects( const Ray< dimension >& ray ) const;
+        [[nodiscard]] bool intersects( const Ray< dimension >& ray ) const;
 
-        bool intersects( const InfiniteLine< dimension >& line ) const;
+        [[nodiscard]] bool intersects(
+            const InfiniteLine< dimension >& line ) const;
 
         /*!
          * Returns true if the element is crossing, is inside, or is containing
          * the bbox
          */
-        bool intersects( const Segment< dimension >& segment ) const;
+        [[nodiscard]] bool intersects(
+            const Segment< dimension >& segment ) const;
 
         /*!
          * Returns true if the element is crossing, is inside (or is containing
          * the bbox in 2D)
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 2 || T == 3, bool >::type intersects(
-            const Triangle< T >& triangle ) const;
+        [[nodiscard]] typename std::enable_if< T == 2 || T == 3, bool >::type
+            intersects( const Triangle< T >& triangle ) const;
 
         /*!
          * Returns true if the element is crossing, is inside, or is containing
          * the bbox
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, bool >::type intersects(
+        [[nodiscard]] typename std::enable_if< T == 3, bool >::type intersects(
             const Tetrahedron& tetra ) const;
 
         /*!
          * Returns the distance between the point and the box.
          * If the point is inside the box, the distance is negative.
          */
-        double signed_distance( const Point< dimension >& point ) const;
+        [[nodiscard]] double signed_distance(
+            const Point< dimension >& point ) const;
 
-        const Point< dimension >& min() const;
+        [[nodiscard]] const Point< dimension >& min() const;
 
-        const Point< dimension >& max() const;
+        [[nodiscard]] const Point< dimension >& max() const;
 
-        Point< dimension > center() const;
+        [[nodiscard]] Point< dimension > center() const;
 
-        Vector< dimension > diagonal() const;
+        [[nodiscard]] Vector< dimension > diagonal() const;
 
-        std::tuple< local_index_t, double > smallest_length() const;
+        [[nodiscard]] std::tuple< local_index_t, double >
+            smallest_length() const;
 
-        std::tuple< local_index_t, double > largest_length() const;
+        [[nodiscard]] std::tuple< local_index_t, double >
+            largest_length() const;
 
     private:
         Point< dimension > min_;

@@ -45,8 +45,9 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        const MeshImpl& impl, std::string_view filename );
+    [[nodiscard]] std::unique_ptr< PolyhedralSolid< dimension > >
+        load_polyhedral_solid(
+            const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an PolyhedralSolid.
@@ -55,8 +56,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        std::string_view filename );
+    [[nodiscard]] std::unique_ptr< PolyhedralSolid< dimension > >
+        load_polyhedral_solid( std::string_view filename );
 
     template < index_t dimension >
     class PolyhedralSolidInput
@@ -79,11 +80,12 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename PolyhedralSolidInput< dimension >::MissingFiles
+    [[nodiscard]] typename PolyhedralSolidInput< dimension >::MissingFiles
         check_polyhedral_solid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_polyhedral_solid_loadable( std::string_view filename );
+    [[nodiscard]] bool is_polyhedral_solid_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     using PolyhedralSolidInputFactory = Factory< std::string,

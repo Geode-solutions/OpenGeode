@@ -61,23 +61,23 @@ namespace geode
         Surface( Surface&& other ) noexcept;
         ~Surface();
 
-        static ComponentType component_type_static()
+        [[nodiscard]] static ComponentType component_type_static()
         {
             return ComponentType{ "Surface" };
         }
 
-        ComponentType component_type() const final
+        [[nodiscard]] ComponentType component_type() const final
         {
             return component_type_static();
         }
 
-        ComponentID component_id() const
+        [[nodiscard]] ComponentID component_id() const
         {
             return { this->component_type_static(), this->id() };
         };
 
         template < typename TypedMesh = Mesh >
-        const TypedMesh& mesh() const
+        [[nodiscard]] const TypedMesh& mesh() const
         {
             return dynamic_cast< const TypedMesh& >( get_mesh() );
         }
@@ -88,12 +88,12 @@ namespace geode
         Surface( const MeshImpl& impl, SurfacesKey key );
 
         template < typename TypedMesh = Mesh >
-        TypedMesh& modifiable_mesh( SurfacesKey /*unused*/ )
+        [[nodiscard]] TypedMesh& modifiable_mesh( SurfacesKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
-        const MeshImpl& mesh_type() const;
+        [[nodiscard]] const MeshImpl& mesh_type() const;
 
         void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesKey key );
 
@@ -102,7 +102,8 @@ namespace geode
         void set_surface_name( std::string_view name, SurfacesBuilderKey key );
 
         template < typename TypedMesh = Mesh >
-        TypedMesh& modifiable_mesh( SurfacesBuilderKey /*unused*/ )
+        [[nodiscard]] TypedMesh& modifiable_mesh(
+            SurfacesBuilderKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
@@ -112,9 +113,9 @@ namespace geode
 
         explicit Surface( const MeshImpl& impl );
 
-        Mesh& get_modifiable_mesh();
+        [[nodiscard]] Mesh& get_modifiable_mesh();
 
-        const Mesh& get_mesh() const;
+        [[nodiscard]] const Mesh& get_mesh() const;
 
         template < typename Archive >
         void serialize( Archive& archive );

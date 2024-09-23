@@ -57,7 +57,7 @@ namespace geode
     private:
         ProgressLoggerManager();
 
-        static ProgressLoggerManager& instance();
+        [[nodiscard]] static ProgressLoggerManager& instance();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

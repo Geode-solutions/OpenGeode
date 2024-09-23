@@ -52,9 +52,9 @@ namespace geode
         GenericSphere< PointType, dimension >& operator=(
             GenericSphere< PointType, dimension >&& other ) noexcept;
 
-        const Point< dimension >& origin() const;
-        double radius() const;
-        BoundingBox< dimension > bounding_box() const;
+        [[nodiscard]] const Point< dimension >& origin() const;
+        [[nodiscard]] double radius() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
     private:
         PointType origin_;

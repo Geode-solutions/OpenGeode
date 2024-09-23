@@ -57,33 +57,38 @@ namespace geode
         LightRegularGrid( LightRegularGrid&& other ) noexcept;
         ~LightRegularGrid();
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension =
                 absl::StrCat( "og_lrgd", dimension, "d" );
             return extension;
         }
 
-        std::string_view native_extension() const
+        [[nodiscard]] std::string_view native_extension() const
         {
             return native_extension_static();
         }
 
-        index_t vertex_index( const VertexIndices& index ) const override;
+        [[nodiscard]] index_t vertex_index(
+            const VertexIndices& index ) const override;
 
-        VertexIndices vertex_indices( index_t index ) const override;
+        [[nodiscard]] VertexIndices vertex_indices(
+            index_t index ) const override;
 
-        index_t cell_index( const CellIndices& index ) const override;
+        [[nodiscard]] index_t cell_index(
+            const CellIndices& index ) const override;
 
-        CellIndices cell_indices( index_t index ) const override;
+        [[nodiscard]] CellIndices cell_indices( index_t index ) const override;
 
-        Point< dimension > point( index_t vertex_id ) const;
+        [[nodiscard]] Point< dimension > point( index_t vertex_id ) const;
 
-        VerticesAroundVertex vertices_around_vertex( index_t vertex_id ) const;
+        [[nodiscard]] VerticesAroundVertex vertices_around_vertex(
+            index_t vertex_id ) const;
 
-        AttributeManager& cell_attribute_manager() const override;
+        [[nodiscard]] AttributeManager& cell_attribute_manager() const override;
 
-        AttributeManager& grid_vertex_attribute_manager() const override;
+        [[nodiscard]] AttributeManager&
+            grid_vertex_attribute_manager() const override;
 
     private:
         friend class bitsery::Access;

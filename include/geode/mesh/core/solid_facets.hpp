@@ -52,27 +52,28 @@ namespace geode
         explicit SolidFacets( const SolidMesh< dimension >& solid );
         ~SolidFacets();
 
-        index_t nb_facets() const;
+        [[nodiscard]] index_t nb_facets() const;
 
-        bool is_facet_isolated( index_t facet_id ) const;
+        [[nodiscard]] bool is_facet_isolated( index_t facet_id ) const;
 
         /*!
          * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const PolyhedronFacetVertices& facet_vertices( index_t facet_id ) const;
+        [[nodiscard]] const PolyhedronFacetVertices& facet_vertices(
+            index_t facet_id ) const;
 
         /*!
          * Get the index of facet corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        std::optional< index_t > facet_from_vertices(
+        [[nodiscard]] std::optional< index_t > facet_from_vertices(
             const PolyhedronFacetVertices& vertices ) const;
 
         /*!
          * Access to the manager of attributes associated with facets.
          */
-        AttributeManager& facet_attribute_manager() const;
+        [[nodiscard]] AttributeManager& facet_attribute_manager() const;
 
     public:
         std::vector< index_t > update_facet_vertices(

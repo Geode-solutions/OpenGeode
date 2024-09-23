@@ -29,7 +29,8 @@ namespace geode
 {
     namespace internal
     {
-        inline POSITION point_segment_position( const SIDE& s0, const SIDE& s1 )
+        [[nodiscard]] inline POSITION point_segment_position(
+            const SIDE& s0, const SIDE& s1 )
         {
             if( s0 == SIDE::zero )
             {
@@ -46,7 +47,7 @@ namespace geode
             return POSITION::outside;
         }
 
-        inline POSITION point_segment_position(
+        [[nodiscard]] inline POSITION point_segment_position(
             const SIDE& s0, const SIDE& s1, bool points_aligned )
         {
             if( !points_aligned )
@@ -56,7 +57,7 @@ namespace geode
             return point_segment_position( s0, s1 );
         }
 
-        inline POSITION point_triangle_position(
+        [[nodiscard]] inline POSITION point_triangle_position(
             const SIDE s0, const SIDE s1, const SIDE s2 )
         {
             if( s0 == SIDE::zero )
@@ -102,7 +103,7 @@ namespace geode
             return POSITION::outside;
         }
 
-        inline POSITION point_triangle_position(
+        [[nodiscard]] inline POSITION point_triangle_position(
             const SIDE s0, const SIDE s1, const SIDE s2, bool point_on_plane )
         {
             if( !point_on_plane )
@@ -112,7 +113,7 @@ namespace geode
             return point_triangle_position( s0, s1, s2 );
         }
 
-        inline POSITION point_tetrahedron_position(
+        [[nodiscard]] inline POSITION point_tetrahedron_position(
             const std::array< GEO::SIGN, 4 >& signs )
         {
             if( signs[0] == GEO::zero )

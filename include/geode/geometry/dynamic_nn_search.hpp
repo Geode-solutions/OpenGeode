@@ -43,9 +43,9 @@ namespace geode
         DynamicNNSearch( DynamicNNSearch&& other ) noexcept;
         ~DynamicNNSearch();
 
-        index_t nb_points() const;
+        [[nodiscard]] index_t nb_points() const;
 
-        const Point< dimension >& point( index_t index ) const;
+        [[nodiscard]] const Point< dimension >& point( index_t index ) const;
         void add_point( const Point< dimension >& point );
 
         /*!
@@ -55,7 +55,7 @@ namespace geode
          * @param[in] threshold_distance The radius of the sphere
          * @return the list of points inside this distance
          */
-        std::vector< index_t > radius_neighbors(
+        [[nodiscard]] std::vector< index_t > radius_neighbors(
             const Point< dimension >& point, double threshold_distance ) const;
 
     private:

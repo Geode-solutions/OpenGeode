@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
+    [[nodiscard]] std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
         const MeshImpl& impl, std::string_view filename );
 
     /*!
@@ -55,7 +55,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
+    [[nodiscard]] std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
         std::string_view filename );
 
     template < index_t dimension >
@@ -78,11 +78,11 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename HybridSolidInput< dimension >::MissingFiles
+    [[nodiscard]] typename HybridSolidInput< dimension >::MissingFiles
         check_hybrid_solid_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_hybrid_solid_loadable( std::string_view filename );
+    [[nodiscard]] bool is_hybrid_solid_loadable( std::string_view filename );
 
     template < index_t dimension >
     using HybridSolidInputFactory =

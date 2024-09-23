@@ -56,27 +56,28 @@ namespace geode
         explicit SurfaceEdges( const SurfaceMesh< dimension >& surface );
         ~SurfaceEdges();
 
-        index_t nb_edges() const;
+        [[nodiscard]] index_t nb_edges() const;
 
-        bool is_edge_isolated( index_t edge_id ) const;
+        [[nodiscard]] bool is_edge_isolated( index_t edge_id ) const;
 
         /*!
          * Return the indices of edge vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
+        [[nodiscard]] const std::array< index_t, 2 >& edge_vertices(
+            index_t edge_id ) const;
 
         /*!
          * Get the index of edge corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        std::optional< index_t > edge_from_vertices(
+        [[nodiscard]] std::optional< index_t > edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
          * Access to the manager of attributes associated with edges.
          */
-        AttributeManager& edge_attribute_manager() const;
+        [[nodiscard]] AttributeManager& edge_attribute_manager() const;
 
     public:
         void update_edge_vertices(

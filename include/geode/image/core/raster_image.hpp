@@ -51,27 +51,28 @@ namespace geode
         RasterImage& operator=( RasterImage&& other ) noexcept;
         ~RasterImage();
 
-        static std::string native_extension_static()
+        [[nodiscard]] static std::string native_extension_static()
         {
             static const auto extension =
                 absl::StrCat( "og_img", dimension, "d" );
             return extension;
         }
 
-        std::string native_extension() const
+        [[nodiscard]] std::string native_extension() const
         {
             return native_extension_static();
         }
 
-        index_t cell_index( const CellIndices& index ) const override;
+        [[nodiscard]] index_t cell_index(
+            const CellIndices& index ) const override;
 
-        CellIndices cell_indices( index_t index ) const override;
+        [[nodiscard]] CellIndices cell_indices( index_t index ) const override;
 
-        const RGBColor& color( index_t index ) const;
+        [[nodiscard]] const RGBColor& color( index_t index ) const;
 
         void set_color( index_t index, RGBColor color );
 
-        RasterImage clone() const;
+        [[nodiscard]] RasterImage clone() const;
 
     private:
         template < typename Archive >

@@ -41,10 +41,11 @@ namespace geode
 
 namespace geode
 {
-    PolyhedronVertices opengeode_model_api polyhedron_unique_vertices(
-        const BRep& model, const Block3D& block, index_t polyhedron_id );
+    [[nodiscard]] PolyhedronVertices opengeode_model_api
+        polyhedron_unique_vertices(
+            const BRep& model, const Block3D& block, index_t polyhedron_id );
 
-    std::vector< MeshElement > opengeode_model_api component_mesh_polyhedra(
-        const BRep& brep,
-        const PolyhedronVertices& polyhedron_unique_vertices );
+    [[nodiscard]] std::vector< MeshElement >
+        opengeode_model_api component_mesh_polyhedra( const BRep& brep,
+            const PolyhedronVertices& polyhedron_unique_vertices );
 } // namespace geode

@@ -51,11 +51,12 @@ namespace geode
         Texture( Texture&& other ) noexcept;
         ~Texture();
 
-        const RasterImage2D& image() const;
+        [[nodiscard]] const RasterImage2D& image() const;
 
         void set_image( RasterImage2D&& image );
 
-        const Point2D& texture_coordinates( const PolygonVertex& vertex ) const;
+        [[nodiscard]] const Point2D& texture_coordinates(
+            const PolygonVertex& vertex ) const;
 
         void set_texture_coordinates(
             const PolygonVertex& vertex, const Point2D& coordinates ) const;

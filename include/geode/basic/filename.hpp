@@ -29,21 +29,21 @@
 
 namespace geode
 {
-    std::filesystem::path opengeode_basic_api filename_with_extension(
-        const std::filesystem::path& path );
+    [[nodiscard]] std::filesystem::path opengeode_basic_api
+        filename_with_extension( const std::filesystem::path& path );
 
-    std::filesystem::path opengeode_basic_api filename_without_extension(
-        const std::filesystem::path& path );
+    [[nodiscard]] std::filesystem::path opengeode_basic_api
+        filename_without_extension( const std::filesystem::path& path );
 
-    std::filesystem::path opengeode_basic_api filepath_without_extension(
-        const std::filesystem::path& path );
+    [[nodiscard]] std::filesystem::path opengeode_basic_api
+        filepath_without_extension( const std::filesystem::path& path );
 
-    std::filesystem::path opengeode_basic_api filepath_without_filename(
-        const std::filesystem::path& path );
+    [[nodiscard]] std::filesystem::path opengeode_basic_api
+        filepath_without_filename( const std::filesystem::path& path );
 
-    std::string_view opengeode_basic_api extension_from_filename(
+    [[nodiscard]] std::string_view opengeode_basic_api extension_from_filename(
         std::string_view filename );
 
-    std::string opengeode_basic_api expand_predefined_folders(
+    [[nodiscard]] std::string opengeode_basic_api expand_predefined_folders(
         std::string_view path );
 } // namespace geode

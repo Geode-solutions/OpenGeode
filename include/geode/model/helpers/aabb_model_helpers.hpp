@@ -40,19 +40,19 @@ namespace geode
 
 namespace geode
 {
-    std::tuple< AABBTree3D, absl::FixedArray< uuid > >
+    [[nodiscard]] std::tuple< AABBTree3D, absl::FixedArray< uuid > >
         opengeode_model_api create_lines_aabb_tree( const BRep& model );
 
-    std::tuple< AABBTree3D, absl::FixedArray< uuid > >
+    [[nodiscard]] std::tuple< AABBTree3D, absl::FixedArray< uuid > >
         opengeode_model_api create_surfaces_aabb_tree( const BRep& model );
 
-    std::tuple< AABBTree3D, absl::FixedArray< uuid > >
+    [[nodiscard]] std::tuple< AABBTree3D, absl::FixedArray< uuid > >
         opengeode_model_api create_blocks_aabb_tree( const BRep& model );
 
-    std::tuple< AABBTree2D, absl::FixedArray< uuid > >
+    [[nodiscard]] std::tuple< AABBTree2D, absl::FixedArray< uuid > >
         opengeode_model_api create_lines_aabb_tree( const Section& model );
 
-    std::tuple< AABBTree2D, absl::FixedArray< uuid > >
+    [[nodiscard]] std::tuple< AABBTree2D, absl::FixedArray< uuid > >
         opengeode_model_api create_surfaces_aabb_tree( const Section& model );
 
     template < index_t dimension >
@@ -71,19 +71,18 @@ namespace geode
     };
     ALIAS_2D_AND_3D( ModelMeshesAABBTree );
 
-    ModelMeshesAABBTree3D opengeode_model_api create_line_meshes_aabb_trees(
-        const BRep& model );
+    [[nodiscard]] ModelMeshesAABBTree3D opengeode_model_api
+        create_line_meshes_aabb_trees( const BRep& model );
 
-    ModelMeshesAABBTree3D opengeode_model_api create_surface_meshes_aabb_trees(
-        const BRep& model );
+    [[nodiscard]] ModelMeshesAABBTree3D opengeode_model_api
+        create_surface_meshes_aabb_trees( const BRep& model );
 
-    ModelMeshesAABBTree3D opengeode_model_api create_block_meshes_aabb_trees(
-        const BRep& model );
+    [[nodiscard]] ModelMeshesAABBTree3D opengeode_model_api
+        create_block_meshes_aabb_trees( const BRep& model );
 
-    ModelMeshesAABBTree2D opengeode_model_api create_line_meshes_aabb_trees(
-        const Section& model );
+    [[nodiscard]] ModelMeshesAABBTree2D opengeode_model_api
+        create_line_meshes_aabb_trees( const Section& model );
 
-    ModelMeshesAABBTree2D opengeode_model_api create_surface_meshes_aabb_trees(
-        const Section& model );
-
+    [[nodiscard]] ModelMeshesAABBTree2D opengeode_model_api
+        create_surface_meshes_aabb_trees( const Section& model );
 } // namespace geode

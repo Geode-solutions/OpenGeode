@@ -63,7 +63,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_polyhedral_solid_saveable(
+    [[nodiscard]] bool is_polyhedral_solid_saveable(
         const PolyhedralSolid< dimension >& polyhedral_solid,
         std::string_view filename );
 

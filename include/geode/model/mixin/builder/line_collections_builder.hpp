@@ -52,7 +52,7 @@ namespace geode
         {
         }
 
-        const uuid& create_line_collection();
+        [[nodiscard]] const uuid& create_line_collection();
 
         void create_line_collection( uuid line_collection_id );
 

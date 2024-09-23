@@ -36,13 +36,14 @@ namespace geode
     /*!
      * Return a 2D vector perpendicular to the given one
      */
-    Vector2D opengeode_geometry_api perpendicular( const Vector2D& v );
+    [[nodiscard]] Vector2D opengeode_geometry_api perpendicular(
+        const Vector2D& v );
 
     /*!
      * Compute the dot product between a 2D vector \p v0 and another 2D vector
      * perpendicular to \p v1.
      */
-    double opengeode_geometry_api dot_perpendicular(
+    [[nodiscard]] double opengeode_geometry_api dot_perpendicular(
         const Vector2D& v0, const Vector2D& v1 );
 
 } // namespace geode

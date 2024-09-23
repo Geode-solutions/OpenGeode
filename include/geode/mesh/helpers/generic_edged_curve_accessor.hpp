@@ -52,47 +52,49 @@ namespace geode
         {
         }
 
-        index_t nb_elements() const
+        [[nodiscard]] index_t nb_elements() const
         {
             return mesh_.nb_edges();
         }
 
-        index_t nb_element_vertices( index_t /*unused*/ ) const
+        [[nodiscard]] index_t nb_element_vertices( index_t /*unused*/ ) const
         {
             return 2;
         }
 
-        index_t nb_element_facets( index_t /*unused*/ ) const
+        [[nodiscard]] index_t nb_element_facets( index_t /*unused*/ ) const
         {
             return 2;
         }
 
-        index_t element_vertex( const ElementVertex& edge_vertex ) const
+        [[nodiscard]] index_t element_vertex(
+            const ElementVertex& edge_vertex ) const
         {
             return mesh_.edge_vertex( edge_vertex );
         }
 
-        ElementVertices element_vertices( index_t edge_id ) const
+        [[nodiscard]] ElementVertices element_vertices( index_t edge_id ) const
         {
             return mesh_.edge_vertices( edge_id );
         }
 
-        Point< dimension > element_barycenter( index_t edge_id ) const
+        [[nodiscard]] Point< dimension > element_barycenter(
+            index_t edge_id ) const
         {
             return mesh_.edge_barycenter( edge_id );
         }
 
-        const uuid& id() const
+        [[nodiscard]] const uuid& id() const
         {
             return mesh_.id();
         }
 
-        const Point< dimension >& point( index_t vertex_id ) const
+        [[nodiscard]] const Point< dimension >& point( index_t vertex_id ) const
         {
             return mesh_.point( vertex_id );
         }
 
-        AttributeManager& element_attribute_manager() const
+        [[nodiscard]] AttributeManager& element_attribute_manager() const
         {
             return mesh_.edge_attribute_manager();
         }

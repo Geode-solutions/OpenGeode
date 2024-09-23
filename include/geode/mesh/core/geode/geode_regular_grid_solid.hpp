@@ -57,28 +57,28 @@ namespace geode
             OpenGeodeRegularGrid&& other ) noexcept;
         ~OpenGeodeRegularGrid();
 
-        static MeshImpl impl_name_static()
+        [[nodiscard]] static MeshImpl impl_name_static()
         {
             return MeshImpl{ "OpenGeodeRegularGrid3D" };
         }
 
-        MeshImpl impl_name() const override
+        [[nodiscard]] MeshImpl impl_name() const override
         {
             return impl_name_static();
         }
 
-        MeshType type_name() const override
+        [[nodiscard]] MeshType type_name() const override
         {
             return RegularGrid< 3 >::type_name_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension = "og_rgd3d";
             return extension;
         }
 
-        std::string_view native_extension() const override
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }

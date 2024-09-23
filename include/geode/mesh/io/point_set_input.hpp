@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< PointSet< dimension > > load_point_set(
+    [[nodiscard]] std::unique_ptr< PointSet< dimension > > load_point_set(
         const MeshImpl& impl, std::string_view filename );
 
     /*!
@@ -55,7 +55,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< PointSet< dimension > > load_point_set(
+    [[nodiscard]] std::unique_ptr< PointSet< dimension > > load_point_set(
         std::string_view filename );
 
     template < index_t dimension >
@@ -75,11 +75,11 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename PointSetInput< dimension >::MissingFiles
+    [[nodiscard]] typename PointSetInput< dimension >::MissingFiles
         check_point_set_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_point_set_loadable( std::string_view filename );
+    [[nodiscard]] bool is_point_set_loadable( std::string_view filename );
 
     template < index_t dimension >
     using PointSetInputFactory =

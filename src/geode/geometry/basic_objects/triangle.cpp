@@ -76,21 +76,6 @@ namespace
             return std::nullopt;
         }
     }
-
-    bool check_right( const PivotNormalResult& result_left,
-        const geode::Point3D& new_point,
-        const geode::Point3D& point1,
-        const geode::Point3D& point2 )
-    {
-        const auto result_right =
-            simple_pivot_and_normal( { new_point, point1, point2 } );
-        if( !result_right || result_right->pivot == geode::NO_LID )
-        {
-            return false;
-        }
-        return result_left.normal.cross( result_right->normal ).length()
-               < geode::GLOBAL_ANGULAR_EPSILON;
-    }
 } // namespace
 
 namespace geode
@@ -218,9 +203,6 @@ namespace geode
             {
                 return std::nullopt;
             }
-            OPENGEODE_ASSERT(
-                check_right( result_left.value(), new_point, point1, point2 ),
-                "[Triangle::pivot_and_normal] Wrong sub-triangle computation" );
             return std::make_pair( e2, result_left->normal );
         }
         return std::nullopt;

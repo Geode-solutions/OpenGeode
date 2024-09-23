@@ -36,13 +36,13 @@ namespace geode
         {
         }
 
-        static std::string_view extension()
+        [[nodiscard]] static std::string_view extension()
         {
             return Section::native_extension_static();
         }
 
         void load_section_files( Section& section, std::string_view directory );
 
-        Section read() final;
+        [[nodiscard]] Section read() final;
     };
 } // namespace geode

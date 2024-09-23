@@ -226,14 +226,16 @@ void test_io(
     const geode::EdgedCurve3D& edged_curve, const std::string& filename )
 {
     geode::save_edged_curve( edged_curve, filename );
-    geode::load_edged_curve< 3 >( filename );
-    const auto reload = geode::load_edged_curve< 3 >(
+    const auto reload = geode::load_edged_curve< 3 >( filename );
+    geode_unused( reload );
+    const auto edged_curve2 = geode::load_edged_curve< 3 >(
         geode::OpenGeodeEdgedCurve3D::impl_name_static(), filename );
-    OPENGEODE_EXCEPTION( reload->nb_edges() == edged_curve.nb_edges(),
+    OPENGEODE_EXCEPTION( edged_curve2->nb_edges() == edged_curve.nb_edges(),
         "[Test] Reload EdgedCurve has wrong number of edges" );
-    OPENGEODE_EXCEPTION( reload->nb_vertices() == edged_curve.nb_vertices(),
+    OPENGEODE_EXCEPTION(
+        edged_curve2->nb_vertices() == edged_curve.nb_vertices(),
         "[Test] Reload EdgedCurve has wrong number of vertices" );
-    auto manager = reload->texture_manager();
+    auto manager = edged_curve2->texture_manager();
     auto texture_names = manager.texture_names();
     OPENGEODE_EXCEPTION( texture_names.size() == 1,
         "[Test] Reloaded EdgedCurve has wrong number of textures" );
@@ -241,8 +243,9 @@ void test_io(
         "[Test] Reloaded EdgedCurve has wrong texture name" );
     for( const auto vertex_id : geode::Range{ edged_curve.nb_vertices() } )
     {
-        OPENGEODE_EXCEPTION( edged_curve.point( vertex_id )
-                                 .inexact_equal( reload->point( vertex_id ) ),
+        OPENGEODE_EXCEPTION(
+            edged_curve.point( vertex_id )
+                .inexact_equal( edged_curve2->point( vertex_id ) ),
             "[Test] Reloaded EdgedCurve has wrong point coordinates" );
     }
 }

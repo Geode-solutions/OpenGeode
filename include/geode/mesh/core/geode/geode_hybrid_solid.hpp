@@ -55,30 +55,30 @@ namespace geode
             OpenGeodeHybridSolid&& other ) noexcept;
         ~OpenGeodeHybridSolid();
 
-        static MeshImpl impl_name_static()
+        [[nodiscard]] static MeshImpl impl_name_static()
         {
             return MeshImpl{ absl::StrCat(
                 "OpenGeodeHybridSolid", dimension, "D" ) };
         }
 
-        MeshImpl impl_name() const override
+        [[nodiscard]] MeshImpl impl_name() const override
         {
             return impl_name_static();
         }
 
-        MeshType type_name() const override
+        [[nodiscard]] MeshType type_name() const override
         {
             return HybridSolid< dimension >::type_name_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension =
                 absl::StrCat( "og_hso", dimension, "d" );
             return extension;
         }
 
-        std::string_view native_extension() const override
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }
@@ -122,32 +122,32 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        index_t get_polyhedron_vertex(
+        [[nodiscard]] index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
 
-        local_index_t get_nb_polyhedron_vertices(
+        [[nodiscard]] local_index_t get_nb_polyhedron_vertices(
             index_t polyhedron_id ) const override;
 
-        local_index_t get_nb_polyhedron_facets(
+        [[nodiscard]] local_index_t get_nb_polyhedron_facets(
             index_t polyhedron_id ) const override;
 
-        local_index_t get_nb_polyhedron_facet_vertices(
+        [[nodiscard]] local_index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
-        PolyhedronVertex get_polyhedron_facet_vertex_id(
+        [[nodiscard]] PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
             const override;
 
-        std::optional< index_t > get_polyhedron_adjacent(
+        [[nodiscard]] std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
-        PolyhedronEdgesVertices polyhedron_edges_vertices(
+        [[nodiscard]] PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const final;
 
-        PolyhedronFacetsVertices polyhedron_facets_vertices(
+        [[nodiscard]] PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
-        typename HybridSolid< dimension >::Type polyhedron_type(
+        [[nodiscard]] typename HybridSolid< dimension >::Type polyhedron_type(
             index_t polyhedron_id ) const final;
 
     private:

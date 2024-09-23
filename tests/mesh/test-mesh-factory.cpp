@@ -58,7 +58,8 @@ void test()
     OPENGEODE_EXCEPTION(
         geode::MeshFactory::type( impl ) == type, "Wrong type" );
 
-    geode::MeshFactory::create_mesh< MeshTest >( impl );
+    const auto mesh = geode::MeshFactory::create_mesh< MeshTest >( impl );
+    geode_unused( mesh );
 }
 
 OPENGEODE_TEST( "mesh-factory" )

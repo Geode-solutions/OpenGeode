@@ -55,7 +55,7 @@ namespace geode
         public:
             ~CornerCollectionRangeBase();
 
-            bool operator!=(
+            [[nodiscard]] bool operator!=(
                 const CornerCollectionRangeBase& /*unused*/ ) const;
 
             void operator++();
@@ -78,22 +78,23 @@ namespace geode
             CornerCollectionRange( const CornerCollectionRange& range );
             ~CornerCollectionRange();
 
-            const CornerCollectionRange& begin() const;
+            [[nodiscard]] const CornerCollectionRange& begin() const;
 
-            const CornerCollectionRange& end() const;
+            [[nodiscard]] const CornerCollectionRange& end() const;
 
-            const CornerCollection< dimension >& operator*() const;
+            [[nodiscard]] const CornerCollection< dimension >&
+                operator*() const;
         };
 
     public:
         ~CornerCollections();
 
-        index_t nb_corner_collections() const;
+        [[nodiscard]] index_t nb_corner_collections() const;
 
-        const CornerCollection< dimension >& corner_collection(
+        [[nodiscard]] const CornerCollection< dimension >& corner_collection(
             const uuid& id ) const;
 
-        CornerCollectionRange corner_collections() const;
+        [[nodiscard]] CornerCollectionRange corner_collections() const;
 
         void save_corner_collections( std::string_view directory ) const;
 
@@ -112,15 +113,16 @@ namespace geode
                 const ModifiableCornerCollectionRange& range );
             ~ModifiableCornerCollectionRange();
 
-            const ModifiableCornerCollectionRange& begin() const;
+            [[nodiscard]] const ModifiableCornerCollectionRange& begin() const;
 
-            const ModifiableCornerCollectionRange& end() const;
+            [[nodiscard]] const ModifiableCornerCollectionRange& end() const;
 
-            CornerCollection< dimension >& operator*() const;
+            [[nodiscard]] CornerCollection< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_corner_collection( CornerCollectionsBuilderKey key );
+        [[nodiscard]] const uuid& create_corner_collection(
+            CornerCollectionsBuilderKey key );
 
         void create_corner_collection(
             uuid corner_collection_id, CornerCollectionsBuilderKey key );
@@ -132,11 +134,12 @@ namespace geode
         void load_corner_collections(
             std::string_view directory, CornerCollectionsBuilderKey key );
 
-        ModifiableCornerCollectionRange modifiable_corner_collections(
-            CornerCollectionsBuilderKey key );
+        [[nodiscard]] ModifiableCornerCollectionRange
+            modifiable_corner_collections( CornerCollectionsBuilderKey key );
 
-        CornerCollection< dimension >& modifiable_corner_collection(
-            const uuid& id, CornerCollectionsBuilderKey key );
+        [[nodiscard]] CornerCollection< dimension >&
+            modifiable_corner_collection(
+                const uuid& id, CornerCollectionsBuilderKey key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

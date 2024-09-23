@@ -42,7 +42,7 @@ namespace geode
      * @param[in] triangle Triangle to compute area
      */
     template < index_t dimension >
-    double triangle_area( const Triangle< dimension >& triangle );
+    [[nodiscard]] double triangle_area( const Triangle< dimension >& triangle );
 
     /*!
      * Compute the signed area of a triangle
@@ -50,7 +50,7 @@ namespace geode
      * returned area is positive if the triangle vertices are ordered
      * counter-clockwise, negative if clockwise.
      */
-    double opengeode_geometry_api triangle_signed_area(
+    [[nodiscard]] double opengeode_geometry_api triangle_signed_area(
         const Triangle2D& triangle );
 
     /*!
@@ -61,18 +61,18 @@ namespace geode
      * than direction, negative if the triangle normal is in the opposition
      * direction.
      */
-    double opengeode_geometry_api triangle_signed_area(
+    [[nodiscard]] double opengeode_geometry_api triangle_signed_area(
         const Triangle3D& triangle, const Vector3D& direction );
 
     /*!
      * Compute the signed volume of a tetrahedron
      */
-    double opengeode_geometry_api tetrahedron_signed_volume(
+    [[nodiscard]] double opengeode_geometry_api tetrahedron_signed_volume(
         const Tetrahedron& tetra );
 
     /*!
      * Compute the (positive) volume of a tetrahedron
      */
-    double opengeode_geometry_api tetrahedron_volume(
+    [[nodiscard]] double opengeode_geometry_api tetrahedron_volume(
         const Tetrahedron& tetra );
 } // namespace geode

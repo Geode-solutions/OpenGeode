@@ -48,7 +48,8 @@ namespace geode
          * Create the builder associated with a Graph.
          * @param[in] mesh The Graph to build/modify
          */
-        static std::unique_ptr< GraphBuilder > create( Graph& mesh );
+        [[nodiscard]] static std::unique_ptr< GraphBuilder > create(
+            Graph& mesh );
 
         /*!
          * Create a new edge.

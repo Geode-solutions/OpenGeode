@@ -41,7 +41,8 @@ namespace geode
             {
             }
 
-            bool operator!=( const PolygonsAroundVertexImpl& other ) const
+            [[nodiscard]] bool operator!=(
+                const PolygonsAroundVertexImpl& other ) const
             {
                 if( vertex_is_on_border != other.vertex_is_on_border )
                 {

@@ -123,7 +123,9 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
 void test_io( const geode::Graph& graph, const std::string& filename )
 {
     geode::save_graph( graph, filename );
-    geode::load_graph( geode::OpenGeodeGraph::impl_name_static(), filename );
+    const auto graph2 = geode::load_graph(
+        geode::OpenGeodeGraph::impl_name_static(), filename );
+    geode_unused( graph2 );
 }
 
 void test_backward_io( const std::string& filename )

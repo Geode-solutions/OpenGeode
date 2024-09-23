@@ -38,12 +38,12 @@ namespace geode
         virtual std::vector< std::string > write(
             const Object& object ) const = 0;
 
-        virtual bool is_saveable( const Object& /*unused*/ ) const
+        [[nodiscard]] virtual bool is_saveable( const Object& /*unused*/ ) const
         {
             return true;
         }
 
     protected:
-        Output( std::string_view filename ) : IOFile( filename ) {}
+        explicit Output( std::string_view filename ) : IOFile( filename ) {}
     };
 } // namespace geode

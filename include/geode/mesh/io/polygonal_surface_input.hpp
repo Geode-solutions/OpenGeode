@@ -45,8 +45,9 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        const MeshImpl& impl, std::string_view filename );
+    [[nodiscard]] std::unique_ptr< PolygonalSurface< dimension > >
+        load_polygonal_surface(
+            const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an PolygonalSurface.
@@ -55,8 +56,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        std::string_view filename );
+    [[nodiscard]] std::unique_ptr< PolygonalSurface< dimension > >
+        load_polygonal_surface( std::string_view filename );
 
     template < index_t dimension >
     class PolygonalSurfaceInput
@@ -77,11 +78,12 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename PolygonalSurfaceInput< dimension >::MissingFiles
+    [[nodiscard]] typename PolygonalSurfaceInput< dimension >::MissingFiles
         check_polygonal_surface_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_polygonal_surface_loadable( std::string_view filename );
+    [[nodiscard]] bool is_polygonal_surface_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     using PolygonalSurfaceInputFactory = Factory< std::string,

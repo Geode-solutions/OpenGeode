@@ -54,7 +54,8 @@ namespace geode
         public:
             ~SurfaceRangeBase();
 
-            bool operator!=( const SurfaceRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const SurfaceRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -74,23 +75,24 @@ namespace geode
             SurfaceRange( const SurfaceRange& range );
             ~SurfaceRange();
 
-            const SurfaceRange& begin() const;
+            [[nodiscard]] const SurfaceRange& begin() const;
 
-            const SurfaceRange& end() const;
+            [[nodiscard]] const SurfaceRange& end() const;
 
-            const Surface< dimension >& operator*() const;
+            [[nodiscard]] const Surface< dimension >& operator*() const;
         };
 
     public:
         ~Surfaces();
 
-        index_t nb_surfaces() const;
+        [[nodiscard]] index_t nb_surfaces() const;
 
-        bool has_surface( const uuid& id ) const;
+        [[nodiscard]] bool has_surface( const uuid& id ) const;
 
-        const Surface< dimension >& surface( const uuid& id ) const;
+        [[nodiscard]] const Surface< dimension >& surface(
+            const uuid& id ) const;
 
-        SurfaceRange surfaces() const;
+        [[nodiscard]] SurfaceRange surfaces() const;
 
         void save_surfaces( std::string_view directory ) const;
 
@@ -108,17 +110,17 @@ namespace geode
             ModifiableSurfaceRange( const ModifiableSurfaceRange& range );
             ~ModifiableSurfaceRange();
 
-            const ModifiableSurfaceRange& begin() const;
+            [[nodiscard]] const ModifiableSurfaceRange& begin() const;
 
-            const ModifiableSurfaceRange& end() const;
+            [[nodiscard]] const ModifiableSurfaceRange& end() const;
 
-            Surface< dimension >& operator*() const;
+            [[nodiscard]] Surface< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_surface( SurfacesBuilderKey key );
+        [[nodiscard]] const uuid& create_surface( SurfacesBuilderKey key );
 
-        const uuid& create_surface(
+        [[nodiscard]] const uuid& create_surface(
             const MeshImpl& impl, SurfacesBuilderKey key );
 
         void create_surface( uuid surface_id, SurfacesBuilderKey key );
@@ -132,9 +134,10 @@ namespace geode
         void load_surfaces(
             std::string_view directory, SurfacesBuilderKey key );
 
-        ModifiableSurfaceRange modifiable_surfaces( SurfacesBuilderKey key );
+        [[nodiscard]] ModifiableSurfaceRange modifiable_surfaces(
+            SurfacesBuilderKey key );
 
-        Surface< dimension >& modifiable_surface(
+        [[nodiscard]] Surface< dimension >& modifiable_surface(
             const uuid& id, SurfacesBuilderKey key );
 
     private:

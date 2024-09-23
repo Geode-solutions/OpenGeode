@@ -38,6 +38,7 @@ namespace geode
 
 namespace geode
 {
-    absl::FixedArray< index_t > opengeode_geometry_api radial_sort(
-        const Segment3D& segment, absl::Span< const Point3D > points );
+    [[nodiscard]] absl::FixedArray< index_t >
+        opengeode_geometry_api radial_sort(
+            const Segment3D& segment, absl::Span< const Point3D > points );
 } // namespace geode

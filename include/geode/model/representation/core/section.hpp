@@ -94,11 +94,11 @@ namespace geode
             BoundaryCornerRange( const BoundaryCornerRange& range );
             ~BoundaryCornerRange();
 
-            const BoundaryCornerRange& begin() const;
+            [[nodiscard]] const BoundaryCornerRange& begin() const;
 
-            const BoundaryCornerRange& end() const;
+            [[nodiscard]] const BoundaryCornerRange& end() const;
 
-            const Corner2D& operator*() const;
+            [[nodiscard]] const Corner2D& operator*() const;
 
         private:
             const Section& section_;
@@ -113,11 +113,11 @@ namespace geode
             BoundaryLineRange( const BoundaryLineRange& range );
             ~BoundaryLineRange();
 
-            const BoundaryLineRange& begin() const;
+            [[nodiscard]] const BoundaryLineRange& begin() const;
 
-            const BoundaryLineRange& end() const;
+            [[nodiscard]] const BoundaryLineRange& end() const;
 
-            const Line2D& operator*() const;
+            [[nodiscard]] const Line2D& operator*() const;
 
         private:
             const Section& section_;
@@ -131,11 +131,11 @@ namespace geode
             IncidentLineRange( const IncidentLineRange& range );
             ~IncidentLineRange();
 
-            const IncidentLineRange& begin() const;
+            [[nodiscard]] const IncidentLineRange& begin() const;
 
-            const IncidentLineRange& end() const;
+            [[nodiscard]] const IncidentLineRange& end() const;
 
-            const Line2D& operator*() const;
+            [[nodiscard]] const Line2D& operator*() const;
 
         private:
             const Section& section_;
@@ -149,11 +149,11 @@ namespace geode
             IncidentSurfaceRange( const IncidentSurfaceRange& range );
             ~IncidentSurfaceRange();
 
-            const IncidentSurfaceRange& begin() const;
+            [[nodiscard]] const IncidentSurfaceRange& begin() const;
 
-            const IncidentSurfaceRange& end() const;
+            [[nodiscard]] const IncidentSurfaceRange& end() const;
 
-            const Surface2D& operator*() const;
+            [[nodiscard]] const Surface2D& operator*() const;
 
         private:
             const Section& section_;
@@ -168,13 +168,13 @@ namespace geode
             InternalLineRange( const InternalLineRange& range );
             ~InternalLineRange();
 
-            const InternalLineRange& begin() const;
+            [[nodiscard]] const InternalLineRange& begin() const;
 
-            const InternalLineRange& end() const;
+            [[nodiscard]] const InternalLineRange& end() const;
 
             void operator++();
 
-            const Line2D& operator*() const;
+            [[nodiscard]] const Line2D& operator*() const;
 
         private:
             const Section& section_;
@@ -189,13 +189,13 @@ namespace geode
             InternalCornerRange( const InternalCornerRange& range );
             ~InternalCornerRange();
 
-            const InternalCornerRange& begin() const;
+            [[nodiscard]] const InternalCornerRange& begin() const;
 
-            const InternalCornerRange& end() const;
+            [[nodiscard]] const InternalCornerRange& end() const;
 
             void operator++();
 
-            const Corner2D& operator*() const;
+            [[nodiscard]] const Corner2D& operator*() const;
 
         private:
             const Section& section_;
@@ -211,13 +211,13 @@ namespace geode
             EmbeddingSurfaceRange( const EmbeddingSurfaceRange& range );
             ~EmbeddingSurfaceRange();
 
-            const EmbeddingSurfaceRange& begin() const;
+            [[nodiscard]] const EmbeddingSurfaceRange& begin() const;
 
-            const EmbeddingSurfaceRange& end() const;
+            [[nodiscard]] const EmbeddingSurfaceRange& end() const;
 
             void operator++();
 
-            const Surface2D& operator*() const;
+            [[nodiscard]] const Surface2D& operator*() const;
 
         private:
             const Section& section_;
@@ -232,11 +232,11 @@ namespace geode
             ItemCornerRange( const ItemCornerRange& range );
             ~ItemCornerRange();
 
-            const ItemCornerRange& begin() const;
+            [[nodiscard]] const ItemCornerRange& begin() const;
 
-            const ItemCornerRange& end() const;
+            [[nodiscard]] const ItemCornerRange& end() const;
 
-            const Corner2D& operator*() const;
+            [[nodiscard]] const Corner2D& operator*() const;
 
         private:
             const Section& section_;
@@ -253,11 +253,11 @@ namespace geode
             ItemLineRange( const ItemLineRange& range );
             ~ItemLineRange();
 
-            const ItemLineRange& begin() const;
+            [[nodiscard]] const ItemLineRange& begin() const;
 
-            const ItemLineRange& end() const;
+            [[nodiscard]] const ItemLineRange& end() const;
 
-            const Line2D& operator*() const;
+            [[nodiscard]] const Line2D& operator*() const;
 
         private:
             const Section& section_;
@@ -272,11 +272,11 @@ namespace geode
             ItemSurfaceRange( const ItemSurfaceRange& range );
             ~ItemSurfaceRange();
 
-            const ItemSurfaceRange& begin() const;
+            [[nodiscard]] const ItemSurfaceRange& begin() const;
 
-            const ItemSurfaceRange& end() const;
+            [[nodiscard]] const ItemSurfaceRange& end() const;
 
-            const Surface2D& operator*() const;
+            [[nodiscard]] const Surface2D& operator*() const;
 
         private:
             const Section& section_;
@@ -288,80 +288,90 @@ namespace geode
         Section& operator=( Section&& section );
         ~Section();
 
-        Section clone() const;
+        [[nodiscard]] Section clone() const;
 
-        BoundaryCornerRange boundaries( const Line2D& line ) const;
+        [[nodiscard]] BoundaryCornerRange boundaries(
+            const Line2D& line ) const;
 
-        BoundaryLineRange boundaries( const Surface2D& surface ) const;
+        [[nodiscard]] BoundaryLineRange boundaries(
+            const Surface2D& surface ) const;
 
-        IncidentLineRange incidences( const Corner2D& corner ) const;
-
-        IncidentSurfaceRange incidences( const Line2D& line ) const;
-
-        index_t nb_internal_corners( const Surface2D& surface ) const;
-
-        InternalCornerRange internal_corners( const Surface2D& surface ) const;
-
-        index_t nb_internal_lines( const Surface2D& surface ) const;
-
-        InternalLineRange internal_lines( const Surface2D& surface ) const;
-
-        index_t nb_embedding_surfaces( const Corner2D& corner ) const;
-
-        EmbeddingSurfaceRange embedding_surfaces(
+        [[nodiscard]] IncidentLineRange incidences(
             const Corner2D& corner ) const;
 
-        index_t nb_embedding_surfaces( const Line2D& line ) const;
+        [[nodiscard]] IncidentSurfaceRange incidences(
+            const Line2D& line ) const;
 
-        EmbeddingSurfaceRange embedding_surfaces( const Line2D& line ) const;
+        [[nodiscard]] index_t nb_internal_corners(
+            const Surface2D& surface ) const;
 
-        ItemLineRange model_boundary_items(
+        [[nodiscard]] InternalCornerRange internal_corners(
+            const Surface2D& surface ) const;
+
+        [[nodiscard]] index_t nb_internal_lines(
+            const Surface2D& surface ) const;
+
+        [[nodiscard]] InternalLineRange internal_lines(
+            const Surface2D& surface ) const;
+
+        [[nodiscard]] index_t nb_embedding_surfaces(
+            const Corner2D& corner ) const;
+
+        [[nodiscard]] EmbeddingSurfaceRange embedding_surfaces(
+            const Corner2D& corner ) const;
+
+        [[nodiscard]] index_t nb_embedding_surfaces( const Line2D& line ) const;
+
+        [[nodiscard]] EmbeddingSurfaceRange embedding_surfaces(
+            const Line2D& line ) const;
+
+        [[nodiscard]] ItemLineRange model_boundary_items(
             const ModelBoundary2D& boundary ) const;
 
-        ItemCornerRange corner_collection_items(
+        [[nodiscard]] ItemCornerRange corner_collection_items(
             const CornerCollection2D& collection ) const;
 
-        ItemLineRange line_collection_items(
+        [[nodiscard]] ItemLineRange line_collection_items(
             const LineCollection2D& collection ) const;
 
-        ItemSurfaceRange surface_collection_items(
+        [[nodiscard]] ItemSurfaceRange surface_collection_items(
             const SurfaceCollection2D& collection ) const;
 
-        bool is_closed( const Line2D& line ) const;
+        [[nodiscard]] bool is_closed( const Line2D& line ) const;
 
-        bool is_boundary( const Corner2D& corner, const Line2D& line ) const;
+        [[nodiscard]] bool is_boundary(
+            const Corner2D& corner, const Line2D& line ) const;
 
-        bool is_boundary( const Line2D& line, const Surface2D& surface ) const;
+        [[nodiscard]] bool is_boundary(
+            const Line2D& line, const Surface2D& surface ) const;
 
-        bool is_internal(
+        [[nodiscard]] bool is_internal(
             const Corner2D& corner, const Surface2D& surface ) const;
 
-        bool is_internal( const Line2D& line, const Surface2D& surface ) const;
+        [[nodiscard]] bool is_internal(
+            const Line2D& line, const Surface2D& surface ) const;
 
-        bool is_model_boundary_item(
+        [[nodiscard]] bool is_model_boundary_item(
             const Line2D& line, const ModelBoundary2D& boundary ) const;
 
-        bool is_corner_collection_item(
+        [[nodiscard]] bool is_corner_collection_item(
             const Corner2D& surface, const CornerCollection2D& boundary ) const;
 
-        bool is_line_collection_item(
+        [[nodiscard]] bool is_line_collection_item(
             const Line2D& surface, const LineCollection2D& boundary ) const;
 
-        bool is_surface_collection_item( const Surface2D& surface,
+        [[nodiscard]] bool is_surface_collection_item( const Surface2D& surface,
             const SurfaceCollection2D& boundary ) const;
 
-        /*!
-         * Compute the bounding box from component meshes
-         */
-        BoundingBox2D bounding_box() const;
+        [[nodiscard]] BoundingBox2D bounding_box() const;
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension = "og_sctn";
             return extension;
         }
 
-        std::string_view native_extension() const
+        [[nodiscard]] std::string_view native_extension() const
         {
             return native_extension_static();
         }

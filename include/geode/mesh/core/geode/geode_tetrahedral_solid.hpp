@@ -56,30 +56,30 @@ namespace geode
             OpenGeodeTetrahedralSolid&& other ) noexcept;
         ~OpenGeodeTetrahedralSolid();
 
-        static MeshImpl impl_name_static()
+        [[nodiscard]] static MeshImpl impl_name_static()
         {
             return MeshImpl{ absl::StrCat(
                 "OpenGeodeTetrahedralSolid", dimension, "D" ) };
         }
 
-        MeshImpl impl_name() const override
+        [[nodiscard]] MeshImpl impl_name() const override
         {
             return impl_name_static();
         }
 
-        MeshType type_name() const override
+        [[nodiscard]] MeshType type_name() const override
         {
             return TetrahedralSolid< dimension >::type_name_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension =
                 absl::StrCat( "og_tso", dimension, "d" );
             return extension;
         }
 
-        std::string_view native_extension() const override
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }
@@ -105,14 +105,14 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        index_t get_polyhedron_vertex(
+        [[nodiscard]] index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
 
-        PolyhedronVertex get_polyhedron_facet_vertex_id(
+        [[nodiscard]] PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
             const override;
 
-        std::optional< index_t > get_polyhedron_adjacent(
+        [[nodiscard]] std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
     private:

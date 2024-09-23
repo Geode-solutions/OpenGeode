@@ -54,32 +54,32 @@ namespace geode
             using ComponentsStore = absl::flat_hash_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
-            index_t nb_components() const
+            [[nodiscard]] index_t nb_components() const
             {
                 return components_.size();
             }
 
-            bool has_component( const uuid& id ) const
+            [[nodiscard]] bool has_component( const uuid& id ) const
             {
                 return components_.contains( id );
             }
 
-            const Component& component( const uuid& id ) const
+            [[nodiscard]] const Component& component( const uuid& id ) const
             {
                 return *components_.at( id );
             }
 
-            Component& component( const uuid& id )
+            [[nodiscard]] Component& component( const uuid& id )
             {
                 return *components_.at( id );
             }
 
-            Iterator begin() const
+            [[nodiscard]] Iterator begin() const
             {
                 return components_.begin();
             }
 
-            Iterator end() const
+            [[nodiscard]] Iterator end() const
             {
                 return components_.end();
             }
@@ -133,8 +133,8 @@ namespace geode
                     filename );
             }
 
-            absl::flat_hash_map< std::string, std::string > file_mapping(
-                std::string_view directory ) const
+            [[nodiscard]] absl::flat_hash_map< std::string, std::string >
+                file_mapping( std::string_view directory ) const
             {
                 absl::flat_hash_map< std::string, std::string > mapping;
                 for( const auto& file : std::filesystem::directory_iterator(

@@ -67,15 +67,15 @@ namespace geode
          * @note This value should match the initial size of the container that
          * store all objects to organize the the aabb tree.
          */
-        index_t nb_bboxes() const;
+        [[nodiscard]] index_t nb_bboxes() const;
 
-        const BoundingBox< dimension >& bounding_box() const;
+        [[nodiscard]] const BoundingBox< dimension >& bounding_box() const;
 
         /*!
          * @brief Gets all the boxes containing a point
          * @param[in] query the point to test
          */
-        std::vector< index_t > containing_boxes(
+        [[nodiscard]] std::vector< index_t > containing_boxes(
             const Point< dimension >& query ) const;
 
         /*!
@@ -98,7 +98,7 @@ namespace geode
          * distance computation, then one of them will be randomly returned.
          */
         template < typename EvalDistance >
-        std::tuple< index_t, double > closest_element_box(
+        [[nodiscard]] std::tuple< index_t, double > closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const;
 
         /*!

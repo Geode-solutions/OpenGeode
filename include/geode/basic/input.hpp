@@ -37,7 +37,7 @@ namespace geode
 
         struct MissingFiles
         {
-            bool has_missing_files() const
+            [[nodiscard]] bool has_missing_files() const
             {
                 return !additional_files.empty() || !mandatory_files.empty();
             }
@@ -51,17 +51,17 @@ namespace geode
             std::vector< std::string > mandatory_files;
         };
 
-        virtual MissingFiles check_missing_files() const
+        [[nodiscard]] virtual MissingFiles check_missing_files() const
         {
             return {};
         }
 
-        virtual bool is_loadable() const
+        [[nodiscard]] virtual bool is_loadable() const
         {
             return true;
         }
 
-        virtual Object read( const Args&... args ) = 0;
+        [[nodiscard]] virtual Object read( const Args&... args ) = 0;
 
         ~Input()
         {
@@ -81,7 +81,7 @@ namespace geode
         }
 
     protected:
-        Input( std::string_view filename ) : IOFile( filename ) {}
+        explicit Input( std::string_view filename ) : IOFile( filename ) {}
 
         void need_to_inspect_result()
         {

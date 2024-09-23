@@ -49,13 +49,14 @@ namespace geode
         return static_cast< unsigned char >( arg );
     }
 
-    inline std::string to_string( std::string_view view )
+    [[nodiscard]] inline std::string to_string( std::string_view view )
     {
         return static_cast< std::string >( view );
     }
 
     template < typename T, typename... Args >
-    constexpr std::array< T, sizeof...( Args ) > to_array( Args&&... args )
+    [[nodiscard]] constexpr std::array< T, sizeof...( Args ) > to_array(
+        Args&&... args )
     {
         return { { std::forward< Args >( args )... } };
     }

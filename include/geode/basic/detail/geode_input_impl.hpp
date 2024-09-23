@@ -60,7 +60,7 @@ namespace geode
         }
 
         template < typename Factory >
-        std::unique_ptr< typename Factory::BaseClass >
+        [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
             geode_object_input_reader( std::string_view& filename )
         {
             filename = absl::StripAsciiWhitespace( filename );
@@ -73,8 +73,9 @@ namespace geode
         }
 
         template < typename Factory, typename... Args >
-        typename Factory::BaseClass::InputData geode_object_input_impl(
-            std::string_view type, std::string_view filename, Args... args )
+        [[nodiscard]] typename Factory::BaseClass::InputData
+            geode_object_input_impl(
+                std::string_view type, std::string_view filename, Args... args )
         {
             const Timer timer;
             auto input = geode_object_input_reader< Factory >( filename );

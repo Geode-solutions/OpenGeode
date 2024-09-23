@@ -62,31 +62,31 @@ namespace geode
         Block( Block&& other ) noexcept;
         ~Block();
 
-        static ComponentType component_type_static()
+        [[nodiscard]] static ComponentType component_type_static()
         {
             return ComponentType{ "Block" };
         }
 
-        ComponentType component_type() const final
+        [[nodiscard]] ComponentType component_type() const final
         {
             return component_type_static();
         }
 
-        ComponentID component_id() const
+        [[nodiscard]] ComponentID component_id() const
         {
             return { this->component_type_static(), this->id() };
         };
 
         template < typename TypedMesh = Mesh >
-        const TypedMesh& mesh() const
+        [[nodiscard]] const TypedMesh& mesh() const
         {
             return dynamic_cast< const TypedMesh& >( get_mesh() );
         }
 
-        const MeshImpl& mesh_type() const;
+        [[nodiscard]] const MeshImpl& mesh_type() const;
 
         template < typename TypedMesh = Mesh >
-        TypedMesh& modifiable_mesh( BlocksKey /*unused*/ )
+        [[nodiscard]] TypedMesh& modifiable_mesh( BlocksKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
@@ -101,7 +101,7 @@ namespace geode
         void set_mesh( std::unique_ptr< Mesh > mesh, BlocksBuilderKey key );
 
         template < typename TypedMesh = Mesh >
-        TypedMesh& modifiable_mesh( BlocksBuilderKey /*unused*/ )
+        [[nodiscard]] TypedMesh& modifiable_mesh( BlocksBuilderKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
@@ -113,9 +113,9 @@ namespace geode
 
         explicit Block( const MeshImpl& impl );
 
-        Mesh& get_modifiable_mesh();
+        [[nodiscard]] Mesh& get_modifiable_mesh();
 
-        const Mesh& get_mesh() const;
+        [[nodiscard]] const Mesh& get_mesh() const;
 
         template < typename Archive >
         void serialize( Archive& archive );

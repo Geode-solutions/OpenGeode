@@ -60,8 +60,8 @@ namespace geode
          * Create the builder associated with a SurfaceMesh.
          * @param[in] mesh The SurfaceMesh to build/modify
          */
-        static std::unique_ptr< SurfaceMeshBuilder< dimension > > create(
-            SurfaceMesh< dimension >& mesh );
+        [[nodiscard]] static std::unique_ptr< SurfaceMeshBuilder< dimension > >
+            create( SurfaceMesh< dimension >& mesh );
 
         SurfaceEdgesBuilder< dimension > edges_builder();
 

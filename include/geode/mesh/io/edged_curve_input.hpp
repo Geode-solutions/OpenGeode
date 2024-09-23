@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+    [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
         const MeshImpl& impl, std::string_view filename );
 
     /*!
@@ -55,7 +55,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+    [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
         std::string_view filename );
 
     template < index_t dimension >
@@ -75,11 +75,11 @@ namespace geode
     };
 
     template < index_t dimension >
-    typename EdgedCurveInput< dimension >::MissingFiles
+    [[nodiscard]] typename EdgedCurveInput< dimension >::MissingFiles
         check_edged_curve_missing_files( std::string_view filename );
 
     template < index_t dimension >
-    bool is_edged_curve_loadable( std::string_view filename );
+    [[nodiscard]] bool is_edged_curve_loadable( std::string_view filename );
 
     template < index_t dimension >
     using EdgedCurveInputFactory =

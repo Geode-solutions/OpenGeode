@@ -59,7 +59,7 @@ namespace geode
             {
             }
 
-            bool operator<( const PolygonDistance& other ) const
+            [[nodiscard]] bool operator<( const PolygonDistance& other ) const
             {
                 return std::fabs( distance ) < std::fabs( other.distance );
             }
@@ -77,14 +77,14 @@ namespace geode
         RayTracing3D( RayTracing3D&& other ) noexcept;
         ~RayTracing3D();
 
-        std::optional< PolygonDistance > closest_polygon() const;
+        [[nodiscard]] std::optional< PolygonDistance > closest_polygon() const;
 
-        std::optional< absl::FixedArray< PolygonDistance > > closest_polygons(
-            index_t size ) const;
+        [[nodiscard]] std::optional< absl::FixedArray< PolygonDistance > >
+            closest_polygons( index_t size ) const;
 
-        std::vector< PolygonDistance > all_intersections() const;
+        [[nodiscard]] std::vector< PolygonDistance > all_intersections() const;
 
-        bool operator()( index_t polygon_id );
+        [[nodiscard]] bool operator()( index_t polygon_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

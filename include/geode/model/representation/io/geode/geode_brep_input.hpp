@@ -36,13 +36,13 @@ namespace geode
         {
         }
 
-        static std::string_view extension()
+        [[nodiscard]] static std::string_view extension()
         {
             return BRep::native_extension_static();
         }
 
         void load_brep_files( BRep& brep, std::string_view directory );
 
-        BRep read() final;
+        [[nodiscard]] BRep read() final;
     };
 } // namespace geode

@@ -62,26 +62,26 @@ namespace geode
         Corner( Corner&& other ) noexcept;
         ~Corner();
 
-        static ComponentType component_type_static()
+        [[nodiscard]] static ComponentType component_type_static()
         {
             return ComponentType{ "Corner" };
         }
 
-        ComponentType component_type() const final
+        [[nodiscard]] ComponentType component_type() const final
         {
             return component_type_static();
         }
 
-        ComponentID component_id() const
+        [[nodiscard]] ComponentID component_id() const
         {
             return { this->component_type_static(), this->id() };
         };
 
-        const Mesh& mesh() const;
+        [[nodiscard]] const Mesh& mesh() const;
 
-        Mesh& modifiable_mesh( CornersKey key );
+        [[nodiscard]] Mesh& modifiable_mesh( CornersKey key );
 
-        const MeshImpl& mesh_type() const;
+        [[nodiscard]] const MeshImpl& mesh_type() const;
 
     public:
         explicit Corner( CornersKey key );
@@ -94,14 +94,14 @@ namespace geode
 
         void set_corner_name( std::string_view name, CornersBuilderKey key );
 
-        Mesh& modifiable_mesh( CornersBuilderKey key );
+        [[nodiscard]] Mesh& modifiable_mesh( CornersBuilderKey key );
 
     private:
         Corner();
 
         explicit Corner( const MeshImpl& impl );
 
-        Mesh& modifiable_mesh();
+        [[nodiscard]] Mesh& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

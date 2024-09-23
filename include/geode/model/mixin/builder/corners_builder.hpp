@@ -51,8 +51,8 @@ namespace geode
          * Get a pointer to the builder of a Corner mesh
          * @param[in] id Unique index of the Corner
          */
-        std::unique_ptr< PointSetBuilder< dimension > > corner_mesh_builder(
-            const uuid& id );
+        [[nodiscard]] std::unique_ptr< PointSetBuilder< dimension > >
+            corner_mesh_builder( const uuid& id );
 
         void set_corner_name( const uuid& id, std::string_view name );
 
@@ -62,9 +62,9 @@ namespace geode
         {
         }
 
-        const uuid& create_corner();
+        [[nodiscard]] const uuid& create_corner();
 
-        const uuid& create_corner( const MeshImpl& impl );
+        [[nodiscard]] const uuid& create_corner( const MeshImpl& impl );
 
         void create_corner( uuid corner_id );
 
@@ -75,7 +75,8 @@ namespace geode
         void set_corner_mesh(
             const uuid& id, std::unique_ptr< PointSet< dimension > > mesh );
 
-        PointSet< dimension >& modifiable_corner_mesh( const uuid& id );
+        [[nodiscard]] PointSet< dimension >& modifiable_corner_mesh(
+            const uuid& id );
 
     private:
         Corners< dimension >& corners_;

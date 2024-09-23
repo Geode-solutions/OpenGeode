@@ -34,12 +34,12 @@ namespace geode
     class OpenGeodeRasterImageInput : public RasterImageInput< dimension >
     {
     public:
-        OpenGeodeRasterImageInput( std::string_view filename )
+        explicit OpenGeodeRasterImageInput( std::string_view filename )
             : RasterImageInput< dimension >( filename )
         {
         }
 
-        RasterImage< dimension > read() final
+        [[nodiscard]] RasterImage< dimension > read() final
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };

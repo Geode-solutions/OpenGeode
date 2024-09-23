@@ -50,9 +50,11 @@ namespace geode
             };
             using VertexOrigins = absl::InlinedVector< VertexOrigin, 1 >;
 
-            index_t vertex_in_merged( index_t mesh, index_t vertex ) const;
+            [[nodiscard]] index_t vertex_in_merged(
+                index_t mesh, index_t vertex ) const;
 
-            const VertexOrigins& vertex_origins( index_t vertex ) const;
+            [[nodiscard]] const VertexOrigins& vertex_origins(
+                index_t vertex ) const;
 
         protected:
             VertexMerger(
@@ -60,14 +62,15 @@ namespace geode
                 double epsilon );
             ~VertexMerger();
 
-            absl::Span< const std::reference_wrapper< const Mesh > >
+            [[nodiscard]] absl::Span<
+                const std::reference_wrapper< const Mesh > >
                 meshes() const;
 
-            const Mesh& mesh() const;
+            [[nodiscard]] const Mesh& mesh() const;
 
-            std::unique_ptr< Mesh > steal_mesh();
+            [[nodiscard]] std::unique_ptr< Mesh > steal_mesh();
 
-            Builder& builder();
+            [[nodiscard]] Builder& builder();
 
             void create_points();
 

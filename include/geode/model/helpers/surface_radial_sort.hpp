@@ -58,12 +58,12 @@ namespace geode
         {
         }
 
-        bool operator==( const SidedSurface& other ) const
+        [[nodiscard]] bool operator==( const SidedSurface& other ) const
         {
             return id == other.id && side == other.side;
         }
 
-        bool operator!=( const SidedSurface& other ) const
+        [[nodiscard]] bool operator!=( const SidedSurface& other ) const
         {
             return !( *this == other );
         }
@@ -77,17 +77,17 @@ namespace geode
     {
         explicit SortedSurfaces( index_t nb_surfaces );
 
-        absl::InlinedVector< index_t, 1 > find(
+        [[nodiscard]] absl::InlinedVector< index_t, 1 > find(
             const SidedSurface& surface ) const;
 
-        index_t opposite( index_t position ) const;
+        [[nodiscard]] index_t opposite( index_t position ) const;
 
-        index_t next( index_t position ) const;
+        [[nodiscard]] index_t next( index_t position ) const;
 
-        absl::FixedArray< SidedSurface > surfaces;
+        [[nodiscard]] absl::FixedArray< SidedSurface > surfaces;
     };
 
-    SortedSurfaces opengeode_model_api surface_radial_sort(
+    [[nodiscard]] SortedSurfaces opengeode_model_api surface_radial_sort(
         const BRep& brep, const Line3D& line );
 } // namespace geode
 

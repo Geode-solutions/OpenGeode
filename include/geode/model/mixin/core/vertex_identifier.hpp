@@ -29,14 +29,14 @@ namespace geode
 
         ~ComponentMeshVertex();
 
-        MeshVertex mesh_vertex() const;
+        [[nodiscard]] MeshVertex mesh_vertex() const;
 
-        bool operator==( const ComponentMeshVertex& other ) const;
+        [[nodiscard]] bool operator==( const ComponentMeshVertex& other ) const;
 
         template < typename Archive >
         void serialize( Archive& archive );
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( component_id.string(), " ", vertex );
         }
@@ -62,35 +62,36 @@ namespace geode
         VertexIdentifier();
         ~VertexIdentifier();
 
-        index_t nb_unique_vertices() const;
+        [[nodiscard]] index_t nb_unique_vertices() const;
 
-        bool is_unique_vertex_isolated( index_t unique_vertex_id ) const;
+        [[nodiscard]] bool is_unique_vertex_isolated(
+            index_t unique_vertex_id ) const;
 
         /*!
          * Return the component vertices identified with an unique vertex.
          * @param[in] unique_vertex_id Indice of the unique vertex.
          */
-        const std::vector< ComponentMeshVertex >& component_mesh_vertices(
-            index_t unique_vertex_id ) const;
+        [[nodiscard]] const std::vector< ComponentMeshVertex >&
+            component_mesh_vertices( index_t unique_vertex_id ) const;
         /*!
          * Return the unique vertex index of a given component vertex.
          * @param[in] component_vertex Vertex index in a geometric component.
          */
-        index_t unique_vertex(
+        [[nodiscard]] index_t unique_vertex(
             const ComponentMeshVertex& component_vertex ) const;
 
         /*!
          * Return true if given unique vertex has at least one mesh component
          * vertex of given component type
          */
-        bool has_component_mesh_vertices(
+        [[nodiscard]] bool has_component_mesh_vertices(
             index_t unique_vertex_id, const ComponentType& type ) const;
 
         /*!
          * Return true if given unique vertex has at least one mesh component
          * vertex of given component
          */
-        bool has_component_mesh_vertices(
+        [[nodiscard]] bool has_component_mesh_vertices(
             index_t unique_vertex_id, const uuid& component_id ) const;
 
         /*!

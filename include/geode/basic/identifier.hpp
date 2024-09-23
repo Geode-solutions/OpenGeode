@@ -46,9 +46,9 @@ namespace geode
         Identifier( Identifier&& other ) noexcept;
         ~Identifier();
 
-        const uuid& id() const;
+        [[nodiscard]] const uuid& id() const;
 
-        std::string_view name() const;
+        [[nodiscard]] std::string_view name() const;
 
         void save_identifier( std::string_view directory ) const;
 

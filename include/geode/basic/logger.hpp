@@ -50,7 +50,7 @@ namespace geode
             off
         };
 
-        static LEVEL level();
+        [[nodiscard]] static LEVEL level();
 
         static void set_level( LEVEL level );
 
@@ -94,7 +94,7 @@ namespace geode
         Logger();
         ~Logger();
 
-        static Logger &instance();
+        [[nodiscard]] static Logger &instance();
 
         static void log_trace( const std::string &message );
         static void log_debug( const std::string &message );

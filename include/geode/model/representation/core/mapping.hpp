@@ -48,17 +48,17 @@ namespace geode
         ModelMapping( ModelMapping&& other ) = default;
         ModelMapping& operator=( ModelMapping&& other ) = default;
 
-        MappingType& at( const ComponentType& type )
+        [[nodiscard]] MappingType& at( const ComponentType& type )
         {
             return mappings.at( type );
         }
 
-        const MappingType& at( const ComponentType& type ) const
+        [[nodiscard]] const MappingType& at( const ComponentType& type ) const
         {
             return mappings.at( type );
         }
 
-        bool has_mapping_type( const ComponentType& type ) const
+        [[nodiscard]] bool has_mapping_type( const ComponentType& type ) const
         {
             return mappings.contains( type );
         }
@@ -77,12 +77,12 @@ namespace geode
             mappings.erase( type );
         }
 
-        MappingType& operator[]( const ComponentType& type )
+        [[nodiscard]] MappingType& operator[]( const ComponentType& type )
         {
             return mappings[type];
         }
 
-        const absl::flat_hash_map< ComponentType, Mapping >&
+        [[nodiscard]] const absl::flat_hash_map< ComponentType, Mapping >&
             components_mappings() const
         {
             return mappings;

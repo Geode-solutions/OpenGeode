@@ -40,12 +40,12 @@ namespace geode
         {
         }
 
-        bool operator==( const MeshElement& other ) const
+        [[nodiscard]] bool operator==( const MeshElement& other ) const
         {
             return mesh_id == other.mesh_id && element_id == other.element_id;
         }
 
-        bool operator!=( const MeshElement& other ) const
+        [[nodiscard]] bool operator!=( const MeshElement& other ) const
         {
             return mesh_id != other.mesh_id || element_id != other.element_id;
         }
@@ -61,7 +61,7 @@ namespace geode
                            } } } );
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( "[", mesh_id.string(), " ", element_id, "]" );
         }
@@ -110,7 +110,7 @@ namespace geode
     };
 
     template < typename MeshElementType >
-    bool are_mesh_elements_included(
+    [[nodiscard]] bool are_mesh_elements_included(
         const MeshElementsInclusion< MeshElementType >& inclusion )
     {
         for( const auto& q : inclusion.query )
@@ -124,8 +124,8 @@ namespace geode
         return true;
     }
 
-    template < typename MeshElementType, typename SkipMeshElement >
-    bool are_mesh_elements_included(
+    template < typename SkipMeshElement, typename MeshElementType >
+    [[nodiscard]] bool are_mesh_elements_included(
         const MeshElementsInclusion< MeshElementType >& inclusion,
         const SkipMeshElement& skip )
     {
@@ -135,14 +135,7 @@ namespace geode
             {
                 continue;
             }
-            const auto predicate = [&q, &skip]( const auto& value ) {
-                if( skip( value ) )
-                {
-                    return false;
-                }
-                return q == value;
-            };
-            if( absl::c_find_if( inclusion.container, predicate )
+            if( absl::c_find( inclusion.container, q )
                 == inclusion.container.end() )
             {
                 return false;

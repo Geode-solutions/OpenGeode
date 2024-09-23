@@ -57,28 +57,28 @@ namespace geode
             OpenGeodeRegularGrid&& other ) noexcept;
         ~OpenGeodeRegularGrid();
 
-        static MeshImpl impl_name_static()
+        [[nodiscard]] static MeshImpl impl_name_static()
         {
             return MeshImpl{ "OpenGeodeRegularGrid2D" };
         }
 
-        MeshImpl impl_name() const override
+        [[nodiscard]] MeshImpl impl_name() const override
         {
             return impl_name_static();
         }
 
-        MeshType type_name() const override
+        [[nodiscard]] MeshType type_name() const override
         {
             return RegularGrid< 2 >::type_name_static();
         }
 
-        static std::string_view native_extension_static()
+        [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension = "og_rgd2d";
             return extension;
         }
 
-        std::string_view native_extension() const override
+        [[nodiscard]] std::string_view native_extension() const override
         {
             return native_extension_static();
         }
@@ -95,20 +95,23 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        index_t get_polygon_vertex(
+        [[nodiscard]] index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;
 
-        std::optional< index_t > get_polygon_adjacent(
+        [[nodiscard]] std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
 
-        index_t cell_index( const Grid2D::CellIndices& index ) const override;
+        [[nodiscard]] index_t cell_index(
+            const Grid2D::CellIndices& index ) const override;
 
-        Grid2D::CellIndices cell_indices( index_t index ) const override;
+        [[nodiscard]] Grid2D::CellIndices cell_indices(
+            index_t index ) const override;
 
-        index_t vertex_index(
+        [[nodiscard]] index_t vertex_index(
             const Grid2D::VertexIndices& index ) const override;
 
-        Grid2D::VertexIndices vertex_indices( index_t index ) const override;
+        [[nodiscard]] Grid2D::VertexIndices vertex_indices(
+            index_t index ) const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

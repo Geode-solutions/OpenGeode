@@ -85,17 +85,17 @@ namespace geode
             }
         }
 
-        index_t nb_bboxes() const
+        [[nodiscard]] index_t nb_bboxes() const
         {
             return mapping_morton_.size();
         }
 
-        static bool is_leaf( index_t box_begin, index_t box_end )
+        [[nodiscard]] static bool is_leaf( index_t box_begin, index_t box_end )
         {
             return box_begin + 1 == box_end;
         }
 
-        static Iterator get_recursive_iterators(
+        [[nodiscard]] static Iterator get_recursive_iterators(
             index_t node_index, index_t box_begin, index_t box_end )
         {
             Iterator it;
@@ -105,18 +105,19 @@ namespace geode
             return it;
         }
 
-        const BoundingBox< dimension >& node( index_t index ) const
+        [[nodiscard]] const BoundingBox< dimension >& node(
+            index_t index ) const
         {
             OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
             return tree_[index];
         }
 
-        index_t mapping_morton( index_t index ) const
+        [[nodiscard]] index_t mapping_morton( index_t index ) const
         {
             return mapping_morton_[index];
         }
 
-        static index_t max_node_index_recursive(
+        [[nodiscard]] static index_t max_node_index_recursive(
             index_t node_index, index_t box_begin, index_t box_end )
         {
             OPENGEODE_ASSERT( box_end > box_begin,
@@ -213,7 +214,7 @@ namespace geode
             index_t element_end,
             ACTION& action ) const;
 
-        index_t closest_element_box_hint(
+        [[nodiscard]] index_t closest_element_box_hint(
             const Point< dimension >& query ) const
         {
             index_t box_begin{ 0 };

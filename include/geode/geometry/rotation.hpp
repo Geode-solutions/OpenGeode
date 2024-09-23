@@ -35,6 +35,6 @@ namespace geode
      * normalized).
      * @param[in] angle Rotation angle expresses in radians.
      */
-    Point3D opengeode_geometry_api rotate(
+    [[nodiscard]] Point3D opengeode_geometry_api rotate(
         const Point3D& point, const Vector3D& axis, double angle );
 } // namespace geode

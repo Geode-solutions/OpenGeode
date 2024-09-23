@@ -54,8 +54,8 @@ namespace geode
          * Create the builder associated with a PointSet.
          * @param[in] mesh The PointSet to build/modify
          */
-        static std::unique_ptr< PointSetBuilder< dimension > > create(
-            PointSet< dimension >& mesh );
+        [[nodiscard]] static std::unique_ptr< PointSetBuilder< dimension > >
+            create( PointSet< dimension >& mesh );
 
         /*!
          * Create a new point with associated coordinates.

@@ -37,17 +37,18 @@ namespace geode
 
 namespace geode
 {
-    std::unique_ptr< EdgedCurve2D >
+    [[nodiscard]] std::unique_ptr< EdgedCurve2D >
         opengeode_mesh_api convert_edged_curve3d_into_2d(
             const EdgedCurve3D& curve3d, index_t axis_to_remove );
 
-    std::unique_ptr< EdgedCurve3D > opengeode_mesh_api
+    [[nodiscard]] std::unique_ptr< EdgedCurve3D > opengeode_mesh_api
         convert_edged_curve2d_into_3d( const EdgedCurve2D& curve2d,
             index_t axis_to_add,
             double axis_coordinate );
 
     template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves( absl::Span<
-        const std::reference_wrapper< const EdgedCurve< dimension > > >
+    [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves(
+        absl::Span<
+            const std::reference_wrapper< const EdgedCurve< dimension > > >
             curves );
 } // namespace geode

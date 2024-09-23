@@ -48,20 +48,23 @@ namespace geode
         /*!
          * Create a new TriangulatedSurface using default data structure.
          */
-        static std::unique_ptr< TriangulatedSurface< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< TriangulatedSurface< dimension > >
+            create();
 
         /*!
          * Create a new TriangulatedSurface using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< TriangulatedSurface< dimension > > create(
-            const MeshImpl& impl );
+        [[nodiscard]] static std::unique_ptr< TriangulatedSurface< dimension > >
+            create( const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< TriangulatedSurface< dimension > >
+            clone() const;
 
-        Triangle< dimension > triangle( index_t triangle_id ) const;
+        [[nodiscard]] Triangle< dimension > triangle(
+            index_t triangle_id ) const;
 
     protected:
         TriangulatedSurface() = default;
@@ -74,7 +77,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        local_index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final
+        [[nodiscard]] local_index_t get_nb_polygon_vertices(
+            index_t /*unused*/ ) const final
         {
             return 3;
         }

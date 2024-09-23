@@ -55,23 +55,23 @@ namespace geode
         /*!
          * Create a new PointSet using default data structure.
          */
-        static std::unique_ptr< PointSet< dimension > > create();
+        [[nodiscard]] static std::unique_ptr< PointSet< dimension > > create();
 
         /*!
          * Create a new PointSet using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< PointSet< dimension > > create(
+        [[nodiscard]] static std::unique_ptr< PointSet< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static();
+        [[nodiscard]] static MeshType type_name_static();
 
-        std::unique_ptr< PointSet< dimension > > clone() const;
+        [[nodiscard]] std::unique_ptr< PointSet< dimension > > clone() const;
 
         /*!
          * Compute the bounding box from mesh vertices
          */
-        BoundingBox< dimension > bounding_box() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
     protected:
         PointSet() = default;

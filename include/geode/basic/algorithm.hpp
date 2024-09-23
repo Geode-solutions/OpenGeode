@@ -88,7 +88,7 @@ namespace geode
      * @return A vector containing only kept elements of in_values
      */
     template < typename DeleteContainer, typename ValueContainer >
-    ValueContainer extract_vector_elements(
+    [[nodiscard]] ValueContainer extract_vector_elements(
         const DeleteContainer& to_keep, const ValueContainer& in_values )
     {
         OPENGEODE_ASSERT( to_keep.size() == in_values.size(),

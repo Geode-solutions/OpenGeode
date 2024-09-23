@@ -50,9 +50,10 @@ namespace geode
     public:
         virtual ~CoordinateReferenceSystem() = default;
 
-        virtual CRSType type_name() const = 0;
+        [[nodiscard]] virtual CRSType type_name() const = 0;
 
-        virtual const Point< dimension >& point( index_t point_id ) const = 0;
+        [[nodiscard]] virtual const Point< dimension >& point(
+            index_t point_id ) const = 0;
 
         virtual void set_point(
             index_t point_id, Point< dimension > point ) = 0;

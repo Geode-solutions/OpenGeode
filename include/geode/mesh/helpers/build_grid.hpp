@@ -34,7 +34,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    LightRegularGrid< dimension >
+    [[nodiscard]] LightRegularGrid< dimension >
         build_grid_from_bbox_target_length_and_maximum_cell_number(
             const BoundingBox< dimension >& bbox,
             double target_cell_length,

@@ -57,7 +57,7 @@ namespace geode
         }
     };
 
-    bool opengeode_model_api is_brep_saveable(
+    [[nodiscard]] bool opengeode_model_api is_brep_saveable(
         const BRep& brep, std::string_view filename );
 
     using BRepOutputFactory =

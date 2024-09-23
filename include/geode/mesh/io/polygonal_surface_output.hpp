@@ -63,7 +63,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_polygonal_surface_saveable(
+    [[nodiscard]] bool is_polygonal_surface_saveable(
         const PolygonalSurface< dimension >& polygonal_surface,
         std::string_view filename );
 

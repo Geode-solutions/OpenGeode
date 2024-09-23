@@ -59,28 +59,32 @@ namespace geode
         GenericTriangle< PointType, dimension >& operator=(
             GenericTriangle< PointType, dimension >&& other ) noexcept;
 
-        Point< dimension > barycenter() const;
+        [[nodiscard]] Point< dimension > barycenter() const;
         template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< Vector3D > >::type
             normal() const;
         template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< Plane > >::type
             plane() const;
         template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< OwnerPlane > >::type
             owner_plane() const;
         template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< local_index_t > >::type
             pivot() const;
         template < index_t T = dimension >
-        typename std::enable_if< T == 3,
+        [[nodiscard]] typename std::enable_if< T == 3,
             std::optional< std::pair< local_index_t, Vector3D > > >::type
             pivot_and_normal() const;
         void set_point( local_index_t vertex, PointType point );
-        const std::array< PointType, 3 >& vertices() const;
-        BoundingBox< dimension > bounding_box() const;
-        local_index_t longest_edge_index() const;
-        double minimum_height() const;
+        [[nodiscard]] const std::array< PointType, 3 >& vertices() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
+        [[nodiscard]] local_index_t longest_edge_index() const;
+        [[nodiscard]] double minimum_height() const;
 
     private:
         std::array< PointType, 3 > vertices_;

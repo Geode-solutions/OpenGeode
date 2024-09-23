@@ -55,7 +55,8 @@ namespace geode
         public:
             ~LineCollectionRangeBase();
 
-            bool operator!=( const LineCollectionRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const LineCollectionRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -76,22 +77,22 @@ namespace geode
             LineCollectionRange( const LineCollectionRange& range );
             ~LineCollectionRange();
 
-            const LineCollectionRange& begin() const;
+            [[nodiscard]] const LineCollectionRange& begin() const;
 
-            const LineCollectionRange& end() const;
+            [[nodiscard]] const LineCollectionRange& end() const;
 
-            const LineCollection< dimension >& operator*() const;
+            [[nodiscard]] const LineCollection< dimension >& operator*() const;
         };
 
     public:
         ~LineCollections();
 
-        index_t nb_line_collections() const;
+        [[nodiscard]] index_t nb_line_collections() const;
 
-        const LineCollection< dimension >& line_collection(
+        [[nodiscard]] const LineCollection< dimension >& line_collection(
             const uuid& id ) const;
 
-        LineCollectionRange line_collections() const;
+        [[nodiscard]] LineCollectionRange line_collections() const;
 
         void save_line_collections( std::string_view directory ) const;
 
@@ -109,15 +110,16 @@ namespace geode
                 const ModifiableLineCollectionRange& range );
             ~ModifiableLineCollectionRange();
 
-            const ModifiableLineCollectionRange& begin() const;
+            [[nodiscard]] const ModifiableLineCollectionRange& begin() const;
 
-            const ModifiableLineCollectionRange& end() const;
+            [[nodiscard]] const ModifiableLineCollectionRange& end() const;
 
-            LineCollection< dimension >& operator*() const;
+            [[nodiscard]] LineCollection< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_line_collection( LineCollectionsBuilderKey key );
+        [[nodiscard]] const uuid& create_line_collection(
+            LineCollectionsBuilderKey key );
 
         void create_line_collection(
             uuid line_collection_id, LineCollectionsBuilderKey key );
@@ -129,10 +131,10 @@ namespace geode
         void load_line_collections(
             std::string_view directory, LineCollectionsBuilderKey key );
 
-        ModifiableLineCollectionRange modifiable_line_collections(
+        [[nodiscard]] ModifiableLineCollectionRange modifiable_line_collections(
             LineCollectionsBuilderKey key );
 
-        LineCollection< dimension >& modifiable_line_collection(
+        [[nodiscard]] LineCollection< dimension >& modifiable_line_collection(
             const uuid& id, LineCollectionsBuilderKey key );
 
     private:

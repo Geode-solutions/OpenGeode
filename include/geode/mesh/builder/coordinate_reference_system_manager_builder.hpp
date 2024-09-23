@@ -50,11 +50,11 @@ namespace geode
 
         void set_active_coordinate_reference_system( std::string_view name );
 
-        CoordinateReferenceSystem< dimension >&
+        [[nodiscard]] CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system();
 
-        CoordinateReferenceSystem< dimension >& coordinate_reference_system(
-            std::string_view name );
+        [[nodiscard]] CoordinateReferenceSystem< dimension >&
+            coordinate_reference_system( std::string_view name );
 
     private:
         CoordinateReferenceSystemManager< dimension >& crs_manager_;

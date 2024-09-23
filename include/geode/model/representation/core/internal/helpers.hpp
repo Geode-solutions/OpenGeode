@@ -57,7 +57,8 @@ namespace geode
         }
 
         template < index_t dimension, typename MeshComponentRange >
-        BoundingBox< dimension > meshes_bounding_box( MeshComponentRange range )
+        [[nodiscard]] BoundingBox< dimension > meshes_bounding_box(
+            MeshComponentRange range )
         {
             BoundingBox< dimension > box;
             for( const auto& component : range )

@@ -58,7 +58,7 @@ namespace geode
         Singleton();
 
         template < class SingletonType >
-        static SingletonType& instance()
+        [[nodiscard]] static SingletonType& instance()
         {
             const auto& type = typeid( SingletonType );
             const std::lock_guard< std::mutex > locking{ lock() };
@@ -73,11 +73,11 @@ namespace geode
         }
 
     private:
-        static Singleton& instance();
+        [[nodiscard]] static Singleton& instance();
         static void set_instance(
             const std::type_info& type, Singleton* singleton );
-        static Singleton* instance( const std::type_info& type );
-        static std::mutex& lock();
+        [[nodiscard]] static Singleton* instance( const std::type_info& type );
+        [[nodiscard]] static std::mutex& lock();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -61,63 +61,73 @@ namespace geode
 
         ~Grid();
 
-        const CoordinateSystem< dimension >& grid_coordinate_system() const;
+        [[nodiscard]] const CoordinateSystem< dimension >&
+            grid_coordinate_system() const;
 
-        local_index_t nb_cell_vertices() const
+        [[nodiscard]] local_index_t nb_cell_vertices() const
         {
             return nb_cell_vertices_static();
         }
 
-        static constexpr local_index_t nb_cell_vertices_static()
+        [[nodiscard]] static constexpr local_index_t nb_cell_vertices_static()
         {
             /* returns 1*pow(2,dimension) using binary operators (faster). */
             return 1 << dimension;
         }
 
-        double cell_length_in_direction( index_t direction ) const;
+        [[nodiscard]] double cell_length_in_direction(
+            index_t direction ) const;
 
-        double cell_size() const;
+        [[nodiscard]] double cell_size() const;
 
-        Point< dimension > grid_point( const VertexIndices& index ) const;
+        [[nodiscard]] Point< dimension > grid_point(
+            const VertexIndices& index ) const;
 
-        index_t nb_grid_vertices() const;
+        [[nodiscard]] index_t nb_grid_vertices() const;
 
-        index_t nb_vertices_in_direction( index_t direction ) const;
+        [[nodiscard]] index_t nb_vertices_in_direction(
+            index_t direction ) const;
 
-        index_t nb_vertices_on_borders() const;
+        [[nodiscard]] index_t nb_vertices_on_borders() const;
 
-        virtual index_t vertex_index( const VertexIndices& index ) const = 0;
+        [[nodiscard]] virtual index_t vertex_index(
+            const VertexIndices& index ) const = 0;
 
-        virtual VertexIndices vertex_indices( index_t index ) const = 0;
+        [[nodiscard]] virtual VertexIndices vertex_indices(
+            index_t index ) const = 0;
 
-        CellVertices cell_vertices( const CellIndices& cell_id ) const;
+        [[nodiscard]] CellVertices cell_vertices(
+            const CellIndices& cell_id ) const;
 
-        VertexIndices cell_vertex_indices(
+        [[nodiscard]] VertexIndices cell_vertex_indices(
             const CellIndices& cell_id, local_index_t vertex_id ) const;
 
-        local_index_t cell_local_vertex(
+        [[nodiscard]] local_index_t cell_local_vertex(
             const CellIndices& cell_id, const VertexIndices& vertex_id ) const;
 
-        std::optional< VertexIndices > next_vertex(
+        [[nodiscard]] std::optional< VertexIndices > next_vertex(
             const VertexIndices& index, index_t direction ) const;
 
-        std::optional< VertexIndices > previous_vertex(
+        [[nodiscard]] std::optional< VertexIndices > previous_vertex(
             const VertexIndices& index, index_t direction ) const;
 
-        bool is_grid_vertex_on_border( const VertexIndices& index ) const;
+        [[nodiscard]] bool is_grid_vertex_on_border(
+            const VertexIndices& index ) const;
 
-        Point< dimension > cell_barycenter( const CellIndices& cell_id ) const;
+        [[nodiscard]] Point< dimension > cell_barycenter(
+            const CellIndices& cell_id ) const;
 
         /*!
          * Return true if the query point is inside the grid, up to a
          * GLOBAL_EPSILON away from the grid bounding box.
          */
-        bool contains( const Point< dimension >& query ) const;
+        [[nodiscard]] bool contains( const Point< dimension >& query ) const;
 
         /*!
          * Returns the closest grid vertex to the query point.
          */
-        VertexIndices closest_vertex( const Point< dimension >& query ) const;
+        [[nodiscard]] VertexIndices closest_vertex(
+            const Point< dimension >& query ) const;
 
         /*!
          * Return the cell(s) containing the query point
@@ -128,15 +138,19 @@ namespace geode
          * cell indices are returned: they correspond the potential cells that
          * may contain the point.
          */
-        CellsAroundVertex cells( const Point< dimension >& query ) const;
+        [[nodiscard]] CellsAroundVertex cells(
+            const Point< dimension >& query ) const;
 
-        CellsAroundVertex cells_around( VertexIndices vertex_indices ) const;
+        [[nodiscard]] CellsAroundVertex cells_around(
+            VertexIndices vertex_indices ) const;
 
-        virtual AttributeManager& cell_attribute_manager() const = 0;
+        [[nodiscard]] virtual AttributeManager&
+            cell_attribute_manager() const = 0;
 
-        virtual AttributeManager& grid_vertex_attribute_manager() const = 0;
+        [[nodiscard]] virtual AttributeManager&
+            grid_vertex_attribute_manager() const = 0;
 
-        BoundingBox< dimension > grid_bounding_box() const;
+        [[nodiscard]] BoundingBox< dimension > grid_bounding_box() const;
 
     public:
         void set_grid_origin( Point< dimension > origin, GridKey );

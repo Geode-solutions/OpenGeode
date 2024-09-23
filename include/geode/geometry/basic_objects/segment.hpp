@@ -53,13 +53,13 @@ namespace geode
         GenericSegment< PointType, dimension >& operator=(
             GenericSegment< PointType, dimension >&& other ) noexcept;
 
-        Vector< dimension > direction() const;
-        Vector< dimension > normalized_direction() const;
-        Point< dimension > barycenter() const;
-        double length() const;
+        [[nodiscard]] Vector< dimension > direction() const;
+        [[nodiscard]] Vector< dimension > normalized_direction() const;
+        [[nodiscard]] Point< dimension > barycenter() const;
+        [[nodiscard]] double length() const;
         void set_point( local_index_t vertex, PointType point );
-        const std::array< PointType, 2 >& vertices() const;
-        BoundingBox< dimension > bounding_box() const;
+        [[nodiscard]] const std::array< PointType, 2 >& vertices() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
     private:
         std::array< PointType, 2 > vertices_;

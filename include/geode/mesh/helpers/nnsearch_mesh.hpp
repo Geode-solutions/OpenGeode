@@ -30,7 +30,8 @@
 namespace geode
 {
     template < template < index_t > class Mesh, index_t dimension >
-    NNSearch< dimension > create_nn_search( const Mesh< dimension >& mesh )
+    [[nodiscard]] NNSearch< dimension > create_nn_search(
+        const Mesh< dimension >& mesh )
     {
         std::vector< Point< dimension > > points;
         points.reserve( mesh.nb_vertices() );

@@ -45,7 +45,7 @@ namespace geode
      * @param[in] segment the segment
      */
     template < index_t dimension >
-    Point< dimension > point_segment_projection(
+    [[nodiscard]] Point< dimension > point_segment_projection(
         const Point< dimension >& point, const Segment< dimension >& segment );
 
     /*!
@@ -54,7 +54,8 @@ namespace geode
      * @param[in] line the line
      */
     template < index_t dimension >
-    Point< dimension > point_line_projection( const Point< dimension >& point,
+    [[nodiscard]] Point< dimension > point_line_projection(
+        const Point< dimension >& point,
         const InfiniteLine< dimension >& line );
 
     /*!
@@ -63,7 +64,7 @@ namespace geode
      * @param[in] triangle the triangle
      */
     template < index_t dimension >
-    Point< dimension > point_triangle_projection(
+    [[nodiscard]] Point< dimension > point_triangle_projection(
         const Point< dimension >& point,
         const Triangle< dimension >& triangle );
 
@@ -72,7 +73,7 @@ namespace geode
      * @param[in] point the point to project
      * @param[in] plane the plane
      */
-    Point3D opengeode_geometry_api point_plane_projection(
+    [[nodiscard]] Point3D opengeode_geometry_api point_plane_projection(
         const Point3D& point, const Plane& plane );
 
 } // namespace geode

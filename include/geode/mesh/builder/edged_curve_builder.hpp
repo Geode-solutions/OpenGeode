@@ -50,8 +50,8 @@ namespace geode
          * Create the builder associated with an EdgedCurve.
          * @param[in] mesh The EdgedCurve to build/modify
          */
-        static std::unique_ptr< EdgedCurveBuilder< dimension > > create(
-            EdgedCurve< dimension >& mesh );
+        [[nodiscard]] static std::unique_ptr< EdgedCurveBuilder< dimension > >
+            create( EdgedCurve< dimension >& mesh );
 
         /*!
          * Create a new point with associated coordinates.

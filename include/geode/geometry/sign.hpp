@@ -39,18 +39,18 @@ namespace geode
     /*!
      * Return the sign of a tetrahedron volume.
      */
-    Sign opengeode_geometry_api tetrahedron_volume_sign(
+    [[nodiscard]] Sign opengeode_geometry_api tetrahedron_volume_sign(
         const Tetrahedron& tetra );
 
     /*!
      * Return the sign of a 2D triangle area.
      */
-    Sign opengeode_geometry_api triangle_area_sign(
+    [[nodiscard]] Sign opengeode_geometry_api triangle_area_sign(
         const Triangle2D& triangle );
 
     /*!
      * Return the sign of a 3D triangle area aligned on X- Y- or Z-axis.
      */
-    Sign opengeode_geometry_api triangle_area_sign(
+    [[nodiscard]] Sign opengeode_geometry_api triangle_area_sign(
         const Triangle3D& triangle, local_index_t axis );
 } // namespace geode

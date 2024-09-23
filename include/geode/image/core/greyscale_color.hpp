@@ -46,7 +46,7 @@ namespace geode
 
         explicit GreyscaleColor( local_index_t value ) : value_( value ) {}
 
-        local_index_t value() const
+        [[nodiscard]] local_index_t value() const
         {
             return value_;
         }
@@ -56,17 +56,18 @@ namespace geode
             value_ = greyscale;
         }
 
-        bool operator==( const GreyscaleColor &other ) const
+        [[nodiscard]] bool operator==( const GreyscaleColor &other ) const
         {
             return value() == other.value();
         }
 
-        bool operator!=( const GreyscaleColor &other ) const
+        [[nodiscard]] bool operator!=( const GreyscaleColor &other ) const
         {
             return value() != other.value();
         }
 
-        GreyscaleColor operator+( const GreyscaleColor &other ) const
+        [[nodiscard]] GreyscaleColor operator+(
+            const GreyscaleColor &other ) const
         {
             return GreyscaleColor{ static_cast< geode::local_index_t >(
                 value() / 2 + other.value() / 2 ) };
@@ -77,7 +78,7 @@ namespace geode
             set_value( ( value() + other.value() ) / 2 );
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( value_ );
         }

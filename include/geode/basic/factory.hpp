@@ -88,7 +88,7 @@ namespace geode
             }
         }
 
-        static inline std::unique_ptr< BaseClass > create(
+        [[nodiscard]] static inline std::unique_ptr< BaseClass > create(
             const Key &key, Args... args )
         {
             const auto &store = get_store();
@@ -99,7 +99,7 @@ namespace geode
             return creator->second( std::forward< Args >( args )... );
         }
 
-        static inline absl::FixedArray< Key > list_creators()
+        [[nodiscard]] static inline absl::FixedArray< Key > list_creators()
         {
             const auto &store = get_store();
             absl::FixedArray< Key > creators( store.size() );
@@ -111,7 +111,7 @@ namespace geode
             return creators;
         }
 
-        static inline bool has_creator( const Key &key )
+        [[nodiscard]] static inline bool has_creator( const Key &key )
         {
             const auto &store = get_store();
             return store.find( key ) != store.end();
@@ -119,14 +119,14 @@ namespace geode
 
     private:
         template < typename DerivedClass >
-        static inline std::unique_ptr< BaseClass > create_function_impl(
-            Args... args )
+        [[nodiscard]] static inline std::unique_ptr< BaseClass >
+            create_function_impl( Args... args )
         {
             return std::unique_ptr< BaseClass >{ new DerivedClass{
                 std::forward< Args >( args )... } };
         }
 
-        static inline FactoryStore &get_store()
+        [[nodiscard]] static inline FactoryStore &get_store()
         {
             return Singleton::instance< Factory >().store_;
         }

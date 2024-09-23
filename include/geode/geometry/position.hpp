@@ -46,25 +46,25 @@ namespace geode
     /*!
      * Return the point side to a segment.
      */
-    SIDE opengeode_geometry_api point_side_to_segment(
+    [[nodiscard]] SIDE opengeode_geometry_api point_side_to_segment(
         const Point2D& point, const Segment2D& segment );
 
     /*!
      * Return the point side to a line.
      */
-    SIDE opengeode_geometry_api point_side_to_line(
+    [[nodiscard]] SIDE opengeode_geometry_api point_side_to_line(
         const Point2D& point, const InfiniteLine2D& line );
 
     /*!
      * Return the point side to a plane.
      */
-    SIDE opengeode_geometry_api point_side_to_plane(
+    [[nodiscard]] SIDE opengeode_geometry_api point_side_to_plane(
         const Point3D& point, const Plane& plane );
 
     /*!
      * Return the point side to a 3D triangle.
      */
-    SIDE opengeode_geometry_api point_side_to_triangle(
+    [[nodiscard]] SIDE opengeode_geometry_api point_side_to_triangle(
         const Point3D& point, const Triangle3D& triangle );
 
     /*!
@@ -72,7 +72,7 @@ namespace geode
      * segment vertex.
      */
     template < index_t dimension >
-    POSITION point_segment_position(
+    [[nodiscard]] POSITION point_segment_position(
         const Point< dimension >& point, const Segment< dimension >& segment );
 
     /*!
@@ -80,21 +80,22 @@ namespace geode
      * triangle vertex or an edge.
      */
     template < index_t dimension >
-    POSITION point_triangle_position( const Point< dimension >& point,
+    [[nodiscard]] POSITION point_triangle_position(
+        const Point< dimension >& point,
         const Triangle< dimension >& triangle );
 
     /*!
      * Return the position of a point in a tetrahedron: inside, outside, on a
      * tetra vertex, an edge or a facet.
      */
-    POSITION opengeode_geometry_api point_tetrahedron_position(
+    [[nodiscard]] POSITION opengeode_geometry_api point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra );
 
     /*!
      * Return true if the three points are exactly aligned.
      */
     template < index_t dimension >
-    bool are_points_aligned( const Point< dimension >& point0,
+    [[nodiscard]] bool are_points_aligned( const Point< dimension >& point0,
         const Point< dimension >& point1,
         const Point< dimension >& point2 );
 } // namespace geode

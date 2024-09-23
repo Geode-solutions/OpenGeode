@@ -46,24 +46,28 @@ namespace geode
 
 namespace geode
 {
-    std::array< index_t, 2 > opengeode_model_api edge_unique_vertices(
-        const Section& section, const Line2D& line, index_t edge );
+    [[nodiscard]] std::array< index_t, 2 >
+        opengeode_model_api edge_unique_vertices(
+            const Section& section, const Line2D& line, index_t edge );
 
-    std::array< index_t, 2 > opengeode_model_api edge_unique_vertices(
-        const Section& section,
-        const Surface2D& surface,
-        const PolygonEdge& edge );
+    [[nodiscard]] std::array< index_t, 2 >
+        opengeode_model_api edge_unique_vertices( const Section& section,
+            const Surface2D& surface,
+            const PolygonEdge& edge );
 
-    std::array< index_t, 2 > opengeode_model_api edge_unique_vertices(
-        const BRep& brep, const Line3D& line, index_t edge );
+    [[nodiscard]] std::array< index_t, 2 >
+        opengeode_model_api edge_unique_vertices(
+            const BRep& brep, const Line3D& line, index_t edge );
 
-    std::array< index_t, 2 > opengeode_model_api edge_unique_vertices(
-        const BRep& brep, const Surface3D& surface, const PolygonEdge& edge );
+    [[nodiscard]] std::array< index_t, 2 >
+        opengeode_model_api edge_unique_vertices( const BRep& brep,
+            const Surface3D& surface,
+            const PolygonEdge& edge );
 
-    std::array< index_t, 2 > opengeode_model_api edge_unique_vertices(
-        const BRep& brep,
-        const Block3D& block,
-        const PolyhedronFacetEdge& edge );
+    [[nodiscard]] std::array< index_t, 2 >
+        opengeode_model_api edge_unique_vertices( const BRep& brep,
+            const Block3D& block,
+            const PolyhedronFacetEdge& edge );
 
     struct ModelComponentMeshEdges
     {
@@ -79,17 +83,18 @@ namespace geode
     {
     };
 
-    SectionComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const Section& section,
-        const std::array< index_t, 2 >& edge_unique_vertices );
+    [[nodiscard]] SectionComponentMeshEdges opengeode_model_api
+        component_mesh_edges( const Section& section,
+            const std::array< index_t, 2 >& edge_unique_vertices );
 
-    SectionComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const Section& section, const Line2D& line, index_t edge );
+    [[nodiscard]] SectionComponentMeshEdges opengeode_model_api
+        component_mesh_edges(
+            const Section& section, const Line2D& line, index_t edge );
 
-    SectionComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const Section& section,
-        const Surface2D& surface,
-        const PolygonEdge& edge );
+    [[nodiscard]] SectionComponentMeshEdges opengeode_model_api
+        component_mesh_edges( const Section& section,
+            const Surface2D& surface,
+            const PolygonEdge& edge );
 
     struct BRepComponentMeshEdges : public ModelComponentMeshEdges
     {
@@ -99,34 +104,37 @@ namespace geode
         BlockEdges block_edges;
     };
 
-    BRepComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const BRep& brep,
-        const std::array< index_t, 2 >& edge_unique_vertices );
+    [[nodiscard]] BRepComponentMeshEdges opengeode_model_api
+        component_mesh_edges( const BRep& brep,
+            const std::array< index_t, 2 >& edge_unique_vertices );
 
-    BRepComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const BRep& brep, const Line3D& line, index_t edge );
+    [[nodiscard]] BRepComponentMeshEdges opengeode_model_api
+        component_mesh_edges(
+            const BRep& brep, const Line3D& line, index_t edge );
 
-    BRepComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const BRep& brep, const Surface3D& surface, const PolygonEdge& edge );
+    [[nodiscard]] BRepComponentMeshEdges opengeode_model_api
+        component_mesh_edges( const BRep& brep,
+            const Surface3D& surface,
+            const PolygonEdge& edge );
 
-    BRepComponentMeshEdges opengeode_model_api component_mesh_edges(
-        const BRep& brep,
-        const Block3D& block,
-        const PolyhedronFacetEdge& edge );
+    [[nodiscard]] BRepComponentMeshEdges opengeode_model_api
+        component_mesh_edges( const BRep& brep,
+            const Block3D& block,
+            const PolyhedronFacetEdge& edge );
 
     namespace detail
     {
         template < typename Model >
-        ModelComponentMeshEdges::LineEdges line_component_mesh_edges(
-            const Model& model,
-            const std::array< index_t, 2 >& edge_unique_vertices );
+        [[nodiscard]] ModelComponentMeshEdges::LineEdges
+            line_component_mesh_edges( const Model& model,
+                const std::array< index_t, 2 >& edge_unique_vertices );
 
         template < typename Model >
-        ModelComponentMeshEdges::SurfaceEdges surface_component_mesh_edges(
-            const Model& model,
-            const std::array< index_t, 2 >& edge_unique_vertices );
+        [[nodiscard]] ModelComponentMeshEdges::SurfaceEdges
+            surface_component_mesh_edges( const Model& model,
+                const std::array< index_t, 2 >& edge_unique_vertices );
 
-        BRepComponentMeshEdges::BlockEdges opengeode_model_api
+        [[nodiscard]] BRepComponentMeshEdges::BlockEdges opengeode_model_api
             block_component_mesh_edges( const BRep& brep,
                 const std::array< index_t, 2 >& edge_unique_vertices );
     } // namespace detail

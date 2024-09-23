@@ -425,7 +425,8 @@ void test_adjacencies2D()
     {
         for( const auto ee : geode::LRange{ grid->nb_polygon_edges( p ) } )
         {
-            grid->polygon_adjacent_edge( { p, ee } );
+            const auto edge = grid->polygon_adjacent_edge( { p, ee } );
+            geode_unused( edge );
         }
     }
 }

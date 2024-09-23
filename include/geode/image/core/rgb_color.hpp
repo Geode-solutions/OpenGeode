@@ -51,17 +51,17 @@ namespace geode
         {
         }
 
-        local_index_t red() const
+        [[nodiscard]] local_index_t red() const
         {
             return values_[0];
         }
 
-        local_index_t green() const
+        [[nodiscard]] local_index_t green() const
         {
             return values_[1];
         }
 
-        local_index_t blue() const
+        [[nodiscard]] local_index_t blue() const
         {
             return values_[2];
         }
@@ -81,7 +81,7 @@ namespace geode
             values_[2] = blue_scale;
         }
 
-        bool operator==( const RGBColor &other ) const
+        [[nodiscard]] bool operator==( const RGBColor &other ) const
         {
             if( red() != other.red() )
             {
@@ -98,12 +98,12 @@ namespace geode
             return true;
         }
 
-        bool operator!=( const RGBColor &other ) const
+        [[nodiscard]] bool operator!=( const RGBColor &other ) const
         {
             return !( *this == other );
         }
 
-        RGBColor operator+( const RGBColor &other ) const
+        [[nodiscard]] RGBColor operator+( const RGBColor &other ) const
         {
             RGBColor result;
             result.set_red( ( result.red() + other.red() ) / 2 );
@@ -119,7 +119,7 @@ namespace geode
             set_blue( ( blue() + other.blue() ) / 2 );
         }
 
-        std::string string() const
+        [[nodiscard]] std::string string() const
         {
             return absl::StrCat( values_[0], " ", values_[1], " ", values_[2] );
         }

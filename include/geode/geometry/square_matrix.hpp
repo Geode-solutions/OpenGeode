@@ -43,24 +43,25 @@ namespace geode
     public:
         SquareMatrix() = default;
         explicit SquareMatrix( double default_value );
-        SquareMatrix(
+        explicit SquareMatrix(
             std::array< Vector< dimension >, dimension > matrix_rows );
 
-        double value( local_index_t row, local_index_t column ) const;
+        [[nodiscard]] double value(
+            local_index_t row, local_index_t column ) const;
 
         void set_value( local_index_t row, local_index_t column, double value );
 
-        Vector< dimension > operator*(
+        [[nodiscard]] Vector< dimension > operator*(
             const Vector< dimension >& vector ) const;
 
-        SquareMatrix< dimension > operator*(
+        [[nodiscard]] SquareMatrix< dimension > operator*(
             const SquareMatrix< dimension >& matrix ) const;
 
-        double determinant() const;
+        [[nodiscard]] double determinant() const;
 
-        SquareMatrix< dimension > transpose() const;
+        [[nodiscard]] SquareMatrix< dimension > transpose() const;
 
-        SquareMatrix< dimension > inverse() const;
+        [[nodiscard]] SquareMatrix< dimension > inverse() const;
 
     private:
         std::array< Vector< dimension >, dimension > matrix_rows_;

@@ -52,7 +52,8 @@ namespace geode
                 {
                 }
 
-                bool operator==( const PolygonOrigin& other ) const
+                [[nodiscard]] bool operator==(
+                    const PolygonOrigin& other ) const
                 {
                     return surface == other.surface && polygon == other.polygon;
                 }
@@ -67,11 +68,13 @@ namespace geode
                 double epsilon );
             ~SurfaceMeshMerger();
 
-            std::unique_ptr< SurfaceMesh< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge();
 
-            index_t polygon_in_merged( index_t surface, index_t polygon ) const;
+            [[nodiscard]] index_t polygon_in_merged(
+                index_t surface, index_t polygon ) const;
 
-            const PolygonOrigins& polygon_origins( index_t polygon ) const;
+            [[nodiscard]] const PolygonOrigins& polygon_origins(
+                index_t polygon ) const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

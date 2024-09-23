@@ -55,7 +55,8 @@ namespace geode
         public:
             ~ModelBoundaryRangeBase();
 
-            bool operator!=( const ModelBoundaryRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const ModelBoundaryRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -76,22 +77,22 @@ namespace geode
             ModelBoundaryRange( const ModelBoundaryRange& range );
             ~ModelBoundaryRange();
 
-            const ModelBoundaryRange& begin() const;
+            [[nodiscard]] const ModelBoundaryRange& begin() const;
 
-            const ModelBoundaryRange& end() const;
+            [[nodiscard]] const ModelBoundaryRange& end() const;
 
-            const ModelBoundary< dimension >& operator*() const;
+            [[nodiscard]] const ModelBoundary< dimension >& operator*() const;
         };
 
     public:
         ~ModelBoundaries();
 
-        index_t nb_model_boundaries() const;
+        [[nodiscard]] index_t nb_model_boundaries() const;
 
-        const ModelBoundary< dimension >& model_boundary(
+        [[nodiscard]] const ModelBoundary< dimension >& model_boundary(
             const uuid& id ) const;
 
-        ModelBoundaryRange model_boundaries() const;
+        [[nodiscard]] ModelBoundaryRange model_boundaries() const;
 
         void save_model_boundaries( std::string_view directory ) const;
 
@@ -109,15 +110,16 @@ namespace geode
                 const ModifiableModelBoundaryRange& range );
             ~ModifiableModelBoundaryRange();
 
-            const ModifiableModelBoundaryRange& begin() const;
+            [[nodiscard]] const ModifiableModelBoundaryRange& begin() const;
 
-            const ModifiableModelBoundaryRange& end() const;
+            [[nodiscard]] const ModifiableModelBoundaryRange& end() const;
 
-            ModelBoundary< dimension >& operator*() const;
+            [[nodiscard]] ModelBoundary< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_model_boundary( ModelBoundariesBuilderKey key );
+        [[nodiscard]] const uuid& create_model_boundary(
+            ModelBoundariesBuilderKey key );
 
         void create_model_boundary(
             uuid model_boundary_id, ModelBoundariesBuilderKey key );
@@ -128,10 +130,10 @@ namespace geode
         void load_model_boundaries(
             std::string_view directory, ModelBoundariesBuilderKey key );
 
-        ModifiableModelBoundaryRange modifiable_model_boundaries(
+        [[nodiscard]] ModifiableModelBoundaryRange modifiable_model_boundaries(
             ModelBoundariesBuilderKey key );
 
-        ModelBoundary< dimension >& modifiable_model_boundary(
+        [[nodiscard]] ModelBoundary< dimension >& modifiable_model_boundary(
             const uuid& id, ModelBoundariesBuilderKey key );
 
     private:

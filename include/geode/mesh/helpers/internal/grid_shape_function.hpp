@@ -37,7 +37,7 @@ namespace geode
     namespace internal
     {
         template < index_t dimension >
-        double shape_function_value(
+        [[nodiscard]] double shape_function_value(
             const typename Grid< dimension >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< dimension >& point_in_grid );

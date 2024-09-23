@@ -61,7 +61,8 @@ namespace geode
         public:
             ~BlockRangeBase();
 
-            bool operator!=( const BlockRangeBase& /*unused*/ ) const;
+            [[nodiscard]] bool operator!=(
+                const BlockRangeBase& /*unused*/ ) const;
 
             void operator++();
 
@@ -84,26 +85,26 @@ namespace geode
             BlockRange( const BlockRange& range );
             ~BlockRange();
 
-            const BlockRange& begin() const;
+            [[nodiscard]] const BlockRange& begin() const;
 
-            const BlockRange& end() const;
+            [[nodiscard]] const BlockRange& end() const;
 
-            const Block< dimension >& operator*() const;
+            [[nodiscard]] const Block< dimension >& operator*() const;
         };
 
     public:
         ~Blocks();
 
-        index_t nb_blocks() const;
+        [[nodiscard]] index_t nb_blocks() const;
 
-        bool has_block( const uuid& id ) const;
+        [[nodiscard]] bool has_block( const uuid& id ) const;
 
         /*!
          * Access to an unmodifiable Block by its unique index
          */
-        const Block< dimension >& block( const uuid& id ) const;
+        [[nodiscard]] const Block< dimension >& block( const uuid& id ) const;
 
-        BlockRange blocks() const;
+        [[nodiscard]] BlockRange blocks() const;
 
         /*!
          * Save each Block in a file located in the specified directory
@@ -124,17 +125,18 @@ namespace geode
             ModifiableBlockRange( const ModifiableBlockRange& range );
             ~ModifiableBlockRange();
 
-            const ModifiableBlockRange& begin() const;
+            [[nodiscard]] const ModifiableBlockRange& begin() const;
 
-            const ModifiableBlockRange& end() const;
+            [[nodiscard]] const ModifiableBlockRange& end() const;
 
-            Block< dimension >& operator*() const;
+            [[nodiscard]] Block< dimension >& operator*() const;
         };
 
     public:
-        const uuid& create_block( BlocksBuilderKey key );
+        [[nodiscard]] const uuid& create_block( BlocksBuilderKey key );
 
-        const uuid& create_block( const MeshImpl& impl, BlocksBuilderKey key );
+        [[nodiscard]] const uuid& create_block(
+            const MeshImpl& impl, BlocksBuilderKey key );
 
         void create_block( uuid block_id, BlocksBuilderKey key );
 
@@ -146,9 +148,10 @@ namespace geode
 
         void load_blocks( std::string_view directory, BlocksBuilderKey key );
 
-        ModifiableBlockRange modifiable_blocks( BlocksBuilderKey key );
+        [[nodiscard]] ModifiableBlockRange modifiable_blocks(
+            BlocksBuilderKey key );
 
-        Block< dimension >& modifiable_block(
+        [[nodiscard]] Block< dimension >& modifiable_block(
             const uuid& id, BlocksBuilderKey key );
 
     private:
