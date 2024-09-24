@@ -202,8 +202,8 @@ namespace geode
                         {
                             const auto edge_origin = find_edge_origin(
                                 merger, edge_vertices, origin, e );
-                            const auto& surface =
-                                merger.meshes()[origin.surface].get();
+                            const auto& meshes = merger.meshes();
+                            const auto& surface = meshes[origin.surface].get();
                             if( !surface.is_edge_on_border( edge_origin ) )
                             {
                                 keep_adj = true;
@@ -226,7 +226,8 @@ namespace geode
                 const PolygonOrigin& origin,
                 local_index_t hint ) const
             {
-                const auto& surface = merger.meshes()[origin.surface].get();
+                const auto& meshes = merger.meshes();
+                const auto& surface = meshes[origin.surface].get();
                 const auto is_same_edge = [&merger, &merged_edge_vertices,
                                               &surface,
                                               &origin]( const auto& edge ) {
