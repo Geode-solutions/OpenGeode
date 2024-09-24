@@ -33,11 +33,10 @@ namespace geode
     {
     }
     template < typename PlaneType >
-    GenericCircle< PlaneType >::GenericCircle(
-        const GenericCircle& other ) = default;
+    GenericCircle< PlaneType >::GenericCircle( const GenericCircle& ) = default;
     template < typename PlaneType >
     GenericCircle< PlaneType >& GenericCircle< PlaneType >::operator=(
-        const GenericCircle& other ) = default;
+        const GenericCircle& ) = default;
     template < typename PlaneType >
     GenericCircle< PlaneType >::GenericCircle(
         GenericCircle&& ) noexcept = default;

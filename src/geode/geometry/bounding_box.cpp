@@ -141,11 +141,11 @@ namespace geode
     BoundingBox< dimension >::~BoundingBox() = default;
 
     template < index_t dimension >
-    BoundingBox< dimension >::BoundingBox( const BoundingBox& other ) = default;
+    BoundingBox< dimension >::BoundingBox( const BoundingBox& ) = default;
 
     template < index_t dimension >
     BoundingBox< dimension >& BoundingBox< dimension >::operator=(
-        const BoundingBox& other ) = default;
+        const BoundingBox& ) = default;
 
     template < index_t dimension >
     BoundingBox< dimension >::BoundingBox( BoundingBox&& ) noexcept = default;
