@@ -71,6 +71,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    const Vector< dimension >& SquareMatrix< dimension >::row(
+        local_index_t row ) const
+    {
+        return matrix_rows_.at( row );
+    }
+
+    template < index_t dimension >
     void SquareMatrix< dimension >::set_value(
         local_index_t row, local_index_t column, double value )
     {
@@ -107,6 +114,35 @@ namespace geode
             }
         }
         return result;
+    }
+
+    template < index_t dimension >
+    void SquareMatrix< dimension >::operator+=(
+        const SquareMatrix< dimension >& other )
+    {
+        for( const auto row : LRange{ dimension } )
+        {
+            matrix_rows_[row] += other.row( row );
+        }
+    }
+
+    template < index_t dimension >
+    void SquareMatrix< dimension >::operator-=(
+        const SquareMatrix< dimension >& other )
+    {
+        for( const auto row : LRange{ dimension } )
+        {
+            matrix_rows_[row] -= other.row( row );
+        }
+    }
+
+    template < index_t dimension >
+    void SquareMatrix< dimension >::operator*=( double multiplier )
+    {
+        for( const auto row : LRange{ dimension } )
+        {
+            matrix_rows_[row] *= multiplier;
+        }
     }
 
     template < index_t dimension >
