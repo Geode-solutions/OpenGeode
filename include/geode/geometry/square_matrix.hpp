@@ -49,6 +49,8 @@ namespace geode
         [[nodiscard]] double value(
             local_index_t row, local_index_t column ) const;
 
+        [[nodiscard]] const Vector< dimension >& row( local_index_t row ) const;
+
         void set_value( local_index_t row, local_index_t column, double value );
 
         [[nodiscard]] Vector< dimension > operator*(
@@ -56,6 +58,12 @@ namespace geode
 
         [[nodiscard]] SquareMatrix< dimension > operator*(
             const SquareMatrix< dimension >& matrix ) const;
+
+        void operator+=( const SquareMatrix< dimension >& other );
+
+        void operator-=( const SquareMatrix< dimension >& other );
+
+        void operator*=( double multiplier );
 
         [[nodiscard]] double determinant() const;
 
