@@ -130,6 +130,74 @@ namespace geode
                 this->value( 0 ) * other.value( 1 )
                     - this->value( 1 ) * other.value( 0 ) } };
         }
+
+        [[nodiscard]] geode::local_index_t least_meaningful_axis() const
+        {
+            if( dimension == 1 )
+            {
+                return 0;
+            }
+            if( dimension == 2 )
+            {
+                return std::abs( this->value( 0 ) )
+                               > std::abs( this->value( 1 ) )
+                           ? 0
+                           : 1;
+            }
+            if( dimension == 3 )
+            {
+                if( std::abs( this->value( 0 ) )
+                    > std::abs( this->value( 1 ) ) )
+                {
+                    if( std::abs( this->value( 0 ) )
+                        > std::abs( this->value( 2 ) ) )
+                    {
+                        return 0;
+                    }
+                    return 2;
+                }
+                if( std::abs( this->value( 1 ) )
+                    > std::abs( this->value( 2 ) ) )
+                {
+                    return 1;
+                }
+                return 2;
+            }
+        }
+
+        [[nodiscard]] geode::local_index_t most_meaningful_axis() const
+        {
+            if( dimension == 1 )
+            {
+                return 0;
+            }
+            if( dimension == 2 )
+            {
+                return std::abs( this->value( 0 ) )
+                               < std::abs( this->value( 1 ) )
+                           ? 0
+                           : 1;
+            }
+            if( dimension == 3 )
+            {
+                if( std::abs( this->value( 0 ) )
+                    < std::abs( this->value( 1 ) ) )
+                {
+                    if( std::abs( this->value( 0 ) )
+                        < std::abs( this->value( 2 ) ) )
+                    {
+                        return 0;
+                    }
+                    return 2;
+                }
+                if( std::abs( this->value( 1 ) )
+                    < std::abs( this->value( 2 ) ) )
+                {
+                    return 1;
+                }
+                return 2;
+            }
+        }
     };
     ALIAS_1D_AND_2D_AND_3D( Vector );
 
