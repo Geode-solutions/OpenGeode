@@ -1,7 +1,7 @@
 # Modified from https://github.com/cpp-best-practices/cmake_template/blob/main/cmake/CompilerWarnings.cmake
 
 if(MSVC)
-    add_compile_options(
+    set(COMPILER_WARNINGS
         /W4 # Baseline reasonable warnings
         /w14242 # 'identifier': conversion from 'type1' to 'type2', possible loss of data
         /w14254 # 'operator': conversion from 'type1:field_bits' to 'type2:field_bits', possible loss of data
@@ -29,7 +29,7 @@ if(MSVC)
         /DNOMINMAX # disable min/max macros
     )
 else() # Clang/GCC
-    add_compile_options(
+    set(COMPILER_WARNINGS
         -Wall
         -Wextra # reasonable and standard
         -Wshadow # warn the user if a variable declaration shadows one from a parent context
@@ -48,7 +48,8 @@ else() # Clang/GCC
         -Wno-error=deprecated-declarations # disable deprecated warnings
     )
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        add_compile_options(
+        set(COMPILER_WARNINGS
+            ${COMPILER_WARNINGS}
             -Wmisleading-indentation # warn if indentation implies blocks where blocks do not exist
             -Wduplicated-cond # warn if if / else chain has duplicated conditions
             -Wduplicated-branches # warn if if / else branches have duplicated code
@@ -58,3 +59,4 @@ else() # Clang/GCC
         )
     endif()
 endif()
+message(STATUS "Compiler warnings: ${COMPILER_WARNINGS}")

@@ -104,6 +104,9 @@ function(add_geode_library)
             FOLDER "Libraries"
             UNITY_BUILD ON
     )
+    target_compile_options(${GEODE_LIB_NAME} 
+        PRIVATE ${COMPILER_WARNINGS}
+    )
     source_group("Public Header Files" FILES "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}")
     source_group("Advanced Header Files" FILES "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}")
     source_group("Internal Header Files" FILES "${ABSOLUTE_GEODE_LIB_INTERNAL_HEADERS}")
