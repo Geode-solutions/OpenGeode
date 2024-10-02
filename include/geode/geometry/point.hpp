@@ -177,8 +177,7 @@ namespace geode
         [[nodiscard]] Point< dimension - 1 > project_point(
             geode::local_index_t axis_to_remove ) const
         {
-            OPENGEODE_ASSERT( axis_to_remove < dimension && axis_to_remove >= 0
-                                  && dimension > 1,
+            OPENGEODE_ASSERT( axis_to_remove < dimension && axis_to_remove >= 0,
                 "[Point] Invalid axis to remove" );
             OPENGEODE_ASSERT(
                 dimension > 1, "[Point] Invalid dimension to reduce" );

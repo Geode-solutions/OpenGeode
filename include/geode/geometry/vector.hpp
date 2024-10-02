@@ -133,70 +133,32 @@ namespace geode
 
         [[nodiscard]] geode::local_index_t least_meaningful_axis() const
         {
-            if( dimension == 1 )
+            geode::local_index_t axis{ 0 };
+            double max{ 0 };
+            for( const auto i : LRange{ dimension } )
             {
-                return 0;
-            }
-            if( dimension == 2 )
-            {
-                return std::abs( this->value( 0 ) )
-                               > std::abs( this->value( 1 ) )
-                           ? 0
-                           : 1;
-            }
-            if( dimension == 3 )
-            {
-                if( std::abs( this->value( 0 ) )
-                    > std::abs( this->value( 1 ) ) )
+                if( std::fabs( this->value( i ) ) > max )
                 {
-                    if( std::abs( this->value( 0 ) )
-                        > std::abs( this->value( 2 ) ) )
-                    {
-                        return 0;
-                    }
-                    return 2;
+                    max = std::fabs( this->value( i ) );
+                    axis = i;
                 }
-                if( std::abs( this->value( 1 ) )
-                    > std::abs( this->value( 2 ) ) )
-                {
-                    return 1;
-                }
-                return 2;
             }
+            return axis;
         }
 
         [[nodiscard]] geode::local_index_t most_meaningful_axis() const
         {
-            if( dimension == 1 )
+            geode::local_index_t axis{ 0 };
+            double min{ 0 };
+            for( const auto i : LRange{ dimension } )
             {
-                return 0;
-            }
-            if( dimension == 2 )
-            {
-                return std::abs( this->value( 0 ) )
-                               < std::abs( this->value( 1 ) )
-                           ? 0
-                           : 1;
-            }
-            if( dimension == 3 )
-            {
-                if( std::abs( this->value( 0 ) )
-                    < std::abs( this->value( 1 ) ) )
+                if( std::fabs( this->value( i ) ) < max )
                 {
-                    if( std::abs( this->value( 0 ) )
-                        < std::abs( this->value( 2 ) ) )
-                    {
-                        return 0;
-                    }
-                    return 2;
+                    min = std::fabs( this->value( i ) );
+                    axis = i;
                 }
-                if( std::abs( this->value( 1 ) )
-                    < std::abs( this->value( 2 ) ) )
-                {
-                    return 1;
-                }
-                return 2;
             }
+            return axis;
         }
     };
     ALIAS_1D_AND_2D_AND_3D( Vector );
