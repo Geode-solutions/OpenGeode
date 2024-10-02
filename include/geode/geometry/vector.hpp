@@ -152,7 +152,7 @@ namespace geode
             double min{ 0 };
             for( const auto i : LRange{ dimension } )
             {
-                if( std::fabs( this->value( i ) ) < max )
+                if( std::fabs( this->value( i ) ) < min )
                 {
                     min = std::fabs( this->value( i ) );
                     axis = i;
