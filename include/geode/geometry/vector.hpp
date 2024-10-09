@@ -150,12 +150,13 @@ namespace geode
         [[nodiscard]] geode::local_index_t least_meaningful_axis() const
         {
             geode::local_index_t axis{ 0 };
-            double min{ std::numeric_limits< double >::max() };
+            auto min = std::numeric_limits< double >::max();
             for( const auto i : LRange{ dimension } )
             {
-                if( std::fabs( this->value( i ) ) < min )
+                const auto val = std::fabs( this->value( i ) );
+                if( val < min )
                 {
-                    min = std::fabs( this->value( i ) );
+                    min = val;
                     axis = i;
                 }
             }
