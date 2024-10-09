@@ -130,6 +130,38 @@ namespace geode
                 this->value( 0 ) * other.value( 1 )
                     - this->value( 1 ) * other.value( 0 ) } };
         }
+
+        [[nodiscard]] geode::local_index_t most_meaningful_axis() const
+        {
+            geode::local_index_t axis{ 0 };
+            double max{ 0 };
+            for( const auto i : LRange{ dimension } )
+            {
+                const auto val = std::fabs( this->value( i ) );
+                if( val > max )
+                {
+                    max = val;
+                    axis = i;
+                }
+            }
+            return axis;
+        }
+
+        [[nodiscard]] geode::local_index_t least_meaningful_axis() const
+        {
+            geode::local_index_t axis{ 0 };
+            auto min = std::numeric_limits< double >::max();
+            for( const auto i : LRange{ dimension } )
+            {
+                const auto val = std::fabs( this->value( i ) );
+                if( val < min )
+                {
+                    min = val;
+                    axis = i;
+                }
+            }
+            return axis;
+        }
     };
     ALIAS_1D_AND_2D_AND_3D( Vector );
 
