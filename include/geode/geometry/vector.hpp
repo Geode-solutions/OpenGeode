@@ -131,25 +131,26 @@ namespace geode
                     - this->value( 1 ) * other.value( 0 ) } };
         }
 
-        [[nodiscard]] geode::local_index_t least_meaningful_axis() const
+        [[nodiscard]] geode::local_index_t most_meaningful_axis() const
         {
             geode::local_index_t axis{ 0 };
             double max{ 0 };
             for( const auto i : LRange{ dimension } )
             {
-                if( std::fabs( this->value( i ) ) > max )
+                const auto val = std::fabs( this->value( i ) );
+                if( val > max )
                 {
-                    max = std::fabs( this->value( i ) );
+                    max = val;
                     axis = i;
                 }
             }
             return axis;
         }
 
-        [[nodiscard]] geode::local_index_t most_meaningful_axis() const
+        [[nodiscard]] geode::local_index_t least_meaningful_axis() const
         {
             geode::local_index_t axis{ 0 };
-            double min{ 0 };
+            double min{ std::numeric_limits< double >::max() };
             for( const auto i : LRange{ dimension } )
             {
                 if( std::fabs( this->value( i ) ) < min )
