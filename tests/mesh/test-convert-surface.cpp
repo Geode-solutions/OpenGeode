@@ -73,9 +73,18 @@ void test()
 
     geode::LightRegularGrid2D grid{ geode::Point2D{ { 1, 2 } }, { 5, 6 },
         { 1, 1 } };
+    const std::array< geode::index_t, 4 > cells_to_densify{ 5, 11, 12, 13 };
     const auto converted_grid2d =
         geode::convert_grid_into_triangulated_surface( grid );
-    OPENGEODE_EXCEPTION( converted_grid2d->nb_polygons() == 5 * 6 * 2,
+    const auto converted_grid2d_densified =
+        geode::convert_grid_into_densified_triangulated_surface(
+            grid, cells_to_densify );
+    OPENGEODE_EXCEPTION( converted_grid2d->nb_polygons() == grid.nb_cells() * 2,
+        "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
+        "correct." );
+    OPENGEODE_EXCEPTION(
+        converted_grid2d_densified->nb_polygons()
+            == grid.nb_cells() * 2 + 2 * cells_to_densify.size(),
         "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
         "correct." );
 }

@@ -144,7 +144,8 @@ namespace
         const geode::Grid3D& grid,
         absl::Span< const geode::index_t > cells_to_densify )
     {
-        builder.reserve_tetrahedra( 6 * grid.nb_cells() );
+        builder.reserve_tetrahedra(
+            6 * grid.nb_cells() + 6 * cells_to_densify.size() );
         geode::GenericMapping< geode::index_t > old2new_mapping;
         for( const auto k : geode::Range{ grid.nb_cells_in_direction( 2 ) } )
         {
@@ -175,7 +176,6 @@ namespace
                 grid.cell_indices( cells_to_densify[cell_index] );
             const auto additional_vertex_id =
                 grid.nb_grid_vertices() + cell_index;
-            geode::index_t counter{ 0 };
             for( const auto tetra_id : create_tetrahedra_from_pyramid_pattern(
                      builder, grid, cell_indices, additional_vertex_id ) )
             {
