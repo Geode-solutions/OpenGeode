@@ -513,17 +513,17 @@ namespace geode
         [[nodiscard]] bool is_model_boundary_item(
             const Surface3D& surface, const ModelBoundary3D& boundary ) const;
 
-        [[nodiscard]] bool is_corner_collection_item(
-            const Corner3D& surface, const CornerCollection3D& boundary ) const;
+        [[nodiscard]] bool is_corner_collection_item( const Corner3D& corner,
+            const CornerCollection3D& corner_collection ) const;
 
         [[nodiscard]] bool is_line_collection_item(
-            const Line3D& surface, const LineCollection3D& boundary ) const;
+            const Line3D& line, const LineCollection3D& line_collection ) const;
 
         [[nodiscard]] bool is_surface_collection_item( const Surface3D& surface,
-            const SurfaceCollection3D& boundary ) const;
+            const SurfaceCollection3D& surface_collection ) const;
 
-        [[nodiscard]] bool is_block_collection_item(
-            const Block3D& surface, const BlockCollection3D& boundary ) const;
+        [[nodiscard]] bool is_block_collection_item( const Block3D& block,
+            const BlockCollection3D& block_collection ) const;
 
         [[nodiscard]] BoundingBox3D bounding_box() const;
 
