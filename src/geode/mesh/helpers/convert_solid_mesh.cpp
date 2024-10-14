@@ -146,6 +146,11 @@ namespace
     {
         builder.reserve_tetrahedra(
             6 * grid.nb_cells() + 6 * cells_to_densify.size() );
+        std::vector< bool > to_densify( grid.nb_cells(), false );
+        for( const auto& cell_id : cells_to_densify )
+        {
+            to_densify[cell_id] = true;
+        }
         geode::GenericMapping< geode::index_t > old2new_mapping;
         for( const auto k : geode::Range{ grid.nb_cells_in_direction( 2 ) } )
         {
@@ -155,9 +160,8 @@ namespace
                 for( const auto i :
                     geode::Range{ grid.nb_cells_in_direction( 0 ) } )
                 {
-                    const auto cell = grid.cell_index( { i, j, k } );
-                    if( absl::c_find( cells_to_densify, cell )
-                        != cells_to_densify.end() )
+                    const auto cell_id = grid.cell_index( { i, j, k } );
+                    if( to_densify[cell_id] )
                     {
                         continue;
                     }
@@ -165,7 +169,7 @@ namespace
                         create_tetrahedra_from_pIpI_pattern(
                             builder, grid, { i, j, k } ) )
                     {
-                        old2new_mapping.map( cell, tetra_id );
+                        old2new_mapping.map( cell_id, tetra_id );
                     }
                 }
             }

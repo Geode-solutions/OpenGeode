@@ -181,15 +181,19 @@ namespace
     {
         builder.reserve_triangles(
             2 * grid.nb_cells() + 2 * cells_to_densify.size() );
+        std::vector< bool > to_densify( grid.nb_cells(), false );
+        for( const auto& cell_id : cells_to_densify )
+        {
+            to_densify[cell_id] = true;
+        }
         geode::GenericMapping< geode::index_t > old2new_mapping;
         for( const auto j : geode::Range{ grid.nb_cells_in_direction( 1 ) } )
         {
             for( const auto i :
                 geode::Range{ grid.nb_cells_in_direction( 0 ) } )
             {
-                const auto cell = grid.cell_index( { i, j } );
-                if( absl::c_find( cells_to_densify, cell )
-                    != cells_to_densify.end() )
+                const auto cell_id = grid.cell_index( { i, j } );
+                if( to_densify[cell_id] )
                 {
                     continue;
                 }
@@ -197,7 +201,7 @@ namespace
                     create_triangles_from_diagonal_pattern(
                         builder, grid, { i, j } ) )
                 {
-                    old2new_mapping.map( cell, triangle_id );
+                    old2new_mapping.map( cell_id, triangle_id );
                 }
             }
         }
