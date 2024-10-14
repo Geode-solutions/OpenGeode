@@ -203,15 +203,28 @@ namespace
             builder.set_point( vertex_id,
                 grid.grid_point( grid.vertex_indices( vertex_id ) ) );
         }
+        auto& solid_attribute_manager = tet_solid.vertex_attribute_manager();
+        geode::internal::copy_attributes(
+            grid.grid_vertex_attribute_manager(), solid_attribute_manager );
         geode::index_t counter{ grid.nb_grid_vertices() };
         for( const auto cell_id : cells_to_densify )
         {
-            builder.set_point(
-                counter, grid.cell_barycenter( grid.cell_indices( cell_id ) ) );
+            const auto cell_indices = grid.cell_indices( cell_id );
+            builder.set_point( counter, grid.cell_barycenter( cell_indices ) );
+            std::vector< geode::index_t > cell_vertices;
+            std::vector< double > lambdas;
+            cell_vertices.reserve( 8 );
+            lambdas.reserve( 8 );
+            for( const auto& vertex_indices :
+                grid.cell_vertices( cell_indices ) )
+            {
+                cell_vertices.push_back( grid.vertex_index( vertex_indices ) );
+                lambdas.push_back( 0.125 );
+            }
+            solid_attribute_manager.interpolate_attribute_value(
+                { cell_vertices, lambdas }, counter );
             counter++;
         }
-        geode::internal::copy_attributes( grid.grid_vertex_attribute_manager(),
-            tet_solid.vertex_attribute_manager() );
     }
 
     std::unique_ptr< geode::TetrahedralSolid3D >
