@@ -90,6 +90,14 @@ namespace geode
             index_t vertex_id, EdgesAroundVertex edges );
 
         /*!
+         * Replace old edge vertices from a given vertex to another.
+         * @param[in] old_vertex_id Index of the initial mesh vertex to modify
+         * @param[in] new_vertex_id Index of the target mesh vertex to set as
+         * edge vertex
+         */
+        void replace_vertex( index_t old_vertex_id, index_t new_vertex_id );
+
+        /*!
          * Delete a set of edges
          * @param[in] to_delete Vector of size graph_.nb_edges(). If
          * to_delete[i] is true the edge of index i is deleted, else the edge is
