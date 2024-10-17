@@ -676,14 +676,15 @@ namespace geode
         const auto adj_vertices = polygon_vertices( polygon_adj_id );
         const auto nb_edges = adj_vertices.size();
         std::vector< PolygonEdge > failed_edges;
-        for( const auto e : LRange{ nb_edges } )
+        for( const auto edge_id : LRange{ nb_edges } )
         {
-            const PolygonEdge polygon_adj_edge{ polygon_adj_id, e };
-            if( v0 == adj_vertices[e] )
+            const PolygonEdge polygon_adj_edge{ polygon_adj_id, edge_id };
+            if( v0 == adj_vertices[edge_id] )
             {
-                const auto enext = e == nb_edges - 1
-                                       ? 0u
-                                       : static_cast< local_index_t >( e + 1 );
+                const auto enext =
+                    edge_id == nb_edges - 1
+                        ? 0u
+                        : static_cast< local_index_t >( edge_id + 1 );
                 if( v1 == adj_vertices[enext] )
                 {
                     if( polygon_adjacent( polygon_adj_edge )
@@ -694,11 +695,12 @@ namespace geode
                     failed_edges.emplace_back( polygon_adj_edge );
                 }
             }
-            else if( v1 == adj_vertices[e] )
+            else if( v1 == adj_vertices[edge_id] )
             {
-                const auto enext = e == nb_edges - 1
-                                       ? 0u
-                                       : static_cast< local_index_t >( e + 1 );
+                const auto enext =
+                    edge_id == nb_edges - 1
+                        ? 0u
+                        : static_cast< local_index_t >( edge_id + 1 );
                 if( v0 == adj_vertices[enext] )
                 {
                     if( polygon_adjacent( polygon_adj_edge )
