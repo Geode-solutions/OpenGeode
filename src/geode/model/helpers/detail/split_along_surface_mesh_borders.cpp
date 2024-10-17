@@ -207,10 +207,10 @@ namespace geode
                 for( const auto& line : model_.internal_lines( surface ) )
                 {
                     const auto& mesh = line.mesh();
-                    for( const auto e : Range{ mesh.nb_edges() } )
+                    for( const auto edge_id : Range{ mesh.nb_edges() } )
                     {
                         const auto model_edges =
-                            component_mesh_edges( model_, line, e );
+                            component_mesh_edges( model_, line, edge_id );
                         const auto& surface_edges = model_edges.surface_edges;
                         const auto it = surface_edges.find( surface.id() );
                         if( it == surface_edges.end() )
@@ -219,24 +219,12 @@ namespace geode
                         }
                         for( auto& edge : it->second )
                         {
-                            const auto& surface_mesh = surface.mesh();
-                            const auto& edge_vertices =
-                                surface_mesh.polygon_edge_vertices( edge );
-                            edges.emplace_back(
-                                surface_mesh
-                                    .polygon_edge_from_vertices(
-                                        edge_vertices[0], edge_vertices[1] )
-                                    .value() );
-                            if( surface_mesh
-                                    .polygon_edge_from_vertices(
-                                        edge_vertices[1], edge_vertices[0] )
-                                    .has_value() )
+                            edges.push_back( edge );
+                            if( const auto adj_edge =
+                                    surface.mesh().polygon_adjacent_edge(
+                                        edge ) )
                             {
-                                edges.emplace_back(
-                                    surface_mesh
-                                        .polygon_edge_from_vertices(
-                                            edge_vertices[1], edge_vertices[0] )
-                                        .value() );
+                                edges.push_back( adj_edge.value() );
                             }
                         }
                     }

@@ -163,7 +163,6 @@ namespace geode
                 {
                     if( auto edge = mesh.polygon_edge_from_vertices(
                             pair[0], pair[1] ) )
-
                     {
                         edges[surface.id()].emplace_back(
                             std::move( edge.value() ) );
