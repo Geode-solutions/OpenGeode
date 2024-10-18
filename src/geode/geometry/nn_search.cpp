@@ -187,6 +187,7 @@ namespace geode
             "[NNSearch::colocated_index_mapping] Given epsilon too small, "
             "should be bigger than GLOBAL_EPSILON (i.e. ",
             GLOBAL_EPSILON, ")" );
+        typename NNSearch< dimension >::ColocatedInfo result;
         std::vector< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
@@ -210,15 +211,16 @@ namespace geode
                 nb_unique_points++;
             }
         }
+        result.colocated_input_points = mapping;
         index_t nb_colocated{ 0 };
         index_t count{ 0 };
-        std::vector< Point< dimension > > unique_points( nb_unique_points );
+        result.unique_points.resize( nb_unique_points );
         for( const auto p : Range{ nb_points() } )
         {
             if( mapping[p] == p )
             {
                 mapping[p] -= nb_colocated;
-                unique_points[count++] = point( p );
+                result.unique_points[count++] = point( p );
             }
             else
             {
@@ -226,7 +228,8 @@ namespace geode
                 mapping[p] = mapping[mapping[p]];
             }
         }
-        return { std::move( mapping ), std::move( unique_points ) };
+        result.colocated_mapping = mapping;
+        return result;
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;

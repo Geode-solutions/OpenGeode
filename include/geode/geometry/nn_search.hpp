@@ -42,6 +42,7 @@ namespace geode
     public:
         struct ColocatedInfo
         {
+            ColocatedInfo() = default;
             [[nodiscard]] index_t nb_unique_points() const
             {
                 return unique_points.size();
@@ -52,13 +53,19 @@ namespace geode
                 return colocated_mapping.size() - nb_unique_points();
             }
 
+            std::vector< Point< dimension > > unique_points;
+            /*!
+             * This list has the size of the number of points in the tree.
+             * Each index is pointing to its old point index as given in input
+             * vector.
+             */
+            std::vector< index_t > colocated_mapping;
             /*!
              * This list has the size of the number of points in the tree.
              * Each index is pointing to its new unique point stored in the
              * unique_points vector.
              */
-            std::vector< index_t > colocated_mapping;
-            std::vector< Point< dimension > > unique_points;
+            std::vector< index_t > colocated_input_points;
         };
 
     public:
