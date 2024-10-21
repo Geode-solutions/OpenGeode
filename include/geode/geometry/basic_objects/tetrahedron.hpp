@@ -64,6 +64,7 @@ namespace geode
         void set_point( local_index_t vertex, PointType point );
         [[nodiscard]] const std::array< PointType, 4 >& vertices() const;
         [[nodiscard]] BoundingBox3D bounding_box() const;
+        [[nodiscard]] bool is_degenerated() const;
 
     private:
         std::array< PointType, 4 > vertices_;

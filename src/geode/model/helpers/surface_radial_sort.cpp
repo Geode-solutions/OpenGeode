@@ -89,17 +89,6 @@ namespace
         geode::Point3D opposite_point;
     };
 
-    bool is_polygon_degenerate( const geode::SurfaceMesh3D& mesh,
-        const geode::PolygonEdge& edge,
-        const geode::Point3D& opposite_point )
-    {
-        const auto edge_vertices = mesh.polygon_edge_vertices( edge );
-        return geode::point_line_distance( opposite_point,
-                   { geode::Segment3D{ mesh.point( edge_vertices[0] ),
-                       mesh.point( edge_vertices[1] ) } } )
-               <= geode::GLOBAL_EPSILON;
-    }
-
     std::pair< bool, std::vector< BorderPolygon > > border_polygons(
         const geode::BRep& brep,
         const geode::Line3D& line,
@@ -126,20 +115,18 @@ namespace
                 {
                     polygons.emplace_back(
                         surface, true, std::move( edge0.value() ) );
-                    degenerate_polygon =
-                        degenerate_polygon
-                        || is_polygon_degenerate( surface_mesh, edge0.value(),
-                            polygons.back().opposite_point );
+                    degenerate_polygon = degenerate_polygon
+                                         || surface_mesh.is_polygon_degenerated(
+                                             edge0->polygon_id );
                 }
                 if( auto edge1 = surface_mesh.polygon_edge_from_vertices(
                         pair[1], pair[0] ) )
                 {
                     polygons.emplace_back(
                         surface, false, std::move( edge1.value() ) );
-                    degenerate_polygon =
-                        degenerate_polygon
-                        || is_polygon_degenerate( surface_mesh, edge1.value(),
-                            polygons.back().opposite_point );
+                    degenerate_polygon = degenerate_polygon
+                                         || surface_mesh.is_polygon_degenerated(
+                                             edge1->polygon_id );
                 }
             }
         }

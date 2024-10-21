@@ -35,7 +35,7 @@ namespace geode
     }
     template < typename PointType, index_t dimension >
     GenericLine< PointType, dimension >::GenericLine(
-        const GenericSegment< PointType, dimension >& segment )
+        const Segment< dimension >& segment )
         : GenericLine( segment.normalized_direction(), segment.vertices()[0] )
     {
     }
@@ -77,8 +77,7 @@ namespace geode
     template < index_t dimension >
     OwnerInfiniteLine< dimension >::OwnerInfiniteLine(
         const Segment< dimension >& segment )
-        : OwnerInfiniteLine(
-              segment.normalized_direction(), segment.vertices()[0] )
+        : Base( segment )
     {
     }
     template < index_t dimension >
@@ -104,7 +103,7 @@ namespace geode
     template < index_t dimension >
     InfiniteLine< dimension >::InfiniteLine(
         const Segment< dimension >& segment )
-        : InfiniteLine( segment.normalized_direction(), segment.vertices()[0] )
+        : Base( segment )
     {
     }
     template < index_t dimension >
@@ -135,7 +134,7 @@ namespace geode
     }
     template < index_t dimension >
     OwnerRay< dimension >::OwnerRay( const Segment< dimension >& segment )
-        : OwnerRay( segment.normalized_direction(), segment.vertices()[0] )
+        : Base( segment )
     {
     }
     template < index_t dimension >
@@ -159,7 +158,7 @@ namespace geode
     }
     template < index_t dimension >
     Ray< dimension >::Ray( const Segment< dimension >& segment )
-        : Ray( segment.normalized_direction(), segment.vertices()[0] )
+        : Base( segment )
     {
     }
     template < index_t dimension >
