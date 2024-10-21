@@ -102,6 +102,12 @@ namespace geode
         return bbox;
     }
 
+    template < typename PointType, index_t dimension >
+    bool GenericSegment< PointType, dimension >::is_degenerated() const
+    {
+        return length() <= GLOBAL_EPSILON;
+    }
+
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
         Point< dimension > point0, Point< dimension > point1 ) noexcept

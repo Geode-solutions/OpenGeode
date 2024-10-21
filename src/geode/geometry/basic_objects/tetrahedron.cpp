@@ -93,7 +93,7 @@ namespace geode
             const Triangle3D triangle{ point0, point1, point2 };
             if( triangle.is_degenerated() )
             {
-                continue;
+                return true;
             }
             for( const auto vertex3 : LRange{ 4 } )
             {
