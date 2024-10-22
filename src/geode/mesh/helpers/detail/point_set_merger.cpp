@@ -39,6 +39,10 @@ namespace geode
         }
 
         template < index_t dimension >
+        PointSetMerger< dimension >::PointSetMerger(
+            PointSetMerger&& ) noexcept = default;
+
+        template < index_t dimension >
         PointSetMerger< dimension >::~PointSetMerger() = default;
 
         template < index_t dimension >

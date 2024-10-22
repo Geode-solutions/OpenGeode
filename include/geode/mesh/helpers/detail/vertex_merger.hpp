@@ -60,6 +60,7 @@ namespace geode
             VertexMerger(
                 absl::Span< const std::reference_wrapper< const Mesh > > meshes,
                 double epsilon );
+            VertexMerger( VertexMerger&& ) noexcept;
             ~VertexMerger();
 
             [[nodiscard]] absl::Span<
