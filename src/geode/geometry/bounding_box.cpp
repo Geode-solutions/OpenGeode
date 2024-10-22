@@ -177,6 +177,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void BoundingBox< dimension >::extends( double length )
+    {
+        for( const auto i : LRange{ dimension } )
+        {
+            min_.set_value( i, min_.value( i ) - length );
+            max_.set_value( i, max_.value( i ) + length );
+        }
+    }
+
+    template < index_t dimension >
     void BoundingBox< dimension >::add_box(
         const BoundingBox< dimension >& box )
     {
