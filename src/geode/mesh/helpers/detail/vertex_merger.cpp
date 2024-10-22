@@ -168,6 +168,9 @@ namespace geode
         }
 
         template < typename Mesh >
+        VertexMerger< Mesh >::VertexMerger( VertexMerger&& ) noexcept = default;
+
+        template < typename Mesh >
         VertexMerger< Mesh >::~VertexMerger() = default;
 
         template < typename Mesh >

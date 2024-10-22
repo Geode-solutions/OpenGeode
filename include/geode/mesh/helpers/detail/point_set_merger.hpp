@@ -44,6 +44,7 @@ namespace geode
             PointSetMerger( absl::Span< const std::reference_wrapper<
                                 const PointSet< dimension > > > pointsets,
                 double epsilon );
+            PointSetMerger( PointSetMerger&& ) noexcept;
             ~PointSetMerger();
 
             [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge();

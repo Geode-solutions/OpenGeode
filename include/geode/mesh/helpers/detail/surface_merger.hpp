@@ -66,6 +66,7 @@ namespace geode
             SurfaceMeshMerger( absl::Span< const std::reference_wrapper<
                                    const SurfaceMesh< dimension > > > surfaces,
                 double epsilon );
+            SurfaceMeshMerger( SurfaceMeshMerger&& ) noexcept;
             ~SurfaceMeshMerger();
 
             [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge();
