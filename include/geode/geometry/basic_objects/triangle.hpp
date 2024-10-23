@@ -85,6 +85,7 @@ namespace geode
         [[nodiscard]] BoundingBox< dimension > bounding_box() const;
         [[nodiscard]] local_index_t longest_edge_index() const;
         [[nodiscard]] double minimum_height() const;
+        [[nodiscard]] bool is_degenerated() const;
 
     private:
         std::array< PointType, 3 > vertices_;

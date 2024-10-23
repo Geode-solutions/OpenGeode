@@ -537,6 +537,7 @@ namespace
         const geode::Segment2D segment_in_grid{ pt0_in_grid, pt1_in_grid };
         const auto normal_in_grid =
             geode::perpendicular( segment_in_grid.direction() );
+        const geode::InfiniteLine2D line_in_grid{ segment_in_grid };
         const auto critical_point = compute_critical_point( normal_in_grid );
 
         for( const auto j : geode::Range( min[1], max[1] + 1 ) )
@@ -549,13 +550,13 @@ namespace
 
                 // Test segment line through box
                 const auto p_minus = point + critical_point;
-                const auto p_minus_dist = geode::point_line_signed_distance(
-                    p_minus, { segment_in_grid } );
+                const auto p_minus_dist =
+                    geode::point_line_signed_distance( p_minus, line_in_grid );
                 const geode::Point2D p_plus{ { 1. + i
                                                    - critical_point.value( 0 ),
                     1. + j - critical_point.value( 1 ) } };
-                const auto p_plus_dist = geode::point_line_signed_distance(
-                    p_plus, { segment_in_grid } );
+                const auto p_plus_dist =
+                    geode::point_line_signed_distance( p_plus, line_in_grid );
                 if( std::fabs( p_minus_dist ) > 2. * geode::GLOBAL_EPSILON
                     && std::fabs( p_plus_dist ) > 2. * geode::GLOBAL_EPSILON
                     && p_minus_dist * p_plus_dist > 0. )

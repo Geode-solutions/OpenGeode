@@ -23,6 +23,8 @@
 
 #include <geode/geometry/basic_objects/plane.hpp>
 
+#include <geode/geometry/basic_objects/triangle.hpp>
+
 namespace geode
 {
     template < typename PointType >
@@ -31,6 +33,13 @@ namespace geode
         : normal_( normal.normalize() ), origin_( std::move( origin ) )
     {
     }
+    template < typename PointType >
+    GenericPlane< PointType >::GenericPlane( const Triangle3D& triangle )
+        : normal_( triangle.normal().value() ),
+          origin_( triangle.vertices()[0] )
+    {
+    }
+
     template < typename PointType >
     GenericPlane< PointType >::GenericPlane( const GenericPlane& ) = default;
     template < typename PointType >
@@ -69,6 +78,8 @@ namespace geode
         : Base( normal, std::move( origin ) )
     {
     }
+    OwnerPlane::OwnerPlane( const Triangle3D& triangle ) : Base( triangle ) {}
+
     OwnerPlane::OwnerPlane( const OwnerPlane& ) = default;
     OwnerPlane& OwnerPlane::operator=( const OwnerPlane& ) = default;
     OwnerPlane::OwnerPlane( OwnerPlane&& ) noexcept = default;
@@ -78,6 +89,8 @@ namespace geode
         : Base( normal, origin )
     {
     }
+    Plane::Plane( const Triangle3D& triangle ) : Base( triangle ) {}
+
     Plane::Plane( const Plane& ) = default;
     Plane::Plane( const OwnerPlane& other )
         : Base( other.normal(), other.origin() )
