@@ -64,6 +64,7 @@ namespace geode
             EdgedCurveMerger( absl::Span< const std::reference_wrapper<
                                   const EdgedCurve< dimension > > > curves,
                 double epsilon );
+            EdgedCurveMerger( EdgedCurveMerger&& ) noexcept;
             ~EdgedCurveMerger();
 
             [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge();

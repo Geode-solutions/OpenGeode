@@ -305,6 +305,10 @@ namespace geode
         }
 
         template < index_t dimension >
+        SurfaceMeshMerger< dimension >::SurfaceMeshMerger(
+            SurfaceMeshMerger&& ) noexcept = default;
+
+        template < index_t dimension >
         SurfaceMeshMerger< dimension >::~SurfaceMeshMerger() = default;
 
         template < index_t dimension >

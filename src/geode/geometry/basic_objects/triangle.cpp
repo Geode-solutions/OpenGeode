@@ -273,23 +273,16 @@ namespace geode
     template < typename PointType, index_t dimension >
     bool GenericTriangle< PointType, dimension >::is_degenerated() const
     {
-        for( const auto edge_id : LRange{ 3 } )
+        const Point< dimension >& point0 = vertices_.at( 0 );
+        const Point< dimension >& point1 = vertices_.at( 1 );
+        const Segment< dimension > edge{ point0, point1 };
+        if( edge.is_degenerated() )
         {
-            const auto next_vertex = edge_id == 2 ? 0 : edge_id + 1;
-            const Point< dimension >& point0 = vertices_.at( edge_id );
-            const Point< dimension >& point1 = vertices_.at( next_vertex );
-            const Segment< dimension > edge{ point0, point1 };
-            if( edge.is_degenerated() )
-            {
-                return true;
-            }
-            const auto last_vertex = next_vertex == 2 ? 0 : next_vertex + 1;
-            const Point< dimension >& point2 = vertices_.at( last_vertex );
-            return point_line_distance(
-                       point2, InfiniteLine< dimension >{ edge } )
-                   <= GLOBAL_EPSILON;
+            return true;
         }
-        return true;
+        const Point< dimension >& point2 = vertices_.at( 2 );
+        return point_line_distance( point2, InfiniteLine< dimension >{ edge } )
+               <= GLOBAL_EPSILON;
     }
 
     template < index_t dimension >

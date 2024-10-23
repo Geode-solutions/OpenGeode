@@ -85,30 +85,18 @@ namespace geode
     template < typename PointType >
     bool GenericTetrahedron< PointType >::is_degenerated() const
     {
-        for( const auto [vertex0, vertex1, vertex2] : tetrahedron_facet_vertex )
+        const Point3D& point0 = vertices_.at( 0 );
+        const Point3D& point1 = vertices_.at( 1 );
+        const Point3D& point2 = vertices_.at( 2 );
+        const Triangle3D triangle{ point0, point1, point2 };
+        if( triangle.is_degenerated() )
         {
-            const Point3D& point0 = vertices_.at( vertex0 );
-            const Point3D& point1 = vertices_.at( vertex1 );
-            const Point3D& point2 = vertices_.at( vertex2 );
-            const Triangle3D triangle{ point0, point1, point2 };
-            if( triangle.is_degenerated() )
-            {
-                return true;
-            }
-            for( const auto vertex3 : LRange{ 4 } )
-            {
-                if( vertex3 == vertex0 || vertex3 == vertex1
-                    || vertex3 == vertex2 )
-                {
-                    continue;
-                }
-                const Point3D& point3 = vertices_.at( vertex3 );
-                return std::get< 0 >(
-                           point_plane_distance( point3, Plane{ triangle } ) )
-                       <= GLOBAL_EPSILON;
-            }
+            return true;
         }
-        return true;
+        const Point3D& point3 = vertices_.at( 3 );
+        return std::get< 0 >(
+                   point_plane_distance( point3, Plane{ triangle } ) )
+               <= GLOBAL_EPSILON;
     }
 
     OwnerTetrahedron::OwnerTetrahedron( Point3D point0,
