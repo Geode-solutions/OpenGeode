@@ -1,1 +1,2 @@
 tests/** linguist-vendored
+bindings/python/requirements.txt merge=ours
