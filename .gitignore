@@ -2,3 +2,4 @@ build
 .settings
 .vscode/ipch
 examples/.ipynb*
+bindings/python/requirements.txt
