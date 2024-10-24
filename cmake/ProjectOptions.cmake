@@ -41,6 +41,13 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/COPYLEFT)
     )
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/.gitconfig)
+    find_package(Git)
+    if(Git_FOUND)
+        execute_process(COMMAND ${GIT_EXECUTABLE} config --local include.path ../.gitconfig)
+    endif()
+endif()
+
 find_package(Doxygen QUIET)
 if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
     # set input and output files
