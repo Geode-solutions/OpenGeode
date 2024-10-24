@@ -85,7 +85,9 @@ namespace geode
                         a.value1b( value.computed_ );
                         a( value.value_ );
                                     }, [] Archive& /*a*/, CachedValue& /*value*/ )
-                    { // skip serialize} } } );
+                    { 
+// skip serialize
+} } } );
                     }
 
                 private:
