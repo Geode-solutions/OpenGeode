@@ -82,16 +82,16 @@ namespace geode
         {
             archive.ext( *this, Growable< Archive, CachedValue >{
                 { []( Archive& a, CachedValue& value ) {
-                        a.value1b( value.computed_ );
-                        a( value.value_ );
+                a.value1b( value.computed_ );
+                a( value.value_ );
                                     }, [] Archive& /*a*/, CachedValue& /*value*/ )
                     { 
 // skip serialize
 } } } );
-                    }
+        }
 
-                private:
-                    mutable bool computed_{ false };
-                    mutable ReturnType value_;
-                };
+    private:
+        mutable bool computed_{ false };
+        mutable ReturnType value_;
+    };
 } // namespace geode
