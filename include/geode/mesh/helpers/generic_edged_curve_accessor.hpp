@@ -52,6 +52,11 @@ namespace geode
         {
         }
 
+        [[nodiscard]] index_t nb_vertices() const
+        {
+            return mesh_.nb_vertices();
+        }
+
         [[nodiscard]] index_t nb_elements() const
         {
             return mesh_.nb_edges();

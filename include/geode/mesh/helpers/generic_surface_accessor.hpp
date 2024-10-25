@@ -45,12 +45,38 @@ namespace geode
     public:
         using ElementVertex = PolygonVertex;
         using ElementVertices = PolygonVertices;
-        using ElementFacet = PolygonEdge;
         using ElementFacetVertices = std::array< index_t, 2 >;
+
+        struct ElementFacet
+        {
+            ElementFacet( index_t element, local_index_t facet )
+                : element_id( element ), facet_id( facet )
+            {
+            }
+            ElementFacet( PolygonEdge polygon_edge )
+                : element_id( polygon_edge.polygon_id ),
+                  facet_id( polygon_edge.edge_id )
+            {
+            }
+
+            bool operator==( const ElementFacet& other ) const
+            {
+                return element_id == other.element_id
+                       && facet_id == other.facet_id;
+            }
+
+            index_t element_id;
+            local_index_t facet_id;
+        };
 
         explicit GenericMeshAccessor( const SurfaceMesh< dimension >& mesh )
             : mesh_( mesh )
         {
+        }
+
+        [[nodiscard]] index_t nb_vertices() const
+        {
+            return mesh_.nb_vertices();
         }
 
         [[nodiscard]] index_t nb_elements() const
@@ -87,21 +113,29 @@ namespace geode
         }
 
         [[nodiscard]] ElementFacetVertices element_facet_vertices(
-            const ElementFacet& polygon_edge ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polygon_edge_vertices( polygon_edge );
+            return mesh_.polygon_edge_vertices(
+                { element_facet.element_id, element_facet.facet_id } );
         }
 
         [[nodiscard]] std::optional< index_t > element_adjacent(
-            const ElementFacet& polygon_edge ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polygon_adjacent( polygon_edge );
+            return mesh_.polygon_adjacent(
+                { element_facet.element_id, element_facet.facet_id } );
         }
 
         [[nodiscard]] std::optional< ElementFacet > element_adjacent_facet(
-            const ElementFacet& polygon_edge ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polygon_adjacent_edge( polygon_edge );
+            const auto adj = mesh_.polygon_adjacent_edge(
+                { element_facet.element_id, element_facet.facet_id } );
+            if( adj )
+            {
+                return adj.value();
+            }
+            return std::nullopt;
         }
 
         [[nodiscard]] const uuid& id() const

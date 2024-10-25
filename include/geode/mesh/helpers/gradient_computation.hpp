@@ -43,4 +43,20 @@ namespace geode
     [[nodiscard]] std::string opengeode_mesh_api
         compute_solid_scalar_function_gradient(
             const SolidMesh3D& mesh, std::string_view scalar_function_name );
+
+    namespace internal
+    {
+        template < index_t dimension >
+        [[nodiscard]] std::tuple< std::string, std::vector< index_t > >
+            compute_surface_scalar_function_gradient(
+                const SurfaceMesh< dimension >& mesh,
+                std::string_view scalar_function_name,
+                absl::Span< const index_t > no_value_vertices );
+
+        [[nodiscard]] std::tuple< std::string, std::vector< index_t > >
+            opengeode_mesh_api compute_solid_scalar_function_gradient(
+                const SolidMesh3D& mesh,
+                std::string_view scalar_function_name,
+                absl::Span< const index_t > no_value_vertices );
+    } // namespace internal
 } // namespace geode
