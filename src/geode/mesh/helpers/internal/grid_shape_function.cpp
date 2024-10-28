@@ -120,12 +120,12 @@ namespace geode
         template double opengeode_mesh_api shape_function_value< 3 >(
             const Grid< 3 >::CellIndices&, local_index_t, const Point< 3 >& );
 
-        template double gradient_shape_function_value< 2 >(
+        template double opengeode_mesh_api gradient_shape_function_value< 2 >(
             const typename Grid< 2 >::CellIndices&,
             local_index_t,
             const Point< 2 >&,
             local_index_t );
-        template double gradient_shape_function_value< 3 >(
+        template double opengeode_mesh_api gradient_shape_function_value< 3 >(
             const typename Grid< 3 >::CellIndices&,
             local_index_t,
             const Point< 3 >&,
