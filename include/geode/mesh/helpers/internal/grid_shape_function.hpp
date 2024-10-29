@@ -29,6 +29,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
 } // namespace geode
 
@@ -41,5 +42,12 @@ namespace geode
             const typename Grid< dimension >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< dimension >& point_in_grid );
+
+        template < index_t dimension >
+        [[nodiscard]] double gradient_shape_function_value(
+            const typename Grid< dimension >::CellIndices& cell_id,
+            local_index_t node_id,
+            const Point< dimension >& point_in_grid,
+            local_index_t derivative_direction );
     } // namespace internal
 } // namespace geode

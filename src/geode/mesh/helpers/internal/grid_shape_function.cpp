@@ -48,11 +48,11 @@ namespace
             point_in_grid.value( direction ) - cell_id[direction];
         if( local_coord < 0 )
         {
-            return 0;
+            return 0.;
         }
         else if( local_coord > 1 )
         {
-            return 1;
+            return 1.;
         }
         return local_coord;
     }
@@ -68,32 +68,67 @@ namespace geode
             local_index_t node_id,
             const Point< dimension >& point_in_grid )
         {
-            double shape_function_value{ 1. };
+            double result{ 1. };
             for( const auto d : LRange{ dimension } )
             {
                 if( node_is_on_axis_origin< dimension >( node_id, d ) )
                 {
-                    shape_function_value *= 1
-                                            - local_point_value< dimension >(
-                                                point_in_grid, cell_id, d );
+                    result *= 1.
+                              - local_point_value< dimension >(
+                                  point_in_grid, cell_id, d );
+                    continue;
                 }
-                else
-                {
-                    shape_function_value *= local_point_value< dimension >(
-                        point_in_grid, cell_id, d );
-                }
+                result *=
+                    local_point_value< dimension >( point_in_grid, cell_id, d );
             }
-            return shape_function_value;
+            return result;
+        }
+
+        template < index_t dimension >
+        double gradient_shape_function_value(
+            const typename Grid< dimension >::CellIndices& cell_id,
+            local_index_t node_id,
+            const Point< dimension >& point_in_grid,
+            local_index_t direction )
+        {
+            double result{ 1. };
+            for( const auto dim : LRange{ dimension } )
+            {
+                if( dim == direction )
+                {
+                    continue;
+                }
+                if( node_is_on_axis_origin< dimension >( node_id, dim ) )
+                {
+                    result *= 1.
+                              - local_point_value< dimension >(
+                                  point_in_grid, cell_id, dim );
+                    continue;
+                }
+                result *= local_point_value< dimension >(
+                    point_in_grid, cell_id, dim );
+            }
+            if( node_is_on_axis_origin< dimension >( node_id, direction ) )
+            {
+                result *= -1.;
+            }
+            return result;
         }
 
         template double opengeode_mesh_api shape_function_value< 2 >(
-            const Grid< 2 >::CellIndices& cell_id,
-            local_index_t node_id,
-            const Point< 2 >& point );
-
+            const Grid< 2 >::CellIndices&, local_index_t, const Point< 2 >& );
         template double opengeode_mesh_api shape_function_value< 3 >(
-            const Grid< 3 >::CellIndices& cell_id,
-            local_index_t node_id,
-            const Point< 3 >& point );
+            const Grid< 3 >::CellIndices&, local_index_t, const Point< 3 >& );
+
+        template double opengeode_mesh_api gradient_shape_function_value< 2 >(
+            const typename Grid< 2 >::CellIndices&,
+            local_index_t,
+            const Point< 2 >&,
+            local_index_t );
+        template double opengeode_mesh_api gradient_shape_function_value< 3 >(
+            const typename Grid< 3 >::CellIndices&,
+            local_index_t,
+            const Point< 3 >&,
+            local_index_t );
     } // namespace internal
 } // namespace geode
