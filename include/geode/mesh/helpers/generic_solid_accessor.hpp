@@ -45,29 +45,8 @@ namespace geode
     public:
         using ElementVertex = PolyhedronVertex;
         using ElementVertices = PolyhedronVertices;
+        using ElementFacet = PolyhedronFacet;
         using ElementFacetVertices = PolyhedronFacetVertices;
-
-        struct ElementFacet
-        {
-            ElementFacet( index_t element, local_index_t facet )
-                : element_id( element ), facet_id( facet )
-            {
-            }
-            ElementFacet( PolyhedronFacet polyhedron_facet )
-                : element_id( polyhedron_facet.polyhedron_id ),
-                  facet_id( polyhedron_facet.facet_id )
-            {
-            }
-
-            bool operator==( const ElementFacet& other ) const
-            {
-                return element_id == other.element_id
-                       && facet_id == other.facet_id;
-            }
-
-            index_t element_id;
-            local_index_t facet_id;
-        };
 
         explicit GenericMeshAccessor( const SolidMesh< dimension >& mesh )
             : mesh_( mesh )
@@ -94,6 +73,18 @@ namespace geode
             return mesh_.nb_polyhedron_facets( polyhedron_id );
         }
 
+        [[nodiscard]] index_t element_index(
+            const ElementFacet& polyhedron_facet ) const
+        {
+            return polyhedron_facet.polyhedron_id;
+        }
+
+        [[nodiscard]] index_t facet_index(
+            const ElementFacet& polyhedron_facet ) const
+        {
+            return polyhedron_facet.facet_id;
+        }
+
         [[nodiscard]] index_t element_vertex(
             const ElementVertex& polyhedron_vertex ) const
         {
@@ -115,27 +106,19 @@ namespace geode
         [[nodiscard]] ElementFacetVertices element_facet_vertices(
             const ElementFacet& element_facet ) const
         {
-            return mesh_.polyhedron_facet_vertices(
-                { element_facet.element_id, element_facet.facet_id } );
+            return mesh_.polyhedron_facet_vertices( element_facet );
         }
 
         [[nodiscard]] std::optional< index_t > element_adjacent(
             const ElementFacet& element_facet ) const
         {
-            return mesh_.polyhedron_adjacent(
-                { element_facet.element_id, element_facet.facet_id } );
+            return mesh_.polyhedron_adjacent( element_facet );
         }
 
         [[nodiscard]] std::optional< ElementFacet > element_adjacent_facet(
             ElementFacet element_facet ) const
         {
-            const auto adj = mesh_.polyhedron_adjacent_facet(
-                { element_facet.element_id, element_facet.facet_id } );
-            if( adj )
-            {
-                return adj.value();
-            }
-            return std::nullopt;
+            return mesh_.polyhedron_adjacent_facet( element_facet );
         }
 
         [[nodiscard]] const uuid& id() const
