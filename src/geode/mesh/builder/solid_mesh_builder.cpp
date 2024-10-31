@@ -251,6 +251,19 @@ namespace
             }
             builder.create_polyhedron( vertices, facets );
         }
+        for( const auto v : geode::Range{ solid.nb_vertices() } )
+        {
+            const auto polyhedron = solid.polyhedron_around_vertex( v );
+            if( !polyhedron )
+            {
+                builder.disassociate_polyhedron_vertex_to_vertex( v );
+            }
+            else
+            {
+                builder.associate_polyhedron_vertex_to_vertex(
+                    polyhedron.value(), v );
+            }
+        }
     }
 
     template < geode::index_t dimension >
@@ -392,43 +405,42 @@ namespace geode
 
     template < index_t dimension >
     void SolidMeshBuilder< dimension >::set_polyhedron_vertex(
-        const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+        const PolyhedronVertex& polyhedron_vertex, index_t new_vertex_id )
     {
-        const auto polyhedron_vertex_id =
+        const auto old_vertex_id =
             solid_mesh_.polyhedron_vertex( polyhedron_vertex );
-        if( polyhedron_vertex_id == vertex_id )
+        if( old_vertex_id == new_vertex_id )
         {
             return;
         }
-        if( polyhedron_vertex_id != NO_ID )
+        if( old_vertex_id != NO_ID )
         {
             const auto polyhedron_around =
-                solid_mesh_.polyhedron_around_vertex( polyhedron_vertex_id );
+                solid_mesh_.polyhedron_around_vertex( old_vertex_id );
             if( polyhedron_around == polyhedron_vertex )
             {
                 const auto& polyhedra_around =
-                    solid_mesh_.polyhedra_around_vertex( polyhedron_vertex_id );
+                    solid_mesh_.polyhedra_around_vertex( old_vertex_id );
                 if( polyhedra_around.size() < 2 )
                 {
-                    disassociate_polyhedron_vertex_to_vertex(
-                        polyhedron_vertex_id );
+                    disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
                 }
                 else
                 {
                     associate_polyhedron_vertex_to_vertex(
-                        polyhedra_around[1], polyhedron_vertex_id );
+                        polyhedra_around[1], new_vertex_id );
                 }
             }
-            reset_polyhedra_around_vertex( polyhedron_vertex_id );
+            reset_polyhedra_around_vertex( old_vertex_id );
         }
 
         if( solid_mesh_.are_edges_enabled()
             || solid_mesh_.are_facets_enabled() )
         {
             update_edge_and_facet(
-                solid_mesh_, *this, polyhedron_vertex, vertex_id );
+                solid_mesh_, *this, polyhedron_vertex, new_vertex_id );
         }
-        update_polyhedron_vertex( polyhedron_vertex, vertex_id );
+        update_polyhedron_vertex( polyhedron_vertex, new_vertex_id );
     }
 
     template < index_t dimension >
