@@ -214,7 +214,7 @@ namespace geode
     struct AttributeLinearInterpolationImpl< Point< dimension > >
     {
         template < template < typename > class Attribute >
-        static Point< dimension > compute(
+        [[nodiscard]] static Point< dimension > compute(
             const AttributeLinearInterpolation &interpolator,
             const Attribute< Point< dimension > > &attribute )
         {

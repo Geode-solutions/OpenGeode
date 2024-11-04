@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/point.hpp>
@@ -54,10 +55,46 @@ void test_operators()
     OPENGEODE_EXCEPTION( answer / 2 == p, "[Test] Points should be equal" );
 }
 
+void test_interpolation()
+{
+    geode::AttributeManager manager;
+    manager.resize( 10 );
+    auto attribute = manager.find_or_create_attribute< geode::VariableAttribute,
+        geode::Point< 3 > >(
+        "point_3", geode::Point3D{ { 10., 11., 12. } }, { false, true } );
+    OPENGEODE_EXCEPTION( attribute->default_value().value( 0 ) == 10.,
+        "[Test] Wrong default value" );
+    OPENGEODE_EXCEPTION( attribute->default_value().value( 1 ) == 11.,
+        "[Test] Wrong default value" );
+    OPENGEODE_EXCEPTION( attribute->default_value().value( 2 ) == 12.,
+        "[Test] Wrong default value" );
+    attribute->set_value( 3, geode::Point3D{ { 1., 2., 3. } } );
+    attribute->set_value( 7, geode::Point3D{ { 2., 5., 7. } } );
+    manager.interpolate_attribute_value( { { 1, 7 }, { 0.5, 0.3 } }, 4 );
+
+    OPENGEODE_EXCEPTION(
+        attribute->value( 3 ).inexact_equal( geode::Point3D{ { 1., 2., 3. } } ),
+        "[Test] Value 3 Should be equal to [ 1., 2., 3. ], not ",
+        attribute->value( 3 ).string() );
+    OPENGEODE_EXCEPTION( attribute->value( 4 ).inexact_equal(
+                             geode::Point3D{ { 5.6, 7., 8.1 } } ),
+        "[Test] Value 4 Should be equal to [ 5.6, 7., 8.1 ], not ",
+        attribute->value( 4 ).string() );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 6 ).inexact_equal( geode::Point3D{ { 10, 11, 12 } } ),
+        "[Test] Value 6 Should be equal to [ 10, 11, 12 ], not ",
+        attribute->value( 6 ).string() );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 7 ).inexact_equal( geode::Point3D{ { 2., 5., 7. } } ),
+        "[Test] Value 7 Should be equal to [ 2., 5., 7. ], not ",
+        attribute->value( 7 ).string() );
+}
+
 void test()
 {
     test_comparison();
     test_operators();
+    test_interpolation();
 }
 
 OPENGEODE_TEST( "point" )
