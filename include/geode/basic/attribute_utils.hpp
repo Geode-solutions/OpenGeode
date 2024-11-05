@@ -140,6 +140,34 @@ namespace geode
     IMPLICIT_ATTRIBUTE_LINEAR_INTERPOLATION( float );
     IMPLICIT_ATTRIBUTE_LINEAR_INTERPOLATION( double );
 
+#define IMPLICIT_ARRAY_ATTRIBUTE_LINEAR_INTERPOLATION( Type )                  \
+    template < size_t array_size >                                             \
+    struct AttributeLinearInterpolationImpl< std::array< Type, array_size > >  \
+    {                                                                          \
+        template < template < typename > class Attribute >                     \
+        [[nodiscard]] static std::array< Type, array_size > compute(           \
+            const AttributeLinearInterpolation& interpolator,                  \
+            const Attribute< std::array< Type, array_size > >& attribute )     \
+        {                                                                      \
+            std::array< Type, array_size > result;                             \
+            result.fill( 0 );                                                  \
+            for( const auto vertex_id : Indices{ interpolator.indices_ } )     \
+            {                                                                  \
+                const auto& array_value =                                      \
+                    attribute.value( interpolator.indices_[vertex_id] );       \
+                for( const auto position : Indices{ array_value } )            \
+                {                                                              \
+                    result[position] += interpolator.lambdas_[vertex_id]       \
+                                        * array_value[position];               \
+                }                                                              \
+            }                                                                  \
+            return result;                                                     \
+        }                                                                      \
+    }
+
+    IMPLICIT_ARRAY_ATTRIBUTE_LINEAR_INTERPOLATION( float );
+    IMPLICIT_ARRAY_ATTRIBUTE_LINEAR_INTERPOLATION( double );
+
     /*!
      * Helper struct to convert an Attribute value to generic float.
      * This struct may be customized for a given type.
