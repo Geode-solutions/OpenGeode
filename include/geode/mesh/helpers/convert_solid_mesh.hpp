@@ -50,6 +50,9 @@ namespace geode
     [[nodiscard]] std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
         convert_grid_into_tetrahedral_solid( const Grid3D& grid );
 
+    [[nodiscard]] std::unique_ptr< HybridSolid3D >
+        opengeode_mesh_api convert_grid_into_hybrid_solid( const Grid3D& grid );
+
     [[nodiscard]] std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
         convert_grid_into_densified_tetrahedral_solid( const Grid3D& grid,
             absl::Span< const geode::index_t > cells_to_densify );

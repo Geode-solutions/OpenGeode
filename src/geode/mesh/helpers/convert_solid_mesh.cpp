@@ -29,6 +29,7 @@
 
 #include <geode/mesh/builder/hybrid_solid_builder.hpp>
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/core/detail/geode_elements.hpp>
 #include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
@@ -39,6 +40,19 @@
 
 namespace
 {
+    std::array< geode::index_t, 8 > grid_cell_vertices(
+        const geode::Grid3D& grid,
+        const geode::Grid3D::CellIndices& cell_indices )
+    {
+        std::array< geode::index_t, 8 > cell_vertices;
+        const auto vertex_indices = grid.cell_vertices( cell_indices );
+        for( const auto v : geode::LIndices{ cell_vertices } )
+        {
+            cell_vertices[v] = grid.vertex_index( vertex_indices[v] );
+        }
+        return cell_vertices;
+    }
+
     bool all_polyhedra_are_simplex( const geode::SolidMesh3D& solid )
     {
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
@@ -102,6 +116,36 @@ namespace
             { cell_mesh_vertices[2], cell_mesh_vertices[6],
                 additional_vertex_id, cell_mesh_vertices[7] } );
         return tetras;
+    }
+
+    std::array< geode::index_t, 6 > create_pyramid_pattern(
+        geode::HybridSolidBuilder3D& builder,
+        const geode::Grid3D& grid,
+        const geode::Grid3D::CellIndices& cell_indices,
+        geode::index_t additional_vertex_id )
+    {
+        std::array< geode::index_t, 6 > pyramids;
+        const auto cell_vertices = grid.cell_vertices( cell_indices );
+        std::array< geode::index_t, 8 > cell_mesh_vertices;
+        for( const auto v : geode::LIndices{ cell_mesh_vertices } )
+        {
+            const auto cell_vertex_id = grid.vertex_index( cell_vertices[v] );
+            cell_mesh_vertices[v] = cell_vertex_id;
+        }
+        for( const auto p : geode::LIndices{ pyramids } )
+        {
+            pyramids[p] = builder.create_pyramid(
+                { cell_mesh_vertices
+                        [geode::detail::HEXAHEDRON_FACET_VERTICES[p][0]],
+                    cell_mesh_vertices
+                        [geode::detail::HEXAHEDRON_FACET_VERTICES[p][1]],
+                    cell_mesh_vertices
+                        [geode::detail::HEXAHEDRON_FACET_VERTICES[p][2]],
+                    cell_mesh_vertices
+                        [geode::detail::HEXAHEDRON_FACET_VERTICES[p][3]],
+                    additional_vertex_id } );
+        }
+        return pyramids;
     }
 
     std::array< geode::index_t, 6 > create_tetrahedra_from_pIpI_pattern(
@@ -191,8 +235,55 @@ namespace
             grid.cell_attribute_manager(), old2new_mapping );
     }
 
-    void create_vertices_from_grid( const geode::TetrahedralSolid3D& tet_solid,
-        geode::TetrahedralSolidBuilder3D& builder,
+    void create_hexahedra_from_grid_cells( const geode::HybridSolid3D& solid,
+        geode::HybridSolidBuilder3D& builder,
+        const geode::Grid3D& grid,
+        absl::Span< const geode::index_t > cells_to_densify )
+    {
+        std::vector< bool > to_densify( grid.nb_cells(), false );
+        for( const auto& cell_id : cells_to_densify )
+        {
+            to_densify[cell_id] = true;
+        }
+        geode::GenericMapping< geode::index_t > old2new_mapping;
+        for( const auto k : geode::Range{ grid.nb_cells_in_direction( 2 ) } )
+        {
+            for( const auto j :
+                geode::Range{ grid.nb_cells_in_direction( 1 ) } )
+            {
+                for( const auto i :
+                    geode::Range{ grid.nb_cells_in_direction( 0 ) } )
+                {
+                    const auto cell_id = grid.cell_index( { i, j, k } );
+                    if( to_densify[cell_id] )
+                    {
+                        continue;
+                    }
+                    const auto hex_id = builder.create_hexahedron(
+                        grid_cell_vertices( grid, { i, j, k } ) );
+                    old2new_mapping.map( cell_id, hex_id );
+                }
+            }
+        }
+        for( const auto cell_index : geode::Indices{ cells_to_densify } )
+        {
+            const auto cell_indices =
+                grid.cell_indices( cells_to_densify[cell_index] );
+            const auto additional_vertex_id =
+                grid.nb_grid_vertices() + cell_index;
+            for( const auto tetra_id : create_pyramid_pattern(
+                     builder, grid, cell_indices, additional_vertex_id ) )
+            {
+                old2new_mapping.map( cells_to_densify[cell_index], tetra_id );
+            }
+        }
+        builder.compute_polyhedron_adjacencies();
+        solid.polyhedron_attribute_manager().import(
+            grid.cell_attribute_manager(), old2new_mapping );
+    }
+
+    void create_vertices_from_grid( const geode::SolidMesh3D& solid,
+        geode::SolidMeshBuilder3D& builder,
         const geode::Grid3D& grid,
         absl::Span< const geode::index_t > cells_to_densify )
     {
@@ -203,7 +294,7 @@ namespace
             builder.set_point( vertex_id,
                 grid.grid_point( grid.vertex_indices( vertex_id ) ) );
         }
-        auto& solid_attribute_manager = tet_solid.vertex_attribute_manager();
+        auto& solid_attribute_manager = solid.vertex_attribute_manager();
         geode::internal::copy_attributes(
             grid.grid_vertex_attribute_manager(), solid_attribute_manager );
         geode::index_t counter{ grid.nb_grid_vertices() };
@@ -238,6 +329,18 @@ namespace
         create_tetrahedra_from_grid_cells(
             *tet_solid, *builder, grid, cells_to_densify );
         return tet_solid;
+    }
+
+    std::unique_ptr< geode::HybridSolid3D > create_hybrid_solid_from_grid(
+        const geode::Grid3D& grid,
+        absl::Span< const geode::index_t > cells_to_densify )
+    {
+        auto solid = geode::HybridSolid3D::create();
+        auto builder = geode::HybridSolidBuilder3D::create( *solid );
+        create_vertices_from_grid( *solid, *builder, grid, cells_to_densify );
+        create_hexahedra_from_grid_cells(
+            *solid, *builder, grid, cells_to_densify );
+        return solid;
     }
 
     bool all_polyhedra_are_hybrid( const geode::SolidMesh3D& solid )
@@ -471,6 +574,12 @@ namespace geode
         const Grid3D& grid )
     {
         return create_tetrahedral_solid_from_grid( grid, {} );
+    }
+
+    std::unique_ptr< HybridSolid3D > convert_grid_into_hybrid_solid(
+        const Grid3D& grid )
+    {
+        return create_hybrid_solid_from_grid( grid, {} );
     }
 
     std::unique_ptr< TetrahedralSolid3D >
