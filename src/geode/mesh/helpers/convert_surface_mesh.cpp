@@ -352,17 +352,19 @@ namespace geode
             to_delete[p] = nb_vertices != 3;
             if( nb_vertices > 3 )
             {
+                std::vector< index_t > new_polygons;
+                new_polygons.reserve( nb_vertices - 2 );
                 const auto vertices = surface.polygon_vertices( p );
                 for( const auto v : LRange{ 2, nb_vertices } )
                 {
-                    builder.create_polygon(
-                        { vertices[0], vertices[v - 1], vertices[v] } );
+                    new_polygons.emplace_back( builder.create_polygon(
+                        { vertices[0], vertices[v - 1], vertices[v] } ) );
                 }
+                builder.compute_polygon_adjacencies( new_polygons );
             }
         }
         to_delete.resize( surface.nb_polygons(), false );
         builder.delete_polygons( to_delete );
-        builder.compute_polygon_adjacencies();
     }
 
     std::unique_ptr< SurfaceMesh3D > convert_surface_mesh2d_into_3d(
