@@ -259,8 +259,12 @@ namespace
                     {
                         continue;
                     }
-                    const auto hex_id = builder.create_hexahedron(
-                        grid_cell_vertices( grid, { i, j, k } ) );
+                    const auto vertices =
+                        grid_cell_vertices( grid, { i, j, k } );
+                    const auto hex_id =
+                        builder.create_hexahedron( { vertices[0], vertices[1],
+                            vertices[3], vertices[2], vertices[4], vertices[5],
+                            vertices[7], vertices[6] } );
                     old2new_mapping.map( cell_id, hex_id );
                 }
             }
