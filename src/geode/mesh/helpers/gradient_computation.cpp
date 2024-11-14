@@ -132,6 +132,7 @@ namespace
             geode::Vector< Mesh::dim > computed_gradient;
             const auto vertices_around =
                 mesh_.vertices_around_vertex( vertex_id );
+            bool value_set{ false };
             for( const auto d : geode::LRange{ Mesh::dim } )
             {
                 double contribution_sum{ 0 };
@@ -164,16 +165,18 @@ namespace
                     inverse_dist_sum +=
                         diff_sign * position_diff.value( d ) / dist2;
                 }
-                OPENGEODE_EXCEPTION(
-                    std::fabs( inverse_dist_sum ) > geode::GLOBAL_EPSILON,
-                    "[compute_scalar_function_gradient] Couldn't compute "
-                    "gradient on vertex ",
-                    vertex_id,
-                    ": No vertex around it allows computation of the "
-                    "derivative along axis ",
-                    d );
+                if( std::fabs( inverse_dist_sum ) <= geode::GLOBAL_EPSILON )
+                {
+                    computed_gradient.set_value( d, 0 );
+                    continue;
+                }
                 computed_gradient.set_value(
                     d, contribution_sum / inverse_dist_sum );
+                value_set = true;
+            }
+            if( !value_set )
+            {
+                return false;
             }
             gradient_function.set_value( vertex_id, computed_gradient );
             return true;
