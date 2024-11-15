@@ -273,8 +273,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void transfer_adjacents(
-        geode::TriangulatedSurfaceBuilder< dimension >& builder,
+    void transfer_adjacents( geode::SurfaceMeshBuilder< dimension >& builder,
         absl::Span< const std::optional< geode::PolygonEdge > > adjacents,
         absl::Span< const geode::index_t > new_polygons )
     {
@@ -285,7 +284,7 @@ namespace
             builder.set_polygon_adjacent(
                 adjacents.front().value(), new_polygons.front() );
         }
-        for( const auto v : LRange{ 1, nb_vertices - 1 } )
+        for( const auto v : geode::LRange{ 1, adjacents.size() - 1 } )
         {
             if( adjacents[v] )
             {
@@ -391,13 +390,12 @@ namespace geode
                 {
                     adjacents[e] = surface.polygon_adjacent_edge( { p, e } );
                 }
-                std::vector< index_t > new_polygons;
-                new_polygons.reserve( nb_vertices - 2 );
+                absl::FixedArray< index_t > new_polygons( nb_vertices - 2 );
                 const auto vertices = surface.polygon_vertices( p );
                 for( const auto v : LRange{ 2, nb_vertices } )
                 {
-                    new_polygons.emplace_back( builder.create_polygon(
-                        { vertices[0], vertices[v - 1], vertices[v] } ) );
+                    new_polygons[v - 2] = builder.create_polygon(
+                        { vertices[0], vertices[v - 1], vertices[v] } );
                 }
                 ::transfer_adjacents( builder, adjacents, new_polygons );
             }
