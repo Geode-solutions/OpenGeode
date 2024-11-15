@@ -271,6 +271,38 @@ namespace
             *surface, *builder, grid, cells_to_densify );
         return surface;
     }
+
+    template < geode::index_t dimension >
+    void transfer_adjacents( geode::SurfaceMeshBuilder< dimension >& builder,
+        absl::Span< const std::optional< geode::PolygonEdge > > adjacents,
+        absl::Span< const geode::index_t > new_polygons )
+    {
+        if( adjacents.front() )
+        {
+            builder.set_polygon_adjacent(
+                { new_polygons.front(), 0 }, adjacents.front()->polygon_id );
+            builder.set_polygon_adjacent(
+                adjacents.front().value(), new_polygons.front() );
+        }
+        for( const auto v : geode::LRange{ 1, adjacents.size() - 1 } )
+        {
+            if( adjacents[v] )
+            {
+                builder.set_polygon_adjacent(
+                    { new_polygons[v - 1], 1 }, adjacents[v]->polygon_id );
+                builder.set_polygon_adjacent(
+                    adjacents[v].value(), new_polygons[v - 1] );
+            }
+        }
+        if( adjacents.back() )
+        {
+            builder.set_polygon_adjacent(
+                { new_polygons.back(), 2 }, adjacents.back()->polygon_id );
+            builder.set_polygon_adjacent(
+                adjacents.back().value(), new_polygons.back() );
+        }
+        builder.compute_polygon_adjacencies( new_polygons );
+    }
 } // namespace
 
 namespace geode
@@ -346,23 +378,30 @@ namespace geode
         SurfaceMeshBuilder< dimension >& builder )
     {
         std::vector< bool > to_delete( surface.nb_polygons(), false );
-        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        for( const auto p : Range{ surface.nb_polygons() } )
         {
             const auto nb_vertices = surface.nb_polygon_vertices( p );
             to_delete[p] = nb_vertices != 3;
             if( nb_vertices > 3 )
             {
+                absl::FixedArray< std::optional< PolygonEdge > > adjacents(
+                    nb_vertices, std::nullopt );
+                for( const auto e : LRange{ nb_vertices } )
+                {
+                    adjacents[e] = surface.polygon_adjacent_edge( { p, e } );
+                }
+                absl::FixedArray< index_t > new_polygons( nb_vertices - 2 );
                 const auto vertices = surface.polygon_vertices( p );
                 for( const auto v : LRange{ 2, nb_vertices } )
                 {
-                    builder.create_polygon(
+                    new_polygons[v - 2] = builder.create_polygon(
                         { vertices[0], vertices[v - 1], vertices[v] } );
                 }
+                ::transfer_adjacents( builder, adjacents, new_polygons );
             }
         }
         to_delete.resize( surface.nb_polygons(), false );
         builder.delete_polygons( to_delete );
-        builder.compute_polygon_adjacencies();
     }
 
     std::unique_ptr< SurfaceMesh3D > convert_surface_mesh2d_into_3d(
