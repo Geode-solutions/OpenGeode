@@ -65,6 +65,7 @@ namespace geode
         [[nodiscard]] const std::array< PointType, 4 >& vertices() const;
         [[nodiscard]] BoundingBox3D bounding_box() const;
         [[nodiscard]] bool is_degenerated() const;
+        [[nodiscard]] std::string string() const;
 
     private:
         std::array< PointType, 4 > vertices_;
@@ -104,4 +105,28 @@ namespace geode
         Tetrahedron( Tetrahedron&& other ) noexcept;
         Tetrahedron& operator=( Tetrahedron&& other ) noexcept;
     };
+
+    class OpenGeodeTetrahedronException : public OpenGeodeException
+    {
+    public:
+        template < typename... Args >
+        explicit OpenGeodeTetrahedronException(
+            Tetrahedron tetrahedron_in, const Args&... message )
+            : OpenGeodeException{ absl::StrCat(
+                  message..., " at ", tetrahedron_in.string() ) },
+              tetrahedron{ std::move( tetrahedron_in ) }
+        {
+        }
+
+        OwnerTetrahedron tetrahedron;
+    };
 } // namespace geode
+
+// NOLINTNEXTLINE
+#define OPENGEODE_TETRAHEDRON_EXCEPTION(                                       \
+    dimension, condition, tetrahedron, ... )                                   \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
+        throw geode::OpenGeodeTetrahedronException< dimension >                \
+        {                                                                      \
+            tetrahedron, __VA_ARGS__                                           \
+        }
