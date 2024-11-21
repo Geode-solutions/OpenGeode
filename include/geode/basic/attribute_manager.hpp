@@ -103,10 +103,10 @@ namespace geode
          * @exception OpenGeodeException if the Attribute replacement failed
          */
         template < template < typename > class Attribute, typename T >
-        [[nodiscard]] std::shared_ptr< Attribute< T > >
-            find_or_create_attribute( std::string_view name,
-                T default_value,
-                AttributeProperties properties )
+        std::shared_ptr< Attribute< T > > find_or_create_attribute(
+            std::string_view name,
+            T default_value,
+            AttributeProperties properties )
         {
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
@@ -127,8 +127,8 @@ namespace geode
         }
 
         template < template < typename > class Attribute, typename T >
-        [[nodiscard]] std::shared_ptr< Attribute< T > >
-            find_or_create_attribute( std::string_view name, T default_value )
+        std::shared_ptr< Attribute< T > > find_or_create_attribute(
+            std::string_view name, T default_value )
         {
             return find_or_create_attribute< Attribute, T >(
                 name, std::move( default_value ), AttributeProperties{} );
