@@ -67,6 +67,9 @@ namespace geode
         [[nodiscard]] PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const final;
 
+        [[nodiscard]] std::array< PolyhedronFacetEdge, 6 > polyhedron_edges(
+            index_t polyhedron ) const;
+
         [[nodiscard]] PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
