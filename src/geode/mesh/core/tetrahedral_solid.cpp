@@ -413,7 +413,7 @@ namespace geode
             PolyhedronFacetEdge{ { polyhedron, 0 }, 1 },
             PolyhedronFacetEdge{ { polyhedron, 0 }, 2 },
             PolyhedronFacetEdge{ { polyhedron, 1 }, 0 },
-            PolyhedronFacetEdge{ { polyhedron, 1 }, 0 },
+            PolyhedronFacetEdge{ { polyhedron, 1 }, 2 },
             PolyhedronFacetEdge{ { polyhedron, 2 }, 1 } };
     }
 
