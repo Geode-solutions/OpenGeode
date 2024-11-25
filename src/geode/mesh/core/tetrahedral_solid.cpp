@@ -409,27 +409,12 @@ namespace geode
         TetrahedralSolid< dimension >::polyhedron_edges(
             index_t polyhedron ) const
     {
-        std::array< PolyhedronFacetEdge, 6 > result;
-        const auto vertices = this->polyhedron_vertices( polyhedron );
-        result[0] = this->polyhedron_facet_edge_from_vertices(
-                            { vertices[0], vertices[1] }, polyhedron )
-                        .value();
-        result[1] = this->polyhedron_facet_edge_from_vertices(
-                            { vertices[0], vertices[2] }, polyhedron )
-                        .value();
-        result[2] = this->polyhedron_facet_edge_from_vertices(
-                            { vertices[0], vertices[3] }, polyhedron )
-                        .value();
-        result[3] = this->polyhedron_facet_edge_from_vertices(
-                            { vertices[1], vertices[2] }, polyhedron )
-                        .value();
-        result[4] = this->polyhedron_facet_edge_from_vertices(
-                            { vertices[1], vertices[3] }, polyhedron )
-                        .value();
-        result[5] = this->polyhedron_facet_edge_from_vertices(
-                            { vertices[2], vertices[3] }, polyhedron )
-                        .value();
-        return result;
+        return { PolyhedronFacetEdge{ { polyhedron, 0 }, 0 },
+            PolyhedronFacetEdge{ { polyhedron, 0 }, 1 },
+            PolyhedronFacetEdge{ { polyhedron, 0 }, 2 },
+            PolyhedronFacetEdge{ { polyhedron, 1 }, 0 },
+            PolyhedronFacetEdge{ { polyhedron, 1 }, 0 },
+            PolyhedronFacetEdge{ { polyhedron, 2 }, 1 } };
     }
 
     template < index_t dimension >
