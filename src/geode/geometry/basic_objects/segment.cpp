@@ -108,6 +108,14 @@ namespace geode
         return length() <= GLOBAL_EPSILON;
     }
 
+    template < typename PointType, index_t dimension >
+    std::string GenericSegment< PointType, dimension >::string() const
+    {
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        return absl::StrCat( "[", point0.string(), ", ", point1.string(), "]" );
+    }
+
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
         Point< dimension > point0, Point< dimension > point1 ) noexcept

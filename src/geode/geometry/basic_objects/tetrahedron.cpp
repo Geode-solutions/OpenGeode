@@ -99,6 +99,17 @@ namespace geode
                <= GLOBAL_EPSILON;
     }
 
+    template < typename PointType >
+    std::string GenericTetrahedron< PointType >::string() const
+    {
+        const Point3D& point0 = vertices_[0];
+        const Point3D& point1 = vertices_[1];
+        const Point3D& point2 = vertices_[2];
+        const Point3D& point3 = vertices_[3];
+        return absl::StrCat( "[", point0.string(), ", ", point1.string(), ", ",
+            point2.string(), ", ", point3.string(), "]" );
+    }
+
     OwnerTetrahedron::OwnerTetrahedron( Point3D point0,
         Point3D point1,
         Point3D point2,

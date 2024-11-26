@@ -284,15 +284,15 @@ namespace geode
         }
 
 // NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION1D( condition, point, ... )                   \
+#define OPENGEODE_POINT1D_EXCEPTION( condition, point, ... )                   \
     OPENGEODE_POINT_EXCEPTION( 1, condition, point, __VA_ARGS__ )
 
 // NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION2D( condition, point, ... )                   \
+#define OPENGEODE_POINT2D_EXCEPTION( condition, point, ... )                   \
     OPENGEODE_POINT_EXCEPTION( 2, condition, point, __VA_ARGS__ )
 
 // NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION3D( condition, point, ... )                   \
+#define OPENGEODE_POINT3D_EXCEPTION( condition, point, ... )                   \
     OPENGEODE_POINT_EXCEPTION( 3, condition, point, __VA_ARGS__ )
 
 namespace std

@@ -102,6 +102,11 @@ namespace geode
      * Always return 1.
      */
     int opengeode_basic_api geode_lippincott();
+
+    /*!
+     * Catch all exceptions and rethrow an OpenGeodeException
+     */
+    void opengeode_basic_api throw_lippincott();
 } // namespace geode
 
 #ifdef OPENGEODE_DEBUG

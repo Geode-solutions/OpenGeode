@@ -285,6 +285,16 @@ namespace geode
                <= GLOBAL_EPSILON;
     }
 
+    template < typename PointType, index_t dimension >
+    std::string GenericTriangle< PointType, dimension >::string() const
+    {
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        const Point< dimension >& point2 = vertices_[2];
+        return absl::StrCat( "[", point0.string(), ", ", point1.string(), ", ",
+            point2.string(), "]" );
+    }
+
     template < index_t dimension >
     OwnerTriangle< dimension >::OwnerTriangle( Point< dimension > point0,
         Point< dimension > point1,
