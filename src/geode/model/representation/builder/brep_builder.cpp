@@ -81,6 +81,48 @@ namespace geode
         return mapping;
     }
 
+    void BRepBuilder::replace_components_meshes_by_others(
+        BRep&& other, const ModelCopyMapping& mapping )
+    {
+        for( const auto& in2out :
+            mapping.at( Corner3D::component_type_static() ).in2out_map() )
+        {
+            this->unregister_mesh_component( brep_.corner( in2out.first ) );
+            this->set_corner_mesh(
+                in2out.first, other.corner( in2out.second ).mesh().clone() );
+            this->corner_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        for( const auto& in2out :
+            mapping.at( Line3D::component_type_static() ).in2out_map() )
+        {
+            this->unregister_mesh_component( brep_.line( in2out.first ) );
+            this->set_line_mesh(
+                in2out.first, other.line( in2out.second ).mesh().clone() );
+            this->line_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        for( const auto& in2out :
+            mapping.at( Surface3D::component_type_static() ).in2out_map() )
+        {
+            this->unregister_mesh_component( brep_.surface( in2out.first ) );
+            this->set_surface_mesh(
+                in2out.first, other.surface( in2out.second ).mesh().clone() );
+            this->surface_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        for( const auto& in2out :
+            mapping.at( Block3D::component_type_static() ).in2out_map() )
+        {
+            this->unregister_mesh_component( brep_.block( in2out.first ) );
+            this->set_block_mesh(
+                in2out.first, other.block( in2out.second ).mesh().clone() );
+            this->block_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        this->delete_isolated_vertices();
+        const auto first_new_unique_vertex_id =
+            create_unique_vertices( other.nb_unique_vertices() );
+        detail::copy_vertex_identifier_components(
+            other, *this, first_new_unique_vertex_id, mapping );
+    }
+
     ModelCopyMapping BRepBuilder::copy_components( const BRep& brep )
     {
         ModelCopyMapping mappings;
