@@ -95,6 +95,14 @@ namespace geode
             typename Surface< dimension >::SurfacesBuilderKey{} );
     }
 
+    template < index_t dimension >
+    std::unique_ptr< SurfaceMesh< dimension > >
+        SurfacesBuilder< dimension >::steal_surface_mesh( const uuid& id )
+    {
+        return surfaces_.modifiable_surface( id, {} ).steal_mesh(
+            typename Surface< dimension >::SurfacesBuilderKey{} );
+    }
+
     template class opengeode_model_api SurfacesBuilder< 2 >;
     template class opengeode_model_api SurfacesBuilder< 3 >;
 } // namespace geode

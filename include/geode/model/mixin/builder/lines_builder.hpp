@@ -75,6 +75,9 @@ namespace geode
         [[nodiscard]] EdgedCurve< dimension >& modifiable_line_mesh(
             const uuid& id );
 
+        [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > >
+            steal_line_mesh( const uuid& id );
+
     private:
         Lines< dimension >& lines_;
     };

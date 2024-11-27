@@ -149,6 +149,13 @@ namespace geode
         this->set_name( name );
     }
 
+    template < index_t dimension >
+    auto Block< dimension >::steal_mesh(
+        BlocksBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    {
+        return impl_->steal_mesh();
+    }
+
     template class opengeode_model_api Block< 3 >;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, Block< 3 > );

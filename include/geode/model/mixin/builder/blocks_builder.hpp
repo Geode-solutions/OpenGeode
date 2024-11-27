@@ -86,6 +86,9 @@ namespace geode
         [[nodiscard]] SolidMesh< dimension >& modifiable_block_mesh(
             const uuid& id );
 
+        [[nodiscard]] std::unique_ptr< SolidMesh< dimension > >
+            steal_block_mesh( const uuid& id );
+
     private:
         Blocks< dimension >& blocks_;
     };

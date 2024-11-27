@@ -108,6 +108,9 @@ namespace geode
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
+        [[nodiscard]] std::unique_ptr< Mesh > steal_mesh(
+            SurfacesBuilderKey key );
+
     private:
         Surface();
 
