@@ -29,15 +29,17 @@
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/polygonal_surface_output.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
 
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-void test()
+void convert_surface_dimension()
 {
-    geode::OpenGeodeMeshLibrary::initialize();
     const auto surface2d = geode::load_triangulated_surface< 2 >(
         absl::StrCat( geode::DATA_PATH, "3patches.og_tsf2d" ) );
     const auto surface3d =
@@ -70,7 +72,10 @@ void test()
         surface2d->nb_polygons() == converted_surface2d->nb_polygons(),
         "[Test] Number of polygons in re-converted TriangulatedSurface2D "
         "is not correct" );
+}
 
+void convert_grid_to_surface()
+{
     geode::LightRegularGrid2D grid{ geode::Point2D{ { 1, 2 } }, { 5, 6 },
         { 1, 1 } };
     const std::array< geode::index_t, 4 > cells_to_densify{ 5, 11, 12, 13 };
@@ -87,6 +92,34 @@ void test()
             == grid.nb_cells() * 2 + 2 * cells_to_densify.size(),
         "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
         "correct." );
+}
+
+void triangulate_surface()
+{
+    auto surface = geode::PolygonalSurface3D::create();
+    auto builder = geode::SurfaceMeshBuilder3D::create( *surface );
+
+    for( const auto i : geode::Range{ 10 } )
+    {
+        builder->create_point(
+            geode::Point3D{ { i * 0.5, i * 0.5, i * 0.5 } } );
+    }
+    builder->create_point( geode::Point3D{ { 10, 0, 10 } } );
+    std::vector< geode::index_t > polygon( surface->nb_vertices() );
+    absl::c_iota( polygon, 0 );
+    builder->create_polygon( polygon );
+    geode::triangulate_surface_mesh( *surface, *builder );
+    geode::save_polygonal_surface( *surface, "triangulated_surface.og_psf3d" );
+    OPENGEODE_EXCEPTION( surface->nb_polygons() == 9,
+        "[Test] Number of polygons in TriangulatedSurface3D is not correct" );
+}
+
+void test()
+{
+    geode::OpenGeodeMeshLibrary::initialize();
+    convert_surface_dimension();
+    convert_grid_to_surface();
+    triangulate_surface();
 }
 
 OPENGEODE_TEST( "convert-surface" )
