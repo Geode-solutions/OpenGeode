@@ -78,6 +78,9 @@ namespace geode
         [[nodiscard]] PointSet< dimension >& modifiable_corner_mesh(
             const uuid& id );
 
+        [[nodiscard]] std::unique_ptr< PointSet< dimension > >
+            steal_corner_mesh( const uuid& id );
+
     private:
         Corners< dimension >& corners_;
     };

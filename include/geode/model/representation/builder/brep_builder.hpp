@@ -110,6 +110,9 @@ namespace geode
 
         ModelCopyMapping copy( const BRep& brep );
 
+        void replace_components_meshes_by_others(
+            BRep&& other, const ModelCopyMapping& mapping );
+
         ModelCopyMapping copy_components( const BRep& brep );
 
         void copy_components( ModelCopyMapping& mapping, const BRep& brep );

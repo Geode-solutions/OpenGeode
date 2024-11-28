@@ -81,6 +81,45 @@ namespace geode
         return mapping;
     }
 
+    void BRepBuilder::replace_components_meshes_by_others(
+        BRep&& other, const ModelCopyMapping& mapping )
+    {
+        BRepBuilder other_builder{ other };
+        for( const auto& in2out :
+            mapping.at( Corner3D::component_type_static() ).in2out_map() )
+        {
+            this->update_corner_mesh( brep_.corner( in2out.first ),
+                other_builder.steal_corner_mesh( in2out.second ) );
+            this->corner_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        for( const auto& in2out :
+            mapping.at( Line3D::component_type_static() ).in2out_map() )
+        {
+            this->update_line_mesh( brep_.line( in2out.first ),
+                other_builder.steal_line_mesh( in2out.second ) );
+            this->line_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        for( const auto& in2out :
+            mapping.at( Surface3D::component_type_static() ).in2out_map() )
+        {
+            this->update_surface_mesh( brep_.surface( in2out.first ),
+                other_builder.steal_surface_mesh( in2out.second ) );
+            this->surface_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        for( const auto& in2out :
+            mapping.at( Block3D::component_type_static() ).in2out_map() )
+        {
+            this->update_block_mesh( brep_.block( in2out.first ),
+                other_builder.steal_block_mesh( in2out.second ) );
+            this->block_mesh_builder( in2out.first )->set_id( in2out.first );
+        }
+        this->delete_isolated_vertices();
+        const auto first_new_unique_vertex_id =
+            create_unique_vertices( other.nb_unique_vertices() );
+        detail::copy_vertex_identifier_components(
+            other, *this, first_new_unique_vertex_id, mapping );
+    }
+
     ModelCopyMapping BRepBuilder::copy_components( const BRep& brep )
     {
         ModelCopyMapping mappings;

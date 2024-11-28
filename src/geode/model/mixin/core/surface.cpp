@@ -150,6 +150,13 @@ namespace geode
         this->set_name( name );
     }
 
+    template < index_t dimension >
+    auto Surface< dimension >::steal_mesh(
+        SurfacesBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    {
+        return impl_->steal_mesh();
+    }
+
     template class opengeode_model_api Surface< 2 >;
     template class opengeode_model_api Surface< 3 >;
 

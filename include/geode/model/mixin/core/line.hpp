@@ -80,8 +80,6 @@ namespace geode
 
         [[nodiscard]] const MeshImpl& mesh_type() const;
 
-        [[nodiscard]] Mesh& modifiable_mesh( LinesKey key );
-
     public:
         explicit Line( LinesKey key );
 
@@ -93,7 +91,11 @@ namespace geode
 
         void set_line_name( std::string_view name, LinesBuilderKey key );
 
+        [[nodiscard]] Mesh& modifiable_mesh( LinesKey key );
+
         [[nodiscard]] Mesh& modifiable_mesh( LinesBuilderKey key );
+
+        [[nodiscard]] std::unique_ptr< Mesh > steal_mesh( LinesBuilderKey key );
 
     private:
         Line();
