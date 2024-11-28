@@ -23,10 +23,13 @@
 
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
+#include <mapbox/earcut.hpp>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/polygonal_surface_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
@@ -38,6 +41,21 @@
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/helpers/detail/surface_merger.hpp>
 #include <geode/mesh/helpers/internal/copy.hpp>
+
+namespace mapbox
+{
+    namespace util
+    {
+        template < std::size_t coord, geode::index_t dimension >
+        struct nth< coord, geode::Point< dimension > >
+        {
+            inline static auto get( const geode::Point< dimension >& point )
+            {
+                return point.value( coord );
+            };
+        };
+    } // namespace util
+} // namespace mapbox
 
 namespace
 {
@@ -273,35 +291,47 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void transfer_adjacents( geode::SurfaceMeshBuilder< dimension >& builder,
-        absl::Span< const std::optional< geode::PolygonEdge > > adjacents,
-        absl::Span< const geode::index_t > new_polygons )
+    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
+        const geode::SurfaceMesh< dimension >& surface,
+        geode::index_t polygon_id,
+        absl::Span< const geode::index_t > vertices );
+
+    template <>
+    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
+        const geode::SurfaceMesh< 2 >& surface,
+        geode::index_t /*unused*/,
+        absl::Span< const geode::index_t > vertices )
     {
-        if( adjacents.front() )
+        std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
+            absl::FixedArray< geode::Point2D >( vertices.size() )
+        };
+        auto& polygon = polygons[0];
+        for( const auto v : geode::LIndices{ vertices } )
         {
-            builder.set_polygon_adjacent(
-                { new_polygons.front(), 0 }, adjacents.front()->polygon_id );
-            builder.set_polygon_adjacent(
-                adjacents.front().value(), new_polygons.front() );
+            polygon[v] = surface.point( vertices[v] );
         }
-        for( const auto v : geode::LRange{ 1, adjacents.size() - 1 } )
+        return polygons;
+    }
+
+    template <>
+    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
+        const geode::SurfaceMesh< 3 >& surface,
+        geode::index_t polygon_id,
+        absl::Span< const geode::index_t > vertices )
+    {
+        std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
+            absl::FixedArray< geode::Point2D >( vertices.size() )
+        };
+        auto& polygon = polygons[0];
+        const auto normal = surface.polygon_normal( polygon_id )
+                                .value_or( geode::Vector3D{ { 0, 0, 1 } } );
+        const auto axis_to_remove = normal.most_meaningful_axis();
+        for( const auto v : geode::LIndices{ vertices } )
         {
-            if( adjacents[v] )
-            {
-                builder.set_polygon_adjacent(
-                    { new_polygons[v - 1], 1 }, adjacents[v]->polygon_id );
-                builder.set_polygon_adjacent(
-                    adjacents[v].value(), new_polygons[v - 1] );
-            }
+            polygon[v] =
+                surface.point( vertices[v] ).project_point( axis_to_remove );
         }
-        if( adjacents.back() )
-        {
-            builder.set_polygon_adjacent(
-                { new_polygons.back(), 2 }, adjacents.back()->polygon_id );
-            builder.set_polygon_adjacent(
-                adjacents.back().value(), new_polygons.back() );
-        }
-        builder.compute_polygon_adjacencies( new_polygons );
+        return polygons;
     }
 } // namespace
 
@@ -384,20 +414,50 @@ namespace geode
             to_delete[p] = nb_vertices != 3;
             if( nb_vertices > 3 )
             {
-                absl::FixedArray< std::optional< PolygonEdge > > adjacents(
-                    nb_vertices, std::nullopt );
+                using Edge = std::array< index_t, 2 >;
+                absl::flat_hash_map< Edge, PolygonEdge > adjacents;
+                const auto vertices = surface.polygon_vertices( p );
                 for( const auto e : LRange{ nb_vertices } )
                 {
-                    adjacents[e] = surface.polygon_adjacent_edge( { p, e } );
+                    if( const auto adj =
+                            surface.polygon_adjacent_edge( { p, e } ) )
+                    {
+                        adjacents.emplace(
+                            Edge{ vertices[e],
+                                vertices[e + 1 == nb_vertices ? 0 : e + 1] },
+                            adj.value() );
+                    }
                 }
-                absl::FixedArray< index_t > new_polygons( nb_vertices - 2 );
-                const auto vertices = surface.polygon_vertices( p );
-                for( const auto v : LRange{ 2, nb_vertices } )
+                const auto polygons = ::polygon_points( surface, p, vertices );
+                const auto new_triangles =
+                    mapbox::earcut< index_t >( polygons );
+                absl::FixedArray< index_t > new_polygons(
+                    new_triangles.size() / 3 );
+                for( const auto trgl : LIndices{ new_polygons } )
                 {
-                    new_polygons[v - 2] = builder.create_polygon(
-                        { vertices[0], vertices[v - 1], vertices[v] } );
+                    const std::array triangle{
+                        vertices[new_triangles[3 * trgl]],
+                        vertices[new_triangles[3 * trgl + 1]],
+                        vertices[new_triangles[3 * trgl + 2]]
+                    };
+                    new_polygons[trgl] = builder.create_polygon( triangle );
+                    for( const auto e : LRange{ 3 } )
+                    {
+                        const auto vertex0 = triangle[e];
+                        const auto vertex1 = triangle[e == 2 ? 0 : e + 1];
+                        const auto adj_it =
+                            adjacents.find( { vertex0, vertex1 } );
+                        if( adj_it == adjacents.end() )
+                        {
+                            continue;
+                        }
+                        builder.set_polygon_adjacent(
+                            adj_it->second, new_polygons[trgl] );
+                        builder.set_polygon_adjacent( { new_polygons[trgl], e },
+                            adj_it->second.polygon_id );
+                    }
                 }
-                ::transfer_adjacents( builder, adjacents, new_polygons );
+                builder.compute_polygon_adjacencies( new_polygons );
             }
         }
         to_delete.resize( surface.nb_polygons(), false );

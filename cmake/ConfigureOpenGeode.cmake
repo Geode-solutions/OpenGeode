@@ -45,7 +45,7 @@ ExternalProject_Add(opengeode
         -DUSE_SUPERBUILD:BOOL=OFF
         -DASYNCPLUSPLUS_INSTALL_PREFIX:PATH=${ASYNCPLUSPLUS_INSTALL_PREFIX}
         -DBITSERY_INSTALL_PREFIX:PATH=${BITSERY_INSTALL_PREFIX}
-        -DFILESYSTEM_INSTALL_PREFIX:PATH=${FILESYSTEM_INSTALL_PREFIX}
+        -DEARCUT_INSTALL_PREFIX:PATH=${EARCUT_INSTALL_PREFIX}
         -DMINIZIP_INSTALL_PREFIX:PATH=${MINIZIP_INSTALL_PREFIX}
         -DNANOFLANN_INSTALL_PREFIX:PATH=${NANOFLANN_INSTALL_PREFIX}
         -DSPDLOG_INSTALL_PREFIX:PATH=${SPDLOG_INSTALL_PREFIX}
@@ -61,6 +61,7 @@ ExternalProject_Add(opengeode
         abseil
         asyncplusplus
         bitsery
+        earcut
         gdal
         minizip
         nanoflann
@@ -80,6 +81,7 @@ add_custom_target(download
         abseil-download
         asyncplusplus-download
         bitsery-download
+        earcut-download
         gdal-download
         minizip-download
         nanoflann-download
