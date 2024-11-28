@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/pimpl.hpp>
 
 #include <geode/geometry/common.hpp>
@@ -51,6 +52,17 @@ namespace geode
             [[nodiscard]] index_t nb_colocated_points() const
             {
                 return colocated_mapping.size() - nb_unique_points();
+            }
+
+            [[nodiscard]] geode::GenericMapping< geode::index_t >
+                points_mapping() const
+            {
+                geode::GenericMapping< geode::index_t > mapping;
+                for( const auto& p : geode::Indices{ colocated_mapping } )
+                {
+                    mapping.map( p, colocated_mapping[p] );
+                }
+                return mapping;
             }
 
             std::vector< Point< dimension > > unique_points;
