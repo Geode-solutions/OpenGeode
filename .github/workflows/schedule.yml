@@ -2,28 +2,20 @@ name: Schedule
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: "master"
   schedule:
     - cron: 0 23 * * *
 
 jobs:
-  schedule-next:
-    if: ${{ github.event_name == 'schedule' }}
+  schedule:
     uses: Geode-solutions/actions/.github/workflows/cpp-schedule.yml@master
     with:
       name: OPENGEODE
       directory: opengeode
-      branch: next
+      branch: ${{ inputs.branch || 'next' }}
     secrets: 
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  schedule-master:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    uses: Geode-solutions/actions/.github/workflows/cpp-schedule.yml@master
-    with:
-      name: OPENGEODE
-      directory: opengeode
-      branch: master
-    secrets: 
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ECOSYSTEM }}
