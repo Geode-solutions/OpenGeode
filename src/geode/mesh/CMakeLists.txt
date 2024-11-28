@@ -330,6 +330,5 @@ add_geode_library(
         ${PROJECT_NAME}::geometry
     PRIVATE_DEPENDENCIES
         Async++
-        earcut_hpp::earcut_hpp
         ${PROJECT_NAME}::image
 )

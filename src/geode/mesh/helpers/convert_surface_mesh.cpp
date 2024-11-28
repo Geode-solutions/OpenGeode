@@ -23,11 +23,10 @@
 
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
-#include <mapbox/earcut.hpp>
-
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
@@ -41,21 +40,6 @@
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/helpers/detail/surface_merger.hpp>
 #include <geode/mesh/helpers/internal/copy.hpp>
-
-namespace mapbox
-{
-    namespace util
-    {
-        template < std::size_t coord, geode::index_t dimension >
-        struct nth< coord, geode::Point< dimension > >
-        {
-            inline static auto get( const geode::Point< dimension >& point )
-            {
-                return point.value( coord );
-            };
-        };
-    } // namespace util
-} // namespace mapbox
 
 namespace
 {
@@ -289,50 +273,6 @@ namespace
             *surface, *builder, grid, cells_to_densify );
         return surface;
     }
-
-    template < geode::index_t dimension >
-    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
-        const geode::SurfaceMesh< dimension >& surface,
-        geode::index_t polygon_id,
-        absl::Span< const geode::index_t > vertices );
-
-    template <>
-    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
-        const geode::SurfaceMesh< 2 >& surface,
-        geode::index_t /*unused*/,
-        absl::Span< const geode::index_t > vertices )
-    {
-        std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
-            absl::FixedArray< geode::Point2D >( vertices.size() )
-        };
-        auto& polygon = polygons[0];
-        for( const auto v : geode::LIndices{ vertices } )
-        {
-            polygon[v] = surface.point( vertices[v] );
-        }
-        return polygons;
-    }
-
-    template <>
-    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
-        const geode::SurfaceMesh< 3 >& surface,
-        geode::index_t polygon_id,
-        absl::Span< const geode::index_t > vertices )
-    {
-        std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
-            absl::FixedArray< geode::Point2D >( vertices.size() )
-        };
-        auto& polygon = polygons[0];
-        const auto normal = surface.polygon_normal( polygon_id )
-                                .value_or( geode::Vector3D{ { 0, 0, 1 } } );
-        const auto axis_to_remove = normal.most_meaningful_axis();
-        for( const auto v : geode::LIndices{ vertices } )
-        {
-            polygon[v] =
-                surface.point( vertices[v] ).project_point( axis_to_remove );
-        }
-        return polygons;
-    }
 } // namespace
 
 namespace geode
@@ -428,18 +368,14 @@ namespace geode
                             adj.value() );
                     }
                 }
-                const auto polygons = ::polygon_points( surface, p, vertices );
-                const auto new_triangles =
-                    mapbox::earcut< index_t >( polygons );
+                const auto new_triangles = surface.polygon( p ).triangulate();
                 absl::FixedArray< index_t > new_polygons(
-                    new_triangles.size() / 3 );
+                    new_triangles.size() );
                 for( const auto trgl : LIndices{ new_polygons } )
                 {
-                    const std::array triangle{
-                        vertices[new_triangles[3 * trgl]],
-                        vertices[new_triangles[3 * trgl + 1]],
-                        vertices[new_triangles[3 * trgl + 2]]
-                    };
+                    const auto& new_triangle = new_triangles[trgl];
+                    const std::array triangle{ vertices[new_triangle[0]],
+                        vertices[new_triangle[1]], vertices[new_triangle[2]] };
                     new_polygons[trgl] = builder.create_polygon( triangle );
                     for( const auto e : LRange{ 3 } )
                     {

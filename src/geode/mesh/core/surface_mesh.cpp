@@ -36,6 +36,7 @@
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
@@ -273,13 +274,11 @@ namespace geode
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
+            : polygon_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           PolygonVertex >(
                           "polygon_around_vertex", PolygonVertex{} ) ),
-              polygons_around_vertex_(
-                  surface.vertex_attribute_manager()
+              polygons_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
                           POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
@@ -1065,32 +1064,26 @@ namespace geode
     }
 
     template < index_t dimension >
+    Polygon< dimension > SurfaceMesh< dimension >::polygon(
+        index_t polygon_id ) const
+    {
+        check_polygon_id( *this, polygon_id );
+        std::vector< std::reference_wrapper< const Point< dimension > > >
+            polygon;
+        for( const auto vertex : this->polygon_vertices( polygon_id ) )
+        {
+            polygon.emplace_back( this->point( vertex ) );
+        }
+        return Polygon< dimension >{ std::move( polygon ) };
+    }
+
+    template < index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, std::optional< Vector3D > >::type
         SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
-        Vector3D normal;
-        const auto vertices = polygon_vertices( polygon_id );
-        const auto& p0 = this->point( vertices[0] );
-        for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
-        {
-            const auto& p1 = this->point( vertices[v - 1] );
-            const auto& p2 = this->point( vertices[v] );
-            if( const auto triangle_normal =
-                    Triangle< T >{ p0, p1, p2 }.normal() )
-            {
-                normal = normal + triangle_normal.value();
-            }
-        }
-        try
-        {
-            return normal.normalize();
-        }
-        catch( const OpenGeodeException& /*unused*/ )
-        {
-            return std::nullopt;
-        }
+        return this->polygon( polygon_id ).normal();
     }
 
     template < index_t dimension >
@@ -1121,42 +1114,8 @@ namespace geode
     bool SurfaceMesh< dimension >::is_polygon_degenerated(
         index_t polygon_id ) const
     {
-        double max_length{ 0. };
-        local_index_t max_length_edge{ 0 };
-        for( const auto e : LRange{ nb_polygon_edges( polygon_id ) } )
-        {
-            const auto cur_length = edge_length( PolygonEdge{ polygon_id, e } );
-            if( cur_length > max_length )
-            {
-                max_length = cur_length;
-                max_length_edge = e;
-            }
-        }
-        if( max_length < GLOBAL_EPSILON )
-        {
-            return true;
-        }
-        const auto vertices = polygon_vertices( polygon_id );
-        const auto next =
-            max_length_edge + 1 == nb_polygon_vertices( polygon_id )
-                ? 0
-                : max_length_edge + 1;
-        InfiniteLine< dimension > line{ Segment< dimension >{
-            this->point( vertices[max_length_edge] ),
-            this->point( vertices[next] ) } };
-        for( const auto v : LIndices{ vertices } )
-        {
-            if( v == max_length_edge || v == next )
-            {
-                continue;
-            }
-            if( point_line_distance( this->point( vertices[v] ), line )
-                > GLOBAL_EPSILON )
-            {
-                return false;
-            }
-        }
-        return true;
+        check_polygon_id( *this, polygon_id );
+        return this->polygon( polygon_id ).is_degenerated();
     }
 
     template < index_t dimension >

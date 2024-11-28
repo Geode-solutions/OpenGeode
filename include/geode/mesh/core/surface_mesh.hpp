@@ -37,6 +37,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Polygon );
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceEdges );
@@ -209,6 +210,8 @@ namespace geode
          */
         [[nodiscard]] std::optional< local_index_t > vertex_in_polygon(
             index_t polygon_id, index_t vertex_id ) const;
+
+        Polygon< dimension > polygon( index_t polygon_id ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.
