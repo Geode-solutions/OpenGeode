@@ -62,6 +62,35 @@ namespace mapbox
     } // namespace util
 } // namespace mapbox
 
+namespace
+{
+    template < typename PointType >
+    std::array< std::vector< PointType >, 1 > polygon_points(
+        const geode::GenericPolygon< PointType, 2 >& polygon )
+    {
+        return { { polygon.vertices() } };
+    }
+
+    template < typename PointType >
+    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
+        const geode::GenericPolygon< PointType, 3 >& polygon )
+    {
+        const auto& vertices = polygon.vertices();
+        std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
+            absl::FixedArray< geode::Point2D >( vertices.size() )
+        };
+        const auto normal =
+            polygon.normal().value_or( geode::Vector3D{ { 0, 0, 1 } } );
+        const auto axis_to_remove = normal.most_meaningful_axis();
+        for( const auto v : geode::LIndices{ vertices } )
+        {
+            const geode::Point3D& point = vertices[v];
+            polygons[0][v] = point.project_point( axis_to_remove );
+        }
+        return polygons;
+    }
+} // namespace
+
 namespace geode
 {
     template < typename PointType, index_t dimension >
@@ -191,7 +220,8 @@ namespace geode
         GenericPolygon< PointType, dimension >::triangulate() const
     {
         const std::array polygons{ vertices_ };
-        const auto new_triangles = mapbox::earcut< index_t >( polygons );
+        const auto new_triangles =
+            mapbox::earcut< index_t >( polygon_points( *this ) );
         const auto nb_new_triangles = new_triangles.size() / 3;
         std::vector< std::array< index_t, 3 > > result;
         result.reserve( nb_new_triangles );
