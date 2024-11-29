@@ -111,7 +111,8 @@ void triangulate_surface()
     geode::triangulate_surface_mesh( *surface, *builder );
     geode::save_polygonal_surface( *surface, "triangulated_surface.og_psf3d" );
     OPENGEODE_EXCEPTION( surface->nb_polygons() == 9,
-        "[Test] Number of polygons in TriangulatedSurface3D is not correct" );
+        "[Test] Number of polygons in TriangulatedSurface3D is not correct: ",
+        surface->nb_polygons() );
 }
 
 void test()

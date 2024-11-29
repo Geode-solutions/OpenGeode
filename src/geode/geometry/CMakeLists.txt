@@ -28,6 +28,7 @@ add_geode_library(
         "basic_objects/cylinder.cpp"
         "basic_objects/infinite_line.cpp"
         "basic_objects/plane.cpp"
+        "basic_objects/polygon.cpp"
         "basic_objects/segment.cpp"
         "basic_objects/sphere.cpp"
         "basic_objects/tetrahedron.cpp"
@@ -62,6 +63,7 @@ add_geode_library(
         "basic_objects/cylinder.hpp"
         "basic_objects/infinite_line.hpp"
         "basic_objects/plane.hpp"
+        "basic_objects/polygon.hpp"
         "basic_objects/segment.hpp"
         "basic_objects/sphere.hpp"
         "basic_objects/tetrahedron.hpp"
@@ -102,5 +104,6 @@ add_geode_library(
         ${PROJECT_NAME}::basic
     PRIVATE_DEPENDENCIES
         Async++
+        earcut_hpp::earcut_hpp
         nanoflann::nanoflann
 )
