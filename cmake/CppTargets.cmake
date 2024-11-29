@@ -166,7 +166,7 @@ macro(_find_dependency_directories directories projects)
                 list(APPEND projects ${project})
                 list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
             endif()
-            get_target_property(dependencies ${dependency} LINK_LIBRARIES)
+            get_target_property(dependencies ${dependency} INTERFACE_LINK_LIBRARIES)
             if(dependencies)
                 _find_dependency_directories(directories projects ${dependencies})
             endif()
@@ -184,10 +184,9 @@ function(_add_geode_executable exe_path folder_name)
     
     if(WIN32)
         _find_dependency_directories(directories projects ${ARGN})
-        list(JOIN directories "\\;" directories)
         set_target_properties(${target_name}
             PROPERTIES
-                VS_DEBUGGER_ENVIRONMENT "PATH=${directories}\\;$ENV{Path}"
+                VS_DEBUGGER_ENVIRONMENT "PATH=$<JOIN:$<REMOVE_DUPLICATES:${directories}>,$<SEMICOLON>>\\;$ENV{Path}"
         )
         if(NOT BUILD_SHARED_LIBS)
             set(pdb_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<$<BOOL:${isMultiConfig}>:$<CONFIG>>/${target_name}.pdb")
@@ -198,7 +197,7 @@ function(_add_geode_executable exe_path folder_name)
         endif()
         if(CMAKE_GENERATOR STREQUAL "Ninja")
             add_custom_target(run-${target_name}
-                COMMAND ${CMAKE_COMMAND} -E env "PATH=${directories}\\;$ENV{Path}" $<TARGET_FILE:${target_name}>
+                COMMAND ${CMAKE_COMMAND} -E env "PATH=$<JOIN:$<REMOVE_DUPLICATES:${directories}>,$<SEMICOLON>>\\;$ENV{Path}" $<TARGET_FILE:${target_name}>
             )
         endif()
     endif()
@@ -247,16 +246,14 @@ function(add_geode_test)
     )
     _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
     if(WIN32)
-        list(JOIN directories "\\;" directories)
         set_tests_properties(${target_name}
             PROPERTIES
-                ENVIRONMENT "Path=${directories}\\;$ENV{Path}"
+                ENVIRONMENT "Path=$<JOIN:$<REMOVE_DUPLICATES:${directories}>,$<SEMICOLON>>\\;$ENV{Path}"
         )
     else()
-        list(JOIN directories ":" directories)
         set_tests_properties(${target_name}
             PROPERTIES
-                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH}"
+                ENVIRONMENT "LD_LIBRARY_PATH=$<JOIN:$<REMOVE_DUPLICATES:${directories}>,:>:$ENV{LD_LIBRARY_PATH}"
         )
     endif()
     if(USE_BENCHMARK)
