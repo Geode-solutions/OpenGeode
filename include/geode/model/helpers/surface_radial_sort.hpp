@@ -84,7 +84,7 @@ namespace geode
 
         [[nodiscard]] index_t next( index_t position ) const;
 
-        [[nodiscard]] absl::FixedArray< SidedSurface > surfaces;
+        absl::FixedArray< SidedSurface > surfaces;
     };
 
     [[nodiscard]] SortedSurfaces opengeode_model_api surface_radial_sort(
