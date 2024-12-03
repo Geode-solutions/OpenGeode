@@ -187,7 +187,6 @@ public:
     }
     bool operator()( geode::index_t box1, geode::index_t box2 )
     {
-        DEBUG( "operator()" );
         if( box_contains_box( box1, box2 ) )
         {
             std::lock_guard< std::mutex > lock( mutex_ );
@@ -417,8 +416,6 @@ void test_self_intersections()
     eval_intersection.included_box_.clear();
     aabb.compute_self_element_bbox_intersections( eval_intersection );
 
-    DEBUG( eval_intersection.included_box_.size() );
-    DEBUG( nb_boxes * nb_boxes );
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
         "[Test] Box self intersection - Every box should have one box "
@@ -438,12 +435,14 @@ class OtherAABBIntersection
 public:
     bool operator()( geode::index_t box1, geode::index_t box2 )
     {
+        std::lock_guard< std::mutex > lock( mutex_ );
         included_box_.push_back( { box1, box2 } );
         return false;
     }
 
 public:
     std::vector< std::pair< geode::index_t, geode::index_t > > included_box_;
+    std::mutex mutex_;
 };
 
 template < geode::index_t dimension >

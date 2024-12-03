@@ -458,7 +458,7 @@ namespace geode
 
             // The acceleration is here:
             if( !node( node_index1 )
-                    .intersects( other_tree.impl_->node( node_index2 ) ) )
+                     .intersects( other_tree.impl_->node( node_index2 ) ) )
             {
                 return false;
             }
