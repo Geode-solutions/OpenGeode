@@ -229,7 +229,7 @@ endfunction()
 option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test)
     cmake_parse_arguments(GEODE_TEST
-        "ESSENTIAL"
+        "ESSENTIAL;UNSTABLE"
         "SOURCE"
         "DEPENDENCIES"
         ${ARGN}
@@ -239,6 +239,9 @@ function(add_geode_test)
     if(${GEODE_TEST_ESSENTIAL})
         add_dependencies(essential ${target_name})
         set_tests_properties(${target_name} PROPERTIES LABELS essential) 
+    endif()
+    elseif(${GEODE_TEST_UNSTABLE})
+        set_tests_properties(${target_name} PROPERTIES LABELS unstable) 
     endif()
     set_tests_properties(${target_name} 
         PROPERTIES 
