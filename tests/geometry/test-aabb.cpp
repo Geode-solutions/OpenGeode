@@ -174,6 +174,7 @@ public:
 
     bool operator()( geode::index_t cur_box )
     {
+        std::lock_guard< std::mutex > lock( mutex_ );
         box_intersections_.emplace( cur_box );
         return false;
     }
@@ -181,24 +182,27 @@ public:
     // test box strict inclusion
     bool box_contains_box( geode::index_t box1, geode::index_t box2 )
     {
-        return (
-            bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
-            && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() ) );
+        return bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
+               && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() );
     }
     bool operator()( geode::index_t box1, geode::index_t box2 )
     {
+        DEBUG( "operator()" );
         if( box_contains_box( box1, box2 ) )
         {
+            std::lock_guard< std::mutex > lock( mutex_ );
             included_box_.emplace_back( box1, box2 );
         }
         else if( box_contains_box( box2, box1 ) )
         {
+            std::lock_guard< std::mutex > lock( mutex_ );
             included_box_.emplace_back( box2, box1 );
         }
         return false;
     }
 
 public:
+    std::mutex mutex_;
     absl::flat_hash_set< geode::index_t > box_intersections_;
     std::vector< std::pair< geode::index_t, geode::index_t > > included_box_;
 
@@ -280,11 +284,13 @@ public:
 
     bool operator()( geode::index_t cur_box )
     {
+        std::lock_guard< std::mutex > lock( mutex_ );
         box_intersections_.emplace( cur_box );
         return false;
     }
 
 public:
+    std::mutex mutex_;
     absl::flat_hash_set< geode::index_t > box_intersections_;
 
 private:
@@ -411,6 +417,8 @@ void test_self_intersections()
     eval_intersection.included_box_.clear();
     aabb.compute_self_element_bbox_intersections( eval_intersection );
 
+    DEBUG( eval_intersection.included_box_.size() );
+    DEBUG( nb_boxes * nb_boxes );
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
         "[Test] Box self intersection - Every box should have one box "

@@ -100,8 +100,8 @@ add_geode_library(
         absl::stacktrace
         absl::symbolize
         Bitsery::bitsery
-    PRIVATE_DEPENDENCIES
         Async++
+    PRIVATE_DEPENDENCIES
         absl::random_random
         absl::time
         spdlog::spdlog_header_only
