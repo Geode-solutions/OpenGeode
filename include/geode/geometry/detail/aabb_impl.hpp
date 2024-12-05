@@ -29,7 +29,14 @@
 
 #pragma once
 
+#include <cmath>
+#include <mutex>
+
+#include <async++.h>
+
 #include <geode/basic/pimpl_impl.hpp>
+
+#include <geode/basic/logger.hpp>
 
 #include <geode/geometry/aabb.hpp>
 #include <geode/geometry/points_sort.hpp>
@@ -55,7 +62,7 @@ namespace geode
 
         struct Iterator
         {
-            index_t middle_box;
+            index_t element_middle;
             index_t child_left;
             index_t child_right;
         };
@@ -64,25 +71,33 @@ namespace geode
         Impl() = default;
 
         Impl( absl::Span< const BoundingBox< dimension > > bboxes )
-            : tree_( bboxes.empty() ? ROOT_INDEX
-                                    : max_node_index_recursive(
-                                          ROOT_INDEX, 0, bboxes.size() )
-                                          + ROOT_INDEX ),
-              mapping_morton_( [&bboxes]() {
-                  absl::FixedArray< geode::Point< dimension > > points(
+            : mapping_morton_( [&bboxes]() {
+                  absl::FixedArray< Point< dimension > > points(
                       bboxes.size() );
                   for( const auto i : Indices{ bboxes } )
                   {
                       points[i] = bboxes[i].min() + bboxes[i].max();
                   }
-                  return geode::morton_mapping< dimension >( points );
+                  return morton_mapping< dimension >( points );
               }() )
         {
-            if( !bboxes.empty() )
+            if( bboxes.empty() )
             {
+                tree_.resize( ROOT_INDEX );
+            }
+            else
+            {
+                const auto [max_node_index, max_depth] =
+                    max_node_index_recursive( ROOT_INDEX, 0, bboxes.size(), 0 );
+                tree_.resize( ROOT_INDEX + max_node_index );
+                depth_ = max_depth;
                 initialize_tree_recursive(
                     bboxes, ROOT_INDEX, 0, bboxes.size() );
             }
+            const auto grain = async::detail::auto_grain_size( bboxes.size() );
+            const auto nb_async_depth = std::log2( grain );
+            async_depth_ =
+                depth_ > nb_async_depth ? depth_ - nb_async_depth : depth_;
         }
 
         [[nodiscard]] index_t nb_bboxes() const
@@ -90,16 +105,18 @@ namespace geode
             return mapping_morton_.size();
         }
 
-        [[nodiscard]] static bool is_leaf( index_t box_begin, index_t box_end )
+        [[nodiscard]] static bool is_leaf(
+            index_t element_begin, index_t element_end )
         {
-            return box_begin + 1 == box_end;
+            return element_begin + 1 == element_end;
         }
 
         [[nodiscard]] static Iterator get_recursive_iterators(
-            index_t node_index, index_t box_begin, index_t box_end )
+            index_t node_index, index_t element_begin, index_t element_end )
         {
             Iterator it;
-            it.middle_box = box_begin + ( box_end - box_begin ) / 2;
+            it.element_middle =
+                element_begin + ( element_end - element_begin ) / 2;
             it.child_left = 2 * node_index;
             it.child_right = 2 * node_index + 1;
             return it;
@@ -117,21 +134,26 @@ namespace geode
             return mapping_morton_[index];
         }
 
-        [[nodiscard]] static index_t max_node_index_recursive(
-            index_t node_index, index_t box_begin, index_t box_end )
+        [[nodiscard]] static std::tuple< index_t, index_t >
+            max_node_index_recursive( index_t node_index,
+                index_t element_begin,
+                index_t element_end,
+                index_t depth )
         {
-            OPENGEODE_ASSERT( box_end > box_begin,
+            OPENGEODE_ASSERT( element_end > element_begin,
                 "End box index should be after Begin box index" );
-            if( is_leaf( box_begin, box_end ) )
+            if( is_leaf( element_begin, element_end ) )
             {
-                return node_index;
+                return std::make_tuple( node_index, depth );
             }
-            const auto it =
-                get_recursive_iterators( node_index, box_begin, box_end );
-            return std::max( max_node_index_recursive(
-                                 it.child_left, box_begin, it.middle_box ),
-                max_node_index_recursive(
-                    it.child_right, it.middle_box, box_end ) );
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            const auto [node_left, depth_left] = max_node_index_recursive(
+                it.child_left, element_begin, it.element_middle, depth + 1 );
+            const auto [node_right, depth_right] = max_node_index_recursive(
+                it.child_right, it.element_middle, element_end, depth + 1 );
+            return std::make_tuple( std::max( node_left, node_right ),
+                std::max( depth_left, depth_right ) );
         }
 
         void initialize_tree_recursive(
@@ -156,9 +178,9 @@ namespace geode
             OPENGEODE_ASSERT(
                 it.child_right < tree_.size(), "Right index out of tree" );
             initialize_tree_recursive(
-                bboxes, it.child_left, element_begin, it.middle_box );
+                bboxes, it.child_left, element_begin, it.element_middle );
             initialize_tree_recursive(
-                bboxes, it.child_right, it.middle_box, element_end );
+                bboxes, it.child_right, it.element_middle, element_end );
             // before box_union
             tree_[node_index].add_box( node( it.child_left ) );
             tree_[node_index].add_box( node( it.child_right ) );
@@ -171,14 +193,115 @@ namespace geode
             index_t node_index,
             index_t element_begin,
             index_t element_end,
-            const ACTION& action ) const;
+            const ACTION& action ) const
+        {
+            OPENGEODE_ASSERT( node_index < tree_.size(), "node out of tree" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "Begin and End indices should be different" );
+
+            // If node is a leaf: compute point-element distance
+            // and replace current if nearer
+            if( is_leaf( element_begin, element_end ) )
+            {
+                const auto cur_box = mapping_morton( element_begin );
+                Point< dimension > cur_nearest_point;
+                const auto cur_distance = action( query, cur_box );
+                if( cur_distance < distance )
+                {
+                    nearest_box = cur_box;
+                    distance = cur_distance;
+                }
+                return;
+            }
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            const auto distance_left =
+                node( it.child_left ).signed_distance( query );
+            const auto distance_right =
+                node( it.child_right ).signed_distance( query );
+
+            // Traverse the "nearest" child first, so that it has more chances
+            // to prune the traversal of the other child.
+            if( distance_left < distance_right )
+            {
+                if( distance_left < distance )
+                {
+                    closest_element_box_recursive( query, nearest_box, distance,
+                        it.child_left, element_begin, it.element_middle,
+                        action );
+                }
+                if( distance_right < distance )
+                {
+                    closest_element_box_recursive( query, nearest_box, distance,
+                        it.child_right, it.element_middle, element_end,
+                        action );
+                }
+            }
+            else
+            {
+                if( distance_right < distance )
+                {
+                    closest_element_box_recursive( query, nearest_box, distance,
+                        it.child_right, it.element_middle, element_end,
+                        action );
+                }
+                if( distance_left < distance )
+                {
+                    closest_element_box_recursive( query, nearest_box, distance,
+                        it.child_left, element_begin, it.element_middle,
+                        action );
+                }
+            }
+        }
 
         template < typename ACTION >
         bool bbox_intersect_recursive( const BoundingBox< dimension >& box,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
-            ACTION& action ) const;
+            index_t depth,
+            ACTION& action ) const
+
+        {
+            OPENGEODE_ASSERT(
+                node_index < tree_.size(), "Node out of tree range" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "No iteration allowed start == end" );
+
+            // Prune sub-tree that does not have intersection
+            if( !box.intersects( node( node_index ) ) )
+            {
+                return false;
+            }
+
+            if( is_leaf( element_begin, element_end ) )
+            {
+                return action( mapping_morton( element_begin ) );
+            }
+
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            if( depth > async_depth_ )
+            {
+                if( bbox_intersect_recursive( box, it.child_left, element_begin,
+                        it.element_middle, depth + 1, action ) )
+                {
+                    return true;
+                }
+                return bbox_intersect_recursive( box, it.child_right,
+                    it.element_middle, element_end, depth + 1, action );
+            }
+            auto task = async::local_spawn( [&] {
+                return bbox_intersect_recursive( box, it.child_left,
+                    element_begin, it.element_middle, depth + 1, action );
+            } );
+            if( bbox_intersect_recursive( box, it.child_right,
+                    it.element_middle, element_end, depth + 1, action ) )
+            {
+                return true;
+            }
+            return task.get();
+        }
 
         template < typename ACTION >
         bool triangle_intersect_recursive(
@@ -186,65 +309,295 @@ namespace geode
             index_t node_index,
             index_t element_begin,
             index_t element_end,
-            ACTION& action ) const;
+            index_t depth,
+            ACTION& action ) const
+        {
+            OPENGEODE_ASSERT(
+                node_index < tree_.size(), "Node out of tree range" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "No iteration allowed start == end" );
+
+            // Prune sub-tree that does not have intersection
+            if( !node( node_index ).intersects( triangle ) )
+            {
+                return false;
+            }
+
+            if( is_leaf( element_begin, element_end ) )
+            {
+                return action( mapping_morton( element_begin ) );
+            }
+
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            if( depth > async_depth_ )
+            {
+                if( triangle_intersect_recursive( triangle, it.child_left,
+                        element_begin, it.element_middle, depth + 1, action ) )
+                {
+                    return true;
+                }
+                return triangle_intersect_recursive( triangle, it.child_right,
+                    it.element_middle, element_end, depth + 1, action );
+            }
+            auto task = async::local_spawn( [&] {
+                return triangle_intersect_recursive( triangle, it.child_left,
+                    element_begin, it.element_middle, depth + 1, action );
+            } );
+            if( triangle_intersect_recursive( triangle, it.child_right,
+                    it.element_middle, element_end, depth + 1, action ) )
+            {
+                return true;
+            }
+            return task.get();
+        }
 
         template < typename ACTION >
         bool self_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
+            index_t depth,
             index_t node_index2,
             index_t element_begin2,
             index_t element_end2,
-            ACTION& action ) const;
+            ACTION& action ) const
+        {
+            OPENGEODE_ASSERT( element_end1 != element_begin1,
+                "No iteration allowed start == end" );
+            OPENGEODE_ASSERT( element_end2 != element_begin2,
+                "No iteration allowed start == end" );
+
+            // Since we are intersecting the AABBTree with *itself*,
+            // we can prune half of the cases by skipping the test
+            // whenever node2's polygon index interval is greated than
+            // node1's polygon index interval.
+            if( element_end2 <= element_begin1 )
+            {
+                return false;
+            }
+
+            // The acceleration is here:
+            if( !node( node_index1 ).intersects( node( node_index2 ) ) )
+            {
+                return false;
+            }
+
+            // Simple case: leaf - leaf intersection.
+            if( is_leaf( element_begin1, element_end1 )
+                && is_leaf( element_begin2, element_end2 ) )
+            {
+                if( node_index1 == node_index2 )
+                {
+                    return false;
+                }
+                return action( mapping_morton( element_begin1 ),
+                    mapping_morton( element_begin2 ) );
+            }
+
+            // If node2 has more polygons than node1, then
+            //   intersect node2's two children with node1
+            // else
+            //   intersect node1's two children with node2
+            if( element_end2 - element_begin2 > element_end1 - element_begin1 )
+            {
+                const auto it = get_recursive_iterators(
+                    node_index2, element_begin2, element_end2 );
+                if( self_intersect_recursive( node_index1, element_begin1,
+                        element_end1, depth, it.child_left, element_begin2,
+                        it.element_middle, action ) )
+                {
+                    return true;
+                }
+                return self_intersect_recursive( node_index1, element_begin1,
+                    element_end1, depth, it.child_right, it.element_middle,
+                    element_end2, action );
+            }
+            const auto it = get_recursive_iterators(
+                node_index1, element_begin1, element_end1 );
+            if( depth > async_depth_ )
+            {
+                if( self_intersect_recursive( it.child_left, element_begin1,
+                        it.element_middle, depth + 1, node_index2,
+                        element_begin2, element_end2, action ) )
+                {
+                    return true;
+                }
+                return self_intersect_recursive( it.child_right,
+                    it.element_middle, element_end1, depth + 1, node_index2,
+                    element_begin2, element_end2, action );
+            }
+            auto task = async::local_spawn( [&] {
+                return self_intersect_recursive( it.child_left, element_begin1,
+                    it.element_middle, depth + 1, node_index2, element_begin2,
+                    element_end2, action );
+            } );
+            if( self_intersect_recursive( it.child_right, it.element_middle,
+                    element_end1, depth + 1, node_index2, element_begin2,
+                    element_end2, action ) )
+            {
+                return true;
+            }
+            return task.get();
+        }
 
         template < typename ACTION >
         bool other_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
+            index_t depth,
             const AABBTree< dimension >& other_tree,
             index_t node_index2,
             index_t element_begin2,
             index_t element_end2,
-            ACTION& action ) const;
+            ACTION& action ) const
+        {
+            OPENGEODE_ASSERT( element_end1 != element_begin1,
+                "No iteration allowed start == end" );
+            OPENGEODE_ASSERT( element_end2 != element_begin2,
+                "No iteration allowed start == end" );
+
+            // The acceleration is here:
+            if( !node( node_index1 )
+                     .intersects( other_tree.impl_->node( node_index2 ) ) )
+            {
+                return false;
+            }
+
+            // Simple case: leaf - leaf intersection.
+            if( is_leaf( element_begin1, element_end1 )
+                && is_leaf( element_begin2, element_end2 ) )
+            {
+                return action( mapping_morton( element_begin1 ),
+                    other_tree.impl_->mapping_morton( element_begin2 ) );
+            }
+
+            // If node2 has more polygons than node1, then
+            //   intersect node2's two children with node1
+            // else
+            //   intersect node1's two children with node2
+            if( element_end2 - element_begin2 > element_end1 - element_begin1 )
+            {
+                const auto it = get_recursive_iterators(
+                    node_index2, element_begin2, element_end2 );
+                if( other_intersect_recursive( node_index1, element_begin1,
+                        element_end1, depth, other_tree, it.child_left,
+                        element_begin2, it.element_middle, action ) )
+                {
+                    return true;
+                }
+                return other_intersect_recursive( node_index1, element_begin1,
+                    element_end1, depth, other_tree, it.child_right,
+                    it.element_middle, element_end2, action );
+            }
+            const auto it = get_recursive_iterators(
+                node_index1, element_begin1, element_end1 );
+            if( depth > async_depth_ )
+            {
+                if( other_intersect_recursive( it.child_left, element_begin1,
+                        it.element_middle, depth + 1, other_tree, node_index2,
+                        element_begin2, element_end2, action ) )
+                {
+                    return true;
+                }
+                return other_intersect_recursive( it.child_right,
+                    it.element_middle, element_end1, depth + 1, other_tree,
+                    node_index2, element_begin2, element_end2, action );
+            }
+            auto task = async::local_spawn( [&] {
+                return other_intersect_recursive( it.child_left, element_begin1,
+                    it.element_middle, depth + 1, other_tree, node_index2,
+                    element_begin2, element_end2, action );
+            } );
+            if( other_intersect_recursive( it.child_right, it.element_middle,
+                    element_end1, depth + 1, other_tree, node_index2,
+                    element_begin2, element_end2, action ) )
+            {
+                return true;
+            }
+            return task.get();
+        }
 
         template < typename Line, typename ACTION >
         bool line_intersect_recursive( const Line& line,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
-            ACTION& action ) const;
+            index_t depth,
+            ACTION& action ) const
+        {
+            OPENGEODE_ASSERT(
+                node_index < tree_.size(), "Node out of tree range" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "No iteration allowed start == end" );
+
+            // Prune sub-tree that does not have intersection
+            if( !node( node_index ).intersects( line ) )
+            {
+                return false;
+            }
+
+            if( is_leaf( element_begin, element_end ) )
+            {
+                return action( mapping_morton( element_begin ) );
+            }
+
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            if( depth > async_depth_ )
+            {
+                if( line_intersect_recursive( line, it.child_left,
+                        element_begin, it.element_middle, depth + 1, action ) )
+                {
+                    return true;
+                }
+                return line_intersect_recursive( line, it.child_right,
+                    it.element_middle, element_end, depth + 1, action );
+            }
+            auto task = async::local_spawn( [&] {
+                return line_intersect_recursive( line, it.child_left,
+                    element_begin, it.element_middle, depth + 1, action );
+            } );
+            if( line_intersect_recursive( line, it.child_right,
+                    it.element_middle, element_end, depth + 1, action ) )
+            {
+                return true;
+            }
+            return task.get();
+        }
 
         [[nodiscard]] index_t closest_element_box_hint(
             const Point< dimension >& query ) const
         {
-            index_t box_begin{ 0 };
-            index_t box_end{ nb_bboxes() };
+            index_t element_begin{ 0 };
+            index_t element_end{ nb_bboxes() };
             index_t node_index{ Impl::ROOT_INDEX };
-            while( !is_leaf( box_begin, box_end ) )
+            while( !is_leaf( element_begin, element_end ) )
             {
-                const auto it =
-                    get_recursive_iterators( node_index, box_begin, box_end );
+                const auto it = get_recursive_iterators(
+                    node_index, element_begin, element_end );
                 if( node( it.child_left ).signed_distance( query )
                     < node( it.child_right ).signed_distance( query ) )
                 {
-                    box_end = it.middle_box;
+                    element_end = it.element_middle;
                     node_index = it.child_left;
                 }
                 else
                 {
-                    box_begin = it.middle_box;
+                    element_begin = it.element_middle;
                     node_index = it.child_right;
                 }
             }
 
-            return mapping_morton( box_begin );
+            return mapping_morton( element_begin );
         }
 
         void containing_boxes_recursive( index_t node_index,
             index_t element_begin,
             index_t element_end,
+            index_t depth,
             const Point< dimension >& query,
-            std::vector< index_t >& result ) const
+            std::vector< index_t >& result,
+            std::mutex& mutex ) const
         {
             OPENGEODE_ASSERT(
                 node_index < tree_.size(), "Node index out of tree" );
@@ -256,20 +609,36 @@ namespace geode
             }
             if( is_leaf( element_begin, element_end ) )
             {
+                std::lock_guard< std::mutex > lock( mutex );
                 result.push_back( mapping_morton( element_begin ) );
                 return;
             }
             const auto it = get_recursive_iterators(
                 node_index, element_begin, element_end );
-            containing_boxes_recursive(
-                it.child_left, element_begin, it.middle_box, query, result );
-            containing_boxes_recursive(
-                it.child_right, it.middle_box, element_end, query, result );
+            if( depth_ > async_depth_ )
+            {
+                containing_boxes_recursive( it.child_left, element_begin,
+                    it.element_middle, depth + 1, query, result, mutex );
+                containing_boxes_recursive( it.child_right, it.element_middle,
+                    element_end, depth + 1, query, result, mutex );
+            }
+            else
+            {
+                auto task = async::local_spawn( [&] {
+                    containing_boxes_recursive( it.child_left, element_begin,
+                        it.element_middle, depth + 1, query, result, mutex );
+                } );
+                containing_boxes_recursive( it.child_right, it.element_middle,
+                    element_end, depth + 1, query, result, mutex );
+                task.get();
+            }
         }
 
     private:
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
+        index_t depth_{ 1 };
+        index_t async_depth_{ 0 };
     };
 
     template < index_t dimension >
@@ -299,7 +668,7 @@ namespace geode
             return;
         }
         impl_->bbox_intersect_recursive(
-            box, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            box, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 
     template < index_t dimension >
@@ -311,7 +680,7 @@ namespace geode
         {
             return;
         }
-        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(), 0,
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
@@ -325,7 +694,7 @@ namespace geode
         {
             return;
         }
-        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(), 0,
             other_tree, Impl::ROOT_INDEX, 0, other_tree.nb_bboxes(), action );
     }
 
@@ -339,7 +708,7 @@ namespace geode
             return;
         }
         impl_->line_intersect_recursive(
-            ray, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            ray, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 
     template < index_t dimension >
@@ -352,7 +721,7 @@ namespace geode
             return;
         }
         impl_->line_intersect_recursive(
-            line, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            line, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 
     template < index_t dimension >
@@ -365,7 +734,7 @@ namespace geode
             return;
         }
         impl_->triangle_intersect_recursive(
-            triangle, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            triangle, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 
     template < index_t dimension >
@@ -379,312 +748,5 @@ namespace geode
         }
         impl_->line_intersect_recursive(
             segment, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
-    }
-
-    template < index_t dimension >
-    template < typename ACTION >
-    void AABBTree< dimension >::Impl::closest_element_box_recursive(
-        const Point< dimension >& query,
-        index_t& nearest_box,
-        double& distance,
-        index_t node_index,
-        index_t box_begin,
-        index_t box_end,
-        const ACTION& action ) const
-    {
-        OPENGEODE_ASSERT( node_index < tree_.size(), "node out of tree" );
-        OPENGEODE_ASSERT(
-            box_begin != box_end, "Begin and End indices should be different" );
-
-        // If node is a leaf: compute point-element distance
-        // and replace current if nearer
-        if( is_leaf( box_begin, box_end ) )
-        {
-            const auto cur_box = mapping_morton( box_begin );
-            Point< dimension > cur_nearest_point;
-            const auto cur_distance = action( query, cur_box );
-            if( cur_distance < distance )
-            {
-                nearest_box = cur_box;
-                distance = cur_distance;
-            }
-            return;
-        }
-        const auto it =
-            get_recursive_iterators( node_index, box_begin, box_end );
-        const auto distance_left =
-            node( it.child_left ).signed_distance( query );
-        const auto distance_right =
-            node( it.child_right ).signed_distance( query );
-
-        // Traverse the "nearest" child first, so that it has more chances
-        // to prune the traversal of the other child.
-        if( distance_left < distance_right )
-        {
-            if( distance_left < distance )
-            {
-                closest_element_box_recursive( query, nearest_box, distance,
-                    it.child_left, box_begin, it.middle_box, action );
-            }
-            if( distance_right < distance )
-            {
-                closest_element_box_recursive( query, nearest_box, distance,
-                    it.child_right, it.middle_box, box_end, action );
-            }
-        }
-        else
-        {
-            if( distance_right < distance )
-            {
-                closest_element_box_recursive( query, nearest_box, distance,
-                    it.child_right, it.middle_box, box_end, action );
-            }
-            if( distance_left < distance )
-            {
-                closest_element_box_recursive( query, nearest_box, distance,
-                    it.child_left, box_begin, it.middle_box, action );
-            }
-        }
-    }
-
-    template < index_t dimension >
-    template < typename ACTION >
-    bool AABBTree< dimension >::Impl::bbox_intersect_recursive(
-        const BoundingBox< dimension >& box,
-        index_t node_index,
-        index_t element_begin,
-        index_t element_end,
-        ACTION& action ) const
-    {
-        OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
-        OPENGEODE_ASSERT(
-            element_begin != element_end, "No iteration allowed start == end" );
-
-        // Prune sub-tree that does not have intersection
-        if( !box.intersects( node( node_index ) ) )
-        {
-            return false;
-        }
-
-        if( is_leaf( element_begin, element_end ) )
-        {
-            return action( mapping_morton( element_begin ) );
-        }
-
-        const auto it =
-            get_recursive_iterators( node_index, element_begin, element_end );
-        if( bbox_intersect_recursive(
-                box, it.child_left, element_begin, it.middle_box, action ) )
-        {
-            return true;
-        }
-        return bbox_intersect_recursive(
-            box, it.child_right, it.middle_box, element_end, action );
-    }
-
-    template < index_t dimension >
-    template < typename ACTION >
-    bool AABBTree< dimension >::Impl::triangle_intersect_recursive(
-        const Triangle< dimension >& triangle,
-        index_t node_index,
-        index_t element_begin,
-        index_t element_end,
-        ACTION& action ) const
-    {
-        OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
-        OPENGEODE_ASSERT(
-            element_begin != element_end, "No iteration allowed start == end" );
-
-        // Prune sub-tree that does not have intersection
-        if( !node( node_index ).intersects( triangle ) )
-        {
-            return false;
-        }
-
-        if( is_leaf( element_begin, element_end ) )
-        {
-            return action( mapping_morton( element_begin ) );
-        }
-
-        const auto it =
-            get_recursive_iterators( node_index, element_begin, element_end );
-        if( triangle_intersect_recursive( triangle, it.child_left,
-                element_begin, it.middle_box, action ) )
-        {
-            return true;
-        }
-        return triangle_intersect_recursive(
-            triangle, it.child_right, it.middle_box, element_end, action );
-    }
-
-    template < index_t dimension >
-    template < typename ACTION >
-    bool AABBTree< dimension >::Impl::self_intersect_recursive(
-        index_t node_index1,
-        index_t element_begin1,
-        index_t element_end1,
-        index_t node_index2,
-        index_t element_begin2,
-        index_t element_end2,
-        ACTION& action ) const
-    {
-        OPENGEODE_ASSERT( element_end1 != element_begin1,
-            "No iteration allowed start == end" );
-        OPENGEODE_ASSERT( element_end2 != element_begin2,
-            "No iteration allowed start == end" );
-
-        // Since we are intersecting the AABBTree with *itself*,
-        // we can prune half of the cases by skipping the test
-        // whenever node2's polygon index interval is greated than
-        // node1's polygon index interval.
-        if( element_end2 <= element_begin1 )
-        {
-            return false;
-        }
-
-        // The acceleration is here:
-        if( !node( node_index1 ).intersects( node( node_index2 ) ) )
-        {
-            return false;
-        }
-
-        // Simple case: leaf - leaf intersection.
-        if( is_leaf( element_begin1, element_end1 )
-            && is_leaf( element_begin2, element_end2 ) )
-        {
-            if( node_index1 == node_index2 )
-            {
-                return false;
-            }
-            return action( mapping_morton( element_begin1 ),
-                mapping_morton( element_begin2 ) );
-        }
-
-        // If node2 has more polygons than node1, then
-        //   intersect node2's two children with node1
-        // else
-        //   intersect node1's two children with node2
-        if( element_end2 - element_begin2 > element_end1 - element_begin1 )
-        {
-            const auto it = get_recursive_iterators(
-                node_index2, element_begin2, element_end2 );
-            if( self_intersect_recursive( node_index1, element_begin1,
-                    element_end1, it.child_left, element_begin2, it.middle_box,
-                    action ) )
-            {
-                return true;
-            }
-            return self_intersect_recursive( node_index1, element_begin1,
-                element_end1, it.child_right, it.middle_box, element_end2,
-                action );
-        }
-        const auto it = get_recursive_iterators(
-            node_index1, element_begin1, element_end1 );
-        if( self_intersect_recursive( it.child_left, element_begin1,
-                it.middle_box, node_index2, element_begin2, element_end2,
-                action ) )
-        {
-            return true;
-        }
-        return self_intersect_recursive( it.child_right, it.middle_box,
-            element_end1, node_index2, element_begin2, element_end2, action );
-    }
-
-    template < index_t dimension >
-    template < typename ACTION >
-    bool AABBTree< dimension >::Impl::other_intersect_recursive(
-        index_t node_index1,
-        index_t element_begin1,
-        index_t element_end1,
-        const AABBTree< dimension >& other_tree,
-        index_t node_index2,
-        index_t element_begin2,
-        index_t element_end2,
-        ACTION& action ) const
-    {
-        OPENGEODE_ASSERT( element_end1 != element_begin1,
-            "No iteration allowed start == end" );
-        OPENGEODE_ASSERT( element_end2 != element_begin2,
-            "No iteration allowed start == end" );
-
-        // The acceleration is here:
-        if( !node( node_index1 )
-                 .intersects( other_tree.impl_->node( node_index2 ) ) )
-        {
-            return false;
-        }
-
-        // Simple case: leaf - leaf intersection.
-        if( is_leaf( element_begin1, element_end1 )
-            && is_leaf( element_begin2, element_end2 ) )
-        {
-            return action( mapping_morton( element_begin1 ),
-                other_tree.impl_->mapping_morton( element_begin2 ) );
-        }
-
-        // If node2 has more polygons than node1, then
-        //   intersect node2's two children with node1
-        // else
-        //   intersect node1's two children with node2
-        if( element_end2 - element_begin2 > element_end1 - element_begin1 )
-        {
-            const auto it = get_recursive_iterators(
-                node_index2, element_begin2, element_end2 );
-            if( other_intersect_recursive( node_index1, element_begin1,
-                    element_end1, other_tree, it.child_left, element_begin2,
-                    it.middle_box, action ) )
-            {
-                return true;
-            }
-            return other_intersect_recursive( node_index1, element_begin1,
-                element_end1, other_tree, it.child_right, it.middle_box,
-                element_end2, action );
-        }
-        const auto it = get_recursive_iterators(
-            node_index1, element_begin1, element_end1 );
-        if( other_intersect_recursive( it.child_left, element_begin1,
-                it.middle_box, other_tree, node_index2, element_begin2,
-                element_end2, action ) )
-        {
-            return true;
-        }
-        return other_intersect_recursive( it.child_right, it.middle_box,
-            element_end1, other_tree, node_index2, element_begin2, element_end2,
-            action );
-    }
-
-    template < index_t dimension >
-    template < typename Line, typename ACTION >
-    bool AABBTree< dimension >::Impl::line_intersect_recursive(
-        const Line& line,
-        index_t node_index,
-        index_t element_begin,
-        index_t element_end,
-        ACTION& action ) const
-    {
-        OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
-        OPENGEODE_ASSERT(
-            element_begin != element_end, "No iteration allowed start == end" );
-
-        // Prune sub-tree that does not have intersection
-        if( !node( node_index ).intersects( line ) )
-        {
-            return false;
-        }
-
-        if( is_leaf( element_begin, element_end ) )
-        {
-            return action( mapping_morton( element_begin ) );
-        }
-
-        const auto it =
-            get_recursive_iterators( node_index, element_begin, element_end );
-        if( line_intersect_recursive(
-                line, it.child_left, element_begin, it.middle_box, action ) )
-        {
-            return true;
-        }
-        return line_intersect_recursive(
-            line, it.child_right, it.middle_box, element_end, action );
     }
 } // namespace geode

@@ -174,6 +174,7 @@ public:
 
     bool operator()( geode::index_t cur_box )
     {
+        std::lock_guard< std::mutex > lock( mutex_ );
         box_intersections_.emplace( cur_box );
         return false;
     }
@@ -181,24 +182,26 @@ public:
     // test box strict inclusion
     bool box_contains_box( geode::index_t box1, geode::index_t box2 )
     {
-        return (
-            bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
-            && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() ) );
+        return bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
+               && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() );
     }
     bool operator()( geode::index_t box1, geode::index_t box2 )
     {
         if( box_contains_box( box1, box2 ) )
         {
+            std::lock_guard< std::mutex > lock( mutex_ );
             included_box_.emplace_back( box1, box2 );
         }
         else if( box_contains_box( box2, box1 ) )
         {
+            std::lock_guard< std::mutex > lock( mutex_ );
             included_box_.emplace_back( box2, box1 );
         }
         return false;
     }
 
 public:
+    std::mutex mutex_;
     absl::flat_hash_set< geode::index_t > box_intersections_;
     std::vector< std::pair< geode::index_t, geode::index_t > > included_box_;
 
@@ -280,11 +283,13 @@ public:
 
     bool operator()( geode::index_t cur_box )
     {
+        std::lock_guard< std::mutex > lock( mutex_ );
         box_intersections_.emplace( cur_box );
         return false;
     }
 
 public:
+    std::mutex mutex_;
     absl::flat_hash_set< geode::index_t > box_intersections_;
 
 private:
@@ -430,12 +435,14 @@ class OtherAABBIntersection
 public:
     bool operator()( geode::index_t box1, geode::index_t box2 )
     {
+        std::lock_guard< std::mutex > lock( mutex_ );
         included_box_.push_back( { box1, box2 } );
         return false;
     }
 
 public:
     std::vector< std::pair< geode::index_t, geode::index_t > > included_box_;
+    std::mutex mutex_;
 };
 
 template < geode::index_t dimension >
