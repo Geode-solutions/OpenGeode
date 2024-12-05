@@ -458,7 +458,7 @@ namespace geode
 
             // The acceleration is here:
             if( !node( node_index1 )
-                     .intersects( other_tree.impl_->node( node_index2 ) ) )
+                    .intersects( other_tree.impl_->node( node_index2 ) ) )
             {
                 return false;
             }
@@ -747,6 +747,6 @@ namespace geode
             return;
         }
         impl_->line_intersect_recursive(
-            segment, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            segment, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 } // namespace geode
