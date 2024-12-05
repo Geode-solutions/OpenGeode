@@ -103,20 +103,20 @@ namespace geode
         for( const auto& direction : directions )
         {
             const Ray3D ray{ direction, point };
-            geode::index_t nb_intersections{ 0 };
-            geode::index_t could_not_determine{ 0 };
+            index_t nb_intersections{ 0 };
+            bool could_determine{ true };
             for( const auto& surface : brep.boundaries( block ) )
             {
                 auto intersections = count_real_intersections_with_boundaries(
                     ray, surface.mesh() );
                 if( !intersections.has_value() )
                 {
-                    could_not_determine++;
+                    could_determine = false;
                     break;
                 }
                 nb_intersections += intersections.value();
             }
-            if( could_not_determine == 0 )
+            if( could_determine )
             {
                 return ( nb_intersections % 2 == 1 );
             }
