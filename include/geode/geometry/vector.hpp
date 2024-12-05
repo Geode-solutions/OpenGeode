@@ -174,11 +174,22 @@ namespace geode
             const Attribute< Vector< dimension > > &attribute )
         {
             Vector< dimension > result;
+            bool is_same{ true };
+            const auto &first_value =
+                attribute.value( interpolator.indices_[0] );
             for( const auto i : Indices{ interpolator.indices_ } )
             {
-                result = result
-                         + attribute.value( interpolator.indices_[i] )
-                               * interpolator.lambdas_[i];
+                const auto &i_value =
+                    attribute.value( interpolator.indices_[i] );
+                if( is_same )
+                {
+                    is_same = i_value == first_value;
+                }
+                result = result + i_value * interpolator.lambdas_[i];
+            }
+            if( is_same )
+            {
+                return first_value;
             }
             return result;
         }
