@@ -128,10 +128,22 @@ namespace geode
             const Attribute< Type >& attribute )                               \
         {                                                                      \
             Type result{ 0 };                                                  \
+            bool is_same{ true };                                              \
+            const auto& first_value =                                          \
+                attribute.value( interpolator.indices_[0] );                   \
             for( auto i : Indices{ interpolator.indices_ } )                   \
             {                                                                  \
-                result += interpolator.lambdas_[i]                             \
-                          * attribute.value( interpolator.indices_[i] );       \
+                const auto& value =                                            \
+                    attribute.value( interpolator.indices_[i] );               \
+                if( is_same )                                                  \
+                {                                                              \
+                    is_same = value == first_value;                            \
+                }                                                              \
+                result += interpolator.lambdas_[i] * value;                    \
+            }                                                                  \
+            if( is_same )                                                      \
+            {                                                                  \
+                return first_value;                                            \
             }                                                                  \
             return result;                                                     \
         }                                                                      \
@@ -151,15 +163,27 @@ namespace geode
         {                                                                      \
             std::array< Type, array_size > result;                             \
             result.fill( 0 );                                                  \
+            bool is_same{ true };                                              \
+            const auto& first_value =                                          \
+                attribute.value( interpolator.indices_[0] );                   \
             for( const auto vertex_id : Indices{ interpolator.indices_ } )     \
             {                                                                  \
                 const auto& array_value =                                      \
                     attribute.value( interpolator.indices_[vertex_id] );       \
                 for( const auto position : Indices{ array_value } )            \
                 {                                                              \
+                    if( is_same )                                              \
+                    {                                                          \
+                        is_same =                                              \
+                            array_value[position] == first_value[position];    \
+                    }                                                          \
                     result[position] += interpolator.lambdas_[vertex_id]       \
                                         * array_value[position];               \
                 }                                                              \
+            }                                                                  \
+            if( is_same )                                                      \
+            {                                                                  \
+                return first_value;                                            \
             }                                                                  \
             return result;                                                     \
         }                                                                      \

@@ -107,10 +107,22 @@ namespace geode
             const Attribute< GreyscaleColor > &attribute )
         {
             local_index_t result{ 0 };
+            bool is_same{ true };
+            const auto &first_value =
+                attribute.value( interpolator.indices_[0] ).value();
             for( const auto i : Indices{ interpolator.indices_ } )
             {
-                result += attribute.value( interpolator.indices_[i] ).value()
-                          * interpolator.lambdas_[i];
+                const auto &i_value =
+                    attribute.value( interpolator.indices_[i] ).value();
+                if( is_same )
+                {
+                    is_same = i_value == first_value;
+                }
+                result = result + i_value * interpolator.lambdas_[i];
+            }
+            if( is_same )
+            {
+                return GreyscaleColor{ first_value };
             }
             return GreyscaleColor{ result };
         }
