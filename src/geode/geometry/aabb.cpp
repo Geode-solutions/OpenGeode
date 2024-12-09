@@ -41,9 +41,7 @@
 namespace geode
 {
     template < index_t dimension >
-    AABBTree< dimension >::AABBTree()
-    {
-    }
+    AABBTree< dimension >::AABBTree() = default;
 
     template < index_t dimension >
     AABBTree< dimension >::AABBTree(
@@ -85,8 +83,9 @@ namespace geode
             return {};
         }
         std::vector< index_t > result;
+        std::mutex mutex;
         impl_->containing_boxes_recursive(
-            Impl::ROOT_INDEX, 0, nb_bboxes(), query, result );
+            Impl::ROOT_INDEX, 0, nb_bboxes(), 0, query, result, mutex );
         return result;
     }
 
