@@ -28,6 +28,7 @@
 #include <limits>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/vector.hpp>
 
 namespace geode
@@ -63,5 +64,27 @@ namespace geode
         const auto aspect_ratio =
             constant * longest_edge_length * total_area2 / absolute_det;
         return aspect_ratio;
+    }
+
+    double tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra )
+    {
+        const auto signed_volume = geode::tetrahedron_signed_volume( tetra );
+        double sq_len{ 0 };
+        const auto& vertices = tetra.vertices();
+        for( const auto v0 : geode::LRange{ 3 } )
+        {
+            const auto& point0 = vertices[v0].get();
+            for( const auto v1 : geode::LRange{ v0, 4 } )
+            {
+                const auto& point1 = vertices[v1].get();
+                for( const auto d : geode::LRange{ 3 } )
+                {
+                    const auto diff = point0.value( d ) - point1.value( d );
+                    sq_len += diff * diff;
+                }
+            }
+        }
+        const auto l_rms = std::sqrt( sq_len / 6 );
+        return 6 * std::sqrt( 2 ) * signed_volume / ( l_rms * l_rms * l_rms );
     }
 } // namespace geode
