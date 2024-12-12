@@ -34,4 +34,6 @@ namespace geode
 {
     [[nodiscard]] double opengeode_geometry_api tetrahedron_aspect_ratio(
         const Tetrahedron& tetra );
+    [[nodiscard]] double opengeode_geometry_api
+        tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra );
 } // namespace geode
