@@ -90,7 +90,7 @@ namespace geode
         }
 
     private:
-        LEVEL level_{ LEVEL::trace };
+        LEVEL level_{ LEVEL::info };
     };
 
     Logger::Logger() = default;
