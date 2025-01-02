@@ -274,13 +274,11 @@ namespace geode
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
+            : polygon_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           PolygonVertex >(
                           "polygon_around_vertex", PolygonVertex{} ) ),
-              polygons_around_vertex_(
-                  surface.vertex_attribute_manager()
+              polygons_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
                           POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
@@ -909,6 +907,14 @@ namespace geode
             }
         }
         return std::nullopt;
+    }
+
+    template < index_t dimension >
+    Segment< dimension > SurfaceMesh< dimension >::segment(
+        const PolygonEdge& polygon_edge ) const
+    {
+        const auto vertices = polygon_edge_vertices( polygon_edge );
+        return { this->point( vertices[0] ), this->point( vertices[1] ) };
     }
 
     template < index_t dimension >
