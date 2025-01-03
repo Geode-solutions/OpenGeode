@@ -31,10 +31,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerInfiniteLine );
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerRay );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    template < typename PointType, index_t dimension >
-    class GenericSegment;
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
-    FORWARD_DECLARATION_DIMENSION_CLASS( OwnerSegment );
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
@@ -47,9 +44,7 @@ namespace geode
     {
     public:
         GenericLine( const Vector< dimension >& direction, PointType origin );
-
-        explicit GenericLine(
-            const GenericSegment< PointType, dimension >& segment );
+        explicit GenericLine( const Segment< dimension >& segment );
         GenericLine( const GenericLine< PointType, dimension >& other );
         GenericLine< PointType, dimension >& operator=(
             const GenericLine< PointType, dimension >& other );
@@ -75,7 +70,7 @@ namespace geode
         explicit OwnerInfiniteLine(
             const Vector< dimension >& direction, Point< dimension > origin );
 
-        OwnerInfiniteLine( const Segment< dimension >& segment );
+        explicit OwnerInfiniteLine( const Segment< dimension >& segment );
         OwnerInfiniteLine( const OwnerInfiniteLine< dimension >& other );
         OwnerInfiniteLine< dimension >& operator=(
             const OwnerInfiniteLine< dimension >& other );
@@ -94,7 +89,7 @@ namespace geode
         explicit OwnerRay(
             const Vector< dimension >& direction, Point< dimension > origin );
 
-        OwnerRay( const Segment< dimension >& segment );
+        explicit OwnerRay( const Segment< dimension >& segment );
         OwnerRay( const OwnerRay< dimension >& other );
         OwnerRay< dimension >& operator=( const OwnerRay< dimension >& other );
         OwnerRay( OwnerRay< dimension >&& other ) noexcept;
@@ -111,7 +106,7 @@ namespace geode
     public:
         InfiniteLine( const Vector< dimension >& direction,
             const Point< dimension >& origin );
-        InfiniteLine( const Segment< dimension >& segment );
+        explicit InfiniteLine( const Segment< dimension >& segment );
 
         InfiniteLine( const InfiniteLine< dimension >& other );
         InfiniteLine( const OwnerInfiniteLine< dimension >& other );

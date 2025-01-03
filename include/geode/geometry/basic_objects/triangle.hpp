@@ -84,7 +84,10 @@ namespace geode
         [[nodiscard]] const std::array< PointType, 3 >& vertices() const;
         [[nodiscard]] BoundingBox< dimension > bounding_box() const;
         [[nodiscard]] local_index_t longest_edge_index() const;
+        [[nodiscard]] local_index_t smallest_edge_index() const;
         [[nodiscard]] double minimum_height() const;
+        [[nodiscard]] bool is_degenerated() const;
+        [[nodiscard]] std::string string() const;
 
     private:
         std::array< PointType, 3 > vertices_;
@@ -128,4 +131,37 @@ namespace geode
             Triangle< dimension >&& other ) noexcept;
     };
     ALIAS_2D_AND_3D( Triangle );
+
+    template < index_t dimension >
+    class OpenGeodeTriangleException : public OpenGeodeException
+    {
+    public:
+        template < typename... Args >
+        explicit OpenGeodeTriangleException(
+            Triangle< dimension > triangle_in, const Args&... message )
+            : OpenGeodeException{ absl::StrCat(
+                  message..., " at ", triangle_in.string() ) },
+              triangle{ std::move( triangle_in ) }
+        {
+        }
+
+        OwnerTriangle< dimension > triangle;
+    };
+    ALIAS_2D_AND_3D( OpenGeodeTriangleException );
 } // namespace geode
+
+// NOLINTNEXTLINE
+#define OPENGEODE_TRIANGLE_EXCEPTION( dimension, condition, triangle, ... )    \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
+        throw geode::OpenGeodeTriangleException< dimension >                   \
+        {                                                                      \
+            triangle, __VA_ARGS__                                              \
+        }
+
+// NOLINTNEXTLINE
+#define OPENGEODE_TRIANGLE2D_EXCEPTION( condition, triangle, ... )             \
+    OPENGEODE_TRIANGLE_EXCEPTION( 2, condition, triangle, __VA_ARGS__ )
+
+// NOLINTNEXTLINE
+#define OPENGEODE_TRIANGLE3D_EXCEPTION( condition, triangle, ... )             \
+    OPENGEODE_TRIANGLE_EXCEPTION( 3, condition, triangle, __VA_ARGS__ )

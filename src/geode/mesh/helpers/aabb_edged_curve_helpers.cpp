@@ -65,12 +65,14 @@ namespace geode
         return point_segment_distance( query, segment );
     }
 
+    template opengeode_mesh_api AABBTree1D create_aabb_tree< 1 >(
+        const EdgedCurve1D& );
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
         const EdgedCurve2D& );
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
         const EdgedCurve3D& );
 
+    template class opengeode_mesh_api DistanceToEdge< 1 >;
     template class opengeode_mesh_api DistanceToEdge< 2 >;
     template class opengeode_mesh_api DistanceToEdge< 3 >;
-
 } // namespace geode

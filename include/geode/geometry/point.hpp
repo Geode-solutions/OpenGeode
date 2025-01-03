@@ -214,16 +214,27 @@ namespace geode
     struct AttributeLinearInterpolationImpl< Point< dimension > >
     {
         template < template < typename > class Attribute >
-        static Point< dimension > compute(
+        [[nodiscard]] static Point< dimension > compute(
             const AttributeLinearInterpolation &interpolator,
             const Attribute< Point< dimension > > &attribute )
         {
             Point< dimension > result;
+            bool is_same{ true };
+            const auto &first_value =
+                attribute.value( interpolator.indices_[0] );
             for( const auto i : Indices{ interpolator.indices_ } )
             {
-                result = result
-                         + attribute.value( interpolator.indices_[i] )
-                               * interpolator.lambdas_[i];
+                const auto &i_value =
+                    attribute.value( interpolator.indices_[i] );
+                if( is_same )
+                {
+                    is_same = i_value == first_value;
+                }
+                result = result + i_value * interpolator.lambdas_[i];
+            }
+            if( is_same )
+            {
+                return first_value;
             }
             return result;
         }
@@ -284,15 +295,15 @@ namespace geode
         }
 
 // NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION1D( condition, point, ... )                   \
+#define OPENGEODE_POINT1D_EXCEPTION( condition, point, ... )                   \
     OPENGEODE_POINT_EXCEPTION( 1, condition, point, __VA_ARGS__ )
 
 // NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION2D( condition, point, ... )                   \
+#define OPENGEODE_POINT2D_EXCEPTION( condition, point, ... )                   \
     OPENGEODE_POINT_EXCEPTION( 2, condition, point, __VA_ARGS__ )
 
 // NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION3D( condition, point, ... )                   \
+#define OPENGEODE_POINT3D_EXCEPTION( condition, point, ... )                   \
     OPENGEODE_POINT_EXCEPTION( 3, condition, point, __VA_ARGS__ )
 
 namespace std

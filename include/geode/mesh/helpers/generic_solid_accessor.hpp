@@ -53,6 +53,11 @@ namespace geode
         {
         }
 
+        [[nodiscard]] index_t nb_vertices() const
+        {
+            return mesh_.nb_vertices();
+        }
+
         [[nodiscard]] index_t nb_elements() const
         {
             return mesh_.nb_polyhedra();
@@ -66,6 +71,18 @@ namespace geode
         [[nodiscard]] index_t nb_element_facets( index_t polyhedron_id ) const
         {
             return mesh_.nb_polyhedron_facets( polyhedron_id );
+        }
+
+        [[nodiscard]] index_t element_index(
+            const ElementFacet& polyhedron_facet ) const
+        {
+            return polyhedron_facet.polyhedron_id;
+        }
+
+        [[nodiscard]] index_t facet_index(
+            const ElementFacet& polyhedron_facet ) const
+        {
+            return polyhedron_facet.facet_id;
         }
 
         [[nodiscard]] index_t element_vertex(
@@ -87,21 +104,21 @@ namespace geode
         }
 
         [[nodiscard]] ElementFacetVertices element_facet_vertices(
-            const ElementFacet& polyhedron_facet ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polyhedron_facet_vertices( polyhedron_facet );
+            return mesh_.polyhedron_facet_vertices( element_facet );
         }
 
         [[nodiscard]] std::optional< index_t > element_adjacent(
-            const ElementFacet& polyhedron_facet ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polyhedron_adjacent( polyhedron_facet );
+            return mesh_.polyhedron_adjacent( element_facet );
         }
 
         [[nodiscard]] std::optional< ElementFacet > element_adjacent_facet(
-            const ElementFacet& polyhedron_facet ) const
+            ElementFacet element_facet ) const
         {
-            return mesh_.polyhedron_adjacent_facet( polyhedron_facet );
+            return mesh_.polyhedron_adjacent_facet( element_facet );
         }
 
         [[nodiscard]] const uuid& id() const

@@ -35,15 +35,14 @@
 #include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/solid_edges.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/helpers/convert_solid_mesh.hpp>
 #include <geode/mesh/helpers/detail/split_along_solid_facets.hpp>
 #include <geode/mesh/io/hybrid_solid_output.hpp>
 #include <geode/mesh/io/tetrahedral_solid_output.hpp>
 
-#include <geode/mesh/helpers/convert_solid_mesh.hpp>
-
 // NOLINTBEGIN(*-magic-numbers)
 
-void test_tetrahedral_solid()
+void test_grid_to_solids()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     auto mesh_grid = geode::RegularGrid3D::create();
@@ -54,11 +53,18 @@ void test_tetrahedral_solid()
         geode::convert_solid_mesh_into_tetrahedral_solid( *mesh_grid );
     const auto tet_solid_from_mesh_grid_2 =
         geode::convert_grid_into_tetrahedral_solid( *mesh_grid );
+    const auto hybrid_solid_from_mesh_grid =
+        geode::convert_grid_into_hybrid_solid( *mesh_grid );
     const geode::LightRegularGrid3D light_grid{
         geode::Point3D{ { 1, 1.5, 1.1 } }, { 5, 5, 5 }, { 5, 5, 5 }
     };
+    std::vector< geode::index_t > cells_to_densify( 25 );
+    absl::c_iota( cells_to_densify, 25 );
     auto tet_solid_from_light_grid =
-        geode::convert_grid_into_tetrahedral_solid( *mesh_grid );
+        geode::convert_grid_into_densified_tetrahedral_solid(
+            *mesh_grid, cells_to_densify );
+    geode::save_tetrahedral_solid(
+        *tet_solid_from_light_grid, "test_densified_tet_from_grid.og_tso3d" );
     const geode::index_t nb_vertices = 6 * 6 * 6;
     OPENGEODE_EXCEPTION(
         tet_solid_from_mesh_grid_1.value()->nb_vertices() == nb_vertices,
@@ -69,9 +75,16 @@ void test_tetrahedral_solid()
         "[Test] Number of vertices in TetrahedralSolid3D from RegularGrid3D as "
         "grid is not correct." );
     OPENGEODE_EXCEPTION(
-        tet_solid_from_light_grid->nb_vertices() == nb_vertices,
+        hybrid_solid_from_mesh_grid->nb_vertices() == nb_vertices,
+        "[Test] Number of vertices in HybridSolid3D from RegularGrid3D as "
+        "grid is not correct." );
+    const geode::index_t nb_densified_vertices =
+        nb_vertices + cells_to_densify.size();
+    OPENGEODE_EXCEPTION( tet_solid_from_light_grid->nb_vertices()
+                             == nb_vertices + cells_to_densify.size(),
         "[Test] Number of vertices in TetrahedralSolid3D from LightRegularGrid "
-        "is not correct" );
+        "is not correct: ",
+        tet_solid_from_light_grid->nb_vertices(), "instead of " );
     const geode::index_t nb_tetrahedra = 5 * 5 * 5 * 6;
     OPENGEODE_EXCEPTION(
         tet_solid_from_mesh_grid_1.value()->nb_polyhedra() == nb_tetrahedra,
@@ -82,9 +95,24 @@ void test_tetrahedral_solid()
         "[Test] Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
         "as grid is not correct." );
     OPENGEODE_EXCEPTION(
-        tet_solid_from_light_grid->nb_polyhedra() == nb_tetrahedra,
-        "[Test] Number of tetrahedra in TetrahedralSolid3D from "
-        "LightRegularGrid is not correct" );
+        tet_solid_from_mesh_grid_2->nb_polyhedra() == nb_tetrahedra,
+        "[Test] Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
+        "as grid is not correct." );
+    OPENGEODE_EXCEPTION(
+        hybrid_solid_from_mesh_grid->nb_polyhedra() == mesh_grid->nb_cells(),
+        "[Test] Number of hexahedra in HybridSolid3D from "
+        "RegularGrid is not correct" );
+    for( const auto polyhedron_id :
+        geode::Range{ tet_solid_from_light_grid->nb_polyhedra() } )
+    {
+        const auto tet_volume =
+            tet_solid_from_light_grid->polyhedron_volume( polyhedron_id );
+        OPENGEODE_EXCEPTION( tet_volume > 0, "[Test] Polyhedron ",
+            polyhedron_id,
+            " in TetrahedralSolid3D from RegularGrid3D should have a positive "
+            "volume, not ",
+            tet_volume );
+    }
 
     auto tet_builder =
         geode::TetrahedralSolidBuilder3D::create( *tet_solid_from_light_grid );
@@ -159,7 +187,7 @@ void test_hybrid_solid()
 
 void test()
 {
-    test_tetrahedral_solid();
+    test_grid_to_solids();
     test_hybrid_solid();
 }
 

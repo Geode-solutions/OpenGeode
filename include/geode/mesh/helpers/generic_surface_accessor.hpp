@@ -53,6 +53,11 @@ namespace geode
         {
         }
 
+        [[nodiscard]] index_t nb_vertices() const
+        {
+            return mesh_.nb_vertices();
+        }
+
         [[nodiscard]] index_t nb_elements() const
         {
             return mesh_.nb_polygons();
@@ -66,6 +71,18 @@ namespace geode
         [[nodiscard]] index_t nb_element_facets( index_t polygon_id ) const
         {
             return mesh_.nb_polygon_edges( polygon_id );
+        }
+
+        [[nodiscard]] index_t element_index(
+            const ElementFacet& polygon_edge ) const
+        {
+            return polygon_edge.polygon_id;
+        }
+
+        [[nodiscard]] index_t facet_index(
+            const ElementFacet& polygon_edge ) const
+        {
+            return polygon_edge.edge_id;
         }
 
         [[nodiscard]] index_t element_vertex(
@@ -87,21 +104,21 @@ namespace geode
         }
 
         [[nodiscard]] ElementFacetVertices element_facet_vertices(
-            const ElementFacet& polygon_edge ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polygon_edge_vertices( polygon_edge );
+            return mesh_.polygon_edge_vertices( element_facet );
         }
 
         [[nodiscard]] std::optional< index_t > element_adjacent(
-            const ElementFacet& polygon_edge ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polygon_adjacent( polygon_edge );
+            return mesh_.polygon_adjacent( element_facet );
         }
 
         [[nodiscard]] std::optional< ElementFacet > element_adjacent_facet(
-            const ElementFacet& polygon_edge ) const
+            const ElementFacet& element_facet ) const
         {
-            return mesh_.polygon_adjacent_edge( polygon_edge );
+            return mesh_.polygon_adjacent_edge( element_facet );
         }
 
         [[nodiscard]] const uuid& id() const

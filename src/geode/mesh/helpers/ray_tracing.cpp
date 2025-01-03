@@ -254,6 +254,7 @@ namespace geode
                     {
                         distance *= -1.;
                     }
+                    std::lock_guard< std::mutex > lock{ mutex_ };
                     results_.emplace_back( polygon_id, distance, result.second,
                         std::move( intersection_result ) );
                 }
@@ -272,6 +273,7 @@ namespace geode
                         {
                             distance *= -1.;
                         }
+                        std::lock_guard< std::mutex > lock{ mutex_ };
                         results_.emplace_back( polygon_id, distance,
                             result.second, std::move( point ) );
                     }
@@ -304,6 +306,7 @@ namespace geode
         DEBUG_CONST OwnerSegment3D segment_;
         mutable std::vector< PolygonDistance > results_;
         mutable bool are_results_sorted_{ false };
+        std::mutex mutex_;
     };
 
     RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray )

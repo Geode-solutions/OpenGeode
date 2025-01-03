@@ -57,6 +57,8 @@ namespace geode
 
         void add_point( const Point< dimension >& point );
 
+        void extends( double length );
+
         bool contains( const Point< dimension >& point ) const;
 
         [[nodiscard]] bool intersects(

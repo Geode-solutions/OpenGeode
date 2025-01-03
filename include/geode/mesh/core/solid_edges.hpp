@@ -71,7 +71,7 @@ namespace geode
 
         /*!
          * Get the index of edge corresponding to given vertices
-         * @param[in] vertices Ordered vertex indices
+         * @param[in] vertices Unordered vertex indices
          */
         [[nodiscard]] std::optional< index_t > edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;

@@ -79,8 +79,6 @@ namespace geode
 
         [[nodiscard]] const Mesh& mesh() const;
 
-        [[nodiscard]] Mesh& modifiable_mesh( CornersKey key );
-
         [[nodiscard]] const MeshImpl& mesh_type() const;
 
     public:
@@ -94,7 +92,12 @@ namespace geode
 
         void set_corner_name( std::string_view name, CornersBuilderKey key );
 
+        [[nodiscard]] Mesh& modifiable_mesh( CornersKey key );
+
         [[nodiscard]] Mesh& modifiable_mesh( CornersBuilderKey key );
+
+        [[nodiscard]] std::unique_ptr< Mesh > steal_mesh(
+            CornersBuilderKey key );
 
     private:
         Corner();

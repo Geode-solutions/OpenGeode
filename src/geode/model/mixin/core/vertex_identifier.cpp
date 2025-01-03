@@ -439,6 +439,7 @@ namespace geode
     {
         return impl_->component_mesh_vertices( unique_vertex_id );
     }
+
     index_t VertexIdentifier::unique_vertex(
         const ComponentMeshVertex& component_mesh_vertex ) const
     {

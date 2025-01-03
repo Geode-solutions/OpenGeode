@@ -35,6 +35,7 @@
 
 void test_ray_inside()
 {
+    geode::Logger::info( "Test ray inside" );
     auto mesh = geode::SurfaceMesh3D::create();
     auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
     builder->create_point( geode::Point3D{ { -1, -1, 1 } } );
@@ -62,11 +63,12 @@ void test_ray_inside()
 
 void test_ray_edge()
 {
+    geode::Logger::info( "Test ray edge" );
     auto mesh = geode::SurfaceMesh3D::create();
     auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
     builder->create_point( geode::Point3D{ { 1, -1, 0 } } );
     builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
-    builder->create_point( geode::Point3D{ { 1, 0, 1 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, -1 } } );
     builder->create_point( geode::Point3D{ { 1, 0, 3 } } );
     builder->create_polygon( { 0, 1, 2 } );
     builder->create_polygon( { 1, 0, 3 } );
@@ -74,14 +76,14 @@ void test_ray_edge()
 
     const auto aabb = geode::create_aabb_tree( *mesh );
     const geode::Vector3D direction{ { 1, 0, 0 } };
-    const geode::Point3D origin{ { 0, 0, 0 } };
+    const geode::Point3D origin{ { 0, 0, 1 } };
     const geode::Ray3D ray{ direction, origin };
     geode::RayTracing3D tracing{ *mesh, ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
     OPENGEODE_EXCEPTION( result, "[Test] Ray edge no result" );
     OPENGEODE_EXCEPTION(
-        result->polygon == 0, "[Test] Ray edge wrong polygon" );
+        result->polygon == 1, "[Test] Ray edge wrong polygon" );
     OPENGEODE_EXCEPTION(
         result->distance == 1, "[Test] Ray edge wrong distance" );
     OPENGEODE_EXCEPTION( tracing.all_intersections().size() == 1,
@@ -90,6 +92,7 @@ void test_ray_edge()
 
 void test_ray_parallel()
 {
+    geode::Logger::info( "Test ray parallel" );
     auto mesh = geode::SurfaceMesh3D::create();
     auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
     builder->create_point( geode::Point3D{ { -1, -1, 0 } } );

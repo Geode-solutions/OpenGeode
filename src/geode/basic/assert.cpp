@@ -61,4 +61,24 @@ namespace geode
         }
         return 1;
     }
+
+    void throw_lippincott()
+    {
+        try
+        {
+            throw;
+        }
+        catch( const OpenGeodeException& /*unused*/ )
+        {
+            throw;
+        }
+        catch( const std::exception& exception )
+        {
+            throw OpenGeodeException{ "std::exception, ", exception.what() };
+        }
+        catch( ... )
+        {
+            throw OpenGeodeException{ "Unknown exception" };
+        }
+    }
 } // namespace geode

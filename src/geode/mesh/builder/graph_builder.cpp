@@ -205,6 +205,20 @@ namespace geode
         return delete_vertices( to_delete );
     }
 
+    void GraphBuilder::replace_vertex(
+        index_t old_vertex_id, index_t new_vertex_id )
+    {
+        if( old_vertex_id == new_vertex_id )
+        {
+            return;
+        }
+        const auto& edges_around = graph_.edges_around_vertex( old_vertex_id );
+        for( const auto& edge_around : edges_around )
+        {
+            set_edge_vertex( edge_around, new_vertex_id );
+        }
+    }
+
     void GraphBuilder::copy( const Graph& graph )
     {
         OPENGEODE_EXCEPTION(

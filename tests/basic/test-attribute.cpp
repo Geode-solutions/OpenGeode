@@ -168,14 +168,14 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
     variable_attribute->set_value( 3, 3 );
 
     const auto attribute = manager.find_attribute< int >( "int" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
+    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 3,
+        "[Test] Int variable value 3 should be equal to 3" );
+    OPENGEODE_EXCEPTION( attribute->value( 6 ) == 12,
+        "[Test] Int variable value 6 should be equal to 12" );
 
     variable_attribute->set_value( 3, 5 );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
+    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 5,
+        "[Test] Int variable value 3 should be equal to 5" );
 }
 
 void test_foo_sparse_attribute( geode::AttributeManager& manager )
@@ -193,8 +193,8 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
         "[Test] Should be equal to 0" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,
         "[Test] Should be equal to 12.4" );
-    OPENGEODE_EXCEPTION(
-        sparse_attribute->value( 3 ).int_ == 3, "[Test] Should be equal to 3" );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).int_ == 3,
+        "[Test] Foo sparse value should be equal to 3" );
 }
 
 void test_double_sparse_attribute( geode::AttributeManager& manager )
@@ -210,10 +210,10 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     manager.interpolate_attribute_value( { { 1, 7 }, { 0.5, 0.3 } }, 4 );
 
     auto attribute = manager.find_attribute< double >( "double" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 2 ) == 3, "[Test] Should be equal to 3" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
+    OPENGEODE_EXCEPTION( attribute->value( 2 ) == 3,
+        "[Test] Double sparse value 2 should be equal to 3" );
+    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 3,
+        "[Test] Double sparse value 3 should be equal to 3" );
     OPENGEODE_EXCEPTION(
         attribute->value( 4 ) == 8.1, "[Test] Should be equal to 8.1" );
     OPENGEODE_EXCEPTION(
@@ -224,6 +224,80 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     sparse_attribute->set_value( 3, 5 );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
+}
+
+void test_double_array_attribute( geode::AttributeManager& manager )
+{
+    auto array_attribute =
+        manager.find_or_create_attribute< geode::VariableAttribute,
+            std::array< double, 3 > >(
+            "array_double_3", { { 10., 11., 12. } }, { true, true } );
+    OPENGEODE_EXCEPTION( array_attribute->default_value()[0] == 10.,
+        "[Test] Wrong default value" );
+    OPENGEODE_EXCEPTION( array_attribute->default_value()[1] == 11.,
+        "[Test] Wrong default value" );
+    OPENGEODE_EXCEPTION( array_attribute->default_value()[2] == 12.,
+        "[Test] Wrong default value" );
+    array_attribute->set_value( 3, { { 1., 2., 3. } } );
+    array_attribute->set_value( 7, { { 2., 5., 7. } } );
+    manager.assign_attribute_value( 3, 2 );
+    manager.interpolate_attribute_value( { { 1, 7 }, { 0.5, 0.3 } }, 4 );
+
+    auto attribute =
+        manager.find_attribute< std::array< double, 3 > >( "array_double_3" );
+    OPENGEODE_EXCEPTION( attribute->value( 2 )[0] == 1.,
+        "[Test] Value [2,0] Should be equal to 1., not ",
+        attribute->value( 2 )[0] );
+    OPENGEODE_EXCEPTION( attribute->value( 2 )[1] == 2.,
+        "[Test] Value [2,1] Should be equal to 2., not ",
+        attribute->value( 2 )[1] );
+    OPENGEODE_EXCEPTION( attribute->value( 2 )[2] == 3.,
+        "[Test] Value [2,2] Should be equal to 3., not ",
+        attribute->value( 2 )[2] );
+    OPENGEODE_EXCEPTION( attribute->value( 3 )[0] == 1.,
+        "[Test] Value [3,0] Should be equal to 1., not ",
+        attribute->value( 3 )[0] );
+    OPENGEODE_EXCEPTION( attribute->value( 3 )[1] == 2.,
+        "[Test] Value [3,1] Should be equal to 2., not ",
+        attribute->value( 3 )[1] );
+    OPENGEODE_EXCEPTION( attribute->value( 3 )[2] == 3.,
+        "[Test] Value [3,2] Should be equal to 3., not ",
+        attribute->value( 3 )[2] );
+    OPENGEODE_EXCEPTION( attribute->value( 4 )[0] == 5.6,
+        "[Test] Value [4,0] Should be equal to 5.6, not ",
+        attribute->value( 4 )[0] );
+    OPENGEODE_EXCEPTION( attribute->value( 4 )[1] == 7.,
+        "[Test] Value [4,1] Should be equal to 7., not ",
+        attribute->value( 4 )[1] );
+    OPENGEODE_EXCEPTION( attribute->value( 4 )[2] == 8.1,
+        "[Test] Value [4,2] Should be equal to 8.1, not ",
+        attribute->value( 4 )[2] );
+    OPENGEODE_EXCEPTION( attribute->value( 6 )[0] == 10.,
+        "[Test] Value [6,0] Should be equal to 10., not ",
+        attribute->value( 6 )[0] );
+    OPENGEODE_EXCEPTION( attribute->value( 6 )[1] == 11.,
+        "[Test] Value [6,1] Should be equal to 11., not ",
+        attribute->value( 6 )[1] );
+    OPENGEODE_EXCEPTION( attribute->value( 6 )[2] == 12.,
+        "[Test] Value [6,2] Should be equal to 12., not ",
+        attribute->value( 6 )[2] );
+    OPENGEODE_EXCEPTION( attribute->value( 7 )[0] == 2.,
+        "[Test] Value [7,0] Should be equal to 2., not ",
+        attribute->value( 7 )[0] );
+    OPENGEODE_EXCEPTION( attribute->value( 7 )[1] == 5.,
+        "[Test] Value [7,1] Should be equal to 5., not ",
+        attribute->value( 7 )[1] );
+    OPENGEODE_EXCEPTION( attribute->value( 7 )[2] == 7.,
+        "[Test] Value [7,2] Should be equal to 7., not ",
+        attribute->value( 7 )[2] );
+
+    array_attribute->set_value( 3, { 2., 5., 5. } );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 3 )[0] == 2., "[Test] Should be equal to 2." );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 3 )[1] == 5., "[Test] Should be equal to 5." );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 3 )[2] == 5., "[Test] Should be equal to 5." );
 }
 
 void test_bool_variable_attribute( geode::AttributeManager& manager )
@@ -479,20 +553,23 @@ void test_permutation( geode::AttributeManager& manager )
     manager.permute_elements( permutation );
 
     const auto int_attribute = manager.find_attribute< int >( "int" );
-    OPENGEODE_EXCEPTION(
-        int_attribute->value( 3 ) == 12, "[Test] Should be equal to 12" );
-    OPENGEODE_EXCEPTION(
-        int_attribute->value( 0 ) == 5, "[Test] Should be equal to 5" );
-    OPENGEODE_EXCEPTION(
-        int_attribute->value( 8 ) == 5, "[Test] Should be equal to 5" );
+    OPENGEODE_EXCEPTION( int_attribute->value( 3 ) == 12,
+        "[Test] Attribute value 3 should be equal to 12" );
+    OPENGEODE_EXCEPTION( int_attribute->value( 0 ) == 5,
+        "[Test] Attribute value 0 should be equal to 5" );
+    OPENGEODE_EXCEPTION( int_attribute->value( 8 ) == 5,
+        "[Test] Attribute value 8 should be equal to 5" );
 
     auto double_attribute = manager.find_attribute< double >( "double" );
-    OPENGEODE_EXCEPTION(
-        double_attribute->value( 2 ) == 12, "[Test] Should be equal to 3" );
-    OPENGEODE_EXCEPTION(
-        double_attribute->value( 4 ) == 3, "[Test] Should be equal to 3" );
-    OPENGEODE_EXCEPTION(
-        double_attribute->value( 7 ) == 8.1, "[Test] Should be equal to 8.1" );
+    OPENGEODE_EXCEPTION( double_attribute->value( 2 ) == 12,
+        "[Test] Attribute value 2 should be equal to 3, not ",
+        double_attribute->value( 2 ) );
+    OPENGEODE_EXCEPTION( double_attribute->value( 4 ) == 3,
+        "[Test] Attribute value 4 should be equal to 3, not ",
+        double_attribute->value( 4 ) );
+    OPENGEODE_EXCEPTION( double_attribute->value( 7 ) == 8.1,
+        "[Test] Attribute value 7 should be equal to 8.1, not ",
+        double_attribute->value( 7 ) );
 }
 
 void test()
@@ -527,6 +604,7 @@ void test()
     manager.resize( 10 );
     OPENGEODE_EXCEPTION(
         manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+    test_double_array_attribute( manager );
     manager.clear();
     test_number_of_attributes( manager, 0 );
 }

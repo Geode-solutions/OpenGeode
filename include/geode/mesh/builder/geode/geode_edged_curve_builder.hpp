@@ -83,5 +83,5 @@ namespace geode
     private:
         OpenGeodeEdgedCurve< dimension >& geode_edged_curve_;
     };
-    ALIAS_2D_AND_3D( OpenGeodeEdgedCurveBuilder );
+    ALIAS_1D_AND_2D_AND_3D( OpenGeodeEdgedCurveBuilder );
 } // namespace geode

@@ -1331,6 +1331,22 @@ void test_components_filter()
         "[Test] Wrong number of components with relations" );
 }
 
+std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
+    geode::BRep& brep )
+{
+    geode::BRep other;
+    geode::BRepBuilder other_builder{ other };
+    auto mapping = other_builder.copy( brep );
+    return { std::move( other ), std::move( mapping ) };
+}
+
+void test_steal_mesh( geode::BRep& brep )
+{
+    auto [other, mapping] = copy_model( brep );
+    geode::BRepBuilder builder{ brep };
+    builder.replace_components_meshes_by_others( std::move( other ), mapping );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -1391,6 +1407,7 @@ void test()
         model, surface_uuids, surface_collection_uuids );
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_clone( model );
+    test_steal_mesh( model );
 
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );

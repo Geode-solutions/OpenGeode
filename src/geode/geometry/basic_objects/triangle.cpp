@@ -30,6 +30,7 @@
 #include <absl/algorithm/container.h>
 
 #include <geode/geometry/barycentric_coordinates.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/bounding_box.hpp>
@@ -256,6 +257,27 @@ namespace geode
     }
 
     template < typename PointType, index_t dimension >
+    local_index_t
+        GenericTriangle< PointType, dimension >::smallest_edge_index() const
+    {
+        local_index_t min_length_edge_id{ NO_LID };
+        auto edge_min_length = std::numeric_limits< double >::max();
+        for( const auto edge_id : LRange{ 3 } )
+        {
+            const auto next_vertex = edge_id == 2 ? 0 : edge_id + 1;
+            const Point< dimension >& point0 = vertices_.at( edge_id );
+            const Point< dimension >& point1 = vertices_.at( next_vertex );
+            const auto edge_length = point_point_distance( point0, point1 );
+            if( edge_length < edge_min_length )
+            {
+                min_length_edge_id = edge_id;
+                edge_min_length = edge_length;
+            }
+        }
+        return min_length_edge_id;
+    }
+
+    template < typename PointType, index_t dimension >
     double GenericTriangle< PointType, dimension >::minimum_height() const
     {
         const auto max_length_edge_id = longest_edge_index();
@@ -267,6 +289,31 @@ namespace geode
             vertices_.at( max_length_edge_id ), next_vertex
         };
         return point_segment_distance( opposite_vertex, longest_edge );
+    }
+
+    template < typename PointType, index_t dimension >
+    bool GenericTriangle< PointType, dimension >::is_degenerated() const
+    {
+        const Point< dimension >& point0 = vertices_.at( 0 );
+        const Point< dimension >& point1 = vertices_.at( 1 );
+        const Segment< dimension > edge{ point0, point1 };
+        if( edge.is_degenerated() )
+        {
+            return true;
+        }
+        const Point< dimension >& point2 = vertices_.at( 2 );
+        return point_line_distance( point2, InfiniteLine< dimension >{ edge } )
+               <= GLOBAL_EPSILON;
+    }
+
+    template < typename PointType, index_t dimension >
+    std::string GenericTriangle< PointType, dimension >::string() const
+    {
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        const Point< dimension >& point2 = vertices_[2];
+        return absl::StrCat( "[", point0.string(), ", ", point1.string(), ", ",
+            point2.string(), "]" );
     }
 
     template < index_t dimension >

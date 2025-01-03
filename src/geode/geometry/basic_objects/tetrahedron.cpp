@@ -23,7 +23,10 @@
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 
+#include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
 
 namespace geode
 {
@@ -77,6 +80,34 @@ namespace geode
             bbox.add_point( point );
         }
         return bbox;
+    }
+
+    template < typename PointType >
+    bool GenericTetrahedron< PointType >::is_degenerated() const
+    {
+        const Point3D& point0 = vertices_.at( 0 );
+        const Point3D& point1 = vertices_.at( 1 );
+        const Point3D& point2 = vertices_.at( 2 );
+        const Triangle3D triangle{ point0, point1, point2 };
+        if( triangle.is_degenerated() )
+        {
+            return true;
+        }
+        const Point3D& point3 = vertices_.at( 3 );
+        return std::get< 0 >(
+                   point_plane_distance( point3, Plane{ triangle } ) )
+               <= GLOBAL_EPSILON;
+    }
+
+    template < typename PointType >
+    std::string GenericTetrahedron< PointType >::string() const
+    {
+        const Point3D& point0 = vertices_[0];
+        const Point3D& point1 = vertices_[1];
+        const Point3D& point2 = vertices_[2];
+        const Point3D& point3 = vertices_[3];
+        return absl::StrCat( "[", point0.string(), ", ", point1.string(), ", ",
+            point2.string(), ", ", point3.string(), "]" );
     }
 
     OwnerTetrahedron::OwnerTetrahedron( Point3D point0,

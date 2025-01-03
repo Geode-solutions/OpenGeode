@@ -158,6 +158,13 @@ namespace geode
         return modifiable_mesh();
     }
 
+    template < index_t dimension >
+    auto Line< dimension >::steal_mesh(
+        LinesBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    {
+        return impl_->steal_mesh();
+    }
+
     template class opengeode_model_api Line< 2 >;
     template class opengeode_model_api Line< 3 >;
 

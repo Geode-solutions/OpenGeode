@@ -67,6 +67,7 @@ namespace geode
             SolidMeshMerger( absl::Span< const std::reference_wrapper<
                                  const SolidMesh< dimension > > > solids,
                 double epsilon );
+            SolidMeshMerger( SolidMeshMerger&& ) noexcept;
             ~SolidMeshMerger();
 
             [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge();

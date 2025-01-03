@@ -159,6 +159,13 @@ namespace geode
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
+    template < index_t dimension >
+    auto Corner< dimension >::steal_mesh(
+        CornersBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    {
+        return impl_->steal_mesh();
+    }
+
     template class opengeode_model_api Corner< 2 >;
     template class opengeode_model_api Corner< 3 >;
 

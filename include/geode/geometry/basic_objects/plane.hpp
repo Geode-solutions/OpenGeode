@@ -29,6 +29,8 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    ALIAS_3D( Triangle );
     class OwnerPlane;
 
     template < index_t dimension >
@@ -43,7 +45,7 @@ namespace geode
     {
     public:
         GenericPlane( const Vector3D& normal, PointType origin );
-
+        explicit GenericPlane( const Triangle3D& triangle );
         GenericPlane( const GenericPlane& other );
         GenericPlane& operator=( const GenericPlane& other );
         GenericPlane( GenericPlane&& other ) noexcept;
@@ -64,6 +66,7 @@ namespace geode
 
     public:
         explicit OwnerPlane( const Vector3D& normal, Point3D origin );
+        explicit OwnerPlane( const Triangle3D& triangle );
         OwnerPlane( const OwnerPlane& other );
         OwnerPlane& operator=( const OwnerPlane& other );
         OwnerPlane( OwnerPlane&& other ) noexcept;
@@ -76,7 +79,7 @@ namespace geode
 
     public:
         Plane( const Vector3D& normal, const Point3D& origin );
-
+        explicit Plane( const Triangle3D& triangle );
         Plane( const Plane& other );
         Plane( const OwnerPlane& other );
         Plane& operator=( const Plane& other );

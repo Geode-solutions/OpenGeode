@@ -124,6 +124,7 @@ namespace geode
         // Operation is directly handled by the AttributeManager
     }
 
+    template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 1 >;
     template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 2 >;
     template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 3 >;
 } // namespace geode

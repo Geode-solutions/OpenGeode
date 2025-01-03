@@ -177,6 +177,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void BoundingBox< dimension >::extends( double length )
+    {
+        for( const auto i : LRange{ dimension } )
+        {
+            min_.set_value( i, min_.value( i ) - length );
+            max_.set_value( i, max_.value( i ) + length );
+        }
+    }
+
+    template < index_t dimension >
     void BoundingBox< dimension >::add_box(
         const BoundingBox< dimension >& box )
     {
@@ -477,7 +487,7 @@ namespace geode
         for( const auto c : geode::LRange{ dimension } )
         {
             const auto local_distance = std::min(
-                std::abs( Pmin.value( c ) ), std::abs( Pmax.value( c ) ) );
+                std::fabs( Pmin.value( c ) ), std::fabs( Pmax.value( c ) ) );
             inner_distance = std::min( inner_distance, local_distance );
         }
         return -inner_distance;

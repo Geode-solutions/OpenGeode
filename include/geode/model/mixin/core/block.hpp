@@ -85,12 +85,6 @@ namespace geode
 
         [[nodiscard]] const MeshImpl& mesh_type() const;
 
-        template < typename TypedMesh = Mesh >
-        [[nodiscard]] TypedMesh& modifiable_mesh( BlocksKey /*unused*/ )
-        {
-            return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
-        }
-
     public:
         explicit Block( BlocksKey key );
 
@@ -101,12 +95,21 @@ namespace geode
         void set_mesh( std::unique_ptr< Mesh > mesh, BlocksBuilderKey key );
 
         template < typename TypedMesh = Mesh >
+        [[nodiscard]] TypedMesh& modifiable_mesh( BlocksKey /*unused*/ )
+        {
+            return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
+        }
+
+        template < typename TypedMesh = Mesh >
         [[nodiscard]] TypedMesh& modifiable_mesh( BlocksBuilderKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
         void set_block_name( std::string_view name, BlocksBuilderKey key );
+
+        [[nodiscard]] std::unique_ptr< Mesh > steal_mesh(
+            BlocksBuilderKey key );
 
     private:
         Block();

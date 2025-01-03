@@ -198,6 +198,24 @@ namespace geode
             this->out2in_mapping()[out].push_back( in );
         }
 
+        void unmap( const T1& in, const T2& out )
+        {
+            auto& in_map = this->in2out_mapping().at( in );
+            const auto itr = absl::c_find( in_map, out );
+            in_map.erase( itr );
+            if( this->in2out( in ).empty() )
+            {
+                this->in2out_mapping().erase( in );
+            }
+            auto& out_map = this->out2in_mapping().at( out );
+            const auto itr2 = absl::c_find( out_map, in );
+            out_map.erase( itr2 );
+            if( this->out2in( out ).empty() )
+            {
+                this->out2in_mapping().erase( out );
+            }
+        }
+
         void erase_in( const T1& in )
         {
             if( !this->has_mapping_input( in ) )

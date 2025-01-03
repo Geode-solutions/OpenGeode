@@ -23,32 +23,16 @@
 
 #pragma once
 
-#include <absl/types/span.h>
-
 #include <geode/mesh/common.hpp>
-#include <geode/mesh/helpers/detail/vertex_merger.hpp>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
-} // namespace geode
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace geode
 {
     namespace detail
     {
-        template < index_t dimension >
-        class PointSetMerger : public VertexMerger< PointSet< dimension > >
-        {
-        public:
-            PointSetMerger( absl::Span< const std::reference_wrapper<
-                                const PointSet< dimension > > > pointsets,
-                double epsilon );
-            PointSetMerger( PointSetMerger&& ) noexcept;
-            ~PointSetMerger();
-
-            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge();
-        };
-        ALIAS_2D_AND_3D( PointSetMerger );
+        template < typename Mesh >
+        bool polygons_intersection_detection( const Mesh& mesh,
+            const PolygonVertices& polygon,
+            const PolygonVertices& other_polygon );
     } // namespace detail
 } // namespace geode

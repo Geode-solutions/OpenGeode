@@ -281,6 +281,19 @@ namespace
             }
             builder.create_polygon( vertices );
         }
+        for( const auto v : geode::Range{ surface.nb_vertices() } )
+        {
+            const auto polygon = surface.polygon_around_vertex( v );
+            if( !polygon )
+            {
+                builder.disassociate_polygon_vertex_to_vertex( v );
+            }
+            else
+            {
+                builder.associate_polygon_vertex_to_vertex(
+                    polygon.value(), v );
+            }
+        }
     }
 
     template < geode::index_t dimension >
@@ -405,41 +418,41 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::set_polygon_vertex(
-        const PolygonVertex& polygon_vertex, index_t vertex_id )
+        const PolygonVertex& polygon_vertex, index_t new_vertex_id )
     {
-        const auto polygon_vertex_id =
+        const auto old_vertex_id =
             surface_mesh_.polygon_vertex( polygon_vertex );
-        if( polygon_vertex_id == vertex_id )
+        if( old_vertex_id == new_vertex_id )
         {
             return;
         }
-        if( polygon_vertex_id != NO_ID )
+        if( old_vertex_id != NO_ID )
         {
             const auto polygon_around =
-                surface_mesh_.polygon_around_vertex( polygon_vertex_id );
+                surface_mesh_.polygon_around_vertex( old_vertex_id );
             if( polygon_around == polygon_vertex )
             {
                 const auto& polygons_around =
-                    surface_mesh_.polygons_around_vertex( polygon_vertex_id );
+                    surface_mesh_.polygons_around_vertex( old_vertex_id );
                 if( polygons_around.size() < 2 )
                 {
-                    disassociate_polygon_vertex_to_vertex( polygon_vertex_id );
+                    disassociate_polygon_vertex_to_vertex( old_vertex_id );
                 }
                 else
                 {
                     associate_polygon_vertex_to_vertex(
-                        polygons_around[1], polygon_vertex_id );
+                        polygons_around[1], new_vertex_id );
                 }
             }
-            reset_polygons_around_vertex( polygon_vertex_id );
+            reset_polygons_around_vertex( old_vertex_id );
         }
 
         if( surface_mesh_.are_edges_enabled() )
         {
-            update_edge( surface_mesh_, *this, polygon_vertex,
-                polygon_vertex_id, vertex_id );
+            update_edge( surface_mesh_, *this, polygon_vertex, old_vertex_id,
+                new_vertex_id );
         }
-        update_polygon_vertex( polygon_vertex, vertex_id );
+        update_polygon_vertex( polygon_vertex, new_vertex_id );
     }
 
     template < index_t dimension >

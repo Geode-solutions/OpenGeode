@@ -94,5 +94,13 @@ namespace geode
             typename Block< dimension >::BlocksBuilderKey{} );
     }
 
+    template < index_t dimension >
+    std::unique_ptr< SolidMesh< dimension > >
+        BlocksBuilder< dimension >::steal_block_mesh( const uuid& id )
+    {
+        return blocks_.modifiable_block( id, {} ).steal_mesh(
+            typename Block< dimension >::BlocksBuilderKey{} );
+    }
+
     template class opengeode_model_api BlocksBuilder< 3 >;
 } // namespace geode

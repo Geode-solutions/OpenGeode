@@ -102,6 +102,14 @@ namespace geode
             typename Line< dimension >::LinesBuilderKey{} );
     }
 
+    template < index_t dimension >
+    std::unique_ptr< EdgedCurve< dimension > >
+        LinesBuilder< dimension >::steal_line_mesh( const uuid& id )
+    {
+        return lines_.modifiable_line( id, {} ).steal_mesh(
+            typename Line< dimension >::LinesBuilderKey{} );
+    }
+
     template class opengeode_model_api LinesBuilder< 2 >;
     template class opengeode_model_api LinesBuilder< 3 >;
 } // namespace geode

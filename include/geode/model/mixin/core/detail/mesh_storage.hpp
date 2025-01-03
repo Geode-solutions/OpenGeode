@@ -59,6 +59,11 @@ namespace geode
                 return *mesh_;
             }
 
+            [[nodiscard]] std::unique_ptr< Mesh > steal_mesh()
+            {
+                return std::move( mesh_ );
+            }
+
             [[nodiscard]] const MeshImpl& mesh_type() const
             {
                 return mesh_type_;
