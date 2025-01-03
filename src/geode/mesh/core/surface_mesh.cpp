@@ -912,6 +912,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    Segment< dimension > SurfaceMesh< dimension >::segment(
+        const PolygonEdge& polygon_edge ) const
+    {
+        const auto vertices = polygon_edge_vertices( polygon_edge );
+        return { this->point( vertices[0] ), this->point( vertices[1] ) };
+    }
+
+    template < index_t dimension >
     PolygonsAroundEdge SurfaceMesh< dimension >::polygons_from_edge_vertices(
         absl::Span< const index_t > edge_vertices ) const
     {

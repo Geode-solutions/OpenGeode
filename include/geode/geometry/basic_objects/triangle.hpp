@@ -84,6 +84,7 @@ namespace geode
         [[nodiscard]] const std::array< PointType, 3 >& vertices() const;
         [[nodiscard]] BoundingBox< dimension > bounding_box() const;
         [[nodiscard]] local_index_t longest_edge_index() const;
+        [[nodiscard]] local_index_t smallest_edge_index() const;
         [[nodiscard]] double minimum_height() const;
         [[nodiscard]] bool is_degenerated() const;
         [[nodiscard]] std::string string() const;

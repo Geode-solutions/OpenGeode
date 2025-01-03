@@ -257,6 +257,27 @@ namespace geode
     }
 
     template < typename PointType, index_t dimension >
+    local_index_t
+        GenericTriangle< PointType, dimension >::smallest_edge_index() const
+    {
+        local_index_t min_length_edge_id{ NO_LID };
+        auto edge_min_length = std::numeric_limits< double >::max();
+        for( const auto edge_id : LRange{ 3 } )
+        {
+            const auto next_vertex = edge_id == 2 ? 0 : edge_id + 1;
+            const Point< dimension >& point0 = vertices_.at( edge_id );
+            const Point< dimension >& point1 = vertices_.at( next_vertex );
+            const auto edge_length = point_point_distance( point0, point1 );
+            if( edge_length < edge_min_length )
+            {
+                min_length_edge_id = edge_id;
+                edge_min_length = edge_length;
+            }
+        }
+        return min_length_edge_id;
+    }
+
+    template < typename PointType, index_t dimension >
     double GenericTriangle< PointType, dimension >::minimum_height() const
     {
         const auto max_length_edge_id = longest_edge_index();

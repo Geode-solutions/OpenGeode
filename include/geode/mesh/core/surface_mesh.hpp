@@ -40,6 +40,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Polygon );
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceEdges );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 
@@ -403,6 +404,9 @@ namespace geode
          */
         [[nodiscard]] std::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
+
+        [[nodiscard]] Segment< dimension > segment(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Find the polygon edges corresponding to a pair of vertex indices.
