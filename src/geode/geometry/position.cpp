@@ -30,6 +30,7 @@
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/internal/position_from_sides.hpp>
 #include <geode/geometry/internal/predicates.hpp>
@@ -65,6 +66,25 @@ namespace geode
         const auto dot1 = GEO::PCK::dot_2d( vertices[1], point, vertices[0] );
         return internal::point_segment_position(
             internal::side( dot0 ), internal::opposite_side( dot1 ) );
+    }
+
+    POSITION point_segment_position_exact(
+        const Point1D& point, const Segment1D& segment )
+    {
+        const auto& vertices = segment.vertices();
+        if( point == vertices[0] )
+        {
+            return POSITION::vertex0;
+        }
+        if( point == vertices[1] )
+        {
+            return POSITION::vertex1;
+        }
+        if( segment.bounding_box().contains( point ) )
+        {
+            return POSITION::inside;
+        }
+        return POSITION::outside;
     }
 
     template < index_t dimension >
@@ -306,8 +326,9 @@ namespace geode
     }
 
     template POSITION opengeode_geometry_api point_segment_position(
+        const Point1D&, const Segment1D& );
+    template POSITION opengeode_geometry_api point_segment_position(
         const Point2D&, const Segment2D& );
-
     template POSITION opengeode_geometry_api point_segment_position(
         const Point3D&, const Segment3D& );
 } // namespace geode
