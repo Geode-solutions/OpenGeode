@@ -79,6 +79,7 @@ namespace geode
         }
     }
 
+    template class opengeode_mesh_api EdgedCurveBuilder< 1 >;
     template class opengeode_mesh_api EdgedCurveBuilder< 2 >;
     template class opengeode_mesh_api EdgedCurveBuilder< 3 >;
 } // namespace geode

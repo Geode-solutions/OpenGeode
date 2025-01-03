@@ -94,5 +94,5 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( EdgedCurve );
+    ALIAS_1D_AND_2D_AND_3D( EdgedCurve );
 } // namespace geode

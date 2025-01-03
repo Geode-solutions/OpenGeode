@@ -180,9 +180,11 @@ namespace geode
         return impl_->texture_manager( *this );
     }
 
+    template class opengeode_mesh_api EdgedCurve< 1 >;
     template class opengeode_mesh_api EdgedCurve< 2 >;
     template class opengeode_mesh_api EdgedCurve< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, EdgedCurve< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, EdgedCurve< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, EdgedCurve< 3 > );
 } // namespace geode

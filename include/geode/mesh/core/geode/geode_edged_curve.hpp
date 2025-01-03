@@ -98,5 +98,5 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( OpenGeodeEdgedCurve );
+    ALIAS_1D_AND_2D_AND_3D( OpenGeodeEdgedCurve );
 } // namespace geode
