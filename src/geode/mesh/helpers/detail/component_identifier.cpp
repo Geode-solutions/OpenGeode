@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/mesh/core/edged_curve.hpp>
@@ -79,11 +80,16 @@ namespace geode
 
             index_t identify_elements()
             {
+                return identify_elements( mesh_.nb_vertices() );
+            }
+
+            index_t identify_elements( index_t nb_max_vertices )
+            {
                 for( const auto p : Indices{ identification_ } )
                 {
                     if( identifier( p ) == NO_ID )
                     {
-                        propagate( p, nb_components_ );
+                        propagate( p, nb_components_, nb_max_vertices );
                         nb_components_++;
                     }
                 }
@@ -114,11 +120,13 @@ namespace geode
             }
 
         private:
-            void propagate( index_t element_from, index_t tag_id )
+            void propagate(
+                index_t element_from, index_t tag_id, index_t nb_max_vertices )
             {
+                index_t counter{ 0 };
                 std::queue< index_t > queue;
                 queue.emplace( element_from );
-                while( !queue.empty() )
+                while( !queue.empty() && counter < nb_max_vertices )
                 {
                     const auto cur_el = queue.front();
                     queue.pop();
@@ -127,8 +135,10 @@ namespace geode
                         continue;
                     }
                     identification_[cur_el] = tag_id;
+                    counter++;
                     add_adjacents( cur_el, queue );
                 }
+                DEBUG( counter );
             }
 
             virtual void add_adjacents(
@@ -174,6 +184,11 @@ namespace geode
         index_t GraphIdentifier::identify_vertices()
         {
             return impl_->identify_elements();
+        }
+
+        index_t GraphIdentifier::identify_vertices( index_t nb_max_vertices )
+        {
+            return impl_->identify_elements( nb_max_vertices );
         }
 
         index_t GraphIdentifier::vertex_identifier( index_t vertex_id ) const

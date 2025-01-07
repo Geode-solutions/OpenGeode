@@ -53,6 +53,8 @@ namespace geode
 
             index_t identify_vertices();
 
+            index_t identify_vertices( index_t nb_max_vertices );
+
             [[nodiscard]] index_t vertex_identifier( index_t vertex_id ) const;
 
             [[nodiscard]] absl::FixedArray< std::vector< index_t > >
