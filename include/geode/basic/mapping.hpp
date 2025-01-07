@@ -32,8 +32,7 @@ namespace geode
 {
     template < typename T1,
         typename T2,
-        template < typename >
-        class StorageType >
+        template < typename > class StorageType >
     class MappingBase
     {
         OPENGEODE_DISABLE_COPY( MappingBase );
@@ -186,6 +185,14 @@ namespace geode
     public:
         void map( const T1& in, const T2& out )
         {
+            if( this->has_mapping_input( in ) )
+            {
+                auto& in_map = this->in2out_mapping().at( in );
+                if( absl::c_contains( in_map, out ) )
+                {
+                    return;
+                }
+            }
             this->in2out_mapping()[in].push_back( out );
             this->out2in_mapping()[out].push_back( in );
         }
