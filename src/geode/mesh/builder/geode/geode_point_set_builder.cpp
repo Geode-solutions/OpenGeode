@@ -81,6 +81,7 @@ namespace geode
         // Operation is directly handled by the AttributeManager
     }
 
+    template class opengeode_mesh_api OpenGeodePointSetBuilder< 1 >;
     template class opengeode_mesh_api OpenGeodePointSetBuilder< 2 >;
     template class opengeode_mesh_api OpenGeodePointSetBuilder< 3 >;
 } // namespace geode

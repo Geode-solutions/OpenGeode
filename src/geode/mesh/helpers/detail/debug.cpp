@@ -77,6 +77,18 @@ namespace geode
                               dimension, "d" ) );
         }
 
+        template < index_t dimension >
+        void save_triangles( const TriangulatedSurface< dimension >& surface,
+            absl::Span< const index_t > indices,
+            std::string_view suffix )
+        {
+            for( const auto index : indices )
+            {
+                save_triangle( surface.triangle( index ),
+                    absl::StrCat( index, "_", suffix ) );
+            }
+        }
+
         void save_tetrahedron(
             const Tetrahedron& tetrahedron, std::string_view suffix )
         {
@@ -116,5 +128,14 @@ namespace geode
             const Triangle< 2 >&, std::string_view );
         template void opengeode_mesh_api save_triangle(
             const Triangle< 3 >&, std::string_view );
+
+        template void opengeode_mesh_api save_triangles(
+            const TriangulatedSurface< 2 >&,
+            absl::Span< const index_t >,
+            std::string_view );
+        template void opengeode_mesh_api save_triangles(
+            const TriangulatedSurface< 3 >&,
+            absl::Span< const index_t >,
+            std::string_view );
     } // namespace detail
 } // namespace geode

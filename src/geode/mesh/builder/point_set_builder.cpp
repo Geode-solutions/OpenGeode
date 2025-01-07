@@ -77,6 +77,7 @@ namespace geode
         }
     }
 
+    template class opengeode_mesh_api PointSetBuilder< 1 >;
     template class opengeode_mesh_api PointSetBuilder< 2 >;
     template class opengeode_mesh_api PointSetBuilder< 3 >;
 } // namespace geode

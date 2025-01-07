@@ -54,6 +54,7 @@ namespace geode
 
         [[nodiscard]] const Point< dimension >& origin() const;
         [[nodiscard]] const Vector< dimension >& direction() const;
+        [[nodiscard]] double line_constant() const;
 
     private:
         Vector< dimension > direction_;

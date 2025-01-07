@@ -67,6 +67,16 @@ namespace geode
     {
         return direction_;
     }
+    template < typename PointType, index_t dimension >
+    double GenericLine< PointType, dimension >::line_constant() const
+    {
+        double line_constant{ 0.0 };
+        for( const auto i : LRange{ 2 } )
+        {
+            line_constant -= origin().value( i ) * direction().value( i );
+        }
+        return line_constant;
+    }
 
     template < index_t dimension >
     OwnerInfiniteLine< dimension >::OwnerInfiniteLine(

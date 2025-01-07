@@ -34,6 +34,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
     ALIAS_3D( TetrahedralSolid );
     class Tetrahedron;
 } // namespace geode
@@ -49,6 +50,11 @@ namespace geode
         template < index_t dimension >
         void save_triangle(
             const Triangle< dimension >& triangle, std::string_view suffix );
+
+        template < index_t dimension >
+        void save_triangles( const TriangulatedSurface< dimension >& surface,
+            absl::Span< const index_t > indices,
+            std::string_view suffix );
 
         void opengeode_mesh_api save_tetrahedron(
             const Tetrahedron& tetrahedron, std::string_view suffix );

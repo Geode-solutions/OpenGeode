@@ -45,8 +45,6 @@ namespace geode
         : public VertexSetBuilder,
           public CoordinateReferenceSystemManagersBuilder< dimension >
     {
-        OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
-
     public:
         static constexpr auto dim = dimension;
 
@@ -75,5 +73,5 @@ namespace geode
     private:
         PointSet< dimension >& point_set_;
     };
-    ALIAS_2D_AND_3D( PointSetBuilder );
+    ALIAS_1D_AND_2D_AND_3D( PointSetBuilder );
 } // namespace geode
