@@ -108,8 +108,8 @@ void test_generic_mappings()
     generic.map( 0, -8.0 );
     generic.map( 0, -8.0 );
     generic.map( 5, -8.0 );
-    OPENGEODE_EXCEPTION( generic.out2in( -8.0 ).size() == 5,
-        "[Test] Size of out2in for -8.0 should be 5" );
+    OPENGEODE_EXCEPTION( generic.out2in( -8.0 ).size() == 2,
+        "[Test] Size of out2in for -8.0 should be 2" );
     generic.erase_in( 0 );
     OPENGEODE_EXCEPTION( generic.out2in( -8.0 ).size() == 1,
         "[Test] Size of out2in for -8.0 should be 1" );
