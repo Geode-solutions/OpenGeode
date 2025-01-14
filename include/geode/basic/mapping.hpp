@@ -126,6 +126,10 @@ namespace geode
     class BijectiveMapping : public MappingBase< T1, T2, OneValueStorage >
     {
     public:
+        BijectiveMapping() = default;
+        BijectiveMapping( BijectiveMapping&& other ) = default;
+        BijectiveMapping& operator=( BijectiveMapping&& other ) = default;
+
         void map( const T1& in, const T2& out )
         {
             if( this->has_mapping_input( in ) )
@@ -184,6 +188,10 @@ namespace geode
     class GenericMapping : public MappingBase< T1, T2, MultipleValueStorage >
     {
     public:
+        GenericMapping() = default;
+        GenericMapping( GenericMapping&& other ) = default;
+        GenericMapping& operator=( GenericMapping&& other ) = default;
+
         void map( const T1& in, const T2& out )
         {
             if( this->has_mapping_input( in ) )

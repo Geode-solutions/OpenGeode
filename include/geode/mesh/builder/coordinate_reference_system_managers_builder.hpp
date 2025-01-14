@@ -71,5 +71,5 @@ namespace geode
     private:
         CoordinateReferenceSystemManagers< dimension >& crs_managers_;
     };
-    ALIAS_2D_AND_3D( CoordinateReferenceSystemManagersBuilder );
+    ALIAS_1D_AND_2D_AND_3D( CoordinateReferenceSystemManagersBuilder );
 } // namespace geode

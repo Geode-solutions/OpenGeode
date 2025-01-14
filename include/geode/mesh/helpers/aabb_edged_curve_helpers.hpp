@@ -61,7 +61,7 @@ namespace geode
     private:
         const EdgedCurve< dimension >& mesh_;
     };
-    ALIAS_2D_AND_3D( DistanceToEdge );
+    ALIAS_1D_AND_2D_AND_3D( DistanceToEdge );
 
     template < index_t dimension >
     class GenericMeshAABB< EdgedCurve< dimension > >
@@ -92,5 +92,5 @@ namespace geode
     };
     template < index_t dimension >
     using EdgedCurveAABB = GenericMeshAABB< EdgedCurve< dimension > >;
-    ALIAS_2D_AND_3D( EdgedCurveAABB );
+    ALIAS_1D_AND_2D_AND_3D( EdgedCurveAABB );
 } // namespace geode

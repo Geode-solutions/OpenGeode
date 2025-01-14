@@ -94,9 +94,11 @@ namespace geode
         return box;
     }
 
+    template class opengeode_mesh_api PointSet< 1 >;
     template class opengeode_mesh_api PointSet< 2 >;
     template class opengeode_mesh_api PointSet< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PointSet< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PointSet< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PointSet< 3 > );
 } // namespace geode

@@ -57,11 +57,16 @@ namespace geode
         MeshBuilderFactory::register_mesh_builder< OpenGeodeGraphBuilder >(
             OpenGeodeGraph::impl_name_static() );
 
+        MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder1D >(
+            OpenGeodePointSet1D::impl_name_static() );
         MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >(
             OpenGeodePointSet2D::impl_name_static() );
         MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder3D >(
             OpenGeodePointSet3D::impl_name_static() );
 
+        MeshBuilderFactory::register_mesh_builder<
+            OpenGeodeEdgedCurveBuilder1D >(
+            OpenGeodeEdgedCurve1D::impl_name_static() );
         MeshBuilderFactory::register_mesh_builder<
             OpenGeodeEdgedCurveBuilder2D >(
             OpenGeodeEdgedCurve2D::impl_name_static() );

@@ -71,5 +71,5 @@ namespace geode
     private:
         EdgedCurve< dimension >& edged_curve_;
     };
-    ALIAS_2D_AND_3D( EdgedCurveBuilder );
+    ALIAS_1D_AND_2D_AND_3D( EdgedCurveBuilder );
 } // namespace geode

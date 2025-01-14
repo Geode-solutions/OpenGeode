@@ -89,6 +89,7 @@ namespace geode
         return result;
     }
 
+    template class opengeode_geometry_api AABBTree< 1 >;
     template class opengeode_geometry_api AABBTree< 2 >;
     template class opengeode_geometry_api AABBTree< 3 >;
 } // namespace geode

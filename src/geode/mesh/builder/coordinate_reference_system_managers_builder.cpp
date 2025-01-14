@@ -78,6 +78,8 @@ namespace geode
     }
 
     template class opengeode_mesh_api
+        CoordinateReferenceSystemManagersBuilder< 1 >;
+    template class opengeode_mesh_api
         CoordinateReferenceSystemManagersBuilder< 2 >;
     template class opengeode_mesh_api
         CoordinateReferenceSystemManagersBuilder< 3 >;

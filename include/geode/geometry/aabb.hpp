@@ -44,7 +44,6 @@ namespace geode
     class AABBTree
     {
         OPENGEODE_DISABLE_COPY( AABBTree );
-        OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
         /*!
@@ -237,7 +236,7 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( AABBTree );
+    ALIAS_1D_AND_2D_AND_3D( AABBTree );
 } // namespace geode
 
 #include <geode/geometry/detail/aabb_impl.hpp>

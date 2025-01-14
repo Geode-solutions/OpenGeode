@@ -132,6 +132,14 @@ namespace geode
     }
 
     template <>
+    const CoordinateReferenceSystemManager< 1 >&
+        CoordinateReferenceSystemManagers<
+            1 >::Impl::main_coordinate_reference_system_manager() const
+    {
+        return coordinate_reference_system_manager1D();
+    }
+
+    template <>
     CoordinateReferenceSystemManager< 3 >& CoordinateReferenceSystemManagers<
         3 >::Impl::main_coordinate_reference_system_manager()
     {
@@ -143,6 +151,13 @@ namespace geode
         2 >::Impl::main_coordinate_reference_system_manager()
     {
         return coordinate_reference_system_manager2D();
+    }
+
+    template <>
+    CoordinateReferenceSystemManager< 1 >& CoordinateReferenceSystemManagers<
+        1 >::Impl::main_coordinate_reference_system_manager()
+    {
+        return coordinate_reference_system_manager1D();
     }
 
     template < index_t dimension >
@@ -249,9 +264,12 @@ namespace geode
                        } } } );
     }
 
+    template class opengeode_mesh_api CoordinateReferenceSystemManagers< 1 >;
     template class opengeode_mesh_api CoordinateReferenceSystemManagers< 2 >;
     template class opengeode_mesh_api CoordinateReferenceSystemManagers< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE(
+        opengeode_mesh_api, CoordinateReferenceSystemManagers< 1 > );
     SERIALIZE_BITSERY_ARCHIVE(
         opengeode_mesh_api, CoordinateReferenceSystemManagers< 2 > );
     SERIALIZE_BITSERY_ARCHIVE(

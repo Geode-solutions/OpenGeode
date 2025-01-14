@@ -124,9 +124,11 @@ namespace geode
                     } } } );
     }
 
+    template class opengeode_mesh_api OpenGeodeEdgedCurve< 1 >;
     template class opengeode_mesh_api OpenGeodeEdgedCurve< 2 >;
     template class opengeode_mesh_api OpenGeodeEdgedCurve< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeEdgedCurve< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeEdgedCurve< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeEdgedCurve< 3 > );
 } // namespace geode

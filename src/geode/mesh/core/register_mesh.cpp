@@ -47,6 +47,9 @@ namespace geode
         MeshFactory::register_default_mesh< OpenGeodeGraph >(
             Graph::type_name_static(), OpenGeodeGraph::impl_name_static() );
 
+        MeshFactory::register_default_mesh< OpenGeodePointSet1D >(
+            PointSet1D::type_name_static(),
+            OpenGeodePointSet1D::impl_name_static() );
         MeshFactory::register_default_mesh< OpenGeodePointSet2D >(
             PointSet2D::type_name_static(),
             OpenGeodePointSet2D::impl_name_static() );
@@ -54,6 +57,9 @@ namespace geode
             PointSet3D::type_name_static(),
             OpenGeodePointSet3D::impl_name_static() );
 
+        MeshFactory::register_default_mesh< OpenGeodeEdgedCurve1D >(
+            EdgedCurve1D::type_name_static(),
+            OpenGeodeEdgedCurve1D::impl_name_static() );
         MeshFactory::register_default_mesh< OpenGeodeEdgedCurve2D >(
             EdgedCurve2D::type_name_static(),
             OpenGeodeEdgedCurve2D::impl_name_static() );

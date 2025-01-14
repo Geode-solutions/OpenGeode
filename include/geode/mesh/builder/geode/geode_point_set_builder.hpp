@@ -68,5 +68,5 @@ namespace geode
     private:
         OpenGeodePointSet< dimension >& geode_point_set_;
     };
-    ALIAS_2D_AND_3D( OpenGeodePointSetBuilder );
+    ALIAS_1D_AND_2D_AND_3D( OpenGeodePointSetBuilder );
 } // namespace geode

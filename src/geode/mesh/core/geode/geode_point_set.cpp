@@ -102,9 +102,11 @@ namespace geode
                     } } } );
     }
 
+    template class opengeode_mesh_api OpenGeodePointSet< 1 >;
     template class opengeode_mesh_api OpenGeodePointSet< 2 >;
     template class opengeode_mesh_api OpenGeodePointSet< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodePointSet< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodePointSet< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodePointSet< 3 > );
 } // namespace geode

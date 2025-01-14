@@ -46,8 +46,6 @@ namespace geode
     class PointSet : public VertexSet,
                      public CoordinateReferenceSystemManagers< dimension >
     {
-        OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
-
     public:
         using Builder = PointSetBuilder< dimension >;
         static constexpr auto dim = dimension;
@@ -83,5 +81,5 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
     };
-    ALIAS_2D_AND_3D( PointSet );
+    ALIAS_1D_AND_2D_AND_3D( PointSet );
 } // namespace geode

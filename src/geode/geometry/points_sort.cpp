@@ -55,7 +55,7 @@ namespace
         absl::Span< const geode::Point< dimension > > points_;
         geode::local_index_t coord_;
     };
-    ALIAS_2D_AND_3D( Morton_cmp );
+    ALIAS_1D_AND_2D_AND_3D( Morton_cmp );
 
     /**
      * \brief Splits a sequence into two ordered halves.
@@ -97,10 +97,8 @@ namespace
         {
             return;
         }
-        constexpr geode::local_index_t COORDY =
-            COORDX + 1 == 3 ? 0 : COORDX + 1;
-        constexpr geode::local_index_t COORDZ =
-            COORDY + 1 == 3 ? 0 : COORDY + 1;
+        constexpr geode::local_index_t COORDY = COORDX == 2 ? 0 : COORDX + 1;
+        constexpr geode::local_index_t COORDZ = COORDY == 2 ? 0 : COORDY + 1;
 
         const Morton_cmp3D compX{ points, COORDX };
         const Morton_cmp3D compY{ points, COORDY };
@@ -134,8 +132,7 @@ namespace
         {
             return;
         }
-        constexpr geode::local_index_t COORDY =
-            COORDX + 1 == 2 ? 0 : COORDX + 1;
+        constexpr geode::local_index_t COORDY = COORDX == 1 ? 0 : COORDX + 1;
 
         const Morton_cmp2D compX{ points, COORDX };
         const Morton_cmp2D compY{ points, COORDY };
@@ -151,48 +148,44 @@ namespace
         morton_mapping< COORDY >( points, m3, m4 );
     }
 
+    template < geode::local_index_t COORDX >
+    void morton_mapping( absl::Span< const geode::Point1D > points,
+        const itr& begin,
+        const itr& end )
+    {
+        if( end - begin <= 1 )
+        {
+            return;
+        }
+        const Morton_cmp1D compX{ points, COORDX };
+
+        const auto m0 = begin;
+        const auto m2 = end;
+        const auto m1 = split_container( m0, m2, compX );
+        morton_mapping< COORDX >( points, m0, m1 );
+        morton_mapping< COORDX >( points, m1, m2 );
+    }
+
     /*
      * Return true if p0 < p1 comparing first X, then Y.
      */
-    bool lexicographic_compare(
-        const geode::Point2D& p0, const geode::Point2D& p1 )
+    template < geode::index_t dimension >
+    bool lexicographic_compare( const geode::Point< dimension >& p0,
+        const geode::Point< dimension >& p1 )
     {
-        if( p0.value( 0 ) < p1.value( 0 ) )
+        for( const auto d : geode::LRange{ dimension - 1 } )
         {
-            return true;
+            if( p0.value( d ) < p1.value( d ) )
+            {
+                return true;
+            }
+            if( p0.value( d ) > p1.value( d ) )
+            {
+                return false;
+            }
         }
-        if( p0.value( 0 ) > p1.value( 0 ) )
-        {
-            return false;
-        }
-        return p0.value( 1 ) < p1.value( 1 );
+        return p0.value( dimension - 1 ) < p1.value( dimension - 1 );
     }
-
-    /*
-     * Return true if p0 < p1 comparing first X, then Y and last Z.
-     */
-    bool lexicographic_compare(
-        const geode::Point3D& p0, const geode::Point3D& p1 )
-    {
-        if( p0.value( 0 ) < p1.value( 0 ) )
-        {
-            return true;
-        }
-        if( p0.value( 0 ) > p1.value( 0 ) )
-        {
-            return false;
-        }
-        if( p0.value( 1 ) < p1.value( 1 ) )
-        {
-            return true;
-        }
-        if( p0.value( 1 ) > p1.value( 1 ) )
-        {
-            return false;
-        }
-        return p0.value( 2 ) < p1.value( 2 );
-    }
-
 } // namespace
 
 namespace geode
@@ -226,10 +219,14 @@ namespace geode
     }
 
     template std::vector< index_t > opengeode_geometry_api
+        lexicographic_mapping( absl::Span< const Point< 1 > > );
+    template std::vector< index_t > opengeode_geometry_api
         lexicographic_mapping( absl::Span< const Point< 2 > > );
     template std::vector< index_t > opengeode_geometry_api
         lexicographic_mapping( absl::Span< const Point< 3 > > );
 
+    template std::vector< index_t > opengeode_geometry_api morton_mapping(
+        absl::Span< const Point< 1 > > );
     template std::vector< index_t > opengeode_geometry_api morton_mapping(
         absl::Span< const Point< 2 > > );
     template std::vector< index_t > opengeode_geometry_api morton_mapping(
