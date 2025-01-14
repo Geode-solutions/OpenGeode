@@ -54,7 +54,9 @@ namespace geode
 
         [[nodiscard]] const Point< dimension >& origin() const;
         [[nodiscard]] const Vector< dimension >& direction() const;
-        [[nodiscard]] double line_constant() const;
+        template < index_t T = dimension >
+        [[nodiscard]] typename std::enable_if< T == 2, double >::type
+            line_constant() const;
 
     private:
         Vector< dimension > direction_;

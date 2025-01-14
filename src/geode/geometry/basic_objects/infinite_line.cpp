@@ -24,6 +24,8 @@
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 
 #include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/perpendicular.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace geode
 {
@@ -68,12 +70,16 @@ namespace geode
         return direction_;
     }
     template < typename PointType, index_t dimension >
-    double GenericLine< PointType, dimension >::line_constant() const
+    template < index_t T >
+    typename std::enable_if< T == 2, double >::type
+        GenericLine< PointType, dimension >::line_constant() const
     {
         double line_constant{ 0.0 };
-        for( const auto i : LRange{ 2 } )
+        const auto perpendicular_direction = perpendicular( direction() );
+        for( const auto i : LRange{ dimension } )
         {
-            line_constant -= origin().value( i ) * direction().value( i );
+            line_constant -=
+                origin().value( i ) * perpendicular_direction.value( i );
         }
         return line_constant;
     }
@@ -206,4 +212,9 @@ namespace geode
     template class opengeode_geometry_api Ray< 1 >;
     template class opengeode_geometry_api Ray< 2 >;
     template class opengeode_geometry_api Ray< 3 >;
+
+    template opengeode_geometry_api double
+        GenericLine< Point< 2 >, 2 >::line_constant< 2 >() const;
+    template opengeode_geometry_api double
+        GenericLine< RefPoint< 2 >, 2 >::line_constant< 2 >() const;
 } // namespace geode
