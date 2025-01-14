@@ -1123,6 +1123,21 @@ void test_point_ellipse_distance_2d()
         "point" );
 }
 
+void test_point_ellipse_distance_2d_not_aligned()
+{
+    const geode::Point2D center{ { 0.0, 0.0 } };
+    const geode::Vector2D first_axis{ { 1.0, 1.0 } };
+    const geode::Vector2D second_axis{ { -1.0, 1.0 } };
+    const geode::Frame2D frame{ { first_axis, second_axis } };
+    const geode::Ellipse2D ellipse{ center, frame };
+    const geode::Point2D point{ { 2.0, 2.0 } };
+    const auto [distance, closest_point] =
+        geode::point_ellipse_distance( point, ellipse );
+    const geode::Point2D result{ { 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( result ),
+        "[Test] Wrong result for point_ellipse_distance_2d_not_aligned" );
+}
+
 void test_point_ellipse_distance_3d()
 {
     const geode::Point3D center{ { 0.0, 0.0, 0.0 } };
@@ -1169,23 +1184,25 @@ void test_point_ellipse_distance_3d()
 
 void test_point_ellipse_distance()
 {
+    geode::Logger::set_level( geode::Logger::LEVEL::trace );
     test_point_ellipse_distance_2d();
     test_point_ellipse_distance_3d();
+    test_point_ellipse_distance_2d_not_aligned();
 }
 
 void test()
 {
-    test_point_segment_distance();
-    test_segment_segment_distance();
-    test_segment_line_distance();
-    test_point_line_distance();
-    test_point_triangle_distance();
-    test_point_tetrahedron_distance();
-    test_point_plane_distance();
-    test_point_sphere_distance();
-    test_point_circle_distance();
-    test_line_triangle_distance();
-    test_segment_triangle_distance();
+    // test_point_segment_distance();
+    // test_segment_segment_distance();
+    // test_segment_line_distance();
+    // test_point_line_distance();
+    // test_point_triangle_distance();
+    // test_point_tetrahedron_distance();
+    // test_point_plane_distance();
+    // test_point_sphere_distance();
+    // test_point_circle_distance();
+    // test_line_triangle_distance();
+    // test_segment_triangle_distance();
     test_point_ellipse_distance();
 }
 

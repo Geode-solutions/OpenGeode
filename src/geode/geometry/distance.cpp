@@ -1336,15 +1336,22 @@ namespace geode
     {
         std::tuple< double, Point< dimension > > result;
         std::array< double, dimension > point_coordinates;
+        const Vector< dimension > center_to_point{ ellipse.center(), point };
         for( const auto i : geode::LRange{ dimension } )
         {
-            point_coordinates[i] = point.value( i );
+            point_coordinates[i] = center_to_point.dot(
+                ellipse.axis().direction( i ).normalize() );
         }
         auto& [distance, closest_point] = result;
         const auto [squared_distance, closest_point_result] =
             SquaredDistance< dimension >( ellipse, point_coordinates );
         distance = std::sqrt( squared_distance );
-        closest_point = closest_point_result;
+        closest_point = ellipse.center();
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            closest_point += ellipse.axis().direction( i ).normalize()
+                             * closest_point_result.value( i );
+        }
         return result;
     }
 
