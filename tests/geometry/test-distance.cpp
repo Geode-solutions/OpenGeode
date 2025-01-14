@@ -1192,17 +1192,17 @@ void test_point_ellipse_distance()
 
 void test()
 {
-    // test_point_segment_distance();
-    // test_segment_segment_distance();
-    // test_segment_line_distance();
-    // test_point_line_distance();
-    // test_point_triangle_distance();
-    // test_point_tetrahedron_distance();
-    // test_point_plane_distance();
-    // test_point_sphere_distance();
-    // test_point_circle_distance();
-    // test_line_triangle_distance();
-    // test_segment_triangle_distance();
+    test_point_segment_distance();
+    test_segment_segment_distance();
+    test_segment_line_distance();
+    test_point_line_distance();
+    test_point_triangle_distance();
+    test_point_tetrahedron_distance();
+    test_point_plane_distance();
+    test_point_sphere_distance();
+    test_point_circle_distance();
+    test_line_triangle_distance();
+    test_segment_triangle_distance();
     test_point_ellipse_distance();
 }
 
