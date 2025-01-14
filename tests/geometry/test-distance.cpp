@@ -24,9 +24,11 @@
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/frame.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
@@ -103,14 +105,14 @@ void test_point_segment_distance_3d()
     distance = geode::point_segment_distance( a, segment3D );
     OPENGEODE_EXCEPTION( distance < geode::GLOBAL_EPSILON
                              && geode::point_segment_projection( a, segment3D )
-                                    .inexact_equal( a ),
+                                 .inexact_equal( a ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
         "a" );
 
     distance = geode::point_segment_distance( b, segment3D );
     OPENGEODE_EXCEPTION( distance < geode::GLOBAL_EPSILON
                              && geode::point_segment_projection( b, segment3D )
-                                    .inexact_equal( b ),
+                                 .inexact_equal( b ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
         "b" );
 
@@ -118,7 +120,7 @@ void test_point_segment_distance_3d()
     distance = geode::point_segment_distance( q1, segment3D );
     OPENGEODE_EXCEPTION( distance < geode::GLOBAL_EPSILON
                              && geode::point_segment_projection( q1, segment3D )
-                                    .inexact_equal( q1 ),
+                                 .inexact_equal( q1 ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
         "q1" );
 
@@ -126,7 +128,7 @@ void test_point_segment_distance_3d()
     distance = geode::point_segment_distance( q2, segment3D );
     OPENGEODE_EXCEPTION( distance == std::sqrt( 170 )
                              && geode::point_segment_projection( q2, segment3D )
-                                    .inexact_equal( a ),
+                                 .inexact_equal( a ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
         "q2" );
 
@@ -135,7 +137,7 @@ void test_point_segment_distance_3d()
     const geode::Point3D result_q3{ { 0.0, 0.0, 0.0 } };
     OPENGEODE_EXCEPTION( distance == std::sqrt( 26 )
                              && geode::point_segment_projection( q3, segment3D )
-                                    .inexact_equal( result_q3 ),
+                                 .inexact_equal( result_q3 ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
         "q3" );
 
@@ -147,7 +149,7 @@ void test_point_segment_distance_3d()
             std::sqrt( 5.05 * 5.05 + 0.75 * 0.75 + 0.65 * 0.65 ) - distance )
                 < geode::GLOBAL_EPSILON
             && geode::point_segment_projection( q4, segment3D )
-                   .inexact_equal( result_q4 ),
+                .inexact_equal( result_q4 ),
         "[Test] Wrong result for point_segment_distance with query Point3D "
         "q4" );
 }
@@ -595,7 +597,7 @@ void test_point_line_distance_2d()
     OPENGEODE_EXCEPTION(
         std::fabs( std::sqrt( 26 ) - distance ) < geode::GLOBAL_EPSILON
             && geode::point_line_projection( q2, line2D )
-                   .inexact_equal( result_q2 ),
+                .inexact_equal( result_q2 ),
         "[Test] Wrong result for point_line_distance with query Point2D "
         "q2" );
 }
@@ -645,7 +647,7 @@ void test_point_line_signed_distance_2d()
     OPENGEODE_EXCEPTION(
         std::fabs( std::sqrt( 26 ) - distance ) < geode::GLOBAL_EPSILON
             && geode::point_line_projection( q3, line2D )
-                   .inexact_equal( result_q3 ),
+                .inexact_equal( result_q3 ),
         "[Test] Wrong result for point_line_signed_distance with query Point2D "
         "q3" );
 
@@ -655,7 +657,7 @@ void test_point_line_signed_distance_2d()
     OPENGEODE_EXCEPTION(
         std::fabs( -std::sqrt( 26 ) - distance ) < geode::GLOBAL_EPSILON
             && geode::point_line_projection( q4, line2D )
-                   .inexact_equal( result_q3 ),
+                .inexact_equal( result_q3 ),
         "[Test] Wrong result for point_line_signed_distance with query Point2D "
         "q4" );
 }
@@ -697,7 +699,7 @@ void test_point_line_distance_3d()
     OPENGEODE_EXCEPTION(
         std::fabs( std::sqrt( 26 ) - distance ) < geode::GLOBAL_EPSILON
             && geode::point_line_projection( q2, line3D )
-                   .inexact_equal( result_q2 ),
+                .inexact_equal( result_q2 ),
         "[Test] Wrong result for point_line_distance with query Point3D "
         "q2" );
 }
@@ -1087,6 +1089,90 @@ void test_segment_triangle_distance()
         "[Test] Wrong result for segment_triangle_distance with seg_hx" );
 }
 
+void test_point_ellipse_distance_2d()
+{
+    const geode::Point2D center{ { 0.0, 0.0 } };
+    const geode::Vector2D first_axis{ { 3.0, 0.0 } };
+    const geode::Vector2D second_axis{ { 0.0, 2.0 } };
+    const geode::Frame2D frame{ { first_axis, second_axis } };
+    const geode::Ellipse2D ellipse{ center, frame };
+    const geode::Point2D on_boundary{ { 3.0, 0.0 } };
+    const geode::Point2D outside1{ { 4.0, 0 } };
+    const geode::Point2D outside2{ { 0, 5.0 } };
+    const auto [on_boundary_distance, on_boundary_closest_point] =
+        geode::point_ellipse_distance( on_boundary, ellipse );
+    OPENGEODE_EXCEPTION(
+        on_boundary_distance == 0. && on_boundary_closest_point == on_boundary,
+        "[Test] Wrong result for point_ellipse_distance_2d with on_boundary "
+        "point" );
+    const auto [outside1_distance, outside1_closest_point] =
+        geode::point_ellipse_distance( outside1, ellipse );
+    const geode::Point2D result_outside1{ { 3, 0 } };
+    OPENGEODE_EXCEPTION(
+        outside1_distance == 1
+            && outside1_closest_point.inexact_equal( result_outside1 ),
+        "[Test] Wrong result for point_ellipse_distance_2d with outside1 "
+        "point" );
+    const auto [outside2_distance, outside2_closest_point] =
+        geode::point_ellipse_distance( outside2, ellipse );
+    const geode::Point2D result_outside2{ { 0, 2 } };
+    OPENGEODE_EXCEPTION(
+        outside2_distance == 3
+            && outside2_closest_point.inexact_equal( result_outside2 ),
+        "[Test] Wrong result for point_ellipse_distance_2d with outside2 "
+        "point" );
+}
+
+void test_point_ellipse_distance_3d()
+{
+    const geode::Point3D center{ { 0.0, 0.0, 0.0 } };
+    const geode::Vector3D first_axis{ { 3.0, 0.0, 0.0 } };
+    const geode::Vector3D second_axis{ { 0.0, 2.0, 0.0 } };
+    const geode::Vector3D third_axis{ { 0.0, 0.0, 1.0 } };
+    const geode::Frame3D frame{ { first_axis, second_axis, third_axis } };
+    const geode::Ellipse3D ellipse{ center, frame };
+    const geode::Point3D on_boundary{ { 3.0, 0.0, 0.0 } };
+    const geode::Point3D outside1{ { 4.0, 0, 0 } };
+    const geode::Point3D outside2{ { 0, 5.0, 0 } };
+    const geode::Point3D outside3{ { 0, 0, 3 } };
+    const auto [on_boundary_distance, on_boundary_closest_point] =
+        geode::point_ellipse_distance( on_boundary, ellipse );
+    OPENGEODE_EXCEPTION(
+        on_boundary_distance == 0. && on_boundary_closest_point == on_boundary,
+        "[Test] Wrong result for point_ellipse_distance_3d with on_boundary "
+        "point" );
+    const auto [outside1_distance, outside1_closest_point] =
+        geode::point_ellipse_distance( outside1, ellipse );
+    const geode::Point3D result_outside1{ { 3, 0, 0 } };
+    OPENGEODE_EXCEPTION(
+        outside1_distance == 1
+            && outside1_closest_point.inexact_equal( result_outside1 ),
+        "[Test] Wrong result for point_ellipse_distance_3d with outside1 "
+        "point" );
+    const auto [outside2_distance, outside2_closest_point] =
+        geode::point_ellipse_distance( outside2, ellipse );
+    const geode::Point3D result_outside2{ { 0, 2, 0 } };
+    OPENGEODE_EXCEPTION(
+        outside2_distance == 3
+            && outside2_closest_point.inexact_equal( result_outside2 ),
+        "[Test] Wrong result for point_ellipse_distance_3d with outside2 "
+        "point" );
+    const auto [outside3_distance, outside3_closest_point] =
+        geode::point_ellipse_distance( outside3, ellipse );
+    const geode::Point3D result_outside3{ { 0, 0, 1 } };
+    OPENGEODE_EXCEPTION(
+        outside3_distance == 2
+            && outside3_closest_point.inexact_equal( result_outside3 ),
+        "[Test] Wrong result for point_ellipse_distance_3d with outside3 "
+        "point" );
+}
+
+void test_point_ellipse_distance()
+{
+    test_point_ellipse_distance_2d();
+    test_point_ellipse_distance_3d();
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1100,6 +1186,7 @@ void test()
     test_point_circle_distance();
     test_line_triangle_distance();
     test_segment_triangle_distance();
+    test_point_ellipse_distance();
 }
 
 OPENGEODE_TEST( "distance" )
