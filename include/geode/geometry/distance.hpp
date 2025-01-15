@@ -233,7 +233,7 @@ namespace geode
         point_disk_distance( const Point3D& point, const Disk& disk );
 
     /*!
-     * Compute the smallest distance between a point and a ellipse
+     * Compute the smallest distance between a point and an ellipse
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the ellipse.

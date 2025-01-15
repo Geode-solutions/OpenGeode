@@ -234,7 +234,7 @@ namespace geode
             const Plane& plane0, const Plane& plane1 );
 
     /*!
-     * Compute the intersection between a segment and a ellipse
+     * Compute the intersection between a segment and an ellipse
      * @return an optional of the intersection points.
      */
     template < index_t dimension >
@@ -245,7 +245,7 @@ namespace geode
             const Ellipse< dimension >& ellipse );
 
     /*!
-     * Compute the intersection between a line and a ellipse
+     * Compute the intersection between a line and an ellipse
      * @return an optional of the intersection points.
      */
     template < index_t dimension >

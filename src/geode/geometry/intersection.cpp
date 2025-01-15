@@ -1020,8 +1020,8 @@ namespace geode
         geode::SquareMatrix< dimension > M( 0 );
         for( const auto i : geode::LRange{ dimension } )
         {
-            const auto ratio = ellipse.axis().direction( i ).normalize()
-                               * ( 1 / ellipse.axis().direction( i ).length() );
+            const auto ratio = ellipse.axes().direction( i ).normalize()
+                               * ( 1 / ellipse.axes().direction( i ).length() );
             geode::SquareMatrix< dimension > M_i;
             for( const auto j : geode::LRange{ dimension } )
             {
@@ -1077,7 +1077,7 @@ namespace geode
             return { std::move( results ),
                 { first_correctness, second_correctness } };
         }
-        else if( discr > -GLOBAL_EPSILON )
+        if( discr > -GLOBAL_EPSILON )
         {
             absl::InlinedVector< Point< dimension >, 2 > results;
             results.reserve( 1 );

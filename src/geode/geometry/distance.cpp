@@ -1290,7 +1290,7 @@ namespace geode
         for( const auto i : geode::LRange{ dimension } )
         {
             auto& [extent, axis] = axis_sorted_by_decreasing_extent.at( i );
-            extent = ellipse.axis().direction( i ).length();
+            extent = ellipse.axes().direction( i ).length();
             axis = i;
         };
         absl::c_sort( axis_sorted_by_decreasing_extent,
@@ -1309,7 +1309,7 @@ namespace geode
         for( const auto i : geode::LRange{ dimension } )
         {
             const auto j = axis_sorted_by_decreasing_extent[i].second;
-            extents[i] = ellipse.axis().direction( j ).length();
+            extents[i] = ellipse.axes().direction( j ).length();
             locY[i] = std::fabs( query_point_coordinates[j] );
         }
         auto [squared_distance_special, closest_point_coordinates] =
@@ -1340,7 +1340,7 @@ namespace geode
         for( const auto i : geode::LRange{ dimension } )
         {
             point_coordinates[i] = center_to_point.dot(
-                ellipse.axis().direction( i ).normalize() );
+                ellipse.axes().direction( i ).normalize() );
         }
         auto& [distance, closest_point] = result;
         const auto [squared_distance, closest_point_result] =
@@ -1349,7 +1349,7 @@ namespace geode
         closest_point = ellipse.center();
         for( const auto i : geode::LRange{ dimension } )
         {
-            closest_point += ellipse.axis().direction( i ).normalize()
+            closest_point += ellipse.axes().direction( i ).normalize()
                              * closest_point_result.value( i );
         }
         return result;

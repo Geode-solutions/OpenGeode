@@ -59,11 +59,11 @@ namespace geode
                 other ) noexcept;
 
         [[nodiscard]] const Point< dimension >& center() const;
-        [[nodiscard]] const Frame< dimension >& axis() const;
+        [[nodiscard]] const Frame< dimension >& axes() const;
 
     private:
         PointType center_;
-        FrameType axis_;
+        FrameType axes_;
     };
 
     template < index_t dimension >
@@ -76,7 +76,7 @@ namespace geode
 
     public:
         explicit OwnerEllipse(
-            Point< dimension > center, Frame< dimension > axis );
+            Point< dimension > center, Frame< dimension > axes );
 
         OwnerEllipse( const OwnerEllipse< dimension >& other );
         OwnerEllipse< dimension >& operator=(
@@ -98,7 +98,7 @@ namespace geode
 
     public:
         Ellipse(
-            const Point< dimension >& center, const Frame< dimension >& axis );
+            const Point< dimension >& center, const Frame< dimension >& axes );
         Ellipse( const Ellipse< dimension >& other );
         Ellipse( const OwnerEllipse< dimension >& other );
         Ellipse< dimension >& operator=( const Ellipse< dimension >& other );

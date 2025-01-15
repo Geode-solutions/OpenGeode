@@ -27,8 +27,8 @@ namespace geode
 {
     template < typename PointType, typename FrameType, index_t dimension >
     GenericEllipse< PointType, FrameType, dimension >::GenericEllipse(
-        PointType center, FrameType axis )
-        : center_( std::move( center ) ), axis_( std::move( axis ) )
+        PointType center, FrameType axes )
+        : center_( std::move( center ) ), axes_( std::move( axes ) )
     {
     }
     template < typename PointType, typename FrameType, index_t dimension >
@@ -58,15 +58,15 @@ namespace geode
     }
     template < typename PointType, typename FrameType, index_t dimension >
     const Frame< dimension >&
-        GenericEllipse< PointType, FrameType, dimension >::axis() const
+        GenericEllipse< PointType, FrameType, dimension >::axes() const
     {
-        return axis_;
+        return axes_;
     }
 
     template < index_t dimension >
     OwnerEllipse< dimension >::OwnerEllipse(
-        Point< dimension > center, Frame< dimension > axis )
-        : Base( std::move( center ), std::move( axis ) )
+        Point< dimension > center, Frame< dimension > axes )
+        : Base( std::move( center ), std::move( axes ) )
     {
     }
     template < index_t dimension >
@@ -84,15 +84,15 @@ namespace geode
 
     template < index_t dimension >
     Ellipse< dimension >::Ellipse(
-        const Point< dimension >& center, const Frame< dimension >& axis )
-        : Base( center, axis )
+        const Point< dimension >& center, const Frame< dimension >& axes )
+        : Base( center, axes )
     {
     }
     template < index_t dimension >
     Ellipse< dimension >::Ellipse( const Ellipse< dimension >& ) = default;
     template < index_t dimension >
     Ellipse< dimension >::Ellipse( const OwnerEllipse< dimension >& other )
-        : Base( other.center(), other.axis() )
+        : Base( other.center(), other.axes() )
     {
     }
     template < index_t dimension >
