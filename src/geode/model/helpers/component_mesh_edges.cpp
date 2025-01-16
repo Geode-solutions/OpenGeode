@@ -109,6 +109,11 @@ namespace geode
             const Model& model,
             const std::array< geode::index_t, 2 >& edge_unique_vertices )
         {
+            if( edge_unique_vertices[0] == NO_ID
+                || edge_unique_vertices[1] == NO_ID )
+            {
+                return {};
+            }
             const auto line_pairs =
                 model_edge_pairs( model, edge_unique_vertices,
                     geode::Line< Model::dim >::component_type_static() );
@@ -146,6 +151,11 @@ namespace geode
             surface_component_mesh_edges( const Model& model,
                 const std::array< geode::index_t, 2 >& edge_unique_vertices )
         {
+            if( edge_unique_vertices[0] == NO_ID
+                || edge_unique_vertices[1] == NO_ID )
+            {
+                return {};
+            }
             const auto surface_pairs =
                 model_edge_pairs( model, edge_unique_vertices,
                     geode::Surface< Model::dim >::component_type_static() );
@@ -184,6 +194,11 @@ namespace geode
             const geode::BRep& model,
             const std::array< geode::index_t, 2 >& edge_unique_vertices )
         {
+            if( edge_unique_vertices[0] == NO_ID
+                || edge_unique_vertices[1] == NO_ID )
+            {
+                return {};
+            }
             const auto block_pairs = model_edge_pairs( model,
                 edge_unique_vertices, geode::Block3D::component_type_static() );
             if( block_pairs.empty() )
