@@ -26,6 +26,7 @@
 #include <string>
 
 #include <geode/basic/common.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl.hpp>
 
 namespace absl
@@ -39,6 +40,8 @@ namespace geode
     {
     public:
         ProgressLogger( const std::string& message, index_t nb_steps );
+        ProgressLogger(
+            Logger::LEVEL level, const std::string& message, index_t nb_steps );
         ~ProgressLogger();
 
         index_t increment();

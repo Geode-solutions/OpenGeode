@@ -40,16 +40,20 @@ namespace geode
 
     private:
         void start( const uuid& progress_logger_id,
+            Logger::LEVEL level,
             const std::string& message,
             index_t nb_steps ) override;
 
         void update( const uuid& progress_logger_id,
+            Logger::LEVEL level,
             index_t current_step,
             index_t nb_steps ) override;
 
-        void completed( const uuid& progress_logger_id ) override;
+        void completed(
+            const uuid& progress_logger_id, Logger::LEVEL level ) override;
 
-        void failed( const uuid& progress_logger_id ) override;
+        void failed(
+            const uuid& progress_logger_id, Logger::LEVEL level ) override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
