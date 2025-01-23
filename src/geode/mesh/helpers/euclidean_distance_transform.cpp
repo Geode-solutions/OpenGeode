@@ -364,7 +364,8 @@ namespace geode
     template <>
     void EuclideanDistanceTransform< 2 >::compute_squared_distance_map()
     {
-        ProgressLogger logger{ "Compute 2D euclidian distance", 2 };
+        ProgressLogger logger{ Logger::LEVEL::info,
+            "Compute 2D euclidian distance", 2 };
         propagate_directional_squared_distance( 0 );
         logger.increment();
         combine_squared_distance_components( 1 );
@@ -373,7 +374,8 @@ namespace geode
     template <>
     void EuclideanDistanceTransform< 3 >::compute_squared_distance_map()
     {
-        ProgressLogger logger{ "Compute 3D euclidian distance", 3 };
+        ProgressLogger logger{ Logger::LEVEL::info,
+            "Compute 3D euclidian distance", 3 };
         propagate_directional_squared_distance( 0 );
         logger.increment();
         combine_squared_distance_components( 1 );

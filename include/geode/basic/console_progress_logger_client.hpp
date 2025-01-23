@@ -55,6 +55,19 @@ namespace geode
         void failed(
             const uuid& progress_logger_id, Logger::LEVEL level ) override;
 
+        [[deprecated]] void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps ) override;
+
+        [[deprecated]] void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps ) override;
+
+        [[deprecated]] void completed(
+            const uuid& progress_logger_id ) override;
+
+        [[deprecated]] void failed( const uuid& progress_logger_id ) override;
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

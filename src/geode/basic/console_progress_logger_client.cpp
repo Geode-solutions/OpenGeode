@@ -118,4 +118,30 @@ namespace geode
     {
         impl_->failed( progress_logger_id, level );
     }
+
+    void ConsoleProgressLoggerClient::start( const uuid& progress_logger_id,
+        const std::string& message,
+        index_t nb_steps )
+    {
+        impl_->start(
+            progress_logger_id, Logger::LEVEL::info, message, nb_steps );
+    }
+
+    void ConsoleProgressLoggerClient::update(
+        const uuid& progress_logger_id, index_t current, index_t nb_steps )
+    {
+        impl_->update(
+            progress_logger_id, Logger::LEVEL::info, current, nb_steps );
+    }
+
+    void ConsoleProgressLoggerClient::completed(
+        const uuid& progress_logger_id )
+    {
+        impl_->completed( progress_logger_id, Logger::LEVEL::info );
+    }
+
+    void ConsoleProgressLoggerClient::failed( const uuid& progress_logger_id )
+    {
+        impl_->failed( progress_logger_id, Logger::LEVEL::info );
+    }
 } // namespace geode

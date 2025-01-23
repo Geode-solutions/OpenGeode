@@ -56,6 +56,20 @@ namespace geode
         virtual void failed(
             const uuid& progress_logger_id, Logger::LEVEL level ) = 0;
 
+        [[deprecated]] virtual void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps ) = 0;
+
+        [[deprecated]] virtual void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps ) = 0;
+
+        [[deprecated]] virtual void completed(
+            const uuid& progress_logger_id ) = 0;
+
+        [[deprecated]] virtual void failed(
+            const uuid& progress_logger_id ) = 0;
+
     protected:
         ProgressLoggerClient() = default;
     };
