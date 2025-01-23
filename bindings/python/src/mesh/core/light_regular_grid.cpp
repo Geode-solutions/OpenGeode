@@ -33,8 +33,8 @@
 #define PYTHON_LIGHT_REGULAR_GRID( dimension )                                 \
     const auto name##dimension =                                               \
         "LightRegularGrid" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< LightRegularGrid##dimension##D, Grid##dimension##D >(    \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< LightRegularGrid##dimension##D, Grid##dimension##D,      \
+        Identifier >( module, name##dimension.c_str() )                        \
         .def( pybind11::init< Point< dimension >,                              \
             std::array< index_t, dimension >,                                  \
             std::array< double, dimension > >() )                              \
