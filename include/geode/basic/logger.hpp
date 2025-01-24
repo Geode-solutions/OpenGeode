@@ -55,6 +55,12 @@ namespace geode
         static void set_level( LEVEL level );
 
         template < typename... Args >
+        static void log( LEVEL level, const Args &...args )
+        {
+            log( level, absl::StrCat( args... ) );
+        }
+
+        template < typename... Args >
         static void trace( const Args &...args )
         {
             log_trace( absl::StrCat( args... ) );
@@ -96,6 +102,7 @@ namespace geode
 
         [[nodiscard]] static Logger &instance();
 
+        static void log( LEVEL level, const std::string &message );
         static void log_trace( const std::string &message );
         static void log_debug( const std::string &message );
         static void log_info( const std::string &message );

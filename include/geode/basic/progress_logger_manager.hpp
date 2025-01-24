@@ -43,16 +43,32 @@ namespace geode
             std::unique_ptr< ProgressLoggerClient >&& client );
 
         static void start( const uuid& progress_logger_id,
+            Logger::LEVEL level,
             const std::string& message,
             index_t nb_steps );
 
         static void update( const uuid& progress_logger_id,
+            Logger::LEVEL level,
             index_t current_step,
             index_t nb_steps );
 
-        static void completed( const uuid& progress_logger_id );
+        static void completed(
+            const uuid& progress_logger_id, Logger::LEVEL level );
 
-        static void failed( const uuid& progress_logger_id );
+        static void failed(
+            const uuid& progress_logger_id, Logger::LEVEL level );
+
+        [[deprecated]] static void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps );
+
+        [[deprecated]] static void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps );
+
+        [[deprecated]] static void completed( const uuid& progress_logger_id );
+
+        [[deprecated]] static void failed( const uuid& progress_logger_id );
 
     private:
         ProgressLoggerManager();
