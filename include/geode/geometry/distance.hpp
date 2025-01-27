@@ -160,7 +160,8 @@ namespace geode
      * - the closest point on the second triangle.
      */
     [[nodiscard]] std::optional< std::tuple< double, Point3D, Point3D > >
-        opengeode_geometry_api triangle_triangle_non_conformal_distance(
+        opengeode_geometry_api
+        triangle_triangle_distance_between_non_conformal_parts(
             const Triangle3D& triangle0, const Triangle3D& triangle1 );
 
     /*!

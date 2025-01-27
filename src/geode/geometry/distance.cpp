@@ -23,6 +23,7 @@
 
 #include <optional>
 
+#include <geode/basic/logger.hpp>
 #include <geode/geometry/distance.hpp>
 
 #include <absl/algorithm/container.h>
@@ -397,6 +398,19 @@ namespace
                 if( vertex0 == vertex1 )
                 {
                     continue;
+                }
+                if( geode::point_point_distance( base_vertices[vertex0].get(),
+                        base_vertices[vertex1].get() )
+                    <= geode::GLOBAL_EPSILON )
+                {
+                    DEBUG( vertex0 );
+                    DEBUG( vertex1 );
+                    SDEBUG( base_vertices[0].get() );
+                    SDEBUG( base_vertices[1].get() );
+                    SDEBUG( base_vertices[2].get() );
+                    SDEBUG( other_triangle.vertices()[0].get() );
+                    SDEBUG( other_triangle.vertices()[1].get() );
+                    SDEBUG( other_triangle.vertices()[2].get() );
                 }
                 const geode::Segment3D edge{ base_vertices[vertex0],
                     base_vertices[vertex1] };
@@ -1011,7 +1025,7 @@ namespace geode
                     auto& pt0 = triangle0.vertices()[v].get();
                     auto [distance, pt1] =
                         point_triangle_distance( pt0, triangle1 );
-                    return std::make_tuple( distance, pt0, pt1 );
+                    return std::tuple{ distance, pt0, pt1 };
                 }
             }
         }
@@ -1024,7 +1038,7 @@ namespace geode
                     auto& pt1 = triangle1.vertices()[v].get();
                     auto [distance, pt0] =
                         point_triangle_distance( pt1, triangle0 );
-                    return std::make_tuple( distance, pt0, pt1 );
+                    return std::tuple{ distance, pt0, pt1 };
                 }
             }
         }
@@ -1034,19 +1048,19 @@ namespace geode
             non_colocated_points.second, triangle1, triangle0 );
         if( cur_distance0 < cur_distance1 )
         {
-            return std::make_tuple( cur_distance0, cur_pt00, cur_pt01 );
+            return std::tuple{ cur_distance0, cur_pt00, cur_pt01 };
         }
-        return std::make_tuple( cur_distance1, cur_pt10, cur_pt11 );
+        return std::tuple{ cur_distance1, cur_pt10, cur_pt11 };
     }
 
     std::optional< std::tuple< double, Point3D, Point3D > >
-        triangle_triangle_non_conformal_distance(
+        triangle_triangle_distance_between_non_conformal_parts(
             const Triangle3D& triangle0, const Triangle3D& triangle1 )
     {
-        const auto non_colocated_points =
+        const auto [non_colocated_points0, non_colocated_points1] =
             find_non_colocated_triangles_points( triangle0, triangle1 );
-        if( non_colocated_points.first.size() == 0
-            || non_colocated_points.second.size() == 0 )
+        if( non_colocated_points0.size() == 0
+            || non_colocated_points1.size() == 0 )
         {
             return std::nullopt;
         }
@@ -1055,32 +1069,32 @@ namespace geode
         double min_distance{ std::numeric_limits< double >::max() };
         Point3D point0;
         Point3D point1;
-        if( non_colocated_points.first.size() == 1 )
+        if( non_colocated_points0.size() == 1 )
         {
             auto [cur_distance, cur_pt] = point_triangle_distance(
-                vertices0[non_colocated_points.first[0]].get(), triangle1 );
+                vertices0[non_colocated_points0[0]].get(), triangle1 );
             if( cur_distance < min_distance )
             {
                 min_distance = cur_distance;
-                point0 = vertices0[non_colocated_points.first[0]].get();
+                point0 = vertices0[non_colocated_points0[0]].get();
                 point1 = cur_pt;
             }
         }
-        if( non_colocated_points.second.size() == 1 )
+        if( non_colocated_points1.size() == 1 )
         {
             auto [cur_distance, cur_pt] = point_triangle_distance(
-                vertices1[non_colocated_points.second[0]].get(), triangle0 );
+                vertices1[non_colocated_points1[0]].get(), triangle0 );
             if( cur_distance < min_distance )
             {
                 min_distance = cur_distance;
                 point0 = cur_pt;
-                point1 = vertices1[non_colocated_points.second[0]].get();
+                point1 = vertices1[non_colocated_points1[0]].get();
             }
         }
-        if( non_colocated_points.first.size() > 1 )
+        if( non_colocated_points0.size() > 1 )
         {
             auto [cur_distance, cur_pt0, cur_pt1] = test_close_triangles(
-                non_colocated_points.first, triangle0, triangle1 );
+                non_colocated_points0, triangle0, triangle1 );
             if( cur_distance < min_distance )
             {
                 min_distance = cur_distance;
@@ -1088,10 +1102,10 @@ namespace geode
                 point1 = cur_pt1;
             }
         }
-        if( non_colocated_points.second.size() > 1 )
+        if( non_colocated_points1.size() > 1 )
         {
             auto [cur_distance, cur_pt1, cur_pt0] = test_close_triangles(
-                non_colocated_points.second, triangle1, triangle0 );
+                non_colocated_points1, triangle1, triangle0 );
             if( cur_distance < min_distance )
             {
                 min_distance = cur_distance;
@@ -1099,7 +1113,7 @@ namespace geode
                 point1 = cur_pt1;
             }
         }
-        return std::make_tuple( min_distance, point0, point1 );
+        return std::tuple{ min_distance, point0, point1 };
     }
 
     std::tuple< double, Point3D > point_tetrahedron_distance(
