@@ -23,6 +23,7 @@
 
 #include <optional>
 
+#include <geode/basic/logger.hpp>
 #include <geode/geometry/distance.hpp>
 
 #include <absl/algorithm/container.h>
@@ -338,6 +339,92 @@ namespace
         const auto distance =
             geode::point_point_distance( point, closest_point );
         return std::make_tuple( distance, std::move( closest_point ) );
+    }
+
+    std::pair< std::vector< geode::local_index_t >,
+        std::vector< geode::local_index_t > >
+        find_non_colocated_triangles_points( const geode::Triangle3D& triangle0,
+            const geode::Triangle3D& triangle1 )
+    {
+        std::pair< std::array< bool, 3 >, std::array< bool, 3 > > colocated{
+            { false, false, false }, { false, false, false }
+        };
+        const auto& vertices0 = triangle0.vertices();
+        const auto& vertices1 = triangle1.vertices();
+        for( const auto vertex0 : geode::LRange{ 3 } )
+        {
+            for( const auto vertex1 : geode::LRange{ 3 } )
+            {
+                if( geode::point_point_distance(
+                        vertices0[vertex0].get(), vertices1[vertex1].get() )
+                    <= geode::GLOBAL_EPSILON )
+                {
+                    colocated.first[vertex0] = true;
+                    colocated.second[vertex1] = true;
+                }
+            }
+        }
+
+        std::pair< std::vector< geode::local_index_t >,
+            std::vector< geode::local_index_t > >
+            result;
+        for( const auto v : geode::LRange{ 3 } )
+        {
+            if( !colocated.first[v] )
+            {
+                result.first.push_back( v );
+            }
+            if( !colocated.second[v] )
+            {
+                result.second.push_back( v );
+            }
+        }
+        return result;
+    }
+
+    std::tuple< double, geode::Point3D, geode::Point3D > test_close_triangles(
+        const std::vector< geode::local_index_t >& non_colocated_points,
+        const geode::Triangle3D& base_triangle,
+        const geode::Triangle3D& other_triangle )
+    {
+        const auto& base_vertices = base_triangle.vertices();
+        double min_distance{ std::numeric_limits< double >::max() };
+        geode::Point3D point0;
+        geode::Point3D point1;
+        for( const auto vertex0 : non_colocated_points )
+        {
+            for( const auto vertex1 : non_colocated_points )
+            {
+                if( vertex0 == vertex1 )
+                {
+                    continue;
+                }
+                if( geode::point_point_distance( base_vertices[vertex0].get(),
+                        base_vertices[vertex1].get() )
+                    <= geode::GLOBAL_EPSILON )
+                {
+                    DEBUG( vertex0 );
+                    DEBUG( vertex1 );
+                    SDEBUG( base_vertices[0].get() );
+                    SDEBUG( base_vertices[1].get() );
+                    SDEBUG( base_vertices[2].get() );
+                    SDEBUG( other_triangle.vertices()[0].get() );
+                    SDEBUG( other_triangle.vertices()[1].get() );
+                    SDEBUG( other_triangle.vertices()[2].get() );
+                }
+                const geode::Segment3D edge{ base_vertices[vertex0],
+                    base_vertices[vertex1] };
+                auto [cur_distance, cur_pt0, cur_pt1] =
+                    geode::segment_triangle_distance( edge, other_triangle );
+                if( cur_distance < min_distance )
+                {
+                    min_distance = cur_distance;
+                    point0 = cur_pt0;
+                    point1 = cur_pt1;
+                }
+            }
+        }
+        return std::make_tuple( min_distance, point0, point1 );
     }
 } // namespace
 
@@ -923,6 +1010,112 @@ namespace geode
             closest_on_segment, closest_on_triangle );
     }
 
+    std::tuple< double, Point3D, Point3D >
+        opengeode_geometry_api triangle_triangle_distance(
+            const Triangle3D& triangle0, const Triangle3D& triangle1 )
+    {
+        const auto non_colocated_points =
+            find_non_colocated_triangles_points( triangle0, triangle1 );
+        if( non_colocated_points.first.size() < 3 )
+        {
+            for( const auto v : LRange{ 3 } )
+            {
+                if( !absl::c_contains( non_colocated_points.first, v ) )
+                {
+                    auto& pt0 = triangle0.vertices()[v].get();
+                    auto [distance, pt1] =
+                        point_triangle_distance( pt0, triangle1 );
+                    return std::tuple{ distance, pt0, pt1 };
+                }
+            }
+        }
+        if( non_colocated_points.second.size() < 3 )
+        {
+            for( const auto v : LRange{ 3 } )
+            {
+                if( !absl::c_contains( non_colocated_points.second, v ) )
+                {
+                    auto& pt1 = triangle1.vertices()[v].get();
+                    auto [distance, pt0] =
+                        point_triangle_distance( pt1, triangle0 );
+                    return std::tuple{ distance, pt0, pt1 };
+                }
+            }
+        }
+        auto [cur_distance0, cur_pt00, cur_pt01] = test_close_triangles(
+            non_colocated_points.first, triangle0, triangle1 );
+        auto [cur_distance1, cur_pt11, cur_pt10] = test_close_triangles(
+            non_colocated_points.second, triangle1, triangle0 );
+        if( cur_distance0 < cur_distance1 )
+        {
+            return std::tuple{ cur_distance0, cur_pt00, cur_pt01 };
+        }
+        return std::tuple{ cur_distance1, cur_pt10, cur_pt11 };
+    }
+
+    std::optional< std::tuple< double, Point3D, Point3D > >
+        triangle_triangle_distance_between_non_conformal_parts(
+            const Triangle3D& triangle0, const Triangle3D& triangle1 )
+    {
+        const auto [non_colocated_points0, non_colocated_points1] =
+            find_non_colocated_triangles_points( triangle0, triangle1 );
+        if( non_colocated_points0.size() == 0
+            || non_colocated_points1.size() == 0 )
+        {
+            return std::nullopt;
+        }
+        const auto& vertices0 = triangle0.vertices();
+        const auto& vertices1 = triangle1.vertices();
+        double min_distance{ std::numeric_limits< double >::max() };
+        Point3D point0;
+        Point3D point1;
+        if( non_colocated_points0.size() == 1 )
+        {
+            auto [cur_distance, cur_pt] = point_triangle_distance(
+                vertices0[non_colocated_points0[0]].get(), triangle1 );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                point0 = vertices0[non_colocated_points0[0]].get();
+                point1 = cur_pt;
+            }
+        }
+        if( non_colocated_points1.size() == 1 )
+        {
+            auto [cur_distance, cur_pt] = point_triangle_distance(
+                vertices1[non_colocated_points1[0]].get(), triangle0 );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                point0 = cur_pt;
+                point1 = vertices1[non_colocated_points1[0]].get();
+            }
+        }
+        if( non_colocated_points0.size() > 1 )
+        {
+            auto [cur_distance, cur_pt0, cur_pt1] = test_close_triangles(
+                non_colocated_points0, triangle0, triangle1 );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                point0 = cur_pt0;
+                point1 = cur_pt1;
+            }
+        }
+        if( non_colocated_points1.size() > 1 )
+        {
+            auto [cur_distance, cur_pt1, cur_pt0] = test_close_triangles(
+                non_colocated_points1, triangle1, triangle0 );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                point0 = cur_pt0;
+                point1 = cur_pt1;
+            }
+        }
+        return std::tuple{ min_distance, point0, point1 };
+    }
+
     std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
@@ -1048,7 +1241,8 @@ namespace geode
             }
             OPENGEODE_ASSERT(
                 !circle.plane().normal().inexact_equal( other_direction ),
-                "[point_circle_distance] Problem while getting circle nearest "
+                "[point_circle_distance] Problem while getting circle "
+                "nearest "
                 "point" );
             const Vector3D other_projected_on_plane =
                 other_direction

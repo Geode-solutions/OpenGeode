@@ -137,6 +137,34 @@ namespace geode
             const Segment3D& segment, const Triangle3D& triangle );
 
     /*!
+     * Compute the smallest distance between two triangles
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the first triangle.
+     * - the closest point on the second triangle.
+     */
+    [[nodiscard]] std::tuple< double, Point3D, Point3D >
+        opengeode_geometry_api triangle_triangle_distance(
+            const Triangle3D& triangle0, const Triangle3D& triangle1 );
+
+    /*!
+     * Compute the smallest distance between two triangles
+     * @details if the two triangles are the same, return nullopt. Only non
+     * conformal part of triangles are considered in computation of distance,
+     * i.e. if the triangle have a common point, it iterates on opposite
+     * segment, if the triangle have a common edge, it computes distance with
+     * the opposite point
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the first triangle.
+     * - the closest point on the second triangle.
+     */
+    [[nodiscard]] std::optional< std::tuple< double, Point3D, Point3D > >
+        opengeode_geometry_api
+        triangle_triangle_distance_between_non_conformal_parts(
+            const Triangle3D& triangle0, const Triangle3D& triangle1 );
+
+    /*!
      * Compute the distance between a point and a tetrahedron
      * @return a tuple containing:
      * - the smallest distance.
