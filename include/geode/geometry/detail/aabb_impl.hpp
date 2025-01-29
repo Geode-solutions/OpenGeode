@@ -95,9 +95,15 @@ namespace geode
                     bboxes, ROOT_INDEX, 0, bboxes.size() );
             }
             const auto grain = async::detail::auto_grain_size( bboxes.size() );
-            const auto nb_async_depth = std::log2( grain );
-            async_depth_ =
-                depth_ > nb_async_depth ? depth_ - nb_async_depth : depth_;
+            if( grain < 8 )
+            {
+                async_depth_ = 0;
+            }
+            else
+            {
+                const auto nb_async_depth = std::log2( grain );
+                async_depth_ = depth_ - nb_async_depth;
+            }
         }
 
         [[nodiscard]] index_t nb_bboxes() const
@@ -458,7 +464,7 @@ namespace geode
 
             // The acceleration is here:
             if( !node( node_index1 )
-                     .intersects( other_tree.impl_->node( node_index2 ) ) )
+                    .intersects( other_tree.impl_->node( node_index2 ) ) )
             {
                 return false;
             }
