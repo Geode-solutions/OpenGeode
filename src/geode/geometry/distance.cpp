@@ -1111,7 +1111,7 @@ namespace geode
             zPos[i] = locY[i] / locE[i];
             sum_z_squared += zPos[i] * zPos[i];
         }
-        if( sum_z_squared == 1 )
+        if( std::fabs( sum_z_squared - 1 ) < geode::GLOBAL_EPSILON )
         {
             for( const auto i : geode::LRange{ number_of_components } )
             {
@@ -1147,13 +1147,12 @@ namespace geode
             {
                 break;
             }
-            auto g = -1;
+            double g = -1;
             for( const auto i : geode::LRange{ number_of_components } )
             {
                 const auto ratio = numerator[i] / ( s + pSqr[i] );
                 g += ratio * ratio;
             }
-
             if( g > 0 )
             {
                 smin = s;
