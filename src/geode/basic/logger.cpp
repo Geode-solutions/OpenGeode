@@ -23,6 +23,8 @@
 #include <geode/basic/logger.hpp>
 #include <iostream>
 
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/logger_manager.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -39,6 +41,11 @@ namespace geode
         void set_level( LEVEL level )
         {
             level_ = level;
+        }
+
+        void log( LEVEL level, const std::string &message )
+        {
+            leveled_log.at( level )( message );
         }
 
         void log_trace( const std::string &message )
@@ -90,6 +97,17 @@ namespace geode
         }
 
     private:
+        const absl::flat_hash_map< geode::Logger::LEVEL,
+            std::function< void( const std::string & ) > >
+            leveled_log{
+                { geode::Logger::LEVEL::trace, geode::Logger::log_trace },
+                { geode::Logger::LEVEL::debug, geode::Logger::log_debug },
+                { geode::Logger::LEVEL::info, geode::Logger::log_info },
+                { geode::Logger::LEVEL::warn, geode::Logger::log_warn },
+                { geode::Logger::LEVEL::err, geode::Logger::log_error },
+                { geode::Logger::LEVEL::critical, geode::Logger::log_critical }
+            };
+
         LEVEL level_{ LEVEL::info };
     };
 
@@ -111,6 +129,11 @@ namespace geode
     void Logger::set_level( LEVEL level )
     {
         instance().impl_->set_level( level );
+    }
+
+    void Logger::log( LEVEL level, const std::string &message )
+    {
+        instance().impl_->log( level, message );
     }
 
     void Logger::log_trace( const std::string &message )

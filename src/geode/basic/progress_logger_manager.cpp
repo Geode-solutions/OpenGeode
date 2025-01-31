@@ -39,42 +39,45 @@ namespace geode
         }
 
         void start( const uuid& progress_logger_id,
+            Logger::LEVEL level,
             const std::string& message,
             index_t nb_steps )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->start( progress_logger_id, message, nb_steps );
+                logger->start( progress_logger_id, level, message, nb_steps );
             }
         }
 
         void update( const uuid& progress_logger_id,
+            Logger::LEVEL level,
             index_t current_step,
             index_t nb_steps )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->update( progress_logger_id, current_step, nb_steps );
+                logger->update(
+                    progress_logger_id, level, current_step, nb_steps );
             }
         }
 
-        void completed( const uuid& progress_logger_id )
+        void completed( const uuid& progress_logger_id, Logger::LEVEL level )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->completed( progress_logger_id );
+                logger->completed( progress_logger_id, level );
             }
         }
 
-        void failed( const uuid& progress_logger_id )
+        void failed( const uuid& progress_logger_id, Logger::LEVEL level )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->failed( progress_logger_id );
+                logger->failed( progress_logger_id, level );
             }
         }
 
@@ -94,26 +97,32 @@ namespace geode
     }
 
     void ProgressLoggerManager::start( const uuid& progress_logger_id,
+        Logger::LEVEL level,
         const std::string& message,
         index_t nb_steps )
     {
-        instance().impl_->start( progress_logger_id, message, nb_steps );
+        instance().impl_->start( progress_logger_id, level, message, nb_steps );
     }
 
-    void ProgressLoggerManager::update(
-        const uuid& progress_logger_id, index_t current_step, index_t nb_steps )
+    void ProgressLoggerManager::update( const uuid& progress_logger_id,
+        Logger::LEVEL level,
+        index_t current_step,
+        index_t nb_steps )
     {
-        instance().impl_->update( progress_logger_id, current_step, nb_steps );
+        instance().impl_->update(
+            progress_logger_id, level, current_step, nb_steps );
     }
 
-    void ProgressLoggerManager::completed( const uuid& progress_logger_id )
+    void ProgressLoggerManager::completed(
+        const uuid& progress_logger_id, Logger::LEVEL level )
     {
-        instance().impl_->completed( progress_logger_id );
+        instance().impl_->completed( progress_logger_id, level );
     }
 
-    void ProgressLoggerManager::failed( const uuid& progress_logger_id )
+    void ProgressLoggerManager::failed(
+        const uuid& progress_logger_id, Logger::LEVEL level )
     {
-        instance().impl_->failed( progress_logger_id );
+        instance().impl_->failed( progress_logger_id, level );
     }
 
     ProgressLoggerManager& ProgressLoggerManager::instance()

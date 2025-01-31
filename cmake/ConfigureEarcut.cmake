@@ -26,7 +26,7 @@ ExternalProject_Add(earcut
     BINARY_DIR ${EARCUT_PATH}/build
     STAMP_DIR ${EARCUT_PATH}/stamp
     GIT_REPOSITORY https://github.com/mapbox/earcut.hpp
-    GIT_TAG a30c14b5676adabe4714ff4173dae8a5d568ab59
+    GIT_TAG 7fa7aa30183849e988ae79ab2eef19f9ae97acf4
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}

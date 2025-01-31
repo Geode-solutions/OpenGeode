@@ -37,21 +37,24 @@ namespace geode
     class ProgressLogger::Impl
     {
     public:
-        Impl( const std::string& message, index_t nb_steps )
-            : nb_steps_( nb_steps ), current_time_{ absl::Now() }
+        Impl(
+            Logger::LEVEL level, const std::string& message, index_t nb_steps )
+            : nb_steps_( nb_steps ),
+              current_time_{ absl::Now() },
+              level_( level )
         {
-            ProgressLoggerManager::start( id_, message, nb_steps_ );
+            ProgressLoggerManager::start( id_, level, message, nb_steps_ );
         }
 
         ~Impl()
         {
             if( current_ == nb_steps_ )
             {
-                ProgressLoggerManager::completed( id_ );
+                ProgressLoggerManager::completed( id_, level_ );
             }
             else
             {
-                ProgressLoggerManager::failed( id_ );
+                ProgressLoggerManager::failed( id_, level_ );
             }
         }
 
@@ -63,7 +66,8 @@ namespace geode
             if( now - current_time_ > refresh_interval_ )
             {
                 current_time_ = now;
-                ProgressLoggerManager::update( id_, current_, nb_steps_ );
+                ProgressLoggerManager::update(
+                    id_, level_, current_, nb_steps_ );
             }
             return current_;
         }
@@ -87,11 +91,18 @@ namespace geode
         absl::Time current_time_;
         std::mutex lock_;
         absl::Duration refresh_interval_{ absl::Seconds( 1 ) };
+        Logger::LEVEL level_;
     };
 
     ProgressLogger::ProgressLogger(
         const std::string& message, index_t nb_steps )
-        : impl_( message, nb_steps )
+        : ProgressLogger( Logger::LEVEL::info, message, nb_steps )
+    {
+    }
+
+    ProgressLogger::ProgressLogger(
+        Logger::LEVEL level, const std::string& message, index_t nb_steps )
+        : impl_( level, message, nb_steps )
     {
     }
 
