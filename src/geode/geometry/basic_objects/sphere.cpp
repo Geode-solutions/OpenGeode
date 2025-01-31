@@ -63,15 +63,8 @@ namespace geode
     BoundingBox< dimension >
         GenericSphere< PointType, dimension >::bounding_box() const
     {
-        Point< dimension > translation;
-        for( const auto i : LRange{ dimension } )
-        {
-            translation.set_value( i, radius_ );
-        }
         BoundingBox< dimension > bbox;
-        const Point< dimension >& origin = origin_;
-        bbox.add_point( origin + translation );
-        bbox.add_point( origin - translation );
+        bbox.extends( radius_ );
         return bbox;
     }
 
