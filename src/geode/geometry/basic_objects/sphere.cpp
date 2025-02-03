@@ -64,6 +64,7 @@ namespace geode
         GenericSphere< PointType, dimension >::bounding_box() const
     {
         BoundingBox< dimension > bbox;
+        bbox.add_point( origin_ );
         bbox.extends( radius_ );
         return bbox;
     }
