@@ -41,6 +41,9 @@ namespace geode
     {
     }
 
+    OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
+        OpenGeodeVertexSetBuilder&& ) noexcept = default;
+
     void OpenGeodeVertexSetBuilder::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

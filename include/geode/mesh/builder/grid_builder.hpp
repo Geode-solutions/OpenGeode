@@ -44,6 +44,8 @@ namespace geode
 
         explicit GridBuilder( Grid< dimension >& grid );
 
+        GridBuilder( GridBuilder&& ) noexcept = default;
+
         void set_grid_origin( Point< dimension > origin );
 
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,

@@ -45,6 +45,8 @@ namespace geode
     public:
         explicit SurfaceEdgesBuilder( SurfaceEdges< dimension >& edges );
 
+        SurfaceEdgesBuilder( SurfaceEdgesBuilder&& ) noexcept = default;
+
         /*!
          * Delete all the isolated edges (not used as polygon edges)
          * @return the mapping between old edge indices to new ones.

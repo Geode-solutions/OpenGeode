@@ -39,6 +39,9 @@ namespace geode
     {
     }
 
+    OpenGeodeGraphBuilder::OpenGeodeGraphBuilder(
+        OpenGeodeGraphBuilder&& ) noexcept = default;
+
     void OpenGeodeGraphBuilder::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

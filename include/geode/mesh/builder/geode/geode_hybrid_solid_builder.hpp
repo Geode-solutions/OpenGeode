@@ -55,6 +55,8 @@ namespace geode
         explicit OpenGeodeHybridSolidBuilder(
             OpenGeodeHybridSolid< dimension >& mesh );
 
+        OpenGeodeHybridSolidBuilder( OpenGeodeHybridSolidBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

@@ -48,6 +48,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        PointSetBuilder( PointSetBuilder&& ) noexcept = default;
+
         /*!
          * Create the builder associated with a PointSet.
          * @param[in] mesh The PointSet to build/modify

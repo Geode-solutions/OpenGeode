@@ -46,6 +46,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        EdgedCurveBuilder( EdgedCurveBuilder&& ) noexcept = default;
+
         /*!
          * Create the builder associated with an EdgedCurve.
          * @param[in] mesh The EdgedCurve to build/modify

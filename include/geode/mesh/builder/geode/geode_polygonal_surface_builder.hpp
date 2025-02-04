@@ -54,6 +54,9 @@ namespace geode
         explicit OpenGeodePolygonalSurfaceBuilder(
             OpenGeodePolygonalSurface< dimension >& mesh );
 
+        OpenGeodePolygonalSurfaceBuilder(
+            OpenGeodePolygonalSurfaceBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

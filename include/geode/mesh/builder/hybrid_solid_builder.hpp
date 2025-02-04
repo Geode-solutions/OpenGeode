@@ -44,6 +44,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        HybridSolidBuilder( HybridSolidBuilder&& ) noexcept = default;
+
         [[nodiscard]] static std::unique_ptr< HybridSolidBuilder< dimension > >
             create( HybridSolid< dimension >& mesh );
 
