@@ -43,6 +43,9 @@ namespace geode
     {
     }
 
+    OpenGeodeRegularGridBuilder< 2 >::OpenGeodeRegularGridBuilder(
+        OpenGeodeRegularGridBuilder&& ) noexcept = default;
+
     void OpenGeodeRegularGridBuilder< 2 >::update_origin(
         const Point2D& origin )
     {

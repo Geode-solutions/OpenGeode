@@ -47,6 +47,8 @@ namespace geode
 
         explicit OpenGeodeVertexSetBuilder( OpenGeodeVertexSet& mesh );
 
+        OpenGeodeVertexSetBuilder( OpenGeodeVertexSetBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

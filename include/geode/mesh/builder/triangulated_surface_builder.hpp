@@ -45,6 +45,9 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        TriangulatedSurfaceBuilder(
+            TriangulatedSurfaceBuilder&& ) noexcept = default;
+
         /*!
          * Create the builder associated with a TriangulatedSurface.
          * @param[in] mesh The TriangulatedSurface to build/modify

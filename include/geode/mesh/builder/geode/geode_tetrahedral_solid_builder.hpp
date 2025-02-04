@@ -57,6 +57,9 @@ namespace geode
         explicit OpenGeodeTetrahedralSolidBuilder(
             OpenGeodeTetrahedralSolid< dimension >& mesh );
 
+        OpenGeodeTetrahedralSolidBuilder(
+            OpenGeodeTetrahedralSolidBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

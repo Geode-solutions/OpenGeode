@@ -43,6 +43,8 @@ namespace geode
     public:
         explicit SolidFacetsBuilder( SolidFacets< dimension >& facets );
 
+        SolidFacetsBuilder( SolidFacetsBuilder&& ) noexcept = default;
+
         /*!
          * Delete all the isolated facets (not used as polyhedron facets)
          * @return the mapping between old facet indices to new ones.

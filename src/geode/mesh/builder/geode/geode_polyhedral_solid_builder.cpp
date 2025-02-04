@@ -50,6 +50,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodePolyhedralSolidBuilder< dimension >::
+        OpenGeodePolyhedralSolidBuilder(
+            OpenGeodePolyhedralSolidBuilder&& ) noexcept = default;
+
+    template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

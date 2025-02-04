@@ -46,6 +46,10 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
+        OpenGeodeHybridSolidBuilder&& ) noexcept = default;
+
+    template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

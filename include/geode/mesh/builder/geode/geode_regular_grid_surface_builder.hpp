@@ -53,6 +53,8 @@ namespace geode
 
         explicit OpenGeodeRegularGridBuilder( OpenGeodeRegularGrid< 2 >& mesh );
 
+        OpenGeodeRegularGridBuilder( OpenGeodeRegularGridBuilder&& ) noexcept;
+
     private:
         void update_origin( const Point2D& origin ) final;
 

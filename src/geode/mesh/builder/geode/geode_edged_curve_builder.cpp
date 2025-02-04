@@ -46,6 +46,10 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeEdgedCurveBuilder< dimension >::OpenGeodeEdgedCurveBuilder(
+        OpenGeodeEdgedCurveBuilder&& ) noexcept = default;
+
+    template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

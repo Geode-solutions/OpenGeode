@@ -54,6 +54,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        SurfaceMeshBuilder( SurfaceMeshBuilder&& ) noexcept = default;
+
         virtual ~SurfaceMeshBuilder();
 
         /*!

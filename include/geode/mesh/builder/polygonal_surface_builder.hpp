@@ -46,6 +46,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        PolygonalSurfaceBuilder( PolygonalSurfaceBuilder&& ) noexcept = default;
+
         /*!
          * Create the builder associated with a PolygonalSurface.
          * @param[in] mesh The PolygonalSurface to build/modify

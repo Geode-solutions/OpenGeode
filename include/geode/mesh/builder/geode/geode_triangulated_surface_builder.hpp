@@ -54,6 +54,9 @@ namespace geode
         explicit OpenGeodeTriangulatedSurfaceBuilder(
             OpenGeodeTriangulatedSurface< dimension >& mesh );
 
+        OpenGeodeTriangulatedSurfaceBuilder(
+            OpenGeodeTriangulatedSurfaceBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 
