@@ -86,8 +86,7 @@ void second_test()
     const double DISTANCE{ 0.8 };
 
     const auto colocated_info = colocator.colocated_index_mapping( DISTANCE );
-    OPENGEODE_EXCEPTION( colocated_info.nb_unique_points() == 2,
-        "[Test] Should be 2 unique points" );
+    DEBUG( colocated_info.nb_unique_points() );
     for( const auto p : geode::Indices{ points } )
     {
         OPENGEODE_EXCEPTION( colocated_info.colocated_mapping[p]
@@ -116,6 +115,8 @@ void second_test()
                 "[Test] Colocated points are too close" );
         }
     }
+    OPENGEODE_EXCEPTION( colocated_info.nb_unique_points() == 2,
+        "[Test] Should be 2 unique points" );
 }
 
 void test()

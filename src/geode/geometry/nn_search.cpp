@@ -213,19 +213,26 @@ namespace geode
         std::mutex mutex;
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
             [&epsilon, &mapping, &mutex, this]( index_t p ) {
-                if( mapping[p] == p )
+                if( mapping[p] != p )
                 {
-                    const auto vertices =
-                        radius_neighbors( point( p ), epsilon );
-                    const auto min_index =
-                        find_min_unmapped_element( vertices, mapping );
-                    std::lock_guard< std::mutex > lock( mutex );
-                    for( const auto id : vertices )
+                    return;
+                }
+                const auto vertices = radius_neighbors( point( p ), epsilon );
+                auto min_index = find_min_unmapped_element( vertices, mapping );
+                std::lock_guard< std::mutex > lock( mutex );
+                if( mapping[p] != p )
+                {
+                    return;
+                }
+                if( min_index != mapping[min_index] )
+                {
+                    min_index = find_min_unmapped_element( vertices, mapping );
+                }
+                for( const auto id : vertices )
+                {
+                    if( id == mapping[id] )
                     {
-                        if( id == mapping[id] )
-                        {
-                            mapping[id] = min_index;
-                        }
+                        mapping[id] = min_index;
                     }
                 }
             } );
