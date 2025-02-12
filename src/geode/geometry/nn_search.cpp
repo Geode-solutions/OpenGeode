@@ -23,6 +23,7 @@
 
 #include <geode/geometry/nn_search.hpp>
 
+#include <mutex>
 #include <numeric>
 
 #include <absl/algorithm/container.h>
@@ -33,6 +34,25 @@
 
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+
+namespace
+{
+    geode::index_t find_min_unmapped_element(
+        absl::Span< const geode::index_t > elements,
+        absl::Span< const geode::index_t > mapping )
+    {
+        geode::index_t min_index{ geode::NO_ID };
+        for( const auto e : elements )
+        {
+            if( mapping[e] != e )
+            {
+                continue;
+            }
+            min_index = std::min( min_index, e );
+        }
+        return min_index;
+    }
+} // namespace
 
 namespace geode
 {
@@ -190,14 +210,27 @@ namespace geode
         typename NNSearch< dimension >::ColocatedInfo result;
         std::vector< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
+        std::mutex mutex;
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
-            [&epsilon, &mapping, this]( index_t p ) {
-                if( mapping[p] == p )
+            [&epsilon, &mapping, &mutex, this]( index_t p ) {
+                if( mapping[p] != p )
                 {
-                    const auto vertices =
-                        radius_neighbors( point( p ), epsilon );
-                    const auto min_index = *absl::c_min_element( vertices );
-                    for( const auto id : vertices )
+                    return;
+                }
+                const auto vertices = radius_neighbors( point( p ), epsilon );
+                auto min_index = find_min_unmapped_element( vertices, mapping );
+                std::lock_guard< std::mutex > lock( mutex );
+                if( mapping[p] != p )
+                {
+                    return;
+                }
+                if( min_index != mapping[min_index] )
+                {
+                    min_index = find_min_unmapped_element( vertices, mapping );
+                }
+                for( const auto id : vertices )
+                {
+                    if( id == mapping[id] )
                     {
                         mapping[id] = min_index;
                     }
