@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <geode/geometry/common.hpp>
 
 namespace geode

@@ -23,18 +23,23 @@
 
 #include <geode/tests/common.hpp>
 
+#include <async++.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/nn_search.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
+#include <geode/mesh/io/triangulated_surface_input.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
-void test()
+void test_create()
 {
-    geode::OpenGeodeMeshLibrary::initialize();
     std::vector< geode::Point2D > points{ geode::Point2D{ { 0, 0 } },
         geode::Point2D{ { 0, 1 } }, geode::Point2D{ { 0, 2 } },
         geode::Point2D{ { 1, 0 } }, geode::Point2D{ { 1, 1 } },
@@ -110,6 +115,64 @@ void test()
         "[Test] Wrong adjacency for { 3, 1 }" );
     OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 2 } ),
         "[Test] Wrong adjacency for { 3, 2 }" );
+}
+
+void test_import()
+{
+    auto surface = geode::load_triangulated_surface< 3 >(
+        absl::StrCat( geode::DATA_PATH, "surface_degen.og_tsf3d" ) );
+    auto bui = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+
+    std::vector< std::reference_wrapper< const geode::SurfaceMesh3D > > meshes{
+        *surface
+    };
+    const auto merged = geode::merge_surface_meshes< 3 >( meshes );
+    geode::save_triangulated_surface(
+        *dynamic_cast< geode::TriangulatedSurface3D* >( merged.get() ),
+        "output.og_tsf3d" );
+
+    std::vector< geode::Point3D > points( merged->nb_vertices() );
+    for( const auto v : geode::Range{ merged->nb_vertices() } )
+    {
+        points[v] = merged->point( v );
+    }
+    geode::NNSearch3D nns( points );
+    const auto mappings = nns.colocated_index_mapping( geode::GLOBAL_EPSILON );
+    OPENGEODE_EXCEPTION( mappings.nb_colocated_points() == 0,
+        "[Test] Should be nomore colocated points" );
+    for( const auto p : geode::Indices{ points } )
+    {
+        OPENGEODE_EXCEPTION(
+            mappings.colocated_mapping[p] < mappings.unique_points.size(),
+            "[Test] Wrong value of colocated_mapping (bigger than unique "
+            "points size)" );
+        const auto& colocated_point =
+            mappings.unique_points[mappings.colocated_mapping[p]];
+        OPENGEODE_EXCEPTION( points[p].inexact_equal( colocated_point ),
+            "[Test] Colocated point is not close enough to original point" );
+    }
+    async::parallel_for(
+        async::irange( geode::index_t{ 0 }, mappings.unique_points.size() ),
+        [&mappings]( geode::index_t up0 ) {
+            for( const auto up1 : geode::Indices{ mappings.unique_points } )
+            {
+                if( up1 <= up0 )
+                {
+                    continue;
+                }
+                OPENGEODE_EXCEPTION( !mappings.unique_points[up0].inexact_equal(
+                                         mappings.unique_points[up1] ),
+                    "[Test] Colocated points are too close" );
+            }
+        } );
+}
+
+void test()
+{
+    geode::OpenGeodeMeshLibrary::initialize();
+    geode::Logger::set_level( geode::Logger::LEVEL::debug );
+    test_create();
+    test_import();
 }
 
 OPENGEODE_TEST( "merge-surface" )
