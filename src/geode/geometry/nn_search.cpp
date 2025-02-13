@@ -240,7 +240,7 @@ namespace geode
                 for( const auto id : vertices )
                 {
                     Logger::trace(
-                        p, " : id ", id " / mapping[id]", mapping[id] );
+                        p, " : id ", id, " / mapping[id]", mapping[id] );
                     if( id == mapping[id] )
                     {
                         mapping[id] = min_index;
