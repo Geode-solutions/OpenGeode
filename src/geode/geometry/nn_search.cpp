@@ -219,17 +219,28 @@ namespace geode
                 }
                 const auto vertices = radius_neighbors( point( p ), epsilon );
                 auto min_index = find_min_unmapped_element( vertices, mapping );
+                Logger::trace( p, " : Min index ", min_index );
                 std::lock_guard< std::mutex > lock( mutex );
                 if( mapping[p] != p )
                 {
+                    Logger::trace(
+                        p, " : correction 1 / mapping[p]", mapping[p] );
                     return;
                 }
                 if( min_index != mapping[min_index] )
                 {
+                    Logger::trace( p, " : correction 2 / min_index before",
+                        min_index, " / mapping[min_index]",
+                        mapping[min_index] );
                     min_index = find_min_unmapped_element( vertices, mapping );
+                    Logger::trace(
+                        p, " : correction 2 / min_index after", min_index );
                 }
+                Logger::trace( p, " : Difinitive min index ", min_index );
                 for( const auto id : vertices )
                 {
+                    Logger::trace(
+                        p, " : id ", id " / mapping[id]", mapping[id] );
                     if( id == mapping[id] )
                     {
                         mapping[id] = min_index;

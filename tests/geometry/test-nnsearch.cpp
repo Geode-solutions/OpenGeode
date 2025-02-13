@@ -73,7 +73,7 @@ void first_test()
 
 void second_test()
 {
-    geode::Logger::set_level( geode::Logger::LEVEL::debug );
+    geode::Logger::set_level( geode::Logger::LEVEL::trace );
     std::vector< geode::Point2D > points{
         geode::Point2D{ { 0, 0.2 } },
         geode::Point2D{ { 0.25, 0 } },
@@ -87,6 +87,12 @@ void second_test()
 
     const auto colocated_info = colocator.colocated_index_mapping( DISTANCE );
     DEBUG( colocated_info.nb_unique_points() );
+    for( const auto v : geode::Range{ 6 } )
+    {
+        geode::Logger::trace( v, " : ",
+            colocated_info.colocated_input_points[v], " / ",
+            colocated_info.colocated_mapping[v] );
+    }
     for( const auto p : geode::Indices{ points } )
     {
         OPENGEODE_EXCEPTION( colocated_info.colocated_mapping[p]
