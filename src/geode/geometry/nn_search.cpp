@@ -44,7 +44,7 @@ namespace
         geode::index_t min_index{ geode::NO_ID };
         for( const auto e : elements )
         {
-            if( mapping[e] != e )
+            if( mapping[e] == geode::NO_ID )
             {
                 continue;
             }
@@ -208,12 +208,11 @@ namespace geode
             "should be bigger than GLOBAL_EPSILON (i.e. ",
             GLOBAL_EPSILON, ")" );
         typename NNSearch< dimension >::ColocatedInfo result;
-        std::vector< index_t > mapping( nb_points() );
-        absl::c_iota( mapping, 0 );
+        std::vector< index_t > mapping( nb_points(), NO_ID );
         std::mutex mutex;
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
             [&epsilon, &mapping, &mutex, this]( index_t p ) {
-                if( mapping[p] != p )
+                if( mapping[p] != NO_ID )
                 {
                     return;
                 }
@@ -221,13 +220,13 @@ namespace geode
                 auto min_index = find_min_unmapped_element( vertices, mapping );
                 Logger::trace( p, " : Min index ", min_index );
                 std::lock_guard< std::mutex > lock( mutex );
-                if( mapping[p] != p )
+                if( mapping[p] != NO_ID )
                 {
                     Logger::trace(
                         p, " : correction 1 / mapping[p]", mapping[p] );
                     return;
                 }
-                if( min_index != mapping[min_index] )
+                if( mapping[min_index] == NO_ID )
                 {
                     Logger::trace( p, " : correction 2 / min_index before",
                         min_index, " / mapping[min_index]",
@@ -241,7 +240,7 @@ namespace geode
                 {
                     Logger::trace(
                         p, " : id ", id, " / mapping[id]", mapping[id] );
-                    if( id == mapping[id] )
+                    if( mapping[id] != NO_ID )
                     {
                         mapping[id] = min_index;
                     }
