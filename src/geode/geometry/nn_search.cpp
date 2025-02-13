@@ -240,7 +240,7 @@ namespace geode
                 {
                     Logger::trace(
                         p, " : id ", id, " / mapping[id]", mapping[id] );
-                    if( mapping[id] != NO_ID )
+                    if( mapping[id] == NO_ID )
                     {
                         mapping[id] = min_index;
                     }
