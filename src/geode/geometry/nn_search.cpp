@@ -44,7 +44,7 @@ namespace
         geode::index_t min_index{ geode::NO_ID };
         for( const auto e : elements )
         {
-            if( mapping[e] == geode::NO_ID )
+            if( mapping[e] != geode::NO_ID )
             {
                 continue;
             }
@@ -223,23 +223,23 @@ namespace geode
                 if( mapping[p] != NO_ID )
                 {
                     Logger::trace(
-                        p, " : correction 1 / mapping[p]", mapping[p] );
+                        p, " : correction 1 / mapping[p] ", mapping[p] );
                     return;
                 }
-                if( mapping[min_index] == NO_ID )
+                if( mapping[min_index] != NO_ID )
                 {
                     Logger::trace( p, " : correction 2 / min_index before",
-                        min_index, " / mapping[min_index]",
+                        min_index, " / mapping[min_index] ",
                         mapping[min_index] );
                     min_index = find_min_unmapped_element( vertices, mapping );
                     Logger::trace(
-                        p, " : correction 2 / min_index after", min_index );
+                        p, " : correction 2 / min_index after ", min_index );
                 }
-                Logger::trace( p, " : Difinitive min index ", min_index );
+                Logger::trace( p, " : Definitive min index ", min_index );
                 for( const auto id : vertices )
                 {
                     Logger::trace(
-                        p, " : id ", id, " / mapping[id]", mapping[id] );
+                        p, " : id ", id, " / mapping[id] ", mapping[id] );
                     if( mapping[id] == NO_ID )
                     {
                         mapping[id] = min_index;
