@@ -198,8 +198,6 @@ namespace geode
                     return;
                 }
                 const auto vertices = radius_neighbors( point( p ), epsilon );
-                // auto min_index = find_min_unmapped_element( vertices, mapping
-                // ); Logger::trace( p, " : Min index ", min_index );
                 std::lock_guard< std::mutex > lock( mutex );
                 if( mapping[p] != NO_ID )
                 {
@@ -207,16 +205,6 @@ namespace geode
                         p, " : correction 1 / mapping[p] ", mapping[p] );
                     return;
                 }
-                // if( mapping[min_index] != NO_ID )
-                // {
-                //     Logger::trace( p, " : correction 2 / min_index before",
-                //         min_index, " / mapping[min_index] ",
-                //         mapping[min_index] );
-                //     min_index = find_min_unmapped_element( vertices, mapping
-                //     ); Logger::trace(
-                //         p, " : correction 2 / min_index after ", min_index );
-                // }
-                // Logger::trace( p, " : Definitive min index ", min_index );
                 for( const auto id : vertices )
                 {
                     Logger::trace(
