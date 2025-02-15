@@ -136,8 +136,9 @@ void test_import()
     }
     geode::NNSearch3D nns( points );
     const auto mappings = nns.colocated_index_mapping( geode::GLOBAL_EPSILON );
+    DEBUG( mappings.nb_colocated_points() );
     OPENGEODE_EXCEPTION( mappings.nb_colocated_points() == 0,
-        "[Test] Should be nomore colocated points" );
+        "[Test] Should be no more colocated points" );
     for( const auto p : geode::Indices{ points } )
     {
         OPENGEODE_EXCEPTION(
