@@ -41,6 +41,9 @@
         .def( pybind11::init< Point< dimension >,                              \
             std::array< index_t, dimension >,                                  \
             std::array< Vector< dimension >, dimension > >() )                 \
+        .def( "vertex_attribute_manager",                                      \
+            &Grid##dimension##D::grid_vertex_attribute_manager,                \
+            pybind11::return_value_policy::reference )                         \
         .def( "native_extension",                                              \
             &LightRegularGrid##dimension##D::native_extension )
 

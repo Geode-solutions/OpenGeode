@@ -249,6 +249,14 @@ def test_attribute( grid ):
         raise ValueError( "[Test] Wrong attribute value" )
     if attribute.value( grid.nb_cells() - 1 ) != -1:
         raise ValueError( "[Test] Wrong attribute value" )
+    attribute = grid.vertex_attribute_manager().find_or_create_attribute_variable_double( "toto_vertex", 1 )
+    attribute.set_value( 10, 10 )
+    if attribute.value( 0 ) != 1:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( 10 ) != 10:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( grid.nb_cells() - 1 ) != 1:
+        raise ValueError( "[Test] Wrong attribute value" )
     
 def test_io(grid, filename):
     mesh.save_light_regular_grid3D(grid, filename)
