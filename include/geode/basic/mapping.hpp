@@ -32,8 +32,7 @@ namespace geode
 {
     template < typename T1,
         typename T2,
-        template < typename >
-        class StorageType >
+        template < typename > class StorageType >
     class MappingBase
     {
     public:
@@ -86,8 +85,8 @@ namespace geode
 
     protected:
         MappingBase() = default;
-        MappingBase( MappingBase& ) = default;
-        MappingBase& operator=( MappingBase& ) = default;
+        MappingBase( const MappingBase& ) = default;
+        MappingBase& operator=( const MappingBase& ) = default;
         MappingBase( MappingBase&& ) noexcept = default;
         MappingBase& operator=( MappingBase&& ) noexcept = default;
 
@@ -127,8 +126,8 @@ namespace geode
     {
     public:
         BijectiveMapping() = default;
-        BijectiveMapping( BijectiveMapping& ) = default;
-        BijectiveMapping& operator=( BijectiveMapping& ) = default;
+        BijectiveMapping( const BijectiveMapping& ) = default;
+        BijectiveMapping& operator=( const BijectiveMapping& ) = default;
         BijectiveMapping( BijectiveMapping&& ) noexcept = default;
         BijectiveMapping& operator=( BijectiveMapping&& ) noexcept = default;
 
@@ -191,8 +190,8 @@ namespace geode
     {
     public:
         GenericMapping() = default;
-        GenericMapping( GenericMapping& ) = default;
-        GenericMapping& operator=( GenericMapping& ) = default;
+        GenericMapping( const GenericMapping& ) = default;
+        GenericMapping& operator=( const GenericMapping& ) = default;
         GenericMapping( GenericMapping&& ) noexcept = default;
         GenericMapping& operator=( GenericMapping&& ) noexcept = default;
 
