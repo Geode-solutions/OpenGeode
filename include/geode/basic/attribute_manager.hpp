@@ -79,10 +79,11 @@ namespace geode
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
                     find_attribute_base( name ) );
             OPENGEODE_EXCEPTION( attribute.get(),
-                "[AttributeManager::find_attribute] You have to create an "
-                "attribute before using it. "
-                "See find_or_create_attribute method and "
-                "derived classes of ReadOnlyAttribute." );
+                "[AttributeManager::find_attribute] Could not find attribute '",
+                name,
+                "'. You have to create an attribute before using it. See "
+                "find_or_create_attribute method and derived classes of "
+                "ReadOnlyAttribute." );
             return attribute;
         }
 

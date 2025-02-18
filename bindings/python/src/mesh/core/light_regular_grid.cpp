@@ -30,25 +30,39 @@
 
 #include <geode/mesh/core/light_regular_grid.hpp>
 
-#define PYTHON_LIGHT_REGULAR_GRID( dimension )                                 \
-    const auto name##dimension =                                               \
-        "LightRegularGrid" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< LightRegularGrid##dimension##D, Grid##dimension##D,      \
-        Identifier >( module, name##dimension.c_str() )                        \
-        .def( pybind11::init< Point< dimension >,                              \
-            std::array< index_t, dimension >,                                  \
-            std::array< double, dimension > >() )                              \
-        .def( pybind11::init< Point< dimension >,                              \
-            std::array< index_t, dimension >,                                  \
-            std::array< Vector< dimension >, dimension > >() )                 \
-        .def( "native_extension",                                              \
-            &LightRegularGrid##dimension##D::native_extension )
+namespace
+{
+    template < geode::index_t dimension >
+    void define_python_light_regular_grid( pybind11::module& module )
+    {
+        const auto class_name =
+            absl::StrCat( "LightRegularGrid", dimension, "D" );
+        pybind11::class_< geode::LightRegularGrid< dimension >,
+            geode::Grid< dimension >, geode::Identifier >(
+            module, class_name.c_str() )
+            .def( pybind11::init< geode::Point< dimension >,
+                std::array< geode::index_t, dimension >,
+                std::array< double, dimension > >() )
+            .def( pybind11::init< geode::Point< dimension >,
+                std::array< geode::index_t, dimension >,
+                std::array< geode::Vector< dimension >, dimension > >() )
+            .def( "vertex_attribute_manager",
+                &geode::Grid< dimension >::grid_vertex_attribute_manager,
+                pybind11::return_value_policy::reference )
+            .def( dimension == 2 ? "polygon_attribute_manager"
+                                 : "polyhedron_attribute_manager",
+                &geode::Grid< dimension >::cell_attribute_manager,
+                pybind11::return_value_policy::reference )
+            .def( "native_extension",
+                &geode::LightRegularGrid< dimension >::native_extension );
+    }
+} // namespace
 
 namespace geode
 {
     void define_light_regular_grid( pybind11::module& module )
     {
-        PYTHON_LIGHT_REGULAR_GRID( 2 );
-        PYTHON_LIGHT_REGULAR_GRID( 3 );
+        define_python_light_regular_grid< 2 >( module );
+        define_python_light_regular_grid< 3 >( module );
     }
 } // namespace geode
