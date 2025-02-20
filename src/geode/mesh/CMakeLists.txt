@@ -240,6 +240,7 @@ add_geode_library(
         "helpers/euclidean_distance_transform.hpp"
         "helpers/gradient_computation.hpp"
         "helpers/generic_solid_accessor.hpp"
+        "helpers/generic_grid_accessor.hpp"
         "helpers/generic_surface_accessor.hpp"
         "helpers/generic_edged_curve_accessor.hpp"
         "helpers/hausdorff_distance.hpp"
