@@ -81,6 +81,11 @@ add_geode_test(
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
+    SOURCE "test-small-set.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
     SOURCE "test-uuid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
