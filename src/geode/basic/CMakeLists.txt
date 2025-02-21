@@ -82,6 +82,7 @@ add_geode_library(
         "progress_logger_manager.hpp"
         "range.hpp"
         "singleton.hpp"
+        "small_set.hpp"
         "string.hpp"
         "timer.hpp"
         "types.hpp"
