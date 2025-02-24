@@ -166,6 +166,10 @@ namespace geode
     double tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra )
     {
         const auto signed_volume = geode::tetrahedron_signed_volume( tetra );
+        if( signed_volume < 0. )
+        {
+            return 0.;
+        }
         double sq_len{ 0 };
         const auto& vertices = tetra.vertices();
         for( const auto v0 : geode::LRange{ 3 } )
