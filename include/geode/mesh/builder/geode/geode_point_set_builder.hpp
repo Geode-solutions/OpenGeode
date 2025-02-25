@@ -52,6 +52,8 @@ namespace geode
         explicit OpenGeodePointSetBuilder(
             OpenGeodePointSet< dimension >& mesh );
 
+        OpenGeodePointSetBuilder( OpenGeodePointSetBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

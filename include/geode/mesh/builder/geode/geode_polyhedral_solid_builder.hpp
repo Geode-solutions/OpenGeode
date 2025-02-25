@@ -56,6 +56,9 @@ namespace geode
         explicit OpenGeodePolyhedralSolidBuilder(
             OpenGeodePolyhedralSolid< dimension >& mesh );
 
+        OpenGeodePolyhedralSolidBuilder(
+            OpenGeodePolyhedralSolidBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

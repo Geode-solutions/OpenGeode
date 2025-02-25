@@ -240,14 +240,43 @@ def test_closest_vertex( grid ):
     if result != answer:
         raise ValueError( "[Test] Wrong result for closest vertex for query p4" )
 
-def test_attribute( grid ):
+def test_attribute_3d( grid ):
     attribute = grid.cell_attribute_manager().find_or_create_attribute_variable_double( "toto", -1 )
     attribute.set_value( 10, 10 )
+    attribute = grid.polyhedron_attribute_manager().find_attribute_double( "toto" )
     if attribute.value( 0 ) != -1:
         raise ValueError( "[Test] Wrong attribute value" )
     if attribute.value( 10 ) != 10:
         raise ValueError( "[Test] Wrong attribute value" )
     if attribute.value( grid.nb_cells() - 1 ) != -1:
+        raise ValueError( "[Test] Wrong attribute value" )
+    attribute = grid.vertex_attribute_manager().find_or_create_attribute_variable_double( "toto_vertex", 1 )
+    attribute.set_value( 10, 10 )
+    if attribute.value( 0 ) != 1:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( 10 ) != 10:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( grid.nb_cells() - 1 ) != 1:
+        raise ValueError( "[Test] Wrong attribute value" )
+
+def test_attribute_2d():
+    grid = mesh.LightRegularGrid2D(geom.Point2D([1.5, 0]), [5, 10], [1., 2.])
+    attribute = grid.cell_attribute_manager().find_or_create_attribute_variable_double( "toto", -1 )
+    attribute.set_value( 10, 10 )
+    attribute = grid.polygon_attribute_manager().find_attribute_double( "toto" )
+    if attribute.value( 0 ) != -1:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( 10 ) != 10:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( grid.nb_cells() - 1 ) != -1:
+        raise ValueError( "[Test] Wrong attribute value" )
+    attribute = grid.vertex_attribute_manager().find_or_create_attribute_variable_double( "toto_vertex", 1 )
+    attribute.set_value( 10, 10 )
+    if attribute.value( 0 ) != 1:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( 10 ) != 10:
+        raise ValueError( "[Test] Wrong attribute value" )
+    if attribute.value( grid.nb_cells() - 1 ) != 1:
         raise ValueError( "[Test] Wrong attribute value" )
     
 def test_io(grid, filename):
@@ -266,5 +295,6 @@ if __name__ == '__main__':
     test_cell_query( grid )
     test_boundary_box( grid )
     test_closest_vertex( grid )
-    test_attribute( grid )
+    test_attribute_3d( grid )
+    test_attribute_2d()
     test_io(grid, "test." + grid.native_extension())

@@ -46,10 +46,12 @@ namespace geode
      */
     class opengeode_mesh_api VertexSetBuilder : public IdentifierBuilder
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetBuilder );
+        OPENGEODE_DISABLE_COPY( VertexSetBuilder );
         PASSKEY( VertexSet, VertexSetKey );
 
     public:
+        VertexSetBuilder( VertexSetBuilder&& ) noexcept = default;
+
         virtual ~VertexSetBuilder() = default;
 
         /*!

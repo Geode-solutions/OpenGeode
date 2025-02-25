@@ -46,6 +46,8 @@ namespace geode
 
         explicit OpenGeodeGraphBuilder( OpenGeodeGraph& mesh );
 
+        OpenGeodeGraphBuilder( OpenGeodeGraphBuilder&& ) noexcept;
+
     private:
         void do_create_vertex() final;
 

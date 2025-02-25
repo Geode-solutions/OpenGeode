@@ -23,12 +23,13 @@
 
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/distance.hpp>
 #include <geode/geometry/nn_search.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/tests/common.hpp>
 
-void test()
+void first_test()
 {
     const geode::NNSearch2D search{ { geode::Point2D{ { 0.1, 4.2 } },
         geode::Point2D{ { 5.9, 7.3 } }, geode::Point2D{ { 1.8, -5 } },
@@ -56,18 +57,101 @@ void test()
     const geode::Point3D p1{ { 2.4, 8.1, 7.6 } };
     const geode::Point3D p2{ { 8.1, 4.2, 3.8 } };
     const geode::Point3D p3{ { 3.1, 9.4, 9.7 } };
-    const geode::NNSearch3D colocator( { p0, p0, p1, p0, p2, p1, p3 } );
+    std::vector< geode::Point3D > points{ p0, p0, p1, p0, p2, p1, p3 };
+    const geode::NNSearch3D colocator( points );
 
     const auto colocated_info =
         colocator.colocated_index_mapping( geode::GLOBAL_EPSILON );
     OPENGEODE_EXCEPTION( colocated_info.nb_colocated_points() == 3,
-        "[Test] Should be 3 colocated points" );
-    const std::vector< geode::index_t > mapping_answer{ 0, 0, 1, 0, 2, 1, 3 };
-    OPENGEODE_EXCEPTION( colocated_info.colocated_mapping == mapping_answer,
-        "[Test] Error in colocated mapping" );
-    const std::vector< geode::Point3D > points_answer{ p0, p1, p2, p3 };
-    OPENGEODE_EXCEPTION( colocated_info.unique_points == points_answer,
-        "[Test] Error in unique points" );
+        "[Test 1] Should be 3 colocated points" );
+    for( const auto p : geode::Indices{ points } )
+    {
+        OPENGEODE_EXCEPTION( colocated_info.colocated_mapping[p]
+                                 < colocated_info.unique_points.size(),
+            "[Test 1] Wrong value of colocated_mapping (bigger than unique "
+            "points size)" );
+        const auto& colocated_point =
+            colocated_info.unique_points[colocated_info.colocated_mapping[p]];
+        OPENGEODE_EXCEPTION(
+            geode::point_point_distance( points[p], colocated_point )
+                <= geode::GLOBAL_EPSILON,
+            "[Test 1] Colocated point is not close enough to original point" );
+    }
+    for( const auto up0 : geode::Indices{ colocated_info.unique_points } )
+    {
+        for( const auto up1 : geode::Indices{ colocated_info.unique_points } )
+        {
+            if( up1 <= up0 )
+            {
+                continue;
+            }
+            OPENGEODE_EXCEPTION(
+                geode::point_point_distance( colocated_info.unique_points[up0],
+                    colocated_info.unique_points[up1] )
+                    > geode::GLOBAL_EPSILON,
+                "[Test 1] Colocated points are too close" );
+        }
+    }
+}
+
+void second_test()
+{
+    geode::Logger::set_level( geode::Logger::LEVEL::trace );
+    std::vector< geode::Point2D > points{
+        geode::Point2D{ { 0, 0.2 } },
+        geode::Point2D{ { 0.25, 0 } },
+        geode::Point2D{ { -0.25, 0 } },
+        geode::Point2D{ { 0, 0.8 } },
+        geode::Point2D{ { 0.25, 1 } },
+        geode::Point2D{ { -0.25, 1 } },
+    };
+    const geode::NNSearch2D colocator{ points };
+    const double DISTANCE{ 0.8 };
+
+    const auto colocated_info = colocator.colocated_index_mapping( DISTANCE );
+    DEBUG( colocated_info.nb_unique_points() );
+    for( const auto v : geode::Range{ 6 } )
+    {
+        geode::Logger::trace( v, " : ",
+            colocated_info.colocated_input_points[v], " / ",
+            colocated_info.colocated_mapping[v] );
+    }
+    for( const auto p : geode::Indices{ points } )
+    {
+        OPENGEODE_EXCEPTION( colocated_info.colocated_mapping[p]
+                                 < colocated_info.unique_points.size(),
+            "[Test 2] Wrong value of colocated_mapping (bigger than unique "
+            "points size)" );
+        const auto& colocated_point =
+            colocated_info.unique_points[colocated_info.colocated_mapping[p]];
+        OPENGEODE_EXCEPTION(
+            geode::point_point_distance( points[p], colocated_point )
+                <= DISTANCE,
+            "[Test 2] Colocated point is not close enough to original point" );
+    }
+    for( const auto up0 : geode::Indices{ colocated_info.unique_points } )
+    {
+        for( const auto up1 : geode::Indices{ colocated_info.unique_points } )
+        {
+            if( up1 <= up0 )
+            {
+                continue;
+            }
+            OPENGEODE_EXCEPTION(
+                geode::point_point_distance( colocated_info.unique_points[up0],
+                    colocated_info.unique_points[up1] )
+                    > DISTANCE,
+                "[Test 2] Colocated points are too close" );
+        }
+    }
+    OPENGEODE_EXCEPTION( colocated_info.nb_unique_points() == 2,
+        "[Test 2] Should be 2 unique points" );
+}
+
+void test()
+{
+    first_test();
+    second_test();
 }
 
 OPENGEODE_TEST( "nnsearch" )

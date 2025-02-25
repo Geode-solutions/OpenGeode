@@ -50,6 +50,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodePolygonalSurfaceBuilder< dimension >::
+        OpenGeodePolygonalSurfaceBuilder(
+            OpenGeodePolygonalSurfaceBuilder&& ) noexcept = default;
+
+    template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

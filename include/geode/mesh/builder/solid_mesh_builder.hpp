@@ -52,6 +52,7 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        SolidMeshBuilder( SolidMeshBuilder&& ) noexcept = default;
         virtual ~SolidMeshBuilder();
         /*!
          * Create the builder associated with a SolidMesh.

@@ -23,6 +23,7 @@
 
 #include <geode/geometry/nn_search.hpp>
 
+#include <mutex>
 #include <numeric>
 
 #include <absl/algorithm/container.h>
@@ -188,21 +189,33 @@ namespace geode
             "should be bigger than GLOBAL_EPSILON (i.e. ",
             GLOBAL_EPSILON, ")" );
         typename NNSearch< dimension >::ColocatedInfo result;
-        std::vector< index_t > mapping( nb_points() );
-        absl::c_iota( mapping, 0 );
+        std::vector< index_t > mapping( nb_points(), NO_ID );
+        std::mutex mutex;
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
-            [&epsilon, &mapping, this]( index_t p ) {
-                if( mapping[p] == p )
+            [&epsilon, &mapping, &mutex, this]( index_t p ) {
+                if( mapping[p] != NO_ID )
                 {
-                    const auto vertices =
-                        radius_neighbors( point( p ), epsilon );
-                    const auto min_index = *absl::c_min_element( vertices );
-                    for( const auto id : vertices )
+                    return;
+                }
+                const auto vertices = radius_neighbors( point( p ), epsilon );
+                std::lock_guard< std::mutex > lock( mutex );
+                if( mapping[p] != NO_ID )
+                {
+                    Logger::trace(
+                        p, " : correction 1 / mapping[p] ", mapping[p] );
+                    return;
+                }
+                for( const auto id : vertices )
+                {
+                    Logger::trace(
+                        p, " : id ", id, " / mapping[id] ", mapping[id] );
+                    if( mapping[id] == NO_ID )
                     {
-                        mapping[id] = min_index;
+                        mapping[id] = p;
                     }
                 }
             } );
+        result.colocated_input_points = mapping;
         index_t nb_unique_points{ 0 };
         for( const auto p : Range{ nb_points() } )
         {
@@ -211,22 +224,21 @@ namespace geode
                 nb_unique_points++;
             }
         }
-        result.colocated_input_points = mapping;
-        index_t nb_colocated{ 0 };
-        index_t count{ 0 };
         result.unique_points.resize( nb_unique_points );
+        std::vector< index_t > old2new( nb_points(), NO_ID );
+        index_t count{ 0 };
         for( const auto p : Range{ nb_points() } )
         {
             if( mapping[p] == p )
             {
-                mapping[p] -= nb_colocated;
-                result.unique_points[count++] = point( p );
+                result.unique_points[count] = point( p );
+                old2new[p] = count;
+                count++;
             }
-            else
-            {
-                nb_colocated++;
-                mapping[p] = mapping[mapping[p]];
-            }
+        }
+        for( const auto p : Range{ nb_points() } )
+        {
+            mapping[p] = old2new[mapping[p]];
         }
         result.colocated_mapping = mapping;
         return result;

@@ -166,7 +166,7 @@ namespace geode
 
         [[nodiscard]] Element element( index_t tetrahedron_id ) const
         {
-            return this->mesh().tetrahedron( tetrahedron_id );
+            return mesh_.tetrahedron( tetrahedron_id );
         }
 
     private:

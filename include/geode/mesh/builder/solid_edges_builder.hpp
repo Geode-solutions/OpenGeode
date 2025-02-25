@@ -43,6 +43,8 @@ namespace geode
     public:
         explicit SolidEdgesBuilder( SolidEdges< dimension >& edges );
 
+        SolidEdgesBuilder( SolidEdgesBuilder&& ) noexcept = default;
+
         /*!
          * Delete all the isolated edges (not used as polyhedron edges)
          * @return the mapping between old edge indices to new ones.

@@ -46,6 +46,10 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
+        OpenGeodePointSetBuilder< dimension >&& ) noexcept = default;
+
+    template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

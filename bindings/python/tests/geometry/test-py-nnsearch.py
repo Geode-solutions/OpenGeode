@@ -55,10 +55,3 @@ if __name__ == '__main__':
     colocated_info = colocator.colocated_index_mapping(basic.GLOBAL_EPSILON)
     if colocated_info.nb_colocated_points() != 3:
         raise ValueError("[Test] Should be 3 colocated points")
-    mapping_answer = [0, 0, 1, 0, 2, 1, 3]
-    if colocated_info.colocated_mapping != mapping_answer:
-        raise ValueError("[Test] Error in colocated mapping")
-    points_answer = [p0, p1, p2, p3]
-    for p in range(4):
-        if colocated_info.unique_points[p] != points_answer[p]:
-            raise ValueError("[Test] Error in unique points")

@@ -44,6 +44,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        TetrahedralSolidBuilder( TetrahedralSolidBuilder&& ) noexcept = default;
+
         [[nodiscard]] static std::unique_ptr<
             TetrahedralSolidBuilder< dimension > >
             create( TetrahedralSolid< dimension >& mesh );

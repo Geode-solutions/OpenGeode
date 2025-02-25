@@ -36,8 +36,6 @@ namespace geode
         class StorageType >
     class MappingBase
     {
-        OPENGEODE_DISABLE_COPY( MappingBase );
-
     public:
         template < typename T >
         using Storage = typename StorageType< T >::Type;
@@ -88,8 +86,10 @@ namespace geode
 
     protected:
         MappingBase() = default;
-        MappingBase( MappingBase&& other ) = default;
-        MappingBase& operator=( MappingBase&& other ) = default;
+        MappingBase( const MappingBase& ) = default;
+        MappingBase& operator=( const MappingBase& ) = default;
+        MappingBase( MappingBase&& ) noexcept = default;
+        MappingBase& operator=( MappingBase&& ) noexcept = default;
 
         [[nodiscard]] index_t size_input() const
         {
@@ -127,8 +127,10 @@ namespace geode
     {
     public:
         BijectiveMapping() = default;
-        BijectiveMapping( BijectiveMapping&& other ) = default;
-        BijectiveMapping& operator=( BijectiveMapping&& other ) = default;
+        BijectiveMapping( const BijectiveMapping& ) = default;
+        BijectiveMapping& operator=( const BijectiveMapping& ) = default;
+        BijectiveMapping( BijectiveMapping&& ) noexcept = default;
+        BijectiveMapping& operator=( BijectiveMapping&& ) noexcept = default;
 
         void map( const T1& in, const T2& out )
         {
@@ -189,8 +191,10 @@ namespace geode
     {
     public:
         GenericMapping() = default;
-        GenericMapping( GenericMapping&& other ) = default;
-        GenericMapping& operator=( GenericMapping&& other ) = default;
+        GenericMapping( const GenericMapping& ) = default;
+        GenericMapping& operator=( const GenericMapping& ) = default;
+        GenericMapping( GenericMapping&& ) noexcept = default;
+        GenericMapping& operator=( GenericMapping&& ) noexcept = default;
 
         void map( const T1& in, const T2& out )
         {

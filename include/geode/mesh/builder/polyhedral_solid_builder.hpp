@@ -47,6 +47,8 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
+        PolyhedralSolidBuilder( PolyhedralSolidBuilder&& ) noexcept = default;
+
         /*!
          * Create the builder associated with a PolyhedralSolid.
          * @param[in] mesh The PolyhedralSolid to build/modify
