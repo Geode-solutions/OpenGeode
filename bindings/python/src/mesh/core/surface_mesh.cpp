@@ -116,7 +116,8 @@
             pybind11::return_value_policy::reference )                         \
         .def( "is_vertex_on_border",                                           \
             &SurfaceMesh##dimension##D::is_vertex_on_border )                  \
-        .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager ) \
+        .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager,  \
+            pybind11::return_value_policy::reference )                         \
         .def( "bounding_box", &SurfaceMesh##dimension##D::bounding_box )       \
         .def_static( "create",                                                 \
             static_cast<                                                       \
