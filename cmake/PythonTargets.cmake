@@ -112,6 +112,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         OUTPUT_STRIP_TRAILING_WHITESPACE
     ) 
     string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
+    string(TOLOWER ${GEODE_WHEEL_NAME} wheel_name)
     set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
     message(STATUS "Wheel file: ${wheel_file}")
     if(${GEODE_WHEEL_SUPERBUILD})
