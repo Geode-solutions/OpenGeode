@@ -113,7 +113,7 @@ print(name + version + '-' + name + version + '-' + platform)"
     ) 
     string(TOLOWER ${GEODE_WHEEL_NAME} wheel_name)
     message(STATUS "Wheel name after lowering: ${wheel_name}")
-    string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
+    string(REGEX REPLACE "-" "_" wheel_name ${wheel_name})
     message(STATUS "Wheel name after regex replace: ${wheel_name}")
     message(STATUS "Wheel version: ${WHEEL_VERSION}")
     message(STATUS "Wheel suffix: ${wheel_sufix}")
