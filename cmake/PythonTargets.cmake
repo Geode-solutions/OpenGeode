@@ -112,11 +112,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         OUTPUT_STRIP_TRAILING_WHITESPACE
     ) 
     string(TOLOWER ${GEODE_WHEEL_NAME} wheel_name)
-    message(STATUS "Wheel name after lowering: ${wheel_name}")
     string(REGEX REPLACE "-" "_" wheel_name ${wheel_name})
-    message(STATUS "Wheel name after regex replace: ${wheel_name}")
-    message(STATUS "Wheel version: ${WHEEL_VERSION}")
-    message(STATUS "Wheel suffix: ${wheel_sufix}")
     set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
     message(STATUS "Wheel file: ${wheel_file}")
     if(${GEODE_WHEEL_SUPERBUILD})
