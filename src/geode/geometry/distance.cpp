@@ -1292,6 +1292,262 @@ namespace geode
         return point_circle_distance( point, disk );
     }
 
+    template < index_t dimension >
+    double Bisector( const geode::index_t number_of_components,
+        const std::array< double, dimension >& locE,
+        const std::array< double, dimension >& locY,
+        std::array< double, dimension >& locX )
+    {
+        double sum_z_squared{ 0 };
+        std::array< double, dimension > zPos;
+        for( const auto i : geode::LRange{ number_of_components } )
+        {
+            zPos[i] = locY[i] / locE[i];
+            sum_z_squared += zPos[i] * zPos[i];
+        }
+        if( std::fabs( sum_z_squared - 1 ) < geode::GLOBAL_EPSILON )
+        {
+            for( const auto i : geode::LRange{ number_of_components } )
+            {
+                locX[i] = locY[i];
+            }
+            return 0;
+        }
+        const auto emin = locE[number_of_components - 1];
+        std::array< double, dimension > numerator;
+        std::array< double, dimension > pSqr;
+        pSqr.fill( 0 );
+        numerator.fill( 0 );
+        for( const auto i : geode::LRange{ number_of_components } )
+        {
+            const auto p = locE[i] / emin;
+            pSqr[i] = p * p;
+            numerator[i] = p * zPos[i];
+        }
+        double s{ 0 };
+        auto smin = zPos[number_of_components - 1] - 1;
+        double smax{ 0 };
+        if( sum_z_squared >= 1 )
+        {
+            geode::Vector< dimension > v{ numerator };
+            smax = v.length() - 1;
+        }
+        const geode::index_t jmax = 2048;
+        geode::index_t j{ 0 };
+        while( j < jmax )
+        {
+            s = ( smin + smax ) * 0.5;
+            if( s == smin || s == smax )
+            {
+                break;
+            }
+            double g = -1;
+            for( const auto i : geode::LRange{ number_of_components } )
+            {
+                const auto ratio = numerator[i] / ( s + pSqr[i] );
+                g += ratio * ratio;
+            }
+            if( g > 0 )
+            {
+                smin = s;
+                j++;
+            }
+            else if( g < 0 )
+            {
+                smax = s;
+                j++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        auto squared_distance = 0.;
+        for( const auto i : geode::LRange{ number_of_components } )
+        {
+            locX[i] = pSqr[i] * locY[i] / ( s + pSqr[i] );
+            const auto diff = locX[i] - locY[i];
+            squared_distance += diff * diff;
+        }
+        return squared_distance;
+    }
+
+    template < index_t dimension >
+    std::tuple< double, std::array< double, dimension > > SqrDistanceSpecial(
+        const std::array< double, dimension >& extents,
+        const std::array< double, dimension >& query_point_coordinates )
+    {
+        std::tuple< double, std::array< double, dimension > > result;
+        auto& [squared_distance, closest_point_coordinates] = result;
+        std::array< double, dimension > ePos;
+        std::array< double, dimension > yPos;
+        std::array< double, dimension > xPos;
+        index_t numpos{ 0 };
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            if( query_point_coordinates[i] > 0 )
+            {
+                ePos.at( numpos ) = extents[i];
+                yPos.at( numpos ) = query_point_coordinates[i];
+                ++numpos;
+                continue;
+            }
+            closest_point_coordinates.at( numpos ) = 0.;
+        }
+        if( query_point_coordinates[dimension - 1] > 0 )
+        {
+            squared_distance =
+                Bisector< dimension >( numpos, ePos, yPos, xPos );
+        }
+        else
+        {
+            std::array< double, dimension - 1 > numer;
+            std::array< double, dimension - 1 > denom;
+            const auto extent_squared =
+                extents[dimension - 1] * extents[dimension - 1];
+            for( const auto i : geode::LRange{ numpos } )
+            {
+                numer[i] = ePos[i] * yPos[i];
+                denom[i] = ePos[i] * ePos[i] - extent_squared;
+            }
+            bool inSubbox{ true };
+            for( const auto i : geode::LRange{ numpos } )
+            {
+                if( numer[i] >= denom[i] )
+                {
+                    inSubbox = false;
+                    break;
+                }
+            }
+            bool inSubellipsoid{ false };
+            double discr{ 1 };
+            if( inSubbox )
+            {
+                std::array< double, dimension - 1 > xde;
+                for( const auto i : geode::LRange{ numpos } )
+                {
+                    xde[i] = numer[i] / denom[i];
+                    discr -= xde[i] * xde[i];
+                }
+                if( discr > 0 )
+                {
+                    squared_distance = 0;
+                    for( const auto i : geode::LRange{ numpos } )
+                    {
+                        xPos[i] = ePos[i] * xde[i];
+                        const auto diff = xPos[i] - yPos[i];
+                        squared_distance += diff * diff;
+                    }
+                    closest_point_coordinates[dimension - 1] =
+                        extents[dimension - 1] * std::sqrt( discr );
+                    squared_distance +=
+                        closest_point_coordinates[dimension - 1]
+                        * closest_point_coordinates[dimension - 1];
+                    inSubellipsoid = true;
+                }
+            }
+            if( !inSubellipsoid )
+            {
+                closest_point_coordinates[dimension - 1] = 0;
+                squared_distance =
+                    Bisector< dimension >( numpos, ePos, yPos, xPos );
+            }
+        }
+        numpos = 0;
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            if( query_point_coordinates[i] > 0 )
+            {
+                closest_point_coordinates[i] = xPos[numpos];
+                ++numpos;
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > SquaredDistance(
+        const Ellipse< dimension >& ellipse,
+        const std::array< double, dimension >& query_point_coordinates )
+    {
+        std::array< bool, dimension > is_query_points_coordinates_negative;
+        std::tuple< double, Point< dimension > > result;
+        auto& [squared_distance, closest_point] = result;
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            is_query_points_coordinates_negative[i] =
+                ( query_point_coordinates[i] < 0. );
+        }
+        std::array< std::pair< double, index_t >, dimension >
+            axis_sorted_by_decreasing_extent;
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            auto& [extent, axis] = axis_sorted_by_decreasing_extent.at( i );
+            extent = ellipse.axes().direction( i ).length();
+            axis = i;
+        };
+        absl::c_sort( axis_sorted_by_decreasing_extent,
+            []( const std::pair< double, index_t >& a,
+                const std::pair< double, index_t >& b ) {
+                return a.second < b.second;
+            } );
+        std::array< index_t, dimension > reverse_permutation;
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            reverse_permutation.at(
+                axis_sorted_by_decreasing_extent[i].second ) = i;
+        }
+        std::array< double, dimension > extents;
+        std::array< double, dimension > locY;
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            const auto j = axis_sorted_by_decreasing_extent[i].second;
+            extents[i] = ellipse.axes().direction( j ).length();
+            locY[i] = std::fabs( query_point_coordinates[j] );
+        }
+        auto [squared_distance_special, closest_point_coordinates] =
+            SqrDistanceSpecial< dimension >( extents, locY );
+        squared_distance = squared_distance_special;
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            const auto j = reverse_permutation[i];
+            if( is_query_points_coordinates_negative[i] )
+            {
+                closest_point_coordinates[j] = -closest_point_coordinates[j];
+            }
+        }
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            closest_point.set_value( i, closest_point_coordinates[i] );
+        }
+        return result;
+    };
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_ellipse_distance(
+        const Point< dimension >& point, const Ellipse< dimension >& ellipse )
+    {
+        std::tuple< double, Point< dimension > > result;
+        std::array< double, dimension > point_coordinates;
+        const Vector< dimension > center_to_point{ ellipse.center(), point };
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            point_coordinates[i] = center_to_point.dot(
+                ellipse.axes().direction( i ).normalize() );
+        }
+        auto& [distance, closest_point] = result;
+        const auto [squared_distance, closest_point_result] =
+            SquaredDistance< dimension >( ellipse, point_coordinates );
+        distance = std::sqrt( squared_distance );
+        closest_point = ellipse.center();
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            closest_point += ellipse.axes().direction( i ).normalize()
+                             * closest_point_result.value( i );
+        }
+        return result;
+    }
+
     template double opengeode_geometry_api point_point_distance(
         const Point1D&, const Point1D& );
     template double opengeode_geometry_api point_segment_distance(
@@ -1317,6 +1573,8 @@ namespace geode
         point_sphere_signed_distance( const Point2D&, const Sphere2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_ball_distance( const Point2D&, const Ball2D& );
+    template std::tuple< double, Point2D > opengeode_geometry_api
+        point_ellipse_distance( const Point2D&, const Ellipse2D& ellipse );
 
     template double opengeode_geometry_api point_point_distance(
         const Point3D&, const Point3D& );
@@ -1336,4 +1594,6 @@ namespace geode
         point_sphere_signed_distance( const Point3D&, const Sphere3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_ball_distance( const Point3D&, const Ball3D& );
+    template std::tuple< double, Point3D > opengeode_geometry_api
+        point_ellipse_distance( const Point3D&, const Ellipse3D& ellipse );
 } // namespace geode

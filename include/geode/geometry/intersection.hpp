@@ -37,11 +37,15 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Sphere );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Ellipse );
+    FORWARD_DECLARATION_DIMENSION_CLASS( OwnerEllipse );
     ALIAS_2D_AND_3D( InfiniteLine );
     ALIAS_2D_AND_3D( OwnerInfiniteLine );
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Segment );
     ALIAS_3D( Triangle );
+    ALIAS_2D_AND_3D( Ellipse );
+    ALIAS_1D_AND_2D_AND_3D( OwnerEllipse );
     class Circle;
     class Cylinder;
     class Plane;
@@ -228,4 +232,27 @@ namespace geode
     [[nodiscard]] IntersectionResult< OwnerInfiniteLine3D >
         opengeode_geometry_api plane_plane_intersection(
             const Plane& plane0, const Plane& plane1 );
+
+    /*!
+     * Compute the intersection between a segment and an ellipse
+     * @return an optional of the intersection points.
+     */
+    template < index_t dimension >
+    [[nodiscard]] IntersectionResult<
+        absl::InlinedVector< Point< dimension >, 2 > >
+        opengeode_geometry_api segment_ellipse_intersection(
+            const Segment< dimension >& segment,
+            const Ellipse< dimension >& ellipse );
+
+    /*!
+     * Compute the intersection between a line and an ellipse
+     * @return an optional of the intersection points.
+     */
+    template < index_t dimension >
+    [[nodiscard]] IntersectionResult<
+        absl::InlinedVector< Point< dimension >, 2 > >
+        opengeode_geometry_api line_ellipse_intersection(
+            const InfiniteLine< dimension >& line,
+            const Ellipse< dimension >& ellipse );
+
 } // namespace geode

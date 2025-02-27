@@ -26,12 +26,14 @@
 
 #include <geode/geometry/basic_objects/circle.hpp>
 #include <geode/geometry/basic_objects/cylinder.hpp>
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/distance.hpp>
+#include <geode/geometry/frame.hpp>
 #include <geode/geometry/intersection.hpp>
 #include <geode/geometry/point.hpp>
 
@@ -750,6 +752,216 @@ void test_triangle_circle_intersection()
         !XY0_result, "[Test] Wrong intersection between planeZO, circleYZ0" );
 }
 
+void test_line_ellipse_intersection_2D()
+{
+    const geode::Point2D center{ { 0.0, 0.0 } };
+    const geode::Vector2D first_axis{ { 3.0, 0.0 } };
+    const geode::Vector2D second_axis{ { 0.0, 2.0 } };
+    const geode::Frame2D frame{ { first_axis, second_axis } };
+    const geode::Ellipse2D ellipse{ center, frame };
+    const geode::Point2D parallel_origin{ { 0., 3 } };
+    const geode::Point2D parallel_dest{ { 1, 3 } };
+    const geode::Segment2D parallel_segment{ parallel_origin, parallel_dest };
+    const geode::InfiniteLine2D parallel{ parallel_segment };
+    const auto parallel_result =
+        geode::line_ellipse_intersection( parallel, ellipse );
+    OPENGEODE_EXCEPTION( !parallel_result,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Point2D intersecting_once_origin{ { 3.0, 2.0 } };
+    const geode::Point2D intersecting_once_dest{ { 3.0, 0.0 } };
+    const geode::Segment2D intersecting_once_segment{ intersecting_once_origin,
+        intersecting_once_dest };
+    const geode::InfiniteLine2D intersecting_once{ intersecting_once_segment };
+    const auto intersecting_once_result =
+        geode::line_ellipse_intersection( intersecting_once, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
+        "[Test] Wrong intersection between line and ellipse" );
+    OPENGEODE_EXCEPTION(
+        intersecting_once_result.result->at( 0 ) == intersecting_once_dest,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Segment2D intersecting_twice_segment(
+        center, geode::Point2D{ { 3, 0 } } );
+    const geode::InfiniteLine2D intersecting_twice_line{
+        intersecting_twice_segment
+    };
+    const auto intersecting_twice_result =
+        geode::line_ellipse_intersection( intersecting_twice_line, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Point2D result1{ { -3, 0 } };
+    OPENGEODE_EXCEPTION( intersecting_twice_result.result->at( 0 ) == result1,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Point2D result2{ { 3, 0 } };
+    OPENGEODE_EXCEPTION( intersecting_twice_result.result->at( 1 ) == result2,
+        "[Test] Wrong intersection between line and ellipse" );
+}
+
+void test_line_ellipse_intersection_3D()
+{
+    const geode::Point3D center{ { 0.0, 0.0 } };
+    const geode::Vector3D first_axis{ { 3.0, 0.0, 0.0 } };
+    const geode::Vector3D second_axis{ { 0.0, 2.0, 0.0 } };
+    const geode::Vector3D third_axis{ { 0.0, 0.0, 1.0 } };
+    const geode::Frame3D frame{ { first_axis, second_axis, third_axis } };
+    const geode::Ellipse3D ellipse{ center, frame };
+
+    const geode::Point3D parallel_origin{ { 0., 3, 1 } };
+    const geode::Point3D parallel_dest{ { 1, 3, 1 } };
+    const geode::Segment3D parallel_segment{ parallel_origin, parallel_dest };
+    const geode::InfiniteLine3D parallel{ parallel_segment };
+    const auto parallel_result =
+        geode::line_ellipse_intersection( parallel, ellipse );
+    OPENGEODE_EXCEPTION( !parallel_result,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Point3D intersecting_once_origin{ { 3.0, 2.0, 0.0 } };
+    const geode::Point3D intersecting_once_dest{ { 3.0, 0.0, 0.0 } };
+    const geode::Segment3D intersecting_once_segment{ intersecting_once_origin,
+        intersecting_once_dest };
+    const geode::InfiniteLine3D intersecting_once{ intersecting_once_segment };
+    const auto intersecting_once_result =
+        geode::line_ellipse_intersection( intersecting_once, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
+        "[Test] Wrong intersection between line and ellipse" );
+    OPENGEODE_EXCEPTION(
+        intersecting_once_result.result->at( 0 ) == intersecting_once_dest,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Segment3D intersecting_twice_segment(
+        geode::Point3D{ { 0, 0, 1 } }, geode::Point3D{ { 3, 0, 0 } } );
+    const geode::InfiniteLine3D intersecting_twice_line{
+        intersecting_twice_segment
+    };
+    const auto intersecting_twice_result =
+        geode::line_ellipse_intersection( intersecting_twice_line, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Point3D result1{ { 0, 0, 1 } };
+    OPENGEODE_EXCEPTION(
+        intersecting_twice_result.result->at( 0 ).inexact_equal( result1 ),
+        "[Test] Wrong intersection between line and ellipse" );
+    const geode::Point3D result2{ { 3, 0, 0 } };
+    OPENGEODE_EXCEPTION(
+        intersecting_twice_result.result->at( 1 ).inexact_equal( result2 ),
+        "[Test] Wrong intersection between line and ellipse" );
+}
+
+void test_line_ellipse_intersection()
+{
+    test_line_ellipse_intersection_2D();
+    test_line_ellipse_intersection_3D();
+}
+
+void test_segment_ellipse_intersection_2D()
+{
+    const geode::Point2D center{ { 0.0, 0.0 } };
+    const geode::Vector2D first_axis{ { 3.0, 0.0 } };
+    const geode::Vector2D second_axis{ { 0.0, 2.0 } };
+    const geode::Frame2D frame{ { first_axis, second_axis } };
+    const geode::Ellipse2D ellipse{ center, frame };
+    const geode::Point2D parallel_origin{ { 0., 3 } };
+    const geode::Point2D parallel_dest{ { 1, 3 } };
+    const geode::Segment2D parallel_segment{ parallel_origin, parallel_dest };
+    const auto parallel_result =
+        geode::segment_ellipse_intersection( parallel_segment, ellipse );
+    OPENGEODE_EXCEPTION( !parallel_result,
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point2D intersecting_once_origin{ { 3.0, 2.0 } };
+    const geode::Point2D intersecting_once_dest{ { 3.0, -2.0 } };
+    const geode::Segment2D intersecting_once_segment{ intersecting_once_origin,
+        intersecting_once_dest };
+    const auto intersecting_once_result = geode::segment_ellipse_intersection(
+        intersecting_once_segment, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
+        "[Test] Wrong intersection between segment and ellipse" );
+    geode::Point2D result{ { 3.0, 0.0 } };
+    OPENGEODE_EXCEPTION( intersecting_once_result.result->at( 0 ) == result,
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point2D intersecting_twice_origin{ { -4.0, 0 } };
+    const geode::Point2D intersecting_twice_dest{ { 4.0, 0 } };
+    const geode::Segment2D intersecting_twice_segment{
+        intersecting_twice_origin, intersecting_twice_dest
+    };
+    const auto intersecting_twice_result = geode::segment_ellipse_intersection(
+        intersecting_twice_segment, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point2D result1{ { -3, 0 } };
+    OPENGEODE_EXCEPTION(
+        intersecting_twice_result.result->at( 0 ).inexact_equal( result1 ),
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point2D result2{ { 3, 0 } };
+    OPENGEODE_EXCEPTION(
+        intersecting_twice_result.result->at( 1 ).inexact_equal( result2 ),
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point2D not_intersecting_origin{ { 1.0, 0.0 } };
+    const geode::Point2D not_intersecting_dest{ { 2.0, 0.0 } };
+    const geode::Segment2D not_intersecting_segment{ not_intersecting_origin,
+        not_intersecting_dest };
+    const auto not_intersecting_result = geode::segment_ellipse_intersection(
+        not_intersecting_segment, ellipse );
+    OPENGEODE_EXCEPTION( !not_intersecting_result,
+        "[Test] Wrong intersection between segment and ellipse" );
+}
+
+void test_segment_ellipse_intersection_3D()
+{
+    const geode::Point3D center{ { 0.0, 0.0, 0.0 } };
+    const geode::Vector3D first_axis{ { 3.0, 0.0, 0.0 } };
+    const geode::Vector3D second_axis{ { 0.0, 2.0, 0.0 } };
+    const geode::Vector3D third_axis{ { 0.0, 0.0, 1.0 } };
+    const geode::Frame3D frame{ { first_axis, second_axis, third_axis } };
+    const geode::Ellipse3D ellipse{ center, frame };
+
+    const geode::Point3D parallel_origin{ { 0., 3, 1 } };
+    const geode::Point3D parallel_dest{ { 1, 3, 1 } };
+    const geode::Segment3D parallel_segment{ parallel_origin, parallel_dest };
+    const auto parallel_result =
+        geode::segment_ellipse_intersection( parallel_segment, ellipse );
+    OPENGEODE_EXCEPTION( !parallel_result,
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point3D intersecting_once_origin{ { 3.0, 2.0, 0 } };
+    const geode::Point3D intersecting_once_dest{ { 3.0, -2.0, 0 } };
+    const geode::Segment3D intersecting_once_segment{ intersecting_once_origin,
+        intersecting_once_dest };
+    const auto intersecting_once_result = geode::segment_ellipse_intersection(
+        intersecting_once_segment, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
+        "[Test] Wrong intersection between segment and ellipse" );
+    geode::Point3D result{ { 3.0, 0.0, 0 } };
+    OPENGEODE_EXCEPTION( intersecting_once_result.result->at( 0 ) == result,
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point3D intersecting_twice_origin{ { -4.0, 0, 0 } };
+    const geode::Point3D intersecting_twice_dest{ { 4.0, 0, 0 } };
+    const geode::Segment3D intersecting_twice_segment{
+        intersecting_twice_origin, intersecting_twice_dest
+    };
+    const auto intersecting_twice_result = geode::segment_ellipse_intersection(
+        intersecting_twice_segment, ellipse );
+    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point3D result1{ { -3, 0 } };
+    OPENGEODE_EXCEPTION(
+        intersecting_twice_result.result->at( 0 ).inexact_equal( result1 ),
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point3D result2{ { 3, 0 } };
+    OPENGEODE_EXCEPTION(
+        intersecting_twice_result.result->at( 1 ).inexact_equal( result2 ),
+        "[Test] Wrong intersection between segment and ellipse" );
+    const geode::Point3D not_intersecting_origin{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D not_intersecting_dest{ { 2.0, 0.0, 0.5 } };
+    const geode::Segment3D not_intersecting_segment{ not_intersecting_origin,
+        not_intersecting_dest };
+    const auto not_intersecting_result = geode::segment_ellipse_intersection(
+        not_intersecting_segment, ellipse );
+    OPENGEODE_EXCEPTION( !not_intersecting_result,
+        "[Test] Wrong intersection between segment and ellipse" );
+}
+
+void test_segment_ellipse_intersection()
+{
+    test_segment_ellipse_intersection_2D();
+    test_segment_ellipse_intersection_3D();
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -764,6 +976,8 @@ void test()
     test_plane_plane_intersection();
     test_plane_circle_intersection();
     test_triangle_circle_intersection();
+    test_line_ellipse_intersection();
+    test_segment_ellipse_intersection();
 }
 
 OPENGEODE_TEST( "intersection" )

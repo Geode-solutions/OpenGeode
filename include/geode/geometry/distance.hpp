@@ -34,10 +34,12 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     FORWARD_DECLARATION_DIMENSION_CLASS( Sphere );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Ellipse );
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Triangle );
     ALIAS_2D_AND_3D( InfiniteLine );
     ALIAS_3D( Segment );
+    ALIAS_2D_AND_3D( Ellipse );
     class Plane;
     class Tetrahedron;
     class Circle;
@@ -259,4 +261,15 @@ namespace geode
      */
     [[nodiscard]] std::tuple< double, Point3D > opengeode_geometry_api
         point_disk_distance( const Point3D& point, const Disk& disk );
+
+    /*!
+     * Compute the smallest distance between a point and an ellipse
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the ellipse.
+     */
+    template < index_t dimension >
+    [[nodiscard]] std::tuple< double, Point< dimension > >
+        point_ellipse_distance( const Point< dimension >& point,
+            const Ellipse< dimension >& ellipse );
 } // namespace geode

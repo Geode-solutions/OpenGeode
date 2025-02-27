@@ -26,6 +26,7 @@
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
 #include <geode/geometry/basic_objects/cylinder.hpp>
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
@@ -34,6 +35,7 @@
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/perpendicular.hpp>
 #include <geode/geometry/projection.hpp>
+#include <geode/geometry/square_matrix.hpp>
 #include <geode/geometry/vector.hpp>
 
 namespace
@@ -1010,6 +1012,124 @@ namespace geode
         return { std::move( line ), { first_correctness, second_correctness } };
     }
 
+    template < index_t dimension >
+    IntersectionResult< absl::InlinedVector< Point< dimension >, 2 > >
+        line_ellipse_intersection( const InfiniteLine< dimension >& line,
+            const Ellipse< dimension >& ellipse )
+    {
+        geode::SquareMatrix< dimension > M( 0 );
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            const auto ratio = ellipse.axes().direction( i ).normalize()
+                               * ( 1 / ellipse.axes().direction( i ).length() );
+            geode::SquareMatrix< dimension > M_i;
+            for( const auto j : geode::LRange{ dimension } )
+            {
+                for( const auto k : geode::LRange{ dimension } )
+                {
+                    M_i.set_value( j, k, ratio.value( j ) * ratio.value( k ) );
+                }
+            }
+            M += M_i;
+        }
+        const Vector< dimension > diff{ ellipse.center(), line.origin() };
+        const auto matDir = M * line.direction();
+        const auto matDiff = M * diff;
+        const auto a0 = diff.dot( matDiff ) - 1;
+        const auto a1 = line.direction().dot( matDiff );
+        const auto a2 = line.direction().dot( matDir );
+        const auto discr = a1 * a1 - a0 * a2;
+        if( discr > GLOBAL_EPSILON )
+        {
+            absl::InlinedVector< Point< dimension >, 2 > results;
+            const auto root = std::sqrt( discr );
+            results.reserve( 2 );
+            results.emplace_back(
+                line.origin() + line.direction() * ( -a1 - root ) / a2 );
+            results.emplace_back(
+                line.origin() + line.direction() * ( -a1 + root ) / a2 );
+            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+                2 > >::Correctness first_correctness;
+            first_correctness.first =
+                point_line_distance( results.front(), line ) <= GLOBAL_EPSILON;
+            first_correctness.second.push_back(
+                point_line_projection( results.front(), line ) );
+            first_correctness.first =
+                first_correctness.first
+                && point_line_distance( results.back(), line )
+                       <= GLOBAL_EPSILON;
+            first_correctness.second.push_back(
+                point_line_projection( results.back(), line ) );
+            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+                2 > >::Correctness second_correctness;
+            const auto front_output =
+                point_ellipse_distance( results.front(), ellipse );
+            second_correctness.first =
+                std::get< 0 >( front_output ) <= GLOBAL_EPSILON;
+            second_correctness.second.push_back(
+                std::get< 1 >( front_output ) );
+            const auto back_output =
+                point_ellipse_distance( results.back(), ellipse );
+            second_correctness.first =
+                second_correctness.first
+                && std::get< 0 >( back_output ) <= GLOBAL_EPSILON;
+            second_correctness.second.push_back( std::get< 1 >( back_output ) );
+            return { std::move( results ),
+                { first_correctness, second_correctness } };
+        }
+        if( discr > -GLOBAL_EPSILON )
+        {
+            absl::InlinedVector< Point< dimension >, 2 > results;
+            results.reserve( 1 );
+            results.emplace_back( line.origin() - line.direction() * a1 / a2 );
+            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+                2 > >::Correctness first_correctness;
+            first_correctness.first =
+                point_line_distance( results.front(), line ) <= GLOBAL_EPSILON;
+            first_correctness.second.push_back(
+                point_line_projection( results.front(), line ) );
+            const auto output =
+                point_ellipse_distance( results.front(), ellipse );
+            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+                2 > >::Correctness second_correctness;
+            second_correctness.first =
+                std::get< 0 >( output ) <= GLOBAL_EPSILON;
+            second_correctness.second.push_back( std::get< 1 >( output ) );
+            return { std::move( results ),
+                { first_correctness, second_correctness } };
+        }
+        return { INTERSECTION_TYPE::none };
+    }
+
+    template < index_t dimension >
+    IntersectionResult< absl::InlinedVector< Point< dimension >, 2 > >
+        segment_ellipse_intersection( const Segment< dimension >& segment,
+            const Ellipse< dimension >& ellipse )
+    {
+        auto line_intersections = line_ellipse_intersection< dimension >(
+            InfiniteLine< dimension >{ segment }, ellipse );
+        if( line_intersections )
+        {
+            absl::InlinedVector< Point< dimension >, 2 > segment_intersections;
+            segment_intersections.reserve(
+                line_intersections.result.value().size() );
+            for( auto&& point : line_intersections.result.value() )
+            {
+                if( point_segment_distance( point, segment ) <= GLOBAL_EPSILON )
+                {
+                    segment_intersections.emplace_back( point );
+                }
+            }
+            if( segment_intersections.empty() )
+            {
+                return { INTERSECTION_TYPE::none };
+            }
+            return { std::move( segment_intersections ),
+                std::move( line_intersections.correctness.value() ) };
+        }
+        return line_intersections.type;
+    }
+
     template IntersectionResult< absl::InlinedVector< Point2D, 2 > >
         opengeode_geometry_api line_sphere_intersection(
             const InfiniteLine2D& segment, const Sphere2D& sphere );
@@ -1018,6 +1138,14 @@ namespace geode
         opengeode_geometry_api segment_sphere_intersection(
             const Segment2D& segment, const Sphere2D& sphere );
 
+    template IntersectionResult< absl::InlinedVector< Point2D, 2 > >
+        opengeode_geometry_api line_ellipse_intersection(
+            const InfiniteLine2D& line, const Ellipse2D& sphere );
+
+    template IntersectionResult< absl::InlinedVector< Point2D, 2 > >
+        opengeode_geometry_api segment_ellipse_intersection(
+            const Segment2D& segment, const Ellipse2D& sphere );
+
     template IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api line_sphere_intersection(
             const InfiniteLine3D& segment, const Sphere3D& sphere );
@@ -1025,5 +1153,13 @@ namespace geode
     template IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api segment_sphere_intersection(
             const Segment3D& segment, const Sphere3D& sphere );
+
+    template IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        opengeode_geometry_api line_ellipse_intersection(
+            const InfiniteLine3D& line, const Ellipse3D& sphere );
+
+    template IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        opengeode_geometry_api segment_ellipse_intersection(
+            const Segment3D& segment, const Ellipse3D& sphere );
 
 } // namespace geode
