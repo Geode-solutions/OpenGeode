@@ -25,19 +25,19 @@ namespace geode
             const Frame< dimension >& from, const Frame< dimension >& to );
         virtual ~FrameTransform();
 
-        virtual [[nodiscard]] local_index_t direction(
+        [[nodiscard]] virtual local_index_t direction(
             local_index_t index ) const final;
 
-        virtual [[nodiscard]] signed_index_t orientation(
+        [[nodiscard]] virtual signed_index_t orientation(
             local_index_t index ) const final;
 
-        virtual [[nodiscard]] Frame< dimension > apply(
+        [[nodiscard]] virtual Frame< dimension > apply(
             const Frame< dimension >& frame ) const;
 
-        virtual [[nodiscard]] Vector< dimension > apply(
+        [[nodiscard]] virtual Vector< dimension > apply(
             const Vector< dimension >& vector ) const;
 
-        virtual [[nodiscard]] Point< dimension > apply(
+        [[nodiscard]] virtual Point< dimension > apply(
             const Point< dimension >& point ) const;
 
     private:
