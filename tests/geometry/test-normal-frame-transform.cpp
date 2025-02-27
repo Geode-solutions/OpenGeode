@@ -13,14 +13,14 @@
 
 void test_normal_frame_transform()
 {
-    geode::Frame2D from{ { geode::Vector2D{ { 1, 0 } },
-        geode::Vector2D{ { 0, 1 } } } };
-    geode::Frame2D to{ { geode::Vector2D{ { 1, 0 } },
-        geode::Vector2D{ { 0, 0.1 } } } };
+    geode::Frame2D from{ { geode::Vector< 2 >{ { 1, 0 } },
+        geode::Vector< 2 >{ { 0, 1 } } } };
+    geode::Frame2D to{ { geode::Vector< 2 >{ { 1, 0 } },
+        geode::Vector< 2 >{ { 0, 0.1 } } } };
     geode::NormalFrameTransform2D frame_transform{ from, to };
-    geode::Vector2D test_vector{ { 1, 1 } };
+    geode::Vector< 2 > test_vector{ { 1, 1 } };
     const auto result = frame_transform.apply( test_vector );
-    const auto correct_result = geode::Vector2D{ { 1, 0.1 } };
+    const auto correct_result = geode::Vector< 2 >{ { 1, 0.1 } };
     OPENGEODE_EXCEPTION( result == correct_result,
         "[Test] Wrong result for normal frame transform" );
     geode::Logger::info( "TEST SUCCESS" );
