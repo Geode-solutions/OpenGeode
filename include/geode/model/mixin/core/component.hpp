@@ -52,6 +52,8 @@ namespace geode
 
         [[nodiscard]] virtual ComponentType component_type() const = 0;
 
+        [[nodiscard]] ComponentID component_id() const;
+
     protected:
         Component();
 

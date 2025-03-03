@@ -72,11 +72,6 @@ namespace geode
             return component_type_static();
         }
 
-        [[nodiscard]] ComponentID component_id() const
-        {
-            return { this->component_type_static(), this->id() };
-        };
-
         template < typename TypedMesh = Mesh >
         [[nodiscard]] const TypedMesh& mesh() const
         {
