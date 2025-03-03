@@ -267,6 +267,10 @@ namespace geode
         {
             return false;
         }
+        if( !intersects( segment.bounding_box() ) )
+        {
+            return false;
+        }
         const auto box_center = center();
         const auto box_extent = diagonal() / 2.;
         const auto segment_origin = segment.barycenter() - box_center;
@@ -299,6 +303,10 @@ namespace geode
                 return true;
             }
         }
+        if( !intersects( triangle.bounding_box() ) )
+        {
+            return false;
+        }
         const auto triangle_projection = [&vertices]( const Vector3D& normal ) {
             BoundingBox1D interval;
             interval.add_point(
@@ -330,8 +338,8 @@ namespace geode
         // Test direction of triangle normal.
         const auto triangle_normal = edges[0].cross( edges[1] );
         if( !bbox_projection( triangle_normal )
-                 .contains( Point1D{ { triangle_normal.dot(
-                     Vector3D{ vertices[0].get() } ) } } ) )
+                .contains( Point1D{ { triangle_normal.dot(
+                    Vector3D{ vertices[0].get() } ) } } ) )
         {
             return false;
         }
