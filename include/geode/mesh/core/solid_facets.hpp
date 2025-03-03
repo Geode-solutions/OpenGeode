@@ -70,6 +70,9 @@ namespace geode
         [[nodiscard]] std::optional< index_t > facet_from_vertices(
             const PolyhedronFacetVertices& vertices ) const;
 
+        [[nodiscard]] bool is_opposite(
+            index_t facet_id, const PolyhedronFacetVertices& vertices ) const;
+
         /*!
          * Access to the manager of attributes associated with facets.
          */

@@ -165,9 +165,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidFacets< dimension >::SolidFacets()
-    {
-    }
+    SolidFacets< dimension >::SolidFacets() = default;
 
     template < index_t dimension >
     SolidFacets< dimension >::~SolidFacets() = default;
@@ -199,6 +197,14 @@ namespace geode
         const PolyhedronFacetVertices& vertices ) const
     {
         return impl_->find_facet( vertices );
+    }
+
+    template < index_t dimension >
+    bool SolidFacets< dimension >::is_opposite(
+        index_t facet_id, const PolyhedronFacetVertices& vertices ) const
+    {
+        check_facet_id( *this, facet_id );
+        return impl_->is_opposite( facet_id, vertices );
     }
 
     template < index_t dimension >

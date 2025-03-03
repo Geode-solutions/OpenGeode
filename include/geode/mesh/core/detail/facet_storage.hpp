@@ -43,6 +43,16 @@ namespace geode
             static constexpr auto ATTRIBUTE_NAME = "facet_vertices";
             friend class bitsery::Access;
 
+        public:
+            [[nodiscard]] bool is_opposite(
+                index_t facet_id, const VertexContainer& vertices ) const
+            {
+                const OrientedVertexCycle other_oriented_cycle{ vertices };
+                const OrientedVertexCycle oriented_cycle{ vertices_->value(
+                    facet_id ) };
+                return oriented_cycle.is_opposite( other_oriented_cycle );
+            }
+
         protected:
             FacetStorage()
                 : counter_(
