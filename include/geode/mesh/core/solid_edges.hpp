@@ -76,6 +76,9 @@ namespace geode
         [[nodiscard]] std::optional< index_t > edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 
+        [[nodiscard]] bool is_opposite(
+            index_t edge_id, const std::array< index_t, 2 >& vertices ) const;
+
         /*!
          * Access to the manager of attributes associated with edges.
          */
