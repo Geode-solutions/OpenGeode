@@ -63,11 +63,6 @@ namespace geode
             return component_type_static();
         }
 
-        [[nodiscard]] ComponentID component_id() const
-        {
-            return { this->component_type_static(), this->id() };
-        };
-
     public:
         ModelBoundary( ModelBoundariesKey ) : ModelBoundary() {}
 
