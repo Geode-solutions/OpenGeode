@@ -47,6 +47,7 @@ void test_normal_frame_transform()
 
 void test()
 {
+    geode::OpenGeodeGeometryLibrary::initialize();
     test_normal_frame_transform();
 }
 
