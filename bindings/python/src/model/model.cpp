@@ -159,4 +159,5 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_model_component_filter( module );
     geode::define_model_concatener( module );
     geode::define_model_coordinate_reference_system( module );
+    geode::define_model_ray_tracing( module );
 }

@@ -90,9 +90,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    SurfaceEdges< dimension >::SurfaceEdges()
-    {
-    }
+    SurfaceEdges< dimension >::SurfaceEdges() = default;
 
     template < index_t dimension >
     SurfaceEdges< dimension >::SurfaceEdges(
@@ -183,6 +181,14 @@ namespace geode
         const std::array< index_t, 2 >& vertices ) const
     {
         return impl_->find_edge( vertices );
+    }
+
+    template < index_t dimension >
+    bool SurfaceEdges< dimension >::is_opposite(
+        index_t edge_id, const std::array< index_t, 2 >& vertices ) const
+    {
+        check_edge_id( *this, edge_id );
+        return impl_->is_opposite( edge_id, vertices );
     }
 
     template < index_t dimension >
