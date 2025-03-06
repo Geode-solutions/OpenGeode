@@ -122,6 +122,6 @@ namespace geode
     {
         return impl_->apply( point );
     }
-    template opengeode_geometry_api class NormalFrameTransform< 2 >;
-    template opengeode_geometry_api class NormalFrameTransform< 3 >;
+    template class opengeode_geometry_api NormalFrameTransform< 2 >;
+    template class opengeode_geometry_api NormalFrameTransform< 3 >;
 } // namespace geode
