@@ -65,6 +65,16 @@ namespace geode
             return true;
         }
 
+        auto at( index_t index ) const
+        {
+            return container_.at( index );
+        }
+
+        auto at( index_t index )
+        {
+            return container_.at( index );
+        }
+
     private:
         absl::InlinedVector< Type, capacity > container_;
     };
