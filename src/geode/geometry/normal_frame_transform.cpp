@@ -40,10 +40,6 @@ namespace geode
         {
             for( const auto d_from : LRange{ dimension } )
             {
-                directions_[d_from] =
-                    normal_frame_transform.direction( d_from );
-                orientations_[d_from] =
-                    normal_frame_transform.orientation( d_from );
                 magnitudes_[d_from] =
                     to.direction( normal_frame_transform.direction( d_from ) )
                         .length()
@@ -51,37 +47,46 @@ namespace geode
             }
         }
 
-        Frame< dimension > apply( const Frame< dimension >& frame ) const
+        Frame< dimension > apply(
+            const FrameTransform< dimension >& base_transform,
+            const Frame< dimension >& frame ) const
         {
             Frame< dimension > result;
             for( const auto d : LRange{ dimension } )
             {
-                result.set_direction( directions_[d],
-                    frame.direction( d ) * orientations_[d] * magnitudes_[d] );
+                result.set_direction( base_transform.direction( d ),
+                    frame.direction( d ) * base_transform.orientation( d )
+                        * magnitudes_[d] );
             }
             return result;
         }
 
-        Point< dimension > apply( const Point< dimension >& point ) const
+        Point< dimension > apply(
+            const FrameTransform< dimension >& base_transform,
+            const Point< dimension >& point ) const
         {
             Point< dimension > result;
             for( const auto d : LRange{ dimension } )
             {
-                result.set_value( d, orientations_[d]
-                                         * point.value( directions_[d] )
-                                         * magnitudes_[d] );
+                result.set_value(
+                    d, base_transform.orientation( d )
+                           * point.value( base_transform.direction( d ) )
+                           * magnitudes_[d] );
             }
             return result;
         }
 
-        Vector< dimension > apply( const Vector< dimension >& vector ) const
+        Vector< dimension > apply(
+            const FrameTransform< dimension >& base_transform,
+            const Vector< dimension >& vector ) const
         {
             Vector< dimension > result;
             for( const auto d : LRange{ dimension } )
             {
-                result.set_value( d, orientations_[d]
-                                         * vector.value( directions_[d] )
-                                         * magnitudes_[d] );
+                result.set_value(
+                    d, base_transform.orientation( d )
+                           * vector.value( base_transform.direction( d ) )
+                           * magnitudes_[d] );
             }
             return result;
         }
@@ -106,21 +111,21 @@ namespace geode
     Frame< dimension > NormalFrameTransform< dimension >::apply(
         const Frame< dimension >& frame ) const
     {
-        return impl_->apply( frame );
+        return impl_->apply( *this, frame );
     }
 
     template < index_t dimension >
     Vector< dimension > NormalFrameTransform< dimension >::apply(
         const Vector< dimension >& vector ) const
     {
-        return impl_->apply( vector );
+        return impl_->apply( *this, vector );
     }
 
     template < index_t dimension >
     Point< dimension > NormalFrameTransform< dimension >::apply(
         const Point< dimension >& point ) const
     {
-        return impl_->apply( point );
+        return impl_->apply( *this, point );
     }
     template class opengeode_geometry_api NormalFrameTransform< 2 >;
     template class opengeode_geometry_api NormalFrameTransform< 3 >;
