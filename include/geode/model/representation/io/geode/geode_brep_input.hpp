@@ -26,6 +26,7 @@
 #include <async++.h>
 
 #include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/detail/filter.hpp>
 #include <geode/model/representation/builder/detail/register.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -95,6 +96,7 @@ namespace geode
                 } );
             Logger::set_level( level );
             detail::register_all_components( brep );
+            detail::filter_unsupported_components( brep );
         }
     } // namespace detail
 } // namespace geode

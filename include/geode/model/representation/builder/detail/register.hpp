@@ -24,11 +24,9 @@
 #pragma once
 
 #include <geode/model/common.hpp>
-#include <geode/model/representation/builder/detail/filter.hpp>
 
 namespace geode
 {
-
     namespace detail
     {
         template < typename ModelBuilder, typename MeshComponent >
@@ -162,7 +160,6 @@ namespace geode
                 typename Model::CollectionComponents >
                 collection_registrator;
             collection_registrator.apply( model, builder );
-            filter_unsupported_components( model );
         }
     } // namespace detail
 } // namespace geode
