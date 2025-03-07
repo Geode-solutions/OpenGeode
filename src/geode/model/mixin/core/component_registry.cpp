@@ -23,6 +23,9 @@
 
 #include <geode/model/mixin/core/component_registry.hpp>
 
+#include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
+
 namespace geode
 {
     class ComponentRegistry::Impl

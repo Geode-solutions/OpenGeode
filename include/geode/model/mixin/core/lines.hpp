@@ -48,6 +48,7 @@ namespace geode
 
     public:
         using Builder = LinesBuilder< dimension >;
+        using Type = Line< dimension >;
 
         class opengeode_model_api LineRangeBase
         {
@@ -92,6 +93,11 @@ namespace geode
         [[nodiscard]] const Line< dimension >& line( const uuid& id ) const;
 
         [[nodiscard]] LineRange lines() const;
+
+        [[nodiscard]] LineRange components() const
+        {
+            return lines();
+        }
 
         void save_lines( std::string_view directory ) const;
 

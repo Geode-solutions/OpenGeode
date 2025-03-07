@@ -49,6 +49,7 @@ namespace geode
 
     public:
         using Builder = CornerCollectionsBuilder< dimension >;
+        using Type = CornerCollection< dimension >;
 
         class opengeode_model_api CornerCollectionRangeBase
         {
@@ -95,6 +96,11 @@ namespace geode
             const uuid& id ) const;
 
         [[nodiscard]] CornerCollectionRange corner_collections() const;
+
+        [[nodiscard]] CornerCollectionRange components() const
+        {
+            return corner_collections();
+        }
 
         void save_corner_collections( std::string_view directory ) const;
 

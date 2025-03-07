@@ -49,6 +49,8 @@ namespace geode
     void OpenGeodeBRepOutput::save_brep_files(
         const BRep& brep, std::string_view directory ) const
     {
+        const auto level = Logger::level();
+        Logger::set_level( Logger::LEVEL::warn );
         async::parallel_invoke(
             [&directory, &brep] {
                 brep.save_identifier( directory );
@@ -61,17 +63,32 @@ namespace geode
             },
             [&directory, &brep] {
                 brep.save_corners( directory );
+            },
+            [&directory, &brep] {
                 brep.save_lines( directory );
+            },
+            [&directory, &brep] {
                 brep.save_surfaces( directory );
+            },
+            [&directory, &brep] {
                 brep.save_blocks( directory );
             },
             [&directory, &brep] {
                 brep.save_model_boundaries( directory );
+            },
+            [&directory, &brep] {
                 brep.save_corner_collections( directory );
+            },
+            [&directory, &brep] {
                 brep.save_line_collections( directory );
+            },
+            [&directory, &brep] {
                 brep.save_surface_collections( directory );
+            },
+            [&directory, &brep] {
                 brep.save_block_collections( directory );
             } );
+        Logger::set_level( level );
     }
 
     std::vector< std::string > OpenGeodeBRepOutput::write(

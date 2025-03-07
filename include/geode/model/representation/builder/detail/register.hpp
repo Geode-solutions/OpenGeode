@@ -24,9 +24,11 @@
 #pragma once
 
 #include <geode/model/common.hpp>
+#include <geode/model/representation/builder/detail/filter.hpp>
 
 namespace geode
 {
+
     namespace detail
     {
         template < typename ModelBuilder, typename MeshComponent >
@@ -63,6 +65,104 @@ namespace geode
             builder.unregister_component( component.id() );
             builder.remove_collection_component(
                 component.component_type(), component.id() );
+        }
+    } // namespace detail
+
+    namespace internal
+    {
+        template < typename Model, typename First, typename... MeshComponents >
+        void register_mesh_components(
+            const Model& model, typename Model::Builder& builder )
+        {
+            if constexpr( sizeof...( MeshComponents ) == 0 )
+            {
+                for( const auto& component : model.First::components() )
+                {
+                    detail::add_mesh_component( builder, component );
+                }
+            }
+            else
+            {
+                for( const auto& component : model.First::components() )
+                {
+                    detail::add_mesh_component( builder, component );
+                }
+                register_mesh_components< Model, MeshComponents... >(
+                    model, builder );
+            }
+        }
+
+        template < typename >
+        struct MeshComponentsRegistrator;
+
+        template < typename... MeshComponents >
+        struct MeshComponentsRegistrator< std::tuple< MeshComponents... > >
+        {
+            template < typename Model >
+            void apply(
+                const Model& model, typename Model::Builder& builder ) const
+            {
+                register_mesh_components< Model, MeshComponents... >(
+                    model, builder );
+            }
+        };
+
+        template < typename Model,
+            typename First,
+            typename... CollectionComponents >
+        void register_collection_components(
+            const Model& model, typename Model::Builder& builder )
+        {
+            if constexpr( sizeof...( CollectionComponents ) == 0 )
+            {
+                for( const auto& component : model.First::components() )
+                {
+                    detail::add_collection_component( builder, component );
+                }
+            }
+            else
+            {
+                for( const auto& component : model.First::components() )
+                {
+                    detail::add_collection_component( builder, component );
+                }
+                register_collection_components< Model,
+                    CollectionComponents... >( model, builder );
+            }
+        }
+
+        template < typename >
+        struct CollectionComponentsRegistrator;
+
+        template < typename... CollectionComponents >
+        struct CollectionComponentsRegistrator<
+            std::tuple< CollectionComponents... > >
+        {
+            template < typename Model >
+            void apply(
+                const Model& model, typename Model::Builder& builder ) const
+            {
+                register_collection_components< Model,
+                    CollectionComponents... >( model, builder );
+            }
+        };
+    } // namespace internal
+
+    namespace detail
+    {
+        template < typename Model >
+        void register_all_components( Model& model )
+        {
+            typename Model::Builder builder{ model };
+            const internal::MeshComponentsRegistrator<
+                typename Model::MeshComponents >
+                mesh_registrator;
+            mesh_registrator.apply( model, builder );
+            const internal::CollectionComponentsRegistrator<
+                typename Model::CollectionComponents >
+                collection_registrator;
+            collection_registrator.apply( model, builder );
+            filter_unsupported_components( model );
         }
     } // namespace detail
 } // namespace geode
