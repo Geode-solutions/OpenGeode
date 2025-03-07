@@ -34,7 +34,13 @@ namespace geode
     class Identifier::Impl
     {
     public:
-        Impl() = default;
+        Impl()
+        {
+            if( name_ == DEFAULT_NAME )
+            {
+                name_ = id_.string();
+            }
+        }
 
         const uuid& id() const
         {
