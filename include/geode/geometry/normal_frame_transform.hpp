@@ -20,62 +20,41 @@
  * SOFTWARE.
  *
  */
-
 #pragma once
 
-#include <absl/algorithm/container.h>
-#include <absl/container/inlined_vector.h>
+#include <geode/basic/pimpl.hpp>
 
-#include <geode/basic/common.hpp>
-#include <geode/basic/range.hpp>
+#include <geode/geometry/common.hpp>
+#include <geode/geometry/frame_transform.hpp>
 
 namespace geode
 {
-    template < typename Type, index_t capacity = 10 >
-    class SmallSet
+    FORWARD_DECLARATION_DIMENSION_CLASS( Frame );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+} // namespace geode
+
+namespace geode
+{
+    template < index_t dimension >
+    class NormalFrameTransform : public FrameTransform< dimension >
     {
     public:
-        auto size() const
-        {
-            return container_.size();
-        }
+        NormalFrameTransform(
+            const Frame< dimension >& from, const Frame< dimension >& to );
+        ~NormalFrameTransform();
 
-        auto empty() const
-        {
-            return container_.empty();
-        }
+        [[nodiscard]] Frame< dimension > apply(
+            const Frame< dimension >& frame ) const final;
 
-        auto begin() const
-        {
-            return container_.begin();
-        }
+        [[nodiscard]] Vector< dimension > apply(
+            const Vector< dimension >& vector ) const final;
 
-        auto end() const
-        {
-            return container_.end();
-        }
-
-        auto insert( const Type& element )
-        {
-            if( absl::c_contains( container_, element ) )
-            {
-                return false;
-            }
-            container_.push_back( element );
-            return true;
-        }
-
-        auto at( index_t index ) const
-        {
-            return container_.at( index );
-        }
-
-        auto at( index_t index )
-        {
-            return container_.at( index );
-        }
+        [[nodiscard]] Point< dimension > apply(
+            const Point< dimension >& point ) const final;
 
     private:
-        absl::InlinedVector< Type, capacity > container_;
+        IMPLEMENTATION_MEMBER( impl_ );
     };
+    ALIAS_2D_AND_3D( NormalFrameTransform );
 } // namespace geode

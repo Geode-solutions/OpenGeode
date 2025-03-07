@@ -908,10 +908,6 @@ namespace geode
                 max_area_facet = f;
             }
         }
-        if( max_area < GLOBAL_EPSILON )
-        {
-            return true;
-        }
         const auto vertices = polyhedron_vertices( polyhedron_id );
         const auto normal =
             polyhedron_facet_normal( { polyhedron_id, max_area_facet } );
@@ -924,8 +920,7 @@ namespace geode
         Plane plane{ normal.value(), this->point( facet_vertices[0] ) };
         for( const auto vertex_id : vertices )
         {
-            if( absl::c_find( facet_vertices, vertex_id )
-                != facet_vertices.end() )
+            if( absl::c_contains( facet_vertices, vertex_id ) )
             {
                 continue;
             }

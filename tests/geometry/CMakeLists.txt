@@ -92,6 +92,14 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
+
+add_geode_test(
+    SOURCE "test-normal-frame-transform.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+
 add_geode_test(
     SOURCE "test-perpendicular.cpp"
     DEPENDENCIES
@@ -158,3 +166,4 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
+

@@ -267,6 +267,10 @@ namespace geode
         {
             return false;
         }
+        if( !intersects( segment.bounding_box() ) )
+        {
+            return false;
+        }
         const auto box_center = center();
         const auto box_extent = diagonal() / 2.;
         const auto segment_origin = segment.barycenter() - box_center;
@@ -298,6 +302,10 @@ namespace geode
             {
                 return true;
             }
+        }
+        if( !intersects( triangle.bounding_box() ) )
+        {
+            return false;
         }
         const auto triangle_projection = [&vertices]( const Vector3D& normal ) {
             BoundingBox1D interval;
