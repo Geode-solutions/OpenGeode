@@ -23,6 +23,9 @@
 
 #include <geode/geometry/nn_search.hpp>
 
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/intersection.hpp>
+
 #include <mutex>
 #include <numeric>
 
@@ -70,6 +73,38 @@ namespace geode
             indices.reserve( nb_results );
             for( auto&& result : results )
             {
+                indices.emplace_back( result.first );
+            }
+            return indices;
+        }
+
+        std::vector< index_t > ellipsoid_radius_neighbors(
+            const Point< dimension >& point,
+            const Ellipse< dimension >& ellipse,
+            const double distance_factor ) const
+        {
+            std::vector< nanoflann::ResultItem< index_t, double > > results;
+            nanoflann::SearchParameters params;
+            params.sorted = true;
+            const auto max_elongation_direction =
+                ellipse.axes().max_elongation_direction();
+            const auto max_elongation =
+                ellipse.axes().direction( max_elongation_direction ).length();
+            const auto radius = distance_factor * distance_factor
+                                * max_elongation * max_elongation;
+            const auto nb_results = nn_tree_.radiusSearch(
+                &copy( point )[0], radius, results, params );
+            std::vector< index_t > indices;
+            indices.reserve( nb_results );
+            for( auto&& result : results )
+            {
+                Segment< dimension > segment{ point,
+                    this->point( result.first ) };
+                if( segment_ellipse_intersection( segment, ellipse ).type
+                    != INTERSECTION_TYPE::none )
+                {
+                    continue;
+                }
                 indices.emplace_back( result.first );
             }
             return indices;
@@ -171,6 +206,16 @@ namespace geode
         const Point< dimension >& point, double threshold_distance ) const
     {
         return impl_->radius_neighbors( point, threshold_distance );
+    }
+
+    template < index_t dimension >
+    std::vector< index_t > NNSearch< dimension >::ellipsoid_radius_neighbors(
+        const Point< dimension >& point,
+        const Ellipse< dimension >& ellipse,
+        const double distance_factor ) const
+    {
+        return impl_->ellipsoid_radius_neighbors(
+            point, ellipse, distance_factor );
     }
 
     template < index_t dimension >

@@ -26,6 +26,7 @@
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/pimpl.hpp>
 
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/common.hpp>
 #include <geode/geometry/point.hpp>
 
@@ -106,6 +107,18 @@ namespace geode
          */
         [[nodiscard]] std::vector< index_t > radius_neighbors(
             const Point< dimension >& point, double threshold_distance ) const;
+
+        /*!
+         * Get the neighbors closer than a given distance from the given point
+         * or within a sphere
+         * @param[in] point The center of the sphere
+         * @param[in] threshold_distance The radius of the sphere
+         * @return the list of points inside this distance
+         */
+        [[nodiscard]] std::vector< index_t > ellipsoid_radius_neighbors(
+            const Point< dimension >& point,
+            const Ellipse< dimension >& ellipse,
+            const double distance_factor ) const;
 
         /*!
          * Get a number ol close neighbors from the given point

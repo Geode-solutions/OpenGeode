@@ -52,6 +52,10 @@ namespace geode
 
         [[nodiscard]] std::string string() const;
 
+        [[nodiscard]] local_index_t max_elongation_direction() const;
+
+        [[nodiscard]] local_index_t min_elongation_direction() const;
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
