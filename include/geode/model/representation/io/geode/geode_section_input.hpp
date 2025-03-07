@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/model/representation/builder/detail/filter.hpp>
 #include <geode/model/representation/builder/detail/register.hpp>
 #include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/section.hpp>
@@ -87,6 +88,7 @@ namespace geode
                 } );
             Logger::set_level( level );
             detail::register_all_components( section );
+            detail::filter_unsupported_components( section );
         }
     } // namespace detail
 } // namespace geode
