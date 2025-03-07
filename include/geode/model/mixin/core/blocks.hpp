@@ -52,6 +52,7 @@ namespace geode
 
     public:
         using Builder = BlocksBuilder< dimension >;
+        using Type = Block< dimension >;
 
         /*!
          * Base class for range-based iteration on Blocks
@@ -105,6 +106,11 @@ namespace geode
         [[nodiscard]] const Block< dimension >& block( const uuid& id ) const;
 
         [[nodiscard]] BlockRange blocks() const;
+
+        [[nodiscard]] BlockRange components() const
+        {
+            return blocks();
+        }
 
         /*!
          * Save each Block in a file located in the specified directory

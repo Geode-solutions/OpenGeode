@@ -51,6 +51,7 @@ namespace geode
 
     public:
         using Builder = CornersBuilder< dimension >;
+        using Type = Corner< dimension >;
 
         /*!
          * Base class for range-based iteration on Corners
@@ -104,6 +105,11 @@ namespace geode
         [[nodiscard]] const Corner< dimension >& corner( const uuid& id ) const;
 
         [[nodiscard]] CornerRange corners() const;
+
+        [[nodiscard]] CornerRange components() const
+        {
+            return corners();
+        }
 
         /*!
          * Save each Corner in a file located in the specified directory

@@ -49,6 +49,7 @@ namespace geode
 
     public:
         using Builder = ModelBoundariesBuilder< dimension >;
+        using Type = ModelBoundary< dimension >;
 
         class opengeode_model_api ModelBoundaryRangeBase
         {
@@ -93,6 +94,11 @@ namespace geode
             const uuid& id ) const;
 
         [[nodiscard]] ModelBoundaryRange model_boundaries() const;
+
+        [[nodiscard]] ModelBoundaryRange components() const
+        {
+            return model_boundaries();
+        }
 
         void save_model_boundaries( std::string_view directory ) const;
 

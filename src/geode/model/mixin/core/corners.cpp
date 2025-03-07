@@ -89,8 +89,6 @@ namespace geode
         impl_->save_components( absl::StrCat( directory, "/corners" ) );
         const auto prefix = absl::StrCat( directory, "/",
             Corner< dimension >::component_type_static().get() );
-        const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( const auto& corner : corners() )
@@ -102,10 +100,7 @@ namespace geode
                 save_point_set( mesh, file );
             } );
         }
-        auto all_tasks = async::when_all( tasks );
-        all_tasks.wait();
-        Logger::set_level( level );
-        for( auto& task : all_tasks.get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
@@ -117,8 +112,6 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );
-        const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( auto& corner : modifiable_corners( {} ) )
@@ -130,10 +123,7 @@ namespace geode
                     typename Corner< dimension >::CornersKey{} );
             } );
         }
-        auto all_tasks = async::when_all( tasks );
-        all_tasks.wait();
-        Logger::set_level( level );
-        for( auto& task : all_tasks.get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }

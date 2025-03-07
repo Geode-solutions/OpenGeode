@@ -52,6 +52,12 @@ namespace geode
                 message, section.nb_corners(), " Corners, " );
             detail::add_to_message(
                 message, section.nb_model_boundaries(), " ModelBoundaries" );
+            detail::add_to_message( message, section.nb_corner_collections(),
+                " CornerCollections, " );
+            detail::add_to_message(
+                message, section.nb_line_collections(), " LineCollections, " );
+            detail::add_to_message( message, section.nb_surface_collections(),
+                " SurfaceCollections" );
             Logger::info( message );
             return section;
         }

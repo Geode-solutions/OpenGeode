@@ -49,6 +49,7 @@ namespace geode
 
     public:
         using Builder = SurfaceCollectionsBuilder< dimension >;
+        using Type = SurfaceCollection< dimension >;
 
         class opengeode_model_api SurfaceCollectionRangeBase
         {
@@ -96,6 +97,11 @@ namespace geode
             const uuid& id ) const;
 
         [[nodiscard]] SurfaceCollectionRange surface_collections() const;
+
+        [[nodiscard]] SurfaceCollectionRange components() const
+        {
+            return surface_collections();
+        }
 
         void save_surface_collections( std::string_view directory ) const;
 

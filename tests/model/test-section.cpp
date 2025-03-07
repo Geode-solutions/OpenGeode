@@ -900,9 +900,41 @@ void test_compare_section(
     }
 }
 
+void test_registry( const geode::Section& section )
+{
+    const auto& mesh_registry = section.mesh_components();
+    OPENGEODE_EXCEPTION(
+        mesh_registry.size() == 3, "[Test] Wrong mesh registry size" );
+    const absl::flat_hash_map< geode::ComponentType, size_t > mesh_answer{
+        { geode::Corner2D::component_type_static(), 5 },
+        { geode::Line2D::component_type_static(), 6 },
+        { geode::Surface2D::component_type_static(), 2 },
+    };
+    for( const auto& [type, ids] : mesh_registry )
+    {
+        OPENGEODE_EXCEPTION( mesh_answer.at( type ) == ids.size(),
+            "[Test] Wrong mesh registry entry" );
+    }
+    const auto& collection_registry = section.collection_components();
+    OPENGEODE_EXCEPTION( collection_registry.size() == 4,
+        "[Test] Wrong collection registry size" );
+    const absl::flat_hash_map< geode::ComponentType, size_t > collection_answer{
+        { geode::CornerCollection2D::component_type_static(), 2 },
+        { geode::LineCollection2D::component_type_static(), 2 },
+        { geode::SurfaceCollection2D::component_type_static(), 2 },
+        { geode::ModelBoundary2D::component_type_static(), 2 },
+    };
+    for( const auto& [type, ids] : collection_registry )
+    {
+        OPENGEODE_EXCEPTION( collection_answer.at( type ) == ids.size(),
+            "[Test] Wrong collection registry entry" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
+    geode::Logger::set_level( geode::Logger::LEVEL::debug );
     geode::Section model;
     geode::SectionBuilder builder( model );
 
@@ -917,6 +949,8 @@ void test()
     const auto line_collection_uuids = add_line_collections( model, builder );
     const auto surface_collection_uuids =
         add_surface_collections( model, builder );
+
+    test_registry( model );
 
     set_geometry( builder, corner_uuids, line_uuids, surface_uuids );
 

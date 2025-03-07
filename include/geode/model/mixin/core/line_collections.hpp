@@ -49,6 +49,7 @@ namespace geode
 
     public:
         using Builder = LineCollectionsBuilder< dimension >;
+        using Type = LineCollection< dimension >;
 
         class opengeode_model_api LineCollectionRangeBase
         {
@@ -93,6 +94,11 @@ namespace geode
             const uuid& id ) const;
 
         [[nodiscard]] LineCollectionRange line_collections() const;
+
+        [[nodiscard]] LineCollectionRange components() const
+        {
+            return line_collections();
+        }
 
         void save_line_collections( std::string_view directory ) const;
 

@@ -24,26 +24,33 @@
 #pragma once
 
 #include <geode/model/common.hpp>
-#include <geode/model/mixin/builder/component_registry_builder.hpp>
-#include <geode/model/mixin/builder/relationships_builder.hpp>
-#include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
-#include <geode/model/mixin/core/topology.hpp>
+#include <geode/model/mixin/core/component_type.hpp>
 
 namespace geode
 {
-    /*!
-     * Class managing modification of Topology
-     */
-    class opengeode_model_api TopologyBuilder : public ComponentRegistryBuilder,
-                                                public RelationshipsBuilder,
-                                                public VertexIdentifierBuilder
+    class ComponentRegistry;
+    class uuid;
+} // namespace geode
+
+namespace geode
+{
+    class opengeode_model_api ComponentRegistryBuilder
     {
-    protected:
-        explicit TopologyBuilder( Topology& topology )
-            : ComponentRegistryBuilder( topology ),
-              RelationshipsBuilder( topology ),
-              VertexIdentifierBuilder( topology )
-        {
-        }
+    public:
+        ComponentRegistryBuilder( ComponentRegistry& component_registry );
+        ~ComponentRegistryBuilder();
+
+        void add_mesh_component( const ComponentType& type, const uuid& id );
+
+        void add_collection_component(
+            const ComponentType& type, const uuid& id );
+
+        void remove_mesh_component( const ComponentType& type, const uuid& id );
+
+        void remove_collection_component(
+            const ComponentType& type, const uuid& id );
+
+    private:
+        ComponentRegistry& registry_;
     };
 } // namespace geode
