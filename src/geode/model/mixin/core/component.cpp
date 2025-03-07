@@ -37,19 +37,14 @@ namespace geode
     class Component< dimension >::Impl
     {
     public:
-        std::string_view name() const
+        std::string_view backward_compatible_name() const
         {
-            return name_;
+            return backward_compatible_name_;
         }
 
-        void set_name( std::string_view name )
+        const uuid& backward_compatible_id() const
         {
-            name_ = to_string( name );
-        }
-
-        const uuid& id() const
-        {
-            return id_;
+            return backward_compatible_id_;
         }
 
     private:
@@ -59,14 +54,15 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.text1b( impl.name_, impl.name_.max_size() );
-                    a.object( impl.id_ );
+                    a.text1b( impl.backward_compatible_name_,
+                        impl.backward_compatible_name_.max_size() );
+                    a.object( impl.backward_compatible_id_ );
                 } } } );
         }
 
     private:
-        std::string name_ = std::string{ "unknown" };
-        uuid id_;
+        std::string backward_compatible_name_ = std::string{ "unknown" };
+        uuid backward_compatible_id_;
     };
 
     template < index_t dimension >
@@ -79,6 +75,12 @@ namespace geode
     Component< dimension >::Component( Component&& ) noexcept = default;
 
     template < index_t dimension >
+    ComponentID Component< dimension >::component_id() const
+    {
+        return { this->component_type(), this->id() };
+    };
+
+    template < index_t dimension >
     template < typename Archive >
     void Component< dimension >::serialize( Archive& archive )
     {
@@ -86,8 +88,10 @@ namespace geode
             *this, Growable< Archive, Component >{
                        { []( Archive& a, Component& component ) {
                             a.object( component.impl_ );
-                            component.set_id( component.impl_->id() );
-                            component.set_name( component.impl_->name() );
+                            component.set_id(
+                                component.impl_->backward_compatible_id() );
+                            component.set_name(
+                                component.impl_->backward_compatible_name() );
                             component.impl_.reset();
                         },
                            []( Archive& a, Component& component ) {
