@@ -34,13 +34,7 @@ namespace geode
     class Identifier::Impl
     {
     public:
-        Impl()
-        {
-            if( name_ == DEFAULT_NAME )
-            {
-                name_ = id_.string();
-            }
-        }
+        Impl() = default;
 
         const uuid& id() const
         {
@@ -49,7 +43,11 @@ namespace geode
 
         std::string_view name() const
         {
-            return name_;
+            if( name_ )
+            {
+                return name_.value();
+            }
+            return id_.string();
         }
 
         void set_id( const uuid& unique_id )
@@ -110,7 +108,7 @@ namespace geode
 
     private:
         uuid id_;
-        std::string name_ = std::string{ DEFAULT_NAME };
+        std::optional< std::string > name_ = std::nullopt;
     };
 
     Identifier::Identifier() = default;
