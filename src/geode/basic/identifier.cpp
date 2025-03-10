@@ -25,6 +25,8 @@
 
 #include <fstream>
 
+#include <bitsery/ext/std_optional.h>
+
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
@@ -34,8 +36,6 @@ namespace geode
     class Identifier::Impl
     {
     public:
-        Impl() = default;
-
         const uuid& id() const
         {
             return id_;
@@ -95,20 +95,34 @@ namespace geode
                 "[Identifier::load] Error while reading file: ", filename );
         }
 
+    private:
+        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{
-                                    { []( Archive& local_archive, Impl& impl ) {
-                                        local_archive.object( impl.id_ );
-                                        local_archive.text1b(
-                                            impl.name_, impl.name_.max_size() );
-                                    } } } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& local_archive, Impl& impl ) {
+                         local_archive.object( impl.id_ );
+                         std::string old_name;
+                         local_archive.text1b( old_name, old_name.max_size() );
+                         impl.name_.emplace( std::move( old_name ) );
+                     },
+                        []( Archive& local_archive, Impl& impl ) {
+                            local_archive.object( impl.id_ );
+                            local_archive.ext( impl.name_,
+                                bitsery::ext::StdOptional{},
+                                []( Archive& local_archive2,
+                                    std::string& name ) {
+                                    local_archive2.text1b(
+                                        name, name.max_size() );
+                                } );
+                        } } } );
         }
 
     private:
         uuid id_;
-        std::optional< std::string > name_ = std::nullopt;
+        std::optional< std::string > name_;
     };
 
     Identifier::Identifier() = default;
