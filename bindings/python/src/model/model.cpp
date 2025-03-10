@@ -31,6 +31,7 @@ namespace geode
     void define_component_type( pybind11::module& );
     void define_component( pybind11::module& );
     void define_component_mesh_element( pybind11::module& );
+    void define_component_registry( pybind11::module& );
     void define_block( pybind11::module& );
     void define_blocks( pybind11::module& );
     void define_corner( pybind11::module& );
@@ -54,6 +55,7 @@ namespace geode
     void define_topology( pybind11::module& );
 
     void define_blocks_builder( pybind11::module& );
+    void define_component_registry_builder( pybind11::module& );
     void define_corners_builder( pybind11::module& );
     void define_lines_builder( pybind11::module& );
     void define_model_boundaries_builder( pybind11::module& );
@@ -106,6 +108,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_component_type( module );
     geode::define_component( module );
     geode::define_component_mesh_element( module );
+    geode::define_component_registry( module );
     geode::define_block( module );
     geode::define_blocks( module );
     geode::define_corner( module );
@@ -129,6 +132,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_topology( module );
 
     geode::define_blocks_builder( module );
+    geode::define_component_registry_builder( module );
     geode::define_corners_builder( module );
     geode::define_lines_builder( module );
     geode::define_model_boundaries_builder( module );

@@ -30,6 +30,7 @@ namespace geode
     void define_topology_builder( pybind11::module& module )
     {
         pybind11::class_< TopologyBuilder, RelationshipsBuilder,
-            VertexIdentifierBuilder >( module, "TopologyBuilder" );
+            VertexIdentifierBuilder, ComponentRegistryBuilder >(
+            module, "TopologyBuilder" );
     }
 } // namespace geode

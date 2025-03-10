@@ -1136,7 +1136,7 @@ void test_clone( const geode::BRep& brep )
     {
         const auto& new_line =
             brep2.line( mappings.at( geode::Line3D::component_type_static() )
-                            .in2out( line.id() ) );
+                    .in2out( line.id() ) );
         for( const auto& surface : brep.incidences( line ) )
         {
             bool found = { false };
@@ -1321,8 +1321,6 @@ void test_registry( const geode::BRep& brep,
     };
     for( const auto& [type, ids] : mesh_registry )
     {
-        DEBUG( type.get() );
-        DEBUG( ids.size() );
         OPENGEODE_EXCEPTION( mesh_answer.at( type ) == ids.size(),
             "[Test] Wrong mesh registry entry" );
     }

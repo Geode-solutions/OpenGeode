@@ -23,13 +23,23 @@
 
 #include "../../../common.hpp"
 
-#include <geode/model/mixin/core/topology.hpp>
+#include <geode/model/mixin/builder/component_registry_builder.hpp>
+#include <geode/model/mixin/core/component_registry.hpp>
 
 namespace geode
 {
-    void define_topology( pybind11::module& module )
+    void define_component_registry_builder( pybind11::module& module )
     {
-        pybind11::class_< Topology, Relationships, VertexIdentifier,
-            ComponentRegistry >( module, "Topology" );
+        pybind11::class_< ComponentRegistryBuilder >(
+            module, "ComponentRegistryBuilder" )
+            .def( pybind11::init< ComponentRegistry& >() )
+            .def( "add_mesh_component",
+                &ComponentRegistryBuilder::add_mesh_component )
+            .def( "add_collection_component",
+                &ComponentRegistryBuilder::add_collection_component )
+            .def( "remove_mesh_component",
+                &ComponentRegistryBuilder::remove_mesh_component )
+            .def( "remove_collection_component",
+                &ComponentRegistryBuilder::remove_collection_component );
     }
 } // namespace geode
