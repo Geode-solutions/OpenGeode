@@ -366,69 +366,89 @@ namespace geode
         return id;
     }
 
-    void BRepBuilder::add_corner( uuid corner_id )
+    void BRepBuilder::add_corner( const uuid& corner_id )
     {
-        create_corner( std::move( corner_id ) );
+        create_corner( corner_id );
+        detail::add_mesh_component( *this, brep_.corner( corner_id ) );
     }
 
-    void BRepBuilder::add_corner( uuid corner_id, const MeshImpl& impl )
+    void BRepBuilder::add_corner( const uuid& corner_id, const MeshImpl& impl )
     {
-        create_corner( std::move( corner_id ), impl );
+        create_corner( corner_id, impl );
+        detail::add_mesh_component( *this, brep_.corner( corner_id ) );
     }
 
-    void BRepBuilder::add_line( uuid line_id )
+    void BRepBuilder::add_line( const uuid& line_id )
     {
-        create_line( std::move( line_id ) );
+        create_line( line_id );
+        detail::add_mesh_component( *this, brep_.line( line_id ) );
     }
 
-    void BRepBuilder::add_line( uuid line_id, const MeshImpl& impl )
+    void BRepBuilder::add_line( const uuid& line_id, const MeshImpl& impl )
     {
-        create_line( std::move( line_id ), impl );
+        create_line( line_id, impl );
+        detail::add_mesh_component( *this, brep_.line( line_id ) );
     }
 
-    void BRepBuilder::add_surface( uuid surface_id )
+    void BRepBuilder::add_surface( const uuid& surface_id )
     {
-        create_surface( std::move( surface_id ) );
+        create_surface( surface_id );
+        detail::add_mesh_component( *this, brep_.surface( surface_id ) );
     }
 
-    void BRepBuilder::add_surface( uuid surface_id, const MeshImpl& impl )
+    void BRepBuilder::add_surface(
+        const uuid& surface_id, const MeshImpl& impl )
     {
-        create_surface( std::move( surface_id ), impl );
+        create_surface( surface_id, impl );
+        detail::add_mesh_component( *this, brep_.surface( surface_id ) );
     }
 
-    void BRepBuilder::add_block( uuid block_id )
+    void BRepBuilder::add_block( const uuid& block_id )
     {
-        create_block( std::move( block_id ) );
+        create_block( block_id );
+        detail::add_mesh_component( *this, brep_.block( block_id ) );
     }
 
-    void BRepBuilder::add_block( uuid block_id, const MeshImpl& impl )
+    void BRepBuilder::add_block( const uuid& block_id, const MeshImpl& impl )
     {
-        create_block( std::move( block_id ), impl );
+        create_block( block_id, impl );
+        detail::add_mesh_component( *this, brep_.block( block_id ) );
     }
 
-    void BRepBuilder::add_model_boundary( uuid model_boundary_id )
+    void BRepBuilder::add_model_boundary( const uuid& model_boundary_id )
     {
-        create_model_boundary( std::move( model_boundary_id ) );
+        create_model_boundary( model_boundary_id );
+        detail::add_collection_component(
+            *this, brep_.model_boundary( model_boundary_id ) );
     }
 
-    void BRepBuilder::add_corner_collection( uuid corner_collection_id )
+    void BRepBuilder::add_corner_collection( const uuid& corner_collection_id )
     {
-        create_corner_collection( std::move( corner_collection_id ) );
+        create_corner_collection( corner_collection_id );
+        detail::add_collection_component(
+            *this, brep_.corner_collection( corner_collection_id ) );
     }
 
-    void BRepBuilder::add_line_collection( uuid line_collection_id )
+    void BRepBuilder::add_line_collection( const uuid& line_collection_id )
     {
-        create_line_collection( std::move( line_collection_id ) );
+        create_line_collection( line_collection_id );
+        detail::add_collection_component(
+            *this, brep_.line_collection( line_collection_id ) );
     }
 
-    void BRepBuilder::add_surface_collection( uuid surface_collection_id )
+    void BRepBuilder::add_surface_collection(
+        const uuid& surface_collection_id )
     {
-        create_surface_collection( std::move( surface_collection_id ) );
+        create_surface_collection( surface_collection_id );
+        detail::add_collection_component(
+            *this, brep_.surface_collection( surface_collection_id ) );
     }
 
-    void BRepBuilder::add_block_collection( uuid block_collection_id )
+    void BRepBuilder::add_block_collection( const uuid& block_collection_id )
     {
-        create_block_collection( std::move( block_collection_id ) );
+        create_block_collection( block_collection_id );
+        detail::add_collection_component(
+            *this, brep_.block_collection( block_collection_id ) );
     }
 
     void BRepBuilder::update_corner_mesh(
