@@ -21,29 +21,41 @@
  *
  */
 
-#pragma once
-
-#include <geode/model/common.hpp>
 #include <geode/model/mixin/builder/component_registry_builder.hpp>
-#include <geode/model/mixin/builder/relationships_builder.hpp>
-#include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
-#include <geode/model/mixin/core/topology.hpp>
+
+#include <geode/model/mixin/core/component_registry.hpp>
 
 namespace geode
 {
-    /*!
-     * Class managing modification of Topology
-     */
-    class opengeode_model_api TopologyBuilder : public ComponentRegistryBuilder,
-                                                public RelationshipsBuilder,
-                                                public VertexIdentifierBuilder
+    ComponentRegistryBuilder::ComponentRegistryBuilder(
+        ComponentRegistry& component_registry )
+        : registry_( component_registry )
     {
-    protected:
-        explicit TopologyBuilder( Topology& topology )
-            : ComponentRegistryBuilder( topology ),
-              RelationshipsBuilder( topology ),
-              VertexIdentifierBuilder( topology )
-        {
-        }
-    };
+    }
+
+    ComponentRegistryBuilder::~ComponentRegistryBuilder() = default;
+
+    void ComponentRegistryBuilder::add_mesh_component(
+        const ComponentType& type, const uuid& id )
+    {
+        registry_.add_mesh_component( type, id, {} );
+    }
+
+    void ComponentRegistryBuilder::add_collection_component(
+        const ComponentType& type, const uuid& id )
+    {
+        registry_.add_collection_component( type, id, {} );
+    }
+
+    void ComponentRegistryBuilder::remove_mesh_component(
+        const ComponentType& type, const uuid& id )
+    {
+        registry_.remove_mesh_component( type, id, {} );
+    }
+
+    void ComponentRegistryBuilder::remove_collection_component(
+        const ComponentType& type, const uuid& id )
+    {
+        registry_.remove_collection_component( type, id, {} );
+    }
 } // namespace geode

@@ -28,31 +28,29 @@
 
 namespace geode
 {
-    namespace detail
+    namespace internal
     {
-        template < typename Last >
+        template < typename First, typename... Components >
         [[nodiscard]] bool is_component_supported(
             const ComponentType& component_type )
         {
-            return component_type == Last::component_type_static();
-        }
-
-        template < typename First, typename Second, typename... Components >
-        [[nodiscard]] bool is_component_supported(
-            const ComponentType& component_type )
-        {
-            if( component_type == First::component_type_static() )
+            if constexpr( sizeof...( Components ) == 0 )
             {
-                return true;
+                return component_type == First::Type::component_type_static();
             }
-            return is_component_supported< Second, Components... >(
-                component_type );
+            else
+            {
+                if( component_type == First::Type::component_type_static() )
+                {
+                    return true;
+                }
+                return is_component_supported< Components... >(
+                    component_type );
+            }
         }
 
         template < typename >
-        struct ComponentsTypesChecker
-        {
-        };
+        struct ComponentsTypesChecker;
 
         template < typename... Components >
         struct ComponentsTypesChecker< std::tuple< Components... > >
@@ -64,11 +62,16 @@ namespace geode
             }
         };
 
+    } // namespace internal
+
+    namespace detail
+    {
         template < typename Model >
         void filter_unsupported_components( Model& model )
         {
             typename Model::Builder builder{ model };
-            const ComponentsTypesChecker< typename Model::Components > checker;
+            const internal::ComponentsTypesChecker< typename Model::Components >
+                checker;
             std::vector< uuid > components_to_remove;
             for( const auto vertex :
                 Range{ model.nb_components_with_relations() } )
@@ -85,6 +88,5 @@ namespace geode
                 builder.unregister_component( component );
             }
         }
-
     } // namespace detail
 } // namespace geode

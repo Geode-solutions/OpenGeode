@@ -88,8 +88,6 @@ namespace geode
         impl_->save_components( absl::StrCat( directory, "/lines" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Line< dimension >::component_type_static().get() );
-        const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( const auto& line : lines() )
@@ -101,10 +99,7 @@ namespace geode
                 save_edged_curve( mesh, file );
             } );
         }
-        auto all_tasks = async::when_all( tasks );
-        all_tasks.wait();
-        Logger::set_level( level );
-        for( auto& task : all_tasks.get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
@@ -116,8 +111,6 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
-        const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( auto& line : modifiable_lines( {} ) )
@@ -129,10 +122,7 @@ namespace geode
                     typename Line< dimension >::LinesKey{} );
             } );
         }
-        auto all_tasks = async::when_all( tasks );
-        all_tasks.wait();
-        Logger::set_level( level );
-        for( auto& task : all_tasks.get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }

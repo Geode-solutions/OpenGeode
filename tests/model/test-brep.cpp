@@ -21,6 +21,8 @@
  *
  */
 
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
@@ -1295,6 +1297,55 @@ void test_clone( const geode::BRep& brep )
     }
 }
 
+void test_registry( const geode::BRep& brep,
+    geode::index_t nb_mesh_components,
+    geode::index_t nb_corners,
+    geode::index_t nb_lines,
+    geode::index_t nb_surfaces,
+    geode::index_t nb_blocks,
+    geode::index_t nb_collection_components,
+    geode::index_t nb_corner_collections,
+    geode::index_t nb_line_collections,
+    geode::index_t nb_surface_collections,
+    geode::index_t nb_block_collections,
+    geode::index_t nb_model_boundaries )
+{
+    const auto& mesh_registry = brep.mesh_components();
+    OPENGEODE_EXCEPTION( mesh_registry.size() == nb_mesh_components,
+        "[Test] Wrong mesh registry size" );
+    const absl::flat_hash_map< geode::ComponentType, size_t > mesh_answer{
+        { geode::Corner3D::component_type_static(), nb_corners },
+        { geode::Line3D::component_type_static(), nb_lines },
+        { geode::Surface3D::component_type_static(), nb_surfaces },
+        { geode::Block3D::component_type_static(), nb_blocks },
+    };
+    for( const auto& [type, ids] : mesh_registry )
+    {
+        OPENGEODE_EXCEPTION( mesh_answer.at( type ) == ids.size(),
+            "[Test] Wrong mesh registry entry" );
+    }
+    const auto& collection_registry = brep.collection_components();
+    OPENGEODE_EXCEPTION( collection_registry.size() == nb_collection_components,
+        "[Test] Wrong collection registry size" );
+    const absl::flat_hash_map< geode::ComponentType, size_t > collection_answer{
+        { geode::CornerCollection3D::component_type_static(),
+            nb_corner_collections },
+        { geode::LineCollection3D::component_type_static(),
+            nb_line_collections },
+        { geode::SurfaceCollection3D::component_type_static(),
+            nb_surface_collections },
+        { geode::BlockCollection3D::component_type_static(),
+            nb_block_collections },
+        { geode::ModelBoundary3D::component_type_static(),
+            nb_model_boundaries },
+    };
+    for( const auto& [type, ids] : collection_registry )
+    {
+        OPENGEODE_EXCEPTION( collection_answer.at( type ) == ids.size(),
+            "[Test] Wrong collection registry entry" );
+    }
+}
+
 void test_backward_io()
 {
     const auto brep = geode::load_brep(
@@ -1321,6 +1372,7 @@ void test_backward_io()
             "[Backward_IO] Brep corner should have the same uuid as its "
             "mesh." );
     }
+    test_registry( brep, 4, 13, 17, 7, 1, 0, 0, 0, 0, 0, 0 );
 }
 
 void test_components_filter()
@@ -1350,6 +1402,7 @@ void test_steal_mesh( geode::BRep& brep )
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
+    geode::Logger::set_level( geode::Logger::LEVEL::debug );
     geode::BRep model;
     geode::BRepBuilder builder( model );
 
@@ -1365,6 +1418,8 @@ void test()
     const auto surface_collection_uuids =
         add_surface_collections( model, builder );
     const auto block_collection_uuid = add_block_collection( model, builder );
+
+    test_registry( model, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 
     set_geometry( builder, corner_uuids, line_uuids, surface_uuids );
 
@@ -1414,6 +1469,7 @@ void test()
 
     auto model2 = geode::load_brep( file_io );
     test_compare_brep( model, model2 );
+    test_registry( model2, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 
     geode::BRep model3{ std::move( model2 ) };
     test_compare_brep( model, model3 );

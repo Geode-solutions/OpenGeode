@@ -21,29 +21,18 @@
  *
  */
 
-#pragma once
+#include "../../../common.hpp"
 
-#include <geode/model/common.hpp>
-#include <geode/model/mixin/builder/component_registry_builder.hpp>
-#include <geode/model/mixin/builder/relationships_builder.hpp>
-#include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
-#include <geode/model/mixin/core/topology.hpp>
+#include <geode/model/mixin/core/component_registry.hpp>
 
 namespace geode
 {
-    /*!
-     * Class managing modification of Topology
-     */
-    class opengeode_model_api TopologyBuilder : public ComponentRegistryBuilder,
-                                                public RelationshipsBuilder,
-                                                public VertexIdentifierBuilder
+    void define_component_registry( pybind11::module& module )
     {
-    protected:
-        explicit TopologyBuilder( Topology& topology )
-            : ComponentRegistryBuilder( topology ),
-              RelationshipsBuilder( topology ),
-              VertexIdentifierBuilder( topology )
-        {
-        }
-    };
+        pybind11::class_< ComponentRegistry >( module, "ComponentRegistry" )
+            .def( pybind11::init<>() )
+            .def( "mesh_components", &ComponentRegistry::mesh_components )
+            .def( "collection_components",
+                &ComponentRegistry::collection_components );
+    }
 } // namespace geode
