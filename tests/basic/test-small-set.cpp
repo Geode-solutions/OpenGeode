@@ -37,6 +37,9 @@ void test()
     OPENGEODE_EXCEPTION( !set.insert( 0 ), "[Test] Insert not allow" );
     OPENGEODE_EXCEPTION( !set.insert( 1 ), "[Test] Insert not allow" );
     OPENGEODE_EXCEPTION( set.size(), "[Test] Set size should be 2" );
+    set.erase( 0 );
+    OPENGEODE_EXCEPTION( set.size(), "[Test] Set size should be 1" );
+    OPENGEODE_EXCEPTION( set.at( 0 ) == 1, "[Test] Wrong value in set" );
 }
 
 OPENGEODE_TEST( "small-set" )
