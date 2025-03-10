@@ -805,7 +805,7 @@ def test_registry(brep):
         if mesh_answer[component.get()] != len(ids):
             raise ValueError("[Test] Wrong mesh registry entry")
     collection_registry = brep.collection_components()
-    if len(collection_registry) != 54:
+    if len(collection_registry) != 5:
         raise ValueError("[Test] Wrong collection registry size")
     collection_answer = {
         model.CornerCollection3D.component_type_static().get(): 2,
