@@ -26,6 +26,7 @@
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
@@ -53,6 +54,7 @@ namespace geode
         Impl()
         {
             cells_length_.fill( 1 );
+            set_base_origin();
             set_base_grid_directions();
         }
 
@@ -429,16 +431,23 @@ namespace geode
                            { []( Archive& a, Impl& impl ) {
                                 a.container4b( impl.deprecated_cells_number_ );
                                 a.container8b( impl.cells_length_ );
+                                impl.set_base_origin();
                                 impl.set_base_grid_directions();
                             },
                                []( Archive& a, Impl& impl ) {
                                    a.container8b( impl.cells_length_ );
+                                   impl.set_base_origin();
                                    impl.set_base_grid_directions();
                                },
                                []( Archive& a, Impl& impl ) {
                                    a.container8b( impl.cells_length_ );
                                    a.object( impl.grid_coordinate_system_ );
                                } } } );
+        }
+
+        void set_base_origin()
+        {
+            set_grid_origin( Point< dimension >{} );
         }
 
         void set_base_grid_directions()
@@ -524,8 +533,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cell_vertices(
-        const CellIndices& cell_id ) const -> CellVertices
+    auto Grid< dimension >::cell_vertices( const CellIndices& cell_id ) const
+        -> CellVertices
     {
         return impl_->cell_vertices( cell_id );
     }
@@ -572,15 +581,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells(
-        const Point< dimension >& query ) const -> CellsAroundVertex
+    auto Grid< dimension >::cells( const Point< dimension >& query ) const
+        -> CellsAroundVertex
     {
         return impl_->cells( *this, query );
     }
 
     template < index_t dimension >
-    auto Grid< dimension >::cells_around(
-        VertexIndices vertex_indices ) const -> CellsAroundVertex
+    auto Grid< dimension >::cells_around( VertexIndices vertex_indices ) const
+        -> CellsAroundVertex
     {
         return impl_->cells_around( *this, vertex_indices );
     }

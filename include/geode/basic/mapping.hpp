@@ -32,8 +32,7 @@ namespace geode
 {
     template < typename T1,
         typename T2,
-        template < typename >
-        class StorageType >
+        template < typename > class StorageType >
     class MappingBase
     {
     public:
@@ -200,7 +199,7 @@ namespace geode
         {
             if( this->has_mapping_input( in ) )
             {
-                if( absl::c_contains( this->in2out_mapping().at( in ), out ) )
+                if( absl::c_contains( this->in2out( in ), out ) )
                 {
                     return;
                 }
