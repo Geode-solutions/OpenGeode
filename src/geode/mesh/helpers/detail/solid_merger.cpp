@@ -85,7 +85,7 @@ namespace geode
             }
 
             std::unique_ptr< SolidMesh< dimension > > merge(
-                SolidMeshMerger< dimension >& merger, double epsilon )
+                SolidMeshMerger< dimension >& merger, const double epsilon )
             {
                 merger.create_points( epsilon );
                 create_polyhedra( merger );
@@ -343,7 +343,7 @@ namespace geode
 
         template < index_t dimension >
         std::unique_ptr< SolidMesh< dimension > >
-            SolidMeshMerger< dimension >::merge( double epsilon )
+            SolidMeshMerger< dimension >::merge( const double epsilon )
         {
             return impl_->merge( *this, epsilon );
         }
