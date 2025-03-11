@@ -28,6 +28,7 @@
 
 #include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/common.hpp>
+#include <geode/geometry/frame.hpp>
 #include <geode/geometry/point.hpp>
 
 namespace geode
@@ -115,10 +116,9 @@ namespace geode
          * @param[in] threshold_distance The radius of the sphere
          * @return the list of points inside this distance
          */
-        [[nodiscard]] std::vector< index_t > ellipsoid_radius_neighbors(
+        [[nodiscard]] std::vector< index_t > frame_neighbors(
             const Point< dimension >& point,
-            const Ellipse< dimension >& ellipse,
-            const double distance_factor ) const;
+            const Frame< dimension >& epsilons_frame ) const;
 
         /*!
          * Get a number ol close neighbors from the given point
@@ -138,7 +138,10 @@ namespace geode
          * @return The information related to this colocated operation
          */
         [[nodiscard]] ColocatedInfo colocated_index_mapping(
-            double epsilon ) const;
+            const double epsilon ) const;
+
+        [[nodiscard]] ColocatedInfo colocated_index_mapping(
+            const Frame< dimension >& epsilon ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

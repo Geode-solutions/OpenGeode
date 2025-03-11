@@ -84,8 +84,8 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves( absl::Span<
         const std::reference_wrapper< const EdgedCurve< dimension > > > curves )
     {
-        detail::EdgedCurveMerger< dimension > merger{ curves, GLOBAL_EPSILON };
-        return merger.merge();
+        detail::EdgedCurveMerger< dimension > merger{ curves };
+        return merger.merge( GLOBAL_EPSILON );
     }
 
     template std::unique_ptr< EdgedCurve< 2 > >

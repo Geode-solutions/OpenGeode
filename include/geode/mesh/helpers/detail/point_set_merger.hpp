@@ -38,16 +38,20 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class PointSetMerger : public VertexMerger< PointSet< dimension > >
+        class PointSetMerger
+            : public VertexMerger< PointSet< dimension >, dimension >
         {
         public:
             PointSetMerger( absl::Span< const std::reference_wrapper<
-                                const PointSet< dimension > > > pointsets,
-                double epsilon );
+                    const PointSet< dimension > > > pointsets );
             PointSetMerger( PointSetMerger&& ) noexcept;
             ~PointSetMerger();
 
-            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge(
+                double epsilon );
+
+            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge(
+                const Frame3D& frame, const double factor_distance );
         };
         ALIAS_2D_AND_3D( PointSetMerger );
     } // namespace detail

@@ -30,11 +30,10 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        PointSetMerger< dimension >::PointSetMerger(
-            absl::Span< const std::reference_wrapper<
-                const PointSet< dimension > > > pointsets,
-            double epsilon )
-            : VertexMerger< PointSet< dimension > >{ pointsets, epsilon }
+        PointSetMerger< dimension >::PointSetMerger( absl::Span<
+            const std::reference_wrapper< const PointSet< dimension > > >
+                pointsets )
+            : VertexMerger< PointSet< dimension >, dimension >{ pointsets }
         {
         }
 
@@ -47,13 +46,22 @@ namespace geode
 
         template < index_t dimension >
         std::unique_ptr< PointSet< dimension > >
-            PointSetMerger< dimension >::merge()
+            PointSetMerger< dimension >::merge( double epsilon )
         {
-            this->create_points();
+            this->create_points( epsilon );
             return this->steal_mesh();
         }
 
-        template class opengeode_mesh_api PointSetMerger< 2 >;
-        template class opengeode_mesh_api PointSetMerger< 3 >;
+        template < index_t dimension >
+        std::unique_ptr< PointSet< dimension > >
+            PointSetMerger< dimension >::merge(
+                const Frame3D& frame, const double factor_distance )
+        {
+            this->create_points( frame, factor_distance );
+            return this->steal_mesh();
+        }
+
+        // template class opengeode_mesh_api PointSetMerger< 2 >;
+        // template class opengeode_mesh_api PointSetMerger< 3 >;
     } // namespace detail
 } // namespace geode

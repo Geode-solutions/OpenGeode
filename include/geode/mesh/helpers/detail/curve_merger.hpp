@@ -41,7 +41,8 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class EdgedCurveMerger : public VertexMerger< EdgedCurve< dimension > >
+        class EdgedCurveMerger
+            : public VertexMerger< EdgedCurve< dimension >, dimension >
         {
         public:
             struct EdgeOrigin
@@ -62,12 +63,15 @@ namespace geode
             using EdgeOrigins = absl::InlinedVector< EdgeOrigin, 1 >;
 
             EdgedCurveMerger( absl::Span< const std::reference_wrapper<
-                                  const EdgedCurve< dimension > > > curves,
-                double epsilon );
+                    const EdgedCurve< dimension > > > curves );
             EdgedCurveMerger( EdgedCurveMerger&& ) noexcept;
             ~EdgedCurveMerger();
 
-            [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge(
+                double epsilon );
+
+            [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge(
+                const Frame< dimension >& epsilons_frame );
 
             [[nodiscard]] index_t edge_in_merged(
                 index_t curve, index_t edge ) const;

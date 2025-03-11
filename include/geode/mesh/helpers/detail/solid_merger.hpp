@@ -31,6 +31,8 @@
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/helpers/detail/vertex_merger.hpp>
 
+#include <geode/geometry/frame.hpp>
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
@@ -41,7 +43,8 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class SolidMeshMerger : public VertexMerger< SolidMesh< dimension > >
+        class SolidMeshMerger
+            : public VertexMerger< SolidMesh< dimension >, dimension >
         {
         public:
             struct PolyhedronOrigin
@@ -65,12 +68,15 @@ namespace geode
                 absl::InlinedVector< PolyhedronOrigin, 1 >;
 
             SolidMeshMerger( absl::Span< const std::reference_wrapper<
-                                 const SolidMesh< dimension > > > solids,
-                double epsilon );
+                    const SolidMesh< dimension > > > solids );
             SolidMeshMerger( SolidMeshMerger&& ) noexcept;
             ~SolidMeshMerger();
 
-            [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge(
+                double epsilon );
+
+            [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge(
+                const Frame< dimension >& epsilons_frame );
 
             [[nodiscard]] index_t polyhedron_in_merged(
                 index_t solid, index_t polyhedron ) const;

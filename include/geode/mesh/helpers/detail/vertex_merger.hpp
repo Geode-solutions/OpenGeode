@@ -28,11 +28,13 @@
 
 #include <geode/basic/pimpl.hpp>
 
+#include <geode/geometry/frame.hpp>
+
 namespace geode
 {
     namespace detail
     {
-        template < typename Mesh >
+        template < typename Mesh, index_t dimension >
         class VertexMerger
         {
         public:
@@ -57,9 +59,14 @@ namespace geode
                 index_t vertex ) const;
 
         protected:
+            // VertexMerger(
+            //     absl::Span< const std::reference_wrapper< const Mesh > >
+            //     meshes, double epsilon );
+
             VertexMerger(
-                absl::Span< const std::reference_wrapper< const Mesh > > meshes,
-                double epsilon );
+                absl::Span< const std::reference_wrapper< const Mesh > >
+                    meshes );
+
             VertexMerger( VertexMerger&& ) noexcept;
             ~VertexMerger();
 
@@ -73,7 +80,9 @@ namespace geode
 
             [[nodiscard]] Builder& builder();
 
-            void create_points();
+            void create_points( double epsilon );
+
+            void create_points( const Frame< dimension >& epsilons_frame );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

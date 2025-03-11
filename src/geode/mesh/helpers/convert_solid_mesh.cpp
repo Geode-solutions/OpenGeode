@@ -654,7 +654,7 @@ namespace geode
     std::unique_ptr< SolidMesh3D > merge_solid_meshes(
         absl::Span< const std::reference_wrapper< const SolidMesh3D > > solids )
     {
-        detail::SolidMeshMerger3D merger{ solids, GLOBAL_EPSILON };
-        return merger.merge();
+        detail::SolidMeshMerger3D merger{ solids };
+        return merger.merge( GLOBAL_EPSILON );
     }
 } // namespace geode

@@ -35,9 +35,17 @@
         .def( "point", &NNSearch##dimension##D::point )                        \
         .def( "closest_neighbor", &NNSearch##dimension##D::closest_neighbor )  \
         .def( "radius_neighbors", &NNSearch##dimension##D::radius_neighbors )  \
+        .def( "frame_neighbors", &NNSearch##dimension##D::frame_neighbors )    \
         .def( "neighbors", &NNSearch##dimension##D::neighbors )                \
-        .def( "colocated_index_mapping",                                       \
-            &NNSearch##dimension##D::colocated_index_mapping );                \
+        .def( "radius_colocated_index_mapping",                                \
+            static_cast< NNSearch##dimension##D::ColocatedInfo (               \
+                NNSearch##dimension##D::* )( const double ) const >(           \
+                &NNSearch##dimension##D::colocated_index_mapping ) )           \
+        .def( "frame_colocated_index_mapping",                                 \
+            static_cast< NNSearch##dimension##D::ColocatedInfo (               \
+                NNSearch##dimension##D::* )( const Frame##dimension##D& )      \
+                    const >(                                                   \
+                &NNSearch##dimension##D::colocated_index_mapping ) );          \
                                                                                \
     const auto info##dimension =                                               \
         "ColocatedInfo" + std::to_string( dimension ) + "D";                   \
@@ -50,7 +58,7 @@
         .def( "nb_unique_points",                                              \
             &NNSearch##dimension##D::ColocatedInfo::nb_unique_points )         \
         .def( "nb_colocated_points",                                           \
-            &NNSearch##dimension##D::ColocatedInfo::nb_colocated_points )
+            &NNSearch##dimension##D::ColocatedInfo::nb_colocated_points );
 
 namespace geode
 {

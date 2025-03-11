@@ -78,20 +78,17 @@ namespace geode
             return indices;
         }
 
-        std::vector< index_t > ellipsoid_radius_neighbors(
-            const Point< dimension >& point,
-            const Ellipse< dimension >& ellipse,
-            const double distance_factor ) const
+        std::vector< index_t > frame_neighbors( const Point< dimension >& point,
+            const Frame< dimension >& epsilons_frame ) const
         {
             std::vector< nanoflann::ResultItem< index_t, double > > results;
             nanoflann::SearchParameters params;
             params.sorted = true;
             const auto max_elongation_direction =
-                ellipse.axes().max_elongation_direction();
+                epsilons_frame.max_elongation_direction();
             const auto max_elongation =
-                ellipse.axes().direction( max_elongation_direction ).length();
-            const auto radius = distance_factor * distance_factor
-                                * max_elongation * max_elongation;
+                epsilons_frame.direction( max_elongation_direction ).length();
+            const auto radius = max_elongation * max_elongation;
             const auto nb_results = nn_tree_.radiusSearch(
                 &copy( point )[0], radius, results, params );
             std::vector< index_t > indices;
@@ -100,7 +97,9 @@ namespace geode
             {
                 Segment< dimension > segment{ point,
                     this->point( result.first ) };
-                if( segment_ellipse_intersection( segment, ellipse ).type
+                if( segment_ellipse_intersection(
+                        segment, Ellipse< dimension >{ point, epsilons_frame } )
+                        .type
                     != INTERSECTION_TYPE::none )
                 {
                     continue;
@@ -119,6 +118,148 @@ namespace geode
                 &copy( point )[0], nb_neighbors, &results[0], &distances[0] );
             results.resize( new_nb_neighbors );
             return results;
+        }
+
+        typename NNSearch< dimension >::ColocatedInfo colocated_index_mapping(
+            const NNSearch< dimension >& nn_search, const double epsilon ) const
+        {
+            OPENGEODE_EXCEPTION( epsilon >= GLOBAL_EPSILON,
+                "[NNSearch::colocated_index_mapping] Given epsilon too "
+                "small, "
+                "should be bigger than GLOBAL_EPSILON (i.e. ",
+                GLOBAL_EPSILON, ")" );
+            typename NNSearch< dimension >::ColocatedInfo result;
+            const auto nb_points = nn_search.nb_points();
+            std::vector< index_t > mapping( nb_points, NO_ID );
+            std::mutex mutex;
+            async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
+                [&nn_search, &epsilon, &mapping, &mutex, this](
+                    index_t point_id ) {
+                    if( mapping[point_id] != NO_ID )
+                    {
+                        return;
+                    }
+                    const auto vertices_around = nn_search.radius_neighbors(
+                        nn_search.point( point_id ), epsilon );
+                    std::lock_guard< std::mutex > lock( mutex );
+                    if( mapping[point_id] != NO_ID )
+                    {
+                        Logger::trace( point_id,
+                            " : correction 1 / mapping[p] ",
+                            mapping[point_id] );
+                        return;
+                    }
+                    for( const auto vertex_id : vertices_around )
+                    {
+                        Logger::trace( point_id, " : id ", vertex_id,
+                            " / mapping[id] ", mapping[vertex_id] );
+                        if( mapping[vertex_id] == NO_ID )
+                        {
+                            mapping[vertex_id] = point_id;
+                        }
+                    }
+                } );
+            result.colocated_input_points = mapping;
+            index_t nb_unique_points{ 0 };
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] == point_id )
+                {
+                    nb_unique_points++;
+                }
+            }
+            result.unique_points.resize( nb_unique_points );
+            std::vector< index_t > old2new( nb_points, NO_ID );
+            index_t count{ 0 };
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] == point_id )
+                {
+                    result.unique_points[count] = nn_search.point( point_id );
+                    old2new[point_id] = count;
+                    count++;
+                }
+            }
+            for( const auto point_id : Range{ nb_points } )
+            {
+                mapping[point_id] = old2new[mapping[point_id]];
+            }
+            result.colocated_mapping = mapping;
+            return result;
+        }
+
+        typename geode::NNSearch< dimension >::ColocatedInfo
+            colocated_index_mapping(
+                const geode::NNSearch< dimension >& nn_search,
+                const Frame< dimension >& epsilons_frame ) const
+        {
+            for( const auto d : LRange{ dimension } )
+            {
+                OPENGEODE_EXCEPTION(
+                    epsilons_frame.direction( d ).length() >= GLOBAL_EPSILON,
+                    "[NNSearch::colocated_index_mapping] Given epsilon too "
+                    "small, "
+                    "should be bigger than GLOBAL_EPSILON (i.e. ",
+                    GLOBAL_EPSILON, ")" );
+            }
+            typename NNSearch< dimension >::ColocatedInfo result;
+            const auto nb_points = nn_search.nb_points();
+            std::vector< index_t > mapping( nb_points, NO_ID );
+            std::mutex mutex;
+            async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
+                [&nn_search, &epsilons_frame, &mapping, &mutex, this](
+                    index_t point_id ) {
+                    if( mapping[point_id] != NO_ID )
+                    {
+                        return;
+                    }
+                    const auto vertices_around = frame_neighbors(
+                        nn_search.point( point_id ), epsilons_frame );
+                    std::lock_guard< std::mutex > lock( mutex );
+                    if( mapping[point_id] != NO_ID )
+                    {
+                        Logger::trace( point_id,
+                            " : correction 1 / mapping[p] ",
+                            mapping[point_id] );
+                        return;
+                    }
+                    for( const auto vertex_id : vertices_around )
+                    {
+                        Logger::trace( point_id, " : id ", vertex_id,
+                            " / mapping[id] ", mapping[vertex_id] );
+                        if( mapping[vertex_id] == NO_ID )
+                        {
+                            mapping[vertex_id] = point_id;
+                        }
+                    }
+                } );
+            result.colocated_input_points = mapping;
+            index_t nb_unique_points{ 0 };
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] == point_id )
+                {
+                    nb_unique_points++;
+                }
+            }
+            result.unique_points.resize( nb_unique_points );
+            std::vector< index_t > old2new( nb_points, NO_ID );
+            index_t count{ 0 };
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] == point_id )
+                {
+                    result.unique_points[count] = nn_search.point( point_id );
+                    old2new[point_id] = count;
+                    count++;
+                }
+            }
+            for( const auto point_id : Range{ nb_points } )
+            {
+                mapping[point_id] = old2new[mapping[point_id]];
+            }
+            result.colocated_mapping = mapping;
+            return result;
         }
 
     private:
@@ -209,13 +350,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< index_t > NNSearch< dimension >::ellipsoid_radius_neighbors(
+    std::vector< index_t > NNSearch< dimension >::frame_neighbors(
         const Point< dimension >& point,
-        const Ellipse< dimension >& ellipse,
-        const double distance_factor ) const
+        const Frame< dimension >& epsilons_frame ) const
     {
-        return impl_->ellipsoid_radius_neighbors(
-            point, ellipse, distance_factor );
+        return impl_->frame_neighbors( point, epsilons_frame );
     }
 
     template < index_t dimension >
@@ -225,68 +364,20 @@ namespace geode
         return impl_->neighbors( point, nb_neighbors );
     }
 
-    template < index_t dimension >
-    typename NNSearch< dimension >::ColocatedInfo
-        NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
+    template < geode::index_t dimension >
+    typename geode::NNSearch< dimension >::ColocatedInfo
+        NNSearch< dimension >::colocated_index_mapping(
+            const double epsilon ) const
     {
-        OPENGEODE_EXCEPTION( epsilon >= GLOBAL_EPSILON,
-            "[NNSearch::colocated_index_mapping] Given epsilon too small, "
-            "should be bigger than GLOBAL_EPSILON (i.e. ",
-            GLOBAL_EPSILON, ")" );
-        typename NNSearch< dimension >::ColocatedInfo result;
-        std::vector< index_t > mapping( nb_points(), NO_ID );
-        std::mutex mutex;
-        async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
-            [&epsilon, &mapping, &mutex, this]( index_t p ) {
-                if( mapping[p] != NO_ID )
-                {
-                    return;
-                }
-                const auto vertices = radius_neighbors( point( p ), epsilon );
-                std::lock_guard< std::mutex > lock( mutex );
-                if( mapping[p] != NO_ID )
-                {
-                    Logger::trace(
-                        p, " : correction 1 / mapping[p] ", mapping[p] );
-                    return;
-                }
-                for( const auto id : vertices )
-                {
-                    Logger::trace(
-                        p, " : id ", id, " / mapping[id] ", mapping[id] );
-                    if( mapping[id] == NO_ID )
-                    {
-                        mapping[id] = p;
-                    }
-                }
-            } );
-        result.colocated_input_points = mapping;
-        index_t nb_unique_points{ 0 };
-        for( const auto p : Range{ nb_points() } )
-        {
-            if( mapping[p] == p )
-            {
-                nb_unique_points++;
-            }
-        }
-        result.unique_points.resize( nb_unique_points );
-        std::vector< index_t > old2new( nb_points(), NO_ID );
-        index_t count{ 0 };
-        for( const auto p : Range{ nb_points() } )
-        {
-            if( mapping[p] == p )
-            {
-                result.unique_points[count] = point( p );
-                old2new[p] = count;
-                count++;
-            }
-        }
-        for( const auto p : Range{ nb_points() } )
-        {
-            mapping[p] = old2new[mapping[p]];
-        }
-        result.colocated_mapping = mapping;
-        return result;
+        return impl_->colocated_index_mapping( *this, epsilon );
+    }
+
+    template < geode::index_t dimension >
+    typename geode::NNSearch< dimension >::ColocatedInfo
+        NNSearch< dimension >::colocated_index_mapping(
+            const Frame< dimension >& epsilons_frame ) const
+    {
+        return impl_->colocated_index_mapping( *this, epsilons_frame );
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;

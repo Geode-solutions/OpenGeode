@@ -42,7 +42,7 @@ namespace geode
     {
         template < index_t dimension >
         class SurfaceMeshMerger
-            : public VertexMerger< SurfaceMesh< dimension > >
+            : public VertexMerger< SurfaceMesh< dimension >, dimension >
         {
         public:
             struct PolygonOrigin
@@ -64,12 +64,15 @@ namespace geode
             using PolygonOrigins = absl::InlinedVector< PolygonOrigin, 1 >;
 
             SurfaceMeshMerger( absl::Span< const std::reference_wrapper<
-                                   const SurfaceMesh< dimension > > > surfaces,
-                double epsilon );
+                    const SurfaceMesh< dimension > > > surfaces );
             SurfaceMeshMerger( SurfaceMeshMerger&& ) noexcept;
             ~SurfaceMeshMerger();
 
-            [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge(
+                double epsilon );
+
+            [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge(
+                const Frame< dimension >& epsilons_frame );
 
             [[nodiscard]] index_t polygon_in_merged(
                 index_t surface, index_t polygon ) const;
