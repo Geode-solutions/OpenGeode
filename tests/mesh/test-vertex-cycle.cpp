@@ -110,11 +110,29 @@ void test_oriented_vertex_cycle()
         "[Test] Wrong result for operator!= with cycle5 and cycle7" );
 }
 
+void test_several_containers()
+{
+    const geode::detail::VertexCycle< std::vector< geode::index_t > > cycle1{
+        { 0, 1, 2, 3 }
+    };
+    const geode::detail::VertexCycle< absl::InlinedVector< geode::index_t, 4 > >
+        cycle2{ { 2, 3, 0, 1 } };
+    const geode::detail::VertexCycle< std::array< geode::index_t, 3 > > cycle3{
+        { 2, 3, 1 }
+    };
+
+    OPENGEODE_EXCEPTION( cycle1 == cycle2,
+        "[Test] Wrong result for operator== with cycle1 and cycle2" );
+    OPENGEODE_EXCEPTION( cycle1 != cycle3,
+        "[Test] Wrong result for operator!= with cycle1 and cycle3" );
+}
+
 void test()
 {
     test_vertex_cycle();
     test_oriented_vertex_cycle();
     test_single_vertex_cycle();
+    test_several_containers();
 }
 
 OPENGEODE_TEST( "vertex-cycle" )
