@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/identifier.hpp>
 
 #include <geode/model/common.hpp>
@@ -78,13 +79,12 @@ namespace geode
     public:
         static constexpr index_t dim{ 2 };
         using Builder = SectionBuilder;
-        using Components = std::tuple< Corner2D,
-            Line2D,
-            Surface2D,
-            ModelBoundary2D,
-            CornerCollection2D,
-            LineCollection2D,
-            SurfaceCollection2D >;
+        using MeshComponents = std::tuple< Corners2D, Lines2D, Surfaces2D >;
+        using CollectionComponents = std::tuple< ModelBoundaries2D,
+            CornerCollections2D,
+            LineCollections2D,
+            SurfaceCollections2D >;
+        using Components = tuple_cat< MeshComponents, CollectionComponents >;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator

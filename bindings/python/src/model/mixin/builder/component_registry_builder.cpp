@@ -21,29 +21,25 @@
  *
  */
 
-#pragma once
+#include "../../../common.hpp"
 
-#include <geode/model/common.hpp>
 #include <geode/model/mixin/builder/component_registry_builder.hpp>
-#include <geode/model/mixin/builder/relationships_builder.hpp>
-#include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
-#include <geode/model/mixin/core/topology.hpp>
+#include <geode/model/mixin/core/component_registry.hpp>
 
 namespace geode
 {
-    /*!
-     * Class managing modification of Topology
-     */
-    class opengeode_model_api TopologyBuilder : public ComponentRegistryBuilder,
-                                                public RelationshipsBuilder,
-                                                public VertexIdentifierBuilder
+    void define_component_registry_builder( pybind11::module& module )
     {
-    protected:
-        explicit TopologyBuilder( Topology& topology )
-            : ComponentRegistryBuilder( topology ),
-              RelationshipsBuilder( topology ),
-              VertexIdentifierBuilder( topology )
-        {
-        }
-    };
+        pybind11::class_< ComponentRegistryBuilder >(
+            module, "ComponentRegistryBuilder" )
+            .def( pybind11::init< ComponentRegistry& >() )
+            .def( "add_mesh_component",
+                &ComponentRegistryBuilder::add_mesh_component )
+            .def( "add_collection_component",
+                &ComponentRegistryBuilder::add_collection_component )
+            .def( "remove_mesh_component",
+                &ComponentRegistryBuilder::remove_mesh_component )
+            .def( "remove_collection_component",
+                &ComponentRegistryBuilder::remove_collection_component );
+    }
 } // namespace geode

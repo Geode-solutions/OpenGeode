@@ -29,7 +29,7 @@ namespace geode
 {
     void define_topology( pybind11::module& module )
     {
-        pybind11::class_< Topology, Relationships, VertexIdentifier >(
-            module, "Topology" );
+        pybind11::class_< Topology, Relationships, VertexIdentifier,
+            ComponentRegistry >( module, "Topology" );
     }
 } // namespace geode
