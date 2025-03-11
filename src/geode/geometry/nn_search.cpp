@@ -79,7 +79,8 @@ namespace geode
         }
 
         std::vector< index_t > frame_neighbors( const Point< dimension >& point,
-            const Frame< dimension >& epsilons_frame ) const
+            const Frame< dimension >& epsilons_frame,
+            const double factor_distance ) const
         {
             std::vector< nanoflann::ResultItem< index_t, double > > results;
             nanoflann::SearchParameters params;
@@ -88,7 +89,8 @@ namespace geode
                 epsilons_frame.max_elongation_direction();
             const auto max_elongation =
                 epsilons_frame.direction( max_elongation_direction ).length();
-            const auto radius = max_elongation * max_elongation;
+            const auto radius = factor_distance * factor_distance
+                                * max_elongation * max_elongation;
             const auto nb_results = nn_tree_.radiusSearch(
                 &copy( point )[0], radius, results, params );
             std::vector< index_t > indices;
@@ -191,12 +193,14 @@ namespace geode
         typename geode::NNSearch< dimension >::ColocatedInfo
             colocated_index_mapping(
                 const geode::NNSearch< dimension >& nn_search,
-                const Frame< dimension >& epsilons_frame ) const
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance ) const
         {
             for( const auto d : LRange{ dimension } )
             {
                 OPENGEODE_EXCEPTION(
-                    epsilons_frame.direction( d ).length() >= GLOBAL_EPSILON,
+                    epsilons_frame.direction( d ).length() * factor_distance
+                        >= GLOBAL_EPSILON,
                     "[NNSearch::colocated_index_mapping] Given epsilon too "
                     "small, "
                     "should be bigger than GLOBAL_EPSILON (i.e. ",
@@ -207,14 +211,15 @@ namespace geode
             std::vector< index_t > mapping( nb_points, NO_ID );
             std::mutex mutex;
             async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
-                [&nn_search, &epsilons_frame, &mapping, &mutex, this](
-                    index_t point_id ) {
+                [&nn_search, &epsilons_frame, &factor_distance, &mapping,
+                    &mutex, this]( index_t point_id ) {
                     if( mapping[point_id] != NO_ID )
                     {
                         return;
                     }
-                    const auto vertices_around = frame_neighbors(
-                        nn_search.point( point_id ), epsilons_frame );
+                    const auto vertices_around =
+                        frame_neighbors( nn_search.point( point_id ),
+                            epsilons_frame, factor_distance );
                     std::lock_guard< std::mutex > lock( mutex );
                     if( mapping[point_id] != NO_ID )
                     {
@@ -352,9 +357,10 @@ namespace geode
     template < index_t dimension >
     std::vector< index_t > NNSearch< dimension >::frame_neighbors(
         const Point< dimension >& point,
-        const Frame< dimension >& epsilons_frame ) const
+        const Frame< dimension >& epsilons_frame,
+        const double factor_distance ) const
     {
-        return impl_->frame_neighbors( point, epsilons_frame );
+        return impl_->frame_neighbors( point, epsilons_frame, factor_distance );
     }
 
     template < index_t dimension >
@@ -375,9 +381,11 @@ namespace geode
     template < geode::index_t dimension >
     typename geode::NNSearch< dimension >::ColocatedInfo
         NNSearch< dimension >::colocated_index_mapping(
-            const Frame< dimension >& epsilons_frame ) const
+            const Frame< dimension >& epsilons_frame,
+            const double factor_distance ) const
     {
-        return impl_->colocated_index_mapping( *this, epsilons_frame );
+        return impl_->colocated_index_mapping(
+            *this, epsilons_frame, factor_distance );
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;

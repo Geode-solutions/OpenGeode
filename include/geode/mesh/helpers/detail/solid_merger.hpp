@@ -76,7 +76,8 @@ namespace geode
                 double epsilon );
 
             [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge(
-                const Frame< dimension >& epsilons_frame );
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance );
 
             [[nodiscard]] index_t polyhedron_in_merged(
                 index_t solid, index_t polyhedron ) const;

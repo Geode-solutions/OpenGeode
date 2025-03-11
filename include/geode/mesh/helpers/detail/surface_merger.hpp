@@ -72,7 +72,8 @@ namespace geode
                 double epsilon );
 
             [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge(
-                const Frame< dimension >& epsilons_frame );
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance );
 
             [[nodiscard]] index_t polygon_in_merged(
                 index_t surface, index_t polygon ) const;

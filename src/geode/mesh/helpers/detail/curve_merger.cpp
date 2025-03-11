@@ -71,9 +71,10 @@ namespace geode
 
             std::unique_ptr< EdgedCurve< dimension > > merge(
                 EdgedCurveMerger< dimension >& merger,
-                const Frame< dimension >& epsilons_frame )
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance )
             {
-                merger.create_points( epsilons_frame );
+                merger.create_points( epsilons_frame, factor_distance );
                 create_edges( merger );
                 clean_curve( merger );
                 curve_id_.clear();
@@ -218,9 +219,10 @@ namespace geode
         template < index_t dimension >
         std::unique_ptr< EdgedCurve< dimension > >
             EdgedCurveMerger< dimension >::merge(
-                const Frame< dimension >& epsilons_frame )
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance )
         {
-            return impl_->merge( *this, epsilons_frame );
+            return impl_->merge( *this, epsilons_frame, factor_distance );
         }
 
         template < index_t dimension >

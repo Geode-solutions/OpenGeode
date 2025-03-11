@@ -118,7 +118,8 @@ namespace geode
          */
         [[nodiscard]] std::vector< index_t > frame_neighbors(
             const Point< dimension >& point,
-            const Frame< dimension >& epsilons_frame ) const;
+            const Frame< dimension >& epsilons_frame,
+            const double factor_distance ) const;
 
         /*!
          * Get a number ol close neighbors from the given point
@@ -141,7 +142,8 @@ namespace geode
             const double epsilon ) const;
 
         [[nodiscard]] ColocatedInfo colocated_index_mapping(
-            const Frame< dimension >& epsilon ) const;
+            const Frame< dimension >& epsilon,
+            const double factor_distance ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -43,8 +43,8 @@
                 &NNSearch##dimension##D::colocated_index_mapping ) )           \
         .def( "frame_colocated_index_mapping",                                 \
             static_cast< NNSearch##dimension##D::ColocatedInfo (               \
-                NNSearch##dimension##D::* )( const Frame##dimension##D& )      \
-                    const >(                                                   \
+                NNSearch##dimension##D::* )(                                   \
+                const Frame##dimension##D&, const double ) const >(            \
                 &NNSearch##dimension##D::colocated_index_mapping ) );          \
                                                                                \
     const auto info##dimension =                                               \

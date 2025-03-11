@@ -97,9 +97,10 @@ namespace geode
 
             std::unique_ptr< SurfaceMesh< dimension > > merge(
                 SurfaceMeshMerger< dimension >& merger,
-                const Frame< dimension >& epsilons_frame )
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance )
             {
-                merger.create_points( epsilons_frame );
+                merger.create_points( epsilons_frame, factor_distance );
                 create_polygons( merger );
                 create_adjacencies( merger );
                 clean_surface( merger );
@@ -332,9 +333,10 @@ namespace geode
         template < index_t dimension >
         std::unique_ptr< SurfaceMesh< dimension > >
             SurfaceMeshMerger< dimension >::merge(
-                const Frame< dimension >& epsilons_frame )
+                const Frame< dimension >& epsilons_frame,
+                const double factor_distance )
         {
-            return impl_->merge( *this, epsilons_frame );
+            return impl_->merge( *this, epsilons_frame, factor_distance );
         }
 
         template < index_t dimension >

@@ -82,7 +82,8 @@ namespace geode
 
             void create_points( double epsilon );
 
-            void create_points( const Frame< dimension >& epsilons_frame );
+            void create_points( const Frame< dimension >& epsilons_frame,
+                const double factor_distance );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
