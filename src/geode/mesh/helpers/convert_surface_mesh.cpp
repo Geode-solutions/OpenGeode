@@ -149,7 +149,7 @@ namespace
             cell_mesh_vertices[3], additional_vertex_id } );
         created_triangles[2] = builder.create_triangle( { cell_mesh_vertices[3],
             cell_mesh_vertices[2], additional_vertex_id } );
-        created_triangles[4] = builder.create_triangle( { cell_mesh_vertices[2],
+        created_triangles[3] = builder.create_triangle( { cell_mesh_vertices[2],
             cell_mesh_vertices[0], additional_vertex_id } );
         return created_triangles;
     }
@@ -210,14 +210,14 @@ namespace
         for( const auto cell_index : geode::Indices{ cells_to_densify } )
         {
             const auto cell_indices =
-                grid.cell_indices( cells_to_densify[cell_index] );
+                grid.cell_indices( cells_to_densify.at( cell_index ) );
             const auto additional_vertex_id =
                 grid.nb_grid_vertices() + cell_index;
             for( const auto triangle_id : create_triangles_from_cross_pattern(
                      builder, grid, cell_indices, additional_vertex_id ) )
             {
                 old2new_mapping.map(
-                    cells_to_densify[cell_index], triangle_id );
+                    cells_to_densify.at( cell_index ), triangle_id );
             }
         }
         builder.compute_polygon_adjacencies();
@@ -232,14 +232,14 @@ namespace
     {
         builder.create_vertices(
             grid.nb_grid_vertices() + cells_to_densify.size() );
+        auto& surface_attribute_manager = surface.vertex_attribute_manager();
+        geode::internal::copy_attributes(
+            grid.grid_vertex_attribute_manager(), surface_attribute_manager );
         for( const auto vertex_id : geode::Range{ grid.nb_grid_vertices() } )
         {
             builder.set_point( vertex_id,
                 grid.grid_point( grid.vertex_indices( vertex_id ) ) );
         }
-        auto& surface_attribute_manager = surface.vertex_attribute_manager();
-        geode::internal::copy_attributes(
-            grid.grid_vertex_attribute_manager(), surface_attribute_manager );
         geode::index_t counter{ grid.nb_grid_vertices() };
         for( const auto cell_id : cells_to_densify )
         {
@@ -249,14 +249,17 @@ namespace
             std::vector< double > lambdas;
             cell_vertices.reserve( 4 );
             lambdas.reserve( 4 );
+            geode::Point2D position{ { 0., 0. } };
             for( const auto& vertex_indices :
                 grid.cell_vertices( cell_indices ) )
             {
                 cell_vertices.push_back( grid.vertex_index( vertex_indices ) );
                 lambdas.push_back( 0.25 );
+                position += grid.grid_point( vertex_indices ) * 0.25;
             }
             surface_attribute_manager.interpolate_attribute_value(
                 { cell_vertices, lambdas }, counter );
+            builder.set_point( counter, position );
             counter++;
         }
     }
