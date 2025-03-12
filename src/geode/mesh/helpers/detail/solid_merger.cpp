@@ -97,7 +97,7 @@ namespace geode
 
             std::unique_ptr< SolidMesh< dimension > > merge(
                 SolidMeshMerger< dimension >& merger,
-                const Frame3D& epsilons_frame )
+                const Frame< dimension >& epsilons_frame )
             {
                 merger.create_points( epsilons_frame );
                 create_polyhedra( merger );
