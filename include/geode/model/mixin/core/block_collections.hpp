@@ -49,6 +49,7 @@ namespace geode
 
     public:
         using Builder = BlockCollectionsBuilder< dimension >;
+        using Type = BlockCollection< dimension >;
 
         class opengeode_model_api BlockCollectionRangeBase
         {
@@ -94,6 +95,11 @@ namespace geode
             const uuid& id ) const;
 
         [[nodiscard]] BlockCollectionRange block_collections() const;
+
+        [[nodiscard]] BlockCollectionRange components() const
+        {
+            return block_collections();
+        }
 
         void save_block_collections( std::string_view directory ) const;
 

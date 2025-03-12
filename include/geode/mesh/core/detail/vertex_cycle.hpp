@@ -96,8 +96,9 @@ namespace geode
                 return vertices_;
             }
 
+            template < typename OtherContainer >
             [[nodiscard]] bool is_opposite(
-                const OrientedVertexCycle& other ) const
+                const OrientedVertexCycle< OtherContainer >& other ) const
             {
                 const auto& other_vertices = other.vertices();
                 if( vertices().size() != other_vertices.size()
@@ -117,20 +118,23 @@ namespace geode
                 return true;
             }
 
+            template < typename OtherContainer >
             [[nodiscard]] bool operator==(
-                const OrientedVertexCycle& other ) const
+                const OrientedVertexCycle< OtherContainer >& other ) const
             {
-                return this->vertices() == other.vertices();
+                return absl::c_equal( this->vertices(), other.vertices() );
             }
 
+            template < typename OtherContainer >
             [[nodiscard]] bool operator!=(
-                const OrientedVertexCycle& other ) const
+                const OrientedVertexCycle< OtherContainer >& other ) const
             {
                 return !operator==( other );
             }
 
+            template < typename OtherContainer >
             [[nodiscard]] bool operator<(
-                const OrientedVertexCycle& other ) const
+                const OrientedVertexCycle< OtherContainer >& other ) const
             {
                 return this->vertices() < other.vertices();
             }

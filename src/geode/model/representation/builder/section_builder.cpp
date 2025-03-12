@@ -41,6 +41,7 @@
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/representation/builder/detail/copy.hpp>
+#include <geode/model/representation/builder/detail/register.hpp>
 #include <geode/model/representation/core/section.hpp>
 
 namespace geode
@@ -132,117 +133,143 @@ namespace geode
     const uuid& SectionBuilder::add_corner()
     {
         const auto& id = create_corner();
-        register_mesh_component( section_.corner( id ) );
+        detail::add_mesh_component( *this, section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_corner( const MeshImpl& impl )
     {
         const auto& id = create_corner( impl );
-        register_mesh_component( section_.corner( id ) );
+        detail::add_mesh_component( *this, section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line()
     {
         const auto& id = create_line();
-        register_mesh_component( section_.line( id ) );
+        detail::add_mesh_component( *this, section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line( const MeshImpl& impl )
     {
         const auto& id = create_line( impl );
-        register_mesh_component( section_.line( id ) );
+        detail::add_mesh_component( *this, section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface()
     {
         const auto& id = create_surface();
-        register_mesh_component( section_.surface( id ) );
+        detail::add_mesh_component( *this, section_.surface( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface( const MeshImpl& impl )
     {
         const auto& id = create_surface( impl );
-        register_mesh_component( section_.surface( id ) );
+        detail::add_mesh_component( *this, section_.surface( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_model_boundary()
     {
         const auto& id = create_model_boundary();
+        detail::add_collection_component(
+            *this, section_.model_boundary( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_corner_collection()
     {
         const auto& id = create_corner_collection();
+        detail::add_collection_component(
+            *this, section_.corner_collection( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line_collection()
     {
         const auto& id = create_line_collection();
+        detail::add_collection_component(
+            *this, section_.line_collection( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface_collection()
     {
         const auto& id = create_surface_collection();
+        detail::add_collection_component(
+            *this, section_.surface_collection( id ) );
         return id;
     }
 
-    void SectionBuilder::add_corner( uuid corner_id )
+    void SectionBuilder::add_corner( const uuid& corner_id )
     {
-        create_corner( std::move( corner_id ) );
+        create_corner( corner_id );
+        detail::add_mesh_component( *this, section_.corner( corner_id ) );
     }
 
-    void SectionBuilder::add_corner( uuid corner_id, const MeshImpl& impl )
+    void SectionBuilder::add_corner(
+        const uuid& corner_id, const MeshImpl& impl )
     {
-        create_corner( std::move( corner_id ), impl );
+        create_corner( corner_id, impl );
+        detail::add_mesh_component( *this, section_.corner( corner_id ) );
     }
 
-    void SectionBuilder::add_line( uuid line_id )
+    void SectionBuilder::add_line( const uuid& line_id )
     {
-        create_line( std::move( line_id ) );
+        create_line( line_id );
+        detail::add_mesh_component( *this, section_.line( line_id ) );
     }
 
-    void SectionBuilder::add_line( uuid line_id, const MeshImpl& impl )
+    void SectionBuilder::add_line( const uuid& line_id, const MeshImpl& impl )
     {
-        create_line( std::move( line_id ), impl );
+        create_line( line_id, impl );
+        detail::add_mesh_component( *this, section_.line( line_id ) );
     }
 
-    void SectionBuilder::add_surface( uuid surface_id )
+    void SectionBuilder::add_surface( const uuid& surface_id )
     {
-        create_surface( std::move( surface_id ) );
+        create_surface( surface_id );
+        detail::add_mesh_component( *this, section_.surface( surface_id ) );
     }
 
-    void SectionBuilder::add_surface( uuid surface_id, const MeshImpl& impl )
+    void SectionBuilder::add_surface(
+        const uuid& surface_id, const MeshImpl& impl )
     {
-        create_surface( std::move( surface_id ), impl );
+        create_surface( surface_id, impl );
+        detail::add_mesh_component( *this, section_.surface( surface_id ) );
     }
 
-    void SectionBuilder::add_model_boundary( uuid model_boundary_id )
+    void SectionBuilder::add_model_boundary( const uuid& model_boundary_id )
     {
-        create_model_boundary( std::move( model_boundary_id ) );
+        create_model_boundary( model_boundary_id );
+        detail::add_collection_component(
+            *this, section_.model_boundary( model_boundary_id ) );
     }
 
-    void SectionBuilder::add_corner_collection( uuid corner_collection_id )
+    void SectionBuilder::add_corner_collection(
+        const uuid& corner_collection_id )
     {
-        create_corner_collection( std::move( corner_collection_id ) );
+        create_corner_collection( corner_collection_id );
+        detail::add_collection_component(
+            *this, section_.corner_collection( corner_collection_id ) );
     }
 
-    void SectionBuilder::add_line_collection( uuid line_collection_id )
+    void SectionBuilder::add_line_collection( const uuid& line_collection_id )
     {
-        create_line_collection( std::move( line_collection_id ) );
+        create_line_collection( line_collection_id );
+        detail::add_collection_component(
+            *this, section_.line_collection( line_collection_id ) );
     }
 
-    void SectionBuilder::add_surface_collection( uuid surface_collection_id )
+    void SectionBuilder::add_surface_collection(
+        const uuid& surface_collection_id )
     {
-        create_surface_collection( std::move( surface_collection_id ) );
+        create_surface_collection( surface_collection_id );
+        detail::add_collection_component(
+            *this, section_.surface_collection( surface_collection_id ) );
     }
 
     void SectionBuilder::update_corner_mesh(
@@ -271,50 +298,47 @@ namespace geode
 
     void SectionBuilder::remove_corner( const Corner2D& corner )
     {
-        unregister_component( corner.id() );
-        unregister_mesh_component( corner );
+        detail::remove_mesh_component( *this, corner );
         delete_corner( corner );
     }
 
     void SectionBuilder::remove_line( const Line2D& line )
     {
-        unregister_component( line.id() );
-        unregister_mesh_component( line );
+        detail::remove_mesh_component( *this, line );
         delete_line( line );
     }
 
     void SectionBuilder::remove_surface( const Surface2D& surface )
     {
-        unregister_component( surface.id() );
-        unregister_mesh_component( surface );
+        detail::remove_mesh_component( *this, surface );
         delete_surface( surface );
     }
 
     void SectionBuilder::remove_model_boundary(
         const ModelBoundary2D& boundary )
     {
-        unregister_component( boundary.id() );
+        detail::remove_collection_component( *this, boundary );
         delete_model_boundary( boundary );
     }
 
     void SectionBuilder::remove_corner_collection(
         const CornerCollection2D& collection )
     {
-        unregister_component( collection.id() );
+        detail::remove_collection_component( *this, collection );
         delete_corner_collection( collection );
     }
 
     void SectionBuilder::remove_line_collection(
         const LineCollection2D& collection )
     {
-        unregister_component( collection.id() );
+        detail::remove_collection_component( *this, collection );
         delete_line_collection( collection );
     }
 
     void SectionBuilder::remove_surface_collection(
         const SurfaceCollection2D& collection )
     {
-        unregister_component( collection.id() );
+        detail::remove_collection_component( *this, collection );
         delete_surface_collection( collection );
     }
 

@@ -26,6 +26,7 @@
 #include <pybind11/stl.h>
 
 #include <absl/container/fixed_array.h>
+#include <absl/container/flat_hash_map.h>
 #include <absl/container/inlined_vector.h>
 #include <absl/types/span.h>
 
@@ -68,6 +69,12 @@ namespace pybind11
             }
 
             std::vector< typename std::remove_const< Type >::type > cpp_;
+        };
+
+        template < typename Key, typename Value >
+        struct type_caster< absl::flat_hash_map< Key, Value > >
+            : map_caster< absl::flat_hash_map< Key, Value >, Key, Value >
+        {
         };
     } // namespace detail
 } // namespace pybind11

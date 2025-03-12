@@ -95,8 +95,6 @@ namespace geode
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Block< dimension >::component_type_static().get() );
-        const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( const auto& block : blocks() )
@@ -131,10 +129,7 @@ namespace geode
                 }
             } );
         }
-        auto all_tasks = async::when_all( tasks );
-        all_tasks.wait();
-        Logger::set_level( level );
-        for( auto& task : all_tasks.get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
@@ -146,8 +141,6 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
-        const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( auto& block : modifiable_blocks( {} ) )
@@ -176,10 +169,7 @@ namespace geode
                 }
             } );
         }
-        auto all_tasks = async::when_all( tasks );
-        all_tasks.wait();
-        Logger::set_level( level );
-        for( auto& task : all_tasks.get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }

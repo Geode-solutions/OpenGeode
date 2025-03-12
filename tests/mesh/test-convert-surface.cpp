@@ -24,16 +24,20 @@
 #include <geode/tests/common.hpp>
 
 #include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/io/polygonal_surface_output.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
 
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
@@ -78,9 +82,9 @@ void convert_grid_to_surface()
 {
     geode::LightRegularGrid2D grid{ geode::Point2D{ { 1, 2 } }, { 5, 6 },
         { 1, 1 } };
-    const std::array< geode::index_t, 4 > cells_to_densify{ 5, 11, 12, 13 };
     const auto converted_grid2d =
         geode::convert_grid_into_triangulated_surface( grid );
+    const std::array< geode::index_t, 4 > cells_to_densify{ 5, 11, 12, 13 };
     const auto converted_grid2d_densified =
         geode::convert_grid_into_densified_triangulated_surface(
             grid, cells_to_densify );
@@ -92,6 +96,37 @@ void convert_grid_to_surface()
             == grid.nb_cells() * 2 + 2 * cells_to_densify.size(),
         "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
         "correct." );
+
+    geode::Logger::debug( "Triangulated surface from created RegularGrid" );
+    auto mesh_grid = geode::RegularGrid2D::create();
+    auto builder = geode::RegularGridBuilder2D::create( *mesh_grid );
+    builder->initialize_grid( geode::Point2D{ { 1, 1.5 } }, { 5, 5 }, 5 );
+    const auto tri_surf_from_mesh_grid_1 =
+        geode::convert_surface_mesh_into_triangulated_surface( *mesh_grid );
+    const auto tri_surf_from_mesh_grid_2 =
+        geode::convert_grid_into_triangulated_surface( *mesh_grid );
+
+    geode::Logger::debug( "Triangulated surface from old RegularGrid" );
+    const auto old_regular_grid = geode::load_regular_grid< 2 >(
+        absl::StrCat( geode::DATA_PATH, "old_regular_grid.og_rgd2d" ) );
+    const auto old_regular_grid_surface =
+        geode::convert_grid_into_triangulated_surface( *old_regular_grid );
+    auto test_attribute =
+        old_regular_grid_surface->vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute,
+                geode::Point2D >( "test", geode::Point2D{ { 0., 0. } } );
+    auto pt_attribute = old_regular_grid_surface->vertex_attribute_manager()
+                            .find_attribute< geode::Point2D >( "points" );
+    const auto old_regular_grid_surface2 =
+        geode::convert_surface_mesh_into_triangulated_surface(
+            *old_regular_grid )
+            .value();
+    auto test_attribute2 =
+        old_regular_grid_surface2->vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute,
+                geode::Point2D >( "test", geode::Point2D{ { 0., 0. } } );
+    auto pt_attribute2 = old_regular_grid_surface2->vertex_attribute_manager()
+                             .find_attribute< geode::Point2D >( "points" );
 }
 
 void triangulate_surface()
@@ -118,6 +153,7 @@ void triangulate_surface()
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    geode::Logger::set_level( geode::Logger::LEVEL::debug );
     convert_surface_dimension();
     convert_grid_to_surface();
     triangulate_surface();

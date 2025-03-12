@@ -127,25 +127,25 @@ namespace geode
 
         [[nodiscard]] const uuid& add_surface_collection();
 
-        void add_corner( uuid corner_id );
+        void add_corner( const uuid& corner_id );
 
-        void add_corner( uuid corner_id, const MeshImpl& impl );
+        void add_corner( const uuid& corner_id, const MeshImpl& impl );
 
-        void add_line( uuid line_id );
+        void add_line( const uuid& line_id );
 
-        void add_line( uuid line_id, const MeshImpl& impl );
+        void add_line( const uuid& line_id, const MeshImpl& impl );
 
-        void add_surface( uuid surface_id );
+        void add_surface( const uuid& surface_id );
 
-        void add_surface( uuid surface_id, const MeshImpl& impl );
+        void add_surface( const uuid& surface_id, const MeshImpl& impl );
 
-        void add_model_boundary( uuid model_boundary_id );
+        void add_model_boundary( const uuid& model_boundary_id );
 
-        void add_corner_collection( uuid corner_collection_id );
+        void add_corner_collection( const uuid& corner_collection_id );
 
-        void add_line_collection( uuid line_collection_id );
+        void add_line_collection( const uuid& line_collection_id );
 
-        void add_surface_collection( uuid surface_collection_id );
+        void add_surface_collection( const uuid& surface_collection_id );
 
         void update_corner_mesh(
             const Corner2D& corner, std::unique_ptr< PointSet2D > mesh );
