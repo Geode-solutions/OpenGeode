@@ -187,12 +187,8 @@ namespace geode
         }
 
     private:
-        template < typename EpsilonType >
         std::vector< index_t > vertices_around(
-            const Point< dimension >& point, const EpsilonType& epsilon ) const;
-
-        std::vector< index_t > vertices_around(
-            const Point< dimension >& point, const double& epsilon ) const
+            const Point< dimension >& point, double epsilon ) const
         {
             return radius_neighbors( point, epsilon );
         }
