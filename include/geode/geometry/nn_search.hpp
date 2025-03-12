@@ -28,11 +28,12 @@
 
 #include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/common.hpp>
-#include <geode/geometry/frame.hpp>
 #include <geode/geometry/point.hpp>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Frame );
+
     /*!
      * Given a list of points, this class returns neighboring points.
      */
@@ -138,7 +139,7 @@ namespace geode
          * @return The information related to this colocated operation
          */
         [[nodiscard]] ColocatedInfo colocated_index_mapping(
-            const double epsilon ) const;
+            double epsilon ) const;
 
         [[nodiscard]] ColocatedInfo colocated_index_mapping(
             const Frame< dimension >& epsilon ) const;

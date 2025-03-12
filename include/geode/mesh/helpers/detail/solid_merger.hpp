@@ -72,7 +72,7 @@ namespace geode
             ~SolidMeshMerger();
 
             [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge(
-                const double epsilon );
+                double epsilon );
 
             [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge(
                 const Frame< dimension >& epsilons_frame );

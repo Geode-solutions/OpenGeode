@@ -24,6 +24,7 @@
 #include <geode/geometry/nn_search.hpp>
 
 #include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/frame.hpp>
 #include <geode/geometry/intersection.hpp>
 
 #include <mutex>
@@ -309,9 +310,8 @@ namespace geode
         {
             OPENGEODE_EXCEPTION(
                 epsilons_frame.direction( d ).length() >= GLOBAL_EPSILON,
-                "[NNSearch::colocated_index_mapping] Given epsilon too "
-                "small, "
-                "should be bigger than GLOBAL_EPSILON (i.e. ",
+                "[NNSearch::colocated_index_mapping] Given epsilon is too "
+                "small, should be bigger than GLOBAL_EPSILON (i.e. ",
                 GLOBAL_EPSILON, ")" );
         }
         return impl_->colocated_index_mapping( *this, epsilons_frame );
