@@ -110,19 +110,18 @@ namespace geode
             const Point< dimension >& point, double threshold_distance ) const;
 
         /*!
-         * Get the neighbors closer than a given distance from the given point
-         * or within a sphere
-         * @param[in] point The center of the sphere
-         * @param[in] threshold_distance The radius of the sphere
+         * Get the neighbors within an ellipse described by its frame, centered
+         * on the given point
+         * @param[in] point The center of the ellipse
+         * @param[in] epsilons_frame The frame describing the ellipse
          * @return the list of points inside this distance
          */
         [[nodiscard]] std::vector< index_t > frame_neighbors(
             const Point< dimension >& point,
-            const Frame< dimension >& epsilons_frame,
-            const double factor_distance ) const;
+            const Frame< dimension >& epsilons_frame ) const;
 
         /*!
-         * Get a number ol close neighbors from the given point
+         * Get a number of close neighbors from the given point
          * @param[in] point The requested point
          * @param[in] nb_neighbors The number of neighbors to return
          * @return the list of points, it can be smaller than the requested
@@ -142,8 +141,7 @@ namespace geode
             const double epsilon ) const;
 
         [[nodiscard]] ColocatedInfo colocated_index_mapping(
-            const Frame< dimension >& epsilon,
-            const double factor_distance ) const;
+            const Frame< dimension >& epsilon ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

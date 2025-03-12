@@ -42,7 +42,7 @@ namespace geode
     {
         template < index_t dimension >
         class SurfaceMeshMerger
-            : public VertexMerger< SurfaceMesh< dimension >, dimension >
+            : public VertexMerger< SurfaceMesh< dimension > >
         {
         public:
             struct PolygonOrigin
@@ -72,8 +72,7 @@ namespace geode
                 double epsilon );
 
             [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > > merge(
-                const Frame< dimension >& epsilons_frame,
-                const double factor_distance );
+                const Frame< dimension >& epsilons_frame );
 
             [[nodiscard]] index_t polygon_in_merged(
                 index_t surface, index_t polygon ) const;

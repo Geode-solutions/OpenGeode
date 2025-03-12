@@ -43,10 +43,10 @@ namespace geode
 {
     namespace detail
     {
-        template < typename Mesh, index_t dimension >
-        class VertexMerger< Mesh, dimension >::Impl
+        template < typename Mesh >
+        class VertexMerger< Mesh >::Impl
         {
-            // static constexpr auto dimension = Mesh::dim;
+            static constexpr auto dimension = Mesh::dim;
             using Builder = typename Mesh::Builder;
             using ColocatedInfo = typename NNSearch< dimension >::ColocatedInfo;
 
@@ -126,11 +126,9 @@ namespace geode
                 }
             }
 
-            void create_points( const Frame< dimension >& epsilon,
-                const double factor_distance )
+            void create_points( const Frame< dimension >& epsilon )
             {
-                auto info =
-                    create_colocated_index_mapping( epsilon, factor_distance );
+                auto info = create_colocated_index_mapping( epsilon );
                 vertices_ = std::move( info.colocated_mapping );
                 builder_->create_vertices( info.nb_unique_points() );
                 for( const auto p : Range{ info.nb_unique_points() } )
@@ -170,8 +168,7 @@ namespace geode
             }
 
             ColocatedInfo create_colocated_index_mapping(
-                const Frame< dimension >& epsilon,
-                const double factor_distance )
+                const Frame< dimension >& epsilon )
             {
                 index_t nb_points{ 0 };
                 for( const auto& mesh : meshes_ )
@@ -188,8 +185,7 @@ namespace geode
                     }
                 }
                 NNSearch< dimension > nnsearch{ std::move( points ) };
-                return nnsearch.colocated_index_mapping(
-                    epsilon, factor_distance );
+                return nnsearch.colocated_index_mapping( epsilon );
             }
 
         private:
@@ -201,82 +197,80 @@ namespace geode
             std::vector< VertexOrigins > vertices_origins_;
         };
 
-        template < typename Mesh, index_t dimension >
-        VertexMerger< Mesh, dimension >::VertexMerger(
+        template < typename Mesh >
+        VertexMerger< Mesh >::VertexMerger(
             absl::Span< const std::reference_wrapper< const Mesh > > meshes )
             : impl_{ meshes }
         {
         }
 
-        template < typename Mesh, index_t dimension >
-        VertexMerger< Mesh, dimension >::VertexMerger(
-            VertexMerger&& ) noexcept = default;
+        template < typename Mesh >
+        VertexMerger< Mesh >::VertexMerger( VertexMerger&& ) noexcept = default;
 
-        template < typename Mesh, index_t dimension >
-        VertexMerger< Mesh, dimension >::~VertexMerger() = default;
+        template < typename Mesh >
+        VertexMerger< Mesh >::~VertexMerger() = default;
 
-        template < typename Mesh, index_t dimension >
-        index_t VertexMerger< Mesh, dimension >::vertex_in_merged(
+        template < typename Mesh >
+        index_t VertexMerger< Mesh >::vertex_in_merged(
             index_t mesh, index_t vertex ) const
         {
             return impl_->vertex_in_merged( mesh, vertex );
         }
 
-        template < typename Mesh, index_t dimension >
-        auto VertexMerger< Mesh, dimension >::vertex_origins(
-            index_t vertex ) const -> const VertexOrigins&
+        template < typename Mesh >
+        auto VertexMerger< Mesh >::vertex_origins( index_t vertex ) const
+            -> const VertexOrigins&
         {
             return impl_->vertex_origins( vertex );
         }
 
-        template < typename Mesh, index_t dimension >
+        template < typename Mesh >
         absl::Span< const std::reference_wrapper< const Mesh > >
-            VertexMerger< Mesh, dimension >::meshes() const
+            VertexMerger< Mesh >::meshes() const
         {
             return impl_->meshes();
         }
 
-        template < typename Mesh, index_t dimension >
-        const Mesh& VertexMerger< Mesh, dimension >::mesh() const
+        template < typename Mesh >
+        const Mesh& VertexMerger< Mesh >::mesh() const
         {
             return impl_->mesh();
         }
 
-        template < typename Mesh, index_t dimension >
-        std::unique_ptr< Mesh > VertexMerger< Mesh, dimension >::steal_mesh()
+        template < typename Mesh >
+        std::unique_ptr< Mesh > VertexMerger< Mesh >::steal_mesh()
         {
             return impl_->steal_mesh();
         }
 
-        template < typename Mesh, index_t dimension >
-        auto VertexMerger< Mesh, dimension >::builder() -> Builder&
+        template < typename Mesh >
+        auto VertexMerger< Mesh >::builder() -> Builder&
         {
             return impl_->builder();
         }
 
-        template < typename Mesh, index_t dimension >
-        void VertexMerger< Mesh, dimension >::create_points( double epsilon )
+        template < typename Mesh >
+        void VertexMerger< Mesh >::create_points( double epsilon )
         {
             impl_->create_points( epsilon );
         }
 
-        template < typename Mesh, index_t dimension >
-        void VertexMerger< Mesh, dimension >::create_points(
-            const Frame< dimension >& epsilons_frame,
-            const double factor_distance )
+        template < typename Mesh >
+        void VertexMerger< Mesh >::create_points(
+            const Frame< Mesh::dim >& epsilons_frame )
         {
-            impl_->create_points( epsilons_frame, factor_distance );
+            impl_->create_points( epsilons_frame );
         }
 
-        template class opengeode_mesh_api VertexMerger< PointSet2D, 2 >;
-        template class opengeode_mesh_api VertexMerger< PointSet3D, 3 >;
+        template class opengeode_mesh_api VertexMerger< PointSet2D >;
+        template class opengeode_mesh_api VertexMerger< PointSet3D >;
 
-        template class opengeode_mesh_api VertexMerger< EdgedCurve2D, 2 >;
-        template class opengeode_mesh_api VertexMerger< EdgedCurve3D, 3 >;
+        template class opengeode_mesh_api VertexMerger< EdgedCurve2D >;
+        template class opengeode_mesh_api VertexMerger< EdgedCurve3D >;
 
-        template class opengeode_mesh_api VertexMerger< SurfaceMesh2D, 2 >;
-        template class opengeode_mesh_api VertexMerger< SurfaceMesh3D, 3 >;
+        template class opengeode_mesh_api VertexMerger< SurfaceMesh2D >;
+        template class opengeode_mesh_api VertexMerger< SurfaceMesh3D >;
 
-        template class opengeode_mesh_api VertexMerger< SolidMesh3D, 3 >;
+        template class opengeode_mesh_api VertexMerger< SolidMesh3D >;
     } // namespace detail
 } // namespace geode

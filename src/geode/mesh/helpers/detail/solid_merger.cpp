@@ -97,10 +97,9 @@ namespace geode
 
             std::unique_ptr< SolidMesh< dimension > > merge(
                 SolidMeshMerger< dimension >& merger,
-                const Frame3D& epsilons_frame,
-                const double factor_distance )
+                const Frame3D& epsilons_frame )
             {
-                merger.create_points( epsilons_frame, factor_distance );
+                merger.create_points( epsilons_frame );
                 create_polyhedra( merger );
                 create_adjacencies( merger );
                 clean_solid( merger );
@@ -329,8 +328,7 @@ namespace geode
         SolidMeshMerger< dimension >::SolidMeshMerger( absl::Span<
             const std::reference_wrapper< const SolidMesh< dimension > > >
                 solids )
-            : VertexMerger< SolidMesh< dimension >, dimension >{ solids },
-              impl_{ solids }
+            : VertexMerger< SolidMesh< dimension > >{ solids }, impl_{ solids }
         {
         }
 
@@ -351,10 +349,9 @@ namespace geode
         template < index_t dimension >
         std::unique_ptr< SolidMesh< dimension > >
             SolidMeshMerger< dimension >::merge(
-                const Frame< dimension >& epsilons_frame,
-                const double factor_distance )
+                const Frame< dimension >& epsilons_frame )
         {
-            return impl_->merge( *this, epsilons_frame, factor_distance );
+            return impl_->merge( *this, epsilons_frame );
         }
 
         template < index_t dimension >

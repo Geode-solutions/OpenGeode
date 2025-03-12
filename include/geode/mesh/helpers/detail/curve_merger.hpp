@@ -41,8 +41,7 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class EdgedCurveMerger
-            : public VertexMerger< EdgedCurve< dimension >, dimension >
+        class EdgedCurveMerger : public VertexMerger< EdgedCurve< dimension > >
         {
         public:
             struct EdgeOrigin
@@ -71,8 +70,7 @@ namespace geode
                 double epsilon );
 
             [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge(
-                const Frame< dimension >& epsilons_frame,
-                const double factor_distance );
+                const Frame< dimension >& epsilons_frame );
 
             [[nodiscard]] index_t edge_in_merged(
                 index_t curve, index_t edge ) const;

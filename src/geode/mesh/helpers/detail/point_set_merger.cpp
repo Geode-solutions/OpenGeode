@@ -33,7 +33,7 @@ namespace geode
         PointSetMerger< dimension >::PointSetMerger( absl::Span<
             const std::reference_wrapper< const PointSet< dimension > > >
                 pointsets )
-            : VertexMerger< PointSet< dimension >, dimension >{ pointsets }
+            : VertexMerger< PointSet< dimension > >{ pointsets }
         {
         }
 
@@ -55,13 +55,13 @@ namespace geode
         template < index_t dimension >
         std::unique_ptr< PointSet< dimension > >
             PointSetMerger< dimension >::merge(
-                const Frame3D& frame, const double factor_distance )
+                const Frame< dimension >& frame )
         {
-            this->create_points( frame, factor_distance );
+            this->create_points( frame );
             return this->steal_mesh();
         }
 
-        // template class opengeode_mesh_api PointSetMerger< 2 >;
-        // template class opengeode_mesh_api PointSetMerger< 3 >;
+        template class opengeode_mesh_api PointSetMerger< 2 >;
+        template class opengeode_mesh_api PointSetMerger< 3 >;
     } // namespace detail
 } // namespace geode

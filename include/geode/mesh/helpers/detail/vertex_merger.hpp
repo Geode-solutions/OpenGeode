@@ -34,7 +34,7 @@ namespace geode
 {
     namespace detail
     {
-        template < typename Mesh, index_t dimension >
+        template < typename Mesh >
         class VertexMerger
         {
         public:
@@ -59,10 +59,6 @@ namespace geode
                 index_t vertex ) const;
 
         protected:
-            // VertexMerger(
-            //     absl::Span< const std::reference_wrapper< const Mesh > >
-            //     meshes, double epsilon );
-
             VertexMerger(
                 absl::Span< const std::reference_wrapper< const Mesh > >
                     meshes );
@@ -82,8 +78,7 @@ namespace geode
 
             void create_points( double epsilon );
 
-            void create_points( const Frame< dimension >& epsilons_frame,
-                const double factor_distance );
+            void create_points( const Frame< Mesh::dim >& epsilons_frame );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

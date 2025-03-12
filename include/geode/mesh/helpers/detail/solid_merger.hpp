@@ -43,8 +43,7 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class SolidMeshMerger
-            : public VertexMerger< SolidMesh< dimension >, dimension >
+        class SolidMeshMerger : public VertexMerger< SolidMesh< dimension > >
         {
         public:
             struct PolyhedronOrigin
@@ -76,8 +75,7 @@ namespace geode
                 const double epsilon );
 
             [[nodiscard]] std::unique_ptr< SolidMesh< dimension > > merge(
-                const Frame< dimension >& epsilons_frame,
-                const double factor_distance );
+                const Frame< dimension >& epsilons_frame );
 
             [[nodiscard]] index_t polyhedron_in_merged(
                 index_t solid, index_t polyhedron ) const;

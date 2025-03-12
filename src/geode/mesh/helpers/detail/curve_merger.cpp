@@ -71,10 +71,9 @@ namespace geode
 
             std::unique_ptr< EdgedCurve< dimension > > merge(
                 EdgedCurveMerger< dimension >& merger,
-                const Frame< dimension >& epsilons_frame,
-                const double factor_distance )
+                const Frame< dimension >& epsilons_frame )
             {
-                merger.create_points( epsilons_frame, factor_distance );
+                merger.create_points( epsilons_frame );
                 create_edges( merger );
                 clean_curve( merger );
                 curve_id_.clear();
@@ -197,8 +196,7 @@ namespace geode
         EdgedCurveMerger< dimension >::EdgedCurveMerger( absl::Span<
             const std::reference_wrapper< const EdgedCurve< dimension > > >
                 curves )
-            : VertexMerger< EdgedCurve< dimension >, dimension >{ curves },
-              impl_{ curves }
+            : VertexMerger< EdgedCurve< dimension > >{ curves }, impl_{ curves }
         {
         }
 
@@ -219,10 +217,9 @@ namespace geode
         template < index_t dimension >
         std::unique_ptr< EdgedCurve< dimension > >
             EdgedCurveMerger< dimension >::merge(
-                const Frame< dimension >& epsilons_frame,
-                const double factor_distance )
+                const Frame< dimension >& epsilons_frame )
         {
-            return impl_->merge( *this, epsilons_frame, factor_distance );
+            return impl_->merge( *this, epsilons_frame );
         }
 
         template < index_t dimension >
@@ -233,8 +230,8 @@ namespace geode
         }
 
         template < index_t dimension >
-        auto EdgedCurveMerger< dimension >::edge_origins(
-            index_t edge ) const -> const EdgeOrigins&
+        auto EdgedCurveMerger< dimension >::edge_origins( index_t edge ) const
+            -> const EdgeOrigins&
         {
             return impl_->edge_origins( edge );
         }
