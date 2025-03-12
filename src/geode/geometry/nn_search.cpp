@@ -60,9 +60,8 @@ namespace geode
             return cloud_.kdtree_get_point_count();
         }
 
-        std::vector< index_t > radius_neighbors(
-            const Point< dimension >& point,
-            const double threshold_distance ) const
+        std::vector< index_t > neighbors(
+            const Point< dimension >& point, double threshold_distance ) const
         {
             std::vector< nanoflann::ResultItem< index_t, double > > results;
             nanoflann::SearchParameters params;
@@ -78,7 +77,7 @@ namespace geode
             return indices;
         }
 
-        std::vector< index_t > frame_neighbors( const Point< dimension >& point,
+        std::vector< index_t > neighbors( const Point< dimension >& point,
             const Frame< dimension >& epsilons_frame ) const
         {
             std::vector< nanoflann::ResultItem< index_t, double > > results;
@@ -109,7 +108,7 @@ namespace geode
             return indices;
         }
 
-        std::vector< index_t > neighbors(
+        std::vector< index_t > nearest_vertices(
             const Point< dimension >& point, const index_t nb_neighbors ) const
         {
             std::vector< index_t > results( nb_neighbors );
@@ -138,7 +137,7 @@ namespace geode
                         return;
                     }
                     const auto neighbor_vertices =
-                        vertices_around( point( point_id ), epsilon );
+                        neighbors( point( point_id ), epsilon );
                     std::lock_guard< std::mutex > lock( mutex );
                     if( mapping[point_id] != NO_ID )
                     {
@@ -187,18 +186,6 @@ namespace geode
         }
 
     private:
-        std::vector< index_t > vertices_around(
-            const Point< dimension >& point, double epsilon ) const
-        {
-            return radius_neighbors( point, epsilon );
-        }
-
-        std::vector< index_t > vertices_around( const Point< dimension >& point,
-            const Frame< dimension >& epsilon ) const
-        {
-            return frame_neighbors( point, epsilon );
-        }
-
         std::array< double, dimension > copy(
             const Point< dimension >& point ) const
         {
@@ -275,14 +262,14 @@ namespace geode
     index_t NNSearch< dimension >::closest_neighbor(
         const Point< dimension >& point ) const
     {
-        return impl_->neighbors( point, 1 ).front();
+        return impl_->nearest_vertices( point, 1 ).front();
     }
 
     template < index_t dimension >
     std::vector< index_t > NNSearch< dimension >::radius_neighbors(
         const Point< dimension >& point, double threshold_distance ) const
     {
-        return impl_->radius_neighbors( point, threshold_distance );
+        return impl_->neighbors( point, threshold_distance );
     }
 
     template < index_t dimension >
@@ -290,14 +277,14 @@ namespace geode
         const Point< dimension >& point,
         const Frame< dimension >& epsilons_frame ) const
     {
-        return impl_->frame_neighbors( point, epsilons_frame );
+        return impl_->neighbors( point, epsilons_frame );
     }
 
     template < index_t dimension >
     std::vector< index_t > NNSearch< dimension >::neighbors(
         const Point< dimension >& point, index_t nb_neighbors ) const
     {
-        return impl_->neighbors( point, nb_neighbors );
+        return impl_->nearest_vertices( point, nb_neighbors );
     }
 
     template < geode::index_t dimension >
