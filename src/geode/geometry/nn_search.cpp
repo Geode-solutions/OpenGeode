@@ -95,8 +95,13 @@ namespace geode
             indices.reserve( nb_results );
             for( auto&& result : results )
             {
-                Segment< dimension > segment{ point,
-                    this->point( result.first ) };
+                const auto& neighbor = this->point( result.first );
+                if( point.inexact_equal( neighbor ) )
+                {
+                    indices.emplace_back( result.first );
+                    continue;
+                }
+                Segment< dimension > segment{ point, neighbor };
                 if( segment_ellipse_intersection(
                         segment, Ellipse< dimension >{ point, epsilons_frame } )
                         .type
@@ -131,8 +136,7 @@ namespace geode
             std::vector< index_t > mapping( nb_points, NO_ID );
             std::mutex mutex;
             async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
-                [&nn_search, &epsilon, &mapping, &mutex, this](
-                    index_t point_id ) {
+                [&epsilon, &mapping, &mutex, this]( index_t point_id ) {
                     if( mapping[point_id] != NO_ID )
                     {
                         return;
