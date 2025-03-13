@@ -148,7 +148,8 @@ namespace geode
 
         private:
             template < typename EpsilonType >
-            ColocatedInfo create_colocated_index_mapping( EpsilonType epsilon )
+            ColocatedInfo create_colocated_index_mapping(
+                const EpsilonType& epsilon )
             {
                 index_t nb_points{ 0 };
                 for( const auto& mesh : meshes_ )
@@ -198,8 +199,8 @@ namespace geode
         }
 
         template < typename Mesh >
-        auto VertexMerger< Mesh >::vertex_origins(
-            index_t vertex ) const -> const VertexOrigins&
+        auto VertexMerger< Mesh >::vertex_origins( index_t vertex ) const
+            -> const VertexOrigins&
         {
             return impl_->vertex_origins( vertex );
         }
