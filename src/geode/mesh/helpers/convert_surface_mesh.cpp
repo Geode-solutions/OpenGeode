@@ -496,9 +496,8 @@ namespace geode
             const std::reference_wrapper< const SurfaceMesh< dimension > > >
             surfaces )
     {
-        detail::SurfaceMeshMerger< dimension > merger{ surfaces,
-            GLOBAL_EPSILON };
-        return merger.merge();
+        detail::SurfaceMeshMerger< dimension > merger{ surfaces };
+        return merger.merge( GLOBAL_EPSILON );
     }
 
     template std::unique_ptr< PolygonalSurface2D > opengeode_mesh_api

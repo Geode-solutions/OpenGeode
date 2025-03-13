@@ -26,11 +26,14 @@
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/pimpl.hpp>
 
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/common.hpp>
 #include <geode/geometry/point.hpp>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Frame );
+
     /*!
      * Given a list of points, this class returns neighboring points.
      */
@@ -108,7 +111,18 @@ namespace geode
             const Point< dimension >& point, double threshold_distance ) const;
 
         /*!
-         * Get a number ol close neighbors from the given point
+         * Get the neighbors within an ellipse described by its frame, centered
+         * on the given point
+         * @param[in] point The center of the ellipse
+         * @param[in] epsilons_frame The frame describing the ellipse
+         * @return the list of points inside this distance
+         */
+        [[nodiscard]] std::vector< index_t > frame_neighbors(
+            const Point< dimension >& point,
+            const Frame< dimension >& epsilons_frame ) const;
+
+        /*!
+         * Get a number of close neighbors from the given point
          * @param[in] point The requested point
          * @param[in] nb_neighbors The number of neighbors to return
          * @return the list of points, it can be smaller than the requested
@@ -126,6 +140,9 @@ namespace geode
          */
         [[nodiscard]] ColocatedInfo colocated_index_mapping(
             double epsilon ) const;
+
+        [[nodiscard]] ColocatedInfo colocated_index_mapping(
+            const Frame< dimension >& epsilon ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

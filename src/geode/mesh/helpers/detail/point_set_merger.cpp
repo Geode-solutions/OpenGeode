@@ -30,11 +30,10 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        PointSetMerger< dimension >::PointSetMerger(
-            absl::Span< const std::reference_wrapper<
-                const PointSet< dimension > > > pointsets,
-            double epsilon )
-            : VertexMerger< PointSet< dimension > >{ pointsets, epsilon }
+        PointSetMerger< dimension >::PointSetMerger( absl::Span<
+            const std::reference_wrapper< const PointSet< dimension > > >
+                pointsets )
+            : VertexMerger< PointSet< dimension > >{ pointsets }
         {
         }
 
@@ -47,9 +46,18 @@ namespace geode
 
         template < index_t dimension >
         std::unique_ptr< PointSet< dimension > >
-            PointSetMerger< dimension >::merge()
+            PointSetMerger< dimension >::merge( double epsilon )
         {
-            this->create_points();
+            this->create_points( epsilon );
+            return this->steal_mesh();
+        }
+
+        template < index_t dimension >
+        std::unique_ptr< PointSet< dimension > >
+            PointSetMerger< dimension >::merge(
+                const Frame< dimension >& frame )
+        {
+            this->create_points( frame );
             return this->steal_mesh();
         }
 

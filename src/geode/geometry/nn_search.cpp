@@ -23,6 +23,10 @@
 
 #include <geode/geometry/nn_search.hpp>
 
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/frame.hpp>
+#include <geode/geometry/intersection.hpp>
+
 #include <mutex>
 #include <numeric>
 
@@ -57,9 +61,8 @@ namespace geode
             return cloud_.kdtree_get_point_count();
         }
 
-        std::vector< index_t > radius_neighbors(
-            const Point< dimension >& point,
-            const double threshold_distance ) const
+        std::vector< index_t > neighbors(
+            const Point< dimension >& point, double threshold_distance ) const
         {
             std::vector< nanoflann::ResultItem< index_t, double > > results;
             nanoflann::SearchParameters params;
@@ -75,7 +78,43 @@ namespace geode
             return indices;
         }
 
-        std::vector< index_t > neighbors(
+        std::vector< index_t > neighbors( const Point< dimension >& point,
+            const Frame< dimension >& epsilons_frame ) const
+        {
+            std::vector< nanoflann::ResultItem< index_t, double > > results;
+            nanoflann::SearchParameters params;
+            params.sorted = true;
+            const auto max_elongation_direction =
+                epsilons_frame.max_elongation_direction();
+            const auto max_elongation =
+                epsilons_frame.direction( max_elongation_direction ).length();
+            const auto radius = max_elongation * max_elongation;
+            const auto nb_results = nn_tree_.radiusSearch(
+                &copy( point )[0], radius, results, params );
+            std::vector< index_t > indices;
+            indices.reserve( nb_results );
+            for( auto&& result : results )
+            {
+                const auto& neighbor = this->point( result.first );
+                if( point.inexact_equal( neighbor ) )
+                {
+                    indices.emplace_back( result.first );
+                    continue;
+                }
+                Segment< dimension > segment{ point, neighbor };
+                if( segment_ellipse_intersection(
+                        segment, Ellipse< dimension >{ point, epsilons_frame } )
+                        .type
+                    != INTERSECTION_TYPE::none )
+                {
+                    continue;
+                }
+                indices.emplace_back( result.first );
+            }
+            return indices;
+        }
+
+        std::vector< index_t > nearest_vertices(
             const Point< dimension >& point, const index_t nb_neighbors ) const
         {
             std::vector< index_t > results( nb_neighbors );
@@ -84,6 +123,71 @@ namespace geode
                 &copy( point )[0], nb_neighbors, &results[0], &distances[0] );
             results.resize( new_nb_neighbors );
             return results;
+        }
+
+        template < typename EpsilonType >
+        typename geode::NNSearch< dimension >::ColocatedInfo
+            colocated_index_mapping(
+                const geode::NNSearch< dimension >& nn_search,
+                const EpsilonType& epsilon ) const
+        {
+            typename NNSearch< dimension >::ColocatedInfo result;
+            const auto nb_points = nn_search.nb_points();
+            std::vector< index_t > mapping( nb_points, NO_ID );
+            std::mutex mutex;
+            async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
+                [&epsilon, &mapping, &mutex, this]( index_t point_id ) {
+                    if( mapping[point_id] != NO_ID )
+                    {
+                        return;
+                    }
+                    const auto neighbor_vertices =
+                        neighbors( point( point_id ), epsilon );
+                    std::lock_guard< std::mutex > lock( mutex );
+                    if( mapping[point_id] != NO_ID )
+                    {
+                        Logger::trace( point_id,
+                            " : correction 1 / mapping[p] ",
+                            mapping[point_id] );
+                        return;
+                    }
+                    for( const auto vertex_id : neighbor_vertices )
+                    {
+                        Logger::trace( point_id, " : id ", vertex_id,
+                            " / mapping[id] ", mapping[vertex_id] );
+                        if( mapping[vertex_id] == NO_ID )
+                        {
+                            mapping[vertex_id] = point_id;
+                        }
+                    }
+                } );
+            result.colocated_input_points = mapping;
+            index_t nb_unique_points{ 0 };
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] == point_id )
+                {
+                    nb_unique_points++;
+                }
+            }
+            result.unique_points.resize( nb_unique_points );
+            std::vector< index_t > old2new( nb_points, NO_ID );
+            index_t count{ 0 };
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] == point_id )
+                {
+                    result.unique_points[count] = point( point_id );
+                    old2new[point_id] = count;
+                    count++;
+                }
+            }
+            for( const auto point_id : Range{ nb_points } )
+            {
+                mapping[point_id] = old2new[mapping[point_id]];
+            }
+            result.colocated_mapping = mapping;
+            return result;
         }
 
     private:
@@ -163,85 +267,58 @@ namespace geode
     index_t NNSearch< dimension >::closest_neighbor(
         const Point< dimension >& point ) const
     {
-        return impl_->neighbors( point, 1 ).front();
+        return impl_->nearest_vertices( point, 1 ).front();
     }
 
     template < index_t dimension >
     std::vector< index_t > NNSearch< dimension >::radius_neighbors(
         const Point< dimension >& point, double threshold_distance ) const
     {
-        return impl_->radius_neighbors( point, threshold_distance );
+        return impl_->neighbors( point, threshold_distance );
+    }
+
+    template < index_t dimension >
+    std::vector< index_t > NNSearch< dimension >::frame_neighbors(
+        const Point< dimension >& point,
+        const Frame< dimension >& epsilons_frame ) const
+    {
+        return impl_->neighbors( point, epsilons_frame );
     }
 
     template < index_t dimension >
     std::vector< index_t > NNSearch< dimension >::neighbors(
         const Point< dimension >& point, index_t nb_neighbors ) const
     {
-        return impl_->neighbors( point, nb_neighbors );
+        return impl_->nearest_vertices( point, nb_neighbors );
     }
 
-    template < index_t dimension >
-    typename NNSearch< dimension >::ColocatedInfo
-        NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
+    template < geode::index_t dimension >
+    typename geode::NNSearch< dimension >::ColocatedInfo
+        NNSearch< dimension >::colocated_index_mapping(
+            const double epsilon ) const
     {
         OPENGEODE_EXCEPTION( epsilon >= GLOBAL_EPSILON,
-            "[NNSearch::colocated_index_mapping] Given epsilon too small, "
+            "[NNSearch::colocated_index_mapping] Given epsilon too "
+            "small, "
             "should be bigger than GLOBAL_EPSILON (i.e. ",
             GLOBAL_EPSILON, ")" );
-        typename NNSearch< dimension >::ColocatedInfo result;
-        std::vector< index_t > mapping( nb_points(), NO_ID );
-        std::mutex mutex;
-        async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
-            [&epsilon, &mapping, &mutex, this]( index_t p ) {
-                if( mapping[p] != NO_ID )
-                {
-                    return;
-                }
-                const auto vertices = radius_neighbors( point( p ), epsilon );
-                std::lock_guard< std::mutex > lock( mutex );
-                if( mapping[p] != NO_ID )
-                {
-                    Logger::trace(
-                        p, " : correction 1 / mapping[p] ", mapping[p] );
-                    return;
-                }
-                for( const auto id : vertices )
-                {
-                    Logger::trace(
-                        p, " : id ", id, " / mapping[id] ", mapping[id] );
-                    if( mapping[id] == NO_ID )
-                    {
-                        mapping[id] = p;
-                    }
-                }
-            } );
-        result.colocated_input_points = mapping;
-        index_t nb_unique_points{ 0 };
-        for( const auto p : Range{ nb_points() } )
+        return impl_->colocated_index_mapping( *this, epsilon );
+    }
+
+    template < geode::index_t dimension >
+    typename geode::NNSearch< dimension >::ColocatedInfo
+        NNSearch< dimension >::colocated_index_mapping(
+            const Frame< dimension >& epsilons_frame ) const
+    {
+        for( const auto d : LRange{ dimension } )
         {
-            if( mapping[p] == p )
-            {
-                nb_unique_points++;
-            }
+            OPENGEODE_EXCEPTION(
+                epsilons_frame.direction( d ).length() >= GLOBAL_EPSILON,
+                "[NNSearch::colocated_index_mapping] Given epsilon is too "
+                "small, should be bigger than GLOBAL_EPSILON (i.e. ",
+                GLOBAL_EPSILON, ")" );
         }
-        result.unique_points.resize( nb_unique_points );
-        std::vector< index_t > old2new( nb_points(), NO_ID );
-        index_t count{ 0 };
-        for( const auto p : Range{ nb_points() } )
-        {
-            if( mapping[p] == p )
-            {
-                result.unique_points[count] = point( p );
-                old2new[p] = count;
-                count++;
-            }
-        }
-        for( const auto p : Range{ nb_points() } )
-        {
-            mapping[p] = old2new[mapping[p]];
-        }
-        result.colocated_mapping = mapping;
-        return result;
+        return impl_->colocated_index_mapping( *this, epsilons_frame );
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;
