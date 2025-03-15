@@ -42,12 +42,15 @@ namespace geode
         {
         public:
             PointSetMerger( absl::Span< const std::reference_wrapper<
-                                const PointSet< dimension > > > pointsets,
-                double epsilon );
+                    const PointSet< dimension > > > pointsets );
             PointSetMerger( PointSetMerger&& ) noexcept;
             ~PointSetMerger();
 
-            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge();
+            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge(
+                double epsilon );
+
+            [[nodiscard]] std::unique_ptr< PointSet< dimension > > merge(
+                const Frame< dimension >& frame );
         };
         ALIAS_2D_AND_3D( PointSetMerger );
     } // namespace detail

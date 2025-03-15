@@ -53,6 +53,7 @@ namespace geode
         Impl()
         {
             cells_length_.fill( 1 );
+            set_base_origin();
             set_base_grid_directions();
         }
 
@@ -429,16 +430,23 @@ namespace geode
                            { []( Archive& a, Impl& impl ) {
                                 a.container4b( impl.deprecated_cells_number_ );
                                 a.container8b( impl.cells_length_ );
+                                impl.set_base_origin();
                                 impl.set_base_grid_directions();
                             },
                                []( Archive& a, Impl& impl ) {
                                    a.container8b( impl.cells_length_ );
+                                   impl.set_base_origin();
                                    impl.set_base_grid_directions();
                                },
                                []( Archive& a, Impl& impl ) {
                                    a.container8b( impl.cells_length_ );
                                    a.object( impl.grid_coordinate_system_ );
                                } } } );
+        }
+
+        void set_base_origin()
+        {
+            set_grid_origin( Point< dimension >{} );
         }
 
         void set_base_grid_directions()

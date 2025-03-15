@@ -28,6 +28,8 @@
 
 #include <geode/basic/pimpl.hpp>
 
+#include <geode/geometry/frame.hpp>
+
 namespace geode
 {
     namespace detail
@@ -58,8 +60,9 @@ namespace geode
 
         protected:
             VertexMerger(
-                absl::Span< const std::reference_wrapper< const Mesh > > meshes,
-                double epsilon );
+                absl::Span< const std::reference_wrapper< const Mesh > >
+                    meshes );
+
             VertexMerger( VertexMerger&& ) noexcept;
             ~VertexMerger();
 
@@ -73,7 +76,9 @@ namespace geode
 
             [[nodiscard]] Builder& builder();
 
-            void create_points();
+            void create_points( double epsilon );
+
+            void create_points( const Frame< Mesh::dim >& epsilons_frame );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

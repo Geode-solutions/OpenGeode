@@ -51,11 +51,9 @@ namespace geode
             using ColocatedInfo = typename NNSearch< dimension >::ColocatedInfo;
 
         public:
-            Impl(
-                absl::Span< const std::reference_wrapper< const Mesh > > meshes,
-                double epsilon )
+            Impl( absl::Span< const std::reference_wrapper< const Mesh > >
+                    meshes )
                 : meshes_( meshes ),
-                  epsilon_( epsilon ),
                   mesh_{ create_mesh( meshes ) },
                   builder_{ Builder::create( *mesh_ ) },
                   offset_vertices_( meshes.size() + 1 )
@@ -108,9 +106,29 @@ namespace geode
                 return *builder_;
             }
 
-            void create_points()
+            void create_points( double epsilon )
             {
-                auto info = create_colocated_index_mapping();
+                auto info = create_colocated_index_mapping( epsilon );
+                vertices_ = std::move( info.colocated_mapping );
+                builder_->create_vertices( info.nb_unique_points() );
+                for( const auto p : Range{ info.nb_unique_points() } )
+                {
+                    builder_->set_point( p, info.unique_points[p] );
+                }
+                for( const auto m : Indices{ meshes_ } )
+                {
+                    const auto& mesh = meshes_[m].get();
+                    for( const auto v : Range{ mesh.nb_vertices() } )
+                    {
+                        vertices_origins_[vertex_in_merged( m, v )]
+                            .emplace_back( m, v );
+                    }
+                }
+            }
+
+            void create_points( const Frame< dimension >& epsilon )
+            {
+                auto info = create_colocated_index_mapping( epsilon );
                 vertices_ = std::move( info.colocated_mapping );
                 builder_->create_vertices( info.nb_unique_points() );
                 for( const auto p : Range{ info.nb_unique_points() } )
@@ -129,7 +147,9 @@ namespace geode
             }
 
         private:
-            ColocatedInfo create_colocated_index_mapping()
+            template < typename EpsilonType >
+            ColocatedInfo create_colocated_index_mapping(
+                const EpsilonType& epsilon )
             {
                 index_t nb_points{ 0 };
                 for( const auto& mesh : meshes_ )
@@ -146,12 +166,11 @@ namespace geode
                     }
                 }
                 NNSearch< dimension > nnsearch{ std::move( points ) };
-                return nnsearch.colocated_index_mapping( epsilon_ );
+                return nnsearch.colocated_index_mapping( epsilon );
             }
 
         private:
             absl::Span< const std::reference_wrapper< const Mesh > > meshes_;
-            double epsilon_;
             std::unique_ptr< Mesh > mesh_;
             std::unique_ptr< Builder > builder_;
             std::vector< index_t > vertices_;
@@ -161,9 +180,8 @@ namespace geode
 
         template < typename Mesh >
         VertexMerger< Mesh >::VertexMerger(
-            absl::Span< const std::reference_wrapper< const Mesh > > meshes,
-            double epsilon )
-            : impl_{ meshes, epsilon }
+            absl::Span< const std::reference_wrapper< const Mesh > > meshes )
+            : impl_{ meshes }
         {
         }
 
@@ -213,9 +231,16 @@ namespace geode
         }
 
         template < typename Mesh >
-        void VertexMerger< Mesh >::create_points()
+        void VertexMerger< Mesh >::create_points( double epsilon )
         {
-            impl_->create_points();
+            impl_->create_points( epsilon );
+        }
+
+        template < typename Mesh >
+        void VertexMerger< Mesh >::create_points(
+            const Frame< Mesh::dim >& epsilons_frame )
+        {
+            impl_->create_points( epsilons_frame );
         }
 
         template class opengeode_mesh_api VertexMerger< PointSet2D >;

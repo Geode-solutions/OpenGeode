@@ -95,7 +95,7 @@ namespace geode
                          grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
                      a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
                      GridBuilder2D builder{ grid };
-                     builder.set_grid_origin( grid.point( 0 ) );
+                     builder.set_grid_origin( grid.grid_point( { 0, 0 } ) );
                  },
                     []( Archive& a, RegularGrid< 2 >& grid ) {
                         a.ext( grid,

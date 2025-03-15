@@ -310,14 +310,17 @@ namespace
             std::vector< double > lambdas;
             cell_vertices.reserve( 8 );
             lambdas.reserve( 8 );
+            geode::Point3D position{ { 0., 0., 0. } };
             for( const auto& vertex_indices :
                 grid.cell_vertices( cell_indices ) )
             {
                 cell_vertices.push_back( grid.vertex_index( vertex_indices ) );
                 lambdas.push_back( 0.125 );
+                position += grid.grid_point( vertex_indices ) * 0.125;
             }
             solid_attribute_manager.interpolate_attribute_value(
                 { cell_vertices, lambdas }, counter );
+            builder.set_point( counter, position );
             counter++;
         }
     }
@@ -654,7 +657,7 @@ namespace geode
     std::unique_ptr< SolidMesh3D > merge_solid_meshes(
         absl::Span< const std::reference_wrapper< const SolidMesh3D > > solids )
     {
-        detail::SolidMeshMerger3D merger{ solids, GLOBAL_EPSILON };
-        return merger.merge();
+        detail::SolidMeshMerger3D merger{ solids };
+        return merger.merge( GLOBAL_EPSILON );
     }
 } // namespace geode

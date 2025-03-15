@@ -27,6 +27,8 @@
 
 #include <geode/geometry/vector.hpp>
 
+#include <absl/algorithm/container.h>
+
 namespace
 {
     template < geode::index_t dimension >
@@ -172,6 +174,18 @@ namespace geode
         }
         absl::StrAppend( &output, ")" );
         return output;
+    }
+
+    template < index_t dimension >
+    local_index_t Frame< dimension >::max_elongation_direction() const
+    {
+        return std::distance( frame_.begin(), absl::c_max_element( frame_ ) );
+    }
+
+    template < index_t dimension >
+    local_index_t Frame< dimension >::min_elongation_direction() const
+    {
+        return std::distance( frame_.begin(), absl::c_min_element( frame_ ) );
     }
 
     template < index_t dimension >
