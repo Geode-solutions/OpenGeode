@@ -55,14 +55,24 @@ namespace geode
             return container_.end();
         }
 
+        auto contains( const Type& element ) const
+        {
+            return absl::c_contains( container_, element );
+        }
+
         auto insert( const Type& element )
         {
-            if( absl::c_contains( container_, element ) )
+            if( contains( element ) )
             {
                 return false;
             }
             container_.push_back( element );
             return true;
+        }
+
+        auto erase( const Type& element )
+        {
+            return container_.erase( absl::c_find( container_, element ) );
         }
 
         auto at( index_t index ) const
