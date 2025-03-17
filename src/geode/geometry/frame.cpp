@@ -170,7 +170,7 @@ namespace geode
         auto output = absl::StrCat( "(", frame_[0].string() );
         for( const auto f : LRange{ dimension - 1 } )
         {
-            absl::StrAppend( &output, " -- ", frame_[f].string() );
+            absl::StrAppend( &output, " -- ", frame_[f + 1].string() );
         }
         absl::StrAppend( &output, ")" );
         return output;
