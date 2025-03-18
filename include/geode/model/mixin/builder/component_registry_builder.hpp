@@ -29,7 +29,7 @@
 namespace geode
 {
     class ComponentRegistry;
-    class uuid;
+    struct uuid;
 } // namespace geode
 
 namespace geode
