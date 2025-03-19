@@ -47,7 +47,16 @@ namespace geode
 
         [[nodiscard]] bool operator!=( const MeshElement& other ) const
         {
-            return mesh_id != other.mesh_id || element_id != other.element_id;
+            return !operator==( other );
+        }
+
+        [[nodiscard]] bool operator<( const MeshElement& other ) const
+        {
+            if( mesh_id != other.mesh_id )
+            {
+                return mesh_id < other.mesh_id;
+            }
+            return element_id < other.element_id;
         }
 
         template < typename Archive >
