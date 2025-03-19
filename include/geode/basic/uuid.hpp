@@ -104,11 +104,11 @@ namespace geode
         uuid &operator=( const uuid &other ) = default;
         ~uuid() = default;
 
-        bool operator==( const uuid &other ) const;
+        [[nodiscard]] bool operator==( const uuid &other ) const;
 
-        bool operator!=( const uuid &other ) const;
+        [[nodiscard]] bool operator!=( const uuid &other ) const;
 
-        bool operator<( const uuid &other ) const;
+        [[nodiscard]] bool operator<( const uuid &other ) const;
 
         [[nodiscard]] std::string string() const;
 
