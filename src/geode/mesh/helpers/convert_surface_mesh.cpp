@@ -189,22 +189,18 @@ namespace
             to_densify[cell_id] = true;
         }
         geode::GenericMapping< geode::index_t > old2new_mapping;
-        for( const auto j : geode::Range{ grid.nb_cells_in_direction( 1 ) } )
+        for( const auto cell_id : geode::Range{ grid.nb_cells() } )
         {
-            for( const auto i :
-                geode::Range{ grid.nb_cells_in_direction( 0 ) } )
+            if( to_densify[cell_id] )
             {
-                const auto cell_id = grid.cell_index( { i, j } );
-                if( to_densify[cell_id] )
-                {
-                    continue;
-                }
-                for( const auto triangle_id :
-                    create_triangles_from_diagonal_pattern(
-                        builder, grid, { i, j } ) )
-                {
-                    old2new_mapping.map( cell_id, triangle_id );
-                }
+                continue;
+            }
+            const auto cell_indices = grid.cell_indices( cell_id );
+            for( const auto triangle_id :
+                create_triangles_from_diagonal_pattern(
+                    builder, grid, cell_indices ) )
+            {
+                old2new_mapping.map( cell_id, triangle_id );
             }
         }
         for( const auto cell_index : geode::Indices{ cells_to_densify } )
