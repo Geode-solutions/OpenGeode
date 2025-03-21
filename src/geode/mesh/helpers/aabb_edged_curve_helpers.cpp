@@ -33,6 +33,7 @@
 
 #include <geode/geometry/aabb.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/projection.hpp>
@@ -65,6 +66,20 @@ namespace geode
         return point_segment_distance( query, segment );
     }
 
+    template < index_t dimension >
+    double AnisotropicDistanceToEdge< dimension >::operator()(
+        const Point< dimension >& query, index_t cur_box ) const
+    {
+        const auto segment = mesh_.segment( cur_box );
+        const auto vertices = segment.vertices();
+        const auto point0 = coordinate_system_.coordinates( vertices[0].get() );
+        const auto point1 = coordinate_system_.coordinates( vertices[1].get() );
+        const auto query_in_metric_space =
+            coordinate_system_.coordinates( query );
+        geode::Segment< dimension > segment_in_metric_space{ point0, point1 };
+        return point_segment_distance( query_in_metric_space, segment );
+    }
+
     template opengeode_mesh_api AABBTree1D create_aabb_tree< 1 >(
         const EdgedCurve1D& );
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
@@ -75,4 +90,7 @@ namespace geode
     template class opengeode_mesh_api DistanceToEdge< 1 >;
     template class opengeode_mesh_api DistanceToEdge< 2 >;
     template class opengeode_mesh_api DistanceToEdge< 3 >;
+
+    template class opengeode_mesh_api AnisotropicDistanceToEdge< 2 >;
+    template class opengeode_mesh_api AnisotropicDistanceToEdge< 3 >;
 } // namespace geode
