@@ -37,6 +37,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( CoordinateSystem );
+    ALIAS_2D_AND_3D( CoordinateSystem );
     template < typename T >
     class GenericMeshAABB;
 } // namespace geode
@@ -64,6 +66,26 @@ namespace geode
         const TriangulatedSurface< dimension >& mesh_;
     };
     ALIAS_2D_AND_3D( DistanceToTriangle );
+
+    template < index_t dimension >
+    class AnisotropicDistanceToTriangle
+    {
+    public:
+        explicit AnisotropicDistanceToTriangle(
+            const TriangulatedSurface< dimension >& mesh,
+            const CoordinateSystem< dimension >& coordinate_system )
+            : mesh_( mesh ), coordinate_system_( coordinate_system )
+        {
+        }
+
+        [[nodiscard]] double operator()(
+            const Point< dimension >& query, index_t cur_box ) const;
+
+    private:
+        const TriangulatedSurface< dimension >& mesh_;
+        const CoordinateSystem< dimension >& coordinate_system_;
+    };
+    ALIAS_2D_AND_3D( AnisotropicDistanceToTriangle );
 
     template < index_t dimension >
     class GenericMeshAABB< SurfaceMesh< dimension > >

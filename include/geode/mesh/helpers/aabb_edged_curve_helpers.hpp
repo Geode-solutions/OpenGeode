@@ -36,6 +36,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( CoordinateSystem );
+    ALIAS_2D_AND_3D( CoordinateSystem );
     template < typename T >
     class GenericMeshAABB;
 } // namespace geode
@@ -62,6 +64,25 @@ namespace geode
         const EdgedCurve< dimension >& mesh_;
     };
     ALIAS_1D_AND_2D_AND_3D( DistanceToEdge );
+
+    template < index_t dimension >
+    class AnisotropicDistanceToEdge
+    {
+    public:
+        explicit AnisotropicDistanceToEdge( const EdgedCurve< dimension >& mesh,
+            const CoordinateSystem< dimension >& coordinate_system )
+            : mesh_( mesh ), coordinate_system_( coordinate_system )
+        {
+        }
+
+        [[nodiscard]] double operator()(
+            const Point< dimension >& query, index_t cur_box ) const;
+
+    private:
+        const EdgedCurve< dimension >& mesh_;
+        const CoordinateSystem< dimension >& coordinate_system_;
+    };
+    ALIAS_2D_AND_3D( AnisotropicDistanceToEdge );
 
     template < index_t dimension >
     class GenericMeshAABB< EdgedCurve< dimension > >
