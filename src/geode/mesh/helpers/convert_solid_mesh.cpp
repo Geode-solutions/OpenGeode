@@ -246,28 +246,18 @@ namespace
             to_densify[cell_id] = true;
         }
         geode::GenericMapping< geode::index_t > old2new_mapping;
-        for( const auto k : geode::Range{ grid.nb_cells_in_direction( 2 ) } )
+        for( const auto cell_id : geode::Range{ grid.nb_cells() } )
         {
-            for( const auto j :
-                geode::Range{ grid.nb_cells_in_direction( 1 ) } )
+            if( to_densify[cell_id] )
             {
-                for( const auto i :
-                    geode::Range{ grid.nb_cells_in_direction( 0 ) } )
-                {
-                    const auto cell_id = grid.cell_index( { i, j, k } );
-                    if( to_densify[cell_id] )
-                    {
-                        continue;
-                    }
-                    const auto vertices =
-                        grid_cell_vertices( grid, { i, j, k } );
-                    const auto hex_id =
-                        builder.create_hexahedron( { vertices[0], vertices[1],
-                            vertices[3], vertices[2], vertices[4], vertices[5],
-                            vertices[7], vertices[6] } );
-                    old2new_mapping.map( cell_id, hex_id );
-                }
+                continue;
             }
+            const auto cell_indices = grid.cell_indices( cell_id );
+            const auto vertices = grid_cell_vertices( grid, cell_indices );
+            const auto hex_id = builder.create_hexahedron(
+                { vertices[0], vertices[1], vertices[3], vertices[2],
+                    vertices[4], vertices[5], vertices[7], vertices[6] } );
+            old2new_mapping.map( cell_id, hex_id );
         }
         for( const auto cell_index : geode::Indices{ cells_to_densify } )
         {
