@@ -58,7 +58,7 @@ namespace geode
         index_t create_tetrahedron( const std::array< index_t, 4 >& vertices );
 
         /*!
-         * Create a new hexahedron from four vertices.
+         * Create a new hexahedron from eight vertices.
          * @param[in] vertices The eight vertices defining the hexahedron to
          * create
          * @return the index of the created hexahedron
