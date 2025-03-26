@@ -60,9 +60,31 @@ namespace geode
             point_tetrahedron_distance( query, mesh_.tetrahedron( cur_box ) ) );
     }
 
+    template < index_t dimension >
+    double AnisotropicDistanceToTetrahedron< dimension >::operator()(
+        const Point< dimension >& query, index_t cur_box ) const
+    {
+        const auto tetrahedron_vertices =
+            mesh_.tetrahedron( cur_box ).vertices();
+        const auto p0 =
+            coordinate_system_.coordinates( tetrahedron_vertices[0] );
+        const auto p1 =
+            coordinate_system_.coordinates( tetrahedron_vertices[1] );
+        const auto p2 =
+            coordinate_system_.coordinates( tetrahedron_vertices[2] );
+        const auto p3 =
+            coordinate_system_.coordinates( tetrahedron_vertices[3] );
+        const Tetrahedron tetrahedron_in_metric_space{ p0, p1, p2, p3 };
+        const auto query_in_metric_space =
+            coordinate_system_.coordinates( query );
+        return std::get< 0 >( point_tetrahedron_distance(
+            query_in_metric_space, tetrahedron_in_metric_space ) );
+    }
+
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
         const SolidMesh3D& );
 
     template class opengeode_mesh_api DistanceToTetrahedron< 3 >;
+    template class opengeode_mesh_api AnisotropicDistanceToTetrahedron< 3 >;
 
 } // namespace geode

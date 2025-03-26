@@ -31,6 +31,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( CoordinateSystem );
+    ALIAS_3D( CoordinateSystem );
     template < typename T >
     class GenericMeshAABB;
 } // namespace geode
@@ -58,6 +60,26 @@ namespace geode
         const TetrahedralSolid< dimension >& mesh_;
     };
     ALIAS_3D( DistanceToTetrahedron );
+
+    template < index_t dimension >
+    class AnisotropicDistanceToTetrahedron
+    {
+    public:
+        explicit AnisotropicDistanceToTetrahedron(
+            const TetrahedralSolid< dimension >& mesh,
+            const CoordinateSystem< dimension >& coordinate_system )
+            : mesh_( mesh ), coordinate_system_( coordinate_system )
+        {
+        }
+
+        [[nodiscard]] double operator()(
+            const Point< dimension >& query, index_t cur_box ) const;
+
+    private:
+        const TetrahedralSolid< dimension >& mesh_;
+        const CoordinateSystem< dimension >& coordinate_system_;
+    };
+    ALIAS_3D( AnisotropicDistanceToTetrahedron );
 
     template < index_t dimension >
     class GenericMeshAABB< SolidMesh< dimension > >
