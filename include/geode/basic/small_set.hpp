@@ -85,6 +85,27 @@ namespace geode
             return container_.at( index );
         }
 
+        auto operator==( const SmallSet& other ) const
+        {
+            if( size() != other.size() )
+            {
+                return false;
+            }
+            for( const auto& i : container_ )
+            {
+                if( !other.contains( i ) )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        auto operator!=( const SmallSet& other ) const
+        {
+            return !operator==( other );
+        }
+
     private:
         absl::InlinedVector< Type, capacity > container_;
     };
