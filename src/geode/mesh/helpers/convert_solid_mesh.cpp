@@ -196,26 +196,18 @@ namespace
             to_densify[cell_id] = true;
         }
         geode::GenericMapping< geode::index_t > old2new_mapping;
-        for( const auto k : geode::Range{ grid.nb_cells_in_direction( 2 ) } )
+        for( const auto cell_index : geode::Range{ grid.nb_cells() } )
         {
-            for( const auto j :
-                geode::Range{ grid.nb_cells_in_direction( 1 ) } )
+            if( to_densify[cell_index] )
             {
-                for( const auto i :
-                    geode::Range{ grid.nb_cells_in_direction( 0 ) } )
-                {
-                    const auto cell_id = grid.cell_index( { i, j, k } );
-                    if( to_densify[cell_id] )
-                    {
-                        continue;
-                    }
-                    for( const auto tetra_id :
-                        create_tetrahedra_from_pIpI_pattern(
-                            builder, grid, { i, j, k } ) )
-                    {
-                        old2new_mapping.map( cell_id, tetra_id );
-                    }
-                }
+                continue;
+            }
+            const auto cell_indices =
+                grid.cell_indices( cells_to_densify[cell_index] );
+            for( const auto tetra_id : create_tetrahedra_from_pIpI_pattern(
+                     builder, grid, cell_indices ) )
+            {
+                old2new_mapping.map( cell_index, tetra_id );
             }
         }
         for( const auto cell_index : geode::Indices{ cells_to_densify } )
