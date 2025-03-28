@@ -202,8 +202,7 @@ namespace
             {
                 continue;
             }
-            const auto cell_indices =
-                grid.cell_indices( cells_to_densify[cell_index] );
+            const auto cell_indices = grid.cell_indices( cell_index );
             for( const auto tetra_id : create_tetrahedra_from_pIpI_pattern(
                      builder, grid, cell_indices ) )
             {
