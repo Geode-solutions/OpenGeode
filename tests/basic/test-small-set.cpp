@@ -40,6 +40,17 @@ void test()
     set.erase( 0 );
     OPENGEODE_EXCEPTION( set.size(), "[Test] Set size should be 1" );
     OPENGEODE_EXCEPTION( set.at( 0 ) == 1, "[Test] Wrong value in set" );
+    geode::SmallSet< double > set2;
+    set2.insert( 0 );
+    OPENGEODE_EXCEPTION( set2 != set, "[Test] Wrong first comparison of sets" );
+    set2.insert( 2 );
+    OPENGEODE_EXCEPTION(
+        set2 != set, "[Test] Wrong second comparison of sets" );
+    geode::SmallSet< double > set3;
+    set3.insert( 2 );
+    set3.insert( 0 );
+    OPENGEODE_EXCEPTION(
+        set2 == set3, "[Test] Wrong third comparison of sets" );
 }
 
 OPENGEODE_TEST( "small-set" )
