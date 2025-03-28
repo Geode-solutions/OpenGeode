@@ -111,17 +111,18 @@ namespace
         auto surf = geode::TriangulatedSurface< dimension >::create();
         auto bui =
             geode::TriangulatedSurfaceBuilder< dimension >::create( *surf );
-        for( const auto v : geode::Range{ mesh.nb_vertices() } )
+        for( const auto vertex_id : geode::Range{ mesh.nb_vertices() } )
         {
-            bui->create_point( mesh.point( v ) );
+            bui->create_point( mesh.point( vertex_id ) );
         }
-        for( const auto p : geode::Range{ mesh.nb_polygons() } )
+        for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
         {
-            const auto vertices = mesh.polygon_vertices( p );
+            const auto vertices = mesh.polygon_vertices( polygon_id );
             bui->create_triangle( { vertices[0], vertices[1], vertices[2] } );
         }
         bui->delete_isolated_vertices();
-        geode::save_triangulated_surface( *surf, "output.og_tsf3d" );
+        geode::save_triangulated_surface(
+            *surf, absl::StrCat( "output.og_tsf", dimension, "d" ) );
     }
 
     template < geode::index_t dimension >
