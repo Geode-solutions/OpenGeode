@@ -147,9 +147,9 @@ namespace geode
         {
             absl::FixedArray< std::string_view > names( attributes_.size() );
             index_t count{ 0 };
-            for( const auto &attribute_it : attributes_ )
+            for( const auto &[attribute_it, _] : attributes_ )
             {
-                names[count++] = attribute_it.first;
+                names[count++] = attribute_it;
             }
             return names;
         }
@@ -223,26 +223,27 @@ namespace geode
             const AttributeBase::AttributeKey &key )
         {
             nb_elements_ = attribute_manager.nb_elements_;
-            for( const auto &attribute : attribute_manager.attributes_ )
+            for( const auto &[attribute_name, attribute] :
+                attribute_manager.attributes_ )
             {
-                const auto attribute_it = attributes_.find( attribute.first );
+                const auto attribute_it = attributes_.find( attribute_name );
                 if( attribute_it != attributes_.end() )
                 {
                     try
                     {
                         attribute_it->second->copy(
-                            *attribute.second, nb_elements_, key );
+                            *attribute, nb_elements_, key );
                     }
                     catch( const std::bad_cast &e )
                     {
-                        Logger::error( "Attribute \"", attribute.first,
+                        Logger::error( "Attribute \"", attribute_name,
                             "\" cannot be copied: ", e.what() );
                     }
                 }
                 else
                 {
                     attributes_.emplace(
-                        attribute.first, attribute.second->clone( key ) );
+                        attribute_name, attribute->clone( key ) );
                 }
             }
         }
@@ -291,9 +292,9 @@ namespace geode
         void initialize_attribute_names(
             const AttributeBase::AttributeKey &key )
         {
-            for( auto &attribute : attributes_ )
+            for( auto &[attribute_name, attribute] : attributes_ )
             {
-                attribute.second->set_name( attribute.first, key );
+                attribute->set_name( attribute_name, key );
             }
         }
 
