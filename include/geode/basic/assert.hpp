@@ -50,7 +50,7 @@ namespace geode
      *           return geode_lippincott();
      *       }
      */
-    class OpenGeodeException : public std::runtime_error
+    class opengeode_basic_api OpenGeodeException : public std::runtime_error
     {
         static constexpr int MAX_STACK_DEPTH = 10;
         static constexpr int NB_SKIPPED_STACKS = 1;
@@ -90,6 +90,12 @@ namespace geode
     private:
         std::array< void*, MAX_STACK_DEPTH > stack_;
         int stack_size_;
+    };
+
+    class opengeode_basic_api OpenGeodeDataException : public OpenGeodeException
+    {
+    public:
+        using OpenGeodeException::OpenGeodeException;
     };
 
     void opengeode_basic_api geode_assertion_failed( std::string_view condition,
