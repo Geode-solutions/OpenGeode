@@ -137,5 +137,12 @@ namespace geode
             __VA_ARGS__                                                        \
         }
 
+#define OPENGEODE_DATA_EXCEPTION( condition, ... )                             \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
+        throw geode::OpenGeodeDataException                                    \
+        {                                                                      \
+            __VA_ARGS__                                                        \
+        }
+
 #define OPENGEODE_RESEARCH( condition, ... )                                   \
     OPENGEODE_EXCEPTION( condition, __VA_ARGS__ )
