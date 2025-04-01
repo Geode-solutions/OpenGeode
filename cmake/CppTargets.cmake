@@ -230,17 +230,35 @@ option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test)
     cmake_parse_arguments(GEODE_TEST
         "ESSENTIAL;UNSTABLE"
-        "SOURCE"
+        "SOURCE;FIXTURES_SETUP;FIXTURES_REQUIRED"
         "DEPENDENCIES"
         ${ARGN}
     )
     _add_geode_executable(${GEODE_TEST_SOURCE} "Tests" ${GEODE_TEST_DEPENDENCIES})
     add_test(NAME ${target_name} COMMAND ${target_name})
-    if(${GEODE_TEST_ESSENTIAL})
+    if(GEODE_TEST_ESSENTIAL)
         add_dependencies(essential ${target_name})
-        set_tests_properties(${target_name} PROPERTIES LABELS essential) 
-    elseif(${GEODE_TEST_UNSTABLE})
-        set_tests_properties(${target_name} PROPERTIES LABELS unstable) 
+        set_tests_properties(${target_name} 
+            PROPERTIES 
+                LABELS essential
+        ) 
+    elseif(GEODE_TEST_UNSTABLE)
+        set_tests_properties(${target_name}
+            PROPERTIES 
+                LABELS unstable
+        ) 
+    endif()
+    if(GEODE_TEST_FIXTURES_SETUP)
+        set_tests_properties(${target_name}
+            PROPERTIES 
+                FIXTURES_SETUP ${GEODE_TEST_FIXTURES_SETUP}
+        ) 
+    endif()
+    if(GEODE_TEST_FIXTURES_REQUIRED)
+        set_tests_properties(${target_name}
+            PROPERTIES 
+                FIXTURES_REQUIRED ${GEODE_TEST_FIXTURES_REQUIRED}
+        ) 
     endif()
     set_tests_properties(${target_name} 
         PROPERTIES 
