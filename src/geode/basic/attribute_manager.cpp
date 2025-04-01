@@ -251,13 +251,18 @@ namespace geode
             absl::Span< const index_t > old2new,
             const AttributeBase::AttributeKey &key )
         {
-            for( const auto &attribute : attribute_manager.attributes_ )
+            for( const auto &[attribute_name, attribute_from] :
+                attribute_manager.attributes_ )
             {
-                if( !attribute_exists( attribute.first ) )
+                if( attribute_exists( attribute_name ) )
                 {
-                    attributes_.emplace(
-                        attribute.first, attribute.second->extract(
-                                             old2new, nb_elements_, key ) );
+                    this->attributes_.at( attribute_name )
+                        ->import( old2new, attribute_from, key );
+                }
+                else
+                {
+                    attributes_.emplace( attribute_name,
+                        attribute_from->extract( old2new, nb_elements_, key ) );
                 }
             }
         }
@@ -266,12 +271,18 @@ namespace geode
             const GenericMapping< index_t > &old2new_mapping,
             const AttributeBase::AttributeKey &key )
         {
-            for( const auto &attribute : attribute_manager.attributes_ )
+            for( const auto &[attribute_name, attribute_from] :
+                attribute_manager.attributes_ )
             {
-                if( !attribute_exists( attribute.first ) )
+                if( attribute_exists( attribute_name ) )
                 {
-                    attributes_.emplace( attribute.first,
-                        attribute.second->extract(
+                    this->attributes_.at( attribute_name )
+                        ->import( old2new_mapping, attribute_from, key );
+                }
+                else
+                {
+                    attributes_.emplace( attribute_name,
+                        attribute_from->extract(
                             old2new_mapping, nb_elements_, key ) );
                 }
             }

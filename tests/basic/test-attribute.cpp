@@ -547,6 +547,84 @@ void test_import_manager( geode::AttributeManager& manager )
     test_sparse_attribute_after_element_deletion( manager4 );
 }
 
+void test_multi_import_manager()
+{
+    geode::AttributeManager from1;
+    from1.resize( 10 );
+    auto attr1_from1 = from1.find_or_create_attribute< geode::VariableAttribute,
+        geode::index_t >( "variable", 42 );
+    for( const auto i : geode::LRange( from1.nb_elements() ) )
+    {
+        attr1_from1->set_value( i, i );
+    }
+    auto attr2_from1 =
+        from1.find_or_create_attribute< geode::ConstantAttribute, double >(
+            "constant", 1.0 );
+    auto attr3_from1 =
+        from1.find_or_create_attribute< geode::SparseAttribute, std::string >(
+            "sparse", "default" );
+    attr3_from1->set_value( 1, "one" );
+
+    geode::AttributeManager from2;
+    from2.resize( 10 );
+    auto attr1_from2 = from2.find_or_create_attribute< geode::VariableAttribute,
+        geode::index_t >( "variable", 42 );
+    for( const auto i : geode::LRange( from2.nb_elements() ) )
+    {
+        attr1_from2->set_value( i, from2.nb_elements() - i );
+    }
+    auto attr2_from2 =
+        from2.find_or_create_attribute< geode::ConstantAttribute, double >(
+            "constant", 2.0 );
+    auto attr3_from2 =
+        from2.find_or_create_attribute< geode::SparseAttribute, std::string >(
+            "sparse", "another_default" );
+    attr3_from2->set_value( 2, "two" );
+
+    geode::GenericMapping< geode::index_t > from1_to;
+    from1_to.map( 1, 0 );
+    from1_to.map( 3, 1 );
+    from1_to.map( 5, 2 );
+    from1_to.map( 7, 3 );
+    from1_to.map( 9, 4 );
+    geode::GenericMapping< geode::index_t > from2_to;
+    from2_to.map( 0, 5 );
+    from2_to.map( 2, 6 );
+    from2_to.map( 4, 7 );
+    from2_to.map( 6, 8 );
+    from2_to.map( 8, 9 );
+
+    geode::AttributeManager to;
+    to.resize( 10 );
+    to.import( from1, from1_to );
+    to.import( from2, from2_to );
+
+    OPENGEODE_EXCEPTION( to.nb_elements() == 10,
+        "[Test] Wrong number of elements for AttributeManger to" );
+
+    std::array< geode::index_t, 10 > answer_variable{ 1, 3, 5, 7, 9, 10, 8, 6,
+        4, 2 };
+    std::array< double, 10 > answer_constant{ 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0,
+        2.0, 2.0, 2.0 };
+    std::array< std::string, 10 > answer_sparse{ "one", "default", "default",
+        "default", "default", "another_default", "two", "another_default",
+        "another_default", "another_default" };
+    const auto result_variable =
+        to.find_attribute< geode::index_t >( "variable" );
+    const auto result_constant = to.find_attribute< double >( "constant" );
+    const auto result_sparse = to.find_attribute< std::string >( "sparse" );
+
+    for( const auto i : geode::LRange( from2.nb_elements() ) )
+    {
+        OPENGEODE_EXCEPTION( result_variable->value( i ) == answer_variable[i],
+            "[Test] Wrong result for attribute variable for value ", i );
+        OPENGEODE_EXCEPTION( result_constant->value( i ) == answer_constant[i],
+            "[Test] Wrong result for attribute constant for value ", i );
+        OPENGEODE_EXCEPTION( result_sparse->value( i ) == answer_sparse[i],
+            "[Test] Wrong result for attribute sparse for value ", i );
+    }
+}
+
 void test_permutation( geode::AttributeManager& manager )
 {
     std::vector< geode::index_t > permutation{ 2, 1, 4, 6, 7, 8, 5, 9, 3, 0 };
@@ -594,6 +672,7 @@ void test()
 
     test_copy_manager( manager );
     test_import_manager( manager );
+    test_multi_import_manager();
     test_attribute_types( manager );
     test_attribute_rename( manager );
     test_number_of_attributes( manager, 8 );

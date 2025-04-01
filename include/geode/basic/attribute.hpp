@@ -40,6 +40,7 @@
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/permutation.hpp>
@@ -112,6 +113,14 @@ namespace geode
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
             AttributeKey ) const = 0;
+
+        virtual void import( absl::Span< const index_t > old2new,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) = 0;
+
+        virtual void import( const GenericMapping< index_t >& old2new_mapping,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) = 0;
 
         virtual void resize( index_t size, AttributeKey ) = 0;
 
@@ -356,6 +365,25 @@ namespace geode
             return attribute;
         }
 
+        void import( absl::Span< const index_t > /* unused */,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+        }
+
+        void import( const GenericMapping< index_t >& /* unused */,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+        }
+
+        void import( const ReadOnlyAttribute< T >& from )
+        {
+            this->set_value( from.value( 0 ) );
+        }
+
     private:
         T value_;
     };
@@ -518,8 +546,11 @@ namespace geode
                 {
                     OPENGEODE_EXCEPTION( new_index < nb_elements,
                         "[VariableAttribute::extract] The given mapping "
-                        "contains values that go beyond the given number of "
-                        "elements." );
+                        "contains values (",
+                        new_index,
+                        ") that go beyond the given number "
+                        "of elements (",
+                        nb_elements, ")." );
                     attribute->set_value( new_index, value( i ) );
                 }
             }
@@ -541,12 +572,62 @@ namespace geode
                 {
                     OPENGEODE_EXCEPTION( new_index < nb_elements,
                         "[VariableAttribute::extract] The given mapping "
-                        "contains values that go beyond the given number "
-                        "of elements." );
+                        "contains values (",
+                        new_index,
+                        ") that go beyond the given number "
+                        "of elements (",
+                        nb_elements, ")." );
                     attribute->set_value( new_index, value( in2out.first ) );
                 }
             }
             return attribute;
+        }
+
+        void import( absl::Span< const index_t > old2new,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            DEBUG( "import 4" );
+            import( old2new,
+                dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+        }
+
+        void import( const GenericMapping< index_t >& old2new_mapping,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            DEBUG( "import 3" );
+            import( old2new_mapping,
+                dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+        }
+
+        void import( absl::Span< const index_t > old2new,
+            const ReadOnlyAttribute< T >& from )
+        {
+            DEBUG( "import" );
+            for( const auto i : Indices{ old2new } )
+            {
+                const auto new_index = old2new[i];
+                if( new_index != NO_ID )
+                {
+                    this->set_value( new_index, from.value( i ) );
+                }
+            }
+        }
+
+        void import( const GenericMapping< index_t >& old2new_mapping,
+            const ReadOnlyAttribute< T >& from )
+        {
+            DEBUG( "import 2" );
+            for( const auto& [in, outs] : old2new_mapping.in2out_map() )
+            {
+                for( const auto new_index : outs )
+                {
+                    DEBUG( in );
+                    DEBUG( new_index );
+                    this->set_value( new_index, from.value( in ) );
+                }
+            }
         }
 
     private:
@@ -712,8 +793,11 @@ namespace geode
                 {
                     OPENGEODE_EXCEPTION( new_index < nb_elements,
                         "[VariableAttribute::extract] The given mapping "
-                        "contains values that go beyond the given number of "
-                        "elements." );
+                        "contains values (",
+                        new_index,
+                        ") that go beyond the given number "
+                        "of elements (",
+                        nb_elements, ")." );
                     attribute->set_value( new_index, value( i ) );
                 }
             }
@@ -736,12 +820,56 @@ namespace geode
                 {
                     OPENGEODE_EXCEPTION( new_index < nb_elements,
                         "[VariableAttribute::extract] The given mapping "
-                        "contains values that go beyond the given number "
-                        "of elements." );
+                        "contains values (",
+                        new_index,
+                        ") that go beyond the given number "
+                        "of elements (",
+                        nb_elements, ")." );
                     attribute->set_value( new_index, value( in2out.first ) );
                 }
             }
             return attribute;
+        }
+
+        void import( absl::Span< const index_t > old2new,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            import( old2new,
+                dynamic_cast< const ReadOnlyAttribute< bool >& >( *from ) );
+        }
+
+        void import( const GenericMapping< index_t >& old2new_mapping,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            import( old2new_mapping,
+                dynamic_cast< const ReadOnlyAttribute< bool >& >( *from ) );
+        }
+
+        void import( absl::Span< const index_t > old2new,
+            const ReadOnlyAttribute< bool >& from )
+        {
+            for( const auto i : Indices{ old2new } )
+            {
+                const auto new_index = old2new[i];
+                if( new_index != NO_ID )
+                {
+                    this->set_value( new_index, from.value( i ) );
+                }
+            }
+        }
+
+        void import( const GenericMapping< index_t >& old2new_mapping,
+            const ReadOnlyAttribute< bool >& from )
+        {
+            for( const auto& in2out : old2new_mapping.in2out_map() )
+            {
+                for( const auto new_index : in2out.second )
+                {
+                    this->set_value( new_index, from.value( in2out.first ) );
+                }
+            }
         }
 
     private:
@@ -925,7 +1053,7 @@ namespace geode
                 if( value( i ) != default_value_ && new_index != NO_ID )
                 {
                     OPENGEODE_EXCEPTION( new_index < nb_elements,
-                        "[VariableAttribute::extract] The given mapping "
+                        "[SparseAttribute::extract] The given mapping "
                         "contains values that go beyond the given number of "
                         "elements." );
                     attribute->set_value( new_index, value( i ) );
@@ -949,7 +1077,7 @@ namespace geode
                     for( const auto new_index : in2out.second )
                     {
                         OPENGEODE_EXCEPTION( new_index < nb_elements,
-                            "[VariableAttribute::extract] The given mapping "
+                            "[SparseAttribute::extract] The given mapping "
                             "contains values that go beyond the given number "
                             "of elements." );
                         attribute->set_value(
@@ -958,6 +1086,51 @@ namespace geode
                 }
             }
             return attribute;
+        }
+
+        void import( absl::Span< const index_t > old2new,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            import( old2new,
+                dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+        }
+
+        void import( const GenericMapping< index_t >& old2new_mapping,
+            const std::shared_ptr< AttributeBase >& from,
+            AttributeBase::AttributeKey ) override
+        {
+            import( old2new_mapping,
+                dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+        }
+
+        void import( absl::Span< const index_t > old2new,
+            const ReadOnlyAttribute< T >& from )
+        {
+            for( const auto i : Indices{ old2new } )
+            {
+                const auto new_index = old2new[i];
+                if( from.value( i ) != default_value_ && new_index != NO_ID )
+                {
+                    this->set_value( new_index, from.value( i ) );
+                }
+            }
+        }
+
+        void import( const GenericMapping< index_t >& old2new_mapping,
+            const ReadOnlyAttribute< T >& from )
+        {
+            for( const auto& in2out : old2new_mapping.in2out_map() )
+            {
+                if( from.value( in2out.first ) != default_value_ )
+                {
+                    for( const auto new_index : in2out.second )
+                    {
+                        this->set_value(
+                            new_index, from.value( in2out.first ) );
+                    }
+                }
+            }
         }
 
     private:
