@@ -78,7 +78,7 @@ namespace geode
     ComponentID Component< dimension >::component_id() const
     {
         return { this->component_type(), this->id() };
-    };
+    }
 
     template < index_t dimension >
     template < typename Archive >
