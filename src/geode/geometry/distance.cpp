@@ -1521,7 +1521,7 @@ namespace geode
             closest_point.set_value( i, closest_point_coordinates[i] );
         }
         return result;
-    };
+    }
 
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_ellipse_distance(
