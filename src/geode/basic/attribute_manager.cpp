@@ -147,9 +147,9 @@ namespace geode
         {
             absl::FixedArray< std::string_view > names( attributes_.size() );
             index_t count{ 0 };
-            for( const auto &[attribute_it, _] : attributes_ )
+            for( const auto &[attribute_name, _] : attributes_ )
             {
-                names[count++] = attribute_it;
+                names[count++] = attribute_name;
             }
             return names;
         }
