@@ -176,6 +176,15 @@ void test_exception()
     {
         geode::geode_lippincott();
     }
+
+    try
+    {
+        throw geode::OpenGeodeDataException{ "Bad ", "data" };
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
 }
 
 void test()
