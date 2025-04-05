@@ -55,12 +55,9 @@ namespace geode
         GenericSegment< PointType, dimension >::direction() const
     {
         Vector< dimension > direction{ vertices_[0], vertices_[1] };
-        if( direction.length() < GLOBAL_EPSILON )
-        {
-            DEBUG( direction.length() );
-        }
         OPENGEODE_EXCEPTION( direction.length() > GLOBAL_EPSILON,
-            "[Segment::direction] Segment length too small" );
+            "[Segment::direction] Segment length too small (",
+            direction.length(), ")" );
         return direction;
     }
     template < typename PointType, index_t dimension >

@@ -51,6 +51,11 @@ namespace geode
             Logger::critical( "OpenGeodeDataException: ", exception.what(),
                 "\n", exception.stack_trace() );
         }
+        catch( const OpenGeodeResultException& exception )
+        {
+            Logger::critical( "OpenGeodeResultException: ", exception.what(),
+                "\n", exception.stack_trace() );
+        }
         catch( const OpenGeodeException& exception )
         {
             Logger::critical( "OpenGeodeException: ", exception.what(), "\n",

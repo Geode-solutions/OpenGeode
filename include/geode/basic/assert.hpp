@@ -98,6 +98,12 @@ namespace geode
         using OpenGeodeException::OpenGeodeException;
     };
 
+    class OpenGeodeResultException : public OpenGeodeException
+    {
+    public:
+        using OpenGeodeException::OpenGeodeException;
+    };
+
     void opengeode_basic_api geode_assertion_failed( std::string_view condition,
         std::string_view message,
         std::string_view file,
@@ -140,6 +146,13 @@ namespace geode
 #define OPENGEODE_DATA_EXCEPTION( condition, ... )                             \
     if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
         throw geode::OpenGeodeDataException                                    \
+        {                                                                      \
+            __VA_ARGS__                                                        \
+        }
+
+#define OPENGEODE_RESULT_EXCEPTION( condition, ... )                           \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
+        throw geode::OpenGeodeResultException                                  \
         {                                                                      \
             __VA_ARGS__                                                        \
         }
