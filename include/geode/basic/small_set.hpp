@@ -35,6 +35,20 @@ namespace geode
     class SmallSet
     {
     public:
+        SmallSet() = default;
+        SmallSet( std::initializer_list< Type > elements )
+        {
+            for( const auto& element : elements )
+            {
+                insert( element );
+            }
+        }
+        SmallSet( const SmallSet& other ) = default;
+        SmallSet( SmallSet&& other ) = default;
+        SmallSet& operator=( const SmallSet& other ) = default;
+        SmallSet& operator=( SmallSet&& other ) = default;
+        ~SmallSet() = default;
+
         auto size() const
         {
             return container_.size();
