@@ -78,8 +78,9 @@ namespace geode
                              const auto& old_edges_properties =
                                  impl.edges_->properties();
                              impl.edges_->set_properties(
-                                 old_edges_properties.assignable,
-                                 old_edges_properties.interpolable, false );
+                                 { old_edges_properties.assignable,
+                                     old_edges_properties.interpolable,
+                                     false } );
                          },
                             []( Archive& a, EdgesImpl& impl ) {
                                 a.ext(

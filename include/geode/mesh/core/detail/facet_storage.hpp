@@ -267,13 +267,15 @@ namespace geode
                              const auto& old_counter_properties =
                                  storage.counter_->properties();
                              storage.counter_->set_properties(
-                                 old_counter_properties.assignable,
-                                 old_counter_properties.interpolable, false );
+                                 { old_counter_properties.assignable,
+                                     old_counter_properties.interpolable,
+                                     false } );
                              const auto& old_vertices_properties =
                                  storage.vertices_->properties();
                              storage.vertices_->set_properties(
-                                 old_vertices_properties.assignable,
-                                 old_vertices_properties.interpolable, false );
+                                 { old_vertices_properties.assignable,
+                                     old_vertices_properties.interpolable,
+                                     false } );
                          },
                             []( Archive& a,
                                 FacetStorage< VertexContainer >& storage ) {

@@ -90,10 +90,11 @@ namespace geode
                         { []( Archive& a, PointsImpl& impl ) {
                              a.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
                              const auto& old_points_properties =
-                                 impl_.points_->properties();
-                             impl_.points_->set_properties(
-                                 old_points_properties.assignable,
-                                 old_points_properties.interpolable, false );
+                                 impl.points_->properties();
+                             impl.points_->set_properties(
+                                 { old_points_properties.assignable,
+                                     old_points_properties.interpolable,
+                                     false } );
                          },
                             []( Archive& a, PointsImpl& impl ) {
                                 a.ext(

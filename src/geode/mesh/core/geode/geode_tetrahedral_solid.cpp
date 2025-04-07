@@ -128,14 +128,39 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                    a.ext( impl.tetrahedron_vertices_,
-                        bitsery::ext::StdSmartPtr{} );
-                    a.ext( impl.tetrahedron_adjacents_,
-                        bitsery::ext::StdSmartPtr{} );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.ext(
+                             impl, bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
+                         a.ext( impl.tetrahedron_vertices_,
+                             bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.tetrahedron_adjacents_,
+                             bitsery::ext::StdSmartPtr{} );
+                         const auto& old_tetrahedron_vertices_properties =
+                             impl.tetrahedron_vertices_->properties();
+                         impl.tetrahedron_vertices_->set_properties(
+                             { old_tetrahedron_vertices_properties.assignable,
+                                 old_tetrahedron_vertices_properties
+                                     .interpolable,
+                                 false } );
+                         const auto& old_tetrahedron_adjacents_properties =
+                             impl.tetrahedron_adjacents_->properties();
+                         impl.tetrahedron_adjacents_->set_properties(
+                             { old_tetrahedron_adjacents_properties.assignable,
+                                 old_tetrahedron_adjacents_properties
+                                     .interpolable,
+                                 false } );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.ext( impl,
+                                bitsery::ext::BaseClass<
+                                    internal::PointsImpl< dimension > >{} );
+                            a.ext( impl.tetrahedron_vertices_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.tetrahedron_adjacents_,
+                                bitsery::ext::StdSmartPtr{} );
+                        } } } );
         }
 
     private:
@@ -205,38 +230,7 @@ namespace geode
                                        TetrahedralSolid< dimension > >{} );
                      a.object( solid.impl_ );
                      solid.impl_->initialize_crs( solid );
-                     const auto& old_tetrahedron_vertices_properties =
-                         solid.impl_->tetrahedron_vertices_->properties();
-                     solid.impl_->tetrahedron_vertices_->set_properties(
-                         { old_tetrahedron_vertices_properties.assignable,
-                             old_tetrahedron_vertices_properties.interpolable,
-                             false } );
-                     const auto& old_tetrahedron_adjacents_properties =
-                         solid.impl_->tetrahedron_adjacents_->properties();
-                     solid.impl_->tetrahedron_adjacents_->set_properties(
-                         { old_tetrahedron_adjacents_properties.assignable,
-                             old_tetrahedron_adjacents_properties.interpolable,
-                             false } );
                  },
-                    []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass<
-                                          TetrahedralSolid< dimension > >{} );
-                        a.object( solid.impl_ );
-                        const auto& old_tetrahedron_vertices_properties =
-                            solid.impl_->tetrahedron_vertices_->properties();
-                        solid.impl_->tetrahedron_vertices_->set_properties(
-                            { old_tetrahedron_vertices_properties.assignable,
-                                old_tetrahedron_vertices_properties
-                                    .interpolable,
-                                false } );
-                        const auto& old_tetrahedron_adjacents_properties =
-                            solid.impl_->tetrahedron_adjacents_->properties();
-                        solid.impl_->tetrahedron_adjacents_->set_properties(
-                            { old_tetrahedron_adjacents_properties.assignable,
-                                old_tetrahedron_adjacents_properties
-                                    .interpolable,
-                                false } );
-                    },
                     []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
                         a.ext( solid, bitsery::ext::BaseClass<
                                           TetrahedralSolid< dimension > >{} );

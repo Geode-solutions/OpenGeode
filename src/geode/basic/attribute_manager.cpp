@@ -255,8 +255,17 @@ namespace geode
             for( const auto &[attribute_name, attribute_from] :
                 attribute_manager.attributes_ )
             {
+                if( !attribute_from->properties().transferable )
+                {
+                    continue;
+                }
                 if( attribute_exists( attribute_name ) )
                 {
+                    if( attribute_from->type()
+                        != this->attributes_.at( attribute_name )->type() )
+                    {
+                        continue;
+                    }
                     this->attributes_.at( attribute_name )
                         ->import( old2new, attribute_from, key );
                 }
@@ -275,6 +284,10 @@ namespace geode
             for( const auto &[attribute_name, attribute_from] :
                 attribute_manager.attributes_ )
             {
+                if( !attribute_from->properties().transferable )
+                {
+                    continue;
+                }
                 if( attribute_exists( attribute_name ) )
                 {
                     if( attribute_from->type()
