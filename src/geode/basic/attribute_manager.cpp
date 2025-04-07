@@ -277,6 +277,11 @@ namespace geode
             {
                 if( attribute_exists( attribute_name ) )
                 {
+                    if( attribute_from->type()
+                        != this->attributes_.at( attribute_name )->type() )
+                    {
+                        continue;
+                    }
                     this->attributes_.at( attribute_name )
                         ->import( old2new_mapping, attribute_from, key );
                 }

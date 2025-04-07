@@ -48,20 +48,18 @@ namespace geode
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
             : internal::PointsImpl< dimension >( mesh ),
-              tetrahedron_vertices_(
-                  mesh.polyhedron_attribute_manager()
+              tetrahedron_vertices_( mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 4 > >( "tetrahedron_vertices",
                           std::array< index_t, 4 >{
                               NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false } ) ),
-              tetrahedron_adjacents_(
-                  mesh.polyhedron_attribute_manager()
+                          { false, false, false } ) ),
+              tetrahedron_adjacents_( mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 4 > >( "tetrahedron_adjacents",
                           std::array< index_t, 4 >{
                               NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false } ) )
+                          { false, false, false } ) )
         {
         }
 
@@ -207,7 +205,38 @@ namespace geode
                                        TetrahedralSolid< dimension > >{} );
                      a.object( solid.impl_ );
                      solid.impl_->initialize_crs( solid );
+                     const auto& old_tetrahedron_vertices_properties =
+                         solid.impl_->tetrahedron_vertices_->properties();
+                     solid.impl_->tetrahedron_vertices_->set_properties(
+                         { old_tetrahedron_vertices_properties.assignable,
+                             old_tetrahedron_vertices_properties.interpolable,
+                             false } );
+                     const auto& old_tetrahedron_adjacents_properties =
+                         solid.impl_->tetrahedron_adjacents_->properties();
+                     solid.impl_->tetrahedron_adjacents_->set_properties(
+                         { old_tetrahedron_adjacents_properties.assignable,
+                             old_tetrahedron_adjacents_properties.interpolable,
+                             false } );
                  },
+                    []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
+                        a.ext( solid, bitsery::ext::BaseClass<
+                                          TetrahedralSolid< dimension > >{} );
+                        a.object( solid.impl_ );
+                        const auto& old_tetrahedron_vertices_properties =
+                            solid.impl_->tetrahedron_vertices_->properties();
+                        solid.impl_->tetrahedron_vertices_->set_properties(
+                            { old_tetrahedron_vertices_properties.assignable,
+                                old_tetrahedron_vertices_properties
+                                    .interpolable,
+                                false } );
+                        const auto& old_tetrahedron_adjacents_properties =
+                            solid.impl_->tetrahedron_adjacents_->properties();
+                        solid.impl_->tetrahedron_adjacents_->set_properties(
+                            { old_tetrahedron_adjacents_properties.assignable,
+                                old_tetrahedron_adjacents_properties
+                                    .interpolable,
+                                false } );
+                    },
                     []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
                         a.ext( solid, bitsery::ext::BaseClass<
                                           TetrahedralSolid< dimension > >{} );

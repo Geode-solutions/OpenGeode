@@ -141,14 +141,18 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
 {
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
-            "foo_var", Foo{}, { false, false } );
-    manager.set_attribute_properties( "foo_var", { true, false } );
+            "foo_var", Foo{}, { false, false, false } );
+    manager.set_attribute_properties( "foo_var", { true, false, true } );
     OPENGEODE_EXCEPTION( variable_attribute->properties().assignable
-                             && !variable_attribute->properties().interpolable,
-        "[Test] Attribute should be assignable but not interpolable." );
+                             && !variable_attribute->properties().interpolable
+                             && variable_attribute->properties().transferable,
+        "[Test] Attribute should be assignable, not interpolable and "
+        "transferable." );
     variable_attribute->set_properties( { true, true } );
     OPENGEODE_EXCEPTION( variable_attribute->properties().interpolable,
         "[Test] Attribute should be interpolable." );
+    OPENGEODE_EXCEPTION( variable_attribute->properties().transferable,
+        "[Test] Attribute should be transferable." );
     variable_attribute->modify_value( 3, []( Foo& foo ) {
         foo.double_ = 12.4;
     } );

@@ -85,11 +85,20 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, Growable< Archive, PointsImpl >{
-                                        { []( Archive& a, PointsImpl& impl ) {
-                                            a.ext( impl.points_,
-                                                bitsery::ext::StdSmartPtr{} );
-                                        } } } );
+                archive.ext( *this,
+                    Growable< Archive, PointsImpl >{
+                        { []( Archive& a, PointsImpl& impl ) {
+                             a.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
+                             const auto& old_points_properties =
+                                 impl_.points_->properties();
+                             impl_.points_->set_properties(
+                                 old_points_properties.assignable,
+                                 old_points_properties.interpolable, false );
+                         },
+                            []( Archive& a, PointsImpl& impl ) {
+                                a.ext(
+                                    impl.points_, bitsery::ext::StdSmartPtr{} );
+                            } } } );
             }
 
             template < typename Mesh >
@@ -127,12 +136,11 @@ namespace geode
 
             PointsImpl(
                 AttributeManager& manager, std::string_view attribute_name )
-                : points_{
-                      manager
+                : points_{ manager
                           .template find_or_create_attribute< VariableAttribute,
-                              Point< dimension > >(
-                              attribute_name, Point< dimension >{} )
-                  }
+                              Point< dimension > >( attribute_name,
+                              Point< dimension >{},
+                              { false, false, false } ) }
             {
             }
 
