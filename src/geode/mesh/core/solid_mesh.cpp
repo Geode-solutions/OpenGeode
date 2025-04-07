@@ -654,6 +654,16 @@ namespace geode
                                          old_polyhedron_around_vertex_properties
                                              .interpolable,
                                          false } );
+                                 const auto&
+                                     old_polyhedra_around_vertex_properties =
+                                         impl.polyhedra_around_vertex_
+                                             ->properties();
+                                 impl.polyhedra_around_vertex_->set_properties(
+                                     { old_polyhedra_around_vertex_properties
+                                             .assignable,
+                                         old_polyhedra_around_vertex_properties
+                                             .interpolable,
+                                         false } );
                              },
                     []( Archive& a, Impl& impl ) {
                         a.object( impl.polyhedron_attribute_manager_ );
@@ -669,6 +679,13 @@ namespace geode
                             { old_polyhedron_around_vertex_properties
                                     .assignable,
                                 old_polyhedron_around_vertex_properties
+                                    .interpolable,
+                                false } );
+                        const auto& old_polyhedra_around_vertex_properties =
+                            impl.polyhedra_around_vertex_->properties();
+                        impl.polyhedra_around_vertex_->set_properties(
+                            { old_polyhedra_around_vertex_properties.assignable,
+                                old_polyhedra_around_vertex_properties
                                     .interpolable,
                                 false } );
                     },
@@ -687,6 +704,13 @@ namespace geode
                             { old_polyhedron_around_vertex_properties
                                     .assignable,
                                 old_polyhedron_around_vertex_properties
+                                    .interpolable,
+                                false } );
+                        const auto& old_polyhedra_around_vertex_properties =
+                            impl.polyhedra_around_vertex_->properties();
+                        impl.polyhedra_around_vertex_->set_properties(
+                            { old_polyhedra_around_vertex_properties.assignable,
+                                old_polyhedra_around_vertex_properties
                                     .interpolable,
                                 false } );
                     },
