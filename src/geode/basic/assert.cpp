@@ -46,14 +46,19 @@ namespace geode
         {
             throw;
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeDataException& exception )
         {
-            Logger::critical(
-                "OpenGeodeException: ", e.what(), "\n", e.stack_trace() );
+            Logger::critical( "OpenGeodeDataException: ", exception.what(),
+                "\n", exception.stack_trace() );
         }
-        catch( const std::exception& e )
+        catch( const OpenGeodeException& exception )
         {
-            Logger::critical( "std::exception: ", e.what() );
+            Logger::critical( "OpenGeodeException: ", exception.what(), "\n",
+                exception.stack_trace() );
+        }
+        catch( const std::exception& exception )
+        {
+            Logger::critical( "std::exception: ", exception.what() );
         }
         catch( ... )
         {

@@ -54,7 +54,6 @@
 #include <geode/mesh/core/texture2d.hpp>
 #include <geode/mesh/core/texture_storage.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
-#include <geode/mesh/io/triangulated_surface_output.hpp>
 
 namespace
 {
@@ -103,26 +102,6 @@ namespace
         OPENGEODE_ASSERT( edge_id < surface.nb_polygon_edges( polygon_id ),
             "[check_polygon_edge_id] Trying to access an invalid polygon local "
             "edge" );
-    }
-
-    template < geode::index_t dimension >
-    void output( const geode::SurfaceMesh< dimension >& mesh )
-    {
-        auto surf = geode::TriangulatedSurface< dimension >::create();
-        auto bui =
-            geode::TriangulatedSurfaceBuilder< dimension >::create( *surf );
-        for( const auto vertex_id : geode::Range{ mesh.nb_vertices() } )
-        {
-            bui->create_point( mesh.point( vertex_id ) );
-        }
-        for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
-        {
-            const auto vertices = mesh.polygon_vertices( polygon_id );
-            bui->create_triangle( { vertices[0], vertices[1], vertices[2] } );
-        }
-        bui->delete_isolated_vertices();
-        geode::save_triangulated_surface(
-            *surf, absl::StrCat( "output.og_tsf", dimension, "d" ) );
     }
 
     template < geode::index_t dimension >
@@ -200,10 +179,6 @@ namespace
                 }
                 cur_polygon_vertex = std::nullopt;
             }
-        }
-        if( safety_count >= MAX_SAFETY_COUNT )
-        {
-            output( mesh );
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
             "[SurfaceMesh::polygons_around_vertex] Too many polygons "
