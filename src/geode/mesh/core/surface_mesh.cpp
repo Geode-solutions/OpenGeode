@@ -245,19 +245,16 @@ namespace geode
         using CachedPolygons =
             CachedValue< internal::PolygonsAroundVertexImpl >;
         static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
-
             "polygons_around_vertex";
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
+            : polygon_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           PolygonVertex >( "polygon_around_vertex",
                           PolygonVertex{},
                           { false, false, false } ) ),
-              polygons_around_vertex_(
-                  surface.vertex_attribute_manager()
+              polygons_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
                           CachedPolygons{},
@@ -416,6 +413,13 @@ namespace geode
                                  old_polygon_around_vertex_properties
                                      .interpolable,
                                  false } );
+                         const auto& old_polygons_around_vertex_properties =
+                             impl.polygons_around_vertex_->properties();
+                         impl.polygons_around_vertex_->set_properties(
+                             { old_polygons_around_vertex_properties.assignable,
+                                 old_polygons_around_vertex_properties
+                                     .interpolable,
+                                 false } );
                      },
                         []( Archive& a, Impl& impl ) {
                             a.object( impl.polygon_attribute_manager_ );
@@ -430,6 +434,14 @@ namespace geode
                                 { old_polygon_around_vertex_properties
                                         .assignable,
                                     old_polygon_around_vertex_properties
+                                        .interpolable,
+                                    false } );
+                            const auto& old_polygons_around_vertex_properties =
+                                impl.polygons_around_vertex_->properties();
+                            impl.polygons_around_vertex_->set_properties(
+                                { old_polygons_around_vertex_properties
+                                        .assignable,
+                                    old_polygons_around_vertex_properties
                                         .interpolable,
                                     false } );
                         },
@@ -447,6 +459,14 @@ namespace geode
                                 { old_polygon_around_vertex_properties
                                         .assignable,
                                     old_polygon_around_vertex_properties
+                                        .interpolable,
+                                    false } );
+                            const auto& old_polygons_around_vertex_properties =
+                                impl.polygons_around_vertex_->properties();
+                            impl.polygons_around_vertex_->set_properties(
+                                { old_polygons_around_vertex_properties
+                                        .assignable,
+                                    old_polygons_around_vertex_properties
                                         .interpolable,
                                     false } );
                         },

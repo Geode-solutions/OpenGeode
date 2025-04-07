@@ -245,7 +245,7 @@ namespace
         }
         OPENGEODE_ASSERT(
             solid.polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
-            "[SolidMesh::polyhedra_around_vertex] Wrong polyhedron "
+            "[SolidMesh::compute_polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 40000 };
@@ -286,7 +286,7 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SolidMesh::polygons_around_vertex] Too many polyhedra "
+            "[SolidMesh::compute_polyhedra_around_vertex] Too many polyhedra "
             "around vertex ",
             vertex_id, " (", solid.point( vertex_id ).string(),
             "). This is probably related to a bug in the polyhedra "
@@ -412,14 +412,12 @@ namespace geode
 
     public:
         explicit Impl( SolidMesh& solid )
-            : polyhedron_around_vertex_(
-                  solid.vertex_attribute_manager()
+            : polyhedron_around_vertex_( solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           PolyhedronVertex >( "polyhedron_around_vertex",
                           PolyhedronVertex{},
                           { false, false, false } ) ),
-              polyhedra_around_vertex_(
-                  solid.vertex_attribute_manager()
+              polyhedra_around_vertex_( solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
                           CachedPolyhedra{},
@@ -1295,7 +1293,7 @@ namespace geode
             {
                 facet_vertices.push_back(
                     vertices[polyhedron_facet_vertex_id( { facet, v } )
-                                 .vertex_id] );
+                            .vertex_id] );
             }
         }
         return facets_vertices;
