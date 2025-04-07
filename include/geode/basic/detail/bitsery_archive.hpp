@@ -87,8 +87,12 @@ namespace geode
                 context, "index_t" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
+            AttributeManager::register_attribute_type< std::string,
+                Serializer >( context, "std::string" );
             register_attribute_type_for_all_containers< Serializer, double >(
                 context, "double" );
+            register_attribute_type_for_all_containers< Serializer, float >(
+                context, "float" );
             register_attribute_type_for_all_containers< Serializer, index_t >(
                 context, "index_t" );
             register_inlinedvector< Serializer >( context );
