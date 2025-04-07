@@ -28,6 +28,7 @@
 #include <absl/container/inlined_vector.h>
 
 #include <bitsery/brief_syntax/array.h>
+#include <bitsery/brief_syntax/string.h>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/uuid.hpp>
