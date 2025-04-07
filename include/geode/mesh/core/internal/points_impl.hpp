@@ -89,6 +89,10 @@ namespace geode
                     Growable< Archive, PointsImpl >{
                         { []( Archive& a, PointsImpl& impl ) {
                              a.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
+                             if( !impl.points_ )
+                             {
+                                 return;
+                             }
                              const auto& old_points_properties =
                                  impl.points_->properties();
                              impl.points_->set_properties(
@@ -137,13 +141,11 @@ namespace geode
 
             PointsImpl(
                 AttributeManager& manager, std::string_view attribute_name )
-                : points_{
-                      manager
+                : points_{ manager
                           .template find_or_create_attribute< VariableAttribute,
                               Point< dimension > >( attribute_name,
                               Point< dimension >{},
-                              { false, false, false } )
-                  }
+                              { false, false, false } ) }
             {
             }
 
