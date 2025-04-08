@@ -1136,7 +1136,7 @@ void test_clone( const geode::BRep& brep )
     {
         const auto& new_line =
             brep2.line( mappings.at( geode::Line3D::component_type_static() )
-                            .in2out( line.id() ) );
+                    .in2out( line.id() ) );
         for( const auto& surface : brep.incidences( line ) )
         {
             bool found = { false };

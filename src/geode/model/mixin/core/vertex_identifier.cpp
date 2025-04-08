@@ -94,8 +94,7 @@ namespace geode
 
     public:
         Impl()
-            : component_vertices_(
-                  unique_vertices_.vertex_attribute_manager()
+            : component_vertices_( unique_vertices_.vertex_attribute_manager()
                       .find_or_create_attribute< VariableAttribute,
                           std::vector< ComponentMeshVertex > >(
                           "component vertices",

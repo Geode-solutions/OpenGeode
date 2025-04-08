@@ -83,7 +83,7 @@ namespace geode
             {
                 cell_vertex[d] +=
                     SOLID_CELL_VERTICES_TRANSLATIONS[polyhedron_vertex
-                                                         .vertex_id][d];
+                            .vertex_id][d];
             }
             return vertex_index( grid, cell_vertex );
         }

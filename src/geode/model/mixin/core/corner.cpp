@@ -119,8 +119,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Corner< dimension >::modifiable_mesh(
-        CornersBuilderKey /*unused*/ ) -> Mesh&
+    auto Corner< dimension >::modifiable_mesh( CornersBuilderKey /*unused*/ )
+        -> Mesh&
     {
         return modifiable_mesh();
     }
@@ -160,8 +160,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Corner< dimension >::steal_mesh(
-        CornersBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    auto Corner< dimension >::steal_mesh( CornersBuilderKey /*unused*/ )
+        -> std::unique_ptr< Mesh >
     {
         return impl_->steal_mesh();
     }

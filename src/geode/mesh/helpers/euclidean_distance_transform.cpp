@@ -43,12 +43,10 @@ namespace geode
             std::string_view distance_map_name )
             : grid_( grid ),
               squared_cell_length_{},
-              distance_map_{
-                  grid.cell_attribute_manager()
+              distance_map_{ grid.cell_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           double >( distance_map_name,
-                          std::numeric_limits< double >::max() )
-              }
+                          std::numeric_limits< double >::max() ) }
         {
             for( const auto d : LRange( dimension ) )
             {

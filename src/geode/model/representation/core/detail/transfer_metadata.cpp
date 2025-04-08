@@ -50,10 +50,9 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping :
-            component_mapping
-                .at( geode::Corner< Model::dim >::component_type_static() )
-                .out2in_map() )
+        for( const auto& out2in_mapping : component_mapping
+                 .at( geode::Corner< Model::dim >::component_type_static() )
+                 .out2in_map() )
         {
             std::string out_name{ "" };
             bool first{ true };
@@ -81,10 +80,9 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping :
-            component_mapping
-                .at( geode::Line< Model::dim >::component_type_static() )
-                .out2in_map() )
+        for( const auto& out2in_mapping : component_mapping
+                 .at( geode::Line< Model::dim >::component_type_static() )
+                 .out2in_map() )
         {
             std::string out_name{ "" };
             bool first{ true };
@@ -111,10 +109,9 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping :
-            component_mapping
-                .at( geode::Surface< Model::dim >::component_type_static() )
-                .out2in_map() )
+        for( const auto& out2in_mapping : component_mapping
+                 .at( geode::Surface< Model::dim >::component_type_static() )
+                 .out2in_map() )
         {
             std::string out_name{ "" };
             bool first{ true };
@@ -204,11 +201,10 @@ namespace geode
             {
                 return;
             }
-            for( const auto& out2in_mapping :
-                component_mapping
-                    .at( geode::Corner<
-                        ModelBuilder::dim >::component_type_static() )
-                    .out2in_map() )
+            for( const auto& out2in_mapping : component_mapping
+                     .at( geode::Corner<
+                         ModelBuilder::dim >::component_type_static() )
+                     .out2in_map() )
             {
                 std::string out_name{ "" };
                 bool first{ true };
@@ -246,11 +242,10 @@ namespace geode
             {
                 return;
             }
-            for( const auto& out2in_mapping :
-                component_mapping
-                    .at( geode::Line<
-                        ModelBuilder::dim >::component_type_static() )
-                    .out2in_map() )
+            for( const auto& out2in_mapping : component_mapping
+                     .at( geode::Line<
+                         ModelBuilder::dim >::component_type_static() )
+                     .out2in_map() )
             {
                 std::string out_name{ "" };
                 bool first{ true };
@@ -288,11 +283,10 @@ namespace geode
             {
                 return;
             }
-            for( const auto& out2in_mapping :
-                component_mapping
-                    .at( geode::Surface<
-                        ModelBuilder::dim >::component_type_static() )
-                    .out2in_map() )
+            for( const auto& out2in_mapping : component_mapping
+                     .at( geode::Surface<
+                         ModelBuilder::dim >::component_type_static() )
+                     .out2in_map() )
             {
                 std::string out_name{ "" };
                 bool first{ true };

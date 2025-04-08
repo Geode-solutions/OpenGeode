@@ -151,8 +151,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Surface< dimension >::steal_mesh(
-        SurfacesBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    auto Surface< dimension >::steal_mesh( SurfacesBuilderKey /*unused*/ )
+        -> std::unique_ptr< Mesh >
     {
         return impl_->steal_mesh();
     }

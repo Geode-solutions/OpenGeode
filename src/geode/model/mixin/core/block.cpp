@@ -150,8 +150,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Block< dimension >::steal_mesh(
-        BlocksBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    auto Block< dimension >::steal_mesh( BlocksBuilderKey /*unused*/ )
+        -> std::unique_ptr< Mesh >
     {
         return impl_->steal_mesh();
     }

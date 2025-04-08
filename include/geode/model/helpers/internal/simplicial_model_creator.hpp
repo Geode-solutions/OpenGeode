@@ -125,7 +125,7 @@ namespace geode
                         create_point( *mesh_builder, surface, vertex );
                     }
                     for( index_t v = 0; v < definition.triangles.size();
-                         v += 3 )
+                        v += 3 )
                     {
                         mesh_builder->create_polygon( { definition.triangles[v],
                             definition.triangles[v + 1],
