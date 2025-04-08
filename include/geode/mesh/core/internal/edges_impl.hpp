@@ -43,7 +43,7 @@ namespace geode
                           .template find_or_create_attribute< VariableAttribute,
                               std::array< index_t, 2 > >( "edges",
                               std::array< index_t, 2 >{ NO_ID, NO_ID },
-                              { false, false } ) )
+                              { false, false, false } ) )
             {
             }
 
@@ -64,15 +64,6 @@ namespace geode
                     } );
             }
 
-            void register_attributes( Graph& graph )
-            {
-                edges_ =
-                    graph.edge_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            std::array< index_t, 2 > >(
-                            "edges", std::array< index_t, 2 >{ NO_ID, NO_ID } );
-            }
-
         protected:
             EdgesImpl() = default;
 
@@ -81,11 +72,21 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, Growable< Archive, EdgesImpl >{
-                                        { []( Archive& a, EdgesImpl& impl ) {
-                                            a.ext( impl.edges_,
-                                                bitsery::ext::StdSmartPtr{} );
-                                        } } } );
+                archive.ext( *this,
+                    Growable< Archive, EdgesImpl >{
+                        { []( Archive& a, EdgesImpl& impl ) {
+                             a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                             const auto& old_edges_properties =
+                                 impl.edges_->properties();
+                             impl.edges_->set_properties(
+                                 { old_edges_properties.assignable,
+                                     old_edges_properties.interpolable,
+                                     false } );
+                         },
+                            []( Archive& a, EdgesImpl& impl ) {
+                                a.ext(
+                                    impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            } } } );
             }
 
         private:

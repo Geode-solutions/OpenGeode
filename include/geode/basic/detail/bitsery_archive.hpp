@@ -28,6 +28,7 @@
 #include <absl/container/inlined_vector.h>
 
 #include <bitsery/brief_syntax/array.h>
+#include <bitsery/brief_syntax/string.h>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/uuid.hpp>
@@ -87,6 +88,8 @@ namespace geode
                 context, "index_t" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
+            AttributeManager::register_attribute_type< std::string,
+                Serializer >( context, "std::string" );
             register_attribute_type_for_all_containers< Serializer, double >(
                 context, "double" );
             register_attribute_type_for_all_containers< Serializer, index_t >(

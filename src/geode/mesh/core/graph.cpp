@@ -47,8 +47,9 @@ namespace geode
             : edges_around_vertex_(
                   graph.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          EdgesAroundVertex >(
-                          ATTRIBUTE_NAME, EdgesAroundVertex{} ) )
+                          EdgesAroundVertex >( ATTRIBUTE_NAME,
+                          EdgesAroundVertex{},
+                          { false, false, false } ) )
         {
         }
 
@@ -111,11 +112,24 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.edge_attribute_manager_ );
-                    a.ext( impl.edges_around_vertex_,
-                        bitsery::ext::StdSmartPtr{} );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.object( impl.edge_attribute_manager_ );
+                         a.ext( impl.edges_around_vertex_,
+                             bitsery::ext::StdSmartPtr{} );
+                         const auto& old_edges_around_vertex_properties =
+                             impl.edges_around_vertex_->properties();
+                         impl.edges_around_vertex_->set_properties(
+                             { old_edges_around_vertex_properties.assignable,
+                                 old_edges_around_vertex_properties
+                                     .interpolable,
+                                 false } );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.edge_attribute_manager_ );
+                            a.ext( impl.edges_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                        } } } );
         }
 
     private:

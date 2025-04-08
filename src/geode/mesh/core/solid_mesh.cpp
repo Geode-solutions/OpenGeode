@@ -245,7 +245,7 @@ namespace
         }
         OPENGEODE_ASSERT(
             solid.polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
-            "[SolidMesh::polyhedra_around_vertex] Wrong polyhedron "
+            "[SolidMesh::compute_polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 40000 };
@@ -286,7 +286,7 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SolidMesh::polygons_around_vertex] Too many polyhedra "
+            "[SolidMesh::compute_polyhedra_around_vertex] Too many polyhedra "
             "around vertex ",
             vertex_id, " (", solid.point( vertex_id ).string(),
             "). This is probably related to a bug in the polyhedra "
@@ -415,13 +415,15 @@ namespace geode
             : polyhedron_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          PolyhedronVertex >(
-                          "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+                          PolyhedronVertex >( "polyhedron_around_vertex",
+                          PolyhedronVertex{},
+                          { false, false, false } ) ),
               polyhedra_around_vertex_(
                   solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          CachedPolyhedra >(
-                          POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} ) )
+                          CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
+                          CachedPolyhedra{},
+                          { false, false, false } ) )
         {
         }
 
@@ -635,33 +637,95 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.object( impl.polyhedron_attribute_manager_ );
-                         a.ext( impl.polyhedron_around_vertex_,
-                             bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                     },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.polyhedron_attribute_manager_ );
-                            a.ext( impl.polyhedron_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.polyhedra_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                        },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.polyhedron_attribute_manager_ );
-                            a.ext( impl.polyhedron_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.polyhedra_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                            a.object( impl.texture_storage_ );
-                        } } } );
+                Growable< Archive,
+                    Impl >{ { []( Archive& a, Impl& impl ) {
+                                 a.object( impl.polyhedron_attribute_manager_ );
+                                 a.ext( impl.polyhedron_around_vertex_,
+                                     bitsery::ext::StdSmartPtr{} );
+                                 a.ext(
+                                     impl.edges_, bitsery::ext::StdSmartPtr{} );
+                                 a.ext( impl.facets_,
+                                     bitsery::ext::StdSmartPtr{} );
+                                 const auto&
+                                     old_polyhedron_around_vertex_properties =
+                                         impl.polyhedron_around_vertex_
+                                             ->properties();
+                                 impl.polyhedron_around_vertex_->set_properties(
+                                     { old_polyhedron_around_vertex_properties
+                                             .assignable,
+                                         old_polyhedron_around_vertex_properties
+                                             .interpolable,
+                                         false } );
+                                 const auto&
+                                     old_polyhedra_around_vertex_properties =
+                                         impl.polyhedra_around_vertex_
+                                             ->properties();
+                                 impl.polyhedra_around_vertex_->set_properties(
+                                     { old_polyhedra_around_vertex_properties
+                                             .assignable,
+                                         old_polyhedra_around_vertex_properties
+                                             .interpolable,
+                                         false } );
+                             },
+                    []( Archive& a, Impl& impl ) {
+                        a.object( impl.polyhedron_attribute_manager_ );
+                        a.ext( impl.polyhedron_around_vertex_,
+                            bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.polyhedra_around_vertex_,
+                            bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        const auto& old_polyhedron_around_vertex_properties =
+                            impl.polyhedron_around_vertex_->properties();
+                        impl.polyhedron_around_vertex_->set_properties(
+                            { old_polyhedron_around_vertex_properties
+                                    .assignable,
+                                old_polyhedron_around_vertex_properties
+                                    .interpolable,
+                                false } );
+                        const auto& old_polyhedra_around_vertex_properties =
+                            impl.polyhedra_around_vertex_->properties();
+                        impl.polyhedra_around_vertex_->set_properties(
+                            { old_polyhedra_around_vertex_properties.assignable,
+                                old_polyhedra_around_vertex_properties
+                                    .interpolable,
+                                false } );
+                    },
+                    []( Archive& a, Impl& impl ) {
+                        a.object( impl.polyhedron_attribute_manager_ );
+                        a.ext( impl.polyhedron_around_vertex_,
+                            bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.polyhedra_around_vertex_,
+                            bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        a.object( impl.texture_storage_ );
+                        const auto& old_polyhedron_around_vertex_properties =
+                            impl.polyhedron_around_vertex_->properties();
+                        impl.polyhedron_around_vertex_->set_properties(
+                            { old_polyhedron_around_vertex_properties
+                                    .assignable,
+                                old_polyhedron_around_vertex_properties
+                                    .interpolable,
+                                false } );
+                        const auto& old_polyhedra_around_vertex_properties =
+                            impl.polyhedra_around_vertex_->properties();
+                        impl.polyhedra_around_vertex_->set_properties(
+                            { old_polyhedra_around_vertex_properties.assignable,
+                                old_polyhedra_around_vertex_properties
+                                    .interpolable,
+                                false } );
+                    },
+                    []( Archive& a, Impl& impl ) {
+                        a.object( impl.polyhedron_attribute_manager_ );
+                        a.ext( impl.polyhedron_around_vertex_,
+                            bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.polyhedra_around_vertex_,
+                            bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        a.object( impl.texture_storage_ );
+                    } } } );
         }
 
     private:
