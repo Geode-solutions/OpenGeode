@@ -249,12 +249,14 @@ namespace geode
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_( surface.vertex_attribute_manager()
+            : polygon_around_vertex_(
+                  surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           PolygonVertex >( "polygon_around_vertex",
                           PolygonVertex{},
                           { false, false, false } ) ),
-              polygons_around_vertex_( surface.vertex_attribute_manager()
+              polygons_around_vertex_(
+                  surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
                           CachedPolygons{},
