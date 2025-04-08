@@ -100,7 +100,7 @@ namespace
             }
             for( auto first = crs_intersection.begin(),
                       last = crs_intersection.end();
-                 first != last; )
+                first != last; )
             {
                 if( !crss.contains( *first ) )
                 {

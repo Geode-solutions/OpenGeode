@@ -152,15 +152,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Line< dimension >::modifiable_mesh(
-        LinesBuilderKey /*unused*/ ) -> Mesh&
+    auto Line< dimension >::modifiable_mesh( LinesBuilderKey /*unused*/ )
+        -> Mesh&
     {
         return modifiable_mesh();
     }
 
     template < index_t dimension >
-    auto Line< dimension >::steal_mesh(
-        LinesBuilderKey /*unused*/ ) -> std::unique_ptr< Mesh >
+    auto Line< dimension >::steal_mesh( LinesBuilderKey /*unused*/ )
+        -> std::unique_ptr< Mesh >
     {
         return impl_->steal_mesh();
     }

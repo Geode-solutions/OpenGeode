@@ -30,8 +30,7 @@
 namespace geode
 {
     template < template < index_t > class Mesh,
-        template < index_t >
-        class MeshBuilder,
+        template < index_t > class MeshBuilder,
         index_t dimension >
     void translate_mesh( Mesh< dimension >& mesh,
         MeshBuilder< dimension >& builder,
@@ -44,8 +43,7 @@ namespace geode
     }
 
     template < template < index_t > class Mesh,
-        template < index_t >
-        class MeshBuilder,
+        template < index_t > class MeshBuilder,
         index_t dimension >
     void rescale_mesh( Mesh< dimension >& mesh,
         MeshBuilder< dimension >& builder,

@@ -714,7 +714,7 @@ void test_clone( const geode::Section& section )
     {
         const auto& new_line =
             section2.line( mappings.at( geode::Line2D::component_type_static() )
-                               .in2out( line.id() ) );
+                    .in2out( line.id() ) );
         for( const auto& surface : section.incidences( line ) )
         {
             bool found = { false };

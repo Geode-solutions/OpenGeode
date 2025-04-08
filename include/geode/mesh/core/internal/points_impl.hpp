@@ -141,13 +141,11 @@ namespace geode
 
             PointsImpl(
                 AttributeManager& manager, std::string_view attribute_name )
-                : points_{
-                      manager
+                : points_{ manager
                           .template find_or_create_attribute< VariableAttribute,
                               Point< dimension > >( attribute_name,
                               Point< dimension >{},
-                              { false, false, false } )
-                  }
+                              { false, false, false } ) }
             {
             }
 

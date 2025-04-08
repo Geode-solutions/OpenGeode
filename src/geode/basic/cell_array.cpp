@@ -134,8 +134,8 @@ namespace geode
     CellArray< dimension >::CellArray( CellArray&& ) noexcept = default;
 
     template < index_t dimension >
-    auto CellArray< dimension >::operator=(
-        CellArray&& ) noexcept -> CellArray& = default;
+    auto CellArray< dimension >::operator=( CellArray&& ) noexcept
+        -> CellArray& = default;
 
     template < index_t dimension >
     CellArray< dimension >::~CellArray() = default;

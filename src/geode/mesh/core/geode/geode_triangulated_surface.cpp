@@ -47,14 +47,12 @@ namespace geode
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
             : internal::PointsImpl< dimension >( mesh ),
-              triangle_vertices_(
-                  mesh.polygon_attribute_manager()
+              triangle_vertices_( mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 3 > >( "triangle_vertices",
                           std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
                           { false, false, false } ) ),
-              triangle_adjacents_(
-                  mesh.polygon_attribute_manager()
+              triangle_adjacents_( mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 3 > >( "triangle_adjacents",
                           std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },

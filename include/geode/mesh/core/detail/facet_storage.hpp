@@ -55,13 +55,11 @@ namespace geode
 
         protected:
             FacetStorage()
-                : counter_(
-                      facet_attribute_manager_
+                : counter_( facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
                               index_t >(
                               "counter", 1u, { false, false, false } ) ),
-                  vertices_(
-                      facet_attribute_manager_
+                  vertices_( facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
                               VertexContainer >( attribute_name(),
                               VertexContainer(),
