@@ -99,7 +99,7 @@ function(add_geode_python_wheel)
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/setup.py.in" "${wheel_output_directory}/../setup.py")
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pyproject.toml.in" "${wheel_output_directory}/../pyproject.toml")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel setuptools build)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel==0.45 setuptools build)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -c 
 "from sysconfig import get_platform

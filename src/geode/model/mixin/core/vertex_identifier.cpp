@@ -98,7 +98,8 @@ namespace geode
                       .find_or_create_attribute< VariableAttribute,
                           std::vector< ComponentMeshVertex > >(
                           "component vertices",
-                          std::vector< ComponentMeshVertex >{} ) )
+                          std::vector< ComponentMeshVertex >{},
+                          { false, false, false } ) )
         {
         }
 
@@ -169,14 +170,17 @@ namespace geode
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
-                            index_t >( unique_vertices_name, NO_ID ) );
+                            index_t >( unique_vertices_name, NO_ID,
+                            { false, false, false } ) );
             }
             else
             {
                 auto attribute =
                     mesh.vertex_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
-                            index_t >( unique_vertices_name, NO_ID );
+                            index_t >( unique_vertices_name, NO_ID,
+                            { false, false, false } );
+                attribute->set_properties( { false, false, false } );
                 try
                 {
                     for( const auto v : Range{ mesh.nb_vertices() } )
@@ -199,7 +203,7 @@ namespace geode
         {
             const auto& mesh = component.mesh();
             mesh.vertex_attribute_manager().delete_attribute(
-                "unique vertices" );
+                unique_vertices_name );
             vertex2unique_vertex_.erase( component.id() );
             filter_component_vertices( component.id() );
         }
@@ -382,20 +386,43 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.unique_vertices_ );
-                    a.ext(
-                        impl.component_vertices_, bitsery::ext::StdSmartPtr{} );
-                    a.ext( impl.vertex2unique_vertex_,
-                        bitsery::ext::StdMap{
-                            impl.vertex2unique_vertex_.max_size() },
-                        []( Archive& a2, uuid& id,
-                            std::shared_ptr< VariableAttribute< index_t > >&
-                                attribute ) {
-                            a2.object( id );
-                            a2.ext( attribute, bitsery::ext::StdSmartPtr{} );
-                        } );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.object( impl.unique_vertices_ );
+                         a.ext( impl.component_vertices_,
+                             bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.vertex2unique_vertex_,
+                             bitsery::ext::StdMap{
+                                 impl.vertex2unique_vertex_.max_size() },
+                             []( Archive& a2, uuid& id,
+                                 std::shared_ptr< VariableAttribute<
+                                     index_t > >& attribute ) {
+                                 a2.object( id );
+                                 a2.ext(
+                                     attribute, bitsery::ext::StdSmartPtr{} );
+                             } );
+                         const auto& old_component_vertices_properties =
+                             impl.component_vertices_->properties();
+                         impl.component_vertices_->set_properties(
+                             { old_component_vertices_properties.assignable,
+                                 old_component_vertices_properties.interpolable,
+                                 false } );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.unique_vertices_ );
+                            a.ext( impl.component_vertices_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.vertex2unique_vertex_,
+                                bitsery::ext::StdMap{
+                                    impl.vertex2unique_vertex_.max_size() },
+                                []( Archive& a2, uuid& id,
+                                    std::shared_ptr< VariableAttribute<
+                                        index_t > >& attribute ) {
+                                    a2.object( id );
+                                    a2.ext( attribute,
+                                        bitsery::ext::StdSmartPtr{} );
+                                } );
+                        } } } );
         }
 
         void filter_component_vertices( const uuid& component_id )

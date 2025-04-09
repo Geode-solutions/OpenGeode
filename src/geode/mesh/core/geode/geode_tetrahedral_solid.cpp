@@ -53,13 +53,13 @@ namespace geode
                           std::array< index_t, 4 > >( "tetrahedron_vertices",
                           std::array< index_t, 4 >{
                               NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false } ) ),
+                          { false, false, false } ) ),
               tetrahedron_adjacents_( mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 4 > >( "tetrahedron_adjacents",
                           std::array< index_t, 4 >{
                               NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false } ) )
+                          { false, false, false } ) )
         {
         }
 
@@ -128,14 +128,39 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                    a.ext( impl.tetrahedron_vertices_,
-                        bitsery::ext::StdSmartPtr{} );
-                    a.ext( impl.tetrahedron_adjacents_,
-                        bitsery::ext::StdSmartPtr{} );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.ext(
+                             impl, bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
+                         a.ext( impl.tetrahedron_vertices_,
+                             bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.tetrahedron_adjacents_,
+                             bitsery::ext::StdSmartPtr{} );
+                         const auto& old_tetrahedron_vertices_properties =
+                             impl.tetrahedron_vertices_->properties();
+                         impl.tetrahedron_vertices_->set_properties(
+                             { old_tetrahedron_vertices_properties.assignable,
+                                 old_tetrahedron_vertices_properties
+                                     .interpolable,
+                                 false } );
+                         const auto& old_tetrahedron_adjacents_properties =
+                             impl.tetrahedron_adjacents_->properties();
+                         impl.tetrahedron_adjacents_->set_properties(
+                             { old_tetrahedron_adjacents_properties.assignable,
+                                 old_tetrahedron_adjacents_properties
+                                     .interpolable,
+                                 false } );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.ext( impl,
+                                bitsery::ext::BaseClass<
+                                    internal::PointsImpl< dimension > >{} );
+                            a.ext( impl.tetrahedron_vertices_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.tetrahedron_adjacents_,
+                                bitsery::ext::StdSmartPtr{} );
+                        } } } );
         }
 
     private:
