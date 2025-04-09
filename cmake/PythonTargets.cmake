@@ -113,7 +113,6 @@ print(name + version + '-' + name + version + '-' + platform)"
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_STRIP_TRAILING_WHITESPACE
     ) 
-    # Print the output and error logs
     message(STATUS "Wheel Suffix: ${wheel_suffix}")
     if(NOT "${python_error}" STREQUAL "")
     message(WARNING "=== Python Error ===")
