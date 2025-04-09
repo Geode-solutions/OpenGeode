@@ -99,21 +99,29 @@ function(add_geode_python_wheel)
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/setup.py.in" "${wheel_output_directory}/../setup.py")
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pyproject.toml.in" "${wheel_output_directory}/../pyproject.toml")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel==0.45 setuptools build)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --upgrade wheel packaging setuptools build)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -c 
 "from sysconfig import get_platform
-from wheel.vendored.packaging import tags
+from packaging import tags
 name=tags.interpreter_name()
 version=tags.interpreter_version()
 platform=get_platform().replace('-', '_').replace('.', '_')
 print(name + version + '-' + name + version + '-' + platform)"
-        OUTPUT_VARIABLE wheel_sufix
+        OUTPUT_VARIABLE wheel_suffix
+        ERROR_VARIABLE python_error
         OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE
     ) 
+    # Print the output and error logs
+    message(STATUS "Wheel Suffix: ${wheel_suffix}")
+    if(NOT "${python_error}" STREQUAL "")
+    message(WARNING "=== Python Error ===")
+    message(WARNING "${python_error}")
+    endif()
     string(TOLOWER ${GEODE_WHEEL_NAME} wheel_name)
     string(REGEX REPLACE "-" "_" wheel_name ${wheel_name})
-    set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
+    set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_suffix}.whl")
     message(STATUS "Wheel file: ${wheel_file}")
     if(${GEODE_WHEEL_SUPERBUILD})
         set(wheel_config_folder "")
