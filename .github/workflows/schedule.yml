@@ -5,7 +5,7 @@ on:
     inputs:
       branch:
         type: string
-        default: "master"
+        default: "next"
   schedule:
     - cron: 0 23 * * *
 
@@ -16,6 +16,6 @@ jobs:
       name: OPENGEODE
       directory: opengeode
       branch: ${{ inputs.branch || 'next' }}
-    secrets: 
+    secrets:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
