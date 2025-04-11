@@ -19,7 +19,7 @@ BEGIN
             VALUE "InternalName", "@PROJECT_LIB_NAME@\0"
             VALUE "ProductName", "@PROJECT_LIB_NAME@\0"
             VALUE "CompanyName", "Geode-solutions SAS\0"
-            VALUE "LegalCopyright", "Copyright 2019 - 2024 Geode-solutions SAS.  All rights reserved.\0"
+            VALUE "LegalCopyright", "Copyright 2019 - 2025 Geode-solutions SAS.  All rights reserved.\0"
             VALUE "Commentaires", "https://geode-solutions.com\0"
         END
     END
