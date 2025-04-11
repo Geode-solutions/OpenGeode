@@ -85,8 +85,13 @@ namespace
                 for( const auto& corner_out_id :
                     corners_mapping.in2out( corner_in_collection.id() ) )
                 {
-                    new_model_builder.add_corner_in_corner_collection(
-                        new_model.corner( corner_out_id ), new_collection );
+                    if( !new_model.is_corner_collection_item(
+                            new_model.corner( corner_out_id ),
+                            new_collection ) )
+                    {
+                        new_model_builder.add_corner_in_corner_collection(
+                            new_model.corner( corner_out_id ), new_collection );
+                    }
                 }
             }
         }
@@ -137,8 +142,12 @@ namespace
                 for( const auto& line_out_id :
                     lines_mapping.in2out( line_in_collection.id() ) )
                 {
-                    new_model_builder.add_line_in_line_collection(
-                        new_model.line( line_out_id ), new_collection );
+                    if( !new_model.is_line_collection_item(
+                            new_model.line( line_out_id ), new_collection ) )
+                    {
+                        new_model_builder.add_line_in_line_collection(
+                            new_model.line( line_out_id ), new_collection );
+                    }
                 }
             }
         }
@@ -190,8 +199,14 @@ namespace
                 for( const auto& surface_out_id :
                     surfaces_mapping.in2out( surface_in_collection.id() ) )
                 {
-                    new_model_builder.add_surface_in_surface_collection(
-                        new_model.surface( surface_out_id ), new_collection );
+                    if( !new_model.is_surface_collection_item(
+                            new_model.surface( surface_out_id ),
+                            new_collection ) )
+                    {
+                        new_model_builder.add_surface_in_surface_collection(
+                            new_model.surface( surface_out_id ),
+                            new_collection );
+                    }
                 }
             }
         }
@@ -242,8 +257,12 @@ namespace
                 for( const auto& block_out_id :
                     blocks_mapping.in2out( block_in_collection.id() ) )
                 {
-                    new_model_builder.add_block_in_block_collection(
-                        new_model.block( block_out_id ), new_collection );
+                    if( !new_model.is_block_collection_item(
+                            new_model.block( block_out_id ), new_collection ) )
+                    {
+                        new_model_builder.add_block_in_block_collection(
+                            new_model.block( block_out_id ), new_collection );
+                    }
                 }
             }
         }
@@ -294,8 +313,14 @@ namespace
                 for( const auto& surface_out_id :
                     surfaces_mapping.in2out( surface_in_collection.id() ) )
                 {
-                    new_model_builder.add_surface_in_model_boundary(
-                        new_model.surface( surface_out_id ), new_collection );
+                    if( !new_model.is_model_boundary_item(
+                            new_model.surface( surface_out_id ),
+                            new_collection ) )
+                    {
+                        new_model_builder.add_surface_in_model_boundary(
+                            new_model.surface( surface_out_id ),
+                            new_collection );
+                    }
                 }
             }
         }
@@ -346,8 +371,12 @@ namespace
                 for( const auto& line_out_id :
                     lines_mapping.in2out( line_in_collection.id() ) )
                 {
-                    new_model_builder.add_line_in_model_boundary(
-                        new_model.line( line_out_id ), new_collection );
+                    if( !new_model.is_model_boundary_item(
+                            new_model.line( line_out_id ), new_collection ) )
+                    {
+                        new_model_builder.add_line_in_model_boundary(
+                            new_model.line( line_out_id ), new_collection );
+                    }
                 }
             }
         }
