@@ -153,7 +153,7 @@ namespace
         {
             return slice1_brep_mapping_.at( brep_component_type )
                 .in2out( section_slice1_mapping_.at( brep_component_type )
-                             .in2out( section_component ) );
+                        .in2out( section_component ) );
         }
 
         void create_lines()
@@ -486,14 +486,14 @@ namespace geode
         {
             builder.update_corner_mesh(
                 section.corner( mappings.at( Corner2D::component_type_static() )
-                                    .in2out( corner.id() ) ),
+                        .in2out( corner.id() ) ),
                 convert_point_set3d_into_2d( corner.mesh(), axis_to_remove ) );
         }
         for( const auto& line : brep.lines() )
         {
             builder.update_line_mesh(
                 section.line( mappings.at( Line2D::component_type_static() )
-                                  .in2out( line.id() ) ),
+                        .in2out( line.id() ) ),
                 convert_edged_curve3d_into_2d( line.mesh(), axis_to_remove ) );
         }
         for( const auto& surface : brep.surfaces() )
@@ -526,7 +526,7 @@ namespace geode
         {
             builder.update_corner_mesh(
                 brep.corner( mappings.at( Corner3D::component_type_static() )
-                                 .in2out( corner.id() ) ),
+                        .in2out( corner.id() ) ),
                 convert_point_set2d_into_3d(
                     corner.mesh(), axis_to_add, axis_coordinate ) );
         }
@@ -534,7 +534,7 @@ namespace geode
         {
             builder.update_line_mesh(
                 brep.line( mappings.at( Line3D::component_type_static() )
-                               .in2out( line.id() ) ),
+                        .in2out( line.id() ) ),
                 convert_edged_curve2d_into_3d(
                     line.mesh(), axis_to_add, axis_coordinate ) );
         }
@@ -542,7 +542,7 @@ namespace geode
         {
             builder.update_surface_mesh(
                 brep.surface( mappings.at( Surface3D::component_type_static() )
-                                  .in2out( surface.id() ) ),
+                        .in2out( surface.id() ) ),
                 convert_surface_mesh2d_into_3d(
                     surface.mesh(), axis_to_add, axis_coordinate ) );
         }

@@ -245,21 +245,20 @@ namespace geode
         using CachedPolygons =
             CachedValue< internal::PolygonsAroundVertexImpl >;
         static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
-
             "polygons_around_vertex";
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
+            : polygon_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          PolygonVertex >(
-                          "polygon_around_vertex", PolygonVertex{} ) ),
-              polygons_around_vertex_(
-                  surface.vertex_attribute_manager()
+                          PolygonVertex >( "polygon_around_vertex",
+                          PolygonVertex{},
+                          { false, false, false } ) ),
+              polygons_around_vertex_( surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          CachedPolygons >(
-                          POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} ) )
+                          CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
+                          CachedPolygons{},
+                          { false, false, false } ) )
         {
         }
 
@@ -407,6 +406,20 @@ namespace geode
                          a.ext( impl.polygon_around_vertex_,
                              bitsery::ext::StdSmartPtr{} );
                          a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                         const auto& old_polygon_around_vertex_properties =
+                             impl.polygon_around_vertex_->properties();
+                         impl.polygon_around_vertex_->set_properties(
+                             { old_polygon_around_vertex_properties.assignable,
+                                 old_polygon_around_vertex_properties
+                                     .interpolable,
+                                 false } );
+                         const auto& old_polygons_around_vertex_properties =
+                             impl.polygons_around_vertex_->properties();
+                         impl.polygons_around_vertex_->set_properties(
+                             { old_polygons_around_vertex_properties.assignable,
+                                 old_polygons_around_vertex_properties
+                                     .interpolable,
+                                 false } );
                      },
                         []( Archive& a, Impl& impl ) {
                             a.object( impl.polygon_attribute_manager_ );
@@ -415,6 +428,47 @@ namespace geode
                             a.ext( impl.polygons_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
                             a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            const auto& old_polygon_around_vertex_properties =
+                                impl.polygon_around_vertex_->properties();
+                            impl.polygon_around_vertex_->set_properties(
+                                { old_polygon_around_vertex_properties
+                                        .assignable,
+                                    old_polygon_around_vertex_properties
+                                        .interpolable,
+                                    false } );
+                            const auto& old_polygons_around_vertex_properties =
+                                impl.polygons_around_vertex_->properties();
+                            impl.polygons_around_vertex_->set_properties(
+                                { old_polygons_around_vertex_properties
+                                        .assignable,
+                                    old_polygons_around_vertex_properties
+                                        .interpolable,
+                                    false } );
+                        },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.polygon_attribute_manager_ );
+                            a.ext( impl.polygon_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.polygons_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            a.object( impl.texture_storage_ );
+                            const auto& old_polygon_around_vertex_properties =
+                                impl.polygon_around_vertex_->properties();
+                            impl.polygon_around_vertex_->set_properties(
+                                { old_polygon_around_vertex_properties
+                                        .assignable,
+                                    old_polygon_around_vertex_properties
+                                        .interpolable,
+                                    false } );
+                            const auto& old_polygons_around_vertex_properties =
+                                impl.polygons_around_vertex_->properties();
+                            impl.polygons_around_vertex_->set_properties(
+                                { old_polygons_around_vertex_properties
+                                        .assignable,
+                                    old_polygons_around_vertex_properties
+                                        .interpolable,
+                                    false } );
                         },
                         []( Archive& a, Impl& impl ) {
                             a.object( impl.polygon_attribute_manager_ );

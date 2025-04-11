@@ -61,8 +61,8 @@ namespace geode
     Blocks< dimension >::~Blocks() = default;
 
     template < index_t dimension >
-    auto Blocks< dimension >::operator=(
-        Blocks&& ) noexcept -> Blocks& = default;
+    auto Blocks< dimension >::operator=( Blocks&& ) noexcept
+        -> Blocks& = default;
 
     template < index_t dimension >
     index_t Blocks< dimension >::nb_blocks() const

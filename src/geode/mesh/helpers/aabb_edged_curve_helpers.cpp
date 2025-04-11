@@ -77,7 +77,8 @@ namespace geode
         const auto query_in_metric_space =
             coordinate_system_.coordinates( query );
         geode::Segment< dimension > segment_in_metric_space{ point0, point1 };
-        return point_segment_distance( query_in_metric_space, segment );
+        return point_segment_distance(
+            query_in_metric_space, segment_in_metric_space );
     }
 
     template opengeode_mesh_api AABBTree1D create_aabb_tree< 1 >(

@@ -151,7 +151,7 @@ enum
 // otherwise 'cin', 'cout' and 'cerr' will be uninitialized.
 #    include <iostream>
 
-#    if( defined( NDEBUG ) || defined( GEOGRAM_PSM ) )                         \
+#    if ( defined( NDEBUG ) || defined( GEOGRAM_PSM ) )                        \
         && !defined( GEOGRAM_PSM_DEBUG )
 #        undef GEO_DEBUG
 #        undef GEO_PARANOID

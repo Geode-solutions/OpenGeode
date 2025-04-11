@@ -47,18 +47,16 @@ namespace geode
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
             : internal::PointsImpl< dimension >( mesh ),
-              triangle_vertices_(
-                  mesh.polygon_attribute_manager()
+              triangle_vertices_( mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 3 > >( "triangle_vertices",
                           std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
-                          { false, false } ) ),
-              triangle_adjacents_(
-                  mesh.polygon_attribute_manager()
+                          { false, false, false } ) ),
+              triangle_adjacents_( mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 3 > >( "triangle_adjacents",
                           std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
-                          { false, false } ) )
+                          { false, false, false } ) )
         {
         }
 
@@ -115,13 +113,38 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl, bitsery::ext::BaseClass<
-                                 internal::PointsImpl< dimension > >{} );
-                a.ext( impl.triangle_vertices_, bitsery::ext::StdSmartPtr{} );
-                a.ext( impl.triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
-            } } } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.ext(
+                             impl, bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
+                         a.ext( impl.triangle_vertices_,
+                             bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.triangle_adjacents_,
+                             bitsery::ext::StdSmartPtr{} );
+                         const auto& old_triangle_vertices_properties =
+                             impl.triangle_vertices_->properties();
+                         impl.triangle_vertices_->set_properties(
+                             { old_triangle_vertices_properties.assignable,
+                                 old_triangle_vertices_properties.interpolable,
+                                 false } );
+                         const auto& old_triangle_adjacents_properties =
+                             impl.triangle_adjacents_->properties();
+                         impl.triangle_adjacents_->set_properties(
+                             { old_triangle_adjacents_properties.assignable,
+                                 old_triangle_adjacents_properties.interpolable,
+                                 false } );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.ext( impl,
+                                bitsery::ext::BaseClass<
+                                    internal::PointsImpl< dimension > >{} );
+                            a.ext( impl.triangle_vertices_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.triangle_adjacents_,
+                                bitsery::ext::StdSmartPtr{} );
+                        } } } );
         }
 
     private:

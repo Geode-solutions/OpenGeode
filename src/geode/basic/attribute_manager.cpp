@@ -147,9 +147,9 @@ namespace geode
         {
             absl::FixedArray< std::string_view > names( attributes_.size() );
             index_t count{ 0 };
-            for( const auto &attribute_it : attributes_ )
+            for( const auto &[attribute_name, _] : attributes_ )
             {
-                names[count++] = attribute_it.first;
+                names[count++] = attribute_name;
             }
             return names;
         }
@@ -223,26 +223,27 @@ namespace geode
             const AttributeBase::AttributeKey &key )
         {
             nb_elements_ = attribute_manager.nb_elements_;
-            for( const auto &attribute : attribute_manager.attributes_ )
+            for( const auto &[attribute_name, attribute] :
+                attribute_manager.attributes_ )
             {
-                const auto attribute_it = attributes_.find( attribute.first );
+                const auto attribute_it = attributes_.find( attribute_name );
                 if( attribute_it != attributes_.end() )
                 {
                     try
                     {
                         attribute_it->second->copy(
-                            *attribute.second, nb_elements_, key );
+                            *attribute, nb_elements_, key );
                     }
                     catch( const std::bad_cast &e )
                     {
-                        Logger::error( "Attribute \"", attribute.first,
+                        Logger::error( "Attribute \"", attribute_name,
                             "\" cannot be copied: ", e.what() );
                     }
                 }
                 else
                 {
                     attributes_.emplace(
-                        attribute.first, attribute.second->clone( key ) );
+                        attribute_name, attribute->clone( key ) );
                 }
             }
         }
@@ -251,13 +252,27 @@ namespace geode
             absl::Span< const index_t > old2new,
             const AttributeBase::AttributeKey &key )
         {
-            for( const auto &attribute : attribute_manager.attributes_ )
+            for( const auto &[attribute_name, attribute_from] :
+                attribute_manager.attributes_ )
             {
-                if( !attribute_exists( attribute.first ) )
+                if( !attribute_from->properties().transferable )
                 {
-                    attributes_.emplace(
-                        attribute.first, attribute.second->extract(
-                                             old2new, nb_elements_, key ) );
+                    continue;
+                }
+                if( attribute_exists( attribute_name ) )
+                {
+                    if( attribute_from->type()
+                        != this->attributes_.at( attribute_name )->type() )
+                    {
+                        continue;
+                    }
+                    this->attributes_.at( attribute_name )
+                        ->import( old2new, attribute_from, key );
+                }
+                else
+                {
+                    attributes_.emplace( attribute_name,
+                        attribute_from->extract( old2new, nb_elements_, key ) );
                 }
             }
         }
@@ -266,12 +281,27 @@ namespace geode
             const GenericMapping< index_t > &old2new_mapping,
             const AttributeBase::AttributeKey &key )
         {
-            for( const auto &attribute : attribute_manager.attributes_ )
+            for( const auto &[attribute_name, attribute_from] :
+                attribute_manager.attributes_ )
             {
-                if( !attribute_exists( attribute.first ) )
+                if( !attribute_from->properties().transferable )
                 {
-                    attributes_.emplace( attribute.first,
-                        attribute.second->extract(
+                    continue;
+                }
+                if( attribute_exists( attribute_name ) )
+                {
+                    if( attribute_from->type()
+                        != this->attributes_.at( attribute_name )->type() )
+                    {
+                        continue;
+                    }
+                    this->attributes_.at( attribute_name )
+                        ->import( old2new_mapping, attribute_from, key );
+                }
+                else
+                {
+                    attributes_.emplace( attribute_name,
+                        attribute_from->extract(
                             old2new_mapping, nb_elements_, key ) );
                 }
             }
@@ -280,9 +310,9 @@ namespace geode
         void initialize_attribute_names(
             const AttributeBase::AttributeKey &key )
         {
-            for( auto &attribute : attributes_ )
+            for( auto &[attribute_name, attribute] : attributes_ )
             {
-                attribute.second->set_name( attribute.first, key );
+                attribute->set_name( attribute_name, key );
             }
         }
 

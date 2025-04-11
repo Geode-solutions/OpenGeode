@@ -32,8 +32,7 @@ namespace geode
 {
     template < typename T1,
         typename T2,
-        template < typename >
-        class StorageType >
+        template < typename > class StorageType >
     class MappingBase
     {
     public:

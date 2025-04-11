@@ -1023,7 +1023,7 @@ namespace
                 "number of intervals to paint" );
             bool paint{ true };
             for( geode::index_t it = 0; it < i_values.size();
-                 it += 2, paint = !paint )
+                it += 2, paint = !paint )
             {
                 if( !paint )
                 {

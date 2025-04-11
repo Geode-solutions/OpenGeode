@@ -47,19 +47,33 @@ namespace geode
         {
         }
 
+        AttributeProperties(
+            bool is_assignable, bool is_interpolable, bool is_transferable )
+            : assignable( is_assignable ),
+              interpolable( is_interpolable ),
+              transferable( is_transferable )
+        {
+        }
+
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext(
-                *this, Growable< Archive, AttributeProperties >{
-                           { []( Archive& a, AttributeProperties& properties ) {
-                               a.value1b( properties.assignable );
-                               a.value1b( properties.interpolable );
-                           } } } );
+            archive.ext( *this,
+                Growable< Archive, AttributeProperties >{
+                    { []( Archive& a, AttributeProperties& properties ) {
+                         a.value1b( properties.assignable );
+                         a.value1b( properties.interpolable );
+                     },
+                        []( Archive& a, AttributeProperties& properties ) {
+                            a.value1b( properties.assignable );
+                            a.value1b( properties.interpolable );
+                            a.value1b( properties.transferable );
+                        } } } );
         }
 
         bool assignable{ false };
         bool interpolable{ false };
+        bool transferable{ true };
     };
 
     /*!

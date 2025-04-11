@@ -201,7 +201,7 @@ namespace geode
                 const auto& component_id = component_from_index( v );
                 if( mapping.has_mapping_type( component_id.type() )
                     && mapping.at( component_id.type() )
-                           .has_mapping_input( component_id.id() ) )
+                        .has_mapping_input( component_id.id() ) )
                 {
                     const auto& new_uuid = mapping.at( component_id.type() )
                                                .in2out( component_id.id() );

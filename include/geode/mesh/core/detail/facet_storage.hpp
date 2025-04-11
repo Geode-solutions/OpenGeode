@@ -55,16 +55,15 @@ namespace geode
 
         protected:
             FacetStorage()
-                : counter_(
-                      facet_attribute_manager_
+                : counter_( facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "counter", 1u, { false, false } ) ),
-                  vertices_(
-                      facet_attribute_manager_
+                              index_t >(
+                              "counter", 1u, { false, false, false } ) ),
+                  vertices_( facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
                               VertexContainer >( attribute_name(),
                               VertexContainer(),
-                              { false, false } ) )
+                              { false, false, false } ) )
             {
             }
 
@@ -222,8 +221,8 @@ namespace geode
             {
                 vertices_ =
                     facet_attribute_manager_.template find_or_create_attribute<
-                        VariableAttribute, VertexContainer >(
-                        attribute_name(), VertexContainer{} );
+                        VariableAttribute, VertexContainer >( attribute_name(),
+                        VertexContainer{}, { false, false, false } );
             }
 
             [[nodiscard]] index_t get_counter( index_t facet_id ) const
@@ -238,10 +237,10 @@ namespace geode
                 counter_ =
                     facet_attribute_manager_
                         .find_or_create_attribute< VariableAttribute, index_t >(
-                            "counter", 1u );
+                            "counter", 1u, { false, false, false } );
                 vertices_ = facet_attribute_manager_.find_or_create_attribute<
-                    VariableAttribute, VertexContainer >(
-                    attribute_name(), VertexContainer{} );
+                    VariableAttribute, VertexContainer >( attribute_name(),
+                    VertexContainer{}, { false, false, false } );
             }
 
         private:
@@ -252,20 +251,48 @@ namespace geode
                     Growable< Archive, FacetStorage< VertexContainer > >{
                         { []( Archive& a,
                               FacetStorage< VertexContainer >& storage ) {
-                            a.object( storage.facet_attribute_manager_ );
-                            a.ext( storage.facet_indices_,
-                                bitsery::ext::StdMap{
-                                    storage.facet_indices_.max_size() },
-                                []( Archive& a2, TypedVertexCycle& cycle,
-                                    index_t& attribute ) {
-                                    a2.object( cycle );
-                                    a2.value4b( attribute );
-                                } );
-                            a.ext(
-                                storage.counter_, bitsery::ext::StdSmartPtr{} );
-                            a.ext( storage.vertices_,
-                                bitsery::ext::StdSmartPtr{} );
-                        } } } );
+                             a.object( storage.facet_attribute_manager_ );
+                             a.ext( storage.facet_indices_,
+                                 bitsery::ext::StdMap{
+                                     storage.facet_indices_.max_size() },
+                                 []( Archive& a2, TypedVertexCycle& cycle,
+                                     index_t& attribute ) {
+                                     a2.object( cycle );
+                                     a2.value4b( attribute );
+                                 } );
+                             a.ext( storage.counter_,
+                                 bitsery::ext::StdSmartPtr{} );
+                             a.ext( storage.vertices_,
+                                 bitsery::ext::StdSmartPtr{} );
+                             const auto& old_counter_properties =
+                                 storage.counter_->properties();
+                             storage.counter_->set_properties(
+                                 { old_counter_properties.assignable,
+                                     old_counter_properties.interpolable,
+                                     false } );
+                             const auto& old_vertices_properties =
+                                 storage.vertices_->properties();
+                             storage.vertices_->set_properties(
+                                 { old_vertices_properties.assignable,
+                                     old_vertices_properties.interpolable,
+                                     false } );
+                         },
+                            []( Archive& a,
+                                FacetStorage< VertexContainer >& storage ) {
+                                a.object( storage.facet_attribute_manager_ );
+                                a.ext( storage.facet_indices_,
+                                    bitsery::ext::StdMap{
+                                        storage.facet_indices_.max_size() },
+                                    []( Archive& a2, TypedVertexCycle& cycle,
+                                        index_t& attribute ) {
+                                        a2.object( cycle );
+                                        a2.value4b( attribute );
+                                    } );
+                                a.ext( storage.counter_,
+                                    bitsery::ext::StdSmartPtr{} );
+                                a.ext( storage.vertices_,
+                                    bitsery::ext::StdSmartPtr{} );
+                            } } } );
             }
 
         private:

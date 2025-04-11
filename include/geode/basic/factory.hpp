@@ -79,9 +79,9 @@ namespace geode
                 "DerivedClass is not constructible with Args..." );
             auto &store = get_store();
             if( !store
-                     .emplace( std::move( key ),
-                         Creator( create_function_impl< DerivedClass > ) )
-                     .second )
+                    .emplace( std::move( key ),
+                        Creator( create_function_impl< DerivedClass > ) )
+                    .second )
             {
                 Logger::warn(
                     "Factory: Trying to register twice the same key" );
