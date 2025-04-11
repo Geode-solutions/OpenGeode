@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <async++.h>
+
 #include <geode/model/representation/builder/detail/filter.hpp>
 #include <geode/model/representation/builder/detail/register.hpp>
 #include <geode/model/representation/builder/section_builder.hpp>
