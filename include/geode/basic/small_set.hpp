@@ -120,6 +120,11 @@ namespace geode
             return !operator==( other );
         }
 
+        const Type* data() const
+        {
+            return container_.data();
+        }
+
     private:
         absl::InlinedVector< Type, capacity > container_;
     };
