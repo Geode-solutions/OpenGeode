@@ -112,6 +112,10 @@ namespace geode
         LightRegularGrid&& ) noexcept = default;
 
     template < index_t dimension >
+    auto LightRegularGrid< dimension >::operator=( LightRegularGrid&& ) noexcept
+        -> LightRegularGrid& = default;
+
+    template < index_t dimension >
     LightRegularGrid< dimension >::~LightRegularGrid() = default;
 
     template < index_t dimension >

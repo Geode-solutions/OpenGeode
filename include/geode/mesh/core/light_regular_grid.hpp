@@ -55,6 +55,7 @@ namespace geode
             std::array< index_t, dimension > cells_number,
             std::array< Vector< dimension >, dimension > directions );
         LightRegularGrid( LightRegularGrid&& other ) noexcept;
+        LightRegularGrid& operator=( LightRegularGrid&& other ) noexcept;
         ~LightRegularGrid();
 
         [[nodiscard]] static std::string_view native_extension_static()

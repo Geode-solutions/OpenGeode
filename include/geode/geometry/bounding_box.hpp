@@ -113,6 +113,8 @@ namespace geode
         [[nodiscard]] std::tuple< local_index_t, double >
             largest_length() const;
 
+        [[nodiscard]] std::string string() const;
+
     private:
         Point< dimension > min_;
         Point< dimension > max_;
