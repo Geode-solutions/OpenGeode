@@ -188,6 +188,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    BoundingBox< dimension > LightRegularGrid< dimension >::bounding_box() const
+    {
+        return this->grid_bounding_box();
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void LightRegularGrid< dimension >::serialize( Archive& archive )
     {

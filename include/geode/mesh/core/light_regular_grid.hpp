@@ -31,6 +31,7 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     class AttributeManager;
@@ -90,6 +91,8 @@ namespace geode
 
         [[nodiscard]] AttributeManager&
             grid_vertex_attribute_manager() const override;
+
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
     private:
         friend class bitsery::Access;
