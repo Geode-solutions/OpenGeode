@@ -34,33 +34,45 @@ namespace geode
             double target_cell_length,
             index_t max_nb_cells )
     {
-        const auto diagonal = bbox.max() - bbox.min();
+        const auto diagonal = bbox.diagonal();
         double numerator{ 1 };
+        index_t nb_grid_extensions{ 0 };
         for( const auto d : LRange{ dimension } )
         {
+            if( diagonal.value( d ) < GLOBAL_EPSILON )
+            {
+                continue;
+            }
             numerator *= diagonal.value( d );
+            nb_grid_extensions++;
         }
+        OPENGEODE_EXCEPTION( nb_grid_extensions != 0,
+            "[build_grid_from_bbox_target_length_and_maximum_cell_number] "
+            "Invalid bbox: ",
+            bbox.string() );
         const auto min_cell_length =
-            std::pow( numerator / max_nb_cells, 1. / dimension );
+            std::pow( numerator / max_nb_cells, 1. / nb_grid_extensions );
         const auto target_is_ok = target_cell_length > min_cell_length;
-        auto cell_length = std::max( min_cell_length, target_cell_length );
+        const auto cell_length =
+            std::max( min_cell_length, target_cell_length );
         std::array< index_t, dimension > cell_numbers;
         std::array< double, dimension > cell_lengths;
         for( const auto d : LRange{ dimension } )
         {
             if( target_is_ok )
             {
-                cell_numbers[d] = std::max( static_cast< index_t >( 1 ),
-                    static_cast< index_t >(
-                        std::ceil( diagonal.value( d ) / cell_length ) ) );
+                cell_numbers[d] = std::max(
+                    1u, static_cast< index_t >(
+                            std::ceil( diagonal.value( d ) / cell_length ) ) );
             }
             else
             {
-                cell_numbers[d] = std::max( static_cast< index_t >( 1 ),
-                    static_cast< index_t >(
-                        std::floor( diagonal.value( d ) / cell_length ) ) );
+                cell_numbers[d] = std::max(
+                    1u, static_cast< index_t >(
+                            std::floor( diagonal.value( d ) / cell_length ) ) );
             }
-            cell_lengths[d] = diagonal.value( d ) / cell_numbers[d];
+            cell_lengths[d] = std::max(
+                2 * GLOBAL_EPSILON, diagonal.value( d ) / cell_numbers[d] );
         }
         return { bbox.min(), std::move( cell_numbers ),
             std::move( cell_lengths ) };

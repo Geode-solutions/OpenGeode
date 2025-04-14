@@ -501,6 +501,13 @@ namespace geode
         return -inner_distance;
     }
 
+    template < index_t dimension >
+    std::string BoundingBox< dimension >::string() const
+    {
+        return absl::StrCat(
+            "(min: ", min_.string(), ", max: ", max_.string(), ")" );
+    }
+
     template class opengeode_geometry_api BoundingBox< 1 >;
     template class opengeode_geometry_api BoundingBox< 2 >;
     template class opengeode_geometry_api BoundingBox< 3 >;
