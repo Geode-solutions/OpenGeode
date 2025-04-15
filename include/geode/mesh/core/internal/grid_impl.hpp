@@ -188,17 +188,16 @@ namespace geode
             {
                 for( const auto v : Range{ nv } )
                 {
-                    tasks[task_id++] = async::spawn(
-                        [&builder, &origin, v, w, du, dv, dw, nu, nv] {
-                            for( const auto u : Range{ nu } )
-                            {
-                                const auto vertex = u + v * nu + w * nu * nv;
-                                const Point3D translation{ { u * du, v * dv,
-                                    w * dw } };
-                                builder.set_point(
-                                    vertex, origin + translation );
-                            }
-                        } );
+                    tasks[task_id++] = async::spawn( [&builder, &origin, v, w,
+                                                         du, dv, dw, nu, nv] {
+                        for( const auto u : Range{ nu } )
+                        {
+                            const auto vertex = u + v * nu + w * nu * nv;
+                            const Point3D translation{ { u * du, v * dv,
+                                w * dw } };
+                            builder.set_point( vertex, origin + translation );
+                        }
+                    } );
                 }
             }
             for( auto& task : async::when_all( tasks ).get() )

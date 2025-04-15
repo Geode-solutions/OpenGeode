@@ -512,10 +512,6 @@ namespace geode
     template class opengeode_geometry_api BoundingBox< 2 >;
     template class opengeode_geometry_api BoundingBox< 3 >;
 
-    // template opengeode_geometry_api bool BoundingBox< 2 >::intersects< 2 >(
-    //     const Triangle< 2 >& ) const;
-    // template opengeode_geometry_api bool BoundingBox< 3 >::intersects< 3 >(
-    //     const Triangle< 3 >& ) const;
     template opengeode_geometry_api bool BoundingBox< 3 >::intersects< 3 >(
         const Tetrahedron& ) const;
 } // namespace geode

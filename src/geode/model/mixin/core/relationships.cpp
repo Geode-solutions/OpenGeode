@@ -994,8 +994,8 @@ namespace geode
     {
     }
 
-    Relationships::CollectionRangeIterator::
-        ~CollectionRangeIterator() = default;
+    Relationships::CollectionRangeIterator::~CollectionRangeIterator() =
+        default;
 
     bool Relationships::CollectionRangeIterator::operator!=(
         const CollectionRangeIterator& /*unused*/ ) const
