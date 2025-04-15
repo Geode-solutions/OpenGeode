@@ -32,6 +32,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     ALIAS_3D( BoundingBox );
     ALIAS_3D( Point );
+    class Tetrahedron;
     class OwnerTetrahedron;
 
     template < index_t dimension >
@@ -82,6 +83,7 @@ namespace geode
             Point3D point2,
             Point3D point3 ) noexcept;
 
+        OwnerTetrahedron( const Tetrahedron& other ) noexcept;
         OwnerTetrahedron( const OwnerTetrahedron& other ) noexcept;
         OwnerTetrahedron& operator=( const OwnerTetrahedron& other ) noexcept;
         OwnerTetrahedron( OwnerTetrahedron&& other ) noexcept;
@@ -111,10 +113,10 @@ namespace geode
     public:
         template < typename... Args >
         explicit OpenGeodeTetrahedronException(
-            Tetrahedron tetrahedron_in, const Args&... message )
+            const Tetrahedron& tetrahedron_in, const Args&... message )
             : OpenGeodeException{ absl::StrCat(
                   message..., " at ", tetrahedron_in.string() ) },
-              tetrahedron{ std::move( tetrahedron_in ) }
+              tetrahedron{ tetrahedron_in }
         {
         }
 

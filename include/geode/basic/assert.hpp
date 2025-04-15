@@ -59,10 +59,11 @@ namespace geode
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args&... message )
-            : std::runtime_error{ absl::StrCat( message... ) },
-              stack_size_{ absl::GetStackTrace(
-                  stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS ) }
+            : std::runtime_error{ absl::StrCat( message... ) }
         {
+            stack_.fill( nullptr );
+            stack_size_ = absl::GetStackTrace(
+                stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS );
         }
 
         ~OpenGeodeException() noexcept override = default;
