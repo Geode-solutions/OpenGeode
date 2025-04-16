@@ -25,6 +25,8 @@
 
 #include <algorithm>
 
+#include <absl/hash/hash.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
@@ -287,3 +289,13 @@ namespace geode
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, Graph );
 } // namespace geode
+
+namespace std
+{
+    size_t hash< geode::EdgeVertex >::operator()(
+        const geode::EdgeVertex& edge_vertex ) const
+    {
+        return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
+               ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
+    }
+} // namespace std

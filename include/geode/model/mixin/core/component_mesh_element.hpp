@@ -81,7 +81,6 @@ namespace std
     template <>
     struct hash< geode::ComponentMeshElement >
     {
-    public:
         size_t operator()( const geode::ComponentMeshElement& cme ) const
         {
             return absl::Hash< geode::uuid >()( cme.component_id.id() )

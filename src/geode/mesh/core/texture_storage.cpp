@@ -27,6 +27,7 @@
 
 #include <bitsery/ext/std_map.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/mesh/core/texture1d.hpp>

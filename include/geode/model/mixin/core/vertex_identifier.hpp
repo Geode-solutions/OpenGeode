@@ -207,7 +207,6 @@ namespace std
     template <>
     struct hash< geode::ComponentMeshVertex >
     {
-    public:
         size_t operator()( const geode::ComponentMeshVertex& cmv ) const
         {
             return absl::Hash< geode::uuid >()( cmv.component_id.id() )

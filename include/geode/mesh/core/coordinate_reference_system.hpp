@@ -25,6 +25,7 @@
 
 #include <absl/hash/hash.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/named_type.hpp>
 
 #include <geode/mesh/common.hpp>

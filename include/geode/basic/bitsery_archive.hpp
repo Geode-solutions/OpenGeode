@@ -23,14 +23,11 @@
 
 #pragma once
 
-#include <functional>
-
 #include <absl/container/fixed_array.h>
 #include <absl/container/inlined_vector.h>
 
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
-#include <bitsery/ext/compact_value.h>
 #include <bitsery/ext/inheritance.h>
 #include <bitsery/ext/pointer.h>
 
@@ -79,56 +76,10 @@ namespace geode
 
         static void register_deserialize_pcontext( PContext &context );
     };
-
-    template < typename Archive, typename T >
-    class Growable
-    {
-    public:
-        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
-                serializers )
-            : version_( serializers.size() ),
-              serializers_( std::move( serializers ) )
-        {
-        }
-
-        template < typename Fnc >
-        void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
-        {
-            geode_unused( fnc );
-            ser.ext4b( version_, bitsery::ext::CompactValue{} );
-            serializers_.back()( ser, const_cast< T & >( obj ) );
-        }
-
-        template < typename Fnc >
-        void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
-        {
-            geode_unused( fnc );
-            index_t current_version;
-            des.ext4b( current_version, bitsery::ext::CompactValue{} );
-            serializers_.at( current_version - 1 )( des, obj );
-        }
-
-    private:
-        index_t version_;
-        absl::FixedArray< std::function< void( Archive &, T & ) > >
-            serializers_;
-    };
 } // namespace geode
 
 namespace bitsery
 {
-    namespace traits
-    {
-        template < typename Archive, typename T >
-        struct ExtensionTraits< geode::Growable< Archive, T >, T >
-        {
-            using TValue = T;
-            static constexpr bool SupportValueOverload = false;
-            static constexpr bool SupportObjectOverload = true;
-            static constexpr bool SupportLambdaOverload = true;
-        };
-    } // namespace traits
-
     namespace traits
     {
         template < typename T, size_t N >

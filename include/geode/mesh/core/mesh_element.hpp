@@ -24,6 +24,8 @@
 #pragma once
 
 #include <absl/algorithm/container.h>
+#include <absl/hash/hash.h>
+#include <absl/types/span.h>
 
 #include <geode/basic/uuid.hpp>
 
@@ -159,7 +161,6 @@ namespace std
     template <>
     struct hash< geode::MeshElement >
     {
-    public:
         size_t operator()( const geode::MeshElement& mesh_element ) const
         {
             return absl::Hash< geode::uuid >()( mesh_element.mesh_id )
@@ -170,7 +171,6 @@ namespace std
     template <>
     struct hash< geode::MeshVertex >
     {
-    public:
         size_t operator()( const geode::MeshVertex& mesh_vertex ) const
         {
             return std::hash< geode::MeshElement >()( mesh_vertex );
@@ -180,7 +180,6 @@ namespace std
     template <>
     struct hash< geode::MeshEdge >
     {
-    public:
         size_t operator()( const geode::MeshEdge& mesh_edge ) const
         {
             return std::hash< geode::MeshElement >()( mesh_edge );
@@ -190,7 +189,6 @@ namespace std
     template <>
     struct hash< geode::MeshPolygon >
     {
-    public:
         size_t operator()( const geode::MeshPolygon& mesh_polygon ) const
         {
             return std::hash< geode::MeshElement >()( mesh_polygon );

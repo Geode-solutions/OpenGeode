@@ -21,44 +21,25 @@
  *
  */
 
-#pragma once
+#include <geode/mesh/core/mesh_id.hpp>
 
 #include <string>
 
+#include <absl/hash/hash.h>
+
 #include <geode/basic/named_type.hpp>
-
-#include <geode/mesh/common.hpp>
-
-namespace geode
-{
-    struct MeshImplTag
-    {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshImpl = NamedType< std::string, MeshImplTag >;
-
-    struct MeshTypeTag
-    {
-    };
-    /*!
-     * Strong type for a mesh type
-     */
-    using MeshType = NamedType< std::string, MeshTypeTag >;
-} // namespace geode
 
 namespace std
 {
-    template <>
-    struct opengeode_mesh_api hash< geode::MeshImpl >
+    std::size_t hash< geode::MeshImpl >::operator()(
+        const geode::MeshImpl& impl ) const
     {
-        std::size_t operator()( const geode::MeshImpl& impl ) const;
-    };
+        return absl::Hash< std::string >{}( impl.get() );
+    }
 
-    template <>
-    struct opengeode_mesh_api hash< geode::MeshType >
+    std::size_t hash< geode::MeshType >::operator()(
+        const geode::MeshType& type ) const
     {
-        std::size_t operator()( const geode::MeshType& type ) const;
-    };
+        return absl::Hash< std::string >{}( type.get() );
+    }
 } // namespace std

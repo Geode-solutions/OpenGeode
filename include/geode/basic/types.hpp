@@ -61,4 +61,10 @@ namespace geode
     {
         return { { std::forward< Args >( args )... } };
     }
+
+    /*!
+     * Concatenate tuples into a single tuple.
+     */
+    template < typename... tuples >
+    using tuple_cat = decltype( std::tuple_cat( std::declval< tuples >()... ) );
 } // namespace geode

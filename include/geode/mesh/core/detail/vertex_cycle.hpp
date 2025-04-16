@@ -37,8 +37,9 @@
 #include <bitsery/brief_syntax/array.h>
 #include <bitsery/brief_syntax/vector.h>
 
-#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/growable.hpp>
+#include <geode/basic/range.hpp>
 
 namespace geode
 {

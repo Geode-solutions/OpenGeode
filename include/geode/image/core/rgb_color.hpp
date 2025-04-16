@@ -207,7 +207,6 @@ namespace std
     template <>
     struct hash< geode::RGBColor >
     {
-    public:
         size_t operator()( const geode::RGBColor &color ) const
         {
             return absl::Hash< geode::local_index_t >()( color.red() )

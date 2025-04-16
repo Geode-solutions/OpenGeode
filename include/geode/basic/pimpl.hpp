@@ -25,9 +25,6 @@
 
 #include <memory>
 
-#include <bitsery/bitsery.h>
-#include <bitsery/ext/std_smart_ptr.h>
-
 #include <geode/basic/common.hpp>
 
 namespace geode

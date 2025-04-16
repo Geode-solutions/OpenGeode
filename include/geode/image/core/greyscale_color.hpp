@@ -163,7 +163,6 @@ namespace std
     template <>
     struct hash< geode::GreyscaleColor >
     {
-    public:
         size_t operator()( const geode::GreyscaleColor &color ) const
         {
             return absl::Hash< geode::local_index_t >()( color.value() );

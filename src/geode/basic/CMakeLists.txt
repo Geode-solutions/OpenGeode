@@ -62,6 +62,7 @@ add_geode_library(
         "factory.hpp"
         "file.hpp"
         "filename.hpp"
+        "growable.hpp"
         "identifier.hpp"
         "input.hpp"
         "io.hpp"
