@@ -30,6 +30,7 @@
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
@@ -846,8 +847,9 @@ namespace geode
     }
 
     template <>
-    std::tuple< double, Point3D > point_triangle_distance(
-        const Point3D& point, const Triangle3D& triangle )
+    std::tuple< double, Point3D >
+        opengeode_geometry_api point_triangle_distance(
+            const Point3D& point, const Triangle3D& triangle )
     {
         if( const auto pivot = triangle.pivot() )
         {
@@ -858,8 +860,9 @@ namespace geode
     }
 
     template <>
-    std::tuple< double, Point2D > point_triangle_distance(
-        const Point2D& point, const Triangle2D& triangle )
+    std::tuple< double, Point2D >
+        opengeode_geometry_api point_triangle_distance(
+            const Point2D& point, const Triangle2D& triangle )
     {
         if( may_point_be_in_triangle( point, triangle ) )
         {
@@ -1566,8 +1569,6 @@ namespace geode
     template double opengeode_geometry_api point_line_distance(
         const Point2D&, const InfiniteLine2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
-        point_triangle_distance( const Point2D&, const Triangle2D& );
-    template std::tuple< double, Point2D > opengeode_geometry_api
         point_sphere_distance( const Point2D&, const Sphere2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_sphere_signed_distance( const Point2D&, const Sphere2D& );
@@ -1586,8 +1587,6 @@ namespace geode
         segment_line_distance( const Segment3D&, const InfiniteLine3D& );
     template double opengeode_geometry_api point_line_distance(
         const Point3D&, const InfiniteLine3D& );
-    template std::tuple< double, Point3D > opengeode_geometry_api
-        point_triangle_distance( const Point3D&, const Triangle3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_sphere_distance( const Point3D&, const Sphere3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api

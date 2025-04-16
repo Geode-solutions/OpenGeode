@@ -117,6 +117,14 @@ namespace geode
         : Base( point0, point1, point2, point3 )
     {
     }
+    OwnerTetrahedron::OwnerTetrahedron( const Tetrahedron& other ) noexcept
+        : Base( other.vertices()[0],
+              other.vertices()[1],
+              other.vertices()[2],
+              other.vertices()[3] )
+    {
+    }
+
     OwnerTetrahedron::OwnerTetrahedron(
         const OwnerTetrahedron& ) noexcept = default;
     OwnerTetrahedron& OwnerTetrahedron::operator=(
