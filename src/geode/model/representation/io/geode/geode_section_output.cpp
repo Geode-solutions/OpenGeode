@@ -39,6 +39,8 @@ namespace geode
     void OpenGeodeSectionOutput::save_section_files(
         const Section& section, std::string_view directory ) const
     {
+        const auto level = Logger::level();
+        Logger::set_level( Logger::LEVEL::warn );
         async::parallel_invoke(
             [&directory, &section] {
                 section.save_identifier( directory );
@@ -60,6 +62,7 @@ namespace geode
                 section.save_line_collections( directory );
                 section.save_surface_collections( directory );
             } );
+        Logger::set_level( level );
     }
 
     void OpenGeodeSectionOutput::archive_section_files(
