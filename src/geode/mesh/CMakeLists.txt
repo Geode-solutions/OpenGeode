@@ -64,6 +64,7 @@ add_geode_library(
         "core/grid.cpp"
         "core/hybrid_solid.cpp"
         "core/light_regular_grid.cpp"
+        "core/mesh_element.cpp"
         "core/mesh_factory.cpp"
         "core/mesh_id.cpp"
         "core/point_set.cpp"

@@ -53,6 +53,7 @@ add_geode_library(
         "points_sort.cpp"
         "position.cpp"
         "internal/predicates.cpp"
+        "point.cpp"
         "projection.cpp"
         "quality.cpp"
         "radial_sort.cpp"

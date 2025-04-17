@@ -24,7 +24,6 @@
 #pragma once
 
 #include <absl/algorithm/container.h>
-#include <absl/hash/hash.h>
 #include <absl/types/span.h>
 
 #include <geode/basic/uuid.hpp>
@@ -159,39 +158,26 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::MeshElement >
+    struct opengeode_mesh_api hash< geode::MeshElement >
     {
-        size_t operator()( const geode::MeshElement& mesh_element ) const
-        {
-            return absl::Hash< geode::uuid >()( mesh_element.mesh_id )
-                   ^ absl::Hash< geode::index_t >()( mesh_element.element_id );
-        }
+        size_t operator()( const geode::MeshElement& mesh_element ) const;
     };
 
     template <>
-    struct hash< geode::MeshVertex >
+    struct opengeode_mesh_api hash< geode::MeshVertex >
     {
-        size_t operator()( const geode::MeshVertex& mesh_vertex ) const
-        {
-            return std::hash< geode::MeshElement >()( mesh_vertex );
-        }
+        size_t operator()( const geode::MeshVertex& mesh_vertex ) const;
     };
 
     template <>
-    struct hash< geode::MeshEdge >
+    struct opengeode_mesh_api hash< geode::MeshEdge >
     {
-        size_t operator()( const geode::MeshEdge& mesh_edge ) const
-        {
-            return std::hash< geode::MeshElement >()( mesh_edge );
-        }
+        size_t operator()( const geode::MeshEdge& mesh_edge ) const;
     };
 
     template <>
-    struct hash< geode::MeshPolygon >
+    struct opengeode_mesh_api hash< geode::MeshPolygon >
     {
-        size_t operator()( const geode::MeshPolygon& mesh_polygon ) const
-        {
-            return std::hash< geode::MeshElement >()( mesh_polygon );
-        }
+        size_t operator()( const geode::MeshPolygon& mesh_polygon ) const;
     };
 } // namespace std

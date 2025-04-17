@@ -25,115 +25,46 @@
 
 #include <array>
 
-#include <absl/hash/hash.h>
-
 #include <geode/basic/attribute_utils.hpp>
-#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/range.hpp>
 
 #include <geode/image/common.hpp>
 
 namespace geode
 {
-    /*!
-     * Description of a color in RGB
-     */
-    class RGBColor
+    class opengeode_image_api RGBColor
     {
     public:
-        RGBColor()
-        {
-            values_.fill( 0 );
-        }
+        RGBColor();
 
-        RGBColor( local_index_t red, local_index_t green, local_index_t blue )
-            : values_( { red, green, blue } )
-        {
-        }
+        RGBColor( local_index_t red, local_index_t green, local_index_t blue );
 
-        [[nodiscard]] local_index_t red() const
-        {
-            return values_[0];
-        }
+        [[nodiscard]] local_index_t red() const;
 
-        [[nodiscard]] local_index_t green() const
-        {
-            return values_[1];
-        }
+        [[nodiscard]] local_index_t green() const;
 
-        [[nodiscard]] local_index_t blue() const
-        {
-            return values_[2];
-        }
+        [[nodiscard]] local_index_t blue() const;
 
-        void set_red( local_index_t red_scale )
-        {
-            values_[0] = red_scale;
-        }
+        void set_red( local_index_t red_scale );
 
-        void set_green( local_index_t green_scale )
-        {
-            values_[1] = green_scale;
-        }
+        void set_green( local_index_t green_scale );
 
-        void set_blue( local_index_t blue_scale )
-        {
-            values_[2] = blue_scale;
-        }
+        void set_blue( local_index_t blue_scale );
 
-        [[nodiscard]] bool operator==( const RGBColor &other ) const
-        {
-            if( red() != other.red() )
-            {
-                return false;
-            }
-            if( green() != other.green() )
-            {
-                return false;
-            }
-            if( blue() != other.blue() )
-            {
-                return false;
-            }
-            return true;
-        }
+        [[nodiscard]] bool operator==( const RGBColor &other ) const;
 
-        [[nodiscard]] bool operator!=( const RGBColor &other ) const
-        {
-            return !( *this == other );
-        }
+        [[nodiscard]] bool operator!=( const RGBColor &other ) const;
 
-        [[nodiscard]] RGBColor operator+( const RGBColor &other ) const
-        {
-            RGBColor result;
-            result.set_red( ( result.red() + other.red() ) / 2 );
-            result.set_green( ( result.green() + other.green() ) / 2 );
-            result.set_blue( ( result.blue() + other.blue() ) / 2 );
-            return result;
-        }
+        [[nodiscard]] RGBColor operator+( const RGBColor &other ) const;
 
-        void operator+=( const RGBColor &other )
-        {
-            set_red( ( red() + other.red() ) / 2 );
-            set_green( ( green() + other.green() ) / 2 );
-            set_blue( ( blue() + other.blue() ) / 2 );
-        }
+        void operator+=( const RGBColor &other );
 
-        [[nodiscard]] std::string string() const
-        {
-            return absl::StrCat( values_[0], " ", values_[1], " ", values_[2] );
-        }
+        [[nodiscard]] std::string string() const;
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive &archive )
-        {
-            archive.ext( *this, Growable< Archive, RGBColor >{
-                                    { []( Archive &a, RGBColor &color ) {
-                                        a.container1b( color.values_ );
-                                    } } } );
-        }
+        void serialize( Archive &archive );
 
     private:
         std::array< local_index_t, 3 > values_;
@@ -205,13 +136,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::RGBColor >
+    struct opengeode_image_api hash< geode::RGBColor >
     {
-        size_t operator()( const geode::RGBColor &color ) const
-        {
-            return absl::Hash< geode::local_index_t >()( color.red() )
-                   ^ absl::Hash< geode::local_index_t >()( color.green() )
-                   ^ absl::Hash< geode::local_index_t >()( color.blue() );
-        }
+        size_t operator()( const geode::RGBColor &color ) const;
     };
 } // namespace std
