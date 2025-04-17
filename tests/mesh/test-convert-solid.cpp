@@ -79,12 +79,13 @@ void test_grid_to_solids()
         "[Test] Number of vertices in HybridSolid3D from RegularGrid3D as "
         "grid is not correct." );
     const geode::index_t nb_densified_vertices =
-        nb_vertices + cells_to_densify.size();
-    OPENGEODE_EXCEPTION( tet_solid_from_light_grid->nb_vertices()
-                             == nb_vertices + cells_to_densify.size(),
+        nb_vertices + 3 * cells_to_densify.size() + 2 * 5 * 6 + 2 * 5 * 5;
+    OPENGEODE_EXCEPTION(
+        tet_solid_from_light_grid->nb_vertices() == nb_densified_vertices,
         "[Test] Number of vertices in TetrahedralSolid3D from LightRegularGrid "
         "is not correct: ",
-        tet_solid_from_light_grid->nb_vertices(), "instead of " );
+        tet_solid_from_light_grid->nb_vertices(), " instead of ",
+        nb_densified_vertices );
     const geode::index_t nb_tetrahedra = 5 * 5 * 5 * 6;
     OPENGEODE_EXCEPTION(
         tet_solid_from_mesh_grid_1.value()->nb_polyhedra() == nb_tetrahedra,
@@ -113,6 +114,15 @@ void test_grid_to_solids()
             "volume, not ",
             tet_volume );
     }
+    const geode::index_t nb_densified_tetras =
+        5 * 5 * ( 2 * 6 + 2 * ( 5 * 2 + 4 ) + 6 * 4 );
+    OPENGEODE_EXCEPTION(
+        tet_solid_from_light_grid->nb_polyhedra() == nb_densified_tetras,
+        "[Test] Number of tetrahedra in TetrahedralSolid3D from "
+        "LightRegularGrid "
+        "is not correct: ",
+        tet_solid_from_light_grid->nb_polyhedra(), " instead of ",
+        nb_densified_tetras );
 
     auto tet_builder =
         geode::TetrahedralSolidBuilder3D::create( *tet_solid_from_light_grid );
@@ -187,6 +197,7 @@ void test_hybrid_solid()
 
 void test()
 {
+    geode::Logger::set_level( geode::Logger::LEVEL::debug );
     test_grid_to_solids();
     test_hybrid_solid();
 }
