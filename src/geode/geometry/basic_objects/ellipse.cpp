@@ -63,6 +63,22 @@ namespace geode
         return axes_;
     }
 
+    template < typename PointType, typename FrameType, index_t dimension >
+    BoundingBox< dimension >
+        GenericEllipse< PointType, FrameType, dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > bbox;
+        const Point< dimension >& point = center_;
+        const Frame< dimension >& axes = axes_;
+        for( const auto d : LRange{ dimension } )
+        {
+            const auto& axe = axes.direction( d );
+            bbox.add_point( point + axe );
+            bbox.add_point( point - axe );
+        }
+        return bbox;
+    }
+
     template < index_t dimension >
     OwnerEllipse< dimension >::OwnerEllipse(
         Point< dimension > center, Frame< dimension > axes )
