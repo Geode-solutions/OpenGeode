@@ -125,7 +125,7 @@ namespace geode
             for( const auto v : Range{ nv } )
             {
                 tasks[task_id++] =
-                    async::spawn( [&builder, &origin, v, du, dv, nu, nv] {
+                    async::spawn( [&builder, &origin, v, du, dv, nu] {
                         for( const auto u : Range{ nu } )
                         {
                             const auto vertex = u + v * nu;
@@ -156,7 +156,7 @@ namespace geode
             for( const auto v : Range{ nv } )
             {
                 tasks[task_id++] = async::spawn(
-                    [&builder, &origin, v, &vector_u, &vector_v, nu, nv] {
+                    [&builder, &origin, v, &vector_u, &vector_v, nu] {
                         for( const auto u : Range{ nu } )
                         {
                             const auto vertex = u + v * nu;
@@ -188,17 +188,16 @@ namespace geode
             {
                 for( const auto v : Range{ nv } )
                 {
-                    tasks[task_id++] = async::spawn(
-                        [&builder, &origin, v, w, du, dv, dw, nu, nv, nw] {
-                            for( const auto u : Range{ nu } )
-                            {
-                                const auto vertex = u + v * nu + w * nu * nv;
-                                const Point3D translation{ { u * du, v * dv,
-                                    w * dw } };
-                                builder.set_point(
-                                    vertex, origin + translation );
-                            }
-                        } );
+                    tasks[task_id++] = async::spawn( [&builder, &origin, v, w,
+                                                         du, dv, dw, nu, nv] {
+                        for( const auto u : Range{ nu } )
+                        {
+                            const auto vertex = u + v * nu + w * nu * nv;
+                            const Point3D translation{ { u * du, v * dv,
+                                w * dw } };
+                            builder.set_point( vertex, origin + translation );
+                        }
+                    } );
                 }
             }
             for( auto& task : async::when_all( tasks ).get() )
@@ -228,7 +227,7 @@ namespace geode
                 {
                     tasks[task_id++] =
                         async::spawn( [&builder, &origin, v, w, &vector_u,
-                                          &vector_v, &vector_w, nu, nv, nw] {
+                                          &vector_v, &vector_w, nu, nv] {
                             for( const auto u : Range{ nu } )
                             {
                                 const auto vertex = u + v * nu + w * nu * nv;

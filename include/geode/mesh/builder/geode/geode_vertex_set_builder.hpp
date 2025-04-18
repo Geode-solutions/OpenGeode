@@ -61,6 +61,6 @@ namespace geode
             absl::Span< const index_t > old2new ) final;
 
     private:
-        OpenGeodeVertexSet& geode_vertex_set_;
+        [[maybe_unused]] OpenGeodeVertexSet& geode_vertex_set_;
     };
 } // namespace geode

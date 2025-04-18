@@ -26,6 +26,7 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
