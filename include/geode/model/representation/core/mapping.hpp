@@ -96,6 +96,8 @@ namespace geode
 
     using ModelGenericMapping = ModelMapping< GenericMapping< uuid > >;
 
+    using ModelAddedComponentMapping = ModelMapping< std::vector< uuid > >;
+
     using MeshElementMapping = GenericMapping< MeshElement, MeshElement >;
 
     using MeshVertexMapping = GenericMapping< MeshVertex, MeshVertex >;
@@ -141,6 +143,7 @@ namespace geode
     struct ModelMappings
     {
         ModelGenericMapping component_mapping;
+        ModelAddedComponentMapping added_component;
         ModelMeshesElementMapping mesh_element_mapping;
         ModelMeshesVertexMapping mesh_vertices_mapping;
     };
