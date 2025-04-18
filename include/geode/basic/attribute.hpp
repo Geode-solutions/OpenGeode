@@ -37,9 +37,9 @@
 
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_utils.hpp>
-#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/permutation.hpp>

@@ -26,8 +26,6 @@
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
-#include <geode/mesh/core/mesh_id.hpp>
-
 #include <geode/model/common.hpp>
 
 namespace geode

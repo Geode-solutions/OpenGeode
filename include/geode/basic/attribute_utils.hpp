@@ -23,8 +23,11 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.hpp>
+#include <absl/types/span.h>
+
 #include <geode/basic/common.hpp>
+#include <geode/basic/growable.hpp>
+#include <geode/basic/range.hpp>
 #include <geode/basic/types.hpp>
 
 namespace geode

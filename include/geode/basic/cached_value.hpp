@@ -27,7 +27,7 @@
 
 #include <bitsery/brief_syntax.h>
 
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 
 namespace geode
 {

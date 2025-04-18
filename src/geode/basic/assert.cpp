@@ -25,10 +25,32 @@
 
 #include <cassert>
 
+#include <absl/debugging/symbolize.h>
+
 #include <geode/basic/logger.hpp>
 
 namespace geode
 {
+    std::string OpenGeodeException::stack_trace() const
+    {
+        std::string stack_string;
+        for( auto frame = 0; frame < stack_size_; ++frame )
+        {
+            absl::StrAppend( &stack_string, "  ", frame, ": " );
+            if( std::array< char, SYMBOL_SIZE > symbol; absl::Symbolize(
+                    stack_[frame], symbol.data(), sizeof( symbol ) ) )
+            {
+                absl::StrAppend( &stack_string, symbol.data() );
+            }
+            else
+            {
+                absl::StrAppend( &stack_string, "Unknown" );
+            }
+            absl::StrAppend( &stack_string, "\n" );
+        }
+        return stack_string;
+    }
+
     void geode_assertion_failed( std::string_view condition,
         std::string_view message,
         std::string_view file,

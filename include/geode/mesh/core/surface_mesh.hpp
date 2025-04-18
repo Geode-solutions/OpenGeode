@@ -486,24 +486,14 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::PolygonVertex >
+    struct opengeode_mesh_api hash< geode::PolygonVertex >
     {
-    public:
-        size_t operator()( const geode::PolygonVertex& polygon_vertex ) const
-        {
-            return absl::Hash< geode::index_t >()( polygon_vertex.polygon_id )
-                   ^ absl::Hash< geode::index_t >()( polygon_vertex.vertex_id );
-        }
+        size_t operator()( const geode::PolygonVertex& polygon_vertex ) const;
     };
 
     template <>
-    struct hash< geode::PolygonEdge >
+    struct opengeode_mesh_api hash< geode::PolygonEdge >
     {
-    public:
-        size_t operator()( const geode::PolygonEdge& polygon_edge ) const
-        {
-            return absl::Hash< geode::index_t >()( polygon_edge.polygon_id )
-                   ^ absl::Hash< geode::index_t >()( polygon_edge.edge_id );
-        }
+        size_t operator()( const geode::PolygonEdge& polygon_edge ) const;
     };
 } // namespace std

@@ -146,15 +146,10 @@ namespace geode
                     std::lock_guard< std::mutex > lock( mutex );
                     if( mapping[point_id] != NO_ID )
                     {
-                        Logger::trace( point_id,
-                            " : correction 1 / mapping[p] ",
-                            mapping[point_id] );
                         return;
                     }
                     for( const auto vertex_id : neighbor_vertices )
                     {
-                        Logger::trace( point_id, " : id ", vertex_id,
-                            " / mapping[id] ", mapping[vertex_id] );
                         if( mapping[vertex_id] == NO_ID )
                         {
                             mapping[vertex_id] = point_id;

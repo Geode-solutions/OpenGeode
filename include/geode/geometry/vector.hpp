@@ -26,6 +26,7 @@
 #include <geode/basic/range.hpp>
 
 #include <geode/geometry/common.hpp>
+#include <geode/geometry/detail/point_operators.hpp>
 #include <geode/geometry/point.hpp>
 
 namespace geode

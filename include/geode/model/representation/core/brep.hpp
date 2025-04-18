@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/algorithm.hpp>
 #include <geode/basic/identifier.hpp>
 
 #include <geode/model/common.hpp>

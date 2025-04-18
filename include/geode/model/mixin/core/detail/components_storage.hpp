@@ -32,7 +32,7 @@
 
 #include <bitsery/ext/std_map.h>
 
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
 

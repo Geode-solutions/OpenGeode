@@ -30,6 +30,11 @@
 
 #include <geode/mesh/common.hpp>
 
+namespace bitsery
+{
+    class Access;
+} // namespace bitsery
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Texture );

@@ -23,76 +23,39 @@
 
 #pragma once
 
-#include <absl/hash/hash.h>
-
 #include <geode/basic/attribute_utils.hpp>
-#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/range.hpp>
 
 #include <geode/image/common.hpp>
 
 namespace geode
 {
-    /*!
-     * Description of a color in grey scale
-     */
-    class GreyscaleColor
+    class opengeode_image_api GreyscaleColor
     {
     public:
-        GreyscaleColor()
-        {
-            value_ = 0;
-        }
+        GreyscaleColor();
 
-        explicit GreyscaleColor( local_index_t value ) : value_( value ) {}
+        explicit GreyscaleColor( local_index_t value );
 
-        [[nodiscard]] local_index_t value() const
-        {
-            return value_;
-        }
+        [[nodiscard]] local_index_t value() const;
 
-        void set_value( local_index_t greyscale )
-        {
-            value_ = greyscale;
-        }
+        void set_value( local_index_t greyscale );
 
-        [[nodiscard]] bool operator==( const GreyscaleColor &other ) const
-        {
-            return value() == other.value();
-        }
+        [[nodiscard]] bool operator==( const GreyscaleColor &other ) const;
 
-        [[nodiscard]] bool operator!=( const GreyscaleColor &other ) const
-        {
-            return value() != other.value();
-        }
+        [[nodiscard]] bool operator!=( const GreyscaleColor &other ) const;
 
         [[nodiscard]] GreyscaleColor operator+(
-            const GreyscaleColor &other ) const
-        {
-            return GreyscaleColor{ static_cast< geode::local_index_t >(
-                value() / 2 + other.value() / 2 ) };
-        }
+            const GreyscaleColor &other ) const;
 
-        void operator+=( const GreyscaleColor &other )
-        {
-            set_value( ( value() + other.value() ) / 2 );
-        }
+        void operator+=( const GreyscaleColor &other );
 
-        [[nodiscard]] std::string string() const
-        {
-            return absl::StrCat( value_ );
-        }
+        [[nodiscard]] std::string string() const;
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive &archive )
-        {
-            archive.ext( *this, Growable< Archive, GreyscaleColor >{
-                                    { []( Archive &a, GreyscaleColor &color ) {
-                                        a.value1b( color.value_ );
-                                    } } } );
-        }
+        void serialize( Archive &archive );
 
     private:
         local_index_t value_;
@@ -161,12 +124,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::GreyscaleColor >
+    struct opengeode_image_api hash< geode::GreyscaleColor >
     {
-    public:
-        size_t operator()( const geode::GreyscaleColor &color ) const
-        {
-            return absl::Hash< geode::local_index_t >()( color.value() );
-        }
+        size_t operator()( const geode::GreyscaleColor &color ) const;
     };
 } // namespace std

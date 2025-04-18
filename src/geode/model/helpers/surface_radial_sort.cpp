@@ -231,3 +231,12 @@ namespace geode
         return SortedSurfaces{ 0 };
     }
 } // namespace geode
+
+namespace std
+{
+    size_t hash< geode::SidedSurface >::operator()(
+        const geode::SidedSurface& surface ) const
+    {
+        return absl::Hash< geode::uuid >()( surface.id );
+    }
+} // namespace std

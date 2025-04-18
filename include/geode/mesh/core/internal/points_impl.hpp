@@ -23,8 +23,10 @@
 
 #pragma once
 
+#include <bitsery/ext/std_smart_ptr.h>
+
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 
 #include <geode/geometry/point.hpp>
 

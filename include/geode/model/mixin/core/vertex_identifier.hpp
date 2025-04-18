@@ -205,13 +205,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::ComponentMeshVertex >
+    struct opengeode_model_api hash< geode::ComponentMeshVertex >
     {
-    public:
-        size_t operator()( const geode::ComponentMeshVertex& cmv ) const
-        {
-            return absl::Hash< geode::uuid >()( cmv.component_id.id() )
-                   ^ absl::Hash< geode::index_t >()( cmv.vertex );
-        }
+        size_t operator()( const geode::ComponentMeshVertex& cmv ) const;
     };
 } // namespace std

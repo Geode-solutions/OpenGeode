@@ -23,6 +23,7 @@
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/model/helpers/detail/mappings_merger.hpp>
 #include <geode/model/mixin/core/corner.hpp>

@@ -21,44 +21,34 @@
  *
  */
 
-#pragma once
+#include <geode/mesh/core/mesh_element.hpp>
 
-#include <string>
-
-#include <geode/basic/named_type.hpp>
-
-#include <geode/mesh/common.hpp>
-
-namespace geode
-{
-    struct MeshImplTag
-    {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshImpl = NamedType< std::string, MeshImplTag >;
-
-    struct MeshTypeTag
-    {
-    };
-    /*!
-     * Strong type for a mesh type
-     */
-    using MeshType = NamedType< std::string, MeshTypeTag >;
-} // namespace geode
+#include <absl/hash/hash.h>
 
 namespace std
 {
-    template <>
-    struct opengeode_mesh_api hash< geode::MeshImpl >
+    size_t hash< geode::MeshElement >::operator()(
+        const geode::MeshElement& mesh_element ) const
     {
-        std::size_t operator()( const geode::MeshImpl& impl ) const;
-    };
+        return absl::Hash< geode::uuid >()( mesh_element.mesh_id )
+               ^ absl::Hash< geode::index_t >()( mesh_element.element_id );
+    }
 
-    template <>
-    struct opengeode_mesh_api hash< geode::MeshType >
+    size_t hash< geode::MeshVertex >::operator()(
+        const geode::MeshVertex& mesh_vertex ) const
     {
-        std::size_t operator()( const geode::MeshType& type ) const;
-    };
+        return std::hash< geode::MeshElement >()( mesh_vertex );
+    }
+
+    size_t hash< geode::MeshEdge >::operator()(
+        const geode::MeshEdge& mesh_edge ) const
+    {
+        return std::hash< geode::MeshElement >()( mesh_edge );
+    }
+
+    size_t hash< geode::MeshPolygon >::operator()(
+        const geode::MeshPolygon& mesh_polygon ) const
+    {
+        return std::hash< geode::MeshElement >()( mesh_polygon );
+    }
 } // namespace std

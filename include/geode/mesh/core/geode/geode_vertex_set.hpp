@@ -25,7 +25,7 @@
 
 #include <bitsery/ext/inheritance.h>
 
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/vertex_set.hpp>

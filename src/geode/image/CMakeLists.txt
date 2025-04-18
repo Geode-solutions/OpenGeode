@@ -24,6 +24,8 @@ add_geode_library(
     SOURCES
         "common.cpp"
         "core/bitsery_archive.cpp"
+        "core/greyscale_color.cpp"
+        "core/rgb_color.cpp"
         "core/raster_image.cpp"
         "io/raster_image_input.cpp"
         "io/raster_image_output.cpp"

@@ -1189,3 +1189,20 @@ namespace geode
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 3 > );
 } // namespace geode
+
+namespace std
+{
+    size_t hash< geode::PolygonVertex >::operator()(
+        const geode::PolygonVertex& polygon_vertex ) const
+    {
+        return absl::Hash< geode::index_t >()( polygon_vertex.polygon_id )
+               ^ absl::Hash< geode::index_t >()( polygon_vertex.vertex_id );
+    }
+
+    size_t hash< geode::PolygonEdge >::operator()(
+        const geode::PolygonEdge& polygon_edge ) const
+    {
+        return absl::Hash< geode::index_t >()( polygon_edge.polygon_id )
+               ^ absl::Hash< geode::index_t >()( polygon_edge.edge_id );
+    }
+} // namespace std

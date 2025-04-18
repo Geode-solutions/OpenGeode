@@ -26,7 +26,7 @@
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 
 #include <geode/mesh/core/detail/facet_storage.hpp>
 

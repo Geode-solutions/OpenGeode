@@ -23,9 +23,10 @@
 
 #pragma once
 
+#include <bitsery/bitsery.h>
 #include <bitsery/ext/std_smart_ptr.h>
 
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/pimpl.hpp>
 
 namespace geode

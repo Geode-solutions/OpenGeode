@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/regular_grid_surface.hpp>
 
+#include <geode/basic/bitsery_archive.hpp>
+
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/regular_grid_surface_builder.hpp>

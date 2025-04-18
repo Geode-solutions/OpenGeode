@@ -648,58 +648,30 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::PolyhedronVertex >
+    struct opengeode_mesh_api hash< geode::PolyhedronVertex >
     {
-    public:
         size_t operator()(
-            const geode::PolyhedronVertex& polyhedron_vertex ) const
-        {
-            return absl::Hash< geode::index_t >()(
-                       polyhedron_vertex.polyhedron_id )
-                   ^ absl::Hash< geode::index_t >()(
-                       polyhedron_vertex.vertex_id );
-        }
+            const geode::PolyhedronVertex& polyhedron_vertex ) const;
     };
 
     template <>
-    struct hash< geode::PolyhedronFacet >
+    struct opengeode_mesh_api hash< geode::PolyhedronFacet >
     {
-    public:
         size_t operator()(
-            const geode::PolyhedronFacet& polyhedron_facet ) const
-        {
-            return absl::Hash< geode::index_t >()(
-                       polyhedron_facet.polyhedron_id )
-                   ^ absl::Hash< geode::index_t >()(
-                       polyhedron_facet.facet_id );
-        }
+            const geode::PolyhedronFacet& polyhedron_facet ) const;
     };
 
     template <>
-    struct hash< geode::PolyhedronFacetVertex >
+    struct opengeode_mesh_api hash< geode::PolyhedronFacetVertex >
     {
-    public:
         size_t operator()(
-            const geode::PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-        {
-            return absl::Hash< geode::PolyhedronFacet >()(
-                       polyhedron_facet_vertex.polyhedron_facet )
-                   ^ absl::Hash< geode::index_t >()(
-                       polyhedron_facet_vertex.vertex_id );
-        }
+            const geode::PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
     };
 
     template <>
-    struct hash< geode::PolyhedronFacetEdge >
+    struct opengeode_mesh_api hash< geode::PolyhedronFacetEdge >
     {
-    public:
         size_t operator()(
-            const geode::PolyhedronFacetEdge& polyhedron_facet_edge ) const
-        {
-            return absl::Hash< geode::PolyhedronFacet >()(
-                       polyhedron_facet_edge.polyhedron_facet )
-                   ^ absl::Hash< geode::index_t >()(
-                       polyhedron_facet_edge.edge_id );
-        }
+            const geode::PolyhedronFacetEdge& polyhedron_facet_edge ) const;
     };
 } // namespace std

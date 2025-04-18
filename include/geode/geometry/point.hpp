@@ -24,19 +24,11 @@
 #pragma once
 
 #include <array>
-#include <limits>
-#include <sstream>
-
-#include <absl/hash/hash.h>
-
-#include <bitsery/bitsery.h>
 
 #include <geode/basic/attribute_utils.hpp>
 #include <geode/basic/range.hpp>
 
-#include <geode/geometry/bitsery_archive.hpp>
 #include <geode/geometry/common.hpp>
-#include <geode/geometry/detail/point_operators.hpp>
 
 namespace geode
 {
@@ -47,163 +39,49 @@ namespace geode
     class Point
     {
     public:
-        Point()
-        {
-            values_.fill( 0 );
-        }
+        Point();
 
-        explicit Point( std::array< double, dimension > values )
-            : values_( std::move( values ) )
-        {
-        }
+        explicit Point( std::array< double, dimension > values );
 
-        [[nodiscard]] double value( local_index_t index ) const
-        {
-            return values_[index];
-        }
+        [[nodiscard]] double value( local_index_t index ) const;
 
-        void set_value( local_index_t index, double coordinate )
-        {
-            values_[index] = coordinate;
-        }
+        void set_value( local_index_t index, double coordinate );
 
-        [[nodiscard]] bool operator==( const Point &other ) const
-        {
-            for( const auto i : LRange{ dimension } )
-            {
-                if( value( i ) != other.value( i ) )
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        [[nodiscard]] bool operator==( const Point &other ) const;
 
-        [[nodiscard]] bool operator!=( const Point &other ) const
-        {
-            return !( *this == other );
-        }
+        [[nodiscard]] bool operator!=( const Point &other ) const;
 
-        [[nodiscard]] bool operator<( const Point &other ) const
-        {
-            for( const auto i : LRange{ dimension } )
-            {
-                if( value( i ) < other.value( i ) )
-                {
-                    return true;
-                }
-                if( value( i ) > other.value( i ) )
-                {
-                    return false;
-                }
-            }
-            return false;
-        }
+        [[nodiscard]] bool operator<( const Point &other ) const;
 
-        [[nodiscard]] bool operator<=( const Point &other ) const
-        {
-            return operator<( other ) || operator==( other );
-        }
+        [[nodiscard]] bool operator<=( const Point &other ) const;
 
-        [[nodiscard]] Point operator*( double multiplier ) const
-        {
-            return detail::coords_multiply( *this, multiplier );
-        }
+        [[nodiscard]] Point operator*( double multiplier ) const;
 
-        [[nodiscard]] Point operator/( double divider ) const
-        {
-            return detail::coords_divide( *this, divider );
-        }
+        [[nodiscard]] Point operator/( double divider ) const;
 
-        [[nodiscard]] Point operator+( const Point &other ) const
-        {
-            return detail::coords_add( *this, other );
-        }
+        [[nodiscard]] Point operator+( const Point &other ) const;
 
-        [[nodiscard]] Point operator-( const Point &other ) const
-        {
-            return detail::coords_substract( *this, other );
-        }
+        [[nodiscard]] Point operator-( const Point &other ) const;
 
-        void operator*=( double multiplier )
-        {
-            detail::coords_multiply_equal( *this, multiplier );
-        }
+        void operator*=( double multiplier );
 
-        void operator/=( double divider )
-        {
-            detail::coords_divide_equal( *this, divider );
-        }
+        void operator/=( double divider );
 
-        void operator+=( const Point &other )
-        {
-            detail::coords_add_equal( *this, other );
-        }
+        void operator+=( const Point &other );
 
-        void operator-=( const Point &other )
-        {
-            detail::coords_substract_equal( *this, other );
-        }
+        void operator-=( const Point &other );
 
-        [[nodiscard]] bool inexact_equal( const Point &other ) const
-        {
-            double square_length{ 0 };
-            static constexpr auto SQR_EPSILON = GLOBAL_EPSILON * GLOBAL_EPSILON;
-            for( const auto i : LRange{ dimension } )
-            {
-                const double diff{ other.value( i ) - this->value( i ) };
-                square_length += diff * diff;
-                if( square_length > SQR_EPSILON )
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        [[nodiscard]] bool inexact_equal( const Point &other ) const;
 
-        [[nodiscard]] std::string string() const
-        {
-            std::ostringstream oss;
-            oss.precision( std::numeric_limits< double >::digits10 );
-            const auto *sep = "";
-            for( const auto i : LRange{ dimension } )
-            {
-                oss << sep << value( i );
-                sep = " ";
-            }
-            return oss.str();
-        }
+        [[nodiscard]] std::string string() const;
 
         [[nodiscard]] Point< dimension - 1 > project_point(
-            geode::local_index_t axis_to_remove ) const
-        {
-            OPENGEODE_ASSERT( axis_to_remove < dimension && axis_to_remove >= 0,
-                "[Point] Invalid axis to remove" );
-            OPENGEODE_ASSERT(
-                dimension > 1, "[Point] Invalid dimension to reduce" );
-            Point< dimension - 1 > projected_point;
-            geode::index_t dim{ 0 };
-            for( const auto i : LRange{ dimension } )
-            {
-                if( i != axis_to_remove )
-                {
-                    projected_point.set_value( dim, this->value( i ) );
-                    dim++;
-                }
-            }
-            return projected_point;
-        }
+            geode::local_index_t axis_to_remove ) const;
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive &archive )
-        {
-            archive.ext( *this,
-                Growable< Archive, Point >{ { []( Archive &a, Point &point ) {
-                    a.container8b( point.values_ );
-                } } } );
-        }
+        void serialize( Archive &archive );
 
     private:
         std::array< double, dimension > values_;
@@ -309,35 +187,20 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::Point1D >
+    struct opengeode_geometry_api hash< geode::Point1D >
     {
-    public:
-        size_t operator()( const geode::Point1D &point ) const
-        {
-            return absl::Hash< double >()( point.value( 0 ) );
-        }
+        size_t operator()( const geode::Point1D &point ) const;
     };
 
     template <>
-    struct hash< geode::Point2D >
+    struct opengeode_geometry_api hash< geode::Point2D >
     {
-    public:
-        size_t operator()( const geode::Point2D &point ) const
-        {
-            return absl::Hash< double >()( point.value( 0 ) )
-                   ^ absl::Hash< double >()( point.value( 1 ) );
-        }
+        size_t operator()( const geode::Point2D &point ) const;
     };
 
     template <>
-    struct hash< geode::Point3D >
+    struct opengeode_geometry_api hash< geode::Point3D >
     {
-    public:
-        size_t operator()( const geode::Point3D &point ) const
-        {
-            return absl::Hash< double >()( point.value( 0 ) )
-                   ^ absl::Hash< double >()( point.value( 1 ) )
-                   ^ absl::Hash< double >()( point.value( 2 ) );
-        }
+        size_t operator()( const geode::Point3D &point ) const;
     };
 } // namespace std

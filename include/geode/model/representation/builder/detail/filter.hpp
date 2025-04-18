@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/range.hpp>
+
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
