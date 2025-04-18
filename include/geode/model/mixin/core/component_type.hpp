@@ -25,11 +25,11 @@
 
 #include <bitsery/brief_syntax/string.h>
 
-#include <absl/hash/hash.h>
-
 #include <geode/basic/growable.hpp>
 #include <geode/basic/named_type.hpp>
 #include <geode/basic/uuid.hpp>
+
+#include <geode/model/common.hpp>
 
 namespace geode
 {
@@ -110,20 +110,14 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::ComponentType >
+    struct opengeode_model_api hash< geode::ComponentType >
     {
-        size_t operator()( const geode::ComponentType& type ) const
-        {
-            return absl::Hash< string >()( type.get() );
-        }
+        size_t operator()( const geode::ComponentType& type ) const;
     };
 
     template <>
-    struct hash< geode::ComponentID >
+    struct opengeode_model_api hash< geode::ComponentID >
     {
-        size_t operator()( const geode::ComponentID& id ) const
-        {
-            return absl::Hash< geode::uuid >()( id.id() );
-        }
+        size_t operator()( const geode::ComponentID& id ) const;
     };
 } // namespace std

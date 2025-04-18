@@ -615,3 +615,13 @@ namespace geode
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ComponentMeshVertex );
 } // namespace geode
+
+namespace std
+{
+    size_t hash< geode::ComponentMeshVertex >::operator()(
+        const geode::ComponentMeshVertex& cmv ) const
+    {
+        return absl::Hash< geode::uuid >()( cmv.component_id.id() )
+               ^ absl::Hash< geode::index_t >()( cmv.vertex );
+    }
+} // namespace std

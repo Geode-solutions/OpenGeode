@@ -57,6 +57,7 @@ add_geode_library(
         "common.cpp"
         "core/attribute_coordinate_reference_system.cpp"
         "core/bitsery_archive.cpp"
+        "core/coordinate_reference_system.cpp"
         "core/coordinate_reference_system_manager.cpp"
         "core/coordinate_reference_system_managers.cpp"
         "core/edged_curve.cpp"

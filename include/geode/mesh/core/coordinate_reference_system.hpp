@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <absl/hash/hash.h>
-
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/named_type.hpp>
 
@@ -86,11 +84,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::CRSType >
+    struct opengeode_mesh_api hash< geode::CRSType >
     {
-        std::size_t operator()( const geode::CRSType& type ) const
-        {
-            return absl::Hash< std::string >{}( type.get() );
-        }
+        std::size_t operator()( const geode::CRSType& type ) const;
     };
 } // namespace std

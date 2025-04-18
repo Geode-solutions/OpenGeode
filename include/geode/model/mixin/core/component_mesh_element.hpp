@@ -25,6 +25,7 @@
 
 #include <geode/mesh/core/mesh_element.hpp>
 
+#include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
 namespace geode
@@ -79,12 +80,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::ComponentMeshElement >
+    struct opengeode_model_api hash< geode::ComponentMeshElement >
     {
-        size_t operator()( const geode::ComponentMeshElement& cme ) const
-        {
-            return absl::Hash< geode::uuid >()( cme.component_id.id() )
-                   ^ absl::Hash< geode::index_t >()( cme.element_id );
-        }
+        size_t operator()( const geode::ComponentMeshElement& cme ) const;
     };
 } // namespace std
