@@ -24,7 +24,9 @@
 #include <fstream>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/constant_attribute.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>

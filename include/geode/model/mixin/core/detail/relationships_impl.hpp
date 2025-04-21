@@ -26,6 +26,7 @@
 #include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/mesh/core/graph.hpp>
 

@@ -28,6 +28,7 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/model/mixin/builder/relationships_builder.hpp>
 #include <geode/model/mixin/core/relationships.hpp>

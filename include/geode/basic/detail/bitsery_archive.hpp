@@ -31,6 +31,7 @@
 #include <bitsery/brief_syntax/string.h>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_attribute.hpp>
 #include <geode/basic/uuid.hpp>
 
 namespace
@@ -39,29 +40,29 @@ namespace
     void register_attribute_type_for_all_containers(
         geode::PContext& context, std::string_view name )
     {
-        geode::AttributeManager::register_attribute_type< std::vector< Type >,
-            Serializer >( context, absl::StrCat( "vector_", name ) );
-        geode::AttributeManager::register_attribute_type< std::array< Type, 2 >,
-            Serializer >( context, absl::StrCat( "array_", name, "_2" ) );
-        geode::AttributeManager::register_attribute_type< std::array< Type, 3 >,
-            Serializer >( context, absl::StrCat( "array_", name, "_3" ) );
-        geode::AttributeManager::register_attribute_type< std::array< Type, 4 >,
-            Serializer >( context, absl::StrCat( "array_", name, "_4" ) );
+        geode::register_attribute_type< std::vector< Type >, Serializer >(
+            context, absl::StrCat( "vector_", name ) );
+        geode::register_attribute_type< std::array< Type, 2 >, Serializer >(
+            context, absl::StrCat( "array_", name, "_2" ) );
+        geode::register_attribute_type< std::array< Type, 3 >, Serializer >(
+            context, absl::StrCat( "array_", name, "_3" ) );
+        geode::register_attribute_type< std::array< Type, 4 >, Serializer >(
+            context, absl::StrCat( "array_", name, "_4" ) );
     }
 
     template < typename Serializer >
     void register_inlinedvector( geode::PContext& context )
     {
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             absl::InlinedVector< geode::index_t, 1 >, Serializer >(
             context, "InlinedVector_index_t_1" );
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             absl::InlinedVector< geode::index_t, 2 >, Serializer >(
             context, "InlinedVector_index_t_2" );
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             absl::InlinedVector< geode::index_t, 3 >, Serializer >(
             context, "InlinedVector_index_t_3" );
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             absl::InlinedVector< geode::index_t, 4 >, Serializer >(
             context, "InlinedVector_index_t_4" );
     }
@@ -74,22 +75,17 @@ namespace geode
         template < typename Serializer >
         void register_basic_pcontext( PContext& context )
         {
-            AttributeManager::register_attribute_type< bool, Serializer >(
-                context, "bool" );
-            AttributeManager::register_attribute_type< int, Serializer >(
-                context, "int" );
-            AttributeManager::register_attribute_type< float, Serializer >(
-                context, "float" );
-            AttributeManager::register_attribute_type< double, Serializer >(
-                context, "double" );
-            AttributeManager::register_attribute_type< local_index_t,
-                Serializer >( context, "local_index_t" );
-            AttributeManager::register_attribute_type< index_t, Serializer >(
+            register_attribute_type< bool, Serializer >( context, "bool" );
+            register_attribute_type< int, Serializer >( context, "int" );
+            register_attribute_type< float, Serializer >( context, "float" );
+            register_attribute_type< double, Serializer >( context, "double" );
+            register_attribute_type< local_index_t, Serializer >(
+                context, "local_index_t" );
+            register_attribute_type< index_t, Serializer >(
                 context, "index_t" );
-            AttributeManager::register_attribute_type< uuid, Serializer >(
-                context, "uuid" );
-            AttributeManager::register_attribute_type< std::string,
-                Serializer >( context, "std::string" );
+            register_attribute_type< uuid, Serializer >( context, "uuid" );
+            register_attribute_type< std::string, Serializer >(
+                context, "std::string" );
             register_attribute_type_for_all_containers< Serializer, double >(
                 context, "double" );
             register_attribute_type_for_all_containers< Serializer, index_t >(
