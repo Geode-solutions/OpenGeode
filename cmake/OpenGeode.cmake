@@ -27,8 +27,6 @@ include(cmake/ProjectOptions.cmake)
 include(cmake/CppTargets.cmake)
 include(cmake/PythonTargets.cmake)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftime-trace") 
-
 # Get OpenGeode dependencies
 find_package(absl REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ABSEIL_INSTALL_PREFIX})
 find_package(Async++ REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ASYNCPLUSPLUS_INSTALL_PREFIX})
