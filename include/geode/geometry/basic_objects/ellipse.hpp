@@ -28,9 +28,10 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Frame );
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerEllipse );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Frame );
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
@@ -60,6 +61,7 @@ namespace geode
 
         [[nodiscard]] const Point< dimension >& center() const;
         [[nodiscard]] const Frame< dimension >& axes() const;
+        [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
     private:
         PointType center_;
