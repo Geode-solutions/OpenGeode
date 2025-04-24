@@ -27,6 +27,11 @@
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
+namespace bitsery
+{
+    class Access;
+} // namespace bitsery
+
 namespace geode
 {
     class IdentifierBuilder;

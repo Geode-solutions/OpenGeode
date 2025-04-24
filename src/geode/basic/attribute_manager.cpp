@@ -27,8 +27,10 @@
 
 #include <absl/container/flat_hash_map.h>
 
+#include <bitsery/ext/std_map.h>
 #include <bitsery/traits/string.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 

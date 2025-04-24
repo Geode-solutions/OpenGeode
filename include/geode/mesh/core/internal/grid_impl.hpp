@@ -26,7 +26,7 @@
 #include <async++.h>
 
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/internal/array_impl.hpp>
 
 #include <geode/geometry/vector.hpp>

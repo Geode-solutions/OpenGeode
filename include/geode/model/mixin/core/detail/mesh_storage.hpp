@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/uuid.hpp>
 

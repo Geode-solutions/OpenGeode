@@ -25,8 +25,8 @@
 
 #include <bitsery/brief_syntax/vector.h>
 
-#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/bitsery_attribute.hpp>
 #include <geode/basic/cached_value.hpp>
 
 #include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
@@ -237,35 +237,30 @@ namespace
     template < typename Serializer >
     void register_mesh_pcontext( geode::PContext& context )
     {
-        geode::AttributeManager::register_attribute_type<
-            geode::EdgesAroundVertex, Serializer >(
+        geode::register_attribute_type< geode::EdgesAroundVertex, Serializer >(
             context, "EdgesAroundVertex" );
-        geode::AttributeManager::register_attribute_type< geode::PolygonVertex,
-            Serializer >( context, "PolygonVertex" );
-        geode::AttributeManager::register_attribute_type< geode::PolygonEdge,
-            Serializer >( context, "PolygonEdge" );
-        geode::AttributeManager::register_attribute_type<
-            geode::PolyhedronFacet, Serializer >( context, "PolyhedronFacet" );
-        geode::AttributeManager::register_attribute_type<
-            geode::PolyhedronFacetVertex, Serializer >(
-            context, "PolyhedronFacetVertex" );
-        geode::AttributeManager::register_attribute_type<
-            geode::PolyhedronVertex, Serializer >(
+        geode::register_attribute_type< geode::PolygonVertex, Serializer >(
+            context, "PolygonVertex" );
+        geode::register_attribute_type< geode::PolygonEdge, Serializer >(
+            context, "PolygonEdge" );
+        geode::register_attribute_type< geode::PolyhedronFacet, Serializer >(
+            context, "PolyhedronFacet" );
+        geode::register_attribute_type< geode::PolyhedronFacetVertex,
+            Serializer >( context, "PolyhedronFacetVertex" );
+        geode::register_attribute_type< geode::PolyhedronVertex, Serializer >(
             context, "PolyhedronVertex" );
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             geode::CachedValue< geode::internal::PolygonsAroundVertexImpl >,
             Serializer >( context, "CachedPolygonsAroundVertexImpl" );
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             geode::CachedValue< geode::internal::PolyhedraAroundVertexImpl >,
             Serializer >( context, "CachedPolyhedraAroundVertexImpl" );
-        geode::AttributeManager::register_attribute_type<
-            geode::HybridSolid3D::Type, Serializer >(
-            context, "HybridSolidType" );
-        geode::AttributeManager::register_attribute_type< geode::MeshElement,
-            Serializer >( context, "SingleMeshElement" );
-        geode::AttributeManager::register_attribute_type<
-            std::vector< geode::MeshElement >, Serializer >(
-            context, "MeshElement" );
+        geode::register_attribute_type< geode::HybridSolid3D::Type,
+            Serializer >( context, "HybridSolidType" );
+        geode::register_attribute_type< geode::MeshElement, Serializer >(
+            context, "SingleMeshElement" );
+        geode::register_attribute_type< std::vector< geode::MeshElement >,
+            Serializer >( context, "MeshElement" );
         geode::CoordinateReferenceSystem1D::
             register_coordinate_reference_system_type<
                 geode::AttributeCoordinateReferenceSystem1D, Serializer >(

@@ -25,6 +25,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/point.hpp>

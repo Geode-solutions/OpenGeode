@@ -24,6 +24,7 @@
 #include <fstream>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/tests/common.hpp>

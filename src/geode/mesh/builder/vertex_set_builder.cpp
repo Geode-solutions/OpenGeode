@@ -24,6 +24,8 @@
 #include <geode/mesh/builder/vertex_set_builder.hpp>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/permutation.hpp>
 
 #include <geode/mesh/builder/mesh_builder_factory.hpp>
 #include <geode/mesh/core/vertex_set.hpp>

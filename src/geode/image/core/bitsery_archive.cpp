@@ -24,6 +24,7 @@
 #include <geode/image/core/bitsery_archive.hpp>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_attribute.hpp>
 
 #include <geode/image/core/greyscale_color.hpp>
 #include <geode/image/core/rgb_color.hpp>
@@ -33,10 +34,10 @@ namespace
     template < typename Serializer >
     void register_image_pcontext( geode::PContext& context )
     {
-        geode::AttributeManager::register_attribute_type< geode::GreyscaleColor,
-            Serializer >( context, "GreyScaleColor" );
-        geode::AttributeManager::register_attribute_type< geode::RGBColor,
-            Serializer >( context, "RGBColor" );
+        geode::register_attribute_type< geode::GreyscaleColor, Serializer >(
+            context, "GreyScaleColor" );
+        geode::register_attribute_type< geode::RGBColor, Serializer >(
+            context, "RGBColor" );
     }
 } // namespace
 

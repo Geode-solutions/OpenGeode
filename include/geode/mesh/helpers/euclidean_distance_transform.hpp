@@ -26,6 +26,7 @@
 #include <absl/types/span.h>
 
 #include <geode/basic/attribute.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/grid.hpp>

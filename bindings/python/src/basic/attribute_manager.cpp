@@ -24,7 +24,12 @@
 #include "../common.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/constant_attribute.hpp>
+#include <geode/basic/sparse_attribute.hpp>
+#include <geode/basic/variable_attribute.hpp>
+
 #include <typeinfo>
+
 namespace geode
 {
     template < typename type >

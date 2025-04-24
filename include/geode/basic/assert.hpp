@@ -24,13 +24,11 @@
 #pragma once
 
 #include <array>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 
 #include <absl/base/optimization.h>
 #include <absl/debugging/stacktrace.h>
-#include <absl/debugging/symbolize.h>
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/opengeode_basic_export.hpp>
@@ -50,7 +48,7 @@ namespace geode
      *           return geode_lippincott();
      *       }
      */
-    class OpenGeodeException : public std::runtime_error
+    class opengeode_basic_api OpenGeodeException : public std::runtime_error
     {
         static constexpr int MAX_STACK_DEPTH = 10;
         static constexpr int NB_SKIPPED_STACKS = 1;
@@ -68,25 +66,7 @@ namespace geode
 
         ~OpenGeodeException() noexcept override = default;
 
-        [[nodiscard]] std::string stack_trace() const
-        {
-            std::string stack_string;
-            for( auto frame = 0; frame < stack_size_; ++frame )
-            {
-                absl::StrAppend( &stack_string, "  ", frame, ": " );
-                if( std::array< char, SYMBOL_SIZE > symbol; absl::Symbolize(
-                        stack_[frame], symbol.data(), sizeof( symbol ) ) )
-                {
-                    absl::StrAppend( &stack_string, symbol.data() );
-                }
-                else
-                {
-                    absl::StrAppend( &stack_string, "Unknown" );
-                }
-                absl::StrAppend( &stack_string, "\n" );
-            }
-            return stack_string;
-        }
+        [[nodiscard]] std::string stack_trace() const;
 
     private:
         std::array< void*, MAX_STACK_DEPTH > stack_;

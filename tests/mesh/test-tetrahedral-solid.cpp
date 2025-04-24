@@ -23,6 +23,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>

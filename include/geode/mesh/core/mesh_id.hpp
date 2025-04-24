@@ -25,11 +25,9 @@
 
 #include <string>
 
-#include <absl/hash/hash.h>
-
-#include <bitsery/brief_syntax/string.h>
-
 #include <geode/basic/named_type.hpp>
+
+#include <geode/mesh/common.hpp>
 
 namespace geode
 {
@@ -53,20 +51,14 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::MeshImpl >
+    struct opengeode_mesh_api hash< geode::MeshImpl >
     {
-        std::size_t operator()( const geode::MeshImpl& impl ) const
-        {
-            return absl::Hash< std::string >{}( impl.get() );
-        }
+        std::size_t operator()( const geode::MeshImpl& impl ) const;
     };
 
     template <>
-    struct hash< geode::MeshType >
+    struct opengeode_mesh_api hash< geode::MeshType >
     {
-        std::size_t operator()( const geode::MeshType& type ) const
-        {
-            return absl::Hash< std::string >{}( type.get() );
-        }
+        std::size_t operator()( const geode::MeshType& type ) const;
     };
 } // namespace std

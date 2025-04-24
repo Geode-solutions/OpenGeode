@@ -257,8 +257,8 @@ namespace geode
                 opposite_facets[1] = { vertex.polyhedron_id, vertex.vertex_id };
             }
         }
-        OPENGEODE_EXCEPTION( opposite_facets[0].facet_id != NO_ID
-                                 && opposite_facets[1].facet_id != NO_ID,
+        OPENGEODE_EXCEPTION( opposite_facets[0].facet_id != NO_LID
+                                 && opposite_facets[1].facet_id != NO_LID,
             "[TetrahedralSolid::opposite_edge_incident_facets] Given edge "
             "vertices are not vertices of given tetrahedron" );
         return opposite_facets;

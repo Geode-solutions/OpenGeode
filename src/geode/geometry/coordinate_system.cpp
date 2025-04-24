@@ -23,6 +23,7 @@
 
 #include <geode/geometry/coordinate_system.hpp>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/perpendicular.hpp>

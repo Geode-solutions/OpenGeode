@@ -94,12 +94,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::SidedSurface >
+    struct opengeode_model_api hash< geode::SidedSurface >
     {
-    public:
-        size_t operator()( const geode::SidedSurface& surface ) const
-        {
-            return absl::Hash< geode::uuid >()( surface.id );
-        }
+        size_t operator()( const geode::SidedSurface& surface ) const;
     };
 } // namespace std
