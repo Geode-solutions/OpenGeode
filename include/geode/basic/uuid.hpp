@@ -81,12 +81,10 @@
 
 #include <string>
 
-#include <absl/hash/hash.h>
-
 #include <bitsery/bitsery.h>
 
-#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/growable.hpp>
 
 namespace geode
 {
@@ -132,13 +130,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::uuid >
+    struct opengeode_basic_api hash< geode::uuid >
     {
-    public:
-        size_t operator()( const geode::uuid &uuid ) const
-        {
-            return absl::Hash< uint64_t >()( uuid.ab )
-                   ^ absl::Hash< uint64_t >()( uuid.cd );
-        }
+        size_t operator()( const geode::uuid &uuid ) const;
     };
 } // namespace std

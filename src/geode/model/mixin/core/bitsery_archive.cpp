@@ -23,8 +23,8 @@
 
 #include <geode/model/mixin/core/bitsery_archive.hpp>
 
-#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/bitsery_attribute.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/block_collection.hpp>
@@ -74,11 +74,11 @@ namespace
     template < typename Serializer >
     void register_model_pcontext( geode::PContext& context )
     {
-        geode::AttributeManager::register_attribute_type<
+        geode::register_attribute_type<
             std::vector< geode::ComponentMeshVertex >, Serializer >(
             context, "vector_MCV" );
-        geode::AttributeManager::register_attribute_type< geode::ComponentID,
-            Serializer >( context, "ComponentID" );
+        geode::register_attribute_type< geode::ComponentID, Serializer >(
+            context, "ComponentID" );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::Component2D >{} );
         context.registerBasesList< Serializer >(

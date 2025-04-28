@@ -132,10 +132,4 @@ namespace geode
         const auto last = std::unique( container.begin(), container.end() );
         container.erase( last, container.end() );
     }
-
-    /*!
-     * Concatenate tuples into a single tuple.
-     */
-    template < typename... tuples >
-    using tuple_cat = decltype( std::tuple_cat( std::declval< tuples >()... ) );
 } // namespace geode

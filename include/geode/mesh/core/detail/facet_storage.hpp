@@ -25,10 +25,13 @@
 
 #include <absl/container/flat_hash_map.h>
 
+#include <bitsery/ext/std_map.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/range.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
 

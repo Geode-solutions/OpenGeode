@@ -26,6 +26,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <absl/hash/hash.h>
+
 #include <absl/random/random.h>
 
 namespace
@@ -145,3 +147,12 @@ namespace geode
         return string;
     }
 } // namespace geode
+
+namespace std
+{
+    size_t hash< geode::uuid >::operator()( const geode::uuid &uuid ) const
+    {
+        return absl::Hash< uint64_t >()( uuid.ab )
+               ^ absl::Hash< uint64_t >()( uuid.cd );
+    }
+} // namespace std

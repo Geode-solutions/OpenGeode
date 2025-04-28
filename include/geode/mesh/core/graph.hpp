@@ -192,13 +192,8 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::EdgeVertex >
+    struct opengeode_mesh_api hash< geode::EdgeVertex >
     {
-    public:
-        size_t operator()( const geode::EdgeVertex& edge_vertex ) const
-        {
-            return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
-                   ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
-        }
+        size_t operator()( const geode::EdgeVertex& edge_vertex ) const;
     };
 } // namespace std

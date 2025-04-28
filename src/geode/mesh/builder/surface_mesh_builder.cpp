@@ -24,6 +24,7 @@
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/permutation.hpp>
 
 #include <geode/geometry/point.hpp>
 

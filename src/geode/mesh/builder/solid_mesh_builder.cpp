@@ -24,6 +24,8 @@
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/permutation.hpp>
 
 #include <geode/geometry/point.hpp>
 

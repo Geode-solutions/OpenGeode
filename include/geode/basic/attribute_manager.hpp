@@ -30,10 +30,7 @@
 #include <absl/container/fixed_array.h>
 #include <absl/strings/str_cat.h>
 
-#include <bitsery/bitsery.h>
-
 #include <geode/basic/attribute.hpp>
-#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -247,30 +244,6 @@ namespace geode
 
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );
-
-        template < typename Type, typename Serializer >
-        static void register_attribute_type(
-            PContext& context, std::string_view name )
-        {
-            context.registerSingleBaseBranch< Serializer, AttributeBase,
-                ConstantAttribute< Type > >(
-                absl::StrCat( "ConstantAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer, AttributeBase,
-                VariableAttribute< Type > >(
-                absl::StrCat( "VariableAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer, AttributeBase,
-                SparseAttribute< Type > >(
-                absl::StrCat( "SparseAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer,
-                ConstantAttribute< Type >, ConstantAttribute< Type > >(
-                absl::StrCat( "ConstantAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer,
-                VariableAttribute< Type >, VariableAttribute< Type > >(
-                absl::StrCat( "VariableAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer,
-                SparseAttribute< Type >, SparseAttribute< Type > >(
-                absl::StrCat( "SparseAttribute", name ).c_str() );
-        }
 
     private:
         friend class bitsery::Access;

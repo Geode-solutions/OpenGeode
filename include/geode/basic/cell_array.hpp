@@ -28,6 +28,11 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/pimpl.hpp>
 
+namespace bitsery
+{
+    class Access;
+} // namespace bitsery
+
 namespace geode
 {
     template < index_t dimension >

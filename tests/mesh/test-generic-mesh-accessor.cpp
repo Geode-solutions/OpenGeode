@@ -26,6 +26,7 @@
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/uuid.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
 

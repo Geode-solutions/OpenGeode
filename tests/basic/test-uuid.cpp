@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
 #include <geode/tests/common.hpp>

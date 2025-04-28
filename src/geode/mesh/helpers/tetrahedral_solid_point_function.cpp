@@ -25,6 +25,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
