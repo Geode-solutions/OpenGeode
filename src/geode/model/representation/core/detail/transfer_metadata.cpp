@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/core/detail/transfer_metadata.hpp>
 
+#include <geode/basic/small_set.hpp>
+
 #include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
@@ -50,23 +52,22 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping : component_mapping
+        for( const auto& [out_uuid, in_uuids] : component_mapping
                  .at( geode::Corner< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
             std::string out_name{ "" };
-            bool first{ true };
-            for( const auto& in_uuid : out2in_mapping.second )
+            geode::SmallSet< std::string_view > unique_names;
+            for( const auto& in_uuid : in_uuids )
             {
-                if( !first )
-                {
-                    absl::StrAppend( &out_name, "+" );
-                }
-                first = false;
-                absl::StrAppend(
-                    &out_name, old_model.corner( in_uuid ).name() );
+                unique_names.insert( old_model.corner( in_uuid ).name() );
             }
-            builder.set_corner_name( out2in_mapping.first, out_name );
+            for( const auto& corner_name : unique_names )
+            {
+                absl::StrAppend( &out_name, corner_name, "+" );
+            }
+            out_name.pop_back();
+            builder.set_corner_name( out_uuid, out_name );
         }
     }
 
@@ -80,22 +81,22 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping : component_mapping
+        for( const auto& [out_uuid, in_uuids] : component_mapping
                  .at( geode::Line< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
             std::string out_name{ "" };
-            bool first{ true };
-            for( const auto& in_uuid : out2in_mapping.second )
+            geode::SmallSet< std::string_view > unique_names;
+            for( const auto& in_uuid : in_uuids )
             {
-                if( !first )
-                {
-                    absl::StrAppend( &out_name, "+" );
-                }
-                first = false;
-                absl::StrAppend( &out_name, old_model.line( in_uuid ).name() );
+                unique_names.insert( old_model.line( in_uuid ).name() );
             }
-            builder.set_line_name( out2in_mapping.first, out_name );
+            for( const auto& line_name : unique_names )
+            {
+                absl::StrAppend( &out_name, line_name, "+" );
+            }
+            out_name.pop_back();
+            builder.set_line_name( out_uuid, out_name );
         }
     }
 
@@ -109,23 +110,22 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping : component_mapping
+        for( const auto& [out_uuid, in_uuids] : component_mapping
                  .at( geode::Surface< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
             std::string out_name{ "" };
-            bool first{ true };
-            for( const auto& in_uuid : out2in_mapping.second )
+            geode::SmallSet< std::string_view > unique_names;
+            for( const auto& in_uuid : in_uuids )
             {
-                if( !first )
-                {
-                    absl::StrAppend( &out_name, "+" );
-                }
-                first = false;
-                absl::StrAppend(
-                    &out_name, old_model.surface( in_uuid ).name() );
+                unique_names.insert( old_model.surface( in_uuid ).name() );
             }
-            builder.set_surface_name( out2in_mapping.first, out_name );
+            for( const auto& surface_name : unique_names )
+            {
+                absl::StrAppend( &out_name, surface_name, "+" );
+            }
+            out_name.pop_back();
+            builder.set_surface_name( out_uuid, out_name );
         }
     }
 
@@ -138,22 +138,22 @@ namespace
         {
             return;
         }
-        for( const auto& out2in_mapping :
+        for( const auto& [out_uuid, in_uuids] :
             component_mapping.at( geode::Block3D::component_type_static() )
                 .out2in_map() )
         {
             std::string out_name{ "" };
-            bool first{ true };
-            for( const auto& in_uuid : out2in_mapping.second )
+            geode::SmallSet< std::string_view > unique_names;
+            for( const auto& in_uuid : in_uuids )
             {
-                if( !first )
-                {
-                    absl::StrAppend( &out_name, "+" );
-                }
-                first = false;
-                absl::StrAppend( &out_name, old_model.block( in_uuid ).name() );
+                unique_names.insert( old_model.block( in_uuid ).name() );
             }
-            builder.set_block_name( out2in_mapping.first, out_name );
+            for( const auto& surface_name : unique_names )
+            {
+                absl::StrAppend( &out_name, surface_name, "+" );
+            }
+            out_name.pop_back();
+            builder.set_block_name( out_uuid, out_name );
         }
     }
 } // namespace

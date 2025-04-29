@@ -203,7 +203,8 @@ namespace geode
         index_t vertex_id ) const
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
-            "[Graph::edges_around_vertex] Accessing an invalid vertex" );
+            "[Graph::edges_around_vertex] Accessing an invalid vertex (",
+            vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->edges_around_vertex( vertex_id );
     }
 
@@ -245,7 +246,8 @@ namespace geode
         index_t vertex_id, EdgesAroundVertex edges, GraphKey )
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
-            "[Graph::get_edges_around_vertex] Accessing an invalid vertex" );
+            "[Graph::edges_around_vertex] Accessing an invalid vertex (",
+            vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->set_edges_around_vertex( vertex_id, std::move( edges ) );
     }
 
