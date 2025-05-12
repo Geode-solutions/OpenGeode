@@ -61,6 +61,10 @@ namespace geode
                 writer_, MZ_COMPRESS_METHOD_STORE );
             const auto status = mz_zip_writer_open_file(
                 writer_, to_string( file ).c_str(), 0, 0 );
+            if( status != MZ_OK )
+            {
+                std::filesystem::remove( directory_ );
+            }
             OPENGEODE_EXCEPTION(
                 status == MZ_OK, "[ZipFile] Error opening zip for writing." );
         }
@@ -137,6 +141,10 @@ namespace geode
             reader_ = mz_zip_reader_create();
             const auto status =
                 mz_zip_reader_open_file( reader_, to_string( file ).c_str() );
+            if( status != MZ_OK )
+            {
+                std::filesystem::remove_all( directory_ );
+            }
             OPENGEODE_EXCEPTION(
                 status == MZ_OK, "[UnzipFile] Error opening zip for reading" );
         }
