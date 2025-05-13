@@ -42,4 +42,8 @@ namespace geode
     template < index_t dimension >
     [[nodiscard]] std::vector< index_t > morton_mapping(
         absl::Span< const Point< dimension > > points );
+
+    template < index_t dimension >
+    [[nodiscard]] std::vector< index_t > hilbert_mapping(
+        absl::Span< const Point< dimension > > points );
 } // namespace geode
