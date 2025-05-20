@@ -29,6 +29,7 @@
 
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/meshes_mapping.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace geode
 {
