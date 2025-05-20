@@ -33,9 +33,7 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
-    ALIAS_3D( SolidMesh );
     ALIAS_3D( SolidMeshBuilder );
 } // namespace geode
 
