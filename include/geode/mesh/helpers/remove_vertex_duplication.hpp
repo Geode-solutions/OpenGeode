@@ -53,6 +53,6 @@ namespace geode
     void remove_vertex_duplication( const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder );
 
-    void remove_vertex_duplication(
+    void opengeode_mesh_api remove_vertex_duplication(
         const SolidMesh3D& mesh, SolidMeshBuilder3D& builder );
 } // namespace geode
