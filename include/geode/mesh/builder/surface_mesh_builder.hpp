@@ -27,6 +27,8 @@
 
 #include <absl/types/span.h>
 
+#include <geode/basic/mapping.hpp>
+
 #include <geode/mesh/builder/coordinate_reference_system_managers_builder.hpp>
 #include <geode/mesh/builder/vertex_set_builder.hpp>
 #include <geode/mesh/common.hpp>
@@ -96,8 +98,18 @@ namespace geode
          * @param[in] old_vertex_id Index of the initial mesh vertex to modify
          * @param[in] new_vertex_id Index of the target mesh vertex to set as
          * polygon vertex
+         * @warning This function supposes that the mesh is manifold around old
+         * vertex
          */
         void replace_vertex( index_t old_vertex_id, index_t new_vertex_id );
+
+        /*!
+         * Replace old polygon vertices from given vertices to another ones.
+         * @warning This function does not suppose that the mesh is manifold
+         * around old vertices
+         */
+        void replace_vertices(
+            const GenericMapping< index_t >& vertices_mapping );
 
         /*!
          * Set a polygon adjacent through an edge.

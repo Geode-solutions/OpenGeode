@@ -406,6 +406,44 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidMeshBuilder< dimension >::replace_vertices(
+        const GenericMapping< index_t >& vertices_mapping )
+    {
+        for( const auto p : Range{ solid_mesh_.nb_polyhedra() } )
+        {
+            for( const auto v :
+                LRange{ solid_mesh_.nb_polyhedron_vertices( p ) } )
+            {
+                const PolyhedronVertex polyhedron_vertex{ p, v };
+                const auto old_vertex_id =
+                    solid_mesh_.polyhedron_vertex( polyhedron_vertex );
+                if( !vertices_mapping.has_mapping_input( old_vertex_id ) )
+                {
+                    continue;
+                }
+                const auto old2news = vertices_mapping.in2out( old_vertex_id );
+                OPENGEODE_ASSERT( old2news.size() == 1,
+                    "[SolidMeshBuilder::replace_vertices] "
+                    "Invalid mapping" );
+                const auto new_vertex_id = old2news[0];
+                if( old_vertex_id == new_vertex_id )
+                {
+                    continue;
+                }
+                disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
+                reset_polyhedra_around_vertex( old_vertex_id );
+                if( solid_mesh_.are_edges_enabled()
+                    || solid_mesh_.are_facets_enabled() )
+                {
+                    update_edge_and_facet(
+                        solid_mesh_, *this, polyhedron_vertex, new_vertex_id );
+                }
+                update_polyhedron_vertex( polyhedron_vertex, new_vertex_id );
+            }
+        }
+    }
+
+    template < index_t dimension >
     void SolidMeshBuilder< dimension >::set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t new_vertex_id )
     {

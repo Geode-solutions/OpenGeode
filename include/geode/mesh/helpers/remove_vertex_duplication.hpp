@@ -23,40 +23,36 @@
 
 #pragma once
 
-#include <absl/types/span.h>
-
-#include <geode/basic/pimpl.hpp>
-
 #include <geode/mesh/common.hpp>
-#include <geode/mesh/core/meshes_mapping.hpp>
-#include <geode/mesh/core/solid_mesh.hpp>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSetBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurveBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
+    ALIAS_3D( SolidMesh );
     ALIAS_3D( SolidMeshBuilder );
 } // namespace geode
 
 namespace geode
 {
-    namespace detail
-    {
-        class opengeode_mesh_api SplitAlongSolidFacets
-        {
-        public:
-            SplitAlongSolidFacets(
-                const SolidMesh3D& mesh, SolidMeshBuilder3D& builder );
-            ~SplitAlongSolidFacets();
+    template < index_t dimension >
+    void remove_vertex_duplication( const PointSet< dimension >& mesh,
+        PointSetBuilder< dimension >& builder );
 
-            /*
-             * Splits the solid along given facets, and returns the mapping on
-             * vertices and facets.
-             */
-            MeshesElementsMapping split_solid_along_facets(
-                absl::Span< const PolyhedronFacet > facets_list );
+    template < index_t dimension >
+    void remove_vertex_duplication( const EdgedCurve< dimension >& mesh,
+        EdgedCurveBuilder< dimension >& builder );
 
-        private:
-            IMPLEMENTATION_MEMBER( impl_ );
-        };
-    } // namespace detail
+    template < index_t dimension >
+    void remove_vertex_duplication( const SurfaceMesh< dimension >& mesh,
+        SurfaceMeshBuilder< dimension >& builder );
+
+    void opengeode_mesh_api remove_vertex_duplication(
+        const SolidMesh3D& mesh, SolidMeshBuilder3D& builder );
 } // namespace geode
