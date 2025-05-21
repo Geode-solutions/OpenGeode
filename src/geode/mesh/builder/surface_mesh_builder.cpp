@@ -438,17 +438,18 @@ namespace geode
                     "[SurfaceMeshBuilder::replace_vertices] "
                     "Invalid mapping" );
                 const auto new_vertex_id = old2news[0];
-                if( old_vertex_id != new_vertex_id )
+                if( old_vertex_id == new_vertex_id )
                 {
-                    disassociate_polygon_vertex_to_vertex( old_vertex_id );
-                    reset_polygons_around_vertex( old_vertex_id );
-                    if( surface_mesh_.are_edges_enabled() )
-                    {
-                        update_edge( surface_mesh_, *this, polygon_vertex,
-                            old_vertex_id, new_vertex_id );
-                    }
-                    update_polygon_vertex( polygon_vertex, new_vertex_id );
+                    continue;
                 }
+                disassociate_polygon_vertex_to_vertex( old_vertex_id );
+                reset_polygons_around_vertex( old_vertex_id );
+                if( surface_mesh_.are_edges_enabled() )
+                {
+                    update_edge( surface_mesh_, *this, polygon_vertex,
+                        old_vertex_id, new_vertex_id );
+                }
+                update_polygon_vertex( polygon_vertex, new_vertex_id );
             }
         }
     }

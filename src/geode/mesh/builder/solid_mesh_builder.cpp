@@ -426,19 +426,19 @@ namespace geode
                     "[SolidMeshBuilder::replace_vertices] "
                     "Invalid mapping" );
                 const auto new_vertex_id = old2news[0];
-                if( old_vertex_id != new_vertex_id )
+                if( old_vertex_id == new_vertex_id )
                 {
-                    disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
-                    reset_polyhedra_around_vertex( old_vertex_id );
-                    if( solid_mesh_.are_edges_enabled()
-                        || solid_mesh_.are_facets_enabled() )
-                    {
-                        update_edge_and_facet( solid_mesh_, *this,
-                            polyhedron_vertex, new_vertex_id );
-                    }
-                    update_polyhedron_vertex(
-                        polyhedron_vertex, new_vertex_id );
+                    continue;
                 }
+                disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
+                reset_polyhedra_around_vertex( old_vertex_id );
+                if( solid_mesh_.are_edges_enabled()
+                    || solid_mesh_.are_facets_enabled() )
+                {
+                    update_edge_and_facet(
+                        solid_mesh_, *this, polyhedron_vertex, new_vertex_id );
+                }
+                update_polyhedron_vertex( polyhedron_vertex, new_vertex_id );
             }
         }
     }
