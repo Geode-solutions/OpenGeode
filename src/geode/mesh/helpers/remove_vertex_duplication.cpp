@@ -43,14 +43,14 @@ namespace
     template < geode::index_t dimension >
     void replace_vertices( const geode::PointSet< dimension >& mesh,
         geode::PointSetBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > mapping )
+        const geode::GenericMapping< geode::index_t >& mapping )
     {
         std::vector< bool > to_delete( mesh.nb_vertices(), false );
-        for( const auto p : geode::Range{ mesh.nb_vertices() } )
+        for( const auto v : geode::Range{ mesh.nb_vertices() } )
         {
-            if( mapping[p] != p )
+            if( mapping.in2out( v ).front() != v )
             {
-                to_delete[p] = true;
+                to_delete[v] = true;
             }
         }
         builder.delete_vertices( to_delete );
@@ -59,16 +59,18 @@ namespace
     template < geode::index_t dimension >
     void replace_vertices( const geode::EdgedCurve< dimension >& mesh,
         geode::EdgedCurveBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > mapping )
+        const geode::GenericMapping< geode::index_t >& mapping )
     {
         for( const auto e : geode::Range{ mesh.nb_edges() } )
         {
             const auto vertices = mesh.edge_vertices( e );
             for( const auto v : geode::LRange{ 2 } )
             {
-                if( mapping[vertices[v]] != vertices[v] )
+                const auto new_vertex_id =
+                    mapping.in2out( vertices[v] ).front();
+                if( new_vertex_id != vertices[v] )
                 {
-                    builder.set_edge_vertex( { e, v }, mapping[vertices[v]] );
+                    builder.set_edge_vertex( { e, v }, new_vertex_id );
                 }
             }
         }
@@ -78,20 +80,9 @@ namespace
     template < geode::index_t dimension >
     void replace_vertices( const geode::SurfaceMesh< dimension >& mesh,
         geode::SurfaceMeshBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > mapping )
+        const geode::GenericMapping< geode::index_t >& mapping )
     {
-        for( const auto p : geode::Range{ mesh.nb_polygons() } )
-        {
-            const auto vertices = mesh.polygon_vertices( p );
-            for( const auto v : geode::LRange{ mesh.nb_polygon_vertices( p ) } )
-            {
-                if( mapping[vertices[v]] != vertices[v] )
-                {
-                    builder.set_polygon_vertex(
-                        { p, v }, mapping[vertices[v]] );
-                }
-            }
-        }
+        builder.replace_vertices( mapping );
         if( mesh.are_edges_enabled() )
         {
             builder.edges_builder().delete_isolated_edges();
@@ -102,21 +93,9 @@ namespace
     template < geode::index_t dimension >
     void replace_vertices( const geode::SolidMesh< dimension >& mesh,
         geode::SolidMeshBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > mapping )
+        const geode::GenericMapping< geode::index_t >& mapping )
     {
-        for( const auto p : geode::Range{ mesh.nb_polyhedra() } )
-        {
-            const auto vertices = mesh.polyhedron_vertices( p );
-            for( const auto v :
-                geode::LRange{ mesh.nb_polyhedron_vertices( p ) } )
-            {
-                if( mapping[vertices[v]] != vertices[v] )
-                {
-                    builder.set_polyhedron_vertex(
-                        { p, v }, mapping[vertices[v]] );
-                }
-            }
-        }
+        builder.replace_vertices( mapping );
         if( mesh.are_edges_enabled() )
         {
             builder.edges_builder().delete_isolated_edges();
@@ -138,7 +117,7 @@ namespace
         {
             return;
         }
-        replace_vertices( mesh, builder, mapping.colocated_input_points );
+        replace_vertices( mesh, builder, mapping.vertices_mapping() );
     }
 } // namespace
 

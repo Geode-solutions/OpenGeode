@@ -27,6 +27,8 @@
 
 #include <absl/container/inlined_vector.h>
 
+#include <geode/basic/mapping.hpp>
+
 #include <geode/mesh/builder/coordinate_reference_system_managers_builder.hpp>
 #include <geode/mesh/builder/vertex_set_builder.hpp>
 #include <geode/mesh/common.hpp>
@@ -93,16 +95,26 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
         /*!
-         * Replace old polygon vertices from a given vertex to another.
+         * Replace old polyhedron vertices from a given vertex to another.
          * @param[in] old_vertex_id Index of the initial mesh vertex to modify
          * @param[in] new_vertex_id Index of the target mesh vertex to set as
          * polyhedron vertex
+         * @warning This function supposes that the mesh is manifold
+         * around old vertex
          */
         void replace_vertex( index_t old_vertex_id, index_t new_vertex_id );
 
         /*!
+         * Replace old polyhedron vertices from given vertices to another ones.
+         * @warning This function does not suppose that the mesh is manifold
+         * around old vertices
+         */
+        void replace_vertices(
+            const GenericMapping< index_t >& vertices_mapping );
+
+        /*!
          * Set a polyhedron adgjacent through a facet.
-         * @param[in] polygon_facet The index of the polygon facet
+         * @param[in] polyhedron_facet The index of the polyhedron facet
          * @param[in] adjacent_id Index of the adjacent polyhedron
          */
         void set_polyhedron_adjacent(
@@ -111,7 +123,7 @@ namespace geode
         /*!
          * Unset a polyhedron adjacency through a facet.
 
-         * @param[in] polygon_facet The index of the polygon facet
+         * @param[in] polyhedron_facet The index of the polyhedron facet
          */
         void unset_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet );

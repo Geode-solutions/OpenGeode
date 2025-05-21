@@ -68,6 +68,17 @@ namespace geode
                 return mapping;
             }
 
+            [[nodiscard]] geode::GenericMapping< geode::index_t >
+                vertices_mapping() const
+            {
+                geode::GenericMapping< geode::index_t > mapping;
+                for( const auto& p : geode::Indices{ colocated_input_points } )
+                {
+                    mapping.map( p, colocated_input_points[p] );
+                }
+                return mapping;
+            }
+
             std::vector< Point< dimension > > unique_points;
             /*!
              * This list has the size of the number of points in the tree.

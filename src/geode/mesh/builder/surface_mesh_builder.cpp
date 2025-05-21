@@ -418,6 +418,42 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SurfaceMeshBuilder< dimension >::replace_vertices(
+        const GenericMapping< index_t >& vertices_mapping )
+    {
+        for( const auto p : Range{ surface_mesh_.nb_polygons() } )
+        {
+            for( const auto v :
+                LRange{ surface_mesh_.nb_polygon_vertices( p ) } )
+            {
+                const PolygonVertex polygon_vertex{ p, v };
+                const auto old_vertex_id =
+                    surface_mesh_.polygon_vertex( polygon_vertex );
+                if( !vertices_mapping.has_mapping_input( old_vertex_id ) )
+                {
+                    continue;
+                }
+                const auto old2news = vertices_mapping.in2out( old_vertex_id );
+                OPENGEODE_ASSERT( old2news.size() == 1,
+                    "[SurfaceMeshBuilder::replace_vertices] "
+                    "Invalid mapping" );
+                const auto new_vertex_id = old2news[0];
+                if( old_vertex_id != new_vertex_id )
+                {
+                    disassociate_polygon_vertex_to_vertex( old_vertex_id );
+                    reset_polygons_around_vertex( old_vertex_id );
+                    if( surface_mesh_.are_edges_enabled() )
+                    {
+                        update_edge( surface_mesh_, *this, polygon_vertex,
+                            old_vertex_id, new_vertex_id );
+                    }
+                    update_polygon_vertex( polygon_vertex, new_vertex_id );
+                }
+            }
+        }
+    }
+
+    template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t new_vertex_id )
     {
