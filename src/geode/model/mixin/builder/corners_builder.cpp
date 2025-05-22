@@ -89,6 +89,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void CornersBuilder< dimension >::set_corner_active(
+        const uuid& id, bool active )
+    {
+        corners_.modifiable_corner( id, {} ).set_corner_active( active, {} );
+    }
+
+    template < index_t dimension >
     void CornersBuilder< dimension >::set_corner_mesh(
         const uuid& id, std::unique_ptr< PointSet< dimension > > mesh )
     {

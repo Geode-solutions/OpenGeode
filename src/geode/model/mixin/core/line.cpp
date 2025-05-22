@@ -152,6 +152,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Line< dimension >::set_line_active(
+        bool is_active, LinesBuilderKey /*unused*/ )
+    {
+        this->set_active( is_active );
+    }
+
+    template < index_t dimension >
     auto Line< dimension >::modifiable_mesh( LinesBuilderKey /*unused*/ )
         -> Mesh&
     {
