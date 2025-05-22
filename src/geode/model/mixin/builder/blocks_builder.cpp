@@ -79,6 +79,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void BlocksBuilder< dimension >::set_block_active(
+        const uuid& id, bool active )
+    {
+        blocks_.modifiable_block( id, {} ).set_block_active( active, {} );
+    }
+
+    template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_mesh(
         const uuid& id, std::unique_ptr< SolidMesh< dimension > > mesh )
     {

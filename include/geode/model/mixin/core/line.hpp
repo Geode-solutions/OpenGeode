@@ -86,6 +86,8 @@ namespace geode
 
         void set_line_name( std::string_view name, LinesBuilderKey key );
 
+        void set_line_active( bool is_active, LinesBuilderKey key );
+
         [[nodiscard]] Mesh& modifiable_mesh( LinesKey key );
 
         [[nodiscard]] Mesh& modifiable_mesh( LinesBuilderKey key );

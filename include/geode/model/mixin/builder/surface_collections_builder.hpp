@@ -46,6 +46,8 @@ namespace geode
         void set_surface_collection_name(
             const uuid& id, std::string_view name );
 
+        void set_surface_collection_active( const uuid& id, bool active );
+
     protected:
         explicit SurfaceCollectionsBuilder(
             SurfaceCollections< dimension >& collections )

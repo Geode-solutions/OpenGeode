@@ -119,6 +119,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Corner< dimension >::set_corner_active(
+        bool is_active, CornersBuilderKey /*unused*/ )
+    {
+        this->set_active( is_active );
+    }
+
+    template < index_t dimension >
     auto Corner< dimension >::modifiable_mesh( CornersBuilderKey /*unused*/ )
         -> Mesh&
     {

@@ -72,6 +72,12 @@ namespace geode
             this->set_name( name );
         }
 
+        void set_corner_collection_active(
+            bool active, CornerCollectionsBuilderKey )
+        {
+            this->set_active( active );
+        }
+
     private:
         CornerCollection() = default;
 

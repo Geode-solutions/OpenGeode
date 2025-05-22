@@ -64,6 +64,14 @@ namespace geode
             .set_line_collection_name( name, {} );
     }
 
+    template < index_t dimension >
+    void LineCollectionsBuilder< dimension >::set_line_collection_active(
+        const uuid& id, bool active )
+    {
+        line_collections_.modifiable_line_collection( id, {} )
+            .set_line_collection_active( active, {} );
+    }
+
     template class opengeode_model_api LineCollectionsBuilder< 2 >;
     template class opengeode_model_api LineCollectionsBuilder< 3 >;
 } // namespace geode
