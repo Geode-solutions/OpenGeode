@@ -120,6 +120,21 @@ namespace geode
             } );
     }
 
+    ComponentMeshVertexPairs component_mesh_vertex_pairs(
+        absl::Span< const ComponentMeshVertex > unique_vertices0,
+        absl::Span< const ComponentMeshVertex > unique_vertices1,
+        const ComponentID& component )
+    {
+        return ::component_mesh_vertex_generic< 2 >(
+            to_array< absl::Span< const ComponentMeshVertex > >(
+                unique_vertices0, unique_vertices1 ),
+            [&component]( const ComponentMeshVertex& cmv0,
+                const ComponentMeshVertex& cmv1 ) {
+                return cmv0.component_id == component
+                       && cmv0.component_id == cmv1.component_id;
+            } );
+    }
+
     ComponentMeshVertexTriplets component_mesh_vertex_triplets(
         absl::Span< const ComponentMeshVertex > unique_vertices0,
         absl::Span< const ComponentMeshVertex > unique_vertices1,
@@ -146,6 +161,22 @@ namespace geode
             [type]( const ComponentMeshVertex& cmv0,
                 const ComponentMeshVertex& cmv1 ) {
                 return cmv0.component_id.type() == type
+                       && cmv0.component_id == cmv1.component_id;
+            } );
+    }
+
+    ComponentMeshVertexTriplets component_mesh_vertex_triplets(
+        absl::Span< const ComponentMeshVertex > unique_vertices0,
+        absl::Span< const ComponentMeshVertex > unique_vertices1,
+        absl::Span< const ComponentMeshVertex > unique_vertices2,
+        const ComponentID& component )
+    {
+        return ::component_mesh_vertex_generic< 3 >(
+            to_array< absl::Span< const ComponentMeshVertex > >(
+                unique_vertices0, unique_vertices1, unique_vertices2 ),
+            [&component]( const ComponentMeshVertex& cmv0,
+                const ComponentMeshVertex& cmv1 ) {
+                return cmv0.component_id == component
                        && cmv0.component_id == cmv1.component_id;
             } );
     }
@@ -178,6 +209,21 @@ namespace geode
             } );
     }
 
+    template < geode::index_t dimension >
+    geode::ComponentMeshVertexGeneric< dimension >
+        component_mesh_vertex_generic(
+            absl::Span< const absl::Span< const geode::ComponentMeshVertex > >
+                unique_vertices,
+            const ComponentID& component )
+    {
+        return ::component_mesh_vertex_generic< dimension >(
+            unique_vertices, [&component]( const ComponentMeshVertex& cmv0,
+                                 const ComponentMeshVertex& cmv1 ) {
+                return cmv0.component_id == component
+                       && cmv0.component_id == cmv1.component_id;
+            } );
+    }
+
     template ComponentMeshVertexGeneric< 2 >
         opengeode_model_api component_mesh_vertex_generic< 2 >(
             absl::Span< const absl::Span< const ComponentMeshVertex > > );
@@ -200,4 +246,17 @@ namespace geode
         opengeode_model_api component_mesh_vertex_generic< 4 >(
             absl::Span< const absl::Span< const ComponentMeshVertex > >,
             const ComponentType& );
+
+    template ComponentMeshVertexGeneric< 2 >
+        opengeode_model_api component_mesh_vertex_generic< 2 >(
+            absl::Span< const absl::Span< const ComponentMeshVertex > >,
+            const ComponentID& );
+    template ComponentMeshVertexGeneric< 3 >
+        opengeode_model_api component_mesh_vertex_generic< 3 >(
+            absl::Span< const absl::Span< const ComponentMeshVertex > >,
+            const ComponentID& );
+    template ComponentMeshVertexGeneric< 4 >
+        opengeode_model_api component_mesh_vertex_generic< 4 >(
+            absl::Span< const absl::Span< const ComponentMeshVertex > >,
+            const ComponentID& );
 } // namespace geode
