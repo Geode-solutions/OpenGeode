@@ -130,12 +130,29 @@ namespace geode
                 const std::array< index_t, 2 >& edge_unique_vertices );
 
         template < typename Model >
+        [[nodiscard]] std::vector< index_t > line_component_mesh_edges(
+            const Model& model,
+            const std::array< index_t, 2 >& edge_unique_vertices,
+            const geode::Line< Model::dim >& line );
+
+        template < typename Model >
         [[nodiscard]] ModelComponentMeshEdges::SurfaceEdges
             surface_component_mesh_edges( const Model& model,
                 const std::array< index_t, 2 >& edge_unique_vertices );
 
+        template < typename Model >
+        [[nodiscard]] std::vector< PolygonEdge > surface_component_mesh_edges(
+            const Model& model,
+            const std::array< index_t, 2 >& edge_unique_vertices,
+            const geode::Surface< Model::dim >& surface );
+
         [[nodiscard]] BRepComponentMeshEdges::BlockEdges opengeode_model_api
             block_component_mesh_edges( const BRep& brep,
                 const std::array< index_t, 2 >& edge_unique_vertices );
+
+        [[nodiscard]] std::vector< PolyhedronFacetEdge >
+            opengeode_model_api block_component_mesh_edges( const BRep& brep,
+                const std::array< index_t, 2 >& edge_unique_vertices,
+                const Block3D& block );
     } // namespace detail
 } // namespace geode
