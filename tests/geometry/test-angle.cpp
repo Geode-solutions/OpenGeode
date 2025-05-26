@@ -30,87 +30,85 @@
 
 constexpr double EPSILON = 1e-10;
 
-void test_factory_methods() {
-    std::vector<std::pair< double, double >> degrees_radians{ { 180., M_PI},{   360., 2 * M_PI},{90.,M_PI / 2.}{100.,1.74533}{1.,0.01745}{540,3 * M_PI}};
-    for(const auto & angle : degrees_radians){
+void test_factory_methods()
+{
+    std::vector< std::pair< double, double > > degrees_radians{
+        { 180., M_PI }, { 360., 2 * M_PI },
+        { 90., M_PI / 2. } { 100., 1.74533 } { 1., 0.01745 } { 540, 3 * M_PI }
+    };
+    for( const auto& angle : degrees_radians )
+    {
         auto angle_deg = geode::Angle::create_from_degrees( angle.first );
         OPENGEODE_EXCEPTION(
-        std::abs(angle_deg.degrees() - angle.first)< EPSILON, 
-        "[Test] Wrong Angle from degree value ",angle_deg.degrees(), " should be ", angle.first, " !" );
+            std::abs( angle_deg.degrees() - angle.first ) < EPSILON,
+            "[Test] Wrong Angle from degree value ", angle_deg.degrees(),
+            " should be ", angle.first, " !" );
         OPENGEODE_EXCEPTION(
-        std::abs(angle_deg.radians() - angle.second)< EPSILON, 
-        "[Test] Wrong Angle from degree value ",angle_deg.degrees(), " should be ", angle.second, " !" );
+            std::abs( angle_deg.radians() - angle.second ) < EPSILON,
+            "[Test] Wrong Angle from degree value ", angle_deg.degrees(),
+            " should be ", angle.second, " !" );
 
         auto angle_rad = geode::Angle::create_from_radians( angle.second );
         OPENGEODE_EXCEPTION(
-        std::abs(angle_rad.degrees() - angle.first)< EPSILON, 
-        "[Test] Wrong Angle from radian value ",angle_rad.degrees(), " should be ", angle.first, " !" );
+            std::abs( angle_rad.degrees() - angle.first ) < EPSILON,
+            "[Test] Wrong Angle from radian value ", angle_rad.degrees(),
+            " should be ", angle.first, " !" );
         OPENGEODE_EXCEPTION(
-        std::abs(angle_rad.radians() - angle.second)< EPSILON, 
-        "[Test] Wrong Angle from radian value ",angle_rad.degrees(), " should be ", angle.second, " !" );
+            std::abs( angle_rad.radians() - angle.second ) < EPSILON,
+            "[Test] Wrong Angle from radian value ", angle_rad.degrees(),
+            " should be ", angle.second, " !" );
     }
 }
 
-void test_comparison_operators() {
-    auto angle1 = geode::Angle::create_from_degrees(60);
-    auto angle2 = geode::Angle::create_from_degrees(60);
-auto angle3 = geode::Angle::create_from_degrees(30); 
-        OPENGEODE_EXCEPTION(
-        angle1 == angle2, 
-        "[Test] Wrong comparition angles should be equal !" );
-                OPENGEODE_EXCEPTION(
-        angle1 != angle3, 
+void test_comparison_operators()
+{
+    auto angle1 = geode::Angle::create_from_degrees( 60 );
+    auto angle2 = geode::Angle::create_from_degrees( 60 );
+    auto angle3 = geode::Angle::create_from_degrees( 30 );
+    OPENGEODE_EXCEPTION(
+        angle1 == angle2, "[Test] Wrong comparition angles should be equal !" );
+    OPENGEODE_EXCEPTION( angle1 != angle3,
         "[Test] Wrong comparition angles should not be equal !" );
-                        OPENGEODE_EXCEPTION(
-        angle1 > angle3, 
-        "[Test] Wrong comparition should be higher !" );
-                                OPENGEODE_EXCEPTION(
-        angle3 < angle2, 
-        "[Test] Wrong comparition should be smaller !" );
+    OPENGEODE_EXCEPTION(
+        angle1 > angle3, "[Test] Wrong comparition should be higher !" );
+    OPENGEODE_EXCEPTION(
+        angle3 < angle2, "[Test] Wrong comparition should be smaller !" );
 }
 
-void test_arithmetic() {
-    auto angle30 = geode::Angle::create_from_degrees(30);
- auto angle60 = geode::Angle::create_from_degrees(60);
+void test_arithmetic()
+{
+    auto angle30 = geode::Angle::create_from_degrees( 30 );
+    auto angle60 = geode::Angle::create_from_degrees( 60 );
     auto sum = angle30 + angle60;
-    OPENGEODE_EXCEPTION(
-        sum ==  geode::Angle::create_from_degrees(90), 
+    OPENGEODE_EXCEPTION( sum == geode::Angle::create_from_degrees( 90 ),
         "[Test] Wrong sum of angles !" );
     auto diff = angle60 - angle30;
-    OPENGEODE_EXCEPTION(
-        diff ==  angle30, 
-        "[Test] Wrong diff of angles !" );
+    OPENGEODE_EXCEPTION( diff == angle30, "[Test] Wrong diff of angles !" );
     auto scaled = angle30 * 2;
-        OPENGEODE_EXCEPTION(
-        scaled ==  angle60, 
-        "[Test] Wrong scale angle !" );
+    OPENGEODE_EXCEPTION( scaled == angle60, "[Test] Wrong scale angle !" );
     auto divided = angle60 / 2;
-            OPENGEODE_EXCEPTION(
-        divided ==  angle30, 
-        "[Test] Wrong divided angle !" );
+    OPENGEODE_EXCEPTION( divided == angle30, "[Test] Wrong divided angle !" );
 }
 
-void test_normalization() {
-    auto angle90= geode::Angle::create_from_degrees(90); // 90° over 360°
-    auto angle450 = geode::Angle::create_from_degrees(450); // 90° over 360°
+void test_normalization()
+{
+    auto angle90 = geode::Angle::create_from_degrees( 90 ); // 90° over 360°
+    auto angle450 = geode::Angle::create_from_degrees( 450 ); // 90° over 360°
     auto norm450 = angle450.normalized_0_twopi();
-            OPENGEODE_EXCEPTION(
-        norm450 ==  angle90, 
-        "[Test] Wrong normalizing between 0 and 2pi !" );
+    OPENGEODE_EXCEPTION(
+        norm450 == angle90, "[Test] Wrong normalizing between 0 and 2pi !" );
 
-    auto angleminus90= geode::Angle::create_from_degrees(-90);
-        auto angle270 = geode::Angle::create_from_degrees(270); // 90° over 360°
+    auto angleminus90 = geode::Angle::create_from_degrees( -90 );
+    auto angle270 = geode::Angle::create_from_degrees( 270 ); // 90° over 360°
     auto norm270 = angleminus90.normalized_minuspi_pi();
-            OPENGEODE_EXCEPTION(
-        norm270 ==  angleminus90, 
+    OPENGEODE_EXCEPTION( norm270 == angleminus90,
         "[Test] Wrong normalizing between -pi and pi !" );
 
-        auto angle10= geode::Angle::create_from_degrees(10);
-        auto angle370 = geode::Angle::create_from_degrees(370);
+    auto angle10 = geode::Angle::create_from_degrees( 10 );
+    auto angle370 = geode::Angle::create_from_degrees( 370 );
     auto norm370 = angle370.normalized_0_pi();
     OPENGEODE_EXCEPTION(
-    angle10==norm370,
-    "[Test] Wrong normalizing between -pi and pi !" );
+        angle10 == norm370, "[Test] Wrong normalizing between -pi and pi !" );
 }
 
 void test()

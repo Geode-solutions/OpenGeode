@@ -30,54 +30,71 @@ namespace geode
     /*!
      * Description of Angle
      */
-    class Angle 
+    class Angle
     {
-        public:
-            [[nodiscard]] static Angle create_from_radians(double radians);
-            [[nodiscard]] static Angle create_from_degrees(double degrees);
+    public:
+        [[nodiscard]] static Angle create_from_radians( double radians );
+        [[nodiscard]] static Angle create_from_degrees( double degrees );
 
-            double radians() const;
-            double degrees() const;
+        double radians() const;
+        double degrees() const;
 
-    double sin() const { return std::sin(radians_); }
-    double cos() const { return std::cos(radians_); }
-    double tan() const { return std::tan(radians_); }
+        double sin() const
+        {
+            return std::sin( radians_ );
+        }
+        double cos() const
+        {
+            return std::cos( radians_ );
+        }
+        double tan() const
+        {
+            return std::tan( radians_ );
+        }
 
-    bool operator==(const Angle& other) const {
-        return std::abs(radians_ - other.radians_) < GLOBAL_ANGULAR_EPSILON;
-    }
+        bool operator==( const Angle& other ) const
+        {
+            return std::abs( radians_ - other.radians_ )
+                   < GLOBAL_ANGULAR_EPSILON;
+        }
 
-    bool operator<(const Angle& other) const {
-        return radians_ < other.radians_;
-    }
+        bool operator<( const Angle& other ) const
+        {
+            return radians_ < other.radians_;
+        }
 
-    bool operator>(const Angle& other) const {
-        return radians_ > other.radians_;
-    }
+        bool operator>( const Angle& other ) const
+        {
+            return radians_ > other.radians_;
+        }
 
-    Angle operator+(const Angle& other) const {
-        return Angle(radians_ + other.radians_);
-    }
+        Angle operator+( const Angle& other ) const
+        {
+            return Angle( radians_ + other.radians_ );
+        }
 
-    Angle operator-(const Angle& other) const {
-        return Angle(radians_ - other.radians_);
-    }
+        Angle operator-( const Angle& other ) const
+        {
+            return Angle( radians_ - other.radians_ );
+        }
 
-    Angle operator*(double scalar) const {
-        return Angle(radians_ * scalar);
-    }
+        Angle operator*( double scalar ) const
+        {
+            return Angle( radians_ * scalar );
+        }
 
-    Angle operator/(double scalar) const {
-        return Angle(radians_ / scalar);
-    }
+        Angle operator/( double scalar ) const
+        {
+            return Angle( radians_ / scalar );
+        }
 
-            Angle normalized_0_twopi() const;
-            Angle normalized_minuspi_pi() const;
-            Angle normalized_0_pi() const;
+        Angle normalized_0_twopi() const;
+        Angle normalized_minuspi_pi() const;
+        Angle normalized_0_pi() const;
 
-        private:
-            explicit Angle( double radians ) : radians_( radians ) {}
-            double radians_;
+    private:
+        explicit Angle( double radians ) : radians_( radians ) {}
+        double radians_;
     };
 
 } // namespace geode

@@ -29,52 +29,67 @@
 
 #include <geode/geometry/angle.hpp>
 
-namespace{
+namespace
+{
     double radians_to_degrees( double radians )
     {
         return radians * 180. / M_PI;
     }
-    double degrees_to_radians(double degree){
+    double degrees_to_radians( double degree )
+    {
         return degree * M_PI / 180.;
     }
-    constexpr double TWO_PI = 2.*M_PI;
+    constexpr double TWO_PI = 2. * M_PI;
     constexpr double HALF_PI = M_PI / 2.;
     constexpr double EPSILON = 1e-10;
-}
+} // namespace
 
 namespace geode
 {
-    Angle Angle::create_from_radians(double radians){
+    Angle Angle::create_from_radians( double radians )
+    {
         return Angle( radians );
     }
 
-    Angle Angle::create_from_degrees(double degrees){
-        return Angle( degrees_to_radians(degrees) );
+    Angle Angle::create_from_degrees( double degrees )
+    {
+        return Angle( degrees_to_radians( degrees ) );
     }
 
-    double Angle::radians() const{
+    double Angle::radians() const
+    {
         return radians_;
     }
 
-    double Angle::degrees() const{
+    double Angle::degrees() const
+    {
         return radians_to_degrees( radians_ );
     }
 
-    Angle Angle::normalized_0_twopi() const {
-        double normalized_radians = std::fmod(radians_, TWO_PI);
-        if (normalized_radians < 0) {normalized_radians += TWO_PI;}
-        return Angle(normalized_radians);
+    Angle Angle::normalized_0_twopi() const
+    {
+        double normalized_radians = std::fmod( radians_, TWO_PI );
+        if( normalized_radians < 0 )
+        {
+            normalized_radians += TWO_PI;
+        }
+        return Angle( normalized_radians );
     }
 
-    Angle Angle::normalized_minuspi_pi() const {
-        auto normalized = normalized_0_twopi( );
-        return normalized - Angle(M_PI);
+    Angle Angle::normalized_minuspi_pi() const
+    {
+        auto normalized = normalized_0_twopi();
+        return normalized - Angle( M_PI );
     }
 
-    Angle Angle::normalized_0_pi() const {
-                double normalized_radians = std::fmod(radians_, M_PI);
-        if (normalized_radians < 0) {normalized_radians += M_PI;}
-        return Angle(normalized_radians);
+    Angle Angle::normalized_0_pi() const
+    {
+        double normalized_radians = std::fmod( radians_, M_PI );
+        if( normalized_radians < 0 )
+        {
+            normalized_radians += M_PI;
+        }
+        return Angle( normalized_radians );
     }
 
 } // namespace geode
