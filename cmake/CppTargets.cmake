@@ -57,8 +57,12 @@ function(add_geode_library)
             "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
         )
     endforeach()
-    foreach(file ${GEODE_SKIP_UNITY})
-        set_property(SOURCE "${file}" PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)
+    foreach(file ${GEODE_LIB_SKIP_UNITY})
+        set_property(
+            SOURCE "${PROJECT_SOURCE_DIR}/src/${GEODE_LIB_FOLDER}/${file}"
+            PROPERTY 
+                SKIP_UNITY_BUILD_INCLUSION ON
+        )
     endforeach()
     set(PROJECT_LIB_NAME ${PROJECT_NAME}::${GEODE_LIB_NAME})
     set(VERSION_RC_FILE_IN ${PROJECT_SOURCE_DIR}/cmake/version.rc.in)
