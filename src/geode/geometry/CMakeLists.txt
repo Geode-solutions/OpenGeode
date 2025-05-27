@@ -107,6 +107,8 @@ add_geode_library(
         "internal/intersection_from_sides.hpp"
         "internal/position_from_sides.hpp"
         "internal/predicates.hpp"
+    SKIP_UNITY
+        "position.cpp"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
         Threads::Threads
