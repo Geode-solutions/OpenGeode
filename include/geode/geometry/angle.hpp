@@ -52,10 +52,14 @@ namespace geode
             return std::tan( radians_ );
         }
 
-        [[nodiscard]] bool operator==( const Angle& other ) const
+        [[nodiscard]] bool inexact_equal( const Angle& other ) const
         {
             return std::abs( radians_ - other.radians_ )
                    < GLOBAL_ANGULAR_EPSILON;
+        }
+        [[nodiscard]] bool operator==( const Angle& other ) const
+        {
+            return radians_ == other.radians_;
         }
         [[nodiscard]] bool operator<( const Angle& other ) const
         {

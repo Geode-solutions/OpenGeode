@@ -61,22 +61,36 @@ void test_factory_methods()
 
 void test_comparison_operators()
 {
-    auto angle1 = geode::Angle::create_from_degrees( 60.00 );
-    auto angle2 = geode::Angle::create_from_degrees( 60.05 );
-    auto angle3 = geode::Angle::create_from_degrees( 30.00 );
-    auto angle4 = geode::Angle::create_from_degrees( 60.07 );
+    auto angle60 = geode::Angle::create_from_degrees( 60.00 );
+    auto angle_almost60 = geode::Angle::create_from_degrees( 60.05 );
+    auto angle_not60 = geode::Angle::create_from_degrees( 60.07 );
+    auto angle30 = geode::Angle::create_from_degrees( 30.00 );
 
-    OPENGEODE_EXCEPTION(
-        angle1 == angle2, "[Test] Wrong comparition angles should be equal !" );
-    OPENGEODE_EXCEPTION( !( angle1 == angle4 ),
-        "[Test] Wrong comparition angles 60.00 and 60.07 should be equal !" );
-    OPENGEODE_EXCEPTION( !( angle1 == angle3 ),
-        "[Test] Wrong comparition angles should not be equal !" );
+    OPENGEODE_EXCEPTION( angle60 == angle60,
+        "[Test] Wrong == comparition angles ", angle60, " and ", angle60,
+        " should be equal !" );
+    OPENGEODE_EXCEPTION( !( angle60 == angle_not60 ),
+        "[Test] Wrong == comparition angles ", angle60, " and ", angle_not60,
+        " should be equal !" );
+    OPENGEODE_EXCEPTION( !( angle60 == angle_almost60 ),
+        "[Test] Wrong == comparition angles ", angle60, " and ", angle_almost60,
+        " should not be "
+        "equal !" );
 
-    OPENGEODE_EXCEPTION(
-        angle1 > angle3, "[Test] Wrong comparition should be higher !" );
-    OPENGEODE_EXCEPTION(
-        angle3 < angle2, "[Test] Wrong comparition should be smaller !" );
+    OPENGEODE_EXCEPTION( angle60.inexact_equal( angle60 ),
+        "[Test] Wrong inexact_equal comparition angles ", angle60, " and ",
+        angle60, " should be equal !" );
+    OPENGEODE_EXCEPTION( !( angle60.inexact_equal( angle_not60 ) ),
+        "[Test] Wrong inexact_equal comparition angles ", angle60, " and ",
+        angle_not60, " should be equal !" );
+    OPENGEODE_EXCEPTION( angle60.inexact_equal( angle_almost60 ),
+        "[Test] Wrong inexact_equal comparition angles ", angle60, " and ",
+        angle_almost60, " should be equal !" );
+
+    OPENGEODE_EXCEPTION( angle_almost60 > angle60, "[Test] Wrong ",
+        angle_almost60, " >", angle60, " comparition should be higher !" );
+    OPENGEODE_EXCEPTION( angle_almost60 < angle_not60, "[Test] Wrong ",
+        angle_almost60, " < ", " comparition should be smaller !" );
 }
 
 void test_arithmetic()

@@ -54,23 +54,29 @@ def test_factory_methods():
 
 
 def test_comparison_operators():
-    angle1 = geom.Angle.from_degrees(60.00)
-    angle2 = geom.Angle.from_degrees(60.05)
-    angle3 = geom.Angle.from_degrees(30.00)
-    angle4 = geom.Angle.from_degrees(60.07)
+    angle60 = Angle.from_degrees(60.00)
+    angle_almost60 = Angle.from_degrees(60.05)
+    angle_not60 = Angle.from_degrees(60.07)
+    angle30 = Angle.from_degrees(30.00)
 
-    if not angle1.inexact_equal(angle2):
-        raise ValueError("[Test] Wrong comparison: angles should be inexactly equal!")
-    if angle1.inexact_equal(angle4):
-        raise ValueError("[Test] Wrong comparison: angles 60.00 and 60.07 should not be considered equal!")
-    if angle1 == angle3:
-        raise ValueError("[Test] Wrong comparison: angles should not be exactly equal!")
+    if not angle60 == angle60:
+        raise ValueError(f"[Test] Wrong == comparison: angles {angle60} and {angle60} should be equal!")
+    if angle60 == angle_not60:
+        raise ValueError(f"[Test] Wrong == comparison: angles {angle60} and {angle_not60} should not be equal!")
+    if angle60 == angle_almost60:
+        raise ValueError(f"[Test] Wrong == comparison: angles {angle60} and {angle_almost60} should not be equal!")
 
-    if not angle1 > angle3:
-        raise ValueError("[Test] Wrong comparison: angle1 should be greater than angle3!")
-    if not angle3 < angle2:
-        raise ValueError("[Test] Wrong comparison: angle3 should be less than angle2!")
+    if not angle60.inexact_equal(angle60):
+        raise ValueError(f"[Test] Wrong inexact_equal: angles {angle60} and {angle60} should be equal!")
+    if angle60.inexact_equal(angle_not60):
+        raise ValueError(f"[Test] Wrong inexact_equal: angles {angle60} and {angle_not60} should not be equal!")
+    if not angle60.inexact_equal(angle_almost60):
+        raise ValueError(f"[Test] Wrong inexact_equal: angles {angle60} and {angle_almost60} should be equal!")
 
+    if not angle_almost60 > angle60:
+        raise ValueError(f"[Test] Wrong comparison: {angle_almost60} > {angle60} should be true!")
+    if not angle_almost60 < angle_not60:
+        raise ValueError(f"[Test] Wrong comparison: {angle_almost60} < {angle_not60} should be true!")
 
 def test_arithmetic():
     angle30 = geom.Angle.from_degrees(30)

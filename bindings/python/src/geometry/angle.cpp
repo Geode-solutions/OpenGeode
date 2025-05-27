@@ -37,6 +37,7 @@ namespace geode
             .def( "sin", &Angle::sin )
             .def( "cos", &Angle::cos )
             .def( "tan", &Angle::tan )
+            .def( "inexact_equal", &Angle::inexact_equal )
             .def( py::self == py::self )
             .def( py::self < py::self )
             .def( py::self > py::self )
