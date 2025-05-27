@@ -36,61 +36,55 @@ namespace geode
         [[nodiscard]] static Angle create_from_radians( double radians );
         [[nodiscard]] static Angle create_from_degrees( double degrees );
 
-        double radians() const;
-        double degrees() const;
+        [[nodiscard]] double radians() const;
+        [[nodiscard]] double degrees() const;
 
-        double sin() const
+        [[nodiscard]] double sin() const
         {
             return std::sin( radians_ );
         }
-        double cos() const
+        [[nodiscard]] double cos() const
         {
             return std::cos( radians_ );
         }
-        double tan() const
+        [[nodiscard]] double tan() const
         {
             return std::tan( radians_ );
         }
 
-        bool operator==( const Angle& other ) const
+        [[nodiscard]] bool operator==( const Angle& other ) const
         {
             return std::abs( radians_ - other.radians_ )
                    < GLOBAL_ANGULAR_EPSILON;
         }
-
-        bool operator<( const Angle& other ) const
+        [[nodiscard]] bool operator<( const Angle& other ) const
         {
             return radians_ < other.radians_;
         }
-
-        bool operator>( const Angle& other ) const
+        [[nodiscard]] bool operator>( const Angle& other ) const
         {
             return radians_ > other.radians_;
         }
-
-        Angle operator+( const Angle& other ) const
+        [[nodiscard]] Angle operator+( const Angle& other ) const
         {
             return Angle( radians_ + other.radians_ );
         }
-
-        Angle operator-( const Angle& other ) const
+        [[nodiscard]] Angle operator-( const Angle& other ) const
         {
             return Angle( radians_ - other.radians_ );
         }
-
-        Angle operator*( double scalar ) const
+        [[nodiscard]] Angle operator*( double scalar ) const
         {
             return Angle( radians_ * scalar );
         }
-
-        Angle operator/( double scalar ) const
+        [[nodiscard]] Angle operator/( double scalar ) const
         {
             return Angle( radians_ / scalar );
         }
 
-        Angle normalized_0_twopi() const;
-        Angle normalized_minuspi_pi() const;
-        Angle normalized_0_pi() const;
+        [[nodiscard]] Angle normalized_0_twopi() const;
+        [[nodiscard]] Angle normalized_minuspi_pi() const;
+        [[nodiscard]] Angle normalized_0_pi() const;
 
     private:
         explicit Angle( double radians ) : radians_( radians ) {}

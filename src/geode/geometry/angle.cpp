@@ -21,12 +21,6 @@
  *
  */
 
-/*
- * Modified from RINGMesh https://github.com/ringmesh/RINGMesh
- * Copyright (c) 2012-2018, Association Scientifique pour la Geologie et ses
- * Applications (ASGA)
- */
-
 #include <geode/geometry/angle.hpp>
 
 namespace
@@ -39,9 +33,19 @@ namespace
     {
         return degree * M_PI / 180.;
     }
+    geode::Angle normalize_angle(
+        double angle_radians, double norm_const_radians )
+    {
+        double normalized_radians =
+            std::fmod( angle_radians, norm_const_radians );
+        if( normalized_radians < 0. )
+        {
+            normalized_radians += norm_const_radians;
+        }
+        return geode::Angle::create_from_radians( normalized_radians );
+    }
     constexpr double TWO_PI = 2. * M_PI;
     constexpr double HALF_PI = M_PI / 2.;
-    constexpr double EPSILON = 1e-10;
 } // namespace
 
 namespace geode
@@ -68,12 +72,7 @@ namespace geode
 
     Angle Angle::normalized_0_twopi() const
     {
-        double normalized_radians = std::fmod( radians_, TWO_PI );
-        if( normalized_radians < 0 )
-        {
-            normalized_radians += TWO_PI;
-        }
-        return Angle( normalized_radians );
+        return normalize_angle( radians_, TWO_PI );
     }
 
     Angle Angle::normalized_minuspi_pi() const
@@ -84,12 +83,7 @@ namespace geode
 
     Angle Angle::normalized_0_pi() const
     {
-        double normalized_radians = std::fmod( radians_, M_PI );
-        if( normalized_radians < 0 )
-        {
-            normalized_radians += M_PI;
-        }
-        return Angle( normalized_radians );
+        return normalize_angle( radians_, M_PI );
     }
 
 } // namespace geode

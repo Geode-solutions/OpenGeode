@@ -32,10 +32,9 @@ constexpr double EPSILON = 1e-10;
 
 void test_factory_methods()
 {
-    std::vector< std::pair< double, double > > degrees_radians{
-        { 180., M_PI }, { 360., 2 * M_PI },
-        { 90., M_PI / 2. } { 100., 1.74533 } { 1., 0.01745 } { 540, 3 * M_PI }
-    };
+    std::vector< std::pair< double, double > > degrees_radians{ { 180., M_PI },
+        { 360., 2 * M_PI }, { 90., M_PI / 2. }, { 100., 1.74533 },
+        { 1., 0.01745 }, { 540, 3 * M_PI } };
     for( const auto& angle : degrees_radians )
     {
         auto angle_deg = geode::Angle::create_from_degrees( angle.first );
@@ -62,13 +61,18 @@ void test_factory_methods()
 
 void test_comparison_operators()
 {
-    auto angle1 = geode::Angle::create_from_degrees( 60 );
-    auto angle2 = geode::Angle::create_from_degrees( 60 );
-    auto angle3 = geode::Angle::create_from_degrees( 30 );
+    auto angle1 = geode::Angle::create_from_degrees( 60.00 );
+    auto angle2 = geode::Angle::create_from_degrees( 60.05 );
+    auto angle3 = geode::Angle::create_from_degrees( 30.00 );
+    auto angle4 = geode::Angle::create_from_degrees( 60.07 );
+
     OPENGEODE_EXCEPTION(
         angle1 == angle2, "[Test] Wrong comparition angles should be equal !" );
-    OPENGEODE_EXCEPTION( angle1 != angle3,
+    OPENGEODE_EXCEPTION( !( angle1 == angle4 ),
+        "[Test] Wrong comparition angles 60.00 and 60.07 should be equal !" );
+    OPENGEODE_EXCEPTION( !( angle1 == angle3 ),
         "[Test] Wrong comparition angles should not be equal !" );
+
     OPENGEODE_EXCEPTION(
         angle1 > angle3, "[Test] Wrong comparition should be higher !" );
     OPENGEODE_EXCEPTION(
