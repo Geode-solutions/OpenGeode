@@ -45,8 +45,11 @@ namespace geode
             .def( pybind11::self - pybind11::self )
             .def( pybind11::self * double() )
             .def( pybind11::self / double() )
-            .def( "normalized_0_twopi", &Angle::normalized_0_twopi )
-            .def( "normalized_minuspi_pi", &Angle::normalized_minuspi_pi )
-            .def( "normalized_0_pi", &Angle::normalized_0_pi );
+            .def( "normalized_between_0_and_2pi",
+                &Angle::normalized_between_0_and_2pi )
+            .def( "normalized_between_minuspi_and_pi",
+                &Angle::normalized_between_minuspi_and_pi )
+            .def( "normalized_between_0_and_pi",
+                &Angle::normalized_between_0_and_pi );
     }
 } // namespace geode

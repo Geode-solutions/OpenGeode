@@ -237,17 +237,19 @@ def test_normalization():
     ]
 
     for i, angle in enumerate(raw_angles):
-        if not angle.normalized_0_twopi().inexact_equal(expected_0_2pi[i]):
+        if not angle.normalized_between_0_and_2pi().inexact_equal(expected_0_2pi[i]):
             raise ValueError(
-                f"[Test] Wrong normalization 0–2pi at index {i}! - should be {angle.normalized_0_twopi().degrees()} and get {expected_0_2pi[i].degrees()} instead."
+                f"[Test] Wrong normalization 0–2pi at index {i}! - should be {angle.normalized_between_0_and_2pi().degrees()} and get {expected_0_2pi[i].degrees()} instead."
             )
-        if not angle.normalized_minuspi_pi().inexact_equal(expected_minuspi_pi[i]):
+        if not angle.normalized_between_minuspi_and_pi().inexact_equal(
+            expected_minuspi_pi[i]
+        ):
             raise ValueError(
-                f"[Test] Wrong normalization -pi–pi at index {i}!- should be {angle.normalized_minuspi_pi().degrees()} and get {expected_minuspi_pi[i].degrees()} instead."
+                f"[Test] Wrong normalization -pi–pi at index {i}!- should be {angle.normalized_between_minuspi_and_pi().degrees()} and get {expected_minuspi_pi[i].degrees()} instead."
             )
-        if not angle.normalized_0_pi().inexact_equal(expected_0_pi[i]):
+        if not angle.normalized_between_0_and_pi().inexact_equal(expected_0_pi[i]):
             raise ValueError(
-                f"[Test] Wrong normalization 0–pi at index {i}!- should be {angle.normalized_0_pi().degrees()} and get {expected_0_pi[i].degrees()} instead."
+                f"[Test] Wrong normalization 0–pi at index {i}!- should be {angle.normalized_between_0_and_pi().degrees()} and get {expected_0_pi[i].degrees()} instead."
             )
 
 

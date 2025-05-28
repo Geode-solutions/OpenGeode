@@ -165,7 +165,7 @@ void test_normalization()
         geode::Angle::create_from_radians( 0. ) };
     for( const auto angle_id : geode::Range( to_normalize.size() ) )
     {
-        auto normalize = to_normalize[angle_id].normalized_0_twopi();
+        auto normalize = to_normalize[angle_id].normalized_between_0_and_2pi();
         OPENGEODE_EXCEPTION( normalize == norm_0_TWOPI[angle_id],
             "[Test] Wrong normalizing between 0 and 2pi - ", angle_id,
             " should be : ", norm_0_TWOPI[angle_id].degrees(), " but get ",
@@ -194,7 +194,8 @@ void test_normalization()
     };
     for( const auto angle_id : geode::Range( to_normalize.size() ) )
     {
-        auto normalize = to_normalize[angle_id].normalized_minuspi_pi();
+        auto normalize =
+            to_normalize[angle_id].normalized_between_minuspi_and_pi();
         OPENGEODE_EXCEPTION( normalize == norm_minusPI_PI[angle_id],
             "[Test] Wrong normalizing between -pi and pi - ", angle_id,
             " should be : ", norm_minusPI_PI[angle_id].degrees(), " but get ",
@@ -222,7 +223,7 @@ void test_normalization()
         geode::Angle::create_from_radians( 0. ) };
     for( const auto angle_id : geode::Range( to_normalize.size() ) )
     {
-        auto normalize = to_normalize[angle_id].normalized_0_pi();
+        auto normalize = to_normalize[angle_id].normalized_between_0_and_pi();
         OPENGEODE_EXCEPTION( normalize == norm_0_PI[angle_id],
             "[Test] Wrong normalizing between 0 and pi -", angle_id,
             " should be : ", norm_0_PI[angle_id].degrees(), " but get ",
