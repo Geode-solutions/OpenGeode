@@ -58,7 +58,53 @@ namespace geode
         return radians_to_degrees( radians_ );
     }
 
-    Angle Angle::normalized_0_twopi() const
+    double Angle::sin() const
+    {
+        return std::sin( radians_ );
+    }
+
+    double Angle::cos() const
+    {
+        return std::cos( radians_ );
+    }
+
+    double Angle::tan() const
+    {
+        return std::tan( radians_ );
+    }
+    bool Angle::inexact_equal( const Angle& other ) const
+    {
+        return std::abs( radians_ - other.radians_ ) < GLOBAL_ANGULAR_EPSILON;
+    }
+    bool Angle::operator==( const Angle& other ) const
+    {
+        return radians_ == other.radians_;
+    }
+    bool Angle::operator<( const Angle& other ) const
+    {
+        return radians_ < other.radians_;
+    }
+    bool Angle::operator>( const Angle& other ) const
+    {
+        return radians_ > other.radians_;
+    }
+    Angle Angle::operator+( const Angle& other ) const
+    {
+        return Angle{ radians_ + other.radians_ };
+    }
+    Angle Angle::operator-( const Angle& other ) const
+    {
+        return Angle{ radians_ - other.radians_ };
+    }
+    Angle Angle::operator*( double scalar ) const
+    {
+        return Angle{ radians_ * scalar };
+    }
+    Angle Angle::operator/( double scalar ) const
+    {
+        return Angle{ radians_ / scalar };
+    }
+    Angle Angle::normalized_between_0_and_2pi() const
     {
         double normalized_radians = std::fmod( radians_, TWO_PI );
         // normalized in [0,2pi[
@@ -68,9 +114,9 @@ namespace geode
         }
         return geode::Angle::create_from_radians( normalized_radians );
     }
-    Angle Angle::normalized_minuspi_pi() const
+    Angle Angle::normalized_between_minuspi_and_pi() const
     {
-        auto normalized = normalized_0_twopi();
+        auto normalized = normalized_between_0_and_2pi();
         // normalized in ]-pi,pi]
         if( normalized.radians() > M_PI )
         {
@@ -79,9 +125,9 @@ namespace geode
         return normalized;
     }
 
-    Angle Angle::normalized_0_pi() const
+    Angle Angle::normalized_between_0_and_pi() const
     {
-        auto normalized = normalized_0_twopi();
+        auto normalized = normalized_between_0_and_2pi();
         // normalized in [0,pi[
         if( normalized.radians() >= M_PI )
         {

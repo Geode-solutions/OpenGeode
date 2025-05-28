@@ -27,9 +27,6 @@
 
 namespace geode
 {
-    /*!
-     * Description of Angle
-     */
     class opengeode_geometry_api Angle
     {
     public:
@@ -39,59 +36,30 @@ namespace geode
         [[nodiscard]] double radians() const;
         [[nodiscard]] double degrees() const;
 
-        [[nodiscard]] double sin() const
-        {
-            return std::sin( radians_ );
-        }
-        [[nodiscard]] double cos() const
-        {
-            return std::cos( radians_ );
-        }
-        [[nodiscard]] double tan() const
-        {
-            return std::tan( radians_ );
-        }
+        [[nodiscard]] double sin() const;
+        [[nodiscard]] double cos() const;
+        [[nodiscard]] double tan() const;
 
-        [[nodiscard]] bool inexact_equal( const Angle& other ) const
-        {
-            return std::abs( radians_ - other.radians_ )
-                   < GLOBAL_ANGULAR_EPSILON;
-        }
-        [[nodiscard]] bool operator==( const Angle& other ) const
-        {
-            return radians_ == other.radians_;
-        }
-        [[nodiscard]] bool operator<( const Angle& other ) const
-        {
-            return radians_ < other.radians_;
-        }
-        [[nodiscard]] bool operator>( const Angle& other ) const
-        {
-            return radians_ > other.radians_;
-        }
-        [[nodiscard]] Angle operator+( const Angle& other ) const
-        {
-            return Angle( radians_ + other.radians_ );
-        }
-        [[nodiscard]] Angle operator-( const Angle& other ) const
-        {
-            return Angle( radians_ - other.radians_ );
-        }
-        [[nodiscard]] Angle operator*( double scalar ) const
-        {
-            return Angle( radians_ * scalar );
-        }
-        [[nodiscard]] Angle operator/( double scalar ) const
-        {
-            return Angle( radians_ / scalar );
-        }
+        [[nodiscard]] bool inexact_equal( const Angle& other ) const;
+        [[nodiscard]] bool operator==( const Angle& other ) const;
+        [[nodiscard]] bool operator<( const Angle& other ) const;
+        [[nodiscard]] bool operator>( const Angle& other ) const;
+        [[nodiscard]] Angle operator+( const Angle& other ) const;
+        [[nodiscard]] Angle operator-( const Angle& other ) const;
+        [[nodiscard]] Angle operator*( double scalar ) const;
+        [[nodiscard]] Angle operator/( double scalar ) const;
 
-        [[nodiscard]] Angle normalized_0_twopi() const;
-        [[nodiscard]] Angle normalized_minuspi_pi() const;
-        [[nodiscard]] Angle normalized_0_pi() const;
+        // 2pi excluded
+        [[nodiscard]] Angle normalized_between_0_and_2pi() const;
+        // minus pi excluded
+        [[nodiscard]] Angle normalized_between_minuspi_and_pi() const;
+        // pi excluded
+        [[nodiscard]] Angle normalized_between_0_and_pi() const;
 
     private:
         explicit Angle( double radians ) : radians_( radians ) {}
+
+    private:
         double radians_;
     };
 
