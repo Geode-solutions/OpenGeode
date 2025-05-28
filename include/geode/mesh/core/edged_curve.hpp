@@ -73,13 +73,6 @@ namespace geode
          */
         [[nodiscard]] bool is_edge_degenerated( index_t edge_id ) const;
 
-        /*!
-         * Return if an edge is degenerated (means stands into an
-         * tolerance-large ball)
-         */
-        [[nodiscard]] bool is_edge_degenerated(
-            index_t edge_id, double tolerance ) const;
-
         [[nodiscard]] Segment< dimension > segment( index_t edge_id ) const;
 
         [[nodiscard]] TextureManager1D texture_manager() const;
