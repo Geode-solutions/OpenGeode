@@ -53,9 +53,9 @@ std::vector< geode::Angle > test_factory_methods()
     std::vector< geode::Angle > from_radians{ geode::Angle::create_from_radians(
                                                   -4. * M_PI ),
         geode::Angle::create_from_radians( -2. * M_PI ),
-        geode::Angle::create_from_radians( -3. * M_PI/2. ),
+        geode::Angle::create_from_radians( -3. * M_PI / 2. ),
         geode::Angle::create_from_radians( -M_PI ),
-        geode::Angle::create_from_radians( -3. * M_PI/4. ),
+        geode::Angle::create_from_radians( -3. * M_PI / 4. ),
         geode::Angle::create_from_radians( -M_PI / 2. ),
         geode::Angle::create_from_radians( -M_PI / 4. ),
         geode::Angle::create_from_radians( 0 ),
