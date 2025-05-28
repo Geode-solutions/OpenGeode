@@ -78,6 +78,7 @@ namespace geode
         [[nodiscard]] std::vector< std::array< index_t, 3 > >
             triangulate() const;
         [[nodiscard]] bool is_degenerated() const;
+        [[nodiscard]] bool is_degenerated( double tolerance ) const;
         [[nodiscard]] std::string string() const;
 
     private:

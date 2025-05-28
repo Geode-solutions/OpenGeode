@@ -114,9 +114,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool EdgedCurve< dimension >::is_edge_degenerated(
+        index_t edge_id, double tolerance ) const
+    {
+        return edge_length( edge_id ) <= tolerance;
+    }
+
+    template < index_t dimension >
     bool EdgedCurve< dimension >::is_edge_degenerated( index_t edge_id ) const
     {
-        return edge_length( edge_id ) <= GLOBAL_EPSILON;
+        return is_edge_degenerated( edge_id, GLOBAL_EPSILON );
     }
 
     template < index_t dimension >

@@ -237,6 +237,13 @@ namespace geode
     template < typename PointType, index_t dimension >
     bool GenericPolygon< PointType, dimension >::is_degenerated() const
     {
+        return is_degenerated( GLOBAL_EPSILON );
+    }
+
+    template < typename PointType, index_t dimension >
+    bool GenericPolygon< PointType, dimension >::is_degenerated(
+        double tolerance ) const
+    {
         double max_length{ 0. };
         index_t max_length_edge{ 0 };
         for( const auto e : Range{ nb_vertices() } )
@@ -251,7 +258,7 @@ namespace geode
                 max_length_edge = e;
             }
         }
-        if( max_length < GLOBAL_EPSILON )
+        if( max_length < tolerance )
         {
             return true;
         }
@@ -266,7 +273,7 @@ namespace geode
                 continue;
             }
             const Point< dimension >& point = vertices_[v];
-            if( point_line_distance( point, line ) > GLOBAL_EPSILON )
+            if( point_line_distance( point, line ) > tolerance )
             {
                 return false;
             }

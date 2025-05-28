@@ -1159,6 +1159,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool SurfaceMesh< dimension >::is_polygon_degenerated(
+        index_t polygon_id, double tolerance ) const
+    {
+        check_polygon_id( *this, polygon_id );
+        return this->polygon( polygon_id ).is_degenerated( tolerance );
+    }
+
+    template < index_t dimension >
     std::unique_ptr< SurfaceMesh< dimension > >
         SurfaceMesh< dimension >::clone() const
     {
