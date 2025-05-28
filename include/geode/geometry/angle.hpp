@@ -30,7 +30,7 @@ namespace geode
     /*!
      * Description of Angle
      */
-    class Angle
+    class opengeode_geometry_api Angle
     {
     public:
         [[nodiscard]] static Angle create_from_radians( double radians );
