@@ -23,47 +23,57 @@ import os
 import sys
 import math
 import platform
+
 if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
-    for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
+    for path in [x.strip() for x in os.environ["PATH"].split(";") if x]:
         os.add_dll_directory(path)
 
 import opengeode_py_geometry as geom
 
 EPSILON = 1e-3
 
+
 def test_factory_methods():
     degrees_radians = [
-        (-720.0, -4. * math.pi),
-        (-360.0, -2. * math.pi),
-        (-270.0, -3.  * math.pi/2.),
+        (-720.0, -4.0 * math.pi),
+        (-360.0, -2.0 * math.pi),
+        (-270.0, -3.0 * math.pi / 2.0),
         (-180.0, -math.pi),
-        (-135.0, -3.  * math.pi/ 4.),
-        (-90.0, - math.pi/ 2.),
-        (-45.0, - math.pi/ 4.),
+        (-135.0, -3.0 * math.pi / 4.0),
+        (-90.0, -math.pi / 2.0),
+        (-45.0, -math.pi / 4.0),
         (0.0, 0.0),
-        (22.5, math.pi / 8.),
-        (45.0, math.pi / 4.),
-        (90.0, math.pi / 2.),
-        (135.0, 3. * math.pi / 4.),
+        (22.5, math.pi / 8.0),
+        (45.0, math.pi / 4.0),
+        (90.0, math.pi / 2.0),
+        (135.0, 3.0 * math.pi / 4.0),
         (180.0, math.pi),
-        (270.0, 3. * math.pi / 2.),
-        (360.0, 2. * math.pi),
-        (540.0, 3. * math.pi),
-        (720.0, 4. * math.pi),
-        (1080.0, 6. * math.pi)
+        (270.0, 3.0 * math.pi / 2.0),
+        (360.0, 2.0 * math.pi),
+        (540.0, 3.0 * math.pi),
+        (720.0, 4.0 * math.pi),
+        (1080.0, 6.0 * math.pi),
     ]
     for degrees, radians in degrees_radians:
         angle_deg = geom.Angle.create_from_degrees(degrees)
         if not abs(angle_deg.degrees() - degrees) < EPSILON:
-            raise ValueError(f"[Test] Wrong Angle from degree value {angle_deg.degrees()} should be {degrees}!")
+            raise ValueError(
+                f"[Test] Wrong Angle from degree value {angle_deg.degrees()} should be {degrees}!"
+            )
         if not abs(angle_deg.radians() - radians) < EPSILON:
-            raise ValueError(f"[Test] Wrong Angle from degree value {angle_deg.radians()} should be {radians}!")
+            raise ValueError(
+                f"[Test] Wrong Angle from degree value {angle_deg.radians()} should be {radians}!"
+            )
 
         angle_rad = geom.Angle.create_from_radians(radians)
         if not abs(angle_rad.degrees() - degrees) < EPSILON:
-            raise ValueError(f"[Test] Wrong Angle from radian value {angle_rad.degrees()} should be {degrees}!")
+            raise ValueError(
+                f"[Test] Wrong Angle from radian value {angle_rad.degrees()} should be {degrees}!"
+            )
         if not abs(angle_rad.radians() - radians) < EPSILON:
-            raise ValueError(f"[Test] Wrong Angle from radian value {angle_rad.radians()} should be {radians}!")
+            raise ValueError(
+                f"[Test] Wrong Angle from radian value {angle_rad.radians()} should be {radians}!"
+            )
 
 
 def test_comparison_operators():
@@ -73,23 +83,40 @@ def test_comparison_operators():
     angle30 = geom.Angle.create_from_degrees(30.00)
 
     if not angle60 == angle60:
-        raise ValueError(f"[Test] Wrong == comparison: angles {angle60} and {angle60} should be equal!")
+        raise ValueError(
+            f"[Test] Wrong == comparison: angles {angle60} and {angle60} should be equal!"
+        )
     if angle60 == angle_not60:
-        raise ValueError(f"[Test] Wrong == comparison: angles {angle60} and {angle_not60} should not be equal!")
+        raise ValueError(
+            f"[Test] Wrong == comparison: angles {angle60} and {angle_not60} should not be equal!"
+        )
     if angle60 == angle_almost60:
-        raise ValueError(f"[Test] Wrong == comparison: angles {angle60} and {angle_almost60} should not be equal!")
+        raise ValueError(
+            f"[Test] Wrong == comparison: angles {angle60} and {angle_almost60} should not be equal!"
+        )
 
     if not angle60.inexact_equal(angle60):
-        raise ValueError(f"[Test] Wrong inexact_equal: angles {angle60} and {angle60} should be equal!")
+        raise ValueError(
+            f"[Test] Wrong inexact_equal: angles {angle60} and {angle60} should be equal!"
+        )
     if angle60.inexact_equal(angle_not60):
-        raise ValueError(f"[Test] Wrong inexact_equal: angles {angle60} and {angle_not60} should not be equal!")
+        raise ValueError(
+            f"[Test] Wrong inexact_equal: angles {angle60} and {angle_not60} should not be equal!"
+        )
     if not angle60.inexact_equal(angle_almost60):
-        raise ValueError(f"[Test] Wrong inexact_equal: angles {angle60} and {angle_almost60} should be equal!")
+        raise ValueError(
+            f"[Test] Wrong inexact_equal: angles {angle60} and {angle_almost60} should be equal!"
+        )
 
     if not angle_almost60 > angle60:
-        raise ValueError(f"[Test] Wrong comparison: {angle_almost60} > {angle60} should be true!")
+        raise ValueError(
+            f"[Test] Wrong comparison: {angle_almost60} > {angle60} should be true!"
+        )
     if not angle_almost60 < angle_not60:
-        raise ValueError(f"[Test] Wrong comparison: {angle_almost60} < {angle_not60} should be true!")
+        raise ValueError(
+            f"[Test] Wrong comparison: {angle_almost60} < {angle_not60} should be true!"
+        )
+
 
 def test_arithmetic():
     angle30 = geom.Angle.create_from_degrees(30)
@@ -114,102 +141,117 @@ def test_arithmetic():
 
 def test_normalization():
     raw_angles = [
-        geom.Angle.create_from_radians(rad) for rad in [
-         -4. * math.pi,
-         -2. * math.pi,
-         -3.  * math.pi/ 2.,
-         - math.pi,
-         -3.  * math.pi/ 4.,
-         - math.pi/ 2.,
-         - math.pi/ 4.,
-        0.0,
-         math.pi / 8.,
-         math.pi / 4.,
-         math.pi / 2.,
-        3. * math.pi / 4.,
-        math.pi,
-        3. * math.pi / 2.,
-        2. * math.pi,
-        3. * math.pi,
-        4. * math.pi,
-         6. * math.pi]
+        geom.Angle.create_from_radians(rad)
+        for rad in [
+            -4.0 * math.pi,
+            -2.0 * math.pi,
+            -3.0 * math.pi / 2.0,
+            -math.pi,
+            -3.0 * math.pi / 4.0,
+            -math.pi / 2.0,
+            -math.pi / 4.0,
+            0.0,
+            math.pi / 8.0,
+            math.pi / 4.0,
+            math.pi / 2.0,
+            3.0 * math.pi / 4.0,
+            math.pi,
+            3.0 * math.pi / 2.0,
+            2.0 * math.pi,
+            3.0 * math.pi,
+            4.0 * math.pi,
+            6.0 * math.pi,
+        ]
     ]
 
-     expected_0_2pi = [
-        geom.Angle.create_from_radians(rad) for rad in [
-         0.,
-         0.,
-         math.pi/ 2.,
-          math.pi,
-         5.  * math.pi/ 4.,
-         3.* math.pi/ 2.,
-         7.* math.pi/ 4.,
-        0.0,
-         math.pi / 8.,
-         math.pi / 4.,
-         math.pi / 2.,
-        3. * math.pi / 4.,
-        math.pi,
-        3. * math.pi / 2.,
-       0.,
-         math.pi,
-        0.,
-         0.]
+    expected_0_2pi = [
+        geom.Angle.create_from_radians(rad)
+        for rad in [
+            0.0,
+            0.0,
+            math.pi / 2.0,
+            math.pi,
+            5.0 * math.pi / 4.0,
+            3.0 * math.pi / 2.0,
+            7.0 * math.pi / 4.0,
+            0.0,
+            math.pi / 8.0,
+            math.pi / 4.0,
+            math.pi / 2.0,
+            3.0 * math.pi / 4.0,
+            math.pi,
+            3.0 * math.pi / 2.0,
+            0.0,
+            math.pi,
+            0.0,
+            0.0,
+        ]
     ]
 
     expected_minuspi_pi = [
-        geom.Angle.create_from_radians(rad) for rad in [
-         0.,
-         0.,
-          math.pi/ 2.,
-          math.pi,
-         -3.  * math.pi/ 4.,
-         - math.pi/ 2.,
-         - math.pi/ 4.,
-        0.0,
-         math.pi / 8.,
-         math.pi / 4.,
-         math.pi / 2.,
-        3. * math.pi / 4.,
-        math.pi,
-        - math.pi / 2.,
-        0.,
-         math.pi,
-        0.,
-         0.]
+        geom.Angle.create_from_radians(rad)
+        for rad in [
+            0.0,
+            0.0,
+            math.pi / 2.0,
+            math.pi,
+            -3.0 * math.pi / 4.0,
+            -math.pi / 2.0,
+            -math.pi / 4.0,
+            0.0,
+            math.pi / 8.0,
+            math.pi / 4.0,
+            math.pi / 2.0,
+            3.0 * math.pi / 4.0,
+            math.pi,
+            -math.pi / 2.0,
+            0.0,
+            math.pi,
+            0.0,
+            0.0,
+        ]
     ]
 
-  expected_0_pi = [
-        geom.Angle.from_degrees(d) for d in [
-         0.,
-         0.,
-          math.pi/ 2.,
-          0.,
-          math.pi/ 4.,
-          math.pi/ 2.,
-         3.* math.pi/ 4.,
-        0.0,
-         math.pi / 8.,
-         math.pi / 4.,
-         math.pi / 2.,
-        3. * math.pi / 4.,
-        0.,
-         math.pi / 2.,
-        0.,
-         0.,
-        0.,
-         0.]
+    expected_0_pi = [
+        geom.Angle.create_from_radians(rad)
+        for rad in [
+            0.0,
+            0.0,
+            math.pi / 2.0,
+            0.0,
+            math.pi / 4.0,
+            math.pi / 2.0,
+            3.0 * math.pi / 4.0,
+            0.0,
+            math.pi / 8.0,
+            math.pi / 4.0,
+            math.pi / 2.0,
+            3.0 * math.pi / 4.0,
+            0.0,
+            math.pi / 2.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
     ]
 
     for i, angle in enumerate(raw_angles):
         if not angle.normalized_0_twopi().inexact_equal(expected_0_2pi[i]):
-            raise ValueError(f"[Test] Wrong normalization 0–2pi at index {i}! - should be {angle.normalized_0_twopi().degrees()} and get {expected_0_2pi[i].degrees()} instead.")
+            raise ValueError(
+                f"[Test] Wrong normalization 0–2pi at index {i}! - should be {angle.normalized_0_twopi().degrees()} and get {expected_0_2pi[i].degrees()} instead."
+            )
         if not angle.normalized_minuspi_pi().inexact_equal(expected_minuspi_pi[i]):
-            raise ValueError(f"[Test] Wrong normalization -pi–pi at index {i}!- should be {angle.normalized_minuspi_pi().degrees()} and get {expected_minuspi_pi[i].degrees()} instead.")
+            raise ValueError(
+                f"[Test] Wrong normalization -pi–pi at index {i}!- should be {angle.normalized_minuspi_pi().degrees()} and get {expected_minuspi_pi[i].degrees()} instead."
+            )
         if not angle.normalized_0_pi().inexact_equal(expected_0_pi[i]):
-            raise ValueError(f"[Test] Wrong normalization 0–pi at index {i}!- should be {angle.normalized_0_pi().degrees()} and get {expected_0_pi[i].degrees()} instead.")
+            raise ValueError(
+                f"[Test] Wrong normalization 0–pi at index {i}!- should be {angle.normalized_0_pi().degrees()} and get {expected_0_pi[i].degrees()} instead."
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_factory_methods()
     test_comparison_operators()
     test_arithmetic()
