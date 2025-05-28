@@ -373,13 +373,6 @@ namespace geode
         [[nodiscard]] bool is_polygon_degenerated( index_t polygon_id ) const;
 
         /*!
-         * Return if a polygon is degenerated (means stands into the
-         * tolerance-large segment)
-         */
-        [[nodiscard]] bool is_polygon_degenerated(
-            index_t polygon_id, double tolerance ) const;
-
-        /*!
          * Returns the vertices linked by an edge to the given mesh vertex.
          */
         [[nodiscard]] virtual VerticesAroundVertex vertices_around_vertex(
