@@ -23,6 +23,7 @@ add_geode_library(
     FOLDER "geode/geometry"
     SOURCES
         "aabb.cpp"
+        "angle.cpp"
         "barycentric_coordinates.cpp"
         "basic_objects/circle.cpp"
         "basic_objects/cylinder.cpp"
@@ -62,6 +63,7 @@ add_geode_library(
         "square_matrix.cpp"
     PUBLIC_HEADERS
         "aabb.hpp"
+        "angle.hpp"
         "barycentric_coordinates.hpp"
         "basic_objects/circle.hpp"
         "basic_objects/cylinder.hpp"
@@ -105,6 +107,8 @@ add_geode_library(
         "internal/intersection_from_sides.hpp"
         "internal/position_from_sides.hpp"
         "internal/predicates.hpp"
+    SKIP_UNITY
+        "position.cpp"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
         Threads::Threads

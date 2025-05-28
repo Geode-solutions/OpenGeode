@@ -19,6 +19,11 @@
 # SOFTWARE.
 
 add_geode_python_test(
+    SOURCE "test-py-angle.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
     SOURCE "test-py-barycentric-coordinates.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
