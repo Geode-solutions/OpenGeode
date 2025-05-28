@@ -33,19 +33,7 @@ namespace
     {
         return degree * M_PI / 180.;
     }
-    geode::Angle normalize_angle(
-        double angle_radians, double norm_const_radians )
-    {
-        double normalized_radians =
-            std::fmod( angle_radians, norm_const_radians );
-        if( normalized_radians < 0. )
-        {
-            normalized_radians += norm_const_radians;
-        }
-        return geode::Angle::create_from_radians( normalized_radians );
-    }
     constexpr double TWO_PI = 2. * M_PI;
-    constexpr double HALF_PI = M_PI / 2.;
 } // namespace
 
 namespace geode
@@ -72,18 +60,34 @@ namespace geode
 
     Angle Angle::normalized_0_twopi() const
     {
-        return normalize_angle( radians_, TWO_PI );
+        double normalized_radians = std::fmod( radians_, TWO_PI );
+        // normalized in [0,2pi[
+        if( normalized_radians < 0. )
+        {
+            normalized_radians += TWO_PI;
+        }
+        return geode::Angle::create_from_radians( normalized_radians );
     }
-
     Angle Angle::normalized_minuspi_pi() const
     {
         auto normalized = normalized_0_twopi();
-        return normalized - Angle( M_PI );
+        // normalized in ]-pi,pi]
+        if( normalized.radians() > M_PI )
+        {
+            return normalized - Angle( TWO_PI );
+        }
+        return normalized;
     }
 
     Angle Angle::normalized_0_pi() const
     {
-        return normalize_angle( radians_, M_PI );
+        auto normalized = normalized_0_twopi();
+        // normalized in [0,pi[
+        if( normalized.radians() >= M_PI )
+        {
+            return normalized - Angle( M_PI );
+        }
+        return normalized;
     }
 
 } // namespace geode
