@@ -38,6 +38,8 @@
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
 
+#include <geode/mesh/helpers/mesh_quality.hpp>
+
 namespace mapbox
 {
     namespace util
@@ -235,50 +237,55 @@ namespace geode
     }
 
     template < typename PointType, index_t dimension >
-    bool GenericPolygon< PointType, dimension >::is_degenerated() const
+    bool GenericPolygon< PointType,
+        dimension >::is_polygon_minimum_height_too_small( double threshold )
+        const
     {
-        return is_degenerated( GLOBAL_EPSILON );
-    }
-
-    template < typename PointType, index_t dimension >
-    bool GenericPolygon< PointType, dimension >::is_degenerated(
-        double tolerance ) const
-    {
+        const auto nb_vertices = vertices_.size();
         double max_length{ 0. };
-        index_t max_length_edge{ 0 };
-        for( const auto e : Range{ nb_vertices() } )
+        geode::index_t max_length_edge{ 0 };
+        for( const auto e : geode::Range{ nb_vertices } )
         {
-            const Point< dimension >& point0 = vertices_[e];
-            const Point< dimension >& point1 =
-                vertices_[e == nb_vertices() - 1 ? 0 : e + 1];
-            const auto cur_length = point_point_distance( point0, point1 );
+            const geode::Point< dimension >& point0 = vertices_[e];
+            const geode::Point< dimension >& point1 =
+                vertices_[e == nb_vertices - 1 ? 0 : e + 1];
+            const auto cur_length =
+                geode::point_point_distance( point0, point1 );
             if( cur_length > max_length )
             {
                 max_length = cur_length;
                 max_length_edge = e;
             }
         }
-        if( max_length < tolerance )
+        if( max_length < threshold )
         {
             return true;
         }
         const auto next =
-            max_length_edge + 1 == nb_vertices() ? 0 : max_length_edge + 1;
-        const InfiniteLine< dimension > line{ Segment< dimension >{
-            vertices_[max_length_edge], vertices_[next] } };
-        for( const auto v : Range{ nb_vertices() } )
+            max_length_edge + 1 == nb_vertices ? 0 : max_length_edge + 1;
+        const geode::InfiniteLine< dimension > line{
+            geode::Segment< dimension >{
+                vertices_[max_length_edge], vertices_[next] }
+        };
+        for( const auto v : geode::Range{ nb_vertices } )
         {
             if( v == max_length_edge || v == next )
             {
                 continue;
             }
-            const Point< dimension >& point = vertices_[v];
-            if( point_line_distance( point, line ) > tolerance )
+            const geode::Point< dimension >& point = vertices_[v];
+            if( geode::point_line_distance( point, line ) > threshold )
             {
                 return false;
             }
         }
         return true;
+    }
+
+    template < typename PointType, index_t dimension >
+    bool GenericPolygon< PointType, dimension >::is_degenerated() const
+    {
+        return is_polygon_minimum_height_too_small( GLOBAL_EPSILON );
     }
 
     template < typename PointType, index_t dimension >

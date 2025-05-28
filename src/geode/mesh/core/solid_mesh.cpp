@@ -59,6 +59,7 @@
 #include <geode/mesh/core/texture3d.hpp>
 #include <geode/mesh/core/texture_storage.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/helpers/mesh_quality.hpp>
 #include <geode/mesh/io/triangulated_surface_output.hpp>
 
 namespace
@@ -960,41 +961,8 @@ namespace geode
     bool SolidMesh< dimension >::is_polyhedron_degenerated(
         index_t polyhedron_id ) const
     {
-        double max_area{ 0. };
-        local_index_t max_area_facet{ 0 };
-        for( const auto f : LRange{ nb_polyhedron_facets( polyhedron_id ) } )
-        {
-            const auto cur_area = polyhedron_facet_area( { polyhedron_id, f } );
-            if( cur_area > max_area )
-            {
-                max_area = cur_area;
-                max_area_facet = f;
-            }
-        }
-        const auto vertices = polyhedron_vertices( polyhedron_id );
-        const auto normal =
-            polyhedron_facet_normal( { polyhedron_id, max_area_facet } );
-        if( !normal )
-        {
-            return true;
-        }
-        const auto facet_vertices =
-            polyhedron_facet_vertices( { polyhedron_id, max_area_facet } );
-        Plane plane{ normal.value(), this->point( facet_vertices[0] ) };
-        for( const auto vertex_id : vertices )
-        {
-            if( absl::c_contains( facet_vertices, vertex_id ) )
-            {
-                continue;
-            }
-            if( std::get< 0 >(
-                    point_plane_distance( this->point( vertex_id ), plane ) )
-                > GLOBAL_EPSILON )
-            {
-                return false;
-            }
-        }
-        return true;
+        return geode::is_polyhedron_minimum_height_too_small(
+            *this, polyhedron_id, GLOBAL_EPSILON );
     }
 
     template < index_t dimension >
