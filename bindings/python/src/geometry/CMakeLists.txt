@@ -22,6 +22,7 @@ add_geode_python_binding(
     NAME "py_geometry"
     SOURCES
         "geometry.cpp"
+        "angle.cpp"
         "barycentric_coordinates.cpp"
         "basic_objects.cpp"
         "bounding_box.cpp"

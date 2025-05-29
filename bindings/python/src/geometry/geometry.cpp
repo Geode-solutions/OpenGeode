@@ -28,6 +28,7 @@
 
 namespace geode
 {
+    void define_angle( pybind11::module& );
     void define_barycentric( pybind11::module& );
     void define_basic_objects( pybind11::module& );
     void define_bounding_box( pybind11::module& );
@@ -55,6 +56,7 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     pybind11::class_< geode::OpenGeodeGeometryLibrary >(
         module, "OpenGeodeGeometryLibrary" )
         .def( "initialize", &geode::OpenGeodeGeometryLibrary::initialize );
+    geode::define_angle( module );
     geode::define_barycentric( module );
     geode::define_basic_objects( module );
     geode::define_bounding_box( module );
