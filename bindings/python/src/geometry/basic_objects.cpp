@@ -67,7 +67,15 @@
         .def( pybind11::init< const Point< dimension >&,                       \
             const Point< dimension >&, const Point< dimension >& >() )         \
         .def( "vertices", &Triangle##dimension##D::vertices )                  \
-        .def( "bounding_box", &Triangle##dimension##D::bounding_box )
+        .def( "bounding_box", &Triangle##dimension##D::bounding_box )          \
+        .def( "minimum_height", &Triangle##dimension##D::minimum_height )      \
+        .def( "is_degenerated", &Triangle##dimension##D::is_degenerated )      \
+        .def( "longest_edge_index",                                            \
+            &Triangle##dimension##D::longest_edge_index )                      \
+        .def( "smallest_edge_index",                                           \
+            &Triangle##dimension##D::smallest_edge_index )                     \
+        .def( "barycenter", &Triangle##dimension##D::barycenter )              \
+        .def( "string", &Triangle##dimension##D::string )
 
 #define PYTHON_SPHERE( dimension )                                             \
     const auto sphere##dimension =                                             \

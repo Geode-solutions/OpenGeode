@@ -34,6 +34,7 @@
 namespace geode
 {
     static constexpr double GLOBAL_EPSILON{ 1E-6 };
+    // 0.001 radians --> 0.057 degrees
     static constexpr double GLOBAL_ANGULAR_EPSILON{ 1E-3 };
 
     using index_t = unsigned int;
