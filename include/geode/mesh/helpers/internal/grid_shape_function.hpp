@@ -37,6 +37,9 @@ namespace geode
 {
     namespace internal
     {
+        [[nodiscard]] bool opengeode_mesh_api local_cell_node_is_on_axis_origin(
+            geode::local_index_t node_id, geode::local_index_t axis_id );
+
         template < index_t dimension >
         [[nodiscard]] double shape_function_value(
             const typename Grid< dimension >::CellIndices& cell_id,
