@@ -35,7 +35,7 @@
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
-#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>
@@ -756,52 +756,52 @@ namespace geode
 
     index_t BRep::nb_internal_corners( const Surface3D& surface ) const
     {
-        return detail::count_relationships( internal_corners( surface ) );
+        return detail::count_range_elements( internal_corners( surface ) );
     }
 
     index_t BRep::nb_internal_lines( const Surface3D& surface ) const
     {
-        return detail::count_relationships( internal_lines( surface ) );
+        return detail::count_range_elements( internal_lines( surface ) );
     }
 
     index_t BRep::nb_internal_corners( const Block3D& block ) const
     {
-        return detail::count_relationships( internal_corners( block ) );
+        return detail::count_range_elements( internal_corners( block ) );
     }
 
     index_t BRep::nb_internal_lines( const Block3D& block ) const
     {
-        return detail::count_relationships( internal_lines( block ) );
+        return detail::count_range_elements( internal_lines( block ) );
     }
 
     index_t BRep::nb_internal_surfaces( const Block3D& block ) const
     {
-        return detail::count_relationships( internal_surfaces( block ) );
+        return detail::count_range_elements( internal_surfaces( block ) );
     }
 
     index_t BRep::nb_embedding_surfaces( const Corner3D& corner ) const
     {
-        return detail::count_relationships( embedding_surfaces( corner ) );
+        return detail::count_range_elements( embedding_surfaces( corner ) );
     }
 
     index_t BRep::nb_embedding_surfaces( const Line3D& line ) const
     {
-        return detail::count_relationships( embedding_surfaces( line ) );
+        return detail::count_range_elements( embedding_surfaces( line ) );
     }
 
     index_t BRep::nb_embedding_blocks( const Corner3D& corner ) const
     {
-        return detail::count_relationships( embedding_blocks( corner ) );
+        return detail::count_range_elements( embedding_blocks( corner ) );
     }
 
     index_t BRep::nb_embedding_blocks( const Line3D& line ) const
     {
-        return detail::count_relationships( embedding_blocks( line ) );
+        return detail::count_range_elements( embedding_blocks( line ) );
     }
 
     index_t BRep::nb_embedding_blocks( const Surface3D& surface ) const
     {
-        return detail::count_relationships( embedding_blocks( surface ) );
+        return detail::count_range_elements( embedding_blocks( surface ) );
     }
 
     bool BRep::is_closed( const Line3D& line ) const

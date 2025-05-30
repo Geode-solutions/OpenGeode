@@ -65,6 +65,14 @@ namespace geode
             .set_corner_collection_name( name, {} );
     }
 
+    template < index_t dimension >
+    void CornerCollectionsBuilder< dimension >::set_corner_collection_active(
+        const uuid& id, bool active )
+    {
+        corner_collections_.modifiable_corner_collection( id, {} )
+            .set_corner_collection_active( active, {} );
+    }
+
     template class opengeode_model_api CornerCollectionsBuilder< 2 >;
     template class opengeode_model_api CornerCollectionsBuilder< 3 >;
 } // namespace geode

@@ -80,6 +80,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SurfacesBuilder< dimension >::set_surface_active(
+        const uuid& id, bool active )
+    {
+        surfaces_.modifiable_surface( id, {} ).set_surface_active( active, {} );
+    }
+
+    template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_mesh(
         const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh )
     {

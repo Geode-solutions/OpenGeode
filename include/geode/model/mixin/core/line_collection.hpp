@@ -72,6 +72,12 @@ namespace geode
             this->set_name( name );
         }
 
+        void set_line_collection_active(
+            bool active, LineCollectionsBuilderKey )
+        {
+            this->set_active( active );
+        }
+
     private:
         LineCollection() = default;
 

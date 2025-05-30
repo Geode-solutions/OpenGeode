@@ -67,6 +67,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             BlockRangeBase( const Blocks& blocks );
             BlockRangeBase( BlockRangeBase&& other ) noexcept;
@@ -98,6 +100,8 @@ namespace geode
 
         [[nodiscard]] index_t nb_blocks() const;
 
+        [[nodiscard]] index_t nb_active_blocks() const;
+
         [[nodiscard]] bool has_block( const uuid& id ) const;
 
         /*!
@@ -106,6 +110,8 @@ namespace geode
         [[nodiscard]] const Block< dimension >& block( const uuid& id ) const;
 
         [[nodiscard]] BlockRange blocks() const;
+
+        [[nodiscard]] BlockRange active_blocks() const;
 
         [[nodiscard]] BlockRange components() const
         {

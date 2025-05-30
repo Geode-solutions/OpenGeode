@@ -62,9 +62,7 @@ namespace geode
 
     template < index_t dimension >
     AttributeCoordinateReferenceSystem<
-        dimension >::AttributeCoordinateReferenceSystem()
-    {
-    }
+        dimension >::AttributeCoordinateReferenceSystem() = default;
 
     template < index_t dimension >
     AttributeCoordinateReferenceSystem< dimension >::
@@ -83,9 +81,7 @@ namespace geode
 
     template < index_t dimension >
     AttributeCoordinateReferenceSystem<
-        dimension >::~AttributeCoordinateReferenceSystem()
-    {
-    }
+        dimension >::~AttributeCoordinateReferenceSystem() = default;
 
     template < index_t dimension >
     const Point< dimension >&

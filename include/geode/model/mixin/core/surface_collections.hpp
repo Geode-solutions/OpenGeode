@@ -61,6 +61,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             SurfaceCollectionRangeBase( const SurfaceCollections& collections );
             SurfaceCollectionRangeBase(
@@ -93,10 +95,14 @@ namespace geode
 
         [[nodiscard]] index_t nb_surface_collections() const;
 
+        [[nodiscard]] index_t nb_active_surface_collections() const;
+
         [[nodiscard]] const SurfaceCollection< dimension >& surface_collection(
             const uuid& id ) const;
 
         [[nodiscard]] SurfaceCollectionRange surface_collections() const;
+
+        [[nodiscard]] SurfaceCollectionRange active_surface_collections() const;
 
         [[nodiscard]] SurfaceCollectionRange components() const
         {

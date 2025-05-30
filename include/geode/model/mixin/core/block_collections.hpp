@@ -59,6 +59,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             BlockCollectionRangeBase( const BlockCollections& collections );
             BlockCollectionRangeBase(
@@ -89,10 +91,14 @@ namespace geode
 
         [[nodiscard]] index_t nb_block_collections() const;
 
+        [[nodiscard]] index_t nb_active_block_collections() const;
+
         [[nodiscard]] const BlockCollection< dimension >& block_collection(
             const uuid& id ) const;
 
         [[nodiscard]] BlockCollectionRange block_collections() const;
+
+        [[nodiscard]] BlockCollectionRange active_block_collections() const;
 
         [[nodiscard]] BlockCollectionRange components() const
         {

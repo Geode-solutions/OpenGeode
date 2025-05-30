@@ -60,6 +60,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             LineRangeBase( const Lines& lines );
             LineRangeBase( LineRangeBase&& other ) noexcept;
@@ -88,11 +90,15 @@ namespace geode
 
         [[nodiscard]] index_t nb_lines() const;
 
+        [[nodiscard]] index_t nb_active_lines() const;
+
         [[nodiscard]] bool has_line( const uuid& id ) const;
 
         [[nodiscard]] const Line< dimension >& line( const uuid& id ) const;
 
         [[nodiscard]] LineRange lines() const;
+
+        [[nodiscard]] LineRange active_lines() const;
 
         [[nodiscard]] LineRange components() const
         {

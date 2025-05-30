@@ -138,9 +138,7 @@ namespace geode
 
     template < index_t dimension, index_t point_dimension >
     TriangulatedSurfacePointFunction< dimension,
-        point_dimension >::~TriangulatedSurfacePointFunction()
-    {
-    }
+        point_dimension >::~TriangulatedSurfacePointFunction() = default;
 
     template < index_t dimension, index_t point_dimension >
     TriangulatedSurfacePointFunction< dimension, point_dimension >

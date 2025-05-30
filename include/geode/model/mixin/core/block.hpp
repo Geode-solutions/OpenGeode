@@ -103,6 +103,8 @@ namespace geode
 
         void set_block_name( std::string_view name, BlocksBuilderKey key );
 
+        void set_block_active( bool is_active, BlocksBuilderKey key );
+
         [[nodiscard]] std::unique_ptr< Mesh > steal_mesh(
             BlocksBuilderKey key );
 

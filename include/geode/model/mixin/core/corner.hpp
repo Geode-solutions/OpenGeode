@@ -87,6 +87,8 @@ namespace geode
 
         void set_corner_name( std::string_view name, CornersBuilderKey key );
 
+        void set_corner_active( bool is_active, CornersBuilderKey key );
+
         [[nodiscard]] Mesh& modifiable_mesh( CornersKey key );
 
         [[nodiscard]] Mesh& modifiable_mesh( CornersBuilderKey key );

@@ -96,6 +96,8 @@ namespace geode
 
         void set_surface_name( std::string_view name, SurfacesBuilderKey key );
 
+        void set_surface_active( bool active, SurfacesBuilderKey key );
+
         template < typename TypedMesh = Mesh >
         [[nodiscard]] TypedMesh& modifiable_mesh(
             SurfacesBuilderKey /*unused*/ )

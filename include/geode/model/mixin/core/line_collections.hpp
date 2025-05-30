@@ -61,6 +61,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             LineCollectionRangeBase( const LineCollections& collections );
             LineCollectionRangeBase( LineCollectionRangeBase&& other ) noexcept;
@@ -90,10 +92,14 @@ namespace geode
 
         [[nodiscard]] index_t nb_line_collections() const;
 
+        [[nodiscard]] index_t nb_active_line_collections() const;
+
         [[nodiscard]] const LineCollection< dimension >& line_collection(
             const uuid& id ) const;
 
         [[nodiscard]] LineCollectionRange line_collections() const;
+
+        [[nodiscard]] LineCollectionRange active_line_collections() const;
 
         [[nodiscard]] LineCollectionRange components() const
         {

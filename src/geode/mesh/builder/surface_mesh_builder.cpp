@@ -328,9 +328,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SurfaceMeshBuilder< dimension >::~SurfaceMeshBuilder()
-    {
-    }
+    SurfaceMeshBuilder< dimension >::~SurfaceMeshBuilder() = default;
 
     template < index_t dimension >
     std::unique_ptr< SurfaceMeshBuilder< dimension > >

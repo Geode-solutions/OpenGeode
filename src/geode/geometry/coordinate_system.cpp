@@ -90,9 +90,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    CoordinateSystem< dimension >::CoordinateSystem()
-    {
-    }
+    CoordinateSystem< dimension >::CoordinateSystem() = default;
 
     template < index_t dimension >
     CoordinateSystem< dimension >::CoordinateSystem(

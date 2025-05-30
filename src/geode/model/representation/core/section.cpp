@@ -32,7 +32,7 @@
 
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
-#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>
@@ -516,22 +516,22 @@ namespace geode
 
     index_t Section::nb_internal_corners( const Surface2D& surface ) const
     {
-        return detail::count_relationships( internal_corners( surface ) );
+        return detail::count_range_elements( internal_corners( surface ) );
     }
 
     index_t Section::nb_internal_lines( const Surface2D& surface ) const
     {
-        return detail::count_relationships( internal_lines( surface ) );
+        return detail::count_range_elements( internal_lines( surface ) );
     }
 
     index_t Section::nb_embedding_surfaces( const Corner2D& corner ) const
     {
-        return detail::count_relationships( embedding_surfaces( corner ) );
+        return detail::count_range_elements( embedding_surfaces( corner ) );
     }
 
     index_t Section::nb_embedding_surfaces( const Line2D& line ) const
     {
-        return detail::count_relationships( embedding_surfaces( line ) );
+        return detail::count_range_elements( embedding_surfaces( line ) );
     }
 
     bool Section::is_closed( const Line2D& line ) const

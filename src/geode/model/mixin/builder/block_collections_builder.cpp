@@ -64,6 +64,14 @@ namespace geode
             .set_block_collection_name( name, {} );
     }
 
+    template < index_t dimension >
+    void BlockCollectionsBuilder< dimension >::set_block_collection_active(
+        const uuid& id, bool active )
+    {
+        block_collections_.modifiable_block_collection( id, {} )
+            .set_block_collection_active( active, {} );
+    }
+
     template class opengeode_model_api BlockCollectionsBuilder< 2 >;
     template class opengeode_model_api BlockCollectionsBuilder< 3 >;
 } // namespace geode

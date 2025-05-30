@@ -54,8 +54,12 @@ namespace geode
 
         [[nodiscard]] ComponentID component_id() const;
 
+        [[nodiscard]] bool is_active() const;
+
     protected:
         Component();
+
+        void set_active( bool active );
 
     private:
         template < typename Archive >

@@ -64,6 +64,8 @@ namespace geode
 
         void set_surface_name( const uuid& id, std::string_view name );
 
+        void set_surface_active( const uuid& id, bool active );
+
     protected:
         explicit SurfacesBuilder( Surfaces< dimension >& surfaces )
             : surfaces_( surfaces )
