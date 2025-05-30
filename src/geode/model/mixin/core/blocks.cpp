@@ -339,9 +339,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Blocks< dimension >::ModifiableBlockRange::~ModifiableBlockRange()
-    {
-    }
+    Blocks< dimension >::ModifiableBlockRange::~ModifiableBlockRange() =
+        default;
 
     template < index_t dimension >
     auto Blocks< dimension >::ModifiableBlockRange::begin() const

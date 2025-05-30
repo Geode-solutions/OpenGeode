@@ -248,9 +248,7 @@ namespace geode
 
     template < index_t dimension >
     LineCollections< dimension >::ModifiableLineCollectionRange::
-        ~ModifiableLineCollectionRange()
-    {
-    }
+        ~ModifiableLineCollectionRange() = default;
 
     template < index_t dimension >
     auto LineCollections< dimension >::ModifiableLineCollectionRange::begin()

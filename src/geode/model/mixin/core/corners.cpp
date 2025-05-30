@@ -299,9 +299,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corners< dimension >::ModifiableCornerRange::~ModifiableCornerRange()
-    {
-    }
+    Corners< dimension >::ModifiableCornerRange::~ModifiableCornerRange() =
+        default;
 
     template < index_t dimension >
     auto Corners< dimension >::ModifiableCornerRange::begin() const

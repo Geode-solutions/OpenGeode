@@ -247,9 +247,7 @@ namespace geode
 
     template < index_t dimension >
     ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
-        ~ModifiableModelBoundaryRange()
-    {
-    }
+        ~ModifiableModelBoundaryRange() = default;
 
     template < index_t dimension >
     auto ModelBoundaries< dimension >::ModifiableModelBoundaryRange::begin()

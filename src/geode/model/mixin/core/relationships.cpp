@@ -38,7 +38,7 @@
 #include <geode/mesh/io/graph_output.hpp>
 
 #include <geode/model/mixin/core/bitsery_archive.hpp>
-#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/detail/relationships_impl.hpp>
 
 namespace geode
@@ -296,7 +296,7 @@ namespace geode
 
     index_t Relationships::nb_boundaries( const uuid& component_id ) const
     {
-        return detail::count_relationships( boundaries( component_id ) );
+        return detail::count_range_elements( boundaries( component_id ) );
     }
 
     Relationships::BoundaryRange Relationships::boundaries(
@@ -307,7 +307,7 @@ namespace geode
 
     index_t Relationships::nb_incidences( const uuid& component_id ) const
     {
-        return detail::count_relationships( incidences( component_id ) );
+        return detail::count_range_elements( incidences( component_id ) );
     }
 
     Relationships::IncidenceRange Relationships::incidences(
@@ -326,7 +326,7 @@ namespace geode
 
     index_t Relationships::nb_internals( const uuid& component_id ) const
     {
-        return detail::count_relationships( internals( component_id ) );
+        return detail::count_range_elements( internals( component_id ) );
     }
 
     Relationships::InternalRange Relationships::internals(
@@ -337,7 +337,7 @@ namespace geode
 
     index_t Relationships::nb_embeddings( const uuid& component_id ) const
     {
-        return detail::count_relationships( embeddings( component_id ) );
+        return detail::count_range_elements( embeddings( component_id ) );
     }
 
     Relationships::EmbeddingRange Relationships::embeddings(
@@ -356,7 +356,7 @@ namespace geode
 
     index_t Relationships::nb_items( const uuid& component_id ) const
     {
-        return detail::count_relationships( items( component_id ) );
+        return detail::count_range_elements( items( component_id ) );
     }
 
     Relationships::ItemRange Relationships::items(
@@ -367,7 +367,7 @@ namespace geode
 
     index_t Relationships::nb_collections( const uuid& component_id ) const
     {
-        return detail::count_relationships( collections( component_id ) );
+        return detail::count_range_elements( collections( component_id ) );
     }
 
     Relationships::CollectionRange Relationships::collections(

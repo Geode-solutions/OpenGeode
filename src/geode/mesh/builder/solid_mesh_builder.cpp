@@ -369,9 +369,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidMeshBuilder< dimension >::~SolidMeshBuilder()
-    {
-    }
+    SolidMeshBuilder< dimension >::~SolidMeshBuilder() = default;
 
     template < index_t dimension >
     std::unique_ptr< SolidMeshBuilder< dimension > >

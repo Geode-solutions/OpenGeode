@@ -253,9 +253,7 @@ namespace geode
 
     template < index_t dimension >
     CornerCollections< dimension >::ModifiableCornerCollectionRange::
-        ~ModifiableCornerCollectionRange()
-    {
-    }
+        ~ModifiableCornerCollectionRange() = default;
 
     template < index_t dimension >
     auto

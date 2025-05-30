@@ -292,9 +292,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Lines< dimension >::ModifiableLineRange::~ModifiableLineRange()
-    {
-    }
+    Lines< dimension >::ModifiableLineRange::~ModifiableLineRange() = default;
 
     template < index_t dimension >
     auto Lines< dimension >::ModifiableLineRange::begin() const

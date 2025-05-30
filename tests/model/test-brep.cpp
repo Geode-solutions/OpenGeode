@@ -45,7 +45,7 @@
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
-#include <geode/model/mixin/core/detail/count_relationships.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>
@@ -74,7 +74,7 @@ std::array< geode::uuid, 6 > add_corners(
         absl::StrCat( "[Test] BRep should have ", 6, " corners" );
     OPENGEODE_EXCEPTION( model.nb_corners() == 6, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.corners() ) == 6, message );
+        geode::detail::count_range_elements( model.corners() ) == 6, message );
     OPENGEODE_EXCEPTION( model.corner( uuids[3] ).name() == "corner4",
         "[Test] Wrong Corner name" );
     return uuids;
@@ -96,7 +96,7 @@ std::array< geode::uuid, 9 > add_lines(
         absl::StrCat( "[Test] BRep should have ", 9, " lines" );
     OPENGEODE_EXCEPTION( model.nb_lines() == 9, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.lines() ) == 9, message );
+        geode::detail::count_range_elements( model.lines() ) == 9, message );
     OPENGEODE_EXCEPTION(
         model.line( uuids[3] ).name() == "line4", "[Test] Wrong Line name" );
     return uuids;
@@ -123,9 +123,14 @@ std::array< geode::uuid, 5 > add_surfaces(
         absl::StrCat( "[Test] BRep should have ", 5, " surfaces" );
     OPENGEODE_EXCEPTION( model.nb_surfaces() == 5, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.surfaces() ) == 5, message );
+        geode::detail::count_range_elements( model.surfaces() ) == 5, message );
     OPENGEODE_EXCEPTION( model.surface( uuids[1] ).name() == "surface2",
         "[Test] Wrong Surface name" );
+    OPENGEODE_EXCEPTION( model.nb_active_surfaces() == 5, message );
+    builder.set_surface_active( uuids[1], false );
+    builder.set_surface_active( uuids[4], false );
+    OPENGEODE_EXCEPTION( model.nb_active_surfaces() == 3,
+        "[Test] BRep should have 3 actives surfaces" );
     return uuids;
 }
 
@@ -139,7 +144,7 @@ geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
     const auto message = absl::StrCat( "[Test] BRep should have 1 block" );
     OPENGEODE_EXCEPTION( model.nb_blocks() == 1, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.blocks() ) == 1, message );
+        geode::detail::count_range_elements( model.blocks() ) == 1, message );
     OPENGEODE_EXCEPTION( model.block( block_uuid ).name() == "block1",
         "[Test] Wrong Block name" );
     return block_uuid;
@@ -162,7 +167,7 @@ std::array< geode::uuid, 3 > add_model_boundaries(
         absl::StrCat( "[Test] BRep should have ", 3, " model boundaries" );
     OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.model_boundaries() ) == 3,
+        geode::detail::count_range_elements( model.model_boundaries() ) == 3,
         message );
     OPENGEODE_EXCEPTION( model.model_boundary( uuids[0] ).name() == "boundary1",
         "[Test] Wrong ModelBoundary name" );
@@ -187,7 +192,7 @@ std::array< geode::uuid, 2 > add_corner_collections(
     OPENGEODE_EXCEPTION(
         model.nb_corner_collections() == uuids.size(), message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.corner_collections() )
+        geode::detail::count_range_elements( model.corner_collections() )
             == uuids.size(),
         message );
     OPENGEODE_EXCEPTION(
@@ -213,7 +218,7 @@ std::array< geode::uuid, 2 > add_line_collections(
         "[Test] BRep should have ", uuids.size(), " line collections" );
     OPENGEODE_EXCEPTION( model.nb_line_collections() == uuids.size(), message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.line_collections() )
+        geode::detail::count_range_elements( model.line_collections() )
             == uuids.size(),
         message );
     OPENGEODE_EXCEPTION(
@@ -240,7 +245,7 @@ std::array< geode::uuid, 2 > add_surface_collections(
     OPENGEODE_EXCEPTION(
         model.nb_surface_collections() == uuids.size(), message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.surface_collections() )
+        geode::detail::count_range_elements( model.surface_collections() )
             == uuids.size(),
         message );
     OPENGEODE_EXCEPTION(
@@ -262,7 +267,7 @@ geode::uuid add_block_collection(
         absl::StrCat( "[Test] BRep should have 1 block collections" );
     OPENGEODE_EXCEPTION( model.nb_block_collections() == 1, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.block_collections() ) == 1,
+        geode::detail::count_range_elements( model.block_collections() ) == 1,
         message );
     OPENGEODE_EXCEPTION(
         model.block_collection( block_uuid ).name() == "block_collection1",

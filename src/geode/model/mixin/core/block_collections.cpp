@@ -251,9 +251,7 @@ namespace geode
 
     template < index_t dimension >
     BlockCollections< dimension >::ModifiableBlockCollectionRange::
-        ~ModifiableBlockCollectionRange()
-    {
-    }
+        ~ModifiableBlockCollectionRange() = default;
 
     template < index_t dimension >
     auto BlockCollections< dimension >::ModifiableBlockCollectionRange::begin()

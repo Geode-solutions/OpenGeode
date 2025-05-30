@@ -257,9 +257,7 @@ namespace geode
 
     template < index_t dimension >
     SurfaceCollections< dimension >::ModifiableSurfaceCollectionRange::
-        ~ModifiableSurfaceCollectionRange()
-    {
-    }
+        ~ModifiableSurfaceCollectionRange() = default;
 
     template < index_t dimension >
     auto SurfaceCollections<
