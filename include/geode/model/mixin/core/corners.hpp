@@ -66,6 +66,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             CornerRangeBase( const Corners& corners );
             CornerRangeBase( CornerRangeBase&& other ) noexcept;
@@ -97,6 +99,8 @@ namespace geode
 
         [[nodiscard]] index_t nb_corners() const;
 
+        [[nodiscard]] index_t nb_active_corners() const;
+
         [[nodiscard]] bool has_corner( const uuid& id ) const;
 
         /*!
@@ -105,6 +109,8 @@ namespace geode
         [[nodiscard]] const Corner< dimension >& corner( const uuid& id ) const;
 
         [[nodiscard]] CornerRange corners() const;
+
+        [[nodiscard]] CornerRange active_corners() const;
 
         [[nodiscard]] CornerRange components() const
         {

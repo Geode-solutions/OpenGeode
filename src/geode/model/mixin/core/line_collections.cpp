@@ -28,6 +28,7 @@
 #include <geode/basic/range.hpp>
 
 #include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/line_collection.hpp>
 
 namespace geode
@@ -56,6 +57,12 @@ namespace geode
     index_t LineCollections< dimension >::nb_line_collections() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    index_t LineCollections< dimension >::nb_active_line_collections() const
+    {
+        return detail::count_range_elements( active_line_collections() );
     }
 
     template < index_t dimension >
@@ -90,16 +97,24 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename LineCollections< dimension >::LineCollectionRange
-        LineCollections< dimension >::line_collections() const
+    auto LineCollections< dimension >::line_collections() const
+        -> LineCollectionRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    typename LineCollections< dimension >::ModifiableLineCollectionRange
-        LineCollections< dimension >::modifiable_line_collections(
-            LineCollectionsBuilderKey )
+    auto LineCollections< dimension >::active_line_collections() const
+        -> LineCollectionRange
+    {
+        LineCollectionRange range{ *this };
+        range.set_active_only();
+        return range;
+    }
+
+    template < index_t dimension >
+    auto LineCollections< dimension >::modifiable_line_collections(
+        LineCollectionsBuilderKey ) -> ModifiableLineCollectionRange
     {
         return { *this };
     }
@@ -154,6 +169,23 @@ namespace geode
         {
             return *this->current()->second;
         }
+
+        void set_active_only()
+        {
+            active_only_ = true;
+        }
+
+        void next_line_collection()
+        {
+            do
+            {
+                this->operator++();
+            } while( this->operator!=( *this )
+                     && ( active_only_ && !line_collection().is_active() ) );
+        }
+
+    private:
+        bool active_only_{ false };
     };
 
     template < index_t dimension >
@@ -187,9 +219,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void
+        LineCollections< dimension >::LineCollectionRangeBase::set_active_only()
+    {
+        impl_->set_active_only();
+    }
+
+    template < index_t dimension >
     void LineCollections< dimension >::LineCollectionRangeBase::operator++()
     {
-        return impl_->operator++();
+        return impl_->next_line_collection();
     }
 
     template < index_t dimension >

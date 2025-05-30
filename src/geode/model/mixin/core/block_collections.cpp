@@ -29,6 +29,7 @@
 
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 
 namespace geode
 {
@@ -56,6 +57,12 @@ namespace geode
     index_t BlockCollections< dimension >::nb_block_collections() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    index_t BlockCollections< dimension >::nb_active_block_collections() const
+    {
+        return detail::count_range_elements( active_block_collections() );
     }
 
     template < index_t dimension >
@@ -90,16 +97,24 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename BlockCollections< dimension >::BlockCollectionRange
-        BlockCollections< dimension >::block_collections() const
+    auto BlockCollections< dimension >::block_collections() const
+        -> BlockCollectionRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    typename BlockCollections< dimension >::ModifiableBlockCollectionRange
-        BlockCollections< dimension >::modifiable_block_collections(
-            BlockCollectionsBuilderKey )
+    auto BlockCollections< dimension >::active_block_collections() const
+        -> BlockCollectionRange
+    {
+        BlockCollectionRange range{ *this };
+        range.set_active_only();
+        return range;
+    }
+
+    template < index_t dimension >
+    auto BlockCollections< dimension >::modifiable_block_collections(
+        BlockCollectionsBuilderKey ) -> ModifiableBlockCollectionRange
     {
         return { *this };
     }
@@ -156,6 +171,22 @@ namespace geode
         {
             return *this->current()->second;
         }
+
+        void set_active_only()
+        {
+            active_only_ = true;
+        }
+        void next_block_collection()
+        {
+            do
+            {
+                this->operator++();
+            } while( this->operator!=( *this )
+                     && ( active_only_ && !block_collection().is_active() ) );
+        }
+
+    private:
+        bool active_only_{ false };
     };
 
     template < index_t dimension >
@@ -190,9 +221,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void BlockCollections<
+        dimension >::BlockCollectionRangeBase::set_active_only()
+    {
+        impl_->set_active_only();
+    }
+
+    template < index_t dimension >
     void BlockCollections< dimension >::BlockCollectionRangeBase::operator++()
     {
-        return impl_->operator++();
+        return impl_->next_block_collection();
     }
 
     template < index_t dimension >

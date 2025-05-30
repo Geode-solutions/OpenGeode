@@ -29,6 +29,7 @@
 
 #include <geode/model/mixin/core/corner_collection.hpp>
 #include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 
 namespace geode
 {
@@ -56,6 +57,12 @@ namespace geode
     index_t CornerCollections< dimension >::nb_corner_collections() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    index_t CornerCollections< dimension >::nb_active_corner_collections() const
+    {
+        return detail::count_range_elements( active_corner_collections() );
     }
 
     template < index_t dimension >
@@ -91,16 +98,24 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename CornerCollections< dimension >::CornerCollectionRange
-        CornerCollections< dimension >::corner_collections() const
+    auto CornerCollections< dimension >::corner_collections() const
+        -> CornerCollectionRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    typename CornerCollections< dimension >::ModifiableCornerCollectionRange
-        CornerCollections< dimension >::modifiable_corner_collections(
-            CornerCollectionsBuilderKey )
+    auto CornerCollections< dimension >::active_corner_collections() const
+        -> CornerCollectionRange
+    {
+        CornerCollectionRange range{ *this };
+        range.set_active_only();
+        return range;
+    }
+
+    template < index_t dimension >
+    auto CornerCollections< dimension >::modifiable_corner_collections(
+        CornerCollectionsBuilderKey ) -> ModifiableCornerCollectionRange
     {
         return { *this };
     }
@@ -158,6 +173,23 @@ namespace geode
         {
             return *this->current()->second;
         }
+
+        void set_active_only()
+        {
+            active_only_ = true;
+        }
+
+        void next_corner_collection()
+        {
+            do
+            {
+                this->operator++();
+            } while( this->operator!=( *this )
+                     && ( active_only_ && !corner_collection().is_active() ) );
+        }
+
+    private:
+        bool active_only_{ false };
     };
 
     template < index_t dimension >
@@ -192,9 +224,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void CornerCollections<
+        dimension >::CornerCollectionRangeBase::set_active_only()
+    {
+        impl_->set_active_only();
+    }
+
+    template < index_t dimension >
     void CornerCollections< dimension >::CornerCollectionRangeBase::operator++()
     {
-        return impl_->operator++();
+        return impl_->next_corner_collection();
     }
 
     template < index_t dimension >

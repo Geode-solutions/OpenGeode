@@ -42,6 +42,7 @@
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/detail/components_storage.hpp>
+#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 
 namespace geode
 {
@@ -68,6 +69,12 @@ namespace geode
     index_t Blocks< dimension >::nb_blocks() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    index_t Blocks< dimension >::nb_active_blocks() const
+    {
+        return detail::count_range_elements( active_blocks() );
     }
 
     template < index_t dimension >
@@ -228,9 +235,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename Blocks< dimension >::BlockRange Blocks< dimension >::blocks() const
+    auto Blocks< dimension >::blocks() const -> BlockRange
     {
         return { *this };
+    }
+
+    template < index_t dimension >
+    auto Blocks< dimension >::active_blocks() const -> BlockRange
+    {
+        BlockRange range{ *this };
+        range.set_active_only();
+        return range;
     }
 
     template < index_t dimension >
@@ -249,6 +264,22 @@ namespace geode
         {
             return *this->current()->second;
         }
+        void set_active_only()
+        {
+            active_only_ = true;
+        }
+
+        void next_block()
+        {
+            do
+            {
+                this->operator++();
+            } while( this->operator!=( *this )
+                     && ( active_only_ && !block().is_active() ) );
+        }
+
+    private:
+        bool active_only_{ false };
     };
 
     template < index_t dimension >
@@ -279,9 +310,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Blocks< dimension >::BlockRangeBase::set_active_only()
+    {
+        impl_->set_active_only();
+    }
+
+    template < index_t dimension >
     void Blocks< dimension >::BlockRangeBase::operator++()
     {
-        return impl_->operator++();
+        return impl_->next_block();
     }
 
     template < index_t dimension >
@@ -318,8 +355,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename Blocks< dimension >::ModifiableBlockRange
-        Blocks< dimension >::modifiable_blocks( BlocksBuilderKey /*unused*/ )
+    auto Blocks< dimension >::modifiable_blocks( BlocksBuilderKey /*unused*/ )
+        -> ModifiableBlockRange
     {
         return { *this };
     }
