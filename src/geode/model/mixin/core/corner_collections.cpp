@@ -177,15 +177,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_corner_collection();
         }
 
+        void next()
+        {
+            this->operator++();
+            next_corner_collection();
+        }
+
+    private:
         void next_corner_collection()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !corner_collection().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !corner_collection().is_active() ) );
+            }
         }
 
     private:
@@ -233,7 +241,7 @@ namespace geode
     template < index_t dimension >
     void CornerCollections< dimension >::CornerCollectionRangeBase::operator++()
     {
-        return impl_->next_corner_collection();
+        return impl_->next();
     }
 
     template < index_t dimension >

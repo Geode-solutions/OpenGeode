@@ -227,15 +227,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_line();
         }
 
+        void next()
+        {
+            this->operator++();
+            next_line();
+        }
+
+    private:
         void next_line()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !line().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !line().is_active() ) );
+            }
         }
 
     private:
@@ -278,7 +286,7 @@ namespace geode
     template < index_t dimension >
     void Lines< dimension >::LineRangeBase::operator++()
     {
-        return impl_->next_line();
+        return impl_->next();
     }
 
     template < index_t dimension >

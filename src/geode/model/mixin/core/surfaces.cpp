@@ -263,15 +263,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_surface();
         }
 
+        void next()
+        {
+            this->operator++();
+            next_surface();
+        }
+
+    private:
         void next_surface()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !surface().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !surface().is_active() ) );
+            }
         }
 
     private:
@@ -315,7 +323,7 @@ namespace geode
     template < index_t dimension >
     void Surfaces< dimension >::SurfaceRangeBase::operator++()
     {
-        return impl_->next_surface();
+        return impl_->next();
     }
 
     template < index_t dimension >

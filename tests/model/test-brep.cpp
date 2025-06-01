@@ -78,19 +78,9 @@ std::array< geode::uuid, 6 > add_corners(
         geode::detail::count_range_elements( model.corners() ) == 6, message );
     OPENGEODE_EXCEPTION( model.corner( uuids[3] ).name() == "corner4",
         "[Test] Wrong Corner name" );
-    for( const auto& corner : model.corners() )
-    {
-        SDEBUG( corner.id() );
-    }
     OPENGEODE_EXCEPTION( model.nb_active_corners() == 6, message );
     builder.set_corner_active( uuids[1], false );
     builder.set_corner_active( uuids[4], false );
-    SDEBUG( uuids[1] );
-    SDEBUG( uuids[4] );
-    for( const auto& corner : model.active_corners() )
-    {
-        SDEBUG( corner.id() );
-    }
     OPENGEODE_EXCEPTION( model.nb_active_corners() == 4,
         "[Test] BRep should have 4 actives corners" );
     return uuids;

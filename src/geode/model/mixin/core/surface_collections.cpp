@@ -177,15 +177,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_surface_collection();
         }
 
+        void next()
+        {
+            this->operator++();
+            next_surface_collection();
+        }
+
+    private:
         void next_surface_collection()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !surface_collection().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !surface_collection().is_active() ) );
+            }
         }
 
     private:
@@ -235,7 +243,7 @@ namespace geode
     void SurfaceCollections<
         dimension >::SurfaceCollectionRangeBase::operator++()
     {
-        return impl_->next_surface_collection();
+        return impl_->next();
     }
 
     template < index_t dimension >

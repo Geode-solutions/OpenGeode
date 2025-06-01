@@ -232,15 +232,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_corner();
         }
 
+        void next()
+        {
+            this->operator++();
+            next_corner();
+        }
+
+    private:
         void next_corner()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !corner().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !corner().is_active() ) );
+            }
         }
 
     private:
@@ -284,7 +292,7 @@ namespace geode
     template < index_t dimension >
     void Corners< dimension >::CornerRangeBase::operator++()
     {
-        return impl_->next_corner();
+        return impl_->next();
     }
 
     template < index_t dimension >

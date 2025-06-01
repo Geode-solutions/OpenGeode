@@ -175,14 +175,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_block_collection();
         }
+
+        void next()
+        {
+            this->operator++();
+            next_block_collection();
+        }
+
+    private:
         void next_block_collection()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !block_collection().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !block_collection().is_active() ) );
+            }
         }
 
     private:
@@ -230,7 +239,7 @@ namespace geode
     template < index_t dimension >
     void BlockCollections< dimension >::BlockCollectionRangeBase::operator++()
     {
-        return impl_->next_block_collection();
+        return impl_->next();
     }
 
     template < index_t dimension >

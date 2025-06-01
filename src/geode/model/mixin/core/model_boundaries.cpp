@@ -172,15 +172,23 @@ namespace geode
         void set_active_only()
         {
             active_only_ = true;
+            next_model_boundary();
         }
 
+        void next()
+        {
+            this->operator++();
+            next_model_boundary();
+        }
+
+    private:
         void next_model_boundary()
         {
-            do
+            while( this->operator!=( *this )
+                   && ( active_only_ && !model_boundary().is_active() ) )
             {
                 this->operator++();
-            } while( this->operator!=( *this )
-                     && ( active_only_ && !model_boundary().is_active() ) );
+            }
         }
 
     private:
@@ -226,7 +234,7 @@ namespace geode
     template < index_t dimension >
     void ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator++()
     {
-        return impl_->next_model_boundary();
+        return impl_->next();
     }
 
     template < index_t dimension >
