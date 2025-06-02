@@ -65,6 +65,14 @@ namespace geode
             .set_surface_collection_name( name, {} );
     }
 
+    template < index_t dimension >
+    void SurfaceCollectionsBuilder< dimension >::set_surface_collection_active(
+        const uuid& id, bool active )
+    {
+        surface_collections_.modifiable_surface_collection( id, {} )
+            .set_surface_collection_active( active, {} );
+    }
+
     template class opengeode_model_api SurfaceCollectionsBuilder< 2 >;
     template class opengeode_model_api SurfaceCollectionsBuilder< 3 >;
 } // namespace geode

@@ -23,6 +23,7 @@
 
 #include <geode/model/mixin/core/model_boundaries.hpp>
 
+#include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
@@ -59,6 +60,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t ModelBoundaries< dimension >::nb_active_model_boundaries() const
+    {
+        return detail::count_range_elements( active_model_boundaries() );
+    }
+
+    template < index_t dimension >
     const ModelBoundary< dimension >&
         ModelBoundaries< dimension >::model_boundary( const uuid& id ) const
     {
@@ -90,16 +97,24 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename ModelBoundaries< dimension >::ModelBoundaryRange
-        ModelBoundaries< dimension >::model_boundaries() const
+    auto ModelBoundaries< dimension >::model_boundaries() const
+        -> ModelBoundaryRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    typename ModelBoundaries< dimension >::ModifiableModelBoundaryRange
-        ModelBoundaries< dimension >::modifiable_model_boundaries(
-            ModelBoundariesBuilderKey )
+    auto ModelBoundaries< dimension >::active_model_boundaries() const
+        -> ModelBoundaryRange
+    {
+        ModelBoundaryRange range{ *this };
+        range.set_active_only();
+        return range;
+    }
+
+    template < index_t dimension >
+    auto ModelBoundaries< dimension >::modifiable_model_boundaries(
+        ModelBoundariesBuilderKey ) -> ModifiableModelBoundaryRange
     {
         return { *this };
     }
@@ -153,6 +168,31 @@ namespace geode
         {
             return *this->current()->second;
         }
+
+        void set_active_only()
+        {
+            active_only_ = true;
+            next_model_boundary();
+        }
+
+        void next()
+        {
+            this->operator++();
+            next_model_boundary();
+        }
+
+    private:
+        void next_model_boundary()
+        {
+            while( this->operator!=( *this )
+                   && ( active_only_ && !model_boundary().is_active() ) )
+            {
+                this->operator++();
+            }
+        }
+
+    private:
+        bool active_only_{ false };
     };
 
     template < index_t dimension >
@@ -186,9 +226,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    void ModelBoundaries< dimension >::ModelBoundaryRangeBase::set_active_only()
+    {
+        impl_->set_active_only();
+    }
+
+    template < index_t dimension >
     void ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator++()
     {
-        return impl_->operator++();
+        return impl_->next();
     }
 
     template < index_t dimension >
@@ -247,9 +293,7 @@ namespace geode
 
     template < index_t dimension >
     ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
-        ~ModifiableModelBoundaryRange()
-    {
-    }
+        ~ModifiableModelBoundaryRange() = default;
 
     template < index_t dimension >
     auto ModelBoundaries< dimension >::ModifiableModelBoundaryRange::begin()

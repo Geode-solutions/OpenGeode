@@ -23,12 +23,14 @@
 
 #pragma once
 
+#include <geode/basic/common.hpp>
+
 namespace geode
 {
     namespace detail
     {
         template < typename Range >
-        [[nodiscard]] index_t count_relationships( const Range& range )
+        [[nodiscard]] index_t count_range_elements( const Range& range )
         {
             index_t nb{ 0 };
             for( const auto& unused : range )

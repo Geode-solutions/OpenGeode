@@ -56,6 +56,8 @@ namespace geode
 
         void set_corner_name( const uuid& id, std::string_view name );
 
+        void set_corner_active( const uuid& id, bool active );
+
     protected:
         explicit CornersBuilder( Corners< dimension >& corners )
             : corners_( corners )

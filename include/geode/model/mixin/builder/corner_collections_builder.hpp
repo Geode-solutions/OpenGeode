@@ -46,6 +46,8 @@ namespace geode
         void set_corner_collection_name(
             const uuid& id, std::string_view name );
 
+        void set_corner_collection_active( const uuid& id, bool active );
+
     protected:
         explicit CornerCollectionsBuilder(
             CornerCollections< dimension >& collections )

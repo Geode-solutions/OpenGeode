@@ -87,6 +87,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void LinesBuilder< dimension >::set_line_active(
+        const uuid& id, bool active )
+    {
+        lines_.modifiable_line( id, {} ).set_line_active( active, {} );
+    }
+
+    template < index_t dimension >
     void LinesBuilder< dimension >::set_line_mesh(
         const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh )
     {
