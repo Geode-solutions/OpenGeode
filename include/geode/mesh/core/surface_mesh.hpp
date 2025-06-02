@@ -442,6 +442,12 @@ namespace geode
         [[nodiscard]] std::optional< PolygonVertex > polygon_around_vertex(
             index_t vertex_id ) const;
 
+        /*!
+         * Return the minimum height of a given polygon.
+         * @param[in] polygon_id Index of the polygon in the surface.
+         */
+        [[nodiscard]] double polygon_minimum_height( index_t polygon_id ) const;
+
     public:
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex,

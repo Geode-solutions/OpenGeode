@@ -38,8 +38,6 @@
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
 
-#include <geode/mesh/helpers/mesh_quality.hpp>
-
 namespace mapbox
 {
     namespace util
@@ -237,9 +235,7 @@ namespace geode
     }
 
     template < typename PointType, index_t dimension >
-    bool GenericPolygon< PointType,
-        dimension >::is_polygon_minimum_height_too_small( double threshold )
-        const
+    double GenericPolygon< PointType, dimension >::minimum_height() const
     {
         const auto nb_vertices = vertices_.size();
         double max_length{ 0. };
@@ -257,35 +253,29 @@ namespace geode
                 max_length_edge = e;
             }
         }
-        if( max_length < threshold )
-        {
-            return true;
-        }
         const auto next =
             max_length_edge + 1 == nb_vertices ? 0 : max_length_edge + 1;
         const geode::InfiniteLine< dimension > line{
             geode::Segment< dimension >{
                 vertices_[max_length_edge], vertices_[next] }
         };
-        for( const auto v : geode::Range{ nb_vertices } )
+        auto opposite_vertex = 0;
+        for( const auto vertex : geode::Range{ nb_vertices } )
         {
-            if( v == max_length_edge || v == next )
+            if( vertex == max_length_edge || vertex == next )
             {
                 continue;
             }
-            const geode::Point< dimension >& point = vertices_[v];
-            if( geode::point_line_distance( point, line ) > threshold )
-            {
-                return false;
-            }
+            opposite_vertex = vertex;
         }
-        return true;
+        const geode::Point< dimension >& point = vertices_[opposite_vertex];
+        return geode::point_line_distance( point, line );
     }
 
     template < typename PointType, index_t dimension >
     bool GenericPolygon< PointType, dimension >::is_degenerated() const
     {
-        return is_polygon_minimum_height_too_small( GLOBAL_EPSILON );
+        return minimum_height() < ( GLOBAL_EPSILON );
     }
 
     template < typename PointType, index_t dimension >

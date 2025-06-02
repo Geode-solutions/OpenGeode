@@ -59,7 +59,6 @@
 #include <geode/mesh/core/texture3d.hpp>
 #include <geode/mesh/core/texture_storage.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
-#include <geode/mesh/helpers/mesh_quality.hpp>
 #include <geode/mesh/io/triangulated_surface_output.hpp>
 
 namespace
@@ -459,7 +458,7 @@ namespace geode
         }
 
         std::optional< PolyhedronVertex > polyhedron_around_vertex(
-            const index_t vertex_id ) const
+            index_t vertex_id ) const
         {
             const auto& value = polyhedron_around_vertex_->value( vertex_id );
             if( value.polyhedron_id != NO_ID )
@@ -467,6 +466,46 @@ namespace geode
                 return value;
             }
             return std::nullopt;
+        }
+
+        double polyhedron_minimum_height(
+            const geode::SolidMesh< dimension >& mesh,
+            const index_t polyhedron_id ) const
+        {
+            double max_area{ 0. };
+            local_index_t max_area_facet{ 0 };
+            for( const auto f :
+                LRange{ mesh.nb_polyhedron_facets( polyhedron_id ) } )
+            {
+                const auto cur_area =
+                    mesh.polyhedron_facet_area( { polyhedron_id, f } );
+                if( cur_area > max_area )
+                {
+                    max_area = cur_area;
+                    max_area_facet = f;
+                }
+            }
+            const auto vertices = mesh.polyhedron_vertices( polyhedron_id );
+            const auto normal = mesh.polyhedron_facet_normal(
+                { polyhedron_id, max_area_facet } );
+            if( !normal )
+            {
+                return true;
+            }
+            const auto facet_vertices = mesh.polyhedron_facet_vertices(
+                { polyhedron_id, max_area_facet } );
+            Plane plane{ normal.value(), mesh.point( facet_vertices[0] ) };
+            auto opposite_vertex{ 0 };
+            for( const auto vertex_id : vertices )
+            {
+                if( absl::c_contains( facet_vertices, vertex_id ) )
+                {
+                    continue;
+                }
+                opposite_vertex = vertex_id;
+            }
+            return std::get< 0 >(
+                point_plane_distance( mesh.point( opposite_vertex ), plane ) );
         }
 
         void reset_polyhedra_around_vertex( index_t vertex_id )
@@ -961,8 +1000,7 @@ namespace geode
     bool SolidMesh< dimension >::is_polyhedron_degenerated(
         index_t polyhedron_id ) const
     {
-        return geode::is_polyhedron_minimum_height_too_small(
-            *this, polyhedron_id, GLOBAL_EPSILON );
+        return polyhedron_minimum_height( polyhedron_id ) < GLOBAL_EPSILON;
     }
 
     template < index_t dimension >
@@ -1324,6 +1362,13 @@ namespace geode
     {
         check_vertex_id( *this, vertex_id );
         return get_polyhedron_around_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
+    double SolidMesh< dimension >::polyhedron_minimum_height(
+        const index_t polyhedron_id ) const
+    {
+        return impl_->polyhedron_minimum_height( *this, polyhedron_id );
     }
 
     template < index_t dimension >

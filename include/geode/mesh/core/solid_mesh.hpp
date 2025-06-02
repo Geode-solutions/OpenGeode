@@ -592,6 +592,9 @@ namespace geode
         [[nodiscard]] std::optional< PolyhedronVertex >
             polyhedron_around_vertex( index_t vertex_id ) const;
 
+        [[nodiscard]] double polyhedron_minimum_height(
+            index_t polyhedron_id ) const;
+
     public:
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex,
