@@ -82,7 +82,9 @@ std::array< geode::uuid, 6 > add_corners(
     builder.set_corner_active( uuids[1], false );
     builder.set_corner_active( uuids[4], false );
     OPENGEODE_EXCEPTION( model.nb_active_corners() == 4,
-        "[Test] BRep should have 4 actives corners" );
+        "[Test] BRep should have 4 active corners" );
+    OPENGEODE_EXCEPTION( model.nb_corners() == 6,
+        "[Test] BRep should still have 6 corners" );
     return uuids;
 }
 
@@ -109,7 +111,9 @@ std::array< geode::uuid, 9 > add_lines(
     builder.set_line_active( uuids[1], false );
     builder.set_line_active( uuids[4], false );
     OPENGEODE_EXCEPTION( model.nb_active_lines() == 7,
-        "[Test] BRep should have 7 actives lines" );
+        "[Test] BRep should have 7 active lines" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 9,
+        "[Test] BRep should still have 9 lines" );
     return uuids;
 }
 
@@ -141,7 +145,9 @@ std::array< geode::uuid, 5 > add_surfaces(
     builder.set_surface_active( uuids[1], false );
     builder.set_surface_active( uuids[4], false );
     OPENGEODE_EXCEPTION( model.nb_active_surfaces() == 3,
-        "[Test] BRep should have 3 actives surfaces" );
+        "[Test] BRep should have 3 active surfaces" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 5,
+        "[Test] BRep should still have 5 surfaces" );
     return uuids;
 }
 
@@ -164,6 +170,8 @@ geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
     DEBUG( model.nb_active_blocks() );
     OPENGEODE_EXCEPTION( model.nb_active_blocks() == 0,
         "[Test] BRep should have 0 active block" );
+    OPENGEODE_EXCEPTION( model.nb_blocks() == 1,
+        "[Test] BRep should still have 1 active block" );
     return block_uuid;
 }
 
@@ -192,7 +200,9 @@ std::array< geode::uuid, 3 > add_model_boundaries(
     builder.set_model_boundary_active( uuids[1], false );
     builder.set_model_boundary_active( uuids[2], false );
     OPENGEODE_EXCEPTION( model.nb_active_model_boundaries() == 1,
-        "[Test] BRep should have 1 actives model boundaries" );
+        "[Test] BRep should have 1 active model boundary" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3,
+        "[Test] BRep should still have 3 model boundaries" );
     return uuids;
 }
 
@@ -223,7 +233,9 @@ std::array< geode::uuid, 2 > add_corner_collections(
     OPENGEODE_EXCEPTION( model.nb_active_corner_collections() == 2, message );
     builder.set_corner_collection_active( uuids[1], false );
     OPENGEODE_EXCEPTION( model.nb_active_corner_collections() == 1,
-        "[Test] BRep should have 1 actives corner collections" );
+        "[Test] BRep should have 1 active corner collection" );
+    OPENGEODE_EXCEPTION( model.nb_active_corner_collections() == 1,
+        "[Test] BRep should still have 2 corner collections" );
     return uuids;
 }
 
@@ -253,7 +265,9 @@ std::array< geode::uuid, 2 > add_line_collections(
     OPENGEODE_EXCEPTION( model.nb_active_line_collections() == 2, message );
     builder.set_line_collection_active( uuids[1], false );
     OPENGEODE_EXCEPTION( model.nb_active_line_collections() == 1,
-        "[Test] BRep should have 1 actives line collections" );
+        "[Test] BRep should have 1 active line collection" );
+    OPENGEODE_EXCEPTION( model.nb_line_collections() == 2,
+        "[Test] BRep should stil have 2 line collections" );
     return uuids;
 }
 
@@ -284,7 +298,9 @@ std::array< geode::uuid, 2 > add_surface_collections(
     OPENGEODE_EXCEPTION( model.nb_active_surface_collections() == 2, message );
     builder.set_surface_collection_active( uuids[1], false );
     OPENGEODE_EXCEPTION( model.nb_active_surface_collections() == 1,
-        "[Test] BRep should have 1 actives surface collections" );
+        "[Test] BRep should have 1 active surface collection" );
+    OPENGEODE_EXCEPTION( model.nb_surface_collections() == 2,
+        "[Test] BRep should still have 2 surface collections" );
     return uuids;
 }
 
@@ -309,7 +325,9 @@ geode::uuid add_block_collection(
     OPENGEODE_EXCEPTION( model.nb_active_block_collections() == 1, message );
     builder.set_block_collection_active( block_uuid, false );
     OPENGEODE_EXCEPTION( model.nb_active_block_collections() == 0,
-        "[Test] BRep should have 0 actives block collections" );
+        "[Test] BRep should have 0 active block collection" );
+     OPENGEODE_EXCEPTION( model.nb_block_collections() == 1,
+        "[Test] BRep should still have 1 block collection" );
     return block_uuid;
 }
 
