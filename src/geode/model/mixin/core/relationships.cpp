@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -38,7 +39,6 @@
 #include <geode/mesh/io/graph_output.hpp>
 
 #include <geode/model/mixin/core/bitsery_archive.hpp>
-#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/detail/relationships_impl.hpp>
 
 namespace geode

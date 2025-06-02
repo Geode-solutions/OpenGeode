@@ -177,7 +177,6 @@ add_geode_library(
         "helpers/detail/split_along_block_mesh_borders.hpp"
         "helpers/detail/surface_mesh_validity_fix.hpp"
         "mixin/core/detail/components_storage.hpp"
-        "mixin/core/detail/count_range_elements.hpp"
         "mixin/core/detail/mesh_storage.hpp"
         "mixin/core/detail/uuid_to_index.hpp"
         "mixin/core/detail/relationships_impl.hpp"

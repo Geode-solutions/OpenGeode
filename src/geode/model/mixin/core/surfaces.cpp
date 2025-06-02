@@ -25,6 +25,7 @@
 
 #include <async++.h>
 
+#include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
@@ -38,7 +39,6 @@
 #include <geode/mesh/io/triangulated_surface_output.hpp>
 
 #include <geode/model/mixin/core/detail/components_storage.hpp>
-#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 
 namespace geode

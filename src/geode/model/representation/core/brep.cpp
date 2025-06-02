@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/core/brep.hpp>
 
+#include <geode/basic/detail/count_range_elements.hpp>
+
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/vector.hpp>
 
@@ -35,7 +37,6 @@
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
-#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>

@@ -23,13 +23,13 @@
 
 #include <geode/model/mixin/core/block_collections.hpp>
 
+#include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
 
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/detail/components_storage.hpp>
-#include <geode/model/mixin/core/detail/count_range_elements.hpp>
 
 namespace geode
 {
