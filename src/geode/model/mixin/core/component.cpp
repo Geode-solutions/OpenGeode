@@ -47,22 +47,37 @@ namespace geode
             return backward_compatible_id_;
         }
 
+        bool is_active() const
+        {
+            return is_active_;
+        }
+
+        void set_active( bool active )
+        {
+            is_active_ = active;
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.text1b( impl.backward_compatible_name_,
-                        impl.backward_compatible_name_.max_size() );
-                    a.object( impl.backward_compatible_id_ );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& local_archive, Impl& impl ) {
+                         local_archive.text1b( impl.backward_compatible_name_,
+                             impl.backward_compatible_name_.max_size() );
+                         local_archive.object( impl.backward_compatible_id_ );
+                     },
+                        []( Archive& local_archive, Impl& impl ) {
+                            local_archive.value1b( impl.is_active_ );
+                        } } } );
         }
 
     private:
         std::string backward_compatible_name_ = std::string{ "unknown" };
         uuid backward_compatible_id_;
+        bool is_active_{ true };
     };
 
     template < index_t dimension >
@@ -81,22 +96,39 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool Component< dimension >::is_active() const
+    {
+        return impl_->is_active();
+    }
+
+    template < index_t dimension >
+    void Component< dimension >::set_active( bool active )
+    {
+        impl_->set_active( active );
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void Component< dimension >::serialize( Archive& archive )
     {
         archive.ext(
             *this, Growable< Archive, Component >{
-                       { []( Archive& a, Component& component ) {
-                            a.object( component.impl_ );
+                       { []( Archive& local_archive, Component& component ) {
+                            local_archive.object( component.impl_ );
                             component.set_id(
                                 component.impl_->backward_compatible_id() );
                             component.set_name(
                                 component.impl_->backward_compatible_name() );
                             component.impl_.reset();
                         },
-                           []( Archive& a, Component& component ) {
-                               a.ext( component,
+                           []( Archive& local_archive, Component& component ) {
+                               local_archive.ext( component,
                                    bitsery::ext::BaseClass< Identifier >{} );
+                           },
+                           []( Archive& local_archive, Component& component ) {
+                               local_archive.ext( component,
+                                   bitsery::ext::BaseClass< Identifier >{} );
+                               local_archive.object( component.impl_ );
                            } } } );
     }
 

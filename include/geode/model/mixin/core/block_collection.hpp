@@ -72,6 +72,12 @@ namespace geode
             this->set_name( name );
         }
 
+        void set_block_collection_active(
+            bool is_active, BlockCollectionsBuilderKey )
+        {
+            this->set_active( is_active );
+        }
+
     private:
         BlockCollection() = default;
 

@@ -61,6 +61,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             CornerCollectionRangeBase( const CornerCollections& collections );
             CornerCollectionRangeBase(
@@ -92,10 +94,14 @@ namespace geode
 
         [[nodiscard]] index_t nb_corner_collections() const;
 
+        [[nodiscard]] index_t nb_active_corner_collections() const;
+
         [[nodiscard]] const CornerCollection< dimension >& corner_collection(
             const uuid& id ) const;
 
         [[nodiscard]] CornerCollectionRange corner_collections() const;
+
+        [[nodiscard]] CornerCollectionRange active_corner_collections() const;
 
         [[nodiscard]] CornerCollectionRange components() const
         {

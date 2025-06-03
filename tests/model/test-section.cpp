@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/assert.hpp>
+#include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
@@ -39,7 +40,6 @@
 
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
-#include <geode/model/mixin/core/detail/count_relationships.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>
@@ -67,7 +67,7 @@ std::array< geode::uuid, 5 > add_corners(
         absl::StrCat( "[Test] Section should have ", 5, " corners" );
     OPENGEODE_EXCEPTION( model.nb_corners() == 5, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.corners() ) == 5, message );
+        geode::detail::count_range_elements( model.corners() ) == 5, message );
     return uuids;
 }
 
@@ -86,7 +86,7 @@ std::array< geode::uuid, 6 > add_lines(
         absl::StrCat( "[Test] Section should have ", 6, " lines" );
     OPENGEODE_EXCEPTION( model.nb_lines() == 6, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.lines() ) == 6, message );
+        geode::detail::count_range_elements( model.lines() ) == 6, message );
     return uuids;
 }
 
@@ -105,7 +105,7 @@ std::array< geode::uuid, 2 > add_surfaces(
         absl::StrCat( "[Test] Section should have ", 2, " surfaces" );
     OPENGEODE_EXCEPTION( model.nb_surfaces() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.surfaces() ) == 2, message );
+        geode::detail::count_range_elements( model.surfaces() ) == 2, message );
     return uuids;
 }
 
@@ -126,7 +126,7 @@ std::array< geode::uuid, 2 > add_model_boundaries(
         absl::StrCat( "[Test] Section should have ", 2, " model boundaries" );
     OPENGEODE_EXCEPTION( section.nb_model_boundaries() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( section.model_boundaries() ) == 2,
+        geode::detail::count_range_elements( section.model_boundaries() ) == 2,
         message );
     OPENGEODE_EXCEPTION(
         section.model_boundary( uuids[0] ).name() == "boundary1",
@@ -151,7 +151,8 @@ std::array< geode::uuid, 2 > add_corner_collections(
         absl::StrCat( "[Test] Section should have ", 2, " corner collections" );
     OPENGEODE_EXCEPTION( section.nb_corner_collections() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( section.corner_collections() ) == 2,
+        geode::detail::count_range_elements( section.corner_collections() )
+            == 2,
         message );
     OPENGEODE_EXCEPTION(
         section.corner_collection( uuids[0] ).name() == "collection1",
@@ -176,7 +177,7 @@ std::array< geode::uuid, 2 > add_line_collections(
         absl::StrCat( "[Test] Section should have ", 2, " line collections" );
     OPENGEODE_EXCEPTION( section.nb_line_collections() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( section.line_collections() ) == 2,
+        geode::detail::count_range_elements( section.line_collections() ) == 2,
         message );
     OPENGEODE_EXCEPTION(
         section.line_collection( uuids[0] ).name() == "collection1",
@@ -201,7 +202,7 @@ std::array< geode::uuid, 2 > add_surface_collections(
         "[Test] Section should have ", 2, " surface collections" );
     OPENGEODE_EXCEPTION( section.nb_surface_collections() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( section.surface_collections() )
+        geode::detail::count_range_elements( section.surface_collections() )
             == 2,
         message );
     OPENGEODE_EXCEPTION(

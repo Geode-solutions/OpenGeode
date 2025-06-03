@@ -138,9 +138,7 @@ namespace geode
 
     template < index_t dimension, index_t point_dimension >
     TetrahedralSolidPointFunction< dimension,
-        point_dimension >::~TetrahedralSolidPointFunction()
-    {
-    }
+        point_dimension >::~TetrahedralSolidPointFunction() = default;
 
     template < index_t dimension, index_t point_dimension >
     TetrahedralSolidPointFunction< dimension, point_dimension >

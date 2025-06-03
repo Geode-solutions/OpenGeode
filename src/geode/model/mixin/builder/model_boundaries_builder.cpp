@@ -64,6 +64,14 @@ namespace geode
             .set_model_boundary_name( name, {} );
     }
 
+    template < index_t dimension >
+    void ModelBoundariesBuilder< dimension >::set_model_boundary_active(
+        const uuid& id, bool active )
+    {
+        model_boundaries_.modifiable_model_boundary( id, {} )
+            .set_model_boundary_active( active, {} );
+    }
+
     template class opengeode_model_api ModelBoundariesBuilder< 2 >;
     template class opengeode_model_api ModelBoundariesBuilder< 3 >;
 } // namespace geode

@@ -34,7 +34,7 @@ function(add_geode_library)
     cmake_parse_arguments(GEODE_LIB
         "STATIC"
         "NAME;FOLDER"
-        "PUBLIC_HEADERS;ADVANCED_HEADERS;INTERNAL_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
+        "PUBLIC_HEADERS;ADVANCED_HEADERS;INTERNAL_HEADERS;SOURCES;SKIP_UNITY;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
         ${ARGN}
     )
     foreach(file ${GEODE_LIB_SOURCES})
@@ -55,6 +55,13 @@ function(add_geode_library)
     foreach(file ${GEODE_LIB_INTERNAL_HEADERS})
         list(APPEND ABSOLUTE_GEODE_LIB_INTERNAL_HEADERS
             "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    foreach(file ${GEODE_LIB_SKIP_UNITY})
+        set_property(
+            SOURCE "${PROJECT_SOURCE_DIR}/src/${GEODE_LIB_FOLDER}/${file}"
+            PROPERTY 
+                SKIP_UNITY_BUILD_INCLUSION ON
         )
     endforeach()
     set(PROJECT_LIB_NAME ${PROJECT_NAME}::${GEODE_LIB_NAME})

@@ -95,6 +95,7 @@ add_geode_library(
         "zip_file.hpp"
     ADVANCED_HEADERS
         "detail/bitsery_archive.hpp"
+        "detail/count_range_elements.hpp"
         "detail/disable_debug_logger.hpp"
         "detail/enable_debug_logger.hpp"
         "detail/geode_input_impl.hpp"

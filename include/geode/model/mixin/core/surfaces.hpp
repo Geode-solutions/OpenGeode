@@ -60,6 +60,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             SurfaceRangeBase( const Surfaces& surfaces );
             SurfaceRangeBase( SurfaceRangeBase&& other ) noexcept;
@@ -88,12 +90,16 @@ namespace geode
 
         [[nodiscard]] index_t nb_surfaces() const;
 
+        [[nodiscard]] index_t nb_active_surfaces() const;
+
         [[nodiscard]] bool has_surface( const uuid& id ) const;
 
         [[nodiscard]] const Surface< dimension >& surface(
             const uuid& id ) const;
 
         [[nodiscard]] SurfaceRange surfaces() const;
+
+        [[nodiscard]] SurfaceRange active_surfaces() const;
 
         [[nodiscard]] SurfaceRange components() const
         {
