@@ -285,6 +285,14 @@ namespace geode
             return result;
         }
 
+        double polygon_minimum_height(
+            const SurfaceMesh< dimension >& mesh, index_t polygon_id ) const
+        {
+            OPENGEODE_EXCEPTION( polygon_id < mesh.nb_polygons(),
+                "[Impl::polygon_minimum_height] Wrong polygon id" );
+            return mesh.polygon( polygon_id ).minimum_height();
+        }
+
         std::optional< PolygonVertex > polygon_around_vertex(
             const index_t vertex_id ) const
         {
@@ -592,6 +600,13 @@ namespace geode
     {
         check_vertex_id( *this, vertex_id );
         return get_polygon_around_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
+    double SurfaceMesh< dimension >::polygon_minimum_height(
+        index_t polygon_id ) const
+    {
+        return impl_->polygon_minimum_height( *this, polygon_id );
     }
 
     template < index_t dimension >

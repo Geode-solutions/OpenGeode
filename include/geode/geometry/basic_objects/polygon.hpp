@@ -77,6 +77,7 @@ namespace geode
         [[nodiscard]] BoundingBox< dimension > bounding_box() const;
         [[nodiscard]] std::vector< std::array< index_t, 3 > >
             triangulate() const;
+        [[nodiscard]] double minimum_height() const;
         [[nodiscard]] bool is_degenerated() const;
         [[nodiscard]] std::string string() const;
 

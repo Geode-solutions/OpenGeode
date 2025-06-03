@@ -442,6 +442,8 @@ namespace geode
         [[nodiscard]] std::optional< PolygonVertex > polygon_around_vertex(
             index_t vertex_id ) const;
 
+        [[nodiscard]] double polygon_minimum_height( index_t polygon_id ) const;
+
     public:
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex,
