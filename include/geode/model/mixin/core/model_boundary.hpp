@@ -72,6 +72,11 @@ namespace geode
             this->set_name( name );
         }
 
+        void set_model_boundary_active( bool active, ModelBoundariesBuilderKey )
+        {
+            this->set_active( active );
+        }
+
     private:
         ModelBoundary() = default;
 

@@ -248,9 +248,7 @@ namespace geode
     }
 
     template < typename Model >
-    ModelConcatener< Model >::~ModelConcatener()
-    {
-    }
+    ModelConcatener< Model >::~ModelConcatener() = default;
 
     template < typename Model >
     ModelCopyMapping ModelConcatener< Model >::concatenate(

@@ -25,6 +25,7 @@
 
 #include <async++.h>
 
+#include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
@@ -61,6 +62,11 @@ namespace geode
     index_t Lines< dimension >::nb_lines() const
     {
         return impl_->nb_components();
+    }
+    template < index_t dimension >
+    index_t Lines< dimension >::nb_active_lines() const
+    {
+        return detail::count_range_elements( active_lines() );
     }
 
     template < index_t dimension >
@@ -129,14 +135,22 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename Lines< dimension >::LineRange Lines< dimension >::lines() const
+    auto Lines< dimension >::lines() const -> LineRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    typename Lines< dimension >::ModifiableLineRange
-        Lines< dimension >::modifiable_lines( LinesBuilderKey )
+    auto Lines< dimension >::active_lines() const -> LineRange
+    {
+        LineRange range{ *this };
+        range.set_active_only();
+        return range;
+    }
+
+    template < index_t dimension >
+    auto Lines< dimension >::modifiable_lines( LinesBuilderKey )
+        -> ModifiableLineRange
     {
         return { *this };
     }
@@ -209,6 +223,31 @@ namespace geode
         {
             return *this->current()->second;
         }
+
+        void set_active_only()
+        {
+            active_only_ = true;
+            next_line();
+        }
+
+        void next()
+        {
+            this->operator++();
+            next_line();
+        }
+
+    private:
+        void next_line()
+        {
+            while( this->operator!=( *this )
+                   && ( active_only_ && !line().is_active() ) )
+            {
+                this->operator++();
+            }
+        }
+
+    private:
+        bool active_only_{ false };
     };
 
     template < index_t dimension >
@@ -239,9 +278,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Lines< dimension >::LineRangeBase::set_active_only()
+    {
+        impl_->set_active_only();
+    }
+
+    template < index_t dimension >
     void Lines< dimension >::LineRangeBase::operator++()
     {
-        return impl_->operator++();
+        return impl_->next();
     }
 
     template < index_t dimension >
@@ -292,9 +337,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Lines< dimension >::ModifiableLineRange::~ModifiableLineRange()
-    {
-    }
+    Lines< dimension >::ModifiableLineRange::~ModifiableLineRange() = default;
 
     template < index_t dimension >
     auto Lines< dimension >::ModifiableLineRange::begin() const

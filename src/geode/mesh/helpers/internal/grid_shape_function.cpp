@@ -31,15 +31,6 @@
 namespace
 {
     template < geode::index_t dimension >
-    bool node_is_on_axis_origin(
-        geode::local_index_t node_id, geode::local_index_t axis_id )
-    {
-        /* returns ((node_id / pow(2,axis_id)) modulo 2) using binary
-         * operators (faster). */
-        return ( ( node_id / ( 1 << axis_id ) ) & 1 ) == 0;
-    }
-
-    template < geode::index_t dimension >
     double local_point_value( const geode::Point< dimension >& point_in_grid,
         const typename geode::Grid< dimension >::CellIndices& cell_id,
         geode::local_index_t direction )
@@ -62,6 +53,14 @@ namespace geode
 {
     namespace internal
     {
+        bool local_cell_node_is_on_axis_origin(
+            geode::local_index_t node_id, geode::local_index_t axis_id )
+        {
+            /* returns ((node_id / pow(2,axis_id)) modulo 2) using binary
+             * operators (faster). */
+            return ( ( node_id / ( 1 << axis_id ) ) & 1 ) == 0;
+        }
+
         template < index_t dimension >
         double shape_function_value(
             const typename Grid< dimension >::CellIndices& cell_id,
@@ -69,17 +68,14 @@ namespace geode
             const Point< dimension >& point_in_grid )
         {
             double result{ 1. };
-            for( const auto d : LRange{ dimension } )
+            for( const auto axis : LRange{ dimension } )
             {
-                if( node_is_on_axis_origin< dimension >( node_id, d ) )
-                {
-                    result *= 1.
-                              - local_point_value< dimension >(
-                                  point_in_grid, cell_id, d );
-                    continue;
-                }
-                result *=
-                    local_point_value< dimension >( point_in_grid, cell_id, d );
+                result *= local_cell_node_is_on_axis_origin( node_id, axis )
+                              ? 1.
+                                    - local_point_value< dimension >(
+                                        point_in_grid, cell_id, axis )
+                              : local_point_value< dimension >(
+                                    point_in_grid, cell_id, axis );
             }
             return result;
         }
@@ -92,23 +88,20 @@ namespace geode
             local_index_t direction )
         {
             double result{ 1. };
-            for( const auto dim : LRange{ dimension } )
+            for( const auto axis : LRange{ dimension } )
             {
-                if( dim == direction )
+                if( axis == direction )
                 {
                     continue;
                 }
-                if( node_is_on_axis_origin< dimension >( node_id, dim ) )
-                {
-                    result *= 1.
-                              - local_point_value< dimension >(
-                                  point_in_grid, cell_id, dim );
-                    continue;
-                }
-                result *= local_point_value< dimension >(
-                    point_in_grid, cell_id, dim );
+                result *= local_cell_node_is_on_axis_origin( node_id, axis )
+                              ? 1.
+                                    - local_point_value< dimension >(
+                                        point_in_grid, cell_id, axis )
+                              : local_point_value< dimension >(
+                                    point_in_grid, cell_id, axis );
             }
-            if( node_is_on_axis_origin< dimension >( node_id, direction ) )
+            if( local_cell_node_is_on_axis_origin( node_id, direction ) )
             {
                 result *= -1.;
             }

@@ -150,6 +150,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Block< dimension >::set_block_active(
+        bool is_active, BlocksBuilderKey /*unused*/ )
+    {
+        this->set_active( is_active );
+    }
+
+    template < index_t dimension >
     auto Block< dimension >::steal_mesh( BlocksBuilderKey /*unused*/ )
         -> std::unique_ptr< Mesh >
     {

@@ -72,6 +72,12 @@ namespace geode
             this->set_name( name );
         }
 
+        void set_surface_collection_active(
+            bool active, SurfaceCollectionsBuilderKey )
+        {
+            this->set_active( active );
+        }
+
     private:
         SurfaceCollection() = default;
 

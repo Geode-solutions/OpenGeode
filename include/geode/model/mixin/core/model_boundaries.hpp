@@ -61,6 +61,8 @@ namespace geode
 
             void operator++();
 
+            void set_active_only();
+
         protected:
             ModelBoundaryRangeBase( const ModelBoundaries& boundaries );
             ModelBoundaryRangeBase( ModelBoundaryRangeBase&& other ) noexcept;
@@ -90,10 +92,14 @@ namespace geode
 
         [[nodiscard]] index_t nb_model_boundaries() const;
 
+        [[nodiscard]] index_t nb_active_model_boundaries() const;
+
         [[nodiscard]] const ModelBoundary< dimension >& model_boundary(
             const uuid& id ) const;
 
         [[nodiscard]] ModelBoundaryRange model_boundaries() const;
+
+        [[nodiscard]] ModelBoundaryRange active_model_boundaries() const;
 
         [[nodiscard]] ModelBoundaryRange components() const
         {

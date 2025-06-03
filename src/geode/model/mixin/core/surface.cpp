@@ -151,6 +151,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Surface< dimension >::set_surface_active(
+        bool active, SurfacesBuilderKey /*unused*/ )
+    {
+        this->set_active( active );
+    }
+
+    template < index_t dimension >
     auto Surface< dimension >::steal_mesh( SurfacesBuilderKey /*unused*/ )
         -> std::unique_ptr< Mesh >
     {
