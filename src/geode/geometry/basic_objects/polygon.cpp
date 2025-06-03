@@ -275,7 +275,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     bool GenericPolygon< PointType, dimension >::is_degenerated() const
     {
-        return minimum_height() < ( GLOBAL_EPSILON );
+        return minimum_height() < GLOBAL_EPSILON;
     }
 
     template < typename PointType, index_t dimension >
