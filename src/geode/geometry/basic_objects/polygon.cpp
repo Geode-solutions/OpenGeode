@@ -235,43 +235,47 @@ namespace geode
     }
 
     template < typename PointType, index_t dimension >
-    bool GenericPolygon< PointType, dimension >::is_degenerated() const
+    double GenericPolygon< PointType, dimension >::minimum_height() const
     {
+        const auto nb_vertices = vertices_.size();
         double max_length{ 0. };
-        index_t max_length_edge{ 0 };
-        for( const auto e : Range{ nb_vertices() } )
+        geode::index_t max_length_edge{ 0 };
+        for( const auto e : geode::Range{ nb_vertices } )
         {
-            const Point< dimension >& point0 = vertices_[e];
-            const Point< dimension >& point1 =
-                vertices_[e == nb_vertices() - 1 ? 0 : e + 1];
-            const auto cur_length = point_point_distance( point0, point1 );
+            const geode::Point< dimension >& point0 = vertices_[e];
+            const geode::Point< dimension >& point1 =
+                vertices_[e == nb_vertices - 1 ? 0 : e + 1];
+            const auto cur_length =
+                geode::point_point_distance( point0, point1 );
             if( cur_length > max_length )
             {
                 max_length = cur_length;
                 max_length_edge = e;
             }
         }
-        if( max_length < GLOBAL_EPSILON )
-        {
-            return true;
-        }
         const auto next =
-            max_length_edge + 1 == nb_vertices() ? 0 : max_length_edge + 1;
-        const InfiniteLine< dimension > line{ Segment< dimension >{
-            vertices_[max_length_edge], vertices_[next] } };
-        for( const auto v : Range{ nb_vertices() } )
+            max_length_edge + 1 == nb_vertices ? 0 : max_length_edge + 1;
+        const geode::InfiniteLine< dimension > line{
+            geode::Segment< dimension >{
+                vertices_[max_length_edge], vertices_[next] }
+        };
+        auto opposite_vertex = 0;
+        for( const auto vertex : geode::Range{ nb_vertices } )
         {
-            if( v == max_length_edge || v == next )
+            if( vertex == max_length_edge || vertex == next )
             {
                 continue;
             }
-            const Point< dimension >& point = vertices_[v];
-            if( point_line_distance( point, line ) > GLOBAL_EPSILON )
-            {
-                return false;
-            }
+            opposite_vertex = vertex;
         }
-        return true;
+        const geode::Point< dimension >& point = vertices_[opposite_vertex];
+        return geode::point_line_distance( point, line );
+    }
+
+    template < typename PointType, index_t dimension >
+    bool GenericPolygon< PointType, dimension >::is_degenerated() const
+    {
+        return minimum_height() < GLOBAL_EPSILON;
     }
 
     template < typename PointType, index_t dimension >
