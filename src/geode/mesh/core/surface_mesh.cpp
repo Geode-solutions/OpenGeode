@@ -290,7 +290,8 @@ namespace geode
         {
             OPENGEODE_EXCEPTION( polygon_id < mesh.nb_polygons(),
                 "[Impl::polygon_minimum_height] Wrong polygon id" );
-            return mesh.polygon( polygon_id ).minimum_height();
+            const auto polygon = mesh.polygon( polygon_id );
+            return polygon.minimum_height();
         }
 
         std::optional< PolygonVertex > polygon_around_vertex(
@@ -1138,7 +1139,8 @@ namespace geode
         SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
-        return this->polygon( polygon_id ).normal();
+        const auto polygon = this->polygon( polygon_id );
+        return polygon.normal();
     }
 
     template < index_t dimension >
@@ -1170,7 +1172,8 @@ namespace geode
         index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
-        return this->polygon( polygon_id ).is_degenerated();
+        const auto polygon = this->polygon( polygon_id );
+        return polygon.is_degenerated();
     }
 
     template < index_t dimension >
