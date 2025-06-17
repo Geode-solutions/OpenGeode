@@ -67,9 +67,16 @@ namespace geode
     bool is_regular_grid_saveable( const RegularGrid< dimension >& regular_grid,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            RegularGridOutputFactory< dimension > >( filename );
-        return output->is_saveable( regular_grid );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                RegularGridOutputFactory< dimension > >( filename );
+            return output->is_saveable( regular_grid );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string > opengeode_mesh_api save_regular_grid(

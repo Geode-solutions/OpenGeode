@@ -68,9 +68,16 @@ namespace geode
         const TriangulatedSurface< dimension >& triangulated_surface,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            TriangulatedSurfaceOutputFactory< dimension > >( filename );
-        return output->is_saveable( triangulated_surface );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                TriangulatedSurfaceOutputFactory< dimension > >( filename );
+            return output->is_saveable( triangulated_surface );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string >

@@ -56,9 +56,16 @@ namespace geode
     bool is_section_saveable(
         const Section& section, std::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< SectionOutputFactory >(
-                filename );
-        return output->is_saveable( section );
+        try
+        {
+            const auto output =
+                detail::geode_object_output_writer< SectionOutputFactory >(
+                    filename );
+            return output->is_saveable( section );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 } // namespace geode

@@ -73,9 +73,16 @@ namespace geode
 
     bool is_vertex_set_loadable( std::string_view filename )
     {
-        const auto input =
-            detail::geode_object_input_reader< VertexSetInputFactory >(
-                filename );
-        return input->is_loadable();
+        try
+        {
+            const auto input =
+                detail::geode_object_input_reader< VertexSetInputFactory >(
+                    filename );
+            return input->is_loadable();
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 } // namespace geode

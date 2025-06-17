@@ -54,8 +54,16 @@ namespace geode
 
     bool is_brep_saveable( const BRep& brep, std::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< BRepOutputFactory >( filename );
-        return output->is_saveable( brep );
+        try
+        {
+            const auto output =
+                detail::geode_object_output_writer< BRepOutputFactory >(
+                    filename );
+            return output->is_saveable( brep );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 } // namespace geode

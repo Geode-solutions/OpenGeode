@@ -55,9 +55,16 @@ namespace geode
     bool is_vertex_set_saveable(
         const VertexSet& vertex_set, std::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< VertexSetOutputFactory >(
-                filename );
-        return output->is_saveable( vertex_set );
+        try
+        {
+            const auto output =
+                detail::geode_object_output_writer< VertexSetOutputFactory >(
+                    filename );
+            return output->is_saveable( vertex_set );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 } // namespace geode

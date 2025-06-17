@@ -66,9 +66,16 @@ namespace geode
     bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            HybridSolidOutputFactory< dimension > >( filename );
-        return output->is_saveable( hybrid_solid );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                HybridSolidOutputFactory< dimension > >( filename );
+            return output->is_saveable( hybrid_solid );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string > opengeode_mesh_api save_hybrid_solid(

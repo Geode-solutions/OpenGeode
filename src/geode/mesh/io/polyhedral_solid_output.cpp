@@ -67,9 +67,16 @@ namespace geode
         const PolyhedralSolid< dimension >& polyhedral_solid,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            PolyhedralSolidOutputFactory< dimension > >( filename );
-        return output->is_saveable( polyhedral_solid );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                PolyhedralSolidOutputFactory< dimension > >( filename );
+            return output->is_saveable( polyhedral_solid );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string > opengeode_mesh_api

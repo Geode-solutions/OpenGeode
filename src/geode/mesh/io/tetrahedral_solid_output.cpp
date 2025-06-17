@@ -67,9 +67,16 @@ namespace geode
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            TetrahedralSolidOutputFactory< dimension > >( filename );
-        return output->is_saveable( tetrahedral_solid );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                TetrahedralSolidOutputFactory< dimension > >( filename );
+            return output->is_saveable( tetrahedral_solid );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string >
