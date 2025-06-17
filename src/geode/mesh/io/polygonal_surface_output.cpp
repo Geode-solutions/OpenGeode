@@ -67,9 +67,16 @@ namespace geode
         const PolygonalSurface< dimension >& polygonal_surface,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            PolygonalSurfaceOutputFactory< dimension > >( filename );
-        return output->is_saveable( polygonal_surface );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                PolygonalSurfaceOutputFactory< dimension > >( filename );
+            return output->is_saveable( polygonal_surface );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string >

@@ -57,10 +57,17 @@ namespace geode
 
     bool is_graph_saveable( const Graph& graph, std::string_view filename )
     {
-        const auto output =
-            detail::geode_object_output_writer< GraphOutputFactory >(
-                filename );
-        return output->is_saveable( graph );
+        try
+        {
+            const auto output =
+                detail::geode_object_output_writer< GraphOutputFactory >(
+                    filename );
+            return output->is_saveable( graph );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
 } // namespace geode

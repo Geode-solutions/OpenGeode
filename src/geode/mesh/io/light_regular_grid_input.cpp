@@ -104,9 +104,16 @@ namespace geode
     template < index_t dimension >
     bool is_light_regular_grid_loadable( std::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            LightRegularGridInputFactory< dimension > >( filename );
-        return input->is_loadable();
+        try
+        {
+            const auto input = detail::geode_object_input_reader<
+                LightRegularGridInputFactory< dimension > >( filename );
+            return input->is_loadable();
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template LightRegularGrid< 2 > opengeode_mesh_api load_light_regular_grid(

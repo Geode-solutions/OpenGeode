@@ -86,9 +86,16 @@ namespace geode
     template < index_t dimension >
     bool is_polygonal_surface_loadable( std::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            PolygonalSurfaceInputFactory< dimension > >( filename );
-        return input->is_loadable();
+        try
+        {
+            const auto input = detail::geode_object_input_reader<
+                PolygonalSurfaceInputFactory< dimension > >( filename );
+            return input->is_loadable();
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api

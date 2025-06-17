@@ -82,9 +82,16 @@ namespace geode
         const LightRegularGrid< dimension >& light_regular_grid,
         std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            LightRegularGridOutputFactory< dimension > >( filename );
-        return output->is_saveable( light_regular_grid );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                LightRegularGridOutputFactory< dimension > >( filename );
+            return output->is_saveable( light_regular_grid );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string >

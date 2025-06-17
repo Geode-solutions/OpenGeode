@@ -65,9 +65,16 @@ namespace geode
     bool is_edged_curve_saveable(
         const EdgedCurve< dimension >& edged_curve, std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            EdgedCurveOutputFactory< dimension > >( filename );
-        return output->is_saveable( edged_curve );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                EdgedCurveOutputFactory< dimension > >( filename );
+            return output->is_saveable( edged_curve );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string > opengeode_mesh_api save_edged_curve(

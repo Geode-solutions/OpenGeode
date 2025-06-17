@@ -65,9 +65,16 @@ namespace geode
     bool is_point_set_saveable(
         const PointSet< dimension >& point_set, std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            PointSetOutputFactory< dimension > >( filename );
-        return output->is_saveable( point_set );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                PointSetOutputFactory< dimension > >( filename );
+            return output->is_saveable( point_set );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string > opengeode_mesh_api save_point_set(
