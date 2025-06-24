@@ -477,11 +477,6 @@ namespace
             const geode::Line< dimension >& line,
             geode::index_t edge_id )
     {
-        OPENGEODE_EXCEPTION( model.is_boundary( line, surface )
-                                 || model.is_internal( line, surface ),
-            "[helpers::surface_vertices_from_line_edge] The given line "
-            "is neither boundary nor internal to the given surface in the "
-            "given model." );
         const auto edge_unique_vertices =
             geode::edge_unique_vertices( model, line, edge_id );
         const auto edges_surface_and_unique_vertices =
@@ -499,11 +494,6 @@ namespace
             const geode::Line< dimension >& line,
             geode::index_t edge_id )
     {
-        OPENGEODE_EXCEPTION( model.is_boundary( line, surface )
-                                 || model.is_internal( line, surface ),
-            "[helpers::oriented_surface_vertices_from_line_edge] The given "
-            "line is neither boundary nor internal to the given surface in the "
-            "given model." );
         const auto edge_unique_vertices =
             geode::edge_unique_vertices( model, line, edge_id );
         const auto output =
@@ -753,11 +743,6 @@ namespace geode
         const Surface3D& surface,
         index_t polygon_id )
     {
-        OPENGEODE_EXCEPTION( model.is_boundary( surface, block )
-                                 || model.is_internal( surface, block ),
-            "[helpers::block_vertices_from_surface_polygon] The given surface "
-            "is neither boundary nor internal to the given block in the given "
-            "model." );
         return block_mesh_polyhedra_from_unique_vertices_facet( model, block,
             polygon_unique_vertices( model, surface, polygon_id ) );
     }
@@ -768,11 +753,6 @@ namespace geode
             const Surface3D& surface,
             index_t polygon_id )
     {
-        OPENGEODE_EXCEPTION( model.is_boundary( surface, block )
-                                 || model.is_internal( surface, block ),
-            "[helpers::block_vertices_from_surface_polygon] The given surface "
-            "is neither boundary nor internal to the given block in the given "
-            "model." );
         const auto polygon_vertices =
             polygon_unique_vertices( model, surface, polygon_id );
         const auto facets_block_and_unique_vertices =
@@ -789,11 +769,6 @@ namespace geode
         const Surface3D& surface,
         index_t polygon_id )
     {
-        OPENGEODE_EXCEPTION( model.is_boundary( surface, block )
-                                 || model.is_internal( surface, block ),
-            "[helpers::block_vertices_from_surface_polygon] The given surface "
-            "is neither boundary nor internal to the given block in the given "
-            "model." );
         const auto polygon_vertices =
             polygon_unique_vertices( model, surface, polygon_id );
         const auto output = oriented_polygon_vertices_to_block_facets_vertices(
