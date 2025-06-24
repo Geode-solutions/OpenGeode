@@ -24,11 +24,14 @@
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
-#include <geode/model/helpers/ray_tracing.hpp>
-
 #include <geode/geometry/bounding_box.hpp>
+
+#include <geode/model/helpers/ray_tracing.hpp>
+#include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/section_input.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -39,23 +42,59 @@ void test()
     // load a 40x40x40 aligned cubic box brep
     auto brep = geode::load_brep(
         absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
-    geode::Point3D center( { 20., 20., 20. } );
+    geode::Point3D center{ { 20., 20., 20. } };
 
     //  get the block
     const auto block_id = geode::block_containing_point( brep, center );
     OPENGEODE_EXCEPTION( block_id.has_value(),
-        "[Test] fail to recover block_containing_point." );
+        "[Test] Failed to recover block_containing_point." );
 
-    // test point iside the block
-    geode::Point3D inside( { 0.00001, 0.00001, 0.00001 } );
-    geode::Point3D outside( { -0.00001, 0.00001, 0.00001 } );
+    // test point inside/outside the block
+    geode::Point3D inside{ { 0.00001, 0.00001, 0.00001 } };
+    geode::Point3D outside{ { -0.00001, 0.00001, 0.00001 } };
     OPENGEODE_EXCEPTION( geode::is_point_inside_block(
                              brep, brep.block( block_id.value() ), inside ),
-        "[Test] the point named inside should be inside the block." );
+        "[Test] Point [", inside.string(), "] should be inside the block." );
 
     OPENGEODE_EXCEPTION( !geode::is_point_inside_block(
                              brep, brep.block( block_id.value() ), outside ),
-        "[Test] the point named outside should be outside the block." );
+        "[Test] Point [", outside.string(), "] should be outside the block." );
+
+    // load a section with various surfaces to test 2D
+    auto section = geode::load_section(
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
+    geode::Point2D section_center{ { 230., 240. } };
+
+    const auto surface_id =
+        geode::surface_containing_point( section, section_center );
+    OPENGEODE_EXCEPTION( surface_id.has_value(),
+        "[Test] Failed to recover surface_containing_point." );
+    OPENGEODE_EXCEPTION(
+        surface_id.value()
+            == geode::uuid{ "00000000-9fa8-42a9-8000-00001948ab25" },
+        "[Test] surface_containing_point recovered surface ",
+        surface_id->string(),
+        " instead of 00000000-9fa8-42a9-8000-00001948ab25" );
+
+    geode::Point2D inside_1{ { 230., 220. } };
+    geode::Point2D inside_2{ { 250., 230. } };
+    const auto& surface_2 = section.surface(
+        geode::uuid{ "00000000-af68-436b-8000-00002d626514" } );
+    OPENGEODE_EXCEPTION(
+        geode::is_point_inside_surface(
+            section, section.surface( surface_id.value() ), inside_1 )
+            && !geode::is_point_inside_surface( section, surface_2, inside_1 ),
+        "[Test] Point [", inside_1.string(), "] should be inside surface ",
+        surface_id->string(), " but not inside surface ",
+        surface_2.id().string() );
+
+    OPENGEODE_EXCEPTION(
+        !geode::is_point_inside_surface(
+            section, section.surface( surface_id.value() ), inside_2 )
+            && geode::is_point_inside_surface( section, surface_2, inside_2 ),
+        "[Test] Point [", inside_2.string(), "] should be inside surface ",
+        surface_2.id().string(), " but not inside surface ",
+        surface_id->string() );
 }
 
 OPENGEODE_TEST( "ray-tracing-helpers" )
