@@ -25,24 +25,68 @@
 
 #include <geode/geometry/aabb.hpp>
 
+#include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.hpp>
 #include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 namespace
 {
-    const std::array< geode::Vector3D, 12 > directions = { { geode::Vector3D{
-                                                                 { 1., 0.,
-                                                                     0. } },
+    const std::array< geode::Vector2D, 8 > directions_2D = {
+        { geode::Vector2D{ { 1., 0. } }, geode::Vector2D{ { 0., 1. } },
+            geode::Vector2D{ { 0.1, 1. } }, geode::Vector2D{ { 0.3, 1. } },
+            geode::Vector2D{ { 0.5, 1. } }, geode::Vector2D{ { 0., 0.1 } },
+            geode::Vector2D{ { 0., 0.3 } }, geode::Vector2D{ { 0., 0.5 } } }
+    };
+
+    const std::array< geode::Vector3D, 12 > directions_3D = { { geode::Vector3D{
+                                                                    { 1., 0.,
+                                                                        0. } },
         geode::Vector3D{ { 1., 0., 0.1 } }, geode::Vector3D{ { 1., 0., 0.3 } },
         geode::Vector3D{ { 1., 0., 0.5 } }, geode::Vector3D{ { 0., 1., 0. } },
         geode::Vector3D{ { 0.1, 1., 0. } }, geode::Vector3D{ { 0.3, 1., 0. } },
         geode::Vector3D{ { 0.5, 1., 0. } }, geode::Vector3D{ { 0., 0., 1. } },
         geode::Vector3D{ { 0., 0.1, 1. } }, geode::Vector3D{ { 0., 0.3, 1. } },
         geode::Vector3D{ { 0., 0.5, 1. } } } };
+
+    std::vector< geode::RayTracing2D::EdgeDistance >
+        find_intersections_with_boundary(
+            const geode::Ray2D& ray, const geode::EdgedCurve2D& curve )
+    {
+        const auto aabb = geode::create_aabb_tree( curve );
+        geode::RayTracing2D ray_tracing{ curve, ray };
+        aabb.compute_ray_element_bbox_intersections( ray, ray_tracing );
+        return ray_tracing.all_intersections();
+    }
+
+    std::optional< geode::index_t > count_real_intersections_with_boundary(
+        const geode::Ray2D& ray, const geode::EdgedCurve2D& curve )
+    {
+        geode::index_t nb_intersections{ 0 };
+        const auto tracing = find_intersections_with_boundary( ray, curve );
+        for( const auto& intersection : tracing )
+        {
+            if( intersection.position != geode::POSITION::inside )
+            {
+                return std::nullopt;
+            }
+            if( std::fabs( intersection.distance ) <= geode::GLOBAL_EPSILON )
+            {
+                continue;
+            }
+            else
+            {
+                nb_intersections += 1;
+            }
+        }
+        return nb_intersections;
+    }
 
     std::vector< geode::RayTracing3D::PolygonDistance >
         find_intersections_with_boundaries(
@@ -100,7 +144,7 @@ namespace geode
     bool is_point_inside_block(
         const BRep& brep, const Block3D& block, const Point3D& point )
     {
-        for( const auto& direction : directions )
+        for( const auto& direction : directions_3D )
         {
             const Ray3D ray{ direction, point };
             index_t nb_intersections{ 0 };
@@ -130,7 +174,7 @@ namespace geode
     bool is_point_inside_closed_surface(
         const SurfaceMesh3D& surface, const Point3D& point )
     {
-        for( const auto& direction : directions )
+        for( const auto& direction : directions_3D )
         {
             const Ray3D ray{ direction, point };
             auto nb_intersections =
@@ -159,4 +203,46 @@ namespace geode
         return std::nullopt;
     }
 
+    bool is_point_inside_surface(
+        const Section& brep, const Surface2D& surface, const Point2D& point )
+    {
+        for( const auto& direction : directions_2D )
+        {
+            const Ray2D ray{ direction, point };
+            index_t nb_intersections{ 0 };
+            bool could_determine{ true };
+            for( const auto& line : brep.boundaries( surface ) )
+            {
+                auto intersections =
+                    count_real_intersections_with_boundary( ray, line.mesh() );
+                if( !intersections.has_value() )
+                {
+                    could_determine = false;
+                    break;
+                }
+                nb_intersections += intersections.value();
+            }
+            if( could_determine )
+            {
+                return ( nb_intersections % 2 == 1 );
+            }
+        }
+        throw OpenGeodeException{
+            "Cannot determine the point is inside the surface or not "
+            "(ambigous intersection with rays)."
+        };
+    }
+
+    std::optional< uuid > surface_containing_point(
+        const Section& section, const Point2D& point )
+    {
+        for( const auto& surface : section.surfaces() )
+        {
+            if( is_point_inside_surface( section, surface, point ) )
+            {
+                return surface.id();
+            }
+        }
+        return std::nullopt;
+    }
 } // namespace geode
