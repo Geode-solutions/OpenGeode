@@ -571,6 +571,54 @@ namespace geode
             return task.get();
         }
 
+        template < typename BOX_FILTER, typename ACTION >
+        bool generic_intersect_recursive( BOX_FILTER& boxFilter,
+            index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            index_t depth,
+            ACTION& action ) const
+        {
+            OPENGEODE_ASSERT(
+                node_index < tree_.size(), "Node out of tree range" );
+            OPENGEODE_ASSERT( element_begin != element_end,
+                "No iteration allowed start == end" );
+
+            // Prune sub-tree that does not have intersection
+            if( !boxFilter( node( node_index ) ) )
+            {
+                return false;
+            }
+
+            if( is_leaf( element_begin, element_end ) )
+            {
+                return action( mapping_morton( element_begin ) );
+            }
+
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            if( depth > async_depth_ )
+            {
+                if( generic_intersect_recursive( boxFilter, it.child_left,
+                        element_begin, it.element_middle, depth + 1, action ) )
+                {
+                    return true;
+                }
+                return generic_intersect_recursive( boxFilter, it.child_right,
+                    it.element_middle, element_end, depth + 1, action );
+            }
+            auto task = async::local_spawn( [&] {
+                return generic_intersect_recursive( boxFilter, it.child_left,
+                    element_begin, it.element_middle, depth + 1, action );
+            } );
+            if( generic_intersect_recursive( boxFilter, it.child_right,
+                    it.element_middle, element_end, depth + 1, action ) )
+            {
+                return true;
+            }
+            return task.get();
+        }
+
         [[nodiscard]] index_t closest_element_box_hint(
             const Point< dimension >& query ) const
         {
@@ -728,6 +776,19 @@ namespace geode
         }
         impl_->line_intersect_recursive(
             line, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
+    }
+
+    template < index_t dimension >
+    template < class EvalBox, class EvalIntersection >
+    void AABBTree< dimension >::compute_generic_element_bbox_intersections(
+        EvalBox& boxFilter, EvalIntersection& action ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
+        impl_->generic_intersect_recursive(
+            boxFilter, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 
     template < index_t dimension >
