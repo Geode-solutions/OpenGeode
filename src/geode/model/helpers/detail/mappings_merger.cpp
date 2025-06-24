@@ -250,10 +250,11 @@ namespace geode
             return transferer.transfer();
         }
 
-        ModelMappings merge_mappings(
-            const ModelMappings& mappings1, const ModelMappings& mappings2 )
+        template < typename ModelMappingType >
+        ModelMappingType base_merge_mappings( const ModelMappingType& mappings1,
+            const ModelMappingType& mappings2 )
         {
-            ModelMappings result;
+            ModelMappingType result;
             result.component_mapping = merge_mappings(
                 mappings1.component_mapping, mappings2.component_mapping );
             result.mesh_element_mapping.corners =
@@ -274,6 +275,25 @@ namespace geode
             result.mesh_vertices_mapping.surfaces =
                 merge_vertex_mappings( mappings1.mesh_vertices_mapping.surfaces,
                     mappings2.mesh_vertices_mapping.surfaces );
+            return result;
+        }
+
+        SectionMappings merge_mappings(
+            const SectionMappings& mappings1, const SectionMappings& mappings2 )
+        {
+            return base_merge_mappings( mappings1, mappings2 );
+        }
+
+        BRepMappings merge_mappings(
+            const BRepMappings& mappings1, const BRepMappings& mappings2 )
+        {
+            auto result = base_merge_mappings( mappings1, mappings2 );
+            result.mesh_element_mapping.blocks =
+                merge_element_mappings( mappings1.mesh_element_mapping.blocks,
+                    mappings2.mesh_element_mapping.blocks );
+            result.mesh_vertices_mapping.blocks =
+                merge_vertex_mappings( mappings1.mesh_vertices_mapping.blocks,
+                    mappings2.mesh_vertices_mapping.blocks );
             return result;
         }
     } // namespace detail
