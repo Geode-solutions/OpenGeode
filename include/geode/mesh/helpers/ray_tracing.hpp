@@ -82,7 +82,7 @@ namespace geode
         [[nodiscard]] std::optional< EdgeDistance > closest_edge() const;
 
         [[nodiscard]] std::optional< absl::FixedArray< EdgeDistance > >
-            closest_edges( index_t size ) const;
+            closest_edges( index_t nb_closest_wanted ) const;
 
         [[nodiscard]] std::vector< EdgeDistance > all_intersections() const;
 
@@ -131,7 +131,7 @@ namespace geode
         [[nodiscard]] std::optional< PolygonDistance > closest_polygon() const;
 
         [[nodiscard]] std::optional< absl::FixedArray< PolygonDistance > >
-            closest_polygons( index_t size ) const;
+            closest_polygons( index_t nb_closest_wanted ) const;
 
         [[nodiscard]] std::vector< PolygonDistance > all_intersections() const;
 
