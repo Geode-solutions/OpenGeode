@@ -143,31 +143,13 @@ namespace
             geode::Sign::zero };
         for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
         {
-            const auto& p1 =
-                mesh.point( mesh.polygon_vertex( { polygon_id, 0 } ) );
-            for( const auto i :
-                geode::LRange{ 1, mesh.nb_polygon_vertices( polygon_id ) - 1 } )
+            area_sign_info.area_sign[polygon_id] =
+                geode::polygon_area_sign( mesh.polygon( polygon_id ) );
+            if( area_sign_info.area_sign[polygon_id] == geode::Sign::negative )
             {
-                const auto& p2 =
-                    mesh.point( mesh.polygon_vertex( { polygon_id, i } ) );
-                const auto& p3 = mesh.point( mesh.polygon_vertex( { polygon_id,
-                    static_cast< geode::local_index_t >( i + 1 ) } ) );
-                const auto sign = geode::triangle_area_sign( { p1, p2, p3 } );
-                if( sign == geode::Sign::positive )
-                {
-                    area_sign_info.area_sign[polygon_id] =
-                        geode::Sign::positive;
-                    break;
-                }
-                if( sign == geode::Sign::negative )
-                {
-                    area_sign_info.area_sign[polygon_id] =
-                        geode::Sign::negative;
-                    area_sign_info.nb_bad_polygons++;
-                    break;
-                }
+                area_sign_info.nb_bad_polygons++;
             }
-            if( area_sign_info.area_sign[polygon_id] == geode::Sign::zero )
+            else if( area_sign_info.area_sign[polygon_id] == geode::Sign::zero )
             {
                 area_sign_info.queue.emplace( polygon_id );
             }

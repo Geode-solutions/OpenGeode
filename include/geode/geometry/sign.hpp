@@ -28,7 +28,9 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Polygon );
     ALIAS_2D_AND_3D( Triangle );
+    ALIAS_2D( Polygon );
     class Tetrahedron;
     enum struct SIDE;
     using Sign = SIDE;
@@ -47,6 +49,9 @@ namespace geode
      */
     [[nodiscard]] Sign opengeode_geometry_api triangle_area_sign(
         const Triangle2D& triangle );
+
+    [[nodiscard]] Sign opengeode_geometry_api polygon_area_sign(
+        const Polygon2D& polygon );
 
     /*!
      * Return the sign of a 3D triangle area aligned on X- Y- or Z-axis.
