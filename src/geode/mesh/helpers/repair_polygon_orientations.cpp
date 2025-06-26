@@ -29,6 +29,7 @@
 
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
 #include <geode/geometry/sign.hpp>
