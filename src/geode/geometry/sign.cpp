@@ -23,6 +23,7 @@
 
 #include <geode/geometry/sign.hpp>
 
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/internal/position_from_sides.hpp>
@@ -51,6 +52,24 @@ namespace geode
         const auto& vertices = triangle.vertices();
         return internal::side(
             GEO::PCK::orient_2d( vertices[0], vertices[1], vertices[2] ) );
+    }
+
+    Sign polygon_area_sign( const Polygon2D& polygon )
+    {
+        const auto& polygon_vertices = polygon.vertices();
+        const auto& p1 = polygon_vertices[0];
+        for( const auto other_index : LRange{ 1, polygon_vertices.size() - 1 } )
+        {
+            const auto& p2 = polygon_vertices[other_index];
+            const auto& p3 = polygon_vertices[static_cast< local_index_t >(
+                other_index + 1 )];
+            const auto sign = triangle_area_sign( { p1, p2, p3 } );
+            if( sign != Sign::zero )
+            {
+                return sign;
+            }
+        }
+        return geode::Sign::zero;
     }
 
     Sign triangle_area_sign( const Triangle3D& triangle, local_index_t axis )
