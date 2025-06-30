@@ -807,11 +807,6 @@ namespace geode
         for( const auto v : Range{ solid_mesh_.nb_vertices() } )
         {
             to_delete[v] = !solid_mesh_.polyhedron_around_vertex( v );
-            if( to_delete[v] )
-            {
-                DEBUG( v );
-                SDEBUG( solid_mesh_.point( v ) );
-            }
         }
         return delete_vertices( to_delete );
     }
