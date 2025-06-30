@@ -204,7 +204,11 @@ namespace
                     vertices_old2new[solid.polyhedron_vertex( { p, v } )];
                 OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
                     "[SolidMesh::update_polyhedron_vertices] No polyhedron "
-                    "should be removed" );
+                    "should be removed (",
+                    p, ", ", v, " -> ", solid.polyhedron_vertex( { p, v } ),
+                    " located at ",
+                    solid.point( solid.polyhedron_vertex( { p, v } ) ).string(),
+                    ")" );
             }
         }
     }
@@ -803,6 +807,11 @@ namespace geode
         for( const auto v : Range{ solid_mesh_.nb_vertices() } )
         {
             to_delete[v] = !solid_mesh_.polyhedron_around_vertex( v );
+            if( to_delete[v] )
+            {
+                DEBUG( v );
+                SDEBUG( solid_mesh_.point( v ) );
+            }
         }
         return delete_vertices( to_delete );
     }

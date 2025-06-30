@@ -163,7 +163,8 @@ void test()
     auto wrong_surface = build_bad_orientation_surface();
     wrong_surface->enable_edges();
     const auto edges_before = get_edges( *wrong_surface );
-    geode::repair_polygon_orientations( *wrong_surface );
+    auto builder = geode::SurfaceMeshBuilder2D::create( *wrong_surface );
+    geode::repair_polygon_orientations( *wrong_surface, *builder );
     check_repaired_surface( *wrong_surface );
     const auto edges_after = get_edges( *wrong_surface );
     compare_edges( edges_before, edges_after );
