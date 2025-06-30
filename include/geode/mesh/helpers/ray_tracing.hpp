@@ -35,12 +35,63 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    ALIAS_2D( EdgedCurve );
     ALIAS_3D( SurfaceMesh );
 } // namespace geode
 
 namespace geode
 {
+    class opengeode_mesh_api RayTracing2D
+    {
+    public:
+        struct EdgeDistance
+        {
+            EdgeDistance() = default;
+
+            EdgeDistance( index_t edge_in,
+                double distance_in,
+                POSITION position_in,
+                Point2D point_in )
+                : edge{ edge_in },
+                  distance{ distance_in },
+                  position{ position_in },
+                  point{ std::move( point_in ) }
+            {
+            }
+
+            [[nodiscard]] bool operator<( const EdgeDistance& other ) const
+            {
+                return std::fabs( distance ) < std::fabs( other.distance );
+            }
+
+            index_t edge{ NO_ID };
+            double distance{ 0 };
+            POSITION position{ POSITION::outside };
+            Point2D point;
+        };
+
+    public:
+        RayTracing2D( const EdgedCurve2D& mesh, const Ray2D& ray );
+        RayTracing2D(
+            const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line );
+        RayTracing2D( RayTracing2D&& other ) noexcept;
+        ~RayTracing2D();
+
+        [[nodiscard]] std::optional< EdgeDistance > closest_edge() const;
+
+        [[nodiscard]] std::optional< absl::FixedArray< EdgeDistance > >
+            closest_edges( index_t nb_closest_wanted ) const;
+
+        [[nodiscard]] std::vector< EdgeDistance > all_intersections() const;
+
+        [[nodiscard]] bool operator()( index_t edge_id );
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
+
     class opengeode_mesh_api RayTracing3D
     {
     public:
@@ -80,7 +131,7 @@ namespace geode
         [[nodiscard]] std::optional< PolygonDistance > closest_polygon() const;
 
         [[nodiscard]] std::optional< absl::FixedArray< PolygonDistance > >
-            closest_polygons( index_t size ) const;
+            closest_polygons( index_t nb_closest_wanted ) const;
 
         [[nodiscard]] std::vector< PolygonDistance > all_intersections() const;
 
