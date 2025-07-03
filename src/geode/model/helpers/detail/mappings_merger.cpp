@@ -221,6 +221,34 @@ namespace
         }
         return result;
     }
+
+    template < typename ModelMappingType >
+    ModelMappingType base_merge_mappings(
+        const ModelMappingType& mappings1, const ModelMappingType& mappings2 )
+    {
+        ModelMappingType result;
+        result.component_mapping = geode::detail::merge_mappings(
+            mappings1.component_mapping, mappings2.component_mapping );
+        result.mesh_element_mapping.corners =
+            merge_element_mappings( mappings1.mesh_element_mapping.corners,
+                mappings2.mesh_element_mapping.corners );
+        result.mesh_element_mapping.lines =
+            merge_element_mappings( mappings1.mesh_element_mapping.lines,
+                mappings2.mesh_element_mapping.lines );
+        result.mesh_element_mapping.surfaces =
+            merge_element_mappings( mappings1.mesh_element_mapping.surfaces,
+                mappings2.mesh_element_mapping.surfaces );
+        result.mesh_vertices_mapping.corners =
+            merge_vertex_mappings( mappings1.mesh_vertices_mapping.corners,
+                mappings2.mesh_vertices_mapping.corners );
+        result.mesh_vertices_mapping.lines =
+            merge_vertex_mappings( mappings1.mesh_vertices_mapping.lines,
+                mappings2.mesh_vertices_mapping.lines );
+        result.mesh_vertices_mapping.surfaces =
+            merge_vertex_mappings( mappings1.mesh_vertices_mapping.surfaces,
+                mappings2.mesh_vertices_mapping.surfaces );
+        return result;
+    }
 } // namespace
 
 namespace geode
@@ -248,34 +276,6 @@ namespace geode
         {
             CopyToGenericMappings transferer{ mappings };
             return transferer.transfer();
-        }
-
-        template < typename ModelMappingType >
-        ModelMappingType base_merge_mappings( const ModelMappingType& mappings1,
-            const ModelMappingType& mappings2 )
-        {
-            ModelMappingType result;
-            result.component_mapping = merge_mappings(
-                mappings1.component_mapping, mappings2.component_mapping );
-            result.mesh_element_mapping.corners =
-                merge_element_mappings( mappings1.mesh_element_mapping.corners,
-                    mappings2.mesh_element_mapping.corners );
-            result.mesh_element_mapping.lines =
-                merge_element_mappings( mappings1.mesh_element_mapping.lines,
-                    mappings2.mesh_element_mapping.lines );
-            result.mesh_element_mapping.surfaces =
-                merge_element_mappings( mappings1.mesh_element_mapping.surfaces,
-                    mappings2.mesh_element_mapping.surfaces );
-            result.mesh_vertices_mapping.corners =
-                merge_vertex_mappings( mappings1.mesh_vertices_mapping.corners,
-                    mappings2.mesh_vertices_mapping.corners );
-            result.mesh_vertices_mapping.lines =
-                merge_vertex_mappings( mappings1.mesh_vertices_mapping.lines,
-                    mappings2.mesh_vertices_mapping.lines );
-            result.mesh_vertices_mapping.surfaces =
-                merge_vertex_mappings( mappings1.mesh_vertices_mapping.surfaces,
-                    mappings2.mesh_vertices_mapping.surfaces );
-            return result;
         }
 
         SectionMappings merge_mappings(
