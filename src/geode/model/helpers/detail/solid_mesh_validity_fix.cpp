@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/helpers/detail/surface_mesh_validity_fix.hpp>
+#include <geode/model/helpers/detail/solid_mesh_validity_fix.hpp>
 
 #include <absl/container/flat_hash_map.h>
 
@@ -29,48 +29,38 @@
 
 #include <geode/geometry/point.hpp>
 
-#include <geode/mesh/helpers/detail/surface_mesh_validity_fix.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/helpers/detail/solid_mesh_validity_fix.hpp>
 
-#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/block.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
-#include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
-#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {
     namespace detail
     {
-        template < typename Model >
         GenericMapping< index_t > repair_non_manifold_vertices(
-            const Model& model,
-            typename Model::Builder& model_builder,
-            const Surface< Model::dim >& surface )
+            const BRep& model,
+            BRepBuilder& model_builder,
+            const Block3D& block )
         {
-            const auto& mesh = surface.mesh();
-            auto mesh_builder =
-                model_builder.surface_mesh_builder( surface.id() );
+            const auto& mesh = block.mesh();
+            auto mesh_builder = model_builder.block_mesh_builder( block.id() );
             const auto vertex_mappings =
                 repair_non_manifold_vertices( mesh, *mesh_builder );
             for( const auto& [old_vertex, new_vertices] :
                 vertex_mappings.in2out_map() )
             {
-                const auto unique_vertex = model.unique_vertex(
-                    { surface.component_id(), old_vertex } );
+                const auto unique_vertex =
+                    model.unique_vertex( { block.component_id(), old_vertex } );
                 for( const auto new_vertex : new_vertices )
                 {
                     model_builder.set_unique_vertex(
-                        { surface.component_id(), new_vertex }, unique_vertex );
+                        { block.component_id(), new_vertex }, unique_vertex );
                 }
             }
             return vertex_mappings;
         }
-
-        template GenericMapping< index_t >
-            opengeode_model_api repair_non_manifold_vertices< Section >(
-                const Section&, SectionBuilder&, const Surface2D& );
-        template GenericMapping< index_t >
-            opengeode_model_api repair_non_manifold_vertices< BRep >(
-                const BRep&, BRepBuilder&, const Surface3D& );
     } // namespace detail
 } // namespace geode

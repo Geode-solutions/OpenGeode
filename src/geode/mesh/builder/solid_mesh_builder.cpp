@@ -204,7 +204,11 @@ namespace
                     vertices_old2new[solid.polyhedron_vertex( { p, v } )];
                 OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
                     "[SolidMesh::update_polyhedron_vertices] No polyhedron "
-                    "should be removed" );
+                    "should be removed (",
+                    p, ", ", v, " -> ", solid.polyhedron_vertex( { p, v } ),
+                    " located at ",
+                    solid.point( solid.polyhedron_vertex( { p, v } ) ).string(),
+                    ")" );
             }
         }
     }

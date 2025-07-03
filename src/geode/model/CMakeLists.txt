@@ -42,6 +42,7 @@ add_geode_library(
         "helpers/ray_tracing.cpp"
         "helpers/detail/build_model_boundaries.cpp"
         "helpers/detail/mappings_merger.cpp"
+        "helpers/detail/solid_mesh_validity_fix.cpp"
         "helpers/detail/split_along_surface_mesh_borders.cpp"
         "helpers/detail/split_along_block_mesh_borders.cpp"
         "helpers/detail/surface_mesh_validity_fix.cpp"
@@ -173,6 +174,7 @@ add_geode_library(
     ADVANCED_HEADERS
         "helpers/detail/build_model_boundaries.hpp"
         "helpers/detail/mappings_merger.hpp"
+        "helpers/detail/solid_mesh_validity_fix.hpp"
         "helpers/detail/split_along_surface_mesh_borders.hpp"
         "helpers/detail/split_along_block_mesh_borders.hpp"
         "helpers/detail/surface_mesh_validity_fix.hpp"

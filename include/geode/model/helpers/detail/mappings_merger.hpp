@@ -41,7 +41,11 @@ namespace geode
         [[nodiscard]] ModelGenericMapping opengeode_model_api
             copy_to_generic_mappings( const ModelCopyMapping& mappings2 );
 
-        [[nodiscard]] ModelMappings opengeode_model_api merge_mappings(
-            const ModelMappings& mappings1, const ModelMappings& mappings2 );
+        [[nodiscard]] SectionMappings opengeode_model_api merge_mappings(
+            const SectionMappings& mappings1,
+            const SectionMappings& mappings2 );
+
+        [[nodiscard]] BRepMappings opengeode_model_api merge_mappings(
+            const BRepMappings& mappings1, const BRepMappings& mappings2 );
     } // namespace detail
 } // namespace geode
