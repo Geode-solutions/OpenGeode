@@ -129,9 +129,6 @@ namespace geode
 
     index_t GraphBuilder::create_edge( index_t v0_id, index_t v1_id )
     {
-        OPENGEODE_ASSERT( v0_id != v1_id, "[GraphBuilder::create_edge] "
-                                          "Trying to create an edge with "
-                                          "same extremities" );
         const auto added_edge = graph_.nb_edges();
         create_edge();
         set_edge_vertex( { added_edge, 0 }, v0_id );
