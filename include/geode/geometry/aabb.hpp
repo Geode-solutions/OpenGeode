@@ -216,7 +216,7 @@ namespace geode
          */
         template < class EvalBox, class EvalIntersection >
         void compute_generic_element_bbox_intersections(
-            EvalBox& box_filter, EvalIntersection& action ) const;
+            const EvalBox& box_filter, EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between a given Segment and

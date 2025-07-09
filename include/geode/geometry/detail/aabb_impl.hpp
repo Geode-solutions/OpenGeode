@@ -426,7 +426,7 @@ namespace geode
         }
 
         template < typename BOX_FILTER, typename ACTION >
-        bool generic_intersect_recursive( BOX_FILTER& box_filter,
+        bool generic_intersect_recursive( const BOX_FILTER& box_filter,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -571,7 +571,7 @@ namespace geode
     void AABBTree< dimension >::compute_bbox_element_bbox_intersections(
         const BoundingBox< dimension >& box, EvalIntersection& action ) const
     {
-        auto box_filter = [&box]( const BoundingBox< dimension >& inner_box ) {
+        const auto box_filter = [&box]( const auto& inner_box ) {
             return inner_box.intersects( box );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
@@ -609,7 +609,7 @@ namespace geode
     void AABBTree< dimension >::compute_ray_element_bbox_intersections(
         const Ray< dimension >& ray, EvalIntersection& action ) const
     {
-        auto box_filter = [&ray]( const BoundingBox< dimension >& box ) {
+        const auto box_filter = [&ray]( const auto& box ) {
             return box.intersects( ray );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
@@ -620,7 +620,7 @@ namespace geode
     void AABBTree< dimension >::compute_line_element_bbox_intersections(
         const InfiniteLine< dimension >& line, EvalIntersection& action ) const
     {
-        auto box_filter = [&line]( const BoundingBox< dimension >& box ) {
+        const auto box_filter = [&line]( const auto& box ) {
             return box.intersects( line );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
@@ -629,7 +629,7 @@ namespace geode
     template < index_t dimension >
     template < class EvalBox, class EvalIntersection >
     void AABBTree< dimension >::compute_generic_element_bbox_intersections(
-        EvalBox& box_filter, EvalIntersection& action ) const
+        const EvalBox& box_filter, EvalIntersection& action ) const
     {
         if( nb_bboxes() == 0 )
         {
@@ -644,7 +644,7 @@ namespace geode
     void AABBTree< dimension >::compute_triangle_element_bbox_intersections(
         const Triangle< dimension >& triangle, EvalIntersection& action ) const
     {
-        auto box_filter = [&triangle]( const BoundingBox< dimension >& box ) {
+        const auto box_filter = [&triangle]( const auto& box ) {
             return box.intersects( triangle );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
@@ -655,7 +655,7 @@ namespace geode
     void AABBTree< dimension >::compute_segment_element_bbox_intersections(
         const Segment< dimension >& segment, EvalIntersection& action ) const
     {
-        auto box_filter = [&segment]( const BoundingBox< dimension >& box ) {
+        const auto box_filter = [&segment]( const auto& box ) {
             return box.intersects( segment );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
