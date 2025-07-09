@@ -31,6 +31,7 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
 #include <geode/model/helpers/component_mesh_edges.hpp>
@@ -174,6 +175,10 @@ namespace geode
 
     BoundingBox3D block_bounding_box( const BRep& brep, const Block3D& block )
     {
+        if( block.mesh().nb_vertices() != 0 )
+        {
+            return block.mesh().bounding_box();
+        }
         BoundingBox3D result;
         for( const auto& surface : brep.boundaries( block ) )
         {
