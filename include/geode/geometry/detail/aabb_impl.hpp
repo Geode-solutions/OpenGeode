@@ -572,7 +572,7 @@ namespace geode
         }
 
         template < typename BOX_FILTER, typename ACTION >
-        bool generic_intersect_recursive( BOX_FILTER& boxFilter,
+        bool generic_intersect_recursive( BOX_FILTER& box_filter,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -585,7 +585,7 @@ namespace geode
                 "No iteration allowed start == end" );
 
             // Prune sub-tree that does not have intersection
-            if( !boxFilter( node( node_index ) ) )
+            if( !box_filter( node( node_index ) ) )
             {
                 return false;
             }
@@ -599,19 +599,19 @@ namespace geode
                 node_index, element_begin, element_end );
             if( depth > async_depth_ )
             {
-                if( generic_intersect_recursive( boxFilter, it.child_left,
+                if( generic_intersect_recursive( box_filter, it.child_left,
                         element_begin, it.element_middle, depth + 1, action ) )
                 {
                     return true;
                 }
-                return generic_intersect_recursive( boxFilter, it.child_right,
+                return generic_intersect_recursive( box_filter, it.child_right,
                     it.element_middle, element_end, depth + 1, action );
             }
             auto task = async::local_spawn( [&] {
-                return generic_intersect_recursive( boxFilter, it.child_left,
+                return generic_intersect_recursive( box_filter, it.child_left,
                     element_begin, it.element_middle, depth + 1, action );
             } );
-            if( generic_intersect_recursive( boxFilter, it.child_right,
+            if( generic_intersect_recursive( box_filter, it.child_right,
                     it.element_middle, element_end, depth + 1, action ) )
             {
                 return true;
@@ -781,14 +781,14 @@ namespace geode
     template < index_t dimension >
     template < class EvalBox, class EvalIntersection >
     void AABBTree< dimension >::compute_generic_element_bbox_intersections(
-        EvalBox& boxFilter, EvalIntersection& action ) const
+        EvalBox& box_filter, EvalIntersection& action ) const
     {
         if( nb_bboxes() == 0 )
         {
             return;
         }
         impl_->generic_intersect_recursive(
-            boxFilter, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
+            box_filter, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
     }
 
     template < index_t dimension >
