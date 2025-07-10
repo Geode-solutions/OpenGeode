@@ -73,6 +73,9 @@ namespace geode
         [[nodiscard]] PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
+        [[nodiscard]] PolyhedronFacetsLocalVertices
+            polyhedron_facets_local_vertices( index_t polyhedron ) const final;
+
         [[nodiscard]] typename SolidMesh< dimension >::VerticesAroundVertex
             vertices_around_vertex( index_t vertex_id ) const final;
 
