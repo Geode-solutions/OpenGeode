@@ -213,5 +213,10 @@ namespace geode
             opengeode_model_api
             block_component_mesh_polygons( const BRep& brep,
                 const PolygonVertices& polygon_unique_vertices );
+
+        [[nodiscard]] std::vector< PolyhedronFacets >
+            opengeode_model_api block_component_mesh_polygons( const BRep& brep,
+                const PolygonVertices& polygon_unique_vertices,
+                const Block3D& block );
     } // namespace detail
 } // namespace geode
