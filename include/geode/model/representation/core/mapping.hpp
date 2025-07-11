@@ -36,6 +36,12 @@
 
 namespace geode
 {
+    class Section;
+    class BRep;
+} // namespace geode
+
+namespace geode
+{
     template < typename MappingType >
     class ModelMapping
     {
@@ -126,6 +132,23 @@ namespace geode
         MeshElementMapping blocks;
     };
 
+    template < typename Model >
+    struct TypedModelMeshesElementMapping
+    {
+    };
+
+    template <>
+    struct TypedModelMeshesElementMapping< Section >
+    {
+        using type = SectionMeshesElementMapping;
+    };
+
+    template <>
+    struct TypedModelMeshesElementMapping< BRep >
+    {
+        using type = BRepMeshesElementMapping;
+    };
+
     struct ModelMeshesVertexMapping
     {
         MeshVertexMapping corners;
@@ -142,19 +165,62 @@ namespace geode
         MeshVertexMapping blocks;
     };
 
-    struct ModelMappings
+    template < typename Model >
+    struct TypedModelMeshesVertexMapping
+    {
+    };
+
+    template <>
+    struct TypedModelMeshesVertexMapping< Section >
+    {
+        using type = SectionMeshesVertexMapping;
+    };
+
+    template <>
+    struct TypedModelMeshesVertexMapping< BRep >
+    {
+        using type = BRepMeshesVertexMapping;
+    };
+
+    struct ModelComponentMappings
     {
         ModelGenericMapping component_mapping;
         ModelAddedComponentMapping added_components;
         ModelUnchangedComponentMapping unchanged_components;
+    };
+
+    struct [[deprecated]] ModelMappings : public ModelComponentMappings
+    {
         ModelMeshesElementMapping mesh_element_mapping;
         ModelMeshesVertexMapping mesh_vertices_mapping;
     };
 
-    struct BRepMappings
+    struct SectionMappings : public ModelComponentMappings
     {
-        ModelGenericMapping component_mapping;
+        ModelMeshesElementMapping mesh_element_mapping;
+        ModelMeshesVertexMapping mesh_vertices_mapping;
+    };
+
+    struct BRepMappings : public ModelComponentMappings
+    {
         BRepMeshesElementMapping mesh_element_mapping;
         BRepMeshesVertexMapping mesh_vertices_mapping;
+    };
+
+    template < typename Model >
+    struct TypedModelMappings
+    {
+    };
+
+    template <>
+    struct TypedModelMappings< Section >
+    {
+        using type = SectionMappings;
+    };
+
+    template <>
+    struct TypedModelMappings< BRep >
+    {
+        using type = BRepMappings;
     };
 } // namespace geode
