@@ -26,7 +26,7 @@ ExternalProject_Add(bitsery
     BINARY_DIR ${BITSERY_PATH}/build
     STAMP_DIR ${BITSERY_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/bitsery
-    GIT_TAG 20240711
+    GIT_TAG 20250717
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
