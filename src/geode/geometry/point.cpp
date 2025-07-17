@@ -57,13 +57,13 @@ namespace geode
     template < index_t dimension >
     double Point< dimension >::value( local_index_t index ) const
     {
-        return values_.at( index );
+        return values_[index];
     }
 
     template < index_t dimension >
     void Point< dimension >::set_value( local_index_t index, double coordinate )
     {
-        values_.at( index ) = coordinate;
+        values_[index] = coordinate;
     }
 
     template < index_t dimension >
