@@ -29,17 +29,18 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    class BRep;
+    class BRepBuilder;
+    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
+    ALIAS_3D( Block );
 } // namespace geode
 
 namespace geode
 {
     namespace detail
     {
-        template < typename Model >
-        GenericMapping< index_t > repair_non_manifold_vertices(
-            const Model& model,
-            typename Model::Builder& builder,
-            const Surface< Model::dim >& surface );
+        GenericMapping< index_t >
+            opengeode_model_api repair_non_manifold_vertices(
+                const BRep& model, BRepBuilder& builder, const Block3D& block );
     } // namespace detail
 } // namespace geode

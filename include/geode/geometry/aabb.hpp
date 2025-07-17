@@ -196,6 +196,29 @@ namespace geode
             EvalIntersection& action ) const;
 
         /*!
+         * @brief Computes the intersections between any object (for which
+         * intersection against an arbitrary axis-aligned bounding box can be
+         * detected efficiently) and all element boxes.
+         * @param[in] box_filter The functor to run to determine whether a box
+         * is intersected by the searched object or not. The box may correspond
+         * either to an internal tree node or to a tree element.
+         * @param[in] action The functor to run when a tree element box is
+         * intersected by the search object.
+         * @tparam EvalBox this functor should have an operator() defined like
+         * this: bool operator( const BoundingBox<dimension> & ) ;
+         * @tparam EvalIntersection this functor should have an operator()
+         * defined like this:
+         * bool operator()( index_t cur_element_box ) ;
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the searched object.
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
+         */
+        template < class EvalBox, class EvalIntersection >
+        void compute_generic_element_bbox_intersections(
+            const EvalBox& box_filter, EvalIntersection& action ) const;
+
+        /*!
          * @brief Computes the intersections between a given Segment and
          * all element boxes.
          * @param[in] segment The segment to test.

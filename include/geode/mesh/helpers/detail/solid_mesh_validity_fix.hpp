@@ -25,21 +25,21 @@
 
 #include <geode/basic/mapping.hpp>
 
-#include <geode/model/common.hpp>
+#include <geode/mesh/common.hpp>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
 } // namespace geode
 
 namespace geode
 {
     namespace detail
     {
-        template < typename Model >
+        template < index_t dimension >
         GenericMapping< index_t > repair_non_manifold_vertices(
-            const Model& model,
-            typename Model::Builder& builder,
-            const Surface< Model::dim >& surface );
+            const SolidMesh< dimension >& mesh,
+            SolidMeshBuilder< dimension >& builder );
     } // namespace detail
 } // namespace geode

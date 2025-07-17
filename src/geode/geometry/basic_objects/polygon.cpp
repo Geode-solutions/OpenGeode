@@ -253,6 +253,10 @@ namespace geode
                 max_length_edge = e;
             }
         }
+        if( max_length < GLOBAL_EPSILON )
+        {
+            return max_length;
+        }
         const auto next =
             max_length_edge + 1 == nb_vertices ? 0 : max_length_edge + 1;
         const geode::InfiniteLine< dimension > line{
