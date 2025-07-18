@@ -163,6 +163,8 @@ namespace
     {
         geode::PolyhedraAroundEdge result;
         const auto first_polyhedron = facet.polyhedron_id;
+        geode::index_t safety_count{ 0 };
+        constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         do
         {
             if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
@@ -188,7 +190,16 @@ namespace
             {
                 return std::make_tuple( std::move( result ), false );
             }
-        } while( facet.polyhedron_id != first_polyhedron );
+        } while( facet.polyhedron_id != first_polyhedron
+                 && safety_count < MAX_SAFETY_COUNT );
+        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+            "[SolidMesh::propagate_around_edge] Too many polyhedra "
+            "around edge ",
+            edge_vertices[0], " ", edge_vertices[1], " (",
+            solid.point( edge_vertices[0] ).string(), " ",
+            solid.point( edge_vertices[1] ).string(),
+            "). This is probably related to a bug in the polyhedron "
+            "adjacencies." );
         return std::make_tuple( std::move( result ), true );
     }
 
