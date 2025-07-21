@@ -119,7 +119,6 @@ namespace geode
                                 component.impl_->backward_compatible_id() );
                             component.set_name(
                                 component.impl_->backward_compatible_name() );
-                            component.impl_.reset();
                         },
                            []( Archive& local_archive, Component& component ) {
                                local_archive.ext( component,
