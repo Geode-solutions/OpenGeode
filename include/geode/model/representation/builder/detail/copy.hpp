@@ -63,7 +63,6 @@ namespace geode
                     ModelFrom::dim == BuilderTo::dim
                         ? builder_to.add_corner( id, corner.mesh().impl_name() )
                         : builder_to.add_corner( id );
-                    builder_to.set_corner_name( id, corner.name() );
                 }
                 else
                 {
@@ -71,9 +70,11 @@ namespace geode
                         ModelFrom::dim == BuilderTo::dim
                             ? builder_to.add_corner( corner.mesh().impl_name() )
                             : builder_to.add_corner();
-                    builder_to.set_corner_name( id, corner.name() );
                     mapping.map( corner.id(), id );
                 }
+                const auto& id = mapping.in2out( corner.id() );
+                builder_to.set_corner_name( id, corner.name() );
+                builder_to.set_corner_active( id, corner.is_active() );
             }
         }
 
@@ -89,7 +90,6 @@ namespace geode
                     ModelFrom::dim == BuilderTo::dim
                         ? builder_to.add_line( id, line.mesh().impl_name() )
                         : builder_to.add_line( id );
-                    builder_to.set_line_name( id, line.name() );
                 }
                 else
                 {
@@ -97,9 +97,11 @@ namespace geode
                         ModelFrom::dim == BuilderTo::dim
                             ? builder_to.add_line( line.mesh().impl_name() )
                             : builder_to.add_line();
-                    builder_to.set_line_name( id, line.name() );
                     mapping.map( line.id(), id );
                 }
+                const auto& id = mapping.in2out( line.id() );
+                builder_to.set_line_name( id, line.name() );
+                builder_to.set_line_active( id, line.is_active() );
             }
         }
 
@@ -116,7 +118,6 @@ namespace geode
                         ? builder_to.add_surface(
                               id, surface.mesh().impl_name() )
                         : builder_to.add_surface( id );
-                    builder_to.set_surface_name( id, surface.name() );
                 }
                 else
                 {
@@ -124,9 +125,11 @@ namespace geode
                                          ? builder_to.add_surface(
                                                surface.mesh().impl_name() )
                                          : builder_to.add_surface();
-                    builder_to.set_surface_name( id, surface.name() );
                     mapping.map( surface.id(), id );
                 }
+                const auto& id = mapping.in2out( surface.id() );
+                builder_to.set_surface_name( id, surface.name() );
+                builder_to.set_surface_active( id, surface.is_active() );
             }
         }
 
@@ -142,7 +145,6 @@ namespace geode
                     ModelFrom::dim == BuilderTo::dim
                         ? builder_to.add_block( id, block.mesh().impl_name() )
                         : builder_to.add_block( id );
-                    builder_to.set_block_name( id, block.name() );
                 }
                 else
                 {
@@ -150,9 +152,11 @@ namespace geode
                         ModelFrom::dim == BuilderTo::dim
                             ? builder_to.add_block( block.mesh().impl_name() )
                             : builder_to.add_block();
-                    builder_to.set_block_name( id, block.name() );
                     mapping.map( block.id(), id );
                 }
+                const auto& id = mapping.in2out( block.id() );
+                builder_to.set_block_name( id, block.name() );
+                builder_to.set_block_active( id, block.is_active() );
             }
         }
 
@@ -166,16 +170,16 @@ namespace geode
                 {
                     const auto& id = mapping.in2out( model_boundary.id() );
                     builder_to.add_model_boundary( id );
-                    builder_to.set_model_boundary_name(
-                        id, model_boundary.name() );
                 }
                 else
                 {
                     const auto& id = builder_to.add_model_boundary();
-                    builder_to.set_model_boundary_name(
-                        id, model_boundary.name() );
                     mapping.map( model_boundary.id(), id );
                 }
+                const auto& id = mapping.in2out( model_boundary.id() );
+                builder_to.set_model_boundary_name( id, model_boundary.name() );
+                builder_to.set_model_boundary_active(
+                    id, model_boundary.is_active() );
             }
         }
 
@@ -189,16 +193,17 @@ namespace geode
                 {
                     const auto& id = mapping.in2out( corner_collection.id() );
                     builder_to.add_corner_collection( id );
-                    builder_to.set_corner_collection_name(
-                        id, corner_collection.name() );
                 }
                 else
                 {
                     const auto& id = builder_to.add_corner_collection();
-                    builder_to.set_corner_collection_name(
-                        id, corner_collection.name() );
                     mapping.map( corner_collection.id(), id );
                 }
+                const auto& id = mapping.in2out( corner_collection.id() );
+                builder_to.set_corner_collection_name(
+                    id, corner_collection.name() );
+                builder_to.set_corner_collection_active(
+                    id, corner_collection.is_active() );
             }
         }
 
@@ -212,16 +217,17 @@ namespace geode
                 {
                     const auto& id = mapping.in2out( line_collection.id() );
                     builder_to.add_line_collection( id );
-                    builder_to.set_line_collection_name(
-                        id, line_collection.name() );
                 }
                 else
                 {
                     const auto& id = builder_to.add_line_collection();
-                    builder_to.set_line_collection_name(
-                        id, line_collection.name() );
                     mapping.map( line_collection.id(), id );
                 }
+                const auto& id = mapping.in2out( line_collection.id() );
+                builder_to.set_line_collection_name(
+                    id, line_collection.name() );
+                builder_to.set_line_collection_active(
+                    id, line_collection.is_active() );
             }
         }
 
@@ -235,16 +241,17 @@ namespace geode
                 {
                     const auto& id = mapping.in2out( surface_collection.id() );
                     builder_to.add_surface_collection( id );
-                    builder_to.set_surface_collection_name(
-                        id, surface_collection.name() );
                 }
                 else
                 {
                     const auto& id = builder_to.add_surface_collection();
-                    builder_to.set_surface_collection_name(
-                        id, surface_collection.name() );
                     mapping.map( surface_collection.id(), id );
                 }
+                const auto& id = mapping.in2out( surface_collection.id() );
+                builder_to.set_surface_collection_name(
+                    id, surface_collection.name() );
+                builder_to.set_surface_collection_active(
+                    id, surface_collection.is_active() );
             }
         }
 
@@ -258,16 +265,17 @@ namespace geode
                 {
                     const auto& id = mapping.in2out( block_collection.id() );
                     builder_to.add_block_collection( id );
-                    builder_to.set_block_collection_name(
-                        id, block_collection.name() );
                 }
                 else
                 {
                     const auto& id = builder_to.add_block_collection();
-                    builder_to.set_block_collection_name(
-                        id, block_collection.name() );
                     mapping.map( block_collection.id(), id );
                 }
+                const auto& id = mapping.in2out( block_collection.id() );
+                builder_to.set_block_collection_name(
+                    id, block_collection.name() );
+                builder_to.set_block_collection_active(
+                    id, block_collection.is_active() );
             }
         }
 
