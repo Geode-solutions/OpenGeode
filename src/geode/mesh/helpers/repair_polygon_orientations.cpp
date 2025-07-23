@@ -79,8 +79,18 @@ namespace
                 {
                     const auto adj =
                         mesh_.polygon_adjacent_edge( { cur_polygon, e } );
-                    if( !adj || visited[adj->polygon_id] )
+                    if( !adj )
                     {
+                        continue;
+                    }
+                    if( visited[adj->polygon_id] )
+                    {
+                        OPENGEODE_DATA_EXCEPTION(
+                            cur_polygon_reorient
+                                == reorient_polygon_[adj->polygon_id],
+                            "[RepairPolygonOrientations] Mobius strip "
+                            "detected, polygons orientations can not be "
+                            "repaired" );
                         continue;
                     }
                     const auto e_next = e == vertices.size() - 1 ? 0 : e + 1;
