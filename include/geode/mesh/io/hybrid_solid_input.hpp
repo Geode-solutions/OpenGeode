@@ -76,6 +76,7 @@ namespace geode
         {
         }
     };
+    ALIAS_3D( HybridSolidInput );
 
     template < index_t dimension >
     [[nodiscard]] typename HybridSolidInput< dimension >::MissingFiles

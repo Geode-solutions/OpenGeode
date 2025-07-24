@@ -78,6 +78,7 @@ namespace geode
         {
         }
     };
+    ALIAS_3D( TetrahedralSolidInput );
 
     template < index_t dimension >
     [[nodiscard]] typename TetrahedralSolidInput< dimension >::MissingFiles

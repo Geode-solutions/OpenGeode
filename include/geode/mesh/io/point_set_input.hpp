@@ -73,6 +73,7 @@ namespace geode
         {
         }
     };
+    ALIAS_2D_AND_3D( PointSetInput );
 
     template < index_t dimension >
     [[nodiscard]] typename PointSetInput< dimension >::MissingFiles

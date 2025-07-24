@@ -76,6 +76,7 @@ namespace geode
         {
         }
     };
+    ALIAS_2D_AND_3D( TriangulatedSurfaceInput );
 
     template < index_t dimension >
     [[nodiscard]] typename TriangulatedSurfaceInput< dimension >::MissingFiles

@@ -78,6 +78,7 @@ namespace geode
         {
         }
     };
+    ALIAS_3D( PolyhedralSolidInput );
 
     template < index_t dimension >
     [[nodiscard]] typename PolyhedralSolidInput< dimension >::MissingFiles

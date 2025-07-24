@@ -61,6 +61,7 @@ namespace geode
         {
         }
     };
+    ALIAS_3D( PolyhedralSolidOutput );
 
     template < index_t dimension >
     [[nodiscard]] bool is_polyhedral_solid_saveable(
