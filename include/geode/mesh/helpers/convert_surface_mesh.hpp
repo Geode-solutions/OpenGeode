@@ -58,6 +58,9 @@ namespace geode
     [[nodiscard]] std::unique_ptr< TriangulatedSurface2D > opengeode_mesh_api
         convert_grid_into_triangulated_surface( const Grid2D& grid );
 
+    [[nodiscard]] std::unique_ptr< PolygonalSurface2D > opengeode_mesh_api
+        convert_grid_into_polygonal_surface( const Grid2D& grid );
+
     [[nodiscard]] std::unique_ptr< TriangulatedSurface2D > opengeode_mesh_api
         convert_grid_into_densified_triangulated_surface( const Grid2D& grid,
             absl::Span< const geode::index_t > cells_to_densify );
