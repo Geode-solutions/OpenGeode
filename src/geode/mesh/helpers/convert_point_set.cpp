@@ -34,7 +34,7 @@
 namespace geode
 {
     std::unique_ptr< PointSet2D > convert_point_set3d_into_2d(
-        const PointSet3D& point_set3d, index_t axis_to_remove )
+        const PointSet3D& point_set3d, local_index_t axis_to_remove )
     {
         auto point_set2d = PointSet2D::create();
         auto builder2d = PointSetBuilder2D::create( *point_set2d );
@@ -48,7 +48,7 @@ namespace geode
 
     std::unique_ptr< PointSet3D > convert_point_set2d_into_3d(
         const PointSet2D& point_set2d,
-        index_t axis_to_add,
+        local_index_t axis_to_add,
         double axis_coordinate )
     {
         auto point_set3d = PointSet3D::create();

@@ -34,18 +34,19 @@ namespace geode
 
 namespace geode
 {
-    [[nodiscard]] std::tuple< Section, ModelCopyMapping > opengeode_model_api
-        convert_brep_into_section( const BRep& brep, index_t axis_to_remove );
+    [[nodiscard]] std::tuple< Section, ModelCopyMapping >
+        opengeode_model_api convert_brep_into_section(
+            const BRep& brep, local_index_t axis_to_remove );
 
     [[nodiscard]] std::tuple< BRep, ModelCopyMapping >
         opengeode_model_api convert_section_into_brep( const Section& section,
-            index_t axis_to_add,
+            local_index_t axis_to_add,
             double axis_coordinate );
 
-    struct opengeode_model_api SectionExtruderOptions
+    struct SectionExtruderOptions
     {
         SectionExtruderOptions() = default;
-        index_t axis_to_extrude{ NO_ID };
+        local_index_t axis_to_extrude{ NO_LID };
         double min_coordinate{ 0. };
         double max_coordinate{ 0. };
     };

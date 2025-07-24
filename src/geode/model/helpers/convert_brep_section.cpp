@@ -476,7 +476,7 @@ namespace
 namespace geode
 {
     std::tuple< Section, ModelCopyMapping > convert_brep_into_section(
-        const BRep& brep, index_t axis_to_remove )
+        const BRep& brep, local_index_t axis_to_remove )
     {
         Section section;
         SectionBuilder builder{ section };
@@ -510,7 +510,9 @@ namespace geode
     }
 
     std::tuple< BRep, ModelCopyMapping > convert_section_into_brep(
-        const Section& section, index_t axis_to_add, double axis_coordinate )
+        const Section& section,
+        local_index_t axis_to_add,
+        double axis_coordinate )
     {
         BRep brep;
         BRepBuilder builder{ brep };

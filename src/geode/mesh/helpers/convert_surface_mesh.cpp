@@ -442,7 +442,7 @@ namespace geode
 
     std::unique_ptr< SurfaceMesh3D > convert_surface_mesh2d_into_3d(
         const SurfaceMesh2D& surface2d,
-        index_t axis_to_add,
+        local_index_t axis_to_add,
         double axis_coordinate )
     {
         auto surface3d = SurfaceMesh3D::create();
@@ -456,7 +456,7 @@ namespace geode
     }
 
     std::unique_ptr< SurfaceMesh2D > convert_surface_mesh3d_into_2d(
-        const SurfaceMesh3D& surface3d, index_t axis_to_remove )
+        const SurfaceMesh3D& surface3d, local_index_t axis_to_remove )
     {
         auto surface2d = SurfaceMesh2D::create();
         auto builder2d = SurfaceMeshBuilder2D::create( *surface2d );
@@ -470,7 +470,7 @@ namespace geode
 
     std::unique_ptr< PolygonalSurface3D > convert_polygonal_surface2d_into_3d(
         const PolygonalSurface2D& surface2d,
-        index_t axis_to_add,
+        local_index_t axis_to_add,
         double axis_coordinate )
     {
         auto surface3d = PolygonalSurface3D::create();
@@ -484,7 +484,7 @@ namespace geode
     }
 
     std::unique_ptr< PolygonalSurface2D > convert_polygonal_surface3d_into_2d(
-        const PolygonalSurface3D& surface3d, index_t axis_to_remove )
+        const PolygonalSurface3D& surface3d, local_index_t axis_to_remove )
     {
         auto surface2d = PolygonalSurface2D::create();
         auto builder2d = PolygonalSurfaceBuilder2D::create( *surface2d );
@@ -499,7 +499,7 @@ namespace geode
     std::unique_ptr< TriangulatedSurface3D >
         convert_triangulated_surface2d_into_3d(
             const TriangulatedSurface2D& surface2d,
-            index_t axis_to_add,
+            local_index_t axis_to_add,
             double axis_coordinate )
     {
         auto surface3d = TriangulatedSurface3D::create();
@@ -514,7 +514,8 @@ namespace geode
 
     std::unique_ptr< TriangulatedSurface2D >
         convert_triangulated_surface3d_into_2d(
-            const TriangulatedSurface3D& surface3d, index_t axis_to_remove )
+            const TriangulatedSurface3D& surface3d,
+            local_index_t axis_to_remove )
     {
         auto surface2d = TriangulatedSurface2D::create();
         auto builder2d = TriangulatedSurfaceBuilder2D::create( *surface2d );
