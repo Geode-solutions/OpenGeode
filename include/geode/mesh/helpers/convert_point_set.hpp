@@ -37,10 +37,10 @@ namespace geode
 {
     [[nodiscard]] std::unique_ptr< PointSet2D >
         opengeode_mesh_api convert_point_set3d_into_2d(
-            const PointSet3D& point_set3d, index_t axis_to_remove );
+            const PointSet3D& point_set3d, local_index_t axis_to_remove );
 
     [[nodiscard]] std::unique_ptr< PointSet3D > opengeode_mesh_api
         convert_point_set2d_into_3d( const PointSet2D& point_set2d,
-            index_t axis_to_add,
+            local_index_t axis_to_add,
             double axis_coordinate );
 } // namespace geode

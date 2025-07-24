@@ -61,6 +61,7 @@ namespace geode
         {
         }
     };
+    ALIAS_2D_AND_3D( PolygonalSurfaceOutput );
 
     template < index_t dimension >
     [[nodiscard]] bool is_polygonal_surface_saveable(

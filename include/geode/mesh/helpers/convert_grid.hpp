@@ -23,34 +23,19 @@
 
 #pragma once
 
-#include <geode/model/common.hpp>
-#include <geode/model/representation/core/mapping.hpp>
+#include <geode/mesh/common.hpp>
 
 namespace geode
 {
-    class BRep;
-    class Section;
+    FORWARD_DECLARATION_DIMENSION_CLASS( CoordinateSystem );
+    FORWARD_DECLARATION_DIMENSION_CLASS( LightRegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( RasterImage );
 } // namespace geode
 
 namespace geode
 {
-    [[nodiscard]] std::tuple< Section, ModelCopyMapping >
-        opengeode_model_api convert_brep_into_section(
-            const BRep& brep, local_index_t axis_to_remove );
-
-    [[nodiscard]] std::tuple< BRep, ModelCopyMapping >
-        opengeode_model_api convert_section_into_brep( const Section& section,
-            local_index_t axis_to_add,
-            double axis_coordinate );
-
-    struct SectionExtruderOptions
-    {
-        SectionExtruderOptions() = default;
-        local_index_t axis_to_extrude{ NO_LID };
-        double min_coordinate{ 0. };
-        double max_coordinate{ 0. };
-    };
-
-    [[nodiscard]] BRep opengeode_model_api extrude_section_to_brep(
-        const Section& section, const SectionExtruderOptions& options );
+    template < index_t dimension >
+    [[nodiscard]] LightRegularGrid< dimension > convert_raster_image_into_grid(
+        const RasterImage< dimension >& raster,
+        const CoordinateSystem< dimension >& coordinate_system );
 } // namespace geode

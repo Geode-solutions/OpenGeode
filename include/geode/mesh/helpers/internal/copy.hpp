@@ -37,8 +37,9 @@ namespace geode
     namespace internal
     {
         template < typename MeshFrom, typename Builder >
-        void copy_points3d_into_2d(
-            const MeshFrom& from, Builder& builder, index_t axis_to_remove )
+        void copy_points3d_into_2d( const MeshFrom& from,
+            Builder& builder,
+            local_index_t axis_to_remove )
         {
             OPENGEODE_EXCEPTION( axis_to_remove < 3,
                 "[copy_points3d_into_2d] Invalid axis to remove." );
@@ -47,16 +48,15 @@ namespace geode
                 async::irange( index_t{ 0 }, from.nb_vertices() ),
                 [&from, &builder, axis_to_remove]( index_t v ) {
                     const auto& pt_3d = from.point( v );
-                    builder.set_point( v,
-                        Point2D{ { pt_3d.value( axis_to_remove == 0 ? 1 : 0 ),
-                            pt_3d.value( axis_to_remove == 2 ? 1 : 2 ) } } );
+                    builder.set_point(
+                        v, pt_3d.project_point( axis_to_remove ) );
                 } );
         }
 
         template < typename MeshFrom, typename Builder >
         void copy_points2d_into_3d( const MeshFrom& from,
             Builder& builder,
-            index_t axis_to_add,
+            local_index_t axis_to_add,
             double axis_coordinate )
         {
             OPENGEODE_EXCEPTION( axis_to_add < 3,

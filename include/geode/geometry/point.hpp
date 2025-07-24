@@ -76,7 +76,7 @@ namespace geode
         [[nodiscard]] std::string string() const;
 
         [[nodiscard]] Point< dimension - 1 > project_point(
-            geode::local_index_t axis_to_remove ) const;
+            local_index_t axis_to_remove ) const;
 
     private:
         friend class bitsery::Access;

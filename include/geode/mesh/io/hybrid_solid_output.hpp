@@ -61,6 +61,7 @@ namespace geode
         {
         }
     };
+    ALIAS_3D( HybridSolidOutput );
 
     template < index_t dimension >
     [[nodiscard]] bool is_hybrid_solid_saveable(

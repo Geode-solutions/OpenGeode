@@ -48,7 +48,7 @@ namespace
 namespace geode
 {
     std::unique_ptr< EdgedCurve2D > convert_edged_curve3d_into_2d(
-        const EdgedCurve3D& curve3d, index_t axis_to_remove )
+        const EdgedCurve3D& curve3d, local_index_t axis_to_remove )
     {
         auto curve2d = EdgedCurve2D::create();
         auto builder2d = EdgedCurveBuilder2D::create( *curve2d );
@@ -64,7 +64,7 @@ namespace geode
 
     std::unique_ptr< EdgedCurve3D > convert_edged_curve2d_into_3d(
         const EdgedCurve2D& curve2d,
-        index_t axis_to_add,
+        local_index_t axis_to_add,
         double axis_coordinate )
     {
         auto curve3d = EdgedCurve3D::create();

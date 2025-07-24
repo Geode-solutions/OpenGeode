@@ -73,6 +73,7 @@ namespace geode
         {
         }
     };
+    ALIAS_2D_AND_3D( RegularGridInput );
 
     template < index_t dimension >
     [[nodiscard]] typename RegularGridInput< dimension >::MissingFiles
