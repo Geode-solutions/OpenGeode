@@ -23,6 +23,7 @@
 
 #include <geode/mesh/helpers/detail/solid_mesh_validity_fix.hpp>
 
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/point.hpp>
@@ -51,10 +52,12 @@ namespace geode
                 }
             }
             GenericMapping< index_t > vertex_mappings;
-            for( const auto v : Range{ mesh.nb_vertices() } )
+            for( const auto vertex_id : Range{ mesh.nb_vertices() } )
             {
-                auto polyhedra_around = mesh.polyhedra_around_vertex( v );
-                const auto& polyhedron_vertices = polyhedra_around_vertices[v];
+                auto polyhedra_around =
+                    mesh.polyhedra_around_vertex( vertex_id );
+                const auto& polyhedron_vertices =
+                    polyhedra_around_vertices[vertex_id];
                 auto nb_polyhedra_around = polyhedra_around.size();
                 if( nb_polyhedra_around == polyhedron_vertices.size() )
                 {
@@ -68,20 +71,23 @@ namespace geode
                         total_polyhedra.emplace_back( std::move( polyhedron ) );
                     }
                     const auto new_vertex_id =
-                        builder.create_point( mesh.point( v ) );
-                    builder.replace_vertex( v, new_vertex_id );
+                        builder.create_point( mesh.point( vertex_id ) );
+                    mesh.vertex_attribute_manager().copy_attribute_value(
+                        vertex_id, new_vertex_id );
+                    builder.replace_vertex( vertex_id, new_vertex_id );
                     for( const auto& polyhedron_vertex : polyhedron_vertices )
                     {
                         if( absl::c_find( total_polyhedra, polyhedron_vertex )
                             == total_polyhedra.end() )
                         {
                             builder.associate_polyhedron_vertex_to_vertex(
-                                polyhedron_vertex, v );
+                                polyhedron_vertex, vertex_id );
                             break;
                         }
                     }
-                    vertex_mappings.map( v, new_vertex_id );
-                    polyhedra_around = mesh.polyhedra_around_vertex( v );
+                    vertex_mappings.map( vertex_id, new_vertex_id );
+                    polyhedra_around =
+                        mesh.polyhedra_around_vertex( vertex_id );
                     nb_polyhedra_around += polyhedra_around.size();
                 }
             }

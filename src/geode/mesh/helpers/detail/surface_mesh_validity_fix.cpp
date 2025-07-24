@@ -23,6 +23,7 @@
 
 #include <geode/model/helpers/detail/surface_mesh_validity_fix.hpp>
 
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/point.hpp>
@@ -53,10 +54,11 @@ namespace geode
                 }
             }
             GenericMapping< index_t > vertex_mappings;
-            for( const auto v : Range{ mesh.nb_vertices() } )
+            for( const auto vertex_id : Range{ mesh.nb_vertices() } )
             {
-                auto polygons_around = mesh.polygons_around_vertex( v );
-                const auto& polygon_vertices = polygons_around_vertices[v];
+                auto polygons_around = mesh.polygons_around_vertex( vertex_id );
+                const auto& polygon_vertices =
+                    polygons_around_vertices[vertex_id];
                 auto nb_polygons_around = polygons_around.size();
                 if( nb_polygons_around == polygon_vertices.size() )
                 {
@@ -71,20 +73,22 @@ namespace geode
                         total_polygons.emplace_back( std::move( polygon ) );
                     }
                     const auto new_vertex_id =
-                        builder.create_point( mesh.point( v ) );
-                    builder.replace_vertex( v, new_vertex_id );
+                        builder.create_point( mesh.point( vertex_id ) );
+                    mesh.vertex_attribute_manager().copy_attribute_value(
+                        vertex_id, new_vertex_id );
+                    builder.replace_vertex( vertex_id, new_vertex_id );
                     for( const auto& polygon_vertex : polygon_vertices )
                     {
                         if( absl::c_find( total_polygons, polygon_vertex )
                             == total_polygons.end() )
                         {
                             builder.associate_polygon_vertex_to_vertex(
-                                polygon_vertex, v );
+                                polygon_vertex, vertex_id );
                             break;
                         }
                     }
-                    vertex_mappings.map( v, new_vertex_id );
-                    polygons_around = mesh.polygons_around_vertex( v );
+                    vertex_mappings.map( vertex_id, new_vertex_id );
+                    polygons_around = mesh.polygons_around_vertex( vertex_id );
                     nb_polygons_around += polygons_around.size();
                 }
             }
