@@ -83,22 +83,26 @@ namespace
                     {
                         continue;
                     }
-                    if( visited[adj->polygon_id] )
-                    {
-                        OPENGEODE_DATA_EXCEPTION(
-                            cur_polygon_reorient
-                                == reorient_polygon_[adj->polygon_id],
-                            "[RepairPolygonOrientations] Mobius strip "
-                            "detected, polygons orientations can not be "
-                            "repaired" );
-                        continue;
-                    }
                     const auto e_next = e == vertices.size() - 1 ? 0 : e + 1;
                     const auto adj_vertices =
                         mesh_.polygon_edge_vertices( adj.value() );
                     const auto same_orientation =
                         ( vertices[e] == adj_vertices[1]
                             && vertices[e_next] == adj_vertices[0] );
+                    if( visited[adj->polygon_id] )
+                    {
+                        const auto is_valid =
+                            same_orientation
+                                ? cur_polygon_reorient
+                                      == reorient_polygon_[adj->polygon_id]
+                                : cur_polygon_reorient
+                                      != reorient_polygon_[adj->polygon_id];
+                        OPENGEODE_DATA_EXCEPTION( is_valid,
+                            "[RepairPolygonOrientations] Mobius "
+                            "strip detected, polygons orientations "
+                            "can not be repaired" );
+                        continue;
+                    }
                     const auto adj_polygon = adj->polygon_id;
                     visited[adj_polygon] = true;
                     reorient_polygon_[adj_polygon] =
