@@ -25,14 +25,11 @@
 
 #include <string>
 
+#include <absl/time/time.h>
+
 #include <geode/basic/common.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl.hpp>
-
-namespace absl
-{
-    class Duration;
-} // namespace absl
 
 namespace geode
 {
