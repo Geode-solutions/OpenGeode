@@ -39,10 +39,10 @@
     const auto load##dimension =                                               \
         "load_raster_image" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(), &load_raster_image< dimension > );    \
-    const auto check##dimension = "check_raster_image_additional_files"        \
-                                  + std::to_string( dimension ) + "D";         \
+    const auto check##dimension =                                              \
+        "raster_image_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \
-        &check_raster_image_additional_files< dimension > );                   \
+        &raster_image_additional_files< dimension > );                         \
     const auto loadable##dimension =                                           \
         "is_raster_image_loadable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \
