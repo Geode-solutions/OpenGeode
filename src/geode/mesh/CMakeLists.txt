@@ -293,6 +293,7 @@ add_geode_library(
         "io/geode/geode_graph_output.hpp"
         "io/geode/geode_hybrid_solid_input.hpp"
         "io/geode/geode_hybrid_solid_output.hpp"
+        "io/geode/geode_light_regular_grid_input.hpp"
         "io/geode/geode_point_set_input.hpp"
         "io/geode/geode_point_set_output.hpp"
         "io/geode/geode_polygonal_surface_input.hpp"

@@ -61,23 +61,19 @@ namespace geode
     class RegularGridInput
         : public Input< std::unique_ptr< RegularGrid< dimension > >, MeshImpl >
     {
-    public:
-        using Base =
-            Input< std::unique_ptr< RegularGrid< dimension > >, MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
         explicit RegularGridInput( std::string_view filename )
-            : Base{ filename }
+            : Input< std::unique_ptr< RegularGrid< dimension > >, MeshImpl >{
+                  filename
+              }
         {
         }
     };
     ALIAS_2D_AND_3D( RegularGridInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename RegularGridInput< dimension >::MissingFiles
-        check_regular_grid_missing_files( std::string_view filename );
+    [[nodiscard]] typename RegularGridInput< dimension >::AdditionalFiles
+        regular_grid_additional_files( std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] bool is_regular_grid_loadable( std::string_view filename );

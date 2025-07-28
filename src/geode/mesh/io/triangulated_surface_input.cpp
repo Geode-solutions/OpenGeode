@@ -77,12 +77,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename TriangulatedSurfaceInput< dimension >::MissingFiles
-        check_triangulated_surface_missing_files( std::string_view filename )
+    typename TriangulatedSurfaceInput< dimension >::AdditionalFiles
+        triangulated_surface_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             TriangulatedSurfaceInputFactory< dimension > >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
     template < index_t dimension >
@@ -110,10 +110,10 @@ namespace geode
     template std::unique_ptr< TriangulatedSurface< 3 > >
         opengeode_mesh_api load_triangulated_surface( std::string_view );
 
-    template TriangulatedSurfaceInput< 2 >::MissingFiles opengeode_mesh_api
-        check_triangulated_surface_missing_files< 2 >( std::string_view );
-    template TriangulatedSurfaceInput< 3 >::MissingFiles opengeode_mesh_api
-        check_triangulated_surface_missing_files< 3 >( std::string_view );
+    template TriangulatedSurfaceInput< 2 >::AdditionalFiles opengeode_mesh_api
+        triangulated_surface_additional_files< 2 >( std::string_view );
+    template TriangulatedSurfaceInput< 3 >::AdditionalFiles opengeode_mesh_api
+        triangulated_surface_additional_files< 3 >( std::string_view );
 
     template bool opengeode_mesh_api is_triangulated_surface_loadable< 2 >(
         std::string_view );

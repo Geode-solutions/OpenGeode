@@ -62,6 +62,12 @@
         {                                                                      \
         }                                                                      \
                                                                                \
+        [[nodiscard]] typename Mesh##Input< dimension >::AdditionalFiles       \
+            additional_files() const final                                     \
+        {                                                                      \
+            return {};                                                         \
+        }                                                                      \
+                                                                               \
         BITSERY_READ( Mesh< dimension > )                                      \
     };                                                                         \
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Input )
@@ -73,6 +79,12 @@
         explicit OpenGeode##Mesh##Input( std::string_view filename )           \
             : Mesh##Input( filename )                                          \
         {                                                                      \
+        }                                                                      \
+                                                                               \
+        [[nodiscard]] typename Mesh##Input::AdditionalFiles                    \
+            additional_files() const final                                     \
+        {                                                                      \
+            return {};                                                         \
         }                                                                      \
                                                                                \
         BITSERY_READ( Mesh )                                                   \

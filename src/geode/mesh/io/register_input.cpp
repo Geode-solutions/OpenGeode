@@ -36,6 +36,7 @@
 #include <geode/mesh/io/geode/geode_edged_curve_input.hpp>
 #include <geode/mesh/io/geode/geode_graph_input.hpp>
 #include <geode/mesh/io/geode/geode_hybrid_solid_input.hpp>
+#include <geode/mesh/io/geode/geode_light_regular_grid_input.hpp>
 #include <geode/mesh/io/geode/geode_point_set_input.hpp>
 #include <geode/mesh/io/geode/geode_polygonal_surface_input.hpp>
 #include <geode/mesh/io/geode/geode_polyhedral_solid_input.hpp>
@@ -53,7 +54,7 @@
 
 #define LIGHT_REGULAR_GRID_INPUT_REGISTER_XD( dimension )                      \
     geode::LightRegularGridInputFactory##dimension##D::register_creator<       \
-        geode::LightRegularGridInput##dimension##D >(                          \
+        geode::OpenGeodeLightRegularGridInput##dimension##D >(                 \
         geode::LightRegularGrid##dimension##D ::native_extension_static()      \
             .data() )
 

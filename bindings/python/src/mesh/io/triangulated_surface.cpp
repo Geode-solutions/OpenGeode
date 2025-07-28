@@ -42,10 +42,10 @@
         static_cast< std::unique_ptr<                                          \
             TriangulatedSurface< dimension > > ( * )( std::string_view ) >(    \
             &load_triangulated_surface< dimension > ) );                       \
-    const auto check##dimension = "check_triangulated_surface_missing_files"   \
+    const auto check##dimension = "triangulated_surface_additional_files"      \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &check_triangulated_surface_missing_files< dimension > );              \
+        &triangulated_surface_additional_files< dimension > );                 \
     const auto loadable##dimension = "is_triangulated_surface_loadable"        \
                                      + std::to_string( dimension ) + "D";      \
     module.def( loadable##dimension.c_str(),                                   \

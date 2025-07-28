@@ -49,23 +49,17 @@ namespace geode
     template < index_t dimension >
     class LightRegularGridInput : public Input< LightRegularGrid< dimension > >
     {
-    public:
-        using Base = Input< LightRegularGrid< dimension > >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
+    protected:
         explicit LightRegularGridInput( std::string_view filename )
-            : Base{ filename }
+            : Input< LightRegularGrid< dimension > >{ filename }
         {
         }
-
-        [[nodiscard]] LightRegularGrid< dimension > read() override;
     };
     ALIAS_2D_AND_3D( LightRegularGridInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename LightRegularGridInput< dimension >::MissingFiles
-        check_light_regular_grid_missing_files( std::string_view filename );
+    [[nodiscard]] typename LightRegularGridInput< dimension >::AdditionalFiles
+        light_regular_grid_additional_files( std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] bool is_light_regular_grid_loadable(

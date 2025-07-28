@@ -75,12 +75,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename PolygonalSurfaceInput< dimension >::MissingFiles
-        check_polygonal_surface_missing_files( std::string_view filename )
+    typename PolygonalSurfaceInput< dimension >::AdditionalFiles
+        polygonal_surface_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             PolygonalSurfaceInputFactory< dimension > >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
     template < index_t dimension >
@@ -108,10 +108,10 @@ namespace geode
     template std::unique_ptr< PolygonalSurface< 3 > >
         opengeode_mesh_api load_polygonal_surface( std::string_view );
 
-    template PolygonalSurfaceInput< 2 >::MissingFiles opengeode_mesh_api
-        check_polygonal_surface_missing_files< 2 >( std::string_view );
-    template PolygonalSurfaceInput< 3 >::MissingFiles opengeode_mesh_api
-        check_polygonal_surface_missing_files< 3 >( std::string_view );
+    template PolygonalSurfaceInput< 2 >::AdditionalFiles opengeode_mesh_api
+        polygonal_surface_additional_files< 2 >( std::string_view );
+    template PolygonalSurfaceInput< 3 >::AdditionalFiles opengeode_mesh_api
+        polygonal_surface_additional_files< 3 >( std::string_view );
 
     template bool opengeode_mesh_api is_polygonal_surface_loadable< 2 >(
         std::string_view );

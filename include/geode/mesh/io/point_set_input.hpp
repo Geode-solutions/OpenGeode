@@ -62,22 +62,19 @@ namespace geode
     class PointSetInput
         : public Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >
     {
-    public:
-        using Base =
-            Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
-        explicit PointSetInput( std::string_view filename ) : Base{ filename }
+        explicit PointSetInput( std::string_view filename )
+            : Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >{
+                  filename
+              }
         {
         }
     };
     ALIAS_2D_AND_3D( PointSetInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename PointSetInput< dimension >::MissingFiles
-        check_point_set_missing_files( std::string_view filename );
+    [[nodiscard]] typename PointSetInput< dimension >::AdditionalFiles
+        point_set_additional_files( std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] bool is_point_set_loadable( std::string_view filename );

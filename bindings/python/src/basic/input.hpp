@@ -24,21 +24,21 @@
 #include <geode/basic/input.hpp>
 
 #define PYTHON_INPUT_CLASS( type, name )                                       \
-    pybind11::class_< Input< type >::MissingFiles >(                           \
+    pybind11::class_< Input< type >::AdditionalFiles >(                        \
         module, absl::StrCat( "MissingFiles", name ).c_str() )                 \
-        .def( "has_missing_files",                                             \
-            &Input< type >::MissingFiles::has_missing_files )                  \
+        .def( "has_additional_files",                                          \
+            &Input< type >::AdditionalFiles::has_additional_files )            \
         .def_readwrite( "additional_files",                                    \
-            &Input< type >::MissingFiles::additional_files )                   \
-        .def_readwrite(                                                        \
-            "mandatory_files", &Input< type >::MissingFiles::mandatory_files )
+            &Input< type >::AdditionalFiles::additional_files )                \
+        .def_readwrite( "mandatory_files",                                     \
+            &Input< type >::AdditionalFiles::mandatory_files )
 
 #define PYTHON_INPUT_MESH_CLASS( type, name )                                  \
-    pybind11::class_< Input< type, MeshImpl >::MissingFiles >(                 \
+    pybind11::class_< Input< type, MeshImpl >::AdditionalFiles >(              \
         module, absl::StrCat( "MissingFiles", name ).c_str() )                 \
-        .def( "has_missing_files",                                             \
-            &Input< type, MeshImpl >::MissingFiles::has_missing_files )        \
+        .def( "has_additional_files",                                          \
+            &Input< type, MeshImpl >::AdditionalFiles::has_additional_files )  \
         .def_readwrite( "additional_files",                                    \
-            &Input< type, MeshImpl >::MissingFiles::additional_files )         \
+            &Input< type, MeshImpl >::AdditionalFiles::additional_files )      \
         .def_readwrite( "mandatory_files",                                     \
-            &Input< type, MeshImpl >::MissingFiles::mandatory_files )
+            &Input< type, MeshImpl >::AdditionalFiles::mandatory_files )

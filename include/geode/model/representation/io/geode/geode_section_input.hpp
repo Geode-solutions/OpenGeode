@@ -47,6 +47,12 @@ namespace geode
         }
 
         [[nodiscard]] Section read() final;
+
+        [[nodiscard]] SectionInput::AdditionalFiles
+            additional_files() const final
+        {
+            return {};
+        }
     };
 
     namespace detail

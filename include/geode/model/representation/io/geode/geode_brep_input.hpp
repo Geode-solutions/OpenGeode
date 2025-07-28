@@ -47,6 +47,11 @@ namespace geode
         }
 
         [[nodiscard]] BRep read() final;
+
+        [[nodiscard]] BRepInput::AdditionalFiles additional_files() const final
+        {
+            return {};
+        }
     };
 
     namespace detail
