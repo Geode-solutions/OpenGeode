@@ -68,6 +68,11 @@
             return {};                                                         \
         }                                                                      \
                                                                                \
+        index_t object_priority() const final                                  \
+        {                                                                      \
+            return 0;                                                          \
+        }                                                                      \
+                                                                               \
         BITSERY_READ( Mesh< dimension > )                                      \
     };                                                                         \
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Input )
@@ -85,6 +90,11 @@
             additional_files() const final                                     \
         {                                                                      \
             return {};                                                         \
+        }                                                                      \
+                                                                               \
+        index_t object_priority() const final                                  \
+        {                                                                      \
+            return 0;                                                          \
         }                                                                      \
                                                                                \
         BITSERY_READ( Mesh )                                                   \

@@ -48,10 +48,14 @@ namespace geode
 
         [[nodiscard]] Section read() final;
 
-        [[nodiscard]] SectionInput::AdditionalFiles
-            additional_files() const final
+        [[nodiscard]] AdditionalFiles additional_files() const final
         {
             return {};
+        }
+
+        [[nodiscard]] index_t object_priority() const final
+        {
+            return 0;
         }
     };
 

@@ -66,6 +66,8 @@ namespace geode
 
         [[nodiscard]] virtual AdditionalFiles additional_files() const = 0;
 
+        [[nodiscard]] virtual index_t object_priority() const = 0;
+
         [[nodiscard]] virtual bool is_loadable() const
         {
             return true;

@@ -67,6 +67,11 @@ namespace geode
         {
             return {};
         }
+
+        index_t object_priority() const final
+        {
+            return 0;
+        }
     };
     ALIAS_2D_AND_3D( OpenGeodeRasterImageInput );
 } // namespace geode
