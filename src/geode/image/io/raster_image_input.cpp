@@ -67,6 +67,14 @@ namespace geode
         return input->is_loadable();
     }
 
+    template < index_t dimension >
+    index_t raster_image_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            RasterImageInputFactory< dimension > >( filename );
+        return input->object_priority();
+    }
+
     template RasterImage< 2 > opengeode_image_api load_raster_image(
         std::string_view );
     template RasterImage< 3 > opengeode_image_api load_raster_image(
@@ -80,5 +88,10 @@ namespace geode
     template bool opengeode_image_api is_raster_image_loadable< 2 >(
         std::string_view );
     template bool opengeode_image_api is_raster_image_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_image_api raster_image_object_priority< 2 >(
+        std::string_view );
+    template index_t opengeode_image_api raster_image_object_priority< 3 >(
         std::string_view );
 } // namespace geode

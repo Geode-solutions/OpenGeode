@@ -93,4 +93,12 @@ namespace geode
             return false;
         }
     }
+
+    index_t section_object_priority( std::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< SectionInputFactory >(
+                filename );
+        return input->object_priority();
+    }
 } // namespace geode

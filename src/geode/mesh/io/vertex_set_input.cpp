@@ -85,4 +85,12 @@ namespace geode
             return false;
         }
     }
+
+    index_t vertex_set_object_priority( std::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< VertexSetInputFactory >(
+                filename );
+        return input->object_priority();
+    }
 } // namespace geode

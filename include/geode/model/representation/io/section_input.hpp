@@ -62,6 +62,9 @@ namespace geode
     [[nodiscard]] bool opengeode_model_api is_section_loadable(
         std::string_view filename );
 
+    [[nodiscard]] index_t opengeode_model_api section_object_priority(
+        std::string_view filename );
+
     using SectionInputFactory =
         Factory< std::string, SectionInput, std::string_view >;
 } // namespace geode

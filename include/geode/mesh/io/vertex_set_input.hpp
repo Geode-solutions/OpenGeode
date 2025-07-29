@@ -72,6 +72,9 @@ namespace geode
     [[nodiscard]] bool opengeode_mesh_api is_vertex_set_loadable(
         std::string_view filename );
 
+    [[nodiscard]] index_t opengeode_mesh_api vertex_set_object_priority(
+        std::string_view filename );
+
     using VertexSetInputFactory =
         Factory< std::string, VertexSetInput, std::string_view >;
 } // namespace geode

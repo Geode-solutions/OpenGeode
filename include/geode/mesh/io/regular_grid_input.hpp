@@ -79,6 +79,10 @@ namespace geode
     [[nodiscard]] bool is_regular_grid_loadable( std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t regular_grid_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using RegularGridInputFactory =
         Factory< std::string, RegularGridInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( RegularGridInputFactory );

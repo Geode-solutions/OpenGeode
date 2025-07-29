@@ -82,6 +82,10 @@ namespace geode
         std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t polyhedral_solid_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using PolyhedralSolidInputFactory = Factory< std::string,
         PolyhedralSolidInput< dimension >,
         std::string_view >;

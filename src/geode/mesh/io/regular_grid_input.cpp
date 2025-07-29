@@ -96,6 +96,14 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    index_t regular_grid_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            RegularGridInputFactory< dimension > >( filename );
+        return input->object_priority();
+    }
+
     template std::unique_ptr< RegularGrid< 2 > > opengeode_mesh_api
         load_regular_grid( const MeshImpl&, std::string_view );
     template std::unique_ptr< RegularGrid< 3 > > opengeode_mesh_api
@@ -114,5 +122,10 @@ namespace geode
     template bool opengeode_mesh_api is_regular_grid_loadable< 2 >(
         std::string_view );
     template bool opengeode_mesh_api is_regular_grid_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_mesh_api regular_grid_object_priority< 2 >(
+        std::string_view );
+    template index_t opengeode_mesh_api regular_grid_object_priority< 3 >(
         std::string_view );
 } // namespace geode

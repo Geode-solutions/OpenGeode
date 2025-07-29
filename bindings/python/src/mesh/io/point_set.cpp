@@ -44,6 +44,10 @@
         "point_set_additional_files" + std::to_string( dimension ) + "D";      \
     module.def(                                                                \
         check##dimension.c_str(), &point_set_additional_files< dimension > );  \
+    const auto priority##dimension =                                           \
+        "point_set_object_priority" + std::to_string( dimension ) + "D";       \
+    module.def( priority##dimension.c_str(),                                   \
+        &point_set_object_priority< dimension > );                             \
     const auto loadable##dimension =                                           \
         "is_point_set_loadable" + std::to_string( dimension ) + "D";           \
     module.def(                                                                \

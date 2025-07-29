@@ -83,6 +83,10 @@ namespace geode
         std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t triangulated_surface_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using TriangulatedSurfaceInputFactory = Factory< std::string,
         TriangulatedSurfaceInput< dimension >,
         std::string_view >;

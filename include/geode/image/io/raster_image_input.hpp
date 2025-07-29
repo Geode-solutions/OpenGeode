@@ -65,6 +65,10 @@ namespace geode
     [[nodiscard]] bool is_raster_image_loadable( std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t raster_image_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using RasterImageInputFactory =
         Factory< std::string, RasterImageInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( RasterImageInputFactory );

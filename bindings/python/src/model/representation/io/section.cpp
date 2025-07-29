@@ -36,6 +36,7 @@ namespace geode
         module.def( "save_section", &save_section );
         module.def( "load_section", &load_section );
         module.def( "section_additional_files", &section_additional_files );
+        module.def( "section_object_priority", &section_object_priority );
         module.def( "is_section_loadable", &is_section_loadable );
         module.def( "is_section_saveable", &is_section_saveable );
         PYTHON_INPUT_CLASS( Section, "Section" );

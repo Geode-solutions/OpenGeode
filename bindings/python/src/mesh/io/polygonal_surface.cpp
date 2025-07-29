@@ -45,6 +45,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &polygonal_surface_additional_files< dimension > );                    \
+    const auto priority##dimension = "polygonal_surface_object_priority"       \
+                                     + std::to_string( dimension ) + "D";      \
+    module.def( priority##dimension.c_str(),                                   \
+        &polygonal_surface_object_priority< dimension > );                     \
     const auto loadable##dimension =                                           \
         "is_polygonal_surface_loadable" + std::to_string( dimension ) + "D";   \
     module.def( loadable##dimension.c_str(),                                   \

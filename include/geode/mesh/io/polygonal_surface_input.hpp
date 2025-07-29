@@ -82,6 +82,10 @@ namespace geode
         std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t polygonal_surface_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using PolygonalSurfaceInputFactory = Factory< std::string,
         PolygonalSurfaceInput< dimension >,
         std::string_view >;
