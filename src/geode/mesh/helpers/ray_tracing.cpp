@@ -473,15 +473,14 @@ namespace geode
                     {
                         continue;
                     }
-                    auto distance = point_point_distance( origin_, point );
                     if( Vector3D{ origin_, point }.dot( segment_.direction() )
                         < 0 )
                     {
-                        distance *= -1.;
+                        ray_edge_distance *= -1.;
                     }
                     std::lock_guard< std::mutex > lock{ mutex_ };
-                    results_.emplace_back( polygon_id, distance, result.second,
-                        std::move( point ) );
+                    results_.emplace_back( polygon_id, ray_edge_distance,
+                        result.second, std::move( point ) );
                 }
                 const auto [distance, __, triangle_point] =
                     segment_triangle_distance( segment_, triangle );
