@@ -41,9 +41,9 @@
         static_cast< std::unique_ptr< PointSet< dimension > > ( * )(           \
             std::string_view ) >( &load_point_set< dimension > ) );            \
     const auto check##dimension =                                              \
-        "check_point_set_missing_files" + std::to_string( dimension ) + "D";   \
-    module.def( check##dimension.c_str(),                                      \
-        &check_point_set_missing_files< dimension > );                         \
+        "point_set_additional_files" + std::to_string( dimension ) + "D";      \
+    module.def(                                                                \
+        check##dimension.c_str(), &point_set_additional_files< dimension > );  \
     const auto loadable##dimension =                                           \
         "is_point_set_loadable" + std::to_string( dimension ) + "D";           \
     module.def(                                                                \

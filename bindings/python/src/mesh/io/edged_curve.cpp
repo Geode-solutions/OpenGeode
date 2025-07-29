@@ -41,9 +41,9 @@
         static_cast< std::unique_ptr< EdgedCurve< dimension > > ( * )(         \
             std::string_view ) >( &load_edged_curve< dimension > ) );          \
     const auto check##dimension =                                              \
-        "check_edged_curve_missing_files" + std::to_string( dimension ) + "D"; \
+        "edged_curve_additional_files" + std::to_string( dimension ) + "D";    \
     module.def( check##dimension.c_str(),                                      \
-        &check_edged_curve_missing_files< dimension > );                       \
+        &edged_curve_additional_files< dimension > );                          \
     const auto loadable##dimension =                                           \
         "is_edged_curve_loadable" + std::to_string( dimension ) + "D";         \
     module.def(                                                                \

@@ -64,23 +64,19 @@ namespace geode
         : public Input< std::unique_ptr< TriangulatedSurface< dimension > >,
               MeshImpl >
     {
-    public:
-        using Base = Input< std::unique_ptr< TriangulatedSurface< dimension > >,
-            MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
         explicit TriangulatedSurfaceInput( std::string_view filename )
-            : Base{ filename }
+            : Input< std::unique_ptr< TriangulatedSurface< dimension > >,
+                  MeshImpl >{ filename }
         {
         }
     };
     ALIAS_2D_AND_3D( TriangulatedSurfaceInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename TriangulatedSurfaceInput< dimension >::MissingFiles
-        check_triangulated_surface_missing_files( std::string_view filename );
+    [[nodiscard]]
+    typename TriangulatedSurfaceInput< dimension >::AdditionalFiles
+        triangulated_surface_additional_files( std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] bool is_triangulated_surface_loadable(

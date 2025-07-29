@@ -41,10 +41,10 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolygonalSurface< dimension > > ( * )(   \
             std::string_view ) >( &load_polygonal_surface< dimension > ) );    \
-    const auto check##dimension = "check_polygonal_surface_missing_files"      \
+    const auto check##dimension = "polygonal_surface_additional_files"         \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &check_polygonal_surface_missing_files< dimension > );                 \
+        &polygonal_surface_additional_files< dimension > );                    \
     const auto loadable##dimension =                                           \
         "is_polygonal_surface_loadable" + std::to_string( dimension ) + "D";   \
     module.def( loadable##dimension.c_str(),                                   \
