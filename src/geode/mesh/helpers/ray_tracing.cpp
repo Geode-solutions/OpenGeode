@@ -461,26 +461,34 @@ namespace geode
                     std::lock_guard< std::mutex > lock{ mutex_ };
                     results_.emplace_back( polygon_id, distance, result.second,
                         std::move( intersection_result ) );
+                    break;
                 }
-                else
+                for( const auto e2 : LRange{ 3 } )
                 {
-                    for( const auto e2 : LRange{ 3 } )
-                    {
-                        auto point = std::get< 1 >( segment_segment_distance(
-                            Segment3D{ segment_ },
+                    auto [ray_edge_distance, point, _] =
+                        segment_segment_distance( Segment3D{ segment_ },
                             { triangle.vertices()[e2].get(),
-                                triangle.vertices()[( e2 + 1 ) % 3].get() } ) );
-                        auto distance = point_point_distance( origin_, point );
-                        if( Vector3D{ origin_, point }.dot(
-                                segment_.direction() )
-                            < 0 )
-                        {
-                            distance *= -1.;
-                        }
-                        std::lock_guard< std::mutex > lock{ mutex_ };
-                        results_.emplace_back( polygon_id, distance,
-                            result.second, std::move( point ) );
+                                triangle.vertices()[( e2 + 1 ) % 3].get() } );
+                    if( ray_edge_distance > GLOBAL_EPSILON )
+                    {
+                        continue;
                     }
+                    if( Vector3D{ origin_, point }.dot( segment_.direction() )
+                        < 0 )
+                    {
+                        ray_edge_distance *= -1.;
+                    }
+                    std::lock_guard< std::mutex > lock{ mutex_ };
+                    results_.emplace_back( polygon_id, ray_edge_distance,
+                        result.second, std::move( point ) );
+                }
+                const auto [distance, __, triangle_point] =
+                    segment_triangle_distance( segment_, triangle );
+                if( distance < GLOBAL_EPSILON )
+                {
+                    std::lock_guard< std::mutex > lock{ mutex_ };
+                    results_.emplace_back(
+                        polygon_id, distance, result.second, triangle_point );
                 }
                 break;
             }

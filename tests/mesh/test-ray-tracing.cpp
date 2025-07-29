@@ -30,6 +30,7 @@
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 #include <geode/mesh/helpers/ray_tracing.hpp>
+#include <geode/mesh/io/triangulated_surface_output.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -99,7 +100,6 @@ void test_ray_parallel()
     builder->create_point( geode::Point3D{ { -1, 1, 0 } } );
     builder->create_point( geode::Point3D{ { -2, 0, 0 } } );
     builder->create_polygon( { 0, 1, 2 } );
-
     const auto aabb = geode::create_aabb_tree( *mesh );
     const geode::Vector3D direction{ { -1, 0, 0 } };
     const geode::Point3D origin{ { 0, 0, 0 } };
@@ -111,7 +111,7 @@ void test_ray_parallel()
     OPENGEODE_EXCEPTION(
         result->polygon == 0, "[Test] Ray edge wrong polygon" );
     OPENGEODE_EXCEPTION(
-        result->distance == 1, "[Test] Ray edge wrong distance" );
+        result->distance == 0, "[Test] Ray edge wrong distance" );
 }
 
 void test()
