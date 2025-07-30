@@ -38,6 +38,7 @@ namespace geode
             static_cast< std::unique_ptr< Graph > ( * )( std::string_view ) >(
                 &load_graph ) );
         module.def( "graph_additional_files", &graph_additional_files );
+        module.def( "graph_object_priority", &graph_object_priority );
         module.def( "is_graph_loadable", &is_graph_loadable );
         module.def( "is_graph_saveable", &is_graph_saveable );
         PYTHON_INPUT_MESH_CLASS( std::unique_ptr< Graph >, "Graph" );

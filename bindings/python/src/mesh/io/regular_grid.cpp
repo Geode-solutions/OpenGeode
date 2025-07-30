@@ -45,6 +45,10 @@
         "regular_grid_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \
         &regular_grid_additional_files< dimension > );                         \
+    const auto priority##dimension =                                           \
+        "regular_grid_object_priority" + std::to_string( dimension ) + "D";    \
+    module.def( priority##dimension.c_str(),                                   \
+        &regular_grid_object_priority< dimension > );                          \
     const auto loadable##dimension =                                           \
         "is_regular_grid_loadable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \

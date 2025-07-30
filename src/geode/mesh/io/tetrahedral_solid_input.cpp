@@ -99,6 +99,14 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    index_t tetrahedral_solid_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            TetrahedralSolidInputFactory< dimension > >( filename );
+        return input->object_priority();
+    }
+
     template std::unique_ptr< TetrahedralSolid< 3 > > opengeode_mesh_api
         load_tetrahedral_solid( const MeshImpl&, std::string_view );
 
@@ -109,5 +117,8 @@ namespace geode
         tetrahedral_solid_additional_files< 3 >( std::string_view );
 
     template bool opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_mesh_api tetrahedral_solid_object_priority< 3 >(
         std::string_view );
 } // namespace geode

@@ -80,6 +80,10 @@ namespace geode
     [[nodiscard]] bool is_point_set_loadable( std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t point_set_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using PointSetInputFactory =
         Factory< std::string, PointSetInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( PointSetInputFactory );

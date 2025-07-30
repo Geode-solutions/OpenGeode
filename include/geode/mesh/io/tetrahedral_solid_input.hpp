@@ -82,6 +82,10 @@ namespace geode
         std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t tetrahedral_solid_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using TetrahedralSolidInputFactory = Factory< std::string,
         TetrahedralSolidInput< dimension >,
         std::string_view >;

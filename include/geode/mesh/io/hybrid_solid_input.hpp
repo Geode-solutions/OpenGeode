@@ -80,6 +80,10 @@ namespace geode
     [[nodiscard]] bool is_hybrid_solid_loadable( std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t hybrid_solid_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using HybridSolidInputFactory =
         Factory< std::string, HybridSolidInput< dimension >, std::string_view >;
     ALIAS_3D( HybridSolidInputFactory );

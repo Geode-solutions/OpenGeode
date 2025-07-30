@@ -66,6 +66,10 @@ namespace geode
         std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t light_regular_grid_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using LightRegularGridInputFactory = Factory< std::string,
         LightRegularGridInput< dimension >,
         std::string_view >;

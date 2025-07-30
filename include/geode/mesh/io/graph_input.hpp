@@ -71,6 +71,9 @@ namespace geode
     [[nodiscard]] bool opengeode_mesh_api is_graph_loadable(
         std::string_view filename );
 
+    [[nodiscard]] index_t opengeode_mesh_api graph_object_priority(
+        std::string_view filename );
+
     using GraphInputFactory =
         Factory< std::string, GraphInput, std::string_view >;
 } // namespace geode

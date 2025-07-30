@@ -80,6 +80,10 @@ namespace geode
     [[nodiscard]] bool is_edged_curve_loadable( std::string_view filename );
 
     template < index_t dimension >
+    [[nodiscard]] index_t edged_curve_object_priority(
+        std::string_view filename );
+
+    template < index_t dimension >
     using EdgedCurveInputFactory =
         Factory< std::string, EdgedCurveInput< dimension >, std::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveInputFactory );

@@ -86,6 +86,11 @@ namespace geode
         {
             return {};
         }
+
+        index_t object_priority() const override
+        {
+            return 0;
+        }
     };
     ALIAS_2D_AND_3D( OpenGeodeLightRegularGridInput );
 } // namespace geode
