@@ -72,7 +72,7 @@ namespace geode
         return input->additional_files();
     }
 
-    bool is_graph_loadable( std::string_view filename )
+    Percentage is_graph_loadable( std::string_view filename )
     {
         try
         {
@@ -83,7 +83,7 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
     }
 

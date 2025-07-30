@@ -77,7 +77,8 @@ namespace geode
         hybrid_solid_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_hybrid_solid_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_hybrid_solid_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] index_t hybrid_solid_object_priority(

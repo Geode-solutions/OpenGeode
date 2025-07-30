@@ -30,7 +30,7 @@ namespace geode
     class opengeode_basic_api Percentage
     {
     public:
-        Percentage( double value );
+        explicit Percentage( double value );
 
         double value() const;
 

@@ -50,6 +50,16 @@
                                  && std::get< 1 >( context ).isValid(),        \
             "[Bitsery::read] Error while reading file: ", this->filename() );  \
         return mesh;                                                           \
+    }                                                                          \
+                                                                               \
+    index_t object_priority() const final                                      \
+    {                                                                          \
+        return 0;                                                              \
+    }                                                                          \
+                                                                               \
+    Percentage is_loadable() const final                                       \
+    {                                                                          \
+        return Percentage{ 1 };                                                \
     }
 
 #define BITSERY_INPUT_MESH_DIMENSION( Mesh )                                   \
@@ -66,11 +76,6 @@
             additional_files() const final                                     \
         {                                                                      \
             return {};                                                         \
-        }                                                                      \
-                                                                               \
-        index_t object_priority() const final                                  \
-        {                                                                      \
-            return 0;                                                          \
         }                                                                      \
                                                                                \
         BITSERY_READ( Mesh< dimension > )                                      \
@@ -90,11 +95,6 @@
             additional_files() const final                                     \
         {                                                                      \
             return {};                                                         \
-        }                                                                      \
-                                                                               \
-        index_t object_priority() const final                                  \
-        {                                                                      \
-            return 0;                                                          \
         }                                                                      \
                                                                                \
         BITSERY_READ( Mesh )                                                   \

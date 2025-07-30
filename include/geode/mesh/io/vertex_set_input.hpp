@@ -69,7 +69,7 @@ namespace geode
     [[nodiscard]] typename VertexSetInput::AdditionalFiles opengeode_mesh_api
         vertex_set_additional_files( std::string_view filename );
 
-    [[nodiscard]] bool opengeode_mesh_api is_vertex_set_loadable(
+    [[nodiscard]] Percentage opengeode_mesh_api is_vertex_set_loadable(
         std::string_view filename );
 
     [[nodiscard]] index_t opengeode_mesh_api vertex_set_object_priority(

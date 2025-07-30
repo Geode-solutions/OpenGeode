@@ -70,7 +70,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_light_regular_grid_loadable( std::string_view filename )
+    Percentage is_light_regular_grid_loadable( std::string_view filename )
     {
         try
         {
@@ -80,7 +80,7 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
     }
 
@@ -105,9 +105,9 @@ namespace geode
     template LightRegularGridInput< 3 >::AdditionalFiles opengeode_mesh_api
         light_regular_grid_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_mesh_api is_light_regular_grid_loadable< 2 >(
+    template Percentage opengeode_mesh_api is_light_regular_grid_loadable< 2 >(
         std::string_view );
-    template bool opengeode_mesh_api is_light_regular_grid_loadable< 3 >(
+    template Percentage opengeode_mesh_api is_light_regular_grid_loadable< 3 >(
         std::string_view );
 
     template index_t opengeode_mesh_api light_regular_grid_object_priority< 2 >(

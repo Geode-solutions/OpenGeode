@@ -85,7 +85,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_tetrahedral_solid_loadable( std::string_view filename )
+    Percentage is_tetrahedral_solid_loadable( std::string_view filename )
     {
         try
         {
@@ -95,7 +95,7 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
     }
 
@@ -116,7 +116,7 @@ namespace geode
     template TetrahedralSolidInput< 3 >::AdditionalFiles opengeode_mesh_api
         tetrahedral_solid_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(
+    template Percentage opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(
         std::string_view );
 
     template index_t opengeode_mesh_api tetrahedral_solid_object_priority< 3 >(

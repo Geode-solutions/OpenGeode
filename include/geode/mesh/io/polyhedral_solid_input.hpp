@@ -78,7 +78,7 @@ namespace geode
         polyhedral_solid_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_polyhedral_solid_loadable(
+    [[nodiscard]] Percentage is_polyhedral_solid_loadable(
         std::string_view filename );
 
     template < index_t dimension >

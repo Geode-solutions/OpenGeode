@@ -71,7 +71,7 @@ namespace geode
         return input->additional_files();
     }
 
-    bool is_vertex_set_loadable( std::string_view filename )
+    Percentage is_vertex_set_loadable( std::string_view filename )
     {
         try
         {
@@ -82,7 +82,7 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
     }
 

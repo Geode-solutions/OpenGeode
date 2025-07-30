@@ -62,7 +62,7 @@ namespace geode
         light_regular_grid_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_light_regular_grid_loadable(
+    [[nodiscard]] Percentage is_light_regular_grid_loadable(
         std::string_view filename );
 
     template < index_t dimension >

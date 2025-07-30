@@ -91,6 +91,11 @@ namespace geode
         {
             return 0;
         }
+
+        Percentage is_loadable() const final
+        {
+            return Percentage{ 1 };
+        }
     };
     ALIAS_2D_AND_3D( OpenGeodeLightRegularGridInput );
 } // namespace geode

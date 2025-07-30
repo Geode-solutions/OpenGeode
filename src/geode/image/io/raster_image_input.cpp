@@ -60,7 +60,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_raster_image_loadable( std::string_view filename )
+    Percentage is_raster_image_loadable( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             RasterImageInputFactory< dimension > >( filename );
@@ -85,9 +85,9 @@ namespace geode
     template RasterImageInput< 3 >::AdditionalFiles opengeode_image_api
         raster_image_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_image_api is_raster_image_loadable< 2 >(
+    template Percentage opengeode_image_api is_raster_image_loadable< 2 >(
         std::string_view );
-    template bool opengeode_image_api is_raster_image_loadable< 3 >(
+    template Percentage opengeode_image_api is_raster_image_loadable< 3 >(
         std::string_view );
 
     template index_t opengeode_image_api raster_image_object_priority< 2 >(

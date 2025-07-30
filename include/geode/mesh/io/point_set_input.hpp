@@ -77,7 +77,7 @@ namespace geode
         point_set_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_point_set_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_point_set_loadable( std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] index_t point_set_object_priority(
