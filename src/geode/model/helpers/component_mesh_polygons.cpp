@@ -691,7 +691,7 @@ namespace geode
             return polygons;
         }
 
-        std::vector< PolyhedronFacets > block_component_mesh_polygons(
+        std::vector< PolyhedronFacet > block_component_mesh_polygons(
             const BRep& model,
             const PolygonVertices& polygon_unique_vertices,
             const Block3D& block )
@@ -702,7 +702,7 @@ namespace geode
             {
                 return {};
             }
-            std::vector< PolyhedronFacets > facets;
+            std::vector< PolyhedronFacet > facets;
             const auto& mesh = block.mesh();
             for( const auto& pair : block_pairs.at( block.component_id() ) )
             {
