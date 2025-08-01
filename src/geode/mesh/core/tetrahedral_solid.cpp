@@ -450,6 +450,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedronFacetsLocalVertices
+        TetrahedralSolid< dimension >::polyhedron_facets_local_vertices(
+            index_t /*unused*/ ) const
+    {
+        PolyhedronFacetsLocalVertices result;
+        for( const auto& facet : detail::TETRAHEDRON_FACET_VERTICES )
+        {
+            result.emplace_back(
+                PolyhedronFacetLocalVertices{ facet[0], facet[1], facet[2] } );
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     std::optional< PolyhedronFacet >
         TetrahedralSolid< dimension >::polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const
