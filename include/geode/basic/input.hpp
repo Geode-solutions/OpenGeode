@@ -26,6 +26,7 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/percentage.hpp>
 
 namespace geode
 {
@@ -35,31 +36,40 @@ namespace geode
     public:
         using InputData = Object;
 
-        struct MissingFiles
+        struct AdditionalFile
         {
-            [[nodiscard]] bool has_missing_files() const
+            AdditionalFile( std::string filename_in, bool is_missing_in )
+                : filename{ std::move( filename_in ) },
+                  is_missing{ is_missing_in }
             {
-                return !additional_files.empty() || !mandatory_files.empty();
             }
 
-            operator bool() const
-            {
-                return has_missing_files();
-            }
-
-            std::vector< std::string > additional_files;
-            std::vector< std::string > mandatory_files;
+            std::string filename;
+            bool is_missing;
         };
 
-        [[nodiscard]] virtual MissingFiles check_missing_files() const
+        struct AdditionalFiles
         {
-            return {};
-        }
+            [[nodiscard]] bool has_additional_files() const
+            {
+                const auto check_missing = []( const auto& file ) {
+                    return file.is_missing;
+                };
+                return absl::c_find_if( optional_files, check_missing )
+                           != optional_files.end()
+                       || absl::c_find_if( mandatory_files, check_missing )
+                              != mandatory_files.end();
+            }
 
-        [[nodiscard]] virtual bool is_loadable() const
-        {
-            return true;
-        }
+            std::vector< AdditionalFile > optional_files;
+            std::vector< AdditionalFile > mandatory_files;
+        };
+
+        [[nodiscard]] virtual AdditionalFiles additional_files() const = 0;
+
+        [[nodiscard]] virtual index_t object_priority() const = 0;
+
+        [[nodiscard]] virtual Percentage is_loadable() const = 0;
 
         [[nodiscard]] virtual Object read( const Args&... args ) = 0;
 

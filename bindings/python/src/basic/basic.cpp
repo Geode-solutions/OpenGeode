@@ -34,6 +34,7 @@ namespace geode
     void define_identifier( pybind11::module& );
     void define_identifier_builder( pybind11::module& );
     void define_mapping( pybind11::module& );
+    void define_percentage( pybind11::module& );
     void define_uuid( pybind11::module& );
 } // namespace geode
 
@@ -53,5 +54,6 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     geode::define_identifier( module );
     geode::define_identifier_builder( module );
     geode::define_mapping( module );
+    geode::define_percentage( module );
     geode::define_uuid( module );
 }

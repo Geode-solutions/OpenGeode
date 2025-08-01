@@ -28,6 +28,7 @@ add_geode_python_binding(
         "identifier.cpp"
         "identifier_builder.cpp"
         "mapping.cpp"
+        "percentage.cpp"
         "uuid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

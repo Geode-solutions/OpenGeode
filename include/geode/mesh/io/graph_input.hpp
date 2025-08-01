@@ -58,19 +58,20 @@ namespace geode
 
     class GraphInput : public Input< std::unique_ptr< Graph >, MeshImpl >
     {
-    public:
-        using Base = Input< std::unique_ptr< Graph >, MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
-        explicit GraphInput( std::string_view filename ) : Base{ filename } {}
+        explicit GraphInput( std::string_view filename )
+            : Input< std::unique_ptr< Graph >, MeshImpl >{ filename }
+        {
+        }
     };
 
-    [[nodiscard]] typename GraphInput::MissingFiles opengeode_mesh_api
-        check_graph_missing_files( std::string_view filename );
+    [[nodiscard]] typename GraphInput::AdditionalFiles opengeode_mesh_api
+        graph_additional_files( std::string_view filename );
 
-    [[nodiscard]] bool opengeode_mesh_api is_graph_loadable(
+    [[nodiscard]] Percentage opengeode_mesh_api is_graph_loadable(
+        std::string_view filename );
+
+    [[nodiscard]] index_t opengeode_mesh_api graph_object_priority(
         std::string_view filename );
 
     using GraphInputFactory =

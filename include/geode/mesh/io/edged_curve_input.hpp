@@ -62,24 +62,27 @@ namespace geode
     class EdgedCurveInput
         : public Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >
     {
-    public:
-        using Base =
-            Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
-        explicit EdgedCurveInput( std::string_view filename ) : Base{ filename }
+        explicit EdgedCurveInput( std::string_view filename )
+            : Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >{
+                  filename
+              }
         {
         }
     };
+    ALIAS_2D_AND_3D( EdgedCurveInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename EdgedCurveInput< dimension >::MissingFiles
-        check_edged_curve_missing_files( std::string_view filename );
+    [[nodiscard]] typename EdgedCurveInput< dimension >::AdditionalFiles
+        edged_curve_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_edged_curve_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_edged_curve_loadable(
+        std::string_view filename );
+
+    template < index_t dimension >
+    [[nodiscard]] index_t edged_curve_object_priority(
+        std::string_view filename );
 
     template < index_t dimension >
     using EdgedCurveInputFactory =

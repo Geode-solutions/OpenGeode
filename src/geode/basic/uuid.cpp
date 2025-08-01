@@ -27,8 +27,9 @@
 #include <sstream>
 
 #include <absl/hash/hash.h>
-
 #include <absl/random/random.h>
+
+#include <geode/basic/range.hpp>
 
 namespace
 {

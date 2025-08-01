@@ -33,42 +33,10 @@
 #include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 
-#include <geode/geometry/point.hpp>
-#include <geode/geometry/vector.hpp>
-
-#include <geode/mesh/core/bitsery_archive.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 
 namespace geode
 {
-    template < index_t dimension >
-    LightRegularGrid< dimension > LightRegularGridInput< dimension >::read()
-    {
-        std::ifstream file{ to_string( this->filename() ),
-            std::ifstream::binary };
-        OPENGEODE_EXCEPTION( file,
-            "[LightRegularGridInput] Failed to open file: ",
-            to_string( this->filename() ) );
-        TContext context{};
-        BitseryExtensions::register_deserialize_pcontext(
-            std::get< 0 >( context ) );
-        Deserializer archive{ context, file };
-        Point< dimension > origin;
-        std::array< index_t, dimension > cells_number;
-        cells_number.fill( 1 );
-        std::array< double, dimension > cells_length;
-        cells_length.fill( 1 );
-        LightRegularGrid< dimension > grid{ origin, cells_number,
-            cells_length };
-        archive.object( grid );
-        const auto& adapter = archive.adapter();
-        OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
-                                 && adapter.isCompletedSuccessfully()
-                                 && std::get< 1 >( context ).isValid(),
-            "[Bitsery::read] Error while reading file: ", this->filename() );
-        return grid;
-    }
-
     template < index_t dimension >
     LightRegularGrid< dimension > load_light_regular_grid(
         std::string_view filename )
@@ -93,16 +61,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename LightRegularGridInput< dimension >::MissingFiles
-        check_light_regular_grid_missing_files( std::string_view filename )
+    typename LightRegularGridInput< dimension >::AdditionalFiles
+        light_regular_grid_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             LightRegularGridInputFactory< dimension > >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
     template < index_t dimension >
-    bool is_light_regular_grid_loadable( std::string_view filename )
+    Percentage is_light_regular_grid_loadable( std::string_view filename )
     {
         try
         {
@@ -112,8 +80,16 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    template < index_t dimension >
+    index_t light_regular_grid_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            LightRegularGridInputFactory< dimension > >( filename );
+        return input->object_priority();
     }
 
     template LightRegularGrid< 2 > opengeode_mesh_api load_light_regular_grid(
@@ -124,13 +100,18 @@ namespace geode
     template class opengeode_mesh_api LightRegularGridInput< 2 >;
     template class opengeode_mesh_api LightRegularGridInput< 3 >;
 
-    template LightRegularGridInput< 2 >::MissingFiles opengeode_mesh_api
-        check_light_regular_grid_missing_files< 2 >( std::string_view );
-    template LightRegularGridInput< 3 >::MissingFiles opengeode_mesh_api
-        check_light_regular_grid_missing_files< 3 >( std::string_view );
+    template LightRegularGridInput< 2 >::AdditionalFiles opengeode_mesh_api
+        light_regular_grid_additional_files< 2 >( std::string_view );
+    template LightRegularGridInput< 3 >::AdditionalFiles opengeode_mesh_api
+        light_regular_grid_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_mesh_api is_light_regular_grid_loadable< 2 >(
+    template Percentage opengeode_mesh_api is_light_regular_grid_loadable< 2 >(
         std::string_view );
-    template bool opengeode_mesh_api is_light_regular_grid_loadable< 3 >(
+    template Percentage opengeode_mesh_api is_light_regular_grid_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_mesh_api light_regular_grid_object_priority< 2 >(
+        std::string_view );
+    template index_t opengeode_mesh_api light_regular_grid_object_priority< 3 >(
         std::string_view );
 } // namespace geode

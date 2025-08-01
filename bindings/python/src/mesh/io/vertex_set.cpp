@@ -38,7 +38,8 @@ namespace geode
             "load_vertex_set", static_cast< std::unique_ptr< VertexSet > ( * )(
                                    std::string_view ) >( &load_vertex_set ) );
         module.def(
-            "check_vertex_set_missing_files", &check_vertex_set_missing_files );
+            "vertex_set_additional_files", &vertex_set_additional_files );
+        module.def( "vertex_set_object_priority", &vertex_set_object_priority );
         module.def( "is_vertex_set_loadable", &is_vertex_set_loadable );
         module.def( "is_vertex_set_saveable", &is_vertex_set_saveable );
         PYTHON_INPUT_MESH_CLASS( std::unique_ptr< VertexSet >, "VertexSet" );

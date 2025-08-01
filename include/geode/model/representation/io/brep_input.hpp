@@ -49,19 +49,20 @@ namespace geode
 
     class BRepInput : public Input< BRep >
     {
-    public:
-        using Base = Input< BRep >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
-        explicit BRepInput( std::string_view filename ) : Base{ filename } {}
+        explicit BRepInput( std::string_view filename )
+            : Input< BRep >{ filename }
+        {
+        }
     };
 
-    [[nodiscard]] typename BRepInput::MissingFiles opengeode_model_api
-        check_brep_missing_files( std::string_view filename );
+    [[nodiscard]] typename BRepInput::AdditionalFiles opengeode_model_api
+        brep_additional_files( std::string_view filename );
 
-    [[nodiscard]] bool opengeode_model_api is_brep_loadable(
+    [[nodiscard]] Percentage opengeode_model_api is_brep_loadable(
+        std::string_view filename );
+
+    [[nodiscard]] index_t opengeode_model_api brep_object_priority(
         std::string_view filename );
 
     using BRepInputFactory =

@@ -64,15 +64,15 @@ namespace geode
             MeshFactory::default_impl( Graph::type_name_static() ), filename );
     }
 
-    typename GraphInput::MissingFiles check_graph_missing_files(
+    typename GraphInput::AdditionalFiles graph_additional_files(
         std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< GraphInputFactory >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
-    bool is_graph_loadable( std::string_view filename )
+    Percentage is_graph_loadable( std::string_view filename )
     {
         try
         {
@@ -83,7 +83,14 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    index_t graph_object_priority( std::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< GraphInputFactory >( filename );
+        return input->object_priority();
     }
 } // namespace geode

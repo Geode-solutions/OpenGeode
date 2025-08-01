@@ -60,6 +60,7 @@ namespace geode
         {
         }
     };
+    ALIAS_2D_AND_3D( TriangulatedSurfaceOutput );
 
     template < index_t dimension >
     [[nodiscard]] bool is_triangulated_surface_saveable(

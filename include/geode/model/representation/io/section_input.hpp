@@ -49,19 +49,20 @@ namespace geode
 
     class SectionInput : public Input< Section >
     {
-    public:
-        using Base = Input< Section >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
-        explicit SectionInput( std::string_view filename ) : Base{ filename } {}
+        explicit SectionInput( std::string_view filename )
+            : Input< Section >{ filename }
+        {
+        }
     };
 
-    [[nodiscard]] typename SectionInput::MissingFiles opengeode_model_api
-        check_section_missing_files( std::string_view filename );
+    [[nodiscard]] typename SectionInput::AdditionalFiles opengeode_model_api
+        section_additional_files( std::string_view filename );
 
-    [[nodiscard]] bool opengeode_model_api is_section_loadable(
+    [[nodiscard]] Percentage opengeode_model_api is_section_loadable(
+        std::string_view filename );
+
+    [[nodiscard]] index_t opengeode_model_api section_object_priority(
         std::string_view filename );
 
     using SectionInputFactory =

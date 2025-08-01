@@ -76,16 +76,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename TetrahedralSolidInput< dimension >::MissingFiles
-        check_tetrahedral_solid_missing_files( std::string_view filename )
+    typename TetrahedralSolidInput< dimension >::AdditionalFiles
+        tetrahedral_solid_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             TetrahedralSolidInputFactory< dimension > >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
     template < index_t dimension >
-    bool is_tetrahedral_solid_loadable( std::string_view filename )
+    Percentage is_tetrahedral_solid_loadable( std::string_view filename )
     {
         try
         {
@@ -95,8 +95,16 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    template < index_t dimension >
+    index_t tetrahedral_solid_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            TetrahedralSolidInputFactory< dimension > >( filename );
+        return input->object_priority();
     }
 
     template std::unique_ptr< TetrahedralSolid< 3 > > opengeode_mesh_api
@@ -105,9 +113,12 @@ namespace geode
     template std::unique_ptr< TetrahedralSolid< 3 > >
         opengeode_mesh_api load_tetrahedral_solid( std::string_view );
 
-    template TetrahedralSolidInput< 3 >::MissingFiles opengeode_mesh_api
-        check_tetrahedral_solid_missing_files< 3 >( std::string_view );
+    template TetrahedralSolidInput< 3 >::AdditionalFiles opengeode_mesh_api
+        tetrahedral_solid_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(
+    template Percentage opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_mesh_api tetrahedral_solid_object_priority< 3 >(
         std::string_view );
 } // namespace geode

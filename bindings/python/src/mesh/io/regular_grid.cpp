@@ -41,10 +41,14 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< RegularGrid< dimension > > ( * )(        \
             std::string_view ) >( &load_regular_grid< dimension > ) );         \
-    const auto check##dimension = "check_regular_grid_missing_files"           \
-                                  + std::to_string( dimension ) + "D";         \
+    const auto check##dimension =                                              \
+        "regular_grid_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \
-        &check_regular_grid_missing_files< dimension > );                      \
+        &regular_grid_additional_files< dimension > );                         \
+    const auto priority##dimension =                                           \
+        "regular_grid_object_priority" + std::to_string( dimension ) + "D";    \
+    module.def( priority##dimension.c_str(),                                   \
+        &regular_grid_object_priority< dimension > );                          \
     const auto loadable##dimension =                                           \
         "is_regular_grid_loadable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \

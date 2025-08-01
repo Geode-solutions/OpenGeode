@@ -62,16 +62,16 @@ namespace geode
         }
     }
 
-    typename VertexSetInput::MissingFiles check_vertex_set_missing_files(
+    typename VertexSetInput::AdditionalFiles vertex_set_additional_files(
         std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< VertexSetInputFactory >(
                 filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
-    bool is_vertex_set_loadable( std::string_view filename )
+    Percentage is_vertex_set_loadable( std::string_view filename )
     {
         try
         {
@@ -82,7 +82,15 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    index_t vertex_set_object_priority( std::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< VertexSetInputFactory >(
+                filename );
+        return input->object_priority();
     }
 } // namespace geode

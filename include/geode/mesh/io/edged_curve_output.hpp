@@ -58,6 +58,7 @@ namespace geode
         {
         }
     };
+    ALIAS_2D_AND_3D( EdgedCurveOutput );
 
     template < index_t dimension >
     [[nodiscard]] bool is_edged_curve_saveable(

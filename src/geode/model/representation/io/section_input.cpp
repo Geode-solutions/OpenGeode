@@ -70,16 +70,16 @@ namespace geode
         }
     }
 
-    typename SectionInput::MissingFiles check_section_missing_files(
+    typename SectionInput::AdditionalFiles section_additional_files(
         std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< SectionInputFactory >(
                 filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
-    bool is_section_loadable( std::string_view filename )
+    Percentage is_section_loadable( std::string_view filename )
     {
         try
         {
@@ -90,7 +90,15 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    index_t section_object_priority( std::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< SectionInputFactory >(
+                filename );
+        return input->object_priority();
     }
 } // namespace geode

@@ -75,16 +75,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename PolygonalSurfaceInput< dimension >::MissingFiles
-        check_polygonal_surface_missing_files( std::string_view filename )
+    typename PolygonalSurfaceInput< dimension >::AdditionalFiles
+        polygonal_surface_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             PolygonalSurfaceInputFactory< dimension > >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
     template < index_t dimension >
-    bool is_polygonal_surface_loadable( std::string_view filename )
+    Percentage is_polygonal_surface_loadable( std::string_view filename )
     {
         try
         {
@@ -94,8 +94,16 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    template < index_t dimension >
+    index_t polygonal_surface_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            PolygonalSurfaceInputFactory< dimension > >( filename );
+        return input->object_priority();
     }
 
     template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api
@@ -108,13 +116,18 @@ namespace geode
     template std::unique_ptr< PolygonalSurface< 3 > >
         opengeode_mesh_api load_polygonal_surface( std::string_view );
 
-    template PolygonalSurfaceInput< 2 >::MissingFiles opengeode_mesh_api
-        check_polygonal_surface_missing_files< 2 >( std::string_view );
-    template PolygonalSurfaceInput< 3 >::MissingFiles opengeode_mesh_api
-        check_polygonal_surface_missing_files< 3 >( std::string_view );
+    template PolygonalSurfaceInput< 2 >::AdditionalFiles opengeode_mesh_api
+        polygonal_surface_additional_files< 2 >( std::string_view );
+    template PolygonalSurfaceInput< 3 >::AdditionalFiles opengeode_mesh_api
+        polygonal_surface_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_mesh_api is_polygonal_surface_loadable< 2 >(
+    template Percentage opengeode_mesh_api is_polygonal_surface_loadable< 2 >(
         std::string_view );
-    template bool opengeode_mesh_api is_polygonal_surface_loadable< 3 >(
+    template Percentage opengeode_mesh_api is_polygonal_surface_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_mesh_api polygonal_surface_object_priority< 2 >(
+        std::string_view );
+    template index_t opengeode_mesh_api polygonal_surface_object_priority< 3 >(
         std::string_view );
 } // namespace geode

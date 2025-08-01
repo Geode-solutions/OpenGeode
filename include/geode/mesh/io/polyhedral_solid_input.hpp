@@ -64,27 +64,25 @@ namespace geode
         : public Input< std::unique_ptr< PolyhedralSolid< dimension > >,
               MeshImpl >
     {
-        OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-
-    public:
-        using Base =
-            Input< std::unique_ptr< PolyhedralSolid< dimension > >, MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
         explicit PolyhedralSolidInput( std::string_view filename )
-            : Base{ filename }
+            : Input< std::unique_ptr< PolyhedralSolid< dimension > >,
+                  MeshImpl >{ filename }
         {
         }
     };
+    ALIAS_3D( PolyhedralSolidInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename PolyhedralSolidInput< dimension >::MissingFiles
-        check_polyhedral_solid_missing_files( std::string_view filename );
+    [[nodiscard]] typename PolyhedralSolidInput< dimension >::AdditionalFiles
+        polyhedral_solid_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_polyhedral_solid_loadable(
+    [[nodiscard]] Percentage is_polyhedral_solid_loadable(
+        std::string_view filename );
+
+    template < index_t dimension >
+    [[nodiscard]] index_t polyhedral_solid_object_priority(
         std::string_view filename );
 
     template < index_t dimension >

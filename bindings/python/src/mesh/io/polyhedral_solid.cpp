@@ -41,10 +41,14 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolyhedralSolid< dimension > > ( * )(    \
             std::string_view ) >( &load_polyhedral_solid< dimension > ) );     \
-    const auto check##dimension = "check_polyhedral_solid_missing_files"       \
+    const auto check##dimension = "polyhedral_solid_additional_files"          \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &check_polyhedral_solid_missing_files< dimension > );                  \
+        &polyhedral_solid_additional_files< dimension > );                     \
+    const auto priority##dimension = "polyhedral_solid_object_priority"        \
+                                     + std::to_string( dimension ) + "D";      \
+    module.def( priority##dimension.c_str(),                                   \
+        &polyhedral_solid_object_priority< dimension > );                      \
     const auto loadable##dimension =                                           \
         "is_polyhedral_solid_loadable" + std::to_string( dimension ) + "D";    \
     module.def( loadable##dimension.c_str(),                                   \

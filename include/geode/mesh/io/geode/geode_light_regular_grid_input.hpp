@@ -23,35 +23,54 @@
 
 #pragma once
 
-#include <fstream>
+#include <string_view>
 
-#include <geode/image/core/bitsery_archive.hpp>
-#include <geode/image/io/raster_image_input.hpp>
+#include <geode/basic/factory.hpp>
+#include <geode/basic/input.hpp>
+
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
+
+#include <geode/mesh/common.hpp>
+#include <geode/mesh/io/light_regular_grid_input.hpp>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( LightRegularGrid );
+} // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
-    class OpenGeodeRasterImageInput : public RasterImageInput< dimension >
+    class OpenGeodeLightRegularGridInput
+        : public LightRegularGridInput< dimension >
     {
     public:
-        explicit OpenGeodeRasterImageInput( std::string_view filename )
-            : RasterImageInput< dimension >( filename )
+        explicit OpenGeodeLightRegularGridInput( std::string_view filename )
+            : LightRegularGridInput< dimension >{ filename }
         {
         }
 
-        [[nodiscard]] RasterImage< dimension > read() final
+    protected:
+        [[nodiscard]] LightRegularGrid< dimension > read() override
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
             OPENGEODE_EXCEPTION( file,
-                "[RasterImageInput] Failed to open file: ",
+                "[LightRegularGridInput] Failed to open file: ",
                 to_string( this->filename() ) );
             TContext context{};
             BitseryExtensions::register_deserialize_pcontext(
                 std::get< 0 >( context ) );
             Deserializer archive{ context, file };
-            RasterImage< dimension > image;
-            archive.object( image );
+            Point< dimension > origin;
+            std::array< index_t, dimension > cells_number;
+            cells_number.fill( 1 );
+            std::array< double, dimension > cells_length;
+            cells_length.fill( 1 );
+            LightRegularGrid< dimension > grid{ origin, cells_number,
+                cells_length };
+            archive.object( grid );
             const auto& adapter = archive.adapter();
             OPENGEODE_EXCEPTION(
                 adapter.error() == bitsery::ReaderError::NoError
@@ -59,16 +78,16 @@ namespace geode
                     && std::get< 1 >( context ).isValid(),
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
-            return image;
+            return grid;
         }
 
-        typename RasterImageInput< dimension >::AdditionalFiles
-            additional_files() const final
+        typename LightRegularGridInput< dimension >::AdditionalFiles
+            additional_files() const override
         {
             return {};
         }
 
-        index_t object_priority() const final
+        index_t object_priority() const override
         {
             return 0;
         }
@@ -78,5 +97,5 @@ namespace geode
             return Percentage{ 1 };
         }
     };
-    ALIAS_2D_AND_3D( OpenGeodeRasterImageInput );
+    ALIAS_2D_AND_3D( OpenGeodeLightRegularGridInput );
 } // namespace geode

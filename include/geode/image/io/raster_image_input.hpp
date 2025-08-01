@@ -50,24 +50,24 @@ namespace geode
     template < index_t dimension >
     class RasterImageInput : public Input< RasterImage< dimension > >
     {
-    public:
-        using Base = Input< RasterImage< dimension > >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
         explicit RasterImageInput( std::string_view filename )
-            : Base{ filename }
+            : Input< RasterImage< dimension > >{ filename }
         {
         }
     };
 
     template < index_t dimension >
-    [[nodiscard]] typename RasterImageInput< dimension >::MissingFiles
-        check_raster_image_missing_files( std::string_view filename );
+    [[nodiscard]] typename RasterImageInput< dimension >::AdditionalFiles
+        raster_image_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_raster_image_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_raster_image_loadable(
+        std::string_view filename );
+
+    template < index_t dimension >
+    [[nodiscard]] index_t raster_image_object_priority(
+        std::string_view filename );
 
     template < index_t dimension >
     using RasterImageInputFactory =

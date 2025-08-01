@@ -62,6 +62,7 @@ namespace geode
         {
         }
     };
+    ALIAS_3D( TetrahedralSolidOutput );
 
     template < index_t dimension >
     [[nodiscard]] bool is_tetrahedral_solid_saveable(

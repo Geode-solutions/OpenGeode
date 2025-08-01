@@ -64,25 +64,25 @@ namespace geode
         : public Input< std::unique_ptr< PolygonalSurface< dimension > >,
               MeshImpl >
     {
-    public:
-        using Base =
-            Input< std::unique_ptr< PolygonalSurface< dimension > >, MeshImpl >;
-        using typename Base::InputData;
-        using typename Base::MissingFiles;
-
     protected:
         explicit PolygonalSurfaceInput( std::string_view filename )
-            : Base{ filename }
+            : Input< std::unique_ptr< PolygonalSurface< dimension > >,
+                  MeshImpl >{ filename }
         {
         }
     };
+    ALIAS_2D_AND_3D( PolygonalSurfaceInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename PolygonalSurfaceInput< dimension >::MissingFiles
-        check_polygonal_surface_missing_files( std::string_view filename );
+    [[nodiscard]] typename PolygonalSurfaceInput< dimension >::AdditionalFiles
+        polygonal_surface_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_polygonal_surface_loadable(
+    [[nodiscard]] Percentage is_polygonal_surface_loadable(
+        std::string_view filename );
+
+    template < index_t dimension >
+    [[nodiscard]] index_t polygonal_surface_object_priority(
         std::string_view filename );
 
     template < index_t dimension >

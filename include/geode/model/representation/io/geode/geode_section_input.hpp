@@ -47,6 +47,21 @@ namespace geode
         }
 
         [[nodiscard]] Section read() final;
+
+        [[nodiscard]] AdditionalFiles additional_files() const final
+        {
+            return {};
+        }
+
+        [[nodiscard]] index_t object_priority() const final
+        {
+            return 0;
+        }
+
+        [[nodiscard]] Percentage is_loadable() const final
+        {
+            return Percentage{ 1 };
+        }
     };
 
     namespace detail

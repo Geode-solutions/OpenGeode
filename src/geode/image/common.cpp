@@ -35,7 +35,7 @@
 #define BITSERY_INPUT_RASTER_REGISTER_XD( dimension )                          \
     geode::RasterImageInputFactory##dimension##D::register_creator<            \
         geode::OpenGeodeRasterImageInput##dimension##D >(                      \
-        geode::RasterImage##dimension##D ::native_extension_static() )
+        geode::RasterImage##dimension##D::native_extension_static() )
 
 #define BITSERY_INPUT_RASTER_REGISTER_2D_3D()                                  \
     BITSERY_INPUT_RASTER_REGISTER_XD( 2 );                                     \
@@ -44,7 +44,7 @@
 #define BITSERY_OUTPUT_RASTER_REGISTER_XD( dimension )                         \
     geode::RasterImageOutputFactory##dimension##D::register_creator<           \
         geode::OpenGeodeRasterImageOutput##dimension##D >(                     \
-        geode::RasterImage##dimension##D ::native_extension_static() )
+        geode::RasterImage##dimension##D::native_extension_static() )
 
 #define BITSERY_OUTPUT_RASTER_REGISTER_2D_3D()                                 \
     BITSERY_OUTPUT_RASTER_REGISTER_XD( 2 );                                    \

@@ -73,16 +73,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename EdgedCurveInput< dimension >::MissingFiles
-        check_edged_curve_missing_files( std::string_view filename )
+    typename EdgedCurveInput< dimension >::AdditionalFiles
+        edged_curve_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             EdgedCurveInputFactory< dimension > >( filename );
-        return input->check_missing_files();
+        return input->additional_files();
     }
 
     template < index_t dimension >
-    bool is_edged_curve_loadable( std::string_view filename )
+    Percentage is_edged_curve_loadable( std::string_view filename )
     {
         try
         {
@@ -92,8 +92,16 @@ namespace geode
         }
         catch( ... )
         {
-            return false;
+            return Percentage{ 0 };
         }
+    }
+
+    template < index_t dimension >
+    index_t edged_curve_object_priority( std::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            EdgedCurveInputFactory< dimension > >( filename );
+        return input->object_priority();
     }
 
     template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
@@ -106,13 +114,18 @@ namespace geode
     template std::unique_ptr< EdgedCurve< 3 > >
         opengeode_mesh_api load_edged_curve( std::string_view );
 
-    template EdgedCurveInput< 2 >::MissingFiles opengeode_mesh_api
-        check_edged_curve_missing_files< 2 >( std::string_view );
-    template EdgedCurveInput< 3 >::MissingFiles opengeode_mesh_api
-        check_edged_curve_missing_files< 3 >( std::string_view );
+    template EdgedCurveInput< 2 >::AdditionalFiles opengeode_mesh_api
+        edged_curve_additional_files< 2 >( std::string_view );
+    template EdgedCurveInput< 3 >::AdditionalFiles opengeode_mesh_api
+        edged_curve_additional_files< 3 >( std::string_view );
 
-    template bool opengeode_mesh_api is_edged_curve_loadable< 2 >(
+    template Percentage opengeode_mesh_api is_edged_curve_loadable< 2 >(
         std::string_view );
-    template bool opengeode_mesh_api is_edged_curve_loadable< 3 >(
+    template Percentage opengeode_mesh_api is_edged_curve_loadable< 3 >(
+        std::string_view );
+
+    template index_t opengeode_mesh_api edged_curve_object_priority< 2 >(
+        std::string_view );
+    template index_t opengeode_mesh_api edged_curve_object_priority< 3 >(
         std::string_view );
 } // namespace geode
