@@ -76,7 +76,8 @@ namespace geode
         regular_grid_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_regular_grid_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_regular_grid_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] index_t regular_grid_object_priority(

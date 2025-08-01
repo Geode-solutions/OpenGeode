@@ -26,6 +26,7 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/percentage.hpp>
 
 namespace geode
 {
@@ -68,10 +69,7 @@ namespace geode
 
         [[nodiscard]] virtual index_t object_priority() const = 0;
 
-        [[nodiscard]] virtual bool is_loadable() const
-        {
-            return true;
-        }
+        [[nodiscard]] virtual Percentage is_loadable() const = 0;
 
         [[nodiscard]] virtual Object read( const Args&... args ) = 0;
 

@@ -23,48 +23,22 @@
 
 #pragma once
 
-#include <string_view>
-
-#include <geode/basic/factory.hpp>
-#include <geode/basic/input.hpp>
-
-#include <geode/model/common.hpp>
+#include <geode/basic/common.hpp>
 
 namespace geode
 {
-    class BRep;
-    class BRepBuilder;
-} // namespace geode
-
-namespace geode
-{
-    /*!
-     * API function for loading a BoundaryRepresentation.
-     * The adequate loader is called depending on the filename extension.
-     * @param[in] filename Path to the file to load.
-     * @return Loaded BRep.
-     */
-    [[nodiscard]] BRep opengeode_model_api load_brep(
-        std::string_view filename );
-
-    class BRepInput : public Input< BRep >
+    class opengeode_basic_api Percentage
     {
-    protected:
-        explicit BRepInput( std::string_view filename )
-            : Input< BRep >{ filename }
-        {
-        }
+    public:
+        explicit Percentage( double value );
+
+        double value() const;
+
+        void set_value( double value );
+
+        std::string string() const;
+
+    private:
+        double value_;
     };
-
-    [[nodiscard]] typename BRepInput::AdditionalFiles opengeode_model_api
-        brep_additional_files( std::string_view filename );
-
-    [[nodiscard]] Percentage opengeode_model_api is_brep_loadable(
-        std::string_view filename );
-
-    [[nodiscard]] index_t opengeode_model_api brep_object_priority(
-        std::string_view filename );
-
-    using BRepInputFactory =
-        Factory< std::string, BRepInput, std::string_view >;
 } // namespace geode

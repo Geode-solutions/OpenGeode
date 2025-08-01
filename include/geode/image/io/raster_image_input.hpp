@@ -62,7 +62,8 @@ namespace geode
         raster_image_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_raster_image_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_raster_image_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] index_t raster_image_object_priority(

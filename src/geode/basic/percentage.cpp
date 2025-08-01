@@ -21,50 +21,31 @@
  *
  */
 
-#pragma once
+#include <absl/strings/str_cat.h>
 
-#include <string_view>
-
-#include <geode/basic/factory.hpp>
-#include <geode/basic/input.hpp>
-
-#include <geode/model/common.hpp>
+#include <geode/basic/percentage.hpp>
 
 namespace geode
 {
-    class BRep;
-    class BRepBuilder;
-} // namespace geode
-
-namespace geode
-{
-    /*!
-     * API function for loading a BoundaryRepresentation.
-     * The adequate loader is called depending on the filename extension.
-     * @param[in] filename Path to the file to load.
-     * @return Loaded BRep.
-     */
-    [[nodiscard]] BRep opengeode_model_api load_brep(
-        std::string_view filename );
-
-    class BRepInput : public Input< BRep >
+    Percentage::Percentage( double value )
     {
-    protected:
-        explicit BRepInput( std::string_view filename )
-            : Input< BRep >{ filename }
-        {
-        }
-    };
+        set_value( value );
+    }
 
-    [[nodiscard]] typename BRepInput::AdditionalFiles opengeode_model_api
-        brep_additional_files( std::string_view filename );
+    double Percentage::value() const
+    {
+        return value_;
+    }
 
-    [[nodiscard]] Percentage opengeode_model_api is_brep_loadable(
-        std::string_view filename );
+    void Percentage::set_value( double value )
+    {
+        OPENGEODE_EXCEPTION( value >= 0 && value <= 1,
+            "[Percentage::set_value] Value must be between 0 and 1" );
+        value_ = value;
+    }
 
-    [[nodiscard]] index_t opengeode_model_api brep_object_priority(
-        std::string_view filename );
-
-    using BRepInputFactory =
-        Factory< std::string, BRepInput, std::string_view >;
+    std::string Percentage::string() const
+    {
+        return absl::StrCat( value_ * 100, "%" );
+    }
 } // namespace geode

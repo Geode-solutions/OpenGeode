@@ -78,7 +78,7 @@ namespace geode
         tetrahedral_solid_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_tetrahedral_solid_loadable(
+    [[nodiscard]] Percentage is_tetrahedral_solid_loadable(
         std::string_view filename );
 
     template < index_t dimension >

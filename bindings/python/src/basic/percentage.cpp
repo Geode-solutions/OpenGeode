@@ -21,50 +21,18 @@
  *
  */
 
-#pragma once
+#include "../common.hpp"
 
-#include <string_view>
-
-#include <geode/basic/factory.hpp>
-#include <geode/basic/input.hpp>
-
-#include <geode/model/common.hpp>
+#include <geode/basic/percentage.hpp>
 
 namespace geode
 {
-    class BRep;
-    class BRepBuilder;
-} // namespace geode
-
-namespace geode
-{
-    /*!
-     * API function for loading a BoundaryRepresentation.
-     * The adequate loader is called depending on the filename extension.
-     * @param[in] filename Path to the file to load.
-     * @return Loaded BRep.
-     */
-    [[nodiscard]] BRep opengeode_model_api load_brep(
-        std::string_view filename );
-
-    class BRepInput : public Input< BRep >
+    void define_percentage( pybind11::module& module )
     {
-    protected:
-        explicit BRepInput( std::string_view filename )
-            : Input< BRep >{ filename }
-        {
-        }
-    };
-
-    [[nodiscard]] typename BRepInput::AdditionalFiles opengeode_model_api
-        brep_additional_files( std::string_view filename );
-
-    [[nodiscard]] Percentage opengeode_model_api is_brep_loadable(
-        std::string_view filename );
-
-    [[nodiscard]] index_t opengeode_model_api brep_object_priority(
-        std::string_view filename );
-
-    using BRepInputFactory =
-        Factory< std::string, BRepInput, std::string_view >;
+        pybind11::class_< Percentage >( module, "Percentage" )
+            .def( pybind11::init< double >() )
+            .def( "string", &Percentage::string )
+            .def( "value", &Percentage::value )
+            .def( "set_value", &Percentage::set_value );
+    }
 } // namespace geode

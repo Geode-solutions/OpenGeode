@@ -68,7 +68,7 @@ namespace geode
     [[nodiscard]] typename GraphInput::AdditionalFiles opengeode_mesh_api
         graph_additional_files( std::string_view filename );
 
-    [[nodiscard]] bool opengeode_mesh_api is_graph_loadable(
+    [[nodiscard]] Percentage opengeode_mesh_api is_graph_loadable(
         std::string_view filename );
 
     [[nodiscard]] index_t opengeode_mesh_api graph_object_priority(

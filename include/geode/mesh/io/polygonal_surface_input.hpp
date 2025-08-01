@@ -78,7 +78,7 @@ namespace geode
         polygonal_surface_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_polygonal_surface_loadable(
+    [[nodiscard]] Percentage is_polygonal_surface_loadable(
         std::string_view filename );
 
     template < index_t dimension >

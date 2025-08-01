@@ -77,7 +77,8 @@ namespace geode
         edged_curve_additional_files( std::string_view filename );
 
     template < index_t dimension >
-    [[nodiscard]] bool is_edged_curve_loadable( std::string_view filename );
+    [[nodiscard]] Percentage is_edged_curve_loadable(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] index_t edged_curve_object_priority(
