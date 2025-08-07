@@ -61,6 +61,8 @@ namespace geode
 
         bool contains( const Point< dimension >& point ) const;
 
+        bool contains( const BoundingBox< dimension >& bbox ) const;
+
         [[nodiscard]] bool intersects(
             const BoundingBox< dimension >& bbox ) const;
 
