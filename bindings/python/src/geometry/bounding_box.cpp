@@ -35,7 +35,14 @@
         .def( pybind11::init<>() )                                             \
         .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
         .def( "add_point", &BoundingBox##dimension##D::add_point )             \
-        .def( "contains", &BoundingBox##dimension##D::contains )               \
+        .def( "contains_point",                                                \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const Point< dimension >& ) const >(                           \
+                &BoundingBox##dimension##D::contains ) )                       \
+        .def( "contains_bbox",                                                 \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const BoundingBox< dimension >& ) const >(                     \
+                &BoundingBox##dimension##D::contains ) )                       \
         .def( "intersects_bbox",                                               \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
