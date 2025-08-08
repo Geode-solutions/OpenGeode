@@ -210,6 +210,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool BoundingBox< dimension >::contains(
+        const BoundingBox< dimension >& bbox ) const
+    {
+        return contains( bbox.min_ ) && contains( bbox.max_ );
+    }
+
+    template < index_t dimension >
     bool BoundingBox< dimension >::intersects(
         const BoundingBox< dimension >& box ) const
     {
