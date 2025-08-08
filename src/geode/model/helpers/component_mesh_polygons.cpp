@@ -561,6 +561,24 @@ namespace
     }
 
     template < typename Model >
+    geode::ComponentMeshVertexGeneric< 3 > model_polygon_pairs(
+        const Model& model,
+        const geode::PolygonVertices& polygon_unique_vertices,
+        const geode::ComponentID& component )
+    {
+        std::vector< absl::Span< const geode::ComponentMeshVertex > >
+            unique_vertices;
+        unique_vertices.reserve( polygon_unique_vertices.size() );
+        for( const auto polygon_unique_vertex : polygon_unique_vertices )
+        {
+            unique_vertices.emplace_back(
+                model.component_mesh_vertices( polygon_unique_vertex ) );
+        }
+        return geode::component_mesh_vertex_generic< 3 >(
+            unique_vertices, component );
+    }
+
+    template < typename Model >
     void model_component_mesh_polygons(
         geode::ModelComponentMeshPolygons& polygons,
         const Model& model,
@@ -673,6 +691,34 @@ namespace geode
             return polygons;
         }
 
+        std::vector< PolyhedronFacet > block_component_mesh_polygons(
+            const BRep& model,
+            const PolygonVertices& polygon_unique_vertices,
+            const Block3D& block )
+        {
+            const auto block_pairs = model_polygon_pairs(
+                model, polygon_unique_vertices, block.component_id() );
+            if( !block_pairs.contains( block.component_id() ) )
+            {
+                return {};
+            }
+            std::vector< PolyhedronFacet > facets;
+            const auto& mesh = block.mesh();
+            for( const auto& pair : block_pairs.at( block.component_id() ) )
+            {
+                if( auto facet = mesh.polyhedron_facet_from_vertices( pair ) )
+                {
+                    facets.emplace_back( std::move( facet.value() ) );
+                    if( auto adj =
+                            mesh.polyhedron_adjacent_facet( facet.value() ) )
+                    {
+                        facets.emplace_back( std::move( adj.value() ) );
+                    }
+                }
+            }
+            geode::sort_unique( facets );
+            return facets;
+        }
     } // namespace detail
 
     PolygonVertices polygon_unique_vertices(

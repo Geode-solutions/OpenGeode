@@ -1342,6 +1342,27 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedronFacetsLocalVertices
+        SolidMesh< dimension >::polyhedron_facets_local_vertices(
+            index_t polyhedron ) const
+    {
+        PolyhedronFacetsLocalVertices facets_vertices;
+        facets_vertices.reserve( nb_polyhedron_facets( polyhedron ) );
+        for( const auto f : LRange{ nb_polyhedron_facets( polyhedron ) } )
+        {
+            const PolyhedronFacet facet{ polyhedron, f };
+            auto& facet_vertices = facets_vertices.emplace_back();
+            for( const auto v :
+                LRange{ nb_polyhedron_facet_vertices( facet ) } )
+            {
+                facet_vertices.push_back(
+                    polyhedron_facet_vertex_id( { facet, v } ).vertex_id );
+            }
+        }
+        return facets_vertices;
+    }
+
+    template < index_t dimension >
     PolyhedronFacets SolidMesh< dimension >::polyhedron_vertex_facets(
         const PolyhedronVertex& polyhedron_vertex ) const
     {

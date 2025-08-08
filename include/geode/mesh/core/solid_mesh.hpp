@@ -210,8 +210,14 @@ namespace geode
 
     using PolyhedronFacetVertices = absl::InlinedVector< index_t, 3 >;
 
+    using PolyhedronFacetLocalVertices =
+        absl::InlinedVector< local_index_t, 3 >;
+
     using PolyhedronFacetsVertices =
         absl::InlinedVector< PolyhedronFacetVertices, 4 >;
+
+    using PolyhedronFacetsLocalVertices =
+        absl::InlinedVector< PolyhedronFacetLocalVertices, 4 >;
 
     using PolyhedronVertices = absl::InlinedVector< index_t, 4 >;
 
@@ -348,6 +354,9 @@ namespace geode
 
         [[nodiscard]] virtual PolyhedronFacetsVertices
             polyhedron_facets_vertices( index_t polyhedron ) const;
+
+        [[nodiscard]] virtual PolyhedronFacetsLocalVertices
+            polyhedron_facets_local_vertices( index_t polyhedron ) const;
 
         [[nodiscard]] virtual PolyhedronFacets polyhedron_vertex_facets(
             const PolyhedronVertex& polyhedron_vertex ) const;
