@@ -345,8 +345,8 @@ namespace geode
         // Test direction of triangle normal.
         const auto triangle_normal = edges[0].cross( edges[1] );
         if( !bbox_projection( triangle_normal )
-                 .contains( Point1D{ { triangle_normal.dot(
-                     Vector3D{ vertices[0].get() } ) } } ) )
+                .contains( Point1D{ { triangle_normal.dot(
+                    Vector3D{ vertices[0].get() } ) } } ) )
         {
             return false;
         }
