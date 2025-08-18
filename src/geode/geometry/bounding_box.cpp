@@ -345,8 +345,8 @@ namespace geode
         // Test direction of triangle normal.
         const auto triangle_normal = edges[0].cross( edges[1] );
         if( !bbox_projection( triangle_normal )
-                .contains( Point1D{ { triangle_normal.dot(
-                    Vector3D{ vertices[0].get() } ) } } ) )
+                 .contains( Point1D{ { triangle_normal.dot(
+                     Vector3D{ vertices[0].get() } ) } } ) )
         {
             return false;
         }
@@ -506,6 +506,17 @@ namespace geode
             inner_distance = std::min( inner_distance, local_distance );
         }
         return -inner_distance;
+    }
+
+    template < index_t dimension >
+    double BoundingBox< dimension >::n_volume() const
+    {
+        double volume{ 1.0 };
+        for( const auto c : geode::LRange{ dimension } )
+        {
+            volume *= ( max_.value( c ) - min_.value( c ) );
+        }
+        return volume;
     }
 
     template < index_t dimension >
