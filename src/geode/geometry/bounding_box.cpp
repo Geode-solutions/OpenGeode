@@ -515,7 +515,7 @@ namespace geode
         const auto box_extent = diagonal();
         for( const auto c : geode::LRange{ dimension } )
         {
-            volume *= ( box_extent.value(c) );
+            volume *= ( box_extent.value( c ) );
         }
         return volume;
     }
