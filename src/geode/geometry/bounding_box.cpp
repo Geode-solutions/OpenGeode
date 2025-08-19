@@ -512,9 +512,10 @@ namespace geode
     double BoundingBox< dimension >::n_volume() const
     {
         double volume{ 1.0 };
+        const auto box_extent = diagonal();
         for( const auto c : geode::LRange{ dimension } )
         {
-            volume *= ( max_.value( c ) - min_.value( c ) );
+            volume *= ( box_extent.value(c) );
         }
         return volume;
     }
