@@ -115,6 +115,8 @@ namespace geode
         [[nodiscard]] std::tuple< local_index_t, double >
             largest_length() const;
 
+        [[nodiscard]] double n_volume() const;
+
         [[nodiscard]] std::string string() const;
 
     private:
