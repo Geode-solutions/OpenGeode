@@ -100,8 +100,6 @@ PYBIND11_MODULE( opengeode_py_model, module )
     {
         pybind11::module::import( "opengeode" );
     }
-    pybind11::options options;
-    options.disable_function_signatures();
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for model";
     pybind11::class_< geode::OpenGeodeModelLibrary >(

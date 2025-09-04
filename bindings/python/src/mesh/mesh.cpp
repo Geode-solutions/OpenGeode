@@ -105,8 +105,6 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     {
         pybind11::module::import( "opengeode" );
     }
-    pybind11::options options;
-    options.disable_function_signatures();
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for mesh";
     pybind11::class_< geode::OpenGeodeMeshLibrary >(
@@ -118,6 +116,9 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_crs_managers( module );
     geode::define_crs_manager_builder( module );
     geode::define_crs_managers_builder( module );
+
+    geode::define_texture( module );
+    geode::define_texture_manager( module );
 
     geode::define_vertex_set( module );
     geode::define_graph( module );
@@ -136,9 +137,6 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );
     geode::define_hybrid_solid( module );
-
-    geode::define_texture( module );
-    geode::define_texture_manager( module );
 
     geode::define_vertex_set_builder( module );
     geode::define_graph_builder( module );

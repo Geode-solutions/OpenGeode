@@ -141,7 +141,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
         COMMAND ${venv_path}/bin/pip install .
         COMMAND ${venv_path}/bin/pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
-        COMMAND ${venv_path}/bin/build
+        COMMAND ${venv_path}/bin/python -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
     string(CONCAT import_test "import " "${project_name}")

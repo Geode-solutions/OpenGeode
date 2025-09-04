@@ -147,8 +147,6 @@ namespace geode
 {
     void define_solid_mesh( pybind11::module& module )
     {
-        PYTHON_SOLID_MESH( 3 );
-
         pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex" )
             .def( pybind11::init<>() )
             .def( pybind11::init< index_t, index_t >() )
@@ -187,5 +185,7 @@ namespace geode
             .def_readwrite(
                 "polyhedron_facet", &PolyhedronFacetEdge::polyhedron_facet )
             .def_readwrite( "edge_id", &PolyhedronFacetEdge::edge_id );
+
+        PYTHON_SOLID_MESH( 3 );
     }
 } // namespace geode
