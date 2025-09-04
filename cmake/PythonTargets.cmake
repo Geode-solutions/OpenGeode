@@ -108,12 +108,6 @@ function(add_geode_python_wheel)
         COMMAND ${venv_path}/bin/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
     )
     execute_process(
-        COMMAND ${venv_path}/bin/pip list
-    )
-    execute_process(
-        COMMAND ls -l ${venv_path}/bin
-    )
-    execute_process(
         COMMAND ${venv_path} -c 
 "from sysconfig import get_platform
 from packaging import tags
@@ -146,8 +140,6 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
         COMMAND ${venv_path}/bin/pip install .
-        COMMAND ${venv_path}/bin/pip list
-        COMMAND ls ${venv_path}/bin
         COMMAND ${venv_path}/bin/pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
         COMMAND ${venv_path}/bin/build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
