@@ -147,6 +147,6 @@ print(name + version + '-' + name + version + '-' + platform)"
     string(CONCAT import_test "import " "${project_name}")
     add_custom_target(test-wheel
         COMMAND ${venv_path}/bin/pip install --force-reinstall --no-deps ${wheel_file}
-        COMMAND $${venv_path}/bin/python -c ${import_test}
+        COMMAND ${venv_path}/bin/python -c ${import_test}
     )
 endfunction()
