@@ -88,14 +88,13 @@
         .def( "radius", &Sphere##dimension##D::radius )                        \
         .def( "bounding_box", &Sphere##dimension##D::bounding_box )
 
-#define PYTHON_RAY( dimension )                                             \
-    const auto ray##dimension =                                             \
-        "Ray" + std::to_string( dimension ) + "D";                          \
-    pybind11::class_< Ray##dimension##D >(                                  \
-        module, ray##dimension.c_str() )                                    \
-        .def( pybind11::init< const Vector< dimension >&, const Point< dimension >& >() )          \
-        .def( pybind11::init< const Segment< dimension >& >() )          \
-          .def( "origin", &Ray##dimension##D::origin )                  \
+#define PYTHON_RAY( dimension )                                                \
+    const auto ray##dimension = "Ray" + std::to_string( dimension ) + "D";     \
+    pybind11::class_< Ray##dimension##D >( module, ray##dimension.c_str() )    \
+        .def( pybind11::init< const Vector< dimension >&,                      \
+            const Point< dimension >& >() )                                    \
+        .def( pybind11::init< const Segment< dimension >& >() )                \
+        .def( "origin", &Ray##dimension##D::origin )                           \
         .def( "direction", &Ray##dimension##D::direction )
 
 namespace geode
