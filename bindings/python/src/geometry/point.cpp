@@ -49,6 +49,7 @@ namespace geode
 {
     void define_point( pybind11::module& module )
     {
+        PYTHON_POINT( 1 );
         PYTHON_POINT( 2 );
         PYTHON_POINT( 3 );
     }

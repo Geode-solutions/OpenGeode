@@ -87,25 +87,20 @@
         .def( "radius", &Sphere##dimension##D::radius )                        \
         .def( "bounding_box", &Sphere##dimension##D::bounding_box )
 
+#define PYTHON_RAY( dimension )                                             \
+    const auto ray##dimension =                                             \
+        "Ray" + std::to_string( dimension ) + "D";                          \
+    pybind11::class_< Ray##dimension##D >(                                  \
+        module, ray##dimension.c_str() )                                    \
+        .def( pybind11::init< const Vector< dimension >&, const Point< dimension >& >() )          \
+        .def( pybind11::init< const Segment< dimension >& >() )          \
+          .def( "origin", &Ray##dimension##D::origin )                  \
+        .def( "direction", &Ray##dimension##D::direction )
+
 namespace geode
 {
     void define_basic_objects( pybind11::module& module )
     {
-        PYTHON_SEGMENT( 2 );
-        PYTHON_SEGMENT( 3 );
-        PYTHON_INFINITE_LINE( 2 );
-        PYTHON_INFINITE_LINE( 3 );
-        PYTHON_SPHERE( 2 );
-        PYTHON_SPHERE( 3 );
-        PYTHON_TRIANGLE( 2 );
-        PYTHON_TRIANGLE( 3 )
-            .def( "normal",
-                static_cast< std::optional< Vector3D > ( Triangle< 3 >::* )()
-                        const >( &Triangle3D::normal ) )
-            .def( "plane",
-                static_cast< std::optional< Plane > ( Triangle< 3 >::* )()
-                        const >( &Triangle3D::plane ) );
-
         pybind11::class_< Plane >( module, "Plane" )
             .def( pybind11::init< const Vector3D&, const Point3D& >() )
             .def( "plane_constant", &Plane::plane_constant )
@@ -123,6 +118,11 @@ namespace geode
             .def( "plane", &Circle::plane )
             .def( "radius", &Circle::radius )
             .def( "bounding_box", &Circle::bounding_box );
+
+        pybind11::class_< Cylinder >( module, "Cylinder" )
+            .def( pybind11::init< Segment3D, double >() )
+            .def( "axis", &Cylinder::axis )
+            .def( "radius", &Cylinder::radius );
 
         pybind11::enum_< SIDE >( module, "Side" )
             .value( "positive", SIDE::positive )
@@ -152,5 +152,22 @@ namespace geode
             .value( "facet3", POSITION::facet3 )
             .value( "parallel", POSITION::parallel )
             .export_values();
+
+        PYTHON_SEGMENT( 2 );
+        PYTHON_SEGMENT( 3 );
+        PYTHON_INFINITE_LINE( 2 );
+        PYTHON_INFINITE_LINE( 3 );
+        PYTHON_SPHERE( 2 );
+        PYTHON_SPHERE( 3 );
+        PYTHON_RAY( 2 );
+        PYTHON_RAY( 3 );
+        PYTHON_TRIANGLE( 2 );
+        PYTHON_TRIANGLE( 3 )
+            .def( "normal",
+                static_cast< std::optional< Vector3D > ( Triangle< 3 >::* )()
+                        const >( &Triangle3D::normal ) )
+            .def( "plane",
+                static_cast< std::optional< Plane > ( Triangle< 3 >::* )()
+                        const >( &Triangle3D::plane ) );
     }
 } // namespace geode

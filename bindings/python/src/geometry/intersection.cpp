@@ -62,6 +62,13 @@ namespace geode
 {
     void define_intersection( pybind11::module& module )
     {
+        pybind11::enum_< INTERSECTION_TYPE >( module, "INTERSECTION_TYPE" )
+            .value( "none", INTERSECTION_TYPE::none )
+            .value( "intersect", INTERSECTION_TYPE::intersect )
+            .value( "parallel", INTERSECTION_TYPE::parallel )
+            .value( "incorrect", INTERSECTION_TYPE::incorrect )
+            .export_values();
+
         PYTHON_INTERSECTION_RESULT( Point2D );
         PYTHON_INTERSECTION_RESULT( Point3D );
         using InlinedVectorPoint2D = absl::InlinedVector< Point2D, 2 >;
@@ -97,6 +104,5 @@ namespace geode
         module.def(
             "triangle_circle_intersection3D", &triangle_circle_intersection );
         module.def( "plane_circle_intersection3D", &plane_circle_intersection );
-        module.def( "plane_plane_intersection3D", &plane_plane_intersection );
     }
 } // namespace geode

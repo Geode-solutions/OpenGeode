@@ -42,6 +42,7 @@ namespace geode
 {
     void define_vector( pybind11::module& module )
     {
+        PYTHON_VECTOR( 1 );
         PYTHON_VECTOR( 2 );
         PYTHON_VECTOR( 3 ).def( "cross", &Vector3D::cross );
     }
