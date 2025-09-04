@@ -62,8 +62,6 @@ namespace geode
 {
     void define_intersection( pybind11::module& module )
     {
-        PYTHON_INTERSECTION( 2 );
-        PYTHON_INTERSECTION( 3 );
         PYTHON_INTERSECTION_RESULT( Point2D );
         PYTHON_INTERSECTION_RESULT( Point3D );
         using InlinedVectorPoint2D = absl::InlinedVector< Point2D, 2 >;
@@ -71,6 +69,8 @@ namespace geode
         using InlinedVectorPoint3D = absl::InlinedVector< Point3D, 2 >;
         PYTHON_INTERSECTION_RESULT( InlinedVectorPoint3D );
         PYTHON_INTERSECTION_RESULT( InfiniteLine3D );
+        PYTHON_INTERSECTION( 2 );
+        PYTHON_INTERSECTION( 3 );
         module.def( "line_plane_intersection3D", &line_plane_intersection );
         module.def(
             "line_sphere_intersection2D", &line_sphere_intersection< 2 > );
