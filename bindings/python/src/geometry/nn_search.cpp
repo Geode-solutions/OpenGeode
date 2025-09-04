@@ -37,9 +37,9 @@
         .def( "nb_unique_points",                                              \
             &NNSearch##dimension##D::ColocatedInfo::nb_unique_points )         \
         .def( "nb_colocated_points",                                           \
-            &NNSearch##dimension##D::ColocatedInfo::nb_colocated_points )      \
+            &NNSearch##dimension##D::ColocatedInfo::nb_colocated_points );     \
                                                                                \
-            const auto name##dimension =                                       \
+    const auto name##dimension =                                       \
         "NNSearch" + std::to_string( dimension ) + "D";                        \
     pybind11::class_< NNSearch##dimension##D >(                                \
         module, name##dimension.c_str() )                                      \
