@@ -104,6 +104,8 @@ function(add_geode_python_wheel)
     message(STATUS "Using Python executable: ${PYTHON_EXECUTABLE}")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -m venv ${venv_path}
+    )
+    execute_process(
         COMMAND ls -l ${venv_path}
         COMMAND ls -l ${venv_path}/bin
         COMMAND ${venv_path}/bin/pip --version
