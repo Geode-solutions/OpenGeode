@@ -102,7 +102,11 @@ function(add_geode_python_wheel)
     set(venv_path "${wheel_output_path}/venv")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -m venv ${venv_path}
+        COMMAND ls -l ${venv_path}
+        COMMAND ls -l ${venv_path}/bin
+        COMMAND ${venv_path}/bin/pip --version
         COMMAND ${venv_path}/bin/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
+        COMMAND ${venv_path}/bin/pip list
     )
     execute_process(
         COMMAND ${venv_path}/bin/python -c 
