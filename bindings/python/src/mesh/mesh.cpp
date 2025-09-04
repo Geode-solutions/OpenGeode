@@ -105,6 +105,8 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     {
         pybind11::module::import( "opengeode" );
     }
+    pybind11::options options;
+    options.disable_function_signatures();
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for mesh";
     pybind11::class_< geode::OpenGeodeMeshLibrary >(

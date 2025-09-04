@@ -38,6 +38,8 @@ namespace geode
 
 PYBIND11_MODULE( opengeode_py_image, module )
 {
+    pybind11::options options;
+    options.disable_function_signatures();
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for image";
     pybind11::class_< geode::OpenGeodeImageLibrary >(
