@@ -100,6 +100,7 @@ function(add_geode_python_wheel)
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pyproject.toml.in" "${wheel_output_directory}/../pyproject.toml")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
     set(venv_path "${wheel_output_path}/venv")
+    set(venv_python "${venv_path}/bin/python")
     message(STATUS "Creating virtual environment at: ${venv_path}")
     message(STATUS "Using Python executable: ${PYTHON_EXECUTABLE}")
     execute_process(
@@ -107,13 +108,21 @@ function(add_geode_python_wheel)
     )
     execute_process(
         COMMAND ls -l ${venv_path}
-        COMMAND ls -l ${venv_path}/bin
-        COMMAND ${venv_path}/bin/pip --version
-        COMMAND ${venv_path}/bin/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
-        COMMAND ${venv_path}/bin/pip list
     )
     execute_process(
-        COMMAND ${venv_path}/bin/python -c 
+        COMMAND ls -l ${venv_path}/bin
+    )
+    execute_process(
+        COMMAND ${venv_python} -m pip --version
+    )
+    execute_process(
+        COMMAND ${venv_python} -m pip install --upgrade wheel packaging setuptools build pybind11-stubgen
+    )
+    execute_process(
+        COMMAND ${venv_python} -m pip list
+    )
+    execute_process(
+        COMMAND ${venv_python} -c 
 "from sysconfig import get_platform
 from packaging import tags
 name=tags.interpreter_name()
@@ -144,14 +153,14 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
-        COMMAND ${venv_path}/bin/pip install .
-        COMMAND ${venv_path}/bin/pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
-        COMMAND ${venv_path}/bin/build
+        COMMAND ${venv_python} -m pip install .
+        COMMAND ${venv_python} -m pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
+        COMMAND ${venv_python} -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
     string(CONCAT import_test "import " "${project_name}")
     add_custom_target(test-wheel
-        COMMAND ${venv_path}/bin/pip install --force-reinstall --no-deps ${wheel_file}
-        COMMAND ${venv_path}/bin/python -c ${import_test}
+        COMMAND ${venv_python} -m pip install --force-reinstall --no-deps ${wheel_file}
+        COMMAND $${venv_python} -c ${import_test}
     )
 endfunction()
