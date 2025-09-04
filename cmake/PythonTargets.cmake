@@ -100,6 +100,8 @@ function(add_geode_python_wheel)
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pyproject.toml.in" "${wheel_output_directory}/../pyproject.toml")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
     set(venv_path "${wheel_output_path}/venv")
+    message(STATUS "Creating virtual environment at: ${venv_path}")
+    message(STATUS "Using Python executable: ${PYTHON_EXECUTABLE}")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -m venv ${venv_path}
         COMMAND ls -l ${venv_path}
