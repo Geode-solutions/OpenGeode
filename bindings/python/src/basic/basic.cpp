@@ -49,11 +49,11 @@ PYBIND11_MODULE( opengeode_py_basic, module )
         module, "OpenGeodeBasicLibrary" )
         .def( "initialize", &geode::OpenGeodeBasicLibrary::initialize );
     geode::define_cell_array( module );
+    geode::define_uuid( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );
     geode::define_identifier( module );
     geode::define_identifier_builder( module );
     geode::define_mapping( module );
     geode::define_percentage( module );
-    geode::define_uuid( module );
 }

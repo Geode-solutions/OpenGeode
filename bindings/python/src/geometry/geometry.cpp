@@ -56,23 +56,23 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     pybind11::class_< geode::OpenGeodeGeometryLibrary >(
         module, "OpenGeodeGeometryLibrary" )
         .def( "initialize", &geode::OpenGeodeGeometryLibrary::initialize );
+    geode::define_point( module );
+    geode::define_vector( module );
+    geode::define_frame( module );
     geode::define_angle( module );
-    geode::define_barycentric( module );
-    geode::define_basic_objects( module );
     geode::define_bounding_box( module );
+    geode::define_basic_objects( module );
+    geode::define_barycentric( module );
     geode::define_distance( module );
     geode::define_intersection( module );
     geode::define_intersection_detection( module );
     geode::define_mensuration( module );
     geode::define_nn_search( module );
     geode::define_perpendicular( module );
-    geode::define_point( module );
     geode::define_points_sort( module );
     geode::define_position( module );
     geode::define_projection( module );
     geode::define_rotation( module );
     geode::define_sign( module );
-    geode::define_vector( module );
-    geode::define_frame( module );
     geode::define_coordinate_system( module );
 }
