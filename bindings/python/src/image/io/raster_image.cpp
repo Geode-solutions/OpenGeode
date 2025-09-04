@@ -28,6 +28,8 @@
 #include "../../basic/factory.hpp"
 #include "../../basic/input.hpp"
 
+#include <geode/basic/percentage.hpp>
+
 #include <geode/image/core/raster_image.hpp>
 #include <geode/image/io/raster_image_input.hpp>
 #include <geode/image/io/raster_image_output.hpp>
