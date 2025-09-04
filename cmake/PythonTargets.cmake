@@ -107,19 +107,13 @@ function(add_geode_python_wheel)
         COMMAND ${PYTHON_EXECUTABLE} -m venv ${venv_path}
     )
     execute_process(
-        COMMAND ls -l ${venv_path}
-    )
-    execute_process(
-        COMMAND ls -l ${venv_path}/bin
-    )
-    execute_process(
-        COMMAND ${venv_python} -m pip --version
-    )
-    execute_process(
         COMMAND ${venv_python} -m pip install --upgrade wheel packaging setuptools build pybind11-stubgen
     )
     execute_process(
         COMMAND ${venv_python} -m pip list
+    )
+    execute_process(
+        COMMAND ls -l ${venv_path}/bin
     )
     execute_process(
         COMMAND ${venv_python} -c 
@@ -154,6 +148,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
         COMMAND ${venv_python} -m pip install .
+        COMMAND ${venv_python} -m pip list
         COMMAND ${venv_python} -m pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
         COMMAND ${venv_python} -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
