@@ -62,6 +62,6 @@ namespace geode
         BitseryExtensions::register_functions(
             register_image_serialize_pcontext,
             register_image_deserialize_pcontext );
-            GDALAllRegister();
+        GDALAllRegister();
     }
 } // namespace geode
