@@ -46,6 +46,7 @@ namespace geode
 {
     void define_cell_array( pybind11::module& module )
     {
+        PYTHON_ARRAY( 1 );
         PYTHON_ARRAY( 2 );
         PYTHON_ARRAY( 3 );
     }
