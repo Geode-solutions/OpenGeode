@@ -41,4 +41,5 @@ add_geode_library(
         "io/geode/geode_bitsery_raster_output.hpp"
     PUBLIC_DEPENDENCIES
         ${PROJECT_NAME}::basic
+        GDAL::GDAL
 )

@@ -24,8 +24,6 @@
 #include "../common.hpp"
 #include <pybind11/iostream.h>
 
-#include <gdal_priv.h>
-
 #include <geode/image/common.hpp>
 
 namespace geode
@@ -42,10 +40,7 @@ PYBIND11_MODULE( opengeode_py_image, module )
     module.doc() = "OpenGeode Python binding for image";
     pybind11::class_< geode::OpenGeodeImageLibrary >(
         module, "OpenGeodeImageLibrary" )
-        .def( "initialize", [] {
-            geode::OpenGeodeImageLibrary::initialize();
-            GDALAllRegister();
-        } );
+        .def( "initialize",            &geode::OpenGeodeImageLibrary::initialize);
     geode::define_greyscale_color( module );
     geode::define_rgb_color( module );
     geode::define_raster_image( module );
