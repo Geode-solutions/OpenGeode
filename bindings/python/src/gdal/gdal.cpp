@@ -21,28 +21,13 @@
  *
  */
 
-#include "../common.hpp"
 #include <pybind11/iostream.h>
 
-#include <geode/image/common.hpp>
+#include <gdal_priv.h>
 
-namespace geode
-{
-    void define_greyscale_color( pybind11::module& );
-    void define_raster_image( pybind11::module& );
-    void define_raster_image_io( pybind11::module& );
-    void define_rgb_color( pybind11::module& );
-} // namespace geode
-
-PYBIND11_MODULE( opengeode_py_image, module )
+PYBIND11_MODULE( opengeode_py_gdal, module )
 {
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for image";
-    pybind11::class_< geode::OpenGeodeImageLibrary >(
-        module, "OpenGeodeImageLibrary" )
-        .def( "initialize", &geode::OpenGeodeImageLibrary::initialize );
-    geode::define_greyscale_color( module );
-    geode::define_rgb_color( module );
-    geode::define_raster_image( module );
-    geode::define_raster_image_io( module );
+    module.doc() = "OpenGeode Python binding for gdal";
+    module.def( "initialize_gdal", &GDALAllRegister );
 }

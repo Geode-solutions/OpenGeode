@@ -28,5 +28,4 @@ add_geode_python_binding(
         "io/raster_image.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::image
-        # GDAL::GDAL
 )

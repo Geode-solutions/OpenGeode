@@ -21,4 +21,3 @@
 from opengeode_py_image import *
 
 OpenGeodeImageLibrary.initialize()
-OpenGeodeImageLibrary.initialize_gdal()
