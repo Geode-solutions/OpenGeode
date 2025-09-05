@@ -179,9 +179,11 @@ namespace geode
                 } } } );
     }
 
+    template class opengeode_geometry_api CoordinateSystem< 1 >;
     template class opengeode_geometry_api CoordinateSystem< 2 >;
     template class opengeode_geometry_api CoordinateSystem< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 3 > );
 } // namespace geode
