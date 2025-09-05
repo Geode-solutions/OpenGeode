@@ -64,9 +64,8 @@ namespace
     geode::SquareMatrix< 1 > frame_inverse_matrix(
         const geode::CoordinateSystem1D& frame )
     {
-        const geode::SquareMatrix< 1 > system_matrix{
-            { geode::Vector1D{ { frame.direction( 0 ).value( 0 ) } }}
-        };
+        const geode::SquareMatrix< 1 > system_matrix{ { geode::Vector1D{
+            { frame.direction( 0 ).value( 0 ) } } } };
         return system_matrix.inverse();
     }
 
