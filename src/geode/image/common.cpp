@@ -23,8 +23,6 @@
 
 #include <geode/image/common.hpp>
 
-#include <gdal_priv.h>
-
 #include <geode/basic/library.hpp>
 
 #include <geode/image/core/bitsery_archive.hpp>
@@ -62,6 +60,5 @@ namespace geode
         BitseryExtensions::register_functions(
             register_image_serialize_pcontext,
             register_image_deserialize_pcontext );
-        GDALAllRegister();
     }
 } // namespace geode

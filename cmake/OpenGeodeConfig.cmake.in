@@ -38,7 +38,6 @@ endif()
 include(CMakeFindDependencyMacro)
 find_dependency(absl)
 find_dependency(Bitsery)
-find_dependency(GDAL)
 find_dependency(Threads)
 find_dependency(Async++)
 
