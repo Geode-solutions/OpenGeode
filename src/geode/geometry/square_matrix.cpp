@@ -234,6 +234,7 @@ namespace geode
         return SquareMatrix< 3 >{ std::move( matrix_rows ) };
     }
 
+    template class opengeode_geometry_api SquareMatrix< 1 >;
     template class opengeode_geometry_api SquareMatrix< 2 >;
     template class opengeode_geometry_api SquareMatrix< 3 >;
     template class opengeode_geometry_api SquareMatrix< 9 >;

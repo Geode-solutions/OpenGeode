@@ -74,5 +74,5 @@ namespace geode
     private:
         std::array< Vector< dimension >, dimension > matrix_rows_;
     };
-    ALIAS_2D_AND_3D( SquareMatrix );
+    ALIAS_1D_AND_2D_AND_3D( SquareMatrix );
 } // namespace geode
