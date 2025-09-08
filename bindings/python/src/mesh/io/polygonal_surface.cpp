@@ -41,10 +41,6 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolygonalSurface< dimension > > ( * )(   \
             std::string_view ) >( &load_polygonal_surface< dimension > ) );    \
-    const auto check##dimension = "polygonal_surface_additional_files"         \
-                                  + std::to_string( dimension ) + "D";         \
-    module.def( check##dimension.c_str(),                                      \
-        &polygonal_surface_additional_files< dimension > );                    \
     const auto priority##dimension = "polygonal_surface_object_priority"       \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
@@ -55,6 +51,10 @@
         &is_polygonal_surface_loadable< dimension > );                         \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolygonalSurface< dimension > >, \
         "PolygonalSurface" + std::to_string( dimension ) + "D" );              \
+    const auto check##dimension = "polygonal_surface_additional_files"         \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &polygonal_surface_additional_files< dimension > );                    \
     const auto saveable##dimension =                                           \
         "is_polygonal_surface_saveable" + std::to_string( dimension ) + "D";   \
     module.def( saveable##dimension.c_str(),                                   \

@@ -44,6 +44,7 @@ add_geode_python_binding(
         "core/crs_managers.cpp"
         "core/edged_curve.cpp"
         "core/graph.cpp"
+        "core/graph_elements.cpp"
         "core/grid.cpp"
         "core/hybrid_solid.cpp"
         "core/light_regular_grid.cpp"

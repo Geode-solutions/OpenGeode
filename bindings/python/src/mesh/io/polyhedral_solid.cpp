@@ -41,10 +41,6 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PolyhedralSolid< dimension > > ( * )(    \
             std::string_view ) >( &load_polyhedral_solid< dimension > ) );     \
-    const auto check##dimension = "polyhedral_solid_additional_files"          \
-                                  + std::to_string( dimension ) + "D";         \
-    module.def( check##dimension.c_str(),                                      \
-        &polyhedral_solid_additional_files< dimension > );                     \
     const auto priority##dimension = "polyhedral_solid_object_priority"        \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
@@ -55,6 +51,10 @@
         &is_polyhedral_solid_loadable< dimension > );                          \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolyhedralSolid< dimension > >,  \
         "PolyhedralSolid" + std::to_string( dimension ) + "D" );               \
+    const auto check##dimension = "polyhedral_solid_additional_files"          \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &polyhedral_solid_additional_files< dimension > );                     \
     const auto saveable##dimension =                                           \
         "is_polyhedral_solid_saveable" + std::to_string( dimension ) + "D";    \
     module.def( saveable##dimension.c_str(),                                   \

@@ -42,10 +42,6 @@
         static_cast< std::unique_ptr<                                          \
             TriangulatedSurface< dimension > > ( * )( std::string_view ) >(    \
             &load_triangulated_surface< dimension > ) );                       \
-    const auto check##dimension = "triangulated_surface_additional_files"      \
-                                  + std::to_string( dimension ) + "D";         \
-    module.def( check##dimension.c_str(),                                      \
-        &triangulated_surface_additional_files< dimension > );                 \
     const auto priority##dimension = "triangulated_surface_object_priority"    \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
@@ -57,6 +53,10 @@
     PYTHON_INPUT_MESH_CLASS(                                                   \
         std::unique_ptr< TriangulatedSurface< dimension > >,                   \
         "TriangulatedSurface" + std::to_string( dimension ) + "D" );           \
+    const auto check##dimension = "triangulated_surface_additional_files"      \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &triangulated_surface_additional_files< dimension > );                 \
     const auto saveable##dimension = "is_triangulated_surface_saveable"        \
                                      + std::to_string( dimension ) + "D";      \
     module.def( saveable##dimension.c_str(),                                   \

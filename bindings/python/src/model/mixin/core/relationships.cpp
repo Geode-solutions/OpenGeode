@@ -32,24 +32,84 @@ namespace geode
         pybind11::class_< Relationships >( module, "Relationships" )
             .def( pybind11::init<>() )
             .def( "nb_boundaries", &Relationships::nb_boundaries )
-            .def( "boundaries", &Relationships::boundaries )
+            .def(
+                "boundaries",
+                []( const Relationships& relationships,
+                    const uuid& component_id ) {
+                    std::vector< ComponentID > components;
+                    for( const auto& component :
+                        relationships.boundaries( component_id ) )
+                    {
+                        components.push_back( component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "nb_incidences", &Relationships::nb_incidences )
-            .def( "incidences", &Relationships::incidences )
+            .def(
+                "incidences",
+                []( const Relationships& relationships,
+                    const uuid& component_id ) {
+                    std::vector< ComponentID > components;
+                    for( const auto& component :
+                        relationships.incidences( component_id ) )
+                    {
+                        components.push_back( component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "nb_internals", &Relationships::nb_internals )
-            .def( "internals", &Relationships::internals )
+            .def(
+                "internals",
+                []( const Relationships& relationships,
+                    const uuid& component_id ) {
+                    std::vector< ComponentID > components;
+                    for( const auto& component :
+                        relationships.internals( component_id ) )
+                    {
+                        components.push_back( component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "nb_embeddings", &Relationships::nb_embeddings )
-            .def( "embeddings", &Relationships::embeddings )
+            .def(
+                "embeddings",
+                []( const Relationships& relationships,
+                    const uuid& component_id ) {
+                    std::vector< ComponentID > components;
+                    for( const auto& component :
+                        relationships.embeddings( component_id ) )
+                    {
+                        components.push_back( component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "nb_items", &Relationships::nb_items )
-            .def( "items", &Relationships::items )
+            .def(
+                "items",
+                []( const Relationships& relationships,
+                    const uuid& component_id ) {
+                    std::vector< ComponentID > components;
+                    for( const auto& component :
+                        relationships.items( component_id ) )
+                    {
+                        components.push_back( component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "nb_collections", &Relationships::nb_collections )
             .def(
                 "collections",
                 []( const Relationships& relationships, const uuid& id ) {
-                    std::vector< const ComponentID* > components;
+                    std::vector< ComponentID > components;
                     for( const auto& component :
                         relationships.collections( id ) )
                     {
-                        components.push_back( &component );
+                        components.push_back( component );
                     }
                     return components;
                 },

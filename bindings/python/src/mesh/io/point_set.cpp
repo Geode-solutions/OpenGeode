@@ -40,10 +40,6 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< PointSet< dimension > > ( * )(           \
             std::string_view ) >( &load_point_set< dimension > ) );            \
-    const auto check##dimension =                                              \
-        "point_set_additional_files" + std::to_string( dimension ) + "D";      \
-    module.def(                                                                \
-        check##dimension.c_str(), &point_set_additional_files< dimension > );  \
     const auto priority##dimension =                                           \
         "point_set_object_priority" + std::to_string( dimension ) + "D";       \
     module.def( priority##dimension.c_str(),                                   \
@@ -54,6 +50,10 @@
         loadable##dimension.c_str(), &is_point_set_loadable< dimension > );    \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PointSet< dimension > >,         \
         "PointSet" + std::to_string( dimension ) + "D" );                      \
+    const auto check##dimension =                                              \
+        "point_set_additional_files" + std::to_string( dimension ) + "D";      \
+    module.def(                                                                \
+        check##dimension.c_str(), &point_set_additional_files< dimension > );  \
     const auto saveable##dimension =                                           \
         "is_point_set_saveable" + std::to_string( dimension ) + "D";           \
     module.def(                                                                \

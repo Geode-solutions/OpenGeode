@@ -31,15 +31,6 @@ namespace geode
 {
     void define_graph( pybind11::module& module )
     {
-        pybind11::class_< EdgeVertex >( module, "EdgeVertex" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< index_t, index_t >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( "string", &EdgeVertex::string )
-            .def_readwrite( "edge_id", &EdgeVertex::edge_id )
-            .def_readwrite( "vertex_id", &EdgeVertex::vertex_id );
-
         pybind11::class_< Graph, VertexSet >( module, "Graph" )
             .def_static(
                 "create", static_cast< std::unique_ptr< Graph > ( * )() >(
