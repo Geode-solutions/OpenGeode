@@ -119,11 +119,6 @@ namespace geode
             .def( "radius", &Circle::radius )
             .def( "bounding_box", &Circle::bounding_box );
 
-        pybind11::class_< Cylinder >( module, "Cylinder" )
-            .def( pybind11::init< Segment3D, double >() )
-            .def( "axis", &Cylinder::axis )
-            .def( "radius", &Cylinder::radius );
-
         pybind11::enum_< SIDE >( module, "Side" )
             .value( "positive", SIDE::positive )
             .value( "negative", SIDE::negative )
@@ -169,5 +164,10 @@ namespace geode
             .def( "plane",
                 static_cast< std::optional< Plane > ( Triangle< 3 >::* )()
                         const >( &Triangle3D::plane ) );
+
+        pybind11::class_< Cylinder >( module, "Cylinder" )
+            .def( pybind11::init< Segment3D, double >() )
+            .def( "axis", &Cylinder::axis )
+            .def( "radius", &Cylinder::radius );
     }
 } // namespace geode
