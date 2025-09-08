@@ -27,7 +27,7 @@
 
 namespace geode
 {
-    void define_solid_mesh_elements( pybind11::module& module )
+    void define_solid_elements( pybind11::module& module )
     {
         pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex" )
             .def( pybind11::init<>() )

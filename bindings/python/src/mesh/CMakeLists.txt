@@ -55,6 +55,7 @@ add_geode_python_binding(
         "core/solid_edges.cpp"
         "core/solid_facets.cpp"
         "core/solid_mesh.cpp"
+        "core/solid_elements.cpp"
         "core/surface_edges.cpp"
         "core/surface_elements.cpp"
         "core/surface_mesh.cpp"
