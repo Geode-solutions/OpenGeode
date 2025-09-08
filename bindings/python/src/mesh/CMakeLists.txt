@@ -55,6 +55,7 @@ add_geode_python_binding(
         "core/solid_facets.cpp"
         "core/solid_mesh.cpp"
         "core/surface_edges.cpp"
+        "core/surface_elements.cpp"
         "core/surface_mesh.cpp"
         "core/tetrahedral_solid.cpp"
         "core/triangulated_surface.cpp"
