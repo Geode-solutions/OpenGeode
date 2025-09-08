@@ -104,11 +104,16 @@ function(add_geode_python_wheel)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -m venv ${venv_path}
     )
+    if(UNIX)
+        set(venv_bin "${venv_path}/bin")
+    elseif(WIN32)
+        set(venv_bin "${venv_path}/Scripts")
+    endif()
     execute_process(
-        COMMAND ${venv_path}/bin/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
+        COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
     )
     execute_process(
-        COMMAND ${venv_path}/bin/python -c 
+        COMMAND ${venv_bin}/python -c 
 "from sysconfig import get_platform
 from packaging import tags
 name=tags.interpreter_name()
@@ -139,14 +144,14 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
-        COMMAND ${venv_path}/bin/pip install .
-        COMMAND ${venv_path}/bin/pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
-        COMMAND ${venv_path}/bin/python -m build
+        COMMAND ${venv_bin}/pip install .
+        COMMAND ${venv_bin}/pybind11-stubgen ${project_name} -o "${wheel_output_directory}/stubs"
+        COMMAND ${venv_bin}/python -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
     string(CONCAT import_test "import " "${project_name}")
     add_custom_target(test-wheel
-        COMMAND ${venv_path}/bin/pip install --force-reinstall --no-deps ${wheel_file}
-        COMMAND ${venv_path}/bin/python -c ${import_test}
+        COMMAND ${venv_bin}/pip install --force-reinstall --no-deps ${wheel_file}
+        COMMAND ${venv_bin}/python -c ${import_test}
     )
 endfunction()
