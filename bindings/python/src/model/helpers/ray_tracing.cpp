@@ -32,10 +32,7 @@ namespace geode
 {
     void define_model_ray_tracing( pybind11::module& module )
     {
-        module
-            .def( "find_intersections_with_boundaries",
-                &find_intersections_with_boundaries )
-            .def( "is_point_inside_block", &is_point_inside_block )
+        module.def( "is_point_inside_block", &is_point_inside_block )
             .def( "block_containing_point", &block_containing_point );
     }
 } // namespace geode
