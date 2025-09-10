@@ -318,8 +318,15 @@ namespace
         };
         const auto triangle_edges = get_triangle_edges( triangle );
         const auto normal_in_grid = triangle_in_grid.normal();
+        const auto triangle_edges_in_grid =
+            get_triangle_edges( triangle_in_grid );
         if( !normal_in_grid
             || absl::c_count_if( triangle_edges,
+                   []( const auto& segment ) {
+                       return segment.length() <= geode::GLOBAL_EPSILON;
+                   } )
+                   > 0
+            || absl::c_count_if( triangle_edges_in_grid,
                    []( const geode::Segment3D& segment ) {
                        return segment.length() <= geode::GLOBAL_EPSILON;
                    } )
@@ -332,8 +339,6 @@ namespace
             }
             return cells;
         }
-        const auto triangle_edges_in_grid =
-            get_triangle_edges( triangle_in_grid );
         const auto critical_point =
             compute_critical_point( normal_in_grid.value() );
         const auto xy_params =
