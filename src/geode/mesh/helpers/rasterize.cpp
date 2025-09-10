@@ -322,7 +322,7 @@ namespace
             get_triangle_edges( triangle_in_grid );
         if( !normal_in_grid
             || absl::c_count_if( triangle_edges,
-                   []( const geode::Segment3D& segment ) {
+                   []( const auto& segment ) {
                        return segment.length() <= geode::GLOBAL_EPSILON;
                    } )
                    > 0
