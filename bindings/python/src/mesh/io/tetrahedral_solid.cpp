@@ -41,10 +41,6 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< TetrahedralSolid< dimension > > ( * )(   \
             std::string_view ) >( &load_tetrahedral_solid< dimension > ) );    \
-    const auto check##dimension = "tetrahedral_solid_additional_files"         \
-                                  + std::to_string( dimension ) + "D";         \
-    module.def( check##dimension.c_str(),                                      \
-        &tetrahedral_solid_additional_files< dimension > );                    \
     const auto priority##dimension = "tetrahedral_solid_object_priority"       \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
@@ -55,6 +51,10 @@
         &is_tetrahedral_solid_loadable< dimension > );                         \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< TetrahedralSolid< dimension > >, \
         "TetrahedralSolid" + std::to_string( dimension ) + "D" );              \
+    const auto check##dimension = "tetrahedral_solid_additional_files"         \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &tetrahedral_solid_additional_files< dimension > );                    \
     const auto saveable##dimension =                                           \
         "is_tetrahedral_solid_saveable" + std::to_string( dimension ) + "D";   \
     module.def( saveable##dimension.c_str(),                                   \

@@ -21,26 +21,13 @@
  *
  */
 
-#include "../../../basic/factory.hpp"
-#include "../../../basic/input.hpp"
-#include "../../../common.hpp"
+#include <pybind11/iostream.h>
 
-#include <geode/model/representation/core/brep.hpp>
-#include <geode/model/representation/io/brep_input.hpp>
-#include <geode/model/representation/io/brep_output.hpp>
+#include <gdal_priv.h>
 
-namespace geode
+PYBIND11_MODULE( opengeode_py_gdal, module )
 {
-    void define_brep_io( pybind11::module& module )
-    {
-        module.def( "save_brep", &save_brep );
-        module.def( "load_brep", &load_brep );
-        module.def( "brep_object_priority", &brep_object_priority );
-        module.def( "is_brep_loadable", &is_brep_loadable );
-        module.def( "is_brep_saveable", &is_brep_saveable );
-        PYTHON_INPUT_CLASS( BRep, "BRep" );
-        module.def( "brep_additional_files", &brep_additional_files );
-        PYTHON_FACTORY_CLASS( BRepInputFactory );
-        PYTHON_FACTORY_CLASS( BRepOutputFactory );
-    }
-} // namespace geode
+    pybind11::add_ostream_redirect( module );
+    module.doc() = "OpenGeode Python binding for gdal";
+    module.def( "initialize_gdal", &GDALAllRegister );
+}

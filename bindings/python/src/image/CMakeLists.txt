@@ -27,6 +27,5 @@ add_geode_python_binding(
         "core/rgb_color.cpp"
         "io/raster_image.cpp"
     DEPENDENCIES
-        GDAL::GDAL
         ${PROJECT_NAME}::image
 )

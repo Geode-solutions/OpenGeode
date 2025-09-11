@@ -46,6 +46,7 @@ namespace geode
 {
     void define_coordinate_system( pybind11::module& module )
     {
+        PYTHON_COORDINATE_SYSTEM( 1 );
         PYTHON_COORDINATE_SYSTEM( 2 );
         PYTHON_COORDINATE_SYSTEM( 3 );
     }

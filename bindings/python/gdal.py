@@ -18,26 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} ${SQLITE_INSTALL_PREFIX} ${PROJ_INSTALL_PREFIX}")
-find_package(GDAL REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${GDAL_INSTALL_PREFIX})
+from opengeode_py_gdal import *
 
-add_subdirectory(src)
-
-if(OPENGEODE_WITH_TESTS)
-    add_subdirectory(tests)
-endif()
-
-add_geode_python_wheel(
-    NAME "OpenGeode-core"
-    DESCRIPTION 
-        "Open source framework for representing and manipulating geometric models"
-    MODULES
-        "basic.py"
-        "geometry.py"
-        "image.py"
-        "mesh.py"
-        "model.py"
-        "gdal.py"
-    SUPERBUILD
-    LICENSE "MIT"
-)
+initialize_gdal()

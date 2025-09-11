@@ -29,18 +29,18 @@ namespace geode
 {
     void define_vertex_identifier( pybind11::module& module )
     {
-        pybind11::class_< VertexIdentifier >( module, "VertexIdentifier" )
-            .def( pybind11::init<>() )
-            .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
-            .def( "component_mesh_vertices",
-                &VertexIdentifier::component_mesh_vertices )
-            .def( "unique_vertex", &VertexIdentifier::unique_vertex );
-
         pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )
             .def( pybind11::init< ComponentID, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( "string", &ComponentMeshVertex::string )
             .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
             .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
+
+        pybind11::class_< VertexIdentifier >( module, "VertexIdentifier" )
+            .def( pybind11::init<>() )
+            .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
+            .def( "component_mesh_vertices",
+                &VertexIdentifier::component_mesh_vertices )
+            .def( "unique_vertex", &VertexIdentifier::unique_vertex );
     }
 } // namespace geode

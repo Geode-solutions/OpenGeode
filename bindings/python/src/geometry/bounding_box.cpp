@@ -47,10 +47,6 @@
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
                 &BoundingBox##dimension##D::intersects ) )                     \
-        .def( "intersects_ray",                                                \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                \
-                const Ray< dimension >& ) const >(                             \
-                &BoundingBox##dimension##D::intersects ) )                     \
         .def( "min", &BoundingBox##dimension##D::min )                         \
         .def( "max", &BoundingBox##dimension##D::max )                         \
         .def( "center", &BoundingBox##dimension##D::center )                   \

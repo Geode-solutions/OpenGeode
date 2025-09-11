@@ -23,25 +23,32 @@
 
 #include "../../common.hpp"
 
-#include <geode/basic/attribute_manager.hpp>
-
-#include <geode/mesh/core/graph.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 namespace geode
 {
-    void define_graph( pybind11::module& module )
+    void define_surface_elements( pybind11::module& module )
     {
-        pybind11::class_< Graph, VertexSet >( module, "Graph" )
-            .def_static(
-                "create", static_cast< std::unique_ptr< Graph > ( * )() >(
-                              &Graph::create ) )
-            .def( "clone", &Graph::clone )
-            .def( "edge_vertex", &Graph::edge_vertex )
-            .def( "edge_vertices", &Graph::edge_vertices )
-            .def( "nb_edges", &Graph::nb_edges )
-            .def( "edge_attribute_manager", &Graph::edge_attribute_manager,
-                pybind11::return_value_policy::reference )
-            .def( "edges_around_vertex", &Graph::edges_around_vertex )
-            .def( "is_vertex_isolated", &Graph::is_vertex_isolated );
+        auto vertex =
+            pybind11::class_< PolygonVertex >( module, "PolygonVertex" );
+        auto edge = pybind11::class_< PolygonEdge >( module, "PolygonEdge" );
+
+        vertex.def( pybind11::init<>() )
+            .def( pybind11::init< index_t, index_t >() )
+            .def( pybind11::init< PolygonEdge >() )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def( "string", &PolygonVertex::string )
+            .def_readwrite( "polygon_id", &PolygonVertex::polygon_id )
+            .def_readwrite( "vertex_id", &PolygonVertex::vertex_id );
+
+        edge.def( pybind11::init<>() )
+            .def( pybind11::init< index_t, index_t >() )
+            .def( pybind11::init< PolygonVertex >() )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def( "string", &PolygonEdge::string )
+            .def_readwrite( "polygon_id", &PolygonEdge::polygon_id )
+            .def_readwrite( "edge_id", &PolygonEdge::edge_id );
     }
 } // namespace geode

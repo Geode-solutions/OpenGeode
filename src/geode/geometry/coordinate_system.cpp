@@ -30,7 +30,11 @@
 
 namespace
 {
-    void check_frame( std::array< geode::Vector2D, 2 > directions )
+    void check_frame( const std::array< geode::Vector1D, 1 >& /*directions*/ )
+    {
+    }
+
+    void check_frame( const std::array< geode::Vector2D, 2 >& directions )
     {
         const auto dot = geode::dot_perpendicular(
             directions[0].normalize(), directions[1].normalize() );
@@ -39,7 +43,7 @@ namespace
             "CoordinateSystem with given directions" );
     }
 
-    void check_frame( std::array< geode::Vector3D, 3 > directions )
+    void check_frame( const std::array< geode::Vector3D, 3 >& directions )
     {
         for( const auto d0 : geode::LRange{ 2 } )
         {
@@ -55,6 +59,14 @@ namespace
                     "CoordinateSystem with given directions" );
             }
         }
+    }
+
+    geode::SquareMatrix< 1 > frame_inverse_matrix(
+        const geode::CoordinateSystem1D& frame )
+    {
+        const geode::SquareMatrix< 1 > system_matrix{ { geode::Vector1D{
+            { frame.direction( 0 ).value( 0 ) } } } };
+        return system_matrix.inverse();
     }
 
     geode::SquareMatrix< 2 > frame_inverse_matrix(
@@ -179,9 +191,11 @@ namespace geode
                 } } } );
     }
 
+    template class opengeode_geometry_api CoordinateSystem< 1 >;
     template class opengeode_geometry_api CoordinateSystem< 2 >;
     template class opengeode_geometry_api CoordinateSystem< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 3 > );
 } // namespace geode

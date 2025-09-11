@@ -28,6 +28,8 @@
 #include "../../basic/factory.hpp"
 #include "../../basic/input.hpp"
 
+#include <geode/basic/percentage.hpp>
+
 #include <geode/image/core/raster_image.hpp>
 #include <geode/image/io/raster_image_input.hpp>
 #include <geode/image/io/raster_image_output.hpp>
@@ -39,10 +41,6 @@
     const auto load##dimension =                                               \
         "load_raster_image" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(), &load_raster_image< dimension > );    \
-    const auto check##dimension =                                              \
-        "raster_image_additional_files" + std::to_string( dimension ) + "D";   \
-    module.def( check##dimension.c_str(),                                      \
-        &raster_image_additional_files< dimension > );                         \
     const auto priority##dimension =                                           \
         "raster_image_object_priority" + std::to_string( dimension ) + "D";    \
     module.def( priority##dimension.c_str(),                                   \
@@ -53,6 +51,10 @@
         loadable##dimension.c_str(), &is_raster_image_loadable< dimension > ); \
     PYTHON_INPUT_CLASS( RasterImage##dimension##D,                             \
         "RasterImage" + std::to_string( dimension ) + "D" );                   \
+    const auto check##dimension =                                              \
+        "raster_image_additional_files" + std::to_string( dimension ) + "D";   \
+    module.def( check##dimension.c_str(),                                      \
+        &raster_image_additional_files< dimension > );                         \
     const auto saveable##dimension =                                           \
         "is_raster_image_saveable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \

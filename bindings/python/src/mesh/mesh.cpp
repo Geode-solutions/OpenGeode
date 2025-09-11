@@ -36,14 +36,17 @@ namespace geode
 
     void define_vertex_set( pybind11::module& );
     void define_graph( pybind11::module& );
+    void define_graph_elements( pybind11::module& );
     void define_edged_curve( pybind11::module& );
     void define_grid( pybind11::module& );
     void define_point_set( pybind11::module& );
     void define_surface_mesh( pybind11::module& );
+    void define_surface_elements( pybind11::module& );
     void define_surface_edges( pybind11::module& );
     void define_polygonal_surface( pybind11::module& );
     void define_triangulated_surface( pybind11::module& );
     void define_solid_mesh( pybind11::module& );
+    void define_solid_elements( pybind11::module& );
     void define_solid_edges( pybind11::module& );
     void define_solid_facets( pybind11::module& );
     void define_light_regular_grid( pybind11::module& );
@@ -117,38 +120,41 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_crs_manager_builder( module );
     geode::define_crs_managers_builder( module );
 
+    geode::define_graph_elements( module );
+    geode::define_surface_elements( module );
+    geode::define_solid_elements( module );
+    geode::define_texture( module );
+    geode::define_texture_manager( module );
+
     geode::define_vertex_set( module );
     geode::define_graph( module );
     geode::define_edged_curve( module );
     geode::define_grid( module );
     geode::define_point_set( module );
-    geode::define_surface_mesh( module );
     geode::define_surface_edges( module );
+    geode::define_surface_mesh( module );
     geode::define_polygonal_surface( module );
     geode::define_triangulated_surface( module );
-    geode::define_solid_mesh( module );
     geode::define_solid_edges( module );
     geode::define_solid_facets( module );
+    geode::define_solid_mesh( module );
     geode::define_light_regular_grid( module );
     geode::define_regular_grid( module );
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );
     geode::define_hybrid_solid( module );
 
-    geode::define_texture( module );
-    geode::define_texture_manager( module );
-
     geode::define_vertex_set_builder( module );
     geode::define_graph_builder( module );
     geode::define_edged_curve_builder( module );
     geode::define_point_set_builder( module );
-    geode::define_surface_mesh_builder( module );
     geode::define_surface_edges_builder( module );
+    geode::define_surface_mesh_builder( module );
     geode::define_polygonal_surface_builder( module );
     geode::define_triangulated_surface_builder( module );
-    geode::define_solid_mesh_builder( module );
     geode::define_solid_edges_builder( module );
     geode::define_solid_facets_builder( module );
+    geode::define_solid_mesh_builder( module );
     geode::define_regular_grid_builder( module );
     geode::define_polyhedral_solid_builder( module );
     geode::define_tetrahedral_solid_builder( module );

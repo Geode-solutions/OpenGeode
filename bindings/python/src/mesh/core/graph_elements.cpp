@@ -21,26 +21,23 @@
  *
  */
 
-#include "../../../basic/factory.hpp"
-#include "../../../basic/input.hpp"
-#include "../../../common.hpp"
+#include "../../common.hpp"
 
-#include <geode/model/representation/core/brep.hpp>
-#include <geode/model/representation/io/brep_input.hpp>
-#include <geode/model/representation/io/brep_output.hpp>
+#include <geode/basic/attribute_manager.hpp>
+
+#include <geode/mesh/core/graph.hpp>
 
 namespace geode
 {
-    void define_brep_io( pybind11::module& module )
+    void define_graph_elements( pybind11::module& module )
     {
-        module.def( "save_brep", &save_brep );
-        module.def( "load_brep", &load_brep );
-        module.def( "brep_object_priority", &brep_object_priority );
-        module.def( "is_brep_loadable", &is_brep_loadable );
-        module.def( "is_brep_saveable", &is_brep_saveable );
-        PYTHON_INPUT_CLASS( BRep, "BRep" );
-        module.def( "brep_additional_files", &brep_additional_files );
-        PYTHON_FACTORY_CLASS( BRepInputFactory );
-        PYTHON_FACTORY_CLASS( BRepOutputFactory );
+        pybind11::class_< EdgeVertex >( module, "EdgeVertex" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< index_t, index_t >() )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def( "string", &EdgeVertex::string )
+            .def_readwrite( "edge_id", &EdgeVertex::edge_id )
+            .def_readwrite( "vertex_id", &EdgeVertex::vertex_id );
     }
 } // namespace geode

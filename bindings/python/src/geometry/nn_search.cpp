@@ -26,6 +26,19 @@
 #include <geode/geometry/nn_search.hpp>
 
 #define PYTHON_NN_SEARCH( dimension )                                          \
+    const auto info##dimension =                                               \
+        "ColocatedInfo" + std::to_string( dimension ) + "D";                   \
+    pybind11::class_< NNSearch##dimension##D::ColocatedInfo >(                 \
+        module, info##dimension.c_str() )                                      \
+        .def_readonly( "colocated_mapping",                                    \
+            &NNSearch##dimension##D::ColocatedInfo::colocated_mapping )        \
+        .def_readonly( "unique_points",                                        \
+            &NNSearch##dimension##D::ColocatedInfo::unique_points )            \
+        .def( "nb_unique_points",                                              \
+            &NNSearch##dimension##D::ColocatedInfo::nb_unique_points )         \
+        .def( "nb_colocated_points",                                           \
+            &NNSearch##dimension##D::ColocatedInfo::nb_colocated_points );     \
+                                                                               \
     const auto name##dimension =                                               \
         "NNSearch" + std::to_string( dimension ) + "D";                        \
     pybind11::class_< NNSearch##dimension##D >(                                \
@@ -45,20 +58,7 @@
             static_cast< NNSearch##dimension##D::ColocatedInfo (               \
                 NNSearch##dimension##D::* )( const Frame##dimension##D& )      \
                     const >(                                                   \
-                &NNSearch##dimension##D::colocated_index_mapping ) );          \
-                                                                               \
-    const auto info##dimension =                                               \
-        "ColocatedInfo" + std::to_string( dimension ) + "D";                   \
-    pybind11::class_< NNSearch##dimension##D::ColocatedInfo >(                 \
-        module, info##dimension.c_str() )                                      \
-        .def_readonly( "colocated_mapping",                                    \
-            &NNSearch##dimension##D::ColocatedInfo::colocated_mapping )        \
-        .def_readonly( "unique_points",                                        \
-            &NNSearch##dimension##D::ColocatedInfo::unique_points )            \
-        .def( "nb_unique_points",                                              \
-            &NNSearch##dimension##D::ColocatedInfo::nb_unique_points )         \
-        .def( "nb_colocated_points",                                           \
-            &NNSearch##dimension##D::ColocatedInfo::nb_colocated_points );
+                &NNSearch##dimension##D::colocated_index_mapping ) )
 
 namespace geode
 {

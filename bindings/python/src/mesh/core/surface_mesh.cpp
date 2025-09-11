@@ -145,25 +145,5 @@ namespace geode
             .def( "polygon_normal", &SurfaceMesh3D::polygon_normal< 3 > )
             .def( "polygon_vertex_normal",
                 &SurfaceMesh3D::polygon_vertex_normal< 3 > );
-
-        pybind11::class_< PolygonVertex >( module, "PolygonVertex" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< index_t, index_t >() )
-            .def( pybind11::init< PolygonEdge >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( "string", &PolygonVertex::string )
-            .def_readwrite( "polygon_id", &PolygonVertex::polygon_id )
-            .def_readwrite( "vertex_id", &PolygonVertex::vertex_id );
-
-        pybind11::class_< PolygonEdge >( module, "PolygonEdge" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< index_t, index_t >() )
-            .def( pybind11::init< PolygonVertex >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( "string", &PolygonEdge::string )
-            .def_readwrite( "polygon_id", &PolygonEdge::polygon_id )
-            .def_readwrite( "edge_id", &PolygonEdge::edge_id );
     }
 } // namespace geode

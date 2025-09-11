@@ -56,6 +56,7 @@ namespace geode
 {
     void define_crs_manager( pybind11::module& module )
     {
+        PYTHON_CRS_MANAGER( 1 );
         PYTHON_CRS_MANAGER( 2 );
         PYTHON_CRS_MANAGER( 3 );
     }

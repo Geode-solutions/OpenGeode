@@ -21,6 +21,7 @@
 add_geode_python_test(
     SOURCE "test-py-colors.py"
     DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_image
 )
 add_geode_python_test(

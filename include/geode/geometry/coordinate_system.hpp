@@ -67,5 +67,5 @@ namespace geode
         Point< dimension > origin_{};
         CachedValue< SquareMatrix< dimension > > global_to_local_matrix_;
     };
-    ALIAS_2D_AND_3D( CoordinateSystem );
+    ALIAS_1D_AND_2D_AND_3D( CoordinateSystem );
 } // namespace geode

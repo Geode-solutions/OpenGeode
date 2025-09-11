@@ -40,10 +40,6 @@
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::unique_ptr< HybridSolid< dimension > > ( * )(        \
             std::string_view ) >( &load_hybrid_solid< dimension > ) );         \
-    const auto check##dimension =                                              \
-        "hybrid_solid_additional_files" + std::to_string( dimension ) + "D";   \
-    module.def( check##dimension.c_str(),                                      \
-        &hybrid_solid_additional_files< dimension > );                         \
     const auto priority##dimension =                                           \
         "hybrid_solid_object_priority" + std::to_string( dimension ) + "D";    \
     module.def( priority##dimension.c_str(),                                   \
@@ -54,6 +50,10 @@
         loadable##dimension.c_str(), &is_hybrid_solid_loadable< dimension > ); \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< HybridSolid< dimension > >,      \
         "HybridSolid" + std::to_string( dimension ) + "D" );                   \
+    const auto check##dimension =                                              \
+        "hybrid_solid_additional_files" + std::to_string( dimension ) + "D";   \
+    module.def( check##dimension.c_str(),                                      \
+        &hybrid_solid_additional_files< dimension > );                         \
     const auto saveable##dimension =                                           \
         "is_hybrid_solid_saveable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \
