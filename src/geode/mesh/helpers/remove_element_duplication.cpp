@@ -24,14 +24,12 @@
 #include <geode/mesh/helpers/remove_element_duplication.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
-#include <geode/mesh/builder/point_set_builder.hpp>
 #include <geode/mesh/builder/solid_edges_builder.hpp>
 #include <geode/mesh/builder/solid_facets_builder.hpp>
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/builder/surface_edges_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/edged_curve.hpp>
-#include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/generic_edged_curve_accessor.hpp>
