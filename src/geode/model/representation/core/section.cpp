@@ -601,7 +601,7 @@ namespace geode
         return internal::meshes_bounding_box< 2 >( corners() );
     }
 
-    BoundingBox2D BRep::active_components_bounding_box() const
+    BoundingBox2D Section::active_components_bounding_box() const
     {
         geode::BoundingBox2D box;
         for( const auto& corner : active_corners() )
