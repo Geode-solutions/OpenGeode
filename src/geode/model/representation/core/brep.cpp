@@ -138,8 +138,8 @@ namespace geode
 
     BRep::BoundarySurfaceRange::~BoundarySurfaceRange() = default;
 
-    auto
-        BRep::BoundarySurfaceRange::begin() const -> const BoundarySurfaceRange&
+    auto BRep::BoundarySurfaceRange::begin() const
+        -> const BoundarySurfaceRange&
     {
         return *this;
     }
@@ -210,8 +210,8 @@ namespace geode
 
     BRep::IncidentSurfaceRange::~IncidentSurfaceRange() = default;
 
-    auto
-        BRep::IncidentSurfaceRange::begin() const -> const IncidentSurfaceRange&
+    auto BRep::IncidentSurfaceRange::begin() const
+        -> const IncidentSurfaceRange&
     {
         return *this;
     }
@@ -399,8 +399,8 @@ namespace geode
 
     BRep::InternalSurfaceRange::~InternalSurfaceRange() = default;
 
-    auto
-        BRep::InternalSurfaceRange::begin() const -> const InternalSurfaceRange&
+    auto BRep::InternalSurfaceRange::begin() const
+        -> const InternalSurfaceRange&
     {
         return *this;
     }
@@ -450,8 +450,8 @@ namespace geode
         return *this;
     }
 
-    auto
-        BRep::EmbeddingSurfaceRange::end() const -> const EmbeddingSurfaceRange&
+    auto BRep::EmbeddingSurfaceRange::end() const
+        -> const EmbeddingSurfaceRange&
     {
         return *this;
     }
