@@ -264,7 +264,7 @@ namespace geode
         try
         {
             const auto& vertices = triangle.vertices();
-            std::array< double, dimension > sinus;
+            std::array< double, 3 > sinus;
             for( const auto v : LRange{ 3 } )
             {
                 const auto point = vertices[v].get();
