@@ -43,6 +43,6 @@ namespace geode
         tetrahedron_collapse_aspect_ratio( const Tetrahedron& tetra );
 
     template < index_t dimension >
-    [[nodiscard]] double opengeode_geometry_api triangle_angle_based_quality(
+    [[nodiscard]] double triangle_angle_based_quality(
         const Triangle< dimension >& triangle );
 } // namespace geode
