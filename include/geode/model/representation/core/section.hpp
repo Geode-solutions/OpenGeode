@@ -365,6 +365,8 @@ namespace geode
 
         [[nodiscard]] BoundingBox2D bounding_box() const;
 
+        [[nodiscard]] BoundingBox2D active_components_bounding_box() const;
+
         [[nodiscard]] static std::string_view native_extension_static()
         {
             static const auto extension = "og_sctn";

@@ -904,4 +904,27 @@ namespace geode
         }
         return internal::meshes_bounding_box< 3 >( corners() );
     }
+
+    BoundingBox3D BRep::active_components_bounding_box() const
+    {
+        geode::BoundingBox3D box;
+        for( const auto& corner : active_corners() )
+        {
+            box.add_box( corner.mesh().bounding_box() );
+        }
+        for( const auto& line : active_lines() )
+        {
+            box.add_box( line.mesh().bounding_box() );
+        }
+        for( const auto& surface : active_surfaces() )
+        {
+            box.add_box( surface.mesh().bounding_box() );
+        }
+        for( const auto& block : active_blocks() )
+        {
+            box.add_box( block.mesh().bounding_box() );
+        }
+        return box;
+    }
+
 } // namespace geode

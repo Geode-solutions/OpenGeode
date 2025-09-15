@@ -600,4 +600,22 @@ namespace geode
         }
         return internal::meshes_bounding_box< 2 >( corners() );
     }
+
+    BoundingBox2D Section::active_components_bounding_box() const
+    {
+        geode::BoundingBox2D box;
+        for( const auto& corner : active_corners() )
+        {
+            box.add_box( corner.mesh().bounding_box() );
+        }
+        for( const auto& line : active_lines() )
+        {
+            box.add_box( line.mesh().bounding_box() );
+        }
+        for( const auto& surface : active_surfaces() )
+        {
+            box.add_box( surface.mesh().bounding_box() );
+        }
+        return box;
+    }
 } // namespace geode
