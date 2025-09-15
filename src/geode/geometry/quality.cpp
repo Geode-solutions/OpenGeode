@@ -33,6 +33,22 @@
 
 namespace
 {
+    template < geode::index_t dimension >
+    double compute_angle( const geode::Point< dimension >& point,
+        const geode::Point< dimension >& point_prev,
+        const geode::Point< dimension >& point_next )
+    {
+        const auto prev =
+            geode::Vector< dimension >{ point, point_prev }.normalize();
+        const auto next =
+            geode::Vector< dimension >{ point, point_next }.normalize();
+        const auto angle = std::acos( prev.dot( next ) );
+        if( std::isnan( angle ) )
+        {
+            return 0;
+        }
+        return angle;
+    }
 
     std::array< geode::local_index_t, 3 > lu_decomposition(
         geode::SquareMatrix3D& matrix )
@@ -241,4 +257,34 @@ namespace geode
         }
         return ( longest_edge_length * heightinv ) / std::sqrt( 3. / 2. );
     }
+
+    template < index_t dimension >
+    double triangle_angle_based_quality( const Triangle< dimension >& triangle )
+    {
+        try
+        {
+            const auto& vertices = triangle.vertices();
+            std::array< double, dimension > sinus;
+            for( const auto v : LRange{ 3 } )
+            {
+                const auto point = vertices[v].get();
+                const auto point_prev = vertices[( v + 2 ) % 3].get();
+                const auto point_next = vertices[( v + 1 ) % 3].get();
+                const auto angle =
+                    compute_angle( point, point_prev, point_next );
+                sinus[v] = std::sin( angle );
+            }
+            return 4 * sinus[0] * sinus[1] * sinus[2]
+                   / ( sinus[0] + sinus[1] + sinus[2] );
+        }
+        catch( ... )
+        {
+            return 0;
+        }
+    }
+
+    template opengeode_geometry_api double triangle_angle_based_quality< 2 >(
+        const Triangle2D& );
+    template opengeode_geometry_api double triangle_angle_based_quality< 3 >(
+        const Triangle3D& );
 } // namespace geode
