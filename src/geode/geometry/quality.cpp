@@ -25,6 +25,8 @@
 
 #include <limits>
 
+#include <geode/basic/logger.hpp>
+
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/mensuration.hpp>
@@ -42,7 +44,8 @@ namespace
             geode::Vector< dimension >{ point, point_prev }.normalize();
         const auto next =
             geode::Vector< dimension >{ point, point_next }.normalize();
-        const auto angle = std::acos( prev.dot( next ) );
+        const auto dot = std::clamp( prev.dot( next ), -1.0, 1.0 );
+        const auto angle = std::acos( dot );
         if( std::isnan( angle ) )
         {
             return 0;
@@ -272,14 +275,18 @@ namespace geode
                 const auto point_next = vertices[( v + 1 ) % 3].get();
                 const auto angle =
                     compute_angle( point, point_prev, point_next );
+                DEBUG( angle );
                 sinus[v] = std::sin( angle );
+                DEBUG( sinus[v] );
             }
-            const auto quality = 4 * sinus[0] * sinus[1] * sinus[2]
-                                 / ( sinus[0] + sinus[1] + sinus[2] );
-            if( std::isnan( quality ) )
+            const auto denominator = sinus[0] + sinus[1] + sinus[2];
+            if( denominator == 0 )
             {
                 return 0;
             }
+            const auto quality =
+                4 * sinus[0] * sinus[1] * sinus[2] / ( denominator );
+            DEBUG( quality );
             return quality;
         }
         catch( ... )
