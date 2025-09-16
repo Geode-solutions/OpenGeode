@@ -274,8 +274,13 @@ namespace geode
                     compute_angle( point, point_prev, point_next );
                 sinus[v] = std::sin( angle );
             }
-            return 4 * sinus[0] * sinus[1] * sinus[2]
-                   / ( sinus[0] + sinus[1] + sinus[2] );
+            const auto quality = 4 * sinus[0] * sinus[1] * sinus[2]
+                                 / ( sinus[0] + sinus[1] + sinus[2] );
+            if( std::isnan( quality ) )
+            {
+                return 0;
+            }
+            return quality;
         }
         catch( ... )
         {
