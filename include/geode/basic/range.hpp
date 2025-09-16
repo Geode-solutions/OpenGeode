@@ -81,6 +81,10 @@ namespace geode
             : iter_( static_cast< Type >( begin ) ),
               last_( static_cast< Type >( end ) )
         {
+            OPENGEODE_EXCEPTION( begin <= std::numeric_limits< Type >::max(),
+                "[Range] Invalid range" );
+            OPENGEODE_EXCEPTION( end <= std::numeric_limits< Type >::max(),
+                "[Range] Invalid range" );
         }
 
     private:
