@@ -97,6 +97,16 @@ namespace
                                       == reorient_polygon_[adj->polygon_id]
                                 : cur_polygon_reorient
                                       != reorient_polygon_[adj->polygon_id];
+                        if( !is_valid )
+                        {
+                            DEBUG( "Mobius strip detected" );
+                            DEBUG( cur_polygon );
+                            DEBUG( e );
+                            SDEBUG( adj.value() );
+                            SDEBUG( mesh_.polygon_barycenter( cur_polygon ) );
+                            SDEBUG(
+                                mesh_.polygon_barycenter( adj->polygon_id ) );
+                        }
                         OPENGEODE_DATA_EXCEPTION( is_valid,
                             "[RepairPolygonOrientations] Mobius "
                             "strip detected, polygons orientations "
