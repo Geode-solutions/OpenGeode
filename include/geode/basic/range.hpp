@@ -83,12 +83,17 @@ namespace geode
         {
             if constexpr( std::is_arithmetic_v< Type > )
             {
-                OPENGEODE_EXCEPTION( begin <= static_cast< T1 >(
-                                         std::numeric_limits< Type >::max() ),
-                    "[Range] Invalid range" );
-                OPENGEODE_EXCEPTION( end <= static_cast< T2 >(
-                                         std::numeric_limits< Type >::max() ),
-                    "[Range] Invalid range" );
+                using T1U = std::make_unsigned_t< T1 >;
+                using T2U = std::make_unsigned_t< T2 >;
+                const auto beginU = static_cast< T1U >( begin );
+                const auto endU = static_cast< T2U >( end );
+                OPENGEODE_EXCEPTION(
+                    beginU <= std::numeric_limits< Type >::max(),
+                    "[Range] Invalid range: ", begin, " > ",
+                    std::numeric_limits< Type >::max() );
+                OPENGEODE_EXCEPTION( endU <= std::numeric_limits< Type >::max(),
+                    "[Range] Invalid range: ", end, " > ",
+                    std::numeric_limits< Type >::max() );
             }
         }
 
@@ -124,7 +129,8 @@ namespace geode
         }
 
         template < typename T >
-        constexpr explicit TRange( T end ) : TRange( 0, end )
+        constexpr explicit TRange( T end )
+            : TRange( static_cast< Type >( 0 ), end )
         {
         }
 
@@ -157,7 +163,9 @@ namespace geode
         }
 
         template < typename T >
-        constexpr explicit TReverseRange( T begin ) : TReverseRange( begin, 0 )
+        constexpr explicit TReverseRange( T begin )
+            : BaseRange< Type, DecrementOperator >(
+                  begin - 1, static_cast< Type >( -1 ) )
         {
         }
 
@@ -185,7 +193,8 @@ namespace geode
     public:
         template < typename Container >
         constexpr explicit TIndices( const Container& container )
-            : BaseRange< Type, IncrementOperator >( 0, container.size() )
+            : BaseRange< Type, IncrementOperator >(
+                  static_cast< Type >( 0 ), container.size() )
         {
         }
 
