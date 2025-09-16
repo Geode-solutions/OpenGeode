@@ -25,6 +25,7 @@
 #include <geode/basic/logger.hpp>
 
 #include <geode/model/helpers/model_component_filter.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 
@@ -62,6 +63,32 @@ void check_brep_dangling( const geode::BRep& brep )
         " Blocks, should have 1 Block" );
 }
 
+void check_brep_dangling_with_inactive_surface( const geode::BRep& brep )
+{
+    OPENGEODE_EXCEPTION( brep.nb_corners() == 8,
+        "[Test] Filtered dangling model has ", brep.nb_corners(),
+        " Corners, should have 8 Corners" );
+    OPENGEODE_EXCEPTION( brep.nb_lines() == 12,
+        "[Test] Filtered dangling model has ", brep.nb_lines(),
+        " Lines, should have 12 Lines" );
+    OPENGEODE_EXCEPTION( brep.nb_surfaces() == 7,
+        "[Test] Filtered dangling model with inactive surface has ",
+        brep.nb_surfaces(), " Surfaces, should have 7 Surfaces" );
+    OPENGEODE_EXCEPTION( brep.nb_active_surfaces() == 6,
+        "[Test] Filtered dangling model with inactive surface has ",
+        brep.nb_active_surfaces(), " Surfaces, should have 6 Surfaces" );
+    OPENGEODE_EXCEPTION( brep.nb_blocks() == 1,
+        "[Test] Filtered dangling model has ", brep.nb_blocks(),
+        " Blocks, should have 1 Block" );
+}
+
+void add_inactive_surface( geode::BRep& brep )
+{
+    geode::BRepBuilder builder{ brep };
+    const auto new_surface_id = builder.add_surface();
+    builder.set_surface_active( new_surface_id, false );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -74,6 +101,9 @@ void test()
         absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
     geode::filter_brep_components_with_regards_to_blocks( brep2 );
     check_brep_dangling( brep2 );
+    add_inactive_surface( brep2 );
+    geode::filter_brep_components_with_regards_to_blocks( brep2 );
+    check_brep_dangling_with_inactive_surface( brep2 );
 }
 
 OPENGEODE_TEST( "model-filter" )
