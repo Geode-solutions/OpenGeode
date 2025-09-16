@@ -87,13 +87,11 @@ namespace geode
                 using T2U = std::make_unsigned_t< T2 >;
                 const auto beginU = static_cast< T1U >( begin );
                 const auto endU = static_cast< T2U >( end );
+                const auto max = std::numeric_limits< Type >::max();
+                OPENGEODE_EXCEPTION( beginU <= max,
+                    "[Range] Invalid range: ", begin, " > ", max );
                 OPENGEODE_EXCEPTION(
-                    beginU <= std::numeric_limits< Type >::max(),
-                    "[Range] Invalid range: ", begin, " > ",
-                    std::numeric_limits< Type >::max() );
-                OPENGEODE_EXCEPTION( endU <= std::numeric_limits< Type >::max(),
-                    "[Range] Invalid range: ", end, " > ",
-                    std::numeric_limits< Type >::max() );
+                    endU <= max, "[Range] Invalid range: ", end, " > ", max );
             }
         }
 
