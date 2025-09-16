@@ -57,7 +57,7 @@ namespace
         std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& surface_uuid : find_components_to_delete(
-                 model, model.surfaces(), model.nb_surfaces() ) )
+                 model, model.active_surfaces(), model.nb_active_surfaces() ) )
         {
             filter.remove_surface( model.surface( surface_uuid ) );
             removed_components.emplace_back(
@@ -71,7 +71,7 @@ namespace
         std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& line_uuid : find_components_to_delete(
-                 model, model.lines(), model.nb_lines() ) )
+                 model, model.active_lines(), model.nb_active_lines() ) )
         {
             filter.remove_line( model.line( line_uuid ) );
             removed_components.emplace_back(
@@ -85,7 +85,7 @@ namespace
         std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& corner_uuid : find_components_to_delete(
-                 model, model.corners(), model.nb_corners() ) )
+                 model, model.active_corners(), model.nb_active_corners() ) )
         {
             filter.remove_corner( model.corner( corner_uuid ) );
             removed_components.emplace_back(
