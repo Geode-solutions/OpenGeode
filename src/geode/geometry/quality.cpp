@@ -33,6 +33,8 @@
 #include <geode/geometry/square_matrix.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/basic/detail/disable_debug_logger.hpp>
+
 namespace
 {
     template < geode::index_t dimension >
@@ -300,3 +302,5 @@ namespace geode
     template opengeode_geometry_api double triangle_angle_based_quality< 3 >(
         const Triangle3D& );
 } // namespace geode
+
+#include <geode/basic/detail/enable_debug_logger.hpp>
