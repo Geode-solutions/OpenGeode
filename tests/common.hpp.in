@@ -46,6 +46,7 @@ namespace geode
         try                                                                    \
         {                                                                      \
             geode::OpenGeodeBasicLibrary::initialize();                        \
+            geode::Logger::set_level( geode::Logger::LEVEL::trace );           \
             test();                                                            \
                                                                                \
             geode::Logger::info( "TEST SUCCESS" );                             \

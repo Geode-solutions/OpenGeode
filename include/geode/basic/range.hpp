@@ -81,6 +81,18 @@ namespace geode
             : iter_( static_cast< Type >( begin ) ),
               last_( static_cast< Type >( end ) )
         {
+            if constexpr( std::is_arithmetic_v< Type > )
+            {
+                using T1U = std::make_unsigned_t< T1 >;
+                using T2U = std::make_unsigned_t< T2 >;
+                const auto beginU = static_cast< T1U >( begin );
+                const auto endU = static_cast< T2U >( end );
+                const auto max = std::numeric_limits< Type >::max();
+                OPENGEODE_EXCEPTION( beginU <= max,
+                    "[Range] Invalid range: ", begin, " > ", max );
+                OPENGEODE_EXCEPTION(
+                    endU <= max, "[Range] Invalid range: ", end, " > ", max );
+            }
         }
 
     private:
@@ -115,7 +127,8 @@ namespace geode
         }
 
         template < typename T >
-        constexpr explicit TRange( T end ) : TRange( 0, end )
+        constexpr explicit TRange( T end )
+            : TRange( static_cast< Type >( 0 ), end )
         {
         }
 
@@ -148,7 +161,9 @@ namespace geode
         }
 
         template < typename T >
-        constexpr explicit TReverseRange( T begin ) : TReverseRange( begin, 0 )
+        constexpr explicit TReverseRange( T begin )
+            : BaseRange< Type, DecrementOperator >(
+                  begin - 1, static_cast< Type >( -1 ) )
         {
         }
 
@@ -176,7 +191,8 @@ namespace geode
     public:
         template < typename Container >
         constexpr explicit TIndices( const Container& container )
-            : BaseRange< Type, IncrementOperator >( 0, container.size() )
+            : BaseRange< Type, IncrementOperator >(
+                  static_cast< Type >( 0 ), container.size() )
         {
         }
 

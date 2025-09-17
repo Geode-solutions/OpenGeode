@@ -685,18 +685,18 @@ namespace
         void fill_values( const geode::Triangle2D& triangle )
         {
             const auto bbox = triangle.bounding_box();
-            const auto max_j = std::floor(
+            const auto max_j = static_cast< geode::index_t >( std::floor(
                 bbox.max().value( 0 ) / grid_.cell_length_in_direction( 1 )
-                - 0.5 );
-            const auto max_k = std::floor(
+                - 0.5 ) );
+            const auto max_k = static_cast< geode::index_t >( std::floor(
                 bbox.max().value( 1 ) / grid_.cell_length_in_direction( 2 )
-                - 0.5 );
-            const auto min_j = std::ceil(
+                - 0.5 ) );
+            const auto min_j = static_cast< geode::index_t >( std::ceil(
                 bbox.min().value( 0 ) / grid_.cell_length_in_direction( 1 )
-                - 0.5 );
-            const auto min_k = std::ceil(
+                - 0.5 ) );
+            const auto min_k = static_cast< geode::index_t >( std::ceil(
                 bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
-                - 0.5 );
+                - 0.5 ) );
             const auto max_i_grid = grid_.nb_cells_in_direction( 0 ) - 1;
             for( const auto j : geode::Range{ min_j, max_j + 1 } )
             {
