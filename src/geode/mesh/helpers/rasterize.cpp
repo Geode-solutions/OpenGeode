@@ -106,7 +106,7 @@ namespace
                 deltas[i] = 0;
                 increments[i] = 0;
             }
-            if( end[i] > start[i] )
+            else if( end[i] > start[i] )
             {
                 deltas[i] = end[i] - start[i];
                 increments[i] = 1;
