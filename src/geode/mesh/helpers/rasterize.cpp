@@ -84,7 +84,10 @@ namespace
             index[axis0] += increments[axis0];
             painted_cells.push_back( index );
         }
-        painted_cells.push_back( end );
+        if( painted_cells.back() != end )
+        {
+            painted_cells.push_back( end );
+        }
         return painted_cells;
     }
 
@@ -98,12 +101,17 @@ namespace
         std::array< int, dimension > increments;
         for( const auto i : geode::LRange{ dimension } )
         {
-            if( end[i] > start[i] )
+            if( end[i] == start[i] )
+            {
+                deltas[i] = 0;
+                increments[i] = 0;
+            }
+            else if( end[i] > start[i] )
             {
                 deltas[i] = end[i] - start[i];
                 increments[i] = 1;
             }
-            else
+            else if( end[i] < start[i] )
             {
                 deltas[i] = start[i] - end[i];
                 increments[i] = -1;
@@ -176,9 +184,9 @@ namespace
         std::array< int, dimension > increments;
         std::tie( deltas, increments ) =
             compute_deltas< dimension >( start, end );
-        const auto i = get_major_axis< dimension >( deltas );
+        const auto major_axis = get_major_axis< dimension >( deltas );
         return paint_segment_axis< dimension >(
-            i, deltas, increments, start, end );
+            major_axis, deltas, increments, start, end );
     }
 
     std::vector< CellIndices< 2 > > conservative_voxelization_triangle(
@@ -446,39 +454,56 @@ namespace
         return cells;
     }
 
-    absl::InlinedVector< CellIndices< 3 >, 6 > neighbors(
-        const geode::Grid3D& grid, const CellIndices< 3 >& cell )
+    void add_neighbors_to_queue( const geode::Grid3D& grid,
+        const CellIndices< 3 >& cell,
+        std::queue< CellIndices< 3 > >& cells_queue,
+        const CellIndices< 3 >& min,
+        const CellIndices< 3 >& max )
     {
-        absl::InlinedVector< CellIndices< 3 >, 6 > neighbors;
-        for( const auto d : geode::LRange{ 3 } )
+        for( const auto axis : geode::LRange{ 3 } )
         {
-            if( const auto prev = grid.previous_cell( cell, d ) )
+            if( const auto prev = grid.previous_cell( cell, axis ) )
             {
-                neighbors.push_back( prev.value() );
+                if( prev.value()[axis] >= min[axis] )
+                {
+                    cells_queue.emplace( prev.value() );
+                }
             }
-            if( const auto next = grid.next_cell( cell, d ) )
+            if( const auto next = grid.next_cell( cell, axis ) )
             {
-                neighbors.push_back( next.value() );
+                if( next.value()[axis] <= max[axis] )
+                {
+                    cells_queue.emplace( next.value() );
+                }
             }
         }
-        return neighbors;
     }
 
     std::vector< CellIndices< 3 > > conservative_voxelization_segment(
         const geode::Grid3D& grid,
         const geode::Segment3D& segment,
-        const std::array< geode::Grid3D::CellsAroundVertex, 2 > /*unused*/ )
+        const std::array< geode::Grid3D::CellsAroundVertex, 2 > vertex_cells )
     {
         auto cells = geode::rasterize_segment( grid, segment );
         std::vector< bool > tested_cells( grid.nb_cells(), false );
+        auto min = grid.cell_indices( grid.nb_cells() - 1 );
+        auto max = grid.cell_indices( 0 );
+        for( const auto vertex_id : geode::LRange{ 2 } )
+        {
+            for( const auto& cell_indices : vertex_cells[vertex_id] )
+            {
+                for( const auto axis : geode::LRange{ 3 } )
+                {
+                    max[axis] = std::max( max[axis], cell_indices[axis] );
+                    min[axis] = std::min( min[axis], cell_indices[axis] );
+                }
+            }
+        }
         std::queue< CellIndices< 3 > > to_test;
         for( const auto& cell : cells )
         {
             tested_cells[grid.cell_index( cell )] = true;
-            for( auto&& neighbor : neighbors( grid, cell ) )
-            {
-                to_test.emplace( std::move( neighbor ) );
-            }
+            add_neighbors_to_queue( grid, cell, to_test, min, max );
         }
         const auto half_cell_size =
             std::sqrt( grid.cell_length_in_direction( 0 )
@@ -502,10 +527,7 @@ namespace
             if( geode::point_segment_distance( center, segment )
                 <= half_cell_size )
             {
-                for( auto&& neighbor : neighbors( grid, cell ) )
-                {
-                    to_test.emplace( std::move( neighbor ) );
-                }
+                add_neighbors_to_queue( grid, cell, to_test, min, max );
                 cells.emplace_back( std::move( cell ) );
             }
         }
