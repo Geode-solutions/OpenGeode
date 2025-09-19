@@ -34,7 +34,7 @@
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
-#include <geode/mesh/helpers/convert_surface_mesh.hpp>
+#include <geode/mesh/helpers/detail/surface_merger.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
 #include <geode/mesh/io/triangulated_surface_output.hpp>
 
@@ -74,7 +74,8 @@ void test_create()
     std::vector< std::reference_wrapper< const geode::SurfaceMesh2D > > meshes{
         *mesh0, *mesh1
     };
-    const auto merged = geode::merge_surface_meshes< 2 >( meshes );
+    geode::detail::SurfaceMeshMerger2D merger{ meshes };
+    const auto merged = merger.merge( geode::GLOBAL_EPSILON );
     OPENGEODE_EXCEPTION(
         merged->nb_vertices() == 6, "[Test] Wrong number of vertices" );
     OPENGEODE_EXCEPTION(
@@ -124,7 +125,8 @@ void test_import()
     std::vector< std::reference_wrapper< const geode::SurfaceMesh3D > > meshes{
         *surface
     };
-    const auto merged = geode::merge_surface_meshes< 3 >( meshes );
+    geode::detail::SurfaceMeshMerger3D merger{ meshes };
+    const auto merged = merger.merge( geode::GLOBAL_EPSILON );
     geode::save_triangulated_surface(
         *dynamic_cast< geode::TriangulatedSurface3D* >( merged.get() ),
         "output.og_tsf3d" );

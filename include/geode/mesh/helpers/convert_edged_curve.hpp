@@ -47,8 +47,7 @@ namespace geode
             double axis_coordinate );
 
     template < index_t dimension >
-    [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves(
-        absl::Span<
-            const std::reference_wrapper< const EdgedCurve< dimension > > >
-            curves );
+    [[deprecated, nodiscard]] std::unique_ptr< EdgedCurve< dimension > >
+        merge_edged_curves( absl::Span< const std::reference_wrapper<
+                const EdgedCurve< dimension > > > curves );
 } // namespace geode
