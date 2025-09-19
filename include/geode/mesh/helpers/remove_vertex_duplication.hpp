@@ -42,17 +42,20 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    void remove_vertex_duplication( const PointSet< dimension >& mesh,
+    [[deprecated]] void remove_vertex_duplication(
+        const PointSet< dimension >& mesh,
         PointSetBuilder< dimension >& builder );
 
     template < index_t dimension >
-    void remove_vertex_duplication( const EdgedCurve< dimension >& mesh,
+    [[deprecated]] void remove_vertex_duplication(
+        const EdgedCurve< dimension >& mesh,
         EdgedCurveBuilder< dimension >& builder );
 
     template < index_t dimension >
-    void remove_vertex_duplication( const SurfaceMesh< dimension >& mesh,
+    [[deprecated]] void remove_vertex_duplication(
+        const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder );
 
-    void opengeode_mesh_api remove_vertex_duplication(
+    [[deprecated]] void opengeode_mesh_api remove_vertex_duplication(
         const SolidMesh3D& mesh, SolidMeshBuilder3D& builder );
 } // namespace geode
