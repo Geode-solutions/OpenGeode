@@ -103,7 +103,7 @@ namespace geode
             local_index_t axis_to_remove );
 
     template < index_t dimension >
-    [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
+    [[deprecated, nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
         merge_surface_meshes( absl::Span< const std::reference_wrapper<
                 const SurfaceMesh< dimension > > > surfaces );
 } // namespace geode

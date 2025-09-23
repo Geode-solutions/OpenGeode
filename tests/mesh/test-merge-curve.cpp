@@ -30,7 +30,7 @@
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/core/edged_curve.hpp>
-#include <geode/mesh/helpers/convert_edged_curve.hpp>
+#include <geode/mesh/helpers/detail/curve_merger.hpp>
 
 std::vector< std::unique_ptr< geode::EdgedCurve2D > > create_curves()
 {
@@ -81,8 +81,9 @@ void test()
     geode::OpenGeodeMeshLibrary::initialize();
 
     const auto curves = create_curves();
-    const auto merged = geode::merge_edged_curves< 2 >(
-        { *curves[0], *curves[1], *curves[2] } );
+    geode::detail::EdgedCurveMerger2D merger{ { *curves[0], *curves[1],
+        *curves[2] } };
+    const auto merged = merger.merge( geode::GLOBAL_EPSILON );
     OPENGEODE_EXCEPTION(
         merged->nb_vertices() == 8, "[Test] Wrong number of vertices" );
     OPENGEODE_EXCEPTION(

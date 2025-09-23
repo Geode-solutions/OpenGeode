@@ -30,7 +30,7 @@
 
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
-#include <geode/mesh/helpers/convert_solid_mesh.hpp>
+#include <geode/mesh/helpers/detail/solid_merger.hpp>
 
 void test()
 {
@@ -87,7 +87,8 @@ void test()
     std::vector< std::reference_wrapper< const geode::SolidMesh3D > > meshes{
         *mesh0, *mesh1
     };
-    const auto merged = geode::merge_solid_meshes( meshes );
+    geode::detail::SolidMeshMerger3D merger{ meshes };
+    const auto merged = merger.merge( geode::GLOBAL_EPSILON );
     OPENGEODE_EXCEPTION(
         merged->nb_vertices() == 10, "[Test] Wrong number of vertices" );
     OPENGEODE_EXCEPTION(
