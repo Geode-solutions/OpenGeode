@@ -25,7 +25,7 @@ ExternalProject_Add(earcut
     SOURCE_DIR ${EARCUT_PATH}/src
     BINARY_DIR ${EARCUT_PATH}/build
     STAMP_DIR ${EARCUT_PATH}/stamp
-    GIT_REPOSITORY https://github.com/mapbox/earcut.hpp
+    GIT_REPOSITORY https://github.com/mapbox/earcut
     GIT_TAG v3.0.2
     GIT_SHALLOW ON
     GIT_PROGRESS ON
