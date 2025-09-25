@@ -30,14 +30,8 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     ALIAS_3D( BoundingBox );
-    ALIAS_3D( Point );
     class OwnerCircle;
-
-    template < index_t dimension >
-    using RefPoint = std::reference_wrapper< const Point< dimension > >;
-    ALIAS_2D_AND_3D( RefPoint );
 } // namespace geode
 
 namespace geode
@@ -46,6 +40,8 @@ namespace geode
     class GenericCircle
     {
     public:
+        static constexpr auto dim = 3;
+
         GenericCircle( PlaneType plane, double radius );
 
         GenericCircle( const GenericCircle& other );

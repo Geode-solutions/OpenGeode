@@ -39,6 +39,8 @@ namespace geode
     class Point
     {
     public:
+        static constexpr auto dim = dimension;
+
         Point();
 
         explicit Point( std::array< double, dimension > values );

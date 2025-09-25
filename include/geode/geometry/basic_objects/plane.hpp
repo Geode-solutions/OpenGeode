@@ -44,6 +44,8 @@ namespace geode
     class GenericPlane
     {
     public:
+        static constexpr auto dim = 3;
+
         GenericPlane( const Vector3D& normal, PointType origin );
         explicit GenericPlane( const Triangle3D& triangle );
         GenericPlane( const GenericPlane& other );

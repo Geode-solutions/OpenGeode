@@ -43,6 +43,8 @@ namespace geode
     class GenericSphere
     {
     public:
+        static constexpr auto dim = dimension;
+
         GenericSphere( PointType origin, double radius );
 
         GenericSphere( const GenericSphere< PointType, dimension >& other );

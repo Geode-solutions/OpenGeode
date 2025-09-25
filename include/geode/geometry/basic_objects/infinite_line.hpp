@@ -43,6 +43,8 @@ namespace geode
     class GenericLine
     {
     public:
+        static constexpr auto dim = dimension;
+
         GenericLine( const Vector< dimension >& direction, PointType origin );
         explicit GenericLine( const Segment< dimension >& segment );
         GenericLine( const GenericLine< PointType, dimension >& other );

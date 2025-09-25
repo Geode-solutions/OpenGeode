@@ -42,6 +42,8 @@ namespace geode
     class GenericSegment
     {
     public:
+        static constexpr auto dim = dimension;
+
         GenericSegment( PointType point0, PointType point1 ) noexcept;
 
         GenericSegment(
