@@ -890,40 +890,50 @@ namespace geode
 
     BoundingBox3D BRep::bounding_box() const
     {
-        if( nb_surfaces() > 0 )
+        geode::BoundingBox3D box;
+        box.add_box( internal::meshes_bounding_box< 3 >( surfaces() ) );
+        box.add_box( internal::meshes_bounding_box< 3 >( lines() ) );
+        box.add_box( internal::meshes_bounding_box< 3 >( corners() ) );
+        try
         {
-            return internal::meshes_bounding_box< 3 >( surfaces() );
+            box.add_box( internal::meshes_bounding_box< 3 >( blocks() ) );
         }
-        if( nb_blocks() > 0 )
+        catch( const OpenGeodeException& )
         {
-            return internal::meshes_bounding_box< 3 >( blocks() );
+            OPENGEODE_EXCEPTION(
+                nb_corners() > 0 || nb_lines() > 0 || nb_surfaces() > 0,
+                "[BRep::bounding_box] Cannot return the bounding_box of a BRep "
+                "with not meshes Blocks and no Corners, no Lines and no "
+                "Surfaces." );
         }
-        if( nb_lines() > 0 )
-        {
-            return internal::meshes_bounding_box< 3 >( lines() );
-        }
-        return internal::meshes_bounding_box< 3 >( corners() );
+        OPENGEODE_EXCEPTION( box.min() <= box.max(),
+            "[BRep::bounding_box] Cannot return the "
+            "bounding_box of an empty BRep." );
+        return box;
     }
 
     BoundingBox3D BRep::active_components_bounding_box() const
     {
         geode::BoundingBox3D box;
-        for( const auto& corner : active_corners() )
+        box.add_box( internal::meshes_bounding_box< 3 >( active_corners() ) );
+        box.add_box( internal::meshes_bounding_box< 3 >( active_lines() ) );
+        box.add_box( internal::meshes_bounding_box< 3 >( active_surfaces() ) );
+        try
         {
-            box.add_box( corner.mesh().bounding_box() );
+            box.add_box(
+                internal::meshes_bounding_box< 3 >( active_blocks() ) );
         }
-        for( const auto& line : active_lines() )
+        catch( const OpenGeodeException& )
         {
-            box.add_box( line.mesh().bounding_box() );
+            for( const auto& block : active_blocks() )
+            {
+                box.add_box(
+                    internal::meshes_bounding_box< 3 >( boundaries( block ) ) );
+            }
         }
-        for( const auto& surface : active_surfaces() )
-        {
-            box.add_box( surface.mesh().bounding_box() );
-        }
-        for( const auto& block : active_blocks() )
-        {
-            box.add_box( block.mesh().bounding_box() );
-        }
+        OPENGEODE_EXCEPTION( box.min() <= box.max(),
+            "[BRep::bounding_box] Cannot return the "
+            "bounding_box of a full inactive BRep." );
         return box;
     }
 

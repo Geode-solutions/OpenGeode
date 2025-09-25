@@ -158,6 +158,9 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > EdgedCurve< dimension >::bounding_box() const
     {
+        OPENGEODE_EXCEPTION( nb_vertices() != 0,
+            "[EdgedCurve::bounding_box] Cannot return "
+            "the bounding_box of an empty edged curve." );
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {
