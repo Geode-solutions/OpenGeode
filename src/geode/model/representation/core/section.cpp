@@ -590,32 +590,46 @@ namespace geode
 
     BoundingBox2D Section::bounding_box() const
     {
-        if( nb_lines() > 0 )
+        geode::BoundingBox2D bbox;
+        if( const auto box = internal::meshes_bounding_box< 2 >( surfaces() ) )
         {
-            return internal::meshes_bounding_box< 2 >( lines() );
+            bbox.add_box( box.value() );
         }
-        if( nb_surfaces() > 0 )
+        if( const auto box = internal::meshes_bounding_box< 2 >( lines() ) )
         {
-            return internal::meshes_bounding_box< 2 >( surfaces() );
+            bbox.add_box( box.value() );
         }
-        return internal::meshes_bounding_box< 2 >( corners() );
+        if( const auto box = internal::meshes_bounding_box< 2 >( corners() ) )
+        {
+            bbox.add_box( box.value() );
+        }
+        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+            "[Section::bounding_box] Cannot return the "
+            "bounding_box of an empty Section." );
+        return bbox;
     }
 
     BoundingBox2D Section::active_components_bounding_box() const
     {
-        geode::BoundingBox2D box;
-        for( const auto& corner : active_corners() )
+        geode::BoundingBox2D bbox;
+        if( const auto box =
+                internal::meshes_bounding_box< 2 >( active_surfaces() ) )
         {
-            box.add_box( corner.mesh().bounding_box() );
+            bbox.add_box( box.value() );
         }
-        for( const auto& line : active_lines() )
+        if( const auto box =
+                internal::meshes_bounding_box< 2 >( active_lines() ) )
         {
-            box.add_box( line.mesh().bounding_box() );
+            bbox.add_box( box.value() );
         }
-        for( const auto& surface : active_surfaces() )
+        if( const auto box =
+                internal::meshes_bounding_box< 2 >( active_corners() ) )
         {
-            box.add_box( surface.mesh().bounding_box() );
+            bbox.add_box( box.value() );
         }
-        return box;
+        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+            "[Section::bounding_box] Cannot return the "
+            "bounding_box of a full inactive Section." );
+        return bbox;
     }
 } // namespace geode

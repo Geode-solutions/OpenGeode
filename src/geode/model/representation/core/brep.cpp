@@ -890,13 +890,26 @@ namespace geode
 
     BoundingBox3D BRep::bounding_box() const
     {
-        geode::BoundingBox3D box;
-        box.add_box( internal::meshes_bounding_box< 3 >( surfaces() ) );
-        box.add_box( internal::meshes_bounding_box< 3 >( lines() ) );
-        box.add_box( internal::meshes_bounding_box< 3 >( corners() ) );
+        geode::BoundingBox3D bbox;
+        if( const auto box = internal::meshes_bounding_box< 3 >( surfaces() ) )
+        {
+            bbox.add_box( box.value() );
+        }
+        if( const auto box = internal::meshes_bounding_box< 3 >( lines() ) )
+        {
+            bbox.add_box( box.value() );
+        }
+        if( const auto box = internal::meshes_bounding_box< 3 >( corners() ) )
+        {
+            bbox.add_box( box.value() );
+        }
         try
         {
-            box.add_box( internal::meshes_bounding_box< 3 >( blocks() ) );
+            if( const auto box =
+                    internal::meshes_bounding_box< 3 >( blocks() ) )
+            {
+                bbox.add_box( box.value() );
+            }
         }
         catch( const OpenGeodeException& )
         {
@@ -906,35 +919,53 @@ namespace geode
                 "with not meshes Blocks and no Corners, no Lines and no "
                 "Surfaces." );
         }
-        OPENGEODE_EXCEPTION( box.min() <= box.max(),
+        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
             "[BRep::bounding_box] Cannot return the "
             "bounding_box of an empty BRep." );
-        return box;
+        return bbox;
     }
 
     BoundingBox3D BRep::active_components_bounding_box() const
     {
-        geode::BoundingBox3D box;
-        box.add_box( internal::meshes_bounding_box< 3 >( active_corners() ) );
-        box.add_box( internal::meshes_bounding_box< 3 >( active_lines() ) );
-        box.add_box( internal::meshes_bounding_box< 3 >( active_surfaces() ) );
+        geode::BoundingBox3D bbox;
+        if( const auto box =
+                internal::meshes_bounding_box< 3 >( active_surfaces() ) )
+        {
+            bbox.add_box( box.value() );
+        }
+        if( const auto box =
+                internal::meshes_bounding_box< 3 >( active_lines() ) )
+        {
+            bbox.add_box( box.value() );
+        }
+        if( const auto box =
+                internal::meshes_bounding_box< 3 >( active_corners() ) )
+        {
+            bbox.add_box( box.value() );
+        }
         try
         {
-            box.add_box(
-                internal::meshes_bounding_box< 3 >( active_blocks() ) );
+            if( const auto box =
+                    internal::meshes_bounding_box< 3 >( active_blocks() ) )
+            {
+                bbox.add_box( box.value() );
+            }
         }
         catch( const OpenGeodeException& )
         {
             for( const auto& block : active_blocks() )
             {
-                box.add_box(
-                    internal::meshes_bounding_box< 3 >( boundaries( block ) ) );
+                if( const auto box = internal::meshes_bounding_box< 3 >(
+                        boundaries( block ) ) )
+                {
+                    bbox.add_box( box.value() );
+                }
             }
         }
-        OPENGEODE_EXCEPTION( box.min() <= box.max(),
+        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
             "[BRep::bounding_box] Cannot return the "
             "bounding_box of a full inactive BRep." );
-        return box;
+        return bbox;
     }
 
 } // namespace geode
