@@ -25,14 +25,35 @@
 
 #include <limits>
 
+#include <geode/basic/logger.hpp>
+
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/square_matrix.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/basic/detail/disable_debug_logger.hpp>
+
 namespace
 {
+    template < geode::index_t dimension >
+    double compute_angle( const geode::Point< dimension >& point,
+        const geode::Point< dimension >& point_prev,
+        const geode::Point< dimension >& point_next )
+    {
+        const auto prev =
+            geode::Vector< dimension >{ point, point_prev }.normalize();
+        const auto next =
+            geode::Vector< dimension >{ point, point_next }.normalize();
+        const auto dot = std::clamp( prev.dot( next ), -1.0, 1.0 );
+        const auto angle = std::acos( dot );
+        if( std::isnan( angle ) )
+        {
+            return 0;
+        }
+        return angle;
+    }
 
     std::array< geode::local_index_t, 3 > lu_decomposition(
         geode::SquareMatrix3D& matrix )
@@ -241,4 +262,45 @@ namespace geode
         }
         return ( longest_edge_length * heightinv ) / std::sqrt( 3. / 2. );
     }
+
+    template < index_t dimension >
+    double triangle_angle_based_quality( const Triangle< dimension >& triangle )
+    {
+        try
+        {
+            const auto& vertices = triangle.vertices();
+            std::array< double, 3 > sinus;
+            for( const auto v : LRange{ 3 } )
+            {
+                const auto point = vertices[v].get();
+                const auto point_prev = vertices[( v + 2 ) % 3].get();
+                const auto point_next = vertices[( v + 1 ) % 3].get();
+                const auto angle =
+                    compute_angle( point, point_prev, point_next );
+                DEBUG( angle );
+                sinus[v] = std::sin( angle );
+                DEBUG( sinus[v] );
+            }
+            const auto denominator = sinus[0] + sinus[1] + sinus[2];
+            if( denominator == 0 )
+            {
+                return 0;
+            }
+            const auto quality =
+                4 * sinus[0] * sinus[1] * sinus[2] / ( denominator );
+            DEBUG( quality );
+            return quality;
+        }
+        catch( ... )
+        {
+            return 0;
+        }
+    }
+
+    template opengeode_geometry_api double triangle_angle_based_quality< 2 >(
+        const Triangle2D& );
+    template opengeode_geometry_api double triangle_angle_based_quality< 3 >(
+        const Triangle3D& );
 } // namespace geode
+
+#include <geode/basic/detail/enable_debug_logger.hpp>

@@ -28,6 +28,8 @@
 namespace geode
 {
     class Tetrahedron;
+    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    ALIAS_2D_AND_3D( Triangle );
 } // namespace geode
 
 namespace geode
@@ -39,4 +41,8 @@ namespace geode
 
     [[nodiscard]] double opengeode_geometry_api
         tetrahedron_collapse_aspect_ratio( const Tetrahedron& tetra );
+
+    template < index_t dimension >
+    [[nodiscard]] double triangle_angle_based_quality(
+        const Triangle< dimension >& triangle );
 } // namespace geode
