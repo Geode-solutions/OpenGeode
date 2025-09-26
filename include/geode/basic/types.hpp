@@ -46,7 +46,7 @@ namespace geode
     static constexpr index_t NO_ID = index_t( -1 );
     static constexpr local_index_t NO_LID = local_index_t( -1 );
 
-    inline constexpr unsigned char operator"" _uc(
+    inline constexpr unsigned char operator""_uc(
         unsigned long long arg ) noexcept
     {
         return static_cast< unsigned char >( arg );
