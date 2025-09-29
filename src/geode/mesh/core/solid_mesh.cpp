@@ -1731,6 +1731,9 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > SolidMesh< dimension >::bounding_box() const
     {
+        OPENGEODE_EXCEPTION( nb_vertices() != 0,
+            "[SolidMesh::bounding_box] Cannot return "
+            "the bounding_box of an empty solid mesh." );
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {

@@ -57,13 +57,19 @@ namespace geode
         }
 
         template < index_t dimension, typename MeshComponentRange >
-        [[nodiscard]] BoundingBox< dimension > meshes_bounding_box(
-            MeshComponentRange range )
+        [[nodiscard]] std::optional< BoundingBox< dimension > >
+            meshes_bounding_box( MeshComponentRange range )
         {
             BoundingBox< dimension > box;
+            bool computed{ false };
             for( const auto& component : range )
             {
+                computed = true;
                 box.add_box( component.mesh().bounding_box() );
+            }
+            if( !computed )
+            {
+                return std::nullopt;
             }
             return box;
         }
