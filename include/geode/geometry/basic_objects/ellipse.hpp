@@ -47,6 +47,8 @@ namespace geode
     class GenericEllipse
     {
     public:
+        static constexpr auto dim = dimension;
+
         GenericEllipse( PointType center, FrameType axis );
 
         GenericEllipse(

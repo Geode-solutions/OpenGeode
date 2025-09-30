@@ -47,6 +47,8 @@ namespace geode
     class GenericPolygon
     {
     public:
+        static constexpr auto dim = dimension;
+
         GenericPolygon( std::vector< PointType > vertices ) noexcept;
 
         GenericPolygon(

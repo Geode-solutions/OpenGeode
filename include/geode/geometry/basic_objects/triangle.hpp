@@ -47,6 +47,8 @@ namespace geode
     class GenericTriangle
     {
     public:
+        static constexpr auto dim = dimension;
+
         GenericTriangle(
             PointType point0, PointType point1, PointType point2 ) noexcept;
 
