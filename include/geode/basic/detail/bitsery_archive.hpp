@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <geode/basic/bitsery_archive.hpp>
 
 #include <absl/container/inlined_vector.h>
@@ -75,10 +77,20 @@ namespace geode
         template < typename Serializer >
         void register_basic_pcontext( PContext& context )
         {
+            // Base types (skip aliases registered below...)
             register_attribute_type< bool, Serializer >( context, "bool" );
+            register_attribute_type< signed char, Serializer >(
+                context, "signed_char" );
+            static_assert( std::is_same_v< unsigned char, local_index_t > );
+            register_attribute_type< short, Serializer >( context, "short" );
+            register_attribute_type< unsigned short, Serializer >(
+                context, "unsigned_short" );
             register_attribute_type< int, Serializer >( context, "int" );
+            static_assert( std::is_same_v< unsigned int, index_t > );
             register_attribute_type< float, Serializer >( context, "float" );
             register_attribute_type< double, Serializer >( context, "double" );
+
+            // Other types or aliases
             register_attribute_type< local_index_t, Serializer >(
                 context, "local_index_t" );
             register_attribute_type< index_t, Serializer >(
@@ -86,6 +98,7 @@ namespace geode
             register_attribute_type< uuid, Serializer >( context, "uuid" );
             register_attribute_type< std::string, Serializer >(
                 context, "std::string" );
+
             register_attribute_type_for_all_containers< Serializer, double >(
                 context, "double" );
             register_attribute_type_for_all_containers< Serializer, index_t >(
