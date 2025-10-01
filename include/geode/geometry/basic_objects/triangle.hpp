@@ -68,6 +68,10 @@ namespace geode
             normal() const;
         template < index_t T = dimension >
         [[nodiscard]]
+        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+            strict_normal() const;
+        template < index_t T = dimension >
+        [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< Plane > >::type
             plane() const;
         template < index_t T = dimension >
@@ -78,6 +82,10 @@ namespace geode
         [[nodiscard]]
         typename std::enable_if< T == 3, std::optional< local_index_t > >::type
             pivot() const;
+        template < index_t T = dimension >
+        [[nodiscard]] typename std::enable_if< T == 3,
+            std::optional< std::pair< local_index_t, Vector3D > > >::type
+            strict_pivot_and_normal() const;
         template < index_t T = dimension >
         [[nodiscard]] typename std::enable_if< T == 3,
             std::optional< std::pair< local_index_t, Vector3D > > >::type
