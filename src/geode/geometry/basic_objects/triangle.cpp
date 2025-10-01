@@ -406,6 +406,8 @@ namespace geode
 
     template opengeode_geometry_api std::optional< Vector3D >
         GenericTriangle< Point< 3 >, 3 >::normal< 3 >() const;
+    template opengeode_geometry_api std::optional< Vector3D >
+        GenericTriangle< Point< 3 >, 3 >::strict_normal< 3 >() const;
     template opengeode_geometry_api std::optional< Plane >
         GenericTriangle< Point< 3 >, 3 >::plane< 3 >() const;
     template opengeode_geometry_api std::optional< OwnerPlane >
@@ -415,9 +417,14 @@ namespace geode
     template opengeode_geometry_api
         std::optional< std::pair< local_index_t, Vector3D > >
         GenericTriangle< Point< 3 >, 3 >::pivot_and_normal< 3 >() const;
+    template opengeode_geometry_api
+        std::optional< std::pair< local_index_t, Vector3D > >
+        GenericTriangle< Point< 3 >, 3 >::strict_pivot_and_normal< 3 >() const;
 
     template opengeode_geometry_api std::optional< Vector3D >
         GenericTriangle< RefPoint< 3 >, 3 >::normal< 3 >() const;
+    template opengeode_geometry_api std::optional< Vector3D >
+        GenericTriangle< RefPoint< 3 >, 3 >::strict_normal< 3 >() const;
     template opengeode_geometry_api std::optional< Plane >
         GenericTriangle< RefPoint< 3 >, 3 >::plane< 3 >() const;
     template opengeode_geometry_api std::optional< OwnerPlane >
@@ -427,4 +434,8 @@ namespace geode
     template opengeode_geometry_api
         std::optional< std::pair< local_index_t, Vector3D > >
         GenericTriangle< RefPoint< 3 >, 3 >::pivot_and_normal< 3 >() const;
+    template opengeode_geometry_api
+        std::optional< std::pair< local_index_t, Vector3D > >
+        GenericTriangle< RefPoint< 3 >, 3 >::strict_pivot_and_normal< 3 >()
+            const;
 } // namespace geode
