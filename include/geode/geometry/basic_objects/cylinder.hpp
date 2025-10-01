@@ -31,6 +31,8 @@ namespace geode
     class opengeode_geometry_api Cylinder
     {
     public:
+        static constexpr auto dim = 3;
+
         Cylinder( Segment3D axis, double radius );
 
         Cylinder( const Cylinder& other );

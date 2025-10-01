@@ -196,13 +196,13 @@ namespace geode
         OPENGEODE_ASSERT(
             dimension > 1, "[Point] Invalid dimension to reduce" );
         Point< dimension - 1 > projected_point;
-        geode::index_t dim{ 0 };
+        geode::index_t dim_id{ 0 };
         for( const auto i : LRange{ dimension } )
         {
             if( i != axis_to_remove )
             {
-                projected_point.set_value( dim, this->value( i ) );
-                dim++;
+                projected_point.set_value( dim_id, this->value( i ) );
+                dim_id++;
             }
         }
         return projected_point;
