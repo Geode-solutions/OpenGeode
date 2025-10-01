@@ -130,6 +130,18 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
+    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+        GenericTriangle< PointType, dimension >::strict_normal() const
+    {
+        if( const auto result = strict_pivot_and_normal() )
+        {
+            return result->second;
+        }
+        return std::nullopt;
+    }
+
+    template < typename PointType, index_t dimension >
+    template < index_t T >
     typename std::enable_if< T == 3, std::optional< Plane > >::type
         GenericTriangle< PointType, dimension >::plane() const
     {
@@ -170,6 +182,27 @@ namespace geode
     template < index_t T >
     typename std::enable_if< T == 3,
         std::optional< std::pair< local_index_t, Vector3D > > >::type
+        GenericTriangle< PointType, dimension >::strict_pivot_and_normal() const
+    {
+        const auto result = simple_pivot_and_normal(
+            { vertices_[0], vertices_[1], vertices_[2] } );
+        if( !result )
+        {
+            return std::nullopt;
+        }
+        if( result->pivot != NO_LID )
+        {
+            return std::optional< std::pair< local_index_t, Vector3D > >{
+                std::make_pair( result->pivot, result->normal )
+            };
+        }
+        return std::nullopt;
+    }
+
+    template < typename PointType, index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3,
+        std::optional< std::pair< local_index_t, Vector3D > > >::type
         GenericTriangle< PointType, dimension >::pivot_and_normal() const
     {
         const auto result = simple_pivot_and_normal(
@@ -183,6 +216,28 @@ namespace geode
             return std::optional< std::pair< local_index_t, Vector3D > >{
                 std::make_pair( result->pivot, result->normal )
             };
+        }
+        const auto max = absl::c_max_element( result->lengths );
+        const local_index_t longest_e =
+            std::distance( result->lengths.begin(), max );
+        const Point3D& point0 = vertices_[longest_e];
+        const auto e1 = longest_e == 2 ? 0 : longest_e + 1;
+        const Point3D& point1 = vertices_[e1];
+        const auto e2 = e1 == 2 ? 0 : e1 + 1;
+        const Point3D& point2 = vertices_[e2];
+        if( point_segment_distance( point2, { point0, point1 } )
+            > GLOBAL_EPSILON )
+        {
+            const auto ratio = result->lengths[e2]
+                               / ( result->lengths[e2] + result->lengths[e1] );
+            const auto new_point = point0 * ( 1. - ratio ) + point1 * ratio;
+            const auto result_left =
+                simple_pivot_and_normal( { point0, new_point, point2 } );
+            if( !result_left || result_left->pivot == NO_LID )
+            {
+                return std::nullopt;
+            }
+            return std::make_pair( e2, result_left->normal );
         }
         return std::nullopt;
     }
