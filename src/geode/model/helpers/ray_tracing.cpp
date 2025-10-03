@@ -167,7 +167,7 @@ namespace geode
         }
         throw OpenGeodeException{
             "Cannot determine the point is inside the block or not "
-            "(ambigous intersection with rays)."
+            "(ambiguous intersection with rays)."
         };
     }
 
@@ -185,8 +185,8 @@ namespace geode
             }
         }
         throw OpenGeodeException{
-            "Cannot determine the point is inside the block or not "
-            "(ambigous intersection with rays)."
+            "Cannot determine the point is inside the closed surface 3D or not "
+            "(ambiguous intersection with rays)."
         };
     }
 
@@ -228,8 +228,8 @@ namespace geode
             }
         }
         throw OpenGeodeException{
-            "Cannot determine the point is inside the surface or not "
-            "(ambigous intersection with rays)."
+            "Cannot determine the point is inside the surface 2D or not "
+            "(ambiguous intersection with rays)."
         };
     }
 
