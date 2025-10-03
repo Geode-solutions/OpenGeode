@@ -891,35 +891,33 @@ namespace geode
     BoundingBox3D BRep::bounding_box() const
     {
         geode::BoundingBox3D bbox;
+        bool bbox_computed{ false };
         if( const auto box = internal::meshes_bounding_box< 3 >( surfaces() ) )
         {
             bbox.add_box( box.value() );
+            bbox_computed = true;
         }
         if( const auto box = internal::meshes_bounding_box< 3 >( lines() ) )
         {
             bbox.add_box( box.value() );
+            bbox_computed = true;
         }
         if( const auto box = internal::meshes_bounding_box< 3 >( corners() ) )
         {
             bbox.add_box( box.value() );
+            bbox_computed = true;
         }
-        try
+        for( const auto& block : blocks() )
         {
-            if( const auto box =
-                    internal::meshes_bounding_box< 3 >( blocks() ) )
+            const auto& block_mesh = block.mesh();
+            if( block_mesh.nb_vertices() == 0 )
             {
-                bbox.add_box( box.value() );
+                continue;
             }
+            bbox.add_box( block_mesh.bounding_box() );
+            bbox_computed = true;
         }
-        catch( const OpenGeodeException& )
-        {
-            OPENGEODE_EXCEPTION(
-                nb_corners() > 0 || nb_lines() > 0 || nb_surfaces() > 0,
-                "[BRep::bounding_box] Cannot return the bounding_box of a BRep "
-                "with not meshes Blocks and no Corners, no Lines and no "
-                "Surfaces." );
-        }
-        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+        OPENGEODE_EXCEPTION( bbox_computed && bbox.min() <= bbox.max(),
             "[BRep::bounding_box] Cannot return the "
             "bounding_box of an empty BRep." );
         return bbox;
