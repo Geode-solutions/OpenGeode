@@ -917,11 +917,7 @@ namespace geode
             bbox.add_box( block_mesh.bounding_box() );
             bbox_computed = true;
         }
-        OPENGEODE_EXCEPTION( bbox_computed,
-            "[BRep::bounding_box] Cannot return the bounding_box of a BRep "
-            "with not meshed Blocks and no Corners, no Lines and no "
-            "Surfaces." );
-        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+        OPENGEODE_EXCEPTION( bbox_computed && bbox.min() <= bbox.max(),
             "[BRep::bounding_box] Cannot return the "
             "bounding_box of an empty BRep." );
         return bbox;

@@ -452,8 +452,8 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
-         * Return the normal of a given PolyhedronFacet (should be oriented
-         * towards the inside of the polyhedron).
+         * Return the normal of a given PolyhedronFacet (in the geode
+         * convention, it is oriented towards the inside of the polyhedron).
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
         [[nodiscard]] std::optional< Vector3D > polyhedron_facet_normal(
