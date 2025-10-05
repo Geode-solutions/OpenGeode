@@ -39,15 +39,17 @@
 
 namespace geode
 {
-    ALIAS_2D( Corner );
-    ALIAS_2D( Line );
-    ALIAS_2D( Surface );
-    ALIAS_2D( ModelBoundary );
-    ALIAS_2D( CornerCollection );
-    ALIAS_2D( LineCollection );
-    ALIAS_2D( SurfaceCollection );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Component );
     ALIAS_2D( BoundingBox );
+    ALIAS_2D( Component );
+    ALIAS_2D( Corner );
+    ALIAS_2D( CornerCollection );
+    ALIAS_2D( Line );
+    ALIAS_2D( LineCollection );
+    ALIAS_2D( ModelBoundary );
+    ALIAS_2D( Surface );
+    ALIAS_2D( SurfaceCollection );
     class SectionBuilder;
 } // namespace geode
 
@@ -289,6 +291,8 @@ namespace geode
         ~Section();
 
         [[nodiscard]] Section clone() const;
+
+        [[nodiscard]] const Component2D& component( const uuid& id ) const;
 
         [[nodiscard]] BoundaryCornerRange boundaries(
             const Line2D& line ) const;

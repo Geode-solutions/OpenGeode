@@ -44,6 +44,7 @@
 #include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/detail/clone.hpp>
+#include <geode/model/representation/core/detail/model_component.hpp>
 #include <geode/model/representation/core/internal/helpers.hpp>
 
 namespace geode
@@ -723,6 +724,11 @@ namespace geode
         clone_builder.copy_relationships( mappings, *this );
         clone_builder.copy_component_geometry( mappings, *this );
         return model_clone;
+    }
+
+    const Component3D& BRep::component( const uuid& component_id ) const
+    {
+        return detail::model_component( *this, component_id );
     }
 
     BRep::ItemSurfaceRange BRep::model_boundary_items(

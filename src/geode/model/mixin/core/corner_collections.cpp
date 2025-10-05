@@ -54,6 +54,13 @@ namespace geode
     CornerCollections< dimension >::~CornerCollections() = default;
 
     template < index_t dimension >
+    bool CornerCollections< dimension >::has_corner_collection(
+        const uuid& id ) const
+    {
+        return impl_->has_component( id );
+    }
+
+    template < index_t dimension >
     index_t CornerCollections< dimension >::nb_corner_collections() const
     {
         return impl_->nb_components();

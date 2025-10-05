@@ -355,6 +355,8 @@ namespace geode
                 &BRep::is_surface_collection_item )
             .def( "is_block_collection_item", &BRep::is_block_collection_item )
             .def( "bounding_box", &BRep::bounding_box )
-            .def( "native_extension", &BRep::native_extension );
+            .def( "native_extension", &BRep::native_extension )
+            .def( "brep_component", &BRep::component,
+                pybind11::return_value_policy::reference );
     }
 } // namespace geode

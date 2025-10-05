@@ -99,6 +99,8 @@ namespace geode
         [[nodiscard]] const CornerCollection< dimension >& corner_collection(
             const uuid& id ) const;
 
+        [[nodiscard]] bool has_corner_collection( const uuid& id ) const;
+
         [[nodiscard]] CornerCollectionRange corner_collections() const;
 
         [[nodiscard]] CornerCollectionRange active_corner_collections() const;
@@ -106,6 +108,17 @@ namespace geode
         [[nodiscard]] CornerCollectionRange components() const
         {
             return corner_collections();
+        }
+
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_corner_collection( id );
+        }
+
+        [[nodiscard]] const CornerCollection< dimension >& component(
+            const uuid& id ) const
+        {
+            return corner_collection( id );
         }
 
         void save_corner_collections( std::string_view directory ) const;

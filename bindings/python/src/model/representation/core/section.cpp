@@ -214,6 +214,8 @@ namespace geode
             .def( "is_surface_collection_item",
                 &Section::is_surface_collection_item )
             .def( "bounding_box", &Section::bounding_box )
-            .def( "native_extension", &Section::native_extension );
+            .def( "native_extension", &Section::native_extension )
+            .def( "section_component", &Section::component,
+                pybind11::return_value_policy::reference );
     }
 } // namespace geode
