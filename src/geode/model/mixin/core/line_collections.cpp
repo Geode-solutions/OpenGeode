@@ -54,6 +54,13 @@ namespace geode
     LineCollections< dimension >::~LineCollections() = default;
 
     template < index_t dimension >
+    bool LineCollections< dimension >::has_line_collection(
+        const uuid& id ) const
+    {
+        return impl_->has_component( id );
+    }
+
+    template < index_t dimension >
     index_t LineCollections< dimension >::nb_line_collections() const
     {
         return impl_->nb_components();

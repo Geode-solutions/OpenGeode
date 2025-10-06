@@ -54,6 +54,13 @@ namespace geode
     SurfaceCollections< dimension >::~SurfaceCollections() = default;
 
     template < index_t dimension >
+    bool SurfaceCollections< dimension >::has_surface_collection(
+        const uuid& id ) const
+    {
+        return impl_->has_component( id );
+    }
+
+    template < index_t dimension >
     index_t SurfaceCollections< dimension >::nb_surface_collections() const
     {
         return impl_->nb_components();

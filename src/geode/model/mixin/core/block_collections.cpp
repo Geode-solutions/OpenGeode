@@ -54,6 +54,13 @@ namespace geode
     BlockCollections< dimension >::~BlockCollections() = default;
 
     template < index_t dimension >
+    bool BlockCollections< dimension >::has_block_collection(
+        const uuid& id ) const
+    {
+        return impl_->has_component( id );
+    }
+
+    template < index_t dimension >
     index_t BlockCollections< dimension >::nb_block_collections() const
     {
         return impl_->nb_components();

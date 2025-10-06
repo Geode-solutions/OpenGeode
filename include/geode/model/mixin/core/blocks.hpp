@@ -118,6 +118,17 @@ namespace geode
             return blocks();
         }
 
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_block( id );
+        }
+
+        [[nodiscard]] const Block< dimension >& component(
+            const uuid& id ) const
+        {
+            return block( id );
+        }
+
         /*!
          * Save each Block in a file located in the specified directory
          */

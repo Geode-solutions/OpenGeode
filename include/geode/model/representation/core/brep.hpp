@@ -39,17 +39,19 @@
 
 namespace geode
 {
-    ALIAS_3D( Block );
-    ALIAS_3D( ModelBoundary );
-    ALIAS_3D( CornerCollection );
-    ALIAS_3D( LineCollection );
-    ALIAS_3D( SurfaceCollection );
-    ALIAS_3D( BlockCollection );
-    ALIAS_3D( Corner );
-    ALIAS_3D( Line );
-    ALIAS_3D( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Component );
+    ALIAS_3D( Block );
+    ALIAS_3D( BlockCollection );
     ALIAS_3D( BoundingBox );
+    ALIAS_3D( Component );
+    ALIAS_3D( Corner );
+    ALIAS_3D( CornerCollection );
+    ALIAS_3D( Line );
+    ALIAS_3D( LineCollection );
+    ALIAS_3D( ModelBoundary );
+    ALIAS_3D( Surface );
+    ALIAS_3D( SurfaceCollection );
     class BRepBuilder;
 } // namespace geode
 
@@ -391,6 +393,9 @@ namespace geode
         ~BRep();
 
         [[nodiscard]] BRep clone() const;
+
+        [[nodiscard]] const Component3D& component(
+            const uuid& component_id ) const;
 
         [[nodiscard]] BoundaryCornerRange boundaries(
             const Line3D& line ) const;
