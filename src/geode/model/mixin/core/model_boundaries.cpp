@@ -54,6 +54,13 @@ namespace geode
     ModelBoundaries< dimension >::~ModelBoundaries() = default;
 
     template < index_t dimension >
+    bool ModelBoundaries< dimension >::has_model_boundary(
+        const uuid& id ) const
+    {
+        return impl_->has_component( id );
+    }
+
+    template < index_t dimension >
     index_t ModelBoundaries< dimension >::nb_model_boundaries() const
     {
         return impl_->nb_components();

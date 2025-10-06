@@ -97,6 +97,8 @@ namespace geode
         [[nodiscard]] const ModelBoundary< dimension >& model_boundary(
             const uuid& id ) const;
 
+        [[nodiscard]] bool has_model_boundary( const uuid& id ) const;
+
         [[nodiscard]] ModelBoundaryRange model_boundaries() const;
 
         [[nodiscard]] ModelBoundaryRange active_model_boundaries() const;
@@ -104,6 +106,17 @@ namespace geode
         [[nodiscard]] ModelBoundaryRange components() const
         {
             return model_boundaries();
+        }
+
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_model_boundary( id );
+        }
+
+        [[nodiscard]] const ModelBoundary< dimension >& component(
+            const uuid& id ) const
+        {
+            return model_boundary( id );
         }
 
         void save_model_boundaries( std::string_view directory ) const;

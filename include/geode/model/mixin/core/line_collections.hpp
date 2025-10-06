@@ -97,6 +97,8 @@ namespace geode
         [[nodiscard]] const LineCollection< dimension >& line_collection(
             const uuid& id ) const;
 
+        [[nodiscard]] bool has_line_collection( const uuid& id ) const;
+
         [[nodiscard]] LineCollectionRange line_collections() const;
 
         [[nodiscard]] LineCollectionRange active_line_collections() const;
@@ -104,6 +106,17 @@ namespace geode
         [[nodiscard]] LineCollectionRange components() const
         {
             return line_collections();
+        }
+
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_line_collection( id );
+        }
+
+        [[nodiscard]] const LineCollection< dimension >& component(
+            const uuid& id ) const
+        {
+            return line_collection( id );
         }
 
         void save_line_collections( std::string_view directory ) const;

@@ -117,6 +117,17 @@ namespace geode
             return corners();
         }
 
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_corner( id );
+        }
+
+        [[nodiscard]] const Corner< dimension >& component(
+            const uuid& id ) const
+        {
+            return corner( id );
+        }
+
         /*!
          * Save each Corner in a file located in the specified directory
          */

@@ -96,6 +96,8 @@ namespace geode
         [[nodiscard]] const BlockCollection< dimension >& block_collection(
             const uuid& id ) const;
 
+        [[nodiscard]] bool has_block_collection( const uuid& id ) const;
+
         [[nodiscard]] BlockCollectionRange block_collections() const;
 
         [[nodiscard]] BlockCollectionRange active_block_collections() const;
@@ -103,6 +105,17 @@ namespace geode
         [[nodiscard]] BlockCollectionRange components() const
         {
             return block_collections();
+        }
+
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_block_collection( id );
+        }
+
+        [[nodiscard]] const BlockCollection< dimension >& component(
+            const uuid& id ) const
+        {
+            return block_collection( id );
         }
 
         void save_block_collections( std::string_view directory ) const;

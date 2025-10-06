@@ -100,6 +100,8 @@ namespace geode
         [[nodiscard]] const SurfaceCollection< dimension >& surface_collection(
             const uuid& id ) const;
 
+        [[nodiscard]] bool has_surface_collection( const uuid& id ) const;
+
         [[nodiscard]] SurfaceCollectionRange surface_collections() const;
 
         [[nodiscard]] SurfaceCollectionRange active_surface_collections() const;
@@ -107,6 +109,17 @@ namespace geode
         [[nodiscard]] SurfaceCollectionRange components() const
         {
             return surface_collections();
+        }
+
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_surface_collection( id );
+        }
+
+        [[nodiscard]] const SurfaceCollection< dimension >& component(
+            const uuid& id ) const
+        {
+            return surface_collection( id );
         }
 
         void save_surface_collections( std::string_view directory ) const;

@@ -186,6 +186,7 @@ add_geode_library(
         "representation/builder/detail/filter.hpp"
         "representation/builder/detail/register.hpp"
         "representation/core/detail/clone.hpp"
+        "representation/core/detail/model_component.hpp"
         "representation/core/detail/transfer_collections.hpp"
         "representation/core/detail/transfer_metadata.hpp"
     INTERNAL_HEADERS

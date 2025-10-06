@@ -106,6 +106,17 @@ namespace geode
             return surfaces();
         }
 
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_surface( id );
+        }
+
+        [[nodiscard]] const Surface< dimension >& component(
+            const uuid& id ) const
+        {
+            return surface( id );
+        }
+
         void save_surfaces( std::string_view directory ) const;
 
     protected:

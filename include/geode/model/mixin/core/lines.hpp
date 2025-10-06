@@ -105,6 +105,16 @@ namespace geode
             return lines();
         }
 
+        [[nodiscard]] bool has_component( const uuid& id ) const
+        {
+            return has_line( id );
+        }
+
+        [[nodiscard]] const Line< dimension >& component( const uuid& id ) const
+        {
+            return line( id );
+        }
+
         void save_lines( std::string_view directory ) const;
 
     protected:

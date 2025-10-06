@@ -41,6 +41,7 @@
 #include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/detail/clone.hpp>
+#include <geode/model/representation/core/detail/model_component.hpp>
 #include <geode/model/representation/core/internal/helpers.hpp>
 
 namespace geode
@@ -64,7 +65,7 @@ namespace geode
     {
     }
 
-    Section::BoundaryCornerRange::~BoundaryCornerRange() {}
+    Section::BoundaryCornerRange::~BoundaryCornerRange() = default;
 
     auto Section::BoundaryCornerRange::begin() const
         -> const BoundaryCornerRange&
@@ -103,7 +104,7 @@ namespace geode
     {
     }
 
-    Section::BoundaryLineRange::~BoundaryLineRange() {}
+    Section::BoundaryLineRange::~BoundaryLineRange() = default;
 
     auto Section::BoundaryLineRange::begin() const -> const BoundaryLineRange&
     {
@@ -141,7 +142,7 @@ namespace geode
     {
     }
 
-    Section::IncidentLineRange::~IncidentLineRange() {}
+    Section::IncidentLineRange::~IncidentLineRange() = default;
 
     auto Section::IncidentLineRange::begin() const -> const IncidentLineRange&
     {
@@ -179,7 +180,7 @@ namespace geode
     {
     }
 
-    Section::IncidentSurfaceRange::~IncidentSurfaceRange() {}
+    Section::IncidentSurfaceRange::~IncidentSurfaceRange() = default;
 
     auto Section::IncidentSurfaceRange::begin() const
         -> const IncidentSurfaceRange&
@@ -220,7 +221,7 @@ namespace geode
     {
     }
 
-    Section::InternalLineRange::~InternalLineRange() {}
+    Section::InternalLineRange::~InternalLineRange() = default;
 
     auto Section::InternalLineRange::begin() const -> const InternalLineRange&
     {
@@ -265,7 +266,7 @@ namespace geode
     {
     }
 
-    Section::InternalCornerRange::~InternalCornerRange() {}
+    Section::InternalCornerRange::~InternalCornerRange() = default;
 
     auto Section::InternalCornerRange::begin() const
         -> const InternalCornerRange&
@@ -325,7 +326,7 @@ namespace geode
     {
     }
 
-    Section::EmbeddingSurfaceRange::~EmbeddingSurfaceRange() {}
+    Section::EmbeddingSurfaceRange::~EmbeddingSurfaceRange() = default;
 
     auto Section::EmbeddingSurfaceRange::begin() const
         -> const EmbeddingSurfaceRange&
@@ -400,7 +401,7 @@ namespace geode
     {
     }
 
-    Section::ItemLineRange::~ItemLineRange() {}
+    Section::ItemLineRange::~ItemLineRange() = default;
 
     auto Section::ItemLineRange::begin() const -> const ItemLineRange&
     {
@@ -489,6 +490,11 @@ namespace geode
         clone_builder.copy_relationships( mappings, *this );
         clone_builder.copy_component_geometry( mappings, *this );
         return model_clone;
+    }
+
+    const Component2D& Section::component( const uuid& id ) const
+    {
+        return detail::model_component( *this, id );
     }
 
     Section::ItemLineRange Section::model_boundary_items(
