@@ -146,7 +146,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
         COMMAND ${venv_bin}/pip install --no-deps .
-        COMMAND ${venv_bin}/pybind11-stubgen --exit-code -o "${wheel_output_directory}" "${project_name}"
+        COMMAND ${venv_bin}/pybind11-stubgen --exit-code -o "${wheel_output_path}" "${project_name}"
         COMMAND ${venv_bin}/python -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
