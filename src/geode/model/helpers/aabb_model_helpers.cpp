@@ -43,17 +43,45 @@
 
 namespace
 {
+    template < typename Range >
+    geode::index_t count_non_empty_elements(
+        const Range& range, geode::index_t nb_elements )
+    {
+        geode::index_t nb_non_empty_elements{ 0 };
+        for( const auto& element : range )
+        {
+            if( element.mesh().nb_vertices() > 0 )
+            {
+                nb_non_empty_elements++;
+            }
+        }
+        if( nb_non_empty_elements < nb_elements )
+        {
+            geode::Logger::warn( absl::StrCat( "[create_model_aabb] ",
+                nb_elements - nb_non_empty_elements, " out of ", nb_elements,
+                " components have empty meshes, not included in the "
+                "AABBTree." ) );
+        }
+        return nb_non_empty_elements;
+    }
+
     template < geode::index_t dimension, typename Range >
     std::tuple< geode::AABBTree< dimension >, absl::FixedArray< geode::uuid > >
         create_aabb( const Range& range, geode::index_t nb_elements )
     {
+        const auto nb_non_empty_elements =
+            count_non_empty_elements( range, nb_elements );
         absl::FixedArray< geode::BoundingBox< dimension > > boxes(
-            nb_elements );
-        absl::FixedArray< geode::uuid > mapping( nb_elements );
-        absl::FixedArray< async::task< void > > tasks( nb_elements );
+            nb_non_empty_elements );
+        absl::FixedArray< geode::uuid > mapping( nb_non_empty_elements );
+        absl::FixedArray< async::task< void > > tasks( nb_non_empty_elements );
         geode::index_t id{ 0 };
         for( const auto& element : range )
         {
+            if( element.mesh().nb_vertices() == 0 )
+            {
+                continue;
+            }
             tasks[id] = async::spawn( [id, &mapping, &boxes, &element] {
                 mapping[id] = element.id();
                 boxes[id] = element.mesh().bounding_box();
@@ -72,21 +100,23 @@ namespace
     geode::ModelMeshesAABBTree< dimension > create_aabbs(
         const Range& range, geode::index_t nb_elements )
     {
-        geode::ModelMeshesAABBTree< dimension > result{ nb_elements };
+        const auto nb_non_empty_elements =
+            count_non_empty_elements( range, nb_elements );
+        geode::ModelMeshesAABBTree< dimension > result{ nb_non_empty_elements };
         absl::FixedArray< geode::BoundingBox< dimension > > boxes(
-            nb_elements );
-        absl::FixedArray< async::task< void > > tasks( nb_elements );
+            nb_non_empty_elements );
+        absl::FixedArray< async::task< void > > tasks( nb_non_empty_elements );
         geode::index_t id{ 0 };
         for( const auto& element : range )
         {
+            if( element.mesh().nb_vertices() == 0 )
+            {
+                continue;
+            }
             tasks[id] = async::spawn( [id, &result, &boxes, &element] {
                 result.mesh_trees_[id] =
                     geode::create_aabb_tree( element.mesh() );
                 result.uuids_[id] = element.id();
-                OPENGEODE_EXCEPTION( result.mesh_trees_[id].nb_bboxes() != 0,
-                    "[create_model_meshes_aabbs] Cannot compute the AABBTree "
-                    "for this model: ",
-                    element.component_id().string(), " has an empty mesh." );
                 boxes[id] = result.mesh_trees_[id].bounding_box();
             } );
             result.mesh_tree_ids_.emplace( element.id(), id );
