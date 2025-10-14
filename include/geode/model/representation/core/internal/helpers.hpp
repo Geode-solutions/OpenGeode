@@ -60,12 +60,16 @@ namespace geode
         [[nodiscard]] std::optional< BoundingBox< dimension > >
             meshes_bounding_box( MeshComponentRange range )
         {
-            BoundingBox< dimension > box;
+            std::optional< BoundingBox< dimension > > box( std::in_place );
             bool computed{ false };
             for( const auto& component : range )
             {
-                computed = true;
-                box.add_box( component.mesh().bounding_box() );
+                const auto& mesh = component.mesh();
+                if( mesh.nb_vertices() > 0 )
+                {
+                    computed = true;
+                    box->add_box( mesh.bounding_box() );
+                }
             }
             if( !computed )
             {

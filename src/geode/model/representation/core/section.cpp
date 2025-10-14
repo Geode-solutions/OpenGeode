@@ -597,19 +597,23 @@ namespace geode
     BoundingBox2D Section::bounding_box() const
     {
         geode::BoundingBox2D bbox;
+        bool bbox_computed{ false };
         if( const auto box = internal::meshes_bounding_box< 2 >( surfaces() ) )
         {
             bbox.add_box( box.value() );
+            bbox_computed = true;
         }
         if( const auto box = internal::meshes_bounding_box< 2 >( lines() ) )
         {
             bbox.add_box( box.value() );
+            bbox_computed = true;
         }
         if( const auto box = internal::meshes_bounding_box< 2 >( corners() ) )
         {
             bbox.add_box( box.value() );
+            bbox_computed = true;
         }
-        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+        OPENGEODE_EXCEPTION( bbox_computed,
             "[Section::bounding_box] Cannot return the "
             "bounding_box of an empty Section." );
         return bbox;
