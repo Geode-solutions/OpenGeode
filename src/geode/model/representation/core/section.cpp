@@ -613,7 +613,7 @@ namespace geode
             bbox.add_box( box.value() );
             bbox_computed = true;
         }
-        OPENGEODE_EXCEPTION( bbox_computed && bbox.min() <= bbox.max(),
+        OPENGEODE_EXCEPTION( bbox_computed,
             "[Section::bounding_box] Cannot return the "
             "bounding_box of an empty Section." );
         return bbox;
