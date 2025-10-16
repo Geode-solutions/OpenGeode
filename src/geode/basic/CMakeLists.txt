@@ -118,6 +118,6 @@ add_geode_library(
         spdlog::spdlog_header_only
         MINIZIP::minizip-ng
 )
-if(WIN32)
+if(WIN32 AND BUILD_SHARED_LIBS)
     target_link_libraries(basic PUBLIC absl::abseil_dll)
 endif()
