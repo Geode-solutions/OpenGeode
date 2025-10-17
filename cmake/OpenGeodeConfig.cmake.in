@@ -43,6 +43,7 @@ find_dependency(Async++)
 
 get_target_property(library_type OpenGeode::basic TYPE)
 if(library_type STREQUAL "STATIC_LIBRARY")
+    find_dependency(earcut_hpp)
     find_dependency(minizip-ng)
     find_dependency(nanoflann)
     find_dependency(spdlog)
