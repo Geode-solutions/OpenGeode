@@ -86,9 +86,12 @@ namespace
         {
             return std::nullopt;
         }
-        const auto area2 = p * ( p - point_to_v0_length )
-                           * ( p - point_to_v1_length )
-                           * ( p - segment_length );
+        auto area2 = p * ( p - point_to_v0_length ) * ( p - point_to_v1_length )
+                     * ( p - segment_length );
+        if( area2 <= 0 )
+        {
+            area2 = 0;
+        }
         return 2 * std::sqrt( area2 ) / segment_length;
     }
 
