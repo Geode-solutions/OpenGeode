@@ -27,7 +27,7 @@ ExternalProject_Add(gdal
     BINARY_DIR ${GDAL_PATH}/build
     STAMP_DIR ${GDAL_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/gdal
-    GIT_TAG 20250629dll
+    GIT_TAG 18102025
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     GIT_CONFIG core.longpaths=true
