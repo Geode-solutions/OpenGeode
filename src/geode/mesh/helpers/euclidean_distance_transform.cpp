@@ -72,6 +72,11 @@ namespace geode
                 async::irange( index_t{ 0 }, grid_.nb_cells() ),
                 [this]( index_t cell ) {
                     distance_map_->modify_value( cell, []( double& value ) {
+                        if( value <= 0. )
+                        {
+                            value = 0;
+                            return;
+                        }
                         value = std::sqrt( value );
                     } );
                 } );
