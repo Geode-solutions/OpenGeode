@@ -427,14 +427,12 @@ namespace geode
 
     public:
         explicit Impl( SolidMesh& solid )
-            : polyhedron_around_vertex_(
-                  solid.vertex_attribute_manager()
+            : polyhedron_around_vertex_( solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           PolyhedronVertex >( "polyhedron_around_vertex",
                           PolyhedronVertex{},
                           { false, false, false } ) ),
-              polyhedra_around_vertex_(
-                  solid.vertex_attribute_manager()
+              polyhedra_around_vertex_( solid.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
                           CachedPolyhedra{},
@@ -1340,7 +1338,7 @@ namespace geode
             {
                 facet_vertices.push_back(
                     vertices[polyhedron_facet_vertex_id( { facet, v } )
-                                 .vertex_id] );
+                            .vertex_id] );
             }
         }
         return facets_vertices;
