@@ -111,6 +111,11 @@ namespace geode
             return mapping_morton_.size();
         }
 
+        [[nodiscard]] index_t initial_depth( bool parallel ) const
+        {
+            return parallel ? 0 : async_depth_ + 1;
+        }
+
         [[nodiscard]] static bool is_leaf(
             index_t element_begin, index_t element_end )
         {
@@ -569,95 +574,115 @@ namespace geode
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_bbox_element_bbox_intersections(
-        const BoundingBox< dimension >& box, EvalIntersection& action ) const
+        const BoundingBox< dimension >& box,
+        EvalIntersection& action,
+        bool parallel ) const
     {
         const auto box_filter = [&box]( const auto& inner_box ) {
             return inner_box.intersects( box );
         };
-        compute_generic_element_bbox_intersections( box_filter, action );
+        compute_generic_element_bbox_intersections(
+            box_filter, action, parallel );
     }
 
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_self_element_bbox_intersections(
-        EvalIntersection& action ) const
+        EvalIntersection& action, bool parallel ) const
     {
         if( nb_bboxes() == 0 )
         {
             return;
         }
-        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(), 0,
-            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+            impl_->initial_depth( parallel ), Impl::ROOT_INDEX, 0, nb_bboxes(),
+            action );
     }
 
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_other_element_bbox_intersections(
         const AABBTree< dimension >& other_tree,
-        EvalIntersection& action ) const
+        EvalIntersection& action,
+        bool parallel ) const
     {
         if( nb_bboxes() == 0 || other_tree.nb_bboxes() == 0 )
         {
             return;
         }
-        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(), 0,
-            other_tree, Impl::ROOT_INDEX, 0, other_tree.nb_bboxes(), action );
+        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+            impl_->initial_depth( parallel ), other_tree, Impl::ROOT_INDEX, 0,
+            other_tree.nb_bboxes(), action );
     }
 
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_ray_element_bbox_intersections(
-        const Ray< dimension >& ray, EvalIntersection& action ) const
+        const Ray< dimension >& ray,
+        EvalIntersection& action,
+        bool parallel ) const
     {
         const auto box_filter = [&ray]( const auto& box ) {
             return box.intersects( ray );
         };
-        compute_generic_element_bbox_intersections( box_filter, action );
+        compute_generic_element_bbox_intersections(
+            box_filter, action, parallel );
     }
 
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_line_element_bbox_intersections(
-        const InfiniteLine< dimension >& line, EvalIntersection& action ) const
+        const InfiniteLine< dimension >& line,
+        EvalIntersection& action,
+        bool parallel ) const
     {
         const auto box_filter = [&line]( const auto& box ) {
             return box.intersects( line );
         };
-        compute_generic_element_bbox_intersections( box_filter, action );
+        compute_generic_element_bbox_intersections(
+            box_filter, action, parallel );
     }
 
     template < index_t dimension >
     template < class EvalBox, class EvalIntersection >
     void AABBTree< dimension >::compute_generic_element_bbox_intersections(
-        const EvalBox& box_filter, EvalIntersection& action ) const
+        const EvalBox& box_filter,
+        EvalIntersection& action,
+        bool parallel ) const
     {
         if( nb_bboxes() == 0 )
         {
             return;
         }
-        impl_->generic_intersect_recursive(
-            box_filter, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
+        impl_->generic_intersect_recursive( box_filter, Impl::ROOT_INDEX, 0,
+            nb_bboxes(), impl_->initial_depth( parallel ), action );
     }
 
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_triangle_element_bbox_intersections(
-        const Triangle< dimension >& triangle, EvalIntersection& action ) const
+        const Triangle< dimension >& triangle,
+        EvalIntersection& action,
+        bool parallel ) const
     {
         const auto box_filter = [&triangle]( const auto& box ) {
             return box.intersects( triangle );
         };
-        compute_generic_element_bbox_intersections( box_filter, action );
+        compute_generic_element_bbox_intersections(
+            box_filter, action, parallel );
     }
 
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_segment_element_bbox_intersections(
-        const Segment< dimension >& segment, EvalIntersection& action ) const
+        const Segment< dimension >& segment,
+        EvalIntersection& action,
+        bool parallel ) const
     {
         const auto box_filter = [&segment]( const auto& box ) {
             return box.intersects( segment );
         };
-        compute_generic_element_bbox_intersections( box_filter, action );
+        compute_generic_element_bbox_intersections(
+            box_filter, action, parallel );
     }
 } // namespace geode
