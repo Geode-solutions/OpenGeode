@@ -81,6 +81,7 @@ namespace geode
                   return morton_mapping< dimension >( points );
               }() )
         {
+            index_t depth = 1;
             if( bboxes.empty() )
             {
                 tree_.resize( ROOT_INDEX );
@@ -90,7 +91,7 @@ namespace geode
                 const auto [max_node_index, max_depth] =
                     max_node_index_recursive( ROOT_INDEX, 0, bboxes.size(), 0 );
                 tree_.resize( ROOT_INDEX + max_node_index );
-                depth_ = max_depth;
+                depth = max_depth;
                 initialize_tree_recursive(
                     bboxes, ROOT_INDEX, 0, bboxes.size() );
             }
@@ -102,7 +103,7 @@ namespace geode
             else
             {
                 const auto nb_async_depth = std::log2( grain );
-                async_depth_ = depth_ - nb_async_depth;
+                async_depth_ = depth - nb_async_depth;
             }
         }
 
@@ -538,7 +539,7 @@ namespace geode
             }
             const auto it = get_recursive_iterators(
                 node_index, element_begin, element_end );
-            if( depth_ > async_depth_ )
+            if( depth > async_depth_ )
             {
                 containing_boxes_recursive( it.child_left, element_begin,
                     it.element_middle, depth + 1, query, result, mutex );
@@ -560,7 +561,6 @@ namespace geode
     private:
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
-        index_t depth_{ 1 };
         index_t async_depth_{ 0 };
         bool parallel_{ true };
     };
