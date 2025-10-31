@@ -209,11 +209,11 @@ private:
     absl::Span< const geode::BoundingBox< dimension > > bounding_boxes_;
 };
 
-template < geode::index_t dimension >
+template < geode::index_t dimension, bool parallel >
 void test_intersections_with_query_box()
 {
-    geode::Logger::info(
-        "TEST", " Box-Box intersection AABB ", dimension, "D" );
+    geode::Logger::info( "TEST", " Box-Box intersection AABB ", dimension, "D ",
+        parallel ? "parallel" : "sequential" );
     const geode::index_t nb_boxes{ 10 };
     const double box_size{ 0.5 };
     const auto box_vector =
@@ -234,7 +234,7 @@ void test_intersections_with_query_box()
 
             eval_intersection.box_intersections_.clear();
             aabb.compute_bbox_element_bbox_intersections(
-                box_query, eval_intersection );
+                box_query, eval_intersection, parallel );
 
             OPENGEODE_EXCEPTION(
                 eval_intersection.box_intersections_.size() == 4,
@@ -296,11 +296,11 @@ private:
     absl::Span< const geode::BoundingBox< dimension > > bounding_boxes_;
 };
 
-template < geode::index_t dimension >
+template < geode::index_t dimension, bool parallel >
 void test_intersections_with_ray_trace()
 {
-    geode::Logger::info(
-        "TEST", " Box-Ray intersection AABB ", dimension, "D" );
+    geode::Logger::info( "TEST", " Box-Ray intersection AABB ", dimension, "D ",
+        parallel ? "parallel" : "sequential" );
 
     const geode::index_t nb_boxes{ 10 };
     const double box_size{ 0.5 };
@@ -322,7 +322,8 @@ void test_intersections_with_ray_trace()
         geode::Ray< dimension > query{ ray_direction, ray_origin };
 
         eval_intersection.box_intersections_.clear();
-        aabb.compute_ray_element_bbox_intersections( query, eval_intersection );
+        aabb.compute_ray_element_bbox_intersections(
+            query, eval_intersection, parallel );
 
         OPENGEODE_EXCEPTION(
             eval_intersection.box_intersections_.size() == nb_boxes - i,
@@ -396,11 +397,11 @@ void test_intersections_with_ray_trace()
         "[Test] Box-Ray intersection - Wrong set of boxes" );
 }
 
-template < geode::index_t dimension >
+template < geode::index_t dimension, bool parallel >
 void test_self_intersections()
 {
-    geode::Logger::info(
-        "TEST", " Box self intersection AABB ", dimension, "D" );
+    geode::Logger::info( "TEST", " Box self intersection AABB ", dimension,
+        "D ", parallel ? "parallel" : "sequential" );
 
     const geode::index_t nb_boxes{ 10 };
     // Create a grid of intersecting boxes
@@ -414,7 +415,7 @@ void test_self_intersections()
     BoxAABBIntersection< dimension > eval_intersection{ box_vector };
     // investigate box inclusions
     eval_intersection.included_box_.clear();
-    aabb.compute_self_element_bbox_intersections( eval_intersection );
+    aabb.compute_self_element_bbox_intersections( eval_intersection, parallel );
 
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
@@ -445,18 +446,18 @@ public:
     std::mutex mutex_;
 };
 
-template < geode::index_t dimension >
+template < geode::index_t dimension, bool parallel >
 void test_other_intersections()
 {
-    geode::Logger::info(
-        "TEST", " Box other intersection AABB ", dimension, "D" );
+    geode::Logger::info( "TEST", " Box other intersection AABB ", dimension,
+        "D ", parallel ? "parallel" : "sequential" );
 
     const geode::AABBTree< dimension > aabb{ create_box_vector< dimension >(
         5, 0.2 ) };
     const geode::AABBTree< dimension > other{ create_box_vector< dimension >(
         2, 0.4 ) };
     OtherAABBIntersection< dimension > action;
-    aabb.compute_other_element_bbox_intersections( other, action );
+    aabb.compute_other_element_bbox_intersections( other, action, parallel );
 
     absl::flat_hash_map< geode::index_t, geode::index_t > answer{ { 0, 0 },
         { 1, 1 }, { 5, 2 }, { 6, 3 } };
@@ -467,21 +468,26 @@ void test_other_intersections()
     }
 }
 
-template < geode::index_t dimension >
+template < geode::index_t dimension, bool parallel >
 void do_test()
 {
-    test_build_aabb< dimension >();
-    test_nearest_neighbor_search< dimension >();
-    test_intersections_with_query_box< dimension >();
-    test_intersections_with_ray_trace< dimension >();
-    test_self_intersections< dimension >();
-    test_other_intersections< dimension >();
+    if( !parallel )
+    {
+        test_build_aabb< dimension >();
+        test_nearest_neighbor_search< dimension >();
+    }
+    test_intersections_with_query_box< dimension, parallel >();
+    test_intersections_with_ray_trace< dimension, parallel >();
+    test_self_intersections< dimension, parallel >();
+    test_other_intersections< dimension, parallel >();
 }
 
 void test()
 {
-    do_test< 2 >();
-    do_test< 3 >();
+    do_test< 2, false >();
+    do_test< 3, false >();
+    do_test< 2, true >();
+    do_test< 3, true >();
 }
 
 OPENGEODE_TEST( "aabb" )
