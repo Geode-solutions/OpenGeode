@@ -181,10 +181,9 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SurfaceMesh::polygons_around_vertex] Surface: ", mesh.name(),
-            " Too many polygons "
-            "around vertex ",
-            vertex_id, " (", mesh.point( vertex_id ).string(),
+            "[SurfaceMesh::polygons_around_vertex] Surface ", mesh.name(),
+            ": Too many polygons around vertex ", vertex_id, " (",
+            mesh.point( vertex_id ).string(),
             "). This is probably related to a bug in the polygon "
             "adjacencies." );
         return result;

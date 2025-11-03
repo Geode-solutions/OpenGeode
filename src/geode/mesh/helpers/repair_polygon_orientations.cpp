@@ -68,8 +68,8 @@ namespace
             catch( geode::OpenGeodeException& e )
             {
                 const auto msg =
-                    absl::StrCat( "Surface ", mesh_.name(), " - ", e.what() );
-                throw( geode::OpenGeodeException( msg ) );
+                    absl::StrCat( "Surface ", mesh_.name(), ": ", e.what() );
+                throw geode::OpenGeodeException( msg );
             }
             catch( ... )
             {
