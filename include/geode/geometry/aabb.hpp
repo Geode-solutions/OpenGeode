@@ -71,12 +71,22 @@ namespace geode
         [[nodiscard]] const BoundingBox< dimension >& bounding_box() const;
 
         /*!
+         * @brief Whether or not the queries run on this tree are parallelized.
+         */
+        [[nodiscard]] bool parallel() const;
+
+        /*!
+         * @brief Sets whether or not the queries run on this tree are
+         * parallelized.
+         */
+        void set_parallel( bool parallel );
+
+        /*!
          * @brief Gets all the boxes containing a point
          * @param[in] query the point to test
-         * @param[in] parallel true to enable parallelization.
          */
         [[nodiscard]] std::vector< index_t > containing_boxes(
-            const Point< dimension >& query, bool parallel = true ) const;
+            const Point< dimension >& query ) const;
 
         /*!
          * @brief Gets the closest element to a point
@@ -107,7 +117,6 @@ namespace geode
          * @param[in] box the box to test
          * @param[in] action The functor to run when an element box intersects
          * \p box
-         * @param[in] parallel true to enable parallelization.
          *
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
@@ -120,13 +129,11 @@ namespace geode
         template < class EvalIntersection >
         void compute_bbox_element_bbox_intersections(
             const BoundingBox< dimension >& box,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the self intersections of the element boxes.
          * @param[in] action The functor to run when two boxes intersect
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box1, index_t cur_element_box2
@@ -142,13 +149,12 @@ namespace geode
          */
         template < class EvalIntersection >
         void compute_self_element_bbox_intersections(
-            EvalIntersection& action, bool parallel = true ) const;
+            EvalIntersection& action ) const;
 
         /*!
          * @brief Computes all the intersections of the element boxes between
          * this tree and another one.
          * @param[in] action The functor to run when two boxes intersect
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box1, index_t cur_element_box2
@@ -161,8 +167,7 @@ namespace geode
         template < class EvalIntersection >
         void compute_other_element_bbox_intersections(
             const AABBTree< dimension >& other_tree,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between a given ray and all
@@ -170,7 +175,6 @@ namespace geode
          * @param[in] ray The ray to test.
          * @param[in] action The functor to run when a box is intersected by the
          * ray.
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box ) ;
@@ -181,9 +185,7 @@ namespace geode
          */
         template < class EvalIntersection >
         void compute_ray_element_bbox_intersections(
-            const Ray< dimension >& ray,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            const Ray< dimension >& ray, EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between a given infinite line and
@@ -191,7 +193,6 @@ namespace geode
          * @param[in] line The line to test.
          * @param[in] action The functor to run when a box is intersected by the
          * line.
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box ) ;
@@ -203,8 +204,7 @@ namespace geode
         template < class EvalIntersection >
         void compute_line_element_bbox_intersections(
             const InfiniteLine< dimension >& line,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between any object (for which
@@ -215,7 +215,6 @@ namespace geode
          * either to an internal tree node or to a tree element.
          * @param[in] action The functor to run when a tree element box is
          * intersected by the search object.
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalBox this functor should have an operator() defined like
          * this: bool operator( const BoundingBox<dimension> & ) ;
          * @tparam EvalIntersection this functor should have an operator()
@@ -228,9 +227,7 @@ namespace geode
          */
         template < class EvalBox, class EvalIntersection >
         void compute_generic_element_bbox_intersections(
-            const EvalBox& box_filter,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            const EvalBox& box_filter, EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between a given Segment and
@@ -238,7 +235,6 @@ namespace geode
          * @param[in] segment The segment to test.
          * @param[in] action The functor to run when a box is intersected by the
          * segment.
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box ) ;
@@ -250,8 +246,7 @@ namespace geode
         template < class EvalIntersection >
         void compute_segment_element_bbox_intersections(
             const Segment< dimension >& segment,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between a given Triangle and
@@ -259,7 +254,6 @@ namespace geode
          * @param[in] triangle The triangle to test.
          * @param[in] action The functor to run when a box is intersected by the
          * segment.
-         * @param[in] parallel true to enable parallelization.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box ) ;
@@ -271,8 +265,7 @@ namespace geode
         template < class EvalIntersection >
         void compute_triangle_element_bbox_intersections(
             const Triangle< dimension >& triangle,
-            EvalIntersection& action,
-            bool parallel = true ) const;
+            EvalIntersection& action ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
