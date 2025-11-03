@@ -218,7 +218,8 @@ void test_intersections_with_query_box()
     const double box_size{ 0.5 };
     const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
-    const geode::AABBTree< dimension > aabb{ box_vector };
+    geode::AABBTree< dimension > aabb{ box_vector };
+    aabb.set_parallel( parallel );
 
     BoxAABBIntersection< dimension > eval_intersection{ box_vector };
 
@@ -234,7 +235,7 @@ void test_intersections_with_query_box()
 
             eval_intersection.box_intersections_.clear();
             aabb.compute_bbox_element_bbox_intersections(
-                box_query, eval_intersection, parallel );
+                box_query, eval_intersection );
 
             OPENGEODE_EXCEPTION(
                 eval_intersection.box_intersections_.size() == 4,
@@ -306,7 +307,8 @@ void test_intersections_with_ray_trace()
     const double box_size{ 0.5 };
     const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
-    const geode::AABBTree< dimension > aabb{ box_vector };
+    geode::AABBTree< dimension > aabb{ box_vector };
+    aabb.set_parallel( parallel );
 
     RayAABBIntersection< dimension > eval_intersection{ box_vector };
 
@@ -322,8 +324,7 @@ void test_intersections_with_ray_trace()
         geode::Ray< dimension > query{ ray_direction, ray_origin };
 
         eval_intersection.box_intersections_.clear();
-        aabb.compute_ray_element_bbox_intersections(
-            query, eval_intersection, parallel );
+        aabb.compute_ray_element_bbox_intersections( query, eval_intersection );
 
         OPENGEODE_EXCEPTION(
             eval_intersection.box_intersections_.size() == nb_boxes - i,
@@ -411,11 +412,13 @@ void test_self_intersections()
     box_vector.insert(
         box_vector.end(), box_vector2.begin(), box_vector2.end() );
 
-    const geode::AABBTree< dimension > aabb{ box_vector };
+    geode::AABBTree< dimension > aabb{ box_vector };
+    aabb.set_parallel( parallel );
+
     BoxAABBIntersection< dimension > eval_intersection{ box_vector };
     // investigate box inclusions
     eval_intersection.included_box_.clear();
-    aabb.compute_self_element_bbox_intersections( eval_intersection, parallel );
+    aabb.compute_self_element_bbox_intersections( eval_intersection );
 
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
@@ -452,12 +455,14 @@ void test_other_intersections()
     geode::Logger::info( "TEST", " Box other intersection AABB ", dimension,
         "D ", parallel ? "parallel" : "sequential" );
 
-    const geode::AABBTree< dimension > aabb{ create_box_vector< dimension >(
+    geode::AABBTree< dimension > aabb{ create_box_vector< dimension >(
         5, 0.2 ) };
+    aabb.set_parallel( parallel );
+
     const geode::AABBTree< dimension > other{ create_box_vector< dimension >(
         2, 0.4 ) };
     OtherAABBIntersection< dimension > action;
-    aabb.compute_other_element_bbox_intersections( other, action, parallel );
+    aabb.compute_other_element_bbox_intersections( other, action );
 
     absl::flat_hash_map< geode::index_t, geode::index_t > answer{ { 0, 0 },
         { 1, 1 }, { 5, 2 }, { 6, 3 } };
