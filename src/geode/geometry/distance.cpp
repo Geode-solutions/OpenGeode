@@ -386,6 +386,52 @@ namespace
         return result;
     }
 
+    std::tuple< double, geode::Point3D, geode::Point3D >
+        test_triangle_non_common_edges(
+            const geode::local_index_t non_colocated0,
+            const geode::local_index_t non_colocated1,
+            const geode::Triangle3D& triangle0,
+            const geode::Triangle3D& triangle1 )
+    {
+        const auto& vertices0 = triangle0.vertices();
+        const auto& vertices1 = triangle1.vertices();
+        double min_distance{ std::numeric_limits< double >::max() };
+        geode::Point3D point0;
+        geode::Point3D point1;
+        for( const auto v0 : geode::LRange{ 3 } )
+        {
+            if( v0 == non_colocated0 )
+            {
+                continue;
+            }
+            const geode::Segment3D edge0{ vertices0[non_colocated0],
+                vertices0[v0] };
+            for( const auto v1 : geode::LRange{ 3 } )
+            {
+                if( v1 == non_colocated1 )
+                {
+                    continue;
+                }
+                const geode::Segment3D edge1{ vertices1[non_colocated1],
+                    vertices1[v1] };
+                auto [cur_distance, cur_pt0, cur_pt1] =
+                    geode::segment_segment_distance( edge0, edge1 );
+                if( cur_pt0.inexact_equal( vertices0[v0] )
+                    || cur_pt1.inexact_equal( vertices1[v1] ) )
+                {
+                    continue;
+                }
+                if( cur_distance < min_distance )
+                {
+                    min_distance = cur_distance;
+                    point0 = cur_pt0;
+                    point1 = cur_pt1;
+                }
+            }
+        }
+        return std::make_tuple( min_distance, point0, point1 );
+    }
+
     std::tuple< double, geode::Point3D, geode::Point3D > test_close_triangles(
         const std::vector< geode::local_index_t >& non_colocated_points,
         const geode::Triangle3D& base_triangle,
@@ -1095,6 +1141,19 @@ namespace geode
                 min_distance = cur_distance;
                 point0 = cur_pt;
                 point1 = vertices1[non_colocated_points1[0]].get();
+            }
+        }
+        if( non_colocated_points0.size() == 1
+            && non_colocated_points1.size() == 1 )
+        {
+            auto [cur_distance, cur_pt0, cur_pt1] =
+                test_triangle_non_common_edges( non_colocated_points0.front(),
+                    non_colocated_points1.front(), triangle0, triangle1 );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                point0 = cur_pt0;
+                point1 = cur_pt1;
             }
         }
         if( non_colocated_points0.size() > 1 )
