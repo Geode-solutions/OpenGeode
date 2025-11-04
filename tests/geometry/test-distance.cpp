@@ -1200,6 +1200,28 @@ void test_point_ellipse_distance()
     test_point_ellipse_distance_2d_not_aligned();
 }
 
+void test_triangle_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 1.0, 0.0 } };
+    const geode::Point3D c{ { -1.0, 1.0, 0.0 } };
+    const geode::Point3D d{ { 0.0, 2.0, 0.0 } };
+    const geode::Triangle3D triangle0{ a, b, d };
+    const geode::Triangle3D triangle1{ c, b, d };
+    const auto result0 =
+        geode::triangle_triangle_distance( triangle0, triangle1 );
+    OPENGEODE_EXCEPTION( std::get< 0 >( result0 ) < geode::GLOBAL_EPSILON,
+        "[Test] The two triangles should have a distance smaller than "
+        "epsilon" );
+    const auto result1 =
+        geode::triangle_triangle_distance_between_non_conformal_parts(
+            triangle0, triangle1 );
+    OPENGEODE_EXCEPTION(
+        std::get< 0 >( result1.value() ) < geode::GLOBAL_EPSILON,
+        "[Test] The two triangles should have a distance smaller than "
+        "epsilon (non conformal parts only)" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1213,6 +1235,7 @@ void test()
     test_point_circle_distance();
     test_line_triangle_distance();
     test_segment_triangle_distance();
+    test_triangle_triangle_distance();
     test_point_ellipse_distance();
 }
 

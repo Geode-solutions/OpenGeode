@@ -155,9 +155,8 @@ namespace geode
      * Compute the smallest distance between two triangles
      * @details if the two triangles are the same, return nullopt. Only non
      * conformal part of triangles are considered in computation of distance,
-     * i.e. if the triangle have a common point, it iterates on opposite
-     * segment, if the triangle have a common edge, it computes distance with
-     * the opposite point
+     * i.e. if the triangles have a common point, it iterates on opposite
+     * segments, if the triangles have a common edge, it computes distance with
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the first triangle.
