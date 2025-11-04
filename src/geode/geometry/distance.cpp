@@ -1077,8 +1077,19 @@ namespace geode
         Point3D point1;
         if( non_colocated_points0.size() == 1 )
         {
+            auto [test_cur_distance, test_cur_pt0, test_cur_pt1] =
+                test_close_triangles(
+                    non_colocated_points0, triangle0, triangle1 );
+            DEBUG( test_cur_distance );
+            // if( cur_distance < min_distance )
+            // {
+            //     min_distance = cur_distance;
+            //     point0 = cur_pt0;
+            //     point1 = cur_pt1;
+            // }
             auto [cur_distance, cur_pt] = point_triangle_distance(
                 vertices0[non_colocated_points0[0]].get(), triangle1 );
+            DEBUG( cur_distance );
             if( cur_distance < min_distance )
             {
                 min_distance = cur_distance;
