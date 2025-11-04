@@ -51,16 +51,29 @@ namespace
 
         absl::FixedArray< geode::index_t > compute_bad_oriented_polygons()
         {
-            absl::FixedArray< bool > visited( mesh_.nb_polygons(), false );
-            for( const auto p : geode::Range{ mesh_.nb_polygons() } )
+            try
             {
-                if( visited[p] )
+                absl::FixedArray< bool > visited( mesh_.nb_polygons(), false );
+                for( const auto p : geode::Range{ mesh_.nb_polygons() } )
                 {
-                    continue;
+                    if( visited[p] )
+                    {
+                        continue;
+                    }
+                    queue_.emplace( p );
+                    visited[p] = true;
+                    process_polygon_queue( visited );
                 }
-                queue_.emplace( p );
-                visited[p] = true;
-                process_polygon_queue( visited );
+            }
+            catch( geode::OpenGeodeException& e )
+            {
+                const auto msg =
+                    absl::StrCat( "Surface ", mesh_.name(), ": ", e.what() );
+                throw geode::OpenGeodeException( msg );
+            }
+            catch( ... )
+            {
+                throw;
             }
             return get_bad_oriented_polygons();
         }
