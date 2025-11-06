@@ -112,6 +112,21 @@ namespace geode
             return mapping_morton_.size();
         }
 
+        [[nodiscard]] bool parallel() const
+        {
+            return parallel_;
+        }
+
+        void set_parallel( bool parallel )
+        {
+            parallel_ = parallel;
+        }
+
+        [[nodiscard]] index_t initial_depth() const
+        {
+            return parallel_ ? 0 : async_depth_ + 1;
+        }
+
         [[nodiscard]] static bool is_leaf(
             index_t element_begin, index_t element_end )
         {
@@ -547,6 +562,7 @@ namespace geode
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
         index_t async_depth_{ 0 };
+        bool parallel_{ true };
     };
 
     template < index_t dimension >
@@ -586,8 +602,8 @@ namespace geode
         {
             return;
         }
-        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(), 0,
-            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+            impl_->initial_depth(), Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
     template < index_t dimension >
@@ -600,8 +616,9 @@ namespace geode
         {
             return;
         }
-        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(), 0,
-            other_tree, Impl::ROOT_INDEX, 0, other_tree.nb_bboxes(), action );
+        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+            impl_->initial_depth(), other_tree, Impl::ROOT_INDEX, 0,
+            other_tree.nb_bboxes(), action );
     }
 
     template < index_t dimension >
@@ -635,8 +652,8 @@ namespace geode
         {
             return;
         }
-        impl_->generic_intersect_recursive(
-            box_filter, Impl::ROOT_INDEX, 0, nb_bboxes(), 0, action );
+        impl_->generic_intersect_recursive( box_filter, Impl::ROOT_INDEX, 0,
+            nb_bboxes(), impl_->initial_depth(), action );
     }
 
     template < index_t dimension >

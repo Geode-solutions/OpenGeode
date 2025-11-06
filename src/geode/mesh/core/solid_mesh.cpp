@@ -193,11 +193,10 @@ namespace
         } while( facet.polyhedron_id != first_polyhedron
                  && safety_count < MAX_SAFETY_COUNT );
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SolidMesh::propagate_around_edge] Too many polyhedra "
-            "around edge ",
-            edge_vertices[0], " ", edge_vertices[1], " (",
-            solid.point( edge_vertices[0] ).string(), " ",
-            solid.point( edge_vertices[1] ).string(),
+            "[SolidMesh::propagate_around_edge] Solid ", solid.name(),
+            ": too many polyhedra around edge ", edge_vertices[0], " ",
+            edge_vertices[1], " (", solid.point( edge_vertices[0] ).string(),
+            " ", solid.point( edge_vertices[1] ).string(),
             "). This is probably related to a bug in the polyhedron "
             "adjacencies." );
         return std::make_tuple( std::move( result ), true );
@@ -298,9 +297,9 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SolidMesh::compute_polyhedra_around_vertex] Too many polyhedra "
-            "around vertex ",
-            vertex_id, " (", solid.point( vertex_id ).string(),
+            "[SolidMesh::compute_polyhedra_around_vertex] Solid ", solid.name(),
+            ": Too many polyhedra around vertex ", vertex_id, " (",
+            solid.point( vertex_id ).string(),
             "). This is probably related to a bug in the polyhedra "
             "adjacencies." );
         return result;
