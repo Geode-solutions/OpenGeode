@@ -72,8 +72,7 @@
         {                                                                      \
         }                                                                      \
                                                                                \
-        [[nodiscard]] typename Mesh##Input< dimension >::AdditionalFiles       \
-            additional_files() const final                                     \
+        [[nodiscard]] AdditionalFiles additional_files() const final           \
         {                                                                      \
             return {};                                                         \
         }                                                                      \
@@ -91,8 +90,7 @@
         {                                                                      \
         }                                                                      \
                                                                                \
-        [[nodiscard]] typename Mesh##Input::AdditionalFiles                    \
-            additional_files() const final                                     \
+        [[nodiscard]] AdditionalFiles additional_files() const final           \
         {                                                                      \
             return {};                                                         \
         }                                                                      \

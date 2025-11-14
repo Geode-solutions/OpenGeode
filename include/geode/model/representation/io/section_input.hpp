@@ -56,8 +56,8 @@ namespace geode
         }
     };
 
-    [[nodiscard]] typename SectionInput::AdditionalFiles opengeode_model_api
-        section_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles opengeode_model_api section_additional_files(
+        std::string_view filename );
 
     [[nodiscard]] Percentage opengeode_model_api is_section_loadable(
         std::string_view filename );

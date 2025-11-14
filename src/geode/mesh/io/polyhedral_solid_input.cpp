@@ -74,8 +74,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename PolyhedralSolidInput< dimension >::AdditionalFiles
-        polyhedral_solid_additional_files( std::string_view filename )
+    AdditionalFiles polyhedral_solid_additional_files(
+        std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             PolyhedralSolidInputFactory< dimension > >( filename );
@@ -111,7 +111,7 @@ namespace geode
     template std::unique_ptr< PolyhedralSolid< 3 > >
         opengeode_mesh_api load_polyhedral_solid( std::string_view );
 
-    template PolyhedralSolidInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         polyhedral_solid_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api is_polyhedral_solid_loadable< 3 >(

@@ -81,8 +81,7 @@ namespace geode
             return grid;
         }
 
-        typename LightRegularGridInput< dimension >::AdditionalFiles
-            additional_files() const override
+        AdditionalFiles additional_files() const override
         {
             return {};
         }

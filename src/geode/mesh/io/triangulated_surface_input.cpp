@@ -77,8 +77,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename TriangulatedSurfaceInput< dimension >::AdditionalFiles
-        triangulated_surface_additional_files( std::string_view filename )
+    AdditionalFiles triangulated_surface_additional_files(
+        std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             TriangulatedSurfaceInputFactory< dimension > >( filename );
@@ -118,9 +118,9 @@ namespace geode
     template std::unique_ptr< TriangulatedSurface< 3 > >
         opengeode_mesh_api load_triangulated_surface( std::string_view );
 
-    template TriangulatedSurfaceInput< 2 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         triangulated_surface_additional_files< 2 >( std::string_view );
-    template TriangulatedSurfaceInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         triangulated_surface_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api

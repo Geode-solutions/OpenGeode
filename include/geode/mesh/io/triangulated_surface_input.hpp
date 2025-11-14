@@ -75,8 +75,8 @@ namespace geode
 
     template < index_t dimension >
     [[nodiscard]]
-    typename TriangulatedSurfaceInput< dimension >::AdditionalFiles
-        triangulated_surface_additional_files( std::string_view filename );
+    AdditionalFiles triangulated_surface_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_triangulated_surface_loadable(

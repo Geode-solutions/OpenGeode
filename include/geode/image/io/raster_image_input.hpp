@@ -58,8 +58,8 @@ namespace geode
     };
 
     template < index_t dimension >
-    [[nodiscard]] typename RasterImageInput< dimension >::AdditionalFiles
-        raster_image_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles raster_image_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_raster_image_loadable(

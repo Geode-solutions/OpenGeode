@@ -73,8 +73,8 @@ namespace geode
     ALIAS_3D( HybridSolidInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename HybridSolidInput< dimension >::AdditionalFiles
-        hybrid_solid_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles hybrid_solid_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_hybrid_solid_loadable(

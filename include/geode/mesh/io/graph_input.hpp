@@ -65,8 +65,8 @@ namespace geode
         }
     };
 
-    [[nodiscard]] typename GraphInput::AdditionalFiles opengeode_mesh_api
-        graph_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles opengeode_mesh_api graph_additional_files(
+        std::string_view filename );
 
     [[nodiscard]] Percentage opengeode_mesh_api is_graph_loadable(
         std::string_view filename );

@@ -58,8 +58,8 @@ namespace geode
     ALIAS_2D_AND_3D( LightRegularGridInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename LightRegularGridInput< dimension >::AdditionalFiles
-        light_regular_grid_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles light_regular_grid_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_light_regular_grid_loadable(
