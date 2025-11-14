@@ -21,24 +21,22 @@
  *
  */
 
-#include "../../../basic/factory.hpp"
-#include "../../../common.hpp"
+#include "../common.hpp"
 
-#include <geode/model/representation/core/brep.hpp>
-#include <geode/model/representation/io/brep_input.hpp>
-#include <geode/model/representation/io/brep_output.hpp>
+#include <geode/basic/input.hpp>
 
 namespace geode
 {
-    void define_brep_io( pybind11::module& module )
+    void define_input( pybind11::module& module )
     {
-        module.def( "save_brep", &save_brep );
-        module.def( "load_brep", &load_brep );
-        module.def( "brep_object_priority", &brep_object_priority );
-        module.def( "is_brep_loadable", &is_brep_loadable );
-        module.def( "is_brep_saveable", &is_brep_saveable );
-        module.def( "brep_additional_files", &brep_additional_files );
-        PYTHON_FACTORY_CLASS( BRepInputFactory );
-        PYTHON_FACTORY_CLASS( BRepOutputFactory );
+        pybind11::class_< AdditionalFile >( module, "AdditionalFile" )
+            .def_readwrite( "filename", &AdditionalFile::filename )
+            .def_readwrite( "is_missing", &AdditionalFile::is_missing );
+        pybind11::class_< AdditionalFiles >( module, "AdditionalFiles" )
+            .def(
+                "has_additional_files", &AdditionalFiles::has_additional_files )
+            .def_readwrite( "optional_files", &AdditionalFiles::optional_files )
+            .def_readwrite(
+                "mandatory_files", &AdditionalFiles::mandatory_files );
     }
 } // namespace geode

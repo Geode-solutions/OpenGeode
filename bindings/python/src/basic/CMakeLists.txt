@@ -27,6 +27,7 @@ add_geode_python_binding(
         "cell_array.cpp"
         "identifier.cpp"
         "identifier_builder.cpp"
+        "input.cpp"
         "mapping.cpp"
         "percentage.cpp"
         "uuid.cpp"

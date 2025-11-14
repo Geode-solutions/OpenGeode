@@ -24,7 +24,6 @@
 #include <string>
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 #include "../../common.hpp"
 
 #include <geode/mesh/core/light_regular_grid.hpp>
@@ -49,8 +48,6 @@
         "is_light_regular_grid_loadable" + std::to_string( dimension ) + "D";  \
     module.def( loadable##dimension.c_str(),                                   \
         &is_light_regular_grid_loadable< dimension > );                        \
-    PYTHON_INPUT_CLASS( LightRegularGrid< dimension >,                         \
-        "LightRegularGrid" + std::to_string( dimension ) + "D" );              \
     const auto check##dimension = "light_regular_grid_additional_files"        \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
