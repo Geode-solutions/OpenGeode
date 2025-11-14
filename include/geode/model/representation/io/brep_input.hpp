@@ -56,8 +56,8 @@ namespace geode
         }
     };
 
-    [[nodiscard]] typename BRepInput::AdditionalFiles opengeode_model_api
-        brep_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles opengeode_model_api brep_additional_files(
+        std::string_view filename );
 
     [[nodiscard]] Percentage opengeode_model_api is_brep_loadable(
         std::string_view filename );

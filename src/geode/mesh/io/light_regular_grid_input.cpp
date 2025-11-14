@@ -61,8 +61,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename LightRegularGridInput< dimension >::AdditionalFiles
-        light_regular_grid_additional_files( std::string_view filename )
+    AdditionalFiles light_regular_grid_additional_files(
+        std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             LightRegularGridInputFactory< dimension > >( filename );
@@ -100,9 +100,9 @@ namespace geode
     template class opengeode_mesh_api LightRegularGridInput< 2 >;
     template class opengeode_mesh_api LightRegularGridInput< 3 >;
 
-    template LightRegularGridInput< 2 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         light_regular_grid_additional_files< 2 >( std::string_view );
-    template LightRegularGridInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         light_regular_grid_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api is_light_regular_grid_loadable< 2 >(

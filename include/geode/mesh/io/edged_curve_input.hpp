@@ -73,8 +73,8 @@ namespace geode
     ALIAS_2D_AND_3D( EdgedCurveInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename EdgedCurveInput< dimension >::AdditionalFiles
-        edged_curve_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles edged_curve_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_edged_curve_loadable(

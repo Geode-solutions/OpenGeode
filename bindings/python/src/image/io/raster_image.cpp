@@ -26,7 +26,6 @@
 #include "../../common.hpp"
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 
 #include <geode/basic/percentage.hpp>
 
@@ -49,8 +48,6 @@
         "is_raster_image_loadable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \
         loadable##dimension.c_str(), &is_raster_image_loadable< dimension > ); \
-    PYTHON_INPUT_CLASS( RasterImage##dimension##D,                             \
-        "RasterImage" + std::to_string( dimension ) + "D" );                   \
     const auto check##dimension =                                              \
         "raster_image_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \

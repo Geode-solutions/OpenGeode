@@ -21,50 +21,22 @@
  *
  */
 
-#pragma once
+#include "../common.hpp"
 
-#include <string_view>
-
-#include <geode/basic/factory.hpp>
 #include <geode/basic/input.hpp>
 
-#include <geode/model/common.hpp>
-
 namespace geode
 {
-    class Section;
-    class SectionBuilder;
-} // namespace geode
-
-namespace geode
-{
-    /*!
-     * API function for loading a Section.
-     * The adequate loader is called depending on the filename extension.
-     * @param[in] filename Path to the file to load.
-     * @return Loaded Section.
-     */
-    [[nodiscard]] Section opengeode_model_api load_section(
-        std::string_view filename );
-
-    class SectionInput : public Input< Section >
+    void define_input( pybind11::module& module )
     {
-    protected:
-        explicit SectionInput( std::string_view filename )
-            : Input< Section >{ filename }
-        {
-        }
-    };
-
-    [[nodiscard]] AdditionalFiles opengeode_model_api section_additional_files(
-        std::string_view filename );
-
-    [[nodiscard]] Percentage opengeode_model_api is_section_loadable(
-        std::string_view filename );
-
-    [[nodiscard]] index_t opengeode_model_api section_object_priority(
-        std::string_view filename );
-
-    using SectionInputFactory =
-        Factory< std::string, SectionInput, std::string_view >;
+        pybind11::class_< AdditionalFile >( module, "AdditionalFile" )
+            .def_readwrite( "filename", &AdditionalFile::filename )
+            .def_readwrite( "is_missing", &AdditionalFile::is_missing );
+        pybind11::class_< AdditionalFiles >( module, "AdditionalFiles" )
+            .def(
+                "has_additional_files", &AdditionalFiles::has_additional_files )
+            .def_readwrite( "optional_files", &AdditionalFiles::optional_files )
+            .def_readwrite(
+                "mandatory_files", &AdditionalFiles::mandatory_files );
+    }
 } // namespace geode

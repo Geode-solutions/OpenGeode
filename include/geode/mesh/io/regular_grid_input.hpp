@@ -72,8 +72,8 @@ namespace geode
     ALIAS_2D_AND_3D( RegularGridInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename RegularGridInput< dimension >::AdditionalFiles
-        regular_grid_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles regular_grid_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_regular_grid_loadable(

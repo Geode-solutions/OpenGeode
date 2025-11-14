@@ -74,8 +74,8 @@ namespace geode
     ALIAS_3D( TetrahedralSolidInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename TetrahedralSolidInput< dimension >::AdditionalFiles
-        tetrahedral_solid_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles tetrahedral_solid_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_tetrahedral_solid_loadable(

@@ -73,8 +73,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename EdgedCurveInput< dimension >::AdditionalFiles
-        edged_curve_additional_files( std::string_view filename )
+    AdditionalFiles edged_curve_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             EdgedCurveInputFactory< dimension > >( filename );
@@ -114,9 +113,9 @@ namespace geode
     template std::unique_ptr< EdgedCurve< 3 > >
         opengeode_mesh_api load_edged_curve( std::string_view );
 
-    template EdgedCurveInput< 2 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         edged_curve_additional_files< 2 >( std::string_view );
-    template EdgedCurveInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         edged_curve_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api is_edged_curve_loadable< 2 >(

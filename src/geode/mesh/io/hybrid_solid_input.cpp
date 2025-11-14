@@ -73,8 +73,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename HybridSolidInput< dimension >::AdditionalFiles
-        hybrid_solid_additional_files( std::string_view filename )
+    AdditionalFiles hybrid_solid_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             HybridSolidInputFactory< dimension > >( filename );
@@ -110,7 +109,7 @@ namespace geode
     template std::unique_ptr< HybridSolid< 3 > >
         opengeode_mesh_api load_hybrid_solid( std::string_view );
 
-    template HybridSolidInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         hybrid_solid_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api is_hybrid_solid_loadable< 3 >(

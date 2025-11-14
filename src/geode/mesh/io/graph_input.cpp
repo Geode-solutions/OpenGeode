@@ -64,8 +64,7 @@ namespace geode
             MeshFactory::default_impl( Graph::type_name_static() ), filename );
     }
 
-    typename GraphInput::AdditionalFiles graph_additional_files(
-        std::string_view filename )
+    AdditionalFiles graph_additional_files( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< GraphInputFactory >( filename );

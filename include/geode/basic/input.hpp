@@ -30,40 +30,39 @@
 
 namespace geode
 {
+    struct AdditionalFile
+    {
+        AdditionalFile( std::string filename_in, bool is_missing_in )
+            : filename{ std::move( filename_in ) }, is_missing{ is_missing_in }
+        {
+        }
+
+        std::string filename;
+        bool is_missing;
+    };
+
+    struct AdditionalFiles
+    {
+        [[nodiscard]] bool has_additional_files() const
+        {
+            const auto check_missing = []( const auto& file ) {
+                return file.is_missing;
+            };
+            return absl::c_find_if( optional_files, check_missing )
+                       != optional_files.end()
+                   || absl::c_find_if( mandatory_files, check_missing )
+                          != mandatory_files.end();
+        }
+
+        std::vector< AdditionalFile > optional_files;
+        std::vector< AdditionalFile > mandatory_files;
+    };
+
     template < typename Object, typename... Args >
     class Input : public IOFile
     {
     public:
         using InputData = Object;
-
-        struct AdditionalFile
-        {
-            AdditionalFile( std::string filename_in, bool is_missing_in )
-                : filename{ std::move( filename_in ) },
-                  is_missing{ is_missing_in }
-            {
-            }
-
-            std::string filename;
-            bool is_missing;
-        };
-
-        struct AdditionalFiles
-        {
-            [[nodiscard]] bool has_additional_files() const
-            {
-                const auto check_missing = []( const auto& file ) {
-                    return file.is_missing;
-                };
-                return absl::c_find_if( optional_files, check_missing )
-                           != optional_files.end()
-                       || absl::c_find_if( mandatory_files, check_missing )
-                              != mandatory_files.end();
-            }
-
-            std::vector< AdditionalFile > optional_files;
-            std::vector< AdditionalFile > mandatory_files;
-        };
 
         [[nodiscard]] virtual AdditionalFiles additional_files() const = 0;
 

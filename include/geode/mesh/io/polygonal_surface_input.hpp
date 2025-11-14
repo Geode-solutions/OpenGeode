@@ -74,8 +74,8 @@ namespace geode
     ALIAS_2D_AND_3D( PolygonalSurfaceInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename PolygonalSurfaceInput< dimension >::AdditionalFiles
-        polygonal_surface_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles polygonal_surface_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_polygonal_surface_loadable(

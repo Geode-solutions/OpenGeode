@@ -73,8 +73,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename PointSetInput< dimension >::AdditionalFiles
-        point_set_additional_files( std::string_view filename )
+    AdditionalFiles point_set_additional_files( std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             PointSetInputFactory< dimension > >( filename );
@@ -114,10 +113,10 @@ namespace geode
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
         std::string_view );
 
-    template PointSetInput< 2 >::AdditionalFiles
-        opengeode_mesh_api point_set_additional_files< 2 >( std::string_view );
-    template PointSetInput< 3 >::AdditionalFiles
-        opengeode_mesh_api point_set_additional_files< 3 >( std::string_view );
+    template AdditionalFiles opengeode_mesh_api point_set_additional_files< 2 >(
+        std::string_view );
+    template AdditionalFiles opengeode_mesh_api point_set_additional_files< 3 >(
+        std::string_view );
 
     template Percentage opengeode_mesh_api is_point_set_loadable< 2 >(
         std::string_view );

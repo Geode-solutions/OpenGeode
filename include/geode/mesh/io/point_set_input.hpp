@@ -73,8 +73,8 @@ namespace geode
     ALIAS_2D_AND_3D( PointSetInput );
 
     template < index_t dimension >
-    [[nodiscard]] typename PointSetInput< dimension >::AdditionalFiles
-        point_set_additional_files( std::string_view filename );
+    [[nodiscard]] AdditionalFiles point_set_additional_files(
+        std::string_view filename );
 
     template < index_t dimension >
     [[nodiscard]] Percentage is_point_set_loadable( std::string_view filename );

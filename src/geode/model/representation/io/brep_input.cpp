@@ -71,8 +71,7 @@ namespace geode
         }
     }
 
-    typename BRepInput::AdditionalFiles brep_additional_files(
-        std::string_view filename )
+    AdditionalFiles brep_additional_files( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< BRepInputFactory >( filename );
