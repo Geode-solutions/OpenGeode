@@ -24,7 +24,6 @@
 #include <string>
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 #include "../../common.hpp"
 
 #include <geode/mesh/core/point_set.hpp>

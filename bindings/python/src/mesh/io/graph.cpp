@@ -22,7 +22,6 @@
  */
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 #include "../../common.hpp"
 
 #include <geode/mesh/core/graph.hpp>
