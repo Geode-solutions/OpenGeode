@@ -21,27 +21,22 @@
  *
  */
 
-#include "../../basic/factory.hpp"
-#include "../../common.hpp"
+#include "../common.hpp"
 
-#include <geode/mesh/core/vertex_set.hpp>
-#include <geode/mesh/io/vertex_set_input.hpp>
-#include <geode/mesh/io/vertex_set_output.hpp>
+#include <geode/basic/input.hpp>
 
 namespace geode
 {
-    void define_vertex_set_io( pybind11::module& module )
+    void define_input( pybind11::module& module )
     {
-        module.def( "save_vertex_set", &save_vertex_set );
-        module.def(
-            "load_vertex_set", static_cast< std::unique_ptr< VertexSet > ( * )(
-                                   std::string_view ) >( &load_vertex_set ) );
-        module.def( "vertex_set_object_priority", &vertex_set_object_priority );
-        module.def( "is_vertex_set_loadable", &is_vertex_set_loadable );
-        module.def( "is_vertex_set_saveable", &is_vertex_set_saveable );
-        module.def(
-            "vertex_set_additional_files", &vertex_set_additional_files );
-        PYTHON_FACTORY_CLASS( VertexSetInputFactory );
-        PYTHON_FACTORY_CLASS( VertexSetOutputFactory );
+        pybind11::class_< AdditionalFile >( module, "AdditionalFile" )
+            .def_readwrite( "filename", &AdditionalFile::filename )
+            .def_readwrite( "is_missing", &AdditionalFile::is_missing );
+        pybind11::class_< AdditionalFiles >( module, "AdditionalFiles" )
+            .def(
+                "has_additional_files", &AdditionalFiles::has_additional_files )
+            .def_readwrite( "optional_files", &AdditionalFiles::optional_files )
+            .def_readwrite(
+                "mandatory_files", &AdditionalFiles::mandatory_files );
     }
 } // namespace geode

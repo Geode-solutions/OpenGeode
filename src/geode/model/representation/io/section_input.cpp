@@ -70,8 +70,7 @@ namespace geode
         }
     }
 
-    typename SectionInput::AdditionalFiles section_additional_files(
-        std::string_view filename )
+    AdditionalFiles section_additional_files( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< SectionInputFactory >(

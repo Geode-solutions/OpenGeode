@@ -24,7 +24,6 @@
 #include <string>
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 #include "../../common.hpp"
 
 #include <geode/mesh/core/hybrid_solid.hpp>
@@ -48,8 +47,6 @@
         "is_hybrid_solid_loadable" + std::to_string( dimension ) + "D";        \
     module.def(                                                                \
         loadable##dimension.c_str(), &is_hybrid_solid_loadable< dimension > ); \
-    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< HybridSolid< dimension > >,      \
-        "HybridSolid" + std::to_string( dimension ) + "D" );                   \
     const auto check##dimension =                                              \
         "hybrid_solid_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \

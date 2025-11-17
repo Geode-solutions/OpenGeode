@@ -22,7 +22,6 @@
  */
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 #include "../../common.hpp"
 
 #include <geode/mesh/core/graph.hpp>
@@ -40,7 +39,6 @@ namespace geode
         module.def( "graph_object_priority", &graph_object_priority );
         module.def( "is_graph_loadable", &is_graph_loadable );
         module.def( "is_graph_saveable", &is_graph_saveable );
-        PYTHON_INPUT_MESH_CLASS( std::unique_ptr< Graph >, "Graph" );
         module.def( "graph_additional_files", &graph_additional_files );
         PYTHON_FACTORY_CLASS( GraphInputFactory );
         PYTHON_FACTORY_CLASS( GraphOutputFactory );

@@ -22,7 +22,6 @@
  */
 
 #include "../../../basic/factory.hpp"
-#include "../../../basic/input.hpp"
 #include "../../../common.hpp"
 
 #include <geode/model/representation/core/brep.hpp>
@@ -38,7 +37,6 @@ namespace geode
         module.def( "brep_object_priority", &brep_object_priority );
         module.def( "is_brep_loadable", &is_brep_loadable );
         module.def( "is_brep_saveable", &is_brep_saveable );
-        PYTHON_INPUT_CLASS( BRep, "BRep" );
         module.def( "brep_additional_files", &brep_additional_files );
         PYTHON_FACTORY_CLASS( BRepInputFactory );
         PYTHON_FACTORY_CLASS( BRepOutputFactory );

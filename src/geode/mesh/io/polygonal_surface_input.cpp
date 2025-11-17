@@ -75,8 +75,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename PolygonalSurfaceInput< dimension >::AdditionalFiles
-        polygonal_surface_additional_files( std::string_view filename )
+    AdditionalFiles polygonal_surface_additional_files(
+        std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             PolygonalSurfaceInputFactory< dimension > >( filename );
@@ -116,9 +116,9 @@ namespace geode
     template std::unique_ptr< PolygonalSurface< 3 > >
         opengeode_mesh_api load_polygonal_surface( std::string_view );
 
-    template PolygonalSurfaceInput< 2 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         polygonal_surface_additional_files< 2 >( std::string_view );
-    template PolygonalSurfaceInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         polygonal_surface_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api is_polygonal_surface_loadable< 2 >(

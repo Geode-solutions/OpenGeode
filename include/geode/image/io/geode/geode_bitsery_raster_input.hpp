@@ -62,8 +62,7 @@ namespace geode
             return image;
         }
 
-        typename RasterImageInput< dimension >::AdditionalFiles
-            additional_files() const final
+        AdditionalFiles additional_files() const final
         {
             return {};
         }

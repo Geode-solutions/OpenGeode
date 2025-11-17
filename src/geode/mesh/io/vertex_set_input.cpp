@@ -62,8 +62,7 @@ namespace geode
         }
     }
 
-    typename VertexSetInput::AdditionalFiles vertex_set_additional_files(
-        std::string_view filename )
+    AdditionalFiles vertex_set_additional_files( std::string_view filename )
     {
         const auto input =
             detail::geode_object_input_reader< VertexSetInputFactory >(

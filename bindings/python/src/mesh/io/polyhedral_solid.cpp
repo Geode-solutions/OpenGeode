@@ -24,7 +24,6 @@
 #include <string>
 
 #include "../../basic/factory.hpp"
-#include "../../basic/input.hpp"
 #include "../../common.hpp"
 
 #include <geode/mesh/core/polyhedral_solid.hpp>
@@ -49,8 +48,6 @@
         "is_polyhedral_solid_loadable" + std::to_string( dimension ) + "D";    \
     module.def( loadable##dimension.c_str(),                                   \
         &is_polyhedral_solid_loadable< dimension > );                          \
-    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolyhedralSolid< dimension > >,  \
-        "PolyhedralSolid" + std::to_string( dimension ) + "D" );               \
     const auto check##dimension = "polyhedral_solid_additional_files"          \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \

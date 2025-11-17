@@ -76,8 +76,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename TetrahedralSolidInput< dimension >::AdditionalFiles
-        tetrahedral_solid_additional_files( std::string_view filename )
+    AdditionalFiles tetrahedral_solid_additional_files(
+        std::string_view filename )
     {
         const auto input = detail::geode_object_input_reader<
             TetrahedralSolidInputFactory< dimension > >( filename );
@@ -113,7 +113,7 @@ namespace geode
     template std::unique_ptr< TetrahedralSolid< 3 > >
         opengeode_mesh_api load_tetrahedral_solid( std::string_view );
 
-    template TetrahedralSolidInput< 3 >::AdditionalFiles opengeode_mesh_api
+    template AdditionalFiles opengeode_mesh_api
         tetrahedral_solid_additional_files< 3 >( std::string_view );
 
     template Percentage opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(

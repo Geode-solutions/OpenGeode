@@ -66,7 +66,7 @@ namespace geode
         }
     };
 
-    [[nodiscard]] typename VertexSetInput::AdditionalFiles opengeode_mesh_api
+    [[nodiscard]] AdditionalFiles opengeode_mesh_api
         vertex_set_additional_files( std::string_view filename );
 
     [[nodiscard]] Percentage opengeode_mesh_api is_vertex_set_loadable(
