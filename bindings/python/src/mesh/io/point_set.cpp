@@ -47,8 +47,6 @@
         "is_point_set_loadable" + std::to_string( dimension ) + "D";           \
     module.def(                                                                \
         loadable##dimension.c_str(), &is_point_set_loadable< dimension > );    \
-    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PointSet< dimension > >,         \
-        "PointSet" + std::to_string( dimension ) + "D" );                      \
     const auto check##dimension =                                              \
         "point_set_additional_files" + std::to_string( dimension ) + "D";      \
     module.def(                                                                \

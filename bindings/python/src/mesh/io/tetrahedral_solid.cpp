@@ -48,8 +48,6 @@
         "is_tetrahedral_solid_loadable" + std::to_string( dimension ) + "D";   \
     module.def( loadable##dimension.c_str(),                                   \
         &is_tetrahedral_solid_loadable< dimension > );                         \
-    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< TetrahedralSolid< dimension > >, \
-        "TetrahedralSolid" + std::to_string( dimension ) + "D" );              \
     const auto check##dimension = "tetrahedral_solid_additional_files"         \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
