@@ -1,4 +1,4 @@
-export default {
+const Configuration = {
   extends: ["@commitlint/config-angular"],
   rules: {
     "scope-empty": [2, "never"],
@@ -12,5 +12,8 @@ export default {
     "subject-full-stop": [0],
     "type-case": [0],
     "type-empty": [0],
+    "type-enum": [2, "always", ["feat", "fix", "perf"]],
   },
 }
+
+export default Configuration

@@ -193,12 +193,11 @@ namespace geode
     {
         std::array< PolyhedronFacet, 2 > facets;
         index_t count{ 0 };
+        const auto solid_vertices = this->polyhedron_vertices( tetrahedron_id );
         for( const auto v : LRange{ 4 } )
         {
-            const auto solid_vertex =
-                this->polyhedron_vertex( { tetrahedron_id, v } );
-            if( solid_vertex != edge_vertices[0]
-                && solid_vertex != edge_vertices[1] )
+            if( solid_vertices[v] != edge_vertices[0]
+                && solid_vertices[v] != edge_vertices[1] )
             {
                 OPENGEODE_EXCEPTION( count < 2,
                     "[TetrahedralSolid::edge_incident_facets] Given edge "
@@ -207,6 +206,12 @@ namespace geode
                 count++;
             }
         }
+        OPENGEODE_EXCEPTION( count == 2,
+            "[TetrahedralSolid::edge_incident_facets] Given tetrahedron has "
+            "more than two times given vertices (",
+            edge_vertices[0], ", ", edge_vertices[1], "): ", solid_vertices[0],
+            ", ", solid_vertices[1], ", ", solid_vertices[2], ", ",
+            solid_vertices[3] );
         return facets;
     }
 
