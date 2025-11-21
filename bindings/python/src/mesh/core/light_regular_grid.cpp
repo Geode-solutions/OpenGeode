@@ -46,13 +46,6 @@ namespace
             .def( pybind11::init< geode::Point< dimension >,
                 std::array< geode::index_t, dimension >,
                 std::array< geode::Vector< dimension >, dimension > >() )
-            .def( "vertex_attribute_manager",
-                &geode::Grid< dimension >::grid_vertex_attribute_manager,
-                pybind11::return_value_policy::reference )
-            .def( dimension == 2 ? "polygon_attribute_manager"
-                                 : "polyhedron_attribute_manager",
-                &geode::Grid< dimension >::cell_attribute_manager,
-                pybind11::return_value_policy::reference )
             .def( "native_extension",
                 &geode::LightRegularGrid< dimension >::native_extension );
     }
