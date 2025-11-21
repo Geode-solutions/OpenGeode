@@ -32,8 +32,18 @@
 #include <geode/mesh/core/bitsery_archive.hpp>
 
 #define BITSERY_WRITE( Mesh )                                                  \
+    bool is_saveable( const Mesh& mesh ) const final                           \
+    {                                                                          \
+        return mesh.impl_name() == OpenGeode##Mesh::impl_name_static();        \
+    }                                                                          \
+                                                                               \
     std::vector< std::string > write( const Mesh& mesh ) const final           \
     {                                                                          \
+        OPENGEODE_EXCEPTION(                                                   \
+            mesh.impl_name() == OpenGeode##Mesh::impl_name_static(),           \
+            "[Bitsery] Cannot save ", mesh.type_name().get(),                  \
+            " in native format because it is not ",                            \
+            OpenGeode##Mesh::impl_name_static().get() );                       \
         std::ofstream file{ to_string( this->filename() ),                     \
             std::ofstream::binary };                                           \
         TContext context{};                                                    \
