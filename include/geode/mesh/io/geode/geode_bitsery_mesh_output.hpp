@@ -41,9 +41,9 @@
     {                                                                          \
         OPENGEODE_EXCEPTION(                                                   \
             mesh.impl_name() == OpenGeode##Mesh::impl_name_static(),           \
-            "[Bitsery] Cannot save ", mesh.type_name(),                        \
+            "[Bitsery] Cannot save ", mesh.type_name().get(),                  \
             " in native format because it is not ",                            \
-            OpenGeode##Mesh::impl_name_static() );                             \
+            OpenGeode##Mesh::impl_name_static().get() );                       \
         std::ofstream file{ to_string( this->filename() ),                     \
             std::ofstream::binary };                                           \
         TContext context{};                                                    \
