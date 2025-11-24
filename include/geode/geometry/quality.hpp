@@ -38,6 +38,8 @@ namespace geode
         const Tetrahedron& tetra );
     [[nodiscard]] double opengeode_geometry_api
         tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra );
+    [[nodiscard]] double opengeode_geometry_api
+        tetrahedron_volume_to_facet_ratio( const Tetrahedron& tetra );
 
     [[nodiscard]] double opengeode_geometry_api
         tetrahedron_collapse_aspect_ratio( const Tetrahedron& tetra );

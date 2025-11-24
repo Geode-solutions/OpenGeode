@@ -29,6 +29,7 @@
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
 #include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/square_matrix.hpp>
 #include <geode/geometry/vector.hpp>
@@ -184,22 +185,63 @@ namespace geode
         return aspect_ratio;
     }
 
+    double tetrahedron_volume_to_facet_ratio( const Tetrahedron& tetra )
+    {
+        const auto signed_volume = tetrahedron_signed_volume( tetra );
+        if( signed_volume < 0. )
+        {
+            return 0.;
+        }
+        const auto& vertices = tetra.vertices();
+        double max_length{ 0 };
+        for( const auto v0 : LRange{ 3 } )
+        {
+            const auto& point0 = vertices[v0].get();
+            for( const auto v1 : LRange{ v0, 4 } )
+            {
+                const auto& point1 = vertices[v1].get();
+                const auto length = point_point_distance( point0, point1 );
+                if( length > max_length )
+                {
+                    max_length = length;
+                }
+            }
+        }
+        double facet_area{ 0 };
+        for( const auto v0 : LRange{ 2 } )
+        {
+            const auto& point0 = vertices[v0].get();
+            for( const auto v1 : LRange{ v0, 3 } )
+            {
+                const auto& point1 = vertices[v1].get();
+                for( const auto v2 : LRange{ v1, 4 } )
+                {
+                    const auto& point2 = vertices[v2].get();
+                    facet_area +=
+                        triangle_area( Triangle3D{ point0, point1, point2 } );
+                }
+            }
+        }
+        return 6. * std::sqrt( 6 ) * signed_volume
+               / ( facet_area * max_length );
+    }
+
     double tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra )
     {
-        const auto signed_volume = geode::tetrahedron_signed_volume( tetra );
+        const auto signed_volume = tetrahedron_signed_volume( tetra );
         if( signed_volume < 0. )
         {
             return 0.;
         }
         double sq_len{ 0 };
         const auto& vertices = tetra.vertices();
-        for( const auto v0 : geode::LRange{ 3 } )
+        for( const auto v0 : LRange{ 3 } )
         {
             const auto& point0 = vertices[v0].get();
-            for( const auto v1 : geode::LRange{ v0, 4 } )
+            for( const auto v1 : LRange{ v0, 4 } )
             {
                 const auto& point1 = vertices[v1].get();
-                for( const auto d : geode::LRange{ 3 } )
+                for( const auto d : LRange{ 3 } )
                 {
                     const auto diff = point0.value( d ) - point1.value( d );
                     sq_len += diff * diff;
@@ -212,7 +254,7 @@ namespace geode
 
     double tetrahedron_collapse_aspect_ratio( const Tetrahedron& tetra )
     {
-        if( geode::tetrahedron_volume( tetra ) < geode::GLOBAL_EPSILON )
+        if( tetrahedron_volume( tetra ) < GLOBAL_EPSILON )
         {
             return std::numeric_limits< double >::max();
         }
@@ -233,11 +275,11 @@ namespace geode
         const auto longest_edge_length = std::sqrt( std::max( { edge_ab_l2,
             edge_bc_l2, edge_ac_l2, edge_ad_l2, edge_bd_l2, edge_cd_l2 } ) );
 
-        geode::SquareMatrix3D matrix{ { edge_ad, edge_bd, edge_cd } };
+        SquareMatrix3D matrix{ { edge_ad, edge_bd, edge_cd } };
         const auto row_indices = lu_decomposition( matrix );
 
         std::array< Vector3D, 4 > N;
-        for( const auto j : geode::LRange{ 3 } )
+        for( const auto j : LRange{ 3 } )
         {
             std::array< double, 3 > b{ 0., 0., 0. };
             b[j] = 1.0; // Positive means the inside direction
@@ -247,13 +289,13 @@ namespace geode
 
         std::array< double, 4 >
             H; // H[i] = inverse of the height of its corresponding face
-        for( const auto i : geode::LRange{ 4 } )
+        for( const auto i : LRange{ 4 } )
         {
             H[i] = N[i].length();
         }
 
         auto heightinv = H[0];
-        for( const auto i : geode::LRange{ 1, 4 } )
+        for( const auto i : LRange{ 1, 4 } )
         { // Get the biggest H[i] (corresponding to the smallest height)
             if( H[i] > heightinv )
             {
