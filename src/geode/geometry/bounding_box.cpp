@@ -289,7 +289,7 @@ namespace geode
             const auto rhs =
                 box_extent.value( i )
                 + segment_extent * std::fabs( segment_direction.value( i ) );
-            if( lhs > rhs )
+            if( lhs - rhs > geode::GLOBAL_EPSILON )
             {
                 return false;
             }
