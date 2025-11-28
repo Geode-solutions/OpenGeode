@@ -23,6 +23,12 @@
 
 #include "../../common.hpp"
 
+#include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
+#include <geode/geometry/basic_objects/triangle.hpp>
+
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/helpers/detail/debug.hpp>
 
 namespace geode
