@@ -235,6 +235,13 @@ namespace geode
         {
         }
 
+        Impl( const EdgedCurve2D& mesh,
+            const Point2D& origin,
+            const OwnerSegment2D& segment )
+            : mesh_( mesh ), origin_( origin ), segment_{ segment }
+        {
+        }
+
         Impl( const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line )
             : mesh_( mesh ),
               origin_( infinite_line.origin() ),
@@ -339,6 +346,13 @@ namespace geode
     {
     }
 
+    RayTracing2D::RayTracing2D( const EdgedCurve2D& mesh,
+        const Point2D& origin,
+        const OwnerSegment2D& segment )
+        : impl_{ mesh, origin, segment }
+    {
+    }
+
     RayTracing2D::RayTracing2D(
         const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line )
         : impl_{ mesh, infinite_line }
@@ -387,6 +401,13 @@ namespace geode
               origin_( infinite_line.origin() ),
               segment_{ begin( mesh, infinite_line ),
                   end( mesh, infinite_line ) }
+        {
+        }
+
+        Impl( const SurfaceMesh3D& mesh,
+            const Point3D& origin,
+            const OwnerSegment3D& segment )
+            : mesh_( mesh ), origin_( origin ), segment_{ segment }
         {
         }
 
@@ -529,6 +550,13 @@ namespace geode
     RayTracing3D::RayTracing3D(
         const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
         : impl_{ mesh, infinite_line }
+    {
+    }
+
+    RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh,
+        const Point3D& origin,
+        const OwnerSegment3D& segment )
+        : impl_{ mesh, origin, segment }
     {
     }
 

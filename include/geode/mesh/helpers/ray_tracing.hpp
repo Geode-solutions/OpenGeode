@@ -28,6 +28,7 @@
 #include <geode/basic/pimpl.hpp>
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/information.hpp>
 #include <geode/geometry/point.hpp>
 
@@ -76,6 +77,9 @@ namespace geode
         RayTracing2D( const EdgedCurve2D& mesh, const Ray2D& ray );
         RayTracing2D(
             const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line );
+        RayTracing2D( const EdgedCurve2D& mesh,
+            const Point2D& origin,
+            const OwnerSegment2D& segment );
         RayTracing2D( RayTracing2D&& other ) noexcept;
         ~RayTracing2D();
 
@@ -125,6 +129,9 @@ namespace geode
         RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray );
         RayTracing3D(
             const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
+        RayTracing3D( const SurfaceMesh3D& mesh,
+            const Point3D& origin,
+            const OwnerSegment3D& segment );
         RayTracing3D( RayTracing3D&& other ) noexcept;
         ~RayTracing3D();
 
