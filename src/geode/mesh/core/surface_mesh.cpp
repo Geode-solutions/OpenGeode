@@ -347,15 +347,14 @@ namespace geode
 
         void enable_edges( const SurfaceMesh< dimension >& surface ) const
         {
-            static absl::Mutex mutex;
             {
-                absl::ReaderMutexLock lock{ &mutex };
+                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_edges_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex };
+            absl::MutexLock lock{ &mutex_ };
             edges_.reset( new SurfaceEdges< dimension >{ surface } );
         }
 

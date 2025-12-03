@@ -570,15 +570,14 @@ namespace geode
 
         void enable_edges( const SolidMesh< dimension >& solid ) const
         {
-            static absl::Mutex mutex;
             {
-                absl::ReaderMutexLock lock{ &mutex };
+                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_edges_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex };
+            absl::MutexLock lock{ &mutex_ };
             edges_.reset( new SolidEdges< dimension >{ solid } );
         }
 
@@ -620,15 +619,14 @@ namespace geode
 
         void enable_facets( const SolidMesh< dimension >& solid ) const
         {
-            static absl::Mutex mutex;
             {
-                absl::ReaderMutexLock lock{ &mutex };
+                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_facets_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex };
+            absl::MutexLock lock{ &mutex_ };
             facets_.reset( new SolidFacets< dimension >{ solid } );
         }
 
