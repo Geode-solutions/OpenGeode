@@ -163,6 +163,7 @@ namespace geode
 
         void delete_attribute( std::string_view name )
         {
+            absl::MutexLock lock{ &mutex_ };
             const auto attribute_it = attributes_.find( name );
             if( attribute_it != attributes_.end() )
             {
@@ -371,9 +372,15 @@ namespace geode
                 } } } );
         }
 
+        absl::Mutex &mutex() const
+        {
+            return mutex_;
+        }
+
     private:
         index_t nb_elements_{ 0 };
         AttributesMap attributes_;
+        mutable absl::Mutex mutex_;
     };
 
     AttributeManager::AttributeManager() = default;
@@ -517,6 +524,11 @@ namespace geode
         const AttributeProperties &new_properties )
     {
         impl_->set_attribute_properties( attribute_name, new_properties );
+    }
+
+    absl::Mutex &AttributeManager::mutex() const
+    {
+        return impl_->mutex();
     }
 
     template < typename Archive >

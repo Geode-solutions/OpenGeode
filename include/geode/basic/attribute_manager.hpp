@@ -29,6 +29,7 @@
 
 #include <absl/container/fixed_array.h>
 #include <absl/strings/str_cat.h>
+#include <absl/synchronization/mutex.h>
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/common.hpp>
@@ -59,6 +60,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > find_generic_attribute(
             std::string_view name ) const
         {
+            absl::ReaderMutexLock lock{ &mutex() };
             return find_attribute_base( name );
         }
 
@@ -72,6 +74,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
             std::string_view name ) const
         {
+            absl::ReaderMutexLock lock{ &mutex() };
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
                     find_attribute_base( name ) );
@@ -106,21 +109,33 @@ namespace geode
             T default_value,
             AttributeProperties properties )
         {
+            {
+                absl::ReaderMutexLock lock{ &mutex() };
+                auto attribute = find_attribute_base( name );
+                auto typed_attribute =
+                    std::dynamic_pointer_cast< Attribute< T > >( attribute );
+                if( typed_attribute.get() )
+                {
+                    return typed_attribute;
+                }
+            }
+            absl::MutexLock lock{ &mutex() };
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
                 std::dynamic_pointer_cast< Attribute< T > >( attribute );
-            if( !typed_attribute.get() )
+            if( typed_attribute.get() )
             {
-                OPENGEODE_EXCEPTION( attribute.use_count() < 2,
-                    "[AttributeManager::find_or_create_attribute] Do not "
-                    "instantiate an attribute "
-                    "if an instantiated attribute of the same name "
-                    "with different storage already exists." );
-
-                typed_attribute.reset( new Attribute< T >{
-                    std::move( default_value ), std::move( properties ), {} } );
-                register_attribute( typed_attribute, name );
+                return typed_attribute;
             }
+            OPENGEODE_EXCEPTION( attribute.use_count() < 2,
+                "[AttributeManager::find_or_create_attribute] Do not "
+                "instantiate an attribute "
+                "if an instantiated attribute of the same name "
+                "with different storage already exists." );
+
+            typed_attribute.reset( new Attribute< T >{
+                std::move( default_value ), std::move( properties ), {} } );
+            register_attribute( typed_attribute, name );
             return typed_attribute;
         }
 
@@ -249,6 +264,8 @@ namespace geode
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
+
+        absl::Mutex& mutex() const;
 
         /*!
          * Find the Attribute associated with the given name
