@@ -371,9 +371,15 @@ namespace geode
                 } } } );
         }
 
+        absl::Mutex &mutex() const
+        {
+            return mutex_;
+        }
+
     private:
         index_t nb_elements_{ 0 };
         AttributesMap attributes_;
+        mutable absl::Mutex mutex_;
     };
 
     AttributeManager::AttributeManager() = default;
@@ -517,6 +523,11 @@ namespace geode
         const AttributeProperties &new_properties )
     {
         impl_->set_attribute_properties( attribute_name, new_properties );
+    }
+
+    absl::Mutex &AttributeManager::mutex() const
+    {
+        return impl_->mutex();
     }
 
     template < typename Archive >

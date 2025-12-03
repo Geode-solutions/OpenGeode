@@ -345,13 +345,6 @@ namespace geode
             return edges_.get() != nullptr;
         }
 
-        // void enable_edges( const SurfaceMesh< dimension >& surface ) const
-        // {
-        //     if( !are_edges_enabled() )
-        //     {
-        //         edges_.reset( new SurfaceEdges< dimension >{ surface } );
-        //     }
-        // }
         void enable_edges( const SurfaceMesh< dimension >& surface ) const
         {
             static absl::Mutex mutex;
