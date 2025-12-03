@@ -163,6 +163,7 @@ namespace geode
 
         void delete_attribute( std::string_view name )
         {
+            absl::MutexLock lock{ &mutex_ };
             const auto attribute_it = attributes_.find( name );
             if( attribute_it != attributes_.end() )
             {
