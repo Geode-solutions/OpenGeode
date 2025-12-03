@@ -679,6 +679,8 @@ namespace geode
                 const std::optional< PolyhedronVertex >& first_polyhedron )
                 const
         {
+            static absl::Mutex mutex;
+            absl::MutexLock lock{ &mutex };
             const auto& cached = polyhedra_around_vertex_->value( vertex_id );
             const auto& polyhedra = cached.value().polyhedra;
             if( !cached.computed()
