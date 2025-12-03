@@ -504,16 +504,23 @@ namespace geode
                 const index_t vertex_id,
                 const std::optional< PolygonVertex >& first_polygon ) const
         {
-            const auto& cached = polygons_around_vertex_->value( vertex_id );
-            const auto& polygons = cached.value().polygons;
-            if( !cached.computed()
-                || ( first_polygon
-                     && absl::c_find( polygons, first_polygon.value() )
-                            == polygons.end() ) )
             {
-                cached( compute_polygons_around_vertex, mesh, vertex_id,
-                    first_polygon );
+                absl::ReaderMutexLock lock{ &mutex_ };
+                const auto& cached =
+                    polygons_around_vertex_->value( vertex_id );
+                const auto& polygons = cached.value().polygons;
+                if( cached.computed()
+                    && ( first_polygon
+                         && absl::c_contains(
+                             polygons, first_polygon.value() ) ) )
+                {
+                    return cached.value();
+                }
             }
+            absl::MutexLock lock{ &mutex_ };
+            const auto& cached = polygons_around_vertex_->value( vertex_id );
+            cached( compute_polygons_around_vertex, mesh, vertex_id,
+                first_polygon );
             return cached.value();
         }
 
@@ -525,6 +532,7 @@ namespace geode
             polygons_around_vertex_;
         mutable std::unique_ptr< SurfaceEdges< dimension > > edges_;
         mutable TextureStorage2D texture_storage_;
+        mutable absl::Mutex mutex_;
     };
 
     template < index_t dimension >
