@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <stack>
 
+#include <absl/synchronization/mutex.h>
+
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute.hpp>
@@ -343,12 +345,25 @@ namespace geode
             return edges_.get() != nullptr;
         }
 
+        // void enable_edges( const SurfaceMesh< dimension >& surface ) const
+        // {
+        //     if( !are_edges_enabled() )
+        //     {
+        //         edges_.reset( new SurfaceEdges< dimension >{ surface } );
+        //     }
+        // }
         void enable_edges( const SurfaceMesh< dimension >& surface ) const
         {
-            if( !are_edges_enabled() )
+            static absl::Mutex mutex;
             {
-                edges_.reset( new SurfaceEdges< dimension >{ surface } );
+                absl::ReaderMutexLock lock{ &mutex };
+                if( are_edges_enabled() )
+                {
+                    return;
+                }
             }
+            absl::MutexLock lock{ &mutex };
+            edges_.reset( new SurfaceEdges< dimension >{ surface } );
         }
 
         void copy_edges( const SurfaceMesh< dimension >& surface ) const

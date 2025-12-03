@@ -28,6 +28,7 @@
 
 #include <absl/container/flat_hash_set.h>
 #include <absl/hash/hash.h>
+#include <absl/synchronization/mutex.h>
 
 #include <bitsery/brief_syntax/array.h>
 
@@ -567,12 +568,25 @@ namespace geode
             return edges_.get() != nullptr;
         }
 
+        // void enable_edges( const SolidMesh< dimension >& solid ) const
+        // {
+        //     if( !are_edges_enabled() )
+        //     {
+        //         edges_.reset( new SolidEdges< dimension >{ solid } );
+        //     }
+        // }
         void enable_edges( const SolidMesh< dimension >& solid ) const
         {
-            if( !are_edges_enabled() )
+            static absl::Mutex mutex;
             {
-                edges_.reset( new SolidEdges< dimension >{ solid } );
+                absl::ReaderMutexLock lock{ &mutex };
+                if( are_edges_enabled() )
+                {
+                    return;
+                }
             }
+            absl::MutexLock lock{ &mutex };
+            edges_.reset( new SolidEdges< dimension >{ solid } );
         }
 
         void copy_edges( const SolidMesh< dimension >& solid )
