@@ -52,7 +52,7 @@ void test_ray_inside()
     const geode::Vector3D direction{ { 0, 0, 1 } };
     const geode::Point3D origin{ { 0, 0, 0 } };
     const geode::Ray3D ray{ direction, origin };
-    geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+    geode::RayTracing3D tracing{ *mesh, ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
     OPENGEODE_EXCEPTION( result, "[Test] Ray inside no result" );
@@ -79,7 +79,7 @@ void test_ray_edge()
     const geode::Vector3D direction{ { 1, 0, 0 } };
     const geode::Point3D origin{ { 0, 0, 1 } };
     const geode::Ray3D ray{ direction, origin };
-    geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+    geode::RayTracing3D tracing{ *mesh, ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
     OPENGEODE_EXCEPTION( result, "[Test] Ray edge no result" );
@@ -104,7 +104,7 @@ void test_ray_parallel()
     const geode::Vector3D direction{ { -1, 0, 0 } };
     const geode::Point3D origin{ { 0, 0, 0 } };
     const geode::Ray3D ray{ direction, origin };
-    geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+    geode::RayTracing3D tracing{ *mesh, ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
     OPENGEODE_EXCEPTION( result, "[Test] Ray edge no result" );

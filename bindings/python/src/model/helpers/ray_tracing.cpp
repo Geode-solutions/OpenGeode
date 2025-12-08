@@ -32,11 +32,7 @@ namespace geode
 {
     void define_model_ray_tracing( pybind11::module& module )
     {
-        pybind11::class_< BRepRayTracing >( module, "BRepRayTracing" )
-            .def( pybind11::init< const BRep& >() )
-            .def( "is_point_inside_block",
-                &BRepRayTracing::is_point_inside_block )
-            .def( "block_containing_point",
-                &BRepRayTracing::block_containing_point );
+        module.def( "is_point_inside_block", &is_point_inside_block )
+            .def( "block_containing_point", &block_containing_point );
     }
 } // namespace geode
