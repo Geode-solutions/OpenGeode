@@ -39,21 +39,23 @@
 
 namespace
 {
-    template < typename Mesh, typename Line >
-    geode::Point< Mesh::dim > begin( const Mesh& mesh, const Line& line )
+    template < geode::index_t dimension, typename Line >
+    geode::Point< dimension > begin(
+        const geode::BoundingBox< dimension >& bbox, const Line& line )
     {
-        auto bbox = mesh.bounding_box();
-        bbox.add_point( line.origin() );
-        const auto diagonal = bbox.diagonal();
+        auto bbox_with_line = bbox;
+        bbox_with_line.add_point( line.origin() );
+        const auto diagonal = bbox_with_line.diagonal();
         return line.origin() - line.direction() * diagonal.length();
     }
 
-    template < typename Mesh, typename Line >
-    geode::Point< Mesh::dim > end( const Mesh& mesh, const Line& line )
+    template < geode::index_t dimension, typename Line >
+    geode::Point< dimension > end(
+        const geode::BoundingBox< dimension >& bbox, const Line& line )
     {
-        auto bbox = mesh.bounding_box();
-        bbox.add_point( line.origin() );
-        const auto diagonal = bbox.diagonal();
+        auto bbox_with_line = bbox;
+        bbox_with_line.add_point( line.origin() );
+        const auto diagonal = bbox_with_line.diagonal();
         return line.origin() + line.direction() * diagonal.length();
     }
 
@@ -231,7 +233,26 @@ namespace geode
         Impl( const EdgedCurve2D& mesh, const Ray2D& ray )
             : mesh_( mesh ),
               origin_( ray.origin() ),
-              segment_{ ray.origin(), end( mesh, ray ) }
+              segment_{ ray.origin(), end( mesh.bounding_box(), ray ) }
+        {
+        }
+
+        Impl( const EdgedCurve2D& mesh,
+            const BoundingBox2D& bbox,
+            const Ray2D& ray )
+            : mesh_( mesh ),
+              origin_( ray.origin() ),
+              segment_{ ray.origin(), end( bbox, ray ) }
+        {
+        }
+
+        Impl( const EdgedCurve2D& mesh,
+            const BoundingBox2D& bbox,
+            const InfiniteLine2D& infinite_line )
+            : mesh_( mesh ),
+              origin_( infinite_line.origin() ),
+              segment_{ begin( bbox, infinite_line ),
+                  end( bbox, infinite_line ) }
         {
         }
 
@@ -245,8 +266,8 @@ namespace geode
         Impl( const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line )
             : mesh_( mesh ),
               origin_( infinite_line.origin() ),
-              segment_{ begin( mesh, infinite_line ),
-                  end( mesh, infinite_line ) }
+              segment_{ begin( mesh.bounding_box(), infinite_line ),
+                  end( mesh.bounding_box(), infinite_line ) }
         {
         }
 
@@ -346,6 +367,19 @@ namespace geode
     {
     }
 
+    RayTracing2D::RayTracing2D(
+        const EdgedCurve2D& mesh, const BoundingBox2D& bbox, const Ray2D& ray )
+        : impl_{ mesh, bbox, ray }
+    {
+    }
+
+    RayTracing2D::RayTracing2D( const EdgedCurve2D& mesh,
+        const BoundingBox2D& bbox,
+        const InfiniteLine2D& infinite_line )
+        : impl_{ mesh, bbox, infinite_line }
+    {
+    }
+
     RayTracing2D::RayTracing2D( const EdgedCurve2D& mesh,
         const Point2D& origin,
         const OwnerSegment2D& segment )
@@ -392,15 +426,34 @@ namespace geode
         Impl( const SurfaceMesh3D& mesh, const Ray3D& ray )
             : mesh_( mesh ),
               origin_( ray.origin() ),
-              segment_{ ray.origin(), end( mesh, ray ) }
+              segment_{ ray.origin(), end( mesh.bounding_box(), ray ) }
         {
         }
 
         Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
             : mesh_( mesh ),
               origin_( infinite_line.origin() ),
-              segment_{ begin( mesh, infinite_line ),
-                  end( mesh, infinite_line ) }
+              segment_{ begin( mesh.bounding_box(), infinite_line ),
+                  end( mesh.bounding_box(), infinite_line ) }
+        {
+        }
+
+        Impl( const SurfaceMesh3D& mesh,
+            const BoundingBox3D& bbox,
+            const Ray3D& ray )
+            : mesh_( mesh ),
+              origin_( ray.origin() ),
+              segment_{ ray.origin(), end( bbox, ray ) }
+        {
+        }
+
+        Impl( const SurfaceMesh3D& mesh,
+            const BoundingBox3D& bbox,
+            const InfiniteLine3D& infinite_line )
+            : mesh_( mesh ),
+              origin_( infinite_line.origin() ),
+              segment_{ begin( bbox, infinite_line ),
+                  end( bbox, infinite_line ) }
         {
         }
 
@@ -550,6 +603,19 @@ namespace geode
     RayTracing3D::RayTracing3D(
         const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
         : impl_{ mesh, infinite_line }
+    {
+    }
+
+    RayTracing3D::RayTracing3D(
+        const SurfaceMesh3D& mesh, const BoundingBox3D& bbox, const Ray3D& ray )
+        : impl_{ mesh, bbox, ray }
+    {
+    }
+
+    RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh,
+        const BoundingBox3D& bbox,
+        const InfiniteLine3D& infinite_line )
+        : impl_{ mesh, bbox, infinite_line }
     {
     }
 
