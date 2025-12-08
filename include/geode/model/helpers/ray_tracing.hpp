@@ -25,6 +25,8 @@
 
 #include <absl/container/flat_hash_map.h>
 
+#include <geode/basic/pimpl.hpp>
+
 #include <geode/mesh/helpers/ray_tracing.hpp>
 
 #include <geode/model/common.hpp>
@@ -42,28 +44,45 @@ namespace geode
 
 namespace geode
 {
-    using BoundarySurfaceIntersections = absl::flat_hash_map< uuid,
-        std::vector< RayTracing3D::PolygonDistance > >;
+    class SectionRayTracing
+    {
+    public:
+        SectionRayTracing( const Section& section );
+        ~SectionRayTracing();
 
-    [[nodiscard]] BoundarySurfaceIntersections opengeode_model_api
-        find_intersections_with_boundaries( const InfiniteLine3D& infinite_line,
-            const BRep& brep,
-            const Block3D& block );
+        bool opengeode_model_api is_point_inside_surface(
+            const Point2D& point, const Surface2D& surface );
 
-    [[nodiscard]] bool opengeode_model_api is_point_inside_block(
-        const BRep& brep, const Block3D& block, const Point3D& point );
+        [[nodiscard]] std::optional< uuid > opengeode_model_api
+            surface_containing_point( const Point2D& point );
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
+
+    class BRepRayTracing
+    {
+    public:
+        using BoundarySurfaceIntersections = absl::flat_hash_map< uuid,
+            std::vector< RayTracing3D::PolygonDistance > >;
+
+        BRepRayTracing( const BRep& brep );
+        ~BRepRayTracing();
+
+        [[nodiscard]] BoundarySurfaceIntersections opengeode_model_api
+            find_intersections_with_boundaries(
+                const InfiniteLine3D& infinite_line, const Block3D& block );
+
+        [[nodiscard]] bool opengeode_model_api is_point_inside_block(
+            const Point3D& point, const Block3D& block );
+
+        [[nodiscard]] std::optional< uuid >
+            opengeode_model_api block_containing_point( const Point3D& point );
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
 
     [[nodiscard]] bool opengeode_model_api is_point_inside_closed_surface(
-        const SurfaceMesh3D& surface, const Point3D& point );
-
-    [[nodiscard]] std::optional< uuid > opengeode_model_api
-        block_containing_point( const BRep& brep, const Point3D& point );
-
-    bool opengeode_model_api is_point_inside_surface( const Section& section,
-        const Surface2D& surface,
-        const Point2D& point );
-
-    [[nodiscard]] std::optional< uuid >
-        opengeode_model_api surface_containing_point(
-            const Section& section, const Point2D& point );
+        const Point3D& point, const SurfaceMesh3D& surface );
 } // namespace geode
