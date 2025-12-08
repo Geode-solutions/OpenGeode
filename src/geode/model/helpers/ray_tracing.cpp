@@ -319,10 +319,14 @@ namespace geode
         return impl_->block_containing_point( point );
     }
 
-    bool is_point_inside_closed_surface(
-        const Point3D& point, const SurfaceMesh3D& surface )
+    bool is_point_inside_closed_surface( const Point3D& point,
+        const SurfaceMesh3D& surface,
+        const AABBTree3D& surface_aabb )
     {
-        const auto& surface_aabb = create_aabb_tree( surface );
+        if( !surface_aabb.bounding_box().contains( point ) )
+        {
+            return false;
+        }
         for( const auto& direction : directions_3D )
         {
             const Ray3D ray{ direction, point };
