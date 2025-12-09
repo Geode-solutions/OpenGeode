@@ -38,8 +38,10 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_2D( EdgedCurve );
     ALIAS_3D( SurfaceMesh );
+    ALIAS_2D_AND_3D( BoundingBox );
 } // namespace geode
 
 namespace geode
@@ -74,9 +76,16 @@ namespace geode
         };
 
     public:
-        RayTracing2D( const EdgedCurve2D& mesh, const Ray2D& ray );
-        RayTracing2D(
+        [[deprecated]] RayTracing2D(
+            const EdgedCurve2D& mesh, const Ray2D& ray );
+        [[deprecated]] RayTracing2D(
             const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line );
+        RayTracing2D( const EdgedCurve2D& mesh,
+            const BoundingBox2D& bbox,
+            const Ray2D& ray );
+        RayTracing2D( const EdgedCurve2D& mesh,
+            const BoundingBox2D& bbox,
+            const InfiniteLine2D& infinite_line );
         RayTracing2D( const EdgedCurve2D& mesh,
             const Point2D& origin,
             const OwnerSegment2D& segment );
@@ -126,9 +135,16 @@ namespace geode
         };
 
     public:
-        RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray );
-        RayTracing3D(
+        [[deprecated]] RayTracing3D(
+            const SurfaceMesh3D& mesh, const Ray3D& ray );
+        [[deprecated]] RayTracing3D(
             const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
+        RayTracing3D( const SurfaceMesh3D& mesh,
+            const BoundingBox3D& bbox,
+            const Ray3D& ray );
+        RayTracing3D( const SurfaceMesh3D& mesh,
+            const BoundingBox3D& bbox,
+            const InfiniteLine3D& infinite_line );
         RayTracing3D( const SurfaceMesh3D& mesh,
             const Point3D& origin,
             const OwnerSegment3D& segment );
