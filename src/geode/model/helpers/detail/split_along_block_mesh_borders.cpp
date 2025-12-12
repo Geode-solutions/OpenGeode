@@ -94,7 +94,7 @@ namespace geode
                             const auto [block_id, solid_info] = task.get();
                             const auto& block = model_.block( block_id );
                             duplicate_tasks[duplicate_count++] =
-                                async::spawn( [this, &block, &solid_info] {
+                                async::spawn( [this, &block, solid_info] {
                                     const auto& mesh = block.mesh();
                                     auto builder = builder_.block_mesh_builder(
                                         block.id() );
