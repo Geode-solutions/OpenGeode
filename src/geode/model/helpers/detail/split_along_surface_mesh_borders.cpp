@@ -24,6 +24,7 @@
 #include <geode/model/helpers/detail/split_along_surface_mesh_borders.hpp>
 
 #include <async++.h>
+#include <shared_mutex>
 
 #include <memory>
 
@@ -54,7 +55,8 @@ namespace geode
             using CMVmapping =
                 std::pair< ComponentMeshVertex, ComponentMeshVertex >;
             using CMVmappings = std::vector< CMVmapping >;
-            using Task = async::task< CMVmappings >;
+            using AdjacencyTask = async::task< void >;
+            using DuplicateTask = async::task< CMVmappings >;
             using ModelBuilder = typename Model::Builder;
             static constexpr auto dimension = Model::dim;
             struct SurfaceInfo
@@ -82,27 +84,49 @@ namespace geode
 
             CMVmappings split()
             {
-                absl::FixedArray< Task > tasks( model_.nb_surfaces() );
-                index_t count{ 0 };
+                absl::FixedArray< AdjacencyTask > adjacency_tasks(
+                    model_.nb_surfaces() );
+                index_t adjacency_count{ 0 };
                 for( const auto& surface : model_.surfaces() )
                 {
-                    tasks[count++] = async::spawn( [this, &surface] {
-                        return split_points( surface );
-                    } );
+                    adjacency_tasks[adjacency_count++] =
+                        async::spawn( [this, &surface] {
+                            return remove_adjacencies_along_internal_lines(
+                                surface );
+                        } );
                 }
                 CMVmappings mapping;
-                async::when_all( tasks )
-                    .then( [this, &mapping]( std::vector< Task > all_task ) {
-                        for( auto& task : all_task )
+                async::when_all( adjacency_tasks )
+                    .then( [this, &mapping]() {
+                        absl::FixedArray< DuplicateTask > duplicate_tasks(
+                            model_.nb_surfaces() );
+                        index_t duplicate_count{ 0 };
+                        for( const auto& surface : model_.surfaces() )
                         {
-                            auto cmv_mappings = task.get();
-                            update_unique_vertices( cmv_mappings );
-                            mapping.insert( mapping.end(),
-                                std::make_move_iterator( cmv_mappings.begin() ),
-                                std::make_move_iterator( cmv_mappings.end() ) );
+                            duplicate_tasks[duplicate_count++] =
+                                async::spawn( [this, &surface] {
+                                    return duplicate_points( surface );
+                                } );
                         }
+                        async::when_all( duplicate_tasks )
+                            .then(
+                                [this, &mapping]( std::vector< DuplicateTask >
+                                        all_duplicate_task ) {
+                                    for( auto& task : all_duplicate_task )
+                                    {
+                                        auto cmv_mappings = task.get();
+                                        update_unique_vertices( cmv_mappings );
+                                        mapping.insert( mapping.end(),
+                                            std::make_move_iterator(
+                                                cmv_mappings.begin() ),
+                                            std::make_move_iterator(
+                                                cmv_mappings.end() ) );
+                                    }
+                                } )
+                            .get();
                     } )
                     .get();
+                DEBUG( "end of split" );
                 return mapping;
             }
 
@@ -125,11 +149,25 @@ namespace geode
                 }
             }
 
+            void remove_adjacencies_along_internal_lines(
+                const Surface< dimension >& surface )
+            {
+                auto builder = builder_.surface_mesh_builder( surface.id() );
+                remove_adjacencies_along_internal_lines( surface, *builder );
+            }
+
+            CMVmappings duplicate_points( const Surface< dimension >& surface )
+            {
+                auto builder = builder_.surface_mesh_builder( surface.id() );
+                return duplicate_points( surface, *builder );
+            }
+
             CMVmappings split_points( const Surface< dimension >& surface )
             {
                 auto builder = builder_.surface_mesh_builder( surface.id() );
                 remove_adjacencies_along_internal_lines( surface, *builder );
-                return duplicate_points( surface, *builder );
+                const auto result = duplicate_points( surface, *builder );
+                return result;
             }
 
             CMVmappings duplicate_points( const Surface< dimension >& surface,
@@ -288,9 +326,8 @@ namespace geode
         }
 
         template < typename Model >
-        SplitAlongSurfaceMeshBorders< Model >::~SplitAlongSurfaceMeshBorders()
-        {
-        }
+        SplitAlongSurfaceMeshBorders< Model >::~SplitAlongSurfaceMeshBorders() =
+            default;
 
         template < typename Model >
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
