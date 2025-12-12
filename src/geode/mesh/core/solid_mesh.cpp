@@ -673,24 +673,14 @@ namespace geode
                 const std::optional< PolyhedronVertex >& first_polyhedron )
                 const
         {
-            {
-                const auto& cached =
-                    polyhedra_around_vertex_->value( vertex_id );
-                const auto& polyhedra = cached.value().polyhedra;
-                if( cached.computed() )
-                {
-                    return cached.value();
-                }
-                if( first_polyhedron )
-                {
-                    OPENGEODE_EXCEPTION(
-                        absl::c_contains( polyhedra, first_polyhedron.value() ),
-                        "[SolidMesh::updated_polyhedra_around_vertex] First "
-                        "polyhedron is not contained in polyhedra around "
-                        "vertex." );
-                }
-            }
             const auto& cached = polyhedra_around_vertex_->value( vertex_id );
+            if( cached.computed()
+                && ( first_polyhedron
+                     && absl::c_contains( cached.value().polyhedra,
+                         first_polyhedron.value() ) ) )
+            {
+                return cached.value();
+            }
             cached( compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
             return cached.value();
