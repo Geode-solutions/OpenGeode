@@ -677,10 +677,7 @@ namespace geode
                 const auto& cached =
                     polyhedra_around_vertex_->value( vertex_id );
                 const auto& polyhedra = cached.value().polyhedra;
-                if( cached.computed()
-                    && ( first_polyhedron
-                         && absl::c_contains(
-                             polyhedra, first_polyhedron.value() ) ) )
+                if( cached.computed() )
                 {
                     return cached.value();
                 }
