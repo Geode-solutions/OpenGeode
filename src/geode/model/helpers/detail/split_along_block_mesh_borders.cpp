@@ -91,8 +91,9 @@ namespace geode
                         index_t duplicate_count{ 0 };
                         for( auto& task : all_adjacency_tasks )
                         {
-                            const auto [block_id, solid_info] = task.get();
-                            const auto& block = model_.block( block_id );
+                            const auto result = task.get();
+                            const auto& block = model_.block( result.first );
+                            const auto solid_info = result.second;
                             duplicate_tasks[duplicate_count++] =
                                 async::spawn( [this, &block, solid_info] {
                                     const auto& mesh = block.mesh();
