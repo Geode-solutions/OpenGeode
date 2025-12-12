@@ -41,50 +41,12 @@ namespace geode
     {
         class SplitAlongSolidFacets::Impl
         {
-            struct SolidInfo
-            {
-                SolidInfo( index_t nb_vertices )
-                    : polyhedron_vertices( nb_vertices ),
-                      vertices_to_check( nb_vertices, false )
-                {
-                }
-                absl::FixedArray< PolyhedraAroundVertex > polyhedron_vertices;
-                std::vector< bool > vertices_to_check;
-            };
-
         public:
             Impl( const SolidMesh3D& mesh, SolidMeshBuilder3D& builder )
                 : solid_( mesh ), builder_( builder )
             {
             }
 
-            MeshesElementsMapping split_solid_along_facets(
-                absl::Span< const PolyhedronFacet > facets_list )
-            {
-                bool facets_enabled = solid_.are_facets_enabled();
-                bool edges_enabled = solid_.are_edges_enabled();
-                const auto nb_initial_facets =
-                    facets_enabled ? solid_.facets().nb_facets() : 0;
-                const auto nb_initial_edges =
-                    edges_enabled ? solid_.edges().nb_edges() : 0;
-                const auto solid_info =
-                    remove_adjacencies_along_facets( facets_list );
-                MeshesElementsMapping mapping;
-                mapping.vertices = duplicate_points( solid_info );
-                if( facets_enabled )
-                {
-                    mapping.polygons = process_solid_facets(
-                        nb_initial_facets, mapping.vertices );
-                }
-                if( edges_enabled )
-                {
-                    mapping.edges = process_solid_edges(
-                        nb_initial_edges, mapping.vertices );
-                }
-                return mapping;
-            }
-
-        private:
             SolidInfo remove_adjacencies_along_facets(
                 absl::Span< const PolyhedronFacet > facets_list )
             {
@@ -122,6 +84,58 @@ namespace geode
                 return info;
             }
 
+            MeshesElementsMapping
+                duplicate_points_and_process_solid_facets_and_edges(
+                    const SolidInfo& solid_info )
+            {
+                bool facets_enabled = solid_.are_facets_enabled();
+                bool edges_enabled = solid_.are_edges_enabled();
+                const auto nb_initial_facets =
+                    facets_enabled ? solid_.facets().nb_facets() : 0;
+                const auto nb_initial_edges =
+                    edges_enabled ? solid_.edges().nb_edges() : 0;
+                MeshesElementsMapping mapping;
+                mapping.vertices = duplicate_points( solid_info );
+                if( facets_enabled )
+                {
+                    mapping.polygons = process_solid_facets(
+                        nb_initial_facets, mapping.vertices );
+                }
+                if( edges_enabled )
+                {
+                    mapping.edges = process_solid_edges(
+                        nb_initial_edges, mapping.vertices );
+                }
+                return mapping;
+            }
+
+            MeshesElementsMapping split_solid_along_facets(
+                absl::Span< const PolyhedronFacet > facets_list )
+            {
+                const auto solid_info =
+                    remove_adjacencies_along_facets( facets_list );
+                bool facets_enabled = solid_.are_facets_enabled();
+                bool edges_enabled = solid_.are_edges_enabled();
+                const auto nb_initial_facets =
+                    facets_enabled ? solid_.facets().nb_facets() : 0;
+                const auto nb_initial_edges =
+                    edges_enabled ? solid_.edges().nb_edges() : 0;
+                MeshesElementsMapping mapping;
+                mapping.vertices = duplicate_points( solid_info );
+                if( facets_enabled )
+                {
+                    mapping.polygons = process_solid_facets(
+                        nb_initial_facets, mapping.vertices );
+                }
+                if( edges_enabled )
+                {
+                    mapping.edges = process_solid_edges(
+                        nb_initial_edges, mapping.vertices );
+                }
+                return mapping;
+            }
+
+        private:
             ElementsMapping duplicate_points( const SolidInfo& solid_info )
             {
                 ElementsMapping vertices_mapping;
@@ -316,7 +330,21 @@ namespace geode
         {
         }
 
-        SplitAlongSolidFacets::~SplitAlongSolidFacets() {}
+        SplitAlongSolidFacets::~SplitAlongSolidFacets() = default;
+
+        SolidInfo SplitAlongSolidFacets::remove_adjacencies_along_facets(
+            absl::Span< const PolyhedronFacet > facets_list )
+        {
+            return impl_->remove_adjacencies_along_facets( facets_list );
+        }
+
+        MeshesElementsMapping SplitAlongSolidFacets::
+            duplicate_points_and_process_solid_facets_and_edges(
+                const SolidInfo& solid_info )
+        {
+            return impl_->duplicate_points_and_process_solid_facets_and_edges(
+                solid_info );
+        }
 
         MeshesElementsMapping SplitAlongSolidFacets::split_solid_along_facets(
             absl::Span< const PolyhedronFacet > facets_list )

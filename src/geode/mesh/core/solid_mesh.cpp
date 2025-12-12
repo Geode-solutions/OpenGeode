@@ -571,13 +571,11 @@ namespace geode
         void enable_edges( const SolidMesh< dimension >& solid ) const
         {
             {
-                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_edges_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex_ };
             edges_.reset( new SolidEdges< dimension >{ solid } );
         }
 
@@ -620,13 +618,11 @@ namespace geode
         void enable_facets( const SolidMesh< dimension >& solid ) const
         {
             {
-                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_facets_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex_ };
             facets_.reset( new SolidFacets< dimension >{ solid } );
         }
 
@@ -678,7 +674,6 @@ namespace geode
                 const
         {
             {
-                absl::ReaderMutexLock lock{ &mutex_ };
                 const auto& cached =
                     polyhedra_around_vertex_->value( vertex_id );
                 const auto& polyhedra = cached.value().polyhedra;
@@ -689,8 +684,15 @@ namespace geode
                 {
                     return cached.value();
                 }
+                if( first_polyhedron )
+                {
+                    OPENGEODE_EXCEPTION(
+                        absl::c_contains( polyhedra, first_polyhedron.value() ),
+                        "[SolidMesh::updated_polyhedra_around_vertex] First "
+                        "polyhedron is not contained in polyhedra around "
+                        "vertex." );
+                }
             }
-            absl::MutexLock lock{ &mutex_ };
             const auto& cached = polyhedra_around_vertex_->value( vertex_id );
             cached( compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
@@ -804,7 +806,6 @@ namespace geode
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
         mutable TextureStorage3D texture_storage_;
-        mutable absl::Mutex mutex_;
     };
 
     template < index_t dimension >

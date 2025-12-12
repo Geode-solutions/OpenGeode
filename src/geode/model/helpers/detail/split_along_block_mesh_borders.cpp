@@ -59,41 +59,76 @@ namespace geode
 
             CMVmappings split()
             {
-                using Task =
+                using AdjacencyTask =
+                    async::task< std::pair< uuid, SolidInfo > >;
+                using DuplicateTask =
                     async::task< std::pair< uuid, MeshesElementsMapping > >;
-                absl::FixedArray< Task > tasks( model_.nb_blocks() );
-                index_t count{ 0 };
+                absl::FixedArray< AdjacencyTask > adjacency_tasks(
+                    model_.nb_blocks() );
+                index_t adjacency_count{ 0 };
                 for( const auto& block : model_.blocks() )
                 {
-                    tasks[count++] = async::spawn( [this, &block] {
-                        const auto& mesh = block.mesh();
-                        auto builder =
-                            builder_.block_mesh_builder( block.id() );
-                        const auto facets_list = mesh_border_facets( block );
-                        SplitAlongSolidFacets block_splitter{ mesh, *builder };
-                        return std::make_pair(
-                            block.id(), block_splitter.split_solid_along_facets(
-                                            facets_list ) );
-                    } );
+                    adjacency_tasks[adjacency_count++] =
+                        async::spawn( [this, &block] {
+                            const auto& mesh = block.mesh();
+                            auto builder =
+                                builder_.block_mesh_builder( block.id() );
+                            const auto facets_list =
+                                mesh_border_facets( block );
+                            SplitAlongSolidFacets block_splitter{ mesh,
+                                *builder };
+                            return std::pair{ block.id(),
+                                block_splitter.remove_adjacencies_along_facets(
+                                    facets_list ) };
+                        } );
                 }
                 CMVmappings mapping;
-                async::when_all( tasks )
-                    .then( [this, &mapping]( std::vector< Task > all_task ) {
-                        for( auto& task : all_task )
+                async::when_all( adjacency_tasks )
+                    .then( [this, &mapping]( std::vector< AdjacencyTask >
+                                   all_adjacency_tasks ) {
+                        absl::FixedArray< DuplicateTask > duplicate_tasks(
+                            model_.nb_blocks() );
+                        index_t duplicate_count{ 0 };
+                        for( auto& task : all_adjacency_tasks )
                         {
-                            const auto result = task.get();
-                            auto cmv_mapping = update_unique_vertices(
-                                model_.block( result.first ),
-                                result.second.vertices );
-                            if( !cmv_mapping.empty() )
-                            {
-                                mapping.insert( mapping.end(),
-                                    std::make_move_iterator(
-                                        cmv_mapping.begin() ),
-                                    std::make_move_iterator(
-                                        cmv_mapping.end() ) );
-                            }
+                            const auto [block_id, solid_info] = task.get();
+                            const auto& block = model_.block( block_id );
+                            duplicate_tasks[duplicate_count++] =
+                                async::spawn( [this, &block, &solid_info] {
+                                    const auto& mesh = block.mesh();
+                                    auto builder = builder_.block_mesh_builder(
+                                        block.id() );
+                                    const auto facets_list =
+                                        mesh_border_facets( block );
+                                    SplitAlongSolidFacets block_splitter{ mesh,
+                                        *builder };
+                                    return std::make_pair( block.id(),
+                                        block_splitter
+                                            .duplicate_points_and_process_solid_facets_and_edges(
+                                                solid_info ) );
+                                } );
                         }
+                        async::when_all( duplicate_tasks )
+                            .then( [this, &mapping](
+                                       std::vector< DuplicateTask >
+                                           all_duplicate_task ) {
+                                for( auto& task : all_duplicate_task )
+                                {
+                                    const auto result = task.get();
+                                    auto cmv_mapping = update_unique_vertices(
+                                        model_.block( result.first ),
+                                        result.second.vertices );
+                                    if( !cmv_mapping.empty() )
+                                    {
+                                        mapping.insert( mapping.end(),
+                                            std::make_move_iterator(
+                                                cmv_mapping.begin() ),
+                                            std::make_move_iterator(
+                                                cmv_mapping.end() ) );
+                                    }
+                                }
+                            } )
+                            .get();
                     } )
                     .get();
                 return mapping;
