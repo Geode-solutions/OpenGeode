@@ -571,13 +571,11 @@ namespace geode
         void enable_edges( const SolidMesh< dimension >& solid ) const
         {
             {
-                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_edges_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex_ };
             edges_.reset( new SolidEdges< dimension >{ solid } );
         }
 
@@ -620,13 +618,11 @@ namespace geode
         void enable_facets( const SolidMesh< dimension >& solid ) const
         {
             {
-                absl::ReaderMutexLock lock{ &mutex_ };
                 if( are_facets_enabled() )
                 {
                     return;
                 }
             }
-            absl::MutexLock lock{ &mutex_ };
             facets_.reset( new SolidFacets< dimension >{ solid } );
         }
 
@@ -677,21 +673,14 @@ namespace geode
                 const std::optional< PolyhedronVertex >& first_polyhedron )
                 const
         {
-            {
-                absl::ReaderMutexLock lock{ &mutex_ };
-                const auto& cached =
-                    polyhedra_around_vertex_->value( vertex_id );
-                const auto& polyhedra = cached.value().polyhedra;
-                if( cached.computed()
-                    && ( first_polyhedron
-                         && absl::c_contains(
-                             polyhedra, first_polyhedron.value() ) ) )
-                {
-                    return cached.value();
-                }
-            }
-            absl::MutexLock lock{ &mutex_ };
             const auto& cached = polyhedra_around_vertex_->value( vertex_id );
+            if( cached.computed()
+                && ( first_polyhedron
+                     && absl::c_contains( cached.value().polyhedra,
+                         first_polyhedron.value() ) ) )
+            {
+                return cached.value();
+            }
             cached( compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
             return cached.value();
@@ -804,7 +793,6 @@ namespace geode
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
         mutable TextureStorage3D texture_storage_;
-        mutable absl::Mutex mutex_;
     };
 
     template < index_t dimension >

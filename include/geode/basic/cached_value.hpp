@@ -23,9 +23,12 @@
 
 #pragma once
 
+#include <atomic>
 #include <type_traits>
 
 #include <bitsery/brief_syntax.h>
+
+#include <absl/synchronization/mutex.h>
 
 #include <geode/basic/growable.hpp>
 
@@ -39,14 +42,44 @@ namespace geode
         using CachedFunction =
             typename std::add_pointer< ReturnType( Args... ) >::type;
 
+        CachedValue() = default;
+        CachedValue( const CachedValue& other )
+        {
+            value_ = other.value_;
+            computed_ = other.computed_.load();
+        }
+        CachedValue( CachedValue&& other ) noexcept
+        {
+            value_ = std::move( other.value_ );
+            computed_ = other.computed_.load();
+        }
+
+        CachedValue& operator=( const CachedValue& other )
+        {
+            value_ = other.value_;
+            computed_ = other.computed_.load();
+            return *this;
+        }
+
+        CachedValue& operator=( CachedValue&& other ) noexcept
+        {
+            value_ = std::move( other.value_ );
+            computed_ = other.computed_.load();
+            return *this;
+        }
+
         template < typename... Args >
         const ReturnType& operator()(
             CachedFunction< Args... > computer, Args&&... args ) const
         {
             if( !computed_ )
             {
-                value_ = computer( std::forward< Args >( args )... );
-                computed_ = true;
+                absl::MutexLock lock{ &mutex_ };
+                if( !computed_ )
+                {
+                    value_ = computer( std::forward< Args >( args )... );
+                    computed_ = true;
+                }
             }
             return value_;
         }
@@ -83,7 +116,9 @@ namespace geode
             archive.ext(
                 *this, Growable< Archive, CachedValue >{
                            { []( Archive& a, CachedValue& value ) {
-                                a.value1b( value.computed_ );
+                                bool computed;
+                                a.value1b( computed );
+                                value.computed_ = computed;
                                 a( value.value_ );
                             },
                                []( Archive& /*a*/, CachedValue& /*value*/ ) {
@@ -92,7 +127,8 @@ namespace geode
         }
 
     private:
-        mutable bool computed_{ false };
+        mutable std::atomic< bool > computed_{ false };
         mutable ReturnType value_;
+        mutable absl::Mutex mutex_;
     };
 } // namespace geode

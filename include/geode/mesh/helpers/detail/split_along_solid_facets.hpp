@@ -41,6 +41,17 @@ namespace geode
 {
     namespace detail
     {
+        struct SolidInfo
+        {
+            SolidInfo( index_t nb_vertices )
+                : polyhedron_vertices( nb_vertices ),
+                  vertices_to_check( nb_vertices, false )
+            {
+            }
+            absl::FixedArray< PolyhedraAroundVertex > polyhedron_vertices;
+            std::vector< bool > vertices_to_check;
+        };
+
         class opengeode_mesh_api SplitAlongSolidFacets
         {
         public:
@@ -54,6 +65,13 @@ namespace geode
              */
             MeshesElementsMapping split_solid_along_facets(
                 absl::Span< const PolyhedronFacet > facets_list );
+
+            SolidInfo remove_adjacencies_along_facets(
+                absl::Span< const PolyhedronFacet > facets_list );
+
+            MeshesElementsMapping
+                duplicate_points_and_process_solid_facets_and_edges(
+                    const SolidInfo& solid_info );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
