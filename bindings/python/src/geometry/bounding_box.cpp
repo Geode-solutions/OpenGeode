@@ -28,48 +28,47 @@
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
-#define PYTHON_BOUNDING_BOX( dimension )                                                                  \
-    const auto name##dimension =                                                                          \
-        "BoundingBox" + std::to_string( dimension ) + "D";                                                \
-    pybind11::class_< BoundingBox##dimension##D >(                                                        \
-        module, name##dimension.c_str() )                                                                 \
-        .def( pybind11::init<>() )                                                                        \
-        .def( "add_box", &BoundingBox##dimension##D::add_box )                                            \
-        .def( "add_point", &BoundingBox##dimension##D::add_point )                                        \
-        .def( "extends", &BoundingBox##dimension##D::extends )                                            \
-        .def( "contains_point",                                                                           \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                                           \
-                const Point< dimension >& ) const >(                                                      \
-                &BoundingBox##dimension##D::contains ) )                                                  \
-        .def( "contains_bbox",                                                                            \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                                           \
-                const BoundingBox< dimension >& ) const >(                                                \
-                &BoundingBox##dimension##D::contains ) )                                                  \
-        .def( "intersects_bbox",                                                                          \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                                           \
-                const BoundingBox< dimension >& ) const >(                                                \
-                &BoundingBox##dimension##D::intersects ) )                                                \
-        .def( "intersects_ray",                                                                           \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                                           \
-                const Ray< dimension >& ) const >(                                                        \
-                &BoundingBox##dimension##D::intersects ) )                                                \
-        .def( "intersects_infiniteline",                                                                  \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                                           \
-                const InfiniteLine< dimension >& ) const >(                                               \
-                &BoundingBox##dimension##D::intersects ) )                                       \       
-          \
-        .def( "intersects_segment",                                                                       \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                                           \
-                const Segment< dimension >& ) const >(                                                    \
-                &BoundingBox##dimension##D::intersects ) )                                       \       
-        .def( "signed_distance", &BoundingBox##dimension##D::signed_distance )                            \
-        .def( "min", &BoundingBox##dimension##D::min )                                                    \
-        .def( "max", &BoundingBox##dimension##D::max )                                                    \
-        .def( "center", &BoundingBox##dimension##D::center )                                              \
-        .def( "diagonal", &BoundingBox##dimension##D::diagonal )                                          \
-        .def( "smallest_length", &BoundingBox##dimension##D::smallest_length )                            \
-        .def( "largest_length", &BoundingBox##dimension##D::largest_length )                              \
-        .def( "n_volume", &BoundingBox##dimension##D::n_volume )                                          \
+#define PYTHON_BOUNDING_BOX( dimension )                                       \
+    const auto name##dimension =                                               \
+        "BoundingBox" + std::to_string( dimension ) + "D";                     \
+    pybind11::class_< BoundingBox##dimension##D >(                             \
+        module, name##dimension.c_str() )                                      \
+        .def( pybind11::init<>() )                                             \
+        .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
+        .def( "add_point", &BoundingBox##dimension##D::add_point )             \
+        .def( "extends", &BoundingBox##dimension##D::extends )                 \
+        .def( "contains_point",                                                \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const Point< dimension >& ) const >(                           \
+                &BoundingBox##dimension##D::contains ) )                       \
+        .def( "contains_bbox",                                                 \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const BoundingBox< dimension >& ) const >(                     \
+                &BoundingBox##dimension##D::contains ) )                       \
+        .def( "intersects_bounding_box",                                       \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const BoundingBox< dimension >& ) const >(                     \
+                &BoundingBox##dimension##D::intersects ) )                     \
+        .def( "intersects_ray",                                                \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const Ray< dimension >& ) const >(                             \
+                &BoundingBox##dimension##D::intersects ) )                     \
+        .def( "intersects_infinite_line",                                      \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const InfiniteLine< dimension >& ) const >(                    \
+                &BoundingBox##dimension##D::intersects ) )                     \
+        .def( "intersects_segment",                                            \
+            static_cast< bool ( BoundingBox##dimension##D::* )(                \
+                const Segment< dimension >& ) const >(                         \
+                &BoundingBox##dimension##D::intersects ) )                     \
+        .def( "signed_distance", &BoundingBox##dimension##D::signed_distance ) \
+        .def( "min", &BoundingBox##dimension##D::min )                         \
+        .def( "max", &BoundingBox##dimension##D::max )                         \
+        .def( "center", &BoundingBox##dimension##D::center )                   \
+        .def( "diagonal", &BoundingBox##dimension##D::diagonal )               \
+        .def( "smallest_length", &BoundingBox##dimension##D::smallest_length ) \
+        .def( "largest_length", &BoundingBox##dimension##D::largest_length )   \
+        .def( "n_volume", &BoundingBox##dimension##D::n_volume )               \
         .def( "string", &BoundingBox##dimension##D::string )
 
 namespace geode
