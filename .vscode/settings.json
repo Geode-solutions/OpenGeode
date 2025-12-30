@@ -2,7 +2,7 @@
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include",
-        "${workspaceFolder}/build/opengeode",
+        "${workspaceFolder}/build/opengeode/include",
         "${workspaceFolder}/build/third_party/abseil/install/include",
         "${workspaceFolder}/build/third_party/asyncplusplus/install/include",
         "${workspaceFolder}/build/third_party/earcut/install/include",

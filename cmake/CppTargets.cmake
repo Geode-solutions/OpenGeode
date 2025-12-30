@@ -68,7 +68,7 @@ function(add_geode_library)
     set(VERSION_RC_FILE_IN ${PROJECT_SOURCE_DIR}/cmake/version.rc.in)
     if(EXISTS ${VERSION_RC_FILE_IN})
         message(STATUS "Configuring ${GEODE_LIB_NAME} version.rc")
-        set(VERSION_RC_FILE ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/version.rc)
+        set(VERSION_RC_FILE ${PROJECT_BINARY_DIR}/include/${GEODE_LIB_FOLDER}/version.rc)
         configure_file(
             ${VERSION_RC_FILE_IN}
             ${VERSION_RC_FILE}
@@ -121,7 +121,7 @@ function(add_geode_library)
     target_include_directories(${GEODE_LIB_NAME}
         PUBLIC
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
     target_link_libraries(${GEODE_LIB_NAME}
@@ -129,12 +129,13 @@ function(add_geode_library)
         PRIVATE ${GEODE_LIB_PRIVATE_DEPENDENCIES}
     )
     _export_library(${GEODE_LIB_NAME})
+    set(EXPORTED_HEADER ${PROJECT_BINARY_DIR}/include/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.hpp)
     generate_export_header(${GEODE_LIB_NAME}
         BASE_NAME ${project_name}_${GEODE_LIB_NAME}
         EXPORT_MACRO_NAME ${project_name}_${GEODE_LIB_NAME}_api
-        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.hpp
+        EXPORT_FILE_NAME ${EXPORTED_HEADER}
     )
-    install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.hpp
+    install(FILES ${EXPORTED_HEADER}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
         COMPONENT public
     )
