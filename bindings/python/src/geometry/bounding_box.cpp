@@ -24,6 +24,7 @@
 #include "../common.hpp"
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
+#include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
@@ -35,6 +36,7 @@
         .def( pybind11::init<>() )                                             \
         .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
         .def( "add_point", &BoundingBox##dimension##D::add_point )             \
+        .def( "extends", &BoundingBox##dimension##D::extends )                 \
         .def( "contains_point",                                                \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const Point< dimension >& ) const >(                           \
@@ -43,16 +45,19 @@
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
                 &BoundingBox##dimension##D::contains ) )                       \
-        .def( "intersects_bbox",                                               \
+        .def( "intersects_bounding_box",                                       \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
                 &BoundingBox##dimension##D::intersects ) )                     \
+        .def( "signed_distance", &BoundingBox##dimension##D::signed_distance ) \
         .def( "min", &BoundingBox##dimension##D::min )                         \
         .def( "max", &BoundingBox##dimension##D::max )                         \
         .def( "center", &BoundingBox##dimension##D::center )                   \
         .def( "diagonal", &BoundingBox##dimension##D::diagonal )               \
         .def( "smallest_length", &BoundingBox##dimension##D::smallest_length ) \
-        .def( "largest_length", &BoundingBox##dimension##D::largest_length )
+        .def( "largest_length", &BoundingBox##dimension##D::largest_length )   \
+        .def( "n_volume", &BoundingBox##dimension##D::n_volume )               \
+        .def( "string", &BoundingBox##dimension##D::string )
 
 namespace geode
 {

@@ -47,3 +47,34 @@ if __name__ == '__main__':
         raise ValueError("[Test] BBox should contain this point")
     if box2.contains_point(geom.Point2D([10, 0])):
         raise ValueError("[Test] BBox should not contain this point")
+
+    # --- 3D Bounding Box and Ray/Line intersections ---
+    bbox3 = geom.BoundingBox3D()
+    bbox3.add_point(geom.Point3D([-1, -1, -1]))
+    bbox3.add_point(geom.Point3D([1, 1, 1]))
+    
+    # Rays
+    ray_inside = geom.Ray3D( geom.Vector3D([0, 0, 1]),geom.Point3D([0, 0, 0]))
+    if not bbox3.intersects_ray(ray_inside):
+        raise ValueError("[Test] Wrong result with ray_inside")
+
+    ray_up = geom.Ray3D( geom.Vector3D([0, 0, 1]),geom.Point3D([0, 0, 2]))
+    if bbox3.intersects_ray(ray_up):
+        raise ValueError("[Test] Wrong result with ray_up")
+
+    ray_down = geom.Ray3D( geom.Vector3D([0, 0, 1]),geom.Point3D([0, 0, -2]))
+    if not bbox3.intersects_ray(ray_down):
+        raise ValueError("[Test] Wrong result with ray_down")
+
+    # Infinite lines
+    line_inside = geom.InfiniteLine3D( geom.Vector3D([0, 0, 1]),geom.Point3D([0, 0, 0]))
+    if not bbox3.intersects_infinite_line(line_inside):
+        raise ValueError("[Test] Wrong result with line_inside")
+
+    line_up = geom.InfiniteLine3D( geom.Vector3D([0, 0, 1]),geom.Point3D([0, 0, 2]))
+    if not bbox3.intersects_infinite_line(line_up):
+        raise ValueError("[Test] Wrong result with line_up")
+
+    line_down = geom.InfiniteLine3D( geom.Vector3D([0, 0, 1]),geom.Point3D([0, 0, -2]))
+    if not bbox3.intersects_infinite_line(line_down):
+        raise ValueError("[Test] Wrong result with line_down")

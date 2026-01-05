@@ -97,6 +97,25 @@
         .def( "origin", &Ray##dimension##D::origin )                           \
         .def( "direction", &Ray##dimension##D::direction )
 
+#define PYTHON_BOUNDING_BOX_AND_BASIC_OBJECTS( dimension )                     \
+    const auto bbox##dimension =                                               \
+        "BoundingBox" + std::to_string( dimension ) + "D";                     \
+    auto pybbox##dimension =                                                   \
+        module.attr( bbox##dimension.c_str() )                                 \
+            .cast< pybind11::class_< BoundingBox##dimension##D > >();          \
+    pybbox##dimension.def(                                                     \
+        "intersects_ray", static_cast< bool ( BoundingBox##dimension##D::* )(  \
+                              const Ray< dimension >& ) const >(               \
+                              &BoundingBox##dimension##D::intersects ) );      \
+    pybbox##dimension.def( "intersects_infinite_line",                         \
+        static_cast< bool ( BoundingBox##dimension##D::* )(                    \
+            const InfiniteLine< dimension >& ) const >(                        \
+            &BoundingBox##dimension##D::intersects ) );                        \
+    pybbox##dimension.def( "intersects_segment",                               \
+        static_cast< bool ( BoundingBox##dimension##D::* )(                    \
+            const Segment< dimension >& ) const >(                             \
+            &BoundingBox##dimension##D::intersects ) )
+
 namespace geode
 {
     void define_basic_objects( pybind11::module& module )
@@ -169,5 +188,7 @@ namespace geode
             .def( pybind11::init< Segment3D, double >() )
             .def( "axis", &Cylinder::axis )
             .def( "radius", &Cylinder::radius );
+        PYTHON_BOUNDING_BOX_AND_BASIC_OBJECTS( 2 );
+        PYTHON_BOUNDING_BOX_AND_BASIC_OBJECTS( 3 );
     }
 } // namespace geode
