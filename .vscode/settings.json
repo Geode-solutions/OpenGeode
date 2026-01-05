@@ -2,7 +2,20 @@
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include",
-        "${workspaceFolder}/build/opengeode",
+        "${workspaceFolder}/build/opengeode/include",
+        "${workspaceFolder}/build/third_party/abseil/install/include",
+        "${workspaceFolder}/build/third_party/asyncplusplus/install/include",
+        "${workspaceFolder}/build/third_party/earcut/install/include",
+        "${workspaceFolder}/build/third_party/bitsery/install/include",
+        "${workspaceFolder}/build/third_party/minizip/install/include",
+        "${workspaceFolder}/build/third_party/nanoflann/install/include",
+        "${workspaceFolder}/build/third_party/pybind11/install/include",
+        "${workspaceFolder}/build/third_party/spdlog/install/include"
+    ],
+    "C_Cpp.default.browse.path": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/build/opengeode/include",
         "${workspaceFolder}/build/third_party/abseil/install/include",
         "${workspaceFolder}/build/third_party/asyncplusplus/install/include",
         "${workspaceFolder}/build/third_party/earcut/install/include",
