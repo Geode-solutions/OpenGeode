@@ -60,8 +60,8 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_vector( module );
     geode::define_frame( module );
     geode::define_angle( module );
-    geode::define_basic_objects( module );
     geode::define_bounding_box( module );
+    geode::define_basic_objects( module );
     geode::define_barycentric( module );
     geode::define_distance( module );
     geode::define_intersection( module );

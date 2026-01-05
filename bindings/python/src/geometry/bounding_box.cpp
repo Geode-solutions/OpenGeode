@@ -49,18 +49,6 @@
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
                 &BoundingBox##dimension##D::intersects ) )                     \
-        .def( "intersects_ray",                                                \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                \
-                const Ray< dimension >& ) const >(                             \
-                &BoundingBox##dimension##D::intersects ) )                     \
-        .def( "intersects_infinite_line",                                      \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                \
-                const InfiniteLine< dimension >& ) const >(                    \
-                &BoundingBox##dimension##D::intersects ) )                     \
-        .def( "intersects_segment",                                            \
-            static_cast< bool ( BoundingBox##dimension##D::* )(                \
-                const Segment< dimension >& ) const >(                         \
-                &BoundingBox##dimension##D::intersects ) )                     \
         .def( "signed_distance", &BoundingBox##dimension##D::signed_distance ) \
         .def( "min", &BoundingBox##dimension##D::min )                         \
         .def( "max", &BoundingBox##dimension##D::max )                         \
