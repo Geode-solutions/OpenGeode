@@ -55,6 +55,7 @@ namespace geode
                     bbox.add_point(
                         mesh.point( mesh.polygon_vertex( { p, v } ) ) );
                 }
+                // bbox.extends( GLOBAL_EPSILON );
                 box_vector[p] = std::move( bbox );
             } );
         return AABBTree< dimension >{ box_vector };
