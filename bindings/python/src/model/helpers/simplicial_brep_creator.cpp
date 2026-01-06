@@ -23,7 +23,10 @@
 
 #include "../../common.hpp"
 
+#include <geode/geometry/bounding_box.hpp>
+
 #include <geode/model/helpers/simplicial_brep_creator.hpp>
+#include <geode/model/representation/core/brep.hpp>
 
 namespace geode
 {
