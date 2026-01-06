@@ -301,7 +301,7 @@ namespace geode
             }
 
             // The acceleration is here:
-            if( !node( node_index1 ).intersects( node( node_index2 ) ) )
+            if( !node( node_index1 ).epsilon_intersects( node( node_index2 ) ) )
             {
                 return false;
             }
@@ -382,7 +382,8 @@ namespace geode
 
             // The acceleration is here:
             if( !node( node_index1 )
-                    .intersects( other_tree.impl_->node( node_index2 ) ) )
+                    .epsilon_intersects(
+                        other_tree.impl_->node( node_index2 ) ) )
             {
                 return false;
             }
@@ -527,7 +528,7 @@ namespace geode
                 node_index < tree_.size(), "Node index out of tree" );
             OPENGEODE_ASSERT( element_begin != element_end,
                 "Begin and End indices should be different" );
-            if( !node( node_index ).contains( query ) )
+            if( !node( node_index ).epsilon_contains( query ) )
             {
                 return;
             }
@@ -588,7 +589,7 @@ namespace geode
         const BoundingBox< dimension >& box, EvalIntersection& action ) const
     {
         const auto box_filter = [&box]( const auto& inner_box ) {
-            return inner_box.intersects( box );
+            return inner_box.epsilon_intersects( box );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
     }
@@ -627,7 +628,7 @@ namespace geode
         const Ray< dimension >& ray, EvalIntersection& action ) const
     {
         const auto box_filter = [&ray]( const auto& box ) {
-            return box.intersects( ray );
+            return box.epsilon_intersects( ray );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
     }
@@ -638,7 +639,7 @@ namespace geode
         const InfiniteLine< dimension >& line, EvalIntersection& action ) const
     {
         const auto box_filter = [&line]( const auto& box ) {
-            return box.intersects( line );
+            return box.epsilon_intersects( line );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
     }
@@ -662,7 +663,7 @@ namespace geode
         const Triangle< dimension >& triangle, EvalIntersection& action ) const
     {
         const auto box_filter = [&triangle]( const auto& box ) {
-            return box.intersects( triangle );
+            return box.epsilon_intersects( triangle );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
     }
@@ -673,7 +674,7 @@ namespace geode
         const Segment< dimension >& segment, EvalIntersection& action ) const
     {
         const auto box_filter = [&segment]( const auto& box ) {
-            return box.intersects( segment );
+            return box.epsilon_intersects( segment );
         };
         compute_generic_element_bbox_intersections( box_filter, action );
     }
