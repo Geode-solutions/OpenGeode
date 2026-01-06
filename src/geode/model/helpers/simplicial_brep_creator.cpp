@@ -25,6 +25,9 @@
 
 #include <geode/basic/pimpl_impl.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/point.hpp>
+
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
 
@@ -32,6 +35,73 @@
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
+
+namespace
+{
+    std::vector< geode::Point3D > create_bbox_points(
+        const geode::BoundingBox3D& bbox )
+    {
+        std::vector< geode::Point3D > points;
+        points.reserve( 8 );
+        points.emplace_back( bbox.min() );
+        points.emplace_back( geode::Point3D{ { bbox.max().value( 0 ),
+            bbox.min().value( 1 ), bbox.min().value( 2 ) } } );
+        points.emplace_back( geode::Point3D{ { bbox.max().value( 0 ),
+            bbox.max().value( 1 ), bbox.min().value( 2 ) } } );
+        points.emplace_back( geode::Point3D{ { bbox.min().value( 0 ),
+            bbox.max().value( 1 ), bbox.min().value( 2 ) } } );
+        points.emplace_back( geode::Point3D{ { bbox.min().value( 0 ),
+            bbox.min().value( 1 ), bbox.max().value( 2 ) } } );
+        points.emplace_back( geode::Point3D{ { bbox.max().value( 0 ),
+            bbox.min().value( 1 ), bbox.max().value( 2 ) } } );
+        points.emplace_back( bbox.max() );
+        points.emplace_back( geode::Point3D{ { bbox.min().value( 0 ),
+            bbox.max().value( 1 ), bbox.max().value( 2 ) } } );
+        return points;
+    }
+
+    std::vector< geode::CornerDefinition > create_corner_definitions()
+    {
+        return std::vector< geode::CornerDefinition >{ { 0 }, { 1 }, { 2 },
+            { 3 }, { 4 }, { 5 }, { 6 }, { 7 } };
+    }
+
+    std::vector< geode::LineDefinition > create_line_definitions()
+    {
+        return std::vector< geode::LineDefinition >{
+            { { 0, 1 } },
+            { { 1, 2 } },
+            { { 2, 3 } },
+            { { 3, 0 } },
+            { { 4, 5 } },
+            { { 5, 6 } },
+            { { 6, 7 } },
+            { { 7, 4 } },
+            { { 0, 4 } },
+            { { 1, 5 } },
+            { { 2, 6 } },
+            { { 3, 7 } },
+        };
+    }
+
+    std::vector< geode::SurfaceDefinition > create_surface_definitions()
+    {
+        return std::vector< geode::SurfaceDefinition >{
+            { { 0, 1, 2, 3 }, { 0, 1, 2, 0, 2, 3 }, { 0, 1, 2, 3 }, {}, {} },
+            { { 4, 5, 6, 7 }, { 0, 1, 2, 0, 2, 3 }, { 4, 5, 6, 7 }, {}, {} },
+            { { 0, 1, 5, 4 }, { 0, 1, 2, 0, 2, 3 }, { 0, 9, 4, 8 }, {}, {} },
+            { { 1, 2, 6, 5 }, { 0, 1, 2, 0, 2, 3 }, { 1, 10, 5, 9 }, {}, {} },
+            { { 2, 3, 7, 6 }, { 0, 1, 2, 0, 2, 3 }, { 2, 11, 6, 10 }, {}, {} },
+            { { 3, 0, 4, 7 }, { 0, 1, 2, 0, 2, 3 }, { 3, 8, 7, 11 }, {}, {} },
+        };
+    }
+
+    std::vector< geode::BlockDefinition > create_block_definitions()
+    {
+        return std::vector< geode::BlockDefinition >{ { {}, {},
+            { 0, 1, 2, 3, 4, 5 }, {}, {}, {} } };
+    }
+} // namespace
 
 namespace geode
 {
@@ -190,5 +260,21 @@ namespace geode
         absl::Span< const BoundaryDefinition > definitions )
     {
         return impl_->create_model_boundaries( surfaces, definitions );
+    }
+
+    BRep create_model_from_bounding_box( const BoundingBox3D& box )
+    {
+        BRep brep;
+        const auto points = create_bbox_points( box );
+        SimplicialBRepCreator creator{ brep, points };
+        const auto corners =
+            creator.create_corners( create_corner_definitions() );
+        const auto lines =
+            creator.create_lines( corners, create_line_definitions() );
+        const auto surfaces =
+            creator.create_surfaces( lines, create_surface_definitions() );
+        const auto blocks =
+            creator.create_blocks( surfaces, create_block_definitions() );
+        return brep;
     }
 } // namespace geode
