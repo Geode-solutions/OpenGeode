@@ -63,6 +63,10 @@ namespace geode
 
         bool contains( const BoundingBox< dimension >& bbox ) const;
 
+        bool epsilon_contains( const Point< dimension >& point ) const;
+
+        bool epsilon_contains( const BoundingBox< dimension >& bbox ) const;
+
         [[nodiscard]] bool intersects(
             const BoundingBox< dimension >& bbox ) const;
 
@@ -93,6 +97,30 @@ namespace geode
         template < index_t T = dimension >
         [[nodiscard]] typename std::enable_if< T == 3, bool >::type intersects(
             const Tetrahedron& tetra ) const;
+
+        /*!
+         * Epsilon intersection methods are equivalent to intersects ones, but
+         * considering an epsilon extension of the bbox
+         */
+        [[nodiscard]] bool epsilon_intersects(
+            const BoundingBox< dimension >& bbox ) const;
+
+        [[nodiscard]] bool epsilon_intersects(
+            const Ray< dimension >& ray ) const;
+
+        [[nodiscard]] bool epsilon_intersects(
+            const InfiniteLine< dimension >& line ) const;
+
+        [[nodiscard]] bool epsilon_intersects(
+            const Segment< dimension >& segment ) const;
+
+        template < index_t T = dimension >
+        [[nodiscard]] typename std::enable_if< T == 2 || T == 3, bool >::type
+            epsilon_intersects( const Triangle< T >& triangle ) const;
+
+        template < index_t T = dimension >
+        [[nodiscard]] typename std::enable_if< T == 3, bool >::type
+            epsilon_intersects( const Tetrahedron& tetra ) const;
 
         /*!
          * Returns the distance between the point and the box.
