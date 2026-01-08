@@ -30,6 +30,7 @@ add_geode_python_binding(
         "helpers/model_concatener.cpp"
         "helpers/model_crs.cpp"
         "helpers/ray_tracing.cpp"
+        "helpers/simplicial_brep_creator.cpp"
         "mixin/builder/blocks_builder.cpp"
         "mixin/builder/block_collections_builder.cpp"
         "mixin/builder/component_registry_builder.cpp"

@@ -35,13 +35,84 @@
 
 namespace
 {
+    geode::BoundingBox1D triangle_1d_projection(
+        const geode::Triangle3D& triangle, const geode::Vector3D& normal )
+    {
+        const auto& vertices = triangle.vertices();
+        geode::BoundingBox1D interval;
+        interval.add_point( geode::Point1D{
+            { normal.dot( geode::Vector3D{ vertices[0].get() } ) } } );
+        interval.add_point( geode::Point1D{
+            { normal.dot( geode::Vector3D{ vertices[1].get() } ) } } );
+        interval.add_point( geode::Point1D{
+            { normal.dot( geode::Vector3D{ vertices[2].get() } ) } } );
+        return interval;
+    }
+
+    geode::BoundingBox1D bbox_1d_projection(
+        const geode::BoundingBox3D& box, const geode::Vector3D& normal )
+    {
+        const auto box_diagonal = box.diagonal();
+        const auto origin = normal.dot( geode::Vector3D{ box.center() } );
+        const auto maximum_extent =
+            ( std::fabs( normal.value( 0 ) * box_diagonal.value( 0 ) )
+                + std::fabs( normal.value( 1 ) * box_diagonal.value( 1 ) )
+                + std::fabs( normal.value( 2 ) * box_diagonal.value( 2 ) ) )
+            / 2.;
+        return geode::BoundingBox1D{ geode::Point1D{
+                                         { origin - maximum_extent } },
+            geode::Point1D{ { origin + maximum_extent } } };
+    }
+
     template < geode::index_t dimension >
-    bool line_intersects( const geode::BoundingBox< dimension >& box,
+    bool ray_quick_skip( const geode::BoundingBox< dimension >& box,
+        const geode::Ray< dimension >& ray )
+    {
+        const auto box_half_extent = box.diagonal() / 2.;
+        const auto ray_translated_origin = ray.origin() - box.center();
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            if( std::fabs( ray_translated_origin.value( i ) )
+                        - box_half_extent.value( i )
+                    > geode::GLOBAL_EPSILON
+                && ray_translated_origin.value( i ) * ray.direction().value( i )
+                       > geode::GLOBAL_EPSILON )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template < geode::index_t dimension >
+    bool segment_quick_skip( const geode::BoundingBox< dimension >& box,
+        const geode::Segment< dimension >& segment )
+    {
+        const auto box_extent = box.diagonal() / 2.;
+        const auto segment_origin = segment.barycenter() - box.center();
+        const auto segment_extent = segment.length() / 2.;
+        const auto segment_direction = segment.normalized_direction();
+        for( const auto i : geode::LRange{ dimension } )
+        {
+            const auto lhs = std::fabs( segment_origin.value( i ) );
+            const auto rhs =
+                box_extent.value( i )
+                + segment_extent * std::fabs( segment_direction.value( i ) );
+            if( lhs - rhs > geode::GLOBAL_EPSILON )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template < geode::index_t dimension >
+    bool line_epsilon_intersects( const geode::BoundingBox< dimension >& box,
         const geode::GenericLine< geode::RefPoint< dimension >, dimension >&
             line );
 
     template <>
-    bool line_intersects< 3 >( const geode::BoundingBox< 3 >& box,
+    bool line_epsilon_intersects< 3 >( const geode::BoundingBox< 3 >& box,
         const geode::GenericLine< geode::RefPoint< 3 >, 3 >& line )
     {
         const auto box_half_extent = box.diagonal() / 2.;
@@ -72,7 +143,7 @@ namespace
     }
 
     template <>
-    bool line_intersects< 2 >( const geode::BoundingBox< 2 >& box,
+    bool line_epsilon_intersects< 2 >( const geode::BoundingBox< 2 >& box,
         const geode::GenericLine< geode::RefPoint< 2 >, 2 >& line )
     {
         const auto box_center = box.center();
@@ -89,10 +160,42 @@ namespace
     }
 
     template <>
+    bool line_epsilon_intersects< 1 >( const geode::BoundingBox< 1 >& box,
+        const geode::GenericLine< geode::RefPoint< 1 >, 1 >& line )
+    {
+        if( line.direction().value( 0 ) > 0 )
+        {
+            return line.origin().value( 0 )
+                   < box.min().value( 0 ) - geode::GLOBAL_EPSILON;
+        }
+        return line.origin().value( 0 )
+               > box.max().value( 0 ) + geode::GLOBAL_EPSILON;
+    }
+
+    template < geode::index_t dimension >
+    bool line_intersects( const geode::BoundingBox< dimension >& box,
+        const geode::GenericLine< geode::RefPoint< dimension >, dimension >&
+            line );
+
+    template <>
+    bool line_intersects< 3 >( const geode::BoundingBox< 3 >& box,
+        const geode::GenericLine< geode::RefPoint< 3 >, 3 >& line )
+    {
+        return line_epsilon_intersects< 3 >( box, line );
+    }
+
+    template <>
+    bool line_intersects< 2 >( const geode::BoundingBox< 2 >& box,
+        const geode::GenericLine< geode::RefPoint< 2 >, 2 >& line )
+    {
+        return line_epsilon_intersects< 2 >( box, line );
+    }
+
+    template <>
     bool line_intersects< 1 >( const geode::BoundingBox< 1 >& box,
         const geode::GenericLine< geode::RefPoint< 1 >, 1 >& line )
     {
-        if( box.diagonal().dot( line.direction() ) > 0 )
+        if( line.direction().value( 0 ) > 0 )
         {
             return line.origin().value( 0 ) < box.min().value( 0 );
         }
@@ -217,6 +320,28 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool BoundingBox< dimension >::epsilon_contains(
+        const Point< dimension >& point ) const
+    {
+        for( const auto i : LRange{ dimension } )
+        {
+            if( point.value( i ) < min_.value( i ) - GLOBAL_EPSILON
+                || point.value( i ) > max_.value( i ) + GLOBAL_EPSILON )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    template < index_t dimension >
+    bool BoundingBox< dimension >::epsilon_contains(
+        const BoundingBox< dimension >& bbox ) const
+    {
+        return epsilon_contains( bbox.min_ ) && epsilon_contains( bbox.max_ );
+    }
+
+    template < index_t dimension >
     bool BoundingBox< dimension >::intersects(
         const BoundingBox< dimension >& box ) const
     {
@@ -232,23 +357,40 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool BoundingBox< dimension >::intersects(
-        const Ray< dimension >& ray ) const
+    bool BoundingBox< dimension >::epsilon_intersects(
+        const BoundingBox< dimension >& box ) const
     {
-        const auto box_half_extent = diagonal() / 2.;
-        const auto ray_translated_origin = ray.origin() - center();
         for( const auto i : LRange{ dimension } )
         {
-            if( std::fabs( ray_translated_origin.value( i ) )
-                        - box_half_extent.value( i )
-                    > GLOBAL_EPSILON
-                && ray_translated_origin.value( i ) * ray.direction().value( i )
-                       > GLOBAL_EPSILON )
+            if( max_.value( i ) < box.min_.value( i ) - GLOBAL_EPSILON
+                || min_.value( i ) > box.max_.value( i ) + GLOBAL_EPSILON )
             {
                 return false;
             }
         }
+        return true;
+    }
+
+    template < index_t dimension >
+    bool BoundingBox< dimension >::intersects(
+        const Ray< dimension >& ray ) const
+    {
+        if( ray_quick_skip( *this, ray ) )
+        {
+            return false;
+        }
         return line_intersects( *this, ray );
+    }
+
+    template < index_t dimension >
+    bool BoundingBox< dimension >::epsilon_intersects(
+        const Ray< dimension >& ray ) const
+    {
+        if( ray_quick_skip( *this, ray ) )
+        {
+            return false;
+        }
+        return line_epsilon_intersects( *this, ray );
     }
 
     template < index_t dimension >
@@ -256,6 +398,13 @@ namespace geode
         const InfiniteLine< dimension >& line ) const
     {
         return line_intersects( *this, line );
+    }
+
+    template < index_t dimension >
+    bool BoundingBox< dimension >::epsilon_intersects(
+        const InfiniteLine< dimension >& line ) const
+    {
+        return line_epsilon_intersects( *this, line );
     }
 
     template < index_t dimension >
@@ -278,23 +427,38 @@ namespace geode
         {
             return false;
         }
-        const auto box_center = center();
-        const auto box_extent = diagonal() / 2.;
-        const auto segment_origin = segment.barycenter() - box_center;
-        const auto segment_extent = segment.length() / 2.;
-        const auto segment_direction = segment.normalized_direction();
-        for( const auto i : LRange{ dimension } )
+        if( segment_quick_skip( *this, segment ) )
         {
-            const auto lhs = std::fabs( segment_origin.value( i ) );
-            const auto rhs =
-                box_extent.value( i )
-                + segment_extent * std::fabs( segment_direction.value( i ) );
-            if( lhs - rhs > geode::GLOBAL_EPSILON )
-            {
-                return false;
-            }
+            return false;
         }
         return this->intersects( InfiniteLine< dimension >{ segment } );
+    }
+
+    template < index_t dimension >
+    bool BoundingBox< dimension >::epsilon_intersects(
+        const Segment< dimension >& segment ) const
+    {
+        const auto& vertices = segment.vertices();
+        for( const auto v : LRange{ 2 } )
+        {
+            if( epsilon_contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
+        if( segment.length() < GLOBAL_EPSILON )
+        {
+            return false;
+        }
+        if( !epsilon_intersects( segment.bounding_box() ) )
+        {
+            return false;
+        }
+        if( segment_quick_skip( *this, segment ) )
+        {
+            return false;
+        }
+        return this->epsilon_intersects( InfiniteLine< dimension >{ segment } );
     }
 
     template <>
@@ -314,29 +478,8 @@ namespace geode
         {
             return false;
         }
-        const auto triangle_projection = [&vertices]( const Vector3D& normal ) {
-            BoundingBox1D interval;
-            interval.add_point(
-                Point1D{ { normal.dot( Vector3D{ vertices[0].get() } ) } } );
-            interval.add_point(
-                Point1D{ { normal.dot( Vector3D{ vertices[1].get() } ) } } );
-            interval.add_point(
-                Point1D{ { normal.dot( Vector3D{ vertices[2].get() } ) } } );
-            return interval;
-        };
         const Vector3D box_center{ center() };
         const auto box_diagonal = diagonal();
-        const auto bbox_projection = [&box_center, &box_diagonal](
-                                         const Vector3D& normal ) {
-            const auto origin = normal.dot( box_center );
-            const auto maximum_extent =
-                ( std::fabs( normal.value( 0 ) * box_diagonal.value( 0 ) )
-                    + std::fabs( normal.value( 1 ) * box_diagonal.value( 1 ) )
-                    + std::fabs( normal.value( 2 ) * box_diagonal.value( 2 ) ) )
-                / 2.;
-            return BoundingBox1D{ Point1D{ { origin - maximum_extent } },
-                Point1D{ { origin + maximum_extent } } };
-        };
         const std::array< Vector3D, 3 > edges{ Vector3D{ vertices[0].get(),
                                                    vertices[1].get() },
             Vector3D{ vertices[0].get(), vertices[2].get() },
@@ -344,7 +487,7 @@ namespace geode
 
         // Test direction of triangle normal.
         const auto triangle_normal = edges[0].cross( edges[1] );
-        if( !bbox_projection( triangle_normal )
+        if( !bbox_1d_projection( *this, triangle_normal )
                 .contains( Point1D{ { triangle_normal.dot(
                     Vector3D{ vertices[0].get() } ) } } ) )
         {
@@ -356,7 +499,8 @@ namespace geode
         {
             Vector3D axis;
             axis.set_value( i, 1 );
-            const auto triangle_interval = triangle_projection( axis );
+            const auto triangle_interval =
+                triangle_1d_projection( triangle, axis );
             const auto center_value = box_center.value( i );
             const auto extent = box_diagonal.value( i ) / 2.;
             const BoundingBox1D box_interval{ Point1D{
@@ -376,9 +520,81 @@ namespace geode
                 Vector3D axis;
                 axis.set_value( i1, 1 );
                 const auto normal = edges[i0].cross( axis );
-                const auto triangle_interval = triangle_projection( normal );
-                const auto box_interval = bbox_projection( normal );
+                const auto triangle_interval =
+                    triangle_1d_projection( triangle, normal );
+                const auto box_interval = bbox_1d_projection( *this, normal );
                 if( !triangle_interval.intersects( box_interval ) )
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    template <>
+    template <>
+    bool opengeode_geometry_api BoundingBox< 3 >::epsilon_intersects< 3 >(
+        const Triangle< 3 >& triangle ) const
+    {
+        const auto& vertices = triangle.vertices();
+        for( const auto v : LRange{ 3 } )
+        {
+            if( epsilon_contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
+        if( !epsilon_intersects( triangle.bounding_box() ) )
+        {
+            return false;
+        }
+        const Vector3D box_center{ center() };
+        const auto box_diagonal = diagonal();
+        const std::array< Vector3D, 3 > edges{ Vector3D{ vertices[0].get(),
+                                                   vertices[1].get() },
+            Vector3D{ vertices[0].get(), vertices[2].get() },
+            Vector3D{ vertices[1].get(), vertices[2].get() } };
+
+        // Test direction of triangle normal.
+        const auto triangle_normal = edges[0].cross( edges[1] );
+        if( !bbox_1d_projection( *this, triangle_normal )
+                .epsilon_contains( Point1D{ { triangle_normal.dot(
+                    Vector3D{ vertices[0].get() } ) } } ) )
+        {
+            return false;
+        }
+
+        // Test direction of box faces.
+        for( const auto i : LRange{ 3 } )
+        {
+            Vector3D axis;
+            axis.set_value( i, 1 );
+            const auto triangle_interval =
+                triangle_1d_projection( triangle, axis );
+            const auto center_value = box_center.value( i );
+            const auto extent = box_diagonal.value( i ) / 2.;
+            const BoundingBox1D box_interval{ Point1D{
+                                                  { center_value - extent } },
+                Point1D{ { center_value + extent } } };
+            if( !triangle_interval.epsilon_intersects( box_interval ) )
+            {
+                return false;
+            }
+        }
+
+        // Test direction of triangle-box edge cross products.
+        for( const auto i0 : LRange{ 3 } )
+        {
+            for( const auto i1 : LRange{ 3 } )
+            {
+                Vector3D axis;
+                axis.set_value( i1, 1 );
+                const auto normal = edges[i0].cross( axis );
+                const auto triangle_interval =
+                    triangle_1d_projection( triangle, normal );
+                const auto box_interval = bbox_1d_projection( *this, normal );
+                if( !triangle_interval.epsilon_intersects( box_interval ) )
                 {
                     return false;
                 }
@@ -411,6 +627,31 @@ namespace geode
                    Segment2D{ vertices[1].get(), vertices[2].get() } );
     }
 
+    template <>
+    template <>
+    bool opengeode_geometry_api BoundingBox< 2 >::epsilon_intersects< 2 >(
+        const Triangle< 2 >& triangle ) const
+    {
+        if( point_triangle_position( center(), triangle ) == POSITION::inside )
+        {
+            return true;
+        }
+        const auto& vertices = triangle.vertices();
+        for( const auto v : LRange{ 3 } )
+        {
+            if( epsilon_contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
+        return epsilon_intersects(
+                   Segment2D{ vertices[0].get(), vertices[1].get() } )
+               || epsilon_intersects(
+                   Segment2D{ vertices[0].get(), vertices[2].get() } )
+               || epsilon_intersects(
+                   Segment2D{ vertices[1].get(), vertices[2].get() } );
+    }
+
     template < index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, bool >::type
@@ -435,6 +676,34 @@ namespace geode
                || intersects(
                    { vertices[0].get(), vertices[2].get(), vertices[3].get() } )
                || intersects( { vertices[1].get(), vertices[2].get(),
+                   vertices[3].get() } );
+    }
+
+    template < index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3, bool >::type
+        BoundingBox< dimension >::epsilon_intersects(
+            const Tetrahedron& tetra ) const
+    {
+        if( point_tetrahedron_position( center(), tetra ) == POSITION::inside )
+        {
+            return true;
+        }
+        const auto& vertices = tetra.vertices();
+        for( const auto v : LRange{ 4 } )
+        {
+            if( epsilon_contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
+        return epsilon_intersects(
+                   { vertices[0].get(), vertices[1].get(), vertices[2].get() } )
+               || epsilon_intersects(
+                   { vertices[0].get(), vertices[1].get(), vertices[3].get() } )
+               || epsilon_intersects(
+                   { vertices[0].get(), vertices[2].get(), vertices[3].get() } )
+               || epsilon_intersects( { vertices[1].get(), vertices[2].get(),
                    vertices[3].get() } );
     }
 
@@ -499,7 +768,7 @@ namespace geode
         const auto Pmin = point - min_;
         const auto Pmax = point - max_;
         auto inner_distance = std::numeric_limits< double >::max();
-        for( const auto c : geode::LRange{ dimension } )
+        for( const auto c : LRange{ dimension } )
         {
             const auto local_distance = std::min(
                 std::fabs( Pmin.value( c ) ), std::fabs( Pmax.value( c ) ) );
@@ -513,7 +782,7 @@ namespace geode
     {
         double volume{ 1.0 };
         const auto box_extent = diagonal();
-        for( const auto c : geode::LRange{ dimension } )
+        for( const auto c : LRange{ dimension } )
         {
             volume *= ( box_extent.value( c ) );
         }
@@ -533,4 +802,6 @@ namespace geode
 
     template opengeode_geometry_api bool BoundingBox< 3 >::intersects< 3 >(
         const Tetrahedron& ) const;
+    template opengeode_geometry_api bool
+        BoundingBox< 3 >::epsilon_intersects< 3 >( const Tetrahedron& ) const;
 } // namespace geode

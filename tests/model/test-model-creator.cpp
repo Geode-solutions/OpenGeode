@@ -26,6 +26,7 @@
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/edged_curve.hpp>
@@ -39,8 +40,19 @@
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
+#include <geode/model/representation/io/brep_output.hpp>
+#include <geode/model/representation/io/section_output.hpp>
 
 #include <geode/tests/common.hpp>
+
+void test_create_brep_from_bbox()
+{
+    geode::BoundingBox3D box;
+    box.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    box.add_point( geode::Point3D{ { 1, 1, 1 } } );
+    const auto brep = geode::create_model_from_bounding_box( box );
+    geode::save_brep( brep, "brep_from_bbox.og_brep" );
+}
 
 void test_create_brep_with_dangling_components()
 {
@@ -100,12 +112,12 @@ void test_create_brep_with_dangling_components()
     const auto line_uuids = creator.create_lines( corner_uuids, lines );
 
     std::vector< geode::SurfaceDefinition > surfaces{
-        { { 0, 1, 2, 3 }, { 0, 1, 2, 0, 3, 2 }, { 0, 1, 2, 3 }, {}, {} },
-        { { 0, 1, 5, 4 }, { 0, 1, 2, 0, 3, 2 }, { 0, 4, 8, 9 }, {}, {} },
-        { { 1, 2, 6, 5 }, { 0, 1, 2, 0, 3, 2 }, { 1, 5, 9, 10 }, {}, {} },
-        { { 2, 3, 7, 6 }, { 0, 1, 2, 0, 3, 2 }, { 2, 6, 10, 11 }, {}, {} },
-        { { 0, 3, 7, 4 }, { 0, 1, 2, 0, 3, 2 }, { 3, 7, 11, 8 }, {}, {} },
-        { { 4, 5, 6, 7 }, { 0, 1, 2, 0, 3, 2 }, {}, {}, {} },
+        { { 0, 1, 2, 3 }, { 0, 1, 2, 0, 2, 3 }, { 0, 1, 2, 3 }, {}, {} },
+        { { 0, 1, 5, 4 }, { 0, 1, 2, 0, 2, 3 }, { 0, 4, 8, 9 }, {}, {} },
+        { { 1, 2, 6, 5 }, { 0, 1, 2, 0, 2, 3 }, { 1, 5, 9, 10 }, {}, {} },
+        { { 2, 3, 7, 6 }, { 0, 1, 2, 0, 2, 3 }, { 2, 6, 10, 11 }, {}, {} },
+        { { 0, 3, 7, 4 }, { 0, 1, 2, 0, 2, 3 }, { 3, 7, 11, 8 }, {}, {} },
+        { { 4, 5, 6, 7 }, { 0, 1, 2, 0, 2, 3 }, {}, {}, {} },
         { { 5, 6, 10, 9, 12 }, { 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 },
             { 5, 12, 13, 14 }, {}, { 12 } },
     };
@@ -129,11 +141,11 @@ void test_create_brep_with_dangling_components()
         "[Test] Wrong number of corner embedding blocks" );
     OPENGEODE_EXCEPTION( nb_embedding_surfaces == 1,
         "[Test] Wrong number of corner embedding surfaces" );
+    geode::save_brep( brep, "test.og_brep" );
 }
 
-void test()
+void test_section()
 {
-    geode::OpenGeodeModelLibrary::initialize();
     std::vector< geode::Point2D > points{
         geode::Point2D{ { 0, 0 } },
         geode::Point2D{ { 1, 0 } },
@@ -198,8 +210,8 @@ void test()
 
     std::vector< geode::SurfaceDefinition > surface_definitions{
         { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10 },
-            { 0, 4, 7, 7, 4, 1, 1, 4, 8, 4, 10, 8, 8, 10, 5, 8, 5, 2, 2, 5, 9,
-                9, 5, 3, 3, 5, 6, 6, 5, 11, 6, 11, 4, 6, 4, 0 },
+            { 0, 7, 4, 7, 1, 4, 1, 8, 4, 4, 8, 10, 8, 5, 10, 8, 2, 5, 2, 9, 5,
+                9, 3, 5, 3, 6, 5, 6, 11, 5, 6, 4, 11, 6, 0, 4 },
             { 0, 1, 2, 3 }, { 4 }, {} },
     };
     const auto surfaces = creator.create_surfaces( lines, surface_definitions );
@@ -273,8 +285,15 @@ void test()
                 found, "[Test] Missing Line in ModelBoundary" );
         }
     }
+    geode::save_section( section, "test_section.og_sctn" );
+}
 
+void test()
+{
+    geode::OpenGeodeModelLibrary::initialize();
+    test_create_brep_from_bbox();
     test_create_brep_with_dangling_components();
+    test_section();
 }
 
 OPENGEODE_TEST( "model-creator" )

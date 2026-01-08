@@ -33,7 +33,9 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_3D( Point );
+    ALIAS_3D( BoundingBox );
     class BRep;
     struct uuid;
 } // namespace geode
@@ -76,4 +78,7 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
+
+    BRep opengeode_model_api create_model_from_bounding_box(
+        const BoundingBox3D& box );
 } // namespace geode
