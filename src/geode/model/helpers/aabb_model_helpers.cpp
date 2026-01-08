@@ -136,56 +136,66 @@ namespace geode
     std::tuple< AABBTree3D, absl::FixedArray< uuid > > create_lines_aabb_tree(
         const BRep& model )
     {
-        return create_aabb< 3 >( model.lines(), model.nb_lines() );
+        return create_aabb< 3 >(
+            model.active_lines(), model.nb_active_lines() );
     }
 
     std::tuple< AABBTree3D, absl::FixedArray< uuid > >
         create_surfaces_aabb_tree( const BRep& model )
     {
-        return create_aabb< 3 >( model.surfaces(), model.nb_surfaces() );
+        return create_aabb< 3 >(
+            model.active_surfaces(), model.nb_active_surfaces() );
     }
 
     std::tuple< AABBTree3D, absl::FixedArray< uuid > > create_blocks_aabb_tree(
         const BRep& model )
     {
-        return create_aabb< 3 >( model.blocks(), model.nb_blocks() );
+        return create_aabb< 3 >(
+            model.active_blocks(), model.nb_active_blocks() );
     }
 
     std::tuple< AABBTree2D, absl::FixedArray< uuid > > create_lines_aabb_tree(
         const Section& model )
     {
-        return create_aabb< 2 >( model.lines(), model.nb_lines() );
+        return create_aabb< 2 >(
+            model.active_lines(), model.nb_active_lines() );
     }
 
     std::tuple< AABBTree2D, absl::FixedArray< uuid > >
         create_surfaces_aabb_tree( const Section& model )
     {
-        return create_aabb< 2 >( model.surfaces(), model.nb_surfaces() );
+        return create_aabb< 2 >(
+            model.active_surfaces(), model.nb_active_surfaces() );
     }
 
     ModelMeshesAABBTree3D create_line_meshes_aabb_trees( const BRep& model )
     {
-        return create_aabbs< 3 >( model.lines(), model.nb_lines() );
+        return create_aabbs< 3 >(
+            model.active_lines(), model.nb_active_lines() );
     }
 
     ModelMeshesAABBTree3D create_surface_meshes_aabb_trees( const BRep& model )
     {
-        return create_aabbs< 3 >( model.surfaces(), model.nb_surfaces() );
+        return create_aabbs< 3 >(
+            model.active_surfaces(), model.nb_active_surfaces() );
     }
 
     ModelMeshesAABBTree3D create_block_meshes_aabb_trees( const BRep& model )
     {
-        return create_aabbs< 3 >( model.blocks(), model.nb_blocks() );
+        return create_aabbs< 3 >(
+            model.active_blocks(), model.nb_active_blocks() );
     }
 
     ModelMeshesAABBTree2D create_line_meshes_aabb_trees( const Section& model )
     {
-        return create_aabbs< 2 >( model.lines(), model.nb_lines() );
+        return create_aabbs< 2 >(
+            model.active_lines(), model.nb_active_lines() );
     }
 
     ModelMeshesAABBTree2D create_surface_meshes_aabb_trees(
         const Section& model )
     {
-        return create_aabbs< 2 >( model.surfaces(), model.nb_surfaces() );
+        return create_aabbs< 2 >(
+            model.active_surfaces(), model.nb_active_surfaces() );
     }
 } // namespace geode
