@@ -54,7 +54,7 @@ namespace
             const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
             const geode::Vector3D edge{ points[pivot], points[next] };
             result->lengths[pivot] = edge.length();
-            if( edge.length() < geode::GLOBAL_EPSILON )
+            if( result->lengths[pivot] < geode::GLOBAL_EPSILON )
             {
                 return std::nullopt;
             }
