@@ -501,7 +501,7 @@ namespace geode
                 { polyhedron_id, max_area_facet } );
             if( !normal )
             {
-                return true;
+                return 0.;
             }
             const auto facet_vertices = mesh.polyhedron_facet_vertices(
                 { polyhedron_id, max_area_facet } );
@@ -967,9 +967,9 @@ namespace geode
     {
         if( nb_polyhedron_facet_vertices( polyhedron_facet ) < 3 )
         {
-            return 0;
+            return 0.;
         }
-        double area{ 0 };
+        double area{ 0. };
         const auto direction = polyhedron_facet_normal( polyhedron_facet )
                                    .value_or( Vector3D{ { 0, 0, 1 } } );
         const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
@@ -989,7 +989,7 @@ namespace geode
     {
         check_polyhedron_facet_id(
             *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
-        Vector3D normal;
+        Vector3D normal{ { 0, 0, 0 } };
         const auto facet_vertices =
             polyhedron_facet_vertices( polyhedron_facet );
         const auto& p0 = this->point( facet_vertices[0] );
@@ -1007,7 +1007,7 @@ namespace geode
         {
             return normal.normalize();
         }
-        catch( const OpenGeodeException& /*unused*/ )
+        catch( ... )
         {
             return std::nullopt;
         }

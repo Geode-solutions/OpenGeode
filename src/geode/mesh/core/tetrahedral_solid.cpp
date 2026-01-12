@@ -343,31 +343,35 @@ namespace geode
         index_t first_polyhedron ) const
     {
         PolyhedraAroundEdge result{ first_polyhedron };
+        const auto tet_vertices = this->polyhedron_vertices( first_polyhedron );
         std::array< index_t, 2 > excluded_facets{ NO_ID, NO_ID };
         local_index_t count{ 0 };
-        const auto polyhedron_vertices =
-            this->polyhedron_vertices( first_polyhedron );
-        for( const auto v : LRange{ 4 } )
+        for( const auto v_id : LRange{ 4 } )
         {
-            if( polyhedron_vertices[v] == vertices[0]
-                || polyhedron_vertices[v] == vertices[1] )
+            if( tet_vertices.at( v_id ) == vertices.at( 0 )
+                || tet_vertices.at( v_id ) == vertices.at( 1 ) )
             {
-                excluded_facets[count++] = v;
+                excluded_facets[count] = v_id;
+                count++;
+            }
+            if( count == 2 )
+            {
+                break;
             }
         }
-        for( const auto f : LRange{ 4 } )
+        for( const auto f_id : LRange{ 4 } )
         {
-            if( f == excluded_facets[0] || f == excluded_facets[1] )
+            if( f_id == excluded_facets[0] || f_id == excluded_facets[1] )
             {
                 continue;
             }
-            const auto vertex_id = polyhedron_vertices[f];
+            const auto vertex_id = tet_vertices[f_id];
             if( vertex_id == vertices[0] || vertex_id == vertices[1] )
             {
                 continue;
             }
             const auto status = propagate_around_edge(
-                *this, { first_polyhedron, f }, vertices, result );
+                *this, { first_polyhedron, f_id }, vertices, result );
             if( !status.first )
             {
                 return polyhedra_around_edge( vertices );

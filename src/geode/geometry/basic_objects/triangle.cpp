@@ -48,34 +48,30 @@ namespace
     std::optional< PivotNormalResult > simple_pivot_and_normal(
         const std::array< geode::RefPoint3D, 3 >& points )
     {
-        try
+        std::optional< PivotNormalResult > result{ std::in_place };
+        for( const auto pivot : geode::LRange{ 3 } )
         {
-            std::optional< PivotNormalResult > result{ std::in_place };
-            for( const auto pivot : geode::LRange{ 3 } )
+            const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
+            const geode::Vector3D edge{ points[pivot], points[next] };
+            result->lengths[pivot] = edge.length();
+            if( edge.length() < geode::GLOBAL_EPSILON )
             {
-                const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
-                const geode::Vector3D edge{ points[pivot], points[next] };
-                result->lengths[pivot] = edge.length();
-                const auto edge0 = edge / result->lengths[pivot];
-                const auto prev = pivot == 0 ? 2 : pivot - 1;
-                const auto edge1 =
-                    geode::Vector3D{ points[pivot], points[prev] }.normalize();
-
-                const auto normal = edge0.cross( edge1 );
-                const auto length = normal.length();
-                if( length > geode::GLOBAL_ANGULAR_EPSILON )
-                {
-                    result->pivot = pivot;
-                    result->normal = normal / length;
-                    return result;
-                }
+                return std::nullopt;
             }
-            return result;
+            const auto edge0 = edge / result->lengths[pivot];
+            const auto prev = pivot == 0 ? 2 : pivot - 1;
+            const auto edge1 = geode::Vector3D{ points[pivot], points[prev] };
+
+            const auto normal = edge0.cross( edge1 );
+            const auto length = normal.length();
+            if( length > geode::GLOBAL_ANGULAR_EPSILON )
+            {
+                result->pivot = pivot;
+                result->normal = normal / length;
+                return result;
+            }
         }
-        catch( const geode::OpenGeodeException& /*unused*/ )
-        {
-            return std::nullopt;
-        }
+        return std::nullopt;
     }
 } // namespace
 
