@@ -60,9 +60,14 @@ namespace
             }
             const auto edge0 = edge / result->lengths[pivot];
             const auto prev = pivot == 0 ? 2 : pivot - 1;
-            const auto edge1 = geode::Vector3D{ points[pivot], points[prev] };
+            auto edge1 = geode::Vector3D{ points[pivot], points[prev] };
+            const auto length1 = edge1.length();
+            if( length1 < geode::GLOBAL_EPSILON )
+            {
+                return std::nullopt;
+            }
 
-            const auto normal = edge0.cross( edge1 );
+            const auto normal = edge0.cross( edge1 / length1 );
             const auto length = normal.length();
             if( length > geode::GLOBAL_ANGULAR_EPSILON )
             {
