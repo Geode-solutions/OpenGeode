@@ -71,7 +71,7 @@ namespace
                 return result;
             }
         }
-        return std::nullopt;
+        return result;
     }
 } // namespace
 
