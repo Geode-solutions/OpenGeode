@@ -25,6 +25,8 @@
 
 #include <limits>
 
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -155,30 +157,24 @@ namespace geode
     double tetrahedron_aspect_ratio( const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
-        const Vector3D edge_ab{ vertices[0], vertices[1] };
-        const Vector3D edge_ac{ vertices[0], vertices[2] };
-        const Vector3D edge_ad{ vertices[0], vertices[3] };
+        const Vector3D edge01{ vertices[0], vertices[1] };
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
         const auto absolute_det =
-            std::fabs( edge_ab.dot( edge_ac.cross( edge_ad ) ) );
+            std::fabs( edge01.dot( edge02.cross( edge03 ) ) );
         if( absolute_det < GLOBAL_EPSILON )
         {
             return std::numeric_limits< double >::max();
         }
-        const Vector3D edge_bc{ vertices[1], vertices[2] };
-        const Vector3D edge_bd{ vertices[1], vertices[3] };
-        const Vector3D edge_cd{ vertices[2], vertices[3] };
-        const auto edge_ab_l2 = edge_ab.length2();
-        const auto edge_bc_l2 = edge_bc.length2();
-        const auto edge_ac_l2 = edge_ac.length2();
-        const auto edge_ad_l2 = edge_ad.length2();
-        const auto edge_bd_l2 = edge_bd.length2();
-        const auto edge_cd_l2 = edge_cd.length2();
-        const auto longest_edge_length = std::sqrt( std::max( { edge_ab_l2,
-            edge_bc_l2, edge_ac_l2, edge_ad_l2, edge_bd_l2, edge_cd_l2 } ) );
-        const auto total_area2 = edge_ab.cross( edge_bc ).length()
-                                 + edge_ab.cross( edge_ad ).length()
-                                 + edge_ac.cross( edge_ad ).length()
-                                 + edge_bc.cross( edge_cd ).length();
+        const Vector3D edge12{ vertices[1], vertices[2] };
+        const Vector3D edge13{ vertices[1], vertices[3] };
+        const Vector3D edge23{ vertices[2], vertices[3] };
+        const auto longest_edge_length = std::sqrt(
+            std::max( { edge01.length2(), edge12.length2(), edge02.length2(),
+                edge03.length2(), edge13.length2(), edge23.length2() } ) );
+        const auto total_area2 =
+            edge01.cross( edge12 ).length() + edge01.cross( edge03 ).length()
+            + edge02.cross( edge03 ).length() + edge12.cross( edge23 ).length();
         const auto constant = std::sqrt( 6 ) / 12.;
         const auto aspect_ratio =
             constant * longest_edge_length * total_area2 / absolute_det;
@@ -193,37 +189,23 @@ namespace geode
             return 0.;
         }
         const auto& vertices = tetra.vertices();
-        double max_length{ 0 };
-        for( const auto v0 : LRange{ 3 } )
-        {
-            const auto& point0 = vertices[v0].get();
-            for( const auto v1 : LRange{ v0, 4 } )
-            {
-                const auto& point1 = vertices[v1].get();
-                const auto length = point_point_distance( point0, point1 );
-                if( length > max_length )
-                {
-                    max_length = length;
-                }
-            }
-        }
-        double facet_area{ 0 };
-        for( const auto v0 : LRange{ 2 } )
-        {
-            const auto& point0 = vertices[v0].get();
-            for( const auto v1 : LRange{ v0, 3 } )
-            {
-                const auto& point1 = vertices[v1].get();
-                for( const auto v2 : LRange{ v1, 4 } )
-                {
-                    const auto& point2 = vertices[v2].get();
-                    facet_area +=
-                        triangle_area( Triangle3D{ point0, point1, point2 } );
-                }
-            }
-        }
+        const Vector3D edge01{ vertices[0], vertices[1] };
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
+        const Vector3D edge12{ vertices[1], vertices[2] };
+        const Vector3D edge13{ vertices[1], vertices[3] };
+        const Vector3D edge23{ vertices[2], vertices[3] };
+        const auto max_length = std::sqrt(
+            std::max( { edge01.length2(), edge12.length2(), edge02.length2(),
+                edge03.length2(), edge13.length2(), edge23.length2() } ) );
+        double tetra_area{ 0 };
+        tetra_area += edge01.cross( edge02 ).length();
+        tetra_area += edge01.cross( edge03 ).length();
+        tetra_area += edge02.cross( edge03 ).length();
+        tetra_area += edge12.cross( edge13 ).length();
+        tetra_area /= 2.;
         return 6. * std::sqrt( 6 ) * signed_volume
-               / ( facet_area * max_length );
+               / ( tetra_area * max_length );
     }
 
     double tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra )
@@ -233,21 +215,16 @@ namespace geode
         {
             return 0.;
         }
-        double sq_len{ 0 };
         const auto& vertices = tetra.vertices();
-        for( const auto v0 : LRange{ 3 } )
-        {
-            const auto& point0 = vertices[v0].get();
-            for( const auto v1 : LRange{ v0, 4 } )
-            {
-                const auto& point1 = vertices[v1].get();
-                for( const auto d : LRange{ 3 } )
-                {
-                    const auto diff = point0.value( d ) - point1.value( d );
-                    sq_len += diff * diff;
-                }
-            }
-        }
+        const Vector3D edge01{ vertices[0], vertices[1] };
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
+        const Vector3D edge12{ vertices[1], vertices[2] };
+        const Vector3D edge13{ vertices[1], vertices[3] };
+        const Vector3D edge23{ vertices[2], vertices[3] };
+        const auto sq_len =
+            std::max( { edge01.length2(), edge02.length2(), edge03.length2(),
+                edge12.length2(), edge13.length2(), edge23.length2() } );
         const auto l_rms = std::sqrt( sq_len / 6 );
         return 6 * std::sqrt( 2 ) * signed_volume / ( l_rms * l_rms * l_rms );
     }
@@ -258,24 +235,18 @@ namespace geode
         {
             return std::numeric_limits< double >::max();
         }
-
         const auto& vertices = tetra.vertices();
-        const Vector3D edge_ab{ vertices[0], vertices[1] };
-        const Vector3D edge_ac{ vertices[0], vertices[2] };
-        const Vector3D edge_ad{ vertices[0], vertices[3] };
-        const Vector3D edge_bc{ vertices[1], vertices[2] };
-        const Vector3D edge_bd{ vertices[1], vertices[3] };
-        const Vector3D edge_cd{ vertices[2], vertices[3] };
-        const auto edge_ab_l2 = edge_ab.length2();
-        const auto edge_bc_l2 = edge_bc.length2();
-        const auto edge_ac_l2 = edge_ac.length2();
-        const auto edge_ad_l2 = edge_ad.length2();
-        const auto edge_bd_l2 = edge_bd.length2();
-        const auto edge_cd_l2 = edge_cd.length2();
-        const auto longest_edge_length = std::sqrt( std::max( { edge_ab_l2,
-            edge_bc_l2, edge_ac_l2, edge_ad_l2, edge_bd_l2, edge_cd_l2 } ) );
+        const Vector3D edge01{ vertices[0], vertices[1] };
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
+        const Vector3D edge12{ vertices[1], vertices[2] };
+        const Vector3D edge13{ vertices[1], vertices[3] };
+        const Vector3D edge23{ vertices[2], vertices[3] };
+        const auto longest_edge_length = std::sqrt(
+            std::max( { edge01.length2(), edge12.length2(), edge02.length2(),
+                edge03.length2(), edge13.length2(), edge23.length2() } ) );
 
-        SquareMatrix3D matrix{ { edge_ad, edge_bd, edge_cd } };
+        SquareMatrix3D matrix{ { edge03, edge13, edge23 } };
         const auto row_indices = lu_decomposition( matrix );
 
         std::array< Vector3D, 4 > N;
