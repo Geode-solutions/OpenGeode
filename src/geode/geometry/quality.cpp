@@ -222,9 +222,9 @@ namespace geode
         const Vector3D edge12{ vertices[1], vertices[2] };
         const Vector3D edge13{ vertices[1], vertices[3] };
         const Vector3D edge23{ vertices[2], vertices[3] };
-        const auto sq_len =
-            std::max( { edge01.length2(), edge02.length2(), edge03.length2(),
-                edge12.length2(), edge13.length2(), edge23.length2() } );
+        const auto sq_len = edge01.length2() + edge02.length2()
+                            + edge03.length2() + edge12.length2()
+                            + edge13.length2() + edge23.length2();
         const auto l_rms = std::sqrt( sq_len / 6 );
         return 6 * std::sqrt( 2 ) * signed_volume / ( l_rms * l_rms * l_rms );
     }
