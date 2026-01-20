@@ -44,10 +44,22 @@ namespace geode
             BRepBuilder& new_brep_builder,
             const ModelGenericMapping& component_mapping );
 
+        void opengeode_model_api transfer_brep_collections(
+            const BRep& old_brep,
+            const BRep& new_brep,
+            BRepBuilder& new_brep_builder,
+            const ModelUnchangedComponentMapping& unchanged_components );
+
         void opengeode_model_api transfer_section_collections(
             const Section& old_section,
             const Section& new_section,
             SectionBuilder& new_brep_builder,
             const ModelGenericMapping& component_mapping );
+
+        void opengeode_model_api transfer_section_collections(
+            const Section& old_section,
+            const Section& new_section,
+            SectionBuilder& new_brep_builder,
+            const ModelUnchangedComponentMapping& unchanged_components );
     } // namespace detail
 } // namespace geode

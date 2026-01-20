@@ -71,5 +71,8 @@ namespace geode
     {
         [[nodiscard]] local_index_t opengeode_geometry_api position_to_index(
             POSITION position );
+
+        [[nodiscard]] std::string opengeode_geometry_api position_to_string(
+            POSITION position );
     } // namespace detail
 } // namespace geode
