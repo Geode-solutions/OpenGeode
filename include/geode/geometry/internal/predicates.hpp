@@ -429,7 +429,6 @@ namespace GEO
 
     enum SIGN
     {
-
         negative = -1,
 
         zero = 0,

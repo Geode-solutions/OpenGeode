@@ -69,9 +69,12 @@ namespace
             {
                 continue;
             }
-            new_model_builder.add_corner_collection( collection_in.id() );
-            new_model_builder.set_corner_collection_name(
-                collection_in.id(), collection_in.name() );
+            if( !new_model.has_corner_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_corner_collection( collection_in.id() );
+                new_model_builder.set_corner_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
             const auto& new_collection =
                 new_model.corner_collection( collection_in.id() );
             for( const auto& corner_in_collection :
@@ -93,6 +96,51 @@ namespace
                             new_model.corner( corner_out_id ), new_collection );
                     }
                 }
+            }
+        }
+    }
+
+    template < typename Model >
+    void transfer_corner_collections( const Model& old_model,
+        const Model& new_model,
+        typename Model::Builder& new_model_builder,
+        const geode::ModelUnchangedComponentMapping& unchanged_components )
+    {
+        if( !unchanged_components.has_mapping_type(
+                geode::Corner< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
+        const auto& unchanged_corners = unchanged_components.at(
+            geode::Corner< Model::dim >::component_type_static() );
+        for( const auto& collection_in : old_model.corner_collections() )
+        {
+            std::vector< geode::uuid > corners_to_add;
+            for( const auto& corner_in_collection :
+                old_model.corner_collection_items( collection_in ) )
+            {
+                if( absl::c_contains(
+                        unchanged_corners, corner_in_collection.id() ) )
+                {
+                    corners_to_add.push_back( corner_in_collection.id() );
+                }
+            }
+            if( corners_to_add.empty() )
+            {
+                continue;
+            }
+            if( !new_model.has_corner_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_corner_collection( collection_in.id() );
+                new_model_builder.set_corner_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
+            const auto& new_collection =
+                new_model.corner_collection( collection_in.id() );
+            for( const auto& corner_id : corners_to_add )
+            {
+                new_model_builder.add_corner_in_corner_collection(
+                    new_model.corner( corner_id ), new_collection );
             }
         }
     }
@@ -126,9 +174,12 @@ namespace
             {
                 continue;
             }
-            new_model_builder.add_line_collection( collection_in.id() );
-            new_model_builder.set_line_collection_name(
-                collection_in.id(), collection_in.name() );
+            if( !new_model.has_line_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_line_collection( collection_in.id() );
+                new_model_builder.set_line_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
             const auto& new_collection =
                 new_model.line_collection( collection_in.id() );
             for( const auto& line_in_collection :
@@ -149,6 +200,50 @@ namespace
                             new_model.line( line_out_id ), new_collection );
                     }
                 }
+            }
+        }
+    }
+    template < typename Model >
+    void transfer_line_collections( const Model& old_model,
+        const Model& new_model,
+        typename Model::Builder& new_model_builder,
+        const geode::ModelUnchangedComponentMapping& unchanged_components )
+    {
+        if( !unchanged_components.has_mapping_type(
+                geode::Line< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
+        const auto& unchanged_lines = unchanged_components.at(
+            geode::Line< Model::dim >::component_type_static() );
+        for( const auto& collection_in : old_model.line_collections() )
+        {
+            std::vector< geode::uuid > lines_to_add;
+            for( const auto& line_in_collection :
+                old_model.line_collection_items( collection_in ) )
+            {
+                if( absl::c_contains(
+                        unchanged_lines, line_in_collection.id() ) )
+                {
+                    lines_to_add.push_back( line_in_collection.id() );
+                }
+            }
+            if( lines_to_add.empty() )
+            {
+                continue;
+            }
+            if( !new_model.has_line_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_line_collection( collection_in.id() );
+                new_model_builder.set_line_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
+            const auto& new_collection =
+                new_model.line_collection( collection_in.id() );
+            for( const auto& line_id : lines_to_add )
+            {
+                new_model_builder.add_line_in_line_collection(
+                    new_model.line( line_id ), new_collection );
             }
         }
     }
@@ -183,9 +278,12 @@ namespace
             {
                 continue;
             }
-            new_model_builder.add_surface_collection( collection_in.id() );
-            new_model_builder.set_surface_collection_name(
-                collection_in.id(), collection_in.name() );
+            if( !new_model.has_surface_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_surface_collection( collection_in.id() );
+                new_model_builder.set_surface_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
             const auto& new_collection =
                 new_model.surface_collection( collection_in.id() );
             for( const auto& surface_in_collection :
@@ -208,6 +306,51 @@ namespace
                             new_collection );
                     }
                 }
+            }
+        }
+    }
+
+    template < typename Model >
+    void transfer_surface_collections( const Model& old_model,
+        const Model& new_model,
+        typename Model::Builder& new_model_builder,
+        const geode::ModelUnchangedComponentMapping& unchanged_components )
+    {
+        if( !unchanged_components.has_mapping_type(
+                geode::Surface< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
+        const auto& unchanged_surfaces = unchanged_components.at(
+            geode::Surface< Model::dim >::component_type_static() );
+        for( const auto& collection_in : old_model.surface_collections() )
+        {
+            std::vector< geode::uuid > surfaces_to_add;
+            for( const auto& surface_in_collection :
+                old_model.surface_collection_items( collection_in ) )
+            {
+                if( absl::c_contains(
+                        unchanged_surfaces, surface_in_collection.id() ) )
+                {
+                    surfaces_to_add.push_back( surface_in_collection.id() );
+                }
+            }
+            if( surfaces_to_add.empty() )
+            {
+                continue;
+            }
+            if( !new_model.has_surface_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_surface_collection( collection_in.id() );
+                new_model_builder.set_surface_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
+            const auto& new_collection =
+                new_model.surface_collection( collection_in.id() );
+            for( const auto& surface_id : surfaces_to_add )
+            {
+                new_model_builder.add_surface_in_surface_collection(
+                    new_model.surface( surface_id ), new_collection );
             }
         }
     }
@@ -241,9 +384,12 @@ namespace
             {
                 continue;
             }
-            new_model_builder.add_block_collection( collection_in.id() );
-            new_model_builder.set_block_collection_name(
-                collection_in.id(), collection_in.name() );
+            if( !new_model.has_block_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_block_collection( collection_in.id() );
+                new_model_builder.set_block_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
             const auto& new_collection =
                 new_model.block_collection( collection_in.id() );
             for( const auto& block_in_collection :
@@ -264,6 +410,50 @@ namespace
                             new_model.block( block_out_id ), new_collection );
                     }
                 }
+            }
+        }
+    }
+
+    void transfer_block_collections( const geode::BRep& old_model,
+        const geode::BRep& new_model,
+        typename geode::BRepBuilder& new_model_builder,
+        const geode::ModelUnchangedComponentMapping& unchanged_components )
+    {
+        if( !unchanged_components.has_mapping_type(
+                geode::Block3D::component_type_static() ) )
+        {
+            return;
+        }
+        const auto& unchanged_blocks =
+            unchanged_components.at( geode::Block3D::component_type_static() );
+        for( const auto& collection_in : old_model.block_collections() )
+        {
+            std::vector< geode::uuid > blocks_to_add;
+            for( const auto& block_in_collection :
+                old_model.block_collection_items( collection_in ) )
+            {
+                if( absl::c_contains(
+                        unchanged_blocks, block_in_collection.id() ) )
+                {
+                    blocks_to_add.push_back( block_in_collection.id() );
+                }
+            }
+            if( blocks_to_add.empty() )
+            {
+                continue;
+            }
+            if( !new_model.has_block_collection( collection_in.id() ) )
+            {
+                new_model_builder.add_block_collection( collection_in.id() );
+                new_model_builder.set_block_collection_name(
+                    collection_in.id(), collection_in.name() );
+            }
+            const auto& new_collection =
+                new_model.block_collection( collection_in.id() );
+            for( const auto& block_id : blocks_to_add )
+            {
+                new_model_builder.add_block_in_block_collection(
+                    new_model.block( block_id ), new_collection );
             }
         }
     }
@@ -297,9 +487,12 @@ namespace
             {
                 continue;
             }
-            new_model_builder.add_model_boundary( collection_in.id() );
-            new_model_builder.set_model_boundary_name(
-                collection_in.id(), collection_in.name() );
+            if( !new_model.has_model_boundary( collection_in.id() ) )
+            {
+                new_model_builder.add_model_boundary( collection_in.id() );
+                new_model_builder.set_model_boundary_name(
+                    collection_in.id(), collection_in.name() );
+            }
             const auto& new_collection =
                 new_model.model_boundary( collection_in.id() );
             for( const auto& surface_in_collection :
@@ -322,6 +515,50 @@ namespace
                             new_collection );
                     }
                 }
+            }
+        }
+    }
+
+    void transfer_brep_model_boundaries( const geode::BRep& old_model,
+        const geode::BRep& new_model,
+        typename geode::BRepBuilder& new_model_builder,
+        const geode::ModelUnchangedComponentMapping& unchanged_components )
+    {
+        if( !unchanged_components.has_mapping_type(
+                geode::Surface3D::component_type_static() ) )
+        {
+            return;
+        }
+        const auto& unchanged_surfaces = unchanged_components.at(
+            geode::Surface3D::component_type_static() );
+        for( const auto& model_bdry : old_model.model_boundaries() )
+        {
+            std::vector< geode::uuid > surfaces_to_add;
+            for( const auto& surface_in_bdry :
+                old_model.model_boundary_items( model_bdry ) )
+            {
+                if( absl::c_contains(
+                        unchanged_surfaces, surface_in_bdry.id() ) )
+                {
+                    surfaces_to_add.push_back( surface_in_bdry.id() );
+                }
+            }
+            if( surfaces_to_add.empty() )
+            {
+                continue;
+            }
+            if( !new_model.has_model_boundary( model_bdry.id() ) )
+            {
+                new_model_builder.add_model_boundary( model_bdry.id() );
+                new_model_builder.set_model_boundary_name(
+                    model_bdry.id(), model_bdry.name() );
+            }
+            const auto& new_model_bdry =
+                new_model.model_boundary( model_bdry.id() );
+            for( const auto& surface_id : surfaces_to_add )
+            {
+                new_model_builder.add_surface_in_model_boundary(
+                    new_model.surface( surface_id ), new_model_bdry );
             }
         }
     }
@@ -355,9 +592,12 @@ namespace
             {
                 continue;
             }
-            new_model_builder.add_model_boundary( collection_in.id() );
-            new_model_builder.set_model_boundary_name(
-                collection_in.id(), collection_in.name() );
+            if( !new_model.has_model_boundary( collection_in.id() ) )
+            {
+                new_model_builder.add_model_boundary( collection_in.id() );
+                new_model_builder.set_model_boundary_name(
+                    collection_in.id(), collection_in.name() );
+            }
             const auto& new_collection =
                 new_model.model_boundary( collection_in.id() );
             for( const auto& line_in_collection :
@@ -378,6 +618,49 @@ namespace
                             new_model.line( line_out_id ), new_collection );
                     }
                 }
+            }
+        }
+    }
+
+    void transfer_section_model_boundaries( const geode::Section& old_model,
+        const geode::Section& new_model,
+        typename geode::SectionBuilder& new_model_builder,
+        const geode::ModelUnchangedComponentMapping& unchanged_components )
+    {
+        if( !unchanged_components.has_mapping_type(
+                geode::Line2D::component_type_static() ) )
+        {
+            return;
+        }
+        const auto& unchanged_lines =
+            unchanged_components.at( geode::Line2D::component_type_static() );
+        for( const auto& model_bdry : old_model.model_boundaries() )
+        {
+            std::vector< geode::uuid > lines_to_add;
+            for( const auto& line_in_bdry :
+                old_model.model_boundary_items( model_bdry ) )
+            {
+                if( absl::c_contains( unchanged_lines, line_in_bdry.id() ) )
+                {
+                    lines_to_add.push_back( line_in_bdry.id() );
+                }
+            }
+            if( lines_to_add.empty() )
+            {
+                continue;
+            }
+            if( !new_model.has_model_boundary( model_bdry.id() ) )
+            {
+                new_model_builder.add_model_boundary( model_bdry.id() );
+                new_model_builder.set_model_boundary_name(
+                    model_bdry.id(), model_bdry.name() );
+            }
+            const auto& new_model_bdry =
+                new_model.model_boundary( model_bdry.id() );
+            for( const auto& line_id : lines_to_add )
+            {
+                new_model_builder.add_line_in_model_boundary(
+                    new_model.line( line_id ), new_model_bdry );
             }
         }
     }
@@ -405,6 +688,24 @@ namespace geode
                 old_brep, new_brep, new_brep_builder, component_mapping );
         }
 
+        void opengeode_model_api transfer_brep_collections(
+            const BRep& old_brep,
+            const BRep& new_brep,
+            BRepBuilder& new_brep_builder,
+            const ModelUnchangedComponentMapping& unchanged_components )
+        {
+            transfer_corner_collections(
+                old_brep, new_brep, new_brep_builder, unchanged_components );
+            transfer_line_collections(
+                old_brep, new_brep, new_brep_builder, unchanged_components );
+            transfer_surface_collections(
+                old_brep, new_brep, new_brep_builder, unchanged_components );
+            transfer_block_collections(
+                old_brep, new_brep, new_brep_builder, unchanged_components );
+            transfer_brep_model_boundaries(
+                old_brep, new_brep, new_brep_builder, unchanged_components );
+        }
+
         void opengeode_model_api transfer_section_collections(
             const Section& old_section,
             const Section& new_section,
@@ -419,6 +720,22 @@ namespace geode
                 new_section_builder, component_mapping );
             transfer_section_model_boundaries( old_section, new_section,
                 new_section_builder, component_mapping );
+        }
+
+        void opengeode_model_api transfer_section_collections(
+            const Section& old_section,
+            const Section& new_section,
+            SectionBuilder& new_brep_builder,
+            const ModelUnchangedComponentMapping& unchanged_components )
+        {
+            transfer_corner_collections( old_section, new_section,
+                new_brep_builder, unchanged_components );
+            transfer_line_collections( old_section, new_section,
+                new_brep_builder, unchanged_components );
+            transfer_surface_collections( old_section, new_section,
+                new_brep_builder, unchanged_components );
+            transfer_section_model_boundaries( old_section, new_section,
+                new_brep_builder, unchanged_components );
         }
     } // namespace detail
 } // namespace geode
