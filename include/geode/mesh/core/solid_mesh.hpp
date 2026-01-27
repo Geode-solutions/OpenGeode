@@ -27,6 +27,7 @@
 #include <vector>
 
 #include <absl/container/inlined_vector.h>
+#include <absl/hash/hash.h>
 
 #include <geode/basic/passkey.hpp>
 
@@ -87,6 +88,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
+        template < typename H >
+        friend H AbslHashValue( H h, const PolyhedronVertex& value )
+        {
+            return H::combine(
+                std::move( h ), value.polyhedron_id, value.vertex_id );
+        }
+
         index_t polyhedron_id{ NO_ID };
         local_index_t vertex_id{ NO_LID };
     };
@@ -125,6 +133,13 @@ namespace geode
         }
         template < typename Archive >
         void serialize( Archive& archive );
+
+        template < typename H >
+        friend H AbslHashValue( H h, const PolyhedronFacet& value )
+        {
+            return H::combine(
+                std::move( h ), value.polyhedron_id, value.facet_id );
+        }
 
         index_t polyhedron_id{ NO_ID };
         local_index_t facet_id{ NO_LID };
@@ -165,6 +180,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
+        template < typename H >
+        friend H AbslHashValue( H h, const PolyhedronFacetVertex& value )
+        {
+            return H::combine(
+                std::move( h ), value.polyhedron_facet, value.vertex_id );
+        }
+
         PolyhedronFacet polyhedron_facet;
         local_index_t vertex_id{ NO_LID };
     };
@@ -200,6 +222,13 @@ namespace geode
         }
         template < typename Archive >
         void serialize( Archive& archive );
+
+        template < typename H >
+        friend H AbslHashValue( H h, const PolyhedronFacetEdge& value )
+        {
+            return H::combine(
+                std::move( h ), value.polyhedron_facet, value.edge_id );
+        }
 
         PolyhedronFacet polyhedron_facet;
         local_index_t edge_id{ NO_LID };

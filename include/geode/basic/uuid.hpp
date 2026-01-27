@@ -81,6 +81,8 @@
 
 #include <string>
 
+#include <absl/hash/hash.h>
+
 #include <bitsery/bitsery.h>
 
 #include <geode/basic/common.hpp>
@@ -109,6 +111,12 @@ namespace geode
         [[nodiscard]] bool operator<( const uuid &other ) const;
 
         [[nodiscard]] std::string string() const;
+
+        template < typename H >
+        friend H AbslHashValue( H h, const uuid &value )
+        {
+            return H::combine( std::move( h ), value.ab, value.cd );
+        }
 
         uint64_t ab;
         uint64_t cd;

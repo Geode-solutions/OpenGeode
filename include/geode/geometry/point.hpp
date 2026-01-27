@@ -25,6 +25,8 @@
 
 #include <array>
 
+#include <absl/hash/hash.h>
+
 #include <geode/basic/attribute_utils.hpp>
 #include <geode/basic/range.hpp>
 
@@ -79,6 +81,12 @@ namespace geode
 
         [[nodiscard]] Point< dimension - 1 > project_point(
             local_index_t axis_to_remove ) const;
+
+        template < typename H >
+        friend H AbslHashValue( H h, const Point &point )
+        {
+            return H::combine( std::move( h ), point.values_ );
+        }
 
     private:
         friend class bitsery::Access;
