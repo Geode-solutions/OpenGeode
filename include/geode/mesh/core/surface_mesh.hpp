@@ -26,6 +26,7 @@
 #include <optional>
 
 #include <absl/container/inlined_vector.h>
+#include <absl/hash/hash.h>
 
 #include <geode/basic/passkey.hpp>
 
@@ -88,6 +89,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
+        template < typename H >
+        friend H AbslHashValue( H h, const PolygonVertex& value )
+        {
+            return H::combine(
+                std::move( h ), value.polygon_id, value.vertex_id );
+        }
+
         index_t polygon_id{ NO_ID };
         local_index_t vertex_id{ NO_LID };
     };
@@ -125,6 +133,13 @@ namespace geode
         }
         template < typename Archive >
         void serialize( Archive& archive );
+
+        template < typename H >
+        friend H AbslHashValue( H h, const PolygonEdge& value )
+        {
+            return H::combine(
+                std::move( h ), value.polygon_id, value.edge_id );
+        }
 
         index_t polygon_id{ NO_ID };
         local_index_t edge_id{ NO_LID };

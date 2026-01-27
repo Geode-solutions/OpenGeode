@@ -24,6 +24,7 @@
 #pragma once
 
 #include <absl/algorithm/container.h>
+#include <absl/hash/hash.h>
 #include <absl/types/span.h>
 
 #include <geode/basic/uuid.hpp>
@@ -74,6 +75,13 @@ namespace geode
         [[nodiscard]] std::string string() const
         {
             return absl::StrCat( "[", mesh_id.string(), " ", element_id, "]" );
+        }
+
+        template < typename H >
+        friend H AbslHashValue( H h, const MeshElement& value )
+        {
+            return H::combine(
+                std::move( h ), value.mesh_id, value.element_id );
         }
 
         uuid mesh_id;

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/hash/hash.h>
+
 #include <bitsery/brief_syntax/string.h>
 
 #include <geode/basic/growable.hpp>
@@ -85,6 +87,12 @@ namespace geode
         [[nodiscard]] std::string string() const
         {
             return absl::StrCat( type_.get(), " ", id_.string() );
+        }
+
+        template < typename H >
+        friend H AbslHashValue( H h, const ComponentID& value )
+        {
+            return H::combine( std::move( h ), value.type_, value.id_ );
         }
 
     private:
