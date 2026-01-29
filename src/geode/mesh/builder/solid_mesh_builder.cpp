@@ -25,6 +25,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/permutation.hpp>
 
 #include <geode/geometry/point.hpp>
@@ -291,11 +292,17 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_edge_and_facet( const geode::SolidMesh< dimension >& solid,
-        geode::SolidMeshBuilder< dimension >& builder,
-        const geode::PolyhedronVertex& polyhedron_vertex,
-        geode::index_t new_vertex_id )
+    std::tuple< geode::BijectiveMapping< geode::index_t >,
+        geode::BijectiveMapping< geode::index_t > >
+        update_edge_and_facet( const geode::SolidMesh< dimension >& solid,
+            geode::SolidMeshBuilder< dimension >& builder,
+            const geode::PolyhedronVertex& polyhedron_vertex,
+            geode::index_t new_vertex_id )
     {
+        std::tuple< geode::BijectiveMapping< geode::index_t >,
+            geode::BijectiveMapping< geode::index_t > >
+            mappings;
+        auto& [edge_mapping, facet_mapping] = mappings;
         for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
                  polyhedron_vertex.polyhedron_id ) } )
         {
@@ -322,17 +329,16 @@ namespace
             {
                 facet_vertices_id.emplace_back( solid.polyhedron_vertex( v ) );
             }
-
             const auto position = static_cast< geode::index_t >(
                 std::distance( facet_vertices.begin(), position_it ) );
-
             if( solid.are_facets_enabled() )
             {
                 auto facets = builder.facets_builder();
-                facets.update_facet_vertex(
-                    facet_vertices_id, position, new_vertex_id );
+                const auto [old_facet_id, new_facet_id] =
+                    facets.update_facet_vertex(
+                        facet_vertices_id, position, new_vertex_id );
+                facet_mapping.map( old_facet_id, new_facet_id );
             }
-
             if( solid.are_edges_enabled() )
             {
                 auto edges = builder.edges_builder();
@@ -343,8 +349,10 @@ namespace
                 };
                 if( next_edge_vertices[0] < next_edge_vertices[1] )
                 {
-                    edges.update_edge_vertex(
-                        next_edge_vertices, 0, new_vertex_id );
+                    const auto [old_edge_id, new_edge_id] =
+                        edges.update_edge_vertex(
+                            next_edge_vertices, 0, new_vertex_id );
+                    edge_mapping.map( old_edge_id, new_edge_id );
                 }
                 const auto prev =
                     position == 0 ? nb_facet_vertices - 1 : position - 1;
@@ -353,11 +361,14 @@ namespace
                 };
                 if( previous_edge_vertices[0] < previous_edge_vertices[1] )
                 {
-                    edges.update_edge_vertex(
-                        previous_edge_vertices, 1, new_vertex_id );
+                    const auto [old_edge_id, new_edge_id] =
+                        edges.update_edge_vertex(
+                            previous_edge_vertices, 1, new_vertex_id );
+                    edge_mapping.map( old_edge_id, new_edge_id );
                 }
             }
         }
+        return mappings;
     }
 } // namespace
 
@@ -384,12 +395,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidMeshBuilder< dimension >::replace_vertex(
-        index_t old_vertex_id, index_t new_vertex_id )
+    std::tuple< BijectiveMapping< index_t >, BijectiveMapping< index_t > >
+        SolidMeshBuilder< dimension >::replace_vertex(
+            index_t old_vertex_id, index_t new_vertex_id )
     {
+        std::tuple< BijectiveMapping< index_t >, BijectiveMapping< index_t > >
+            mappings;
+        auto& [edge_mapping, facet_mapping] = mappings;
         if( old_vertex_id == new_vertex_id )
         {
-            return;
+            return mappings;
         }
         const auto& polyhedra_around =
             solid_mesh_.polyhedra_around_vertex( old_vertex_id );
@@ -399,12 +414,24 @@ namespace geode
             if( solid_mesh_.are_edges_enabled()
                 || solid_mesh_.are_facets_enabled() )
             {
-                update_edge_and_facet(
-                    solid_mesh_, *this, polyhedron_around, new_vertex_id );
+                const auto [local_edge_mapping, local_facet_mapping] =
+                    update_edge_and_facet(
+                        solid_mesh_, *this, polyhedron_around, new_vertex_id );
+                for( const auto& [old_edge_id, new_edge_id] :
+                    local_edge_mapping.in2out_map() )
+                {
+                    edge_mapping.map( old_edge_id, new_edge_id );
+                }
+                for( const auto& [old_facet_id, new_facet_id] :
+                    local_facet_mapping.in2out_map() )
+                {
+                    facet_mapping.map( old_facet_id, new_facet_id );
+                }
             }
             update_polyhedron_vertex( polyhedron_around, new_vertex_id );
         }
         reset_polyhedra_around_vertex( old_vertex_id );
+        return mappings;
     }
 
     template < index_t dimension >

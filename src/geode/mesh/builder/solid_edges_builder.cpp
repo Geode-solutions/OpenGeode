@@ -62,12 +62,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidEdgesBuilder< dimension >::update_edge_vertex(
-        std::array< index_t, 2 > edge_vertices,
-        index_t edge_vertex_id,
-        index_t new_vertex_id )
+    std::pair< index_t, index_t >
+        SolidEdgesBuilder< dimension >::update_edge_vertex(
+            std::array< index_t, 2 > edge_vertices,
+            index_t edge_vertex_id,
+            index_t new_vertex_id )
     {
-        edges_->update_edge_vertex(
+        return edges_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id, {} );
     }
 

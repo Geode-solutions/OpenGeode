@@ -98,11 +98,12 @@ namespace geode
             return Facets::get_facet_vertices( facet_id );
         }
 
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+        std::pair< index_t, index_t > update_facet_vertex(
+            PolyhedronFacetVertices facet_vertices,
             const index_t facet_vertex_id,
             const index_t new_vertex_id )
         {
-            Facets::update_facet_vertex(
+            return Facets::update_facet_vertex(
                 std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
         }
 
@@ -215,13 +216,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidFacets< dimension >::update_facet_vertex(
+    std::pair< index_t, index_t > SolidFacets< dimension >::update_facet_vertex(
         PolyhedronFacetVertices facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id,
         SolidFacetsKey )
     {
-        impl_->update_facet_vertex(
+        return impl_->update_facet_vertex(
             std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
     }
 

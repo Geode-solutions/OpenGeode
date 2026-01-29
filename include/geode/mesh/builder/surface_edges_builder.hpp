@@ -63,7 +63,8 @@ namespace geode
 
         void update_edge_vertices( absl::Span< const index_t > old2new );
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+        std::pair< index_t, index_t > update_edge_vertex(
+            std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 

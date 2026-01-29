@@ -30,6 +30,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -104,12 +105,12 @@ namespace geode
                 return id;
             }
 
-            void remove_facet( TypedVertexCycle vertices )
+            index_t remove_facet( TypedVertexCycle vertices )
             {
                 const auto it = facet_indices_.find( vertices );
                 if( it == facet_indices_.end() )
                 {
-                    return;
+                    return NO_ID;
                 }
                 const auto id = it->second;
                 OPENGEODE_ASSERT( id != NO_ID,
@@ -118,6 +119,7 @@ namespace geode
                 const auto old_count = counter_->value( id );
                 const auto new_count = std::max( 1u, old_count ) - 1;
                 counter_->set_value( id, new_count );
+                return id;
             }
 
             std::vector< index_t > clean_facets()
@@ -155,16 +157,20 @@ namespace geode
                 return old2new;
             }
 
-            void update_facet_vertex( VertexContainer facet_vertices,
+            std::pair< index_t, index_t > update_facet_vertex(
+                VertexContainer facet_vertices,
                 const index_t facet_vertex_id,
                 const index_t new_vertex_id )
             {
+                std::pair< index_t, index_t > old2new;
+                auto& [old_facet_id, new_facet_id] = old2new;
                 auto updated_facet_vertices = facet_vertices;
                 updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-                this->add_facet(
+                new_facet_id = this->add_facet(
                     TypedVertexCycle{ std::move( updated_facet_vertices ) } );
-                this->remove_facet(
+                old_facet_id = this->remove_facet(
                     TypedVertexCycle{ std::move( facet_vertices ) } );
+                return old2new;
             }
 
             std::vector< index_t > update_facet_vertices(
