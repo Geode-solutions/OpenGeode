@@ -25,6 +25,7 @@
 
 #include <vector>
 
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -88,7 +89,7 @@ namespace geode
         void update_edge_vertices(
             absl::Span< const index_t > old2new, SolidEdgesKey );
 
-        std::pair< index_t, index_t > update_edge_vertex(
+        BijectiveMapping< index_t > update_edge_vertex(
             std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id,

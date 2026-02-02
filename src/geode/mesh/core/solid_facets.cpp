@@ -98,7 +98,7 @@ namespace geode
             return Facets::get_facet_vertices( facet_id );
         }
 
-        std::pair< index_t, index_t > update_facet_vertex(
+        BijectiveMapping< index_t > update_facet_vertex(
             PolyhedronFacetVertices facet_vertices,
             const index_t facet_vertex_id,
             const index_t new_vertex_id )
@@ -216,7 +216,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::pair< index_t, index_t > SolidFacets< dimension >::update_facet_vertex(
+    BijectiveMapping< index_t > SolidFacets< dimension >::update_facet_vertex(
         PolyhedronFacetVertices facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id,

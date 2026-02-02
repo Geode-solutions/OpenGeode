@@ -82,7 +82,7 @@ namespace geode
         std::vector< index_t > update_facet_vertices(
             absl::Span< const index_t > old2new, SolidFacetsKey );
 
-        std::pair< index_t, index_t > update_facet_vertex(
+        BijectiveMapping< index_t > update_facet_vertex(
             PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id,

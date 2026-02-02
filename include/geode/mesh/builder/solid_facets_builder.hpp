@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/mapping.hpp>
+
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
@@ -59,7 +61,7 @@ namespace geode
 
         void remove_facet( PolyhedronFacetVertices facet_vertices );
 
-        std::pair< index_t, index_t > update_facet_vertex(
+        geode::BijectiveMapping< index_t > update_facet_vertex(
             PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );

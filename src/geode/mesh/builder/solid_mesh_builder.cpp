@@ -334,10 +334,13 @@ namespace
             if( solid.are_facets_enabled() )
             {
                 auto facets = builder.facets_builder();
-                const auto [old_facet_id, new_facet_id] =
-                    facets.update_facet_vertex(
-                        facet_vertices_id, position, new_vertex_id );
-                facet_mapping.map( old_facet_id, new_facet_id );
+                const auto maping = facets.update_facet_vertex(
+                    facet_vertices_id, position, new_vertex_id );
+                for( const auto& [old_facet_id, new_facet_id] :
+                    maping.in2out_map() )
+                {
+                    facet_mapping.map( old_facet_id, new_facet_id );
+                }
             }
             if( solid.are_edges_enabled() )
             {
@@ -349,10 +352,13 @@ namespace
                 };
                 if( next_edge_vertices[0] < next_edge_vertices[1] )
                 {
-                    const auto [old_edge_id, new_edge_id] =
-                        edges.update_edge_vertex(
-                            next_edge_vertices, 0, new_vertex_id );
-                    edge_mapping.map( old_edge_id, new_edge_id );
+                    const auto mapping = edges.update_edge_vertex(
+                        next_edge_vertices, 0, new_vertex_id );
+                    for( const auto& [old_edge_id, new_edge_id] :
+                        mapping.in2out_map() )
+                    {
+                        edge_mapping.map( old_edge_id, new_edge_id );
+                    }
                 }
                 const auto prev =
                     position == 0 ? nb_facet_vertices - 1 : position - 1;
@@ -361,10 +367,13 @@ namespace
                 };
                 if( previous_edge_vertices[0] < previous_edge_vertices[1] )
                 {
-                    const auto [old_edge_id, new_edge_id] =
-                        edges.update_edge_vertex(
-                            previous_edge_vertices, 1, new_vertex_id );
-                    edge_mapping.map( old_edge_id, new_edge_id );
+                    const auto mapping = edges.update_edge_vertex(
+                        previous_edge_vertices, 1, new_vertex_id );
+                    for( const auto& [old_edge_id, new_edge_id] :
+                        mapping.in2out_map() )
+                    {
+                        edge_mapping.map( old_edge_id, new_edge_id );
+                    }
                 }
             }
         }
@@ -395,13 +404,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< BijectiveMapping< index_t >, BijectiveMapping< index_t > >
-        SolidMeshBuilder< dimension >::replace_vertex(
-            index_t old_vertex_id, index_t new_vertex_id )
+    ReplaceVertexInfo SolidMeshBuilder< dimension >::replace_vertex(
+        index_t old_vertex_id, index_t new_vertex_id )
     {
-        std::tuple< BijectiveMapping< index_t >, BijectiveMapping< index_t > >
-            mappings;
-        auto& [edge_mapping, facet_mapping] = mappings;
+        ReplaceVertexInfo mappings;
         if( old_vertex_id == new_vertex_id )
         {
             return mappings;
@@ -420,12 +426,12 @@ namespace geode
                 for( const auto& [old_edge_id, new_edge_id] :
                     local_edge_mapping.in2out_map() )
                 {
-                    edge_mapping.map( old_edge_id, new_edge_id );
+                    mappings.edge_mapping.map( old_edge_id, new_edge_id );
                 }
                 for( const auto& [old_facet_id, new_facet_id] :
                     local_facet_mapping.in2out_map() )
                 {
-                    facet_mapping.map( old_facet_id, new_facet_id );
+                    mappings.facet_mapping.map( old_facet_id, new_facet_id );
                 }
             }
             update_polyhedron_vertex( polyhedron_around, new_vertex_id );

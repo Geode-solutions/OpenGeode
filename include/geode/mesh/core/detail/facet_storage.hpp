@@ -157,20 +157,20 @@ namespace geode
                 return old2new;
             }
 
-            std::pair< index_t, index_t > update_facet_vertex(
+            geode::BijectiveMapping< index_t > update_facet_vertex(
                 VertexContainer facet_vertices,
                 const index_t facet_vertex_id,
                 const index_t new_vertex_id )
             {
-                std::pair< index_t, index_t > old2new;
-                auto& [old_facet_id, new_facet_id] = old2new;
+                geode::BijectiveMapping< index_t > mapping;
                 auto updated_facet_vertices = facet_vertices;
                 updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-                new_facet_id = this->add_facet(
+                const auto new_facet_id = this->add_facet(
                     TypedVertexCycle{ std::move( updated_facet_vertices ) } );
-                old_facet_id = this->remove_facet(
+                const auto old_facet_id = this->remove_facet(
                     TypedVertexCycle{ std::move( facet_vertices ) } );
-                return old2new;
+                mapping.map( old_facet_id, new_facet_id );
+                return mapping;
             }
 
             std::vector< index_t > update_facet_vertices(

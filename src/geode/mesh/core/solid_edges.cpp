@@ -146,7 +146,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::pair< index_t, index_t > SolidEdges< dimension >::update_edge_vertex(
+    BijectiveMapping< index_t > SolidEdges< dimension >::update_edge_vertex(
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id,

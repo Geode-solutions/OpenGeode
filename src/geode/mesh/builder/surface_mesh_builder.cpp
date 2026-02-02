@@ -311,12 +311,20 @@ namespace
         const auto next_id = surface.polygon_vertex(
             surface.next_polygon_vertex( polygon_vertex ) );
         auto edges = builder.edges_builder();
-        const auto [old_edge_id, new_edge_id] = edges.update_edge_vertex(
+        const auto first_mapping = edges.update_edge_vertex(
             { old_vertex_id, next_id }, 0, new_vertex_id );
-        mapping.map( old_edge_id, new_edge_id );
-        const auto [old_edge_id2, new_edge_id2] = edges.update_edge_vertex(
+        for( const auto& [old_edge_id, new_edge_id] :
+            first_mapping.in2out_map() )
+        {
+            mapping.map( old_edge_id, new_edge_id );
+        }
+        const auto second_mapping = edges.update_edge_vertex(
             { previous_id, old_vertex_id }, 1, new_vertex_id );
-        mapping.map( old_edge_id2, new_edge_id2 );
+        for( const auto& [old_edge_id2, new_edge_id2] :
+            second_mapping.in2out_map() )
+        {
+            mapping.map( old_edge_id2, new_edge_id2 );
+        }
         return mapping;
     }
 } // namespace

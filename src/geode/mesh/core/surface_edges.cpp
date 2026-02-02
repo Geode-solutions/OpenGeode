@@ -129,7 +129,7 @@ namespace geode
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id,
-        SurfaceEdgesKey ) -> std::pair< index_t, index_t >
+        SurfaceEdgesKey ) -> BijectiveMapping< index_t >
     {
         return impl_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id );

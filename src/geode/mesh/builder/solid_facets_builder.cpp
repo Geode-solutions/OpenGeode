@@ -61,7 +61,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::pair< index_t, index_t >
+    BijectiveMapping< index_t >
         SolidFacetsBuilder< dimension >::update_facet_vertex(
             PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,

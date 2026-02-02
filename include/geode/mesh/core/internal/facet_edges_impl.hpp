@@ -64,7 +64,7 @@ namespace geode
                 return this->get_facet_vertices( edge_id );
             }
 
-            std::pair< index_t, index_t > update_edge_vertex(
+            BijectiveMapping< index_t > update_edge_vertex(
                 std::array< index_t, 2 > edge_vertices,
                 const index_t edge_vertex_id,
                 const index_t new_vertex_id )
