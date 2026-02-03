@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/mapping.hpp>
+
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
@@ -59,7 +61,8 @@ namespace geode
 
         void remove_edge( std::array< index_t, 2 > edge_vertices );
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+        geode::BijectiveMapping< index_t > update_edge_vertex(
+            std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 

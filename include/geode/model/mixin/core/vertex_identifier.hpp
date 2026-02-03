@@ -25,6 +25,7 @@
 
 #include <vector>
 
+#include <absl/hash/hash.h>
 #include <absl/types/span.h>
 
 #include <geode/basic/passkey.hpp>
@@ -62,6 +63,13 @@ namespace geode
         [[nodiscard]] std::string string() const
         {
             return absl::StrCat( component_id.string(), " ", vertex );
+        }
+
+        template < typename H >
+        friend H AbslHashValue( H h, const ComponentMeshVertex& value )
+        {
+            return H::combine(
+                std::move( h ), value.component_id, value.vertex );
         }
 
         ComponentID component_id;

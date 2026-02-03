@@ -64,11 +64,12 @@ namespace geode
                 return this->get_facet_vertices( edge_id );
             }
 
-            void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+            BijectiveMapping< index_t > update_edge_vertex(
+                std::array< index_t, 2 > edge_vertices,
                 const index_t edge_vertex_id,
                 const index_t new_vertex_id )
             {
-                this->update_facet_vertex(
+                return this->update_facet_vertex(
                     std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
             }
 

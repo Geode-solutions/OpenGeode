@@ -125,13 +125,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfaceEdges< dimension >::update_edge_vertex(
+    auto SurfaceEdges< dimension >::update_edge_vertex(
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id,
-        SurfaceEdgesKey )
+        SurfaceEdgesKey ) -> BijectiveMapping< index_t >
     {
-        impl_->update_edge_vertex(
+        return impl_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
     }
 

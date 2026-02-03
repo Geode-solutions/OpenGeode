@@ -27,6 +27,7 @@
 #include <vector>
 
 #include <absl/container/inlined_vector.h>
+#include <absl/hash/hash.h>
 
 #include <geode/basic/passkey.hpp>
 
@@ -78,6 +79,12 @@ namespace geode
         }
         template < typename Archive >
         void serialize( Archive& archive );
+
+        template < typename H >
+        friend H AbslHashValue( H h, const EdgeVertex& value )
+        {
+            return H::combine( std::move( h ), value.edge_id, value.vertex_id );
+        }
 
         /*!
          * Index of the edge

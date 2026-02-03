@@ -61,15 +61,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidFacetsBuilder< dimension >::update_facet_vertex(
-        PolyhedronFacetVertices facet_vertices,
-        index_t facet_vertex_id,
-        index_t new_vertex_id )
+    BijectiveMapping< index_t >
+        SolidFacetsBuilder< dimension >::update_facet_vertex(
+            PolyhedronFacetVertices facet_vertices,
+            index_t facet_vertex_id,
+            index_t new_vertex_id )
     {
         OPENGEODE_ASSERT( facet_vertex_id < facet_vertices.size(),
             "[SolidFacetsBuilder::update_facet_vertex] "
             "Accessing an invalid vertex in facet" );
-        facets_->update_facet_vertex(
+        return facets_->update_facet_vertex(
             std::move( facet_vertices ), facet_vertex_id, new_vertex_id, {} );
     }
 

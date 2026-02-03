@@ -46,6 +46,13 @@ namespace geode
     /*!
      * Interface class to represent the builder of a SolidMesh
      */
+
+    struct ReplaceVertexInfo
+    {
+        geode::BijectiveMapping< index_t > edge_mapping;
+        geode::BijectiveMapping< index_t > facet_mapping;
+    };
+
     template < index_t dimension >
     class SolidMeshBuilder
         : public VertexSetBuilder,
@@ -102,7 +109,8 @@ namespace geode
          * @warning This function supposes that the mesh is manifold
          * around old vertex
          */
-        void replace_vertex( index_t old_vertex_id, index_t new_vertex_id );
+        ReplaceVertexInfo replace_vertex(
+            index_t old_vertex_id, index_t new_vertex_id );
 
         /*!
          * Replace old polyhedron vertices from given vertices to another ones.

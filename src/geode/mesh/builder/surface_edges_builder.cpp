@@ -49,15 +49,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfaceEdgesBuilder< dimension >::update_edge_vertex(
-        std::array< index_t, 2 > edge_vertices,
-        index_t edge_vertex_id,
-        index_t new_vertex_id )
+    BijectiveMapping< index_t >
+        SurfaceEdgesBuilder< dimension >::update_edge_vertex(
+            std::array< index_t, 2 > edge_vertices,
+            index_t edge_vertex_id,
+            index_t new_vertex_id )
     {
         OPENGEODE_ASSERT( edge_vertex_id < 2,
             "[SurfaceEdgesBuilder::update_edge_vertex] "
             "Accessing an invalid vertex in edge" );
-        edges_->update_edge_vertex(
+        return edges_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id, {} );
     }
 

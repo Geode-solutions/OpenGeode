@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/hash/hash.h>
+
 #include <bitsery/bitsery.h>
 #include <bitsery/brief_syntax.h>
 
@@ -63,6 +65,12 @@ namespace geode
         bool operator!=( const NamedType& other ) const
         {
             return !( operator==( other ) );
+        }
+
+        template < typename H >
+        friend H AbslHashValue( H h, const NamedType& value )
+        {
+            return H::combine( std::move( h ), value.value_ );
         }
 
     private:

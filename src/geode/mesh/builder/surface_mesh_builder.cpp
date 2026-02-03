@@ -298,21 +298,34 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_edge( const geode::SurfaceMesh< dimension >& surface,
+    geode::BijectiveMapping< geode::index_t > update_edge(
+        const geode::SurfaceMesh< dimension >& surface,
         geode::SurfaceMeshBuilder< dimension >& builder,
         const geode::PolygonVertex& polygon_vertex,
         geode::index_t old_vertex_id,
         geode::index_t new_vertex_id )
     {
+        geode::BijectiveMapping< geode::index_t > mapping;
         const auto previous_id = surface.polygon_vertex(
             surface.previous_polygon_vertex( polygon_vertex ) );
         const auto next_id = surface.polygon_vertex(
             surface.next_polygon_vertex( polygon_vertex ) );
         auto edges = builder.edges_builder();
-        edges.update_edge_vertex(
+        const auto first_mapping = edges.update_edge_vertex(
             { old_vertex_id, next_id }, 0, new_vertex_id );
-        edges.update_edge_vertex(
+        for( const auto& [old_edge_id, new_edge_id] :
+            first_mapping.in2out_map() )
+        {
+            mapping.map( old_edge_id, new_edge_id );
+        }
+        const auto second_mapping = edges.update_edge_vertex(
             { previous_id, old_vertex_id }, 1, new_vertex_id );
+        for( const auto& [old_edge_id2, new_edge_id2] :
+            second_mapping.in2out_map() )
+        {
+            mapping.map( old_edge_id2, new_edge_id2 );
+        }
+        return mapping;
     }
 } // namespace
 
@@ -393,12 +406,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfaceMeshBuilder< dimension >::replace_vertex(
-        index_t old_vertex_id, index_t new_vertex_id )
+    geode::BijectiveMapping< index_t >
+        SurfaceMeshBuilder< dimension >::replace_vertex(
+            index_t old_vertex_id, index_t new_vertex_id )
     {
+        geode::BijectiveMapping< index_t > edge_mapping;
         if( old_vertex_id == new_vertex_id )
         {
-            return;
+            return edge_mapping;
         }
         const auto& polygons_around =
             surface_mesh_.polygons_around_vertex( old_vertex_id );
@@ -407,12 +422,18 @@ namespace geode
         {
             if( surface_mesh_.are_edges_enabled() )
             {
-                update_edge( surface_mesh_, *this, polygon_around,
-                    old_vertex_id, new_vertex_id );
+                const auto local_mapping = update_edge( surface_mesh_, *this,
+                    polygon_around, old_vertex_id, new_vertex_id );
+                for( const auto& [old_edge_id, new_edge_id] :
+                    local_mapping.in2out_map() )
+                {
+                    edge_mapping.map( old_edge_id, new_edge_id );
+                }
             }
             update_polygon_vertex( polygon_around, new_vertex_id );
         }
         reset_polygons_around_vertex( old_vertex_id );
+        return edge_mapping;
     }
 
     template < index_t dimension >

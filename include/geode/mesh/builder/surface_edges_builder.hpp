@@ -25,6 +25,8 @@
 
 #include <absl/types/span.h>
 
+#include <geode/basic/mapping.hpp>
+
 #include <geode/mesh/builder/vertex_set_builder.hpp>
 #include <geode/mesh/common.hpp>
 
@@ -63,7 +65,8 @@ namespace geode
 
         void update_edge_vertices( absl::Span< const index_t > old2new );
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+        geode::BijectiveMapping< index_t > update_edge_vertex(
+            std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
