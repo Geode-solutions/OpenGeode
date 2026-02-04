@@ -24,13 +24,14 @@
 #include <geode/basic/uuid.hpp>
 
 #include <atomic>
-#include <chrono>
 #include <iomanip>
 #include <sstream>
 #include <thread>
 
 #include <absl/hash/hash.h>
 #include <absl/random/random.h>
+#include <absl/time/clock.h>
+#include <absl/time/time.h>
 
 #include <geode/basic/range.hpp>
 
@@ -59,21 +60,13 @@ namespace
         // behind)
         [[nodiscard]] static std::int64_t current_drift_ms()
         {
-            auto real_ms = ms_since_epoch( std::chrono::system_clock::now() );
+            auto real_ms = absl::ToUnixMillis( absl::Now() );
             auto state_ms = g_state.load( std::memory_order_acquire ) >> 16;
             return static_cast< std::int64_t >( state_ms )
                    - static_cast< std::int64_t >( real_ms );
         }
 
     private:
-        static std::uint64_t ms_since_epoch(
-            std::chrono::system_clock::time_point tp )
-        {
-            return std::chrono::duration_cast< std::chrono::milliseconds >(
-                tp.time_since_epoch() )
-                .count();
-        }
-
         // Tuning parameters
         static constexpr std::uint64_t kMaxDriftMs =
             1000; // Max drift ahead of real time
@@ -102,8 +95,7 @@ namespace
                 std::random_device rd;
                 const auto tid_hash = std::hash< std::thread::id >{}(
                     std::this_thread::get_id() );
-                const auto mono_ns =
-                    std::chrono::steady_clock::now().time_since_epoch().count();
+                const auto mono_ns = absl::GetCurrentTimeNanos();
                 return std::mt19937_64(
                     rd() ^ tid_hash ^ static_cast< std::uint64_t >( mono_ns ) );
             }
@@ -129,8 +121,7 @@ namespace
     inline std::optional< std::array< std::uint8_t, 16 > >
         UUIDv7Generator::generate()
     {
-        using clock = std::chrono::system_clock;
-        std::uint64_t real_ms = ms_since_epoch( clock::now() );
+        std::uint64_t real_ms = absl::ToUnixMillis( absl::Now() );
 
         unsigned fail_count = 0;
         unsigned backoff_us = kBackoffSleepUs;
@@ -193,7 +184,7 @@ namespace
                 backoff_us = std::min( backoff_us * 2, kBackoffMaxUs );
                 fail_count = 0;
             }
-            real_ms = ms_since_epoch( clock::now() );
+            real_ms = absl::ToUnixMillis( absl::Now() );
         }
     }
 
@@ -231,8 +222,7 @@ namespace
     inline std::uint16_t initial_seq()
     {
         std::random_device rd;
-        const auto mono =
-            std::chrono::steady_clock::now().time_since_epoch().count();
+        const auto mono = absl::GetCurrentTimeNanos();
         std::uint16_t s = static_cast< std::uint16_t >(
             ( rd() ^ mono ) & UUIDv7Generator::kSeqMask );
         return s ? s : 1;
@@ -240,10 +230,7 @@ namespace
 
     // Initialize global state with current time + random sequence
     inline std::atomic< std::uint64_t > UUIDv7Generator::g_state{
-        ( static_cast< std::uint64_t >(
-              std::chrono::duration_cast< std::chrono::milliseconds >(
-                  std::chrono::system_clock::now().time_since_epoch() )
-                  .count() )
+        ( static_cast< std::uint64_t >( absl::ToUnixMillis( absl::Now() ) )
             << 16 )
         | initial_seq()
     };
@@ -264,6 +251,7 @@ namespace geode
             {
                 bytes_ = bytes.value();
                 generated = true;
+                break;
             }
         }
         OPENGEODE_EXCEPTION( generated, "[uuid] could not generate uuid" );
