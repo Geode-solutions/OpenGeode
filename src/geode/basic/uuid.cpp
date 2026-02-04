@@ -23,8 +23,11 @@
 
 #include <geode/basic/uuid.hpp>
 
+#include <atomic>
+#include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <thread>
 
 #include <absl/hash/hash.h>
 #include <absl/random/random.h>
@@ -33,37 +36,237 @@
 
 namespace
 {
-    size_t decode( char ch )
+    class UUIDv7Generator
     {
-        if( 'f' >= ch && ch >= 'a' )
+    public:
+        UUIDv7Generator() = default;
+        ~UUIDv7Generator() = default;
+
+        // Non-copyable: all instances share global state
+        UUIDv7Generator( const UUIDv7Generator & ) = delete;
+        UUIDv7Generator( UUIDv7Generator && ) = delete;
+        UUIDv7Generator &operator=( const UUIDv7Generator & ) = delete;
+        UUIDv7Generator &operator=( UUIDv7Generator && ) = delete;
+
+        static constexpr std::uint16_t kSeqMask =
+            0x0FFF; // 12‑bit sequence (0-4095)
+
+        // Returns UUID or nullopt if drift/burst limits exceeded
+        [[nodiscard]] std::optional< std::array< std::uint8_t, 16 > >
+            generate();
+
+        // Diagnostic: virtual clock drift in milliseconds (+ = ahead, - =
+        // behind)
+        [[nodiscard]] static std::int64_t current_drift_ms()
         {
-            return ch - 'a' + 10;
+            auto real_ms = ms_since_epoch( std::chrono::system_clock::now() );
+            auto state_ms = g_state.load( std::memory_order_acquire ) >> 16;
+            return static_cast< std::int64_t >( state_ms )
+                   - static_cast< std::int64_t >( real_ms );
         }
-        if( 'F' >= ch && ch >= 'A' )
+
+    private:
+        static std::uint64_t ms_since_epoch(
+            std::chrono::system_clock::time_point tp )
         {
-            return ch - 'A' + 10;
+            return std::chrono::duration_cast< std::chrono::milliseconds >(
+                tp.time_since_epoch() )
+                .count();
         }
-        if( '9' >= ch && ch >= '0' )
+
+        // Tuning parameters
+        static constexpr std::uint64_t kMaxDriftMs =
+            1000; // Max drift ahead of real time
+        static constexpr unsigned kBackoffThreshold =
+            8; // CAS failures before sleep
+        static constexpr unsigned kBackoffSleepUs = 1; // Initial sleep duration
+        static constexpr unsigned kBackoffMaxUs = 64; // Max sleep duration
+
+        // Global state: [48-bit timestamp_ms][16-bit sequence]
+        // All threads compete to update this atomically
+        static std::atomic< std::uint64_t > g_state;
+
+        // Per‑thread RNG to avoid contention
+        struct TLS
         {
-            return ch - '0';
+            std::mt19937_64 eng;
+            std::uniform_int_distribution< std::uint16_t > dist12{ 0,
+                kSeqMask };
+            std::uniform_int_distribution< std::uint8_t > dist8{ 0, 0xFF };
+
+            TLS() : eng( seed_engine() ) {}
+
+            // Seed with multiple entropy sources for thread uniqueness
+            static std::mt19937_64 seed_engine()
+            {
+                std::random_device rd;
+                const auto tid_hash = std::hash< std::thread::id >{}(
+                    std::this_thread::get_id() );
+                const auto mono_ns =
+                    std::chrono::steady_clock::now().time_since_epoch().count();
+                return std::mt19937_64(
+                    rd() ^ tid_hash ^ static_cast< std::uint64_t >( mono_ns ) );
+            }
+        };
+        static thread_local TLS tls;
+
+        // Generate non-zero random sequence (preserves lexicographic ordering)
+        static std::uint16_t fresh_sequence()
+        {
+            std::uint16_t s;
+            do
+            {
+                s = tls.dist12( tls.eng );
+            } while( s == 0 );
+
+            return s;
         }
-        return 0;
+
+        static std::array< std::uint8_t, 16 > encode_uuid(
+            std::uint64_t ts, std::uint16_t seq );
+    };
+
+    inline std::optional< std::array< std::uint8_t, 16 > >
+        UUIDv7Generator::generate()
+    {
+        using clock = std::chrono::system_clock;
+        std::uint64_t real_ms = ms_since_epoch( clock::now() );
+
+        unsigned fail_count = 0;
+        unsigned backoff_us = kBackoffSleepUs;
+
+        // Main CAS loop
+        for( ;; )
+        {
+            std::uint64_t old = g_state.load( std::memory_order_acquire );
+            std::uint64_t old_ts = old >> 16;
+            std::uint16_t old_seq =
+                static_cast< std::uint16_t >( old & 0xFFFF );
+
+            // Enforce drift cap: limit how fast we can catch up to real time
+            if( real_ms > old_ts + kMaxDriftMs )
+                real_ms = old_ts + kMaxDriftMs;
+
+            std::uint64_t ts = old_ts;
+            std::uint16_t seq = old_seq;
+
+            if( real_ms > old_ts )
+            {
+                // Time advanced: use new timestamp with fresh random sequence
+                ts = real_ms;
+                seq = fresh_sequence();
+            }
+            else
+            {
+                // Same millisecond: increment sequence or handle wraparound
+                if( old_seq == 0 && real_ms == old_ts )
+                    seq = fresh_sequence(); // Reset from zero to preserve
+                                            // ordering
+                else
+                    seq =
+                        static_cast< std::uint16_t >( ( seq + 1 ) & kSeqMask );
+
+                if( seq == 0 )
+                {
+                    // Sequence wrapped: advance virtual time by 1ms
+                    if( old_ts + 1 > real_ms + kMaxDriftMs )
+                        return std::nullopt; // Would exceed drift limit
+                    ts += 1;
+                    seq = fresh_sequence();
+                }
+            }
+
+            if( ts > real_ms + kMaxDriftMs )
+                return std::nullopt;
+
+            // Attempt atomic update
+            const std::uint64_t next = ( ts << 16 ) | seq;
+            if( g_state.compare_exchange_weak( old, next,
+                    std::memory_order_acq_rel, std::memory_order_relaxed ) )
+                return encode_uuid( ts, seq );
+
+            // CAS failed: exponential backoff to reduce contention
+            if( ++fail_count >= kBackoffThreshold )
+            {
+                std::this_thread::sleep_for(
+                    std::chrono::microseconds( backoff_us ) );
+                backoff_us = std::min( backoff_us * 2, kBackoffMaxUs );
+                fail_count = 0;
+            }
+            real_ms = ms_since_epoch( clock::now() );
+        }
     }
+
+    // Pack timestamp and sequence into RFC 9562 UUID v7 format
+    inline std::array< std::uint8_t, 16 > UUIDv7Generator::encode_uuid(
+        std::uint64_t ts, std::uint16_t seq )
+    {
+        std::array< std::uint8_t, 16 > bytes;
+        auto *d = bytes.data();
+
+        // 48‑bit big‑endian timestamp (bytes 0‑5)
+        d[0] = static_cast< std::uint8_t >( ( ts >> 40 ) & 0xFF );
+        d[1] = static_cast< std::uint8_t >( ( ts >> 32 ) & 0xFF );
+        d[2] = static_cast< std::uint8_t >( ( ts >> 24 ) & 0xFF );
+        d[3] = static_cast< std::uint8_t >( ( ts >> 16 ) & 0xFF );
+        d[4] = static_cast< std::uint8_t >( ( ts >> 8 ) & 0xFF );
+        d[5] = static_cast< std::uint8_t >( ts & 0xFF );
+
+        // version (0111) + sequence high nibble (byte 6)
+        d[6] = static_cast< std::uint8_t >( 0x70 | ( ( seq >> 8 ) & 0x0F ) );
+        // sequence low byte (byte 7)
+        d[7] = static_cast< std::uint8_t >( seq & 0xFF );
+
+        // variant (10xx) + 6 random bits (byte 8)
+        d[8] = static_cast< std::uint8_t >(
+            0x80 | ( tls.dist8( tls.eng ) & 0x3F ) );
+        // remaining 56 random bits (bytes 9‑15)
+        for( int i = 9; i < 16; ++i )
+            d[i] = tls.dist8( tls.eng );
+
+        return bytes;
+    }
+
+    // Generate non-zero initial sequence for process startup
+    inline std::uint16_t initial_seq()
+    {
+        std::random_device rd;
+        const auto mono =
+            std::chrono::steady_clock::now().time_since_epoch().count();
+        std::uint16_t s = static_cast< std::uint16_t >(
+            ( rd() ^ mono ) & UUIDv7Generator::kSeqMask );
+        return s ? s : 1;
+    }
+
+    // Initialize global state with current time + random sequence
+    inline std::atomic< std::uint64_t > UUIDv7Generator::g_state{
+        ( static_cast< std::uint64_t >(
+              std::chrono::duration_cast< std::chrono::milliseconds >(
+                  std::chrono::system_clock::now().time_since_epoch() )
+                  .count() )
+            << 16 )
+        | initial_seq()
+    };
+
+    inline thread_local UUIDv7Generator::TLS UUIDv7Generator::tls{};
 } // namespace
 
 namespace geode
 {
     uuid::uuid()
     {
-        static thread_local absl::BitGen gen;
-        static thread_local absl::uniform_int_distribution< uint64_t > dist(
-            0u, ~0u );
-
-        ab = dist( gen );
-        cd = dist( gen );
-
-        ab = ( ab & 0xFFFFFFFFFFFF0FFFULL ) | 0x0000000000004000ULL;
-        cd = ( cd & 0x3FFFFFFFFFFFFFFFULL ) | 0x8000000000000000ULL;
+        UUIDv7Generator gen;
+        bool generated{ false };
+        for( const auto i : Range{ 10 } )
+        {
+            geode_unused( i );
+            if( auto bytes = gen.generate() )
+            {
+                bytes_ = bytes.value();
+                generated = true;
+            }
+        }
+        OPENGEODE_EXCEPTION( generated, "[uuid] could not generate uuid" );
     }
 
     uuid::uuid( std::string_view string )
@@ -72,28 +275,21 @@ namespace geode
         OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'
                                  && string[18] == '-' && string[23] == '-',
             "[uuid] unknown string format" );
-
-        for( const auto i : Range{ 18 } )
-        {
-            if( i == 8 || i == 13 )
-            {
-                continue;
-            }
-            ab = ab << 4 | decode( string[i] );
-        }
-        for( const auto i : Range{ 19, 36 } )
-        {
-            if( i == 23 )
-            {
-                continue;
-            }
-            cd = cd << 4 | decode( string[i] );
-        }
+        std::sscanf( to_string( string ).c_str(),
+            "%2hhx%2hhx%2hhx%2hhx-"
+            "%2hhx%2hhx-"
+            "%2hhx%2hhx-"
+            "%2hhx%2hhx-"
+            "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
+            &bytes_[0], &bytes_[1], &bytes_[2], &bytes_[3], &bytes_[4],
+            &bytes_[5], &bytes_[6], &bytes_[7], &bytes_[8], &bytes_[9],
+            &bytes_[10], &bytes_[11], &bytes_[12], &bytes_[13], &bytes_[14],
+            &bytes_[15] );
     }
 
     bool uuid::operator==( const uuid &other ) const
     {
-        return ab == other.ab && cd == other.cd;
+        return bytes_ == other.bytes_;
     }
 
     bool uuid::operator!=( const uuid &other ) const
@@ -103,49 +299,29 @@ namespace geode
 
     bool uuid::operator<( const uuid &other ) const
     {
-        if( ab < other.ab )
-        {
-            return true;
-        }
-        if( ab > other.ab )
-        {
-            return false;
-        }
-        if( cd < other.cd )
-        {
-            return true;
-        }
-        return false;
+        return bytes_ < other.bytes_;
     }
 
     std::string uuid::string() const
     {
-        char string[] = "00000000-0000-0000-0000-000000000000";
-        static constexpr char ENCODE[] = "0123456789abcdef";
+        static constexpr char hex[] = "0123456789abcdef";
 
-        index_t bit = 15;
-        for( const auto i : Range{ 18 } )
+        // Positions for each byte in 36-char string (accounting for hyphens)
+        static constexpr int pos[16] = { 0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24,
+            26, 28, 30, 32, 34 };
+
+        std::array< char, 36 > buf{};
+        buf[8] = buf[13] = buf[18] = buf[23] = '-';
+
+        for( int i = 0; i < 16; ++i )
         {
-            if( i == 8 || i == 13 )
-            {
-                continue;
-            }
-            string[i] = ENCODE[ab >> 4 * bit & 0x0f];
-            bit--;
+            unsigned b = bytes_[i];
+
+            buf[pos[i]] = hex[b >> 4];
+            buf[pos[i] + 1] = hex[b & 0x0F];
         }
 
-        bit = 15;
-        for( const auto i : Range{ 19, 36 } )
-        {
-            if( i == 23 )
-            {
-                continue;
-            }
-            string[i] = ENCODE[cd >> 4 * bit & 0x0f];
-            bit--;
-        }
-
-        return string;
+        return { buf.data(), buf.size() };
     }
 } // namespace geode
 
@@ -153,7 +329,6 @@ namespace std
 {
     size_t hash< geode::uuid >::operator()( const geode::uuid &uuid ) const
     {
-        return absl::Hash< uint64_t >()( uuid.ab )
-               ^ absl::Hash< uint64_t >()( uuid.cd );
+        return absl::HashOf( uuid.bytes_ );
     }
 } // namespace std

@@ -115,22 +115,42 @@ namespace geode
         template < typename H >
         friend H AbslHashValue( H h, const uuid &value )
         {
-            return H::combine( std::move( h ), value.ab, value.cd );
+            return H::combine( std::move( h ), value.bytes_ );
         }
 
-        uint64_t ab;
-        uint64_t cd;
+        std::array< std::uint8_t, 16 > bytes_;
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext(
-                *this, Growable< Archive, uuid >{ { []( Archive &a, uuid &id ) {
-                    a.value8b( id.ab );
-                    a.value8b( id.cd );
-                } } } );
+            archive.ext( *this, Growable< Archive, uuid >{
+                                    { []( Archive &a, uuid &id ) {
+                                         uint64_t ab;
+                                         uint64_t cd;
+                                         a.value8b( ab );
+                                         a.value8b( cd );
+                                         id.bytes_[0] = ( ab >> 56 ) & 0xFF;
+                                         id.bytes_[1] = ( ab >> 48 ) & 0xFF;
+                                         id.bytes_[2] = ( ab >> 40 ) & 0xFF;
+                                         id.bytes_[3] = ( ab >> 32 ) & 0xFF;
+                                         id.bytes_[4] = ( ab >> 24 ) & 0xFF;
+                                         id.bytes_[5] = ( ab >> 16 ) & 0xFF;
+                                         id.bytes_[6] = ( ab >> 8 ) & 0xFF;
+                                         id.bytes_[7] = ( ab >> 0 ) & 0xFF;
+                                         id.bytes_[8] = ( cd >> 56 ) & 0xFF;
+                                         id.bytes_[9] = ( cd >> 48 ) & 0xFF;
+                                         id.bytes_[10] = ( cd >> 40 ) & 0xFF;
+                                         id.bytes_[11] = ( cd >> 32 ) & 0xFF;
+                                         id.bytes_[12] = ( cd >> 24 ) & 0xFF;
+                                         id.bytes_[13] = ( cd >> 16 ) & 0xFF;
+                                         id.bytes_[14] = ( cd >> 8 ) & 0xFF;
+                                         id.bytes_[15] = ( cd >> 0 ) & 0xFF;
+                                     },
+                                        []( Archive &a, uuid &id ) {
+                                            a.container1b( id.bytes_ );
+                                        } } } );
         }
     };
 } // namespace geode
