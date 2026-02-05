@@ -57,5 +57,34 @@ namespace geode
             }
             return index_it->second;
         }
+
+        std::string position_to_string( POSITION position )
+        {
+            static const absl::flat_hash_map< POSITION, std::string > map = {
+                { POSITION::vertex0, "vertex0" },
+                { POSITION::vertex1, "vertex1" },
+                { POSITION::vertex2, "vertex2" },
+                { POSITION::vertex3, "vertex3" },
+                { POSITION::edge0, "edge0" },
+                { POSITION::edge1, "edge1" },
+                { POSITION::edge2, "edge2" },
+                { POSITION::facet0, "facet0" },
+                { POSITION::facet1, "facet1" },
+                { POSITION::facet2, "facet2" },
+                { POSITION::facet3, "facet3" },
+                { POSITION::edge01, "edge01" },
+                { POSITION::edge02, "edge02" },
+                { POSITION::edge03, "edge03" },
+                { POSITION::edge12, "edge12" },
+                { POSITION::edge13, "edge13" },
+                { POSITION::edge23, "edge23" },
+            };
+            const auto index_it = map.find( position );
+            if( index_it == map.end() )
+            {
+                return "NO_LID";
+            }
+            return index_it->second;
+        }
     } // namespace detail
 } // namespace geode
