@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2025 Geode-solutions
+ * Copyright (c) 2019 - 2026 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include <fstream>
 #include <memory>
 
+#include <absl/container/btree_map.h>
 #include <absl/container/flat_hash_map.h>
 #include <absl/strings/match.h>
 
@@ -51,7 +52,7 @@ namespace geode
         {
         public:
             using ComponentPtr = std::unique_ptr< Component >;
-            using ComponentsStore = absl::flat_hash_map< uuid, ComponentPtr >;
+            using ComponentsStore = absl::btree_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
             [[nodiscard]] index_t nb_components() const
