@@ -66,8 +66,7 @@ namespace
         {
             auto real_ms = absl::ToUnixMillis( absl::Now() );
             auto state_ms = g_state.load( std::memory_order_acquire ) >> 16;
-            return static_cast< std::int64_t >( state_ms )
-                   - static_cast< std::int64_t >( real_ms );
+            return static_cast< std::int64_t >( state_ms ) - real_ms;
         }
 
     private:
