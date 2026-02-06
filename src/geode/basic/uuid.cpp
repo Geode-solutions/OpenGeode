@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2025 Geode-solutions
+ * Copyright (c) 2019 - 2026 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -86,22 +86,16 @@ namespace
         // Per‑thread RNG to avoid contention
         struct TLS
         {
-            std::mt19937_64 eng;
-            std::uniform_int_distribution< std::uint16_t > dist12{ 0,
-                kSeqMask };
-            std::uniform_int_distribution< std::uint8_t > dist8{ 0, 0xFF };
+            absl::BitGen gen;
 
-            TLS() : eng( seed_engine() ) {}
-
-            // Seed with multiple entropy sources for thread uniqueness
-            static std::mt19937_64 seed_engine()
+            uint16_t gen_uint16_t()
             {
-                std::random_device rd;
-                const auto tid_hash = std::hash< std::thread::id >{}(
-                    std::this_thread::get_id() );
-                const auto mono_ns = absl::GetCurrentTimeNanos();
-                return std::mt19937_64(
-                    rd() ^ tid_hash ^ static_cast< std::uint64_t >( mono_ns ) );
+                return absl::Uniform< uint16_t >( gen, 0, kSeqMask );
+            }
+
+            uint8_t gen_uint8_t()
+            {
+                return absl::Uniform< uint8_t >( gen, 0, 0xFF );
             }
         };
         static thread_local TLS tls;
@@ -112,7 +106,7 @@ namespace
             std::uint16_t s;
             do
             {
-                s = tls.dist12( tls.eng );
+                s = tls.gen_uint16_t();
             } while( s == 0 );
 
             return s;
@@ -213,11 +207,11 @@ namespace
         d[7] = static_cast< std::uint8_t >( seq & 0xFF );
 
         // variant (10xx) + 6 random bits (byte 8)
-        d[8] = static_cast< std::uint8_t >(
-            0x80 | ( tls.dist8( tls.eng ) & 0x3F ) );
+        d[8] =
+            static_cast< std::uint8_t >( 0x80 | ( tls.gen_uint8_t() & 0x3F ) );
         // remaining 56 random bits (bytes 9‑15)
         for( int i = 9; i < 16; ++i )
-            d[i] = tls.dist8( tls.eng );
+            d[i] = tls.gen_uint8_t();
 
         return bytes;
     }
