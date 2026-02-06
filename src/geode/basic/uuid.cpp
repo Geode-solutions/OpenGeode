@@ -37,6 +37,10 @@
 
 namespace
 {
+    /*
+     * Modified and simplified version of https://github.com/mq1n/uuid-v7-cpp.
+     */
+
     class UUIDv7Generator
     {
     public:
