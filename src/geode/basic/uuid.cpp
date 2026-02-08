@@ -72,7 +72,7 @@ namespace
     private:
         // Tuning parameters
         static constexpr std::uint64_t kMaxDriftMs =
-            2000; // Max drift ahead of real time
+            1000; // Max drift ahead of real time
         static constexpr unsigned kBackoffThreshold =
             8; // CAS failures before sleep
         static constexpr unsigned kBackoffSleepUs = 1; // Initial sleep duration
