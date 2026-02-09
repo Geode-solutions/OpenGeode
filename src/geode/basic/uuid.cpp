@@ -239,9 +239,14 @@ namespace geode
 {
     uuid::uuid()
     {
+        static constexpr index_t MAX_SAFETY_COUNT = 1000;
+        static constexpr absl::Duration INITIAL_SLEEP =
+            absl::Microseconds( 100 );
+        static constexpr absl::Duration MAX_SLEEP = absl::Milliseconds( 50 );
         UUIDv7Generator gen;
         bool generated{ false };
-        for( const auto i : Range{ 10 } )
+        auto sleep = INITIAL_SLEEP;
+        for( const auto i : Range{ MAX_SAFETY_COUNT } )
         {
             geode_unused( i );
             if( auto bytes = gen.generate() )
@@ -250,6 +255,8 @@ namespace geode
                 generated = true;
                 break;
             }
+            absl::SleepFor( sleep );
+            sleep = std::min( sleep * 2., MAX_SLEEP );
         }
         OPENGEODE_EXCEPTION( generated, "[uuid] could not generate uuid" );
     }
