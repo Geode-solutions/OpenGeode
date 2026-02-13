@@ -1051,15 +1051,15 @@ namespace geode
         const Segment3D& segment, const Triangle3D& triangle )
     {
         const InfiniteLine3D line{ segment };
-        const auto line_triangle_result =
+        const auto [_, closest_on_line, closest_on_triangle] =
             line_triangle_distance( line, triangle );
-        const auto& closest_on_line = std::get< 1 >( line_triangle_result );
-        const auto& closest_on_triangle = std::get< 2 >( line_triangle_result );
         const auto closest_on_segment =
             point_segment_projection( closest_on_line, segment );
-        return std::make_tuple(
-            point_point_distance( closest_on_segment, closest_on_triangle ),
-            closest_on_segment, closest_on_triangle );
+        const auto reprojection_on_triangle =
+            point_triangle_projection( closest_on_segment, triangle );
+        return std::make_tuple( point_point_distance( closest_on_segment,
+                                    reprojection_on_triangle ),
+            closest_on_segment, reprojection_on_triangle );
     }
 
     std::tuple< double, Point3D, Point3D >
