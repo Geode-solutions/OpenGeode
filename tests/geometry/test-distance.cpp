@@ -1045,6 +1045,16 @@ void test_segment_triangle_distance()
     const geode::Segment3D seg_bz0{ bplus, b };
     const geode::Segment3D seg_bz1{ bminus, b };
     const geode::Segment3D seg_hx{ h2, h };
+    const geode::Point3D t0{ { 481.283958699181, 450.641409484767,
+        16.0218597413699 } };
+    const geode::Point3D t1{ { 436.66619673526, 410.956383185562,
+        -9.33593054802634 } };
+    const geode::Point3D t2{ { 437.005650057499, 490.326435783972,
+        -9.33593054802634 } };
+    const geode::Point3D s0{ { 478.259567983804, 448.24094898319,
+        14.302289193253 } };
+    const geode::Point3D s1{ { 478.345179768413, 450.641409484767,
+        14.3452740537089 } };
 
     double distance;
     geode::Point3D closest_point0;
@@ -1087,6 +1097,15 @@ void test_segment_triangle_distance()
                              && closest_point0.inexact_equal( result_t30 )
                              && closest_point1.inexact_equal( g ),
         "[Test] Wrong result for segment_triangle_distance with seg_hx" );
+
+    const geode::Triangle3D real_triangle{ t0, t1, t2 };
+    const geode::Segment3D real_segment{ s0, s1 };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( real_segment, real_triangle );
+    OPENGEODE_EXCEPTION( distance <= geode::GLOBAL_EPSILON
+                             && closest_point0.inexact_equal( s0 )
+                             && closest_point1.inexact_equal( s0 ),
+        "[Test] Wrong result for segment_triangle_distance with real_segment" );
 }
 
 void test_point_ellipse_distance_2d()
