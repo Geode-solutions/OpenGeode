@@ -133,49 +133,47 @@ namespace geode
 
         void map( const T1& in, const T2& out )
         {
-            if( this->has_mapping_input( in ) )
+            auto [in_itr, in_is_new] =
+                this->in2out_mapping().emplace( in, out );
+            if( !in_is_new )
             {
-                erase_in( in );
+                this->out2in_mapping().erase( in_itr->second );
+                in_itr->second = out;
             }
-            if( this->has_mapping_output( out ) )
+            auto [out_itr, out_is_new] =
+                this->out2in_mapping().emplace( out, in );
+            if( !out_is_new )
             {
-                erase_out( out );
+                this->in2out_mapping().erase( out_itr->second );
+                out_itr->second = in;
             }
-            emplace( in, out );
         }
 
         void erase_in( const T1& in )
         {
-            if( !this->has_mapping_input( in ) )
+            auto in_itr = this->in2out_mapping().find( in );
+            if( in_itr == this->in2out_mapping().end() )
             {
                 return;
             }
-            const auto out = this->in2out( in );
-            this->in2out_mapping().erase( in );
-            this->out2in_mapping().erase( out );
+            this->out2in_mapping().erase( in_itr->second );
+            this->in2out_mapping().erase( in_itr );
         }
 
         void erase_out( const T2& out )
         {
-            if( !this->has_mapping_output( out ) )
+            auto out_itr = this->out2in_mapping().find( out );
+            if( out_itr == this->out2in_mapping().end() )
             {
                 return;
             }
-            const auto in = this->out2in( out );
-            this->in2out_mapping().erase( in );
-            this->out2in_mapping().erase( out );
+            this->in2out_mapping().erase( out_itr->second );
+            this->out2in_mapping().erase( out_itr );
         }
 
         [[nodiscard]] index_t size() const
         {
             return this->size_input();
-        }
-
-    private:
-        void emplace( const T1& in, const T2& out )
-        {
-            this->in2out_mapping().emplace( in, out );
-            this->out2in_mapping().emplace( out, in );
         }
     };
 
