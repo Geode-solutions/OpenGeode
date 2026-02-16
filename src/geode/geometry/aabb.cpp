@@ -77,13 +77,12 @@ namespace geode
     template < index_t dimension >
     bool AABBTree< dimension >::parallel() const
     {
-        return impl_->parallel();
+        return false;
     }
 
     template < index_t dimension >
-    void AABBTree< dimension >::set_parallel( bool parallel )
+    void AABBTree< dimension >::set_parallel( bool /*parallel*/ )
     {
-        impl_->set_parallel( parallel );
     }
 
     template < index_t dimension >
@@ -95,9 +94,8 @@ namespace geode
             return {};
         }
         std::vector< index_t > result;
-        std::mutex mutex;
-        impl_->containing_boxes_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
-            impl_->initial_depth(), query, result, mutex );
+        impl_->containing_boxes_recursive(
+            Impl::ROOT_INDEX, 0, nb_bboxes(), query, result );
         return result;
     }
 
