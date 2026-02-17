@@ -342,7 +342,12 @@ namespace geode
                     vertex2unique_vertex_.at( component_vertices.first );
                 for( const auto v : component_vertices.second )
                 {
-                    attribute->set_value( v, old2new[attribute->value( v )] );
+                    const auto value = attribute->value( v );
+                    if( value == NO_ID )
+                    {
+                        continue;
+                    }
+                    attribute->set_value( v, old2new[value] );
                 }
             }
             return old2new;
