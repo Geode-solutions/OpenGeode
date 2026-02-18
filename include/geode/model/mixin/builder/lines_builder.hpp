@@ -58,6 +58,9 @@ namespace geode
 
         void set_line_active( const uuid& id, bool active );
 
+        [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > >
+            steal_line_mesh( const uuid& id );
+
     protected:
         explicit LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
 
@@ -76,9 +79,6 @@ namespace geode
 
         [[nodiscard]] EdgedCurve< dimension >& modifiable_line_mesh(
             const uuid& id );
-
-        [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > >
-            steal_line_mesh( const uuid& id );
 
     private:
         Lines< dimension >& lines_;

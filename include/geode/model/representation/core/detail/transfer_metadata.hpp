@@ -53,7 +53,7 @@ namespace geode
 
         void opengeode_model_api transfer_section_metadata(
             const Section& old_section,
-            SectionBuilder& new_brep_builder,
+            SectionBuilder& new_section_builder,
             const ModelGenericMapping& component_mapping );
 
         template < typename ModelBuilder >

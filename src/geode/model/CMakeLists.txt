@@ -88,6 +88,7 @@ add_geode_library(
         "representation/builder/section_builder.cpp"
         "representation/core/detail/clone.cpp"
         "representation/core/detail/transfer_collections.cpp"
+        "representation/core/detail/transfer_meshes.cpp"
         "representation/core/detail/transfer_metadata.cpp"
         "representation/core/brep.cpp"
         "representation/core/section.cpp"
@@ -188,6 +189,7 @@ add_geode_library(
         "representation/core/detail/clone.hpp"
         "representation/core/detail/model_component.hpp"
         "representation/core/detail/transfer_collections.hpp"
+        "representation/core/detail/transfer_meshes.hpp"
         "representation/core/detail/transfer_metadata.hpp"
     INTERNAL_HEADERS
         "helpers/internal/simplicial_model_creator.hpp"

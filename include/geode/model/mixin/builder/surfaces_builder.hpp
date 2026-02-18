@@ -66,6 +66,9 @@ namespace geode
 
         void set_surface_active( const uuid& id, bool active );
 
+        [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
+            steal_surface_mesh( const uuid& id );
+
     protected:
         explicit SurfacesBuilder( Surfaces< dimension >& surfaces )
             : surfaces_( surfaces )
@@ -87,9 +90,6 @@ namespace geode
 
         [[nodiscard]] SurfaceMesh< dimension >& modifiable_surface_mesh(
             const uuid& id );
-
-        [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
-            steal_surface_mesh( const uuid& id );
 
     private:
         Surfaces< dimension >& surfaces_;

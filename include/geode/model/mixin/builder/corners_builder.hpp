@@ -58,6 +58,9 @@ namespace geode
 
         void set_corner_active( const uuid& id, bool active );
 
+        [[nodiscard]] std::unique_ptr< PointSet< dimension > >
+            steal_corner_mesh( const uuid& id );
+
     protected:
         explicit CornersBuilder( Corners< dimension >& corners )
             : corners_( corners )
@@ -79,9 +82,6 @@ namespace geode
 
         [[nodiscard]] PointSet< dimension >& modifiable_corner_mesh(
             const uuid& id );
-
-        [[nodiscard]] std::unique_ptr< PointSet< dimension > >
-            steal_corner_mesh( const uuid& id );
 
     private:
         Corners< dimension >& corners_;
