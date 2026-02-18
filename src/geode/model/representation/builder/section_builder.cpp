@@ -42,6 +42,7 @@
 #include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/representation/builder/detail/copy.hpp>
 #include <geode/model/representation/builder/detail/register.hpp>
+#include <geode/model/representation/core/detail/transfer_meshes.hpp>
 #include <geode/model/representation/core/section.hpp>
 
 namespace geode
@@ -74,6 +75,13 @@ namespace geode
         copy_relationships( mapping, section );
         copy_component_geometry( mapping, section );
         return mapping;
+    }
+
+    void SectionBuilder::replace_components_meshes_by_others(
+        Section&& other, const ModelCopyMapping& mapping )
+    {
+        detail::transfer_section_meshes(
+            section_, *this, std::move( other ), mapping );
     }
 
     ModelCopyMapping SectionBuilder::copy_components( const Section& section )

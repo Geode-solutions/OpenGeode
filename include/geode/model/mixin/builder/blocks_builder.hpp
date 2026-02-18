@@ -66,6 +66,9 @@ namespace geode
 
         void set_block_active( const uuid& id, bool active );
 
+        [[nodiscard]] std::unique_ptr< SolidMesh< dimension > >
+            steal_block_mesh( const uuid& id );
+
     protected:
         explicit BlocksBuilder( Blocks< dimension >& blocks )
             : blocks_( blocks )
@@ -87,9 +90,6 @@ namespace geode
 
         [[nodiscard]] SolidMesh< dimension >& modifiable_block_mesh(
             const uuid& id );
-
-        [[nodiscard]] std::unique_ptr< SolidMesh< dimension > >
-            steal_block_mesh( const uuid& id );
 
     private:
         Blocks< dimension >& blocks_;

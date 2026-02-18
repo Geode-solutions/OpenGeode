@@ -99,6 +99,9 @@ namespace geode
 
         ModelCopyMapping copy( const Section& section );
 
+        void replace_components_meshes_by_others(
+            Section&& other, const ModelCopyMapping& mapping );
+
         ModelCopyMapping copy_components( const Section& section );
 
         void copy_components(
