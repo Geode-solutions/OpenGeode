@@ -52,8 +52,8 @@ namespace
             mapping.at( geode::Corner< Model::dim >::component_type_static() )
                 .in2out_map() )
         {
-            builder.update_corner_mesh( model.corner( in ),
-                geode::PointSet< Model::dim >::create() );
+            builder.update_corner_mesh(
+                model.corner( in ), geode::PointSet< Model::dim >::create() );
         }
     }
 
