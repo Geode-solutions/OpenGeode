@@ -48,11 +48,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
-        for( const auto& in2out :
+        for( const auto& [in, _] :
             mapping.at( geode::Corner< Model::dim >::component_type_static() )
                 .in2out_map() )
         {
-            builder.update_corner_mesh( model.corner( in2out.first ),
+            builder.update_corner_mesh( model.corner( in ),
                 geode::PointSet< Model::dim >::create() );
         }
     }
