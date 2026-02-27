@@ -23,6 +23,7 @@
 
 #include "../../common.hpp"
 
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
