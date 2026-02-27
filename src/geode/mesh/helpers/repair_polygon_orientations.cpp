@@ -322,13 +322,6 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    void repair_polygon_orientations( SurfaceMesh< dimension >& mesh )
-    {
-        auto builder = SurfaceMeshBuilder< dimension >::create( mesh );
-        repair_polygon_orientations( mesh, *builder );
-    }
-
-    template < index_t dimension >
     void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder )
     {
@@ -342,11 +335,6 @@ namespace geode
         Logger::trace( "Repair polygons orientations: ",
             polygons_to_reorient.size(), " polygons reoriented" );
     }
-
-    template void opengeode_mesh_api repair_polygon_orientations(
-        SurfaceMesh2D& );
-    template void opengeode_mesh_api repair_polygon_orientations(
-        SurfaceMesh3D& );
 
     template void opengeode_mesh_api repair_polygon_orientations(
         const SurfaceMesh2D&, SurfaceMeshBuilder2D& );

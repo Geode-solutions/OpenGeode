@@ -76,10 +76,6 @@ namespace geode
         };
 
     public:
-        [[deprecated]] RayTracing2D(
-            const EdgedCurve2D& mesh, const Ray2D& ray );
-        [[deprecated]] RayTracing2D(
-            const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line );
         RayTracing2D( const EdgedCurve2D& mesh,
             const BoundingBox2D& bbox,
             const Ray2D& ray );
@@ -135,10 +131,6 @@ namespace geode
         };
 
     public:
-        [[deprecated]] RayTracing3D(
-            const SurfaceMesh3D& mesh, const Ray3D& ray );
-        [[deprecated]] RayTracing3D(
-            const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
         RayTracing3D( const SurfaceMesh3D& mesh,
             const BoundingBox3D& bbox,
             const Ray3D& ray );
