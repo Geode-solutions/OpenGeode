@@ -36,6 +36,7 @@
 #include <geode/basic/cached_value.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/polygon.hpp>
@@ -183,7 +184,8 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SurfaceMesh::polygons_around_vertex] Surface ", mesh.name(),
+            "[SurfaceMesh::polygons_around_vertex] Surface ",
+            mesh.name().value_or( mesh.id().string() ),
             ": Too many polygons around vertex ", vertex_id, " (",
             mesh.point( vertex_id ).string(),
             "). This is probably related to a bug in the polygon "

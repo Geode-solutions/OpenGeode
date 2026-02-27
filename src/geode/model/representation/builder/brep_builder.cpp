@@ -76,7 +76,10 @@ namespace geode
         OPENGEODE_EXCEPTION( nb_components == 0,
             "[BRepBuild::copy] BRep should be empty before copy. To add BRep "
             "components in a BRep which is not empty, use ModelConcatener." );
-        set_name( brep.name() );
+        if( const auto name = brep.name() )
+        {
+            set_name( name.value() );
+        }
         auto mapping = copy_components( brep );
         copy_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );

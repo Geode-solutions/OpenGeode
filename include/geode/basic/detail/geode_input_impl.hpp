@@ -38,27 +38,6 @@ namespace geode
 {
     namespace detail
     {
-        template < typename Object >
-        void update_default_name( Object& object, std::string_view filename )
-        {
-            if( object.name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ object }.set_name(
-                    filename_without_extension( filename ).string() );
-            }
-        }
-
-        template < typename Object >
-        void update_default_name(
-            std::unique_ptr< Object >& object, std::string_view filename )
-        {
-            if( object->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *object }.set_name(
-                    filename_without_extension( filename ).string() );
-            }
-        }
-
         template < typename Factory >
         [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
             geode_object_input_reader( std::string_view& filename )
@@ -80,7 +59,6 @@ namespace geode
             const Timer timer;
             auto input = geode_object_input_reader< Factory >( filename );
             auto object = input->read( std::forward< Args >( args )... );
-            update_default_name( object, filename );
             Logger::info(
                 type, " loaded from ", filename, " in ", timer.duration() );
             return object;

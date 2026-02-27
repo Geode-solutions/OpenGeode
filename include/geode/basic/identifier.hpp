@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <geode/basic/common.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
@@ -46,14 +48,12 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        static constexpr auto DEFAULT_NAME = "default_name";
-
         Identifier( Identifier&& other ) noexcept;
         ~Identifier();
 
         [[nodiscard]] const uuid& id() const;
 
-        [[nodiscard]] std::string_view name() const;
+        [[nodiscard]] const std::optional< std::string >& name() const;
 
         void save_identifier( std::string_view directory ) const;
 

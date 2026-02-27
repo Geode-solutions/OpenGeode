@@ -41,13 +41,9 @@ namespace geode
             return id_;
         }
 
-        std::string_view name() const
+        const std::optional< std::string >& name() const
         {
-            if( name_ )
-            {
-                return name_.value();
-            }
-            return id_.string();
+            return name_;
         }
 
         void set_id( const uuid& unique_id )
@@ -96,6 +92,8 @@ namespace geode
         }
 
     private:
+        static constexpr auto DEFAULT_NAME = "default_name";
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
@@ -106,7 +104,10 @@ namespace geode
                          local_archive.object( impl.id_ );
                          std::string old_name;
                          local_archive.text1b( old_name, old_name.max_size() );
-                         impl.name_.emplace( std::move( old_name ) );
+                         if( old_name != DEFAULT_NAME )
+                         {
+                             impl.name_.emplace( std::move( old_name ) );
+                         }
                      },
                         []( Archive& local_archive, Impl& impl ) {
                             local_archive.object( impl.id_ );
@@ -138,7 +139,7 @@ namespace geode
         return impl_->id();
     }
 
-    std::string_view Identifier::name() const
+    const std::optional< std::string >& Identifier::name() const
     {
         return impl_->name();
     }
@@ -167,7 +168,10 @@ namespace geode
     void Identifier::copy_identifier(
         const Identifier& other, IdentifierKey /*unused*/ )
     {
-        set_name( other.name() );
+        if( const auto name = other.name() )
+        {
+            set_name( name.value() );
+        }
         set_id( other.id() );
     }
 

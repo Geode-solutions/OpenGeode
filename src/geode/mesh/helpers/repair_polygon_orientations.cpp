@@ -28,6 +28,7 @@
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
@@ -64,18 +65,19 @@ namespace
                     visited[p] = true;
                     process_polygon_queue( visited );
                 }
+                return get_bad_oriented_polygons();
             }
             catch( geode::OpenGeodeException& e )
             {
-                const auto msg =
-                    absl::StrCat( "Surface ", mesh_.name(), ": ", e.what() );
+                const auto msg = absl::StrCat( "Surface ",
+                    mesh_.name().value_or( mesh_.id().string() ), ": ",
+                    e.what() );
                 throw geode::OpenGeodeException( msg );
             }
             catch( ... )
             {
                 throw;
             }
-            return get_bad_oriented_polygons();
         }
 
     private:

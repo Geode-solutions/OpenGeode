@@ -73,7 +73,10 @@ namespace geode
                     mapping.map( corner.id(), id );
                 }
                 const auto& id = mapping.in2out( corner.id() );
-                builder_to.set_corner_name( id, corner.name() );
+                if( const auto name = corner.name() )
+                {
+                    builder_to.set_corner_name( id, name.value() );
+                }
                 builder_to.set_corner_active( id, corner.is_active() );
             }
         }
@@ -100,7 +103,10 @@ namespace geode
                     mapping.map( line.id(), id );
                 }
                 const auto& id = mapping.in2out( line.id() );
-                builder_to.set_line_name( id, line.name() );
+                if( const auto name = line.name() )
+                {
+                    builder_to.set_line_name( id, name.value() );
+                }
                 builder_to.set_line_active( id, line.is_active() );
             }
         }
@@ -128,7 +134,10 @@ namespace geode
                     mapping.map( surface.id(), id );
                 }
                 const auto& id = mapping.in2out( surface.id() );
-                builder_to.set_surface_name( id, surface.name() );
+                if( const auto name = surface.name() )
+                {
+                    builder_to.set_surface_name( id, name.value() );
+                }
                 builder_to.set_surface_active( id, surface.is_active() );
             }
         }
@@ -155,7 +164,10 @@ namespace geode
                     mapping.map( block.id(), id );
                 }
                 const auto& id = mapping.in2out( block.id() );
-                builder_to.set_block_name( id, block.name() );
+                if( const auto name = block.name() )
+                {
+                    builder_to.set_block_name( id, name.value() );
+                }
                 builder_to.set_block_active( id, block.is_active() );
             }
         }
@@ -177,7 +189,10 @@ namespace geode
                     mapping.map( model_boundary.id(), id );
                 }
                 const auto& id = mapping.in2out( model_boundary.id() );
-                builder_to.set_model_boundary_name( id, model_boundary.name() );
+                if( const auto name = model_boundary.name() )
+                {
+                    builder_to.set_model_boundary_name( id, name.value() );
+                }
                 builder_to.set_model_boundary_active(
                     id, model_boundary.is_active() );
             }
@@ -200,8 +215,10 @@ namespace geode
                     mapping.map( corner_collection.id(), id );
                 }
                 const auto& id = mapping.in2out( corner_collection.id() );
-                builder_to.set_corner_collection_name(
-                    id, corner_collection.name() );
+                if( const auto name = corner_collection.name() )
+                {
+                    builder_to.set_corner_collection_name( id, name.value() );
+                }
                 builder_to.set_corner_collection_active(
                     id, corner_collection.is_active() );
             }
@@ -224,8 +241,10 @@ namespace geode
                     mapping.map( line_collection.id(), id );
                 }
                 const auto& id = mapping.in2out( line_collection.id() );
-                builder_to.set_line_collection_name(
-                    id, line_collection.name() );
+                if( const auto name = line_collection.name() )
+                {
+                    builder_to.set_line_collection_name( id, name.value() );
+                }
                 builder_to.set_line_collection_active(
                     id, line_collection.is_active() );
             }
@@ -248,8 +267,10 @@ namespace geode
                     mapping.map( surface_collection.id(), id );
                 }
                 const auto& id = mapping.in2out( surface_collection.id() );
-                builder_to.set_surface_collection_name(
-                    id, surface_collection.name() );
+                if( const auto name = surface_collection.name() )
+                {
+                    builder_to.set_surface_collection_name( id, name.value() );
+                }
                 builder_to.set_surface_collection_active(
                     id, surface_collection.is_active() );
             }
@@ -272,8 +293,10 @@ namespace geode
                     mapping.map( block_collection.id(), id );
                 }
                 const auto& id = mapping.in2out( block_collection.id() );
-                builder_to.set_block_collection_name(
-                    id, block_collection.name() );
+                if( const auto name = block_collection.name() )
+                {
+                    builder_to.set_block_collection_name( id, name.value() );
+                }
                 builder_to.set_block_collection_active(
                     id, block_collection.is_active() );
             }
