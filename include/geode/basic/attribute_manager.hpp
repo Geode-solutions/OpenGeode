@@ -60,7 +60,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > find_generic_attribute(
             std::string_view name ) const
         {
-            absl::ReaderMutexLock lock{ mutex() };
+            absl::ReaderMutexLock lock{ &mutex() };
             return find_attribute_base( name );
         }
 
@@ -74,7 +74,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
             std::string_view name ) const
         {
-            absl::ReaderMutexLock lock{ mutex() };
+            absl::ReaderMutexLock lock{ &mutex() };
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
                     find_attribute_base( name ) );
@@ -110,7 +110,7 @@ namespace geode
             AttributeProperties properties )
         {
             {
-                absl::ReaderMutexLock lock{ mutex() };
+                absl::ReaderMutexLock lock{ &mutex() };
                 auto attribute = find_attribute_base( name );
                 auto typed_attribute =
                     std::dynamic_pointer_cast< Attribute< T > >( attribute );
@@ -119,7 +119,7 @@ namespace geode
                     return typed_attribute;
                 }
             }
-            absl::MutexLock lock{ mutex() };
+            absl::MutexLock lock{ &mutex() };
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
                 std::dynamic_pointer_cast< Attribute< T > >( attribute );

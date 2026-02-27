@@ -74,7 +74,7 @@ namespace geode
         {
             if( !computed_ )
             {
-                absl::MutexLock lock{ mutex_ };
+                absl::MutexLock lock{ &mutex_ };
                 if( !computed_ )
                 {
                     value_ = computer( std::forward< Args >( args )... );
