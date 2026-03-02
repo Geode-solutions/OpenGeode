@@ -431,13 +431,9 @@ namespace geode
                       .template find_or_create_attribute< VariableAttribute,
                           PolyhedronVertex >( "polyhedron_around_vertex",
                           PolyhedronVertex{},
-                          { false, false, false } ) ),
-              polyhedra_around_vertex_( solid.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
-                          CachedPolyhedra{},
                           { false, false, false } ) )
         {
+            initialize_polyhedra_around_vertex( solid );
         }
 
         VerticesAroundVertex vertices_around_vertex(
@@ -666,8 +662,8 @@ namespace geode
             polyhedra_around_vertex_ =
                 solid.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        CachedPolyhedra >(
-                        POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} );
+                        CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
+                        CachedPolyhedra{}, { false, false, false } );
         }
 
         const internal::PolyhedraAroundVertexImpl&
