@@ -23,62 +23,57 @@
 
 #include <geode/geometry/is_point_inside.hpp>
 
-#include <geode/basic/logger.hpp>
+#include <geode/geometry/basic_objects/polygon.hpp>
+#include <geode/geometry/point.hpp>
 
 namespace
 {
-    double is_left( const geode::Point2D& p0,
+    bool is_left( const geode::Point2D& p0,
         const geode::Point2D& p1,
         const geode::Point2D& p2 )
     {
         return ( p1.value( 0 ) - p0.value( 0 ) )
-                   * ( p2.value( 1 ) - p0.value( 1 ) )
-               - ( p2.value( 0 ) - p0.value( 0 ) )
-                     * ( p1.value( 1 ) - p0.value( 1 ) );
+                       * ( p2.value( 1 ) - p0.value( 1 ) )
+                   - ( p2.value( 0 ) - p0.value( 0 ) )
+                         * ( p1.value( 1 ) - p0.value( 1 ) )
+               > 0;
     }
 } // namespace
 
 namespace geode
 {
-    bool opengeode_geometry_api is_point_inside_polygon(
-        const Point2D& point, absl::Span< const Point2D > polygon_points )
+    bool is_point_inside_polygon(
+        const Point2D& point, const Polygon2D& polygon )
     {
-        double widing_number{ 0 };
-        DEBUG( "is_point_inside_polygon" );
-        SDEBUG( point );
-        for( const auto polygon_vertex :
-            geode::Range{ 0, polygon_points.size() } )
+        double winding_number{ 0 };
+        const auto& vertices = polygon.vertices();
+        for( const auto polygon_vertex : geode::Range{ polygon.nb_vertices() } )
         {
-            const auto v0 = polygon_points[polygon_vertex];
-            const auto next_polygon_vertex =
-                ( polygon_vertex + 1 ) % polygon_points.size();
-            const auto v1 = polygon_points[next_polygon_vertex];
-            SDEBUG( v0 );
-            SDEBUG( v1 );
-            if( v0.value( 1 ) <= point.value( 1 ) )
+            const auto& v0 = vertices[polygon_vertex];
+            const auto& next_polygon_vertex =
+                ( polygon_vertex + 1 ) % vertices.size();
+            const auto& v1 = vertices[next_polygon_vertex];
+            if( v0.get().value( 1 ) <= point.value( 1 ) )
             {
-                if( v1.value( 1 ) > point.value( 1 ) )
+                if( v1.get().value( 1 ) > point.value( 1 ) )
                 {
-                    if( is_left( v0, v1, point ) > 0 )
+                    if( is_left( v0, v1, point ) )
                     {
-                        DEBUG( "widing_number++" );
-                        widing_number++;
+                        winding_number++;
                     }
                 }
             }
             else
             {
-                if( v1.value( 1 ) <= point.value( 1 ) )
+                if( v1.get().value( 1 ) <= point.value( 1 ) )
                 {
-                    if( is_left( v0, v1, point ) < 0 )
+                    if( !is_left( v0, v1, point ) )
                     {
-                        DEBUG( "widing_number--" );
-                        widing_number--;
+                        winding_number--;
                     }
                 }
             }
         }
-        DEBUG( widing_number );
-        return widing_number != 0;
+        return winding_number != 0;
     }
 } // namespace geode

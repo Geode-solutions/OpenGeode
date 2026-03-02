@@ -23,20 +23,23 @@
 
 #pragma once
 
-#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/common.hpp>
-#include <geode/geometry/point.hpp>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Polygon );
+    ALIAS_2D( Point );
+    ALIAS_2D( Polygon );
+} // namespace geode
 
 namespace geode
 {
     /*!
      * Find if point is inside a polygon.
      * @param[in] point The point to rotate.
-     * @param[in] axis Axis for the rotation (not null but not necessary
-     * normalized).
-     * @param[in] angle Rotation angle expresses in radians.
      */
     [[nodiscard]] bool opengeode_geometry_api is_point_inside_polygon(
-        const Point2D& point, absl::Span< const Point2D > polygon_points );
+        const Point2D& point, const Polygon2D& polygon );
 
 } // namespace geode
