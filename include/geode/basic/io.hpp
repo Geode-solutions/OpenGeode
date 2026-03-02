@@ -33,7 +33,7 @@
 
 namespace geode
 {
-    class opengeode_basic_api IOFile
+    class IOFile
     {
     public:
         virtual ~IOFile() = default;

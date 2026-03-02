@@ -56,8 +56,7 @@ namespace
                  .at( geode::Corner< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
                 if( const auto name = old_model.corner( in_uuid ).name() )
@@ -69,6 +68,7 @@ namespace
             {
                 continue;
             }
+            std::string out_name{ "" };
             for( const auto& corner_name : unique_names )
             {
                 absl::StrAppend( &out_name, corner_name, "+" );
@@ -92,8 +92,7 @@ namespace
                  .at( geode::Line< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
                 if( const auto name = old_model.line( in_uuid ).name() )
@@ -105,6 +104,7 @@ namespace
             {
                 continue;
             }
+            std::string out_name{ "" };
             for( const auto& line_name : unique_names )
             {
                 absl::StrAppend( &out_name, line_name, "+" );
@@ -128,8 +128,7 @@ namespace
                  .at( geode::Surface< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
                 if( const auto name = old_model.surface( in_uuid ).name() )
@@ -141,6 +140,7 @@ namespace
             {
                 continue;
             }
+            std::string out_name{ "" };
             for( const auto& surface_name : unique_names )
             {
                 absl::StrAppend( &out_name, surface_name, "+" );
@@ -163,8 +163,7 @@ namespace
             component_mapping.at( geode::Block3D::component_type_static() )
                 .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
                 if( const auto name = old_model.block( in_uuid ).name() )
@@ -176,6 +175,7 @@ namespace
             {
                 continue;
             }
+            std::string out_name{ "" };
             for( const auto& surface_name : unique_names )
             {
                 absl::StrAppend( &out_name, surface_name, "+" );
