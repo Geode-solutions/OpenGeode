@@ -200,8 +200,11 @@ namespace
             for( const auto& model_boundary : section_.model_boundaries() )
             {
                 const auto new_id = brep_builder_.add_model_boundary();
-                brep_builder_.set_model_boundary_name(
-                    new_id, model_boundary.name() );
+                if( const auto name = model_boundary.name() )
+                {
+                    brep_builder_.set_model_boundary_name(
+                        new_id, name.value() );
+                }
                 for( const auto& item :
                     section_.model_boundary_items( model_boundary ) )
                 {

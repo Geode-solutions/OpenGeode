@@ -79,19 +79,4 @@ namespace geode
         internal::copy_meta_info( curve2d, *builder3d );
         return curve3d;
     }
-
-    template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves( absl::Span<
-        const std::reference_wrapper< const EdgedCurve< dimension > > > curves )
-    {
-        detail::EdgedCurveMerger< dimension > merger{ curves };
-        return merger.merge( GLOBAL_EPSILON );
-    }
-
-    template std::unique_ptr< EdgedCurve< 2 > >
-        opengeode_mesh_api merge_edged_curves( absl::Span<
-            const std::reference_wrapper< const EdgedCurve< 2 > > > );
-    template std::unique_ptr< EdgedCurve< 3 > >
-        opengeode_mesh_api merge_edged_curves( absl::Span<
-            const std::reference_wrapper< const EdgedCurve< 3 > > > );
 } // namespace geode

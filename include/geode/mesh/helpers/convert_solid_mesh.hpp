@@ -60,9 +60,4 @@ namespace geode
     [[nodiscard]] std::optional< std::unique_ptr< HybridSolid3D > >
         opengeode_mesh_api convert_solid_mesh_into_hybrid_solid(
             const SolidMesh3D& solid );
-
-    [[deprecated, nodiscard]] std::unique_ptr< SolidMesh3D >
-        opengeode_mesh_api merge_solid_meshes(
-            absl::Span< const std::reference_wrapper< const SolidMesh3D > >
-                solids );
 } // namespace geode

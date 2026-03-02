@@ -101,9 +101,4 @@ namespace geode
         opengeode_mesh_api convert_triangulated_surface3d_into_2d(
             const TriangulatedSurface3D& surface3d,
             local_index_t axis_to_remove );
-
-    template < index_t dimension >
-    [[deprecated, nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
-        merge_surface_meshes( absl::Span< const std::reference_wrapper<
-                const SurfaceMesh< dimension > > > surfaces );
 } // namespace geode

@@ -75,17 +75,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool AABBTree< dimension >::parallel() const
-    {
-        return false;
-    }
-
-    template < index_t dimension >
-    void AABBTree< dimension >::set_parallel( bool /*parallel*/ )
-    {
-    }
-
-    template < index_t dimension >
     std::vector< index_t > AABBTree< dimension >::containing_boxes(
         const Point< dimension >& query ) const
     {

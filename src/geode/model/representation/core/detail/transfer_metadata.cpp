@@ -56,12 +56,19 @@ namespace
                  .at( geode::Corner< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
-                unique_names.insert( old_model.corner( in_uuid ).name() );
+                if( const auto name = old_model.corner( in_uuid ).name() )
+                {
+                    unique_names.insert( name.value() );
+                }
             }
+            if( unique_names.empty() )
+            {
+                continue;
+            }
+            std::string out_name{ "" };
             for( const auto& corner_name : unique_names )
             {
                 absl::StrAppend( &out_name, corner_name, "+" );
@@ -85,12 +92,19 @@ namespace
                  .at( geode::Line< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
-                unique_names.insert( old_model.line( in_uuid ).name() );
+                if( const auto name = old_model.line( in_uuid ).name() )
+                {
+                    unique_names.insert( name.value() );
+                }
             }
+            if( unique_names.empty() )
+            {
+                continue;
+            }
+            std::string out_name{ "" };
             for( const auto& line_name : unique_names )
             {
                 absl::StrAppend( &out_name, line_name, "+" );
@@ -114,12 +128,19 @@ namespace
                  .at( geode::Surface< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
-                unique_names.insert( old_model.surface( in_uuid ).name() );
+                if( const auto name = old_model.surface( in_uuid ).name() )
+                {
+                    unique_names.insert( name.value() );
+                }
             }
+            if( unique_names.empty() )
+            {
+                continue;
+            }
+            std::string out_name{ "" };
             for( const auto& surface_name : unique_names )
             {
                 absl::StrAppend( &out_name, surface_name, "+" );
@@ -142,12 +163,19 @@ namespace
             component_mapping.at( geode::Block3D::component_type_static() )
                 .out2in_map() )
         {
-            std::string out_name{ "" };
-            geode::SmallSet< std::string_view > unique_names;
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
-                unique_names.insert( old_model.block( in_uuid ).name() );
+                if( const auto name = old_model.block( in_uuid ).name() )
+                {
+                    unique_names.insert( name.value() );
+                }
             }
+            if( unique_names.empty() )
+            {
+                continue;
+            }
+            std::string out_name{ "" };
             for( const auto& surface_name : unique_names )
             {
                 absl::StrAppend( &out_name, surface_name, "+" );
@@ -207,14 +235,12 @@ namespace geode
                      .out2in_map() )
             {
                 std::string out_name{ "" };
-                bool first{ true };
                 for( const auto& in_uuid : out2in_mapping.second )
                 {
-                    if( !first )
+                    if( !out_name.empty() )
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    first = false;
                     const auto in_pointset = absl::c_find_if(
                         pointsets, [&in_uuid]( const std::reference_wrapper<
                                        const PointSet< ModelBuilder::dim > >&
@@ -224,9 +250,16 @@ namespace geode
                     OPENGEODE_EXCEPTION( in_pointset != pointsets.end(),
                         "[transfer_pointsets_metadata] Should have found input "
                         "pointset from mapping" );
-                    absl::StrAppend( &out_name, in_pointset->get().name() );
+                    if( const auto name = in_pointset->get().name() )
+                    {
+                        absl::StrAppend( &out_name, name.value() );
+                    }
                 }
-                model_builder.set_corner_name( out2in_mapping.first, out_name );
+                if( !out_name.empty() )
+                {
+                    model_builder.set_corner_name(
+                        out2in_mapping.first, out_name );
+                }
             }
         }
 
@@ -248,14 +281,12 @@ namespace geode
                      .out2in_map() )
             {
                 std::string out_name{ "" };
-                bool first{ true };
                 for( const auto& in_uuid : out2in_mapping.second )
                 {
-                    if( !first )
+                    if( !out_name.empty() )
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    first = false;
                     const auto in_curve = absl::c_find_if(
                         curves, [&in_uuid]( const std::reference_wrapper<
                                     const EdgedCurve< ModelBuilder::dim > >&
@@ -265,9 +296,16 @@ namespace geode
                     OPENGEODE_EXCEPTION( in_curve != curves.end(),
                         "[transfer_curves_metadata] Should have found input "
                         "curve from mapping" );
-                    absl::StrAppend( &out_name, in_curve->get().name() );
+                    if( const auto name = in_curve->get().name() )
+                    {
+                        absl::StrAppend( &out_name, name.value() );
+                    }
                 }
-                model_builder.set_line_name( out2in_mapping.first, out_name );
+                if( !out_name.empty() )
+                {
+                    model_builder.set_line_name(
+                        out2in_mapping.first, out_name );
+                }
             }
         }
 
@@ -289,14 +327,12 @@ namespace geode
                      .out2in_map() )
             {
                 std::string out_name{ "" };
-                bool first{ true };
                 for( const auto& in_uuid : out2in_mapping.second )
                 {
-                    if( !first )
+                    if( !out_name.empty() )
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    first = false;
                     const auto in_surface = absl::c_find_if(
                         surfaces, [&in_uuid]( const std::reference_wrapper<
                                       const SurfaceMesh< ModelBuilder::dim > >&
@@ -306,10 +342,16 @@ namespace geode
                     OPENGEODE_EXCEPTION( in_surface != surfaces.end(),
                         "[transfer_surfaces_metadata] Should have found input "
                         "surface from mapping" );
-                    absl::StrAppend( &out_name, in_surface->get().name() );
+                    if( const auto name = in_surface->get().name() )
+                    {
+                        absl::StrAppend( &out_name, name.value() );
+                    }
                 }
-                model_builder.set_surface_name(
-                    out2in_mapping.first, out_name );
+                if( !out_name.empty() )
+                {
+                    model_builder.set_surface_name(
+                        out2in_mapping.first, out_name );
+                }
             }
         }
 
@@ -329,14 +371,12 @@ namespace geode
                     .out2in_map() )
             {
                 std::string out_name{ "" };
-                bool first{ true };
                 for( const auto& in_uuid : out2in_mapping.second )
                 {
-                    if( !first )
+                    if( !out_name.empty() )
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    first = false;
                     const auto in_solid = absl::c_find_if( solids,
                         [&in_uuid](
                             const std::reference_wrapper< const SolidMesh3D >&
@@ -346,9 +386,16 @@ namespace geode
                     OPENGEODE_EXCEPTION( in_solid != solids.end(),
                         "[transfer_solids_metadata] Should have found input "
                         "solid from mapping" );
-                    absl::StrAppend( &out_name, in_solid->get().name() );
+                    if( const auto name = in_solid->get().name() )
+                    {
+                        absl::StrAppend( &out_name, name.value() );
+                    }
                 }
-                model_builder.set_block_name( out2in_mapping.first, out_name );
+                if( !out_name.empty() )
+                {
+                    model_builder.set_block_name(
+                        out2in_mapping.first, out_name );
+                }
             }
         }
 

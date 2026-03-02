@@ -26,7 +26,7 @@ ExternalProject_Add(minizip
     BINARY_DIR ${MINIZIP_PATH}/build
     STAMP_DIR ${MINIZIP_PATH}/stamp
     GIT_REPOSITORY https://github.com/zlib-ng/minizip-ng
-    GIT_TAG 4.0.7
+    GIT_TAG 4.1.0
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}

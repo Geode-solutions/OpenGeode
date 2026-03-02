@@ -26,7 +26,7 @@ ExternalProject_Add(spdlog
     BINARY_DIR ${SPDLOG_PATH}/build
     STAMP_DIR ${SPDLOG_PATH}/stamp
     GIT_REPOSITORY https://github.com/gabime/spdlog
-    GIT_TAG v1.14.1
+    GIT_TAG v1.17.0
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}

@@ -88,7 +88,10 @@ namespace geode
         template < typename MeshFrom, typename Builder >
         void copy_meta_info( const MeshFrom& from, Builder& builder )
         {
-            builder.set_name( from.name() );
+            if( const auto name = from.name() )
+            {
+                builder.set_name( name.value() );
+            }
         }
 
         void copy_attributes(

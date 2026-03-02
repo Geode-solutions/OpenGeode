@@ -70,7 +70,10 @@ namespace geode
             "[SectionBuild::copy] Section should be empty before copy. To add "
             "Section components in a Section which is not empty, use "
             "ModelConcatener." );
-        set_name( section.name() );
+        if( const auto name = section.name() )
+        {
+            set_name( name.value() );
+        }
         auto mapping = copy_components( section );
         copy_relationships( mapping, section );
         copy_component_geometry( mapping, section );

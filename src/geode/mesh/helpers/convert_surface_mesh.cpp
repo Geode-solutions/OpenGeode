@@ -528,16 +528,6 @@ namespace geode
         return surface2d;
     }
 
-    template < index_t dimension >
-    std::unique_ptr< SurfaceMesh< dimension > > merge_surface_meshes(
-        absl::Span<
-            const std::reference_wrapper< const SurfaceMesh< dimension > > >
-            surfaces )
-    {
-        detail::SurfaceMeshMerger< dimension > merger{ surfaces };
-        return merger.merge( GLOBAL_EPSILON );
-    }
-
     template std::unique_ptr< PolygonalSurface2D > opengeode_mesh_api
         convert_surface_mesh_into_polygonal_surface( const SurfaceMesh2D& );
     template std::unique_ptr< PolygonalSurface3D > opengeode_mesh_api
@@ -557,11 +547,4 @@ namespace geode
         const SurfaceMesh2D&, SurfaceMeshBuilder2D& );
     template void opengeode_mesh_api triangulate_surface_mesh(
         const SurfaceMesh3D&, SurfaceMeshBuilder3D& );
-
-    template std::unique_ptr< SurfaceMesh< 2 > >
-        opengeode_mesh_api merge_surface_meshes( absl::Span<
-            const std::reference_wrapper< const SurfaceMesh< 2 > > > );
-    template std::unique_ptr< SurfaceMesh< 3 > >
-        opengeode_mesh_api merge_surface_meshes( absl::Span<
-            const std::reference_wrapper< const SurfaceMesh< 3 > > > );
 } // namespace geode

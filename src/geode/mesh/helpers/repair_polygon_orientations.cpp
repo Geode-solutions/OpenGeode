@@ -28,6 +28,7 @@
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
@@ -64,18 +65,19 @@ namespace
                     visited[p] = true;
                     process_polygon_queue( visited );
                 }
+                return get_bad_oriented_polygons();
             }
             catch( geode::OpenGeodeException& e )
             {
-                const auto msg =
-                    absl::StrCat( "Surface ", mesh_.name(), ": ", e.what() );
+                const auto msg = absl::StrCat( "Surface ",
+                    mesh_.name().value_or( mesh_.id().string() ), ": ",
+                    e.what() );
                 throw geode::OpenGeodeException( msg );
             }
             catch( ... )
             {
                 throw;
             }
-            return get_bad_oriented_polygons();
         }
 
     private:
@@ -322,13 +324,6 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    void repair_polygon_orientations( SurfaceMesh< dimension >& mesh )
-    {
-        auto builder = SurfaceMeshBuilder< dimension >::create( mesh );
-        repair_polygon_orientations( mesh, *builder );
-    }
-
-    template < index_t dimension >
     void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder )
     {
@@ -342,11 +337,6 @@ namespace geode
         Logger::trace( "Repair polygons orientations: ",
             polygons_to_reorient.size(), " polygons reoriented" );
     }
-
-    template void opengeode_mesh_api repair_polygon_orientations(
-        SurfaceMesh2D& );
-    template void opengeode_mesh_api repair_polygon_orientations(
-        SurfaceMesh3D& );
 
     template void opengeode_mesh_api repair_polygon_orientations(
         const SurfaceMesh2D&, SurfaceMeshBuilder2D& );

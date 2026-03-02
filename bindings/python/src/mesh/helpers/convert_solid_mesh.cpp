@@ -36,7 +36,6 @@ namespace geode
             .def( "convert_solid_mesh_into_tetrahedral_solid",
                 &convert_solid_mesh_into_tetrahedral_solid )
             .def( "convert_grid_into_tetrahedral_solid",
-                &convert_grid_into_tetrahedral_solid )
-            .def( "merge_solid_meshes", &merge_solid_meshes );
+                &convert_grid_into_tetrahedral_solid );
     }
 } // namespace geode

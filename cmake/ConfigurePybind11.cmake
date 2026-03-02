@@ -26,7 +26,7 @@ ExternalProject_Add(pybind11
     BINARY_DIR ${PYBIND11_PATH}/build
     STAMP_DIR ${PYBIND11_PATH}/stamp
     GIT_REPOSITORY https://github.com/pybind/pybind11
-    GIT_TAG v2.13.1
+    GIT_TAG v3.0.2
     GIT_SHALLOW ON
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}

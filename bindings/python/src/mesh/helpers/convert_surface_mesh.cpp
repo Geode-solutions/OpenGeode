@@ -57,8 +57,6 @@ namespace geode
             .def( "convert_triangulated_surface2d_into_3d",
                 &convert_triangulated_surface2d_into_3d )
             .def( "convert_triangulated_surface3d_into_2d",
-                &convert_triangulated_surface3d_into_2d )
-            .def( "merge_surface_meshes2D", &merge_surface_meshes< 2 > )
-            .def( "merge_surface_meshes3D", &merge_surface_meshes< 3 > );
+                &convert_triangulated_surface3d_into_2d );
     }
 } // namespace geode
