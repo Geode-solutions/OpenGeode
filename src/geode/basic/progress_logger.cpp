@@ -95,12 +95,6 @@ namespace geode
     };
 
     ProgressLogger::ProgressLogger(
-        const std::string& message, index_t nb_steps )
-        : ProgressLogger( Logger::LEVEL::info, message, nb_steps )
-    {
-    }
-
-    ProgressLogger::ProgressLogger(
         Logger::LEVEL level, const std::string& message, index_t nb_steps )
         : impl_( level, message, nb_steps )
     {

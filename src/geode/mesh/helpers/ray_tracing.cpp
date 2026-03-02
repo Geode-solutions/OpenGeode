@@ -362,11 +362,6 @@ namespace geode
         std::mutex mutex_;
     };
 
-    RayTracing2D::RayTracing2D( const EdgedCurve2D& mesh, const Ray2D& ray )
-        : impl_{ mesh, ray }
-    {
-    }
-
     RayTracing2D::RayTracing2D(
         const EdgedCurve2D& mesh, const BoundingBox2D& bbox, const Ray2D& ray )
         : impl_{ mesh, bbox, ray }
@@ -384,12 +379,6 @@ namespace geode
         const Point2D& origin,
         const OwnerSegment2D& segment )
         : impl_{ mesh, origin, segment }
-    {
-    }
-
-    RayTracing2D::RayTracing2D(
-        const EdgedCurve2D& mesh, const InfiniteLine2D& infinite_line )
-        : impl_{ mesh, infinite_line }
     {
     }
 
@@ -594,17 +583,6 @@ namespace geode
         mutable bool are_results_sorted_{ false };
         std::mutex mutex_;
     };
-
-    RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray )
-        : impl_{ mesh, ray }
-    {
-    }
-
-    RayTracing3D::RayTracing3D(
-        const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
-        : impl_{ mesh, infinite_line }
-    {
-    }
 
     RayTracing3D::RayTracing3D(
         const SurfaceMesh3D& mesh, const BoundingBox3D& bbox, const Ray3D& ray )

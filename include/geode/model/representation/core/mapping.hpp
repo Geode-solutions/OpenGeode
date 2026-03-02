@@ -189,12 +189,6 @@ namespace geode
         ModelUnchangedComponentMapping unchanged_components;
     };
 
-    struct [[deprecated]] ModelMappings : public ModelComponentMappings
-    {
-        ModelMeshesElementMapping mesh_element_mapping;
-        ModelMeshesVertexMapping mesh_vertices_mapping;
-    };
-
     struct SectionMappings : public ModelComponentMappings
     {
         ModelMeshesElementMapping mesh_element_mapping;

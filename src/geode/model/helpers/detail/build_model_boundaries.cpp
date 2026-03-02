@@ -52,7 +52,7 @@ namespace
     const geode::ModelBoundary< Model::dim >& find_or_create_boundary(
         const Model& model,
         typename Model::Builder& builder,
-        std::string_view name )
+        const std::optional< std::string >& name )
     {
         for( const auto& boundary : model.model_boundaries() )
         {
@@ -62,7 +62,10 @@ namespace
             }
         }
         const auto& model_boundary_id = builder.add_model_boundary();
-        builder.set_model_boundary_name( model_boundary_id, name );
+        if( name )
+        {
+            builder.set_model_boundary_name( model_boundary_id, name.value() );
+        }
         const auto& boundary = model.model_boundary( model_boundary_id );
         return boundary;
     }

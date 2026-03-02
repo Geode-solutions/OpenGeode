@@ -37,6 +37,7 @@
 #include <geode/basic/cached_value.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -194,7 +195,8 @@ namespace
         } while( facet.polyhedron_id != first_polyhedron
                  && safety_count < MAX_SAFETY_COUNT );
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SolidMesh::propagate_around_edge] Solid ", solid.name(),
+            "[SolidMesh::propagate_around_edge] Solid ",
+            solid.name().value_or( solid.id().string() ),
             ": too many polyhedra around edge ", edge_vertices[0], " ",
             edge_vertices[1], " (", solid.point( edge_vertices[0] ).string(),
             " ", solid.point( edge_vertices[1] ).string(),
@@ -298,7 +300,8 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SolidMesh::compute_polyhedra_around_vertex] Solid ", solid.name(),
+            "[SolidMesh::compute_polyhedra_around_vertex] Solid ",
+            solid.name().value_or( solid.id().string() ),
             ": Too many polyhedra around vertex ", vertex_id, " (",
             solid.point( vertex_id ).string(),
             "). This is probably related to a bug in the polyhedra "
@@ -428,13 +431,9 @@ namespace geode
                       .template find_or_create_attribute< VariableAttribute,
                           PolyhedronVertex >( "polyhedron_around_vertex",
                           PolyhedronVertex{},
-                          { false, false, false } ) ),
-              polyhedra_around_vertex_( solid.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
-                          CachedPolyhedra{},
                           { false, false, false } ) )
         {
+            initialize_polyhedra_around_vertex( solid );
         }
 
         VerticesAroundVertex vertices_around_vertex(
@@ -663,8 +662,8 @@ namespace geode
             polyhedra_around_vertex_ =
                 solid.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        CachedPolyhedra >(
-                        POLYHEDRA_AROUND_VERTEX_NAME, CachedPolyhedra{} );
+                        CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
+                        CachedPolyhedra{}, { false, false, false } );
         }
 
         const internal::PolyhedraAroundVertexImpl&

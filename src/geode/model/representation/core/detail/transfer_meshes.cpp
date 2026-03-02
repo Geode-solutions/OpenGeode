@@ -150,7 +150,10 @@ namespace
                 corner, other_builder.steal_corner_mesh( other_corner_id ) );
             auto mesh_builder = builder.corner_mesh_builder( corner_id );
             mesh_builder->set_id( corner.id() );
-            mesh_builder->set_name( corner.name() );
+            if( const auto name = corner.name() )
+            {
+                mesh_builder->set_name( name.value() );
+            }
             set_mesh_unique_vertices( builder, corner_unique_vertices,
                 corner.component_id(), first_new_unique_vertex_id );
         }
@@ -176,7 +179,10 @@ namespace
                 line, other_builder.steal_line_mesh( other_line_id ) );
             auto mesh_builder = builder.line_mesh_builder( line_id );
             mesh_builder->set_id( line.id() );
-            mesh_builder->set_name( line.name() );
+            if( const auto name = line.name() )
+            {
+                mesh_builder->set_name( name.value() );
+            }
             set_mesh_unique_vertices( builder, line_unique_vertices,
                 line.component_id(), first_new_unique_vertex_id );
         }
@@ -203,7 +209,10 @@ namespace
                 surface, other_builder.steal_surface_mesh( other_surface_id ) );
             auto mesh_builder = builder.surface_mesh_builder( surface_id );
             mesh_builder->set_id( surface.id() );
-            mesh_builder->set_name( surface.name() );
+            if( const auto name = surface.name() )
+            {
+                mesh_builder->set_name( name.value() );
+            }
             set_mesh_unique_vertices( builder, surface_unique_vertices,
                 surface.component_id(), first_new_unique_vertex_id );
         }
@@ -229,7 +238,10 @@ namespace
                 block, other_builder.steal_block_mesh( other_block_id ) );
             auto mesh_builder = builder.block_mesh_builder( block_id );
             mesh_builder->set_id( block.id() );
-            mesh_builder->set_name( block.name() );
+            if( const auto name = block.name() )
+            {
+                mesh_builder->set_name( name.value() );
+            }
             set_mesh_unique_vertices( builder, block_unique_vertices,
                 block.component_id(), first_new_unique_vertex_id );
         }

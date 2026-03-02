@@ -36,8 +36,6 @@ namespace geode
     class opengeode_basic_api ProgressLogger
     {
     public:
-        [[deprecated]] ProgressLogger(
-            const std::string& message, index_t nb_steps );
         ProgressLogger(
             Logger::LEVEL level, const std::string& message, index_t nb_steps );
         ~ProgressLogger();

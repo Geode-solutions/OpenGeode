@@ -36,6 +36,7 @@
 #include <geode/basic/cached_value.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/polygon.hpp>
@@ -129,7 +130,9 @@ namespace
             OPENGEODE_ASSERT(
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
-                "around vertex" );
+                "around vertex ",
+                vertex_id, " / ", cur_polygon_vertex->string(), " ",
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
             const auto prev_vertex =
                 mesh.previous_polygon_vertex( cur_polygon_vertex.value() );
@@ -183,7 +186,8 @@ namespace
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SurfaceMesh::polygons_around_vertex] Surface ", mesh.name(),
+            "[SurfaceMesh::polygons_around_vertex] Surface ",
+            mesh.name().value_or( mesh.id().string() ),
             ": Too many polygons around vertex ", vertex_id, " (",
             mesh.point( vertex_id ).string(),
             "). This is probably related to a bug in the polygon "
@@ -255,13 +259,9 @@ namespace geode
                       .template find_or_create_attribute< VariableAttribute,
                           PolygonVertex >( "polygon_around_vertex",
                           PolygonVertex{},
-                          { false, false, false } ) ),
-              polygons_around_vertex_( surface.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
-                          CachedPolygons{},
                           { false, false, false } ) )
         {
+            initialize_polygons_around_vertex( surface );
         }
 
         VerticesAroundVertex vertices_around_vertex(
@@ -403,8 +403,8 @@ namespace geode
             polygons_around_vertex_ =
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        CachedPolygons >(
-                        POLYGONS_AROUND_VERTEX_NAME, CachedPolygons{} );
+                        CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
+                        CachedPolygons{}, { false, false, false } );
         }
 
     private:

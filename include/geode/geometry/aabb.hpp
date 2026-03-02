@@ -71,17 +71,6 @@ namespace geode
         [[nodiscard]] const BoundingBox< dimension >& bounding_box() const;
 
         /*!
-         * @brief Whether or not the queries run on this tree are parallelized.
-         */
-        [[deprecated, nodiscard]] bool parallel() const;
-
-        /*!
-         * @brief Sets whether or not the queries run on this tree are
-         * parallelized.
-         */
-        [[deprecated]] void set_parallel( bool parallel );
-
-        /*!
          * @brief Gets all the boxes containing a point
          * @param[in] query the point to test
          */
