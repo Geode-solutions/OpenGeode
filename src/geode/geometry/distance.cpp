@@ -778,16 +778,17 @@ namespace
             const geode::Segment< dimension >& segment0,
             const geode::Segment< dimension >& segment1 )
     {
-        auto current_point = segment0.vertices()[0].get();
+        auto current_point = segment0.barycenter();
         auto step = segment0.length() / 4;
         auto current_distance =
             geode::point_segment_distance( current_point, segment1 );
+        const auto segment_direction = segment0.normalized_direction();
         while( step > geode::GLOBAL_EPSILON )
         {
             const auto point_at_step_plus =
-                current_point + segment0.normalized_direction() * step;
+                current_point + segment_direction * step;
             const auto point_at_step_minus =
-                current_point - segment0.normalized_direction() * step;
+                current_point - segment_direction * step;
             const auto distance_plus =
                 geode::point_segment_distance( point_at_step_plus, segment1 );
             const auto distance_minus =
