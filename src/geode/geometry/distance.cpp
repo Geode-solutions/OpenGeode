@@ -782,7 +782,6 @@ namespace
         auto step = segment0.length() / 4;
         auto current_distance =
             geode::point_segment_distance( current_point, segment1 );
-        geode::index_t nb_steps = 0;
         while( step > geode::GLOBAL_EPSILON )
         {
             const auto point_at_step_plus =
@@ -804,7 +803,6 @@ namespace
                 current_point = point_at_step_minus;
             }
             step /= 2;
-            nb_steps++;
         }
         return std::make_tuple(
             current_distance, current_point, current_point );
