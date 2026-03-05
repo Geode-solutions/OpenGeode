@@ -24,6 +24,7 @@
 #include <iostream>
 #include <memory>
 
+#include <geode/basic/file_logger_client.hpp>
 #include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/logger_client.hpp>
@@ -79,6 +80,8 @@ void test()
 {
     geode::OpenGeodeBasicLibrary::initialize();
     geode::LoggerManager::register_client( std::make_unique< CustomClient >() );
+    geode::LoggerManager::register_client(
+        std::make_unique< geode::FileLoggerClient >( "geode.log" ) );
 
     test_logger();
     geode::Logger::set_level( geode::Logger::LEVEL::err );
