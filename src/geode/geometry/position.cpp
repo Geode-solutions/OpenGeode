@@ -37,88 +37,91 @@
 #include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/perpendicular.hpp>
 
-namespace geode
+namespace
 {
-    POSITION point_segment_position_exact(
-        const Point3D& point, const Segment3D& segment )
+    geode::POSITION point_segment_position_exact(
+        const geode::Point3D& point, const geode::Segment3D& segment )
     {
         const auto& vertices = segment.vertices();
         if( !GEO::PCK::aligned_3d( point, vertices[0], vertices[1] ) )
         {
-            return POSITION::outside;
+            return geode::POSITION::outside;
         }
         const auto dot0 = GEO::PCK::dot_3d( vertices[0], point, vertices[1] );
         const auto dot1 = GEO::PCK::dot_3d( vertices[1], point, vertices[0] );
-        return internal::point_segment_position(
-            internal::side( dot0 ), internal::opposite_side( dot1 ) );
+        return geode::internal::point_segment_position(
+            geode::internal::side( dot0 ),
+            geode::internal::opposite_side( dot1 ) );
     }
 
-    POSITION point_segment_position_exact(
-        const Point2D& point, const Segment2D& segment )
+    geode::POSITION point_segment_position_exact(
+        const geode::Point2D& point, const geode::Segment2D& segment )
     {
         const auto& vertices = segment.vertices();
         if( GEO::PCK::orient_2d( point, vertices[0], vertices[1] )
             != GEO::zero )
         {
-            return POSITION::outside;
+            return geode::POSITION::outside;
         }
         const auto dot0 = GEO::PCK::dot_2d( vertices[0], point, vertices[1] );
         const auto dot1 = GEO::PCK::dot_2d( vertices[1], point, vertices[0] );
-        return internal::point_segment_position(
-            internal::side( dot0 ), internal::opposite_side( dot1 ) );
+        return geode::internal::point_segment_position(
+            geode::internal::side( dot0 ),
+            geode::internal::opposite_side( dot1 ) );
     }
 
-    POSITION point_segment_position_exact(
-        const Point1D& point, const Segment1D& segment )
+    geode::POSITION point_segment_position_exact(
+        const geode::Point1D& point, const geode::Segment1D& segment )
     {
         const auto& vertices = segment.vertices();
         if( point == vertices[0] )
         {
-            return POSITION::vertex0;
+            return geode::POSITION::vertex0;
         }
         if( point == vertices[1] )
         {
-            return POSITION::vertex1;
+            return geode::POSITION::vertex1;
         }
         if( segment.bounding_box().contains( point ) )
         {
-            return POSITION::inside;
+            return geode::POSITION::inside;
         }
-        return POSITION::outside;
+        return geode::POSITION::outside;
     }
 
-    template < index_t dimension >
-    POSITION point_triangle_position_all_zero(
-        const Point< dimension >& point, const Triangle< dimension >& triangle )
+    template < geode::index_t dimension >
+    geode::POSITION point_triangle_position_all_zero(
+        const geode::Point< dimension >& point,
+        const geode::Triangle< dimension >& triangle )
     {
         const auto& vertices = triangle.vertices();
         if( point == vertices[0] )
         {
-            return POSITION::parallel;
+            return geode::POSITION::parallel;
         }
         const auto smaller = point < vertices[0];
 
         if( smaller && vertices[1].get() <= point )
         {
-            return POSITION::parallel;
+            return geode::POSITION::parallel;
         }
         if( smaller && vertices[2].get() <= point )
         {
-            return POSITION::parallel;
+            return geode::POSITION::parallel;
         }
         if( !smaller && point <= vertices[1] )
         {
-            return POSITION::parallel;
+            return geode::POSITION::parallel;
         }
         if( !smaller && point <= vertices[2] )
         {
-            return POSITION::parallel;
+            return geode::POSITION::parallel;
         }
-        return POSITION::outside;
+        return geode::POSITION::outside;
     }
 
-    POSITION point_triangle_position_exact(
-        const Point2D& point, const Triangle2D& triangle )
+    geode::POSITION point_triangle_position_exact(
+        const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
         const auto& vertices = triangle.vertices();
         const auto s0 =
@@ -127,21 +130,21 @@ namespace geode
             point_side_to_segment( point, { vertices[1], vertices[2] } );
         const auto s2 =
             point_side_to_segment( point, { vertices[2], vertices[0] } );
-        if( s0 == s1 && s1 == s2 && s2 == SIDE::zero )
+        if( s0 == s1 && s1 == s2 && s2 == geode::SIDE::zero )
         {
             return point_triangle_position_all_zero( point, triangle );
         }
-        return internal::point_triangle_position( s0, s1, s2 );
+        return geode::internal::point_triangle_position( s0, s1, s2 );
     }
 
-    POSITION compute_determinants( const Point3D& point,
-        const Triangle3D& triangle,
-        const Vector3D& third_vector )
+    geode::POSITION compute_determinants( const geode::Point3D& point,
+        const geode::Triangle3D& triangle,
+        const geode::Vector3D& third_vector )
     {
         const auto& vertices = triangle.vertices();
-        const Vector3D v0_to_point{ vertices[0], point };
-        const Vector3D v1_to_point{ vertices[1], point };
-        const Vector3D v2_to_point{ vertices[2], point };
+        const geode::Vector3D v0_to_point{ vertices[0], point };
+        const geode::Vector3D v1_to_point{ vertices[1], point };
+        const geode::Vector3D v2_to_point{ vertices[2], point };
         const auto det0 =
             GEO::PCK::det_3d( v0_to_point, v1_to_point, third_vector );
         const auto det1 =
@@ -153,44 +156,49 @@ namespace geode
         {
             return point_triangle_position_all_zero( point, triangle );
         }
-        return internal::point_triangle_position( internal::side( det0 ),
-            internal::side( det1 ), internal::side( det2 ) );
+        return geode::internal::point_triangle_position(
+            geode::internal::side( det0 ), geode::internal::side( det1 ),
+            geode::internal::side( det2 ) );
     }
 
-    POSITION point_triangle_position_exact(
-        const Point3D& point, const Triangle3D& triangle )
+    geode::POSITION point_triangle_position_exact(
+        const geode::Point3D& point, const geode::Triangle3D& triangle )
     {
         const auto& vertices = triangle.vertices();
         if( GEO::PCK::orient_3d( point, vertices[0], vertices[1], vertices[2] )
             != GEO::zero )
         {
-            return POSITION::outside;
+            return geode::POSITION::outside;
         }
 
         return compute_determinants(
-            point, triangle, Vector3D{ { 1.0, 1.0, 1.0 } } );
+            point, triangle, geode::Vector3D{ { 1.0, 1.0, 1.0 } } );
     }
 
-    POSITION point_tetrahedron_position_exact(
-        const Point3D& point, const Tetrahedron& tetra )
+    geode::POSITION point_tetrahedron_position_exact(
+        const geode::Point3D& point, const geode::Tetrahedron& tetra )
     {
         std::array< GEO::SIGN, 4 > signs;
         const auto& vertices = tetra.vertices();
-        for( const auto f : Range{ 4 } )
+        for( const auto f : geode::Range{ 4 } )
         {
             const auto& facet_vertices =
-                Tetrahedron::tetrahedron_facet_vertex[f];
+                geode::Tetrahedron::tetrahedron_facet_vertex[f];
             signs[f] = GEO::PCK::orient_3d( vertices[facet_vertices[0]],
                 vertices[facet_vertices[1]], vertices[facet_vertices[2]],
                 point );
             if( signs[f] == GEO::SIGN::negative )
             {
-                return POSITION::outside;
+                return geode::POSITION::outside;
             }
         }
-        return internal::point_tetrahedron_position( signs );
+        return geode::internal::point_tetrahedron_position( signs );
     }
 
+} // namespace
+
+namespace geode
+{
     POSITION point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra )
     {
