@@ -500,10 +500,14 @@ namespace
         const auto ac = a * c;
         const auto bb = b * b;
         double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
+        DEBUG( ac );
+        DEBUG( bb );
         if( ac > bb )
         {
             if( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) > 20 )
             {
+                DEBUG( "DET" );
+                DEBUG( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) );
                 return std::nullopt;
             }
             const auto det = ac - bb;
@@ -552,6 +556,8 @@ namespace
             {
                 if( std::log2( std::abs( bte ) / std::abs( bte - ctd ) ) > 20 )
                 {
+                    DEBUG(
+                        std::log2( std::abs( bte ) / std::abs( bte - ctd ) ) );
                     return std::nullopt;
                 }
                 s = bte - ctd;
@@ -623,6 +629,8 @@ namespace
                         if( std::log2( std::abs( ate ) / std::abs( ate - btd ) )
                             > 20 )
                         {
+                            DEBUG( std::log2(
+                                std::abs( ate ) / std::abs( ate - btd ) ) );
                             return std::nullopt;
                         }
                         t = ate - btd;
@@ -782,8 +790,14 @@ namespace
             ( segment0.length() > segment1.length() ) ? segment0 : segment1;
         const auto shortest_segment =
             ( segment0.length() < segment1.length() ) ? segment0 : segment1;
-        auto current_point = longest_segment.barycenter();
-        auto step = longest_segment.length() / 4;
+        auto current_point =
+            ( geode::point_segment_distance(
+                  longest_segment.vertices()[0].get(), shortest_segment )
+                < geode::point_segment_distance(
+                    longest_segment.vertices()[1].get(), shortest_segment ) )
+                ? longest_segment.vertices()[0].get()
+                : longest_segment.vertices()[1].get();
+        auto step = longest_segment.length() / 2;
         auto current_distance =
             geode::point_segment_distance( current_point, shortest_segment );
         const auto segment_direction = longest_segment.normalized_direction();
@@ -797,12 +811,14 @@ namespace
                 point_at_step_plus, shortest_segment );
             const auto distance_minus = geode::point_segment_distance(
                 point_at_step_minus, shortest_segment );
-            if( distance_plus < current_distance )
+            if( distance_plus < current_distance
+                && current_point != longest_segment.vertices()[1].get() )
             {
                 current_distance = distance_plus;
                 current_point = point_at_step_plus;
             }
-            if( distance_minus < current_distance )
+            if( distance_minus < current_distance
+                && current_point != longest_segment.vertices()[0].get() )
             {
                 current_distance = distance_minus;
                 current_point = point_at_step_minus;
