@@ -500,14 +500,10 @@ namespace
         const auto ac = a * c;
         const auto bb = b * b;
         double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
-        DEBUG( ac );
-        DEBUG( bb );
         if( ac > bb )
         {
             if( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) > 20 )
             {
-                DEBUG( "DET" );
-                DEBUG( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) );
                 return std::nullopt;
             }
             const auto det = ac - bb;
@@ -556,8 +552,6 @@ namespace
             {
                 if( std::log2( std::abs( bte ) / std::abs( bte - ctd ) ) > 20 )
                 {
-                    DEBUG(
-                        std::log2( std::abs( bte ) / std::abs( bte - ctd ) ) );
                     return std::nullopt;
                 }
                 s = bte - ctd;
@@ -629,8 +623,6 @@ namespace
                         if( std::log2( std::abs( ate ) / std::abs( ate - btd ) )
                             > 20 )
                         {
-                            DEBUG( std::log2(
-                                std::abs( ate ) / std::abs( ate - btd ) ) );
                             return std::nullopt;
                         }
                         t = ate - btd;
