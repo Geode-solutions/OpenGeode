@@ -476,81 +476,37 @@ namespace
         }
         return std::make_tuple( min_distance, point0, point1 );
     }
-} // namespace
 
-namespace geode
-{
-    template < index_t dimension >
-    double point_point_distance(
-        const Point< dimension >& point0, const Point< dimension >& point1 )
-    {
-        double diff2{ 0 };
-        for( const auto d : LRange{ dimension } )
-        {
-            const auto diff = point0.value( d ) - point1.value( d );
-            diff2 += diff * diff;
-        }
-        return std::sqrt( diff2 );
-    }
-
-    template < index_t dimension >
-    double point_segment_distance(
-        const Point< dimension >& point, const Segment< dimension >& segment )
-    {
-        const auto length = segment.length();
-        const auto length0 =
-            point_point_distance( segment.vertices()[0].get(), point );
-        if( length <= GLOBAL_EPSILON )
-        {
-            return length0;
-        }
-        const auto length1 =
-            point_point_distance( segment.vertices()[1].get(), point );
-        const auto sqr_length = length * length;
-        const auto sqr_length0 = length0 * length0;
-        const auto sqr_length1 = length1 * length1;
-        if( length0 >= length && length0 >= length1
-            && sqr_length + sqr_length1 <= sqr_length0 )
-        { // obtuse by vertex 1
-            return length1;
-        }
-        if( length1 >= length && length1 >= length0
-            && sqr_length + sqr_length0 <= sqr_length1 )
-        { // obtuse by vertex 0
-            return length0;
-        }
-        // acute angles
-        if( const auto distance =
-                compute_point_line_distance( length, length0, length1 ) )
-        {
-            return distance.value();
-        }
-        return std::get< 0 >(
-            point_segment_distance_using_projection( point, segment ) );
-    }
-
-    template < index_t dimension >
-    std::tuple< double, Point< dimension >, Point< dimension > >
-        segment_segment_distance( const Segment< dimension >& segment0,
-            const Segment< dimension >& segment1 )
+    template < geode::index_t dimension >
+    std::optional< std::tuple< double,
+        geode::Point< dimension >,
+        geode::Point< dimension > > >
+        approximate_segment_segment_distance(
+            const geode::Segment< dimension >& segment0,
+            const geode::Segment< dimension >& segment1 )
     {
         /* Algorithm and code found on
          * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
          */
         const auto P1mP0 = segment0.direction();
         const auto Q1mQ0 = segment1.direction();
-        const Vector< dimension > P0mQ0{ segment1.vertices()[0],
+        const geode::Vector< dimension > P0mQ0{ segment1.vertices()[0],
             segment0.vertices()[0] };
         const auto a = P1mP0.dot( P1mP0 );
         const auto b = P1mP0.dot( Q1mQ0 );
         const auto c = Q1mQ0.dot( Q1mQ0 );
         const auto d = P1mP0.dot( P0mQ0 );
         const auto e = Q1mQ0.dot( P0mQ0 );
-        const auto det = a * c - b * b;
+        const auto ac = a * c;
+        const auto bb = b * b;
         double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
-
-        if( det > 0 )
+        if( ac > bb )
         {
+            if( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) > 20 )
+            {
+                return std::nullopt;
+            }
+            const auto det = ac - bb;
             bte = b * e;
             ctd = c * d;
             if( bte <= ctd ) // s <= 0
@@ -594,6 +550,10 @@ namespace geode
             }
             else // s > 0
             {
+                if( std::log2( std::abs( bte ) / std::abs( bte - ctd ) ) > 20 )
+                {
+                    return std::nullopt;
+                }
                 s = bte - ctd;
                 if( s >= det ) // s >= 1
                 {
@@ -660,6 +620,11 @@ namespace geode
                     }
                     else // t > 0
                     {
+                        if( std::log2( std::abs( ate ) / std::abs( ate - btd ) )
+                            > 20 )
+                        {
+                            return std::nullopt;
+                        }
                         t = ate - btd;
                         if( t >= det ) // t >= 1
                         {
@@ -766,21 +731,21 @@ namespace geode
             segment1.vertices()[0].get() + Q1mQ0 * t;
         const auto distance =
             point_point_distance( closest_on_segment0, closest_on_segment1 );
-        if( distance < GLOBAL_EPSILON )
+        if( distance < geode::GLOBAL_EPSILON )
         {
             return std::make_tuple(
                 distance, closest_on_segment0, closest_on_segment1 );
         }
         const auto distance_to_closest0 =
             point_segment_distance( closest_on_segment0, segment1 );
-        if( distance_to_closest0 < GLOBAL_EPSILON )
+        if( distance_to_closest0 < geode::GLOBAL_EPSILON )
         {
             return std::make_tuple( distance_to_closest0, closest_on_segment0,
                 point_segment_projection( closest_on_segment0, segment1 ) );
         }
         const auto distance_to_closest1 =
             point_segment_distance( closest_on_segment1, segment0 );
-        if( distance_to_closest1 < GLOBAL_EPSILON )
+        if( distance_to_closest1 < geode::GLOBAL_EPSILON )
         {
             return std::make_tuple( distance_to_closest1,
                 point_segment_projection( closest_on_segment1, segment0 ),
@@ -805,6 +770,121 @@ namespace geode
         }
         return std::make_tuple(
             distance, closest_on_segment0, closest_on_segment1 );
+    }
+
+    template < geode::index_t dimension >
+    std::tuple< double, geode::Point< dimension >, geode::Point< dimension > >
+        dichotomic_segment_segment_distance(
+            const geode::Segment< dimension >& segment0,
+            const geode::Segment< dimension >& segment1 )
+    {
+        const auto longest_segment =
+            ( segment0.length() > segment1.length() ) ? segment0 : segment1;
+        const auto shortest_segment =
+            ( segment0.length() < segment1.length() ) ? segment0 : segment1;
+        auto current_point =
+            ( geode::point_segment_distance(
+                  longest_segment.vertices()[0].get(), shortest_segment )
+                < geode::point_segment_distance(
+                    longest_segment.vertices()[1].get(), shortest_segment ) )
+                ? longest_segment.vertices()[0].get()
+                : longest_segment.vertices()[1].get();
+        auto step = longest_segment.length() / 2;
+        auto current_distance =
+            geode::point_segment_distance( current_point, shortest_segment );
+        const auto segment_direction = longest_segment.normalized_direction();
+        while( step > geode::GLOBAL_EPSILON )
+        {
+            const auto point_at_step_plus =
+                current_point + segment_direction * step;
+            const auto point_at_step_minus =
+                current_point - segment_direction * step;
+            const auto distance_plus = geode::point_segment_distance(
+                point_at_step_plus, shortest_segment );
+            const auto distance_minus = geode::point_segment_distance(
+                point_at_step_minus, shortest_segment );
+            if( distance_plus < current_distance
+                && current_point != longest_segment.vertices()[1].get() )
+            {
+                current_distance = distance_plus;
+                current_point = point_at_step_plus;
+            }
+            if( distance_minus < current_distance
+                && current_point != longest_segment.vertices()[0].get() )
+            {
+                current_distance = distance_minus;
+                current_point = point_at_step_minus;
+            }
+            step /= 2;
+        }
+        return std::make_tuple(
+            current_distance, current_point, current_point );
+    }
+
+} // namespace
+
+namespace geode
+{
+    template < index_t dimension >
+    double point_point_distance(
+        const Point< dimension >& point0, const Point< dimension >& point1 )
+    {
+        double diff2{ 0 };
+        for( const auto d : LRange{ dimension } )
+        {
+            const auto diff = point0.value( d ) - point1.value( d );
+            diff2 += diff * diff;
+        }
+        return std::sqrt( diff2 );
+    }
+
+    template < index_t dimension >
+    double point_segment_distance(
+        const Point< dimension >& point, const Segment< dimension >& segment )
+    {
+        const auto length = segment.length();
+        const auto length0 =
+            point_point_distance( segment.vertices()[0].get(), point );
+        if( length <= GLOBAL_EPSILON )
+        {
+            return length0;
+        }
+        const auto length1 =
+            point_point_distance( segment.vertices()[1].get(), point );
+        const auto sqr_length = length * length;
+        const auto sqr_length0 = length0 * length0;
+        const auto sqr_length1 = length1 * length1;
+        if( length0 >= length && length0 >= length1
+            && sqr_length + sqr_length1 <= sqr_length0 )
+        { // obtuse by vertex 1
+            return length1;
+        }
+        if( length1 >= length && length1 >= length0
+            && sqr_length + sqr_length0 <= sqr_length1 )
+        { // obtuse by vertex 0
+            return length0;
+        }
+        // acute angles
+        if( const auto distance =
+                compute_point_line_distance( length, length0, length1 ) )
+        {
+            return distance.value();
+        }
+        return std::get< 0 >(
+            point_segment_distance_using_projection( point, segment ) );
+    }
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension >, Point< dimension > >
+        segment_segment_distance( const Segment< dimension >& segment0,
+            const Segment< dimension >& segment1 )
+    {
+        if( const auto approximation =
+                approximate_segment_segment_distance( segment0, segment1 ) )
+        {
+            return approximation.value();
+        }
+        return dichotomic_segment_segment_distance( segment0, segment1 );
     }
 
     template < index_t dimension >
