@@ -499,14 +499,14 @@ namespace
         const auto e = Q1mQ0.dot( P0mQ0 );
         const auto ac = a * c;
         const auto bb = b * b;
-        if( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) > 20 )
-        {
-            return std::nullopt;
-        }
         const auto det = ac - bb;
         double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
         if( det > 0 )
         {
+            if( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) > 20 )
+            {
+                return std::nullopt;
+            }
             bte = b * e;
             ctd = c * d;
             if( bte <= ctd ) // s <= 0
