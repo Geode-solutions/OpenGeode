@@ -29,7 +29,8 @@
     const auto name##dimension =                                               \
         "PolygonalSurface" + std::to_string( dimension ) + "D";                \
     pybind11::class_< PolygonalSurface##dimension##D,                          \
-        SurfaceMesh##dimension##D >( module, name##dimension.c_str() )         \
+        SurfaceMesh##dimension##D, pybind11::smart_holder >(                   \
+        module, name##dimension.c_str() )                                      \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< PolygonalSurface##dimension##D > ( * )() >(   \

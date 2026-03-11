@@ -33,7 +33,8 @@
     const auto name##dimension =                                               \
         "RegularGrid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RegularGrid##dimension##D, Base##dimension##D,           \
-        Grid##dimension##D >( module, name##dimension.c_str() )                \
+        Grid##dimension##D, pybind11::smart_holder >(                          \
+        module, name##dimension.c_str() )                                      \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< RegularGrid##dimension##D > ( * )() >(        \

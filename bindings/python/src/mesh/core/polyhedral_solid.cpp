@@ -28,8 +28,8 @@
 #define PYTHON_POLYHEDRAL_SOLID( dimension )                                   \
     const auto name##dimension =                                               \
         "PolyhedralSolid" + std::to_string( dimension ) + "D";                 \
-    pybind11::class_< PolyhedralSolid##dimension##D,                           \
-        SolidMesh##dimension##D >( module, name##dimension.c_str() )           \
+    pybind11::class_< PolyhedralSolid##dimension##D, SolidMesh##dimension##D,  \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< PolyhedralSolid##dimension##D > ( * )() >(    \

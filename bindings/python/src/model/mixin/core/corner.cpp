@@ -29,8 +29,8 @@
 
 #define PYTHON_CORNER( dimension )                                             \
     const auto name##dimension = "Corner" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Corner##dimension##D, Component##dimension##D >(         \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Corner##dimension##D, Component##dimension##D,           \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "mesh", &Corner##dimension##D::mesh,                             \
             pybind11::return_value_policy::reference )                         \
         .def( "component_id", &Corner##dimension##D::component_id )            \

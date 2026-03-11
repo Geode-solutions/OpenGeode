@@ -29,7 +29,8 @@
     const auto name##dimension =                                               \
         "SurfaceCollection" + std::to_string( dimension ) + "D";               \
     pybind11::class_< SurfaceCollection##dimension##D,                         \
-        Component##dimension##D >( module, name##dimension.c_str() )           \
+        Component##dimension##D, pybind11::smart_holder >(                     \
+        module, name##dimension.c_str() )                                      \
         .def( "component_id", &SurfaceCollection##dimension##D::component_id ) \
         .def_static( "component_type_static",                                  \
             &SurfaceCollection##dimension##D::component_type_static )

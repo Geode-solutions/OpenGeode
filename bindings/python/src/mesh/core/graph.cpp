@@ -31,7 +31,8 @@ namespace geode
 {
     void define_graph( pybind11::module& module )
     {
-        pybind11::class_< Graph, VertexSet >( module, "Graph" )
+        pybind11::class_< Graph, VertexSet, pybind11::smart_holder >(
+            module, "Graph" )
             .def_static(
                 "create", static_cast< std::unique_ptr< Graph > ( * )() >(
                               &Graph::create ) )

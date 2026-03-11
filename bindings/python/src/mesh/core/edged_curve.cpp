@@ -32,8 +32,8 @@
     const auto name##dimension =                                               \
         "EdgedCurve" + std::to_string( dimension ) + "D";                      \
     pybind11::class_< EdgedCurve##dimension##D, Graph,                         \
-        CoordinateReferenceSystemManagers##dimension##D >(                     \
-        module, name##dimension.c_str() )                                      \
+        CoordinateReferenceSystemManagers##dimension##D,                       \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< EdgedCurve##dimension##D > ( * )() >(         \

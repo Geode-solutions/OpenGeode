@@ -29,7 +29,8 @@ namespace geode
 {
     void define_component_registry( pybind11::module& module )
     {
-        pybind11::class_< ComponentRegistry >( module, "ComponentRegistry" )
+        pybind11::class_< ComponentRegistry, pybind11::smart_holder >(
+            module, "ComponentRegistry" )
             .def( pybind11::init<>() )
             .def( "mesh_components", &ComponentRegistry::mesh_components )
             .def( "collection_components",

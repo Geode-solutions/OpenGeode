@@ -29,7 +29,7 @@
 #define PYTHON_SURFACES( dimension )                                           \
     const auto name##dimension =                                               \
         "Surfaces" + std::to_string( dimension ) + "D";                        \
-    pybind11::class_< Surfaces##dimension##D >(                                \
+    pybind11::class_< Surfaces##dimension##D, pybind11::smart_holder >(        \
         module, name##dimension.c_str() )                                      \
         .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces )            \
         .def( "surface", &Surfaces##dimension##D::surface,                     \

@@ -40,7 +40,8 @@ namespace geode
     {
         pybind11::class_< Section, Topology, Corners2D, Lines2D, Surfaces2D,
             ModelBoundaries2D, CornerCollections2D, LineCollections2D,
-            SurfaceCollections2D, Identifier >( module, "Section" )
+            SurfaceCollections2D, Identifier, pybind11::smart_holder >(
+            module, "Section" )
             .def( pybind11::init<>() )
             .def(
                 "boundary_corners",

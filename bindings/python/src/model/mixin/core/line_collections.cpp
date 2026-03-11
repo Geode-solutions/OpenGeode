@@ -29,7 +29,7 @@
 #define PYTHON_LINE_COLLECTIONS( dimension )                                   \
     const auto name##dimension =                                               \
         "LineCollections" + std::to_string( dimension ) + "D";                 \
-    pybind11::class_< LineCollections##dimension##D >(                         \
+    pybind11::class_< LineCollections##dimension##D, pybind11::smart_holder >( \
         module, name##dimension.c_str() )                                      \
         .def( "nb_line_collections",                                           \
             &LineCollections##dimension##D::nb_line_collections )              \

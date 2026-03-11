@@ -28,8 +28,8 @@
 #define PYTHON_MODEL_BOUNDARY( dimension )                                     \
     const auto name##dimension =                                               \
         "ModelBoundary" + std::to_string( dimension ) + "D";                   \
-    pybind11::class_< ModelBoundary##dimension##D, Component##dimension##D >(  \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< ModelBoundary##dimension##D, Component##dimension##D,    \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "component_id", &ModelBoundary##dimension##D::component_id )     \
         .def_static( "component_type_static",                                  \
             &ModelBoundary##dimension##D::component_type_static )

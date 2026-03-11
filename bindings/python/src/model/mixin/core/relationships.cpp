@@ -29,7 +29,8 @@ namespace geode
 {
     void define_relationships( pybind11::module& module )
     {
-        pybind11::class_< Relationships >( module, "Relationships" )
+        pybind11::class_< Relationships, pybind11::smart_holder >(
+            module, "Relationships" )
             .def( pybind11::init<>() )
             .def( "nb_boundaries", &Relationships::nb_boundaries )
             .def(

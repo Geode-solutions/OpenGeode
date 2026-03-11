@@ -30,7 +30,8 @@
     const auto name##dimension =                                               \
         "RasterImage" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RasterImage##dimension##D, CellArray##dimension##D,      \
-        Identifier >( module, name##dimension.c_str() )                        \
+        Identifier, pybind11::smart_holder >(                                  \
+        module, name##dimension.c_str() )                                      \
         .def( pybind11::init< std::array< index_t, dimension > >() )           \
         .def(                                                                  \
             "native_extension", &RasterImage##dimension##D::native_extension ) \

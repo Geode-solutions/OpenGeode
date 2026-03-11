@@ -39,8 +39,8 @@
     const auto name##dimension =                                               \
         "SolidMesh" + std::to_string( dimension ) + "D";                       \
     pybind11::class_< SolidMesh##dimension##D, VertexSet,                      \
-        CoordinateReferenceSystemManagers##dimension##D >(                     \
-        module, name##dimension.c_str() )                                      \
+        CoordinateReferenceSystemManagers##dimension##D,                       \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def_static( "create",                                                 \
             static_cast< std::unique_ptr< SolidMesh##dimension##D > ( * )() >( \
                 &SolidMesh##dimension##D::create ) )                           \
