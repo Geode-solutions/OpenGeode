@@ -37,8 +37,8 @@
     const auto name##dimension =                                               \
         "SurfaceMesh" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< SurfaceMesh##dimension##D, VertexSet,                    \
-        CoordinateReferenceSystemManagers##dimension##D >(                     \
-        module, name##dimension.c_str() )                                      \
+        CoordinateReferenceSystemManagers##dimension##D,                       \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "are_edges_enabled",                                             \
             &SurfaceMesh##dimension##D::are_edges_enabled )                    \
         .def( "enable_edges", &SurfaceMesh##dimension##D::enable_edges )       \

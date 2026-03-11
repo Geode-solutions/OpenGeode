@@ -36,7 +36,8 @@ namespace geode
             .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
             .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
 
-        pybind11::class_< VertexIdentifier >( module, "VertexIdentifier" )
+        pybind11::class_< VertexIdentifier, pybind11::smart_holder >(
+            module, "VertexIdentifier" )
             .def( pybind11::init<>() )
             .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
             .def( "component_mesh_vertices",

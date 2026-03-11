@@ -28,7 +28,7 @@
 #define PYTHON_ARRAY( dimension )                                              \
     const auto name##dimension =                                               \
         "CellArray" + std::to_string( dimension ) + "D";                       \
-    pybind11::class_< CellArray##dimension##D >(                               \
+    pybind11::class_< CellArray##dimension##D, pybind11::smart_holder >(                               \
         module, name##dimension.c_str() )                                      \
         .def(                                                                  \
             "nb_cell_neighbors", &CellArray##dimension##D::nb_cell_neighbors ) \

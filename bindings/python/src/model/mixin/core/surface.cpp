@@ -31,8 +31,8 @@
 #define PYTHON_SURFACE( dimension )                                            \
     const auto name##dimension =                                               \
         "Surface" + std::to_string( dimension ) + "D";                         \
-    pybind11::class_< Surface##dimension##D, Component##dimension##D >(        \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Surface##dimension##D, Component##dimension##D,          \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "mesh",                                                          \
             &Surface##dimension##D::mesh< SurfaceMesh##dimension##D >,         \
             pybind11::return_value_policy::reference )                         \

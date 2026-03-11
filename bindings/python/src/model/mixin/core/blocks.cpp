@@ -28,7 +28,7 @@
 
 #define PYTHON_BLOCKS( dimension )                                             \
     const auto name##dimension = "Blocks" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Blocks##dimension##D >(                                  \
+    pybind11::class_< Blocks##dimension##D, pybind11::smart_holder >(          \
         module, name##dimension.c_str() )                                      \
         .def( "nb_blocks", &Blocks##dimension##D::nb_blocks )                  \
         .def( "block", &Blocks##dimension##D::block,                           \

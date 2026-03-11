@@ -29,8 +29,8 @@
 #define PYTHON_SURFACE_COLLECTIONS( dimension )                                \
     const auto name##dimension =                                               \
         "SurfaceCollections" + std::to_string( dimension ) + "D";              \
-    pybind11::class_< SurfaceCollections##dimension##D >(                      \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< SurfaceCollections##dimension##D,                        \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "nb_surface_collections",                                        \
             &SurfaceCollections##dimension##D::nb_surface_collections )        \
         .def( "surface_collection",                                            \

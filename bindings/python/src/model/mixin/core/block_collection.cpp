@@ -28,8 +28,8 @@
 #define PYTHON_BLOCK_COLLECTION( dimension )                                   \
     const auto name##dimension =                                               \
         "BlockCollection" + std::to_string( dimension ) + "D";                 \
-    pybind11::class_< BlockCollection##dimension##D,                           \
-        Component##dimension##D >( module, name##dimension.c_str() )           \
+    pybind11::class_< BlockCollection##dimension##D, Component##dimension##D,  \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "component_id", &BlockCollection##dimension##D::component_id )   \
         .def_static( "component_type_static",                                  \
             &BlockCollection##dimension##D::component_type_static )

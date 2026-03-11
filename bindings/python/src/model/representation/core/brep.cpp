@@ -42,8 +42,8 @@ namespace geode
     {
         pybind11::class_< BRep, Topology, Corners3D, Lines3D, Surfaces3D,
             Blocks3D, ModelBoundaries3D, CornerCollections3D, LineCollections3D,
-            SurfaceCollections3D, BlockCollections3D, Identifier >(
-            module, "BRep" )
+            SurfaceCollections3D, BlockCollections3D, Identifier,
+            pybind11::smart_holder >( module, "BRep" )
             .def( pybind11::init<>() )
             .def(
                 "boundary_corners",

@@ -31,8 +31,8 @@
 
 #define PYTHON_BLOCK( dimension )                                              \
     const auto name##dimension = "Block" + std::to_string( dimension ) + "D";  \
-    pybind11::class_< Block##dimension##D, Component##dimension##D >(          \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Block##dimension##D, Component##dimension##D,            \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "mesh", &Block##dimension##D::mesh< SolidMesh##dimension##D >,   \
             pybind11::return_value_policy::reference )                         \
         .def( "polyhedral_mesh",                                               \

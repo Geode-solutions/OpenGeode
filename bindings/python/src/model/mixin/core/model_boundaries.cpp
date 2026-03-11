@@ -29,7 +29,7 @@
 #define PYTHON_MODEL_BOUNDARIES( dimension )                                   \
     const auto name##dimension =                                               \
         "ModelBoundaries" + std::to_string( dimension ) + "D";                 \
-    pybind11::class_< ModelBoundaries##dimension##D >(                         \
+    pybind11::class_< ModelBoundaries##dimension##D, pybind11::smart_holder >( \
         module, name##dimension.c_str() )                                      \
         .def( "nb_model_boundaries",                                           \
             &ModelBoundaries##dimension##D::nb_model_boundaries )              \

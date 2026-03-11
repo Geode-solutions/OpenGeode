@@ -31,8 +31,8 @@
 #define PYTHON_CRS_MANAGERS( dimension )                                       \
     const auto name##dimension = "CoordinateReferenceSystemManagers"           \
                                  + std::to_string( dimension ) + "D";          \
-    pybind11::class_< CoordinateReferenceSystemManagers##dimension##D >(       \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< CoordinateReferenceSystemManagers##dimension##D,         \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "coordinate_reference_system_manager1D",                         \
             static_cast< const CoordinateReferenceSystemManager1D& (           \
                 CoordinateReferenceSystemManagers##dimension##D::*) ()         \

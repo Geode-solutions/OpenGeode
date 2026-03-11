@@ -29,8 +29,8 @@
 #define PYTHON_CORNER_COLLECTIONS( dimension )                                 \
     const auto name##dimension =                                               \
         "CornerCollections" + std::to_string( dimension ) + "D";               \
-    pybind11::class_< CornerCollections##dimension##D >(                       \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< CornerCollections##dimension##D,                         \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "nb_corner_collections",                                         \
             &CornerCollections##dimension##D::nb_corner_collections )          \
         .def( "corner_collection",                                             \

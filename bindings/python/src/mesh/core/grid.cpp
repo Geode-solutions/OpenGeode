@@ -34,8 +34,8 @@
 
 #define PYTHON_GRID( dimension )                                               \
     const auto name##dimension = "Grid" + std::to_string( dimension ) + "D";   \
-    pybind11::class_< Grid##dimension##D, CellArray##dimension##D >(           \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Grid##dimension##D, CellArray##dimension##D,             \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "grid_coordinate_system",                                        \
             &Grid##dimension##D::grid_coordinate_system )                      \
         .def( "nb_cell_vertices", &Grid##dimension##D::nb_cell_vertices )      \
