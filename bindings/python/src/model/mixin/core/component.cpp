@@ -28,8 +28,8 @@
 #define PYTHON_COMPONENT( dimension )                                          \
     const auto name##dimension =                                               \
         "Component" + std::to_string( dimension ) + "D";                       \
-    pybind11::class_< Component##dimension##D, Identifier, pybind11::smart_holder >(                   \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Component##dimension##D, Identifier,                     \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "component_type", &Component##dimension##D::component_type )
 
 namespace geode
