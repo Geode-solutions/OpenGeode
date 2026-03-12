@@ -29,8 +29,8 @@
 
 #define PYTHON_LINE( dimension )                                               \
     const auto name##dimension = "Line" + std::to_string( dimension ) + "D";   \
-    pybind11::class_< Line##dimension##D, Component##dimension##D >(           \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Line##dimension##D, Component##dimension##D,             \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "mesh", &Line##dimension##D::mesh,                               \
             pybind11::return_value_policy::reference )                         \
         .def( "component_id", &Line##dimension##D::component_id )              \

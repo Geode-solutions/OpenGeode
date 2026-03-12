@@ -28,8 +28,8 @@
 #define PYTHON_CORNER_COLLECTION( dimension )                                  \
     const auto name##dimension =                                               \
         "CornerCollection" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< CornerCollection##dimension##D,                          \
-        Component##dimension##D >( module, name##dimension.c_str() )           \
+    pybind11::class_< CornerCollection##dimension##D, Component##dimension##D, \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "component_id", &CornerCollection##dimension##D::component_id )  \
         .def_static( "component_type_static",                                  \
             &CornerCollection##dimension##D::component_type_static )

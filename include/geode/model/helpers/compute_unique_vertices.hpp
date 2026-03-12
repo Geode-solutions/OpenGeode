@@ -21,27 +21,17 @@
  *
  */
 
-#include "../../common.hpp"
+#pragma once
 
-#include <geode/mesh/core/polygonal_surface.hpp>
-
-#define PYTHON_POLYGONAL_SURFACE( dimension )                                  \
-    const auto name##dimension =                                               \
-        "PolygonalSurface" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< PolygonalSurface##dimension##D,                          \
-        SurfaceMesh##dimension##D, pybind11::smart_holder >(                   \
-        module, name##dimension.c_str() )                                      \
-        .def_static( "create",                                                 \
-            static_cast<                                                       \
-                std::unique_ptr< PolygonalSurface##dimension##D > ( * )() >(   \
-                &PolygonalSurface##dimension##D::create ) )                    \
-        .def( "clone", &PolygonalSurface##dimension##D::clone )
+#include <geode/model/common.hpp>
 
 namespace geode
 {
-    void define_polygonal_surface( pybind11::module& module )
-    {
-        PYTHON_POLYGONAL_SURFACE( 2 );
-        PYTHON_POLYGONAL_SURFACE( 3 );
-    }
+} // namespace geode
+
+namespace geode
+{
+    template < typename Model >
+    void compute_model_unique_vertices(
+        const Model& model, typename Model::Builder& builder );
 } // namespace geode

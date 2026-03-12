@@ -29,6 +29,8 @@
 
 #include <geode/geometry/point.hpp>
 
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/detail/surface_mesh_validity_fix.hpp>
 
 #include <geode/model/mixin/core/surface.hpp>

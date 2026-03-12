@@ -21,27 +21,30 @@
  *
  */
 
-#include "../../../common.hpp"
+#include <geode/tests/common.hpp>
 
-#include <geode/model/mixin/core/vertex_identifier.hpp>
+#include <geode/basic/assert.hpp>
+#include <geode/basic/logger.hpp>
 
-namespace geode
+#include <geode/model/helpers/compute_unique_vertices.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+
+void test_brep()
 {
-    void define_vertex_identifier( pybind11::module& module )
-    {
-        pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )
-            .def( pybind11::init< ComponentID, index_t >() )
-            .def( pybind11::self == pybind11::self )
-            .def( "string", &ComponentMeshVertex::string )
-            .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
-            .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
+    auto brep = geode::load_brep( absl::StrCat(
+        geode::DATA_PATH, "rectangular_cuboid_without_uv.og_brep" ) );
+    geode::BRepBuilder brep_builder{ brep };
+    geode::compute_model_unique_vertices( brep, brep_builder );
+    OPENGEODE_EXCEPTION( brep.nb_unique_vertices() == 8,
+        "[Test] Wrong number of unique vertices" );
+}
 
-        pybind11::class_< VertexIdentifier, pybind11::smart_holder >(
-            module, "VertexIdentifier" )
-            .def( pybind11::init<>() )
-            .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
-            .def( "component_mesh_vertices",
-                &VertexIdentifier::component_mesh_vertices )
-            .def( "unique_vertex", &VertexIdentifier::unique_vertex );
-    }
-} // namespace geode
+void test()
+{
+    geode::OpenGeodeModelLibrary::initialize();
+    test_brep();
+}
+
+OPENGEODE_TEST( "convert-brep" )

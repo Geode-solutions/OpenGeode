@@ -28,7 +28,8 @@
 
 #define PYTHON_LINES( dimension )                                              \
     const auto name##dimension = "Lines" + std::to_string( dimension ) + "D";  \
-    pybind11::class_< Lines##dimension##D >( module, name##dimension.c_str() ) \
+    pybind11::class_< Lines##dimension##D, pybind11::smart_holder >(           \
+        module, name##dimension.c_str() )                                      \
         .def( "nb_lines", &Lines##dimension##D::nb_lines )                     \
         .def( "line", &Lines##dimension##D::line,                              \
             pybind11::return_value_policy::reference )                         \

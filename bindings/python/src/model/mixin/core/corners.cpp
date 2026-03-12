@@ -29,7 +29,7 @@
 #define PYTHON_CORNERS( dimension )                                            \
     const auto name##dimension =                                               \
         "Corners" + std::to_string( dimension ) + "D";                         \
-    pybind11::class_< Corners##dimension##D >(                                 \
+    pybind11::class_< Corners##dimension##D, pybind11::smart_holder >(         \
         module, name##dimension.c_str() )                                      \
         .def( "nb_corners", &Corners##dimension##D::nb_corners )               \
         .def( "corner", &Corners##dimension##D::corner,                        \

@@ -30,6 +30,6 @@ namespace geode
     void define_topology( pybind11::module& module )
     {
         pybind11::class_< Topology, Relationships, VertexIdentifier,
-            ComponentRegistry >( module, "Topology" );
+            ComponentRegistry, pybind11::smart_holder >( module, "Topology" );
     }
 } // namespace geode

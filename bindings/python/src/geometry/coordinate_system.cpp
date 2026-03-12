@@ -28,8 +28,8 @@
 #define PYTHON_COORDINATE_SYSTEM( dimension )                                  \
     const auto name##dimension =                                               \
         "CoordinateSystem" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< CoordinateSystem##dimension##D >(                        \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< CoordinateSystem##dimension##D,                          \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( pybind11::init<>() )                                             \
         .def( pybind11::init< std::array< Vector< dimension >, dimension >,    \
             Point< dimension > >() )                                           \

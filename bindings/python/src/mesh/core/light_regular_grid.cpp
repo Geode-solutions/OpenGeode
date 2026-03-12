@@ -38,8 +38,8 @@ namespace
         const auto class_name =
             absl::StrCat( "LightRegularGrid", dimension, "D" );
         pybind11::class_< geode::LightRegularGrid< dimension >,
-            geode::Grid< dimension >, geode::Identifier >(
-            module, class_name.c_str() )
+            geode::Grid< dimension >, geode::Identifier,
+            pybind11::smart_holder >( module, class_name.c_str() )
             .def( pybind11::init< geode::Point< dimension >,
                 std::array< geode::index_t, dimension >,
                 std::array< double, dimension > >() )

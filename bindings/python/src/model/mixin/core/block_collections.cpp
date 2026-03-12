@@ -29,8 +29,8 @@
 #define PYTHON_BLOCK_COLLECTIONS( dimension )                                  \
     const auto name##dimension =                                               \
         "BlockCollections" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< BlockCollections##dimension##D >(                        \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< BlockCollections##dimension##D,                          \
+        pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "nb_block_collections",                                          \
             &BlockCollections##dimension##D::nb_block_collections )            \
         .def( "block_collection",                                              \

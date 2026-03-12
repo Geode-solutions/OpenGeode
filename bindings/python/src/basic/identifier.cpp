@@ -30,7 +30,8 @@ namespace geode
 {
     void define_identifier( pybind11::module& module )
     {
-        pybind11::class_< Identifier >( module, "Identifier" )
+        pybind11::class_< Identifier, pybind11::smart_holder >(
+            module, "Identifier" )
             .def( "id", &Identifier::id )
             .def( "name", &Identifier::name );
     }
