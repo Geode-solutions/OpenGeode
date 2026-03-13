@@ -31,9 +31,10 @@ namespace geode
     class LoggerManager::Impl
     {
     public:
-        void register_client( std::unique_ptr< LoggerClient > &&client )
+        LoggerClient &register_client(
+            std::unique_ptr< LoggerClient > &&client )
         {
-            loggers_.emplace_back( std::move( client ) );
+            return *loggers_.emplace_back( std::move( client ) );
         }
 
         void trace( const std::string &message )
@@ -92,10 +93,10 @@ namespace geode
 
     LoggerManager::~LoggerManager() = default;
 
-    void LoggerManager::register_client(
+    LoggerClient &LoggerManager::register_client(
         std::unique_ptr< LoggerClient > &&client )
     {
-        instance().impl_->register_client( std::move( client ) );
+        return instance().impl_->register_client( std::move( client ) );
     }
 
     void LoggerManager::trace( const std::string &message )
