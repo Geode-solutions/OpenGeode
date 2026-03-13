@@ -200,9 +200,13 @@ namespace
         const geode::Triangle3D& triangle,
         geode::local_index_t v0 )
     {
+        DEBUG( "pivot_point_triangle_distance with pivot vertex " );
         const auto v1 = v0 == 2 ? 0 : v0 + 1;
         const auto v2 = v1 == 2 ? 0 : v1 + 1;
         const auto& vertices = triangle.vertices();
+        SDEBUG( vertices[v0].get() );
+        SDEBUG( vertices[v1].get() );
+        SDEBUG( vertices[v2].get() );
         const geode::Vector3D edge0{ vertices[v0], vertices[v1] };
         const geode::Vector3D edge1{ vertices[v0], vertices[v2] };
         const auto a00 = edge0.length2();
@@ -219,6 +223,9 @@ namespace
         std::array< double, 2 > p0, p1, p;
         double dt1, h0, h1;
 
+        DEBUG( f00 );
+        DEBUG( f10 );
+        DEBUG( f01 );
         if( f00 >= 0 )
         {
             if( f01 >= 0 )
@@ -337,9 +344,11 @@ namespace
                 }
             }
         }
-
+        DEBUG( p[0] );
+        DEBUG( p[1] );
         geode::Point3D closest_point{ vertices[v0].get() + edge0 * p[0]
                                       + edge1 * p[1] };
+        SDEBUG( closest_point );
         const auto distance =
             geode::point_point_distance( point, closest_point );
         return std::make_tuple( distance, std::move( closest_point ) );
