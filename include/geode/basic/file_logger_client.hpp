@@ -35,6 +35,8 @@ namespace geode
         FileLoggerClient( std::string_view file_path );
         ~FileLoggerClient();
 
+        void always_flush();
+
     private:
         void trace( const std::string &message ) override;
 
