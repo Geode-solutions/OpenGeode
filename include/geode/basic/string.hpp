@@ -27,6 +27,9 @@
 
 namespace geode
 {
+    inline constexpr char EOL{ '\n' };
+    inline constexpr char SPACE{ ' ' };
+
     [[nodiscard]] std::vector< std::string_view >
         opengeode_basic_api string_split( std::string_view string );
 
