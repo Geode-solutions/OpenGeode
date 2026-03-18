@@ -65,7 +65,7 @@ namespace geode::detail
         std::string joined_filenames;
         for( const auto& output_filename : output_filenames )
         {
-            absl::StrAppend( &joined_filenames, output_filename, ", " )
+            absl::StrAppend( &joined_filenames, output_filename, ", " );
         }
         joined_filenames.pop_back();
         joined_filenames.pop_back();
