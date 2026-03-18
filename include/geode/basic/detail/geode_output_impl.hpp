@@ -69,10 +69,10 @@ namespace geode
             std::string joined_filenames;
             for( const auto& output_filename : output_filenames )
             {
-                if( !joined_filenames.empty() )
-                    joined_filenames += ", ";
-                joined_filenames += output_filename;
+                absl::StrAppend( &joined_filenames, output_filename, ", " )
             }
+            joined_filenames.pop_back();
+            joined_filenames.pop_back();
             Logger::info(
                 type, " saved in ", _filenames, " in ", timer.duration() );
             return output_filenames;
