@@ -35,47 +35,42 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
-namespace geode
+namespace geode::detail
 {
-    namespace detail
+    template < typename Factory >
+    [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
+        geode_object_output_writer( std::string_view& filename )
     {
-        template < typename Factory >
-        [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
-            geode_object_output_writer( std::string_view& filename )
-        {
-            filename = absl::StripAsciiWhitespace( filename );
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            return Factory::create(
-                extension, expand_predefined_folders( filename ) );
-        }
+        filename = absl::StripAsciiWhitespace( filename );
+        const auto extension =
+            absl::AsciiStrToLower( extension_from_filename( filename ) );
+        OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
+            "Unknown extension: ", extension );
+        return Factory::create(
+            extension, expand_predefined_folders( filename ) );
+    }
 
-        template < typename Factory, typename Object >
-        std::vector< std::string > geode_object_output_impl(
-            std::string_view type,
-            const Object& object,
-            std::string_view filename )
+    template < typename Factory, typename Object >
+    std::vector< std::string > geode_object_output_impl(
+        std::string_view type, const Object& object, std::string_view filename )
+    {
+        const Timer timer;
+        auto output = geode_object_output_writer< Factory >( filename );
+        const auto directories = filepath_without_filename( filename );
+        if( !directories.empty() )
         {
-            const Timer timer;
-            auto output = geode_object_output_writer< Factory >( filename );
-            const auto directories = filepath_without_filename( filename );
-            if( !directories.empty() )
-            {
-                std::filesystem::create_directories( directories );
-            }
-            auto output_filenames = output->write( object );
-            std::string joined_filenames;
-            for( const auto& output_filename : output_filenames )
-            {
-                absl::StrAppend( &joined_filenames, output_filename, ", " )
-            }
-            joined_filenames.pop_back();
-            joined_filenames.pop_back();
-            Logger::info(
-                type, " saved in ", _filenames, " in ", timer.duration() );
-            return output_filenames;
+            std::filesystem::create_directories( directories );
         }
-    } // namespace detail
-} // namespace geode
+        auto output_filenames = output->write( object );
+        std::string joined_filenames;
+        for( const auto& output_filename : output_filenames )
+        {
+            absl::StrAppend( &joined_filenames, output_filename, ", " )
+        }
+        joined_filenames.pop_back();
+        joined_filenames.pop_back();
+        Logger::info(
+            type, " saved in ", joined_filenames, " in ", timer.duration() );
+        return output_filenames;
+    }
+} // namespace geode::detail
