@@ -5,15 +5,18 @@
 Checks: >
   *,
   -altera*,
+  -boost*,
   -fuchsia*,
   -llvmlibc*,
   -llvm-header-guard,
   -llvm-prefer-static-over-anonymous-namespace,
+  -google-readability-todo,
   -misc-no-recursion,
   -misc-include-cleaner,
   -misc-const-correctness,
   -modernize-use-trailing-return-type,
   -portability-avoid-pragma-once,
+  -readability-use-anyofallof,
   -readability-redundant-access-specifiers,
   -readability-convert-member-functions-to-static,
   -cppcoreguidelines-avoid-const-or-ref-data-members
