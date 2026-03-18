@@ -65,10 +65,17 @@ namespace geode
             {
                 std::filesystem::create_directories( directories );
             }
-            auto result = output->write( object );
+            auto output_filenames = output->write( object );
+            std::string joined_filenames;
+            for( const auto& output_filename : output_filenames )
+            {
+                if( !joined_filenames.empty() )
+                    joined_filenames += ", ";
+                joined_filenames += output_filename;
+            }
             Logger::info(
-                type, " saved in ", filename, " in ", timer.duration() );
-            return result;
+                type, " saved in ", _filenames, " in ", timer.duration() );
+            return output_filenames;
         }
     } // namespace detail
 } // namespace geode
