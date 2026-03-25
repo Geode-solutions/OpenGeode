@@ -111,7 +111,7 @@ function(add_geode_python_wheel)
         set(venv_bin "${venv_path}/Scripts")
     endif()
     execute_process(
-        COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
+        COMMAND ${venv_bin}/pip install --upgrade pip wheel packaging setuptools build pybind11-stubgen
     )
     execute_process(
         COMMAND ${venv_bin}/python -c 
