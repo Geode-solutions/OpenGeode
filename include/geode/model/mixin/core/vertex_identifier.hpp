@@ -57,6 +57,8 @@ namespace geode
 
         [[nodiscard]] bool operator==( const ComponentMeshVertex& other ) const;
 
+        [[nodiscard]] bool operator<( const ComponentMeshVertex& other ) const;
+
         template < typename Archive >
         void serialize( Archive& archive );
 

@@ -84,6 +84,15 @@ namespace geode
             return type_.get() == other.type_.get() && id_ == other.id_;
         }
 
+        [[nodiscard]] bool operator<( const ComponentID& other ) const
+        {
+            if( type_.get() != other.type_.get() )
+            {
+                return type_.get() < other.type_.get();
+            }
+            return id_.string() < other.id_.string();
+        }
+
         [[nodiscard]] std::string string() const
         {
             return absl::StrCat( type_.get(), " ", id_.string() );
