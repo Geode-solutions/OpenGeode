@@ -19,7 +19,8 @@ Checks: >
   -readability-use-anyofallof,
   -readability-redundant-access-specifiers,
   -readability-convert-member-functions-to-static,
-  -cppcoreguidelines-avoid-const-or-ref-data-members
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-pro-bounds-constant-array-index
 
 CheckOptions:
   - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
