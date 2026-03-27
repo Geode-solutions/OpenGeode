@@ -61,14 +61,13 @@ namespace geode
         {
             const auto& type = typeid( SingletonType );
             const std::lock_guard< std::mutex > locking{ lock() };
-            auto* singleton =
-                dynamic_cast< SingletonType* >( instance( type ) );
+            auto* singleton = instance( type );
             if( singleton == nullptr )
             {
                 singleton = new SingletonType{};
                 set_instance( type, singleton );
             }
-            return *singleton;
+            return *static_cast< SingletonType* >( singleton );
         }
 
     private:
