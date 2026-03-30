@@ -42,8 +42,8 @@ namespace geode
 
         [[deprecated]] void reserve( index_t capacity )
         {
-            // in2out_.reserve( capacity );
-            // out2in_.reserve( capacity );
+            in2out_.reserve( capacity );
+            out2in_.reserve( capacity );
         }
 
         void clear()
