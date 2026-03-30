@@ -40,7 +40,7 @@ namespace geode
         template < typename T >
         using Storage = typename StorageType< T >::Type;
 
-        void reserve( index_t /* capacity */ )
+        [[deprecated]] void reserve( index_t capacity )
         {
             // in2out_.reserve( capacity );
             // out2in_.reserve( capacity );
@@ -226,7 +226,6 @@ namespace geode
             }
             auto& out_map = this->out2in_mapping().at( out );
             const auto itr2 = absl::c_find( out_map, in );
-            DEBUG( itr2 == out_map.end() );
             if( itr2 == out_map.end() )
             {
                 return;

@@ -90,7 +90,7 @@ namespace geode
             {
                 return type_.get() < other.type_.get();
             }
-            return id_.string() < other.id_.string();
+            return id_ < other.id_;
         }
 
         [[nodiscard]] std::string string() const

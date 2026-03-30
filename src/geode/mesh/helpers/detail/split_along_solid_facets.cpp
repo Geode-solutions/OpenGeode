@@ -139,7 +139,6 @@ namespace geode
             ElementsMapping duplicate_points( const SolidInfo& solid_info )
             {
                 ElementsMapping vertices_mapping;
-                vertices_mapping.reserve( solid_.nb_vertices() );
                 for( const auto vertex_id : Range{ solid_.nb_vertices() } )
                 {
                     vertices_mapping.map( vertex_id, vertex_id );
