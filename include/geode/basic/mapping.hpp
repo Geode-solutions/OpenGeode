@@ -226,6 +226,11 @@ namespace geode
             }
             auto& out_map = this->out2in_mapping().at( out );
             const auto itr2 = absl::c_find( out_map, in );
+            DEBUG( itr2 == out_map.end() );
+            if( itr2 == out_map.end() )
+            {
+                return;
+            }
             out_map.erase( itr2 );
             if( this->out2in( out ).empty() )
             {
