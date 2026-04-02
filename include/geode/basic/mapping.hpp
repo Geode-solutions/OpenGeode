@@ -40,9 +40,10 @@ namespace geode
         template < typename T >
         using Storage = typename StorageType< T >::Type;
 
-        [[deprecated]] void reserve( index_t capacity )
+        void reserve( index_t capacity )
         {
-            geode_unused( capacity );
+            in2out_.reserve( capacity );
+            out2in_.reserve( capacity );
         }
 
         void clear()
