@@ -78,6 +78,16 @@ namespace geode
         return component_id == other.component_id && vertex == other.vertex;
     }
 
+    bool ComponentMeshVertex::operator<(
+        const ComponentMeshVertex& other ) const
+    {
+        if( component_id != other.component_id )
+        {
+            return component_id < other.component_id;
+        }
+        return vertex < other.vertex;
+    }
+
     template < typename Archive >
     void ComponentMeshVertex::serialize( Archive& archive )
     {

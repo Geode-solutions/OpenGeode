@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 

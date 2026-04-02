@@ -27,8 +27,8 @@
 #include <fstream>
 #include <memory>
 
-#include <absl/container/btree_map.h>
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/linked_hash_map.h>
 #include <absl/strings/match.h>
 
 #include <bitsery/ext/std_map.h>
@@ -52,7 +52,7 @@ namespace geode
         {
         public:
             using ComponentPtr = std::unique_ptr< Component >;
-            using ComponentsStore = absl::btree_map< uuid, ComponentPtr >;
+            using ComponentsStore = absl::linked_hash_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
             [[nodiscard]] index_t nb_components() const
