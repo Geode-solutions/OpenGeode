@@ -23,8 +23,6 @@
 
 #include <geode/mesh/core/solid_facets.hpp>
 
-#include <absl/container/flat_hash_set.h>
-
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.hpp>

@@ -654,7 +654,7 @@ namespace geode
         else
         {
             using Edge = detail::VertexCycle< std::array< index_t, 2 > >;
-            absl::flat_hash_map< Edge, PolygonEdge > edges;
+            absl::linked_hash_map< Edge, PolygonEdge > edges;
             for( const auto polygon : polygons_to_connect )
             {
                 for( const auto e :

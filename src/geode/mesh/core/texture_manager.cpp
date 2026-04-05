@@ -23,8 +23,6 @@
 
 #include <geode/mesh/core/texture_manager.hpp>
 
-#include <absl/container/flat_hash_map.h>
-
 #include <bitsery/ext/std_map.h>
 
 #include <geode/basic/attribute_manager.hpp>

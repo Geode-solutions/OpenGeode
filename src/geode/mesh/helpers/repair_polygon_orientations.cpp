@@ -25,8 +25,6 @@
 
 #include <queue>
 
-#include <absl/container/flat_hash_map.h>
-
 #include <geode/basic/logger.hpp>
 #include <geode/basic/uuid.hpp>
 
