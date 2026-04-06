@@ -109,6 +109,7 @@ add_geode_library(
         "internal/array_impl.hpp"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
+        absl::linked_hash_map
         absl::strings
         absl::stacktrace
         absl::symbolize

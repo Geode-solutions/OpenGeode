@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/algorithm/container.h>
 #include <absl/container/inlined_vector.h>
+#include <absl/container/linked_hash_map.h>
 
 #include <geode/basic/common.hpp>
 
@@ -71,13 +72,13 @@ namespace geode
             return out2in_.at( out );
         }
 
-        [[nodiscard]] const absl::flat_hash_map< T1, Storage< T2 > >&
+        [[nodiscard]] const absl::linked_hash_map< T1, Storage< T2 > >&
             in2out_map() const
         {
             return in2out_;
         }
 
-        [[nodiscard]] const absl::flat_hash_map< T2, Storage< T1 > >&
+        [[nodiscard]] const absl::linked_hash_map< T2, Storage< T1 > >&
             out2in_map() const
         {
             return out2in_;
@@ -100,19 +101,21 @@ namespace geode
             return static_cast< index_t >( out2in_.size() );
         }
 
-        [[nodiscard]] absl::flat_hash_map< T1, Storage< T2 > >& in2out_mapping()
+        [[nodiscard]] absl::linked_hash_map< T1, Storage< T2 > >&
+            in2out_mapping()
         {
             return in2out_;
         }
 
-        [[nodiscard]] absl::flat_hash_map< T2, Storage< T1 > >& out2in_mapping()
+        [[nodiscard]] absl::linked_hash_map< T2, Storage< T1 > >&
+            out2in_mapping()
         {
             return out2in_;
         }
 
     private:
-        absl::flat_hash_map< T1, Storage< T2 > > in2out_;
-        absl::flat_hash_map< T2, Storage< T1 > > out2in_;
+        absl::linked_hash_map< T1, Storage< T2 > > in2out_;
+        absl::linked_hash_map< T2, Storage< T1 > > out2in_;
     };
 
     template < typename T >
@@ -225,6 +228,10 @@ namespace geode
             }
             auto& out_map = this->out2in_mapping().at( out );
             const auto itr2 = absl::c_find( out_map, in );
+            if( itr2 == out_map.end() )
+            {
+                return;
+            }
             out_map.erase( itr2 );
             if( this->out2in( out ).empty() )
             {

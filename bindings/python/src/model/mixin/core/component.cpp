@@ -30,7 +30,9 @@
         "Component" + std::to_string( dimension ) + "D";                       \
     pybind11::class_< Component##dimension##D, Identifier,                     \
         pybind11::smart_holder >( module, name##dimension.c_str() )            \
-        .def( "component_type", &Component##dimension##D::component_type )
+        .def( "component_type", &Component##dimension##D::component_type )     \
+        .def( "component_id", &Component##dimension##D::component_id )         \
+        .def( "is_active", &Component##dimension##D::is_active )
 
 namespace geode
 {

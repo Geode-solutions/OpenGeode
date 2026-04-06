@@ -38,7 +38,8 @@ namespace geode
     public:
         ~LoggerManager();
 
-        static void register_client( std::unique_ptr< LoggerClient > &&client );
+        static LoggerClient &register_client(
+            std::unique_ptr< LoggerClient > &&client );
 
         static void trace( const std::string &message );
 
