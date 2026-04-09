@@ -338,8 +338,32 @@ namespace geode
             polygons_to_reorient.size(), " polygons reoriented" );
     }
 
+    template < index_t dimension >
+    void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
+        SurfaceMeshBuilder< dimension >& builder,
+        absl::Span< const index_t > polygons_to_reorient )
+    {
+        reorient_bad_polygons( builder, mesh, polygons_to_reorient );
+        if( mesh.are_edges_enabled() )
+        {
+            builder.edges_builder().delete_isolated_edges();
+        }
+        Logger::trace( "Repair polygons orientations: ",
+            polygons_to_reorient.size(), " polygons reoriented" );
+    }
+
     template void opengeode_mesh_api repair_polygon_orientations(
         const SurfaceMesh2D&, SurfaceMeshBuilder2D& );
     template void opengeode_mesh_api repair_polygon_orientations(
         const SurfaceMesh3D&, SurfaceMeshBuilder3D& );
+
+    template void opengeode_mesh_api repair_polygon_orientations(
+        const SurfaceMesh2D&,
+        SurfaceMeshBuilder2D&,
+        absl::Span< const index_t > );
+    template void opengeode_mesh_api repair_polygon_orientations(
+        const SurfaceMesh3D&,
+        SurfaceMeshBuilder3D&,
+        absl::Span< const index_t > );
+
 } // namespace geode

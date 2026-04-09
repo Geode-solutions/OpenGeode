@@ -36,4 +36,9 @@ namespace geode
     template < index_t dimension >
     void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
         SurfaceMeshBuilder< dimension >& builder );
+
+    template < index_t dimension >
+    void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
+        SurfaceMeshBuilder< dimension >& builder,
+        absl::Span< const index_t > polygons_to_reorient );
 } // namespace geode
