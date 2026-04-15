@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/container/linked_hash_map.h>
 #include <absl/types/span.h>
 
 #include <geode/model/common.hpp>
@@ -41,7 +41,7 @@ namespace geode
     using ComponentMeshVertexGenericStorage =
         absl::InlinedVector< index_t, dimension >;
     template < index_t dimension >
-    using ComponentMeshVertexGeneric = absl::flat_hash_map< ComponentID,
+    using ComponentMeshVertexGeneric = absl::linked_hash_map< ComponentID,
         std::vector< ComponentMeshVertexGenericStorage< dimension > > >;
 
     template < index_t dimension >
