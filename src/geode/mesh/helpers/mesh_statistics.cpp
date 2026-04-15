@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/mesh_statistics.hpp>
 
+#include <geode/basic/range.hpp>
+
 #include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
