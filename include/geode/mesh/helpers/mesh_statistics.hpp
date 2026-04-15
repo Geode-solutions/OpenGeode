@@ -29,19 +29,18 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     ALIAS_2D_AND_3D( SurfaceMesh );
-    class Tetrahedron;
 } // namespace geode
 
 namespace geode
 {
-    struct MeshMetric
+    struct MeshStatistics
     {
-        double min_mesh_size{ std::numeric_limits< double >::max() };
-        double mean_mesh_size{ 0. };
-        double max_mesh_size{ std::numeric_limits< double >::min() };
+        double min_edge_size{ std::numeric_limits< double >::max() };
+        double mean_edge_size{ 0. };
+        double max_edge_size{ std::numeric_limits< double >::min() };
     };
 
     template < index_t dimension >
-    [[nodiscard]] MeshMetric compute_surface_metrics(
+    [[nodiscard]] MeshStatistics compute_surface_metrics(
         const SurfaceMesh< dimension >& mesh );
 } // namespace geode

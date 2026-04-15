@@ -32,10 +32,10 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    [[nodiscard]] MeshMetric compute_surface_metrics(
+    [[nodiscard]] MeshStatistics compute_surface_metrics(
         const SurfaceMesh< dimension >& mesh )
     {
-        MeshMetric result;
+        MeshStatistics result;
         index_t nb_edges{ 0 };
         for( const auto polygon_id : Range{ mesh.nb_polygons() } )
         {
@@ -52,19 +52,21 @@ namespace geode
                     }
                 }
                 const auto length = mesh.edge_length( polygon_edge );
-                result.max_mesh_size = std::max( result.max_mesh_size, length );
-                result.min_mesh_size = std::min( result.min_mesh_size, length );
-                result.mean_mesh_size += length;
+                result.max_edge_size = std::max( result.max_edge_size, length );
+                result.min_edge_size = std::min( result.min_edge_size, length );
+                result.mean_edge_size += length;
                 nb_edges++;
             }
         }
         if( nb_edges != 0 )
         {
-            result.mean_mesh_size /= nb_edges;
+            result.mean_edge_size /= nb_edges;
         }
         return result;
     }
 
-    template MeshMetric compute_surface_metrics< 2 >( const SurfaceMesh< 2 >& );
-    template MeshMetric compute_surface_metrics< 3 >( const SurfaceMesh< 3 >& );
+    template MeshStatistics compute_surface_metrics< 2 >(
+        const SurfaceMesh< 2 >& );
+    template MeshStatistics compute_surface_metrics< 3 >(
+        const SurfaceMesh< 3 >& );
 } // namespace geode
