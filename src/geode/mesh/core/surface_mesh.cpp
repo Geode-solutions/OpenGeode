@@ -125,22 +125,38 @@ namespace
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         geode::internal::PolygonsAroundVertexImpl result;
         auto cur_polygon_vertex = first_polygon;
-        bool non_orientable{ false };
+        bool reversed_orientation{ false };
         do
         {
-            if( mesh.polygon_vertex( cur_polygon_vertex.value() ) != vertex_id )
-            {
-                non_orientable = true;
-                break;
-            }
+            OPENGEODE_ASSERT(
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
+                "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
+                "around vertex ",
+                vertex_id, " / ", cur_polygon_vertex->string(), " ",
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
-            const auto prev_vertex =
-                mesh.previous_polygon_vertex( cur_polygon_vertex.value() );
+            const auto edge_vertex =
+                reversed_orientation
+                    ? mesh.next_polygon_vertex( cur_polygon_vertex.value() )
+                    : mesh.previous_polygon_vertex(
+                          cur_polygon_vertex.value() );
             auto adj_edge =
-                mesh.polygon_adjacent_edge( geode::PolygonEdge{ prev_vertex } );
+                mesh.polygon_adjacent_edge( geode::PolygonEdge{ edge_vertex } );
             safety_count++;
             if( adj_edge )
             {
+                const auto cur_edge_v0 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ edge_vertex }, 0 );
+                const auto cur_edge_v1 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ edge_vertex }, 1 );
+                const auto adj_edge_v0 =
+                    mesh.polygon_edge_vertex( adj_edge.value(), 0 );
+                const auto adj_edge_v1 =
+                    mesh.polygon_edge_vertex( adj_edge.value(), 1 );
+                if( cur_edge_v0 == adj_edge_v0 && cur_edge_v1 == adj_edge_v1 )
+                {
+                    reversed_orientation = !reversed_orientation;
+                }
                 cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
             }
             else
@@ -150,27 +166,6 @@ namespace
             }
         } while( cur_polygon_vertex != first_polygon
                  && safety_count < MAX_SAFETY_COUNT );
-
-        if( non_orientable )
-        {
-            result.polygons.clear();
-            result.vertex_is_on_border = false;
-            // méthode bourrin à améliorer
-            for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
-            {
-                for( const auto local_vertex_id :
-                    geode::LRange{ mesh.nb_polygon_vertices( polygon_id ) } )
-                {
-                    const geode::PolygonVertex polygon_vertex{ polygon_id,
-                        local_vertex_id };
-                    if( mesh.polygon_vertex( polygon_vertex ) == vertex_id )
-                    {
-                        result.polygons.push_back( polygon_vertex );
-                    }
-                }
-            }
-            return result;
-        }
 
         result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
@@ -187,16 +182,31 @@ namespace
             }
             while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
             {
-                const geode::PolygonVertex next_vertex{ mesh.next_polygon_edge(
-                    geode::PolygonEdge{ cur_polygon_vertex.value() } ) };
+                const geode::PolygonVertex edge_vertex =
+                    reversed_orientation ? mesh.previous_polygon_vertex(
+                                               cur_polygon_vertex.value() )
+                                         : mesh.next_polygon_vertex(
+                                               cur_polygon_vertex.value() );
+                const auto cur_edge_v0 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ edge_vertex }, 0 );
+                const auto cur_edge_v1 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ edge_vertex }, 1 );
+                const auto adj_edge_v0 =
+                    mesh.polygon_edge_vertex( adj_edge.value(), 0 );
+                const auto adj_edge_v1 =
+                    mesh.polygon_edge_vertex( adj_edge.value(), 1 );
+                if( cur_edge_v0 == adj_edge_v0 && cur_edge_v1 == adj_edge_v1 )
+                {
+                    reversed_orientation = !reversed_orientation;
+                }
                 OPENGEODE_ASSERT(
-                    mesh.polygon_vertex( next_vertex ) == vertex_id,
+                    mesh.polygon_vertex( edge_vertex ) == vertex_id,
                     "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                     "around vertex" );
-                result.polygons.push_back( next_vertex );
+                result.polygons.push_back( edge_vertex );
                 safety_count++;
                 adj_edge = mesh.polygon_adjacent_edge(
-                    geode::PolygonEdge{ next_vertex } );
+                    geode::PolygonEdge{ edge_vertex } );
                 if( adj_edge )
                 {
                     cur_polygon_vertex =
