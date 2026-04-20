@@ -25,6 +25,8 @@
 
 #include <queue>
 
+#include <geode/basic/logger.hpp>
+
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/mensuration.hpp>
@@ -96,42 +98,73 @@ namespace
         return std::nullopt;
     }
 
-    std::vector< std::pair< geode::uuid, bool > > sided_surfaces(
+    struct SidedSurface
+    {
+        SidedSurface() = default;
+        geode::uuid id{};
+        bool side{ false };
+    };
+
+    using GroupedSidedSurfaces = std::vector< SidedSurface >;
+
+    std::vector< GroupedSidedSurfaces > sided_surfaces(
         const geode::BRep& brep, const geode::Block3D& block )
     {
-        std::vector< std::pair< geode::uuid, bool > > surfaces;
-        surfaces.reserve( brep.nb_boundaries( block.id() ) );
+        std::vector< GroupedSidedSurfaces > grouped_sided_surfaces;
+        std::vector< SidedSurface > cur_surfaces;
         std::queue< geode::uuid > to_process;
         for( const auto& surface : brep.boundaries( block ) )
         {
             to_process.emplace( surface.id() );
         }
-        absl::flat_hash_map< geode::uuid, bool > processed;
-        const auto first_surface_uuid = to_process.front();
-        to_process.pop();
-        surfaces.emplace_back( first_surface_uuid, true );
-        processed.emplace( first_surface_uuid, true );
         while( !to_process.empty() )
         {
-            const auto surface_uuid = to_process.front();
+            absl::flat_hash_map< geode::uuid, bool > processed;
+            const auto first_surface_uuid = to_process.front();
             to_process.pop();
-            if( processed.contains( surface_uuid ) )
+            auto& itr = cur_surfaces.emplace_back();
+            itr.id = first_surface_uuid;
+            itr.side = true;
+            processed.emplace( first_surface_uuid, true );
+            geode::index_t skip_counter{ 0 };
+            while( !to_process.empty() )
             {
-                continue;
-            }
-            const auto surface_side =
-                find_surface_side( brep, surface_uuid, processed );
-            if( surface_side )
-            {
-                surfaces.emplace_back( surface_uuid, surface_side.value() );
-                processed.emplace( surface_uuid, surface_side.value() );
-            }
-            else
-            {
-                to_process.emplace( surface_uuid );
+                if( skip_counter == to_process.size() )
+                {
+                    grouped_sided_surfaces.emplace_back(
+                        std::move( cur_surfaces ) );
+                    break;
+                }
+                const auto surface_uuid = to_process.front();
+                to_process.pop();
+                if( processed.contains( surface_uuid ) )
+                {
+                    continue;
+                }
+                const auto surface_side =
+                    find_surface_side( brep, surface_uuid, processed );
+                if( surface_side.has_value() )
+                {
+                    auto& new_itr = cur_surfaces.emplace_back();
+                    new_itr.id = surface_uuid;
+                    new_itr.side = surface_side.value();
+                    processed.emplace( surface_uuid, surface_side.value() );
+                }
+                else
+                {
+                    to_process.emplace( surface_uuid );
+                    skip_counter++;
+                }
             }
         }
-        return surfaces;
+        if( grouped_sided_surfaces.size() > 1 )
+        {
+            geode::Logger::warn( block.component_id().string(),
+                " has unconnected boundaries. This is either not valid or "
+                "the block boundaries are valid and the block shows one or "
+                "more holes inside it." );
+        }
+        return grouped_sided_surfaces;
     }
 
     double block_mesh_volume( const geode::SolidMesh3D& mesh )
@@ -153,24 +186,45 @@ namespace geode
         {
             return block_mesh_volume( block.mesh() );
         }
-        double total_volume{ 0 };
-        const auto& surfaces = sided_surfaces( brep, block );
-        const auto& anchor =
-            brep.surface( surfaces.front().first ).mesh().point( 0 );
-        for( const auto& surface : surfaces )
+        const auto& grouped_surfaces = sided_surfaces( brep, block );
+        std::vector< double > volumes( grouped_surfaces.size() );
+        index_t biggest_volume_id{ 0 };
+        double biggest_volume{ 0 };
+        for( const auto group_id : geode::Indices{ grouped_surfaces } )
         {
-            const auto volume =
-                surface_volume( brep.surface( surface.first ).mesh(), anchor );
-            if( surface.second )
+            const auto& surfaces = grouped_surfaces[group_id];
+            double group_volume{ 0 };
+            const auto& anchor =
+                brep.surface( surfaces.front().id ).mesh().point( 0 );
+            for( const auto& surface : surfaces )
             {
-                total_volume += volume;
+                const auto volume =
+                    surface_volume( brep.surface( surface.id ).mesh(), anchor );
+                if( surface.side )
+                {
+                    group_volume += volume;
+                }
+                else
+                {
+                    group_volume -= volume;
+                }
             }
-            else
+            volumes[group_id] = std::fabs( group_volume );
+            if( volumes[group_id] > biggest_volume )
             {
-                total_volume -= volume;
+                biggest_volume = volumes[group_id];
+                biggest_volume_id = group_id;
             }
         }
-        return std::fabs( total_volume );
+        double total_volume{ biggest_volume };
+        for( const auto id : Indices{ volumes } )
+        {
+            if( id != biggest_volume_id )
+            {
+                total_volume -= volumes[id];
+            }
+        }
+        return total_volume;
     }
 
     BoundingBox3D block_bounding_box( const BRep& brep, const Block3D& block )
