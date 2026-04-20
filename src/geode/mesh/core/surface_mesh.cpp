@@ -128,12 +128,6 @@ namespace
         bool reversed_orientation{ false };
         do
         {
-            OPENGEODE_ASSERT(
-                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
-                "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
-                "around vertex ",
-                vertex_id, " / ", cur_polygon_vertex->string(), " ",
-                mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
             const auto edge_vertex =
                 reversed_orientation

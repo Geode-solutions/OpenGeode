@@ -39,8 +39,7 @@ void test_polygons_around_vertex()
         moebius_strip->polygons_around_vertex( vertex_id_border );
     OPENGEODE_EXCEPTION( polygons_around_border.size() == 2,
         "[Test] Wrong computation of polygons around vertex 0 : should be 2 "
-        "polygons , "
-        "get ",
+        "polygons, get ",
         polygons_around_border.size() );
     OPENGEODE_EXCEPTION( polygons_around_border[0].polygon_id == 159
                              && polygons_around_border[0].vertex_id == 2,
@@ -53,8 +52,7 @@ void test_polygons_around_vertex()
     auto polygons_around = moebius_strip->polygons_around_vertex( vertex_id );
     OPENGEODE_EXCEPTION( polygons_around.size() == 6,
         "[Test] Wrong computation of polygons around vertex 1 : should be 6 "
-        "polygons , "
-        "get ",
+        "polygons, get ",
         polygons_around.size() );
     OPENGEODE_EXCEPTION( polygons_around[0].polygon_id == 159
                              && polygons_around[0].vertex_id == 1,
