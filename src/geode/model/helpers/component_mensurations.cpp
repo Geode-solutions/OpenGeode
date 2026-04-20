@@ -89,9 +89,11 @@ namespace
                     surfaces_cmes.at( other_surface.id() ).front()
                 };
                 const auto different_orientation =
-                    surface.mesh().polygon_vertex( polygon_vertex )
-                    == other_surface.mesh().polygon_vertex(
-                        other_polygon_vertex );
+                    brep.unique_vertex( { surface.component_id(),
+                        surface.mesh().polygon_vertex( polygon_vertex ) } )
+                    == brep.unique_vertex( { other_surface.component_id(),
+                        other_surface.mesh().polygon_vertex(
+                            other_polygon_vertex ) } );
                 return other_surface_itr->second != different_orientation;
             }
         }
