@@ -125,14 +125,14 @@ namespace
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         geode::internal::PolygonsAroundVertexImpl result;
         auto cur_polygon_vertex = first_polygon;
+        bool non_orientable{ false };
         do
         {
-            OPENGEODE_ASSERT(
-                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
-                "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
-                "around vertex ",
-                vertex_id, " / ", cur_polygon_vertex->string(), " ",
-                mesh.polygon_vertex( cur_polygon_vertex.value() ) );
+            if( mesh.polygon_vertex( cur_polygon_vertex.value() ) != vertex_id )
+            {
+                non_orientable = true;
+                break;
+            }
             result.polygons.push_back( cur_polygon_vertex.value() );
             const auto prev_vertex =
                 mesh.previous_polygon_vertex( cur_polygon_vertex.value() );
@@ -150,6 +150,27 @@ namespace
             }
         } while( cur_polygon_vertex != first_polygon
                  && safety_count < MAX_SAFETY_COUNT );
+
+        if( non_orientable )
+        {
+            result.polygons.clear();
+            result.vertex_is_on_border = false;
+            // méthode bourrin à améliorer
+            for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
+            {
+                for( const auto local_vertex_id :
+                    geode::LRange{ mesh.nb_polygon_vertices( polygon_id ) } )
+                {
+                    const geode::PolygonVertex polygon_vertex{ polygon_id,
+                        local_vertex_id };
+                    if( mesh.polygon_vertex( polygon_vertex ) == vertex_id )
+                    {
+                        result.polygons.push_back( polygon_vertex );
+                    }
+                }
+            }
+            return result;
+        }
 
         result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
