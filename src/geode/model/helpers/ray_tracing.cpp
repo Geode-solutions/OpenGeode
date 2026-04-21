@@ -47,15 +47,21 @@ namespace
             geode::Vector2D{ { 0., 0.3 } }, geode::Vector2D{ { 0., 0.5 } } }
     };
 
-    const std::array< geode::Vector3D, 12 > directions_3D = { { geode::Vector3D{
-                                                                    { 1., 0.,
-                                                                        0. } },
-        geode::Vector3D{ { 1., 0., 0.1 } }, geode::Vector3D{ { 1., 0., 0.3 } },
-        geode::Vector3D{ { 1., 0., 0.5 } }, geode::Vector3D{ { 0., 1., 0. } },
-        geode::Vector3D{ { 0.1, 1., 0. } }, geode::Vector3D{ { 0.3, 1., 0. } },
-        geode::Vector3D{ { 0.5, 1., 0. } }, geode::Vector3D{ { 0., 0., 1. } },
-        geode::Vector3D{ { 0., 0.1, 1. } }, geode::Vector3D{ { 0., 0.3, 1. } },
-        geode::Vector3D{ { 0., 0.5, 1. } } } };
+    const std::array< geode::Vector3D, 13 > directions_3D = { {
+        geode::Vector3D{ { 1., 0., 0. } },
+        geode::Vector3D{ { 1., 0., 0.1 } },
+        geode::Vector3D{ { 1., 0., 0.3 } },
+        geode::Vector3D{ { 1., 0., 0.5 } },
+        geode::Vector3D{ { 0., 1., 0. } },
+        geode::Vector3D{ { 0.1, 1., 0. } },
+        geode::Vector3D{ { 0.3, 1., 0. } },
+        geode::Vector3D{ { 0.5, 1., 0. } },
+        geode::Vector3D{ { 0., 0., 1. } },
+        geode::Vector3D{ { 0., 0.1, 1. } },
+        geode::Vector3D{ { 0., 0.3, 1. } },
+        geode::Vector3D{ { 0., 0.5, 1. } },
+        geode::Vector3D{ { 0.425, 0.134, 0.741 } },
+    } };
 
     std::vector< geode::RayTracing2D::EdgeDistance >
         find_intersections_with_boundary( const geode::Ray2D& ray,
