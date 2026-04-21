@@ -40,39 +40,43 @@
 
 namespace
 {
-    const std::array< geode::Vector2D, 9 >& directions_2D()
+    constexpr geode::index_t NUMBER_2D_DIRECTIONS = 9;
+    const std::array< geode::Vector2D, NUMBER_2D_DIRECTIONS >& directions_2D()
     {
-        static const std::array< geode::Vector2D, 9 > directions = { {
-            geode::Vector2D{ { 1., 0. } },
-            geode::Vector2D{ { 0., 1. } },
-            geode::Vector2D{ { 0.1, 1. } },
-            geode::Vector2D{ { 0.3, 1. } },
-            geode::Vector2D{ { 0.5, 1. } },
-            geode::Vector2D{ { 0., 0.1 } },
-            geode::Vector2D{ { 0., 0.3 } },
-            geode::Vector2D{ { 0., 0.5 } },
-            geode::Vector2D{ { 0.425, 0.134 } },
-        } };
+        static const std::array< geode::Vector2D, NUMBER_2D_DIRECTIONS >
+            directions = { {
+                geode::Vector2D{ { 1., 0. } },
+                geode::Vector2D{ { 0., 1. } },
+                geode::Vector2D{ { 0.1, 1. } },
+                geode::Vector2D{ { 0.3, 1. } },
+                geode::Vector2D{ { 0.5, 1. } },
+                geode::Vector2D{ { 0., 0.1 } },
+                geode::Vector2D{ { 0., 0.3 } },
+                geode::Vector2D{ { 0., 0.5 } },
+                geode::Vector2D{ { 0.425, 0.134 } },
+            } };
         return directions;
     }
 
-    const std::array< geode::Vector3D, 13 >& directions_3D()
+    constexpr geode::index_t NUMBER_3D_DIRECTIONS = 13;
+    const std::array< geode::Vector3D, NUMBER_3D_DIRECTIONS >& directions_3D()
     {
-        static const std::array< geode::Vector3D, 13 > directions = { {
-            geode::Vector3D{ { 1., 0., 0. } },
-            geode::Vector3D{ { 1., 0., 0.1 } },
-            geode::Vector3D{ { 1., 0., 0.3 } },
-            geode::Vector3D{ { 1., 0., 0.5 } },
-            geode::Vector3D{ { 0., 1., 0. } },
-            geode::Vector3D{ { 0.1, 1., 0. } },
-            geode::Vector3D{ { 0.3, 1., 0. } },
-            geode::Vector3D{ { 0.5, 1., 0. } },
-            geode::Vector3D{ { 0., 0., 1. } },
-            geode::Vector3D{ { 0., 0.1, 1. } },
-            geode::Vector3D{ { 0., 0.3, 1. } },
-            geode::Vector3D{ { 0., 0.5, 1. } },
-            geode::Vector3D{ { 0.425, 0.134, 0.741 } },
-        } };
+        static const std::array< geode::Vector3D, NUMBER_3D_DIRECTIONS >
+            directions = { {
+                geode::Vector3D{ { 1., 0., 0. } },
+                geode::Vector3D{ { 1., 0., 0.1 } },
+                geode::Vector3D{ { 1., 0., 0.3 } },
+                geode::Vector3D{ { 1., 0., 0.5 } },
+                geode::Vector3D{ { 0., 1., 0. } },
+                geode::Vector3D{ { 0.1, 1., 0. } },
+                geode::Vector3D{ { 0.3, 1., 0. } },
+                geode::Vector3D{ { 0.5, 1., 0. } },
+                geode::Vector3D{ { 0., 0., 1. } },
+                geode::Vector3D{ { 0., 0.1, 1. } },
+                geode::Vector3D{ { 0., 0.3, 1. } },
+                geode::Vector3D{ { 0., 0.5, 1. } },
+                geode::Vector3D{ { 0.425, 0.134, 0.741 } },
+            } };
         return directions;
     }
 
