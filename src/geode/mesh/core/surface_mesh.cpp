@@ -125,33 +125,42 @@ namespace
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         geode::internal::PolygonsAroundVertexImpl result;
         auto cur_polygon_vertex = first_polygon;
-        bool reversed_orientation{ false };
+        bool vertex_is_next{ false };
         do
         {
+            OPENGEODE_ASSERT(
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
+                "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
+                "around vertex ",
+                vertex_id, " / ", cur_polygon_vertex->string(), " ",
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
-            const auto edge_vertex =
-                reversed_orientation
-                    ? mesh.next_polygon_vertex( cur_polygon_vertex.value() )
-                    : mesh.previous_polygon_vertex(
-                          cur_polygon_vertex.value() );
-            auto adj_edge =
-                mesh.polygon_adjacent_edge( geode::PolygonEdge{ edge_vertex } );
             safety_count++;
+            auto exit_vertex = vertex_is_next
+                                   ? cur_polygon_vertex.value()
+                                   : mesh.previous_polygon_vertex(
+                                         cur_polygon_vertex.value() );
+            auto adj_edge =
+                mesh.polygon_adjacent_edge( geode::PolygonEdge{ exit_vertex } );
             if( adj_edge )
             {
-                const auto cur_edge_v0 = mesh.polygon_edge_vertex(
-                    geode::PolygonEdge{ edge_vertex }, 0 );
-                const auto cur_edge_v1 = mesh.polygon_edge_vertex(
-                    geode::PolygonEdge{ edge_vertex }, 1 );
-                const auto adj_edge_v0 =
+                const auto cur_v0 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ exit_vertex }, 0 );
+                const auto cur_v1 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ exit_vertex }, 1 );
+                const auto adj_v0 =
                     mesh.polygon_edge_vertex( adj_edge.value(), 0 );
-                const auto adj_edge_v1 =
+                const auto adj_v1 =
                     mesh.polygon_edge_vertex( adj_edge.value(), 1 );
-                if( cur_edge_v0 == adj_edge_v0 && cur_edge_v1 == adj_edge_v1 )
+                if( cur_v0 == adj_v0 && cur_v1 == adj_v1 )
                 {
-                    reversed_orientation = !reversed_orientation;
+                    vertex_is_next = !vertex_is_next;
                 }
-                cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
+                cur_polygon_vertex =
+                    vertex_is_next
+                        ? geode::PolygonVertex{ mesh.next_polygon_vertex(
+                              geode::PolygonVertex{ adj_edge.value() } ) }
+                        : geode::PolygonVertex{ adj_edge.value() };
             }
             else
             {
@@ -164,11 +173,28 @@ namespace
         result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
         {
+            vertex_is_next = false;
             auto adj_edge = mesh.polygon_adjacent_edge(
                 geode::PolygonEdge{ first_polygon.value() } );
             if( adj_edge )
             {
-                cur_polygon_vertex = geode::PolygonVertex{ adj_edge.value() };
+                const auto cur_v0 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ first_polygon.value() }, 0 );
+                const auto cur_v1 = mesh.polygon_edge_vertex(
+                    geode::PolygonEdge{ first_polygon.value() }, 1 );
+                const auto adj_v0 =
+                    mesh.polygon_edge_vertex( adj_edge.value(), 0 );
+                const auto adj_v1 =
+                    mesh.polygon_edge_vertex( adj_edge.value(), 1 );
+                if( cur_v0 == adj_v0 && cur_v1 == adj_v1 )
+                {
+                    vertex_is_next = !vertex_is_next;
+                }
+                cur_polygon_vertex =
+                    vertex_is_next
+                        ? geode::PolygonVertex{ adj_edge.value() }
+                        : geode::PolygonVertex{ mesh.next_polygon_vertex(
+                              geode::PolygonVertex{ adj_edge.value() } ) };
             }
             else
             {
@@ -176,35 +202,38 @@ namespace
             }
             while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
             {
-                const geode::PolygonVertex edge_vertex =
-                    reversed_orientation ? mesh.previous_polygon_vertex(
-                                               cur_polygon_vertex.value() )
-                                         : mesh.next_polygon_vertex(
-                                               cur_polygon_vertex.value() );
-                const auto cur_edge_v0 = mesh.polygon_edge_vertex(
-                    geode::PolygonEdge{ edge_vertex }, 0 );
-                const auto cur_edge_v1 = mesh.polygon_edge_vertex(
-                    geode::PolygonEdge{ edge_vertex }, 1 );
-                const auto adj_edge_v0 =
-                    mesh.polygon_edge_vertex( adj_edge.value(), 0 );
-                const auto adj_edge_v1 =
-                    mesh.polygon_edge_vertex( adj_edge.value(), 1 );
-                if( cur_edge_v0 == adj_edge_v0 && cur_edge_v1 == adj_edge_v1 )
-                {
-                    reversed_orientation = !reversed_orientation;
-                }
                 OPENGEODE_ASSERT(
-                    mesh.polygon_vertex( edge_vertex ) == vertex_id,
+                    mesh.polygon_vertex( cur_polygon_vertex.value() )
+                        == vertex_id,
                     "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                     "around vertex" );
-                result.polygons.push_back( edge_vertex );
+                result.polygons.push_back( cur_polygon_vertex.value() );
                 safety_count++;
+                auto exit_vertex = vertex_is_next
+                                       ? mesh.previous_polygon_vertex(
+                                             cur_polygon_vertex.value() )
+                                       : cur_polygon_vertex.value();
                 adj_edge = mesh.polygon_adjacent_edge(
-                    geode::PolygonEdge{ edge_vertex } );
+                    geode::PolygonEdge{ exit_vertex } );
                 if( adj_edge )
                 {
+                    const auto cur_v0 = mesh.polygon_edge_vertex(
+                        geode::PolygonEdge{ exit_vertex }, 0 );
+                    const auto cur_v1 = mesh.polygon_edge_vertex(
+                        geode::PolygonEdge{ exit_vertex }, 1 );
+                    const auto adj_v0 =
+                        mesh.polygon_edge_vertex( adj_edge.value(), 0 );
+                    const auto adj_v1 =
+                        mesh.polygon_edge_vertex( adj_edge.value(), 1 );
+                    if( cur_v0 == adj_v0 && cur_v1 == adj_v1 )
+                    {
+                        vertex_is_next = !vertex_is_next;
+                    }
                     cur_polygon_vertex =
-                        geode::PolygonVertex{ adj_edge.value() };
+                        vertex_is_next
+                            ? geode::PolygonVertex{ adj_edge.value() }
+                            : geode::PolygonVertex{ mesh.next_polygon_vertex(
+                                  geode::PolygonVertex{ adj_edge.value() } ) };
                     continue;
                 }
                 cur_polygon_vertex = std::nullopt;
@@ -977,8 +1006,8 @@ namespace geode
         for( const auto& polygon_vertex :
             polygons_around_vertex( from_vertex_id ) )
         {
-            const auto next_vertex = next_polygon_vertex( polygon_vertex );
-            if( this->polygon_vertex( next_vertex ) == to_vertex_id )
+            const auto exit_vertex = next_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( exit_vertex ) == to_vertex_id )
             {
                 return std::optional< PolygonEdge >{ std::in_place,
                     polygon_vertex };
@@ -1003,8 +1032,8 @@ namespace geode
         for( auto&& polygon_vertex :
             polygons_around_vertex( edge_vertices[0] ) )
         {
-            const auto next_vertex = next_polygon_vertex( polygon_vertex );
-            if( this->polygon_vertex( next_vertex ) == edge_vertices[1] )
+            const auto exit_vertex = next_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( exit_vertex ) == edge_vertices[1] )
             {
                 polygons_around_edge.emplace_back(
                     std::move( polygon_vertex ) );
