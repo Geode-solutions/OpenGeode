@@ -34,7 +34,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    [[nodiscard]] MeshStatistics compute_surface_metrics(
+    [[nodiscard]] MeshStatistics compute_surface_statistics(
         const SurfaceMesh< dimension >& mesh )
     {
         MeshStatistics result;
@@ -67,8 +67,8 @@ namespace geode
         return result;
     }
 
-    template MeshStatistics compute_surface_metrics< 2 >(
+    template MeshStatistics opengeode_mesh_api compute_surface_statistics< 2 >(
         const SurfaceMesh< 2 >& );
-    template MeshStatistics compute_surface_metrics< 3 >(
+    template MeshStatistics opengeode_mesh_api compute_surface_statistics< 3 >(
         const SurfaceMesh< 3 >& );
 } // namespace geode

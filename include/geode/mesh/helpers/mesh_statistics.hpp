@@ -41,6 +41,6 @@ namespace geode
     };
 
     template < index_t dimension >
-    [[nodiscard]] MeshStatistics compute_surface_metrics(
+    [[nodiscard]] MeshStatistics compute_surface_statistics(
         const SurfaceMesh< dimension >& mesh );
 } // namespace geode
