@@ -35,7 +35,6 @@ void test_polygons_around_vertex()
         absl::StrCat( geode::DATA_PATH, "moebius_strip.og_tsf3d" ) );
 
     geode::index_t vertex_id_0{ 0 };
-    geode::Logger::debug( "TEST vertex id", vertex_id_0 );
     auto polygons_around_0 =
         moebius_strip->polygons_around_vertex( vertex_id_0 );
     OPENGEODE_EXCEPTION( polygons_around_0.size() == 2,
@@ -50,7 +49,6 @@ void test_polygons_around_vertex()
         "[TEST] Wrong polygons around vertex 0" );
 
     geode::index_t vertex_id_1{ 1 };
-    geode::Logger::debug( "TEST vertex id", vertex_id_1 );
     auto polygons_around_1 =
         moebius_strip->polygons_around_vertex( vertex_id_1 );
     OPENGEODE_EXCEPTION( polygons_around_1.size() == 6,
@@ -77,7 +75,6 @@ void test_polygons_around_vertex()
         "[TEST] Wrong polygons around vertex 1" );
 
     geode::index_t vertex_id_99{ 99 };
-    geode::Logger::debug( "TEST vertex id", vertex_id_99 );
     auto polygons_around_99 =
         moebius_strip->polygons_around_vertex( vertex_id_99 );
     OPENGEODE_EXCEPTION( polygons_around_99.size() == 4,
