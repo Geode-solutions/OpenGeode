@@ -31,11 +31,11 @@
 
 void test_polygons_around_vertex()
 {
-    auto moebius_strip = geode::load_triangulated_surface< 3 >(
+    const auto moebius_strip = geode::load_triangulated_surface< 3 >(
         absl::StrCat( geode::DATA_PATH, "moebius_strip.og_tsf3d" ) );
 
-    geode::index_t vertex_id_0{ 0 };
-    auto polygons_around_0 =
+    const geode::index_t vertex_id_0{ 0 };
+    const auto polygons_around_0 =
         moebius_strip->polygons_around_vertex( vertex_id_0 );
     OPENGEODE_EXCEPTION( polygons_around_0.size() == 2,
         "[Test] Wrong computation of polygons around vertex 0 : should be 2 "
@@ -48,8 +48,8 @@ void test_polygons_around_vertex()
                              && polygons_around_0[1].vertex_id == 0,
         "[TEST] Wrong polygons around vertex 0" );
 
-    geode::index_t vertex_id_1{ 1 };
-    auto polygons_around_1 =
+    const geode::index_t vertex_id_1{ 1 };
+    const auto polygons_around_1 =
         moebius_strip->polygons_around_vertex( vertex_id_1 );
     OPENGEODE_EXCEPTION( polygons_around_1.size() == 6,
         "[Test] Wrong computation of polygons around vertex 1 : should be 6 "
@@ -74,8 +74,8 @@ void test_polygons_around_vertex()
                              && polygons_around_1[5].vertex_id == 2,
         "[TEST] Wrong polygons around vertex 1" );
 
-    geode::index_t vertex_id_99{ 99 };
-    auto polygons_around_99 =
+    const geode::index_t vertex_id_99{ 99 };
+    const auto polygons_around_99 =
         moebius_strip->polygons_around_vertex( vertex_id_99 );
     OPENGEODE_EXCEPTION( polygons_around_99.size() == 4,
         "[Test] Wrong computation of polygons around vertex 99 : should be 4 "
@@ -98,7 +98,7 @@ void test_polygons_around_vertex()
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
-    geode::Logger::set_level( geode::Logger::LEVEL::debug );
+    geode::Logger::set_level( geode::Logger::LEVEL::info );
     test_polygons_around_vertex();
 }
 
