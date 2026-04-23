@@ -974,8 +974,8 @@ namespace geode
         for( const auto& polygon_vertex :
             polygons_around_vertex( from_vertex_id ) )
         {
-            const auto exit_vertex = next_polygon_vertex( polygon_vertex );
-            if( this->polygon_vertex( exit_vertex ) == to_vertex_id )
+            const auto next_vertex = next_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
                 return std::optional< PolygonEdge >{ std::in_place,
                     polygon_vertex };
@@ -1000,8 +1000,8 @@ namespace geode
         for( auto&& polygon_vertex :
             polygons_around_vertex( edge_vertices[0] ) )
         {
-            const auto exit_vertex = next_polygon_vertex( polygon_vertex );
-            if( this->polygon_vertex( exit_vertex ) == edge_vertices[1] )
+            const auto next_vertex = next_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( next_vertex ) == edge_vertices[1] )
             {
                 polygons_around_edge.emplace_back(
                     std::move( polygon_vertex ) );
