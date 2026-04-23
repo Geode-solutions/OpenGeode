@@ -108,7 +108,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    bool orientation_has_changed( const geode::SurfaceMesh< dimension >& mesh,
+    bool not_same_orientation( const geode::SurfaceMesh< dimension >& mesh,
         const geode::PolygonEdge& current_edge,
         const geode::PolygonEdge& adj_edge )
     {
@@ -117,6 +117,30 @@ namespace
         const auto adj_v0 = mesh.polygon_edge_vertex( adj_edge, 0 );
         const auto adj_v1 = mesh.polygon_edge_vertex( adj_edge, 1 );
         return cur_v0 == adj_v0 && cur_v1 == adj_v1;
+    }
+
+    template < geode::index_t dimension >
+    std::optional< geode::PolygonVertex > next_polygon_vertex_around(
+        const geode::SurfaceMesh< dimension >& mesh,
+        const geode::PolygonVertex& cur_polygon_vertex,
+        bool& vertex_is_next )
+    {
+        const auto exit_vertex =
+            vertex_is_next ? cur_polygon_vertex
+                           : mesh.previous_polygon_vertex( cur_polygon_vertex );
+        const geode::PolygonEdge exit_edge{ exit_vertex };
+        const auto adj_edge = mesh.polygon_adjacent_edge( exit_edge );
+        if( !adj_edge )
+        {
+            return std::nullopt;
+        }
+        if( not_same_orientation( mesh, exit_edge, adj_edge.value() ) )
+        {
+            vertex_is_next = !vertex_is_next;
+        }
+        return vertex_is_next ? geode::PolygonVertex{ mesh.next_polygon_vertex(
+                                    geode::PolygonVertex{ adj_edge.value() } ) }
+                              : geode::PolygonVertex{ adj_edge.value() };
     }
 
     template < geode::index_t dimension >
@@ -148,28 +172,10 @@ namespace
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
             safety_count++;
-            const auto exit_vertex = vertex_is_next
-                                         ? cur_polygon_vertex.value()
-                                         : mesh.previous_polygon_vertex(
-                                               cur_polygon_vertex.value() );
-            const auto exit_edge = geode::PolygonEdge{ exit_vertex };
-            const auto adj_edge = mesh.polygon_adjacent_edge( exit_edge );
-            if( adj_edge )
+            cur_polygon_vertex = next_polygon_vertex_around(
+                mesh, cur_polygon_vertex.value(), vertex_is_next );
+            if( !cur_polygon_vertex )
             {
-                if( orientation_has_changed(
-                        mesh, exit_edge, adj_edge.value() ) )
-                {
-                    vertex_is_next = !vertex_is_next;
-                }
-                cur_polygon_vertex =
-                    vertex_is_next
-                        ? geode::PolygonVertex{ mesh.next_polygon_vertex(
-                              geode::PolygonVertex{ adj_edge.value() } ) }
-                        : geode::PolygonVertex{ adj_edge.value() };
-            }
-            else
-            {
-                cur_polygon_vertex = std::nullopt;
                 break;
             }
         } while( cur_polygon_vertex != first_polygon
@@ -178,57 +184,27 @@ namespace
         result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
         {
-            vertex_is_next = false;
-            auto adj_edge = mesh.polygon_adjacent_edge(
-                geode::PolygonEdge{ first_polygon.value() } );
-            if( adj_edge )
+            vertex_is_next = true;
+            cur_polygon_vertex = next_polygon_vertex_around(
+                mesh, first_polygon.value(), vertex_is_next );
+        }
+        else
+        {
+            cur_polygon_vertex = std::nullopt;
+        }
+        while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
+        {
+            OPENGEODE_ASSERT(
+                mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
+                "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
+                "around vertex" );
+            result.polygons.push_back( cur_polygon_vertex.value() );
+            safety_count++;
+            cur_polygon_vertex = next_polygon_vertex_around(
+                mesh, cur_polygon_vertex.value(), vertex_is_next );
+            if( !cur_polygon_vertex )
             {
-                if( orientation_has_changed( mesh,
-                        geode::PolygonEdge{ first_polygon.value() },
-                        adj_edge.value() ) )
-                {
-                    vertex_is_next = !vertex_is_next;
-                }
-                cur_polygon_vertex =
-                    vertex_is_next
-                        ? geode::PolygonVertex{ adj_edge.value() }
-                        : geode::PolygonVertex{ mesh.next_polygon_vertex(
-                              geode::PolygonVertex{ adj_edge.value() } ) };
-            }
-            else
-            {
-                cur_polygon_vertex = std::nullopt;
-            }
-            while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
-            {
-                OPENGEODE_ASSERT(
-                    mesh.polygon_vertex( cur_polygon_vertex.value() )
-                        == vertex_id,
-                    "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
-                    "around vertex" );
-                result.polygons.push_back( cur_polygon_vertex.value() );
-                safety_count++;
-                const auto exit_vertex = vertex_is_next
-                                             ? mesh.previous_polygon_vertex(
-                                                   cur_polygon_vertex.value() )
-                                             : cur_polygon_vertex.value();
-                const auto exit_edge = geode::PolygonEdge{ exit_vertex };
-                adj_edge = mesh.polygon_adjacent_edge( exit_edge );
-                if( adj_edge )
-                {
-                    if( orientation_has_changed(
-                            mesh, exit_edge, adj_edge.value() ) )
-                    {
-                        vertex_is_next = !vertex_is_next;
-                    }
-                    cur_polygon_vertex =
-                        vertex_is_next
-                            ? geode::PolygonVertex{ adj_edge.value() }
-                            : geode::PolygonVertex{ mesh.next_polygon_vertex(
-                                  geode::PolygonVertex{ adj_edge.value() } ) };
-                    continue;
-                }
-                cur_polygon_vertex = std::nullopt;
+                break;
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
