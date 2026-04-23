@@ -56,7 +56,7 @@ namespace geode
     index_t delete_vector_elements(
         const DeleteContainer& to_delete, ValueContainer& values )
     {
-        OPENGEODE_ASSERT( to_delete.size() == values.size(),
+        OpenGeodeBasicException::assertion( to_delete.size() == values.size(),
             "[delete_vector_elements] Number of elements in the two vectors "
             "should match" );
         const auto it = absl::c_find( to_delete, true );
@@ -91,7 +91,7 @@ namespace geode
     [[nodiscard]] ValueContainer extract_vector_elements(
         const DeleteContainer& to_keep, const ValueContainer& in_values )
     {
-        OPENGEODE_ASSERT( to_keep.size() == in_values.size(),
+        OpenGeodeBasicException::assertion( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
         const auto nb =

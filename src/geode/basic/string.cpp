@@ -43,7 +43,8 @@ namespace geode
     {
         index_t value{ 0 };
         const auto status = absl::SimpleAtoi( string, &value );
-        OPENGEODE_EXCEPTION( status,
+        OpenGeodeBasicException::check( status, nullptr,
+            OpenGeodeException::TYPE::internal,
             "[string_to_index] Cannot convert string \"", string,
             "\" to index" );
         return value;
@@ -53,8 +54,9 @@ namespace geode
     {
         int value{ 0 };
         const auto status = absl::SimpleAtoi( string, &value );
-        OPENGEODE_EXCEPTION( status, "[string_to_int] Cannot convert string \"",
-            string, "\" to int" );
+        OpenGeodeBasicException::check( status, nullptr,
+            OpenGeodeException::TYPE::internal,
+            "[string_to_int] Cannot convert string \"", string, "\" to int" );
         return value;
     }
 
@@ -62,7 +64,8 @@ namespace geode
     {
         float value{ 0 };
         const auto status = absl::SimpleAtof( string, &value );
-        OPENGEODE_EXCEPTION( status,
+        OpenGeodeBasicException::check( status, nullptr,
+            OpenGeodeException::TYPE::internal,
             "[string_to_float] Cannot convert string \"", string,
             "\" to float" );
         return value;
@@ -72,7 +75,8 @@ namespace geode
     {
         double value{ 0 };
         const auto status = absl::SimpleAtod( string, &value );
-        OPENGEODE_EXCEPTION( status,
+        OpenGeodeBasicException::check( status, nullptr,
+            OpenGeodeException::TYPE::internal,
             "[string_to_double] Cannot convert string \"", string,
             "\" to double" );
         return value;

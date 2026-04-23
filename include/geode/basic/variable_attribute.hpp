@@ -203,7 +203,8 @@ namespace geode
                 const auto new_index = old2new[i];
                 if( new_index != NO_ID )
                 {
-                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                    OpenGeodeBasicException::check( new_index < nb_elements,
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[VariableAttribute::extract] The given mapping "
                         "contains values (",
                         new_index,
@@ -229,7 +230,8 @@ namespace geode
             {
                 for( const auto new_index : outs )
                 {
-                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                    OpenGeodeBasicException::check( new_index < nb_elements,
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[VariableAttribute::extract] The given mapping "
                         "contains values (",
                         new_index,
@@ -444,7 +446,8 @@ namespace geode
                 const auto new_index = old2new[i];
                 if( new_index != NO_ID )
                 {
-                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                    OpenGeodeBasicException::check( new_index < nb_elements,
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[VariableAttribute::extract] The given mapping "
                         "contains values (",
                         new_index,
@@ -471,7 +474,8 @@ namespace geode
             {
                 for( const auto new_index : outs )
                 {
-                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                    OpenGeodeBasicException::check( new_index < nb_elements,
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[VariableAttribute::extract] The given mapping "
                         "contains values (",
                         new_index,

@@ -26,7 +26,9 @@
 #include <sstream>
 #include <string>
 
-#include <geode/basic/common.hpp>
+#include <absl/strings/str_cat.h>
+
+#include <geode/basic/opengeode_basic_export.hpp>
 #include <geode/basic/pimpl.hpp>
 
 namespace geode

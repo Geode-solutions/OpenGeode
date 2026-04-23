@@ -88,9 +88,9 @@ namespace geode
                 const auto beginU = static_cast< T1U >( begin );
                 const auto endU = static_cast< T2U >( end );
                 const auto max = std::numeric_limits< Type >::max();
-                OPENGEODE_EXCEPTION( beginU <= max,
+                OpenGeodeBasicException::assertion( beginU <= max,
                     "[Range] Invalid range: ", begin, " > ", max );
-                OPENGEODE_EXCEPTION(
+                OpenGeodeBasicException::assertion(
                     endU <= max, "[Range] Invalid range: ", end, " > ", max );
             }
         }

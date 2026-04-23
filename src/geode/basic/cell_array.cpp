@@ -94,7 +94,8 @@ namespace geode
             std::array< index_t, dimension > cells_number )
         {
             cells_number_ = std::move( cells_number );
-            OPENGEODE_EXCEPTION( nb_cells() != 0,
+            OpenGeodeBasicException::check( nb_cells() != 0, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CellArray] Creation of a array with no cells "
                 "in one direction." );
         }

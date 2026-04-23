@@ -39,7 +39,8 @@ namespace geode
 
     void Percentage::set_value( double value )
     {
-        OPENGEODE_EXCEPTION( value >= 0 && value <= 1,
+        OpenGeodeBasicException::check( value >= 0 && value <= 1, nullptr,
+            OpenGeodeException::TYPE::data,
             "[Percentage::set_value] Value must be between 0 and 1" );
         value_ = value;
     }

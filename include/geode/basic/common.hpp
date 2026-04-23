@@ -33,6 +33,9 @@
 
 #ifndef NDEBUG
 #    define OPENGEODE_DEBUG
+inline constexpr bool is_debug_build = false;
+#else
+inline constexpr bool is_debug_build = true;
 #endif
 
 #ifdef OPENGEODE_WINDOWS
@@ -96,5 +99,6 @@ void geode_unused( const T & /*unused*/ )
 }
 
 #include <geode/basic/assert.hpp>
+#include <geode/basic/library.hpp>
 #include <geode/basic/opengeode_basic_export.hpp>
 #include <geode/basic/types.hpp>

@@ -58,7 +58,7 @@ namespace geode
             [[nodiscard]] CellIndices cell_indices(
                 const CellArray< dimension >& array, index_t index ) const
             {
-                OPENGEODE_ASSERT( index < array.nb_cells(),
+                OpenGeodeBasicException::assertion( index < array.nb_cells(),
                     "[CellArray::cell_index] Invalid index" );
                 CellIndices cell_id;
                 for( const auto d : LRange{ dimension } )

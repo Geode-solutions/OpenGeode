@@ -224,7 +224,8 @@ namespace geode
                 const auto new_index = old2new[i];
                 if( value( i ) != default_value_ && new_index != NO_ID )
                 {
-                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                    OpenGeodeBasicException::check( new_index < nb_elements,
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[SparseAttribute::extract] The given mapping "
                         "contains values that go beyond the given number of "
                         "elements." );
@@ -248,7 +249,8 @@ namespace geode
                 {
                     for( const auto new_index : outs )
                     {
-                        OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        OpenGeodeBasicException::check( new_index < nb_elements,
+                            nullptr, OpenGeodeException::TYPE::data,
                             "[SparseAttribute::extract] The given mapping "
                             "contains values that go beyond the given number "
                             "of elements." );

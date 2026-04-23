@@ -110,6 +110,7 @@ add_geode_library(
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         absl::linked_hash_map
+        absl::source_location
         absl::strings
         absl::stacktrace
         absl::symbolize

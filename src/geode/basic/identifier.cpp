@@ -66,7 +66,8 @@ namespace geode
             Serializer archive{ context, file };
             archive.object( *this );
             archive.adapter().flush();
-            OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+            OpenGeodeBasicException::check( std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Identifier::save] Error while writing file: ", filename );
         }
 
@@ -84,10 +85,11 @@ namespace geode
             Deserializer archive{ context, file };
             archive.object( *this );
             const auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION(
+            OpenGeodeBasicException::check(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Identifier::load] Error while reading file: ", filename );
         }
 

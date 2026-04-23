@@ -114,7 +114,8 @@ namespace geode
             absl::Span< const double > lambdas )
             : indices_( indices.size() ), lambdas_( lambdas.size() )
         {
-            OPENGEODE_EXCEPTION( indices_.size() == lambdas_.size(),
+            OpenGeodeBasicException::check( indices_.size() == lambdas_.size(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[AttributeLinearInterpolation] Both arrays should have the "
                 "same size" );
             for( const auto index : Indices{ indices } )
@@ -297,7 +298,7 @@ namespace geode
         [[nodiscard]] static float converted_item_value(                       \
             const Container& value, local_index_t item )                       \
         {                                                                      \
-            OPENGEODE_ASSERT( item < nb_items(),                               \
+            OpenGeodeBasicException::assertion( item < nb_items(),             \
                 "[GenericAttributeConversion] Accessing "                      \
                 "incorrect item value" );                                      \
             return static_cast< float >( value[item] );                        \
