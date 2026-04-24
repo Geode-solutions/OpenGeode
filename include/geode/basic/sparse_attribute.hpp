@@ -120,7 +120,7 @@ namespace geode
             values_.reserve( 10 );
         }
 
-        SparseAttribute() = default;
+        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ) {}
 
         template < typename Archive >
         void serialize( Archive& archive )
