@@ -23,22 +23,23 @@
 
 #pragma once
 
-#include <geode/mesh/common.hpp>
+#include <geode/geometry/common.hpp>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Polygon );
+    ALIAS_2D( Point );
+    ALIAS_2D( Polygon );
 } // namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
-    void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
-        SurfaceMeshBuilder< dimension >& builder );
+    /*!
+     * Find if point is inside a polygon.
+     * @param[in] point The point to rotate.
+     */
+    [[nodiscard]] bool opengeode_geometry_api is_point_inside_polygon(
+        const Point2D& point, const Polygon2D& polygon );
 
-    template < index_t dimension >
-    void repair_polygons_orientations( const SurfaceMesh< dimension >& mesh,
-        SurfaceMeshBuilder< dimension >& builder,
-        absl::Span< const index_t > polygons_to_reorient );
 } // namespace geode
