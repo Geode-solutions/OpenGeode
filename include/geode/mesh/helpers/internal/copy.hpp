@@ -41,7 +41,8 @@ namespace geode
             Builder& builder,
             local_index_t axis_to_remove )
         {
-            OPENGEODE_EXCEPTION( axis_to_remove < 3,
+            OpenGeodeMeshException::check( axis_to_remove < 3, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[copy_points3d_into_2d] Invalid axis to remove." );
             builder.create_vertices( from.nb_vertices() );
             async::parallel_for(
@@ -59,7 +60,8 @@ namespace geode
             local_index_t axis_to_add,
             double axis_coordinate )
         {
-            OPENGEODE_EXCEPTION( axis_to_add < 3,
+            OpenGeodeMeshException::check( axis_to_add < 3, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[copy_points2d_into_3d] Invalid axis to add." );
             builder.create_vertices( from.nb_vertices() );
             for( const auto v : Range{ from.nb_vertices() } )

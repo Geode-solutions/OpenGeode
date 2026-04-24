@@ -161,10 +161,10 @@ namespace geode
                     return ( nb_intersections % 2 == 1 );
                 }
             }
-            throw OpenGeodeException{
+            throw OpenGeodeModelException{ point,
+                OpenGeodeException::TYPE::internal,
                 "Cannot determine the point is inside the surface 2D or not "
-                "(ambiguous intersection with rays)."
-            };
+                "(ambiguous intersection with rays)." };
         }
 
         std::optional< uuid > surface_containing_point( const Point2D& point )
@@ -260,10 +260,10 @@ namespace geode
                     return ( nb_intersections % 2 == 1 );
                 }
             }
-            throw OpenGeodeException{
+            throw OpenGeodeModelException{ point,
+                OpenGeodeException::TYPE::internal,
                 "Cannot determine the point is inside the block or not "
-                "(ambiguous intersection with rays)."
-            };
+                "(ambiguous intersection with rays)." };
         }
 
         std::optional< uuid > block_containing_point( const Point3D& point )
@@ -337,8 +337,9 @@ namespace geode
                 return ( nb_intersections.value() % 2 == 1 );
             }
         }
-        throw OpenGeodeException{ "Cannot determine the point is inside "
-                                  "the closed surface 3D or not "
-                                  "(ambiguous intersection with rays)." };
+        throw OpenGeodeModelException{ point,
+            OpenGeodeException::TYPE::internal,
+            "Cannot determine the point is inside the closed surface 3D or not "
+            "(ambiguous intersection with rays)." };
     }
 } // namespace geode

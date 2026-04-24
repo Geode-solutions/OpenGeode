@@ -58,9 +58,9 @@ namespace geode
         absl::Span< const std::vector< local_index_t > > facets )
     {
         geode_unused( facets );
-        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
-                                                "do_create_polyhedron] Only "
-                                                "tetrahedra are handled" );
+        OpenGeodeMeshException::assertion( vertices.size() == 4,
+            "[TetrahedralSolidBuilder::do_create_"
+            "polyhedron] Only tetrahedra are handled" );
         std::array< index_t, 4 > tetrahedron_vertices;
         absl::c_copy_n( vertices, 4, tetrahedron_vertices.begin() );
         do_create_tetrahedron( tetrahedron_vertices );
@@ -111,8 +111,10 @@ namespace geode
     void TetrahedralSolidBuilder< dimension >::copy(
         const TetrahedralSolid< dimension >& tetrahedral_solid )
     {
-        OPENGEODE_EXCEPTION( tetrahedral_solid_.nb_vertices() == 0
-                                 && tetrahedral_solid_.nb_polyhedra() == 0,
+        OpenGeodeMeshException::check(
+            tetrahedral_solid_.nb_vertices() == 0
+                && tetrahedral_solid_.nb_polyhedra() == 0,
+            nullptr, OpenGeodeException::TYPE::data,
             "[TetrahedralSolidBuilder::copy] Cannot copy a mesh into an "
             "already initialized mesh." );
         SolidMeshBuilder< dimension >::copy( tetrahedral_solid );

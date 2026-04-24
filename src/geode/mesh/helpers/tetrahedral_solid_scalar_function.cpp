@@ -43,9 +43,10 @@ namespace geode
             double value )
             : solid_( solid )
         {
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 !solid_.vertex_attribute_manager().attribute_exists(
                     function_name ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "Cannot create TetrahedralSolidScalarFunction: attribute with "
                 "name '",
                 function_name, "' already exists." );
@@ -59,9 +60,10 @@ namespace geode
             std::string_view function_name )
             : solid_( solid )
         {
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 solid_.vertex_attribute_manager().attribute_exists(
                     function_name ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "Cannot create TetrahedralSolidScalarFunction: attribute with "
                 "name '",
                 function_name, "' does not exist." );

@@ -33,17 +33,19 @@
 
 void test_raster( const geode::RasterImage2D& raster )
 {
-    OPENGEODE_EXCEPTION(
-        raster.nb_cells() == 100, "[Test] Wrong number of cells" );
-    OPENGEODE_EXCEPTION( raster.nb_cells_in_direction( 0 ) == 10,
-        "[Test] Wrong number of cells in direction 0" );
-    OPENGEODE_EXCEPTION( raster.nb_cells_in_direction( 1 ) == 10,
-        "[Test] Wrong number of cells in direction 1" );
+    geode::OpenGeodeImageException::test(
+        raster.nb_cells() == 100, "Wrong number of cells" );
+    geode::OpenGeodeImageException::test(
+        raster.nb_cells_in_direction( 0 ) == 10,
+        "Wrong number of cells in direction 0" );
+    geode::OpenGeodeImageException::test(
+        raster.nb_cells_in_direction( 1 ) == 10,
+        "Wrong number of cells in direction 1" );
     for( const auto i : geode::LRange{ raster.nb_cells() } )
     {
         const geode::RGBColor color{ i, i, i };
-        OPENGEODE_EXCEPTION(
-            raster.color( i ) == color, "[Test] Wrong color for ", i );
+        geode::OpenGeodeImageException::test(
+            raster.color( i ) == color, "Wrong color for ", i );
     }
 }
 
@@ -62,8 +64,8 @@ void test()
     const auto reload = geode::load_raster_image< 2 >( filename_with_spaces );
     test_raster( reload );
     auto raster2 = std::move( raster );
-    OPENGEODE_EXCEPTION(
-        raster2.nb_cells() == 100, "[Test] Wrong number of cells after move" );
+    geode::OpenGeodeImageException::test(
+        raster2.nb_cells() == 100, "Wrong number of cells after move" );
 }
 
 OPENGEODE_TEST( "raster" )

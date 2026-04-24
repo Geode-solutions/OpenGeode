@@ -71,7 +71,8 @@ namespace
     {
         geode_unused( solid );
         geode_unused( vertex_id );
-        OPENGEODE_ASSERT( vertex_id < solid.nb_vertices(),
+        geode::OpenGeodeMeshException::assertion(
+            vertex_id < solid.nb_vertices(),
             "[check_vertex_id] Trying to access an invalid vertex" );
     }
 
@@ -81,7 +82,7 @@ namespace
     {
         geode_unused( solid );
         geode_unused( facet_id );
-        OPENGEODE_ASSERT( facet_id < solid.nb_facets(),
+        geode::OpenGeodeMeshException::assertion( facet_id < solid.nb_facets(),
             "[check_facet_id] Trying to access an invalid facet" );
     }
 
@@ -91,7 +92,8 @@ namespace
     {
         geode_unused( solid );
         geode_unused( polyhedron_id );
-        OPENGEODE_ASSERT( polyhedron_id < solid.nb_polyhedra(),
+        geode::OpenGeodeMeshException::assertion(
+            polyhedron_id < solid.nb_polyhedra(),
             "[check_polyhedron_id] Trying to access an invalid polyhedron" );
     }
 
@@ -103,7 +105,7 @@ namespace
         geode_unused( solid );
         geode_unused( polyhedron_id );
         geode_unused( vertex_id );
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeMeshException::assertion(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
             "[check_polyhedron_vertex_id] Trying to access an invalid "
             "polyhedron vertex" );
@@ -117,7 +119,7 @@ namespace
         geode_unused( solid );
         geode_unused( polyhedron_id );
         geode_unused( facet_id );
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeMeshException::assertion(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
             "[check_polyhedron_facet_id] Trying to access an invalid "
             "polyhedron facet" );
@@ -134,8 +136,9 @@ namespace
         geode_unused( polyhedron_id );
         geode_unused( facet_id );
         geode_unused( vertex_id );
-        OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+        geode::OpenGeodeMeshException::assertion(
+            vertex_id < solid.nb_polyhedron_facet_vertices(
+                { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -194,7 +197,9 @@ namespace
             }
         } while( facet.polyhedron_id != first_polyhedron
                  && safety_count < MAX_SAFETY_COUNT );
-        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+        geode::OpenGeodeMeshException::check( safety_count < MAX_SAFETY_COUNT,
+            solid.edge_barycenter( edge_vertices ),
+            geode::OpenGeodeException::TYPE::data,
             "[SolidMesh::propagate_around_edge] Solid ",
             solid.name().value_or( solid.id().string() ),
             ": too many polyhedra around edge ", edge_vertices[0], " ",
@@ -257,7 +262,7 @@ namespace
         {
             return {};
         }
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeMeshException::assertion(
             solid.polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
             "[SolidMesh::compute_polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
@@ -299,7 +304,8 @@ namespace
                 }
             }
         }
-        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+        geode::OpenGeodeMeshException::check( safety_count < MAX_SAFETY_COUNT,
+            solid.point( vertex_id ), geode::OpenGeodeException::TYPE::data,
             "[SolidMesh::compute_polyhedra_around_vertex] Solid ",
             solid.name().value_or( solid.id().string() ),
             ": Too many polyhedra around vertex ", vertex_id, " (",
@@ -580,7 +586,8 @@ namespace geode
 
         void copy_edges( const SolidMesh< dimension >& solid )
         {
-            OPENGEODE_EXCEPTION( !are_edges_enabled(),
+            OpenGeodeMeshException::check( !are_edges_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh] Cannot copy edges into mesh "
                 "where edges are already enabled." );
             edges_.reset( new SolidEdges< dimension >{} );
@@ -595,7 +602,8 @@ namespace geode
 
         const SolidEdges< dimension >& edges() const
         {
-            OPENGEODE_EXCEPTION( are_edges_enabled(),
+            OpenGeodeMeshException::check( are_edges_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::edges] Edges should be "
                 "enabled before accessing them" );
             return *edges_;
@@ -603,7 +611,8 @@ namespace geode
 
         SolidEdges< dimension >& edges()
         {
-            OPENGEODE_EXCEPTION( are_edges_enabled(),
+            OpenGeodeMeshException::check( are_edges_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::edges] Edges should be "
                 "enabled before accessing them" );
             return *edges_;
@@ -627,7 +636,8 @@ namespace geode
 
         void copy_facets( const SolidMesh< dimension >& solid )
         {
-            OPENGEODE_EXCEPTION( !are_facets_enabled(),
+            OpenGeodeMeshException::check( !are_facets_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh] Cannot copy facets into mesh where facets are "
                 "already enabled." );
             facets_.reset( new SolidFacets< dimension >{} );
@@ -642,7 +652,8 @@ namespace geode
 
         const SolidFacets< dimension >& facets() const
         {
-            OPENGEODE_EXCEPTION( are_facets_enabled(),
+            OpenGeodeMeshException::check( are_facets_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::facets] Facets should be "
                 "enabled before accessing them" );
             return *facets_;
@@ -650,7 +661,8 @@ namespace geode
 
         SolidFacets< dimension >& facets()
         {
-            OPENGEODE_EXCEPTION( are_facets_enabled(),
+            OpenGeodeMeshException::check( are_facets_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::facets] Facets should be "
                 "enabled before accessing them" );
             return *facets_;
@@ -1224,9 +1236,10 @@ namespace geode
     {
         const auto first_polyhedron =
             first_polyhedron_around_edge( *this, vertices );
-        OPENGEODE_EXCEPTION( first_polyhedron,
-            "[SolidMesh::is_edge_on_border] Given pair of "
-            "vertices does not define a Solid edge" );
+        OpenGeodeMeshException::check( first_polyhedron.has_value(),
+            edge_barycenter( vertices ), OpenGeodeException::TYPE::data,
+            "[SolidMesh::is_edge_on_border] Given pair of vertices does not "
+            "define a Solid edge" );
         return is_edge_on_border( vertices, first_polyhedron.value() );
     }
 
@@ -1245,10 +1258,10 @@ namespace geode
             return !std::get< 1 >( propagate_around_edge(
                 *this, { first_polyhedron, f }, vertices ) );
         }
-        OPENGEODE_EXCEPTION( true,
+        throw OpenGeodeMeshException{ polyhedron_barycenter( first_polyhedron ),
+            OpenGeodeException::TYPE::data,
             "[SolidMesh::is_edge_on_border] Incoherence between given vertices "
-            "and given first_polyhedron" );
-        return false;
+            "and given first_polyhedron" };
     }
 
     template < index_t dimension >
@@ -1524,8 +1537,8 @@ namespace geode
         {
             return std::nullopt;
         }
-        absl::FixedArray< index_t > vertices(
-            nb_polyhedron_facet_vertices( polyhedron_facet ) );
+        PolyhedronFacetVertices vertices;
+        vertices.resize( nb_polyhedron_facet_vertices( polyhedron_facet ) );
         for( const auto v : LIndices{ vertices } )
         {
             vertices[v] = polyhedron_facet_vertex( { polyhedron_facet, v } );
@@ -1556,10 +1569,11 @@ namespace geode
                     polyhedron_adj, f };
             }
         }
-        throw OpenGeodeException{ "[SolidMesh::polyhedron_adjacent_"
-                                  "facet] Wrong adjacency with polyhedra: ",
+        throw OpenGeodeMeshException{ facet_barycenter( vertices ),
+            OpenGeodeException::TYPE::data,
+            "[SolidMesh::polyhedron_adjacent_facet] Wrong adjacency with "
+            "polyhedra: ",
             polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };
-        return std::nullopt;
     }
 
     template < index_t dimension >
@@ -1736,9 +1750,10 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > SolidMesh< dimension >::bounding_box() const
     {
-        OPENGEODE_EXCEPTION( nb_vertices() != 0,
-            "[SolidMesh::bounding_box] Cannot return "
-            "the bounding_box of an empty solid mesh." );
+        OpenGeodeMeshException::check( nb_vertices() != 0, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SolidMesh::bounding_box] Cannot return the bounding_box of an "
+            "empty solid mesh." );
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {

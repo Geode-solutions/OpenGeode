@@ -46,30 +46,32 @@ void test()
     crs_manager_builder.register_coordinate_reference_system( crs_name,
         std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
             att_manager ) );
-    OPENGEODE_EXCEPTION( crs_manager.nb_coordinate_reference_systems() == 1,
-        "[Test] Wrong number of CRS" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        crs_manager.nb_coordinate_reference_systems() == 1,
+        "Wrong number of CRS" );
+    geode::OpenGeodeMeshException::test(
         crs_manager.coordinate_reference_system_exists( crs_name ),
-        "[Test] CRS should exist" );
-    OPENGEODE_EXCEPTION(
+        "CRS should exist" );
+    geode::OpenGeodeMeshException::test(
         !crs_manager.coordinate_reference_system_exists( "not a good test" ),
-        "[Test] CRS should not exist" );
+        "CRS should not exist" );
     auto& crs = crs_manager_builder.coordinate_reference_system( crs_name );
     const geode::Point3D test_point{ { 12, 12, 12 } };
     crs.set_point( 0, test_point );
     crs_manager_builder.set_active_coordinate_reference_system( crs_name );
     const auto& const_crs = crs_manager.active_coordinate_reference_system();
-    OPENGEODE_EXCEPTION(
-        const_crs.point( 0 ) == test_point, "[Test] Wrong CRS point value" );
-    OPENGEODE_EXCEPTION(
-        const_crs.point( 1 ) != test_point, "[Test] Wrong CRS point value" );
+    geode::OpenGeodeMeshException::test(
+        const_crs.point( 0 ) == test_point, "Wrong CRS point value" );
+    geode::OpenGeodeMeshException::test(
+        const_crs.point( 1 ) != test_point, "Wrong CRS point value" );
 
     const auto crs_name2 = "test2";
     crs_manager_builder.register_coordinate_reference_system( crs_name2,
         std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
             att_manager, "another crs" ) );
-    OPENGEODE_EXCEPTION( crs_manager.nb_coordinate_reference_systems() == 2,
-        "[Test] Wrong number of CRS" );
+    geode::OpenGeodeMeshException::test(
+        crs_manager.nb_coordinate_reference_systems() == 2,
+        "Wrong number of CRS" );
 }
 
 OPENGEODE_TEST( "coordinate-reference-manager" )

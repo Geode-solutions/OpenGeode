@@ -65,7 +65,8 @@ namespace geode
 
         void do_create_vertex() final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{
+                nullptr, OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use create_vertex in RegularGrid"
             };
         }
@@ -73,39 +74,44 @@ namespace geode
         void do_permute_polygons( absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "permute_polygons in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "permute_polygons in RegularGrid" };
         }
 
         void do_delete_surface_vertices( const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use delete_surface_vertices in "
-                "RegularGrid"
-            };
+                "RegularGrid" };
         }
 
         void do_permute_surface_vertices(
             absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use permute_surface_vertices in "
-                "RegularGrid"
-            };
+                "RegularGrid" };
         }
 
         void do_set_polygon_vertex(
             const PolygonVertex& /*unused*/, index_t /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "set_polygon_vertex in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "set_polygon_vertex in RegularGrid" };
         }
 
         void do_create_polygon( absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{
+                nullptr, OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use create_polygon in RegularGrid"
             };
         }
@@ -113,7 +119,8 @@ namespace geode
         void do_delete_polygons( const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{
+                nullptr, OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use delete_polygons in RegularGrid"
             };
         }
@@ -121,14 +128,18 @@ namespace geode
         void do_set_polygon_adjacent(
             const PolygonEdge& /*unused*/, index_t /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "set_polygon_adjacent in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "set_polygon_adjacent in RegularGrid" };
         }
 
         void do_unset_polygon_adjacent( const PolygonEdge& /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "unset_polygon_adjacent in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "unset_polygon_adjacent in RegularGrid" };
         }
 
         void do_copy_points( const SurfaceMesh< 2 >& surface_mesh ) final;

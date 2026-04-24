@@ -40,6 +40,8 @@
 #include <geode/basic/growable.hpp>
 #include <geode/basic/range.hpp>
 
+#include <geode/mesh/common.hpp>
+
 namespace geode
 {
     namespace detail

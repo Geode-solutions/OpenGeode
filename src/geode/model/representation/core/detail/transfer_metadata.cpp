@@ -247,7 +247,9 @@ namespace geode
                                            pointset_ref ) {
                             return pointset_ref.get().id() == in_uuid;
                         } );
-                    OPENGEODE_EXCEPTION( in_pointset != pointsets.end(),
+                    OpenGeodeModelException::check(
+                        in_pointset != pointsets.end(), nullptr,
+                        OpenGeodeException::TYPE::data,
                         "[transfer_pointsets_metadata] Should have found input "
                         "pointset from mapping" );
                     if( const auto name = in_pointset->get().name() )
@@ -293,7 +295,8 @@ namespace geode
                                         curve_ref ) {
                             return curve_ref.get().id() == in_uuid;
                         } );
-                    OPENGEODE_EXCEPTION( in_curve != curves.end(),
+                    OpenGeodeModelException::check( in_curve != curves.end(),
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[transfer_curves_metadata] Should have found input "
                         "curve from mapping" );
                     if( const auto name = in_curve->get().name() )
@@ -339,7 +342,9 @@ namespace geode
                                           surface_ref ) {
                             return surface_ref.get().id() == in_uuid;
                         } );
-                    OPENGEODE_EXCEPTION( in_surface != surfaces.end(),
+                    OpenGeodeModelException::check(
+                        in_surface != surfaces.end(), nullptr,
+                        OpenGeodeException::TYPE::data,
                         "[transfer_surfaces_metadata] Should have found input "
                         "surface from mapping" );
                     if( const auto name = in_surface->get().name() )
@@ -383,7 +388,8 @@ namespace geode
                                 solid_ref ) {
                             return solid_ref.get().id() == in_uuid;
                         } );
-                    OPENGEODE_EXCEPTION( in_solid != solids.end(),
+                    OpenGeodeModelException::check( in_solid != solids.end(),
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[transfer_solids_metadata] Should have found input "
                         "solid from mapping" );
                     if( const auto name = in_solid->get().name() )

@@ -45,7 +45,9 @@ namespace
             {
                 const geode::EdgeVertex id{ e, v };
                 const auto new_vertex = old2new[graph.edge_vertex( id )];
-                OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
+                geode::OpenGeodeMeshException::check(
+                    new_vertex != geode::NO_ID, nullptr,
+                    geode::OpenGeodeException::TYPE::data,
                     "[GraphBuilder::update_edge_vertices] Cannot remove vertex "
                     "associated to an edge" );
                 builder.set_edge_vertex( id, new_vertex );
@@ -90,13 +92,14 @@ namespace geode
     void GraphBuilder::set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        OPENGEODE_ASSERT( edge_vertex.edge_id < graph_.nb_edges(),
+        OpenGeodeMeshException::assertion(
+            edge_vertex.edge_id < graph_.nb_edges(),
             "[GraphBuilder::set_edge_vertex] Accessing an edge that does not "
             "exist" );
-        OPENGEODE_ASSERT( edge_vertex.vertex_id < 2,
+        OpenGeodeMeshException::assertion( edge_vertex.vertex_id < 2,
             "[GraphBuilder::set_edge_vertex] Trying to access an invalid edge "
             "local vertex" );
-        OPENGEODE_ASSERT( vertex_id < graph_.nb_vertices(),
+        OpenGeodeMeshException::assertion( vertex_id < graph_.nb_vertices(),
             "[GraphBuilder::set_edge_vertex] Accessing a vertex that does not "
             "exist" );
         if( graph_.edge_vertex( edge_vertex ) == vertex_id )
@@ -219,8 +222,9 @@ namespace geode
 
     void GraphBuilder::copy( const Graph& graph )
     {
-        OPENGEODE_EXCEPTION(
-            graph_.nb_vertices() == 0 && graph_.nb_edges() == 0,
+        OpenGeodeMeshException::check(
+            graph_.nb_vertices() == 0 && graph_.nb_edges() == 0, nullptr,
+            OpenGeodeException::TYPE::data,
             "[GraphBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         VertexSetBuilder::copy( graph );

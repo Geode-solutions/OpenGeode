@@ -31,26 +31,32 @@ void test()
     geode::OpenGeodeBasicLibrary::initialize();
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
     geode::SmallSet< double > set;
-    OPENGEODE_EXCEPTION( set.empty(), "[Test] Set should be empty" );
-    OPENGEODE_EXCEPTION( set.insert( 0 ), "[Test] Insert should be done" );
-    OPENGEODE_EXCEPTION( set.insert( 1 ), "[Test] Insert should be done" );
-    OPENGEODE_EXCEPTION( !set.insert( 0 ), "[Test] Insert not allow" );
-    OPENGEODE_EXCEPTION( !set.insert( 1 ), "[Test] Insert not allow" );
-    OPENGEODE_EXCEPTION( set.size(), "[Test] Set size should be 2" );
+    geode::OpenGeodeBasicException::test( set.empty(), "Set should be empty" );
+    geode::OpenGeodeBasicException::test(
+        set.insert( 0 ), "Insert should be done" );
+    geode::OpenGeodeBasicException::test(
+        set.insert( 1 ), "Insert should be done" );
+    geode::OpenGeodeBasicException::test(
+        !set.insert( 0 ), "Insert not allow" );
+    geode::OpenGeodeBasicException::test(
+        !set.insert( 1 ), "Insert not allow" );
+    geode::OpenGeodeBasicException::test( set.size(), "Set size should be 2" );
     set.erase( 0 );
-    OPENGEODE_EXCEPTION( set.size(), "[Test] Set size should be 1" );
-    OPENGEODE_EXCEPTION( set.at( 0 ) == 1, "[Test] Wrong value in set" );
+    geode::OpenGeodeBasicException::test( set.size(), "Set size should be 1" );
+    geode::OpenGeodeBasicException::test(
+        set.at( 0 ) == 1, "Wrong value in set" );
     geode::SmallSet< double > set2;
     set2.insert( 0 );
-    OPENGEODE_EXCEPTION( set2 != set, "[Test] Wrong first comparison of sets" );
+    geode::OpenGeodeBasicException::test(
+        set2 != set, "Wrong first comparison of sets" );
     set2.insert( 2 );
-    OPENGEODE_EXCEPTION(
-        set2 != set, "[Test] Wrong second comparison of sets" );
+    geode::OpenGeodeBasicException::test(
+        set2 != set, "Wrong second comparison of sets" );
     geode::SmallSet< double > set3;
     set3.insert( 2 );
     set3.insert( 0 );
-    OPENGEODE_EXCEPTION(
-        set2 == set3, "[Test] Wrong third comparison of sets" );
+    geode::OpenGeodeBasicException::test(
+        set2 == set3, "Wrong third comparison of sets" );
 }
 
 OPENGEODE_TEST( "small-set" )

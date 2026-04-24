@@ -613,7 +613,8 @@ namespace geode
             bbox.add_box( box.value() );
             bbox_computed = true;
         }
-        OPENGEODE_EXCEPTION( bbox_computed,
+        OpenGeodeModelException::check( bbox_computed, nullptr,
+            OpenGeodeException::TYPE::data,
             "[Section::bounding_box] Cannot return the "
             "bounding_box of an empty Section." );
         return bbox;
@@ -637,7 +638,8 @@ namespace geode
         {
             bbox.add_box( box.value() );
         }
-        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+        OpenGeodeModelException::check( bbox.min() <= bbox.max(), nullptr,
+            OpenGeodeException::TYPE::data,
             "[Section::bounding_box] Cannot return the "
             "bounding_box of a full inactive Section." );
         return bbox;

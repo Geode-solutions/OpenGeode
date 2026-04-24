@@ -30,7 +30,8 @@
 #include <geode/tests/common.hpp>
 
 #define CHECK( arg, value )                                                    \
-    OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for ", arg );
+    geode::OpenGeodeBasicException::test(                                      \
+        arg == value, "Wrong value for ", arg );
 
 struct Foo
 {
@@ -115,9 +116,10 @@ Out test_growable( const T &foo )
     Out new_foo;
     deserializer.object( new_foo );
     const auto &adapter = deserializer.adapter();
-    OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
-                             && adapter.isCompletedSuccessfully(),
-        "[Test] Error while reading file" );
+    geode::OpenGeodeBasicException::test(
+        adapter.error() == bitsery::ReaderError::NoError
+            && adapter.isCompletedSuccessfully(),
+        "Error while reading file" );
     return new_foo;
 }
 

@@ -160,10 +160,11 @@ namespace
             return block_mesh_polyhedra_around_quadrangle(
                 block.mesh(), block_facet_from_unique_vertices );
         }
-        OPENGEODE_ASSERT_NOT_REACHED(
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal,
             "[helpers::block_mesh_polyhedra_from_unique_vertices_facet] "
             "Function is not yet implemented for facets other than "
-            "triangles and quadrangles." );
+            "triangles and quadrangles." };
         return {};
     }
 
@@ -237,13 +238,13 @@ namespace
         }
         else if( facets_block_vertices.size() >= 2 )
         {
-            OPENGEODE_ASSERT( polygon_unique_vertices_cycle.is_opposite(
-                                  geode::detail::OrientedVertexCycle<
-                                      geode::PolygonVertices >{
-                                      facets_unique_vertices[1].vertices } ),
-                "[block_vertices_from_surface_polygon] The block facets "
-                "found from the polygon vertices have the same "
-                "orientation." );
+            geode::OpenGeodeModelException::assertion(
+                polygon_unique_vertices_cycle.is_opposite(
+                    geode::detail::OrientedVertexCycle<
+                        geode::PolygonVertices >{
+                        facets_unique_vertices[1].vertices } ),
+                "[block_vertices_from_surface_polygon] The block facets found "
+                "from the polygon vertices have the same orientation." );
         }
         return std::make_tuple( std::move( facets_block_vertices ),
             std::move( facets_unique_vertices ), true );
@@ -275,8 +276,9 @@ namespace
                 const auto unique_vertex_in_facet =
                     static_cast< geode::index_t >(
                         std::distance( facet_uvertices.begin(), it ) );
-                OPENGEODE_EXCEPTION(
-                    unique_vertex_in_facet != facet_uvertices.size(),
+                geode::OpenGeodeModelException::check(
+                    unique_vertex_in_facet != facet_uvertices.size(), nullptr,
+                    geode::OpenGeodeException::TYPE::data,
                     "[block_vertices_from_surface_polygon] Could not find a "
                     "unique vertex matching a polygon of the surface and the "
                     "polyhedra of the block around it." );
@@ -418,7 +420,7 @@ namespace
             return std::make_tuple( std::move( surface_edges_vertices ),
                 std::move( surface_edges_unique_vertices ), true );
         }
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeModelException::assertion(
             edge_unique_vertices[0]
                     == surface_edges_unique_vertices[0].vertices[1]
                 && edge_unique_vertices[1]
@@ -457,8 +459,10 @@ namespace
                 const auto unique_vertex_in_surface_edge =
                     static_cast< geode::index_t >(
                         std::distance( surface_edge_uvertices.begin(), it ) );
-                OPENGEODE_EXCEPTION( unique_vertex_in_surface_edge
-                                         != surface_edge_uvertices.size(),
+                geode::OpenGeodeModelException::check(
+                    unique_vertex_in_surface_edge
+                        != surface_edge_uvertices.size(),
+                    nullptr, geode::OpenGeodeException::TYPE::data,
                     "[surface_vertices_from_line_edge] Could not find a unique "
                     "vertex matching an edge of the line and the polygons of "
                     "the surface around it." );

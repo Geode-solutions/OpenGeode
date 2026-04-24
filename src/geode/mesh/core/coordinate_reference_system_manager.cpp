@@ -48,7 +48,8 @@ namespace geode
             find_coordinate_reference_system( std::string_view name ) const
         {
             const auto it = crss_.find( name );
-            OPENGEODE_EXCEPTION( it != crss_.end(),
+            OpenGeodeMeshException::check( it != crss_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::find_coordinate_reference_"
                 "system] Unknown CRS :",
                 name );
@@ -58,7 +59,8 @@ namespace geode
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const
         {
-            OPENGEODE_ASSERT( active_crs_.use_count() > 1,
+            geode::OpenGeodeMeshException::assertion(
+                active_crs_.use_count() > 1,
                 "[CoordinateReferenceSystemManager::active_coordinate_"
                 "reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -91,7 +93,8 @@ namespace geode
         {
             const auto status =
                 crss_.emplace( to_string( name ), std::move( crs ) );
-            OPENGEODE_EXCEPTION( status.second,
+            OpenGeodeMeshException::check( status.second, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::register_coordinate_"
                 "reference_system] CRS named ",
                 name, " already exists" );
@@ -114,7 +117,8 @@ namespace geode
         void set_active_coordinate_reference_system( std::string_view name )
         {
             const auto it = crss_.find( name );
-            OPENGEODE_EXCEPTION( it != crss_.end(),
+            OpenGeodeMeshException::check( it != crss_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::set_active_coordinate_"
                 "reference_system] Unknown CRS :",
                 name );
@@ -125,7 +129,8 @@ namespace geode
         CoordinateReferenceSystem< dimension >&
             modifiable_active_coordinate_reference_system()
         {
-            OPENGEODE_EXCEPTION( active_crs_.use_count() > 0,
+            OpenGeodeMeshException::check( active_crs_.use_count() > 0, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::modifiable_active_"
                 "coordinate_reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -135,7 +140,8 @@ namespace geode
             modifiable_coordinate_reference_system( std::string_view name )
         {
             const auto it = crss_.find( name );
-            OPENGEODE_EXCEPTION( it != crss_.end(),
+            OpenGeodeMeshException::check( it != crss_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::find_coordinate_reference_"
                 "system] Unknown CRS :",
                 name );

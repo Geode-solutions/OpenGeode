@@ -148,10 +148,10 @@ namespace geode
     template < index_t dimension >
     double SquareMatrix< dimension >::determinant() const
     {
-        throw OpenGeodeException{
+        throw OpenGeodeGeometryException{ nullptr,
+            OpenGeodeException::TYPE::internal,
             "[SquareMatrix::determinant] Not implemented for dimension ",
-            dimension
-        };
+            dimension };
     }
 
     template <>
@@ -191,16 +191,18 @@ namespace geode
     template < index_t dimension >
     SquareMatrix< dimension > SquareMatrix< dimension >::inverse() const
     {
-        throw OpenGeodeException{
-            "[SquareMatrix::inverse] Not implemented for dimension ", dimension
-        };
+        throw OpenGeodeGeometryException{ nullptr,
+            OpenGeodeException::TYPE::internal,
+            "[SquareMatrix::inverse] Not implemented for dimension ",
+            dimension };
     }
 
     template <>
     SquareMatrix< 2 > opengeode_geometry_api SquareMatrix< 2 >::inverse() const
     {
         const auto det = determinant();
-        OPENGEODE_EXCEPTION( det != 0,
+        OpenGeodeGeometryException::check( det != 0, nullptr,
+            OpenGeodeBasicException::TYPE::data,
             "[SquareMatrix::inverse] Cannot inverse matrix: determinant is "
             "null (given vectors do not form a well-defined base)." );
 
@@ -216,7 +218,8 @@ namespace geode
     SquareMatrix< 3 > opengeode_geometry_api SquareMatrix< 3 >::inverse() const
     {
         const auto det = determinant();
-        OPENGEODE_EXCEPTION( det != 0,
+        OpenGeodeGeometryException::check( det != 0, nullptr,
+            OpenGeodeBasicException::TYPE::data,
             "[SquareMatrix::inverse] Cannot inverse matrix: determinant is "
             "null (given vectors do not form a well-defined base)." );
 

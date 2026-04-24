@@ -104,40 +104,40 @@ void test()
     const auto sorted = geode::surface_radial_sort( brep, line );
 
     const auto it = absl::c_find( answer.surfaces, sorted.surfaces.front() );
-    OPENGEODE_EXCEPTION(
-        it != answer.surfaces.end(), "[Test] Wrong radial sort" );
+    geode::OpenGeodeModelException::test(
+        it != answer.surfaces.end(), "Wrong radial sort" );
     auto i = std::distance( answer.surfaces.begin(), it );
 
     for( const auto& surface : sorted.surfaces )
     {
-        OPENGEODE_EXCEPTION(
-            surface == answer.surfaces[i], "[Test] Wrong surface" );
+        geode::OpenGeodeModelException::test(
+            surface == answer.surfaces[i], "Wrong surface" );
         i = ( i + 1 ) % answer.surfaces.size();
     }
 
     const auto test0 = sorted.next(
         sorted.find( { surface2_id, geode::SidedSurface::POSITIVE } ).front() );
-    OPENGEODE_EXCEPTION(
-        sorted.surfaces[test0].id == surface0_id, "[Test] Wrong surface" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeModelException::test(
+        sorted.surfaces[test0].id == surface0_id, "Wrong surface" );
+    geode::OpenGeodeModelException::test(
         sorted.surfaces[test0].side == geode::SidedSurface::POSITIVE,
-        "[Test] Wrong side" );
+        "Wrong side" );
 
     const auto test1 = sorted.next(
         sorted.find( { surface0_id, geode::SidedSurface::POSITIVE } ).front() );
-    OPENGEODE_EXCEPTION(
-        sorted.surfaces[test1].id == surface2_id, "[Test] Wrong surface" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeModelException::test(
+        sorted.surfaces[test1].id == surface2_id, "Wrong surface" );
+    geode::OpenGeodeModelException::test(
         sorted.surfaces[test1].side == geode::SidedSurface::POSITIVE,
-        "[Test] Wrong side" );
+        "Wrong side" );
 
     const auto test2 = sorted.next(
         sorted.find( { surface0_id, geode::SidedSurface::NEGATIVE } ).front() );
-    OPENGEODE_EXCEPTION(
-        sorted.surfaces[test2].id == surface1_id, "[Test] Wrong surface" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeModelException::test(
+        sorted.surfaces[test2].id == surface1_id, "Wrong surface" );
+    geode::OpenGeodeModelException::test(
         sorted.surfaces[test2].side == geode::SidedSurface::POSITIVE,
-        "[Test] Wrong side" );
+        "Wrong side" );
 
     geode::Logger::info( "TEST SUCCESS" );
 }

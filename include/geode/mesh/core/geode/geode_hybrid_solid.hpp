@@ -147,7 +147,7 @@ namespace geode
         [[nodiscard]] PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
-        [[nodiscard]] typename HybridSolid< dimension >::Type polyhedron_type(
+        [[nodiscard]] typename HybridSolid< dimension >::TYPE polyhedron_type(
             index_t polyhedron_id ) const final;
 
     private:

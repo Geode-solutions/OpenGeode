@@ -64,37 +64,40 @@ void test_delete_vector_elements()
     auto bool_vector = create_bool_vector();
     const auto to_delete = bool_vector;
     geode::delete_vector_elements( to_delete, bool_vector );
-    OPENGEODE_EXCEPTION( bool_vector.size() == 3,
-        "[Test] Delete elements result (size) for bool is not correct" );
-    OPENGEODE_EXCEPTION( !bool_vector[0] & !bool_vector[1] & !bool_vector[2],
-        "[Test] Delete elements result (values) for bool is not correct" );
+    geode::OpenGeodeBasicException::test( bool_vector.size() == 3,
+        "Delete elements result (size) for bool is not correct" );
+    geode::OpenGeodeBasicException::test(
+        !bool_vector[0] & !bool_vector[1] & !bool_vector[2],
+        "Delete elements result (values) for bool is not correct" );
 
     auto double_vector = create_double_vector();
     geode::delete_vector_elements( to_delete, double_vector );
-    OPENGEODE_EXCEPTION( double_vector.size() == 3,
-        "[Test] Delete elements result (size) for double is not correct" );
-    OPENGEODE_EXCEPTION( ( double_vector[0] == 0.0 )
-                             && ( double_vector[1] == 2.2 )
-                             && ( double_vector[2] == 3.3 ),
-        "[Test] Delete elements result (values) for double is not correct" );
+    geode::OpenGeodeBasicException::test( double_vector.size() == 3,
+        "Delete elements result (size) for double is not correct" );
+    geode::OpenGeodeBasicException::test( ( double_vector[0] == 0.0 )
+                                              && ( double_vector[1] == 2.2 )
+                                              && ( double_vector[2] == 3.3 ),
+        "Delete elements result (values) for double is not correct" );
 
     auto toto_vector = create_toto_vector();
     geode::delete_vector_elements( to_delete, toto_vector );
-    OPENGEODE_EXCEPTION( toto_vector.size() == 3,
-        "[Test] Delete elements result (size) for double is not correct" );
-    OPENGEODE_EXCEPTION( ( toto_vector[0].front().second == 0 )
-                             && ( toto_vector[1].front().second == 2 )
-                             && ( toto_vector[2].front().second == 3 ),
-        "[Test] Delete elements result (values) for double is not correct" );
+    geode::OpenGeodeBasicException::test( toto_vector.size() == 3,
+        "Delete elements result (size) for double is not correct" );
+    geode::OpenGeodeBasicException::test(
+        ( toto_vector[0].front().second == 0 )
+            && ( toto_vector[1].front().second == 2 )
+            && ( toto_vector[2].front().second == 3 ),
+        "Delete elements result (values) for double is not correct" );
 
     auto totos_vector = create_totostruct_vector();
     geode::delete_vector_elements( to_delete, totos_vector );
-    OPENGEODE_EXCEPTION( totos_vector.size() == 3,
-        "[Test] Delete elements result (size) for double is not correct" );
-    OPENGEODE_EXCEPTION( ( totos_vector[0].front().titi == 0 )
-                             && ( totos_vector[1].front().titi == 2 )
-                             && ( totos_vector[2].front().titi == 3 ),
-        "[Test] Delete elements result (values) for double is not correct" );
+    geode::OpenGeodeBasicException::test( totos_vector.size() == 3,
+        "Delete elements result (size) for double is not correct" );
+    geode::OpenGeodeBasicException::test(
+        ( totos_vector[0].front().titi == 0 )
+            && ( totos_vector[1].front().titi == 2 )
+            && ( totos_vector[2].front().titi == 3 ),
+        "Delete elements result (values) for double is not correct" );
 }
 
 void test_extract_vector_elements()
@@ -103,23 +106,23 @@ void test_extract_vector_elements()
     const auto to_keep = bool_vector;
     const auto bool_result =
         geode::extract_vector_elements( to_keep, bool_vector );
-    OPENGEODE_EXCEPTION( bool_result.size() == 1,
-        "[Test] Extract elements result (size) for bool is not correct" );
-    OPENGEODE_EXCEPTION( bool_result[0],
-        "[Test] Extract elements result (values) for bool is not correct" );
+    geode::OpenGeodeBasicException::test( bool_result.size() == 1,
+        "Extract elements result (size) for bool is not correct" );
+    geode::OpenGeodeBasicException::test( bool_result[0],
+        "Extract elements result (values) for bool is not correct" );
 
     const auto double_vector = create_double_vector();
     const auto double_result =
         geode::extract_vector_elements( to_keep, double_vector );
-    OPENGEODE_EXCEPTION( double_result.size() == 1,
-        "[Test] Extract elements result (size) for double is not correct" );
-    OPENGEODE_EXCEPTION( double_result[0] == 1.1,
-        "[Test] Extract elements result (values) for double is not correct" );
+    geode::OpenGeodeBasicException::test( double_result.size() == 1,
+        "Extract elements result (size) for double is not correct" );
+    geode::OpenGeodeBasicException::test( double_result[0] == 1.1,
+        "Extract elements result (values) for double is not correct" );
     std::vector< bool > keep_all( 4, true );
     const auto double_copy_result =
         geode::extract_vector_elements( keep_all, double_vector );
-    OPENGEODE_EXCEPTION( double_copy_result == double_vector,
-        "[Test] Extract elements result (keep_all) for double is not correct" );
+    geode::OpenGeodeBasicException::test( double_copy_result == double_vector,
+        "Extract elements result (keep_all) for double is not correct" );
 }
 
 void test_sort_unique()
@@ -128,8 +131,8 @@ void test_sort_unique()
     geode::sort_unique( data );
 
     const std::vector< int > answer{ 1, 2, 3, 4, 5, 6, 7 };
-    OPENGEODE_EXCEPTION( data == answer,
-        "[Test] Vectors are not identical after sort_unique()" );
+    geode::OpenGeodeBasicException::test(
+        data == answer, "Vectors are not identical after sort_unique()" );
 }
 
 void test()

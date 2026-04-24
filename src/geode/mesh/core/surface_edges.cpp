@@ -49,7 +49,7 @@ namespace
     {
         geode_unused( edges );
         geode_unused( edge_id );
-        OPENGEODE_ASSERT( edge_id < edges.nb_edges(),
+        geode::OpenGeodeMeshException::assertion( edge_id < edges.nb_edges(),
             "[check_edge_id] Trying to access an invalid edge" );
     }
 } // namespace

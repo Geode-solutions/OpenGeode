@@ -52,7 +52,8 @@ namespace geode
 
     void VertexSetBuilder::copy( const VertexSet& vertex_set )
     {
-        OPENGEODE_EXCEPTION( vertex_set_.nb_vertices() == 0,
+        OpenGeodeMeshException::check( vertex_set_.nb_vertices() == 0, nullptr,
+            OpenGeodeException::TYPE::data,
             "[VertexSetBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         if( const auto name = vertex_set.name() )

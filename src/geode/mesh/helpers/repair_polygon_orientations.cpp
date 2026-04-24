@@ -69,10 +69,10 @@ namespace
             }
             catch( geode::OpenGeodeException& e )
             {
-                const auto msg = absl::StrCat( "Surface ",
+                throw geode::OpenGeodeMeshException( nullptr,
+                    geode::OpenGeodeException::TYPE::internal, "Surface ",
                     mesh_.name().value_or( mesh_.id().string() ), ": ",
                     e.what() );
-                throw geode::OpenGeodeException( msg );
             }
             catch( ... )
             {
@@ -112,7 +112,9 @@ namespace
                                       == reorient_polygon_[adj->polygon_id]
                                 : cur_polygon_reorient
                                       != reorient_polygon_[adj->polygon_id];
-                        OPENGEODE_DATA_EXCEPTION( is_valid,
+                        geode::OpenGeodeMeshException::check( is_valid,
+                            mesh_.polygon_barycenter( cur_polygon ),
+                            geode::OpenGeodeException::TYPE::data,
                             "[RepairPolygonOrientations] Mobius "
                             "strip detected, polygons orientations "
                             "can not be repaired" );
@@ -184,7 +186,9 @@ namespace
                 area_sign_info.queue.emplace( polygon_id );
             }
         }
-        OPENGEODE_EXCEPTION( area_sign_info.queue.size() != mesh.nb_polygons(),
+        geode::OpenGeodeMeshException::check(
+            area_sign_info.queue.size() != mesh.nb_polygons(), mesh.point( 0 ),
+            geode::OpenGeodeException::TYPE::data,
             "[repair_polygon_bad_orientations] Cannot repair orientations of a "
             "SurfaceMesh2D where all polygons have a null area." );
         return area_sign_info;

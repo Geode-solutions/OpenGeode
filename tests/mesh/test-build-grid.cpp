@@ -44,8 +44,8 @@ void test()
     DEBUG( grid.nb_cells_in_direction( 1 ) );
     DEBUG( grid.cell_length_in_direction( 0 ) );
     DEBUG( grid.cell_length_in_direction( 1 ) );
-    OPENGEODE_EXCEPTION( grid.nb_cells() <= max_nb_cells,
-        "[Test] Too much cells in built grid" );
+    geode::OpenGeodeMeshException::test(
+        grid.nb_cells() <= max_nb_cells, "Too much cells in built grid" );
 
     bbox.add_point( geode::Point2D{ { 1, 10 } } );
     const auto grid2 =
@@ -56,8 +56,8 @@ void test()
     DEBUG( grid2.nb_cells_in_direction( 1 ) );
     DEBUG( grid2.cell_length_in_direction( 0 ) );
     DEBUG( grid2.cell_length_in_direction( 1 ) );
-    OPENGEODE_EXCEPTION( grid.nb_cells() <= max_nb_cells,
-        "[Test] Too much cells in built grid2" );
+    geode::OpenGeodeMeshException::test(
+        grid.nb_cells() <= max_nb_cells, "Too much cells in built grid2" );
 
     bbox.add_point( geode::Point2D{ { 3, 10 } } );
     const auto grid3 =
@@ -68,8 +68,8 @@ void test()
     DEBUG( grid3.nb_cells_in_direction( 1 ) );
     DEBUG( grid3.cell_length_in_direction( 0 ) );
     DEBUG( grid3.cell_length_in_direction( 1 ) );
-    OPENGEODE_EXCEPTION( grid.nb_cells() <= max_nb_cells,
-        "[Test] Too much cells in built grid3" );
+    geode::OpenGeodeMeshException::test(
+        grid.nb_cells() <= max_nb_cells, "Too much cells in built grid3" );
 }
 
 OPENGEODE_TEST( "graph" )

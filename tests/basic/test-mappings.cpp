@@ -32,87 +32,87 @@ void test_bijective_mappings()
     bijective.map( 0, 42.1 );
     bijective.clear();
     bijective.map( 0, 42.1 );
-    OPENGEODE_EXCEPTION( bijective.has_mapping_input( 0 ),
-        "[Test] 0 should be a key for bijective inputs" );
-    OPENGEODE_EXCEPTION( bijective.has_mapping_output( 42.1 ),
-        "[Test] 42.1 should be a key for bijective outputs" );
+    geode::OpenGeodeBasicException::test( bijective.has_mapping_input( 0 ),
+        "0 should be a key for bijective inputs" );
+    geode::OpenGeodeBasicException::test( bijective.has_mapping_output( 42.1 ),
+        "42.1 should be a key for bijective outputs" );
     bijective.map( 1, -22 );
-    OPENGEODE_EXCEPTION( bijective.has_mapping_input( 1 ),
-        "[Test] 1 should be a key for bijective inputs" );
-    OPENGEODE_EXCEPTION( bijective.has_mapping_output( -22 ),
-        "[Test] -22 should be a key for bijective outputs" );
-    OPENGEODE_EXCEPTION(
-        bijective.size() == 2, "[Test] Size of bijective should be 2" );
+    geode::OpenGeodeBasicException::test( bijective.has_mapping_input( 1 ),
+        "1 should be a key for bijective inputs" );
+    geode::OpenGeodeBasicException::test( bijective.has_mapping_output( -22 ),
+        "-22 should be a key for bijective outputs" );
+    geode::OpenGeodeBasicException::test(
+        bijective.size() == 2, "Size of bijective should be 2" );
     bijective.map( 3, -22 );
-    OPENGEODE_EXCEPTION(
-        bijective.size() == 2, "[Test] Size of bijective should still be 2" );
-    OPENGEODE_EXCEPTION( bijective.has_mapping_input( 3 ),
-        "[Test] 3 should be a key for bijective inputs" );
-    OPENGEODE_EXCEPTION( !bijective.has_mapping_input( 1 ),
-        "[Test] 1 should not be a key for bijective inputs anymore" );
+    geode::OpenGeodeBasicException::test(
+        bijective.size() == 2, "Size of bijective should still be 2" );
+    geode::OpenGeodeBasicException::test( bijective.has_mapping_input( 3 ),
+        "3 should be a key for bijective inputs" );
+    geode::OpenGeodeBasicException::test( !bijective.has_mapping_input( 1 ),
+        "1 should not be a key for bijective inputs anymore" );
     bijective.erase_out( 42.1 );
-    OPENGEODE_EXCEPTION( !bijective.has_mapping_output( 42.1 ),
-        "[Test] 42.1 should not be a key for bijective outputs anymore" );
-    OPENGEODE_EXCEPTION( !bijective.has_mapping_input( 0 ),
-        "[Test] 0 should not be a key for bijective inputs anymore" );
-    OPENGEODE_EXCEPTION(
-        bijective.size() == 1, "[Test] Size of bijective should be 1" );
+    geode::OpenGeodeBasicException::test( !bijective.has_mapping_output( 42.1 ),
+        "42.1 should not be a key for bijective outputs anymore" );
+    geode::OpenGeodeBasicException::test( !bijective.has_mapping_input( 0 ),
+        "0 should not be a key for bijective inputs anymore" );
+    geode::OpenGeodeBasicException::test(
+        bijective.size() == 1, "Size of bijective should be 1" );
     bijective.map( 3, 11.1 );
-    OPENGEODE_EXCEPTION(
-        bijective.size() == 1, "[Test] Size of bijective should still be 1" );
-    OPENGEODE_EXCEPTION( bijective.has_mapping_output( 11.1 ),
-        "[Test] 11.1 should be a key for bijective outputs" );
-    OPENGEODE_EXCEPTION( !bijective.has_mapping_output( -22 ),
-        "[Test] -22 should not be a key for bijective outputs anymore" );
+    geode::OpenGeodeBasicException::test(
+        bijective.size() == 1, "Size of bijective should still be 1" );
+    geode::OpenGeodeBasicException::test( bijective.has_mapping_output( 11.1 ),
+        "11.1 should be a key for bijective outputs" );
+    geode::OpenGeodeBasicException::test( !bijective.has_mapping_output( -22 ),
+        "-22 should not be a key for bijective outputs anymore" );
 }
 
 void test_generic_mappings()
 {
     geode::GenericMapping< geode::index_t, double > generic;
     generic.map( 0, 42.1 );
-    OPENGEODE_EXCEPTION( generic.has_mapping_input( 0 ),
-        "[Test] 0 should be a key for generic inputs" );
-    OPENGEODE_EXCEPTION( generic.has_mapping_output( 42.1 ),
-        "[Test] 42.1 should be a key for generic outputs" );
+    geode::OpenGeodeBasicException::test( generic.has_mapping_input( 0 ),
+        "0 should be a key for generic inputs" );
+    geode::OpenGeodeBasicException::test( generic.has_mapping_output( 42.1 ),
+        "42.1 should be a key for generic outputs" );
     generic.map( 1, -22 );
-    OPENGEODE_EXCEPTION( generic.has_mapping_input( 1 ),
-        "[Test] 1 should be a key for generic inputs" );
-    OPENGEODE_EXCEPTION( generic.has_mapping_output( -22 ),
-        "[Test] -22 should be a key for generic outputs" );
-    OPENGEODE_EXCEPTION(
-        generic.size_in() == 2, "[Test] Size in of generic should be 2" );
-    OPENGEODE_EXCEPTION(
-        generic.size_out() == 2, "[Test] Size out of generic should be 2" );
+    geode::OpenGeodeBasicException::test( generic.has_mapping_input( 1 ),
+        "1 should be a key for generic inputs" );
+    geode::OpenGeodeBasicException::test( generic.has_mapping_output( -22 ),
+        "-22 should be a key for generic outputs" );
+    geode::OpenGeodeBasicException::test(
+        generic.size_in() == 2, "Size in of generic should be 2" );
+    geode::OpenGeodeBasicException::test(
+        generic.size_out() == 2, "Size out of generic should be 2" );
     generic.map( 7, 42.1 );
-    OPENGEODE_EXCEPTION(
-        generic.size_in() == 3, "[Test] Size in of generic should be 3" );
-    OPENGEODE_EXCEPTION( generic.size_out() == 2,
-        "[Test] Size out of generic should still be 2" );
-    OPENGEODE_EXCEPTION( generic.has_mapping_input( 7 ),
-        "[Test] 7 should be a key for generic inputs" );
-    OPENGEODE_EXCEPTION( generic.has_mapping_input( 1 ),
-        "[Test] 1 should still be a key for generic inputs anymore" );
+    geode::OpenGeodeBasicException::test(
+        generic.size_in() == 3, "Size in of generic should be 3" );
+    geode::OpenGeodeBasicException::test(
+        generic.size_out() == 2, "Size out of generic should still be 2" );
+    geode::OpenGeodeBasicException::test( generic.has_mapping_input( 7 ),
+        "7 should be a key for generic inputs" );
+    geode::OpenGeodeBasicException::test( generic.has_mapping_input( 1 ),
+        "1 should still be a key for generic inputs anymore" );
     generic.erase_out( 42.1 );
-    OPENGEODE_EXCEPTION( !generic.has_mapping_output( 42.1 ),
-        "[Test] 42.1 should not be a key for generic outputs anymore" );
-    OPENGEODE_EXCEPTION( !generic.has_mapping_input( 0 ),
-        "[Test] 0 should not be a key for generic inputs anymore" );
-    OPENGEODE_EXCEPTION( !generic.has_mapping_input( 7 ),
-        "[Test] 7 should not be a key for generic inputs anymore" );
-    OPENGEODE_EXCEPTION(
-        generic.size_in() == 1, "[Test] Size in of generic should be 1" );
-    OPENGEODE_EXCEPTION(
-        generic.size_out() == 1, "[Test] Size out of generic should be 1" );
+    geode::OpenGeodeBasicException::test( !generic.has_mapping_output( 42.1 ),
+        "42.1 should not be a key for generic outputs anymore" );
+    geode::OpenGeodeBasicException::test( !generic.has_mapping_input( 0 ),
+        "0 should not be a key for generic inputs anymore" );
+    geode::OpenGeodeBasicException::test( !generic.has_mapping_input( 7 ),
+        "7 should not be a key for generic inputs anymore" );
+    geode::OpenGeodeBasicException::test(
+        generic.size_in() == 1, "Size in of generic should be 1" );
+    geode::OpenGeodeBasicException::test(
+        generic.size_out() == 1, "Size out of generic should be 1" );
     generic.map( 0, -8.0 );
     generic.map( 0, -8.0 );
     generic.map( 0, -8.0 );
     generic.map( 0, -8.0 );
     generic.map( 5, -8.0 );
-    OPENGEODE_EXCEPTION( generic.out2in( -8.0 ).size() == 2,
-        "[Test] Size of out2in for -8.0 should be 2" );
+    geode::OpenGeodeBasicException::test( generic.out2in( -8.0 ).size() == 2,
+        "Size of out2in for -8.0 should be 2" );
     generic.erase_in( 0 );
-    OPENGEODE_EXCEPTION( generic.out2in( -8.0 ).size() == 1,
-        "[Test] Size of out2in for -8.0 should be 1" );
+    geode::OpenGeodeBasicException::test( generic.out2in( -8.0 ).size() == 1,
+        "Size of out2in for -8.0 should be 1" );
 }
 
 void test()

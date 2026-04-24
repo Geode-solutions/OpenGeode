@@ -30,6 +30,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/vector.hpp>
 
@@ -181,9 +182,9 @@ namespace geode
 
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
     {
-        OPENGEODE_ASSERT( edge_vertex.edge_id < nb_edges(),
+        OpenGeodeMeshException::assertion( edge_vertex.edge_id < nb_edges(),
             "[Graph::edge_vertex] Trying to access an invalid edge" );
-        OPENGEODE_ASSERT( edge_vertex.vertex_id < 2,
+        OpenGeodeMeshException::assertion( edge_vertex.vertex_id < 2,
             "[Graph::edge_vertex] Trying to access "
             "an invalid edge local vertex" );
         return get_edge_vertex( edge_vertex );
@@ -202,7 +203,7 @@ namespace geode
     const EdgesAroundVertex& Graph::edges_around_vertex(
         index_t vertex_id ) const
     {
-        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
+        OpenGeodeMeshException::assertion( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->edges_around_vertex( vertex_id );
@@ -245,7 +246,7 @@ namespace geode
     void Graph::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges, GraphKey )
     {
-        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
+        OpenGeodeMeshException::assertion( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->set_edges_around_vertex( vertex_id, std::move( edges ) );

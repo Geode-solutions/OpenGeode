@@ -30,28 +30,27 @@
 #include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
 
-namespace
+namespace geode
 {
-    std::string exception_type( const geode::OpenGeodeException& exception )
+    OpenGeodeException::~OpenGeodeException() noexcept = default;
+
+    std::string_view OpenGeodeException::type_name() const
     {
-        if( exception.type() == geode::OpenGeodeException::TYPE::data )
+        if( type_ == geode::OpenGeodeException::TYPE::data )
         {
-            return "data";
+            return "Data";
         }
-        if( exception.type() == geode::OpenGeodeException::TYPE::internal )
+        if( type_ == geode::OpenGeodeException::TYPE::internal )
         {
-            return "internal";
+            return "Internal";
         }
-        if( exception.type() == geode::OpenGeodeException::TYPE::result )
+        if( type_ == geode::OpenGeodeException::TYPE::result )
         {
-            return "result";
+            return "Result";
         }
         return "unknown";
     }
-} // namespace
 
-namespace geode
-{
     std::string OpenGeodeException::stack_trace() const
     {
         std::string stack_string;
@@ -81,9 +80,9 @@ namespace geode
         catch( const OpenGeodeException& exception )
         {
             Logger::critical( "OpenGeodeException of type ",
-                exception_type( exception ), " from project ",
-                exception.project(), " and library ", exception.library(), ": ",
-                exception.what(), "\n", exception.stack_trace() );
+                exception.type_name(), " from project ", exception.project(),
+                " and library ", exception.library(), ": ", exception.what(),
+                "\n", exception.stack_trace() );
         }
         catch( const std::exception& exception )
         {

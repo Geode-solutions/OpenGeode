@@ -52,7 +52,7 @@ namespace geode
                 index_t vertex_id{ 0 };
                 for( const auto d : LRange{ dimension } )
                 {
-                    OPENGEODE_ASSERT(
+                    OpenGeodeMeshException::assertion(
                         index[d] < grid.nb_vertices_in_direction( d ),
                         "[RegularGrid::vertex_index] Invalid index" );
 
@@ -69,7 +69,8 @@ namespace geode
             [[nodiscard]] VertexIndices vertex_indices(
                 const Grid< dimension >& grid, index_t index ) const
             {
-                OPENGEODE_ASSERT( index < grid.nb_grid_vertices(),
+                OpenGeodeMeshException::assertion(
+                    index < grid.nb_grid_vertices(),
                     "[RegularGrid::vertex_index] Invalid index" );
                 VertexIndices vertex_id;
                 for( const auto d : LRange{ dimension } )

@@ -55,10 +55,10 @@ void check_nnsearch( const geode::NNSearch3D& nnsearch )
 {
     const auto mappings =
         nnsearch.colocated_index_mapping( geode::GLOBAL_EPSILON );
-    OPENGEODE_EXCEPTION( nnsearch.nb_points() == 54,
-        "[Test] Wrong computation of NNSearch points" );
-    OPENGEODE_EXCEPTION( mappings.nb_unique_points() == 27,
-        "[Test] Wrong computation of NNSearch unique points" );
+    geode::OpenGeodeMeshException::test(
+        nnsearch.nb_points() == 54, "Wrong computation of NNSearch points" );
+    geode::OpenGeodeMeshException::test( mappings.nb_unique_points() == 27,
+        "Wrong computation of NNSearch unique points" );
     geode::index_t counter{ 0 };
     for( const auto i : geode::LRange{ 3 } )
     {
@@ -68,11 +68,11 @@ void check_nnsearch( const geode::NNSearch3D& nnsearch )
             {
                 const geode::Point3D query{ { static_cast< double >( i ),
                     static_cast< double >( j ), static_cast< double >( k ) } };
-                OPENGEODE_EXCEPTION(
+                geode::OpenGeodeMeshException::test(
                     mappings.colocated_mapping[nnsearch.closest_neighbor(
                         query )]
                         == counter,
-                    "[Test] Wrong computation of NNSearch" );
+                    "Wrong computation of NNSearch" );
                 counter++;
             };
         }
@@ -84,8 +84,8 @@ void test_nn_search3d()
     auto pointset = geode::PointSet3D::create();
     auto pointset_builder = geode::PointSetBuilder3D::create( *pointset );
     add_points( *pointset_builder );
-    OPENGEODE_EXCEPTION( pointset->nb_vertices() == 54,
-        "[Test] Wrong computation of PointSet3D points" );
+    geode::OpenGeodeMeshException::test( pointset->nb_vertices() == 54,
+        "Wrong computation of PointSet3D points" );
 
     check_nnsearch( geode::create_nn_search( *pointset ) );
 }

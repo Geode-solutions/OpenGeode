@@ -118,8 +118,9 @@ namespace geode
 
     void RegularGridBuilder< 2 >::copy( const RegularGrid2D& grid )
     {
-        OPENGEODE_EXCEPTION(
-            grid_.nb_vertices() == 0 && grid_.nb_polygons() == 0,
+        OpenGeodeMeshException::check(
+            grid_.nb_vertices() == 0 && grid_.nb_polygons() == 0, nullptr,
+            OpenGeodeException::TYPE::data,
             "[RegularGridBuilder::copy] Cannot copy a mesh into an "
             "already initialized mesh." );
         SurfaceMeshBuilder2D::copy( grid );

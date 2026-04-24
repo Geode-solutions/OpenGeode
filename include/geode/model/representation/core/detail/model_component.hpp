@@ -52,10 +52,10 @@ namespace geode
                 return get_model_component< Model, Components... >(
                     model, component_id );
             }
-            throw OpenGeodeException{
+            throw OpenGeodeModelException{ component_id,
+                OpenGeodeException::TYPE::data,
                 "[ModelComponentGetter::get] Model has no component with id ",
-                component_id.string()
-            };
+                component_id.string() };
         }
 
         template < typename >

@@ -71,10 +71,9 @@ void check_vertices_order( const geode::SurfaceMesh2D& surface,
     for( const auto v :
         geode::LRange{ surface.nb_polygon_vertices( polygon_id ) } )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             surface.polygon_vertex( { polygon_id, v } ) == vertices_id[v],
-            "[Test] Wrong vertex for PolygonVertex ( ", polygon_id, ", ", v,
-            " )" );
+            "Wrong vertex for PolygonVertex ( ", polygon_id, ", ", v, " )" );
     }
 }
 
@@ -87,16 +86,17 @@ void check_adjacents( const geode::SurfaceMesh2D& surface,
     {
         if( adjacents_id[e] == geode::NO_ID )
         {
-            OPENGEODE_EXCEPTION( surface.is_edge_on_border( { polygon_id, e } ),
-                "[Test] Wrong edge on border for PolygonEdge ( ", polygon_id,
-                ", ", e, " )" );
+            geode::OpenGeodeMeshException::test(
+                surface.is_edge_on_border( { polygon_id, e } ),
+                "Wrong edge on border for PolygonEdge ( ", polygon_id, ", ", e,
+                " )" );
         }
         else
         {
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeMeshException::test(
                 surface.polygon_adjacent( { polygon_id, e } ).value()
                     == adjacents_id[e],
-                "[Test] Wrong adjacent for PolygonEdge ( ", polygon_id, ", ", e,
+                "Wrong adjacent for PolygonEdge ( ", polygon_id, ", ", e,
                 " )" );
         }
     }
@@ -148,12 +148,13 @@ void compare_edges(
     absl::Span< const std::array< geode::index_t, 2 > > edges_before,
     absl::Span< const std::array< geode::index_t, 2 > > edges_after )
 {
-    OPENGEODE_EXCEPTION( edges_before.size() == edges_after.size(),
-        "[Test] Number of edges has been modified" );
+    geode::OpenGeodeMeshException::test(
+        edges_before.size() == edges_after.size(),
+        "Number of edges has been modified" );
     for( const auto e : geode::Range{ edges_before.size() } )
     {
-        OPENGEODE_EXCEPTION( edges_before[e] == edges_after[e], "[Test] Edge ",
-            e, " has been modified" );
+        geode::OpenGeodeMeshException::test( edges_before[e] == edges_after[e],
+            "Edge ", e, " has been modified" );
     }
 }
 

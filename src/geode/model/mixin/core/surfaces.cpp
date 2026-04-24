@@ -122,9 +122,10 @@ namespace geode
                 }
                 else
                 {
-                    throw OpenGeodeException( "[Surfaces::save_surfaces] "
-                                              "Cannot find the explicit "
-                                              "SurfaceMesh type" );
+                    throw OpenGeodeModelException{ nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[Surfaces::save_surfaces] Cannot find the explicit "
+                        "SurfaceMesh type" };
                 }
             } );
         }

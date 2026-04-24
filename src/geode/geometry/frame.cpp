@@ -124,7 +124,8 @@ namespace geode
     Frame< dimension > Frame< dimension >::inverse() const
     {
         auto result = compute_inverse( *this );
-        OPENGEODE_EXCEPTION( result.has_value(),
+        OpenGeodeGeometryException::check( result.has_value(), nullptr,
+            OpenGeodeException::TYPE::internal,
             "[Frame<dimension>::inverse] Failed to inverse" );
         return result.value();
     }

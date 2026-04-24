@@ -55,7 +55,7 @@ void test()
     geode::MeshType type{ "type" };
     geode::MeshFactory::register_mesh< MeshTest >( type, impl );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         geode::MeshFactory::type( impl ) == type, "Wrong type" );
 
     const auto mesh = geode::MeshFactory::create_mesh< MeshTest >( impl );

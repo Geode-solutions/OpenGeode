@@ -139,7 +139,7 @@ namespace geode
         static float converted_item_value(
             const Point< dimension > &point, local_index_t item )
         {
-            OPENGEODE_ASSERT( item < nb_items(),
+            OpenGeodeGeometryException::assertion( item < nb_items(),
                 "[GenericAttributeConversion] Accessing "
                 "incorrect item value" );
             return static_cast< float >( point.value( item ) );

@@ -109,6 +109,16 @@ namespace geode
                 exit( 1 );                                                     \
             }                                                                  \
         }                                                                      \
+                                                                               \
+        template < typename... Args >                                          \
+        static void test( bool condition, const Args&... message )             \
+        {                                                                      \
+            if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
+            {                                                                  \
+                geode::Logger::critical( "Test failed: ", message... );        \
+                exit( 1 );                                                     \
+            }                                                                  \
+        }                                                                      \
     }
 
 /*!

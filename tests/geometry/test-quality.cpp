@@ -48,14 +48,18 @@ void test_perfect_tetrahedron()
     const auto quality2 = geode::tetrahedron_volume_to_edge_ratio( tetra );
     const auto quality3 = geode::tetrahedron_collapse_aspect_ratio( tetra );
     const auto quality4 = geode::tetrahedron_volume_to_facet_ratio( tetra );
-    OPENGEODE_EXCEPTION( std::fabs( quality - 1 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio for perfect tetrahedron ", quality );
-    OPENGEODE_EXCEPTION( std::fabs( quality2 - 1 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 2 for perfect tetrahedron ", quality2 );
-    OPENGEODE_EXCEPTION( std::fabs( quality3 - 1 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 3 for perfect tetrahedron ", quality3 );
-    OPENGEODE_EXCEPTION( std::fabs( quality4 - 1 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 4 for perfect tetrahedron ", quality4 );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality - 1 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio for perfect tetrahedron ", quality );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality2 - 1 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio 2 for perfect tetrahedron ", quality2 );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality3 - 1 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio 3 for perfect tetrahedron ", quality3 );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality4 - 1 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio 4 for perfect tetrahedron ", quality4 );
 }
 
 void test_regular_tetrahedron()
@@ -69,16 +73,18 @@ void test_regular_tetrahedron()
     const auto quality2 = geode::tetrahedron_volume_to_edge_ratio( tetra );
     const auto quality3 = geode::tetrahedron_collapse_aspect_ratio( tetra );
     const auto quality4 = geode::tetrahedron_volume_to_facet_ratio( tetra );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         std::fabs( quality - 1.366026 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio for regular tetrahedron ", quality );
-    OPENGEODE_EXCEPTION( std::fabs( quality2 - 0.7698 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 2 for regular tetrahedron ", quality2 );
-    OPENGEODE_EXCEPTION( std::fabs( quality3 - 2 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 3 for regular tetrahedron ", quality3 );
-    OPENGEODE_EXCEPTION(
+        "Wrong aspect ratio for regular tetrahedron ", quality );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality2 - 0.7698 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio 2 for regular tetrahedron ", quality2 );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality3 - 2 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio 3 for regular tetrahedron ", quality3 );
+    geode::OpenGeodeGeometryException::test(
         std::fabs( quality4 - 0.732051 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 4 for regular tetrahedron ", quality4 );
+        "Wrong aspect ratio 4 for regular tetrahedron ", quality4 );
 }
 
 void test_sliver_tetrahedron()
@@ -92,14 +98,17 @@ void test_sliver_tetrahedron()
     const auto quality2 = geode::tetrahedron_volume_to_edge_ratio( tetra );
     const auto quality3 = geode::tetrahedron_collapse_aspect_ratio( tetra );
     const auto quality4 = geode::tetrahedron_volume_to_facet_ratio( tetra );
-    OPENGEODE_EXCEPTION( quality == std::numeric_limits< double >::max(),
-        "[Test] Wrong aspect ratio for sliver tetrahedron ", quality );
-    OPENGEODE_EXCEPTION( std::fabs( quality2 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 2 for sliver tetrahedron ", quality2 );
-    OPENGEODE_EXCEPTION( quality3 == std::numeric_limits< double >::max(),
-        "[Test] Wrong aspect ratio 3 for sliver tetrahedron ", quality3 );
-    OPENGEODE_EXCEPTION( quality4 == 0,
-        "[Test] Wrong aspect ratio 4 for sliver tetrahedron ", quality4 );
+    geode::OpenGeodeGeometryException::test(
+        quality == std::numeric_limits< double >::max(),
+        "Wrong aspect ratio for sliver tetrahedron ", quality );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality2 ) < geode::GLOBAL_EPSILON,
+        "Wrong aspect ratio 2 for sliver tetrahedron ", quality2 );
+    geode::OpenGeodeGeometryException::test(
+        quality3 == std::numeric_limits< double >::max(),
+        "Wrong aspect ratio 3 for sliver tetrahedron ", quality3 );
+    geode::OpenGeodeGeometryException::test( quality4 == 0,
+        "Wrong aspect ratio 4 for sliver tetrahedron ", quality4 );
 }
 
 void test_other_tetrahedron()
@@ -114,18 +123,18 @@ void test_other_tetrahedron()
     const auto quality3 = geode::tetrahedron_collapse_aspect_ratio( tetra );
     const auto quality4 = geode::tetrahedron_volume_to_facet_ratio( tetra );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         std::fabs( quality - 2.884068 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio for random tetrahedron ", quality );
-    OPENGEODE_EXCEPTION(
+        "Wrong aspect ratio for random tetrahedron ", quality );
+    geode::OpenGeodeGeometryException::test(
         std::fabs( quality2 - 0.341354 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 2 for random tetrahedron ", quality2 );
-    OPENGEODE_EXCEPTION(
+        "Wrong aspect ratio 2 for random tetrahedron ", quality2 );
+    geode::OpenGeodeGeometryException::test(
         std::fabs( quality3 - 4.618802 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 3 for random tetrahedron ", quality3 );
-    OPENGEODE_EXCEPTION(
+        "Wrong aspect ratio 3 for random tetrahedron ", quality3 );
+    geode::OpenGeodeGeometryException::test(
         std::fabs( quality4 - 0.346732 ) < geode::GLOBAL_EPSILON,
-        "[Test] Wrong aspect ratio 4 for random tetrahedron ", quality4 );
+        "Wrong aspect ratio 4 for random tetrahedron ", quality4 );
 }
 
 void test()

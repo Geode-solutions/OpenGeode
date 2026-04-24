@@ -84,10 +84,10 @@ void test()
     geode::detail::EdgedCurveMerger2D merger{ { *curves[0], *curves[1],
         *curves[2] } };
     const auto merged = merger.merge( geode::GLOBAL_EPSILON );
-    OPENGEODE_EXCEPTION(
-        merged->nb_vertices() == 8, "[Test] Wrong number of vertices" );
-    OPENGEODE_EXCEPTION(
-        merged->nb_edges() == 7, "[Test] Wrong number of edges" );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_vertices() == 8, "Wrong number of vertices" );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_edges() == 7, "Wrong number of edges" );
 }
 
 OPENGEODE_TEST( "merge-curve" )

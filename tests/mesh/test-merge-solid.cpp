@@ -89,10 +89,10 @@ void test()
     };
     geode::detail::SolidMeshMerger3D merger{ meshes };
     const auto merged = merger.merge( geode::GLOBAL_EPSILON );
-    OPENGEODE_EXCEPTION(
-        merged->nb_vertices() == 10, "[Test] Wrong number of vertices" );
-    OPENGEODE_EXCEPTION(
-        merged->nb_polyhedra() == 4, "[Test] Wrong number of polyhedra" );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_vertices() == 10, "Wrong number of vertices" );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_polyhedra() == 4, "Wrong number of polyhedra" );
 }
 
 OPENGEODE_TEST( "merge-solid" )

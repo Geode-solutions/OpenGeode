@@ -44,17 +44,17 @@ namespace geode
         }
 
         template < typename Fnc >
-        void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
+        void serialize(
+            Archive &ser, const T &obj, [[maybe_unused]] Fnc &&fnc ) const
         {
-            geode_unused( fnc );
             ser.ext4b( version_, bitsery::ext::CompactValue{} );
             serializers_.back()( ser, const_cast< T & >( obj ) );
         }
 
         template < typename Fnc >
-        void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
+        void deserialize(
+            Archive &des, T &obj, [[maybe_unused]] Fnc &&fnc ) const
         {
-            geode_unused( fnc );
             index_t current_version;
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
             serializers_.at( current_version - 1 )( des, obj );

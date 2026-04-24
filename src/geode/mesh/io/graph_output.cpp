@@ -51,7 +51,9 @@ namespace geode
             print_available_extensions< GraphOutputFactory >( TYPE );
             Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
-            throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save Graph in file: ", filename };
         }
     }
 

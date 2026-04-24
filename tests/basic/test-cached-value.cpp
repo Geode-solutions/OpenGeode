@@ -51,23 +51,23 @@ Value compute_value( double d, int i )
 void test()
 {
     geode::CachedValue< Value > cache;
-    OPENGEODE_EXCEPTION(
-        nb_computed == 0, "[Test] Wrong number of computations" );
-    OPENGEODE_EXCEPTION(
-        cache( compute_value, 12., 15 ).test() == 27, "[Test] Wrong result" );
-    OPENGEODE_EXCEPTION(
-        nb_computed == 1, "[Test] Wrong number of computations" );
-    OPENGEODE_EXCEPTION(
-        cache( compute_value, 12., 15 ).test() == 27, "[Test] Wrong result" );
-    OPENGEODE_EXCEPTION(
-        cache( compute_value, 1., 5 ).test() == 27, "[Test] Wrong result" );
-    OPENGEODE_EXCEPTION(
-        nb_computed == 1, "[Test] Wrong number of computations" );
+    geode::OpenGeodeBasicException::test(
+        nb_computed == 0, "Wrong number of computations" );
+    geode::OpenGeodeBasicException::test(
+        cache( compute_value, 12., 15 ).test() == 27, "Wrong result" );
+    geode::OpenGeodeBasicException::test(
+        nb_computed == 1, "Wrong number of computations" );
+    geode::OpenGeodeBasicException::test(
+        cache( compute_value, 12., 15 ).test() == 27, "Wrong result" );
+    geode::OpenGeodeBasicException::test(
+        cache( compute_value, 1., 5 ).test() == 27, "Wrong result" );
+    geode::OpenGeodeBasicException::test(
+        nb_computed == 1, "Wrong number of computations" );
     cache.reset();
-    OPENGEODE_EXCEPTION(
-        cache( compute_value, 2., 5 ).test() == 7, "[Test] Wrong result" );
-    OPENGEODE_EXCEPTION(
-        nb_computed == 2, "[Test] Wrong number of computations" );
+    geode::OpenGeodeBasicException::test(
+        cache( compute_value, 2., 5 ).test() == 7, "Wrong result" );
+    geode::OpenGeodeBasicException::test(
+        nb_computed == 2, "Wrong number of computations" );
 }
 
 OPENGEODE_TEST( "cached-value" )

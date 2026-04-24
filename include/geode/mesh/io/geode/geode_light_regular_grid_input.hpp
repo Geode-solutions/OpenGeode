@@ -56,7 +56,8 @@ namespace geode
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
-            OPENGEODE_EXCEPTION( file,
+            OpenGeodeMeshException::check( !file.fail(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[LightRegularGridInput] Failed to open file: ",
                 to_string( this->filename() ) );
             TContext context{};
@@ -72,10 +73,11 @@ namespace geode
                 cells_length };
             archive.object( grid );
             const auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
             return grid;

@@ -43,13 +43,12 @@ namespace geode
         using Builder = HybridSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
 
-        enum class Type : unsigned char
+        enum class TYPE
         {
-            UNKNOWN,
-            TETRAHEDRON,
-            HEXAHEDRON,
-            PRISM,
-            PYRAMID
+            tetrahedron,
+            hexahedron,
+            prism,
+            pyramid
         };
 
         /*!
@@ -69,7 +68,7 @@ namespace geode
 
         [[nodiscard]] std::unique_ptr< HybridSolid< dimension > > clone() const;
 
-        [[nodiscard]] virtual Type polyhedron_type(
+        [[nodiscard]] virtual TYPE polyhedron_type(
             index_t polyhedron_id ) const = 0;
 
     protected:

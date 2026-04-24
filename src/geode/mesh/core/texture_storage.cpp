@@ -60,7 +60,8 @@ namespace geode
 
         const Texture< dimension >& find_texture( std::string_view name ) const
         {
-            OPENGEODE_EXCEPTION( texture_exists( name ),
+            OpenGeodeMeshException::check( texture_exists( name ), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[TextureStorage::find_texture] Texture ", name,
                 " does not exists" );
             return textures_.at( name );

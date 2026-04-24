@@ -112,14 +112,13 @@ namespace geode
                 index_t solid,
                 index_t polyhedron ) const
             {
-                geode_unused( merger );
-                OPENGEODE_ASSERT( solid < merger.meshes().size(),
+                OpenGeodeMeshException::assertion(
+                    solid < merger.meshes().size(),
                     "[SolidMerger::polyhedron_in_merged] Wrong solid index" );
-                OPENGEODE_ASSERT(
+                OpenGeodeMeshException::assertion(
                     polyhedron < merger.meshes()[solid].get().nb_polyhedra(),
                     "[SolidMerger::polyhedron_in_merged] Wrong solid "
-                    "polyhedron "
-                    "index" );
+                    "polyhedron index" );
                 return new_id_[solid][polyhedron];
             }
 
@@ -181,13 +180,14 @@ namespace geode
                             const auto polyhedron_id =
                                 merger.builder().create_polyhedron(
                                     vertices, facets );
-                            OPENGEODE_ASSERT( polyhedron_id == solid_id_.size(),
+                            OpenGeodeMeshException::assertion(
+                                polyhedron_id == solid_id_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (solid_id_)" );
                             solid_id_.emplace_back();
                             solid_id_.back().insert( s );
                             new_id_[s][p] = polyhedron_id;
-                            OPENGEODE_ASSERT(
+                            OpenGeodeMeshException::assertion(
                                 polyhedron_id == polyhedra_origins_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (polyhedra_origins_)" );
@@ -197,12 +197,13 @@ namespace geode
                         else
                         {
                             const auto polyhedron_id = it.first->second;
-                            OPENGEODE_ASSERT( polyhedron_id < solid_id_.size(),
+                            OpenGeodeMeshException::assertion(
+                                polyhedron_id < solid_id_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (solid_id_)" );
                             solid_id_[polyhedron_id].insert( s );
                             new_id_[s][p] = polyhedron_id;
-                            OPENGEODE_ASSERT(
+                            OpenGeodeMeshException::assertion(
                                 polyhedron_id < polyhedra_origins_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (polyhedra_origins_)" );
@@ -293,8 +294,9 @@ namespace geode
                         return facet;
                     }
                 }
-                OPENGEODE_ASSERT_NOT_REACHED(
-                    "[SolidMerger::find_facet_origin] Facet not found" );
+                throw OpenGeodeMeshException{ nullptr,
+                    OpenGeodeException::TYPE::internal,
+                    "[SolidMerger::find_facet_origin] Facet not found" };
                 return hint_facet;
             }
 

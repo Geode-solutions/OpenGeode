@@ -52,7 +52,8 @@ namespace geode
             Serializer archive{ context, file };
             archive.object( mesh );
             archive.adapter().flush();
-            OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+            OpenGeodeImageException::check( std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Bitsery::write] Error while writing file: ",
                 this->filename() );
             return { to_string( this->filename() ) };

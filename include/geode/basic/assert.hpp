@@ -25,6 +25,7 @@
 
 #include <any>
 #include <array>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -63,12 +64,16 @@ namespace geode
             result
         };
 
-        ~OpenGeodeException() noexcept override = default;
+        OpenGeodeException( OpenGeodeException&& ) = default;
+
+        ~OpenGeodeException() noexcept override;
 
         [[nodiscard]] TYPE type() const
         {
             return type_;
         }
+
+        [[nodiscard]] std::string_view type_name() const;
 
         [[nodiscard]] std::string_view project() const
         {
@@ -86,6 +91,22 @@ namespace geode
         }
 
         [[nodiscard]] std::string stack_trace() const;
+
+        [[nodiscard]] bool has_parent() const
+        {
+            return parent_ != nullptr;
+        }
+
+        [[nodiscard]] const OpenGeodeException& parent() const
+        {
+            return *parent_;
+        }
+
+        void set_parent( OpenGeodeException&& exception )
+        {
+            parent_ = std::make_unique< OpenGeodeException >(
+                std::move( exception ) );
+        }
 
     protected:
         template < typename... Args >
@@ -114,6 +135,7 @@ namespace geode
         std::any data_;
         std::array< void*, MAX_STACK_DEPTH > stack_;
         int stack_size_{ 0 };
+        std::unique_ptr< OpenGeodeException > parent_;
     };
 
     /*!

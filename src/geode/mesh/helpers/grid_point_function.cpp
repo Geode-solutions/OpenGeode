@@ -44,9 +44,10 @@ namespace geode
             Point< point_dimension > value )
             : grid_( grid )
         {
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 !grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "Cannot create GridPointFunction: attribute with name ",
                 function_name, " already exists." );
             function_attribute_ =
@@ -59,9 +60,10 @@ namespace geode
         Impl( const Grid< dimension >& grid, std::string_view function_name )
             : grid_( grid )
         {
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "Cannot create GridPointFunction: attribute with name",
                 function_name, " does not exist." );
             function_attribute_ =

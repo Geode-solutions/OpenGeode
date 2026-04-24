@@ -127,7 +127,8 @@ namespace geode
         const std::vector< ComponentMeshVertex >& component_mesh_vertices(
             index_t unique_vertex_id ) const
         {
-            OPENGEODE_ASSERT( unique_vertex_id < nb_unique_vertices(),
+            OpenGeodeModelException::assertion(
+                unique_vertex_id < nb_unique_vertices(),
                 "[VertexIdentifier::component_mesh_vertices] Given "
                 "unique_vertex_id is bigger than the number of unique "
                 "vertices." );
@@ -234,7 +235,8 @@ namespace geode
         void set_unique_vertex( ComponentMeshVertex component_vertex_id,
             const index_t unique_vertex_id )
         {
-            OPENGEODE_ASSERT( unique_vertex_id < nb_unique_vertices(),
+            OpenGeodeModelException::assertion(
+                unique_vertex_id < nb_unique_vertices(),
                 "[VertexIdentifier::set_unique_vertex] Unique vertex ",
                 unique_vertex_id, " does not exist (nb=", nb_unique_vertices(),
                 ")" );
@@ -373,7 +375,8 @@ namespace geode
             Serializer archive{ context, file };
             archive.object( *this );
             archive.adapter().flush();
-            OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+            OpenGeodeModelException::check( std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[VertexIdentifier::save] Error while writing file: ",
                 filename );
         }
@@ -388,10 +391,11 @@ namespace geode
             Deserializer archive{ context, file };
             archive.object( *this );
             const auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION(
+            OpenGeodeModelException::check(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[VertexIdentifier::load] Error while reading file: ",
                 filename );
         }

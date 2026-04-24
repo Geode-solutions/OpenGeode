@@ -1384,11 +1384,10 @@ namespace geode
             {
                 other_direction.set_value( 1, 1.0 );
             }
-            OPENGEODE_ASSERT(
+            OpenGeodeGeometryException::assertion(
                 !circle.plane().normal().inexact_equal( other_direction ),
                 "[point_circle_distance] Problem while getting circle "
-                "nearest "
-                "point" );
+                "nearest point" );
             const Vector3D other_projected_on_plane =
                 other_direction
                 - circle.plane().normal()
