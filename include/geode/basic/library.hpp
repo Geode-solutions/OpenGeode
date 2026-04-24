@@ -79,8 +79,8 @@ namespace geode
         template < typename... Args >                                          \
         project_name##library_name##Exception(                                 \
             std::any data, TYPE type, const Args&... message )                 \
-            : geode::OpenGeodeException{ #project_name, #library_name, data,   \
-                  type, message... }                                           \
+            : geode::project_name##Exception{ #project_name, #library_name,    \
+                  data, type, message... }                                     \
         {                                                                      \
         }                                                                      \
                                                                                \
