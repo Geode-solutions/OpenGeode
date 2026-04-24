@@ -81,11 +81,12 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  internal::FacetEdgesImpl< dimension > >{} );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext( impl,
+                            bitsery::ext::BaseClass<
+                                internal::FacetEdgesImpl< dimension > >{} );
+                    } } } );
         }
     };
 
@@ -119,7 +120,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceEdges< dimension >::update_edge_vertices(
-        absl::Span< const index_t > old2new, SurfaceEdgesKey )
+        absl::Span< const index_t > old2new, SurfaceEdgesKey /*key*/ )
     {
         impl_->update_edge_vertices( old2new );
     }
@@ -129,7 +130,7 @@ namespace geode
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id,
-        SurfaceEdgesKey ) -> BijectiveMapping< index_t >
+        SurfaceEdgesKey /*key*/ ) -> BijectiveMapping< index_t >
     {
         return impl_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
@@ -137,28 +138,28 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceEdges< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey )
+        std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey /*key*/ )
     {
         impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
     std::vector< index_t > SurfaceEdges< dimension >::delete_edges(
-        const std::vector< bool >& to_delete, SurfaceEdgesKey )
+        const std::vector< bool >& to_delete, SurfaceEdgesKey /*key*/ )
     {
         return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
     std::vector< index_t > SurfaceEdges< dimension >::remove_isolated_edges(
-        SurfaceEdgesKey )
+        SurfaceEdgesKey /*key*/ )
     {
         return impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >
     void SurfaceEdges< dimension >::overwrite_edges(
-        const SurfaceEdges< dimension >& from, SurfaceEdgesKey )
+        const SurfaceEdges< dimension >& from, SurfaceEdgesKey /*key*/ )
     {
         impl_->overwrite_edges( *from.impl_ );
     }
@@ -202,8 +203,8 @@ namespace geode
     void SurfaceEdges< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, Growable< Archive, SurfaceEdges >{
-                                { []( Archive& a, SurfaceEdges& edges ) {
-                                    a.object( edges.impl_ );
+                                { []( Archive& archive, SurfaceEdges& edges ) {
+                                    archive.object( edges.impl_ );
                                 } } } );
     }
 

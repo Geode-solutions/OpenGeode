@@ -44,7 +44,7 @@ namespace geode
     class opengeode_model_api Lines
     {
         OPENGEODE_DISABLE_COPY( Lines );
-        PASSKEY( LinesBuilder< dimension >, LinesBuilderKey );
+        PASSKEY( LinesBuilder< dimension >, LinesBuilderKey /*key*/ );
 
     public:
         using Builder = LinesBuilder< dimension >;

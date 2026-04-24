@@ -57,7 +57,7 @@ namespace geode
         static constexpr int SYMBOL_SIZE = 1024;
 
     public:
-        enum class TYPE
+        enum struct TYPE : std::uint8_t
         {
             data,
             internal,
@@ -65,6 +65,9 @@ namespace geode
         };
 
         OpenGeodeException( OpenGeodeException&& ) = default;
+        OpenGeodeException( const OpenGeodeException& ) = delete;
+        OpenGeodeException& operator=( const OpenGeodeException& ) = delete;
+        OpenGeodeException& operator=( OpenGeodeException&& ) = default;
 
         ~OpenGeodeException() noexcept override;
 
@@ -102,10 +105,10 @@ namespace geode
             return *parent_;
         }
 
-        void set_parent( OpenGeodeException&& exception )
+        void set_parent( OpenGeodeException&& parent )
         {
-            parent_ = std::make_unique< OpenGeodeException >(
-                std::move( exception ) );
+            parent_ =
+                std::make_unique< OpenGeodeException >( std::move( parent ) );
         }
 
     protected:
@@ -121,8 +124,8 @@ namespace geode
               library_{ std::move( library ) },
               data_{ std::move( data ) }
         {
-#ifndef NDEBUG
             stack_.fill( nullptr );
+#ifndef NDEBUG
             stack_size_ = absl::GetStackTrace(
                 stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS );
 #endif

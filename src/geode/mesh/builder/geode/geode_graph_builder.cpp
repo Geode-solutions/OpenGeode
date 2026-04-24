@@ -29,7 +29,7 @@
 namespace geode
 {
     OpenGeodeGraphBuilder::OpenGeodeGraphBuilder(
-        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ )
         : OpenGeodeGraphBuilder( dynamic_cast< OpenGeodeGraph& >( vertex_set ) )
     {
     }

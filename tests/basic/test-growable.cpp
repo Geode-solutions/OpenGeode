@@ -38,11 +38,11 @@ struct Foo
     template < typename Archive >
     void serialize( Archive &archive )
     {
-        archive.ext( *this,
-            geode::Growable< Archive, Foo >{ { []( Archive &a, Foo &foo ) {
-                a.value8b( foo.double_ );
-                a.value4b( foo.unsigned_int_ );
-            } } } );
+        archive.ext( *this, geode::Growable< Archive, Foo >{
+                                { []( Archive &archive, Foo &foo ) {
+                                    archive.value8b( foo.double_ );
+                                    archive.value4b( foo.unsigned_int_ );
+                                } } } );
     }
 
     double double_{ 10 };
@@ -55,14 +55,14 @@ struct Foo2
     void serialize( Archive &archive )
     {
         archive.ext( *this, geode::Growable< Archive, Foo2 >{
-                                { []( Archive &a, Foo2 &foo ) {
-                                     a.value8b( foo.double_ );
-                                     a.value4b( foo.unsigned_int_ );
+                                { []( Archive &archive, Foo2 &foo ) {
+                                     archive.value8b( foo.double_ );
+                                     archive.value4b( foo.unsigned_int_ );
                                  },
-                                    []( Archive &a, Foo2 &foo ) {
-                                        a.value8b( foo.double_ );
-                                        a.value4b( foo.unsigned_int_ );
-                                        a.value1b( foo.bool_ );
+                                    []( Archive &archive, Foo2 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
+                                        archive.value1b( foo.bool_ );
                                     } } } );
     }
     double double_{ 10 };
@@ -76,23 +76,23 @@ struct Foo3
     void serialize( Archive &archive )
     {
         archive.ext( *this, geode::Growable< Archive, Foo3 >{
-                                { []( Archive &a, Foo3 &foo ) {
-                                     a.value8b( foo.double_ );
-                                     a.value4b( foo.unsigned_int_ );
+                                { []( Archive &archive, Foo3 &foo ) {
+                                     archive.value8b( foo.double_ );
+                                     archive.value4b( foo.unsigned_int_ );
                                      foo.bool_ = true;
                                      foo.int_ = -52;
                                  },
-                                    []( Archive &a, Foo3 &foo ) {
-                                        a.value8b( foo.double_ );
-                                        a.value4b( foo.unsigned_int_ );
-                                        a.value1b( foo.bool_ );
+                                    []( Archive &archive, Foo3 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
+                                        archive.value1b( foo.bool_ );
                                         foo.int_ = true;
                                     },
-                                    []( Archive &a, Foo3 &foo ) {
-                                        a.value8b( foo.double_ );
-                                        a.value4b( foo.unsigned_int_ );
-                                        a.value1b( foo.bool_ );
-                                        a.value4b( foo.int_ );
+                                    []( Archive &archive, Foo3 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
+                                        archive.value1b( foo.bool_ );
+                                        archive.value4b( foo.int_ );
                                     } } } );
     }
     double double_{ 10 };

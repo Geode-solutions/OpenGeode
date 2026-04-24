@@ -44,7 +44,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeTetrahedralSolid );
         PASSKEY( OpenGeodeTetrahedralSolidBuilder< dimension >,
-            OGTetrahedralSolidKey );
+            OGTetrahedralSolidKey /*key*/ );
 
     public:
         using Builder = OpenGeodeTetrahedralSolidBuilder< dimension >;
@@ -87,18 +87,18 @@ namespace geode
     public:
         void set_vertex( index_t vertex_id,
             Point< dimension > point,
-            OGTetrahedralSolidKey );
+            OGTetrahedralSolidKey /*key*/ );
 
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
-            OGTetrahedralSolidKey );
+            OGTetrahedralSolidKey /*key*/ );
 
         void set_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet,
             index_t adjacent_id,
-            OGTetrahedralSolidKey );
+            OGTetrahedralSolidKey /*key*/ );
 
-        void add_tetrahedron(
-            const std::array< index_t, 4 >& vertices, OGTetrahedralSolidKey );
+        void add_tetrahedron( const std::array< index_t, 4 >& vertices,
+            OGTetrahedralSolidKey /*key*/ );
 
     private:
         friend class bitsery::Access;

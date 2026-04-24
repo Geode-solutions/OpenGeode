@@ -430,23 +430,23 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext(
-                *this, Growable< Archive, Impl >{
-                           { []( Archive& a, Impl& impl ) {
-                                a.container4b( impl.deprecated_cells_number_ );
-                                a.container8b( impl.cells_length_ );
-                                impl.set_base_origin();
-                                impl.set_base_grid_directions();
-                            },
-                               []( Archive& a, Impl& impl ) {
-                                   a.container8b( impl.cells_length_ );
-                                   impl.set_base_origin();
-                                   impl.set_base_grid_directions();
-                               },
-                               []( Archive& a, Impl& impl ) {
-                                   a.container8b( impl.cells_length_ );
-                                   a.object( impl.grid_coordinate_system_ );
-                               } } } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.container4b( impl.deprecated_cells_number_ );
+                         archive.container8b( impl.cells_length_ );
+                         impl.set_base_origin();
+                         impl.set_base_grid_directions();
+                     },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.container8b( impl.cells_length_ );
+                            impl.set_base_origin();
+                            impl.set_base_grid_directions();
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.container8b( impl.cells_length_ );
+                            archive.object( impl.grid_coordinate_system_ );
+                        } } } );
         }
 
         void set_base_origin()
@@ -613,7 +613,7 @@ namespace geode
 
     template < index_t dimension >
     void Grid< dimension >::set_grid_origin(
-        Point< dimension > origin, GridKey )
+        Point< dimension > origin, GridKey /*key*/ )
     {
         impl_->set_grid_origin( std::move( origin ) );
     }
@@ -622,7 +622,7 @@ namespace geode
     void Grid< dimension >::set_grid_dimensions(
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_length,
-        GridKey )
+        GridKey /*key*/ )
     {
         set_array_dimensions( std::move( cells_number ) );
         impl_->set_grid_dimensions( *this, std::move( cells_length ) );
@@ -630,13 +630,15 @@ namespace geode
 
     template < index_t dimension >
     void Grid< dimension >::set_grid_directions(
-        std::array< Vector< dimension >, dimension > directions, GridKey )
+        std::array< Vector< dimension >, dimension > directions,
+        GridKey /*key*/ )
     {
         impl_->set_grid_directions( std::move( directions ) );
     }
 
     template < index_t dimension >
-    void Grid< dimension >::copy( const Grid< dimension >& grid, GridKey )
+    void Grid< dimension >::copy(
+        const Grid< dimension >& grid, GridKey /*key*/ )
     {
         CellArray< dimension >::copy( grid );
         impl_->copy( *grid.impl_ );
@@ -648,15 +650,15 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive,
-                Grid >{ { []( Archive& a, Grid& grid ) {
-                             a.object( grid.impl_ );
+                Grid >{ { []( Archive& archive, Grid& grid ) {
+                             archive.object( grid.impl_ );
                              grid.set_array_dimensions(
                                  grid.impl_->deprecated_cells_number() );
                          },
-                []( Archive& a, Grid& grid ) {
-                    a.ext( grid,
+                []( Archive& archive, Grid& grid ) {
+                    archive.ext( grid,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
-                    a.object( grid.impl_ );
+                    archive.object( grid.impl_ );
                 } } } );
     }
 

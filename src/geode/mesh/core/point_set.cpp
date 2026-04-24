@@ -60,15 +60,17 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PointSet >{
-                { []( Archive& a, PointSet& point_set ) {
-                     a.ext( point_set, bitsery::ext::BaseClass< VertexSet >{} );
+                { []( Archive& archive, PointSet& point_set ) {
+                     archive.ext(
+                         point_set, bitsery::ext::BaseClass< VertexSet >{} );
                  },
-                    []( Archive& a, PointSet& point_set ) {
-                        a.ext(
+                    []( Archive& archive, PointSet& point_set ) {
+                        archive.ext(
                             point_set, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.ext( point_set, bitsery::ext::BaseClass<
-                                              CoordinateReferenceSystemManagers<
-                                                  dimension > >{} );
+                        archive.ext(
+                            point_set, bitsery::ext::BaseClass<
+                                           CoordinateReferenceSystemManagers<
+                                               dimension > >{} );
                     } } } );
     }
 

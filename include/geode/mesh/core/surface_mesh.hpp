@@ -163,7 +163,7 @@ namespace geode
           public CoordinateReferenceSystemManagers< dimension >
     {
         OPENGEODE_DISABLE_COPY( SurfaceMesh );
-        PASSKEY( SurfaceMeshBuilder< dimension >, SurfaceMeshKey );
+        PASSKEY( SurfaceMeshBuilder< dimension >, SurfaceMeshKey /*key*/ );
 
     public:
         using Builder = SurfaceMeshBuilder< dimension >;
@@ -463,14 +463,16 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex,
             index_t vertex_id,
-            SurfaceMeshKey );
+            SurfaceMeshKey /*key*/ );
 
-        void reset_polygons_around_vertex( index_t vertex_id, SurfaceMeshKey );
+        void reset_polygons_around_vertex(
+            index_t vertex_id, SurfaceMeshKey /*key*/ );
 
-        [[nodiscard]] SurfaceEdges< dimension >& edges( SurfaceMeshKey );
+        [[nodiscard]] SurfaceEdges< dimension >& edges(
+            SurfaceMeshKey /*key*/ );
 
-        void copy_edges(
-            const SurfaceMesh< dimension >& surface_mesh, SurfaceMeshKey );
+        void copy_edges( const SurfaceMesh< dimension >& surface_mesh,
+            SurfaceMeshKey /*key*/ );
 
     protected:
         SurfaceMesh();

@@ -34,8 +34,10 @@ namespace geode
 {
     class opengeode_basic_api Library : public Singleton
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( Library );
+
     public:
-        virtual ~Library();
+        ~Library() override;
 
     protected:
         Library();

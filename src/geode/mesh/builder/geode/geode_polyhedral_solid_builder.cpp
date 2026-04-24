@@ -33,7 +33,7 @@ namespace geode
     template < index_t dimension >
     OpenGeodePolyhedralSolidBuilder<
         dimension >::OpenGeodePolyhedralSolidBuilder( VertexSet& vertex_set,
-        MeshBuilderFactoryKey )
+        MeshBuilderFactoryKey /*key*/ )
         : OpenGeodePolyhedralSolidBuilder< dimension >(
               dynamic_cast< OpenGeodePolyhedralSolid< dimension >& >(
                   vertex_set ) )

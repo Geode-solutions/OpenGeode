@@ -68,8 +68,8 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, HybridSolid >{
-                { []( Archive& a, HybridSolid& hybrid_solid ) {
-                    a.ext( hybrid_solid,
+                { []( Archive& archive, HybridSolid& hybrid_solid ) {
+                    archive.ext( hybrid_solid,
                         bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
                 } } } );
     }

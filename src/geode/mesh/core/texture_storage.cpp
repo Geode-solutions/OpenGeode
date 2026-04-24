@@ -97,15 +97,16 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl.textures_,
-                        bitsery::ext::StdMap{ impl.textures_.max_size() },
-                        []( Archive& a2, std::string& name,
-                            Texture< dimension >& texture ) {
-                            a2.text1b( name, name.max_size() );
-                            a2.object( texture );
-                        } );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext( impl.textures_,
+                            bitsery::ext::StdMap{ impl.textures_.max_size() },
+                            []( Archive& archive2, std::string& name,
+                                Texture< dimension >& texture ) {
+                                archive2.text1b( name, name.max_size() );
+                                archive2.object( texture );
+                            } );
+                    } } } );
         }
 
     private:
@@ -123,42 +124,46 @@ namespace geode
     TextureStorage< dimension >::~TextureStorage() = default;
 
     template < index_t dimension >
-    index_t TextureStorage< dimension >::nb_textures( TextureManagerKey ) const
+    index_t TextureStorage< dimension >::nb_textures(
+        TextureManagerKey /*key*/ ) const
     {
         return impl_->nb_textures();
     }
 
     template < index_t dimension >
     Texture< dimension >& TextureStorage< dimension >::find_or_create_texture(
-        AttributeManager& manager, std::string_view name, TextureManagerKey )
+        AttributeManager& manager,
+        std::string_view name,
+        TextureManagerKey /*key*/ )
     {
         return impl_->find_or_create_texture( manager, name );
     }
 
     template < index_t dimension >
     const Texture< dimension >& TextureStorage< dimension >::find_texture(
-        std::string_view name, TextureManagerKey ) const
+        std::string_view name, TextureManagerKey /*key*/ ) const
     {
         return impl_->find_texture( name );
     }
 
     template < index_t dimension >
     absl::FixedArray< std::string_view >
-        TextureStorage< dimension >::texture_names( TextureManagerKey ) const
+        TextureStorage< dimension >::texture_names(
+            TextureManagerKey /*key*/ ) const
     {
         return impl_->texture_names();
     }
 
     template < index_t dimension >
     bool TextureStorage< dimension >::texture_exists(
-        std::string_view name, TextureManagerKey ) const
+        std::string_view name, TextureManagerKey /*key*/ ) const
     {
         return impl_->texture_exists( name );
     }
 
     template < index_t dimension >
     void TextureStorage< dimension >::delete_texture(
-        std::string_view name, TextureManagerKey )
+        std::string_view name, TextureManagerKey /*key*/ )
     {
         impl_->delete_texture( name );
     }
@@ -167,10 +172,11 @@ namespace geode
     template < typename Archive >
     void TextureStorage< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, Growable< Archive, TextureStorage >{
-                                { []( Archive& a, TextureStorage& manager ) {
-                                    a.object( manager.impl_ );
-                                } } } );
+        archive.ext(
+            *this, Growable< Archive, TextureStorage >{
+                       { []( Archive& archive, TextureStorage& manager ) {
+                           archive.object( manager.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api TextureStorage< 1 >;

@@ -49,7 +49,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidEdges );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey );
+        PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey /*key*/ );
 
     public:
         using Builder = SolidEdgesBuilder< dimension >;
@@ -87,30 +87,30 @@ namespace geode
 
     public:
         void update_edge_vertices(
-            absl::Span< const index_t > old2new, SolidEdgesKey );
+            absl::Span< const index_t > old2new, SolidEdgesKey /*key*/ );
 
         BijectiveMapping< index_t > update_edge_vertex(
             std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id,
-            SolidEdgesKey );
+            SolidEdgesKey /*key*/ );
 
         void remove_edge(
-            std::array< index_t, 2 > edge_vertices, SolidEdgesKey );
+            std::array< index_t, 2 > edge_vertices, SolidEdgesKey /*key*/ );
 
         std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete, SolidEdgesKey );
+            const std::vector< bool >& to_delete, SolidEdgesKey /*key*/ );
 
-        std::vector< index_t > remove_isolated_edges( SolidEdgesKey );
+        std::vector< index_t > remove_isolated_edges( SolidEdgesKey /*key*/ );
 
         index_t find_or_create_edge(
-            std::array< index_t, 2 > edge_vertices, SolidEdgesKey )
+            std::array< index_t, 2 > edge_vertices, SolidEdgesKey /*key*/ )
         {
             return find_or_create_edge( std::move( edge_vertices ) );
         }
 
         void overwrite_edges(
-            const SolidEdges< dimension >& from, SolidEdgesKey );
+            const SolidEdges< dimension >& from, SolidEdgesKey /*key*/ );
 
     private:
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );

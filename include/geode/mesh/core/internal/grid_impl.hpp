@@ -105,9 +105,10 @@ namespace geode
                 archive.ext( *this,
                     Growable< Archive, GridImpl >{
                         { []( Archive& /*unused*/, GridImpl& /*unused*/ ) {},
-                            []( Archive& a, GridImpl& grid ) {
-                                a.ext( grid, bitsery::ext::BaseClass<
-                                                 ArrayImpl< dimension > >{} );
+                            []( Archive& archive, GridImpl& grid ) {
+                                archive.ext(
+                                    grid, bitsery::ext::BaseClass<
+                                              ArrayImpl< dimension > >{} );
                             } } } );
             }
         };

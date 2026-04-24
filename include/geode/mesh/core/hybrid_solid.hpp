@@ -43,7 +43,7 @@ namespace geode
         using Builder = HybridSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
 
-        enum class TYPE
+        enum struct TYPE
         {
             tetrahedron,
             hexahedron,

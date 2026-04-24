@@ -355,33 +355,34 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PolyhedronVertex >{
-                { []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
-                     a.value4b( polyhedron_vertex.polyhedron_id );
+                { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                     archive.value4b( polyhedron_vertex.polyhedron_id );
                      index_t value{ NO_ID };
-                     a.value4b( value );
+                     archive.value4b( value );
                      polyhedron_vertex.vertex_id = value;
                  },
-                    []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
-                        a.value4b( polyhedron_vertex.polyhedron_id );
-                        a.value1b( polyhedron_vertex.vertex_id );
+                    []( Archive& archive,
+                        PolyhedronVertex& polyhedron_vertex ) {
+                        archive.value4b( polyhedron_vertex.polyhedron_id );
+                        archive.value1b( polyhedron_vertex.vertex_id );
                     } } } );
     }
 
     template < typename Archive >
     void PolyhedronFacet::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, PolyhedronFacet >{
-                       { []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
-                            a.value4b( polyhedron_facet.polyhedron_id );
-                            index_t value{ NO_ID };
-                            a.value4b( value );
-                            polyhedron_facet.facet_id = value;
-                        },
-                           []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
-                               a.value4b( polyhedron_facet.polyhedron_id );
-                               a.value1b( polyhedron_facet.facet_id );
-                           } } } );
+        archive.ext( *this,
+            Growable< Archive, PolyhedronFacet >{
+                { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                     archive.value4b( polyhedron_facet.polyhedron_id );
+                     index_t value{ NO_ID };
+                     archive.value4b( value );
+                     polyhedron_facet.facet_id = value;
+                 },
+                    []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                        archive.value4b( polyhedron_facet.polyhedron_id );
+                        archive.value1b( polyhedron_facet.facet_id );
+                    } } } );
     }
 
     template < typename Archive >
@@ -389,17 +390,18 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PolyhedronFacetVertex >{
-                { []( Archive& a,
+                { []( Archive& archive,
                       PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                     a.object( polyhedron_facet_vertex.polyhedron_facet );
+                     archive.object( polyhedron_facet_vertex.polyhedron_facet );
                      index_t value{ NO_ID };
-                     a.value4b( value );
+                     archive.value4b( value );
                      polyhedron_facet_vertex.vertex_id = value;
                  },
-                    []( Archive& a,
+                    []( Archive& archive,
                         PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                        a.object( polyhedron_facet_vertex.polyhedron_facet );
-                        a.value1b( polyhedron_facet_vertex.vertex_id );
+                        archive.object(
+                            polyhedron_facet_vertex.polyhedron_facet );
+                        archive.value1b( polyhedron_facet_vertex.vertex_id );
                     } } } );
     }
 
@@ -408,16 +410,18 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PolyhedronFacetEdge >{
-                { []( Archive& a, PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                     a.object( polyhedron_facet_edge.polyhedron_facet );
+                { []( Archive& archive,
+                      PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                     archive.object( polyhedron_facet_edge.polyhedron_facet );
                      index_t value{ NO_ID };
-                     a.value4b( value );
+                     archive.value4b( value );
                      polyhedron_facet_edge.edge_id = value;
                  },
-                    []( Archive& a,
+                    []( Archive& archive,
                         PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                        a.object( polyhedron_facet_edge.polyhedron_facet );
-                        a.value1b( polyhedron_facet_edge.edge_id );
+                        archive.object(
+                            polyhedron_facet_edge.polyhedron_facet );
+                        archive.value1b( polyhedron_facet_edge.edge_id );
                     } } } );
     }
 
@@ -705,13 +709,14 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive,
-                    Impl >{ { []( Archive& a, Impl& impl ) {
-                                 a.object( impl.polyhedron_attribute_manager_ );
-                                 a.ext( impl.polyhedron_around_vertex_,
+                    Impl >{ { []( Archive& archive, Impl& impl ) {
+                                 archive.object(
+                                     impl.polyhedron_attribute_manager_ );
+                                 archive.ext( impl.polyhedron_around_vertex_,
                                      bitsery::ext::StdSmartPtr{} );
-                                 a.ext(
+                                 archive.ext(
                                      impl.edges_, bitsery::ext::StdSmartPtr{} );
-                                 a.ext( impl.facets_,
+                                 archive.ext( impl.facets_,
                                      bitsery::ext::StdSmartPtr{} );
                                  const auto&
                                      old_polyhedron_around_vertex_properties =
@@ -734,14 +739,15 @@ namespace geode
                                              .interpolable,
                                          false } );
                              },
-                    []( Archive& a, Impl& impl ) {
-                        a.object( impl.polyhedron_attribute_manager_ );
-                        a.ext( impl.polyhedron_around_vertex_,
+                    []( Archive& archive, Impl& impl ) {
+                        archive.object( impl.polyhedron_attribute_manager_ );
+                        archive.ext( impl.polyhedron_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.polyhedra_around_vertex_,
+                        archive.ext( impl.polyhedra_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            impl.facets_, bitsery::ext::StdSmartPtr{} );
                         const auto& old_polyhedron_around_vertex_properties =
                             impl.polyhedron_around_vertex_->properties();
                         impl.polyhedron_around_vertex_->set_properties(
@@ -758,15 +764,16 @@ namespace geode
                                     .interpolable,
                                 false } );
                     },
-                    []( Archive& a, Impl& impl ) {
-                        a.object( impl.polyhedron_attribute_manager_ );
-                        a.ext( impl.polyhedron_around_vertex_,
+                    []( Archive& archive, Impl& impl ) {
+                        archive.object( impl.polyhedron_attribute_manager_ );
+                        archive.ext( impl.polyhedron_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.polyhedra_around_vertex_,
+                        archive.ext( impl.polyhedra_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                        a.object( impl.texture_storage_ );
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        archive.object( impl.texture_storage_ );
                         const auto& old_polyhedron_around_vertex_properties =
                             impl.polyhedron_around_vertex_->properties();
                         impl.polyhedron_around_vertex_->set_properties(
@@ -783,15 +790,16 @@ namespace geode
                                     .interpolable,
                                 false } );
                     },
-                    []( Archive& a, Impl& impl ) {
-                        a.object( impl.polyhedron_attribute_manager_ );
-                        a.ext( impl.polyhedron_around_vertex_,
+                    []( Archive& archive, Impl& impl ) {
+                        archive.object( impl.polyhedron_attribute_manager_ );
+                        archive.ext( impl.polyhedron_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.polyhedra_around_vertex_,
+                        archive.ext( impl.polyhedra_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                        a.object( impl.texture_storage_ );
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        archive.object( impl.texture_storage_ );
                     } } } );
         }
 
@@ -1433,7 +1441,7 @@ namespace geode
     void SolidMesh< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex,
         index_t vertex_id,
-        SolidMeshKey )
+        SolidMeshKey /*key*/ )
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
@@ -1441,7 +1449,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidMesh< dimension >::reset_polyhedra_around_vertex(
-        index_t vertex_id, SolidMeshKey )
+        index_t vertex_id, SolidMeshKey /*key*/ )
     {
         impl_->reset_polyhedra_around_vertex( vertex_id );
     }
@@ -1652,7 +1660,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidMesh< dimension >::copy_edges(
-        const SolidMesh< dimension >& solid, SolidMeshKey )
+        const SolidMesh< dimension >& solid, SolidMeshKey /*key*/ )
     {
         impl_->copy_edges( solid );
     }
@@ -1670,7 +1678,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidEdges< dimension >& SolidMesh< dimension >::edges( SolidMeshKey )
+    SolidEdges< dimension >& SolidMesh< dimension >::edges(
+        SolidMeshKey /*key*/ )
     {
         return impl_->edges();
     }
@@ -1689,7 +1698,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidMesh< dimension >::copy_facets(
-        const SolidMesh< dimension >& solid, SolidMeshKey )
+        const SolidMesh< dimension >& solid, SolidMeshKey /*key*/ )
     {
         impl_->copy_facets( solid );
     }
@@ -1707,7 +1716,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidFacets< dimension >& SolidMesh< dimension >::facets( SolidMeshKey )
+    SolidFacets< dimension >& SolidMesh< dimension >::facets(
+        SolidMeshKey /*key*/ )
     {
         return impl_->facets();
     }
@@ -1718,21 +1728,25 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, SolidMesh >{
-                { []( Archive& a, SolidMesh& solid ) {
-                     a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                     a.object( solid.impl_ );
+                { []( Archive& archive, SolidMesh& solid ) {
+                     archive.ext(
+                         solid, bitsery::ext::BaseClass< VertexSet >{} );
+                     archive.object( solid.impl_ );
                      solid.impl_->initialize_polyhedra_around_vertex( solid );
                  },
-                    []( Archive& a, SolidMesh& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.object( solid.impl_ );
+                    []( Archive& archive, SolidMesh& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass< VertexSet >{} );
+                        archive.object( solid.impl_ );
                     },
-                    []( Archive& a, SolidMesh& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.ext( solid, bitsery::ext::BaseClass<
-                                          CoordinateReferenceSystemManagers<
-                                              dimension > >{} );
-                        a.object( solid.impl_ );
+                    []( Archive& archive, SolidMesh& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass< VertexSet >{} );
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass<
+                                       CoordinateReferenceSystemManagers<
+                                           dimension > >{} );
+                        archive.object( solid.impl_ );
                     } } } );
     }
 

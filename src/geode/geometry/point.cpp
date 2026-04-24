@@ -214,8 +214,8 @@ namespace geode
     void Point< dimension >::serialize( Archive &archive )
     {
         archive.ext( *this,
-            Growable< Archive, Point >{ { []( Archive &a, Point &point ) {
-                a.container8b( point.values_ );
+            Growable< Archive, Point >{ { []( Archive &archive, Point &point ) {
+                archive.container8b( point.values_ );
             } } } );
     }
 

@@ -83,7 +83,7 @@ namespace geode
 
     template < index_t dimension >
     Line< dimension >& Lines< dimension >::modifiable_line(
-        const uuid& id, LinesBuilderKey )
+        const uuid& id, LinesBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -113,7 +113,7 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::load_lines(
-        std::string_view directory, LinesBuilderKey )
+        std::string_view directory, LinesBuilderKey /*key*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
@@ -149,14 +149,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Lines< dimension >::modifiable_lines( LinesBuilderKey )
+    auto Lines< dimension >::modifiable_lines( LinesBuilderKey /*key*/ )
         -> ModifiableLineRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    const uuid& Lines< dimension >::create_line( LinesBuilderKey )
+    const uuid& Lines< dimension >::create_line( LinesBuilderKey /*key*/ )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{ typename Line< dimension >::LinesKey{} }
@@ -168,7 +168,7 @@ namespace geode
 
     template < index_t dimension >
     const uuid& Lines< dimension >::create_line(
-        const MeshImpl& impl, LinesBuilderKey )
+        const MeshImpl& impl, LinesBuilderKey /*key*/ )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{
@@ -180,7 +180,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Lines< dimension >::create_line( uuid line_id, LinesBuilderKey )
+    void Lines< dimension >::create_line(
+        uuid line_id, LinesBuilderKey /*key*/ )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{ typename Line< dimension >::LinesKey{} }
@@ -191,7 +192,7 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::create_line(
-        uuid line_id, const MeshImpl& impl, LinesBuilderKey )
+        uuid line_id, const MeshImpl& impl, LinesBuilderKey /*key*/ )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{ impl, {} }
@@ -202,7 +203,7 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::delete_line(
-        const Line< dimension >& line, LinesBuilderKey )
+        const Line< dimension >& line, LinesBuilderKey /*key*/ )
     {
         impl_->delete_component( line.id() );
     }

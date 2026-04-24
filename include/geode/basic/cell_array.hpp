@@ -25,6 +25,7 @@
 
 #include <optional>
 
+#include <geode/basic/cell_array.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/pimpl.hpp>
 

@@ -41,7 +41,7 @@ namespace geode
     class opengeode_basic_api Logger
     {
     public:
-        enum struct LEVEL
+        enum struct LEVEL : std::uint8_t
         {
             trace,
             debug,

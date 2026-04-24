@@ -52,8 +52,8 @@ namespace geode
     class Corner final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( Corner );
-        PASSKEY( Corners< dimension >, CornersKey );
-        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey );
+        PASSKEY( Corners< dimension >, CornersKey /*key*/ );
+        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:

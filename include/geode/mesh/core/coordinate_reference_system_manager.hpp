@@ -48,7 +48,7 @@ namespace geode
     class CoordinateReferenceSystemManager
     {
         PASSKEY( CoordinateReferenceSystemManagerBuilder< dimension >,
-            CRSManagerKey );
+            CRSManagerKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -77,20 +77,21 @@ namespace geode
     public:
         void register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs,
-            CRSManagerKey );
+            CRSManagerKey /*key*/ );
 
         void delete_coordinate_reference_system(
-            std::string_view name, CRSManagerKey );
+            std::string_view name, CRSManagerKey /*key*/ );
 
         void set_active_coordinate_reference_system(
-            std::string_view name, CRSManagerKey );
+            std::string_view name, CRSManagerKey /*key*/ );
 
         [[nodiscard]] CoordinateReferenceSystem< dimension >&
-            modifiable_active_coordinate_reference_system( CRSManagerKey );
+            modifiable_active_coordinate_reference_system(
+                CRSManagerKey /*key*/ );
 
         [[nodiscard]] CoordinateReferenceSystem< dimension >&
             modifiable_coordinate_reference_system(
-                std::string_view name, CRSManagerKey );
+                std::string_view name, CRSManagerKey /*key*/ );
 
     private:
         template < typename Archive >

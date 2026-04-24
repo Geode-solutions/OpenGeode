@@ -43,7 +43,7 @@ namespace geode
     class OpenGeodePointSet : public PointSet< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePointSet );
-        PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey );
+        PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey /*key*/ );
 
     public:
         using Builder = OpenGeodePointSetBuilder< dimension >;
@@ -83,8 +83,9 @@ namespace geode
         }
 
     public:
-        void set_vertex(
-            index_t vertex_id, Point< dimension > point, OGPointSetKey );
+        void set_vertex( index_t vertex_id,
+            Point< dimension > point,
+            OGPointSetKey /*key*/ );
 
     private:
         friend class bitsery::Access;

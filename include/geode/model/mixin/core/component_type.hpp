@@ -111,9 +111,9 @@ namespace geode
         {
             archive.ext(
                 *this, Growable< Archive, ComponentID >{
-                           { []( Archive& a, ComponentID& component_id ) {
-                               a.object( component_id.type_ );
-                               a.object( component_id.id_ );
+                           { []( Archive& archive, ComponentID& component_id ) {
+                               archive.object( component_id.type_ );
+                               archive.object( component_id.id_ );
                            } } } );
         }
 

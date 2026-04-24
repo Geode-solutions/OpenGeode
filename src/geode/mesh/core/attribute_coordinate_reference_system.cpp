@@ -52,11 +52,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                } } } );
+            archive.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& archive, Impl& impl ) {
+                               archive.ext( impl,
+                                   bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
+                           } } } );
         }
     };
 
@@ -116,14 +118,15 @@ namespace geode
     void AttributeCoordinateReferenceSystem< dimension >::serialize(
         Archive& archive )
     {
-        archive.ext( *this,
-            Growable< Archive, AttributeCoordinateReferenceSystem >{
-                { []( Archive& a, AttributeCoordinateReferenceSystem& crs ) {
-                    a.ext(
-                        crs, bitsery::ext::BaseClass<
-                                 CoordinateReferenceSystem< dimension > >{} );
-                    a.object( crs.impl_ );
-                } } } );
+        archive.ext(
+            *this, Growable< Archive, AttributeCoordinateReferenceSystem >{
+                       { []( Archive& archive,
+                             AttributeCoordinateReferenceSystem& crs ) {
+                           archive.ext( crs,
+                               bitsery::ext::BaseClass<
+                                   CoordinateReferenceSystem< dimension > >{} );
+                           archive.object( crs.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 1 >;

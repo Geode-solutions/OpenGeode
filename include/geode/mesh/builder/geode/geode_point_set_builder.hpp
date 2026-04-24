@@ -47,7 +47,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePointSetBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodePointSetBuilder(
             OpenGeodePointSet< dimension >& mesh );

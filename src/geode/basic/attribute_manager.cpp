@@ -386,10 +386,10 @@ namespace geode
     };
 
     AttributeManager::AttributeManager() = default;
-    AttributeManager::AttributeManager( AttributeManager &&other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    AttributeManager::AttributeManager(
+        AttributeManager &&other ) noexcept = default;
+    AttributeManager &AttributeManager::operator=(
+        AttributeManager &&other ) noexcept = default;
     AttributeManager::~AttributeManager() = default;
 
     std::shared_ptr< AttributeBase > AttributeManager::find_attribute_base(

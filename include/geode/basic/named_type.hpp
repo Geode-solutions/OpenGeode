@@ -77,10 +77,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, NamedType >{
-                                    { []( Archive& a, NamedType& named_type ) {
-                                        a( named_type.value_ );
-                                    } } } );
+            archive.ext(
+                *this, Growable< Archive, NamedType >{
+                           { []( Archive& archive, NamedType& named_type ) {
+                               archive( named_type.value_ );
+                           } } } );
         }
 
     private:

@@ -90,8 +90,9 @@ namespace geode
             {
                 archive.ext( *this,
                     Growable< Archive, PointsImpl >{
-                        { []( Archive& a, PointsImpl& impl ) {
-                             a.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
+                        { []( Archive& archive, PointsImpl& impl ) {
+                             archive.ext(
+                                 impl.points_, bitsery::ext::StdSmartPtr{} );
                              if( !impl.points_ )
                              {
                                  return;
@@ -103,8 +104,8 @@ namespace geode
                                      old_points_properties.interpolable,
                                      false } );
                          },
-                            []( Archive& a, PointsImpl& impl ) {
-                                a.ext(
+                            []( Archive& archive, PointsImpl& impl ) {
+                                archive.ext(
                                     impl.points_, bitsery::ext::StdSmartPtr{} );
                             } } } );
             }

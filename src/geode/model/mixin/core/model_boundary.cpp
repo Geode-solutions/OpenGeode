@@ -34,8 +34,8 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, ModelBoundary >{
-                { []( Archive &a, ModelBoundary &model_boundary ) {
-                    a.ext( model_boundary,
+                { []( Archive &archive, ModelBoundary &model_boundary ) {
+                    archive.ext( model_boundary,
                         bitsery::ext::BaseClass< Component< dimension > >{} );
                 } } } );
     }

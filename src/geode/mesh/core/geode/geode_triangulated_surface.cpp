@@ -115,13 +115,13 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.ext(
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.ext(
                              impl, bitsery::ext::BaseClass<
                                        internal::PointsImpl< dimension > >{} );
-                         a.ext( impl.triangle_vertices_,
+                         archive.ext( impl.triangle_vertices_,
                              bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.triangle_adjacents_,
+                         archive.ext( impl.triangle_adjacents_,
                              bitsery::ext::StdSmartPtr{} );
                          const auto& old_triangle_vertices_properties =
                              impl.triangle_vertices_->properties();
@@ -136,13 +136,13 @@ namespace geode
                                  old_triangle_adjacents_properties.interpolable,
                                  false } );
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.ext( impl,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.ext( impl,
                                 bitsery::ext::BaseClass<
                                     internal::PointsImpl< dimension > >{} );
-                            a.ext( impl.triangle_vertices_,
+                            archive.ext( impl.triangle_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.triangle_adjacents_,
+                            archive.ext( impl.triangle_adjacents_,
                                 bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
@@ -175,7 +175,9 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGTriangulatedSurfaceKey )
+        index_t vertex_id,
+        Point< dimension > point,
+        OGTriangulatedSurfaceKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
@@ -202,17 +204,20 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, OpenGeodeTriangulatedSurface >{
-                { []( Archive& a, OpenGeodeTriangulatedSurface& surface ) {
-                     a.ext( surface, bitsery::ext::BaseClass<
-                                         TriangulatedSurface< dimension > >{} );
-                     a.object( surface.impl_ );
+                { []( Archive& archive,
+                      OpenGeodeTriangulatedSurface& surface ) {
+                     archive.ext(
+                         surface, bitsery::ext::BaseClass<
+                                      TriangulatedSurface< dimension > >{} );
+                     archive.object( surface.impl_ );
                      surface.impl_->initialize_crs( surface );
                  },
-                    []( Archive& a, OpenGeodeTriangulatedSurface& surface ) {
-                        a.ext(
+                    []( Archive& archive,
+                        OpenGeodeTriangulatedSurface& surface ) {
+                        archive.ext(
                             surface, bitsery::ext::BaseClass<
                                          TriangulatedSurface< dimension > >{} );
-                        a.object( surface.impl_ );
+                        archive.object( surface.impl_ );
                     } } } );
     }
 
@@ -220,14 +225,15 @@ namespace geode
     void OpenGeodeTriangulatedSurface< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex,
         index_t vertex_id,
-        OGTriangulatedSurfaceKey )
+        OGTriangulatedSurfaceKey /*key*/ )
     {
         impl_->set_polygon_vertex( polygon_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::add_triangle(
-        const std::array< index_t, 3 >& vertices, OGTriangulatedSurfaceKey )
+        const std::array< index_t, 3 >& vertices,
+        OGTriangulatedSurfaceKey /*key*/ )
     {
         impl_->add_triangle( *this, vertices );
     }
@@ -236,7 +242,7 @@ namespace geode
     void OpenGeodeTriangulatedSurface< dimension >::set_polygon_adjacent(
         const PolygonEdge& polygon_edge,
         index_t adjacent_id,
-        OGTriangulatedSurfaceKey )
+        OGTriangulatedSurfaceKey /*key*/ )
     {
         impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
     }

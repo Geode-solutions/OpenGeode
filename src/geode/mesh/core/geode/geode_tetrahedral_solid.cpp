@@ -130,13 +130,13 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.ext(
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.ext(
                              impl, bitsery::ext::BaseClass<
                                        internal::PointsImpl< dimension > >{} );
-                         a.ext( impl.tetrahedron_vertices_,
+                         archive.ext( impl.tetrahedron_vertices_,
                              bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.tetrahedron_adjacents_,
+                         archive.ext( impl.tetrahedron_adjacents_,
                              bitsery::ext::StdSmartPtr{} );
                          const auto& old_tetrahedron_vertices_properties =
                              impl.tetrahedron_vertices_->properties();
@@ -153,13 +153,13 @@ namespace geode
                                      .interpolable,
                                  false } );
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.ext( impl,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.ext( impl,
                                 bitsery::ext::BaseClass<
                                     internal::PointsImpl< dimension > >{} );
-                            a.ext( impl.tetrahedron_vertices_,
+                            archive.ext( impl.tetrahedron_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.tetrahedron_adjacents_,
+                            archive.ext( impl.tetrahedron_adjacents_,
                                 bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
@@ -191,8 +191,9 @@ namespace geode
         default;
 
     template < index_t dimension >
-    void OpenGeodeTetrahedralSolid< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGTetrahedralSolidKey )
+    void OpenGeodeTetrahedralSolid< dimension >::set_vertex( index_t vertex_id,
+        Point< dimension > point,
+        OGTetrahedralSolidKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
@@ -226,16 +227,18 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, OpenGeodeTetrahedralSolid >{
-                { []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
-                     a.ext( solid, bitsery::ext::BaseClass<
-                                       TetrahedralSolid< dimension > >{} );
-                     a.object( solid.impl_ );
+                { []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
+                     archive.ext(
+                         solid, bitsery::ext::BaseClass<
+                                    TetrahedralSolid< dimension > >{} );
+                     archive.object( solid.impl_ );
                      solid.impl_->initialize_crs( solid );
                  },
-                    []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass<
-                                          TetrahedralSolid< dimension > >{} );
-                        a.object( solid.impl_ );
+                    []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass<
+                                       TetrahedralSolid< dimension > >{} );
+                        archive.object( solid.impl_ );
                     } } } );
     }
 
@@ -243,14 +246,15 @@ namespace geode
     void OpenGeodeTetrahedralSolid< dimension >::set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex,
         index_t vertex_id,
-        OGTetrahedralSolidKey )
+        OGTetrahedralSolidKey /*key*/ )
     {
         impl_->set_polyhedron_vertex( polyhedron_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::add_tetrahedron(
-        const std::array< index_t, 4 >& vertices, OGTetrahedralSolidKey )
+        const std::array< index_t, 4 >& vertices,
+        OGTetrahedralSolidKey /*key*/ )
     {
         impl_->add_tetrahedron( *this, vertices );
     }
@@ -259,7 +263,7 @@ namespace geode
     void OpenGeodeTetrahedralSolid< dimension >::set_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet,
         index_t adjacent_id,
-        OGTetrahedralSolidKey )
+        OGTetrahedralSolidKey /*key*/ )
     {
         impl_->set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }

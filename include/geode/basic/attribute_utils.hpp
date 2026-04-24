@@ -63,14 +63,15 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, AttributeProperties >{
-                    { []( Archive& a, AttributeProperties& properties ) {
-                         a.value1b( properties.assignable );
-                         a.value1b( properties.interpolable );
+                    { []( Archive& archive, AttributeProperties& properties ) {
+                         archive.value1b( properties.assignable );
+                         archive.value1b( properties.interpolable );
                      },
-                        []( Archive& a, AttributeProperties& properties ) {
-                            a.value1b( properties.assignable );
-                            a.value1b( properties.interpolable );
-                            a.value1b( properties.transferable );
+                        []( Archive& archive,
+                            AttributeProperties& properties ) {
+                            archive.value1b( properties.assignable );
+                            archive.value1b( properties.interpolable );
+                            archive.value1b( properties.transferable );
                         } } } );
         }
 

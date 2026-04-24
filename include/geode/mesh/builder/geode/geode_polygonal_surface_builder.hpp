@@ -49,7 +49,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePolygonalSurfaceBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodePolygonalSurfaceBuilder(
             OpenGeodePolygonalSurface< dimension >& mesh );

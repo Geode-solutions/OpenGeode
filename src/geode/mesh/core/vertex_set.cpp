@@ -45,10 +45,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.vertex_attribute_manager_ );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{
+                                    { []( Archive& archive, Impl& impl ) {
+                                        archive.object(
+                                            impl.vertex_attribute_manager_ );
+                                    } } } );
         }
 
     private:
@@ -94,12 +95,12 @@ namespace geode
     {
         archive.ext(
             *this, Growable< Archive, VertexSet >{
-                       { []( Archive& a, VertexSet& vertex_set ) {
-                            a.object( vertex_set.impl_ );
+                       { []( Archive& archive, VertexSet& vertex_set ) {
+                            archive.object( vertex_set.impl_ );
                         },
-                           []( Archive& a, VertexSet& vertex_set ) {
-                               a.object( vertex_set.impl_ );
-                               a.ext( vertex_set,
+                           []( Archive& archive, VertexSet& vertex_set ) {
+                               archive.object( vertex_set.impl_ );
+                               archive.ext( vertex_set,
                                    bitsery::ext::BaseClass< Identifier >{} );
                            } } } );
     }

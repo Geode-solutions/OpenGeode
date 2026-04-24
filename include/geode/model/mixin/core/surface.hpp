@@ -51,8 +51,8 @@ namespace geode
     class Surface final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( Surface );
-        PASSKEY( Surfaces< dimension >, SurfacesKey );
-        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey );
+        PASSKEY( Surfaces< dimension >, SurfacesKey /*key*/ );
+        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:

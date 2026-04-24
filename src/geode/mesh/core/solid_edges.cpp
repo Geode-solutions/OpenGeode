@@ -81,11 +81,12 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  internal::FacetEdgesImpl< dimension > >{} );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext( impl,
+                            bitsery::ext::BaseClass<
+                                internal::FacetEdgesImpl< dimension > >{} );
+                    } } } );
         }
     };
 
@@ -140,7 +141,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidEdges< dimension >::update_edge_vertices(
-        absl::Span< const index_t > old2new, SolidEdgesKey )
+        absl::Span< const index_t > old2new, SolidEdgesKey /*key*/ )
     {
         impl_->update_edge_vertices( old2new );
     }
@@ -150,7 +151,7 @@ namespace geode
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id,
-        SolidEdgesKey )
+        SolidEdgesKey /*key*/ )
     {
         return impl_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
@@ -158,28 +159,28 @@ namespace geode
 
     template < index_t dimension >
     void SolidEdges< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices, SolidEdgesKey )
+        std::array< index_t, 2 > edge_vertices, SolidEdgesKey /*key*/ )
     {
         impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
     std::vector< index_t > SolidEdges< dimension >::remove_isolated_edges(
-        SolidEdgesKey )
+        SolidEdgesKey /*key*/ )
     {
         return impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >
     std::vector< index_t > SolidEdges< dimension >::delete_edges(
-        const std::vector< bool >& to_delete, SolidEdgesKey )
+        const std::vector< bool >& to_delete, SolidEdgesKey /*key*/ )
     {
         return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
     void SolidEdges< dimension >::overwrite_edges(
-        const SolidEdges< dimension >& from, SolidEdgesKey )
+        const SolidEdges< dimension >& from, SolidEdgesKey /*key*/ )
     {
         impl_->overwrite_edges( *from.impl_ );
     }
@@ -201,8 +202,8 @@ namespace geode
     void SolidEdges< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, Growable< Archive, SolidEdges >{
-                                { []( Archive& a, SolidEdges& solid ) {
-                                    a.object( solid.impl_ );
+                                { []( Archive& archive, SolidEdges& solid ) {
+                                    archive.object( solid.impl_ );
                                 } } } );
     }
 

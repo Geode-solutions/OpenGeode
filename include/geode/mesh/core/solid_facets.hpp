@@ -42,7 +42,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidFacets );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey );
+        PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey /*key*/ );
 
     public:
         using Builder = SolidFacetsBuilder< dimension >;
@@ -80,30 +80,30 @@ namespace geode
 
     public:
         std::vector< index_t > update_facet_vertices(
-            absl::Span< const index_t > old2new, SolidFacetsKey );
+            absl::Span< const index_t > old2new, SolidFacetsKey /*key*/ );
 
         BijectiveMapping< index_t > update_facet_vertex(
             PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id,
-            SolidFacetsKey );
+            SolidFacetsKey /*key*/ );
 
         void remove_facet(
-            PolyhedronFacetVertices facet_vertices, SolidFacetsKey );
+            PolyhedronFacetVertices facet_vertices, SolidFacetsKey /*key*/ );
 
         std::vector< index_t > delete_facets(
-            const std::vector< bool >& to_delete, SolidFacetsKey );
+            const std::vector< bool >& to_delete, SolidFacetsKey /*key*/ );
 
-        std::vector< index_t > remove_isolated_facets( SolidFacetsKey );
+        std::vector< index_t > remove_isolated_facets( SolidFacetsKey /*key*/ );
 
         index_t find_or_create_facet(
-            PolyhedronFacetVertices facet_vertices, SolidFacetsKey )
+            PolyhedronFacetVertices facet_vertices, SolidFacetsKey /*key*/ )
         {
             return find_or_create_facet( std::move( facet_vertices ) );
         }
 
         void overwrite_facets(
-            const SolidFacets< dimension >& from, SolidFacetsKey );
+            const SolidFacets< dimension >& from, SolidFacetsKey /*key*/ );
 
     private:
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );

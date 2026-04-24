@@ -77,10 +77,11 @@ namespace geode
     template < typename Archive >
     void GreyscaleColor::serialize( Archive &archive )
     {
-        archive.ext( *this, Growable< Archive, GreyscaleColor >{
-                                { []( Archive &a, GreyscaleColor &color ) {
-                                    a.value1b( color.value_ );
-                                } } } );
+        archive.ext(
+            *this, Growable< Archive, GreyscaleColor >{
+                       { []( Archive &archive, GreyscaleColor &color ) {
+                           archive.value1b( color.value_ );
+                       } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_image_api, GreyscaleColor );

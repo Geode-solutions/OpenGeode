@@ -74,8 +74,8 @@ namespace geode
             {
                 archive.ext(
                     *this, Growable< Archive, MeshStorage >{
-                               { []( Archive& a, MeshStorage& storage ) {
-                                   a.object( storage.mesh_type_ );
+                               { []( Archive& archive, MeshStorage& storage ) {
+                                   archive.object( storage.mesh_type_ );
                                } } } );
             }
 

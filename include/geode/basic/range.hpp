@@ -70,7 +70,7 @@ namespace geode
             next_operator_( iter_ );
         }
 
-        constexpr Type current() const
+        [[nodiscard]] constexpr Type current() const
         {
             return iter_;
         }
@@ -85,13 +85,13 @@ namespace geode
             {
                 using T1U = std::make_unsigned_t< T1 >;
                 using T2U = std::make_unsigned_t< T2 >;
-                const auto beginU = static_cast< T1U >( begin );
-                const auto endU = static_cast< T2U >( end );
+                const auto unsined_begin = static_cast< T1U >( begin );
+                const auto unsined_end = static_cast< T2U >( end );
                 const auto max = std::numeric_limits< Type >::max();
-                OpenGeodeBasicException::assertion( beginU <= max,
+                OpenGeodeBasicException::assertion( unsined_begin <= max,
                     "[Range] Invalid range: ", begin, " > ", max );
-                OpenGeodeBasicException::assertion(
-                    endU <= max, "[Range] Invalid range: ", end, " > ", max );
+                OpenGeodeBasicException::assertion( unsined_end <= max,
+                    "[Range] Invalid range: ", end, " > ", max );
             }
         }
 
@@ -218,7 +218,7 @@ namespace geode
     class EraserRange : public BaseRange< index_t, DecrementOperator >
     {
     public:
-        EraserRange( std::vector< Type >& values )
+        explicit EraserRange( std::vector< Type >& values )
             : BaseRange< index_t, DecrementOperator >( values.size() - 1, -1 ),
               values_( values )
         {

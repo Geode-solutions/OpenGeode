@@ -55,13 +55,14 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this,
-                    Growable< Archive, PolygonsAroundVertexImpl >{
-                        { []( Archive& a, PolygonsAroundVertexImpl& value ) {
-                            a.container(
-                                value.polygons, value.polygons.max_size() );
-                            a.value1b( value.vertex_is_on_border );
-                        } } } );
+                archive.ext(
+                    *this, Growable< Archive, PolygonsAroundVertexImpl >{
+                               { []( Archive& archive,
+                                     PolygonsAroundVertexImpl& value ) {
+                                   archive.container( value.polygons,
+                                       value.polygons.max_size() );
+                                   archive.value1b( value.vertex_is_on_border );
+                               } } } );
             }
 
             PolygonsAroundVertex polygons;

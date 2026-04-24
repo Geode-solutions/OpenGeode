@@ -326,43 +326,43 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.container4b( impl.polyhedron_vertices_,
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.container4b( impl.polyhedron_vertices_,
                              impl.polyhedron_vertices_.max_size() );
-                         a.container4b( impl.polyhedron_vertex_ptr_,
+                         archive.container4b( impl.polyhedron_vertex_ptr_,
                              impl.polyhedron_vertex_ptr_.max_size() );
                          std::vector< index_t > facets;
-                         a.container4b(
+                         archive.container4b(
                              facets, impl.polyhedron_facets_.max_size() );
                          impl.polyhedron_facets_.reserve( facets.size() );
                          for( const auto v : facets )
                          {
                              impl.polyhedron_facets_.emplace_back( v );
                          }
-                         a.container4b( impl.polyhedron_facet_ptr_,
+                         archive.container4b( impl.polyhedron_facet_ptr_,
                              impl.polyhedron_facet_ptr_.max_size() );
-                         a.container4b( impl.polyhedron_adjacents_,
+                         archive.container4b( impl.polyhedron_adjacents_,
                              impl.polyhedron_adjacents_.max_size() );
-                         a.container4b( impl.polyhedron_adjacent_ptr_,
+                         archive.container4b( impl.polyhedron_adjacent_ptr_,
                              impl.polyhedron_adjacent_ptr_.max_size() );
-                         a.ext(
+                         archive.ext(
                              impl, bitsery::ext::BaseClass<
                                        internal::PointsImpl< dimension > >{} );
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.container4b( impl.polyhedron_vertices_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.container4b( impl.polyhedron_vertices_,
                                 impl.polyhedron_vertices_.max_size() );
-                            a.container4b( impl.polyhedron_vertex_ptr_,
+                            archive.container4b( impl.polyhedron_vertex_ptr_,
                                 impl.polyhedron_vertex_ptr_.max_size() );
-                            a.container1b( impl.polyhedron_facets_,
+                            archive.container1b( impl.polyhedron_facets_,
                                 impl.polyhedron_facets_.max_size() );
-                            a.container4b( impl.polyhedron_facet_ptr_,
+                            archive.container4b( impl.polyhedron_facet_ptr_,
                                 impl.polyhedron_facet_ptr_.max_size() );
-                            a.container4b( impl.polyhedron_adjacents_,
+                            archive.container4b( impl.polyhedron_adjacents_,
                                 impl.polyhedron_adjacents_.max_size() );
-                            a.container4b( impl.polyhedron_adjacent_ptr_,
+                            archive.container4b( impl.polyhedron_adjacent_ptr_,
                                 impl.polyhedron_adjacent_ptr_.max_size() );
-                            a.ext( impl,
+                            archive.ext( impl,
                                 bitsery::ext::BaseClass<
                                     internal::PointsImpl< dimension > >{} );
                         } } } );
@@ -428,8 +428,9 @@ namespace geode
         default;
 
     template < index_t dimension >
-    void OpenGeodePolyhedralSolid< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey )
+    void OpenGeodePolyhedralSolid< dimension >::set_vertex( index_t vertex_id,
+        Point< dimension > point,
+        OGPolyhedralSolidKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
@@ -485,7 +486,7 @@ namespace geode
     void OpenGeodePolyhedralSolid< dimension >::set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex,
         index_t vertex_id,
-        OGPolyhedralSolidKey )
+        OGPolyhedralSolidKey /*key*/ )
     {
         impl_->set_polyhedron_vertex( polyhedron_vertex, vertex_id );
     }
@@ -494,21 +495,21 @@ namespace geode
     void OpenGeodePolyhedralSolid< dimension >::set_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet,
         index_t adjacent_id,
-        OGPolyhedralSolidKey )
+        OGPolyhedralSolidKey /*key*/ )
     {
         impl_->set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::remove_polyhedra(
-        const std::vector< bool >& to_delete, OGPolyhedralSolidKey )
+        const std::vector< bool >& to_delete, OGPolyhedralSolidKey /*key*/ )
     {
         impl_->remove_polyhedra( to_delete );
     }
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::permute_polyhedra(
-        absl::Span< const index_t > permutation, OGPolyhedralSolidKey )
+        absl::Span< const index_t > permutation, OGPolyhedralSolidKey /*key*/ )
     {
         impl_->permute_polyhedra( permutation );
     }
@@ -517,7 +518,7 @@ namespace geode
     void OpenGeodePolyhedralSolid< dimension >::add_polyhedron(
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< local_index_t > > facets,
-        OGPolyhedralSolidKey )
+        OGPolyhedralSolidKey /*key*/ )
     {
         impl_->add_polyhedron( vertices, facets );
     }
@@ -525,7 +526,7 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::copy_polyhedra(
         const OpenGeodePolyhedralSolid< dimension >& solid_mesh,
-        OGPolyhedralSolidKey )
+        OGPolyhedralSolidKey /*key*/ )
     {
         impl_->copy_polyhedra( *solid_mesh.impl_ );
     }
@@ -536,16 +537,17 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, OpenGeodePolyhedralSolid >{
-                { []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
-                     a.ext( solid, bitsery::ext::BaseClass<
-                                       PolyhedralSolid< dimension > >{} );
-                     a.object( solid.impl_ );
+                { []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
+                     archive.ext( solid, bitsery::ext::BaseClass<
+                                             PolyhedralSolid< dimension > >{} );
+                     archive.object( solid.impl_ );
                      solid.impl_->initialize_crs( solid );
                  },
-                    []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass<
-                                          PolyhedralSolid< dimension > >{} );
-                        a.object( solid.impl_ );
+                    []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass<
+                                       PolyhedralSolid< dimension > >{} );
+                        archive.object( solid.impl_ );
                     } } } );
     }
 

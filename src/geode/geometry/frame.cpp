@@ -194,8 +194,8 @@ namespace geode
     void Frame< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this,
-            Growable< Archive, Frame >{ { []( Archive& a, Frame& frame ) {
-                a.container( frame.frame_ );
+            Growable< Archive, Frame >{ { []( Archive& archive, Frame& frame ) {
+                archive.container( frame.frame_ );
             } } } );
     }
 

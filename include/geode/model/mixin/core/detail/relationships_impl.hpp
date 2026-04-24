@@ -103,10 +103,12 @@ namespace geode
             {
                 archive.ext( *this,
                     Growable< Archive, RelationshipsImpl >{
-                        { []( Archive& a, RelationshipsImpl& impl ) {
-                            a.ext( impl.graph_, bitsery::ext::StdSmartPtr{} );
-                            a.object( impl.uuid2index_ );
-                            a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
+                        { []( Archive& archive, RelationshipsImpl& impl ) {
+                            archive.ext(
+                                impl.graph_, bitsery::ext::StdSmartPtr{} );
+                            archive.object( impl.uuid2index_ );
+                            archive.ext(
+                                impl.ids_, bitsery::ext::StdSmartPtr{} );
                             impl.delete_isolated_vertices();
                         } } } );
             }

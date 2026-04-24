@@ -92,17 +92,19 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, RegularGrid< 2 > >{
-                { []( Archive& a, RegularGrid< 2 >& grid ) {
-                     a.ext(
+                { []( Archive& archive, RegularGrid< 2 >& grid ) {
+                     archive.ext(
                          grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
-                     a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
+                     archive.ext(
+                         grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
                      GridBuilder2D builder{ grid };
                      builder.set_grid_origin( grid.grid_point( { 0, 0 } ) );
                  },
-                    []( Archive& a, RegularGrid< 2 >& grid ) {
-                        a.ext( grid,
+                    []( Archive& archive, RegularGrid< 2 >& grid ) {
+                        archive.ext( grid,
                             bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
-                        a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
+                        archive.ext(
+                            grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
                     } } } );
     }
 

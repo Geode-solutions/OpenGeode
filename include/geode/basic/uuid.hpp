@@ -67,11 +67,11 @@ namespace geode
         void serialize( Archive &archive )
         {
             archive.ext( *this, Growable< Archive, uuid >{
-                                    { []( Archive &a, uuid &id ) {
+                                    { []( Archive &archive, uuid &id ) {
                                          uint64_t ab;
                                          uint64_t cd;
-                                         a.value8b( ab );
-                                         a.value8b( cd );
+                                         archive.value8b( ab );
+                                         archive.value8b( cd );
                                          id.bytes_[0] = ( ab >> 56 ) & 0xFF;
                                          id.bytes_[1] = ( ab >> 48 ) & 0xFF;
                                          id.bytes_[2] = ( ab >> 40 ) & 0xFF;
@@ -89,8 +89,8 @@ namespace geode
                                          id.bytes_[14] = ( cd >> 8 ) & 0xFF;
                                          id.bytes_[15] = ( cd >> 0 ) & 0xFF;
                                      },
-                                        []( Archive &a, uuid &id ) {
-                                            a.container1b( id.bytes_ );
+                                        []( Archive &archive, uuid &id ) {
+                                            archive.container1b( id.bytes_ );
                                         } } } );
         }
     };

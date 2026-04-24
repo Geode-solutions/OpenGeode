@@ -66,9 +66,9 @@ namespace geode
         {
             archive.ext(
                 *this, Growable< Archive, MeshElement >{
-                           { []( Archive& a, MeshElement& mesh_element ) {
-                               a.object( mesh_element.mesh_id );
-                               a.value4b( mesh_element.element_id );
+                           { []( Archive& archive, MeshElement& mesh_element ) {
+                               archive.object( mesh_element.mesh_id );
+                               archive.value4b( mesh_element.element_id );
                            } } } );
         }
 

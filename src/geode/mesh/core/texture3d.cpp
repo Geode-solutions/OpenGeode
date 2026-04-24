@@ -63,9 +63,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive,
+                                                  Impl& impl ) {
+                archive.ext( impl,
                     bitsery::ext::BaseClass< internal::TextureImpl< 3 > >{} );
             } } } );
         }
@@ -107,10 +108,11 @@ namespace geode
     template < typename Archive >
     void Texture< 3 >::serialize( Archive& archive )
     {
-        archive.ext( *this, Growable< Archive, Texture< 3 > >{
-                                { []( Archive& a, Texture< 3 >& texture ) {
-                                    a.object( texture.impl_ );
-                                } } } );
+        archive.ext(
+            *this, Growable< Archive, Texture< 3 > >{
+                       { []( Archive& archive, Texture< 3 >& texture ) {
+                           archive.object( texture.impl_ );
+                       } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, Texture< 3 > );

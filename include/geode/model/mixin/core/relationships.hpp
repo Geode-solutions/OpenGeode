@@ -50,7 +50,7 @@ namespace geode
      */
     class opengeode_model_api Relationships
     {
-        PASSKEY( RelationshipsBuilder, RelationshipsBuilderKey );
+        PASSKEY( RelationshipsBuilder, RelationshipsBuilderKey /*key*/ );
 
     public:
         /*!
@@ -422,7 +422,7 @@ namespace geode
          * @param[in] component_id Unique index of the component to remove
          */
         void remove_component(
-            const uuid& component_id, RelationshipsBuilderKey );
+            const uuid& component_id, RelationshipsBuilderKey /*key*/ );
 
         /*!
          * Add a new relationship of type boundary-incidence between two
@@ -430,7 +430,7 @@ namespace geode
          */
         index_t add_boundary_relation( const ComponentID& boundary,
             const ComponentID& incidence,
-            RelationshipsBuilderKey );
+            RelationshipsBuilderKey /*key*/ );
 
         /*!
          * Add a new relationship of type internal-embedding between two
@@ -438,28 +438,28 @@ namespace geode
          */
         index_t add_internal_relation( const ComponentID& internal,
             const ComponentID& embedding,
-            RelationshipsBuilderKey );
+            RelationshipsBuilderKey /*key*/ );
 
         /*!
          * Add a new relationship of type item-collection between two components
          */
         index_t add_item_in_collection( const ComponentID& item,
             const ComponentID& collection,
-            RelationshipsBuilderKey );
+            RelationshipsBuilderKey /*key*/ );
 
         /*!
          * Remove a relationship between two components
          */
         void remove_relation( const uuid& component_id1,
             const uuid& component_id2,
-            RelationshipsBuilderKey );
+            RelationshipsBuilderKey /*key*/ );
 
         void copy_relationships( const ModelCopyMapping& mapping,
             const Relationships& relationships,
-            RelationshipsBuilderKey );
+            RelationshipsBuilderKey /*key*/ );
 
         void load_relationships(
-            std::string_view directory, RelationshipsBuilderKey );
+            std::string_view directory, RelationshipsBuilderKey /*key*/ );
 
     protected:
         Relationships( Relationships&& other ) noexcept;

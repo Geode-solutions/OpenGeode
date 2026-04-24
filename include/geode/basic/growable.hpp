@@ -36,7 +36,8 @@ namespace geode
     class Growable
     {
     public:
-        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
+        explicit Growable(
+            absl::FixedArray< std::function< void( Archive &, T & ) > >
                 serializers )
             : version_( serializers.size() ),
               serializers_( std::move( serializers ) )
@@ -44,18 +45,16 @@ namespace geode
         }
 
         template < typename Fnc >
-        void serialize(
-            Archive &ser, const T &obj, [[maybe_unused]] Fnc &&fnc ) const
+        void serialize( Archive &ser, const T &obj, Fnc && /*fnc*/ ) const
         {
             ser.ext4b( version_, bitsery::ext::CompactValue{} );
             serializers_.back()( ser, const_cast< T & >( obj ) );
         }
 
         template < typename Fnc >
-        void deserialize(
-            Archive &des, T &obj, [[maybe_unused]] Fnc &&fnc ) const
+        void deserialize( Archive &des, T &obj, Fnc && /*fnc*/ ) const
         {
-            index_t current_version;
+            index_t current_version{ 0 };
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
             serializers_.at( current_version - 1 )( des, obj );
         }
@@ -67,17 +66,14 @@ namespace geode
     };
 } // namespace geode
 
-namespace bitsery
+namespace bitsery::traits
 {
-    namespace traits
+    template < typename Archive, typename T >
+    struct ExtensionTraits< geode::Growable< Archive, T >, T >
     {
-        template < typename Archive, typename T >
-        struct ExtensionTraits< geode::Growable< Archive, T >, T >
-        {
-            using TValue = T;
-            static constexpr bool SupportValueOverload = false;
-            static constexpr bool SupportObjectOverload = true;
-            static constexpr bool SupportLambdaOverload = true;
-        };
-    } // namespace traits
-} // namespace bitsery
+        using TValue = T;
+        static constexpr bool SupportValueOverload = false;
+        static constexpr bool SupportObjectOverload = true;
+        static constexpr bool SupportLambdaOverload = true;
+    };
+} // namespace bitsery::traits

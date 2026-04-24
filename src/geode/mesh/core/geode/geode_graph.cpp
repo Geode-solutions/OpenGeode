@@ -46,10 +46,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< internal::EdgesImpl >{} );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext( impl,
+                            bitsery::ext::BaseClass< internal::EdgesImpl >{} );
+                    } } } );
         }
     };
 
@@ -69,7 +70,7 @@ namespace geode
     }
 
     void OpenGeodeGraph::set_edge_vertex(
-        const EdgeVertex& edge_vertex, index_t vertex_id, OGGraphKey )
+        const EdgeVertex& edge_vertex, index_t vertex_id, OGGraphKey /*key*/ )
     {
         impl_->set_edge_vertex( edge_vertex, vertex_id );
     }
@@ -77,12 +78,12 @@ namespace geode
     template < typename Archive >
     void OpenGeodeGraph::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, OpenGeodeGraph >{
-                       { []( Archive& a, OpenGeodeGraph& graph ) {
-                           a.ext( graph, bitsery::ext::BaseClass< Graph >{} );
-                           a.object( graph.impl_ );
-                       } } } );
+        archive.ext( *this,
+            Growable< Archive, OpenGeodeGraph >{
+                { []( Archive& archive, OpenGeodeGraph& graph ) {
+                    archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
+                    archive.object( graph.impl_ );
+                } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeGraph );

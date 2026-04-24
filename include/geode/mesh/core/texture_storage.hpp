@@ -48,7 +48,7 @@ namespace geode
     class TextureStorage
     {
         friend class bitsery::Access;
-        PASSKEY( TextureManager< dimension >, TextureManagerKey );
+        PASSKEY( TextureManager< dimension >, TextureManagerKey /*key*/ );
 
     public:
         TextureStorage();
@@ -56,22 +56,22 @@ namespace geode
         ~TextureStorage();
 
     public:
-        [[nodiscard]] index_t nb_textures( TextureManagerKey ) const;
+        [[nodiscard]] index_t nb_textures( TextureManagerKey /*key*/ ) const;
 
         Texture< dimension >& find_or_create_texture( AttributeManager& manager,
             std::string_view name,
-            TextureManagerKey );
+            TextureManagerKey /*key*/ );
 
         [[nodiscard]] const Texture< dimension >& find_texture(
-            std::string_view name, TextureManagerKey ) const;
+            std::string_view name, TextureManagerKey /*key*/ ) const;
 
         [[nodiscard]] absl::FixedArray< std::string_view > texture_names(
-            TextureManagerKey ) const;
+            TextureManagerKey /*key*/ ) const;
 
         [[nodiscard]] bool texture_exists(
-            std::string_view name, TextureManagerKey ) const;
+            std::string_view name, TextureManagerKey /*key*/ ) const;
 
-        void delete_texture( std::string_view name, TextureManagerKey );
+        void delete_texture( std::string_view name, TextureManagerKey /*key*/ );
 
     private:
         template < typename Archive >

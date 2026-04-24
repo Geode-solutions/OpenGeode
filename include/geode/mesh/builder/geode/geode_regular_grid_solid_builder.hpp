@@ -49,7 +49,7 @@ namespace geode
         static constexpr index_t dim{ 3 };
 
         OpenGeodeRegularGridBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeRegularGridBuilder( OpenGeodeRegularGrid< 3 >& mesh );
 

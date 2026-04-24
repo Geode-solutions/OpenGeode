@@ -48,6 +48,7 @@ namespace geode
     public:
         AttributeManager();
         AttributeManager( AttributeManager&& other ) noexcept;
+        AttributeManager& operator=( AttributeManager&& other ) noexcept;
         ~AttributeManager();
 
         /*!
@@ -267,7 +268,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        absl::Mutex& mutex() const;
+        [[nodiscard]] absl::Mutex& mutex() const;
 
         /*!
          * Find the Attribute associated with the given name

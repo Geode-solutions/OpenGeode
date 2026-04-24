@@ -115,11 +115,11 @@ namespace geode
         {
             archive.ext(
                 *this, Growable< Archive, CachedValue >{
-                           { []( Archive& a, CachedValue& value ) {
+                           { []( Archive& archive, CachedValue& value ) {
                                 bool computed;
-                                a.value1b( computed );
+                                archive.value1b( computed );
                                 value.computed_ = computed;
-                                a( value.value_ );
+                                archive( value.value_ );
                             },
                                []( Archive& /*a*/, CachedValue& /*value*/ ) {
                                    // skip serialize

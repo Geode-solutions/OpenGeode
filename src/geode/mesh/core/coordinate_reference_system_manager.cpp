@@ -152,18 +152,19 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl.crss_,
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive,
+                                                  Impl& impl ) {
+                archive.ext( impl.crss_,
                     bitsery::ext::StdMap{ impl.crss_.max_size() },
-                    []( Archive& a2, std::string& name,
+                    []( Archive& archive2, std::string& name,
                         std::shared_ptr<
                             CoordinateReferenceSystem< dimension > >& crs ) {
-                        a2.text1b( name, name.max_size() );
-                        a2.ext( crs, bitsery::ext::StdSmartPtr{} );
+                        archive2.text1b( name, name.max_size() );
+                        archive2.ext( crs, bitsery::ext::StdSmartPtr{} );
                     } );
-                a.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
-                a.text1b(
+                archive.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
+                archive.text1b(
                     impl.active_crs_name_, impl.active_crs_name_.max_size() );
             } } } );
         }
@@ -237,7 +238,7 @@ namespace geode
     void CoordinateReferenceSystemManager< dimension >::
         register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs,
-            CRSManagerKey )
+            CRSManagerKey /*key*/ )
     {
         impl_->register_coordinate_reference_system( name, std::move( crs ) );
     }
@@ -245,7 +246,7 @@ namespace geode
     template < index_t dimension >
     void CoordinateReferenceSystemManager<
         dimension >::delete_coordinate_reference_system( std::string_view name,
-        CRSManagerKey )
+        CRSManagerKey /*key*/ )
     {
         impl_->delete_coordinate_reference_system( name );
     }
@@ -253,7 +254,7 @@ namespace geode
     template < index_t dimension >
     void CoordinateReferenceSystemManager< dimension >::
         set_active_coordinate_reference_system(
-            std::string_view name, CRSManagerKey )
+            std::string_view name, CRSManagerKey /*key*/ )
     {
         impl_->set_active_coordinate_reference_system( name );
     }
@@ -261,7 +262,8 @@ namespace geode
     template < index_t dimension >
     CoordinateReferenceSystem< dimension >&
         CoordinateReferenceSystemManager< dimension >::
-            modifiable_active_coordinate_reference_system( CRSManagerKey )
+            modifiable_active_coordinate_reference_system(
+                CRSManagerKey /*key*/ )
     {
         return impl_->modifiable_active_coordinate_reference_system();
     }
@@ -270,7 +272,7 @@ namespace geode
     CoordinateReferenceSystem< dimension >&
         CoordinateReferenceSystemManager< dimension >::
             modifiable_coordinate_reference_system(
-                std::string_view name, CRSManagerKey )
+                std::string_view name, CRSManagerKey /*key*/ )
     {
         return impl_->modifiable_coordinate_reference_system( name );
     }
@@ -280,11 +282,12 @@ namespace geode
     void CoordinateReferenceSystemManager< dimension >::serialize(
         Archive& archive )
     {
-        archive.ext( *this,
-            Growable< Archive, CoordinateReferenceSystemManager >{
-                { []( Archive& a, CoordinateReferenceSystemManager& manager ) {
-                    a.object( manager.impl_ );
-                } } } );
+        archive.ext(
+            *this, Growable< Archive, CoordinateReferenceSystemManager >{
+                       { []( Archive& archive,
+                             CoordinateReferenceSystemManager& manager ) {
+                           archive.object( manager.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api CoordinateReferenceSystemManager< 1 >;

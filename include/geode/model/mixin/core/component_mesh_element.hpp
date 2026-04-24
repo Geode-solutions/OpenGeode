@@ -60,9 +60,9 @@ namespace geode
         {
             archive.ext(
                 *this, Growable< Archive, ComponentMeshElement >{
-                           { []( Archive& a, ComponentMeshElement& cme ) {
-                               a.object( cme.component_id );
-                               a.value4b( cme.element_id );
+                           { []( Archive& archive, ComponentMeshElement& cme ) {
+                               archive.object( cme.component_id );
+                               archive.value4b( cme.element_id );
                            } } } );
         }
 

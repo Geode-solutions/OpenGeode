@@ -53,10 +53,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.texture_storage_ );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{
+                                    { []( Archive& archive, Impl& impl ) {
+                                        archive.object( impl.texture_storage_ );
+                                    } } } );
         }
 
     private:
@@ -125,22 +125,23 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, EdgedCurve >{
-                { []( Archive& a, EdgedCurve& edged_curve ) {
-                     a.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
+                { []( Archive& archive, EdgedCurve& edged_curve ) {
+                     archive.ext(
+                         edged_curve, bitsery::ext::BaseClass< Graph >{} );
                  },
-                    []( Archive& a, EdgedCurve& edged_curve ) {
-                        a.ext(
+                    []( Archive& archive, EdgedCurve& edged_curve ) {
+                        archive.ext(
                             edged_curve, bitsery::ext::BaseClass< Graph >{} );
-                        a.object( edged_curve.impl_ );
+                        archive.object( edged_curve.impl_ );
                     },
-                    []( Archive& a, EdgedCurve& edged_curve ) {
-                        a.ext(
+                    []( Archive& archive, EdgedCurve& edged_curve ) {
+                        archive.ext(
                             edged_curve, bitsery::ext::BaseClass< Graph >{} );
-                        a.ext(
+                        archive.ext(
                             edged_curve, bitsery::ext::BaseClass<
                                              CoordinateReferenceSystemManagers<
                                                  dimension > >{} );
-                        a.object( edged_curve.impl_ );
+                        archive.object( edged_curve.impl_ );
                     } } } );
     }
 

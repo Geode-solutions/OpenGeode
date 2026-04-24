@@ -44,9 +44,9 @@ namespace geode
     class BlockCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( BlockCollection );
-        PASSKEY( BlockCollections< dimension >, BlockCollectionsKey );
-        PASSKEY(
-            BlockCollectionsBuilder< dimension >, BlockCollectionsBuilderKey );
+        PASSKEY( BlockCollections< dimension >, BlockCollectionsKey /*key*/ );
+        PASSKEY( BlockCollectionsBuilder< dimension >,
+            BlockCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -64,16 +64,16 @@ namespace geode
         }
 
     public:
-        BlockCollection( BlockCollectionsKey ) : BlockCollection() {}
+        BlockCollection( BlockCollectionsKey /*key*/ ) : BlockCollection() {}
 
         void set_block_collection_name(
-            std::string_view name, BlockCollectionsBuilderKey )
+            std::string_view name, BlockCollectionsBuilderKey /*key*/ )
         {
             this->set_name( name );
         }
 
         void set_block_collection_active(
-            bool is_active, BlockCollectionsBuilderKey )
+            bool is_active, BlockCollectionsBuilderKey /*key*/ )
         {
             this->set_active( is_active );
         }

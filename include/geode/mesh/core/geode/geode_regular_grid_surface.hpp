@@ -45,7 +45,7 @@ namespace geode
     class opengeode_mesh_api OpenGeodeRegularGrid< 2 > : public RegularGrid< 2 >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeRegularGrid );
-        PASSKEY( OpenGeodeRegularGridBuilder< 2 >, OGRegularGridKey );
+        PASSKEY( OpenGeodeRegularGridBuilder< 2 >, OGRegularGridKey /*key*/ );
 
     public:
         using Builder = OpenGeodeRegularGridBuilder< 2 >;
@@ -84,11 +84,11 @@ namespace geode
         }
 
     public:
-        void update_origin( const Point2D& origin, OGRegularGridKey );
+        void update_origin( const Point2D& origin, OGRegularGridKey /*key*/ );
 
         void update_origin_and_directions( const Point2D& origin,
             const std::array< Vector2D, 2 >& directions,
-            OGRegularGridKey );
+            OGRegularGridKey /*key*/ );
 
     private:
         friend class bitsery::Access;

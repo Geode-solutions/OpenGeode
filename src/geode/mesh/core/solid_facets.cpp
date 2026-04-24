@@ -149,12 +149,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
-                    bitsery::ext::BaseClass<
-                        detail::FacetStorage< PolyhedronFacetVertices > >{} );
-            } } } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                      PolyhedronFacetVertices > >{} );
+                    } } } );
         }
     };
 
@@ -209,7 +210,7 @@ namespace geode
 
     template < index_t dimension >
     std::vector< index_t > SolidFacets< dimension >::update_facet_vertices(
-        absl::Span< const index_t > old2new, SolidFacetsKey )
+        absl::Span< const index_t > old2new, SolidFacetsKey /*key*/ )
     {
         return impl_->update_facet_vertices( old2new );
     }
@@ -219,7 +220,7 @@ namespace geode
         PolyhedronFacetVertices facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id,
-        SolidFacetsKey )
+        SolidFacetsKey /*key*/ )
     {
         return impl_->update_facet_vertex(
             std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
@@ -227,28 +228,28 @@ namespace geode
 
     template < index_t dimension >
     void SolidFacets< dimension >::remove_facet(
-        PolyhedronFacetVertices facet_vertices, SolidFacetsKey )
+        PolyhedronFacetVertices facet_vertices, SolidFacetsKey /*key*/ )
     {
         impl_->remove_facet( std::move( facet_vertices ) );
     }
 
     template < index_t dimension >
     std::vector< index_t > SolidFacets< dimension >::remove_isolated_facets(
-        SolidFacetsKey )
+        SolidFacetsKey /*key*/ )
     {
         return impl_->remove_isolated_facets();
     }
 
     template < index_t dimension >
     std::vector< index_t > SolidFacets< dimension >::delete_facets(
-        const std::vector< bool >& to_delete, SolidFacetsKey )
+        const std::vector< bool >& to_delete, SolidFacetsKey /*key*/ )
     {
         return impl_->delete_facets( to_delete );
     }
 
     template < index_t dimension >
     void SolidFacets< dimension >::overwrite_facets(
-        const SolidFacets< dimension >& from, SolidFacetsKey )
+        const SolidFacets< dimension >& from, SolidFacetsKey /*key*/ )
     {
         impl_->overwrite_facets( *from.impl_ );
     }
@@ -270,8 +271,8 @@ namespace geode
     void SolidFacets< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, Growable< Archive, SolidFacets >{
-                                { []( Archive& a, SolidFacets& solid ) {
-                                    a.object( solid.impl_ );
+                                { []( Archive& archive, SolidFacets& solid ) {
+                                    archive.object( solid.impl_ );
                                 } } } );
     }
 

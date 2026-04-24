@@ -188,10 +188,10 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, CoordinateSystem >{
-                { []( Archive& a, CoordinateSystem& coord_system ) {
-                    a.ext( coord_system,
+                { []( Archive& archive, CoordinateSystem& coord_system ) {
+                    archive.ext( coord_system,
                         bitsery::ext::BaseClass< Frame< dimension > >{} );
-                    a.object( coord_system.origin_ );
+                    archive.object( coord_system.origin_ );
                 } } } );
     }
 

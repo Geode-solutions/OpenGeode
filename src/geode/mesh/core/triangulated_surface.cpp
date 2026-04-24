@@ -83,8 +83,9 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, TriangulatedSurface >{
-                { []( Archive& a, TriangulatedSurface& triangulated_surface ) {
-                    a.ext( triangulated_surface,
+                { []( Archive& archive,
+                      TriangulatedSurface& triangulated_surface ) {
+                    archive.ext( triangulated_surface,
                         bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
                 } } } );
     }

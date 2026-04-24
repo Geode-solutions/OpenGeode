@@ -68,11 +68,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::ArrayImpl< dimension > >{} );
-                    a.container( impl.colors_, impl.colors_.max_size() );
+            archive.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  internal::ArrayImpl< dimension > >{} );
+                    archive.container( impl.colors_, impl.colors_.max_size() );
                 } } } );
         }
 
@@ -142,10 +144,10 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, RasterImage >{
-                { []( Archive& a, RasterImage& raster ) {
-                    a.ext( raster,
+                { []( Archive& archive, RasterImage& raster ) {
+                    archive.ext( raster,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
-                    a.object( raster.impl_ );
+                    archive.object( raster.impl_ );
                 } } } );
     }
 

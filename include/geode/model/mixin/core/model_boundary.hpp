@@ -44,9 +44,9 @@ namespace geode
     class ModelBoundary : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( ModelBoundary );
-        PASSKEY( ModelBoundaries< dimension >, ModelBoundariesKey );
-        PASSKEY(
-            ModelBoundariesBuilder< dimension >, ModelBoundariesBuilderKey );
+        PASSKEY( ModelBoundaries< dimension >, ModelBoundariesKey /*key*/ );
+        PASSKEY( ModelBoundariesBuilder< dimension >,
+            ModelBoundariesBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -64,15 +64,16 @@ namespace geode
         }
 
     public:
-        ModelBoundary( ModelBoundariesKey ) : ModelBoundary() {}
+        ModelBoundary( ModelBoundariesKey /*key*/ ) : ModelBoundary() {}
 
         void set_model_boundary_name(
-            std::string_view name, ModelBoundariesBuilderKey )
+            std::string_view name, ModelBoundariesBuilderKey /*key*/ )
         {
             this->set_name( name );
         }
 
-        void set_model_boundary_active( bool active, ModelBoundariesBuilderKey )
+        void set_model_boundary_active(
+            bool active, ModelBoundariesBuilderKey /*key*/ )
         {
             this->set_active( active );
         }

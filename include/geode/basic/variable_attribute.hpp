@@ -58,7 +58,7 @@ namespace geode
     public:
         VariableAttribute( T default_value,
             AttributeProperties properties,
-            AttributeBase::AttributeKey )
+            AttributeBase::AttributeKey /*key*/ )
             : VariableAttribute(
                   std::move( default_value ), std::move( properties ) )
         {
@@ -80,7 +80,7 @@ namespace geode
         }
 
         template < typename Modifier >
-        void modify_value( index_t element, Modifier&& modifier )
+        void modify_value( index_t element, Modifier modifier )
         {
             modifier( values_[element] );
         }
@@ -93,14 +93,14 @@ namespace geode
     public:
         void compute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -119,22 +119,24 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, VariableAttribute< T > >{
-                    { []( Archive& a, VariableAttribute< T >& attribute ) {
-                        a.ext( attribute, bitsery::ext::BaseClass<
-                                              ReadOnlyAttribute< T > >{} );
-                        a( attribute.default_value_ );
-                        a.container( attribute.values_,
-                            attribute.values_.max_size(),
-                            []( Archive& a2, T& item ) {
-                                a2( item );
-                            } );
-                    } } } );
+            archive.ext( *this, Growable< Archive, VariableAttribute< T > >{
+                                    { []( Archive& archive,
+                                          VariableAttribute< T >& attribute ) {
+                                        archive.ext( attribute,
+                                            bitsery::ext::BaseClass<
+                                                ReadOnlyAttribute< T > >{} );
+                                        archive( attribute.default_value_ );
+                                        archive.container( attribute.values_,
+                                            attribute.values_.max_size(),
+                                            []( Archive& archive2, T& item ) {
+                                                archive2( item );
+                                            } );
+                                    } } } );
             values_.reserve( 10 );
         }
 
-        void resize( index_t size, AttributeBase::AttributeKey ) override
+        void resize(
+            index_t size, AttributeBase::AttributeKey /*key*/ ) override
         {
             const auto capacity = static_cast< index_t >( values_.capacity() );
             if( size > capacity )
@@ -145,25 +147,26 @@ namespace geode
             values_.resize( size, default_value_ );
         }
 
-        void reserve( index_t capacity, AttributeBase::AttributeKey ) override
+        void reserve(
+            index_t capacity, AttributeBase::AttributeKey /*key*/ ) override
         {
             values_.reserve( capacity );
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             delete_vector_elements( to_delete, values_ );
         }
 
         void permute_elements( absl::Span< const index_t > permutation,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             permute( values_, permutation );
         }
 
         [[nodiscard]] std::shared_ptr< AttributeBase > clone(
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{ default_value_, this->properties() }
@@ -174,7 +177,7 @@ namespace geode
 
         void copy( const AttributeBase& attribute,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             const auto& typed_attribute =
                 dynamic_cast< const VariableAttribute< T >& >( attribute );
@@ -192,7 +195,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{ default_value_, this->properties() }
@@ -220,25 +223,24 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{ default_value_, this->properties() }
             };
             attribute->values_.resize( nb_elements, default_value_ );
-            for( const auto& [in, outs] : old2new_mapping.in2out_map() )
+            for( const auto& [input, outputs] : old2new_mapping.in2out_map() )
             {
-                for( const auto new_index : outs )
+                for( const auto new_index : outputs )
                 {
                     OpenGeodeBasicException::check( new_index < nb_elements,
                         nullptr, OpenGeodeException::TYPE::data,
                         "[VariableAttribute::extract] The given mapping "
                         "contains values (",
                         new_index,
-                        ") that go beyond the given number "
-                        "of elements (",
+                        ") that go beyond the given number of elements (",
                         nb_elements, ")." );
-                    attribute->set_value( new_index, value( in ) );
+                    attribute->set_value( new_index, value( input ) );
                 }
             }
             return attribute;
@@ -246,7 +248,7 @@ namespace geode
 
         void import( absl::Span< const index_t > old2new,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new,
                 dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
@@ -254,7 +256,7 @@ namespace geode
 
         void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new_mapping,
                 dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
@@ -303,7 +305,7 @@ namespace geode
     public:
         VariableAttribute( bool default_value,
             AttributeProperties properties,
-            AttributeBase::AttributeKey )
+            AttributeBase::AttributeKey /*key*/ )
             : VariableAttribute( default_value, std::move( properties ) )
         {
         }
@@ -324,7 +326,7 @@ namespace geode
         }
 
         template < typename Modifier >
-        void modify_value( index_t element, Modifier&& modifier )
+        void modify_value( index_t element, Modifier modifier )
         {
             modifier( reinterpret_cast< bool& >( values_[element] ) );
         }
@@ -337,14 +339,14 @@ namespace geode
     public:
         void compute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -365,17 +367,20 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, VariableAttribute< bool > >{
-                    { []( Archive& a, VariableAttribute< bool >& attribute ) {
-                        a.ext( attribute, bitsery::ext::BaseClass<
-                                              ReadOnlyAttribute< bool > >{} );
-                        a.value1b( attribute.default_value_ );
-                        a.container1b(
+                    { []( Archive& archive,
+                          VariableAttribute< bool >& attribute ) {
+                        archive.ext(
+                            attribute, bitsery::ext::BaseClass<
+                                           ReadOnlyAttribute< bool > >{} );
+                        archive.value1b( attribute.default_value_ );
+                        archive.container1b(
                             attribute.values_, attribute.values_.max_size() );
                     } } } );
             values_.reserve( 10 );
         }
 
-        void resize( index_t size, AttributeBase::AttributeKey ) override
+        void resize(
+            index_t size, AttributeBase::AttributeKey /*key*/ ) override
         {
             const auto capacity = static_cast< index_t >( values_.capacity() );
             if( size > capacity )
@@ -386,25 +391,26 @@ namespace geode
             values_.resize( size, default_value_ );
         }
 
-        void reserve( index_t capacity, AttributeBase::AttributeKey ) override
+        void reserve(
+            index_t capacity, AttributeBase::AttributeKey /*key*/ ) override
         {
             values_.reserve( capacity );
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             delete_vector_elements( to_delete, values_ );
         }
 
         void permute_elements( absl::Span< const index_t > permutation,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             permute( values_, permutation );
         }
 
         [[nodiscard]] std::shared_ptr< AttributeBase > clone(
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
@@ -416,7 +422,7 @@ namespace geode
 
         void copy( const AttributeBase& attribute,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             const auto& typed_attribute =
                 dynamic_cast< const VariableAttribute< bool >& >( attribute );
@@ -434,7 +440,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
@@ -463,7 +469,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
@@ -490,7 +496,7 @@ namespace geode
 
         void import( absl::Span< const index_t > old2new,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new,
                 dynamic_cast< const ReadOnlyAttribute< bool >& >( *from ) );
@@ -498,7 +504,7 @@ namespace geode
 
         void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new_mapping,
                 dynamic_cast< const ReadOnlyAttribute< bool >& >( *from ) );

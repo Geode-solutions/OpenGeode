@@ -41,7 +41,8 @@ namespace geode
     class OpenGeodeEdgedCurve : public EdgedCurve< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeEdgedCurve );
-        PASSKEY( OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey );
+        PASSKEY(
+            OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey /*key*/ );
 
     public:
         using Builder = OpenGeodeEdgedCurveBuilder< dimension >;
@@ -81,11 +82,13 @@ namespace geode
         }
 
     public:
-        void set_vertex(
-            index_t vertex_id, Point< dimension > point, OGEdgedCurveKey );
+        void set_vertex( index_t vertex_id,
+            Point< dimension > point,
+            OGEdgedCurveKey /*key*/ );
 
-        void set_edge_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id, OGEdgedCurveKey );
+        void set_edge_vertex( const EdgeVertex& edge_vertex,
+            index_t vertex_id,
+            OGEdgedCurveKey /*key*/ );
 
     private:
         friend class bitsery::Access;

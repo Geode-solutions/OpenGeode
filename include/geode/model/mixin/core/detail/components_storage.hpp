@@ -163,14 +163,15 @@ namespace geode
             {
                 archive.ext( *this,
                     Growable< Archive, ComponentsStorage >{
-                        { []( Archive& a, ComponentsStorage& storage ) {
-                            a.ext( storage.components_,
+                        { []( Archive& archive, ComponentsStorage& storage ) {
+                            archive.ext( storage.components_,
                                 bitsery::ext::StdMap{
                                     storage.components_.max_size() },
-                                []( Archive& a2, uuid& id,
+                                []( Archive& archive2, uuid& id,
                                     ComponentPtr& item ) {
-                                    a2.object( id );
-                                    a2.ext( item, bitsery::ext::StdSmartPtr{} );
+                                    archive2.object( id );
+                                    archive2.ext(
+                                        item, bitsery::ext::StdSmartPtr{} );
                                 } );
                         } } } );
             }

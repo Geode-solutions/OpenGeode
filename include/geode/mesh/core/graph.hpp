@@ -106,7 +106,7 @@ namespace geode
      */
     class opengeode_mesh_api Graph : public VertexSet
     {
-        PASSKEY( GraphBuilder, GraphKey );
+        PASSKEY( GraphBuilder, GraphKey /*key*/ );
 
     public:
         using Builder = GraphBuilder;
@@ -170,13 +170,14 @@ namespace geode
 
     public:
         void set_edges_around_vertex(
-            index_t vertex_id, EdgesAroundVertex edges, GraphKey );
+            index_t vertex_id, EdgesAroundVertex edges, GraphKey /*key*/ );
 
-        void associate_edge_vertex_to_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey );
+        void associate_edge_vertex_to_vertex( const EdgeVertex& edge_vertex,
+            index_t vertex_id,
+            GraphKey /*key*/ );
 
         void disassociate_edge_vertex_to_vertex(
-            const EdgeVertex& edge_vertex, GraphKey );
+            const EdgeVertex& edge_vertex, GraphKey /*key*/ );
 
     protected:
         Graph();

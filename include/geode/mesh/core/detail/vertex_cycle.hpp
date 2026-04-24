@@ -155,8 +155,8 @@ namespace geode
             {
                 archive.ext( *this,
                     Growable< Archive, OrientedVertexCycle >{
-                        { []( Archive& a, OrientedVertexCycle& storage ) {
-                            a( storage.vertices_ );
+                        { []( Archive& archive, OrientedVertexCycle& storage ) {
+                            archive( storage.vertices_ );
                         } } } );
             }
 

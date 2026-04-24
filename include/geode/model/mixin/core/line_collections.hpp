@@ -44,8 +44,8 @@ namespace geode
     class LineCollections
     {
         OPENGEODE_DISABLE_COPY( LineCollections );
-        PASSKEY(
-            LineCollectionsBuilder< dimension >, LineCollectionsBuilderKey );
+        PASSKEY( LineCollectionsBuilder< dimension >,
+            LineCollectionsBuilderKey /*key*/ );
 
     public:
         using Builder = LineCollectionsBuilder< dimension >;

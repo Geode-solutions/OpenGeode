@@ -258,20 +258,20 @@ namespace geode
             {
                 archive.ext( *this,
                     Growable< Archive, FacetStorage< VertexContainer > >{
-                        { []( Archive& a,
+                        { []( Archive& archive,
                               FacetStorage< VertexContainer >& storage ) {
-                             a.object( storage.facet_attribute_manager_ );
-                             a.ext( storage.facet_indices_,
+                             archive.object( storage.facet_attribute_manager_ );
+                             archive.ext( storage.facet_indices_,
                                  bitsery::ext::StdMap{
                                      storage.facet_indices_.max_size() },
-                                 []( Archive& a2, TypedVertexCycle& cycle,
+                                 []( Archive& archive2, TypedVertexCycle& cycle,
                                      index_t& attribute ) {
-                                     a2.object( cycle );
-                                     a2.value4b( attribute );
+                                     archive2.object( cycle );
+                                     archive2.value4b( attribute );
                                  } );
-                             a.ext( storage.counter_,
+                             archive.ext( storage.counter_,
                                  bitsery::ext::StdSmartPtr{} );
-                             a.ext( storage.vertices_,
+                             archive.ext( storage.vertices_,
                                  bitsery::ext::StdSmartPtr{} );
                              const auto& old_counter_properties =
                                  storage.counter_->properties();
@@ -286,20 +286,22 @@ namespace geode
                                      old_vertices_properties.interpolable,
                                      false } );
                          },
-                            []( Archive& a,
+                            []( Archive& archive,
                                 FacetStorage< VertexContainer >& storage ) {
-                                a.object( storage.facet_attribute_manager_ );
-                                a.ext( storage.facet_indices_,
+                                archive.object(
+                                    storage.facet_attribute_manager_ );
+                                archive.ext( storage.facet_indices_,
                                     bitsery::ext::StdMap{
                                         storage.facet_indices_.max_size() },
-                                    []( Archive& a2, TypedVertexCycle& cycle,
+                                    []( Archive& archive2,
+                                        TypedVertexCycle& cycle,
                                         index_t& attribute ) {
-                                        a2.object( cycle );
-                                        a2.value4b( attribute );
+                                        archive2.object( cycle );
+                                        archive2.value4b( attribute );
                                     } );
-                                a.ext( storage.counter_,
+                                archive.ext( storage.counter_,
                                     bitsery::ext::StdSmartPtr{} );
-                                a.ext( storage.vertices_,
+                                archive.ext( storage.vertices_,
                                     bitsery::ext::StdSmartPtr{} );
                             } } } );
             }

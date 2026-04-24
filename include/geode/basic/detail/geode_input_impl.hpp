@@ -34,45 +34,42 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
-namespace geode
+namespace geode::detail
 {
-    namespace detail
+    template < typename Factory >
+    [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
+        geode_object_input_reader( std::string_view& filename )
     {
-        template < typename Factory >
-        [[nodiscard]] std::unique_ptr< typename Factory::BaseClass >
-            geode_object_input_reader( std::string_view& filename )
-        {
-            filename = absl::StripAsciiWhitespace( filename );
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OpenGeodeBasicException::check( Factory::has_creator( extension ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Unknown extension: ", extension );
-            return Factory::create(
-                extension, expand_predefined_folders( filename ) );
-        }
+        filename = absl::StripAsciiWhitespace( filename );
+        const auto extension =
+            absl::AsciiStrToLower( extension_from_filename( filename ) );
+        OpenGeodeBasicException::check( Factory::has_creator( extension ),
+            nullptr, OpenGeodeException::TYPE::data,
+            "Unknown extension: ", extension );
+        return Factory::create(
+            extension, expand_predefined_folders( filename ) );
+    }
 
-        template < typename Factory, typename... Args >
-        [[nodiscard]] typename Factory::BaseClass::InputData
-            geode_object_input_impl(
-                std::string_view type, std::string_view filename, Args... args )
-        {
-            const Timer timer;
-            auto input = geode_object_input_reader< Factory >( filename );
-            auto object = input->read( std::forward< Args >( args )... );
-            Logger::info(
-                type, " loaded from ", filename, " in ", timer.duration() );
-            return object;
-        }
+    template < typename Factory, typename... Args >
+    [[nodiscard]] typename Factory::BaseClass::InputData
+        geode_object_input_impl(
+            std::string_view type, std::string_view filename, Args... args )
+    {
+        const Timer timer;
+        auto input = geode_object_input_reader< Factory >( filename );
+        auto object = input->read( std::forward< Args >( args )... );
+        Logger::info(
+            type, " loaded from ", filename, " in ", timer.duration() );
+        return object;
+    }
 
-        inline void add_to_message( std::string& message,
-            geode::index_t nb_components,
-            std::string_view component_text )
+    inline void add_to_message( std::string& message,
+        geode::index_t nb_components,
+        std::string_view component_text )
+    {
+        if( nb_components > 0 )
         {
-            if( nb_components > 0 )
-            {
-                absl::StrAppend( &message, nb_components, component_text );
-            }
+            absl::StrAppend( &message, nb_components, component_text );
         }
-    } // namespace detail
-} // namespace geode
+    }
+} // namespace geode::detail

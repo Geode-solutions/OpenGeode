@@ -218,18 +218,18 @@ namespace geode
     template < typename Archive >
     void PolygonVertex::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, PolygonVertex >{
-                       { []( Archive& a, PolygonVertex& polygon_vertex ) {
-                            a.value4b( polygon_vertex.polygon_id );
-                            index_t value{ NO_ID };
-                            a.value4b( value );
-                            polygon_vertex.vertex_id = value;
-                        },
-                           []( Archive& a, PolygonVertex& polygon_vertex ) {
-                               a.value4b( polygon_vertex.polygon_id );
-                               a.value1b( polygon_vertex.vertex_id );
-                           } } } );
+        archive.ext( *this,
+            Growable< Archive, PolygonVertex >{
+                { []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                     archive.value4b( polygon_vertex.polygon_id );
+                     index_t value{ NO_ID };
+                     archive.value4b( value );
+                     polygon_vertex.vertex_id = value;
+                 },
+                    []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                        archive.value4b( polygon_vertex.polygon_id );
+                        archive.value1b( polygon_vertex.vertex_id );
+                    } } } );
     }
 
     template < typename Archive >
@@ -237,15 +237,15 @@ namespace geode
     {
         archive.ext(
             *this, Growable< Archive, PolygonEdge >{
-                       { []( Archive& a, PolygonEdge& polygon_edge ) {
-                            a.value4b( polygon_edge.polygon_id );
+                       { []( Archive& archive, PolygonEdge& polygon_edge ) {
+                            archive.value4b( polygon_edge.polygon_id );
                             index_t value{ NO_ID };
-                            a.value4b( value );
+                            archive.value4b( value );
                             polygon_edge.edge_id = value;
                         },
-                           []( Archive& a, PolygonEdge& polygon_edge ) {
-                               a.value4b( polygon_edge.polygon_id );
-                               a.value1b( polygon_edge.edge_id );
+                           []( Archive& archive, PolygonEdge& polygon_edge ) {
+                               archive.value4b( polygon_edge.polygon_id );
+                               archive.value1b( polygon_edge.edge_id );
                            } } } );
     }
 
@@ -422,11 +422,12 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.object( impl.polygon_attribute_manager_ );
-                         a.ext( impl.polygon_around_vertex_,
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.object( impl.polygon_attribute_manager_ );
+                         archive.ext( impl.polygon_around_vertex_,
                              bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                         archive.ext(
+                             impl.edges_, bitsery::ext::StdSmartPtr{} );
                          const auto& old_polygon_around_vertex_properties =
                              impl.polygon_around_vertex_->properties();
                          impl.polygon_around_vertex_->set_properties(
@@ -442,13 +443,14 @@ namespace geode
                                      .interpolable,
                                  false } );
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.polygon_attribute_manager_ );
-                            a.ext( impl.polygon_around_vertex_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.polygon_attribute_manager_ );
+                            archive.ext( impl.polygon_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.polygons_around_vertex_,
+                            archive.ext( impl.polygons_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            archive.ext(
+                                impl.edges_, bitsery::ext::StdSmartPtr{} );
                             const auto& old_polygon_around_vertex_properties =
                                 impl.polygon_around_vertex_->properties();
                             impl.polygon_around_vertex_->set_properties(
@@ -466,14 +468,15 @@ namespace geode
                                         .interpolable,
                                     false } );
                         },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.polygon_attribute_manager_ );
-                            a.ext( impl.polygon_around_vertex_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.polygon_attribute_manager_ );
+                            archive.ext( impl.polygon_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.polygons_around_vertex_,
+                            archive.ext( impl.polygons_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                            a.object( impl.texture_storage_ );
+                            archive.ext(
+                                impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            archive.object( impl.texture_storage_ );
                             const auto& old_polygon_around_vertex_properties =
                                 impl.polygon_around_vertex_->properties();
                             impl.polygon_around_vertex_->set_properties(
@@ -491,14 +494,15 @@ namespace geode
                                         .interpolable,
                                     false } );
                         },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.polygon_attribute_manager_ );
-                            a.ext( impl.polygon_around_vertex_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.polygon_attribute_manager_ );
+                            archive.ext( impl.polygon_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.polygons_around_vertex_,
+                            archive.ext( impl.polygons_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                            a.object( impl.texture_storage_ );
+                            archive.ext(
+                                impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            archive.object( impl.texture_storage_ );
                         } } } );
         }
 
@@ -632,7 +636,9 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceMesh< dimension >::associate_polygon_vertex_to_vertex(
-        const PolygonVertex& polygon_vertex, index_t vertex_id, SurfaceMeshKey )
+        const PolygonVertex& polygon_vertex,
+        index_t vertex_id,
+        SurfaceMeshKey /*key*/ )
     {
         impl_->associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
     }
@@ -1029,14 +1035,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    SurfaceEdges< dimension >& SurfaceMesh< dimension >::edges( SurfaceMeshKey )
+    SurfaceEdges< dimension >& SurfaceMesh< dimension >::edges(
+        SurfaceMeshKey /*key*/ )
     {
         return impl_->edges();
     }
 
     template < index_t dimension >
     void SurfaceMesh< dimension >::copy_edges(
-        const SurfaceMesh< dimension >& surface_mesh, SurfaceMeshKey )
+        const SurfaceMesh< dimension >& surface_mesh, SurfaceMeshKey /*key*/ )
     {
         return impl_->copy_edges( surface_mesh );
     }
@@ -1054,24 +1061,26 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, SurfaceMesh >{
-                { []( Archive& a, SurfaceMesh& surface ) {
-                     a.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
-                     a.object( surface.impl_ );
+                { []( Archive& archive, SurfaceMesh& surface ) {
+                     archive.ext(
+                         surface, bitsery::ext::BaseClass< VertexSet >{} );
+                     archive.object( surface.impl_ );
                      surface.impl_->initialize_polygons_around_vertex(
                          surface );
                  },
-                    []( Archive& a, SurfaceMesh& surface ) {
-                        a.ext(
+                    []( Archive& archive, SurfaceMesh& surface ) {
+                        archive.ext(
                             surface, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.object( surface.impl_ );
+                        archive.object( surface.impl_ );
                     },
-                    []( Archive& a, SurfaceMesh& surface ) {
-                        a.ext(
+                    []( Archive& archive, SurfaceMesh& surface ) {
+                        archive.ext(
                             surface, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.ext( surface, bitsery::ext::BaseClass<
-                                            CoordinateReferenceSystemManagers<
-                                                dimension > >{} );
-                        a.object( surface.impl_ );
+                        archive.ext(
+                            surface, bitsery::ext::BaseClass<
+                                         CoordinateReferenceSystemManagers<
+                                             dimension > >{} );
+                        archive.object( surface.impl_ );
                     } } } );
     }
 
@@ -1092,7 +1101,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceMesh< dimension >::reset_polygons_around_vertex(
-        index_t vertex_id, SurfaceMeshKey )
+        index_t vertex_id, SurfaceMeshKey /*key*/ )
     {
         impl_->reset_polygons_around_vertex( vertex_id );
     }

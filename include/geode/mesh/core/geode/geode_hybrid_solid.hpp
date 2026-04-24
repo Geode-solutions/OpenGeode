@@ -43,7 +43,8 @@ namespace geode
     class OpenGeodeHybridSolid : public HybridSolid< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeHybridSolid );
-        PASSKEY( OpenGeodeHybridSolidBuilder< dimension >, OGHybridSolidKey );
+        PASSKEY( OpenGeodeHybridSolidBuilder< dimension >,
+            OGHybridSolidKey /*key*/ );
 
     public:
         using Builder = OpenGeodeHybridSolidBuilder< dimension >;
@@ -84,38 +85,39 @@ namespace geode
         }
 
     public:
-        void set_vertex(
-            index_t vertex_id, Point< dimension > point, OGHybridSolidKey );
+        void set_vertex( index_t vertex_id,
+            Point< dimension > point,
+            OGHybridSolidKey /*key*/ );
 
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
-            OGHybridSolidKey );
+            OGHybridSolidKey /*key*/ );
 
         void set_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet,
             index_t adjacent_id,
-            OGHybridSolidKey );
+            OGHybridSolidKey /*key*/ );
 
-        void add_tetrahedron(
-            const std::array< index_t, 4 >& vertices, OGHybridSolidKey );
+        void add_tetrahedron( const std::array< index_t, 4 >& vertices,
+            OGHybridSolidKey /*key*/ );
 
-        void add_hexahedron(
-            const std::array< index_t, 8 >& vertices, OGHybridSolidKey );
+        void add_hexahedron( const std::array< index_t, 8 >& vertices,
+            OGHybridSolidKey /*key*/ );
 
-        void add_prism(
-            const std::array< index_t, 6 >& vertices, OGHybridSolidKey );
+        void add_prism( const std::array< index_t, 6 >& vertices,
+            OGHybridSolidKey /*key*/ );
 
-        void add_pyramid(
-            const std::array< index_t, 5 >& vertices, OGHybridSolidKey );
+        void add_pyramid( const std::array< index_t, 5 >& vertices,
+            OGHybridSolidKey /*key*/ );
 
         void remove_polyhedra(
-            const std::vector< bool >& to_delete, OGHybridSolidKey );
+            const std::vector< bool >& to_delete, OGHybridSolidKey /*key*/ );
 
         void permute_polyhedra(
-            absl::Span< const index_t > permutation, OGHybridSolidKey );
+            absl::Span< const index_t > permutation, OGHybridSolidKey /*key*/ );
 
         void copy_polyhedra(
             const OpenGeodeHybridSolid< dimension >& solid_mesh,
-            OGHybridSolidKey );
+            OGHybridSolidKey /*key*/ );
 
     private:
         friend class bitsery::Access;

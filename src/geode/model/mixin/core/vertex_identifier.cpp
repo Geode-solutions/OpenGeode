@@ -91,12 +91,13 @@ namespace geode
     template < typename Archive >
     void ComponentMeshVertex::serialize( Archive& archive )
     {
-        archive.ext( *this,
-            Growable< Archive, ComponentMeshVertex >{
-                { []( Archive& a, ComponentMeshVertex& component_mesh_vertex ) {
-                    a.object( component_mesh_vertex.component_id );
-                    a.value4b( component_mesh_vertex.vertex );
-                } } } );
+        archive.ext(
+            *this, Growable< Archive, ComponentMeshVertex >{
+                       { []( Archive& archive,
+                             ComponentMeshVertex& component_mesh_vertex ) {
+                           archive.object( component_mesh_vertex.component_id );
+                           archive.value4b( component_mesh_vertex.vertex );
+                       } } } );
     }
 
     class VertexIdentifier::Impl
@@ -407,18 +408,18 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.object( impl.unique_vertices_ );
-                         a.ext( impl.component_vertices_,
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.object( impl.unique_vertices_ );
+                         archive.ext( impl.component_vertices_,
                              bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.vertex2unique_vertex_,
+                         archive.ext( impl.vertex2unique_vertex_,
                              bitsery::ext::StdMap{
                                  impl.vertex2unique_vertex_.max_size() },
-                             []( Archive& a2, uuid& id,
+                             []( Archive& archive2, uuid& id,
                                  std::shared_ptr< VariableAttribute<
                                      index_t > >& attribute ) {
-                                 a2.object( id );
-                                 a2.ext(
+                                 archive2.object( id );
+                                 archive2.ext(
                                      attribute, bitsery::ext::StdSmartPtr{} );
                              } );
                          const auto& old_component_vertices_properties =
@@ -428,18 +429,18 @@ namespace geode
                                  old_component_vertices_properties.interpolable,
                                  false } );
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.unique_vertices_ );
-                            a.ext( impl.component_vertices_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.unique_vertices_ );
+                            archive.ext( impl.component_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.vertex2unique_vertex_,
+                            archive.ext( impl.vertex2unique_vertex_,
                                 bitsery::ext::StdMap{
                                     impl.vertex2unique_vertex_.max_size() },
-                                []( Archive& a2, uuid& id,
+                                []( Archive& archive2, uuid& id,
                                     std::shared_ptr< VariableAttribute<
                                         index_t > >& attribute ) {
-                                    a2.object( id );
-                                    a2.ext( attribute,
+                                    archive2.object( id );
+                                    archive2.ext( attribute,
                                         bitsery::ext::StdSmartPtr{} );
                                 } );
                         } } } );
@@ -531,24 +532,25 @@ namespace geode
 
     template < typename MeshComponent >
     void VertexIdentifier::register_mesh_component(
-        const MeshComponent& component, BuilderKey )
+        const MeshComponent& component, BuilderKey /*key*/ )
     {
         impl_->register_component( component );
     }
 
     template < typename MeshComponent >
     void VertexIdentifier::unregister_mesh_component(
-        const MeshComponent& component, BuilderKey )
+        const MeshComponent& component, BuilderKey /*key*/ )
     {
         impl_->unregister_component( component );
     }
 
-    index_t VertexIdentifier::create_unique_vertex( BuilderKey )
+    index_t VertexIdentifier::create_unique_vertex( BuilderKey /*key*/ )
     {
         return impl_->create_unique_vertex();
     }
 
-    index_t VertexIdentifier::create_unique_vertices( index_t nb, BuilderKey )
+    index_t VertexIdentifier::create_unique_vertices(
+        index_t nb, BuilderKey /*key*/ )
     {
         return impl_->create_unique_vertices( nb );
     }
@@ -556,7 +558,7 @@ namespace geode
     void VertexIdentifier::set_unique_vertex(
         ComponentMeshVertex component_vertex_id,
         index_t unique_vertex_id,
-        BuilderKey )
+        BuilderKey /*key*/ )
     {
         impl_->set_unique_vertex(
             std::move( component_vertex_id ), unique_vertex_id );
@@ -565,7 +567,7 @@ namespace geode
     void VertexIdentifier::unset_unique_vertex(
         const ComponentMeshVertex& component_vertex_id,
         index_t unique_vertex_id,
-        BuilderKey )
+        BuilderKey /*key*/ )
     {
         impl_->unset_unique_vertex( component_vertex_id, unique_vertex_id );
     }
@@ -573,7 +575,7 @@ namespace geode
     void VertexIdentifier::update_unique_vertices(
         const ComponentID& component_id,
         absl::Span< const index_t > old2new,
-        BuilderKey )
+        BuilderKey /*key*/ )
     {
         impl_->update_unique_vertices( component_id, old2new );
     }
@@ -585,53 +587,53 @@ namespace geode
     }
 
     void VertexIdentifier::load_unique_vertices(
-        std::string_view directory, BuilderKey )
+        std::string_view directory, BuilderKey /*key*/ )
     {
         return impl_->load( directory );
     }
 
     std::vector< index_t > VertexIdentifier::delete_isolated_vertices(
-        BuilderKey )
+        BuilderKey /*key*/ )
     {
         return impl_->delete_isolated_vertices();
     }
 
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Corner2D&, BuilderKey );
+        const Corner2D&, BuilderKey /*key*/ );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Corner3D&, BuilderKey );
+        const Corner3D&, BuilderKey /*key*/ );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Line2D&, BuilderKey );
+        const Line2D&, BuilderKey /*key*/ );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Line3D&, BuilderKey );
+        const Line3D&, BuilderKey /*key*/ );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Surface2D&, BuilderKey );
+        const Surface2D&, BuilderKey /*key*/ );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Surface3D&, BuilderKey );
+        const Surface3D&, BuilderKey /*key*/ );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Block3D&, BuilderKey );
+        const Block3D&, BuilderKey /*key*/ );
 
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Corner2D&, BuilderKey );
+            const Corner2D&, BuilderKey /*key*/ );
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Corner3D&, BuilderKey );
+            const Corner3D&, BuilderKey /*key*/ );
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Line2D&, BuilderKey );
+            const Line2D&, BuilderKey /*key*/ );
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Line3D&, BuilderKey );
+            const Line3D&, BuilderKey /*key*/ );
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Surface2D&, BuilderKey );
+            const Surface2D&, BuilderKey /*key*/ );
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Surface3D&, BuilderKey );
+            const Surface3D&, BuilderKey /*key*/ );
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
-            const Block3D&, BuilderKey );
+            const Block3D&, BuilderKey /*key*/ );
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ComponentMeshVertex );
 } // namespace geode

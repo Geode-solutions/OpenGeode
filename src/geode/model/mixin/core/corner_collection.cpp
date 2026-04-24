@@ -34,8 +34,8 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, CornerCollection >{
-                { []( Archive &a, CornerCollection &corner_collection ) {
-                    a.ext( corner_collection,
+                { []( Archive &archive, CornerCollection &corner_collection ) {
+                    archive.ext( corner_collection,
                         bitsery::ext::BaseClass< Component< dimension > >{} );
                 } } } );
     }

@@ -118,8 +118,8 @@ namespace geode
             {
                 archive.ext( *this,
                     Growable< Archive, FacetEdgesImpl >{
-                        { []( Archive& a, FacetEdgesImpl& impl ) {
-                            a.ext( impl,
+                        { []( Archive& archive, FacetEdgesImpl& impl ) {
+                            archive.ext( impl,
                                 bitsery::ext::BaseClass< detail::FacetStorage<
                                     std::array< index_t, 2 > > >{} );
                         } } } );

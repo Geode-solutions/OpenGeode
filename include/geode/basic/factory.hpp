@@ -63,19 +63,18 @@ namespace geode
     {
     public:
         using BaseClass = BaseClassType;
-        using Creator = typename std::add_pointer< std::unique_ptr< BaseClass >(
-            Args... ) >::type;
+        using Creator =
+            std::add_pointer_t< std::unique_ptr< BaseClass >( Args... ) >;
         using FactoryStore = absl::flat_hash_map< Key, Creator >;
-        static_assert( std::has_virtual_destructor< BaseClass >::value,
+        static_assert( std::has_virtual_destructor_v< BaseClass >,
             "BaseClass must have a virtual destructor" );
 
         template < typename DerivedClass >
-        static inline void register_creator( Key key )
+        static void register_creator( Key key )
         {
-            static_assert( std::is_base_of< BaseClass, DerivedClass >::value,
+            static_assert( std::is_base_of_v< BaseClass, DerivedClass >,
                 "DerivedClass is not a subclass of BaseClass" );
-            static_assert(
-                std::is_constructible< DerivedClass, Args... >::value,
+            static_assert( std::is_constructible_v< DerivedClass, Args... >,
                 "DerivedClass is not constructible with Args..." );
             auto &store = get_store();
             if( !store
@@ -88,7 +87,7 @@ namespace geode
             }
         }
 
-        [[nodiscard]] static inline std::unique_ptr< BaseClass > create(
+        [[nodiscard]] static std::unique_ptr< BaseClass > create(
             const Key &key, Args... args )
         {
             const auto &store = get_store();
@@ -100,7 +99,7 @@ namespace geode
             return creator->second( std::forward< Args >( args )... );
         }
 
-        [[nodiscard]] static inline absl::FixedArray< Key > list_creators()
+        [[nodiscard]] static absl::FixedArray< Key > list_creators()
         {
             const auto &store = get_store();
             absl::FixedArray< Key > creators( store.size() );
@@ -112,7 +111,7 @@ namespace geode
             return creators;
         }
 
-        [[nodiscard]] static inline bool has_creator( const Key &key )
+        [[nodiscard]] static bool has_creator( const Key &key )
         {
             const auto &store = get_store();
             return store.find( key ) != store.end();
@@ -120,14 +119,14 @@ namespace geode
 
     private:
         template < typename DerivedClass >
-        [[nodiscard]] static inline std::unique_ptr< BaseClass >
-            create_function_impl( Args... args )
+        [[nodiscard]] static std::unique_ptr< BaseClass > create_function_impl(
+            Args... args )
         {
             return std::unique_ptr< BaseClass >{ new DerivedClass{
                 std::forward< Args >( args )... } };
         }
 
-        [[nodiscard]] static inline FactoryStore &get_store()
+        [[nodiscard]] static FactoryStore &get_store()
         {
             return Singleton::instance< Factory >().store_;
         }

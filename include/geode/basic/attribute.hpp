@@ -54,7 +54,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        PASSKEY( AttributeManager, AttributeKey );
+        PASSKEY( AttributeManager, AttributeKey /*key*/ );
 
         virtual ~AttributeBase() = default;
 
@@ -85,53 +85,54 @@ namespace geode
         }
 
     public:
-        void set_name( std::string_view name, AttributeKey )
+        void set_name( std::string_view name, AttributeKey /*key*/ )
         {
             name_ = to_string( name );
         }
 
         [[nodiscard]] virtual std::shared_ptr< AttributeBase > clone(
-            AttributeKey ) const = 0;
+            AttributeKey /*key*/ ) const = 0;
 
         virtual void copy( const AttributeBase& attribute,
             index_t nb_elements,
-            AttributeKey ) = 0;
+            AttributeKey /*key*/ ) = 0;
 
         [[nodiscard]] virtual std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
-            AttributeKey ) const = 0;
+            AttributeKey /*key*/ ) const = 0;
 
         [[nodiscard]] virtual std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
-            AttributeKey ) const = 0;
+            AttributeKey /*key*/ ) const = 0;
 
         virtual void import( absl::Span< const index_t > old2new,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) = 0;
+            AttributeBase::AttributeKey /*key*/ ) = 0;
 
         virtual void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) = 0;
+            AttributeBase::AttributeKey /*key*/ ) = 0;
 
-        virtual void resize( index_t size, AttributeKey ) = 0;
+        virtual void resize( index_t size, AttributeKey /*key*/ ) = 0;
 
-        virtual void reserve( index_t capacity, AttributeKey ) = 0;
+        virtual void reserve( index_t capacity, AttributeKey /*key*/ ) = 0;
 
         virtual void delete_elements(
-            const std::vector< bool >& to_delete, AttributeKey ) = 0;
+            const std::vector< bool >& to_delete, AttributeKey /*key*/ ) = 0;
 
         virtual void permute_elements(
-            absl::Span< const index_t > permutation, AttributeKey ) = 0;
+            absl::Span< const index_t > permutation, AttributeKey /*key*/ ) = 0;
 
-        virtual void compute_value(
-            index_t from_element, index_t to_element, AttributeKey ) = 0;
+        virtual void compute_value( index_t from_element,
+            index_t to_element,
+            AttributeKey /*key*/ ) = 0;
 
         virtual void compute_value(
             const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeKey ) = 0;
+            AttributeKey /*key*/ ) = 0;
 
     private:
         AttributeBase() = default;
@@ -139,16 +140,16 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext(
-                *this, Growable< Archive, AttributeBase >{
-                           { []( Archive& a, AttributeBase& attribute ) {
-                                a.object( attribute.properties_ );
-                            },
-                               []( Archive& a, AttributeBase& attribute ) {
-                                   a.object( attribute.properties_ );
-                                   a.text1b( attribute.name_,
-                                       attribute.name_.max_size() );
-                               } } } );
+            archive.ext( *this,
+                Growable< Archive, AttributeBase >{
+                    { []( Archive& archive, AttributeBase& attribute ) {
+                         archive.object( attribute.properties_ );
+                     },
+                        []( Archive& archive, AttributeBase& attribute ) {
+                            archive.object( attribute.properties_ );
+                            archive.text1b(
+                                attribute.name_, attribute.name_.max_size() );
+                        } } } );
         }
 
     protected:
@@ -214,12 +215,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, ReadOnlyAttribute< T > >{
-                    { []( Archive& a, ReadOnlyAttribute< T >& attribute ) {
-                        a.ext( attribute,
-                            bitsery::ext::BaseClass< AttributeBase >{} );
-                    } } } );
+            archive.ext(
+                *this, Growable< Archive, ReadOnlyAttribute< T > >{
+                           { []( Archive& archive,
+                                 ReadOnlyAttribute< T >& attribute ) {
+                               archive.ext( attribute,
+                                   bitsery::ext::BaseClass< AttributeBase >{} );
+                           } } } );
         }
     };
 } // namespace geode

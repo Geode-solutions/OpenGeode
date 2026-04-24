@@ -506,8 +506,8 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, TetrahedralSolid >{
-                { []( Archive& a, TetrahedralSolid& tetrahedral_solid ) {
-                    a.ext( tetrahedral_solid,
+                { []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
+                    archive.ext( tetrahedral_solid,
                         bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
                 } } } );
     }
