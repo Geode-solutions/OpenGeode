@@ -159,9 +159,9 @@ namespace geode
         private:
             friend class bitsery::Access;
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, ComponentsStorage >{
                         { []( Archive& archive, ComponentsStorage& storage ) {
                             archive.ext( storage.components_,

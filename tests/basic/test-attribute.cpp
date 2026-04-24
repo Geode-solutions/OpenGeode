@@ -51,10 +51,10 @@ struct Foo
     }
 
     template < typename Archive >
-    void serialize( Archive& archive )
+    void serialize( Archive& serializer )
     {
-        archive.value8b( double_ );
-        archive.value4b( int_ );
+        serializer.value8b( double_ );
+        serializer.value4b( int_ );
     }
     double double_{ 0 };
     int int_{ 0 };

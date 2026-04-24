@@ -93,7 +93,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] index_t get_edge_vertex(
             const EdgeVertex& edge_vertex ) const override;

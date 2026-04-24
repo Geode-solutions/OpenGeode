@@ -75,9 +75,9 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, NamedType >{
                            { []( Archive& archive, NamedType& named_type ) {
                                archive( named_type.value_ );

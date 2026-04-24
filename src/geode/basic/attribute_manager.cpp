@@ -346,9 +346,9 @@ namespace geode
         }
 
         template < typename Archive >
-        void serialize( Archive &archive )
+        void serialize( Archive &serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, Impl >{ { []( Archive &local_archive,
                                                         Impl &impl ) {
                     local_archive.value4b( impl.nb_elements_ );
@@ -534,9 +534,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void AttributeManager::serialize( Archive &archive )
+    void AttributeManager::serialize( Archive &serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, AttributeManager >{
                 { []( Archive &local_archive,
                       AttributeManager &attribute_manager ) {

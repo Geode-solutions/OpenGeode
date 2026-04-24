@@ -111,9 +111,9 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.object( impl.edge_attribute_manager_ );
@@ -141,9 +141,9 @@ namespace geode
     };
 
     template < typename Archive >
-    void EdgeVertex::serialize( Archive& archive )
+    void EdgeVertex::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, EdgeVertex >{
                        { []( Archive& archive, EdgeVertex& edge_vertex ) {
                             archive.value4b( edge_vertex.edge_id );
@@ -271,9 +271,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void Graph::serialize( Archive& archive )
+    void Graph::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, Graph >{ { []( Archive& archive, Graph& graph ) {
                 archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( graph.impl_ );

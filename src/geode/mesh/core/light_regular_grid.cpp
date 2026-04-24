@@ -62,9 +62,9 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, Impl >{
                            { []( Archive& archive, Impl& impl ) {
                                archive.object( impl.cell_attribute_manager_ );
@@ -197,9 +197,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void LightRegularGrid< dimension >::serialize( Archive& archive )
+    void LightRegularGrid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, LightRegularGrid >{
                        { []( Archive& archive, LightRegularGrid& grid ) {
                            archive.ext( grid,

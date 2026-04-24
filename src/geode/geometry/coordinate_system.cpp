@@ -184,9 +184,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void CoordinateSystem< dimension >::serialize( Archive& archive )
+    void CoordinateSystem< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, CoordinateSystem >{
                 { []( Archive& archive, CoordinateSystem& coord_system ) {
                     archive.ext( coord_system,

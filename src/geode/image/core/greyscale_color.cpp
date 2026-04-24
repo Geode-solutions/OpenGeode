@@ -75,9 +75,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void GreyscaleColor::serialize( Archive &archive )
+    void GreyscaleColor::serialize( Archive &serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, GreyscaleColor >{
                        { []( Archive &archive, GreyscaleColor &color ) {
                            archive.value1b( color.value_ );

@@ -351,9 +351,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolyhedronVertex::serialize( Archive& archive )
+    void PolyhedronVertex::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronVertex >{
                 { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
                      archive.value4b( polyhedron_vertex.polyhedron_id );
@@ -369,9 +369,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolyhedronFacet::serialize( Archive& archive )
+    void PolyhedronFacet::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronFacet >{
                 { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
                      archive.value4b( polyhedron_facet.polyhedron_id );
@@ -386,9 +386,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolyhedronFacetVertex::serialize( Archive& archive )
+    void PolyhedronFacetVertex::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronFacetVertex >{
                 { []( Archive& archive,
                       PolyhedronFacetVertex& polyhedron_facet_vertex ) {
@@ -406,9 +406,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolyhedronFacetEdge::serialize( Archive& archive )
+    void PolyhedronFacetEdge::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronFacetEdge >{
                 { []( Archive& archive,
                       PolyhedronFacetEdge& polyhedron_facet_edge ) {
@@ -705,9 +705,9 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive,
                     Impl >{ { []( Archive& archive, Impl& impl ) {
                                  archive.object(
@@ -1724,9 +1724,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void SolidMesh< dimension >::serialize( Archive& archive )
+    void SolidMesh< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, SolidMesh >{
                 { []( Archive& archive, SolidMesh& solid ) {
                      archive.ext(

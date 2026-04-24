@@ -88,9 +88,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void RegularGrid< 3 >::serialize( Archive& archive )
+    void RegularGrid< 3 >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, RegularGrid< 3 > >{
                 { []( Archive& archive, RegularGrid< 3 >& grid ) {
                      archive.ext(

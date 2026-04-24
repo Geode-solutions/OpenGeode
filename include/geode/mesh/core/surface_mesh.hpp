@@ -87,7 +87,7 @@ namespace geode
             return absl::StrCat( "(", polygon_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolygonVertex& value )
@@ -132,7 +132,7 @@ namespace geode
             return absl::StrCat( "(", polygon_id, ", ", edge_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolygonEdge& value )
@@ -482,7 +482,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;

@@ -66,9 +66,9 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, Impl >{ { []( Archive& archive,
                                                         Impl& impl ) {
                     archive.ext(
@@ -140,9 +140,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void RasterImage< dimension >::serialize( Archive& archive )
+    void RasterImage< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, RasterImage >{
                 { []( Archive& archive, RasterImage& raster ) {
                     archive.ext( raster,

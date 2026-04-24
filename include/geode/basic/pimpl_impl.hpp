@@ -79,9 +79,9 @@ namespace geode
 
     template < typename T >
     template < typename Archive >
-    void PImpl< T >::serialize( Archive& archive )
+    void PImpl< T >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PImpl >{ { []( Archive& archive2, PImpl& impl ) {
                 archive2.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
             } } } );

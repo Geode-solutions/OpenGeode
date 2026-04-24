@@ -78,9 +78,9 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                         archive.ext( impl,
@@ -200,12 +200,13 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void SurfaceEdges< dimension >::serialize( Archive& archive )
+    void SurfaceEdges< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this, Growable< Archive, SurfaceEdges >{
-                                { []( Archive& archive, SurfaceEdges& edges ) {
-                                    archive.object( edges.impl_ );
-                                } } } );
+        serializer.ext(
+            *this, Growable< Archive, SurfaceEdges >{
+                       { []( Archive& archive, SurfaceEdges& edges ) {
+                           archive.object( edges.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api SurfaceEdges< 2 >;

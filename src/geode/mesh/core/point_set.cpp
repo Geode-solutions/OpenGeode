@@ -56,9 +56,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void PointSet< dimension >::serialize( Archive& archive )
+    void PointSet< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PointSet >{
                 { []( Archive& archive, PointSet& point_set ) {
                      archive.ext(

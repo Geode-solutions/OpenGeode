@@ -90,7 +90,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

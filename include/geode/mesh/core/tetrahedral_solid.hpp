@@ -148,7 +148,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] local_index_t get_nb_polyhedron_vertices(
             index_t /*unused*/ ) const final

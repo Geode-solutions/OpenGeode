@@ -36,13 +36,13 @@
 struct Foo
 {
     template < typename Archive >
-    void serialize( Archive &archive )
+    void serialize( Archive &serializer )
     {
-        archive.ext( *this, geode::Growable< Archive, Foo >{
-                                { []( Archive &archive, Foo &foo ) {
-                                    archive.value8b( foo.double_ );
-                                    archive.value4b( foo.unsigned_int_ );
-                                } } } );
+        serializer.ext( *this, geode::Growable< Archive, Foo >{
+                                   { []( Archive &archive, Foo &foo ) {
+                                       archive.value8b( foo.double_ );
+                                       archive.value4b( foo.unsigned_int_ );
+                                   } } } );
     }
 
     double double_{ 10 };
@@ -52,18 +52,18 @@ struct Foo
 struct Foo2
 {
     template < typename Archive >
-    void serialize( Archive &archive )
+    void serialize( Archive &serializer )
     {
-        archive.ext( *this, geode::Growable< Archive, Foo2 >{
-                                { []( Archive &archive, Foo2 &foo ) {
-                                     archive.value8b( foo.double_ );
-                                     archive.value4b( foo.unsigned_int_ );
-                                 },
-                                    []( Archive &archive, Foo2 &foo ) {
+        serializer.ext( *this, geode::Growable< Archive, Foo2 >{
+                                   { []( Archive &archive, Foo2 &foo ) {
                                         archive.value8b( foo.double_ );
                                         archive.value4b( foo.unsigned_int_ );
-                                        archive.value1b( foo.bool_ );
-                                    } } } );
+                                    },
+                                       []( Archive &archive, Foo2 &foo ) {
+                                           archive.value8b( foo.double_ );
+                                           archive.value4b( foo.unsigned_int_ );
+                                           archive.value1b( foo.bool_ );
+                                       } } } );
     }
     double double_{ 10 };
     unsigned int unsigned_int_{ 10 };
@@ -73,27 +73,27 @@ struct Foo2
 struct Foo3
 {
     template < typename Archive >
-    void serialize( Archive &archive )
+    void serialize( Archive &serializer )
     {
-        archive.ext( *this, geode::Growable< Archive, Foo3 >{
-                                { []( Archive &archive, Foo3 &foo ) {
-                                     archive.value8b( foo.double_ );
-                                     archive.value4b( foo.unsigned_int_ );
-                                     foo.bool_ = true;
-                                     foo.int_ = -52;
-                                 },
-                                    []( Archive &archive, Foo3 &foo ) {
+        serializer.ext( *this, geode::Growable< Archive, Foo3 >{
+                                   { []( Archive &archive, Foo3 &foo ) {
                                         archive.value8b( foo.double_ );
                                         archive.value4b( foo.unsigned_int_ );
-                                        archive.value1b( foo.bool_ );
-                                        foo.int_ = true;
+                                        foo.bool_ = true;
+                                        foo.int_ = -52;
                                     },
-                                    []( Archive &archive, Foo3 &foo ) {
-                                        archive.value8b( foo.double_ );
-                                        archive.value4b( foo.unsigned_int_ );
-                                        archive.value1b( foo.bool_ );
-                                        archive.value4b( foo.int_ );
-                                    } } } );
+                                       []( Archive &archive, Foo3 &foo ) {
+                                           archive.value8b( foo.double_ );
+                                           archive.value4b( foo.unsigned_int_ );
+                                           archive.value1b( foo.bool_ );
+                                           foo.int_ = true;
+                                       },
+                                       []( Archive &archive, Foo3 &foo ) {
+                                           archive.value8b( foo.double_ );
+                                           archive.value4b( foo.unsigned_int_ );
+                                           archive.value1b( foo.bool_ );
+                                           archive.value4b( foo.int_ );
+                                       } } } );
     }
     double double_{ 10 };
     unsigned int unsigned_int_{ 10 };

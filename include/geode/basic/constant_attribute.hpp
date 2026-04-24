@@ -112,16 +112,17 @@ namespace geode
             : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, ConstantAttribute< T > >{
-                                    { []( Archive& archive,
-                                          ConstantAttribute< T >& attribute ) {
-                                        archive.ext( attribute,
-                                            bitsery::ext::BaseClass<
-                                                ReadOnlyAttribute< T > >{} );
-                                        archive( attribute.value_ );
-                                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, ConstantAttribute< T > >{
+                           { []( Archive& archive,
+                                 ConstantAttribute< T >& attribute ) {
+                               archive.ext(
+                                   attribute, bitsery::ext::BaseClass<
+                                                  ReadOnlyAttribute< T > >{} );
+                               archive( attribute.value_ );
+                           } } } );
         }
 
     public:

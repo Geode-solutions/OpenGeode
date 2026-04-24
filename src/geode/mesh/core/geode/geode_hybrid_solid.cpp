@@ -412,9 +412,9 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                         archive.container4b( impl.polyhedron_vertices_,
@@ -628,9 +628,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodeHybridSolid< dimension >::serialize( Archive& archive )
+    void OpenGeodeHybridSolid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodeHybridSolid >{
                 { []( Archive& archive, OpenGeodeHybridSolid& solid ) {
                      archive.ext( solid, bitsery::ext::BaseClass<

@@ -117,21 +117,22 @@ namespace geode
             : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, VariableAttribute< T > >{
-                                    { []( Archive& archive,
-                                          VariableAttribute< T >& attribute ) {
-                                        archive.ext( attribute,
-                                            bitsery::ext::BaseClass<
-                                                ReadOnlyAttribute< T > >{} );
-                                        archive( attribute.default_value_ );
-                                        archive.container( attribute.values_,
-                                            attribute.values_.max_size(),
-                                            []( Archive& archive2, T& item ) {
-                                                archive2( item );
-                                            } );
-                                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, VariableAttribute< T > >{
+                           { []( Archive& archive,
+                                 VariableAttribute< T >& attribute ) {
+                               archive.ext(
+                                   attribute, bitsery::ext::BaseClass<
+                                                  ReadOnlyAttribute< T > >{} );
+                               archive( attribute.default_value_ );
+                               archive.container( attribute.values_,
+                                   attribute.values_.max_size(),
+                                   []( Archive& archive2, T& item ) {
+                                       archive2( item );
+                                   } );
+                           } } } );
             values_.reserve( 10 );
         }
 
@@ -363,9 +364,9 @@ namespace geode
             : ReadOnlyAttribute< bool >( AttributeProperties{} ) {};
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, VariableAttribute< bool > >{
                     { []( Archive& archive,
                           VariableAttribute< bool >& attribute ) {

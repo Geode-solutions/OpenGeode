@@ -100,9 +100,9 @@ namespace geode
 
         private:
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, GridImpl >{
                         { []( Archive& /*unused*/, GridImpl& /*unused*/ ) {},
                             []( Archive& archive, GridImpl& grid ) {

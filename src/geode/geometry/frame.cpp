@@ -191,9 +191,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Frame< dimension >::serialize( Archive& archive )
+    void Frame< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, Frame >{ { []( Archive& archive, Frame& frame ) {
                 archive.container( frame.frame_ );
             } } } );

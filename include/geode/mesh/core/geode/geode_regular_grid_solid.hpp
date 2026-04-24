@@ -93,7 +93,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;

@@ -89,9 +89,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void ComponentMeshVertex::serialize( Archive& archive )
+    void ComponentMeshVertex::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, ComponentMeshVertex >{
                        { []( Archive& archive,
                              ComponentMeshVertex& component_mesh_vertex ) {
@@ -404,9 +404,9 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.object( impl.unique_vertices_ );

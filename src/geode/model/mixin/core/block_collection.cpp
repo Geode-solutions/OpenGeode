@@ -30,9 +30,9 @@ namespace geode
 {
     template < index_t dimension >
     template < typename Archive >
-    void BlockCollection< dimension >::serialize( Archive &archive )
+    void BlockCollection< dimension >::serialize( Archive &serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, BlockCollection >{
                 { []( Archive &archive, BlockCollection &block_collection ) {
                     archive.ext( block_collection,

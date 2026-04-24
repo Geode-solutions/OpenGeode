@@ -64,9 +64,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void HybridSolid< dimension >::serialize( Archive& archive )
+    void HybridSolid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, HybridSolid >{
                 { []( Archive& archive, HybridSolid& hybrid_solid ) {
                     archive.ext( hybrid_solid,

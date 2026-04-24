@@ -94,9 +94,9 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                         archive.ext( impl.textures_,
@@ -170,9 +170,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void TextureStorage< dimension >::serialize( Archive& archive )
+    void TextureStorage< dimension >::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, TextureStorage >{
                        { []( Archive& archive, TextureStorage& manager ) {
                            archive.object( manager.impl_ );

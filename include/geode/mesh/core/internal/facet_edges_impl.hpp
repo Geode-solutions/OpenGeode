@@ -114,9 +114,9 @@ namespace geode
 
         private:
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, FacetEdgesImpl >{
                         { []( Archive& archive, FacetEdgesImpl& impl ) {
                             archive.ext( impl,

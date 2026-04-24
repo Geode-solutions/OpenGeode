@@ -98,9 +98,9 @@ namespace geode
 
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& local_archive, Impl& impl ) {
                          local_archive.object( impl.id_ );
@@ -188,9 +188,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void Identifier::serialize( Archive& archive )
+    void Identifier::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, Identifier >{
                        { []( Archive& local_archive, Identifier& identifier ) {
                            local_archive.object( identifier.impl_ );

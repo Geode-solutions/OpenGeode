@@ -82,7 +82,7 @@ namespace geode
         ModelBoundary() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
     };
     ALIAS_2D_AND_3D( ModelBoundary );
 } // namespace geode

@@ -88,9 +88,9 @@ namespace geode
         private:
             friend class bitsery::Access;
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext(
+                serializer.ext(
                     *this, Growable< Archive, UuidToIndex >{
                                { []( Archive& archive, UuidToIndex& uuids ) {
                                    archive.ext( uuids.uuid2index_,

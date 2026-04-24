@@ -138,9 +138,9 @@ namespace geode
         AttributeBase() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, AttributeBase >{
                     { []( Archive& archive, AttributeBase& attribute ) {
                          archive.object( attribute.properties_ );
@@ -213,9 +213,9 @@ namespace geode
         ReadOnlyAttribute() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, ReadOnlyAttribute< T > >{
                            { []( Archive& archive,
                                  ReadOnlyAttribute< T >& attribute ) {

@@ -51,12 +51,13 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, Impl >{
-                                    { []( Archive& archive, Impl& impl ) {
-                                        archive.object( impl.texture_storage_ );
-                                    } } } );
+            serializer.ext( *this, Growable< Archive, Impl >{
+                                       { []( Archive& archive, Impl& impl ) {
+                                           archive.object(
+                                               impl.texture_storage_ );
+                                       } } } );
         }
 
     private:
@@ -121,9 +122,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void EdgedCurve< dimension >::serialize( Archive& archive )
+    void EdgedCurve< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, EdgedCurve >{
                 { []( Archive& archive, EdgedCurve& edged_curve ) {
                      archive.ext(

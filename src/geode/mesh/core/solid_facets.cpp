@@ -147,9 +147,9 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                         archive.ext(
@@ -268,12 +268,13 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void SolidFacets< dimension >::serialize( Archive& archive )
+    void SolidFacets< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this, Growable< Archive, SolidFacets >{
-                                { []( Archive& archive, SolidFacets& solid ) {
-                                    archive.object( solid.impl_ );
-                                } } } );
+        serializer.ext(
+            *this, Growable< Archive, SolidFacets >{
+                       { []( Archive& archive, SolidFacets& solid ) {
+                           archive.object( solid.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api SolidFacets< 3 >;

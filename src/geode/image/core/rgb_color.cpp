@@ -118,12 +118,12 @@ namespace geode
     }
 
     template < typename Archive >
-    void RGBColor::serialize( Archive &archive )
+    void RGBColor::serialize( Archive &serializer )
     {
-        archive.ext( *this, Growable< Archive, RGBColor >{
-                                { []( Archive &archive, RGBColor &color ) {
-                                    archive.container1b( color.values_ );
-                                } } } );
+        serializer.ext( *this, Growable< Archive, RGBColor >{
+                                   { []( Archive &archive, RGBColor &color ) {
+                                       archive.container1b( color.values_ );
+                                   } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_image_api, RGBColor );

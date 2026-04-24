@@ -182,9 +182,9 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                         archive.container4b( impl.polygon_vertices_,
@@ -269,9 +269,10 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodePolygonalSurface< dimension >::serialize( Archive& archive )
+    void OpenGeodePolygonalSurface< dimension >::serialize(
+        Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodePolygonalSurface >{
                 { []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                      archive.ext(

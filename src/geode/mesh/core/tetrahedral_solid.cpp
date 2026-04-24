@@ -502,9 +502,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void TetrahedralSolid< dimension >::serialize( Archive& archive )
+    void TetrahedralSolid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, TetrahedralSolid >{
                 { []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
                     archive.ext( tetrahedral_solid,

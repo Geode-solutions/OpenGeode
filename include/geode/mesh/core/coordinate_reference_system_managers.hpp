@@ -93,7 +93,7 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

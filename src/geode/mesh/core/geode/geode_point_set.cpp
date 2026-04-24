@@ -50,9 +50,9 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, Impl >{
                            { []( Archive& archive, Impl& impl ) {
                                archive.ext( impl,
@@ -87,9 +87,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodePointSet< dimension >::serialize( Archive& archive )
+    void OpenGeodePointSet< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodePointSet >{
                 { []( Archive& archive, OpenGeodePointSet& point_set ) {
                      archive.ext( point_set,

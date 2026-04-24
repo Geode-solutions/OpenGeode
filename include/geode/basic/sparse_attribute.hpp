@@ -123,9 +123,9 @@ namespace geode
         SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ) {}
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, SparseAttribute< T > >{
                     { []( Archive& archive, SparseAttribute< T >& attribute ) {
                         archive.ext(

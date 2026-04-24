@@ -59,9 +59,9 @@ namespace geode
         }
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, AttributeProperties >{
                     { []( Archive& archive, AttributeProperties& properties ) {
                          archive.value1b( properties.assignable );

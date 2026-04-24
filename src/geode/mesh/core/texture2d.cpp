@@ -60,11 +60,11 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive,
-                                    Impl >{ { []( Archive& archive,
-                                                  Impl& impl ) {
+            serializer.ext( *this, Growable< Archive,
+                                       Impl >{ { []( Archive& archive,
+                                                     Impl& impl ) {
                 archive.ext( impl,
                     bitsery::ext::BaseClass< internal::TextureImpl< 2 > >{} );
             } } } );
@@ -105,9 +105,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void Texture< 2 >::serialize( Archive& archive )
+    void Texture< 2 >::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, Texture< 2 > >{
                        { []( Archive& archive, Texture< 2 >& texture ) {
                            archive.object( texture.impl_ );

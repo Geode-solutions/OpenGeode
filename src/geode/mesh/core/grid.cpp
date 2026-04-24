@@ -428,9 +428,9 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.container4b( impl.deprecated_cells_number_ );
@@ -646,9 +646,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Grid< dimension >::serialize( Archive& archive )
+    void Grid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive,
                 Grid >{ { []( Archive& archive, Grid& grid ) {
                              archive.object( grid.impl_ );

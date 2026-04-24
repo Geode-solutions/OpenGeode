@@ -62,9 +62,9 @@ namespace geode
         }
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, MeshElement >{
                            { []( Archive& archive, MeshElement& mesh_element ) {
                                archive.object( mesh_element.mesh_id );

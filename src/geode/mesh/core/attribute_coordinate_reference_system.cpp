@@ -50,9 +50,9 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, Impl >{
                            { []( Archive& archive, Impl& impl ) {
                                archive.ext( impl,
@@ -116,9 +116,9 @@ namespace geode
     template < index_t dimension >
     template < typename Archive >
     void AttributeCoordinateReferenceSystem< dimension >::serialize(
-        Archive& archive )
+        Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, AttributeCoordinateReferenceSystem >{
                        { []( Archive& archive,
                              AttributeCoordinateReferenceSystem& crs ) {

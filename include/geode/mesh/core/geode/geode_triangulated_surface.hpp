@@ -104,7 +104,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;

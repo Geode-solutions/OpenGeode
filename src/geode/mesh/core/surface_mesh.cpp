@@ -216,9 +216,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolygonVertex::serialize( Archive& archive )
+    void PolygonVertex::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolygonVertex >{
                 { []( Archive& archive, PolygonVertex& polygon_vertex ) {
                      archive.value4b( polygon_vertex.polygon_id );
@@ -233,9 +233,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolygonEdge::serialize( Archive& archive )
+    void PolygonEdge::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, PolygonEdge >{
                        { []( Archive& archive, PolygonEdge& polygon_edge ) {
                             archive.value4b( polygon_edge.polygon_id );
@@ -418,9 +418,9 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.object( impl.polygon_attribute_manager_ );
@@ -1057,9 +1057,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void SurfaceMesh< dimension >::serialize( Archive& archive )
+    void SurfaceMesh< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, SurfaceMesh >{
                 { []( Archive& archive, SurfaceMesh& surface ) {
                      archive.ext(

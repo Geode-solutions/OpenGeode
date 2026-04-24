@@ -99,14 +99,15 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, Impl >{
-                                    { []( Archive& archive, Impl& impl ) {
-                                        archive.object( impl.crs_manager1D_ );
-                                        archive.object( impl.crs_manager2D_ );
-                                        archive.object( impl.crs_manager3D_ );
-                                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& archive, Impl& impl ) {
+                               archive.object( impl.crs_manager1D_ );
+                               archive.object( impl.crs_manager2D_ );
+                               archive.object( impl.crs_manager3D_ );
+                           } } } );
         }
 
     private:
@@ -257,9 +258,9 @@ namespace geode
     template < index_t dimension >
     template < typename Archive >
     void CoordinateReferenceSystemManagers< dimension >::serialize(
-        Archive& archive )
+        Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, CoordinateReferenceSystemManagers >{
                        { []( Archive& archive,
                              CoordinateReferenceSystemManagers& managers ) {

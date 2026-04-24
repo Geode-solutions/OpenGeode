@@ -46,7 +46,7 @@ namespace geode
         const T &operator*() const;
 
         template < typename Archive >
-        void serialize( Archive &archive );
+        void serialize( Archive &serializer );
 
     private:
         std::unique_ptr< T > pimpl_;

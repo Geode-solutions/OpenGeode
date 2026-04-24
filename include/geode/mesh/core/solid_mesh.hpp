@@ -86,7 +86,7 @@ namespace geode
             return absl::StrCat( "(", polyhedron_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronVertex& value )
@@ -132,7 +132,7 @@ namespace geode
             return absl::StrCat( "(", polyhedron_id, ", ", facet_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronFacet& value )
@@ -178,7 +178,7 @@ namespace geode
                 polyhedron_facet.facet_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronFacetVertex& value )
@@ -221,7 +221,7 @@ namespace geode
                 polyhedron_facet.facet_id, ", ", edge_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronFacetEdge& value )
@@ -661,7 +661,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

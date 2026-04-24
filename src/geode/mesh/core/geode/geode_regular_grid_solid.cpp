@@ -126,11 +126,11 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive,
-                                    Impl >{ { []( Archive& archive,
-                                                  Impl& impl ) {
+            serializer.ext( *this, Growable< Archive,
+                                       Impl >{ { []( Archive& archive,
+                                                     Impl& impl ) {
                 archive.ext( impl,
                     bitsery::ext::BaseClass< internal::PointsImpl< 3 > >{} );
                 archive.ext( impl,
@@ -206,9 +206,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void OpenGeodeRegularGrid< 3 >::serialize( Archive& archive )
+    void OpenGeodeRegularGrid< 3 >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodeRegularGrid >{
                 { []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                      archive.ext(

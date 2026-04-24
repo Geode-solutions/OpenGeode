@@ -211,9 +211,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Point< dimension >::serialize( Archive &archive )
+    void Point< dimension >::serialize( Archive &serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, Point >{ { []( Archive &archive, Point &point ) {
                 archive.container8b( point.values_ );
             } } } );
