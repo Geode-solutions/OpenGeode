@@ -71,6 +71,13 @@ namespace geode
         return stack_string;
     }
 
+    std::string OpenGeodeException::string() const
+    {
+        return absl::StrCat( "OpenGeodeException of type ", type_name(),
+            " from project ", project(), " and library ", library(), ": ",
+            what(), "\n", stack_trace() );
+    }
+
     int geode_lippincott()
     {
         try
@@ -79,10 +86,14 @@ namespace geode
         }
         catch( const OpenGeodeException& exception )
         {
-            Logger::critical( "OpenGeodeException of type ",
-                exception.type_name(), " from project ", exception.project(),
-                " and library ", exception.library(), ": ", exception.what(),
-                "\n", exception.stack_trace() );
+            Logger::critical( exception.string() );
+            std::reference_wrapper< const OpenGeodeException > current =
+                exception;
+            while( current.get().has_parent() )
+            {
+                current = current.get().parent();
+                Logger::critical( "From: ", current.get().string() );
+            }
         }
         catch( const std::exception& exception )
         {

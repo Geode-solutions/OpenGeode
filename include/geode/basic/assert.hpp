@@ -111,6 +111,8 @@ namespace geode
                 std::make_unique< OpenGeodeException >( std::move( parent ) );
         }
 
+        [[nodiscard]] std::string string() const;
+
     protected:
         template < typename... Args >
         explicit OpenGeodeException( std::string project,
