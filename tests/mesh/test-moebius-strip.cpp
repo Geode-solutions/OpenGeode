@@ -98,7 +98,6 @@ void test_polygons_around_vertex()
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
-    geode::Logger::set_level( geode::Logger::LEVEL::info );
     test_polygons_around_vertex();
 }
 
