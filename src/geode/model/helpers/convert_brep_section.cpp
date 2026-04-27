@@ -35,6 +35,7 @@
 #include <geode/mesh/helpers/convert_point_set.hpp>
 #include <geode/mesh/helpers/convert_surface_mesh.hpp>
 
+#include <geode/model/helpers/detail/build_model_boundaries.hpp>
 #include <geode/model/helpers/model_concatener.hpp>
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/line.hpp>
@@ -61,9 +62,6 @@ namespace
             mappings[geode::Line< dimension >::component_type_static()] );
         geode::detail::copy_surface_components( from, builder_to,
             mappings[geode::Surface< dimension >::component_type_static()] );
-        geode::detail::copy_model_boundary_components( from, builder_to,
-            mappings
-                [geode::ModelBoundary< dimension >::component_type_static()] );
         builder_to.copy_relationships( mappings, from );
         return mappings;
     }
@@ -509,6 +507,7 @@ namespace geode
                     surface.mesh(), axis_to_remove ) );
         }
         copy_unique_vertices( brep, builder, mappings );
+        detail::build_model_boundaries( section, builder );
         return std::make_tuple( std::move( section ), std::move( mappings ) );
     }
 
@@ -521,12 +520,6 @@ namespace geode
         BRepBuilder builder{ brep };
         auto mappings =
             copy_components< Section, BRepBuilder >( section, builder );
-        // Remove wrong transfer of Model Boundaries
-        mappings.remove( ModelBoundary3D::component_type_static() );
-        for( const auto& model_boundary : brep.model_boundaries() )
-        {
-            builder.remove_model_boundary( model_boundary );
-        }
         for( const auto& corner : section.corners() )
         {
             builder.update_corner_mesh(
