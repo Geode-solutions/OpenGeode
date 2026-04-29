@@ -198,7 +198,7 @@ namespace
         }
         while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
         {
-            OPENGEODE_ASSERT(
+            geode::OpenGeodeMeshException::assertion(
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex" );

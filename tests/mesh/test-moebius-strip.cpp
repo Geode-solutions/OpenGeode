@@ -37,61 +37,73 @@ void test_polygons_around_vertex()
     const geode::index_t vertex_id_0{ 0 };
     const auto polygons_around_0 =
         moebius_strip->polygons_around_vertex( vertex_id_0 );
-    OPENGEODE_EXCEPTION( polygons_around_0.size() == 2,
+    geode::OpenGeodeMeshException::test( polygons_around_0.size() == 2,
         "[Test] Wrong computation of polygons around vertex 0 : should be 2 "
         "polygons, get ",
         polygons_around_0.size() );
-    OPENGEODE_EXCEPTION( polygons_around_0[0].polygon_id == 159
-                             && polygons_around_0[0].vertex_id == 2,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_0[0].polygon_id == 159
+            && polygons_around_0[0].vertex_id == 2,
         "[TEST] Wrong polygons around vertex 0" );
-    OPENGEODE_EXCEPTION( polygons_around_0[1].polygon_id == 0
-                             && polygons_around_0[1].vertex_id == 0,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_0[1].polygon_id == 0
+            && polygons_around_0[1].vertex_id == 0,
         "[TEST] Wrong polygons around vertex 0" );
 
     const geode::index_t vertex_id_1{ 1 };
     const auto polygons_around_1 =
         moebius_strip->polygons_around_vertex( vertex_id_1 );
-    OPENGEODE_EXCEPTION( polygons_around_1.size() == 6,
+    geode::OpenGeodeMeshException::test( polygons_around_1.size() == 6,
         "[Test] Wrong computation of polygons around vertex 1 : should be 6 "
         "polygons, get ",
         polygons_around_1.size() );
-    OPENGEODE_EXCEPTION( polygons_around_1[0].polygon_id == 159
-                             && polygons_around_1[0].vertex_id == 1,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_1[0].polygon_id == 159
+            && polygons_around_1[0].vertex_id == 1,
         "[TEST] Wrong polygons around vertex 1" );
-    OPENGEODE_EXCEPTION( polygons_around_1[1].polygon_id == 158
-                             && polygons_around_1[1].vertex_id == 1,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_1[1].polygon_id == 158
+            && polygons_around_1[1].vertex_id == 1,
         "[TEST] Wrong polygons around vertex 1" );
-    OPENGEODE_EXCEPTION( polygons_around_1[2].polygon_id == 157
-                             && polygons_around_1[2].vertex_id == 2,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_1[2].polygon_id == 157
+            && polygons_around_1[2].vertex_id == 2,
         "[TEST] Wrong polygons around vertex 1" );
-    OPENGEODE_EXCEPTION( polygons_around_1[3].polygon_id == 2
-                             && polygons_around_1[3].vertex_id == 0,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_1[3].polygon_id == 2
+            && polygons_around_1[3].vertex_id == 0,
         "[TEST] Wrong polygons around vertex 1" );
-    OPENGEODE_EXCEPTION( polygons_around_1[4].polygon_id == 1
-                             && polygons_around_1[4].vertex_id == 0,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_1[4].polygon_id == 1
+            && polygons_around_1[4].vertex_id == 0,
         "[TEST] Wrong polygons around vertex 1" );
-    OPENGEODE_EXCEPTION( polygons_around_1[5].polygon_id == 0
-                             && polygons_around_1[5].vertex_id == 2,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_1[5].polygon_id == 0
+            && polygons_around_1[5].vertex_id == 2,
         "[TEST] Wrong polygons around vertex 1" );
 
     const geode::index_t vertex_id_99{ 99 };
     const auto polygons_around_99 =
         moebius_strip->polygons_around_vertex( vertex_id_99 );
-    OPENGEODE_EXCEPTION( polygons_around_99.size() == 4,
+    geode::OpenGeodeMeshException::test( polygons_around_99.size() == 4,
         "[Test] Wrong computation of polygons around vertex 99 : should be 4 "
         "polygons, get ",
         polygons_around_99.size() );
-    OPENGEODE_EXCEPTION( polygons_around_99[0].polygon_id == 153
-                             && polygons_around_99[0].vertex_id == 1,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_99[0].polygon_id == 153
+            && polygons_around_99[0].vertex_id == 1,
         "[TEST] Wrong polygons around vertex 99" );
-    OPENGEODE_EXCEPTION( polygons_around_99[1].polygon_id == 152
-                             && polygons_around_99[1].vertex_id == 1,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_99[1].polygon_id == 152
+            && polygons_around_99[1].vertex_id == 1,
         "[TEST] Wrong polygons around vertex 99" );
-    OPENGEODE_EXCEPTION( polygons_around_99[2].polygon_id == 6
-                             && polygons_around_99[2].vertex_id == 2,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_99[2].polygon_id == 6
+            && polygons_around_99[2].vertex_id == 2,
         "[TEST] Wrong polygons around vertex 99" );
-    OPENGEODE_EXCEPTION( polygons_around_99[3].polygon_id == 7
-                             && polygons_around_99[3].vertex_id == 0,
+    geode::OpenGeodeMeshException::test(
+        polygons_around_99[3].polygon_id == 7
+            && polygons_around_99[3].vertex_id == 0,
         "[TEST] Wrong polygons around vertex 99" );
 }
 

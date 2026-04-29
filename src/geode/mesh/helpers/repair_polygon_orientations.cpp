@@ -67,13 +67,6 @@ namespace
                 }
                 return get_bad_oriented_polygons();
             }
-            catch( geode::OpenGeodeDataException& e )
-            {
-                const auto msg = absl::StrCat( "Surface ",
-                    mesh_.name().value_or( mesh_.id().string() ), ": ",
-                    e.what() );
-                throw geode::OpenGeodeDataException( msg );
-            }
             catch( geode::OpenGeodeException& e )
             {
                 throw geode::OpenGeodeMeshException( nullptr,
