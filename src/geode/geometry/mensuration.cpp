@@ -113,10 +113,6 @@ namespace geode
                 return edge01.dot( cross02_03 ) / 6.;
             }
         }
-        throw OpenGeodeGeometryException{ vertices[0].get(),
-            OpenGeodeException::TYPE::internal,
-            "[tetrahedron_signed_volume] Tetrahedron signed volume uses "
-            "below angular threshold cross products" };
         return 0.;
     }
 
