@@ -40,22 +40,45 @@
 
 namespace
 {
-    const std::array< geode::Vector2D, 8 > directions_2D = {
-        { geode::Vector2D{ { 1., 0. } }, geode::Vector2D{ { 0., 1. } },
-            geode::Vector2D{ { 0.1, 1. } }, geode::Vector2D{ { 0.3, 1. } },
-            geode::Vector2D{ { 0.5, 1. } }, geode::Vector2D{ { 0., 0.1 } },
-            geode::Vector2D{ { 0., 0.3 } }, geode::Vector2D{ { 0., 0.5 } } }
-    };
+    constexpr geode::index_t NUMBER_2D_DIRECTIONS = 9;
+    const std::array< geode::Vector2D, NUMBER_2D_DIRECTIONS >& directions_2D()
+    {
+        static const std::array< geode::Vector2D, NUMBER_2D_DIRECTIONS >
+            directions = { {
+                geode::Vector2D{ { 1., 0. } },
+                geode::Vector2D{ { 0., 1. } },
+                geode::Vector2D{ { 0.1, 1. } },
+                geode::Vector2D{ { 0.3, 1. } },
+                geode::Vector2D{ { 0.5, 1. } },
+                geode::Vector2D{ { 0., 0.1 } },
+                geode::Vector2D{ { 0., 0.3 } },
+                geode::Vector2D{ { 0., 0.5 } },
+                geode::Vector2D{ { 0.425, 0.134 } },
+            } };
+        return directions;
+    }
 
-    const std::array< geode::Vector3D, 12 > directions_3D = { { geode::Vector3D{
-                                                                    { 1., 0.,
-                                                                        0. } },
-        geode::Vector3D{ { 1., 0., 0.1 } }, geode::Vector3D{ { 1., 0., 0.3 } },
-        geode::Vector3D{ { 1., 0., 0.5 } }, geode::Vector3D{ { 0., 1., 0. } },
-        geode::Vector3D{ { 0.1, 1., 0. } }, geode::Vector3D{ { 0.3, 1., 0. } },
-        geode::Vector3D{ { 0.5, 1., 0. } }, geode::Vector3D{ { 0., 0., 1. } },
-        geode::Vector3D{ { 0., 0.1, 1. } }, geode::Vector3D{ { 0., 0.3, 1. } },
-        geode::Vector3D{ { 0., 0.5, 1. } } } };
+    constexpr geode::index_t NUMBER_3D_DIRECTIONS = 13;
+    const std::array< geode::Vector3D, NUMBER_3D_DIRECTIONS >& directions_3D()
+    {
+        static const std::array< geode::Vector3D, NUMBER_3D_DIRECTIONS >
+            directions = { {
+                geode::Vector3D{ { 1., 0., 0. } },
+                geode::Vector3D{ { 1., 0., 0.1 } },
+                geode::Vector3D{ { 1., 0., 0.3 } },
+                geode::Vector3D{ { 1., 0., 0.5 } },
+                geode::Vector3D{ { 0., 1., 0. } },
+                geode::Vector3D{ { 0.1, 1., 0. } },
+                geode::Vector3D{ { 0.3, 1., 0. } },
+                geode::Vector3D{ { 0.5, 1., 0. } },
+                geode::Vector3D{ { 0., 0., 1. } },
+                geode::Vector3D{ { 0., 0.1, 1. } },
+                geode::Vector3D{ { 0., 0.3, 1. } },
+                geode::Vector3D{ { 0., 0.5, 1. } },
+                geode::Vector3D{ { 0.425, 0.134, 0.741 } },
+            } };
+        return directions;
+    }
 
     std::vector< geode::RayTracing2D::EdgeDistance >
         find_intersections_with_boundary( const geode::Ray2D& ray,
@@ -85,10 +108,7 @@ namespace
             {
                 continue;
             }
-            else
-            {
-                nb_intersections += 1;
-            }
+            nb_intersections++;
         }
         return nb_intersections;
     }
@@ -121,10 +141,7 @@ namespace
             {
                 continue;
             }
-            else
-            {
-                nb_intersections += 1;
-            }
+            nb_intersections++;
         }
         return nb_intersections;
     }
@@ -135,12 +152,12 @@ namespace geode
     class SectionRayTracing::Impl
     {
     public:
-        Impl( const Section& section ) : section_( section ) {}
+        explicit Impl( const Section& section ) : section_( section ) {}
 
         bool is_point_inside_surface(
             const Point2D& point, const Surface2D& surface )
         {
-            for( const auto& direction : directions_2D )
+            for( const auto& direction : ::directions_2D() )
             {
                 const Ray2D ray{ direction, point };
                 index_t nb_intersections{ 0 };
@@ -218,7 +235,7 @@ namespace geode
     class BRepRayTracing::Impl
     {
     public:
-        Impl( const BRep& brep ) : brep_( brep ) {}
+        explicit Impl( const BRep& brep ) : brep_( brep ) {}
 
         BoundarySurfaceIntersections find_intersections_with_boundaries(
             const InfiniteLine3D& infinite_line, const Block3D& block )
@@ -238,7 +255,7 @@ namespace geode
 
         bool is_point_inside_block( const Point3D& point, const Block3D& block )
         {
-            for( const auto& direction : directions_3D )
+            for( const auto& direction : ::directions_3D() )
             {
                 const Ray3D ray{ direction, point };
                 index_t nb_intersections{ 0 };
@@ -327,7 +344,7 @@ namespace geode
         {
             return false;
         }
-        for( const auto& direction : directions_3D )
+        for( const auto& direction : ::directions_3D() )
         {
             const Ray3D ray{ direction, point };
             auto nb_intersections = count_real_intersections_with_boundaries(

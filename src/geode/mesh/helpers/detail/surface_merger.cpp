@@ -27,6 +27,7 @@
 #include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/algorithm.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
@@ -132,7 +133,15 @@ namespace geode
             void clean_surface( SurfaceMeshMerger< dimension >& merger )
             {
                 separate_surfaces( merger );
-                repair_polygon_orientations( merger.mesh(), merger.builder() );
+                try
+                {
+                    repair_polygon_orientations(
+                        merger.mesh(), merger.builder() );
+                }
+                catch( const OpenGeodeException& e )
+                {
+                    Logger::warn( e.what() );
+                }
             }
 
             void create_polygons( SurfaceMeshMerger< dimension >& merger )
