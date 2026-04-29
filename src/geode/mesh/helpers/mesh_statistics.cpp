@@ -25,6 +25,7 @@
 
 #include <geode/basic/range.hpp>
 
+#include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
 namespace
@@ -34,7 +35,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    [[nodiscard]] MeshStatistics compute_surface_statistics(
+    MeshStatistics compute_surface_statistics(
         const SurfaceMesh< dimension >& mesh )
     {
         MeshStatistics result;
@@ -67,8 +68,32 @@ namespace geode
         return result;
     }
 
+    template < index_t dimension >
+    MeshStatistics compute_curve_statistics(
+        const EdgedCurve< dimension >& mesh )
+    {
+        MeshStatistics result;
+        if( mesh.nb_edges() == 0 )
+        {
+            return result;
+        }
+        for( const auto edge_id : Range{ mesh.nb_edges() } )
+        {
+            const auto length = mesh.edge_length( edge_id );
+            result.max_edge_size = std::max( result.max_edge_size, length );
+            result.min_edge_size = std::min( result.min_edge_size, length );
+            result.mean_edge_size += length;
+        }
+        result.mean_edge_size /= mesh.nb_edges();
+        return result;
+    }
+
     template MeshStatistics opengeode_mesh_api compute_surface_statistics< 2 >(
         const SurfaceMesh< 2 >& );
     template MeshStatistics opengeode_mesh_api compute_surface_statistics< 3 >(
         const SurfaceMesh< 3 >& );
+    template MeshStatistics opengeode_mesh_api compute_curve_statistics< 2 >(
+        const EdgedCurve< 2 >& );
+    template MeshStatistics opengeode_mesh_api compute_curve_statistics< 3 >(
+        const EdgedCurve< 3 >& );
 } // namespace geode

@@ -28,7 +28,9 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     ALIAS_2D_AND_3D( SurfaceMesh );
+    ALIAS_2D_AND_3D( EdgedCurve );
 } // namespace geode
 
 namespace geode
@@ -43,4 +45,8 @@ namespace geode
     template < index_t dimension >
     [[nodiscard]] MeshStatistics compute_surface_statistics(
         const SurfaceMesh< dimension >& mesh );
+
+    template < index_t dimension >
+    [[nodiscard]] MeshStatistics compute_curve_statistics(
+        const EdgedCurve< dimension >& mesh );
 } // namespace geode
