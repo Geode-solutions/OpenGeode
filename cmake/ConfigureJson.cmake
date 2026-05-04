@@ -1,0 +1,27 @@
+#
+# Copyright (c) 2019 - 2026 Geode-solutions. All rights reserved.
+#
+
+
+set(JSON_PATH ${PROJECT_BINARY_DIR}/third_party/json)
+set(JSON_INSTALL_PREFIX ${JSON_PATH}/install)
+ExternalProject_Add(json
+    PREFIX ${JSON_PATH}
+    SOURCE_DIR ${JSON_PATH}/src
+    BINARY_DIR ${JSON_PATH}/build
+    STAMP_DIR ${JSON_PATH}/stamp
+    GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG v3.11.3
+    GIT_SHALLOW ON
+    GIT_PROGRESS ON
+    CMAKE_GENERATOR ${CMAKE_GENERATOR}
+    CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
+    CMAKE_ARGS
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_INSTALL_MESSAGE=LAZY
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    CMAKE_CACHE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${JSON_INSTALL_PREFIX}
+        -DJSON_BuildTests:BOOL=OFF
+        -DJSON_MultipleHeaders:BOOL=ON
+)

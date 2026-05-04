@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/common.hpp>
 #include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
