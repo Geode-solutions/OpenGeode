@@ -10,7 +10,8 @@
         "${workspaceFolder}/build/third_party/minizip/install/include",
         "${workspaceFolder}/build/third_party/nanoflann/install/include",
         "${workspaceFolder}/build/third_party/pybind11/install/include",
-        "${workspaceFolder}/build/third_party/spdlog/install/include"
+        "${workspaceFolder}/build/third_party/spdlog/install/include",
+        "${workspaceFolder}/build/third_party/json/install/include"
     ],
     "C_Cpp.default.browse.path": [
         "${workspaceFolder}/include",
@@ -23,7 +24,8 @@
         "${workspaceFolder}/build/third_party/minizip/install/include",
         "${workspaceFolder}/build/third_party/nanoflann/install/include",
         "${workspaceFolder}/build/third_party/pybind11/install/include",
-        "${workspaceFolder}/build/third_party/spdlog/install/include"
+        "${workspaceFolder}/build/third_party/spdlog/install/include",
+        "${workspaceFolder}/build/third_party/json/install/include"
     ],
     "files.watcherExclude": {
         "${workspaceFolder}/build/**": true
