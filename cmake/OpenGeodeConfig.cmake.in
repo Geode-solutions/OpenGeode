@@ -47,7 +47,7 @@ if(library_type STREQUAL "STATIC_LIBRARY")
     find_dependency(minizip-ng)
     find_dependency(nanoflann)
     find_dependency(spdlog)
-    find_dependency(nlohmann_json CONFIG)
+    find_dependency(nlohmann_json)
 endif()
 
 set(CMAKE_CXX_STANDARD @OPENGEODE_CXX_STANDARD@)
