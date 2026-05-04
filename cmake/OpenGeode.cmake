@@ -46,6 +46,7 @@ install(
         ${BITSERY_INSTALL_PREFIX}/
         ${GDAL_INSTALL_PREFIX}/
         ${PROJ_INSTALL_PREFIX}/
+        ${JSON_INSTALL_PREFIX}/
     DESTINATION
         .
     COMPONENT
@@ -59,7 +60,6 @@ if(NOT BUILD_SHARED_LIBS)
             ${NANOFLANN_INSTALL_PREFIX}/
             ${SPDLOG_INSTALL_PREFIX}/
             ${SQLITE_INSTALL_PREFIX}/
-            ${JSON_INSTALL_PREFIX}/
         DESTINATION
             .
         COMPONENT
