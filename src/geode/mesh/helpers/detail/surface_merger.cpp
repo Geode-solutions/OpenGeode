@@ -114,9 +114,10 @@ namespace geode
                 index_t polygon ) const
             {
                 geode_unused( merger );
-                OPENGEODE_ASSERT( surface < merger.meshes().size(),
+                OpenGeodeMeshException::assertion(
+                    surface < merger.meshes().size(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface index" );
-                OPENGEODE_ASSERT(
+                OpenGeodeMeshException::assertion(
                     polygon < merger.meshes()[surface].get().nb_polygons(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface polygon "
                     "index" );
@@ -170,13 +171,14 @@ namespace geode
                         {
                             const auto polygon_id =
                                 merger.builder().create_polygon( vertices );
-                            OPENGEODE_ASSERT( polygon_id == surface_id_.size(),
+                            OpenGeodeMeshException::assertion(
+                                polygon_id == surface_id_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (surface_id_)" );
                             surface_id_.emplace_back();
                             surface_id_.back().insert( s );
                             new_id_[s][p] = polygon_id;
-                            OPENGEODE_ASSERT(
+                            OpenGeodeMeshException::assertion(
                                 polygon_id == polygons_origins_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (polygons_origins_)" );
@@ -186,12 +188,13 @@ namespace geode
                         else
                         {
                             const auto polygon_id = it.first->second;
-                            OPENGEODE_ASSERT( polygon_id < surface_id_.size(),
+                            OpenGeodeMeshException::assertion(
+                                polygon_id < surface_id_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (surface_id_)" );
                             surface_id_[polygon_id].insert( s );
                             new_id_[s][p] = polygon_id;
-                            OPENGEODE_ASSERT(
+                            OpenGeodeMeshException::assertion(
                                 polygon_id < polygons_origins_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (polygons_origins_)" );
@@ -283,8 +286,9 @@ namespace geode
                         return edge;
                     }
                 }
-                OPENGEODE_ASSERT_NOT_REACHED(
-                    "[SurfaceMerger::find_edge_origin] Edge not found" );
+                throw OpenGeodeMeshException{ nullptr,
+                    OpenGeodeException::TYPE::internal,
+                    "[SurfaceMerger::find_edge_origin] Edge not found" };
                 return hint_edge;
             }
 

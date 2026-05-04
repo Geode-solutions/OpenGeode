@@ -67,8 +67,9 @@ namespace geode
             const MeshImpl& key )
         {
             auto* mesh = dynamic_cast< Mesh* >( create( key ).release() );
-            OPENGEODE_EXCEPTION(
-                mesh, "Cannot create mesh with key: ", key.get() );
+            OpenGeodeMeshException::check( mesh, nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot create mesh with key: ", key.get() );
             return std::unique_ptr< Mesh >{ mesh };
         }
 

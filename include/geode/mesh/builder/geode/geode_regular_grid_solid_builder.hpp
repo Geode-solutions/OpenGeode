@@ -49,7 +49,7 @@ namespace geode
         static constexpr index_t dim{ 3 };
 
         OpenGeodeRegularGridBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeRegularGridBuilder( OpenGeodeRegularGrid< 3 >& mesh );
 
@@ -65,7 +65,8 @@ namespace geode
 
         void do_create_vertex() final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{
+                nullptr, OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use create_vertex in RegularGrid"
             };
         }
@@ -73,63 +74,73 @@ namespace geode
         void do_delete_solid_vertices( const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "delete_solid_vertices in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "delete_solid_vertices in RegularGrid" };
         }
 
         void do_permute_solid_vertices( absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use _permute_solid_vertices in "
-                "RegularGrid"
-            };
+                "RegularGrid" };
         }
 
         void do_set_polyhedron_vertex(
             const PolyhedronVertex& /*unused*/, index_t /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "set_polyhedron_vertex in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "set_polyhedron_vertex in RegularGrid" };
         }
 
         void do_create_polyhedron( absl::Span< const index_t > /*unused*/,
             absl::Span< const std::vector< local_index_t > > /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "create_polyhedron in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "create_polyhedron in RegularGrid" };
         }
 
         void do_delete_polyhedra( const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "delete_polyhedra in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "delete_polyhedra in RegularGrid" };
         }
 
         void do_permute_polyhedra( absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ ) final
         {
-            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
-                                      "permute_polyhedra in RegularGrid" };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[RegularGridBuilder] Cannot use "
+                "permute_polyhedra in RegularGrid" };
         }
 
         void do_set_polyhedron_adjacent(
             const PolyhedronFacet& /*unused*/, index_t /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use set_polyhedron_adjacent in "
-                "RegularGrid"
-            };
+                "RegularGrid" };
         }
 
         void do_unset_polyhedron_adjacent(
             const PolyhedronFacet& /*unused*/ ) final
         {
-            throw OpenGeodeException{
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::data,
                 "[RegularGridBuilder] Cannot use unset_polyhedron_adjacent in "
-                "RegularGrid"
-            };
+                "RegularGrid" };
         }
 
         void do_copy_points( const SolidMesh< 3 >& solid_mesh ) final;

@@ -48,6 +48,7 @@ namespace geode
     public:
         AttributeManager();
         AttributeManager( AttributeManager&& other ) noexcept;
+        AttributeManager& operator=( AttributeManager&& other ) noexcept;
         ~AttributeManager();
 
         /*!
@@ -78,7 +79,8 @@ namespace geode
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
                     find_attribute_base( name ) );
-            OPENGEODE_EXCEPTION( attribute.get(),
+            OpenGeodeBasicException::check( attribute.get(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[AttributeManager::find_attribute] Could not find attribute '",
                 name,
                 "'. You have to create an attribute before using it. See "
@@ -127,7 +129,8 @@ namespace geode
             {
                 return typed_attribute;
             }
-            OPENGEODE_EXCEPTION( attribute.use_count() < 2,
+            OpenGeodeBasicException::check( attribute.use_count() < 2, nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[AttributeManager::find_or_create_attribute] Do not "
                 "instantiate an attribute "
                 "if an instantiated attribute of the same name "
@@ -263,9 +266,9 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
-        absl::Mutex& mutex() const;
+        [[nodiscard]] absl::Mutex& mutex() const;
 
         /*!
          * Find the Attribute associated with the given name

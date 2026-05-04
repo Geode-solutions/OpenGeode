@@ -44,9 +44,9 @@ namespace geode
     class CornerCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( CornerCollection );
-        PASSKEY( CornerCollections< dimension >, CornerCollectionsKey );
+        PASSKEY( CornerCollections< dimension >, CornerCollectionsKey /*key*/ );
         PASSKEY( CornerCollectionsBuilder< dimension >,
-            CornerCollectionsBuilderKey );
+            CornerCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -64,16 +64,16 @@ namespace geode
         }
 
     public:
-        CornerCollection( CornerCollectionsKey ) : CornerCollection() {}
+        CornerCollection( CornerCollectionsKey /*key*/ ) : CornerCollection() {}
 
         void set_corner_collection_name(
-            std::string_view name, CornerCollectionsBuilderKey )
+            std::string_view name, CornerCollectionsBuilderKey /*key*/ )
         {
             this->set_name( name );
         }
 
         void set_corner_collection_active(
-            bool active, CornerCollectionsBuilderKey )
+            bool active, CornerCollectionsBuilderKey /*key*/ )
         {
             this->set_active( active );
         }
@@ -82,7 +82,7 @@ namespace geode
         CornerCollection() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
     };
     ALIAS_2D_AND_3D( CornerCollection );
 } // namespace geode

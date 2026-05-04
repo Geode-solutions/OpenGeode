@@ -50,7 +50,8 @@ namespace geode
         Serializer archive{ context, file };
         archive.object( grid );
         archive.adapter().flush();
-        OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+        OpenGeodeMeshException::check( std::get< 1 >( context ).isValid(),
+            nullptr, OpenGeodeException::TYPE::internal,
             "[Bitsery::write] Error while writing file: ", this->filename() );
         return { to_string( this->filename() ) };
     }
@@ -72,8 +73,9 @@ namespace geode
             Logger::error( e.what() );
             print_available_extensions<
                 LightRegularGridOutputFactory< dimension > >( type );
-            throw OpenGeodeException{ "Cannot save LightRegularGrid in file: ",
-                filename };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save LightRegularGrid in file: ", filename };
         }
     }
 

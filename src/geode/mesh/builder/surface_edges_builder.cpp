@@ -55,7 +55,7 @@ namespace geode
             index_t edge_vertex_id,
             index_t new_vertex_id )
     {
-        OPENGEODE_ASSERT( edge_vertex_id < 2,
+        OpenGeodeMeshException::assertion( edge_vertex_id < 2,
             "[SurfaceEdgesBuilder::update_edge_vertex] "
             "Accessing an invalid vertex in edge" );
         return edges_->update_edge_vertex(
@@ -73,7 +73,8 @@ namespace geode
     void SurfaceEdgesBuilder< dimension >::copy(
         const SurfaceEdges< dimension >& edges )
     {
-        OPENGEODE_EXCEPTION( edges_->nb_edges() == 0,
+        OpenGeodeMeshException::check( edges_->nb_edges() == 0, nullptr,
+            OpenGeodeException::TYPE::data,
             "[SurfaceEdgesBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         edges_->overwrite_edges( edges, {} );

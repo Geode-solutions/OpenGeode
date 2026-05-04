@@ -78,7 +78,7 @@ namespace geode
             return absl::StrCat( "(", edge_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const EdgeVertex& value )
@@ -106,7 +106,7 @@ namespace geode
      */
     class opengeode_mesh_api Graph : public VertexSet
     {
-        PASSKEY( GraphBuilder, GraphKey );
+        PASSKEY( GraphBuilder, GraphKey /*key*/ );
 
     public:
         using Builder = GraphBuilder;
@@ -170,13 +170,14 @@ namespace geode
 
     public:
         void set_edges_around_vertex(
-            index_t vertex_id, EdgesAroundVertex edges, GraphKey );
+            index_t vertex_id, EdgesAroundVertex edges, GraphKey /*key*/ );
 
-        void associate_edge_vertex_to_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey );
+        void associate_edge_vertex_to_vertex( const EdgeVertex& edge_vertex,
+            index_t vertex_id,
+            GraphKey /*key*/ );
 
         void disassociate_edge_vertex_to_vertex(
-            const EdgeVertex& edge_vertex, GraphKey );
+            const EdgeVertex& edge_vertex, GraphKey /*key*/ );
 
     protected:
         Graph();
@@ -186,7 +187,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] virtual index_t get_edge_vertex(
             const EdgeVertex& edge_vertex ) const = 0;

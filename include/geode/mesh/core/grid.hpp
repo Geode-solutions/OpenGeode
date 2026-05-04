@@ -52,7 +52,7 @@ namespace geode
     class Grid : public CellArray< dimension >
     {
         OPENGEODE_DISABLE_COPY( Grid );
-        PASSKEY( GridBuilder< dimension >, GridKey );
+        PASSKEY( GridBuilder< dimension >, GridKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -158,16 +158,17 @@ namespace geode
         [[nodiscard]] BoundingBox< dimension > grid_bounding_box() const;
 
     public:
-        void set_grid_origin( Point< dimension > origin, GridKey );
+        void set_grid_origin( Point< dimension > origin, GridKey /*key*/ );
 
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length,
-            GridKey );
+            GridKey /*key*/ );
 
         void set_grid_directions(
-            std::array< Vector< dimension >, dimension > directions, GridKey );
+            std::array< Vector< dimension >, dimension > directions,
+            GridKey /*key*/ );
 
-        void copy( const Grid< dimension >& grid, GridKey );
+        void copy( const Grid< dimension >& grid, GridKey /*key*/ );
 
     protected:
         Grid();
@@ -176,7 +177,7 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         using CellArray< dimension >::set_array_dimensions;
         using CellArray< dimension >::copy;

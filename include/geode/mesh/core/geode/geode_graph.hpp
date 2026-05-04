@@ -38,7 +38,7 @@ namespace geode
 {
     class opengeode_mesh_api OpenGeodeGraph : public Graph
     {
-        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey );
+        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey /*key*/ );
 
     public:
         using Builder = OpenGeodeGraphBuilder;
@@ -75,13 +75,14 @@ namespace geode
         }
 
     public:
-        void set_edge_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id, OGGraphKey );
+        void set_edge_vertex( const EdgeVertex& edge_vertex,
+            index_t vertex_id,
+            OGGraphKey /*key*/ );
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] index_t get_edge_vertex(
             const EdgeVertex& edge_vertex ) const override;

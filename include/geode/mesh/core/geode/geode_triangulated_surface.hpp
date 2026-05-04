@@ -44,7 +44,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeTriangulatedSurface );
         PASSKEY( OpenGeodeTriangulatedSurfaceBuilder< dimension >,
-            OGTriangulatedSurfaceKey );
+            OGTriangulatedSurfaceKey /*key*/ );
 
     public:
         using Builder = OpenGeodeTriangulatedSurfaceBuilder< dimension >;
@@ -88,23 +88,23 @@ namespace geode
     public:
         void set_vertex( index_t vertex_id,
             Point< dimension > point,
-            OGTriangulatedSurfaceKey );
+            OGTriangulatedSurfaceKey /*key*/ );
 
         void set_polygon_vertex( const PolygonVertex& polygon_vertex,
             index_t vertex_id,
-            OGTriangulatedSurfaceKey );
+            OGTriangulatedSurfaceKey /*key*/ );
 
         void set_polygon_adjacent( const PolygonEdge& polygon_edge,
             index_t adjacent_id,
-            OGTriangulatedSurfaceKey );
+            OGTriangulatedSurfaceKey /*key*/ );
 
         void add_triangle( const std::array< index_t, 3 >& vertices,
-            OGTriangulatedSurfaceKey );
+            OGTriangulatedSurfaceKey /*key*/ );
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;

@@ -923,7 +923,8 @@ namespace geode
             bbox.add_box( block_mesh.bounding_box() );
             bbox_computed = true;
         }
-        OPENGEODE_EXCEPTION( bbox_computed,
+        OpenGeodeModelException::check( bbox_computed, nullptr,
+            OpenGeodeException::TYPE::data,
             "[BRep::bounding_box] Cannot return the "
             "bounding_box of an empty BRep." );
         return bbox;
@@ -966,7 +967,8 @@ namespace geode
                 }
             }
         }
-        OPENGEODE_EXCEPTION( bbox.min() <= bbox.max(),
+        OpenGeodeModelException::check( bbox.min() <= bbox.max(), nullptr,
+            OpenGeodeException::TYPE::data,
             "[BRep::bounding_box] Cannot return the "
             "bounding_box of a full inactive BRep." );
         return bbox;

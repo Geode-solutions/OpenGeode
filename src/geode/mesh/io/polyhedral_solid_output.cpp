@@ -57,8 +57,9 @@ namespace geode
                 PolyhedralSolidOutputFactory< dimension > >( type );
             Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
-            throw OpenGeodeException{ "Cannot save PolyhedralSolid in file: ",
-                filename };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save PolyhedralSolid in file: ", filename };
         }
     }
 

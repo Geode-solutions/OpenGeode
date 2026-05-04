@@ -48,7 +48,9 @@ namespace geode
         {
             Logger::error( e.what() );
             print_available_extensions< BRepOutputFactory >( TYPE );
-            throw OpenGeodeException{ "Cannot save BRep in file: ", filename };
+            throw OpenGeodeModelException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save BRep in file: ", filename };
         }
     }
 

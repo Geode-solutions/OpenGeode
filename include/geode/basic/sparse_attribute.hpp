@@ -36,6 +36,7 @@
 #include <bitsery/ext/std_map.h>
 
 #include <geode/basic/algorithm.hpp>
+#include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_utils.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
@@ -63,7 +64,7 @@ namespace geode
     public:
         SparseAttribute( T default_value,
             AttributeProperties properties,
-            AttributeBase::AttributeKey )
+            AttributeBase::AttributeKey /*key*/ )
             : SparseAttribute(
                   std::move( default_value ), std::move( properties ) )
         {
@@ -71,10 +72,10 @@ namespace geode
 
         [[nodiscard]] const T& value( index_t element ) const override
         {
-            const auto it = values_.find( element );
-            if( it != values_.end() )
+            const auto value_it = values_.find( element );
+            if( value_it != values_.end() )
             {
-                return it->second;
+                return value_it->second;
             }
             return default_value_;
         }
@@ -90,27 +91,23 @@ namespace geode
         }
 
         template < typename Modifier >
-        void modify_value( index_t element, Modifier&& modifier )
+        void modify_value( index_t element, Modifier modifier )
         {
-            const auto it = values_.find( element );
-            if( it == values_.end() )
-            {
-                values_.emplace( element, default_value_ );
-            }
-            modifier( values_[element] );
+            auto [value_it, _] = values_.emplace( element, default_value_ );
+            modifier( value_it->second );
         }
 
     public:
         void compute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -123,39 +120,42 @@ namespace geode
             values_.reserve( 10 );
         }
 
-        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
+        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ) {}
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, SparseAttribute< T > >{
-                    { []( Archive& a, SparseAttribute< T >& attribute ) {
-                        a.ext( attribute, bitsery::ext::BaseClass<
-                                              ReadOnlyAttribute< T > >{} );
-                        a( attribute.default_value_ );
-                        a.ext( attribute.values_,
+                    { []( Archive& archive, SparseAttribute< T >& attribute ) {
+                        archive.ext(
+                            attribute, bitsery::ext::BaseClass<
+                                           ReadOnlyAttribute< T > >{} );
+                        archive( attribute.default_value_ );
+                        archive.ext( attribute.values_,
                             bitsery::ext::StdMap{
                                 attribute.values_.max_size() },
-                            []( Archive& a2, index_t& i, T& item ) {
-                                a2.value4b( i );
-                                a2( item );
+                            []( Archive& archive2, index_t& i, T& item ) {
+                                archive2.value4b( i );
+                                archive2( item );
                             } );
                     } } } );
             values_.reserve( 10 );
         }
 
-        void resize( index_t /*unused*/, AttributeBase::AttributeKey ) override
+        void resize(
+            index_t /*unused*/, AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
-        void reserve( index_t capacity, AttributeBase::AttributeKey ) override
+        void reserve(
+            index_t capacity, AttributeBase::AttributeKey /*key*/ ) override
         {
             values_.reserve( capacity );
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             const auto old2new = detail::mapping_after_deletion( to_delete );
             auto old_values = std::move( values_ );
@@ -171,7 +171,7 @@ namespace geode
         }
 
         void permute_elements( absl::Span< const index_t > permutation,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             auto old_values = std::move( values_ );
             values_ = decltype( values_ )();
@@ -183,7 +183,7 @@ namespace geode
         }
 
         [[nodiscard]] std::shared_ptr< AttributeBase > clone(
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
                 new SparseAttribute< T >{ default_value_, this->properties() }
@@ -194,7 +194,7 @@ namespace geode
 
         void copy( const AttributeBase& attribute,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             const auto& typed_attribute =
                 dynamic_cast< const SparseAttribute< T >& >( attribute );
@@ -214,7 +214,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
                 new SparseAttribute< T >{ default_value_, this->properties() }
@@ -224,7 +224,8 @@ namespace geode
                 const auto new_index = old2new[i];
                 if( value( i ) != default_value_ && new_index != NO_ID )
                 {
-                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                    OpenGeodeBasicException::check( new_index < nb_elements,
+                        nullptr, OpenGeodeException::TYPE::data,
                         "[SparseAttribute::extract] The given mapping "
                         "contains values that go beyond the given number of "
                         "elements." );
@@ -237,7 +238,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
                 new SparseAttribute< T >{ default_value_, this->properties() }
@@ -248,7 +249,8 @@ namespace geode
                 {
                     for( const auto new_index : outs )
                     {
-                        OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        OpenGeodeBasicException::check( new_index < nb_elements,
+                            nullptr, OpenGeodeException::TYPE::data,
                             "[SparseAttribute::extract] The given mapping "
                             "contains values that go beyond the given number "
                             "of elements." );
@@ -261,7 +263,7 @@ namespace geode
 
         void import( absl::Span< const index_t > old2new,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new,
                 dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
@@ -269,7 +271,7 @@ namespace geode
 
         void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new_mapping,
                 dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );

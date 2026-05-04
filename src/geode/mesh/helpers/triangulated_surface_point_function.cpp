@@ -44,9 +44,10 @@ namespace geode
             Point< point_dimension > value )
             : surface_( surface )
         {
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 !surface_.vertex_attribute_manager().attribute_exists(
                     function_name ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "Cannot create TriangulatedSurfacePointFunction: attribute "
                 "with name '",
                 function_name, "' already exists." );
@@ -61,9 +62,10 @@ namespace geode
             std::string_view function_name )
             : surface_( surface )
         {
-            OPENGEODE_EXCEPTION(
+            OpenGeodeMeshException::check(
                 surface_.vertex_attribute_manager().attribute_exists(
                     function_name ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "Cannot create TriangulatedSurfacePointFunction: attribute "
                 "with name '",
                 function_name, "' does not exist." );

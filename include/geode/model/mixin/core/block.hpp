@@ -52,8 +52,8 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( Blocks< dimension >, BlocksKey );
-        PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey );
+        PASSKEY( Blocks< dimension >, BlocksKey /*key*/ );
+        PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -118,7 +118,7 @@ namespace geode
         [[nodiscard]] const Mesh& get_mesh() const;
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

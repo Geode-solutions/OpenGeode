@@ -51,12 +51,13 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.texture_storage_ );
-                } } } );
+            serializer.ext( *this, Growable< Archive, Impl >{
+                                       { []( Archive& archive, Impl& impl ) {
+                                           archive.object(
+                                               impl.texture_storage_ );
+                                       } } } );
         }
 
     private:
@@ -121,26 +122,27 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void EdgedCurve< dimension >::serialize( Archive& archive )
+    void EdgedCurve< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, EdgedCurve >{
-                { []( Archive& a, EdgedCurve& edged_curve ) {
-                     a.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
+                { []( Archive& archive, EdgedCurve& edged_curve ) {
+                     archive.ext(
+                         edged_curve, bitsery::ext::BaseClass< Graph >{} );
                  },
-                    []( Archive& a, EdgedCurve& edged_curve ) {
-                        a.ext(
+                    []( Archive& archive, EdgedCurve& edged_curve ) {
+                        archive.ext(
                             edged_curve, bitsery::ext::BaseClass< Graph >{} );
-                        a.object( edged_curve.impl_ );
+                        archive.object( edged_curve.impl_ );
                     },
-                    []( Archive& a, EdgedCurve& edged_curve ) {
-                        a.ext(
+                    []( Archive& archive, EdgedCurve& edged_curve ) {
+                        archive.ext(
                             edged_curve, bitsery::ext::BaseClass< Graph >{} );
-                        a.ext(
+                        archive.ext(
                             edged_curve, bitsery::ext::BaseClass<
                                              CoordinateReferenceSystemManagers<
                                                  dimension > >{} );
-                        a.object( edged_curve.impl_ );
+                        archive.object( edged_curve.impl_ );
                     } } } );
     }
 
@@ -158,9 +160,10 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > EdgedCurve< dimension >::bounding_box() const
     {
-        OPENGEODE_EXCEPTION( nb_vertices() != 0,
-            "[EdgedCurve::bounding_box] Cannot return "
-            "the bounding_box of an empty edged curve." );
+        OpenGeodeMeshException::check( nb_vertices() != 0, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[EdgedCurve::bounding_box] Cannot return the bounding_box of an "
+            "empty edged curve." );
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {

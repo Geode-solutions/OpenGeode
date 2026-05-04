@@ -33,7 +33,7 @@ namespace geode
     template < index_t dimension >
     OpenGeodeTriangulatedSurfaceBuilder<
         dimension >::OpenGeodeTriangulatedSurfaceBuilder( VertexSet& vertex_set,
-        MeshBuilderFactoryKey )
+        MeshBuilderFactoryKey /*key*/ )
         : OpenGeodeTriangulatedSurfaceBuilder< dimension >(
               dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
                   vertex_set ) )

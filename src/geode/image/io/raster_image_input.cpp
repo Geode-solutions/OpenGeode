@@ -45,8 +45,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load RasterImage from file: ",
-                filename };
+            throw OpenGeodeImageException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load RasterImage from file: ", filename };
         }
     }
 

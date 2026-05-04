@@ -45,7 +45,7 @@ namespace geode
     class opengeode_mesh_api OpenGeodeRegularGrid< 3 > : public RegularGrid< 3 >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeRegularGrid );
-        PASSKEY( OpenGeodeRegularGridBuilder< 3 >, OGRegularGridKey );
+        PASSKEY( OpenGeodeRegularGridBuilder< 3 >, OGRegularGridKey /*key*/ );
 
     public:
         using Builder = OpenGeodeRegularGridBuilder< 3 >;
@@ -84,16 +84,16 @@ namespace geode
         }
 
     public:
-        void update_origin( const Point3D& origin, OGRegularGridKey );
+        void update_origin( const Point3D& origin, OGRegularGridKey /*key*/ );
 
         void update_origin_and_directions( const Point3D& origin,
             const std::array< Vector3D, 3 >& directions,
-            OGRegularGridKey );
+            OGRegularGridKey /*key*/ );
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;

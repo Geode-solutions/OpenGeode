@@ -76,7 +76,7 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         using CellArray< dimension >::set_array_dimensions;
         using CellArray< dimension >::copy;

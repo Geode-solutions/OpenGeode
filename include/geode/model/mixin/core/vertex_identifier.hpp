@@ -60,7 +60,7 @@ namespace geode
         [[nodiscard]] bool operator<( const ComponentMeshVertex& other ) const;
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] std::string string() const
         {
@@ -89,7 +89,7 @@ namespace geode
      */
     class opengeode_model_api VertexIdentifier
     {
-        PASSKEY( VertexIdentifierBuilder, BuilderKey );
+        PASSKEY( VertexIdentifierBuilder, BuilderKey /*key*/ );
 
     public:
         VertexIdentifier();
@@ -139,7 +139,7 @@ namespace geode
          */
         template < typename MeshComponent >
         void register_mesh_component(
-            const MeshComponent& component, BuilderKey );
+            const MeshComponent& component, BuilderKey /*key*/ );
 
         /*!
          * Remove a component from the VertexIdentifier and delete corresponding
@@ -147,19 +147,19 @@ namespace geode
          */
         template < typename MeshComponent >
         void unregister_mesh_component(
-            const MeshComponent& component, BuilderKey );
+            const MeshComponent& component, BuilderKey /*key*/ );
 
         /*!
          * Create an empty unique vertex.
          * @return Index of the created unique vertex.
          */
-        index_t create_unique_vertex( BuilderKey );
+        index_t create_unique_vertex( BuilderKey /*key*/ );
 
         /*!
          * Create several empty unique vertices
          * @return Index of the first created unique vertex
          */
-        index_t create_unique_vertices( index_t nb, BuilderKey );
+        index_t create_unique_vertices( index_t nb, BuilderKey /*key*/ );
 
         /*!
          * Identify a component vertex to an existing unique vertex index.
@@ -168,7 +168,7 @@ namespace geode
          */
         void set_unique_vertex( ComponentMeshVertex component_vertex_id,
             index_t unique_vertex_id,
-            BuilderKey );
+            BuilderKey /*key*/ );
 
         /*!
          * Remove a component vertex to its unique vertex index.
@@ -178,7 +178,7 @@ namespace geode
         void unset_unique_vertex(
             const ComponentMeshVertex& component_vertex_id,
             index_t unique_vertex_id,
-            BuilderKey );
+            BuilderKey /*key*/ );
 
         /*!
          * Remove a component vertex to its unique vertex index.
@@ -189,19 +189,20 @@ namespace geode
          */
         void update_unique_vertices( const ComponentID& component_id,
             absl::Span< const index_t > old2new,
-            BuilderKey );
+            BuilderKey /*key*/ );
 
         /*!
          * Load the VertexIdentifier from a file.
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( std::string_view directory, BuilderKey );
+        void load_unique_vertices(
+            std::string_view directory, BuilderKey /*key*/ );
 
         /*!
          * Delete all unique vertices not associated with any component
          */
-        std::vector< index_t > delete_isolated_vertices( BuilderKey );
+        std::vector< index_t > delete_isolated_vertices( BuilderKey /*key*/ );
 
     protected:
         VertexIdentifier( VertexIdentifier&& other ) noexcept;

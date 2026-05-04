@@ -182,7 +182,8 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto diff = vertex_id[d] - cell_id[d];
-                OPENGEODE_EXCEPTION( diff == 0 || diff == 1,
+                OpenGeodeMeshException::check( diff == 0 || diff == 1, nullptr,
+                    OpenGeodeException::TYPE::data,
                     "[Grid::cell_local_vertex] vertex [", vertex_id[0], ",",
                     vertex_id[1], "] is not part of cell [", cell_id[0], ",",
                     cell_id[1], "] vertices." );
@@ -370,7 +371,9 @@ namespace geode
             cells_length_ = std::move( cells_length );
             for( const auto direction : LRange{ dimension } )
             {
-                OPENGEODE_EXCEPTION( cells_length_[direction] > GLOBAL_EPSILON,
+                OpenGeodeMeshException::check(
+                    cells_length_[direction] > GLOBAL_EPSILON, nullptr,
+                    OpenGeodeException::TYPE::data,
                     "[Grid] Creation of a grid with a cell length smaller than "
                     "epsilon in direction ",
                     direction, "." );
@@ -381,8 +384,10 @@ namespace geode
                 nb_vertices_double *= static_cast< double >(
                     grid.nb_cells_in_direction( d ) + 1 );
             }
-            OPENGEODE_EXCEPTION( nb_vertices_double < static_cast< double >(
-                                     std::numeric_limits< index_t >::max() ),
+            OpenGeodeMeshException::check(
+                nb_vertices_double < static_cast< double >(
+                    std::numeric_limits< index_t >::max() ),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[Grid] Creation of a grid for which the number of cell "
                 "vertices exceeds the unsigned int limit." );
             for( const auto d : LRange{ dimension } )
@@ -423,25 +428,25 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
-                *this, Growable< Archive, Impl >{
-                           { []( Archive& a, Impl& impl ) {
-                                a.container4b( impl.deprecated_cells_number_ );
-                                a.container8b( impl.cells_length_ );
-                                impl.set_base_origin();
-                                impl.set_base_grid_directions();
-                            },
-                               []( Archive& a, Impl& impl ) {
-                                   a.container8b( impl.cells_length_ );
-                                   impl.set_base_origin();
-                                   impl.set_base_grid_directions();
-                               },
-                               []( Archive& a, Impl& impl ) {
-                                   a.container8b( impl.cells_length_ );
-                                   a.object( impl.grid_coordinate_system_ );
-                               } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.container4b( impl.deprecated_cells_number_ );
+                         archive.container8b( impl.cells_length_ );
+                         impl.set_base_origin();
+                         impl.set_base_grid_directions();
+                     },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.container8b( impl.cells_length_ );
+                            impl.set_base_origin();
+                            impl.set_base_grid_directions();
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.container8b( impl.cells_length_ );
+                            archive.object( impl.grid_coordinate_system_ );
+                        } } } );
         }
 
         void set_base_origin()
@@ -608,7 +613,7 @@ namespace geode
 
     template < index_t dimension >
     void Grid< dimension >::set_grid_origin(
-        Point< dimension > origin, GridKey )
+        Point< dimension > origin, GridKey /*key*/ )
     {
         impl_->set_grid_origin( std::move( origin ) );
     }
@@ -617,7 +622,7 @@ namespace geode
     void Grid< dimension >::set_grid_dimensions(
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_length,
-        GridKey )
+        GridKey /*key*/ )
     {
         set_array_dimensions( std::move( cells_number ) );
         impl_->set_grid_dimensions( *this, std::move( cells_length ) );
@@ -625,13 +630,15 @@ namespace geode
 
     template < index_t dimension >
     void Grid< dimension >::set_grid_directions(
-        std::array< Vector< dimension >, dimension > directions, GridKey )
+        std::array< Vector< dimension >, dimension > directions,
+        GridKey /*key*/ )
     {
         impl_->set_grid_directions( std::move( directions ) );
     }
 
     template < index_t dimension >
-    void Grid< dimension >::copy( const Grid< dimension >& grid, GridKey )
+    void Grid< dimension >::copy(
+        const Grid< dimension >& grid, GridKey /*key*/ )
     {
         CellArray< dimension >::copy( grid );
         impl_->copy( *grid.impl_ );
@@ -639,19 +646,19 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Grid< dimension >::serialize( Archive& archive )
+    void Grid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive,
-                Grid >{ { []( Archive& a, Grid& grid ) {
-                             a.object( grid.impl_ );
+                Grid >{ { []( Archive& archive, Grid& grid ) {
+                             archive.object( grid.impl_ );
                              grid.set_array_dimensions(
                                  grid.impl_->deprecated_cells_number() );
                          },
-                []( Archive& a, Grid& grid ) {
-                    a.ext( grid,
+                []( Archive& archive, Grid& grid ) {
+                    archive.ext( grid,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
-                    a.object( grid.impl_ );
+                    archive.object( grid.impl_ );
                 } } } );
     }
 

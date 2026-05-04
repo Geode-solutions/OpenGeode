@@ -40,6 +40,8 @@
 #include <geode/basic/growable.hpp>
 #include <geode/basic/range.hpp>
 
+#include <geode/mesh/common.hpp>
+
 namespace geode
 {
     namespace detail
@@ -149,12 +151,12 @@ namespace geode
 
         private:
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, OrientedVertexCycle >{
-                        { []( Archive& a, OrientedVertexCycle& storage ) {
-                            a( storage.vertices_ );
+                        { []( Archive& archive, OrientedVertexCycle& storage ) {
+                            archive( storage.vertices_ );
                         } } } );
             }
 

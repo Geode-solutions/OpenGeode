@@ -49,42 +49,49 @@ void test_rescale( geode::TriangulatedSurface3D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
     geode::rescale_mesh( surface, *builder, { 2, -2, 0.1 } );
-    OPENGEODE_EXCEPTION( surface.point( 0 ).inexact_equal(
-                             geode::Point3D{ { 0.2, -0.4, 0.03 } } ),
-        "[Test] Wrong rescale of vertex 0" );
-    OPENGEODE_EXCEPTION( surface.point( 1 ).inexact_equal(
-                             geode::Point3D{ { 4.2, -18.8, 0.67 } } ),
-        "[Test] Wrong rescale of vertex 1" );
-    OPENGEODE_EXCEPTION( surface.point( 2 ).inexact_equal(
-                             geode::Point3D{ { 15.0, -10.4, 0.63 } } ),
-        "[Test] Wrong rescale of vertex 2" );
-    OPENGEODE_EXCEPTION( surface.point( 3 ).inexact_equal(
-                             geode::Point3D{ { 16.2, -2.8, 0.47 } } ),
-        "[Test] Wrong rescale of vertex 3" );
-    OPENGEODE_EXCEPTION( surface.point( 4 ).inexact_equal(
-                             geode::Point3D{ { 9.4, -4.2, 0.13 } } ),
-        "[Test] Wrong rescale of vertex 4" );
+    geode::OpenGeodeMeshException::test(
+        surface.point( 0 ).inexact_equal(
+            geode::Point3D{ { 0.2, -0.4, 0.03 } } ),
+        "Wrong rescale of vertex 0" );
+    geode::OpenGeodeMeshException::test(
+        surface.point( 1 ).inexact_equal(
+            geode::Point3D{ { 4.2, -18.8, 0.67 } } ),
+        "Wrong rescale of vertex 1" );
+    geode::OpenGeodeMeshException::test(
+        surface.point( 2 ).inexact_equal(
+            geode::Point3D{ { 15.0, -10.4, 0.63 } } ),
+        "Wrong rescale of vertex 2" );
+    geode::OpenGeodeMeshException::test(
+        surface.point( 3 ).inexact_equal(
+            geode::Point3D{ { 16.2, -2.8, 0.47 } } ),
+        "Wrong rescale of vertex 3" );
+    geode::OpenGeodeMeshException::test(
+        surface.point( 4 ).inexact_equal(
+            geode::Point3D{ { 9.4, -4.2, 0.13 } } ),
+        "Wrong rescale of vertex 4" );
 }
 
 void test_translate( geode::TriangulatedSurface3D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
     geode::translate_mesh( surface, *builder, geode::Vector3D{ { 2, -2, 1 } } );
-    OPENGEODE_EXCEPTION( surface.point( 0 ).inexact_equal(
-                             geode::Point3D{ { 2.1, -1.8, 1.3 } } ),
-        "[Test] Wrong translation of vertex 0" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        surface.point( 0 ).inexact_equal(
+            geode::Point3D{ { 2.1, -1.8, 1.3 } } ),
+        "Wrong translation of vertex 0" );
+    geode::OpenGeodeMeshException::test(
         surface.point( 1 ).inexact_equal( geode::Point3D{ { 4.1, 7.4, 7.7 } } ),
-        "[Test] Wrong translation of vertex 1" );
-    OPENGEODE_EXCEPTION(
+        "Wrong translation of vertex 1" );
+    geode::OpenGeodeMeshException::test(
         surface.point( 2 ).inexact_equal( geode::Point3D{ { 9.5, 3.2, 7.3 } } ),
-        "[Test] Wrong translation of vertex 2" );
-    OPENGEODE_EXCEPTION( surface.point( 3 ).inexact_equal(
-                             geode::Point3D{ { 10.1, -0.6, 5.7 } } ),
-        "[Test] Wrong translation of vertex 3" );
-    OPENGEODE_EXCEPTION(
+        "Wrong translation of vertex 2" );
+    geode::OpenGeodeMeshException::test(
+        surface.point( 3 ).inexact_equal(
+            geode::Point3D{ { 10.1, -0.6, 5.7 } } ),
+        "Wrong translation of vertex 3" );
+    geode::OpenGeodeMeshException::test(
         surface.point( 4 ).inexact_equal( geode::Point3D{ { 6.7, 0.1, 2.3 } } ),
-        "[Test] Wrong translation of vertex 4" );
+        "Wrong translation of vertex 4" );
 }
 
 void test()

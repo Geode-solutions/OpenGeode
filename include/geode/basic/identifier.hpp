@@ -44,7 +44,7 @@ namespace geode
 {
     class opengeode_basic_api Identifier
     {
-        PASSKEY( IdentifierBuilder, IdentifierKey );
+        PASSKEY( IdentifierBuilder, IdentifierKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -58,13 +58,14 @@ namespace geode
         void save_identifier( std::string_view directory ) const;
 
     public:
-        void set_id( const uuid& unique_id, IdentifierKey );
+        void set_id( const uuid& unique_id, IdentifierKey /*key*/ );
 
-        void set_name( std::string_view name, IdentifierKey );
+        void set_name( std::string_view name, IdentifierKey /*key*/ );
 
-        void load_identifier( std::string_view directory, IdentifierKey );
+        void load_identifier(
+            std::string_view directory, IdentifierKey /*key*/ );
 
-        void copy_identifier( const Identifier& other, IdentifierKey );
+        void copy_identifier( const Identifier& other, IdentifierKey /*key*/ );
 
     protected:
         Identifier();
@@ -77,7 +78,7 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

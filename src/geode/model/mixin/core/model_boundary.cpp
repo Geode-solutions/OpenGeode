@@ -30,12 +30,12 @@ namespace geode
 {
     template < index_t dimension >
     template < typename Archive >
-    void ModelBoundary< dimension >::serialize( Archive &archive )
+    void ModelBoundary< dimension >::serialize( Archive &serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, ModelBoundary >{
-                { []( Archive &a, ModelBoundary &model_boundary ) {
-                    a.ext( model_boundary,
+                { []( Archive &archive, ModelBoundary &model_boundary ) {
+                    archive.ext( model_boundary,
                         bitsery::ext::BaseClass< Component< dimension > >{} );
                 } } } );
     }

@@ -42,7 +42,8 @@ namespace geode
     class opengeode_mesh_api OpenGeodeGraphBuilder : public GraphBuilder
     {
     public:
-        OpenGeodeGraphBuilder( VertexSet& vertex_set, MeshBuilderFactoryKey );
+        OpenGeodeGraphBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeGraphBuilder( OpenGeodeGraph& mesh );
 

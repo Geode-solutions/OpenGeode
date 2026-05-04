@@ -49,7 +49,8 @@ namespace geode
 
     void check_keyword( std::ifstream& file, std::string_view keyword )
     {
-        OPENGEODE_EXCEPTION( line_starts_with( file, keyword ),
+        OpenGeodeBasicException::check( line_starts_with( file, keyword ),
+            nullptr, OpenGeodeException::TYPE::data,
             absl::StrCat( "Line should starts with \"", keyword, "\"" ) );
     }
 
@@ -63,9 +64,9 @@ namespace geode
                 return line;
             }
         }
-        throw geode::OpenGeodeException{
-            "[goto_keyword] Cannot find the requested keyword: ", word
-        };
+        throw geode::OpenGeodeBasicException{ nullptr,
+            OpenGeodeException::TYPE::data,
+            "[goto_keyword] Cannot find the requested keyword: ", word };
         return "";
     }
 
@@ -83,9 +84,9 @@ namespace geode
                 }
             }
         }
-        throw geode::OpenGeodeException{
-            "[goto_keywords] Cannot find one of the requested keywords"
-        };
+        throw geode::OpenGeodeBasicException{ nullptr,
+            OpenGeodeException::TYPE::data,
+            "[goto_keywords] Cannot find one of the requested keywords" };
         return "";
     }
 

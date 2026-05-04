@@ -126,13 +126,14 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
+            serializer.ext( *this, Growable< Archive,
+                                       Impl >{ { []( Archive& archive,
+                                                     Impl& impl ) {
+                archive.ext( impl,
                     bitsery::ext::BaseClass< internal::PointsImpl< 3 > >{} );
-                a.ext( impl,
+                archive.ext( impl,
                     bitsery::ext::BaseClass< internal::GridImpl< 3 > >{} );
             } } } );
         }
@@ -191,7 +192,7 @@ namespace geode
     }
 
     void OpenGeodeRegularGrid< 3 >::update_origin(
-        const Point3D& origin, OGRegularGridKey )
+        const Point3D& origin, OGRegularGridKey /*key*/ )
     {
         impl_->update_origin( *this, origin );
     }
@@ -199,26 +200,26 @@ namespace geode
     void OpenGeodeRegularGrid< 3 >::update_origin_and_directions(
         const Point3D& origin,
         const std::array< Vector3D, 3 >& directions,
-        OGRegularGridKey )
+        OGRegularGridKey /*key*/ )
     {
         impl_->update_origin_and_directions( *this, origin, directions );
     }
 
     template < typename Archive >
-    void OpenGeodeRegularGrid< 3 >::serialize( Archive& archive )
+    void OpenGeodeRegularGrid< 3 >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodeRegularGrid >{
-                { []( Archive& a, OpenGeodeRegularGrid& grid ) {
-                     a.ext(
+                { []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                     archive.ext(
                          grid, bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
-                     a.object( grid.impl_ );
+                     archive.object( grid.impl_ );
                      grid.impl_->initialize_crs( grid );
                  },
-                    []( Archive& a, OpenGeodeRegularGrid& grid ) {
-                        a.ext( grid,
+                    []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                        archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
-                        a.object( grid.impl_ );
+                        archive.object( grid.impl_ );
                     } } } );
     }
 

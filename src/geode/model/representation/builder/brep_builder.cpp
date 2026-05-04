@@ -73,7 +73,8 @@ namespace geode
                              + brep_.nb_surfaces() + brep_.nb_blocks()
                              + brep_.nb_model_boundaries()
                              + brep_.nb_unique_vertices();
-        OPENGEODE_EXCEPTION( nb_components == 0,
+        OpenGeodeModelException::check( nb_components == 0, nullptr,
+            OpenGeodeException::TYPE::data,
             "[BRepBuild::copy] BRep should be empty before copy. To add BRep "
             "components in a BRep which is not empty, use ModelConcatener." );
         if( const auto name = brep.name() )

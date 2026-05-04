@@ -153,7 +153,7 @@ namespace geode
                     const auto& all_polyhedra_around =
                         solid_info.polyhedron_vertices[vertex_id];
                     auto nb_polyhedra_around = polyhedra_around.size();
-                    OPENGEODE_ASSERT(
+                    OpenGeodeMeshException::assertion(
                         nb_polyhedra_around <= all_polyhedra_around.size(),
                         "[SplitAlongSolidFacets] Wrong size comparison" );
                     /// Already processed polyhedra
@@ -198,7 +198,7 @@ namespace geode
                         break;
                     }
                 }
-                OPENGEODE_ASSERT(
+                OpenGeodeMeshException::assertion(
                     !solid_.polyhedra_around_vertex( vertex_id ).empty(),
                     "[BRepFromMeshBuilder::split_block_by_surfaces] Lost "
                     "polyhedron around vertex" );

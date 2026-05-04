@@ -36,7 +36,9 @@
     {                                                                          \
         std::ifstream file{ to_string( this->filename() ),                     \
             std::ifstream::binary };                                           \
-        OPENGEODE_EXCEPTION( file, "[Bitsery::read] Failed to open file: ",    \
+        geode::OpenGeodeMeshException::check( !file.fail(), nullptr,           \
+            geode::OpenGeodeException::TYPE::data,                             \
+            "[Bitsery::read] Failed to open file: ",                           \
             to_string( this->filename() ) );                                   \
         TContext context{};                                                    \
         BitseryExtensions::register_deserialize_pcontext(                      \
@@ -45,9 +47,11 @@
         auto mesh = Mesh::create( impl );                                      \
         archive.object( dynamic_cast< OpenGeode##Mesh& >( *mesh ) );           \
         const auto& adapter = archive.adapter();                               \
-        OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError  \
-                                 && adapter.isCompletedSuccessfully()          \
-                                 && std::get< 1 >( context ).isValid(),        \
+        geode::OpenGeodeMeshException::check(                                  \
+            adapter.error() == bitsery::ReaderError::NoError                   \
+                && adapter.isCompletedSuccessfully()                           \
+                && std::get< 1 >( context ).isValid(),                         \
+            nullptr, geode::OpenGeodeException::TYPE::internal,                \
             "[Bitsery::read] Error while reading file: ", this->filename() );  \
         return mesh;                                                           \
     }                                                                          \

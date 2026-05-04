@@ -66,8 +66,9 @@ void build_test_surface( geode::TriangulatedSurface2D& surface )
         surface_area +=
             geode::triangle_signed_area( surface.triangle( triangle_id ) );
     }
-    OPENGEODE_EXCEPTION( inexact_equal( surface_area, 2.5, 1e-7 ),
-        "[Test] Total area of triangle should be 2.5." );
+    geode::OpenGeodeMeshException::test(
+        inexact_equal( surface_area, 2.5, 1e-7 ),
+        "Total area of triangle should be 2.5." );
 }
 
 void test_scalar_function( geode::TriangulatedSurface2D& surface )
@@ -81,28 +82,30 @@ void test_scalar_function( geode::TriangulatedSurface2D& surface )
     {
         if( i == 4 || i == 6 )
         {
-            OPENGEODE_EXCEPTION( scalar_function.value( i ) == 22,
-                "[Test] Scalar function value is wrong." );
+            geode::OpenGeodeMeshException::test(
+                scalar_function.value( i ) == 22,
+                "Scalar function value is wrong." );
         }
         else
         {
-            OPENGEODE_EXCEPTION( scalar_function.value( i ) == 26,
-                "[Test] Scalar function value is wrong." );
+            geode::OpenGeodeMeshException::test(
+                scalar_function.value( i ) == 26,
+                "Scalar function value is wrong." );
         }
     }
     scalar_function.set_value( 5, 22 );
     geode::Point2D point{ { 1., 1. } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal( scalar_function.value( point, 2 ), 26, 1e-7 ),
-        "[Test] Scalar function value 1 is wrong." );
+        "Scalar function value 1 is wrong." );
     point = geode::Point2D{ { 1., 1.8 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal( scalar_function.value( point, 5 ), 22, 1e-7 ),
-        "[Test] Scalar function value 2 is wrong." );
+        "Scalar function value 2 is wrong." );
     point = geode::Point2D{ { 1., 1.375 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal( scalar_function.value( point, 2 ), 24, 1e-7 ),
-        "[Test] Scalar function value 3 is wrong." );
+        "Scalar function value 3 is wrong." );
 }
 
 void test_point_function( geode::TriangulatedSurface2D& surface )
@@ -117,30 +120,33 @@ void test_point_function( geode::TriangulatedSurface2D& surface )
     {
         if( i == 4 || i == 6 )
         {
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeMeshException::test(
                 ( point_function.value( i ) == geode::Point2D{ { 22, -3 } } ),
-                "[Test] Point function value is wrong." );
+                "Point function value is wrong." );
         }
         else
         {
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeMeshException::test(
                 ( point_function.value( i ) == geode::Point2D{ { 26, 3 } } ),
-                "[Test] Point function value is wrong." );
+                "Point function value is wrong." );
         }
     }
     point_function.set_value( 5, geode::Point2D{ { 22, -3 } } );
     geode::Point2D point{ { 1., 1. } };
-    OPENGEODE_EXCEPTION( point_function.value( point, 2 )
-                             .inexact_equal( geode::Point2D{ { 26, 3 } } ),
-        "[Test] Point function value 1 is wrong." );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, 2 )
+            .inexact_equal( geode::Point2D{ { 26, 3 } } ),
+        "Point function value 1 is wrong." );
     point = geode::Point2D{ { 1., 1.8 } };
-    OPENGEODE_EXCEPTION( point_function.value( point, 5 )
-                             .inexact_equal( geode::Point2D{ { 22, -3 } } ),
-        "[Test] Point function value 2 is wrong." );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, 5 )
+            .inexact_equal( geode::Point2D{ { 22, -3 } } ),
+        "Point function value 2 is wrong." );
     point = geode::Point2D{ { 1., 1.375 } };
-    OPENGEODE_EXCEPTION( point_function.value( point, 2 )
-                             .inexact_equal( geode::Point2D{ { 24, 0 } } ),
-        "[Test] Point function value 3 is wrong." );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, 2 )
+            .inexact_equal( geode::Point2D{ { 24, 0 } } ),
+        "Point function value 3 is wrong." );
 }
 
 void test()

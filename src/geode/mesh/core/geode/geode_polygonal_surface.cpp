@@ -182,19 +182,21 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.container4b( impl.polygon_vertices_,
-                        impl.polygon_vertices_.max_size() );
-                    a.container4b( impl.polygon_adjacents_,
-                        impl.polygon_adjacents_.max_size() );
-                    a.container4b(
-                        impl.polygon_ptr_, impl.polygon_ptr_.max_size() );
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.container4b( impl.polygon_vertices_,
+                            impl.polygon_vertices_.max_size() );
+                        archive.container4b( impl.polygon_adjacents_,
+                            impl.polygon_adjacents_.max_size() );
+                        archive.container4b(
+                            impl.polygon_ptr_, impl.polygon_ptr_.max_size() );
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass<
+                                      internal::PointsImpl< dimension > >{} );
+                    } } } );
         }
 
         index_t get_polygon_adjacent_impl(
@@ -235,8 +237,9 @@ namespace geode
         default;
 
     template < index_t dimension >
-    void OpenGeodePolygonalSurface< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGPolygonalSurfaceKey )
+    void OpenGeodePolygonalSurface< dimension >::set_vertex( index_t vertex_id,
+        Point< dimension > point,
+        OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
@@ -266,20 +269,23 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodePolygonalSurface< dimension >::serialize( Archive& archive )
+    void OpenGeodePolygonalSurface< dimension >::serialize(
+        Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodePolygonalSurface >{
-                { []( Archive& a, OpenGeodePolygonalSurface& surface ) {
-                     a.ext( surface, bitsery::ext::BaseClass<
-                                         PolygonalSurface< dimension > >{} );
-                     a.object( surface.impl_ );
+                { []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
+                     archive.ext(
+                         surface, bitsery::ext::BaseClass<
+                                      PolygonalSurface< dimension > >{} );
+                     archive.object( surface.impl_ );
                      surface.impl_->initialize_crs( surface );
                  },
-                    []( Archive& a, OpenGeodePolygonalSurface& surface ) {
-                        a.ext( surface, bitsery::ext::BaseClass<
-                                            PolygonalSurface< dimension > >{} );
-                        a.object( surface.impl_ );
+                    []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
+                        archive.ext(
+                            surface, bitsery::ext::BaseClass<
+                                         PolygonalSurface< dimension > >{} );
+                        archive.object( surface.impl_ );
                     } } } );
     }
 
@@ -287,28 +293,28 @@ namespace geode
     void OpenGeodePolygonalSurface< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex,
         index_t vertex_id,
-        OGPolygonalSurfaceKey )
+        OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->set_polygon_vertex( polygon_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::add_polygon(
-        absl::Span< const index_t > vertices, OGPolygonalSurfaceKey )
+        absl::Span< const index_t > vertices, OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->add_polygon( vertices );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::remove_polygons(
-        const std::vector< bool >& to_delete, OGPolygonalSurfaceKey )
+        const std::vector< bool >& to_delete, OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->remove_polygons( to_delete );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::permute_polygons(
-        absl::Span< const index_t > permutation, OGPolygonalSurfaceKey )
+        absl::Span< const index_t > permutation, OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->permute_polygons( permutation );
     }
@@ -317,7 +323,7 @@ namespace geode
     void OpenGeodePolygonalSurface< dimension >::set_polygon_adjacent(
         const PolygonEdge& polygon_edge,
         index_t adjacent_id,
-        OGPolygonalSurfaceKey )
+        OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
     }
@@ -325,7 +331,7 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::copy_polygons(
         const OpenGeodePolygonalSurface< dimension >& surface_mesh,
-        OGPolygonalSurfaceKey )
+        OGPolygonalSurfaceKey /*key*/ )
     {
         impl_->copy_polygons( *surface_mesh.impl_ );
     }

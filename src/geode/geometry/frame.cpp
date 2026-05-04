@@ -124,7 +124,8 @@ namespace geode
     Frame< dimension > Frame< dimension >::inverse() const
     {
         auto result = compute_inverse( *this );
-        OPENGEODE_EXCEPTION( result.has_value(),
+        OpenGeodeGeometryException::check( result.has_value(), nullptr,
+            OpenGeodeException::TYPE::internal,
             "[Frame<dimension>::inverse] Failed to inverse" );
         return result.value();
     }
@@ -190,11 +191,11 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Frame< dimension >::serialize( Archive& archive )
+    void Frame< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
-            Growable< Archive, Frame >{ { []( Archive& a, Frame& frame ) {
-                a.container( frame.frame_ );
+        serializer.ext( *this,
+            Growable< Archive, Frame >{ { []( Archive& archive, Frame& frame ) {
+                archive.container( frame.frame_ );
             } } } );
     }
 

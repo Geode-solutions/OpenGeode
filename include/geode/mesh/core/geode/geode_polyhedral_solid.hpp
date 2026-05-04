@@ -42,7 +42,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePolyhedralSolid );
         PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
-            OGPolyhedralSolidKey );
+            OGPolyhedralSolidKey /*key*/ );
 
     public:
         using Builder = OpenGeodePolyhedralSolidBuilder< dimension >;
@@ -83,35 +83,36 @@ namespace geode
         }
 
     public:
-        void set_vertex(
-            index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey );
+        void set_vertex( index_t vertex_id,
+            Point< dimension > point,
+            OGPolyhedralSolidKey /*key*/ );
 
         void add_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< local_index_t > > facets,
-            OGPolyhedralSolidKey );
+            OGPolyhedralSolidKey /*key*/ );
 
-        void remove_polyhedra(
-            const std::vector< bool >& to_delete, OGPolyhedralSolidKey );
+        void remove_polyhedra( const std::vector< bool >& to_delete,
+            OGPolyhedralSolidKey /*key*/ );
 
-        void permute_polyhedra(
-            absl::Span< const index_t > permutation, OGPolyhedralSolidKey );
+        void permute_polyhedra( absl::Span< const index_t > permutation,
+            OGPolyhedralSolidKey /*key*/ );
 
         void set_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet,
             index_t adjacent_id,
-            OGPolyhedralSolidKey );
+            OGPolyhedralSolidKey /*key*/ );
 
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
-            OGPolyhedralSolidKey );
+            OGPolyhedralSolidKey /*key*/ );
 
         void copy_polyhedra(
             const OpenGeodePolyhedralSolid< dimension >& solid_mesh,
-            OGPolyhedralSolidKey );
+            OGPolyhedralSolidKey /*key*/ );
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;

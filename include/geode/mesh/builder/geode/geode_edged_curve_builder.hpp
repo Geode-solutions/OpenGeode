@@ -47,7 +47,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeEdgedCurveBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeEdgedCurveBuilder(
             OpenGeodeEdgedCurve< dimension >& mesh );

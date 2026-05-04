@@ -23,7 +23,10 @@
 
 #pragma once
 
-#include <geode/basic/common.hpp>
+#include <absl/base/optimization.h>
+
+#include <geode/basic/logger.hpp>
+#include <geode/basic/opengeode_basic_export.hpp>
 #include <geode/basic/pimpl.hpp>
 #include <geode/basic/singleton.hpp>
 
@@ -31,8 +34,10 @@ namespace geode
 {
     class opengeode_basic_api Library : public Singleton
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( Library );
+
     public:
-        virtual ~Library();
+        ~Library() override;
 
     protected:
         Library();
@@ -51,29 +56,88 @@ namespace geode
  * Use this macro to declare an OpenGeode library in a header file (usually
  * common.h)
  */
-#define OPENGEODE_LIBRARY( export_api, library_name )                          \
-    class export_api library_name##Library : public geode::Library             \
+#define OPENGEODE_LIBRARY( export_api, project_name, library_name )            \
+    class export_api project_name##library_name##Library                       \
+        : public geode::Library                                                \
     {                                                                          \
     public:                                                                    \
         static void initialize()                                               \
         {                                                                      \
-            library_name##Library& library =                                   \
-                Singleton::instance< library_name##Library >();                \
+            project_name##library_name##Library& library =                     \
+                Singleton::instance< project_name##library_name##Library >();  \
             library.call_initialize( #library_name );                          \
         }                                                                      \
                                                                                \
     private:                                                                   \
         void do_initialize() override;                                         \
+    };                                                                         \
+                                                                               \
+    class export_api project_name##library_name##Exception                     \
+        : public geode::project_name##Exception                                \
+    {                                                                          \
+    public:                                                                    \
+        template < typename... Args >                                          \
+        project_name##library_name##Exception(                                 \
+            std::any data, TYPE type, const Args&... message )                 \
+            : geode::project_name##Exception{ #project_name, #library_name,    \
+                  data, type, message... }                                     \
+        {                                                                      \
+        }                                                                      \
+                                                                               \
+        template < typename... Args >                                          \
+        static void check(                                                     \
+            bool condition, std::any data, TYPE type, const Args&... message ) \
+        {                                                                      \
+            if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
+            {                                                                  \
+                throw project_name##library_name##Exception{                   \
+                    std::move( data ), type, message...                        \
+                };                                                             \
+            }                                                                  \
+        }                                                                      \
+                                                                               \
+        template < typename Condition, typename... Args >                      \
+        static void assertion_check(                                           \
+            Condition&& condition, const Args&... message )                    \
+        {                                                                      \
+            if constexpr( is_debug_build )                                     \
+            {                                                                  \
+                if( ABSL_PREDICT_FALSE( !( condition() ) ) )                   \
+                {                                                              \
+                    geode::Logger::critical( #project_name, " ",               \
+                        #library_name, " assertion failed" );                  \
+                    geode::Logger::critical( "Message: ", message... );        \
+                    exit( 1 );                                                 \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+                                                                               \
+        template < typename... Args >                                          \
+        static void test( bool condition, const Args&... message )             \
+        {                                                                      \
+            if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
+            {                                                                  \
+                geode::Logger::critical( "Test failed: ", message... );        \
+                exit( 1 );                                                     \
+            }                                                                  \
+        }                                                                      \
     }
+
+#define assertion( condition, ... )                                            \
+    assertion_check(                                                           \
+        [&] {                                                                  \
+            return ( condition );                                              \
+        },                                                                     \
+        __VA_ARGS__ )
 
 /*!
  * Use this macro to implement an OpenGeode library in a cpp file (usually
  * common.cpp) and call all functions that need to be initialized.
  */
-#define OPENGEODE_LIBRARY_IMPLEMENTATION( library_name )                       \
-    void library_name##Library::do_initialize()
+#define OPENGEODE_LIBRARY_IMPLEMENTATION( project_name, library_name )         \
+    void project_name##library_name##Library::do_initialize()
 
 namespace geode
 {
-    OPENGEODE_LIBRARY( opengeode_basic_api, OpenGeodeBasic );
+    OPENGEODE_LIBRARY( opengeode_basic_api, OpenGeode, Basic );
 } // namespace geode

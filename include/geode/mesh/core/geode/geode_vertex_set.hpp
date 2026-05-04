@@ -71,14 +71,14 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive &archive )
+        void serialize( Archive &serializer )
         {
-            archive.ext(
-                *this, Growable< Archive, OpenGeodeVertexSet >{
-                           { []( Archive &a, OpenGeodeVertexSet &vertex_set ) {
-                               a.ext( vertex_set,
-                                   bitsery::ext::BaseClass< VertexSet >{} );
-                           } } } );
+            serializer.ext( *this,
+                Growable< Archive, OpenGeodeVertexSet >{
+                    { []( Archive &archive, OpenGeodeVertexSet &vertex_set ) {
+                        archive.ext( vertex_set,
+                            bitsery::ext::BaseClass< VertexSet >{} );
+                    } } } );
         }
     };
 } // namespace geode

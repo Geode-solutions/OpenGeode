@@ -79,7 +79,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
     };
     ALIAS_1D_AND_2D_AND_3D( PointSet );
 } // namespace geode

@@ -85,7 +85,7 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >& Corners< dimension >::modifiable_corner(
-        const uuid& id, CornersBuilderKey )
+        const uuid& id, CornersBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -115,7 +115,7 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::load_corners(
-        std::string_view directory, CornersBuilderKey )
+        std::string_view directory, CornersBuilderKey /*key*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );
@@ -151,14 +151,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Corners< dimension >::modifiable_corners( CornersBuilderKey )
+    auto Corners< dimension >::modifiable_corners( CornersBuilderKey /*key*/ )
         -> ModifiableCornerRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    const uuid& Corners< dimension >::create_corner( CornersBuilderKey )
+    const uuid& Corners< dimension >::create_corner( CornersBuilderKey /*key*/ )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
             new Corner< dimension >{
@@ -171,7 +171,7 @@ namespace geode
 
     template < index_t dimension >
     const uuid& Corners< dimension >::create_corner(
-        const MeshImpl& impl, CornersBuilderKey )
+        const MeshImpl& impl, CornersBuilderKey /*key*/ )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
             new Corner< dimension >{
@@ -184,7 +184,7 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::create_corner(
-        uuid corner_id, CornersBuilderKey )
+        uuid corner_id, CornersBuilderKey /*key*/ )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
             new Corner< dimension >{
@@ -196,7 +196,7 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::create_corner(
-        uuid corner_id, const MeshImpl& impl, CornersBuilderKey )
+        uuid corner_id, const MeshImpl& impl, CornersBuilderKey /*key*/ )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
             new Corner< dimension >{ impl, {} }
@@ -207,7 +207,7 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::delete_corner(
-        const Corner< dimension >& corner, CornersBuilderKey )
+        const Corner< dimension >& corner, CornersBuilderKey /*key*/ )
     {
         impl_->delete_component( corner.id() );
     }

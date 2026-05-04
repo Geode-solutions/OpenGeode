@@ -50,7 +50,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeHybridSolidBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeHybridSolidBuilder(
             OpenGeodeHybridSolid< dimension >& mesh );

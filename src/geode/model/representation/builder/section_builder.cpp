@@ -66,7 +66,8 @@ namespace geode
         auto nb_components =
             section_.nb_corners() + section_.nb_lines() + section_.nb_surfaces()
             + section_.nb_model_boundaries() + section_.nb_unique_vertices();
-        OPENGEODE_EXCEPTION( nb_components == 0,
+        OpenGeodeModelException::check( nb_components == 0, nullptr,
+            OpenGeodeException::TYPE::data,
             "[SectionBuild::copy] Section should be empty before copy. To add "
             "Section components in a Section which is not empty, use "
             "ModelConcatener." );

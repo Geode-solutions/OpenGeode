@@ -52,7 +52,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeTetrahedralSolidBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeTetrahedralSolidBuilder(
             OpenGeodeTetrahedralSolid< dimension >& mesh );

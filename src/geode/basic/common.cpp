@@ -33,7 +33,7 @@
 
 namespace geode
 {
-    OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeBasic )
+    OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeode, Basic )
     {
         LoggerManager::register_client(
             std::make_unique< ConsoleLoggerClient >() );

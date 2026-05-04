@@ -66,7 +66,8 @@ namespace geode
             Serializer archive{ context, file };
             archive.object( *this );
             archive.adapter().flush();
-            OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+            OpenGeodeBasicException::check( std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Identifier::save] Error while writing file: ", filename );
         }
 
@@ -84,10 +85,11 @@ namespace geode
             Deserializer archive{ context, file };
             archive.object( *this );
             const auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION(
+            OpenGeodeBasicException::check(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Identifier::load] Error while reading file: ", filename );
         }
 
@@ -96,9 +98,9 @@ namespace geode
 
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& local_archive, Impl& impl ) {
                          local_archive.object( impl.id_ );
@@ -186,9 +188,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void Identifier::serialize( Archive& archive )
+    void Identifier::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, Identifier >{
                        { []( Archive& local_archive, Identifier& identifier ) {
                            local_archive.object( identifier.impl_ );

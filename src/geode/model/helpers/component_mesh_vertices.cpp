@@ -47,7 +47,9 @@ namespace
         {
             if( compare( cmv, previous ) )
             {
-                OPENGEODE_ASSERT( cmv.vertex != previous.vertex,
+                geode::OpenGeodeModelException::check(
+                    cmv.vertex != previous.vertex, nullptr,
+                    geode::OpenGeodeException::TYPE::data,
                     "[component_mesh_vertex_pairs] Vertices should be "
                     "different" );
                 auto temp_result = current_result;

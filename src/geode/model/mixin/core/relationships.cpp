@@ -172,7 +172,8 @@ namespace geode
             Serializer archive{ context, file };
             archive.object( *this );
             archive.adapter().flush();
-            OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+            OpenGeodeModelException::check( std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Relationships::save] Error while writing file: ", filename );
         }
 
@@ -186,44 +187,48 @@ namespace geode
             Deserializer archive{ context, file };
             archive.object( *this );
             const auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION(
+            OpenGeodeModelException::check(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
                 "[Relationships::load] Error while reading file: ", filename );
         }
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
+                    { []( Archive& archive, Impl& impl ) {
                          OpenGeodeGraph graph;
-                         a.object( graph );
-                         a.object( impl.uuid2index_ );
-                         a.ext(
+                         archive.object( graph );
+                         archive.object( impl.uuid2index_ );
+                         archive.ext(
                              impl.relation_type_, bitsery::ext::StdSmartPtr{} );
-                         a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
+                         archive.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                          impl.graph_ = graph.clone();
                          impl.initialize_attributes();
                          impl.initialize_relation_attribute();
                          impl.delete_isolated_vertices();
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.ext( impl.graph_, bitsery::ext::StdSmartPtr{} );
-                            a.object( impl.uuid2index_ );
-                            a.ext( impl.relation_type_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.ext(
+                                impl.graph_, bitsery::ext::StdSmartPtr{} );
+                            archive.object( impl.uuid2index_ );
+                            archive.ext( impl.relation_type_,
                                 bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
+                            archive.ext(
+                                impl.ids_, bitsery::ext::StdSmartPtr{} );
                             impl.delete_isolated_vertices();
                         },
-                        []( Archive& a, Impl& impl ) {
-                            a.ext( impl, bitsery::ext::BaseClass<
-                                             detail::RelationshipsImpl >{} );
-                            a.ext( impl.relation_type_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.ext(
+                                impl, bitsery::ext::BaseClass<
+                                          detail::RelationshipsImpl >{} );
+                            archive.ext( impl.relation_type_,
                                 bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
@@ -318,7 +323,7 @@ namespace geode
 
     index_t Relationships::add_boundary_relation( const ComponentID& boundary,
         const ComponentID& incidence,
-        RelationshipsBuilderKey )
+        RelationshipsBuilderKey /*key*/ )
     {
         return impl_->add_relation(
             boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
@@ -348,7 +353,7 @@ namespace geode
 
     index_t Relationships::add_internal_relation( const ComponentID& internal,
         const ComponentID& embedding,
-        RelationshipsBuilderKey )
+        RelationshipsBuilderKey /*key*/ )
     {
         return impl_->add_relation(
             internal, embedding, Relationships::Impl::INTERNAL_RELATION );
@@ -378,7 +383,7 @@ namespace geode
 
     index_t Relationships::add_item_in_collection( const ComponentID& item,
         const ComponentID& collection,
-        RelationshipsBuilderKey )
+        RelationshipsBuilderKey /*key*/ )
     {
         return impl_->add_relation(
             item, collection, Relationships::Impl::ITEM_RELATION );
@@ -416,13 +421,13 @@ namespace geode
 
     void Relationships::copy_relationships( const ModelCopyMapping& mapping,
         const Relationships& relationships,
-        RelationshipsBuilderKey )
+        RelationshipsBuilderKey /*key*/ )
     {
         impl_->copy( *relationships.impl_, mapping );
     }
 
     void Relationships::load_relationships(
-        std::string_view directory, RelationshipsBuilderKey )
+        std::string_view directory, RelationshipsBuilderKey /*key*/ )
     {
         return impl_->load( directory );
     }

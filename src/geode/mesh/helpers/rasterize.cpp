@@ -140,8 +140,9 @@ namespace
                 return i;
             }
         }
-        OPENGEODE_ASSERT_NOT_REACHED(
-            "[rasterize_segment] Main axis not found" );
+        throw geode::OpenGeodeMeshException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal,
+            "[rasterize_segment] Main axis not found" };
         return geode::NO_ID;
     }
 
@@ -539,7 +540,8 @@ namespace
         const geode::Segment2D& segment,
         const std::array< geode::Grid2D::CellsAroundVertex, 2 > vertex_cells )
     {
-        OPENGEODE_ASSERT( segment.length() > geode::GLOBAL_EPSILON,
+        geode::OpenGeodeMeshException::assertion(
+            segment.length() > geode::GLOBAL_EPSILON,
             "[conservative_voxelization_segment] Segment should be longer than "
             "epsilon" );
         std::vector< CellIndices< 2 > > cells;
@@ -943,8 +945,9 @@ namespace
                     current_j, current_k, vertices_order_[order[2]] );
                 return result;
             }
-            OPENGEODE_ASSERT_NOT_REACHED(
-                "[Rasterize::is_jk_to_process] Missing position case" );
+            throw geode::OpenGeodeMeshException{ nullptr,
+                geode::OpenGeodeException::TYPE::internal,
+                "[Rasterize::is_jk_to_process] Missing position case" };
             return result;
         }
 
@@ -1045,9 +1048,10 @@ namespace
             const auto k = value.first.second;
             auto& i_values = value.second;
             absl::c_sort( i_values );
-            OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
-                "[rasterize_closed_surface] Wrong "
-                "number of intervals to paint" );
+            geode::OpenGeodeMeshException::check( i_values.size() % 2 == 0,
+                nullptr, geode::OpenGeodeException::TYPE::internal,
+                "[rasterize_closed_surface] Wrong number of intervals to "
+                "paint" );
             bool paint{ true };
             for( geode::index_t it = 0; it < i_values.size();
                 it += 2, paint = !paint )
@@ -1076,7 +1080,8 @@ namespace geode
     {
         const auto start = grid.cells( segment.vertices().front() );
         const auto end = grid.cells( segment.vertices().back() );
-        OPENGEODE_EXCEPTION( !start.empty() && !end.empty(),
+        OpenGeodeMeshException::check( !start.empty() && !end.empty(),
+            segment.barycenter(), OpenGeodeException::TYPE::data,
             "[rasterize_segment] Segment is not included in the given Grid" );
         if( start == end )
         {
@@ -1109,7 +1114,8 @@ namespace geode
         for( const auto v : LRange{ 2 } )
         {
             vertex_cells[v] = grid.cells( vertices[v] );
-            OPENGEODE_EXCEPTION( !vertex_cells[v].empty(),
+            OpenGeodeMeshException::check( !vertex_cells[v].empty(),
+                segment.barycenter(), OpenGeodeException::TYPE::data,
                 "[conservative_rasterize_segment] Segment is "
                 "not included in the given Grid" );
         }
@@ -1130,7 +1136,8 @@ namespace geode
         for( const auto v : LRange{ 3 } )
         {
             vertex_cells[v] = grid.cells( vertices[v].get() );
-            OPENGEODE_EXCEPTION( !vertex_cells[v].empty(),
+            OpenGeodeMeshException::check( !vertex_cells[v].empty(),
+                triangle.barycenter(), OpenGeodeException::TYPE::data,
                 "[conservative_rasterize_triangle] Triangle is not included in "
                 "the given Grid" );
         }

@@ -94,7 +94,8 @@ namespace geode
             std::array< index_t, dimension > cells_number )
         {
             cells_number_ = std::move( cells_number );
-            OPENGEODE_EXCEPTION( nb_cells() != 0,
+            OpenGeodeBasicException::check( nb_cells() != 0, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CellArray] Creation of a array with no cells "
                 "in one direction." );
         }
@@ -107,13 +108,13 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, Impl >{
-                                    { []( Archive& local_archive, Impl& impl ) {
-                                        local_archive.container4b(
-                                            impl.cells_number_ );
-                                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& local_archive, Impl& impl ) {
+                               local_archive.container4b( impl.cells_number_ );
+                           } } } );
         }
 
     private:
@@ -189,9 +190,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void CellArray< dimension >::serialize( Archive& archive )
+    void CellArray< dimension >::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, CellArray >{
                        { []( Archive& local_archive, CellArray& array ) {
                            local_archive.object( array.impl_ );

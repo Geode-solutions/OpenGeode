@@ -52,7 +52,7 @@ namespace geode
                 index_t vertex_id{ 0 };
                 for( const auto d : LRange{ dimension } )
                 {
-                    OPENGEODE_ASSERT(
+                    OpenGeodeMeshException::assertion(
                         index[d] < grid.nb_vertices_in_direction( d ),
                         "[RegularGrid::vertex_index] Invalid index" );
 
@@ -69,7 +69,8 @@ namespace geode
             [[nodiscard]] VertexIndices vertex_indices(
                 const Grid< dimension >& grid, index_t index ) const
             {
-                OPENGEODE_ASSERT( index < grid.nb_grid_vertices(),
+                OpenGeodeMeshException::assertion(
+                    index < grid.nb_grid_vertices(),
                     "[RegularGrid::vertex_index] Invalid index" );
                 VertexIndices vertex_id;
                 for( const auto d : LRange{ dimension } )
@@ -99,14 +100,15 @@ namespace geode
 
         private:
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, GridImpl >{
                         { []( Archive& /*unused*/, GridImpl& /*unused*/ ) {},
-                            []( Archive& a, GridImpl& grid ) {
-                                a.ext( grid, bitsery::ext::BaseClass<
-                                                 ArrayImpl< dimension > >{} );
+                            []( Archive& archive, GridImpl& grid ) {
+                                archive.ext(
+                                    grid, bitsery::ext::BaseClass<
+                                              ArrayImpl< dimension > >{} );
                             } } } );
             }
         };

@@ -82,7 +82,7 @@ namespace geode
     template < index_t dimension >
     BlockCollection< dimension >&
         BlockCollections< dimension >::modifiable_block_collection(
-            const uuid& id, BlockCollectionsBuilderKey )
+            const uuid& id, BlockCollectionsBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -97,7 +97,7 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollections< dimension >::load_block_collections(
-        std::string_view directory, BlockCollectionsBuilderKey )
+        std::string_view directory, BlockCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
             absl::StrCat( directory, "/block_collections" ) );
@@ -121,14 +121,14 @@ namespace geode
 
     template < index_t dimension >
     auto BlockCollections< dimension >::modifiable_block_collections(
-        BlockCollectionsBuilderKey ) -> ModifiableBlockCollectionRange
+        BlockCollectionsBuilderKey /*key*/ ) -> ModifiableBlockCollectionRange
     {
         return { *this };
     }
 
     template < index_t dimension >
     const uuid& BlockCollections< dimension >::create_block_collection(
-        BlockCollectionsBuilderKey )
+        BlockCollectionsBuilderKey /*key*/ )
     {
         typename BlockCollections< dimension >::Impl::ComponentPtr collection{
             new BlockCollection< dimension >{
@@ -141,7 +141,7 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollections< dimension >::create_block_collection(
-        uuid block_collection_id, BlockCollectionsBuilderKey )
+        uuid block_collection_id, BlockCollectionsBuilderKey /*key*/ )
     {
         typename BlockCollections<
             dimension >::Impl::ComponentPtr block_collection{
@@ -156,7 +156,7 @@ namespace geode
     template < index_t dimension >
     void BlockCollections< dimension >::delete_block_collection(
         const BlockCollection< dimension >& collection,
-        BlockCollectionsBuilderKey )
+        BlockCollectionsBuilderKey /*key*/ )
     {
         impl_->delete_component( collection.id() );
     }

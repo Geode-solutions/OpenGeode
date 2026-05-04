@@ -53,9 +53,10 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::do_create_polygon(
         absl::Span< const index_t > vertices )
     {
-        OPENGEODE_ASSERT( vertices.size() == 3, "[TriangulatedSurfaceBuilder"
-                                                "::do_create_polygon] Only "
-                                                "triangles are handled" );
+        OpenGeodeMeshException::assertion( vertices.size() == 3,
+            "[TriangulatedSurfaceBuilder"
+            "::do_create_polygon] Only "
+            "triangles are handled" );
         std::array< index_t, 3 > triangle_vertices;
         absl::c_copy_n( vertices, 3, triangle_vertices.begin() );
         do_create_triangle( triangle_vertices );
@@ -111,8 +112,10 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::copy(
         const TriangulatedSurface< dimension >& triangulated_surface )
     {
-        OPENGEODE_EXCEPTION( triangulated_surface_.nb_vertices() == 0
-                                 && triangulated_surface_.nb_polygons() == 0,
+        OpenGeodeMeshException::check(
+            triangulated_surface_.nb_vertices() == 0
+                && triangulated_surface_.nb_polygons() == 0,
+            nullptr, OpenGeodeException::TYPE::data,
             "[TriangulatedSurfaceBuilder::copy] Cannot copy a mesh into an "
             "already initialized mesh." );
         SurfaceMeshBuilder< dimension >::copy( triangulated_surface );

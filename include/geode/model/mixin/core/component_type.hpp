@@ -107,13 +107,13 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, ComponentID >{
-                           { []( Archive& a, ComponentID& component_id ) {
-                               a.object( component_id.type_ );
-                               a.object( component_id.id_ );
+                           { []( Archive& archive, ComponentID& component_id ) {
+                               archive.object( component_id.type_ );
+                               archive.object( component_id.id_ );
                            } } } );
         }
 

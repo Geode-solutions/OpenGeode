@@ -111,7 +111,7 @@ namespace
             {
                 sorted[left_id++] = id;
             }
-            OPENGEODE_ASSERT( left_id == right_id,
+            geode::OpenGeodeGeometryException::assertion( left_id == right_id,
                 "[RadialSort::recursive_sort] left and "
                 "right ids are different" );
             sorted[left_id] = result[begin];
@@ -130,7 +130,7 @@ namespace
 
     private:
         const geode::Segment3D& segment_;
-        DEBUG_CONST geode::Plane plane_;
+        geode::Plane plane_;
         absl::Span< const geode::Point3D > points_;
     };
 } // namespace

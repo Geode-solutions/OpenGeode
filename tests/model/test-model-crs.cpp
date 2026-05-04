@@ -37,15 +37,17 @@
 void check_result(
     absl::Span< const std::pair< geode::CRSType, std::string > > crss )
 {
-    OPENGEODE_EXCEPTION( crss.size() == 1, "[Test] Wrong number of CRS" );
+    geode::OpenGeodeModelException::test(
+        crss.size() == 1, "Wrong number of CRS" );
     for( const auto& crs : crss )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeModelException::test(
             crs.first
                 == geode::AttributeCoordinateReferenceSystem3D::
                     type_name_static(),
-            "[Test] Wrong CRS type" );
-        OPENGEODE_EXCEPTION( crs.second == "points", "[Test] Wrong CRS name" );
+            "Wrong CRS type" );
+        geode::OpenGeodeModelException::test(
+            crs.second == "points", "Wrong CRS name" );
     }
 }
 

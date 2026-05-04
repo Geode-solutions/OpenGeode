@@ -43,23 +43,23 @@ void test()
 
     const geode::Triangle3D triangle_ref{ a, b_ref, c };
     const auto normal_ref = triangle_ref.normal();
-    OPENGEODE_EXCEPTION( normal_ref,
-        "[Test] Normal of reference triangle should be calculated" );
-    OPENGEODE_EXCEPTION( normal_ref.value() == answer,
-        "[Test] Wrong normal of reference triangle" );
+    geode::OpenGeodeGeometryException::test( normal_ref.has_value(),
+        "Normal of reference triangle should be calculated" );
+    geode::OpenGeodeGeometryException::test(
+        normal_ref.value() == answer, "Wrong normal of reference triangle" );
     const auto pivot_ref = triangle_ref.pivot();
-    OPENGEODE_EXCEPTION(
-        pivot_ref, "[Test] Pivot of reference triangle should be calculated" );
-    OPENGEODE_EXCEPTION(
-        pivot_ref.value() == 0, "[Test] Wrong pivot of reference triangle" );
+    geode::OpenGeodeGeometryException::test( pivot_ref.has_value(),
+        "Pivot of reference triangle should be calculated" );
+    geode::OpenGeodeGeometryException::test(
+        pivot_ref.value() == 0, "Wrong pivot of reference triangle" );
 
     const geode::Triangle3D triangle2{ a, b, c };
     const auto normal2 = triangle2.normal();
-    OPENGEODE_EXCEPTION(
-        !normal2, "[Test] Normal of triangle2 should not be calculated" );
+    geode::OpenGeodeGeometryException::test(
+        !normal2, "Normal of triangle2 should not be calculated" );
     const auto pivot2 = triangle2.pivot();
-    OPENGEODE_EXCEPTION(
-        !pivot2, "[Test] Pivot of triangle2 should not be calculated" );
+    geode::OpenGeodeGeometryException::test(
+        !pivot2, "Pivot of triangle2 should not be calculated" );
 }
 
 OPENGEODE_TEST( "distance" )

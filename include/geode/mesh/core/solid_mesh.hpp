@@ -86,7 +86,7 @@ namespace geode
             return absl::StrCat( "(", polyhedron_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronVertex& value )
@@ -132,7 +132,7 @@ namespace geode
             return absl::StrCat( "(", polyhedron_id, ", ", facet_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronFacet& value )
@@ -178,7 +178,7 @@ namespace geode
                 polyhedron_facet.facet_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronFacetVertex& value )
@@ -221,7 +221,7 @@ namespace geode
                 polyhedron_facet.facet_id, ", ", edge_id, ")" );
         }
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         template < typename H >
         friend H AbslHashValue( H h, const PolyhedronFacetEdge& value )
@@ -270,7 +270,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidMesh );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey );
+        PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey /*key*/ );
 
     public:
         using Builder = SolidMeshBuilder< dimension >;
@@ -638,17 +638,20 @@ namespace geode
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
-            SolidMeshKey );
+            SolidMeshKey /*key*/ );
 
-        void reset_polyhedra_around_vertex( index_t vertex_id, SolidMeshKey );
+        void reset_polyhedra_around_vertex(
+            index_t vertex_id, SolidMeshKey /*key*/ );
 
-        [[nodiscard]] SolidEdges< dimension >& edges( SolidMeshKey );
+        [[nodiscard]] SolidEdges< dimension >& edges( SolidMeshKey /*key*/ );
 
-        void copy_edges( const SolidMesh< dimension >& solid, SolidMeshKey );
+        void copy_edges(
+            const SolidMesh< dimension >& solid, SolidMeshKey /*key*/ );
 
-        [[nodiscard]] SolidFacets< dimension >& facets( SolidMeshKey );
+        [[nodiscard]] SolidFacets< dimension >& facets( SolidMeshKey /*key*/ );
 
-        void copy_facets( const SolidMesh< dimension >& solid, SolidMeshKey );
+        void copy_facets(
+            const SolidMesh< dimension >& solid, SolidMeshKey /*key*/ );
 
     protected:
         SolidMesh();
@@ -658,7 +661,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

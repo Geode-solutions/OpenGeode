@@ -43,10 +43,11 @@ namespace
         const geode::PolyhedronVertices& vertices_adj,
         geode::index_t polyhedron_adj )
     {
-        std::array< geode::index_t, 3 > facet_vertices;
+        geode::PolyhedronFacetVertices facet_vertices;
         for( const auto v : geode::LRange{ 3 } )
         {
-            facet_vertices[v] = solid.polyhedron_facet_vertex( { facet, v } );
+            facet_vertices.push_back(
+                solid.polyhedron_facet_vertex( { facet, v } ) );
         }
         std::array< bool, 4 > candidates{ true, true, true, true };
         for( const auto v : geode::LRange{ 4 } )
@@ -81,11 +82,12 @@ namespace
             return std::optional< geode::PolyhedronFacet >{ std::in_place,
                 polyhedron_adj, f };
         }
-        throw geode::OpenGeodeException{
+        throw geode::OpenGeodeMeshException{ solid.facet_barycenter(
+                                                 facet_vertices ),
+            geode::OpenGeodeException::TYPE::internal,
             "[TetrahedralSolid3D::polyhedron_adjacent_"
             "facet] Wrong adjacency with polyhedra: ",
-            polyhedron, " and ", polyhedron_adj
-        };
+            polyhedron, " and ", polyhedron_adj };
         return std::nullopt;
     }
 
@@ -141,7 +143,9 @@ namespace
                 facet = { adj, f };
                 break;
             }
-            OPENGEODE_ASSERT( facet.polyhedron_id == adj,
+            geode::OpenGeodeMeshException::check( facet.polyhedron_id == adj,
+                solid.edge_barycenter( edge_vertices ),
+                geode::OpenGeodeException::TYPE::data,
                 "[TetrahedralSolid3D::propagate_around_edge] Next "
                 "facet not found" );
         } while( facet.polyhedron_id != first_polyhedron );
@@ -199,14 +203,18 @@ namespace geode
             if( solid_vertices[v] != edge_vertices[0]
                 && solid_vertices[v] != edge_vertices[1] )
             {
-                OPENGEODE_EXCEPTION( count < 2,
+                OpenGeodeMeshException::check( count < 2,
+                    this->polyhedron_barycenter( tetrahedron_id ),
+                    OpenGeodeException::TYPE::data,
                     "[TetrahedralSolid::edge_incident_facets] Given edge "
                     "vertices are not vertices of given tetrahedron" );
                 facets[count] = { tetrahedron_id, v };
                 count++;
             }
         }
-        OPENGEODE_EXCEPTION( count == 2,
+        OpenGeodeMeshException::check( count == 2,
+            this->polyhedron_barycenter( tetrahedron_id ),
+            OpenGeodeException::TYPE::data,
             "[TetrahedralSolid::edge_incident_facets] Given tetrahedron has "
             "more than two times given vertices (",
             edge_vertices[0], ", ", edge_vertices[1], "): ", solid_vertices[0],
@@ -262,8 +270,11 @@ namespace geode
                 opposite_facets[1] = { vertex.polyhedron_id, vertex.vertex_id };
             }
         }
-        OPENGEODE_EXCEPTION( opposite_facets[0].facet_id != NO_LID
-                                 && opposite_facets[1].facet_id != NO_LID,
+        OpenGeodeMeshException::check(
+            opposite_facets[0].facet_id != NO_LID
+                && opposite_facets[1].facet_id != NO_LID,
+            this->polyhedron_barycenter( tetrahedron_id ),
+            OpenGeodeException::TYPE::data,
             "[TetrahedralSolid::opposite_edge_incident_facets] Given edge "
             "vertices are not vertices of given tetrahedron" );
         return opposite_facets;
@@ -491,12 +502,12 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void TetrahedralSolid< dimension >::serialize( Archive& archive )
+    void TetrahedralSolid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, TetrahedralSolid >{
-                { []( Archive& a, TetrahedralSolid& tetrahedral_solid ) {
-                    a.ext( tetrahedral_solid,
+                { []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
+                    archive.ext( tetrahedral_solid,
                         bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
                 } } } );
     }

@@ -164,8 +164,8 @@ void test_gradient_grid3D()
         geode::internal::compute_solid_scalar_function_gradient(
             *grid, scalar_function_name, { 0, 1 } );
     geode::Logger::info( "Gradient attribute name 2: ", gradient_name_2 );
-    OPENGEODE_EXCEPTION( vertices_with_no_value.size() == 7,
-        "[Test] Wrong number of vertices without value for gradient "
+    geode::OpenGeodeMeshException::test( vertices_with_no_value.size() == 7,
+        "Wrong number of vertices without value for gradient "
         "computation, ",
         vertices_with_no_value.size(), " instead of 7" );
     geode::save_regular_grid< 3 >( *grid, "grid_with_gradient.og_rgd3d" );

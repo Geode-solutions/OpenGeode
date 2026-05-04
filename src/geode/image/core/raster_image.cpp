@@ -40,7 +40,7 @@ namespace geode
     public:
         const RGBColor& color( index_t index ) const
         {
-            OPENGEODE_ASSERT( index < colors_.size(),
+            OpenGeodeImageException::assertion( index < colors_.size(),
                 "[RasterImage::set_color] Accessing a "
                 "cell that does not exist" );
             return colors_[index];
@@ -48,7 +48,7 @@ namespace geode
 
         void set_color( index_t index, RGBColor color )
         {
-            OPENGEODE_ASSERT( index < colors_.size(),
+            OpenGeodeImageException::assertion( index < colors_.size(),
                 "[RasterImage::set_color] Accessing a "
                 "cell that does not exist" );
             colors_[index] = std::move( color );
@@ -66,13 +66,15 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::ArrayImpl< dimension > >{} );
-                    a.container( impl.colors_, impl.colors_.max_size() );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  internal::ArrayImpl< dimension > >{} );
+                    archive.container( impl.colors_, impl.colors_.max_size() );
                 } } } );
         }
 
@@ -138,14 +140,14 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void RasterImage< dimension >::serialize( Archive& archive )
+    void RasterImage< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, RasterImage >{
-                { []( Archive& a, RasterImage& raster ) {
-                    a.ext( raster,
+                { []( Archive& archive, RasterImage& raster ) {
+                    archive.ext( raster,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
-                    a.object( raster.impl_ );
+                    archive.object( raster.impl_ );
                 } } } );
     }
 

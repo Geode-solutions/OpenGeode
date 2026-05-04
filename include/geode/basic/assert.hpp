@@ -23,7 +23,9 @@
 
 #pragma once
 
+#include <any>
 #include <array>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -55,40 +57,91 @@ namespace geode
         static constexpr int SYMBOL_SIZE = 1024;
 
     public:
-        template < typename... Args >
-        explicit OpenGeodeException( const Args&... message )
-            : std::runtime_error{ absl::StrCat( message... ) }
+        enum struct TYPE : std::uint8_t
         {
-            stack_.fill( nullptr );
-            stack_size_ = absl::GetStackTrace(
-                stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS );
+            data,
+            internal,
+            result
+        };
+
+        OpenGeodeException( OpenGeodeException&& ) = default;
+        OpenGeodeException( const OpenGeodeException& ) = delete;
+        OpenGeodeException& operator=( const OpenGeodeException& ) = delete;
+        OpenGeodeException& operator=( OpenGeodeException&& ) = default;
+
+        ~OpenGeodeException() noexcept override;
+
+        [[nodiscard]] TYPE type() const
+        {
+            return type_;
         }
 
-        ~OpenGeodeException() noexcept override = default;
+        [[nodiscard]] std::string_view type_name() const;
+
+        [[nodiscard]] std::string_view project() const
+        {
+            return project_;
+        }
+
+        [[nodiscard]] std::string_view library() const
+        {
+            return library_;
+        }
+
+        [[nodiscard]] const std::any& data() const
+        {
+            return data_;
+        }
 
         [[nodiscard]] std::string stack_trace() const;
 
+        [[nodiscard]] bool has_parent() const
+        {
+            return parent_ != nullptr;
+        }
+
+        [[nodiscard]] const OpenGeodeException& parent() const
+        {
+            return *parent_;
+        }
+
+        void set_parent( OpenGeodeException&& parent )
+        {
+            parent_ =
+                std::make_unique< OpenGeodeException >( std::move( parent ) );
+        }
+
+        [[nodiscard]] std::string string() const;
+
+    protected:
+        template < typename... Args >
+        explicit OpenGeodeException( std::string project,
+            std::string library,
+            std::any data,
+            TYPE type,
+            const Args&... message )
+            : std::runtime_error{ absl::StrCat( message... ) },
+              type_{ type },
+              project_{ std::move( project ) },
+              library_{ std::move( library ) },
+              data_{ std::move( data ) }
+        {
+            stack_.fill( nullptr );
+#ifndef NDEBUG
+            stack_size_ = absl::GetStackTrace(
+                stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS );
+#endif
+        }
+
     private:
+        TYPE type_;
+        std::string project_;
+        std::string library_;
+        std::any data_;
         std::array< void*, MAX_STACK_DEPTH > stack_;
-        int stack_size_;
+        int stack_size_{ 0 };
+        std::unique_ptr< OpenGeodeException > parent_;
     };
-
-    class OpenGeodeDataException : public OpenGeodeException
-    {
-    public:
-        using OpenGeodeException::OpenGeodeException;
-    };
-
-    class OpenGeodeResultException : public OpenGeodeException
-    {
-    public:
-        using OpenGeodeException::OpenGeodeException;
-    };
-
-    void opengeode_basic_api geode_assertion_failed( std::string_view condition,
-        std::string_view message,
-        std::string_view file,
-        int line );
 
     /*!
      * Try to catch several exception types.
@@ -101,42 +154,3 @@ namespace geode
      */
     void opengeode_basic_api throw_lippincott();
 } // namespace geode
-
-#ifdef OPENGEODE_DEBUG
-#    define OPENGEODE_ASSERT( condition, ... )                                 \
-        if( ABSL_PREDICT_FALSE( !( condition ) ) )                             \
-        geode::geode_assertion_failed(                                         \
-            #condition, absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
-#    define OPENGEODE_ASSERT_NOT_REACHED( ... )                                \
-        geode::geode_assertion_failed( "should not have reached",              \
-            absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
-#    define DEBUG_CONST const
-#else
-#    define OPENGEODE_ASSERT( x, ... )
-#    define OPENGEODE_ASSERT_NOT_REACHED( ... )
-#    define DEBUG_CONST
-#endif
-
-#define OPENGEODE_EXCEPTION( condition, ... )                                  \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-        throw geode::OpenGeodeException                                        \
-        {                                                                      \
-            __VA_ARGS__                                                        \
-        }
-
-#define OPENGEODE_DATA_EXCEPTION( condition, ... )                             \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-        throw geode::OpenGeodeDataException                                    \
-        {                                                                      \
-            __VA_ARGS__                                                        \
-        }
-
-#define OPENGEODE_RESULT_EXCEPTION( condition, ... )                           \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-        throw geode::OpenGeodeResultException                                  \
-        {                                                                      \
-            __VA_ARGS__                                                        \
-        }
-
-#define OPENGEODE_RESEARCH( condition, ... )                                   \
-    OPENGEODE_EXCEPTION( condition, __VA_ARGS__ )

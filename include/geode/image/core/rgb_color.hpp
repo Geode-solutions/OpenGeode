@@ -64,7 +64,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive &archive );
+        void serialize( Archive &serializer );
 
     private:
         std::array< local_index_t, 3 > values_;
@@ -107,7 +107,7 @@ namespace geode
         static float converted_item_value(
             const RGBColor &color, local_index_t item )
         {
-            OPENGEODE_ASSERT( item < nb_items(),
+            OpenGeodeImageException::assertion( item < nb_items(),
                 "[GenericAttributeConversion] Accessing "
                 "incorrect item value" );
             if( item == 0 )

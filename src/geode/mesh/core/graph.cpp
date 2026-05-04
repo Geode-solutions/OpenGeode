@@ -30,6 +30,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/vector.hpp>
 
@@ -110,13 +111,13 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& a, Impl& impl ) {
-                         a.object( impl.edge_attribute_manager_ );
-                         a.ext( impl.edges_around_vertex_,
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.object( impl.edge_attribute_manager_ );
+                         archive.ext( impl.edges_around_vertex_,
                              bitsery::ext::StdSmartPtr{} );
                          const auto& old_edges_around_vertex_properties =
                              impl.edges_around_vertex_->properties();
@@ -126,9 +127,9 @@ namespace geode
                                      .interpolable,
                                  false } );
                      },
-                        []( Archive& a, Impl& impl ) {
-                            a.object( impl.edge_attribute_manager_ );
-                            a.ext( impl.edges_around_vertex_,
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.edge_attribute_manager_ );
+                            archive.ext( impl.edges_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
@@ -140,19 +141,20 @@ namespace geode
     };
 
     template < typename Archive >
-    void EdgeVertex::serialize( Archive& archive )
+    void EdgeVertex::serialize( Archive& serializer )
     {
-        archive.ext( *this, Growable< Archive, EdgeVertex >{
-                                { []( Archive& a, EdgeVertex& edge_vertex ) {
-                                     a.value4b( edge_vertex.edge_id );
-                                     index_t value{ NO_ID };
-                                     a.value4b( value );
-                                     edge_vertex.vertex_id = value;
-                                 },
-                                    []( Archive& a, EdgeVertex& edge_vertex ) {
-                                        a.value4b( edge_vertex.edge_id );
-                                        a.value1b( edge_vertex.vertex_id );
-                                    } } } );
+        serializer.ext(
+            *this, Growable< Archive, EdgeVertex >{
+                       { []( Archive& archive, EdgeVertex& edge_vertex ) {
+                            archive.value4b( edge_vertex.edge_id );
+                            index_t value{ NO_ID };
+                            archive.value4b( value );
+                            edge_vertex.vertex_id = value;
+                        },
+                           []( Archive& archive, EdgeVertex& edge_vertex ) {
+                               archive.value4b( edge_vertex.edge_id );
+                               archive.value1b( edge_vertex.vertex_id );
+                           } } } );
     }
 
     Graph::Graph() : impl_( *this ) {}
@@ -181,9 +183,9 @@ namespace geode
 
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
     {
-        OPENGEODE_ASSERT( edge_vertex.edge_id < nb_edges(),
+        OpenGeodeMeshException::assertion( edge_vertex.edge_id < nb_edges(),
             "[Graph::edge_vertex] Trying to access an invalid edge" );
-        OPENGEODE_ASSERT( edge_vertex.vertex_id < 2,
+        OpenGeodeMeshException::assertion( edge_vertex.vertex_id < 2,
             "[Graph::edge_vertex] Trying to access "
             "an invalid edge local vertex" );
         return get_edge_vertex( edge_vertex );
@@ -202,7 +204,7 @@ namespace geode
     const EdgesAroundVertex& Graph::edges_around_vertex(
         index_t vertex_id ) const
     {
-        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
+        OpenGeodeMeshException::assertion( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->edges_around_vertex( vertex_id );
@@ -243,22 +245,22 @@ namespace geode
     }
 
     void Graph::set_edges_around_vertex(
-        index_t vertex_id, EdgesAroundVertex edges, GraphKey )
+        index_t vertex_id, EdgesAroundVertex edges, GraphKey /*key*/ )
     {
-        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
+        OpenGeodeMeshException::assertion( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->set_edges_around_vertex( vertex_id, std::move( edges ) );
     }
 
     void Graph::associate_edge_vertex_to_vertex(
-        const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey )
+        const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey /*key*/ )
     {
         impl_->associate_edge_vertex_to_vertex( *this, edge_vertex, vertex_id );
     }
 
     void Graph::disassociate_edge_vertex_to_vertex(
-        const EdgeVertex& edge_vertex, GraphKey )
+        const EdgeVertex& edge_vertex, GraphKey /*key*/ )
     {
         impl_->disassociate_edge_vertex_to_vertex( *this, edge_vertex );
     }
@@ -269,12 +271,12 @@ namespace geode
     }
 
     template < typename Archive >
-    void Graph::serialize( Archive& archive )
+    void Graph::serialize( Archive& serializer )
     {
-        archive.ext( *this,
-            Growable< Archive, Graph >{ { []( Archive& a, Graph& graph ) {
-                a.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
-                a.object( graph.impl_ );
+        serializer.ext( *this,
+            Growable< Archive, Graph >{ { []( Archive& archive, Graph& graph ) {
+                archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
+                archive.object( graph.impl_ );
             } } } );
     }
 

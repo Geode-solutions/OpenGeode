@@ -33,7 +33,7 @@ namespace geode
     template < index_t dimension >
     OpenGeodePolygonalSurfaceBuilder<
         dimension >::OpenGeodePolygonalSurfaceBuilder( VertexSet& vertex_set,
-        MeshBuilderFactoryKey )
+        MeshBuilderFactoryKey /*key*/ )
         : OpenGeodePolygonalSurfaceBuilder< dimension >(
               dynamic_cast< OpenGeodePolygonalSurface< dimension >& >(
                   vertex_set ) )

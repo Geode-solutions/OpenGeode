@@ -54,11 +54,11 @@ void test_component_mesh_polyhedra()
                     model, block, polyhedron_id );
             const auto result = geode::component_mesh_polyhedra(
                 model, polyhedron_unique_vertices );
-            OPENGEODE_EXCEPTION( result.size() == 1,
+            geode::OpenGeodeModelException::test( result.size() == 1,
                 "[TEST] Should have found a polyhedron corresponding "
                 "to given unique vertices." );
             const geode::MeshElement result_cme{ block.id(), polyhedron_id };
-            OPENGEODE_EXCEPTION( result[0] == result_cme,
+            geode::OpenGeodeModelException::test( result[0] == result_cme,
                 "[TEST] Result polyhedron is ", result[0].string(),
                 ", but it should be ", result_cme.string() );
         }

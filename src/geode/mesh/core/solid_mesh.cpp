@@ -71,7 +71,8 @@ namespace
     {
         geode_unused( solid );
         geode_unused( vertex_id );
-        OPENGEODE_ASSERT( vertex_id < solid.nb_vertices(),
+        geode::OpenGeodeMeshException::assertion(
+            vertex_id < solid.nb_vertices(),
             "[check_vertex_id] Trying to access an invalid vertex" );
     }
 
@@ -81,7 +82,7 @@ namespace
     {
         geode_unused( solid );
         geode_unused( facet_id );
-        OPENGEODE_ASSERT( facet_id < solid.nb_facets(),
+        geode::OpenGeodeMeshException::assertion( facet_id < solid.nb_facets(),
             "[check_facet_id] Trying to access an invalid facet" );
     }
 
@@ -91,7 +92,8 @@ namespace
     {
         geode_unused( solid );
         geode_unused( polyhedron_id );
-        OPENGEODE_ASSERT( polyhedron_id < solid.nb_polyhedra(),
+        geode::OpenGeodeMeshException::assertion(
+            polyhedron_id < solid.nb_polyhedra(),
             "[check_polyhedron_id] Trying to access an invalid polyhedron" );
     }
 
@@ -103,7 +105,7 @@ namespace
         geode_unused( solid );
         geode_unused( polyhedron_id );
         geode_unused( vertex_id );
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeMeshException::assertion(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
             "[check_polyhedron_vertex_id] Trying to access an invalid "
             "polyhedron vertex" );
@@ -117,7 +119,7 @@ namespace
         geode_unused( solid );
         geode_unused( polyhedron_id );
         geode_unused( facet_id );
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeMeshException::assertion(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
             "[check_polyhedron_facet_id] Trying to access an invalid "
             "polyhedron facet" );
@@ -134,8 +136,9 @@ namespace
         geode_unused( polyhedron_id );
         geode_unused( facet_id );
         geode_unused( vertex_id );
-        OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+        geode::OpenGeodeMeshException::assertion(
+            vertex_id < solid.nb_polyhedron_facet_vertices(
+                { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -194,7 +197,9 @@ namespace
             }
         } while( facet.polyhedron_id != first_polyhedron
                  && safety_count < MAX_SAFETY_COUNT );
-        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+        geode::OpenGeodeMeshException::check( safety_count < MAX_SAFETY_COUNT,
+            solid.edge_barycenter( edge_vertices ),
+            geode::OpenGeodeException::TYPE::data,
             "[SolidMesh::propagate_around_edge] Solid ",
             solid.name().value_or( solid.id().string() ),
             ": too many polyhedra around edge ", edge_vertices[0], " ",
@@ -257,7 +262,7 @@ namespace
         {
             return {};
         }
-        OPENGEODE_ASSERT(
+        geode::OpenGeodeMeshException::assertion(
             solid.polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
             "[SolidMesh::compute_polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
@@ -299,7 +304,8 @@ namespace
                 }
             }
         }
-        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+        geode::OpenGeodeMeshException::check( safety_count < MAX_SAFETY_COUNT,
+            solid.point( vertex_id ), geode::OpenGeodeException::TYPE::data,
             "[SolidMesh::compute_polyhedra_around_vertex] Solid ",
             solid.name().value_or( solid.id().string() ),
             ": Too many polyhedra around vertex ", vertex_id, " (",
@@ -345,73 +351,77 @@ namespace geode
     }
 
     template < typename Archive >
-    void PolyhedronVertex::serialize( Archive& archive )
+    void PolyhedronVertex::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronVertex >{
-                { []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
-                     a.value4b( polyhedron_vertex.polyhedron_id );
+                { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                     archive.value4b( polyhedron_vertex.polyhedron_id );
                      index_t value{ NO_ID };
-                     a.value4b( value );
+                     archive.value4b( value );
                      polyhedron_vertex.vertex_id = value;
                  },
-                    []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
-                        a.value4b( polyhedron_vertex.polyhedron_id );
-                        a.value1b( polyhedron_vertex.vertex_id );
+                    []( Archive& archive,
+                        PolyhedronVertex& polyhedron_vertex ) {
+                        archive.value4b( polyhedron_vertex.polyhedron_id );
+                        archive.value1b( polyhedron_vertex.vertex_id );
                     } } } );
     }
 
     template < typename Archive >
-    void PolyhedronFacet::serialize( Archive& archive )
+    void PolyhedronFacet::serialize( Archive& serializer )
     {
-        archive.ext(
-            *this, Growable< Archive, PolyhedronFacet >{
-                       { []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
-                            a.value4b( polyhedron_facet.polyhedron_id );
-                            index_t value{ NO_ID };
-                            a.value4b( value );
-                            polyhedron_facet.facet_id = value;
-                        },
-                           []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
-                               a.value4b( polyhedron_facet.polyhedron_id );
-                               a.value1b( polyhedron_facet.facet_id );
-                           } } } );
+        serializer.ext( *this,
+            Growable< Archive, PolyhedronFacet >{
+                { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                     archive.value4b( polyhedron_facet.polyhedron_id );
+                     index_t value{ NO_ID };
+                     archive.value4b( value );
+                     polyhedron_facet.facet_id = value;
+                 },
+                    []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                        archive.value4b( polyhedron_facet.polyhedron_id );
+                        archive.value1b( polyhedron_facet.facet_id );
+                    } } } );
     }
 
     template < typename Archive >
-    void PolyhedronFacetVertex::serialize( Archive& archive )
+    void PolyhedronFacetVertex::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronFacetVertex >{
-                { []( Archive& a,
+                { []( Archive& archive,
                       PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                     a.object( polyhedron_facet_vertex.polyhedron_facet );
+                     archive.object( polyhedron_facet_vertex.polyhedron_facet );
                      index_t value{ NO_ID };
-                     a.value4b( value );
+                     archive.value4b( value );
                      polyhedron_facet_vertex.vertex_id = value;
                  },
-                    []( Archive& a,
+                    []( Archive& archive,
                         PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                        a.object( polyhedron_facet_vertex.polyhedron_facet );
-                        a.value1b( polyhedron_facet_vertex.vertex_id );
+                        archive.object(
+                            polyhedron_facet_vertex.polyhedron_facet );
+                        archive.value1b( polyhedron_facet_vertex.vertex_id );
                     } } } );
     }
 
     template < typename Archive >
-    void PolyhedronFacetEdge::serialize( Archive& archive )
+    void PolyhedronFacetEdge::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PolyhedronFacetEdge >{
-                { []( Archive& a, PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                     a.object( polyhedron_facet_edge.polyhedron_facet );
+                { []( Archive& archive,
+                      PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                     archive.object( polyhedron_facet_edge.polyhedron_facet );
                      index_t value{ NO_ID };
-                     a.value4b( value );
+                     archive.value4b( value );
                      polyhedron_facet_edge.edge_id = value;
                  },
-                    []( Archive& a,
+                    []( Archive& archive,
                         PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                        a.object( polyhedron_facet_edge.polyhedron_facet );
-                        a.value1b( polyhedron_facet_edge.edge_id );
+                        archive.object(
+                            polyhedron_facet_edge.polyhedron_facet );
+                        archive.value1b( polyhedron_facet_edge.edge_id );
                     } } } );
     }
 
@@ -580,7 +590,8 @@ namespace geode
 
         void copy_edges( const SolidMesh< dimension >& solid )
         {
-            OPENGEODE_EXCEPTION( !are_edges_enabled(),
+            OpenGeodeMeshException::check( !are_edges_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh] Cannot copy edges into mesh "
                 "where edges are already enabled." );
             edges_.reset( new SolidEdges< dimension >{} );
@@ -595,7 +606,8 @@ namespace geode
 
         const SolidEdges< dimension >& edges() const
         {
-            OPENGEODE_EXCEPTION( are_edges_enabled(),
+            OpenGeodeMeshException::check( are_edges_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::edges] Edges should be "
                 "enabled before accessing them" );
             return *edges_;
@@ -603,7 +615,8 @@ namespace geode
 
         SolidEdges< dimension >& edges()
         {
-            OPENGEODE_EXCEPTION( are_edges_enabled(),
+            OpenGeodeMeshException::check( are_edges_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::edges] Edges should be "
                 "enabled before accessing them" );
             return *edges_;
@@ -627,7 +640,8 @@ namespace geode
 
         void copy_facets( const SolidMesh< dimension >& solid )
         {
-            OPENGEODE_EXCEPTION( !are_facets_enabled(),
+            OpenGeodeMeshException::check( !are_facets_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh] Cannot copy facets into mesh where facets are "
                 "already enabled." );
             facets_.reset( new SolidFacets< dimension >{} );
@@ -642,7 +656,8 @@ namespace geode
 
         const SolidFacets< dimension >& facets() const
         {
-            OPENGEODE_EXCEPTION( are_facets_enabled(),
+            OpenGeodeMeshException::check( are_facets_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::facets] Facets should be "
                 "enabled before accessing them" );
             return *facets_;
@@ -650,7 +665,8 @@ namespace geode
 
         SolidFacets< dimension >& facets()
         {
-            OPENGEODE_EXCEPTION( are_facets_enabled(),
+            OpenGeodeMeshException::check( are_facets_enabled(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMesh::facets] Facets should be "
                 "enabled before accessing them" );
             return *facets_;
@@ -689,17 +705,18 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive,
-                    Impl >{ { []( Archive& a, Impl& impl ) {
-                                 a.object( impl.polyhedron_attribute_manager_ );
-                                 a.ext( impl.polyhedron_around_vertex_,
+                    Impl >{ { []( Archive& archive, Impl& impl ) {
+                                 archive.object(
+                                     impl.polyhedron_attribute_manager_ );
+                                 archive.ext( impl.polyhedron_around_vertex_,
                                      bitsery::ext::StdSmartPtr{} );
-                                 a.ext(
+                                 archive.ext(
                                      impl.edges_, bitsery::ext::StdSmartPtr{} );
-                                 a.ext( impl.facets_,
+                                 archive.ext( impl.facets_,
                                      bitsery::ext::StdSmartPtr{} );
                                  const auto&
                                      old_polyhedron_around_vertex_properties =
@@ -722,14 +739,15 @@ namespace geode
                                              .interpolable,
                                          false } );
                              },
-                    []( Archive& a, Impl& impl ) {
-                        a.object( impl.polyhedron_attribute_manager_ );
-                        a.ext( impl.polyhedron_around_vertex_,
+                    []( Archive& archive, Impl& impl ) {
+                        archive.object( impl.polyhedron_attribute_manager_ );
+                        archive.ext( impl.polyhedron_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.polyhedra_around_vertex_,
+                        archive.ext( impl.polyhedra_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            impl.facets_, bitsery::ext::StdSmartPtr{} );
                         const auto& old_polyhedron_around_vertex_properties =
                             impl.polyhedron_around_vertex_->properties();
                         impl.polyhedron_around_vertex_->set_properties(
@@ -746,15 +764,16 @@ namespace geode
                                     .interpolable,
                                 false } );
                     },
-                    []( Archive& a, Impl& impl ) {
-                        a.object( impl.polyhedron_attribute_manager_ );
-                        a.ext( impl.polyhedron_around_vertex_,
+                    []( Archive& archive, Impl& impl ) {
+                        archive.object( impl.polyhedron_attribute_manager_ );
+                        archive.ext( impl.polyhedron_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.polyhedra_around_vertex_,
+                        archive.ext( impl.polyhedra_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                        a.object( impl.texture_storage_ );
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        archive.object( impl.texture_storage_ );
                         const auto& old_polyhedron_around_vertex_properties =
                             impl.polyhedron_around_vertex_->properties();
                         impl.polyhedron_around_vertex_->set_properties(
@@ -771,15 +790,16 @@ namespace geode
                                     .interpolable,
                                 false } );
                     },
-                    []( Archive& a, Impl& impl ) {
-                        a.object( impl.polyhedron_attribute_manager_ );
-                        a.ext( impl.polyhedron_around_vertex_,
+                    []( Archive& archive, Impl& impl ) {
+                        archive.object( impl.polyhedron_attribute_manager_ );
+                        archive.ext( impl.polyhedron_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.polyhedra_around_vertex_,
+                        archive.ext( impl.polyhedra_around_vertex_,
                             bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                        a.object( impl.texture_storage_ );
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        archive.object( impl.texture_storage_ );
                     } } } );
         }
 
@@ -1224,9 +1244,10 @@ namespace geode
     {
         const auto first_polyhedron =
             first_polyhedron_around_edge( *this, vertices );
-        OPENGEODE_EXCEPTION( first_polyhedron,
-            "[SolidMesh::is_edge_on_border] Given pair of "
-            "vertices does not define a Solid edge" );
+        OpenGeodeMeshException::check( first_polyhedron.has_value(),
+            edge_barycenter( vertices ), OpenGeodeException::TYPE::data,
+            "[SolidMesh::is_edge_on_border] Given pair of vertices does not "
+            "define a Solid edge" );
         return is_edge_on_border( vertices, first_polyhedron.value() );
     }
 
@@ -1245,10 +1266,10 @@ namespace geode
             return !std::get< 1 >( propagate_around_edge(
                 *this, { first_polyhedron, f }, vertices ) );
         }
-        OPENGEODE_EXCEPTION( true,
+        throw OpenGeodeMeshException{ polyhedron_barycenter( first_polyhedron ),
+            OpenGeodeException::TYPE::data,
             "[SolidMesh::is_edge_on_border] Incoherence between given vertices "
-            "and given first_polyhedron" );
-        return false;
+            "and given first_polyhedron" };
     }
 
     template < index_t dimension >
@@ -1420,7 +1441,7 @@ namespace geode
     void SolidMesh< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex,
         index_t vertex_id,
-        SolidMeshKey )
+        SolidMeshKey /*key*/ )
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
@@ -1428,7 +1449,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidMesh< dimension >::reset_polyhedra_around_vertex(
-        index_t vertex_id, SolidMeshKey )
+        index_t vertex_id, SolidMeshKey /*key*/ )
     {
         impl_->reset_polyhedra_around_vertex( vertex_id );
     }
@@ -1524,8 +1545,8 @@ namespace geode
         {
             return std::nullopt;
         }
-        absl::FixedArray< index_t > vertices(
-            nb_polyhedron_facet_vertices( polyhedron_facet ) );
+        PolyhedronFacetVertices vertices;
+        vertices.resize( nb_polyhedron_facet_vertices( polyhedron_facet ) );
         for( const auto v : LIndices{ vertices } )
         {
             vertices[v] = polyhedron_facet_vertex( { polyhedron_facet, v } );
@@ -1556,10 +1577,11 @@ namespace geode
                     polyhedron_adj, f };
             }
         }
-        throw OpenGeodeException{ "[SolidMesh::polyhedron_adjacent_"
-                                  "facet] Wrong adjacency with polyhedra: ",
+        throw OpenGeodeMeshException{ facet_barycenter( vertices ),
+            OpenGeodeException::TYPE::data,
+            "[SolidMesh::polyhedron_adjacent_facet] Wrong adjacency with "
+            "polyhedra: ",
             polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };
-        return std::nullopt;
     }
 
     template < index_t dimension >
@@ -1638,7 +1660,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidMesh< dimension >::copy_edges(
-        const SolidMesh< dimension >& solid, SolidMeshKey )
+        const SolidMesh< dimension >& solid, SolidMeshKey /*key*/ )
     {
         impl_->copy_edges( solid );
     }
@@ -1656,7 +1678,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidEdges< dimension >& SolidMesh< dimension >::edges( SolidMeshKey )
+    SolidEdges< dimension >& SolidMesh< dimension >::edges(
+        SolidMeshKey /*key*/ )
     {
         return impl_->edges();
     }
@@ -1675,7 +1698,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidMesh< dimension >::copy_facets(
-        const SolidMesh< dimension >& solid, SolidMeshKey )
+        const SolidMesh< dimension >& solid, SolidMeshKey /*key*/ )
     {
         impl_->copy_facets( solid );
     }
@@ -1693,32 +1716,37 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidFacets< dimension >& SolidMesh< dimension >::facets( SolidMeshKey )
+    SolidFacets< dimension >& SolidMesh< dimension >::facets(
+        SolidMeshKey /*key*/ )
     {
         return impl_->facets();
     }
 
     template < index_t dimension >
     template < typename Archive >
-    void SolidMesh< dimension >::serialize( Archive& archive )
+    void SolidMesh< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, SolidMesh >{
-                { []( Archive& a, SolidMesh& solid ) {
-                     a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                     a.object( solid.impl_ );
+                { []( Archive& archive, SolidMesh& solid ) {
+                     archive.ext(
+                         solid, bitsery::ext::BaseClass< VertexSet >{} );
+                     archive.object( solid.impl_ );
                      solid.impl_->initialize_polyhedra_around_vertex( solid );
                  },
-                    []( Archive& a, SolidMesh& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.object( solid.impl_ );
+                    []( Archive& archive, SolidMesh& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass< VertexSet >{} );
+                        archive.object( solid.impl_ );
                     },
-                    []( Archive& a, SolidMesh& solid ) {
-                        a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.ext( solid, bitsery::ext::BaseClass<
-                                          CoordinateReferenceSystemManagers<
-                                              dimension > >{} );
-                        a.object( solid.impl_ );
+                    []( Archive& archive, SolidMesh& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass< VertexSet >{} );
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass<
+                                       CoordinateReferenceSystemManagers<
+                                           dimension > >{} );
+                        archive.object( solid.impl_ );
                     } } } );
     }
 
@@ -1736,9 +1764,10 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > SolidMesh< dimension >::bounding_box() const
     {
-        OPENGEODE_EXCEPTION( nb_vertices() != 0,
-            "[SolidMesh::bounding_box] Cannot return "
-            "the bounding_box of an empty solid mesh." );
+        OpenGeodeMeshException::check( nb_vertices() != 0, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SolidMesh::bounding_box] Cannot return the bounding_box of an "
+            "empty solid mesh." );
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {

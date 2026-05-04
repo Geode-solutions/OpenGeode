@@ -38,7 +38,9 @@ namespace
     {
         const auto dot = geode::dot_perpendicular(
             directions[0].normalize(), directions[1].normalize() );
-        OPENGEODE_EXCEPTION( std::fabs( dot ) > geode::GLOBAL_ANGULAR_EPSILON,
+        geode::OpenGeodeGeometryException::check(
+            std::fabs( dot ) > geode::GLOBAL_ANGULAR_EPSILON, nullptr,
+            geode::OpenGeodeException::TYPE::data,
             "[CoordinateSystem2D] Could not create a "
             "CoordinateSystem with given directions" );
     }
@@ -54,7 +56,9 @@ namespace
 
                 const auto normal = vector0.cross( vector1 );
                 const auto length = normal.length();
-                OPENGEODE_EXCEPTION( length > geode::GLOBAL_ANGULAR_EPSILON,
+                geode::OpenGeodeGeometryException::check(
+                    length > geode::GLOBAL_ANGULAR_EPSILON, nullptr,
+                    geode::OpenGeodeException::TYPE::data,
                     "[CoordinateSystem3D] Could not create a "
                     "CoordinateSystem with given directions" );
             }
@@ -180,14 +184,14 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void CoordinateSystem< dimension >::serialize( Archive& archive )
+    void CoordinateSystem< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, CoordinateSystem >{
-                { []( Archive& a, CoordinateSystem& coord_system ) {
-                    a.ext( coord_system,
+                { []( Archive& archive, CoordinateSystem& coord_system ) {
+                    archive.ext( coord_system,
                         bitsery::ext::BaseClass< Frame< dimension > >{} );
-                    a.object( coord_system.origin_ );
+                    archive.object( coord_system.origin_ );
                 } } } );
     }
 

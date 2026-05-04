@@ -106,9 +106,11 @@ namespace
         {
             cell_mesh_vertices[v] = grid.vertex_index( cell_vertices[v] );
         }
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::check(
             densification_info.cell_to_barycenter_vertex.contains(
                 cell_indices ),
+            grid.cell_barycenter( cell_indices ),
+            geode::OpenGeodeException::TYPE::internal,
             "[create_tetrahedra_from_pyramid_pattern] No barycenter defined on "
             "cell [",
             cell_indices[0], ",", cell_indices[1], ",", cell_indices[2], "]" );

@@ -56,19 +56,21 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void PointSet< dimension >::serialize( Archive& archive )
+    void PointSet< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, PointSet >{
-                { []( Archive& a, PointSet& point_set ) {
-                     a.ext( point_set, bitsery::ext::BaseClass< VertexSet >{} );
+                { []( Archive& archive, PointSet& point_set ) {
+                     archive.ext(
+                         point_set, bitsery::ext::BaseClass< VertexSet >{} );
                  },
-                    []( Archive& a, PointSet& point_set ) {
-                        a.ext(
+                    []( Archive& archive, PointSet& point_set ) {
+                        archive.ext(
                             point_set, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.ext( point_set, bitsery::ext::BaseClass<
-                                              CoordinateReferenceSystemManagers<
-                                                  dimension > >{} );
+                        archive.ext(
+                            point_set, bitsery::ext::BaseClass<
+                                           CoordinateReferenceSystemManagers<
+                                               dimension > >{} );
                     } } } );
     }
 
@@ -86,9 +88,10 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > PointSet< dimension >::bounding_box() const
     {
-        OPENGEODE_EXCEPTION( nb_vertices() != 0,
-            "[PointSet::bounding_box] Cannot return "
-            "the bounding_box of an empty point set." );
+        OpenGeodeMeshException::check( nb_vertices() != 0, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[PointSet::bounding_box] Cannot return the bounding_box of an "
+            "empty point set." );
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {

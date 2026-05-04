@@ -26,7 +26,9 @@
 #include <sstream>
 #include <string>
 
-#include <geode/basic/common.hpp>
+#include <absl/strings/str_cat.h>
+
+#include <geode/basic/opengeode_basic_export.hpp>
 #include <geode/basic/pimpl.hpp>
 
 namespace geode
@@ -39,7 +41,7 @@ namespace geode
     class opengeode_basic_api Logger
     {
     public:
-        enum struct LEVEL
+        enum struct LEVEL : std::uint8_t
         {
             trace,
             debug,

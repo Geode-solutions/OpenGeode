@@ -42,7 +42,7 @@ namespace geode
     template < typename Container >
     void concatenate( Container& container, Container&& values )
     {
-        absl::c_move( std::move( values ), std::back_inserter( container ) );
+        absl::c_move( std::forward( values ), std::back_inserter( container ) );
     }
 
     /*!
@@ -56,16 +56,17 @@ namespace geode
     index_t delete_vector_elements(
         const DeleteContainer& to_delete, ValueContainer& values )
     {
-        OPENGEODE_ASSERT( to_delete.size() == values.size(),
+        OpenGeodeBasicException::assertion( to_delete.size() == values.size(),
             "[delete_vector_elements] Number of elements in the two vectors "
             "should match" );
-        const auto it = absl::c_find( to_delete, true );
-        if( it == to_delete.end() )
+        const auto first_true = absl::c_find( to_delete, true );
+        if( first_true == to_delete.end() )
         {
             return 0;
         }
         index_t nb_removed_elements{ 0 };
-        for( const auto i : Range{ it - to_delete.begin(), to_delete.size() } )
+        for( const auto i :
+            Range{ first_true - to_delete.begin(), to_delete.size() } )
         {
             if( to_delete[i] )
             {
@@ -91,17 +92,17 @@ namespace geode
     [[nodiscard]] ValueContainer extract_vector_elements(
         const DeleteContainer& to_keep, const ValueContainer& in_values )
     {
-        OPENGEODE_ASSERT( to_keep.size() == in_values.size(),
+        OpenGeodeBasicException::assertion( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
-        const auto nb =
+        const auto nb_to_keep =
             static_cast< index_t >( absl::c_count( to_keep, true ) );
-        if( nb == in_values.size() )
+        if( nb_to_keep == in_values.size() )
         {
             return in_values;
         }
         ValueContainer out_values;
-        out_values.reserve( nb );
+        out_values.reserve( nb_to_keep );
         for( const auto i : Indices{ to_keep } )
         {
             if( to_keep[i] )

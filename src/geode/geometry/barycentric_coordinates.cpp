@@ -50,7 +50,8 @@ namespace geode
         const auto i = v2.dot( v2 );
         const auto denom =
             2 * c * d * g - b * g * g + i * b * f - i * c * c - d * d * f;
-        OPENGEODE_EXCEPTION( denom != 0,
+        OpenGeodeGeometryException::check( denom != 0, point,
+            OpenGeodeException::TYPE::internal,
             "[tetrahedron_barycentric_coordinates] Computation failed" );
         const auto dg_ci = d * g - c * i;
         const auto cg_df = c * g - d * f;
@@ -120,7 +121,8 @@ namespace geode
         const auto d20 = v2.dot( v0 );
         const auto d21 = v2.dot( v1 );
         const auto denom = d00 * d11 - d01 * d01;
-        OPENGEODE_EXCEPTION( denom != 0,
+        OpenGeodeGeometryException::check( denom != 0, point,
+            OpenGeodeException::TYPE::internal,
             "[triangle_barycentric_coordinates] Computation failed" );
         const auto lambda1 = ( d11 * d20 - d01 * d21 ) / denom;
         const auto lambda2 = ( d00 * d21 - d01 * d20 ) / denom;
@@ -177,7 +179,8 @@ namespace geode
         const Vector< dimension > v1p{ vertices[1], point };
         const auto dot1 = -v1p.dot( dir ) / length;
         const auto sum = dot0 + dot1;
-        OPENGEODE_EXCEPTION( sum != 0,
+        OpenGeodeGeometryException::check( sum != 0, point,
+            OpenGeodeException::TYPE::data,
             "[segment_barycentric_coordinates] Length of input segment too "
             "small" );
         const auto lambda0 = dot1 / sum;

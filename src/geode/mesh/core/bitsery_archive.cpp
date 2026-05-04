@@ -255,7 +255,7 @@ namespace
         geode::register_attribute_type<
             geode::CachedValue< geode::internal::PolyhedraAroundVertexImpl >,
             Serializer >( context, "CachedPolyhedraAroundVertexImpl" );
-        geode::register_attribute_type< geode::HybridSolid3D::Type,
+        geode::register_attribute_type< geode::HybridSolid3D::TYPE,
             Serializer >( context, "HybridSolidType" );
         geode::register_attribute_type< geode::MeshElement, Serializer >(
             context, "SingleMeshElement" );

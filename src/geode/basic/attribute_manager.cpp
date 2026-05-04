@@ -324,7 +324,8 @@ namespace geode
             const AttributeBase::AttributeKey &key )
         {
             const auto attribute_it = attributes_.find( old_name );
-            OPENGEODE_EXCEPTION( attribute_it != attributes_.end(),
+            OpenGeodeBasicException::check( attribute_it != attributes_.end(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[AttributeManager::rename_attribute] Attribute ", old_name,
                 "does not exist" );
             auto attribute = attribute_it->second;
@@ -337,16 +338,17 @@ namespace geode
             const AttributeProperties &new_properties )
         {
             const auto attribute_it = attributes_.find( attribute_name );
-            OPENGEODE_EXCEPTION( attribute_it != attributes_.end(),
+            OpenGeodeBasicException::check( attribute_it != attributes_.end(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[AttributeManager::rename_attribute] Attribute ",
                 attribute_name, "does not exist" );
             attribute_it->second->set_properties( new_properties );
         }
 
         template < typename Archive >
-        void serialize( Archive &archive )
+        void serialize( Archive &serializer )
         {
-            archive.ext(
+            serializer.ext(
                 *this, Growable< Archive, Impl >{ { []( Archive &local_archive,
                                                         Impl &impl ) {
                     local_archive.value4b( impl.nb_elements_ );
@@ -362,11 +364,11 @@ namespace geode
                             }
                             catch( ... )
                             {
-                                throw OpenGeodeException{
+                                throw OpenGeodeBasicException{ nullptr,
+                                    OpenGeodeException::TYPE::internal,
                                     "[AttributeManager::serialize] Cannot "
                                     "serialize attribute ",
-                                    name, " holding type ", attribute->type()
-                                };
+                                    name, " holding type ", attribute->type() };
                             }
                         } );
                 } } } );
@@ -384,10 +386,10 @@ namespace geode
     };
 
     AttributeManager::AttributeManager() = default;
-    AttributeManager::AttributeManager( AttributeManager &&other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    AttributeManager::AttributeManager(
+        AttributeManager &&other ) noexcept = default;
+    AttributeManager &AttributeManager::operator=(
+        AttributeManager &&other ) noexcept = default;
     AttributeManager::~AttributeManager() = default;
 
     std::shared_ptr< AttributeBase > AttributeManager::find_attribute_base(
@@ -477,10 +479,10 @@ namespace geode
     {
         if( absl::c_find( to_delete, true ) != to_delete.end() )
         {
-            OPENGEODE_ASSERT( to_delete.size() == nb_elements(),
+            OpenGeodeBasicException::assertion(
+                to_delete.size() == nb_elements(),
                 "[AttributeManager::delete_elements] Vector to_delete should "
-                "have the same size as the number of "
-                "elements" );
+                "have the same size as the number of elements" );
             impl_->delete_elements( to_delete, {} );
         }
     }
@@ -532,9 +534,9 @@ namespace geode
     }
 
     template < typename Archive >
-    void AttributeManager::serialize( Archive &archive )
+    void AttributeManager::serialize( Archive &serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, AttributeManager >{
                 { []( Archive &local_archive,
                       AttributeManager &attribute_manager ) {

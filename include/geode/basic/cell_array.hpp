@@ -25,6 +25,7 @@
 
 #include <optional>
 
+#include <geode/basic/cell_array.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -89,7 +90,7 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

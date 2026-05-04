@@ -48,7 +48,8 @@ namespace geode
             find_coordinate_reference_system( std::string_view name ) const
         {
             const auto it = crss_.find( name );
-            OPENGEODE_EXCEPTION( it != crss_.end(),
+            OpenGeodeMeshException::check( it != crss_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::find_coordinate_reference_"
                 "system] Unknown CRS :",
                 name );
@@ -58,7 +59,8 @@ namespace geode
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const
         {
-            OPENGEODE_ASSERT( active_crs_.use_count() > 1,
+            geode::OpenGeodeMeshException::assertion(
+                active_crs_.use_count() > 1,
                 "[CoordinateReferenceSystemManager::active_coordinate_"
                 "reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -91,7 +93,8 @@ namespace geode
         {
             const auto status =
                 crss_.emplace( to_string( name ), std::move( crs ) );
-            OPENGEODE_EXCEPTION( status.second,
+            OpenGeodeMeshException::check( status.second, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::register_coordinate_"
                 "reference_system] CRS named ",
                 name, " already exists" );
@@ -114,7 +117,8 @@ namespace geode
         void set_active_coordinate_reference_system( std::string_view name )
         {
             const auto it = crss_.find( name );
-            OPENGEODE_EXCEPTION( it != crss_.end(),
+            OpenGeodeMeshException::check( it != crss_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::set_active_coordinate_"
                 "reference_system] Unknown CRS :",
                 name );
@@ -125,7 +129,8 @@ namespace geode
         CoordinateReferenceSystem< dimension >&
             modifiable_active_coordinate_reference_system()
         {
-            OPENGEODE_EXCEPTION( active_crs_.use_count() > 0,
+            OpenGeodeMeshException::check( active_crs_.use_count() > 0, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::modifiable_active_"
                 "coordinate_reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -135,7 +140,8 @@ namespace geode
             modifiable_coordinate_reference_system( std::string_view name )
         {
             const auto it = crss_.find( name );
-            OPENGEODE_EXCEPTION( it != crss_.end(),
+            OpenGeodeMeshException::check( it != crss_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::find_coordinate_reference_"
                 "system] Unknown CRS :",
                 name );
@@ -144,20 +150,21 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl.crss_,
+            serializer.ext( *this, Growable< Archive,
+                                       Impl >{ { []( Archive& archive,
+                                                     Impl& impl ) {
+                archive.ext( impl.crss_,
                     bitsery::ext::StdMap{ impl.crss_.max_size() },
-                    []( Archive& a2, std::string& name,
+                    []( Archive& archive2, std::string& name,
                         std::shared_ptr<
                             CoordinateReferenceSystem< dimension > >& crs ) {
-                        a2.text1b( name, name.max_size() );
-                        a2.ext( crs, bitsery::ext::StdSmartPtr{} );
+                        archive2.text1b( name, name.max_size() );
+                        archive2.ext( crs, bitsery::ext::StdSmartPtr{} );
                     } );
-                a.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
-                a.text1b(
+                archive.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
+                archive.text1b(
                     impl.active_crs_name_, impl.active_crs_name_.max_size() );
             } } } );
         }
@@ -231,7 +238,7 @@ namespace geode
     void CoordinateReferenceSystemManager< dimension >::
         register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs,
-            CRSManagerKey )
+            CRSManagerKey /*key*/ )
     {
         impl_->register_coordinate_reference_system( name, std::move( crs ) );
     }
@@ -239,7 +246,7 @@ namespace geode
     template < index_t dimension >
     void CoordinateReferenceSystemManager<
         dimension >::delete_coordinate_reference_system( std::string_view name,
-        CRSManagerKey )
+        CRSManagerKey /*key*/ )
     {
         impl_->delete_coordinate_reference_system( name );
     }
@@ -247,7 +254,7 @@ namespace geode
     template < index_t dimension >
     void CoordinateReferenceSystemManager< dimension >::
         set_active_coordinate_reference_system(
-            std::string_view name, CRSManagerKey )
+            std::string_view name, CRSManagerKey /*key*/ )
     {
         impl_->set_active_coordinate_reference_system( name );
     }
@@ -255,7 +262,8 @@ namespace geode
     template < index_t dimension >
     CoordinateReferenceSystem< dimension >&
         CoordinateReferenceSystemManager< dimension >::
-            modifiable_active_coordinate_reference_system( CRSManagerKey )
+            modifiable_active_coordinate_reference_system(
+                CRSManagerKey /*key*/ )
     {
         return impl_->modifiable_active_coordinate_reference_system();
     }
@@ -264,7 +272,7 @@ namespace geode
     CoordinateReferenceSystem< dimension >&
         CoordinateReferenceSystemManager< dimension >::
             modifiable_coordinate_reference_system(
-                std::string_view name, CRSManagerKey )
+                std::string_view name, CRSManagerKey /*key*/ )
     {
         return impl_->modifiable_coordinate_reference_system( name );
     }
@@ -272,13 +280,14 @@ namespace geode
     template < index_t dimension >
     template < typename Archive >
     void CoordinateReferenceSystemManager< dimension >::serialize(
-        Archive& archive )
+        Archive& serializer )
     {
-        archive.ext( *this,
-            Growable< Archive, CoordinateReferenceSystemManager >{
-                { []( Archive& a, CoordinateReferenceSystemManager& manager ) {
-                    a.object( manager.impl_ );
-                } } } );
+        serializer.ext(
+            *this, Growable< Archive, CoordinateReferenceSystemManager >{
+                       { []( Archive& archive,
+                             CoordinateReferenceSystemManager& manager ) {
+                           archive.object( manager.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api CoordinateReferenceSystemManager< 1 >;

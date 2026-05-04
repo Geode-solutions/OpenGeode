@@ -97,14 +97,15 @@ namespace geode
 
         private:
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this, Growable< Archive, TextureImpl >{
-                                        { []( Archive& a, TextureImpl& impl ) {
-                                            a.object( impl.image_ );
-                                            a.ext( impl.coordinates_,
-                                                bitsery::ext::StdSmartPtr{} );
-                                        } } } );
+                serializer.ext(
+                    *this, Growable< Archive, TextureImpl >{
+                               { []( Archive& archive, TextureImpl& impl ) {
+                                   archive.object( impl.image_ );
+                                   archive.ext( impl.coordinates_,
+                                       bitsery::ext::StdSmartPtr{} );
+                               } } } );
             }
 
         private:

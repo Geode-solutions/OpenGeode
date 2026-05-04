@@ -51,10 +51,10 @@ struct Foo
     }
 
     template < typename Archive >
-    void serialize( Archive& archive )
+    void serialize( Archive& serializer )
     {
-        archive.value8b( double_ );
-        archive.value4b( int_ );
+        serializer.value8b( double_ );
+        serializer.value4b( int_ );
     }
     double double_{ 0 };
     int int_{ 0 };
@@ -111,20 +111,21 @@ void test_constant_attribute( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, bool >(
             "bool", true, { true, true } );
-    OPENGEODE_EXCEPTION(
-        constant_attribute->name() == "bool", "[Test] Wrong attribute name" );
-    OPENGEODE_EXCEPTION( constant_attribute->default_value() == true,
-        "[Test] Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        constant_attribute->name() == "bool", "Wrong attribute name" );
+    geode::OpenGeodeBasicException::test(
+        constant_attribute->default_value() == true, "Wrong default value" );
 
     auto attribute = manager.find_attribute< bool >( "bool" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 0 ), "[Test] Should be equal to true" );
-    OPENGEODE_EXCEPTION( attribute->type() == typeid( bool ).name(),
-        "[Test] Should be equal to 'b' or 'bool'" );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 0 ), "Should be equal to true" );
+    geode::OpenGeodeBasicException::test(
+        attribute->type() == typeid( bool ).name(),
+        "Should be equal to 'b' or 'bool'" );
 
     constant_attribute->set_value( false );
-    OPENGEODE_EXCEPTION(
-        !attribute->value( 12 ), "[Test] Should be equal to false" );
+    geode::OpenGeodeBasicException::test(
+        !attribute->value( 12 ), "Should be equal to false" );
 }
 
 void test_foo_constant_attribute( geode::AttributeManager& manager )
@@ -135,8 +136,9 @@ void test_foo_constant_attribute( geode::AttributeManager& manager )
     constant_attribute->modify_value( []( Foo& foo ) {
         foo.double_ = 12.4;
     } );
-    OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
-        "[Test] Should be equal to 12.4" );
+    geode::OpenGeodeBasicException::test(
+        constant_attribute->value().double_ == 12.4,
+        "Should be equal to 12.4" );
 }
 
 void test_foo_variable_attribute( geode::AttributeManager& manager )
@@ -145,23 +147,27 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
             "foo_var", Foo{}, { false, false, false } );
     manager.set_attribute_properties( "foo_var", { true, false, true } );
-    OPENGEODE_EXCEPTION( variable_attribute->properties().assignable
-                             && !variable_attribute->properties().interpolable
-                             && variable_attribute->properties().transferable,
-        "[Test] Attribute should be assignable, not interpolable and "
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->properties().assignable
+            && !variable_attribute->properties().interpolable
+            && variable_attribute->properties().transferable,
+        "Attribute should be assignable, not interpolable and "
         "transferable." );
     variable_attribute->set_properties( { true, true } );
-    OPENGEODE_EXCEPTION( variable_attribute->properties().interpolable,
-        "[Test] Attribute should be interpolable." );
-    OPENGEODE_EXCEPTION( variable_attribute->properties().transferable,
-        "[Test] Attribute should be transferable." );
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->properties().interpolable,
+        "Attribute should be interpolable." );
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->properties().transferable,
+        "Attribute should be transferable." );
     variable_attribute->modify_value( 3, []( Foo& foo ) {
         foo.double_ = 12.4;
     } );
-    OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0,
-        "[Test] Should be equal to 0" );
-    OPENGEODE_EXCEPTION( variable_attribute->value( 3 ).double_ == 12.4,
-        "[Test] Should be equal to 12.4" );
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->value( 0 ).double_ == 0, "Should be equal to 0" );
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->value( 3 ).double_ == 12.4,
+        "Should be equal to 12.4" );
 }
 
 void test_int_variable_attribute( geode::AttributeManager& manager )
@@ -169,19 +175,19 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, int >(
             "int", 12, { true, true } );
-    OPENGEODE_EXCEPTION( variable_attribute->default_value() == 12,
-        "[Test] Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->default_value() == 12, "Wrong default value" );
     variable_attribute->set_value( 3, 3 );
 
     const auto attribute = manager.find_attribute< int >( "int" );
-    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 3,
-        "[Test] Int variable value 3 should be equal to 3" );
-    OPENGEODE_EXCEPTION( attribute->value( 6 ) == 12,
-        "[Test] Int variable value 6 should be equal to 12" );
+    geode::OpenGeodeBasicException::test( attribute->value( 3 ) == 3,
+        "Int variable value 3 should be equal to 3" );
+    geode::OpenGeodeBasicException::test( attribute->value( 6 ) == 12,
+        "Int variable value 6 should be equal to 12" );
 
     variable_attribute->set_value( 3, 5 );
-    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 5,
-        "[Test] Int variable value 3 should be equal to 5" );
+    geode::OpenGeodeBasicException::test( attribute->value( 3 ) == 5,
+        "Int variable value 3 should be equal to 5" );
 }
 
 void test_foo_sparse_attribute( geode::AttributeManager& manager )
@@ -195,12 +201,14 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
     sparse_attribute->modify_value( 3, []( Foo& foo ) {
         foo.int_ = 3;
     } );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
-        "[Test] Should be equal to 0" );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,
-        "[Test] Should be equal to 12.4" );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).int_ == 3,
-        "[Test] Foo sparse value should be equal to 3" );
+    geode::OpenGeodeBasicException::test(
+        sparse_attribute->value( 0 ).double_ == 0, "Should be equal to 0" );
+    geode::OpenGeodeBasicException::test(
+        sparse_attribute->value( 3 ).double_ == 12.4,
+        "Should be equal to 12.4" );
+    geode::OpenGeodeBasicException::test(
+        sparse_attribute->value( 3 ).int_ == 3,
+        "Foo sparse value should be equal to 3" );
 }
 
 void test_double_sparse_attribute( geode::AttributeManager& manager )
@@ -208,28 +216,28 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, double >(
             "double", 12., { true, true } );
-    OPENGEODE_EXCEPTION(
-        sparse_attribute->default_value() == 12, "[Test] Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        sparse_attribute->default_value() == 12, "Wrong default value" );
     sparse_attribute->set_value( 3, 3 );
     sparse_attribute->set_value( 7, 7 );
     manager.assign_attribute_value( 3, 2 );
     manager.interpolate_attribute_value( { { 1, 7 }, { 0.5, 0.3 } }, 4 );
 
     auto attribute = manager.find_attribute< double >( "double" );
-    OPENGEODE_EXCEPTION( attribute->value( 2 ) == 3,
-        "[Test] Double sparse value 2 should be equal to 3" );
-    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 3,
-        "[Test] Double sparse value 3 should be equal to 3" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 4 ) == 8.1, "[Test] Should be equal to 8.1" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 7 ) == 7, "[Test] Should be equal to 7" );
+    geode::OpenGeodeBasicException::test( attribute->value( 2 ) == 3,
+        "Double sparse value 2 should be equal to 3" );
+    geode::OpenGeodeBasicException::test( attribute->value( 3 ) == 3,
+        "Double sparse value 3 should be equal to 3" );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 4 ) == 8.1, "Should be equal to 8.1" );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 6 ) == 12, "Should be equal to 12" );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 7 ) == 7, "Should be equal to 7" );
 
     sparse_attribute->set_value( 3, 5 );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 3 ) == 5, "Should be equal to 5" );
 }
 
 void test_double_array_attribute( geode::AttributeManager& manager )
@@ -238,12 +246,12 @@ void test_double_array_attribute( geode::AttributeManager& manager )
         manager.find_or_create_attribute< geode::VariableAttribute,
             std::array< double, 3 > >(
             "array_double_3", { { 10., 11., 12. } }, { true, true } );
-    OPENGEODE_EXCEPTION( array_attribute->default_value()[0] == 10.,
-        "[Test] Wrong default value" );
-    OPENGEODE_EXCEPTION( array_attribute->default_value()[1] == 11.,
-        "[Test] Wrong default value" );
-    OPENGEODE_EXCEPTION( array_attribute->default_value()[2] == 12.,
-        "[Test] Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        array_attribute->default_value()[0] == 10., "Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        array_attribute->default_value()[1] == 11., "Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        array_attribute->default_value()[2] == 12., "Wrong default value" );
     array_attribute->set_value( 3, { { 1., 2., 3. } } );
     array_attribute->set_value( 7, { { 2., 5., 7. } } );
     manager.assign_attribute_value( 3, 2 );
@@ -251,59 +259,44 @@ void test_double_array_attribute( geode::AttributeManager& manager )
 
     auto attribute =
         manager.find_attribute< std::array< double, 3 > >( "array_double_3" );
-    OPENGEODE_EXCEPTION( attribute->value( 2 )[0] == 1.,
-        "[Test] Value [2,0] Should be equal to 1., not ",
-        attribute->value( 2 )[0] );
-    OPENGEODE_EXCEPTION( attribute->value( 2 )[1] == 2.,
-        "[Test] Value [2,1] Should be equal to 2., not ",
-        attribute->value( 2 )[1] );
-    OPENGEODE_EXCEPTION( attribute->value( 2 )[2] == 3.,
-        "[Test] Value [2,2] Should be equal to 3., not ",
-        attribute->value( 2 )[2] );
-    OPENGEODE_EXCEPTION( attribute->value( 3 )[0] == 1.,
-        "[Test] Value [3,0] Should be equal to 1., not ",
-        attribute->value( 3 )[0] );
-    OPENGEODE_EXCEPTION( attribute->value( 3 )[1] == 2.,
-        "[Test] Value [3,1] Should be equal to 2., not ",
-        attribute->value( 3 )[1] );
-    OPENGEODE_EXCEPTION( attribute->value( 3 )[2] == 3.,
-        "[Test] Value [3,2] Should be equal to 3., not ",
-        attribute->value( 3 )[2] );
-    OPENGEODE_EXCEPTION( attribute->value( 4 )[0] == 5.6,
-        "[Test] Value [4,0] Should be equal to 5.6, not ",
-        attribute->value( 4 )[0] );
-    OPENGEODE_EXCEPTION( attribute->value( 4 )[1] == 7.,
-        "[Test] Value [4,1] Should be equal to 7., not ",
-        attribute->value( 4 )[1] );
-    OPENGEODE_EXCEPTION( attribute->value( 4 )[2] == 8.1,
-        "[Test] Value [4,2] Should be equal to 8.1, not ",
-        attribute->value( 4 )[2] );
-    OPENGEODE_EXCEPTION( attribute->value( 6 )[0] == 10.,
-        "[Test] Value [6,0] Should be equal to 10., not ",
-        attribute->value( 6 )[0] );
-    OPENGEODE_EXCEPTION( attribute->value( 6 )[1] == 11.,
-        "[Test] Value [6,1] Should be equal to 11., not ",
-        attribute->value( 6 )[1] );
-    OPENGEODE_EXCEPTION( attribute->value( 6 )[2] == 12.,
-        "[Test] Value [6,2] Should be equal to 12., not ",
-        attribute->value( 6 )[2] );
-    OPENGEODE_EXCEPTION( attribute->value( 7 )[0] == 2.,
-        "[Test] Value [7,0] Should be equal to 2., not ",
-        attribute->value( 7 )[0] );
-    OPENGEODE_EXCEPTION( attribute->value( 7 )[1] == 5.,
-        "[Test] Value [7,1] Should be equal to 5., not ",
-        attribute->value( 7 )[1] );
-    OPENGEODE_EXCEPTION( attribute->value( 7 )[2] == 7.,
-        "[Test] Value [7,2] Should be equal to 7., not ",
-        attribute->value( 7 )[2] );
+    geode::OpenGeodeBasicException::test( attribute->value( 2 )[0] == 1.,
+        "Value [2,0] Should be equal to 1., not ", attribute->value( 2 )[0] );
+    geode::OpenGeodeBasicException::test( attribute->value( 2 )[1] == 2.,
+        "Value [2,1] Should be equal to 2., not ", attribute->value( 2 )[1] );
+    geode::OpenGeodeBasicException::test( attribute->value( 2 )[2] == 3.,
+        "Value [2,2] Should be equal to 3., not ", attribute->value( 2 )[2] );
+    geode::OpenGeodeBasicException::test( attribute->value( 3 )[0] == 1.,
+        "Value [3,0] Should be equal to 1., not ", attribute->value( 3 )[0] );
+    geode::OpenGeodeBasicException::test( attribute->value( 3 )[1] == 2.,
+        "Value [3,1] Should be equal to 2., not ", attribute->value( 3 )[1] );
+    geode::OpenGeodeBasicException::test( attribute->value( 3 )[2] == 3.,
+        "Value [3,2] Should be equal to 3., not ", attribute->value( 3 )[2] );
+    geode::OpenGeodeBasicException::test( attribute->value( 4 )[0] == 5.6,
+        "Value [4,0] Should be equal to 5.6, not ", attribute->value( 4 )[0] );
+    geode::OpenGeodeBasicException::test( attribute->value( 4 )[1] == 7.,
+        "Value [4,1] Should be equal to 7., not ", attribute->value( 4 )[1] );
+    geode::OpenGeodeBasicException::test( attribute->value( 4 )[2] == 8.1,
+        "Value [4,2] Should be equal to 8.1, not ", attribute->value( 4 )[2] );
+    geode::OpenGeodeBasicException::test( attribute->value( 6 )[0] == 10.,
+        "Value [6,0] Should be equal to 10., not ", attribute->value( 6 )[0] );
+    geode::OpenGeodeBasicException::test( attribute->value( 6 )[1] == 11.,
+        "Value [6,1] Should be equal to 11., not ", attribute->value( 6 )[1] );
+    geode::OpenGeodeBasicException::test( attribute->value( 6 )[2] == 12.,
+        "Value [6,2] Should be equal to 12., not ", attribute->value( 6 )[2] );
+    geode::OpenGeodeBasicException::test( attribute->value( 7 )[0] == 2.,
+        "Value [7,0] Should be equal to 2., not ", attribute->value( 7 )[0] );
+    geode::OpenGeodeBasicException::test( attribute->value( 7 )[1] == 5.,
+        "Value [7,1] Should be equal to 5., not ", attribute->value( 7 )[1] );
+    geode::OpenGeodeBasicException::test( attribute->value( 7 )[2] == 7.,
+        "Value [7,2] Should be equal to 7., not ", attribute->value( 7 )[2] );
 
     array_attribute->set_value( 3, { 2., 5., 5. } );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 )[0] == 2., "[Test] Should be equal to 2." );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 )[1] == 5., "[Test] Should be equal to 5." );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 )[2] == 5., "[Test] Should be equal to 5." );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 3 )[0] == 2., "Should be equal to 2." );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 3 )[1] == 5., "Should be equal to 5." );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 3 )[2] == 5., "Should be equal to 5." );
 }
 
 void test_bool_variable_attribute( geode::AttributeManager& manager )
@@ -311,17 +304,17 @@ void test_bool_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, bool >(
             "bool_var", false, { true, true } );
-    OPENGEODE_EXCEPTION( variable_attribute->default_value() == false,
-        "[Test] Wrong default value" );
+    geode::OpenGeodeBasicException::test(
+        variable_attribute->default_value() == false, "Wrong default value" );
     variable_attribute->set_value( 3, true );
 
     const auto attribute = manager.find_attribute< bool >( "bool_var" );
-    OPENGEODE_EXCEPTION(
-        attribute->value( 3 ), "[Test] Should be equal to true" );
+    geode::OpenGeodeBasicException::test(
+        attribute->value( 3 ), "Should be equal to true" );
 
     variable_attribute->set_value( 3, false );
-    OPENGEODE_EXCEPTION(
-        !attribute->value( 3 ), "[Test] Should be equal to false" );
+    geode::OpenGeodeBasicException::test(
+        !attribute->value( 3 ), "Should be equal to false" );
 }
 
 bool managers_have_same_attributes( const geode::AttributeManager& manager,
@@ -360,8 +353,9 @@ void check_one_attribute_values( geode::AttributeManager& manager,
     const auto out_att = reloaded_manager.find_attribute< T >( name );
     for( auto i : geode::Range{ manager.nb_elements() } )
     {
-        OPENGEODE_EXCEPTION( in_att->value( i ) == out_att->value( i ),
-            "[Test] At least one value of Attribute ", name,
+        geode::OpenGeodeBasicException::test(
+            in_att->value( i ) == out_att->value( i ),
+            "At least one value of Attribute ", name,
             " is not correct after reloading" );
     }
 }
@@ -391,8 +385,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::Serializer archive{ context, file };
     archive.object( manager );
     archive.adapter().flush();
-    OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-        "[Test] Error while writing file: ", filename );
+    geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
+        "Error while writing file: ", filename );
 
     std::ifstream infile{ filename, std::ifstream::binary };
     geode::AttributeManager reloaded_manager;
@@ -409,30 +403,31 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
-    OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
-                             && adapter.isCompletedSuccessfully()
-                             && std::get< 1 >( context ).isValid(),
-        "[Test] Error while reading file: ", filename );
+    geode::OpenGeodeBasicException::test(
+        adapter.error() == bitsery::ReaderError::NoError
+            && adapter.isCompletedSuccessfully()
+            && std::get< 1 >( context ).isValid(),
+        "Error while reading file: ", filename );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeBasicException::test(
         reloaded_manager.nb_elements() == manager.nb_elements(),
-        "[Test] Number of elements in reloaded AttributeManager is not "
+        "Number of elements in reloaded AttributeManager is not "
         "correct" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeBasicException::test(
         managers_have_same_attributes( manager, reloaded_manager ),
-        "[Test] Number and names of attributes in reloaded AttributeManager "
+        "Number and names of attributes in reloaded AttributeManager "
         "are not correct" );
     check_attribute_values( manager, reloaded_manager );
 }
 
 void test_attribute_types( geode::AttributeManager& manager )
 {
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeBasicException::test(
         manager.attribute_type( "bool_var" ) == typeid( bool ).name(),
-        "[Test] Returned attribute type is not correct (should be bool)" );
-    OPENGEODE_EXCEPTION(
+        "Returned attribute type is not correct (should be bool)" );
+    geode::OpenGeodeBasicException::test(
         manager.attribute_type( "unknown_name" ) == "undefined",
-        "[Test] Returned attribute type is not correct (should be undefined)" );
+        "Returned attribute type is not correct (should be undefined)" );
 }
 
 void test_attribute_rename( geode::AttributeManager& manager )
@@ -441,15 +436,17 @@ void test_attribute_rename( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
             "foo_constant", Foo{} );
-    OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
-        "[Test] Should be equal to 12.4" );
+    geode::OpenGeodeBasicException::test(
+        constant_attribute->value().double_ == 12.4,
+        "Should be equal to 12.4" );
 }
 
 void test_number_of_attributes(
     geode::AttributeManager& manager, geode::index_t nb )
 {
-    OPENGEODE_EXCEPTION( manager.attribute_names().size() == nb,
-        "[Test] Should have ", nb, " attributes in the manager" );
+    geode::OpenGeodeBasicException::test(
+        manager.attribute_names().size() == nb, "Should have ", nb,
+        " attributes in the manager" );
 }
 
 void test_delete_attribute_elements( geode::AttributeManager& manager )
@@ -458,51 +455,55 @@ void test_delete_attribute_elements( geode::AttributeManager& manager )
     to_delete[3] = true;
     to_delete[5] = true;
     manager.delete_elements( to_delete );
-    OPENGEODE_EXCEPTION( manager.nb_elements() == to_delete.size() - 2,
-        "[Test] Two attribute elements should have been removed" );
+    geode::OpenGeodeBasicException::test(
+        manager.nb_elements() == to_delete.size() - 2,
+        "Two attribute elements should have been removed" );
 }
 
 void test_sparse_attribute_after_element_deletion(
     geode::AttributeManager& manager )
 {
     const auto sparse_attribute = manager.find_attribute< double >( "double" );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
-        "[Test] Element 0 of sparse attribute should be 12 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 3,
-        "[Test] Element 3 of sparse attribute should be 3 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 8.1,
-        "[Test] Element 5 of sparse attribute should be 8.1 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 7 ) == 7,
-        "[Test] Element 7 of sparse attribute should be 7 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 0 ) == 12,
+        "Element 0 of sparse attribute should be 12 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 3 ) == 3,
+        "Element 3 of sparse attribute should be 3 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 5 ) == 8.1,
+        "Element 5 of sparse attribute should be 8.1 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 7 ) == 7,
+        "Element 7 of sparse attribute should be 7 " );
 }
 
 void test_generic_value( geode::AttributeManager& manager )
 {
     const auto& foo_attr = manager.find_attribute< Foo >( "foo_spr" );
-    OPENGEODE_EXCEPTION( foo_attr->is_genericable(),
-        "[Test] Foo attribute should be genericable" );
-    OPENGEODE_EXCEPTION( foo_attr->generic_value( 3 ) == 15.4f,
-        "[Test] Generic value for element 3 of foo sparse attribute should be "
+    geode::OpenGeodeBasicException::test(
+        foo_attr->is_genericable(), "Foo attribute should be genericable" );
+    geode::OpenGeodeBasicException::test( foo_attr->generic_value( 3 ) == 15.4f,
+        "Generic value for element 3 of foo sparse attribute should be "
         "15.4" );
 
     const auto& double_attr = manager.find_attribute< double >( "double" );
-    OPENGEODE_EXCEPTION( double_attr->generic_value( 7 ) == 7,
-        "[Test] Generic value for element 7 of double attribute should be 7" );
+    geode::OpenGeodeBasicException::test( double_attr->generic_value( 7 ) == 7,
+        "Generic value for element 7 of double attribute should be 7" );
 
     auto array_attr =
         manager.find_or_create_attribute< geode::VariableAttribute,
             std::array< double, 2 > >(
             "array_double", std::array< double, 2 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
-    OPENGEODE_EXCEPTION(
-        array_attr->is_genericable(), "[Test] Foo attribute is genericable" );
-    OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 3.1f,
-        "[Test] Generic value for element 2 of array attribute should be 3.1" );
-    OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 0 ) == 3.1f,
-        "[Test] Generic value for element 2,0 of array attribute should be "
+    geode::OpenGeodeBasicException::test(
+        array_attr->is_genericable(), "Foo attribute is genericable" );
+    geode::OpenGeodeBasicException::test(
+        array_attr->generic_value( 2 ) == 3.1f,
+        "Generic value for element 2 of array attribute should be 3.1" );
+    geode::OpenGeodeBasicException::test(
+        array_attr->generic_item_value( 2, 0 ) == 3.1f,
+        "Generic value for element 2,0 of array attribute should be "
         "3.1" );
-    OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 1 ) == 1.3f,
-        "[Test] Generic value for element 2,1 of array attribute should be "
+    geode::OpenGeodeBasicException::test(
+        array_attr->generic_item_value( 2, 1 ) == 1.3f,
+        "Generic value for element 2,1 of array attribute should be "
         "1.3" );
 }
 
@@ -538,8 +539,9 @@ void test_import_manager( geode::AttributeManager& manager )
         manager.find_attribute< std::array< double, 2 > >( "array_double" );
     auto array_attr2 =
         manager3.find_attribute< std::array< double, 2 > >( "array_double" );
-    OPENGEODE_EXCEPTION( array_attr->value( 2 ) == array_attr2->value( 4 ),
-        "[Test] Error in attribute import value." );
+    geode::OpenGeodeBasicException::test(
+        array_attr->value( 2 ) == array_attr2->value( 4 ),
+        "Error in attribute import value." );
 
     geode::AttributeManager manager4;
     for( const auto i : geode::LRange( nb_elements ) )
@@ -605,8 +607,8 @@ void test_multi_import_manager()
     to.import( from1, from1_to );
     to.import( from2, from2_to );
 
-    OPENGEODE_EXCEPTION( to.nb_elements() == 10,
-        "[Test] Wrong number of elements for AttributeManger to" );
+    geode::OpenGeodeBasicException::test( to.nb_elements() == 10,
+        "Wrong number of elements for AttributeManger to" );
 
     std::array< geode::index_t, 10 > answer_variable{ 1, 3, 5, 7, 9, 10, 8, 6,
         4, 2 };
@@ -622,12 +624,15 @@ void test_multi_import_manager()
 
     for( const auto i : geode::LRange( from2.nb_elements() ) )
     {
-        OPENGEODE_EXCEPTION( result_variable->value( i ) == answer_variable[i],
-            "[Test] Wrong result for attribute variable for value ", i );
-        OPENGEODE_EXCEPTION( result_constant->value( i ) == answer_constant[i],
-            "[Test] Wrong result for attribute constant for value ", i );
-        OPENGEODE_EXCEPTION( result_sparse->value( i ) == answer_sparse[i],
-            "[Test] Wrong result for attribute sparse for value ", i );
+        geode::OpenGeodeBasicException::test(
+            result_variable->value( i ) == answer_variable[i],
+            "Wrong result for attribute variable for value ", i );
+        geode::OpenGeodeBasicException::test(
+            result_constant->value( i ) == answer_constant[i],
+            "Wrong result for attribute constant for value ", i );
+        geode::OpenGeodeBasicException::test(
+            result_sparse->value( i ) == answer_sparse[i],
+            "Wrong result for attribute sparse for value ", i );
     }
 }
 
@@ -637,22 +642,22 @@ void test_permutation( geode::AttributeManager& manager )
     manager.permute_elements( permutation );
 
     const auto int_attribute = manager.find_attribute< int >( "int" );
-    OPENGEODE_EXCEPTION( int_attribute->value( 3 ) == 12,
-        "[Test] Attribute value 3 should be equal to 12" );
-    OPENGEODE_EXCEPTION( int_attribute->value( 0 ) == 5,
-        "[Test] Attribute value 0 should be equal to 5" );
-    OPENGEODE_EXCEPTION( int_attribute->value( 8 ) == 5,
-        "[Test] Attribute value 8 should be equal to 5" );
+    geode::OpenGeodeBasicException::test( int_attribute->value( 3 ) == 12,
+        "Attribute value 3 should be equal to 12" );
+    geode::OpenGeodeBasicException::test( int_attribute->value( 0 ) == 5,
+        "Attribute value 0 should be equal to 5" );
+    geode::OpenGeodeBasicException::test( int_attribute->value( 8 ) == 5,
+        "Attribute value 8 should be equal to 5" );
 
     auto double_attribute = manager.find_attribute< double >( "double" );
-    OPENGEODE_EXCEPTION( double_attribute->value( 2 ) == 12,
-        "[Test] Attribute value 2 should be equal to 3, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 2 ) == 12,
+        "Attribute value 2 should be equal to 3, not ",
         double_attribute->value( 2 ) );
-    OPENGEODE_EXCEPTION( double_attribute->value( 4 ) == 3,
-        "[Test] Attribute value 4 should be equal to 3, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 4 ) == 3,
+        "Attribute value 4 should be equal to 3, not ",
         double_attribute->value( 4 ) );
-    OPENGEODE_EXCEPTION( double_attribute->value( 7 ) == 8.1,
-        "[Test] Attribute value 7 should be equal to 8.1, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 7 ) == 8.1,
+        "Attribute value 7 should be equal to 8.1, not ",
         double_attribute->value( 7 ) );
 }
 
@@ -660,8 +665,8 @@ void test()
 {
     geode::AttributeManager manager;
     manager.resize( 10 );
-    OPENGEODE_EXCEPTION(
-        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+    geode::OpenGeodeBasicException::test(
+        manager.nb_elements() == 10, "Manager should have 10 elements" );
     test_constant_attribute( manager );
     test_foo_constant_attribute( manager );
     test_int_variable_attribute( manager );
@@ -687,8 +692,8 @@ void test()
     manager.clear_attributes();
     test_number_of_attributes( manager, 7 );
     manager.resize( 10 );
-    OPENGEODE_EXCEPTION(
-        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+    geode::OpenGeodeBasicException::test(
+        manager.nb_elements() == 10, "Manager should have 10 elements" );
     test_double_array_attribute( manager );
     manager.clear();
     test_number_of_attributes( manager, 0 );

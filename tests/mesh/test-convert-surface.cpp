@@ -49,33 +49,35 @@ void convert_surface_dimension()
         absl::StrCat( geode::DATA_PATH, "3patches.og_tsf2d" ) );
     const auto surface3d =
         geode::convert_triangulated_surface2d_into_3d( *surface2d, 2, 0. );
-    OPENGEODE_EXCEPTION( surface2d->nb_vertices() == surface3d->nb_vertices(),
-        "[Test] Number of vertices in TriangulatedSurface3D is not "
+    geode::OpenGeodeMeshException::test(
+        surface2d->nb_vertices() == surface3d->nb_vertices(),
+        "Number of vertices in TriangulatedSurface3D is not "
         "correct" );
-    OPENGEODE_EXCEPTION( surface2d->nb_polygons() == surface3d->nb_polygons(),
-        "[Test] Number of polygons in TriangulatedSurface3D is not "
+    geode::OpenGeodeMeshException::test(
+        surface2d->nb_polygons() == surface3d->nb_polygons(),
+        "Number of polygons in TriangulatedSurface3D is not "
         "correct" );
 
     const auto surface_mesh3d =
         geode::convert_surface_mesh2d_into_3d( *surface2d, 2, 0. );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         surface2d->nb_vertices() == surface_mesh3d->nb_vertices(),
-        "[Test] Number of vertices in SurfaceMesh3D is not "
+        "Number of vertices in SurfaceMesh3D is not "
         "correct" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         surface2d->nb_polygons() == surface_mesh3d->nb_polygons(),
-        "[Test] Number of polygons in SurfaceMesh3D is not "
+        "Number of polygons in SurfaceMesh3D is not "
         "correct" );
 
     const auto converted_surface2d =
         geode::convert_triangulated_surface3d_into_2d( *surface3d, 2 );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         surface2d->nb_vertices() == converted_surface2d->nb_vertices(),
-        "[Test] Number of vertices in re-converted TriangulatedSurface2D "
+        "Number of vertices in re-converted TriangulatedSurface2D "
         "is not correct" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         surface2d->nb_polygons() == converted_surface2d->nb_polygons(),
-        "[Test] Number of polygons in re-converted TriangulatedSurface2D "
+        "Number of polygons in re-converted TriangulatedSurface2D "
         "is not correct" );
 }
 
@@ -89,13 +91,14 @@ void convert_grid_to_surface()
     const auto converted_grid2d_densified =
         geode::convert_grid_into_densified_triangulated_surface(
             grid, cells_to_densify );
-    OPENGEODE_EXCEPTION( converted_grid2d->nb_polygons() == grid.nb_cells() * 2,
-        "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
+    geode::OpenGeodeMeshException::test(
+        converted_grid2d->nb_polygons() == grid.nb_cells() * 2,
+        "Number of polygons in TriangulatedSurface2D from grid is not "
         "correct." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         converted_grid2d_densified->nb_polygons()
             == grid.nb_cells() * 2 + 2 * cells_to_densify.size(),
-        "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
+        "Number of polygons in TriangulatedSurface2D from grid is not "
         "correct." );
 
     geode::Logger::debug( "Triangulated surface from created RegularGrid" );
@@ -146,8 +149,8 @@ void triangulate_surface()
     builder->create_polygon( polygon );
     geode::triangulate_surface_mesh( *surface, *builder );
     geode::save_polygonal_surface( *surface, "triangulated_surface.og_psf3d" );
-    OPENGEODE_EXCEPTION( surface->nb_polygons() == 9,
-        "[Test] Number of polygons in TriangulatedSurface3D is not correct: ",
+    geode::OpenGeodeMeshException::test( surface->nb_polygons() == 9,
+        "Number of polygons in TriangulatedSurface3D is not correct: ",
         surface->nb_polygons() );
 }
 

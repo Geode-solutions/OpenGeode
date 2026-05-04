@@ -33,40 +33,40 @@ void test()
     {
         range1.push_back( i );
     }
-    OPENGEODE_EXCEPTION(
-        range1.front() == 0, "[Test] Wrong Range first item (1)" );
-    OPENGEODE_EXCEPTION(
-        range1.back() == 9, "[Test] Wrong Range last item (1)" );
+    geode::OpenGeodeBasicException::test(
+        range1.front() == 0, "Wrong Range first item (1)" );
+    geode::OpenGeodeBasicException::test(
+        range1.back() == 9, "Wrong Range last item (1)" );
 
     std::vector< geode::index_t > range2;
     for( const auto i : geode::Range{ 3, 10 } )
     {
         range2.push_back( i );
     }
-    OPENGEODE_EXCEPTION(
-        range2.front() == 3, "[Test] Wrong Range first item (2)" );
-    OPENGEODE_EXCEPTION(
-        range2.back() == 9, "[Test] Wrong Range last item (2)" );
+    geode::OpenGeodeBasicException::test(
+        range2.front() == 3, "Wrong Range first item (2)" );
+    geode::OpenGeodeBasicException::test(
+        range2.back() == 9, "Wrong Range last item (2)" );
 
     std::vector< geode::index_t > reverse_range1;
     for( const auto i : geode::ReverseRange{ 10 } )
     {
         reverse_range1.push_back( i );
     }
-    OPENGEODE_EXCEPTION( reverse_range1.front() == 9,
-        "[Test] Wrong ReverseRange first item (1)" );
-    OPENGEODE_EXCEPTION(
-        reverse_range1.back() == 0, "[Test] Wrong ReverseRange last item (2)" );
+    geode::OpenGeodeBasicException::test(
+        reverse_range1.front() == 9, "Wrong ReverseRange first item (1)" );
+    geode::OpenGeodeBasicException::test(
+        reverse_range1.back() == 0, "Wrong ReverseRange last item (2)" );
 
     std::vector< geode::index_t > reverse_range2;
     for( const auto i : geode::ReverseRange{ 10, 3 } )
     {
         reverse_range2.push_back( i );
     }
-    OPENGEODE_EXCEPTION( reverse_range2.front() == 9,
-        "[Test] Wrong ReverseRange first item (1)" );
-    OPENGEODE_EXCEPTION(
-        reverse_range2.back() == 3, "[Test] Wrong ReverseRange last item (2)" );
+    geode::OpenGeodeBasicException::test(
+        reverse_range2.front() == 9, "Wrong ReverseRange first item (1)" );
+    geode::OpenGeodeBasicException::test(
+        reverse_range2.back() == 3, "Wrong ReverseRange last item (2)" );
 
     struct Foo
     {
@@ -94,7 +94,8 @@ void test()
     {
         geode::Logger::info( i.double_, " # ", i.int_ );
     }
-    OPENGEODE_EXCEPTION( foos.empty(), "[Test] EraserRange should clean data" );
+    geode::OpenGeodeBasicException::test(
+        foos.empty(), "EraserRange should clean data" );
 }
 
 OPENGEODE_TEST( "range" )

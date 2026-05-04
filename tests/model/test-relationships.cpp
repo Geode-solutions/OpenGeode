@@ -100,33 +100,35 @@ void test_uuid( const geode::Relationships& relations,
     geode::index_t nb_items,
     geode::index_t nb_collections )
 {
-    OPENGEODE_EXCEPTION( relations.nb_boundaries( uuid ) == nb_boundaries,
-        "[Test] ", uuid.string(), " should have ", nb_boundaries,
-        " boundary(ies)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_boundaries( uuid ) == nb_boundaries, "", uuid.string(),
+        " should have ", nb_boundaries, " boundary(ies)" );
 
-    OPENGEODE_EXCEPTION( relations.nb_incidences( uuid ) == nb_incidences,
-        "[Test] ", uuid.string(), " should have ", nb_incidences,
-        " incidence(s)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_incidences( uuid ) == nb_incidences, "", uuid.string(),
+        " should have ", nb_incidences, " incidence(s)" );
 
-    OPENGEODE_EXCEPTION( relations.nb_internals( uuid ) == nb_internals,
-        "[Test] ", uuid.string(), " should have ", nb_internals,
-        " internal component(s)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_internals( uuid ) == nb_internals, "", uuid.string(),
+        " should have ", nb_internals, " internal component(s)" );
 
-    OPENGEODE_EXCEPTION( relations.nb_embeddings( uuid ) == nb_embeddings,
-        "[Test] ", uuid.string(), " should have ", nb_embeddings,
-        " embedding(s)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_embeddings( uuid ) == nb_embeddings, "", uuid.string(),
+        " should have ", nb_embeddings, " embedding(s)" );
 
-    OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, "[Test] ",
-        uuid.string(), " should have ", nb_boundaries, " item(s)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_items( uuid ) == nb_items, "", uuid.string(),
+        " should have ", nb_boundaries, " item(s)" );
 
-    OPENGEODE_EXCEPTION( relations.nb_collections( uuid ) == nb_collections,
-        "[Test] ", uuid.string(), " should have ", nb_collections,
-        " collection(s)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_collections( uuid ) == nb_collections, "", uuid.string(),
+        " should have ", nb_collections, " collection(s)" );
 
     const auto total = nb_boundaries + nb_incidences + nb_internals
                        + nb_embeddings + nb_items + nb_collections;
-    OPENGEODE_EXCEPTION( relations.nb_relations( uuid ) == total, "[Test] ",
-        uuid.string(), " should have ", total, " relation(s)" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_relations( uuid ) == total, "", uuid.string(),
+        " should have ", total, " relation(s)" );
 }
 
 void test_relations( const geode::Relationships& relations,
@@ -138,36 +140,43 @@ void test_relations( const geode::Relationships& relations,
     test_uuid( relations, uuids[3], 1, 1, 0, 0, 0, 1 );
     test_uuid( relations, uuids[4], 0, 0, 0, 0, 5, 0 );
     test_uuid( relations, uuids[5], 0, 1, 0, 1, 0, 1 );
-    OPENGEODE_EXCEPTION( relations.is_boundary( uuids[1], uuids[0] ),
-        "[Test] uuids[0] should be boundary of uuids[1]" );
-    OPENGEODE_EXCEPTION( !relations.is_boundary( uuids[0], uuids[1] ),
-        "[Test] uuids[0] should not be boundary of uuids[1]" );
-    OPENGEODE_EXCEPTION( relations.is_internal( uuids[2], uuids[0] ),
-        "[Test] uuids[0] should be internal of uuids[1]" );
-    OPENGEODE_EXCEPTION( relations.is_item( uuids[0], uuids[4] ),
-        "[Test] uuids[0] should be item of uuids[4]" );
+    geode::OpenGeodeModelException::test(
+        relations.is_boundary( uuids[1], uuids[0] ),
+        "uuids[0] should be boundary of uuids[1]" );
+    geode::OpenGeodeModelException::test(
+        !relations.is_boundary( uuids[0], uuids[1] ),
+        "uuids[0] should not be boundary of uuids[1]" );
+    geode::OpenGeodeModelException::test(
+        relations.is_internal( uuids[2], uuids[0] ),
+        "uuids[0] should be internal of uuids[1]" );
+    geode::OpenGeodeModelException::test(
+        relations.is_item( uuids[0], uuids[4] ),
+        "uuids[0] should be item of uuids[4]" );
 }
 
 void test_attributes( const geode::Relationships& relations,
     absl::Span< const geode::uuid > uuids )
 {
-    OPENGEODE_EXCEPTION( relations.relation_index( uuids[0], uuids[1] ) == 0,
-        "[Test] Wrong relation index from uuids" );
+    geode::OpenGeodeModelException::test(
+        relations.relation_index( uuids[0], uuids[1] ) == 0,
+        "Wrong relation index from uuids" );
     const auto output = relations.relation_from_index( 0 );
-    OPENGEODE_EXCEPTION( std::get< 0 >( output ).id() == uuids[1],
-        "[Test] Wrong relation uuids from index" );
-    OPENGEODE_EXCEPTION( std::get< 1 >( output ).id() == uuids[0],
-        "[Test] Wrong relation uuids from index" );
+    geode::OpenGeodeModelException::test(
+        std::get< 0 >( output ).id() == uuids[1],
+        "Wrong relation uuids from index" );
+    geode::OpenGeodeModelException::test(
+        std::get< 1 >( output ).id() == uuids[0],
+        "Wrong relation uuids from index" );
     auto relation_att =
         relations.relation_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, int >(
                 "int", 0 );
     relation_att->set_value( 0, 1 );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeModelException::test(
         relation_att->value(
             relations.relation_index( uuids[0], uuids[1] ).value() )
             == 1,
-        "[Test] Wrong relation attribute assignment" );
+        "Wrong relation attribute assignment" );
 }
 
 void test_io(

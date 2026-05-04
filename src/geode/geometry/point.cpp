@@ -191,9 +191,9 @@ namespace geode
     Point< dimension - 1 > Point< dimension >::project_point(
         geode::local_index_t axis_to_remove ) const
     {
-        OPENGEODE_ASSERT( axis_to_remove < dimension && axis_to_remove >= 0,
-            "[Point] Invalid axis to remove" );
-        OPENGEODE_ASSERT(
+        OpenGeodeGeometryException::assertion(
+            axis_to_remove < dimension, "[Point] Invalid axis to remove" );
+        OpenGeodeGeometryException::assertion(
             dimension > 1, "[Point] Invalid dimension to reduce" );
         Point< dimension - 1 > projected_point;
         geode::index_t dim_id{ 0 };
@@ -210,11 +210,11 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Point< dimension >::serialize( Archive &archive )
+    void Point< dimension >::serialize( Archive &serializer )
     {
-        archive.ext( *this,
-            Growable< Archive, Point >{ { []( Archive &a, Point &point ) {
-                a.container8b( point.values_ );
+        serializer.ext( *this,
+            Growable< Archive, Point >{ { []( Archive &archive, Point &point ) {
+                archive.container8b( point.values_ );
             } } } );
     }
 

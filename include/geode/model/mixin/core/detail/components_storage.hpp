@@ -100,7 +100,9 @@ namespace geode
                 Serializer archive{ context, file };
                 archive.object( *this );
                 archive.adapter().flush();
-                OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+                OpenGeodeModelException::check(
+                    std::get< 1 >( context ).isValid(), nullptr,
+                    OpenGeodeException::TYPE::internal,
                     "[ComponentsStorage::save_components] Error while writing "
                     "file: ",
                     filename );
@@ -125,10 +127,11 @@ namespace geode
                 Deserializer archive{ context, file };
                 archive.object( *this );
                 const auto& adapter = archive.adapter();
-                OPENGEODE_EXCEPTION(
+                OpenGeodeModelException::check(
                     adapter.error() == bitsery::ReaderError::NoError
                         && adapter.isCompletedSuccessfully()
                         && std::get< 1 >( context ).isValid(),
+                    nullptr, OpenGeodeException::TYPE::internal,
                     "[ComponentsStorage::load_components] Error while reading "
                     "file: ",
                     filename );
@@ -156,18 +159,19 @@ namespace geode
         private:
             friend class bitsery::Access;
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, ComponentsStorage >{
-                        { []( Archive& a, ComponentsStorage& storage ) {
-                            a.ext( storage.components_,
+                        { []( Archive& archive, ComponentsStorage& storage ) {
+                            archive.ext( storage.components_,
                                 bitsery::ext::StdMap{
                                     storage.components_.max_size() },
-                                []( Archive& a2, uuid& id,
+                                []( Archive& archive2, uuid& id,
                                     ComponentPtr& item ) {
-                                    a2.object( id );
-                                    a2.ext( item, bitsery::ext::StdSmartPtr{} );
+                                    archive2.object( id );
+                                    archive2.ext(
+                                        item, bitsery::ext::StdSmartPtr{} );
                                 } );
                         } } } );
             }

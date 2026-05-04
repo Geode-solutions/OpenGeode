@@ -33,52 +33,52 @@
 
 void check_brep_prism( const geode::BRep& brep )
 {
-    OPENGEODE_EXCEPTION( brep.nb_corners() == 7,
-        "[Test] Filtered prism model has ", brep.nb_corners(),
+    geode::OpenGeodeModelException::test( brep.nb_corners() == 7,
+        "Filtered prism model has ", brep.nb_corners(),
         " Corners, should have 7 Corners" );
-    OPENGEODE_EXCEPTION( brep.nb_lines() == 10,
-        "[Test] Filtered prism model has ", brep.nb_lines(),
+    geode::OpenGeodeModelException::test( brep.nb_lines() == 10,
+        "Filtered prism model has ", brep.nb_lines(),
         " Lines, should have 10 Lines" );
-    OPENGEODE_EXCEPTION( brep.nb_surfaces() == 5,
-        "[Test] Filtered prism model has ", brep.nb_surfaces(),
+    geode::OpenGeodeModelException::test( brep.nb_surfaces() == 5,
+        "Filtered prism model has ", brep.nb_surfaces(),
         " Surfaces, should have 5 Surfaces" );
-    OPENGEODE_EXCEPTION( brep.nb_blocks() == 1,
-        "[Test] Filtered prism model has ", brep.nb_blocks(),
+    geode::OpenGeodeModelException::test( brep.nb_blocks() == 1,
+        "Filtered prism model has ", brep.nb_blocks(),
         " Blocks, should have 1 Block" );
 }
 
 void check_brep_dangling( const geode::BRep& brep )
 {
-    OPENGEODE_EXCEPTION( brep.nb_corners() == 8,
-        "[Test] Filtered dangling model has ", brep.nb_corners(),
+    geode::OpenGeodeModelException::test( brep.nb_corners() == 8,
+        "Filtered dangling model has ", brep.nb_corners(),
         " Corners, should have 8 Corners" );
-    OPENGEODE_EXCEPTION( brep.nb_lines() == 12,
-        "[Test] Filtered dangling model has ", brep.nb_lines(),
+    geode::OpenGeodeModelException::test( brep.nb_lines() == 12,
+        "Filtered dangling model has ", brep.nb_lines(),
         " Lines, should have 12 Lines" );
-    OPENGEODE_EXCEPTION( brep.nb_surfaces() == 6,
-        "[Test] Filtered dangling model has ", brep.nb_surfaces(),
+    geode::OpenGeodeModelException::test( brep.nb_surfaces() == 6,
+        "Filtered dangling model has ", brep.nb_surfaces(),
         " Surfaces, should have 6 Surfaces" );
-    OPENGEODE_EXCEPTION( brep.nb_blocks() == 1,
-        "[Test] Filtered dangling model has ", brep.nb_blocks(),
+    geode::OpenGeodeModelException::test( brep.nb_blocks() == 1,
+        "Filtered dangling model has ", brep.nb_blocks(),
         " Blocks, should have 1 Block" );
 }
 
 void check_brep_dangling_with_inactive_surface( const geode::BRep& brep )
 {
-    OPENGEODE_EXCEPTION( brep.nb_corners() == 8,
-        "[Test] Filtered dangling model has ", brep.nb_corners(),
+    geode::OpenGeodeModelException::test( brep.nb_corners() == 8,
+        "Filtered dangling model has ", brep.nb_corners(),
         " Corners, should have 8 Corners" );
-    OPENGEODE_EXCEPTION( brep.nb_lines() == 12,
-        "[Test] Filtered dangling model has ", brep.nb_lines(),
+    geode::OpenGeodeModelException::test( brep.nb_lines() == 12,
+        "Filtered dangling model has ", brep.nb_lines(),
         " Lines, should have 12 Lines" );
-    OPENGEODE_EXCEPTION( brep.nb_surfaces() == 7,
-        "[Test] Filtered dangling model with inactive surface has ",
+    geode::OpenGeodeModelException::test( brep.nb_surfaces() == 7,
+        "Filtered dangling model with inactive surface has ",
         brep.nb_surfaces(), " Surfaces, should have 7 Surfaces" );
-    OPENGEODE_EXCEPTION( brep.nb_active_surfaces() == 6,
-        "[Test] Filtered dangling model with inactive surface has ",
+    geode::OpenGeodeModelException::test( brep.nb_active_surfaces() == 6,
+        "Filtered dangling model with inactive surface has ",
         brep.nb_active_surfaces(), " Surfaces, should have 6 Surfaces" );
-    OPENGEODE_EXCEPTION( brep.nb_blocks() == 1,
-        "[Test] Filtered dangling model has ", brep.nb_blocks(),
+    geode::OpenGeodeModelException::test( brep.nb_blocks() == 1,
+        "Filtered dangling model has ", brep.nb_blocks(),
         " Blocks, should have 1 Block" );
 }
 
