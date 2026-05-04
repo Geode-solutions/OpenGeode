@@ -213,7 +213,7 @@ namespace geode
     {
         OpenGeodeGeometryException::assertion(
             segment_segment_intersection_detection( segment0, segment1 )
-                == std::pair{ POSITION::parallel, POSITION::parallel },
+                == std::pair( POSITION::parallel, POSITION::parallel ),
             "[colinear_segment_segment_intersection_detection] Given segments "
             "are not colinear" );
         const auto s0_p0_position =

@@ -96,19 +96,19 @@ namespace geode
             }                                                                  \
         }                                                                      \
                                                                                \
-        template < typename... Args >                                          \
-        static void assertion( bool condition, const Args&... message )        \
+        template < typename Condition, typename... Args >                      \
+        static void assertion_check(                                           \
+            Condition&& condition, const Args&... message )                    \
         {                                                                      \
-            if constexpr( !is_debug_build )                                    \
+            if constexpr( is_debug_build )                                     \
             {                                                                  \
-                return;                                                        \
-            }                                                                  \
-            if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
-            {                                                                  \
-                geode::Logger::critical(                                       \
-                    #project_name, " ", #library_name, " assertion failed" );  \
-                geode::Logger::critical( "Message: ", message... );            \
-                exit( 1 );                                                     \
+                if( ABSL_PREDICT_FALSE( !( condition() ) ) )                   \
+                {                                                              \
+                    geode::Logger::critical( #project_name, " ",               \
+                        #library_name, " assertion failed" );                  \
+                    geode::Logger::critical( "Message: ", message... );        \
+                    exit( 1 );                                                 \
+                }                                                              \
             }                                                                  \
         }                                                                      \
                                                                                \
@@ -122,6 +122,13 @@ namespace geode
             }                                                                  \
         }                                                                      \
     }
+
+#define assertion( condition, ... )                                            \
+    assertion_check(                                                           \
+        [&] {                                                                  \
+            return ( condition );                                              \
+        },                                                                     \
+        __VA_ARGS__ )
 
 /*!
  * Use this macro to implement an OpenGeode library in a cpp file (usually

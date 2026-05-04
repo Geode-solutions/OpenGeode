@@ -33,9 +33,9 @@
 
 #ifndef NDEBUG
 #    define OPENGEODE_DEBUG
-inline constexpr bool is_debug_build = false;
-#else
 inline constexpr bool is_debug_build = true;
+#else
+inline constexpr bool is_debug_build = false;
 #endif
 
 #ifdef OPENGEODE_WINDOWS
