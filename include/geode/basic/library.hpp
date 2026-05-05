@@ -80,24 +80,25 @@ namespace geode
         project_name##library_name##Exception(                                 \
             std::any data, TYPE type, const Args&... message )                 \
             : geode::project_name##Exception{ #project_name, #library_name,    \
-                  data, type, message... }                                     \
+                  std::move( data ), type, message... }                        \
         {                                                                      \
         }                                                                      \
                                                                                \
-        template < typename... Args >                                          \
-        static void check(                                                     \
-            bool condition, std::any data, TYPE type, const Args&... message ) \
+        template < typename DataProvider, typename... Args >                   \
+        static void check_impl( bool condition,                                \
+            DataProvider&& data_provider,                                      \
+            TYPE type,                                                         \
+            const Args&... message )                                           \
         {                                                                      \
             if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
             {                                                                  \
-                throw project_name##library_name##Exception{                   \
-                    std::move( data ), type, message...                        \
-                };                                                             \
+                throw project_name##library_name##Exception{ data_provider(),  \
+                    type, message... };                                        \
             }                                                                  \
         }                                                                      \
                                                                                \
         template < typename Condition, typename... Args >                      \
-        static void assertion_check(                                           \
+        static void assertion_impl(                                            \
             Condition&& condition, const Args&... message )                    \
         {                                                                      \
             if constexpr( is_debug_build )                                     \
@@ -124,9 +125,16 @@ namespace geode
     }
 
 #define assertion( condition, ... )                                            \
-    assertion_check(                                                           \
+    assertion_impl(                                                            \
         [&] {                                                                  \
             return ( condition );                                              \
+        },                                                                     \
+        __VA_ARGS__ )
+
+#define check( condition, data, ... )                                          \
+    check_impl( ( condition ),                                                 \
+        [&]() -> std::any {                                                    \
+            return ( data );                                                   \
         },                                                                     \
         __VA_ARGS__ )
 
