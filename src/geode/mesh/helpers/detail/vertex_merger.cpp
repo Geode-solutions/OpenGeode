@@ -70,12 +70,12 @@ namespace geode
 
             index_t vertex_in_merged( index_t mesh, index_t vertex ) const
             {
-                OpenGeodeMeshException::assertion( mesh < meshes_.size(),
+                OpenGeodeMeshException::check_assertion( mesh < meshes_.size(),
                     "[Merger::vertex_in_merged] Wrong mesh index" );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     vertex < meshes_[mesh].get().nb_vertices(),
                     "[Merger::vertex_in_merged] Wrong mesh vertex index" );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     offset_vertices_[mesh] + vertex < vertices_.size(),
                     "[Merger::vertex_in_merged] Wrong global vertex index" );
                 return vertices_[offset_vertices_[mesh] + vertex];

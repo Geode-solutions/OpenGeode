@@ -43,7 +43,7 @@ namespace geode
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
-            OpenGeodeImageException::check( !file.fail(), nullptr,
+            OpenGeodeImageException::check_exception( !file.fail(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[RasterImageInput] Failed to open file: ",
                 to_string( this->filename() ) );
@@ -54,7 +54,7 @@ namespace geode
             RasterImage< dimension > image;
             archive.object( image );
             const auto& adapter = archive.adapter();
-            OpenGeodeImageException::check(
+            OpenGeodeImageException::check_exception(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),

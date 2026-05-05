@@ -106,7 +106,7 @@ namespace
         {
             cell_mesh_vertices[v] = grid.vertex_index( cell_vertices[v] );
         }
-        geode::OpenGeodeMeshException::check(
+        geode::OpenGeodeMeshException::check_exception(
             densification_info.cell_to_barycenter_vertex.contains(
                 cell_indices ),
             grid.cell_barycenter( cell_indices ),

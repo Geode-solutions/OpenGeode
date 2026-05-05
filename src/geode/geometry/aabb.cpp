@@ -68,8 +68,8 @@ namespace geode
     template < index_t dimension >
     const BoundingBox< dimension >& AABBTree< dimension >::bounding_box() const
     {
-        OpenGeodeGeometryException::check( impl_->nb_bboxes() != 0, nullptr,
-            OpenGeodeException::TYPE::data,
+        OpenGeodeGeometryException::check_exception( impl_->nb_bboxes() != 0,
+            nullptr, OpenGeodeException::TYPE::data,
             "[AABBTree::bounding_box] Cannot return "
             "the bounding_box of an empty AABBTree." );
         return impl_->node( Impl::ROOT_INDEX );

@@ -258,18 +258,18 @@ namespace geode
             absl::SleepFor( sleep );
             sleep = std::min( sleep * 2., MAX_SLEEP );
         }
-        OpenGeodeBasicException::check( generated, nullptr,
+        OpenGeodeBasicException::check_exception( generated, nullptr,
             OpenGeodeException::TYPE::internal,
             "[uuid] could not generate uuid" );
     }
 
     uuid::uuid( std::string_view string )
     {
-        OpenGeodeBasicException::check( string.size() == 36, nullptr,
+        OpenGeodeBasicException::check_exception( string.size() == 36, nullptr,
             OpenGeodeException::TYPE::internal, "[uuid] wrong string size" );
-        OpenGeodeBasicException::check( string[8] == '-' && string[13] == '-'
-                                            && string[18] == '-'
-                                            && string[23] == '-',
+        OpenGeodeBasicException::check_exception(
+            string[8] == '-' && string[13] == '-' && string[18] == '-'
+                && string[23] == '-',
             nullptr, OpenGeodeException::TYPE::internal,
             "[uuid] unknown string format" );
         std::sscanf( to_string( string ).c_str(),

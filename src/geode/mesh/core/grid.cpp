@@ -182,8 +182,8 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto diff = vertex_id[d] - cell_id[d];
-                OpenGeodeMeshException::check( diff == 0 || diff == 1, nullptr,
-                    OpenGeodeException::TYPE::data,
+                OpenGeodeMeshException::check_exception( diff == 0 || diff == 1,
+                    nullptr, OpenGeodeException::TYPE::data,
                     "[Grid::cell_local_vertex] vertex [", vertex_id[0], ",",
                     vertex_id[1], "] is not part of cell [", cell_id[0], ",",
                     cell_id[1], "] vertices." );
@@ -371,7 +371,7 @@ namespace geode
             cells_length_ = std::move( cells_length );
             for( const auto direction : LRange{ dimension } )
             {
-                OpenGeodeMeshException::check(
+                OpenGeodeMeshException::check_exception(
                     cells_length_[direction] > GLOBAL_EPSILON, nullptr,
                     OpenGeodeException::TYPE::data,
                     "[Grid] Creation of a grid with a cell length smaller than "
@@ -384,7 +384,7 @@ namespace geode
                 nb_vertices_double *= static_cast< double >(
                     grid.nb_cells_in_direction( d ) + 1 );
             }
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 nb_vertices_double < static_cast< double >(
                     std::numeric_limits< index_t >::max() ),
                 nullptr, OpenGeodeException::TYPE::data,

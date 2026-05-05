@@ -67,7 +67,7 @@ namespace geode
             index_t facet_vertex_id,
             index_t new_vertex_id )
     {
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             facet_vertex_id < facet_vertices.size(),
             "[SolidFacetsBuilder::update_facet_vertex] "
             "Accessing an invalid vertex in facet" );
@@ -93,8 +93,8 @@ namespace geode
     void SolidFacetsBuilder< dimension >::copy(
         const SolidFacets< dimension >& facets )
     {
-        OpenGeodeMeshException::check( facets_->nb_facets() == 0, nullptr,
-            OpenGeodeException::TYPE::data,
+        OpenGeodeMeshException::check_exception( facets_->nb_facets() == 0,
+            nullptr, OpenGeodeException::TYPE::data,
             "[SolidFacetsBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         facets_->overwrite_facets( facets, {} );

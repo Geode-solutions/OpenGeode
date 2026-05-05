@@ -53,7 +53,7 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::copy(
         const PolygonalSurface< dimension >& polygonal_surface )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             polygonal_surface_.nb_vertices() == 0
                 && polygonal_surface_.nb_polygons() == 0,
             nullptr, OpenGeodeException::TYPE::data,

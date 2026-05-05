@@ -66,7 +66,7 @@ namespace
     {
         geode_unused( surface );
         geode_unused( vertex_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             vertex_id < surface.nb_vertices(),
             "[check_vertex_id] Trying to access an invalid vertex" );
     }
@@ -77,7 +77,7 @@ namespace
     {
         geode_unused( surface );
         geode_unused( polygon_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             polygon_id < surface.nb_polygons(),
             "[check_polygon_id] Trying to access an invalid polygon" );
     }
@@ -91,7 +91,7 @@ namespace
         geode_unused( surface );
         geode_unused( polygon_id );
         geode_unused( vertex_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             vertex_id < surface.nb_polygon_vertices( polygon_id ),
             "[check_polygon_vertex_id] Trying to access an invalid polygon "
             "local vertex" );
@@ -105,7 +105,7 @@ namespace
         geode_unused( surface );
         geode_unused( polygon_id );
         geode_unused( edge_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             edge_id < surface.nb_polygon_edges( polygon_id ),
             "[check_polygon_edge_id] Trying to access an invalid polygon local "
             "edge" );
@@ -157,7 +157,7 @@ namespace
         {
             return {};
         }
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             mesh.polygon_vertex( first_polygon.value() ) == vertex_id,
             "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
             "around vertex" );
@@ -168,7 +168,7 @@ namespace
         bool vertex_is_next{ false };
         do
         {
-            geode::OpenGeodeMeshException::assertion(
+            geode::OpenGeodeMeshException::check_assertion(
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex ",
@@ -198,7 +198,7 @@ namespace
         }
         while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
         {
-            geode::OpenGeodeMeshException::assertion(
+            geode::OpenGeodeMeshException::check_assertion(
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex" );
@@ -211,8 +211,9 @@ namespace
                 break;
             }
         }
-        geode::OpenGeodeMeshException::check( safety_count < MAX_SAFETY_COUNT,
-            mesh.point( vertex_id ), geode::OpenGeodeException::TYPE::data,
+        geode::OpenGeodeMeshException::check_exception(
+            safety_count < MAX_SAFETY_COUNT, mesh.point( vertex_id ),
+            geode::OpenGeodeException::TYPE::data,
             "[SurfaceMesh::polygons_around_vertex] Surface ",
             mesh.name().value_or( mesh.id().string() ),
             ": Too many polygons around vertex ", vertex_id, " (",
@@ -317,8 +318,9 @@ namespace geode
         double polygon_minimum_height(
             const SurfaceMesh< dimension >& mesh, index_t polygon_id ) const
         {
-            OpenGeodeMeshException::check( polygon_id < mesh.nb_polygons(),
-                nullptr, OpenGeodeException::TYPE::data,
+            OpenGeodeMeshException::check_exception(
+                polygon_id < mesh.nb_polygons(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[Impl::polygon_minimum_height] Wrong polygon id" );
             const auto polygon = mesh.polygon( polygon_id );
             return polygon.minimum_height();
@@ -386,8 +388,8 @@ namespace geode
 
         void copy_edges( const SurfaceMesh< dimension >& surface ) const
         {
-            OpenGeodeMeshException::check( !are_edges_enabled(), nullptr,
-                OpenGeodeException::TYPE::data,
+            OpenGeodeMeshException::check_exception( !are_edges_enabled(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[SurfaceMesh] Cannot copy edges into mesh where edges are "
                 "already enabled." );
             edges_.reset( new SurfaceEdges< dimension >{} );
@@ -402,16 +404,16 @@ namespace geode
 
         const SurfaceEdges< dimension >& edges() const
         {
-            OpenGeodeMeshException::check( are_edges_enabled(), nullptr,
-                OpenGeodeException::TYPE::data,
+            OpenGeodeMeshException::check_exception( are_edges_enabled(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[SurfaceMesh] Edges should be enabled before accessing them" );
             return *edges_;
         }
 
         SurfaceEdges< dimension >& edges()
         {
-            OpenGeodeMeshException::check( are_edges_enabled(), nullptr,
-                OpenGeodeException::TYPE::data,
+            OpenGeodeMeshException::check_exception( are_edges_enabled(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[SurfaceMesh] Edges should be enabled before accessing them" );
             return *edges_;
         }
@@ -856,8 +858,9 @@ namespace geode
     PolygonEdge SurfaceMesh< dimension >::next_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        OpenGeodeMeshException::check( is_edge_on_border( polygon_edge ),
-            edge_barycenter( polygon_edge ), OpenGeodeException::TYPE::data,
+        OpenGeodeMeshException::check_exception(
+            is_edge_on_border( polygon_edge ), edge_barycenter( polygon_edge ),
+            OpenGeodeException::TYPE::data,
             "[SurfaceMesh::next_on_border] Polygon edge should be on border" );
         auto next_border = next_polygon_edge( polygon_edge );
         while( !is_edge_on_border( next_border ) )
@@ -872,8 +875,9 @@ namespace geode
     PolygonEdge SurfaceMesh< dimension >::previous_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        OpenGeodeMeshException::check( is_edge_on_border( polygon_edge ),
-            edge_barycenter( polygon_edge ), OpenGeodeException::TYPE::data,
+        OpenGeodeMeshException::check_exception(
+            is_edge_on_border( polygon_edge ), edge_barycenter( polygon_edge ),
+            OpenGeodeException::TYPE::data,
             "[SurfaceMesh::previous_on_border] Polygon edge should be on "
             "border" );
         auto previous_border = previous_polygon_edge( polygon_edge );
@@ -920,7 +924,7 @@ namespace geode
     index_t SurfaceMesh< dimension >::polygon_edge_vertex(
         const PolygonEdge& polygon_edge, local_index_t vertex_id ) const
     {
-        OpenGeodeMeshException::assertion( vertex_id < 2,
+        OpenGeodeMeshException::check_assertion( vertex_id < 2,
             "[SurfaceMesh::polygon_edge_vertex] vertex_id should be 0 or 1" );
         const auto edge = polygon_edge.edge_id;
         const auto polygon = polygon_edge.polygon_id;
@@ -1109,7 +1113,7 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > SurfaceMesh< dimension >::bounding_box() const
     {
-        OpenGeodeMeshException::check( nb_vertices() != 0, nullptr,
+        OpenGeodeMeshException::check_exception( nb_vertices() != 0, nullptr,
             OpenGeodeException::TYPE::data,
             "[SurfaceMesh::bounding_box] Cannot return the bounding_box of an "
             "empty surface mesh." );

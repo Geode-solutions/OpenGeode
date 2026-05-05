@@ -88,7 +88,7 @@ namespace geode
     template < index_t dimension >
     BoundingBox< dimension > PointSet< dimension >::bounding_box() const
     {
-        OpenGeodeMeshException::check( nb_vertices() != 0, nullptr,
+        OpenGeodeMeshException::check_exception( nb_vertices() != 0, nullptr,
             OpenGeodeException::TYPE::data,
             "[PointSet::bounding_box] Cannot return the bounding_box of an "
             "empty point set." );

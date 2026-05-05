@@ -432,7 +432,7 @@ namespace geode
         for( const auto unique_vertex :
             geode::Range{ brep.nb_unique_vertices() } )
         {
-            OpenGeodeModelException::check(
+            OpenGeodeModelException::check_exception(
                 brep.has_component_mesh_vertices(
                     unique_vertex, geode::Block3D::component_type_static() ),
                 unique_vertex, OpenGeodeException::TYPE::data,

@@ -107,7 +107,7 @@ namespace geode
         static float converted_item_value(
             const RGBColor &color, local_index_t item )
         {
-            OpenGeodeImageException::assertion( item < nb_items(),
+            OpenGeodeImageException::check_assertion( item < nb_items(),
                 "[GenericAttributeConversion] Accessing "
                 "incorrect item value" );
             if( item == 0 )

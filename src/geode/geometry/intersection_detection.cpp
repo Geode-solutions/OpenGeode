@@ -211,7 +211,7 @@ namespace geode
     SegmentSegmentIntersection colinear_segment_segment_intersection_detection(
         const Segment2D& segment0, const Segment2D& segment1 )
     {
-        OpenGeodeGeometryException::assertion(
+        OpenGeodeGeometryException::check_assertion(
             segment_segment_intersection_detection( segment0, segment1 )
                 == std::pair( POSITION::parallel, POSITION::parallel ),
             "[colinear_segment_segment_intersection_detection] Given segments "

@@ -140,8 +140,9 @@ namespace geode
     void HybridSolidBuilder< dimension >::copy(
         const HybridSolid< dimension >& hybrid_solid )
     {
-        OpenGeodeMeshException::check( hybrid_solid_.nb_vertices() == 0
-                                           && hybrid_solid_.nb_polyhedra() == 0,
+        OpenGeodeMeshException::check_exception(
+            hybrid_solid_.nb_vertices() == 0
+                && hybrid_solid_.nb_polyhedra() == 0,
             nullptr, OpenGeodeException::TYPE::data,
             "[HybridSolidBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );

@@ -324,8 +324,9 @@ namespace geode
             const AttributeBase::AttributeKey &key )
         {
             const auto attribute_it = attributes_.find( old_name );
-            OpenGeodeBasicException::check( attribute_it != attributes_.end(),
-                nullptr, OpenGeodeException::TYPE::data,
+            OpenGeodeBasicException::check_exception(
+                attribute_it != attributes_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[AttributeManager::rename_attribute] Attribute ", old_name,
                 "does not exist" );
             auto attribute = attribute_it->second;
@@ -338,8 +339,9 @@ namespace geode
             const AttributeProperties &new_properties )
         {
             const auto attribute_it = attributes_.find( attribute_name );
-            OpenGeodeBasicException::check( attribute_it != attributes_.end(),
-                nullptr, OpenGeodeException::TYPE::data,
+            OpenGeodeBasicException::check_exception(
+                attribute_it != attributes_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[AttributeManager::rename_attribute] Attribute ",
                 attribute_name, "does not exist" );
             attribute_it->second->set_properties( new_properties );
@@ -479,7 +481,7 @@ namespace geode
     {
         if( absl::c_find( to_delete, true ) != to_delete.end() )
         {
-            OpenGeodeBasicException::assertion(
+            OpenGeodeBasicException::check_assertion(
                 to_delete.size() == nb_elements(),
                 "[AttributeManager::delete_elements] Vector to_delete should "
                 "have the same size as the number of elements" );

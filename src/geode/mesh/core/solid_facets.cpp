@@ -50,7 +50,8 @@ namespace
     {
         geode_unused( solid );
         geode_unused( facet_id );
-        geode::OpenGeodeMeshException::assertion( facet_id < solid.nb_facets(),
+        geode::OpenGeodeMeshException::check_assertion(
+            facet_id < solid.nb_facets(),
             "[check_facet_id] Trying to access an invalid facet" );
     }
 } // namespace

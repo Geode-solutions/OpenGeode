@@ -46,7 +46,7 @@ namespace
     {
         geode_unused( solid );
         geode_unused( polyhedron_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             polyhedron_id < solid.nb_polyhedra(),
             "[check_polyhedron_id] Trying to access an invalid polyhedron" );
     }
@@ -59,7 +59,7 @@ namespace
         geode_unused( solid );
         geode_unused( polyhedron_id );
         geode_unused( vertex_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
             "[check_polyhedron_vertex_id] Trying to access an invalid "
             "polyhedron vertex" );
@@ -73,7 +73,7 @@ namespace
         geode_unused( solid );
         geode_unused( polyhedron_id );
         geode_unused( facet_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
             "[check_polyhedron_facet_id] Trying to access an invalid "
             "polyhedron facet" );
@@ -90,7 +90,7 @@ namespace
         geode_unused( polyhedron_id );
         geode_unused( facet_id );
         geode_unused( vertex_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             vertex_id < solid.nb_polyhedron_facet_vertices(
                 { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
@@ -205,7 +205,7 @@ namespace
             {
                 const auto new_vertex =
                     vertices_old2new[solid.polyhedron_vertex( { p, v } )];
-                geode::OpenGeodeMeshException::check(
+                geode::OpenGeodeMeshException::check_exception(
                     new_vertex != geode::NO_ID,
                     solid.point( solid.polyhedron_vertex( { p, v } ) ),
                     geode::OpenGeodeException::TYPE::data,
@@ -254,7 +254,7 @@ namespace
                 {
                     const auto it = absl::c_find( vertices,
                         solid.polyhedron_facet_vertex( { { p, f }, v } ) );
-                    geode::OpenGeodeMeshException::assertion(
+                    geode::OpenGeodeMeshException::check_assertion(
                         it != vertices.end(),
                         "[SolidMeshBuilder::copy] Wrong indexing between "
                         "polyhedron_vertex and polyhedron_facet_vertex" );
@@ -463,7 +463,7 @@ namespace geode
                     continue;
                 }
                 const auto old2news = vertices_mapping.in2out( old_vertex_id );
-                OpenGeodeMeshException::assertion( old2news.size() == 1,
+                OpenGeodeMeshException::check_assertion( old2news.size() == 1,
                     "[SolidMeshBuilder::replace_vertices] "
                     "Invalid mapping" );
                 const auto new_vertex_id = old2news[0];
@@ -539,7 +539,7 @@ namespace geode
                 const PolyhedronVertex id{ p, v };
                 const auto new_vertex =
                     old2new[solid_mesh_.polyhedron_vertex( id )];
-                OpenGeodeMeshException::assertion( new_vertex != NO_ID,
+                OpenGeodeMeshException::check_assertion( new_vertex != NO_ID,
                     "[SolidMeshBuilder::update_polyhedron_vertices] No "
                     "more polyhedra with vertices to delete should remain at "
                     "this point" );
@@ -555,7 +555,7 @@ namespace geode
         check_polyhedron_id( solid_mesh_, polyhedron_vertex.polyhedron_id );
         check_polyhedron_vertex_id( solid_mesh_,
             polyhedron_vertex.polyhedron_id, polyhedron_vertex.vertex_id );
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             vertex_id < solid_mesh_.nb_vertices(),
             "[SolidMeshBuilder::update_polyhedron_vertex] Accessing a "
             "vertex that does not exist" );
@@ -611,7 +611,7 @@ namespace geode
             polyhedron_facet_vertices[f].resize( facets[f].size() );
             for( const auto v : Indices{ facets[f] } )
             {
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     facets[f][v] < vertices.size(),
                     "[SolidMeshBuilder::get_polyhedron_facet_vertices] "
                     "Wrong facet definition" );
@@ -632,11 +632,12 @@ namespace geode
     void SolidMeshBuilder< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             polyhedron_vertex.polyhedron_id != NO_ID,
             "[SolidMeshBuilder::associate_polyhedron_vertex_to_vertex] "
             "PolyhedronVertex invalid" );
-        OpenGeodeMeshException::assertion( polyhedron_vertex.vertex_id != NO_ID,
+        OpenGeodeMeshException::check_assertion(
+            polyhedron_vertex.vertex_id != NO_ID,
             "[SolidMeshBuilder::associate_polyhedron_vertex_to_vertex] "
             "PolyhedronVertex invalid" );
         solid_mesh_.associate_polyhedron_vertex_to_vertex(
@@ -693,7 +694,7 @@ namespace geode
         check_polyhedron_id( solid_mesh_, polyhedron_facet.polyhedron_id );
         check_polyhedron_facet_id( solid_mesh_, polyhedron_facet.polyhedron_id,
             polyhedron_facet.facet_id );
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             adjacent_id < solid_mesh_.nb_polyhedra(),
             "[SolidMeshBuilder::set_polyhedron_adjacent] Accessing a "
             "polyhedron that does not exist" );
@@ -933,22 +934,23 @@ namespace geode
     void SolidMeshBuilder< dimension >::copy(
         const SolidMesh< dimension >& solid_mesh )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             solid_mesh_.nb_vertices() == 0 && solid_mesh_.nb_polyhedra() == 0,
             nullptr, OpenGeodeException::TYPE::data,
             "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         if( solid_mesh_.are_edges_enabled() )
         {
-            OpenGeodeMeshException::check( solid_mesh_.edges().nb_edges() == 0,
-                nullptr, OpenGeodeException::TYPE::data,
+            OpenGeodeMeshException::check_exception(
+                solid_mesh_.edges().nb_edges() == 0, nullptr,
+                OpenGeodeException::TYPE::data,
                 "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "
                 "initialized mesh." );
             solid_mesh_.disable_edges();
         }
         if( solid_mesh_.are_facets_enabled() )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 solid_mesh_.facets().nb_facets() == 0, nullptr,
                 OpenGeodeException::TYPE::data,
                 "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "

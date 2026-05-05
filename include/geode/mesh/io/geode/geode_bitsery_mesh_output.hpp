@@ -39,7 +39,7 @@
                                                                                \
     std::vector< std::string > write( const Mesh& mesh ) const final           \
     {                                                                          \
-        geode::OpenGeodeMeshException::check(                                  \
+        geode::OpenGeodeMeshException::check_exception(                        \
             mesh.impl_name() == OpenGeode##Mesh::impl_name_static(), nullptr,  \
             geode::OpenGeodeException::TYPE::data, "[Bitsery] Cannot save ",   \
             mesh.type_name().get(), " in native format because it is not ",    \
@@ -52,7 +52,7 @@
         Serializer archive{ context, file };                                   \
         archive.object( dynamic_cast< const OpenGeode##Mesh& >( mesh ) );      \
         archive.adapter().flush();                                             \
-        geode::OpenGeodeMeshException::check(                                  \
+        geode::OpenGeodeMeshException::check_exception(                        \
             std::get< 1 >( context ).isValid(), nullptr,                       \
             geode::OpenGeodeException::TYPE::internal,                         \
             "[Bitsery::write] Error while writing file: ", this->filename() ); \

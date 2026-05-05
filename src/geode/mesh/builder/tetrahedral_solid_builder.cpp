@@ -58,7 +58,7 @@ namespace geode
         absl::Span< const std::vector< local_index_t > > facets )
     {
         geode_unused( facets );
-        OpenGeodeMeshException::assertion( vertices.size() == 4,
+        OpenGeodeMeshException::check_assertion( vertices.size() == 4,
             "[TetrahedralSolidBuilder::do_create_"
             "polyhedron] Only tetrahedra are handled" );
         std::array< index_t, 4 > tetrahedron_vertices;
@@ -111,7 +111,7 @@ namespace geode
     void TetrahedralSolidBuilder< dimension >::copy(
         const TetrahedralSolid< dimension >& tetrahedral_solid )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             tetrahedral_solid_.nb_vertices() == 0
                 && tetrahedral_solid_.nb_polyhedra() == 0,
             nullptr, OpenGeodeException::TYPE::data,

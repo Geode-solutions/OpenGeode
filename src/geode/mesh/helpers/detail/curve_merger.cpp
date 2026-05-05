@@ -85,10 +85,10 @@ namespace geode
                 index_t edge ) const
             {
                 geode_unused( merger );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     curve < merger.meshes().size(),
                     "[EdgedCurveMerger::edge_in_merged] Wrong curve index" );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     edge < merger.meshes()[curve].get().nb_edges(),
                     "[EdgedCurveMerger::edge_in_merged] Wrong curve edge "
                     "index" );
@@ -158,14 +158,14 @@ namespace geode
                         {
                             const auto edge_id = merger.builder().create_edge(
                                 vertices[0], vertices[1] );
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 edge_id == curve_id_.size(),
                                 "[EdgedCurveMerger::create_edges] Issue in "
                                 "edge database (curve_id_)" );
                             curve_id_.emplace_back();
                             curve_id_.back().insert( s );
                             new_id_[s][e] = edge_id;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 edge_id == edges_origins_.size(),
                                 "[EdgedCurveMerger::create_edges] Issue in "
                                 "edge database (edges_origins_)" );
@@ -175,13 +175,13 @@ namespace geode
                         else
                         {
                             const auto edge_id = it.first->second;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 edge_id < curve_id_.size(),
                                 "[EdgedCurveMerger::create_edges] Issue in "
                                 "edge database (curve_id_)" );
                             curve_id_[edge_id].insert( s );
                             new_id_[s][e] = edge_id;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 edge_id < edges_origins_.size(),
                                 "[EdgedCurveMerger::create_edges] Issue in "
                                 "edge database (edges_origins_)" );

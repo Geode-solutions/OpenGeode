@@ -89,8 +89,9 @@ namespace
         {
             auto tri_surface =
                 geode::convert_surface_mesh_into_triangulated_surface( mesh );
-            geode::OpenGeodeModelException::check( tri_surface.has_value(),
-                nullptr, geode::OpenGeodeException::TYPE::internal,
+            geode::OpenGeodeModelException::check_exception(
+                tri_surface.has_value(), nullptr,
+                geode::OpenGeodeException::TYPE::internal,
                 "[do_convert_surface] Cannot convert SurfaceMesh "
                 "to TriangulatedSurface" );
             builder.update_surface_mesh(
@@ -134,7 +135,7 @@ namespace
         const geode::Block3D& block,
         const geode::MeshType& mesh_type )
     {
-        geode::OpenGeodeModelException::check(
+        geode::OpenGeodeModelException::check_exception(
             mesh_type == geode::TetrahedralSolid3D::type_name_static()
                 || mesh_type == geode::HybridSolid3D::type_name_static(),
             nullptr, geode::OpenGeodeException::TYPE::data,
@@ -152,8 +153,9 @@ namespace
         {
             auto tet_solid =
                 geode::convert_solid_mesh_into_tetrahedral_solid( mesh );
-            geode::OpenGeodeModelException::check( tet_solid.has_value(),
-                nullptr, geode::OpenGeodeException::TYPE::internal,
+            geode::OpenGeodeModelException::check_exception(
+                tet_solid.has_value(), nullptr,
+                geode::OpenGeodeException::TYPE::internal,
                 "[do_convert_block] Cannot convert "
                 "SolidMesh to TetrahedralSolid" );
             builder.update_block_mesh( block, std::move( tet_solid ).value() );
@@ -162,8 +164,9 @@ namespace
         {
             auto hybrid_solid =
                 geode::convert_solid_mesh_into_hybrid_solid( mesh );
-            geode::OpenGeodeModelException::check( hybrid_solid.has_value(),
-                nullptr, geode::OpenGeodeException::TYPE::internal,
+            geode::OpenGeodeModelException::check_exception(
+                hybrid_solid.has_value(), nullptr,
+                geode::OpenGeodeException::TYPE::internal,
                 "[do_convert_block] Cannot convert SolidMesh to HybridSolid" );
             builder.update_block_mesh(
                 block, std::move( hybrid_solid ).value() );

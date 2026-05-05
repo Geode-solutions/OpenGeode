@@ -540,7 +540,7 @@ namespace
         const geode::Segment2D& segment,
         const std::array< geode::Grid2D::CellsAroundVertex, 2 > vertex_cells )
     {
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             segment.length() > geode::GLOBAL_EPSILON,
             "[conservative_voxelization_segment] Segment should be longer than "
             "epsilon" );
@@ -1048,8 +1048,9 @@ namespace
             const auto k = value.first.second;
             auto& i_values = value.second;
             absl::c_sort( i_values );
-            geode::OpenGeodeMeshException::check( i_values.size() % 2 == 0,
-                nullptr, geode::OpenGeodeException::TYPE::internal,
+            geode::OpenGeodeMeshException::check_exception(
+                i_values.size() % 2 == 0, nullptr,
+                geode::OpenGeodeException::TYPE::internal,
                 "[rasterize_closed_surface] Wrong number of intervals to "
                 "paint" );
             bool paint{ true };
@@ -1080,7 +1081,7 @@ namespace geode
     {
         const auto start = grid.cells( segment.vertices().front() );
         const auto end = grid.cells( segment.vertices().back() );
-        OpenGeodeMeshException::check( !start.empty() && !end.empty(),
+        OpenGeodeMeshException::check_exception( !start.empty() && !end.empty(),
             segment.barycenter(), OpenGeodeException::TYPE::data,
             "[rasterize_segment] Segment is not included in the given Grid" );
         if( start == end )
@@ -1114,7 +1115,7 @@ namespace geode
         for( const auto v : LRange{ 2 } )
         {
             vertex_cells[v] = grid.cells( vertices[v] );
-            OpenGeodeMeshException::check( !vertex_cells[v].empty(),
+            OpenGeodeMeshException::check_exception( !vertex_cells[v].empty(),
                 segment.barycenter(), OpenGeodeException::TYPE::data,
                 "[conservative_rasterize_segment] Segment is "
                 "not included in the given Grid" );
@@ -1136,7 +1137,7 @@ namespace geode
         for( const auto v : LRange{ 3 } )
         {
             vertex_cells[v] = grid.cells( vertices[v].get() );
-            OpenGeodeMeshException::check( !vertex_cells[v].empty(),
+            OpenGeodeMeshException::check_exception( !vertex_cells[v].empty(),
                 triangle.barycenter(), OpenGeodeException::TYPE::data,
                 "[conservative_rasterize_triangle] Triangle is not included in "
                 "the given Grid" );

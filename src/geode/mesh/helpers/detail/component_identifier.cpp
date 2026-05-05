@@ -73,7 +73,7 @@ namespace geode
 
             index_t identifier( index_t element ) const
             {
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     element < identification_.size(),
                     "[Propagator::identifier] Wrong element index required" );
                 return identification_[element];

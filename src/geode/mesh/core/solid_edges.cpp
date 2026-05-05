@@ -49,7 +49,8 @@ namespace
     {
         geode_unused( solid );
         geode_unused( edge_id );
-        geode::OpenGeodeMeshException::assertion( edge_id < solid.nb_edges(),
+        geode::OpenGeodeMeshException::check_assertion(
+            edge_id < solid.nb_edges(),
             "[check_edge_id] Trying to access an invalid edge" );
     }
 

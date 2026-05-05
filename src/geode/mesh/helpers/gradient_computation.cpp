@@ -92,13 +92,13 @@ namespace
         void initialize_attribute_and_name(
             std::string_view scalar_function_name )
         {
-            geode::OpenGeodeMeshException::check(
+            geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_exists(
                     scalar_function_name ),
                 nullptr, geode::OpenGeodeException::TYPE::data,
                 "[compute_scalar_function_gradient] No attribute exists with "
                 "given name." );
-            geode::OpenGeodeMeshException::check(
+            geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_type(
                     scalar_function_name )
                     == typeid( double ).name(),

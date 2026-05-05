@@ -73,7 +73,7 @@ namespace geode
         {
             const auto result =
                 mappings.try_emplace( type, std::move( mapping ) );
-            OpenGeodeModelException::check( result.second, nullptr,
+            OpenGeodeModelException::check_exception( result.second, nullptr,
                 OpenGeodeException::TYPE::data,
                 "[ModelMapping::emplace] A mapping with the given "
                 "ComponentType is already present, cannot emplace another." );

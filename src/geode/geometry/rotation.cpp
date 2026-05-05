@@ -88,7 +88,7 @@ namespace geode
     Point3D opengeode_geometry_api rotate(
         const Point3D& point, const Vector3D& axis, double angle )
     {
-        OpenGeodeGeometryException::check(
+        OpenGeodeGeometryException::check_exception(
             axis.length2() > geode::GLOBAL_EPSILON, point,
             OpenGeodeBasicException::TYPE::data,
             "[rotate] Given axis is almost null" );
@@ -114,7 +114,7 @@ namespace geode
             result.set_value( i, matrix[i].dot( quat_point ) );
         }
 
-        OpenGeodeGeometryException::check(
+        OpenGeodeGeometryException::check_exception(
             std::fabs( result.value( 3 ) ) > GLOBAL_EPSILON, point,
             OpenGeodeBasicException::TYPE::internal,
             "[rotate] Error in computation" );

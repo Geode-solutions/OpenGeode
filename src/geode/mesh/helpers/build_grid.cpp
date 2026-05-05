@@ -46,8 +46,8 @@ namespace geode
             numerator *= diagonal.value( d );
             nb_grid_extensions++;
         }
-        OpenGeodeMeshException::check( nb_grid_extensions != 0, nullptr,
-            OpenGeodeException::TYPE::data,
+        OpenGeodeMeshException::check_exception( nb_grid_extensions != 0,
+            nullptr, OpenGeodeException::TYPE::data,
             "[build_grid_from_bbox_target_length_and_maximum_cell_number] "
             "Invalid bbox: ",
             bbox.string() );

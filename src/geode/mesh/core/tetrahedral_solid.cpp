@@ -143,7 +143,8 @@ namespace
                 facet = { adj, f };
                 break;
             }
-            geode::OpenGeodeMeshException::check( facet.polyhedron_id == adj,
+            geode::OpenGeodeMeshException::check_exception(
+                facet.polyhedron_id == adj,
                 solid.edge_barycenter( edge_vertices ),
                 geode::OpenGeodeException::TYPE::data,
                 "[TetrahedralSolid3D::propagate_around_edge] Next "
@@ -203,7 +204,7 @@ namespace geode
             if( solid_vertices[v] != edge_vertices[0]
                 && solid_vertices[v] != edge_vertices[1] )
             {
-                OpenGeodeMeshException::check( count < 2,
+                OpenGeodeMeshException::check_exception( count < 2,
                     this->polyhedron_barycenter( tetrahedron_id ),
                     OpenGeodeException::TYPE::data,
                     "[TetrahedralSolid::edge_incident_facets] Given edge "
@@ -212,7 +213,7 @@ namespace geode
                 count++;
             }
         }
-        OpenGeodeMeshException::check( count == 2,
+        OpenGeodeMeshException::check_exception( count == 2,
             this->polyhedron_barycenter( tetrahedron_id ),
             OpenGeodeException::TYPE::data,
             "[TetrahedralSolid::edge_incident_facets] Given tetrahedron has "
@@ -270,7 +271,7 @@ namespace geode
                 opposite_facets[1] = { vertex.polyhedron_id, vertex.vertex_id };
             }
         }
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             opposite_facets[0].facet_id != NO_LID
                 && opposite_facets[1].facet_id != NO_LID,
             this->polyhedron_barycenter( tetrahedron_id ),

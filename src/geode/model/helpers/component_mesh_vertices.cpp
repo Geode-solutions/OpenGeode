@@ -47,7 +47,7 @@ namespace
         {
             if( compare( cmv, previous ) )
             {
-                geode::OpenGeodeModelException::check(
+                geode::OpenGeodeModelException::check_exception(
                     cmv.vertex != previous.vertex, nullptr,
                     geode::OpenGeodeException::TYPE::data,
                     "[component_mesh_vertex_pairs] Vertices should be "

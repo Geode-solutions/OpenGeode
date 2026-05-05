@@ -44,7 +44,7 @@ namespace geode
             Point< point_dimension > value )
             : solid_( solid )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 !solid_.vertex_attribute_manager().attribute_exists(
                     function_name ),
                 nullptr, OpenGeodeException::TYPE::data,
@@ -62,7 +62,7 @@ namespace geode
             std::string_view function_name )
             : solid_( solid )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 solid_.vertex_attribute_manager().attribute_exists(
                     function_name ),
                 nullptr, OpenGeodeException::TYPE::data,

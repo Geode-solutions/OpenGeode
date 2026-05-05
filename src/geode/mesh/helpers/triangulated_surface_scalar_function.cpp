@@ -44,7 +44,7 @@ namespace geode
             double value )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 !surface_.vertex_attribute_manager().attribute_exists(
                     function_name ),
                 nullptr, OpenGeodeException::TYPE::data,
@@ -61,7 +61,7 @@ namespace geode
             std::string_view function_name )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 surface_.vertex_attribute_manager().attribute_exists(
                     function_name ),
                 nullptr, OpenGeodeException::TYPE::data,

@@ -238,7 +238,7 @@ namespace
         }
         else if( facets_block_vertices.size() >= 2 )
         {
-            geode::OpenGeodeModelException::assertion(
+            geode::OpenGeodeModelException::check_assertion(
                 polygon_unique_vertices_cycle.is_opposite(
                     geode::detail::OrientedVertexCycle<
                         geode::PolygonVertices >{
@@ -276,7 +276,7 @@ namespace
                 const auto unique_vertex_in_facet =
                     static_cast< geode::index_t >(
                         std::distance( facet_uvertices.begin(), it ) );
-                geode::OpenGeodeModelException::check(
+                geode::OpenGeodeModelException::check_exception(
                     unique_vertex_in_facet != facet_uvertices.size(), nullptr,
                     geode::OpenGeodeException::TYPE::data,
                     "[block_vertices_from_surface_polygon] Could not find a "
@@ -420,7 +420,7 @@ namespace
             return std::make_tuple( std::move( surface_edges_vertices ),
                 std::move( surface_edges_unique_vertices ), true );
         }
-        geode::OpenGeodeModelException::assertion(
+        geode::OpenGeodeModelException::check_assertion(
             edge_unique_vertices[0]
                     == surface_edges_unique_vertices[0].vertices[1]
                 && edge_unique_vertices[1]
@@ -459,7 +459,7 @@ namespace
                 const auto unique_vertex_in_surface_edge =
                     static_cast< geode::index_t >(
                         std::distance( surface_edge_uvertices.begin(), it ) );
-                geode::OpenGeodeModelException::check(
+                geode::OpenGeodeModelException::check_exception(
                     unique_vertex_in_surface_edge
                         != surface_edge_uvertices.size(),
                     nullptr, geode::OpenGeodeException::TYPE::data,

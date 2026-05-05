@@ -85,7 +85,7 @@ namespace geode
         }                                                                      \
                                                                                \
         template < typename DataProvider, typename... Args >                   \
-        static void check_impl( bool condition,                                \
+        static void exception( bool condition,                                 \
             DataProvider&& data_provider,                                      \
             TYPE type,                                                         \
             const Args&... message )                                           \
@@ -98,8 +98,7 @@ namespace geode
         }                                                                      \
                                                                                \
         template < typename Condition, typename... Args >                      \
-        static void assertion_impl(                                            \
-            Condition&& condition, const Args&... message )                    \
+        static void assertion( Condition&& condition, const Args&... message ) \
         {                                                                      \
             if constexpr( is_debug_build )                                     \
             {                                                                  \
@@ -124,15 +123,15 @@ namespace geode
         }                                                                      \
     }
 
-#define assertion( condition, ... )                                            \
-    assertion_impl(                                                            \
+#define check_assertion( condition, ... )                                      \
+    assertion(                                                                 \
         [&] {                                                                  \
             return ( condition );                                              \
         },                                                                     \
         __VA_ARGS__ )
 
-#define check( condition, data, ... )                                          \
-    check_impl( ( condition ),                                                 \
+#define check_exception( condition, data, ... )                                \
+    exception( ( condition ),                                                  \
         [&]() -> std::any {                                                    \
             return ( data );                                                   \
         },                                                                     \

@@ -45,8 +45,9 @@ namespace geode
         [[nodiscard]] Coords< dimension > coords_divide(
             const Coords< dimension > &input, double divider )
         {
-            OpenGeodeGeometryException::check( std::fabs( divider ) > 1e-30,
-                input, OpenGeodeException::TYPE::data,
+            OpenGeodeGeometryException::check_exception(
+                std::fabs( divider ) > 1e-30, input,
+                OpenGeodeException::TYPE::data,
                 "[Point::operator/] Cannot divide Point by something close to "
                 "zero" );
             auto result = input;

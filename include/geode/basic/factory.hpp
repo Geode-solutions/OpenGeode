@@ -92,8 +92,8 @@ namespace geode
         {
             const auto &store = get_store();
             const auto creator = store.find( key );
-            OpenGeodeBasicException::check( creator != store.end(), nullptr,
-                OpenGeodeException::TYPE::data,
+            OpenGeodeBasicException::check_exception( creator != store.end(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[Factory::create] Factory does not "
                 "contain the requested key" );
             return creator->second( std::forward< Args >( args )... );

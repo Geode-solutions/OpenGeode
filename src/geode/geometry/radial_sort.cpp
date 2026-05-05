@@ -111,9 +111,9 @@ namespace
             {
                 sorted[left_id++] = id;
             }
-            geode::OpenGeodeGeometryException::assertion( left_id == right_id,
-                "[RadialSort::recursive_sort] left and "
-                "right ids are different" );
+            geode::OpenGeodeGeometryException::check_assertion(
+                left_id == right_id, "[RadialSort::recursive_sort] left and "
+                                     "right ids are different" );
             sorted[left_id] = result[begin];
             absl::c_copy( sorted, result.begin() + begin );
             const auto left_middle_id = begin + left_id - same.size();

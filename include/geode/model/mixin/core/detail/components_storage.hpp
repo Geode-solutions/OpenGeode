@@ -100,7 +100,7 @@ namespace geode
                 Serializer archive{ context, file };
                 archive.object( *this );
                 archive.adapter().flush();
-                OpenGeodeModelException::check(
+                OpenGeodeModelException::check_exception(
                     std::get< 1 >( context ).isValid(), nullptr,
                     OpenGeodeException::TYPE::internal,
                     "[ComponentsStorage::save_components] Error while writing "
@@ -127,7 +127,7 @@ namespace geode
                 Deserializer archive{ context, file };
                 archive.object( *this );
                 const auto& adapter = archive.adapter();
-                OpenGeodeModelException::check(
+                OpenGeodeModelException::check_exception(
                     adapter.error() == bitsery::ReaderError::NoError
                         && adapter.isCompletedSuccessfully()
                         && std::get< 1 >( context ).isValid(),

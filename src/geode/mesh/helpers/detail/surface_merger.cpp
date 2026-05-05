@@ -114,10 +114,10 @@ namespace geode
                 index_t polygon ) const
             {
                 geode_unused( merger );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     surface < merger.meshes().size(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface index" );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     polygon < merger.meshes()[surface].get().nb_polygons(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface polygon "
                     "index" );
@@ -171,14 +171,14 @@ namespace geode
                         {
                             const auto polygon_id =
                                 merger.builder().create_polygon( vertices );
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polygon_id == surface_id_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (surface_id_)" );
                             surface_id_.emplace_back();
                             surface_id_.back().insert( s );
                             new_id_[s][p] = polygon_id;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polygon_id == polygons_origins_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (polygons_origins_)" );
@@ -188,13 +188,13 @@ namespace geode
                         else
                         {
                             const auto polygon_id = it.first->second;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polygon_id < surface_id_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (surface_id_)" );
                             surface_id_[polygon_id].insert( s );
                             new_id_[s][p] = polygon_id;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polygon_id < polygons_origins_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (polygons_origins_)" );

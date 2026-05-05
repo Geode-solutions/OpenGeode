@@ -292,8 +292,8 @@ namespace geode
         NNSearch< dimension >::colocated_index_mapping(
             const double epsilon ) const
     {
-        OpenGeodeGeometryException::check( epsilon >= GLOBAL_EPSILON, nullptr,
-            OpenGeodeException::TYPE::data,
+        OpenGeodeGeometryException::check_exception( epsilon >= GLOBAL_EPSILON,
+            nullptr, OpenGeodeException::TYPE::data,
             "[NNSearch::colocated_index_mapping] Given epsilon too small, "
             "should be bigger than GLOBAL_EPSILON (i.e. ",
             GLOBAL_EPSILON, ")" );
@@ -307,7 +307,7 @@ namespace geode
     {
         for( const auto d : LRange{ dimension } )
         {
-            OpenGeodeGeometryException::check(
+            OpenGeodeGeometryException::check_exception(
                 epsilons_frame.direction( d ).length() >= GLOBAL_EPSILON,
                 nullptr, OpenGeodeException::TYPE::data,
                 "[NNSearch::colocated_index_mapping] Given epsilon is too "

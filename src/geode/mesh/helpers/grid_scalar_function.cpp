@@ -44,7 +44,7 @@ namespace geode
             double value )
             : grid_( grid )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 !grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
                 nullptr, OpenGeodeException::TYPE::data,
@@ -59,7 +59,7 @@ namespace geode
         Impl( const Grid< dimension >& grid, std::string_view function_name )
             : grid_( grid )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
                 nullptr, OpenGeodeException::TYPE::data,

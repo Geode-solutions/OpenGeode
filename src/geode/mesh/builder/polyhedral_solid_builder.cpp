@@ -53,7 +53,7 @@ namespace geode
     void PolyhedralSolidBuilder< dimension >::copy(
         const PolyhedralSolid< dimension >& polyhedral_solid )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             polyhedral_solid_.nb_vertices() == 0
                 && polyhedral_solid_.nb_polyhedra() == 0,
             nullptr, OpenGeodeException::TYPE::data,

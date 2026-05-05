@@ -45,7 +45,7 @@ namespace
             {
                 const geode::EdgeVertex id{ e, v };
                 const auto new_vertex = old2new[graph.edge_vertex( id )];
-                geode::OpenGeodeMeshException::check(
+                geode::OpenGeodeMeshException::check_exception(
                     new_vertex != geode::NO_ID, nullptr,
                     geode::OpenGeodeException::TYPE::data,
                     "[GraphBuilder::update_edge_vertices] Cannot remove vertex "
@@ -92,14 +92,15 @@ namespace geode
     void GraphBuilder::set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             edge_vertex.edge_id < graph_.nb_edges(),
             "[GraphBuilder::set_edge_vertex] Accessing an edge that does not "
             "exist" );
-        OpenGeodeMeshException::assertion( edge_vertex.vertex_id < 2,
+        OpenGeodeMeshException::check_assertion( edge_vertex.vertex_id < 2,
             "[GraphBuilder::set_edge_vertex] Trying to access an invalid edge "
             "local vertex" );
-        OpenGeodeMeshException::assertion( vertex_id < graph_.nb_vertices(),
+        OpenGeodeMeshException::check_assertion(
+            vertex_id < graph_.nb_vertices(),
             "[GraphBuilder::set_edge_vertex] Accessing a vertex that does not "
             "exist" );
         if( graph_.edge_vertex( edge_vertex ) == vertex_id )
@@ -222,7 +223,7 @@ namespace geode
 
     void GraphBuilder::copy( const Graph& graph )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             graph_.nb_vertices() == 0 && graph_.nb_edges() == 0, nullptr,
             OpenGeodeException::TYPE::data,
             "[GraphBuilder::copy] Cannot copy a mesh into an already "

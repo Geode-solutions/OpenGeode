@@ -113,7 +113,7 @@ namespace geode
                     return NO_ID;
                 }
                 const auto id = it->second;
-                OpenGeodeMeshException::assertion( id != NO_ID,
+                OpenGeodeMeshException::check_assertion( id != NO_ID,
                     "[FacetStorage::remove_facet] Cannot find "
                     "facet from given vertices" );
                 const auto old_count = counter_->value( id );

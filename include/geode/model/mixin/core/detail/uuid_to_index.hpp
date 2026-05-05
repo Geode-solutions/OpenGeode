@@ -79,7 +79,8 @@ namespace geode
                 for( auto& it : uuid2index_ )
                 {
                     const auto new_index = old2new[it.second];
-                    OpenGeodeModelException::assertion( new_index != NO_ID,
+                    OpenGeodeModelException::check_assertion(
+                        new_index != NO_ID,
                         "[UuidToIndex::update] no uuid should be removed" );
                     it.second = new_index;
                 }

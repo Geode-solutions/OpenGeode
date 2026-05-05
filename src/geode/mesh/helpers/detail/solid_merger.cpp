@@ -112,10 +112,10 @@ namespace geode
                 index_t solid,
                 index_t polyhedron ) const
             {
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     solid < merger.meshes().size(),
                     "[SolidMerger::polyhedron_in_merged] Wrong solid index" );
-                OpenGeodeMeshException::assertion(
+                OpenGeodeMeshException::check_assertion(
                     polyhedron < merger.meshes()[solid].get().nb_polyhedra(),
                     "[SolidMerger::polyhedron_in_merged] Wrong solid "
                     "polyhedron index" );
@@ -180,14 +180,14 @@ namespace geode
                             const auto polyhedron_id =
                                 merger.builder().create_polyhedron(
                                     vertices, facets );
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polyhedron_id == solid_id_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (solid_id_)" );
                             solid_id_.emplace_back();
                             solid_id_.back().insert( s );
                             new_id_[s][p] = polyhedron_id;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polyhedron_id == polyhedra_origins_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (polyhedra_origins_)" );
@@ -197,13 +197,13 @@ namespace geode
                         else
                         {
                             const auto polyhedron_id = it.first->second;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polyhedron_id < solid_id_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (solid_id_)" );
                             solid_id_[polyhedron_id].insert( s );
                             new_id_[s][p] = polyhedron_id;
-                            OpenGeodeMeshException::assertion(
+                            OpenGeodeMeshException::check_assertion(
                                 polyhedron_id < polyhedra_origins_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
                                 "polyhedron database (polyhedra_origins_)" );

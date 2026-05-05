@@ -53,7 +53,7 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::do_create_polygon(
         absl::Span< const index_t > vertices )
     {
-        OpenGeodeMeshException::assertion( vertices.size() == 3,
+        OpenGeodeMeshException::check_assertion( vertices.size() == 3,
             "[TriangulatedSurfaceBuilder"
             "::do_create_polygon] Only "
             "triangles are handled" );
@@ -112,7 +112,7 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::copy(
         const TriangulatedSurface< dimension >& triangulated_surface )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             triangulated_surface_.nb_vertices() == 0
                 && triangulated_surface_.nb_polygons() == 0,
             nullptr, OpenGeodeException::TYPE::data,

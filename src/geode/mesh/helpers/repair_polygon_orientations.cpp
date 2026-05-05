@@ -112,8 +112,8 @@ namespace
                                       == reorient_polygon_[adj->polygon_id]
                                 : cur_polygon_reorient
                                       != reorient_polygon_[adj->polygon_id];
-                        geode::OpenGeodeMeshException::check( is_valid,
-                            mesh_.polygon_barycenter( cur_polygon ),
+                        geode::OpenGeodeMeshException::check_exception(
+                            is_valid, mesh_.polygon_barycenter( cur_polygon ),
                             geode::OpenGeodeException::TYPE::data,
                             "[RepairPolygonOrientations] Mobius "
                             "strip detected, polygons orientations "
@@ -186,7 +186,7 @@ namespace
                 area_sign_info.queue.emplace( polygon_id );
             }
         }
-        geode::OpenGeodeMeshException::check(
+        geode::OpenGeodeMeshException::check_exception(
             area_sign_info.queue.size() != mesh.nb_polygons(), mesh.point( 0 ),
             geode::OpenGeodeException::TYPE::data,
             "[repair_polygon_bad_orientations] Cannot repair orientations of a "

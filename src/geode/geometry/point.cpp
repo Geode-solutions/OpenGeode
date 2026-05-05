@@ -191,9 +191,9 @@ namespace geode
     Point< dimension - 1 > Point< dimension >::project_point(
         geode::local_index_t axis_to_remove ) const
     {
-        OpenGeodeGeometryException::assertion(
+        OpenGeodeGeometryException::check_assertion(
             axis_to_remove < dimension, "[Point] Invalid axis to remove" );
-        OpenGeodeGeometryException::assertion(
+        OpenGeodeGeometryException::check_assertion(
             dimension > 1, "[Point] Invalid dimension to reduce" );
         Point< dimension - 1 > projected_point;
         geode::index_t dim_id{ 0 };

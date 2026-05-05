@@ -103,7 +103,7 @@ namespace geode
             const GreyscaleColor &color, local_index_t item )
         {
             geode_unused( item );
-            OpenGeodeImageException::assertion( item < nb_items(),
+            OpenGeodeImageException::check_assertion( item < nb_items(),
                 "[GenericAttributeConversion] Accessing incorrect item value" );
             return static_cast< float >( color.value() );
         }

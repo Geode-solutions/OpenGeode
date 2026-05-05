@@ -49,8 +49,9 @@ namespace geode
 
     void check_keyword( std::ifstream& file, std::string_view keyword )
     {
-        OpenGeodeBasicException::check( line_starts_with( file, keyword ),
-            nullptr, OpenGeodeException::TYPE::data,
+        OpenGeodeBasicException::check_exception(
+            line_starts_with( file, keyword ), nullptr,
+            OpenGeodeException::TYPE::data,
             absl::StrCat( "Line should starts with \"", keyword, "\"" ) );
     }
 

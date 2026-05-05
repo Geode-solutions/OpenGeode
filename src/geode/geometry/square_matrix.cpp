@@ -201,7 +201,7 @@ namespace geode
     SquareMatrix< 2 > opengeode_geometry_api SquareMatrix< 2 >::inverse() const
     {
         const auto det = determinant();
-        OpenGeodeGeometryException::check( det != 0, nullptr,
+        OpenGeodeGeometryException::check_exception( det != 0, nullptr,
             OpenGeodeBasicException::TYPE::data,
             "[SquareMatrix::inverse] Cannot inverse matrix: determinant is "
             "null (given vectors do not form a well-defined base)." );
@@ -218,7 +218,7 @@ namespace geode
     SquareMatrix< 3 > opengeode_geometry_api SquareMatrix< 3 >::inverse() const
     {
         const auto det = determinant();
-        OpenGeodeGeometryException::check( det != 0, nullptr,
+        OpenGeodeGeometryException::check_exception( det != 0, nullptr,
             OpenGeodeBasicException::TYPE::data,
             "[SquareMatrix::inverse] Cannot inverse matrix: determinant is "
             "null (given vectors do not form a well-defined base)." );

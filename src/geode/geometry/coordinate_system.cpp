@@ -38,7 +38,7 @@ namespace
     {
         const auto dot = geode::dot_perpendicular(
             directions[0].normalize(), directions[1].normalize() );
-        geode::OpenGeodeGeometryException::check(
+        geode::OpenGeodeGeometryException::check_exception(
             std::fabs( dot ) > geode::GLOBAL_ANGULAR_EPSILON, nullptr,
             geode::OpenGeodeException::TYPE::data,
             "[CoordinateSystem2D] Could not create a "
@@ -56,7 +56,7 @@ namespace
 
                 const auto normal = vector0.cross( vector1 );
                 const auto length = normal.length();
-                geode::OpenGeodeGeometryException::check(
+                geode::OpenGeodeGeometryException::check_exception(
                     length > geode::GLOBAL_ANGULAR_EPSILON, nullptr,
                     geode::OpenGeodeException::TYPE::data,
                     "[CoordinateSystem3D] Could not create a "

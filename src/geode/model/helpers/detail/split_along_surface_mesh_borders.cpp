@@ -184,7 +184,7 @@ namespace geode
                     const auto& polygon_vertices =
                         info.polygon_vertices[vertex_id];
                     auto nb_polygons_around = polygons_around.size();
-                    OpenGeodeModelException::assertion(
+                    OpenGeodeModelException::check_assertion(
                         nb_polygons_around <= polygon_vertices.size(),
                         "[SplitAlongSurfaceMeshBorders] Wrong size "
                         "comparison" );
@@ -295,7 +295,7 @@ namespace geode
                         break;
                     }
                 }
-                OpenGeodeModelException::assertion(
+                OpenGeodeModelException::check_assertion(
                     !mesh.polygons_around_vertex( vertex_id ).empty(),
                     "[ModelFromMeshBuilder::split_surface_by_lines] Lost "
                     "polygon around vertex" );

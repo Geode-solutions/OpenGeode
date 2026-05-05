@@ -42,7 +42,7 @@ namespace
     {
         geode_unused( surface );
         geode_unused( polygon_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             polygon_id < surface.nb_polygons(),
             "[check_polygon_id] Trying to access an invalid polygon" );
     }
@@ -56,7 +56,7 @@ namespace
         geode_unused( surface );
         geode_unused( polygon_id );
         geode_unused( vertex_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             vertex_id < surface.nb_polygon_vertices( polygon_id ),
             "[check_polygon_vertex_id] Trying to access an invalid polygon "
             "local vertex" );
@@ -70,7 +70,7 @@ namespace
         geode_unused( surface );
         geode_unused( polygon_id );
         geode_unused( edge_id );
-        geode::OpenGeodeMeshException::assertion(
+        geode::OpenGeodeMeshException::check_assertion(
             edge_id < surface.nb_polygon_edges( polygon_id ),
             "[check_polygon_edge_id] Trying to access an invalid polygon local "
             "edge" );
@@ -123,7 +123,7 @@ namespace
             {
                 const auto new_vertex =
                     vertices_old2new[surface.polygon_vertex( { p, v } )];
-                geode::OpenGeodeMeshException::check(
+                geode::OpenGeodeMeshException::check_exception(
                     new_vertex != geode::NO_ID,
                     surface.point( surface.polygon_vertex( { p, v } ) ),
                     geode::OpenGeodeException::TYPE::data,
@@ -393,10 +393,12 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::associate_polygon_vertex_to_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
-        OpenGeodeMeshException::assertion( polygon_vertex.polygon_id != NO_ID,
+        OpenGeodeMeshException::check_assertion(
+            polygon_vertex.polygon_id != NO_ID,
             "[SurfaceMeshBuilder::associate_polygon_vertex_to_vertex] "
             "PolygonVertex invalid" );
-        OpenGeodeMeshException::assertion( polygon_vertex.vertex_id != NO_LID,
+        OpenGeodeMeshException::check_assertion(
+            polygon_vertex.vertex_id != NO_LID,
             "[SurfaceMeshBuilder::associate_polygon_vertex_to_vertex] "
             "PolygonVertex invalid" );
         surface_mesh_.associate_polygon_vertex_to_vertex(
@@ -459,7 +461,7 @@ namespace geode
                     continue;
                 }
                 const auto old2news = vertices_mapping.in2out( old_vertex_id );
-                OpenGeodeMeshException::assertion( old2news.size() == 1,
+                OpenGeodeMeshException::check_assertion( old2news.size() == 1,
                     "[SurfaceMeshBuilder::replace_vertices] "
                     "Invalid mapping" );
                 const auto new_vertex_id = old2news[0];
@@ -532,7 +534,7 @@ namespace geode
                 const PolygonVertex id{ p, v };
                 const auto old_vertex = surface_mesh_.polygon_vertex( id );
                 const auto new_vertex = old2new[old_vertex];
-                OpenGeodeMeshException::assertion( new_vertex != NO_ID,
+                OpenGeodeMeshException::check_assertion( new_vertex != NO_ID,
                     "[SurfaceMeshBuilder::update_polygon_vertices] No "
                     "more polygons with vertices to delete should remain at "
                     "this point" );
@@ -551,7 +553,7 @@ namespace geode
         check_polygon_id( surface_mesh_, polygon_vertex.polygon_id );
         check_polygon_vertex_id( surface_mesh_, polygon_vertex.polygon_id,
             polygon_vertex.vertex_id );
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             vertex_id < surface_mesh_.nb_vertices(),
             "[SurfaceMeshBuilder::update_polygon_vertex] Accessing a "
             "vertex that does not exist" );
@@ -593,7 +595,7 @@ namespace geode
         check_polygon_id( surface_mesh_, polygon_edge.polygon_id );
         check_polygon_edge_id(
             surface_mesh_, polygon_edge.polygon_id, polygon_edge.edge_id );
-        OpenGeodeMeshException::assertion(
+        OpenGeodeMeshException::check_assertion(
             adjacent_id < surface_mesh_.nb_polygons(),
             "[SurfaceMeshBuilder::set_polygon_adjacent] Accessing a "
             "polygon that does not exist" );
@@ -814,14 +816,15 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::copy(
         const SurfaceMesh< dimension >& surface_mesh )
     {
-        OpenGeodeMeshException::check( surface_mesh_.nb_vertices() == 0
-                                           && surface_mesh_.nb_polygons() == 0,
+        OpenGeodeMeshException::check_exception(
+            surface_mesh_.nb_vertices() == 0
+                && surface_mesh_.nb_polygons() == 0,
             nullptr, OpenGeodeException::TYPE::data,
             "[SurfaceMeshBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         if( surface_mesh_.are_edges_enabled() )
         {
-            OpenGeodeMeshException::check(
+            OpenGeodeMeshException::check_exception(
                 surface_mesh_.edges().nb_edges() == 0, nullptr,
                 OpenGeodeException::TYPE::data,
                 "[SurfaceMeshBuilder::copy] Cannot copy a mesh into an already "

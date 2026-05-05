@@ -118,7 +118,7 @@ namespace geode
 
     void RegularGridBuilder< 2 >::copy( const RegularGrid2D& grid )
     {
-        OpenGeodeMeshException::check(
+        OpenGeodeMeshException::check_exception(
             grid_.nb_vertices() == 0 && grid_.nb_polygons() == 0, nullptr,
             OpenGeodeException::TYPE::data,
             "[RegularGridBuilder::copy] Cannot copy a mesh into an "

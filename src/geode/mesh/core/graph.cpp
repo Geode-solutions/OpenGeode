@@ -183,9 +183,10 @@ namespace geode
 
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
     {
-        OpenGeodeMeshException::assertion( edge_vertex.edge_id < nb_edges(),
+        OpenGeodeMeshException::check_assertion(
+            edge_vertex.edge_id < nb_edges(),
             "[Graph::edge_vertex] Trying to access an invalid edge" );
-        OpenGeodeMeshException::assertion( edge_vertex.vertex_id < 2,
+        OpenGeodeMeshException::check_assertion( edge_vertex.vertex_id < 2,
             "[Graph::edge_vertex] Trying to access "
             "an invalid edge local vertex" );
         return get_edge_vertex( edge_vertex );
@@ -204,7 +205,8 @@ namespace geode
     const EdgesAroundVertex& Graph::edges_around_vertex(
         index_t vertex_id ) const
     {
-        OpenGeodeMeshException::assertion( vertex_id < this->nb_vertices(),
+        OpenGeodeMeshException::check_assertion(
+            vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->edges_around_vertex( vertex_id );
@@ -247,7 +249,8 @@ namespace geode
     void Graph::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges, GraphKey /*key*/ )
     {
-        OpenGeodeMeshException::assertion( vertex_id < this->nb_vertices(),
+        OpenGeodeMeshException::check_assertion(
+            vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->set_edges_around_vertex( vertex_id, std::move( edges ) );
