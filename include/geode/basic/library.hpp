@@ -73,32 +73,33 @@ namespace geode
     };                                                                         \
                                                                                \
     class export_api project_name##library_name##Exception                     \
-        : public geode::project_name##Exception                                \
+        : public project_name##Exception                                       \
     {                                                                          \
     public:                                                                    \
         template < typename... Args >                                          \
         project_name##library_name##Exception(                                 \
             std::any data, TYPE type, const Args&... message )                 \
-            : geode::project_name##Exception{ #project_name, #library_name,    \
+            : project_name##Exception{ #project_name, #library_name,           \
                   std::move( data ), type, message... }                        \
         {                                                                      \
         }                                                                      \
                                                                                \
-        template < typename DataProvider, typename... Args >                   \
+        template < typename DataProvider, typename MessageProvider >           \
         static void exception( bool condition,                                 \
             DataProvider&& data_provider,                                      \
             TYPE type,                                                         \
-            const Args&... message )                                           \
+            MessageProvider&& message_provider )                               \
         {                                                                      \
             if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
             {                                                                  \
                 throw project_name##library_name##Exception{ data_provider(),  \
-                    type, message... };                                        \
+                    type, message_provider() };                                \
             }                                                                  \
         }                                                                      \
                                                                                \
-        template < typename Condition, typename... Args >                      \
-        static void assertion( Condition&& condition, const Args&... message ) \
+        template < typename Condition, typename MessageProvider >              \
+        static void assertion(                                                 \
+            Condition&& condition, MessageProvider&& message_provider )        \
         {                                                                      \
             if constexpr( is_debug_build )                                     \
             {                                                                  \
@@ -106,7 +107,8 @@ namespace geode
                 {                                                              \
                     geode::Logger::critical( #project_name, " ",               \
                         #library_name, " assertion failed" );                  \
-                    geode::Logger::critical( "Message: ", message... );        \
+                    geode::Logger::critical(                                   \
+                        "Message: ", message_provider() );                     \
                     exit( 1 );                                                 \
                 }                                                              \
             }                                                                  \
@@ -128,14 +130,19 @@ namespace geode
         [&] {                                                                  \
             return ( condition );                                              \
         },                                                                     \
-        __VA_ARGS__ )
+        [&] {                                                                  \
+            return absl::StrCat( __VA_ARGS__ );                                \
+        } )
 
-#define check_exception( condition, data, ... )                                \
+#define check_exception( condition, data, type, ... )                          \
     exception( ( condition ),                                                  \
         [&]() -> std::any {                                                    \
             return ( data );                                                   \
         },                                                                     \
-        __VA_ARGS__ )
+        type,                                                                  \
+        [&] {                                                                  \
+            return absl::StrCat( __VA_ARGS__ );                                \
+        } )
 
 /*!
  * Use this macro to implement an OpenGeode library in a cpp file (usually
