@@ -83,7 +83,8 @@ void check_edgedcurve_tree( const geode::EdgedCurve< dimension >& edged_curve )
         std::tie( closest_edge, std::ignore ) =
             aabb_tree.closest_element_box( barycenter, distance_action );
 
-        OPENGEODE_EXCEPTION( closest_edge == e, "[TEST] Wrong edge found" );
+        geode::OpenGeodeMeshException::test(
+            closest_edge == e, "[TEST] Wrong edge found" );
     }
 }
 

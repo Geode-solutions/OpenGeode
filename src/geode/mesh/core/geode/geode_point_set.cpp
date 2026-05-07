@@ -50,13 +50,15 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& archive, Impl& impl ) {
+                               archive.ext( impl,
+                                   bitsery::ext::BaseClass<
+                                       internal::PointsImpl< dimension > >{} );
+                           } } } );
         }
     };
 
@@ -78,27 +80,27 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePointSet< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGPointSetKey )
+        index_t vertex_id, Point< dimension > point, OGPointSetKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodePointSet< dimension >::serialize( Archive& archive )
+    void OpenGeodePointSet< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodePointSet >{
-                { []( Archive& a, OpenGeodePointSet& point_set ) {
-                     a.ext( point_set,
+                { []( Archive& archive, OpenGeodePointSet& point_set ) {
+                     archive.ext( point_set,
                          bitsery::ext::BaseClass< PointSet< dimension > >{} );
-                     a.object( point_set.impl_ );
+                     archive.object( point_set.impl_ );
                      point_set.impl_->initialize_crs( point_set );
                  },
-                    []( Archive& a, OpenGeodePointSet& point_set ) {
-                        a.ext( point_set, bitsery::ext::BaseClass<
-                                              PointSet< dimension > >{} );
-                        a.object( point_set.impl_ );
+                    []( Archive& archive, OpenGeodePointSet& point_set ) {
+                        archive.ext( point_set, bitsery::ext::BaseClass<
+                                                    PointSet< dimension > >{} );
+                        archive.object( point_set.impl_ );
                     } } } );
     }
 

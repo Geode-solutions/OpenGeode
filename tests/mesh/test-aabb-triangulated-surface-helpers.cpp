@@ -96,7 +96,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
             geode::index_t triangle1;
             std::tie( triangle1, std::ignore ) =
                 tree.closest_element_box( query1, distance_action );
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeMeshException::test(
                 triangle1 == id++, "[TEST] Wrong triangle found" );
 
             const auto query2 =
@@ -104,7 +104,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
             geode::index_t triangle2;
             std::tie( triangle2, std::ignore ) =
                 tree.closest_element_box( query2, distance_action );
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeMeshException::test(
                 triangle2 == id++, "[TEST] Wrong triangle found" );
         }
     }
@@ -113,7 +113,8 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
     geode::index_t triangle;
     std::tie( triangle, std::ignore ) =
         tree.closest_element_box( query, distance_action );
-    OPENGEODE_EXCEPTION( triangle == 0, "[TEST] Wrong triangle found" );
+    geode::OpenGeodeMeshException::test(
+        triangle == 0, "[TEST] Wrong triangle found" );
 }
 
 template < geode::index_t dimension >

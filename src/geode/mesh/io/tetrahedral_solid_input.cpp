@@ -59,9 +59,9 @@ namespace geode
                 TetrahedralSolidInputFactory< dimension > >( type );
             Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetInputFactory >( "VertexSet" );
-            throw OpenGeodeException{
-                "Cannot load TetrahedralSolid from file: ", filename
-            };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load TetrahedralSolid from file: ", filename };
         }
     }
 

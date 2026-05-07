@@ -40,8 +40,8 @@ void test_normal_frame_transform()
     geode::Vector2D test_vector{ { 1, 1 } };
     const auto result = frame_transform.apply( test_vector );
     const auto correct_result = geode::Vector2D{ { 1, 0.1 } };
-    OPENGEODE_EXCEPTION( result == correct_result,
-        "[Test] Wrong result for normal frame transform" );
+    geode::OpenGeodeGeometryException::test(
+        result == correct_result, "Wrong result for normal frame transform" );
     geode::Logger::info( "TEST SUCCESS" );
 }
 

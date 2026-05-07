@@ -76,10 +76,10 @@ void test_create()
     };
     geode::detail::SurfaceMeshMerger2D merger{ meshes };
     const auto merged = merger.merge( geode::GLOBAL_EPSILON );
-    OPENGEODE_EXCEPTION(
-        merged->nb_vertices() == 6, "[Test] Wrong number of vertices" );
-    OPENGEODE_EXCEPTION(
-        merged->nb_polygons() == 4, "[Test] Wrong number of polygons" );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_vertices() == 6, "Wrong number of vertices" );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_polygons() == 4, "Wrong number of polygons" );
     for( const auto p : geode::Range{ merged->nb_polygons() } )
     {
         for( const auto e : geode::LRange{ 3 } )
@@ -89,33 +89,37 @@ void test_create()
         }
     }
 
-    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 0, 0 } ) = 1,
-        "[Test] Wrong adjacency for { 0, 0 }" );
-    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 0, 1 } ) = 2,
-        "[Test] Wrong adjacency for { 0, 1 }" );
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 0, 2 } ),
-        "[Test] Wrong adjacency for { 0, 2 }" );
+    geode::OpenGeodeMeshException::test(
+        merged->polygon_adjacent( { 0, 0 } ) == 1,
+        "Wrong adjacency for { 0, 0 }" );
+    geode::OpenGeodeMeshException::test(
+        merged->polygon_adjacent( { 0, 1 } ) == 2,
+        "Wrong adjacency for { 0, 1 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 0, 2 } ), "Wrong adjacency for { 0, 2 }" );
 
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 1, 0 } ),
-        "[Test] Wrong adjacency for { 1, 0 }" );
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 1, 1 } ),
-        "[Test] Wrong adjacency for { 1, 1 }" );
-    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 1, 2 } ) = 0,
-        "[Test] Wrong adjacency for { 1, 2 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 1, 0 } ), "Wrong adjacency for { 1, 0 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 1, 1 } ), "Wrong adjacency for { 1, 1 }" );
+    geode::OpenGeodeMeshException::test(
+        merged->polygon_adjacent( { 1, 2 } ) == 0,
+        "Wrong adjacency for { 1, 2 }" );
 
-    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 2, 0 } ) = 0,
-        "[Test] Wrong adjacency for { 2, 0 }" );
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 2, 1 } ),
-        "[Test] Wrong adjacency for { 2, 1 }" );
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 2, 2 } ),
-        "[Test] Wrong adjacency for { 2, 2 }" );
+    geode::OpenGeodeMeshException::test(
+        merged->polygon_adjacent( { 2, 0 } ) == 0,
+        "Wrong adjacency for { 2, 0 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 2, 1 } ), "Wrong adjacency for { 2, 1 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 2, 2 } ), "Wrong adjacency for { 2, 2 }" );
 
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 0 } ),
-        "[Test] Wrong adjacency for { 3, 0 }" );
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 1 } ),
-        "[Test] Wrong adjacency for { 3, 1 }" );
-    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 2 } ),
-        "[Test] Wrong adjacency for { 3, 2 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 3, 0 } ), "Wrong adjacency for { 3, 0 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 3, 1 } ), "Wrong adjacency for { 3, 1 }" );
+    geode::OpenGeodeMeshException::test(
+        !merged->polygon_adjacent( { 3, 2 } ), "Wrong adjacency for { 3, 2 }" );
 }
 
 void test_import()
@@ -139,18 +143,19 @@ void test_import()
     geode::NNSearch3D nns( points );
     const auto mappings = nns.colocated_index_mapping( geode::GLOBAL_EPSILON );
     DEBUG( mappings.nb_colocated_points() );
-    OPENGEODE_EXCEPTION( mappings.nb_colocated_points() == 0,
-        "[Test] Should be no more colocated points" );
+    geode::OpenGeodeMeshException::test( mappings.nb_colocated_points() == 0,
+        "Should be no more colocated points" );
     for( const auto p : geode::Indices{ points } )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             mappings.colocated_mapping[p] < mappings.unique_points.size(),
-            "[Test] Wrong value of colocated_mapping (bigger than unique "
+            "Wrong value of colocated_mapping (bigger than unique "
             "points size)" );
         const auto& colocated_point =
             mappings.unique_points[mappings.colocated_mapping[p]];
-        OPENGEODE_EXCEPTION( points[p].inexact_equal( colocated_point ),
-            "[Test] Colocated point is not close enough to original point" );
+        geode::OpenGeodeMeshException::test(
+            points[p].inexact_equal( colocated_point ),
+            "Colocated point is not close enough to original point" );
     }
     async::parallel_for(
         async::irange( geode::index_t{ 0 }, mappings.unique_points.size() ),
@@ -161,9 +166,10 @@ void test_import()
                 {
                     continue;
                 }
-                OPENGEODE_EXCEPTION( !mappings.unique_points[up0].inexact_equal(
-                                         mappings.unique_points[up1] ),
-                    "[Test] Colocated points are too close" );
+                geode::OpenGeodeMeshException::test(
+                    !mappings.unique_points[up0].inexact_equal(
+                        mappings.unique_points[up1] ),
+                    "Colocated points are too close" );
             }
         } );
 }

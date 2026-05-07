@@ -89,7 +89,7 @@ namespace geode
 
     template < index_t dimension >
     Surface< dimension >& Surfaces< dimension >::modifiable_surface(
-        const uuid& id, SurfacesBuilderKey )
+        const uuid& id, SurfacesBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -122,9 +122,10 @@ namespace geode
                 }
                 else
                 {
-                    throw OpenGeodeException( "[Surfaces::save_surfaces] "
-                                              "Cannot find the explicit "
-                                              "SurfaceMesh type" );
+                    throw OpenGeodeModelException{ nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[Surfaces::save_surfaces] Cannot find the explicit "
+                        "SurfaceMesh type" };
                 }
             } );
         }
@@ -136,7 +137,7 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::load_surfaces(
-        std::string_view directory, SurfacesBuilderKey )
+        std::string_view directory, SurfacesBuilderKey /*key*/ )
     {
         impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
         const auto mapping = impl_->file_mapping( directory );
@@ -182,14 +183,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    auto Surfaces< dimension >::modifiable_surfaces( SurfacesBuilderKey )
-        -> ModifiableSurfaceRange
+    auto Surfaces< dimension >::modifiable_surfaces(
+        SurfacesBuilderKey /*key*/ ) -> ModifiableSurfaceRange
     {
         return { *this };
     }
 
     template < index_t dimension >
-    const uuid& Surfaces< dimension >::create_surface( SurfacesBuilderKey )
+    const uuid& Surfaces< dimension >::create_surface(
+        SurfacesBuilderKey /*key*/ )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
@@ -202,7 +204,7 @@ namespace geode
 
     template < index_t dimension >
     const uuid& Surfaces< dimension >::create_surface(
-        const MeshImpl& impl, SurfacesBuilderKey )
+        const MeshImpl& impl, SurfacesBuilderKey /*key*/ )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
@@ -215,7 +217,7 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::create_surface(
-        uuid surface_id, SurfacesBuilderKey )
+        uuid surface_id, SurfacesBuilderKey /*key*/ )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
@@ -227,7 +229,7 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::create_surface(
-        uuid surface_id, const MeshImpl& impl, SurfacesBuilderKey )
+        uuid surface_id, const MeshImpl& impl, SurfacesBuilderKey /*key*/ )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{ impl, {} }
@@ -238,7 +240,7 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::delete_surface(
-        const Surface< dimension >& surface, SurfacesBuilderKey )
+        const Surface< dimension >& surface, SurfacesBuilderKey /*key*/ )
     {
         impl_->delete_component( surface.id() );
     }

@@ -60,9 +60,9 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
+            serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& local_archive, Impl& impl ) {
                          local_archive.text1b( impl.backward_compatible_name_,
@@ -109,9 +109,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Component< dimension >::serialize( Archive& archive )
+    void Component< dimension >::serialize( Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, Component >{
                        { []( Archive& local_archive, Component& component ) {
                             local_archive.object( component.impl_ );

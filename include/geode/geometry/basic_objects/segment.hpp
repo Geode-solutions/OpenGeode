@@ -105,41 +105,4 @@ namespace geode
             Segment< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( Segment );
-
-    template < index_t dimension >
-    class OpenGeodeSegmentException : public OpenGeodeException
-    {
-    public:
-        template < typename... Args >
-        explicit OpenGeodeSegmentException(
-            Segment< dimension > segment_in, const Args&... message )
-            : OpenGeodeException{ absl::StrCat(
-                  message..., " at ", segment_in.string() ) },
-              segment{ std::move( segment_in ) }
-        {
-        }
-
-        OwnerSegment< dimension > segment;
-    };
-    ALIAS_1D_AND_2D_AND_3D( OpenGeodeSegmentException );
 } // namespace geode
-
-// NOLINTNEXTLINE
-#define OPENGEODE_SEGMENT_EXCEPTION( dimension, condition, segment, ... )      \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-        throw geode::OpenGeodeSegmentException< dimension >                    \
-        {                                                                      \
-            segment, __VA_ARGS__                                               \
-        }
-
-// NOLINTNEXTLINE
-#define OPENGEODE_SEGMENT1D_EXCEPTION( condition, segment, ... )               \
-    OPENGEODE_SEGMENT_EXCEPTION( 1, condition, segment, __VA_ARGS__ )
-
-// NOLINTNEXTLINE
-#define OPENGEODE_SEGMENT2D_EXCEPTION( condition, segment, ... )               \
-    OPENGEODE_SEGMENT_EXCEPTION( 2, condition, segment, __VA_ARGS__ )
-
-// NOLINTNEXTLINE
-#define OPENGEODE_SEGMENT3D_EXCEPTION( condition, segment, ... )               \
-    OPENGEODE_SEGMENT_EXCEPTION( 3, condition, segment, __VA_ARGS__ )

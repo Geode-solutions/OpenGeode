@@ -35,11 +35,13 @@ void test()
         const geode::uuid id;
         SDEBUG( id );
         const geode::uuid id2;
-        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
-        OPENGEODE_EXCEPTION(
-            id2 < id || id < id2, "[Test] UUIDs should be different" );
+        geode::OpenGeodeBasicException::test(
+            id2 != id, "UUIDs should be different" );
+        geode::OpenGeodeBasicException::test(
+            id2 < id || id < id2, "UUIDs should be different" );
         const geode::uuid same{ id.string() };
-        OPENGEODE_EXCEPTION( id == same, "[Test] UUIDs should be equal" );
+        geode::OpenGeodeBasicException::test(
+            id == same, "UUIDs should be equal" );
     }
 }
 

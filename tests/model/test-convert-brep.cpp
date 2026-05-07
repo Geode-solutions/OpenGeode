@@ -39,22 +39,22 @@ void test_convert_brep_section()
     const auto section =
         std::get< 0 >( geode::convert_brep_into_section( brep, 2 ) );
 
-    OPENGEODE_EXCEPTION(
-        section.nb_corners() == 172, "[Test] Section should have 172 corners" );
-    OPENGEODE_EXCEPTION(
-        section.nb_lines() == 288, "[Test] Section should have 288 lines" );
-    OPENGEODE_EXCEPTION( section.nb_surfaces() == 117,
-        "[Test] Section should have 117 surfaces" );
+    geode::OpenGeodeModelException::test(
+        section.nb_corners() == 172, "Section should have 172 corners" );
+    geode::OpenGeodeModelException::test(
+        section.nb_lines() == 288, "Section should have 288 lines" );
+    geode::OpenGeodeModelException::test(
+        section.nb_surfaces() == 117, "Section should have 117 surfaces" );
 
     const auto brep2 =
         std::get< 0 >( geode::convert_section_into_brep( section, 2, 10. ) );
 
-    OPENGEODE_EXCEPTION(
-        brep2.nb_corners() == 172, "[Test] BRep should have 172 corners" );
-    OPENGEODE_EXCEPTION(
-        brep2.nb_lines() == 288, "[Test] BRep should have 288 lines" );
-    OPENGEODE_EXCEPTION(
-        brep2.nb_surfaces() == 117, "[Test] BRep should have 117 surfaces" );
+    geode::OpenGeodeModelException::test(
+        brep2.nb_corners() == 172, "BRep should have 172 corners" );
+    geode::OpenGeodeModelException::test(
+        brep2.nb_lines() == 288, "BRep should have 288 lines" );
+    geode::OpenGeodeModelException::test(
+        brep2.nb_surfaces() == 117, "BRep should have 117 surfaces" );
 }
 
 void test_extrusion_section_to_brep()
@@ -66,16 +66,18 @@ void test_extrusion_section_to_brep()
     options.min_coordinate = 0.;
     options.max_coordinate = 10.;
     const auto brep = geode::extrude_section_to_brep( section, options );
-    OPENGEODE_EXCEPTION( brep.nb_corners() == 2 * section.nb_corners(),
-        "[Test] Extruded BRep - wrong number of corners." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeModelException::test(
+        brep.nb_corners() == 2 * section.nb_corners(),
+        "Extruded BRep - wrong number of corners." );
+    geode::OpenGeodeModelException::test(
         brep.nb_lines() == 2 * section.nb_lines() + section.nb_corners(),
-        "[Test] Extruded BRep - wrong number of lines." );
-    OPENGEODE_EXCEPTION(
+        "Extruded BRep - wrong number of lines." );
+    geode::OpenGeodeModelException::test(
         brep.nb_surfaces() == 2 * section.nb_surfaces() + section.nb_lines(),
-        "[Test] Extruded BRep - wrong number of surfaces." );
-    OPENGEODE_EXCEPTION( brep.nb_blocks() == section.nb_surfaces(),
-        "[Test] Extruded BRep - wrong number of blocks." );
+        "Extruded BRep - wrong number of surfaces." );
+    geode::OpenGeodeModelException::test(
+        brep.nb_blocks() == section.nb_surfaces(),
+        "Extruded BRep - wrong number of blocks." );
 }
 
 void test()

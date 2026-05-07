@@ -55,11 +55,12 @@ void test_ray_inside()
     geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
-    OPENGEODE_EXCEPTION( result, "[Test] Ray inside no result" );
-    OPENGEODE_EXCEPTION(
-        result->polygon == 0, "[Test] Ray inside wrong polygon" );
-    OPENGEODE_EXCEPTION(
-        result->distance == 1, "[Test] Ray inside wrong distance" );
+    geode::OpenGeodeMeshException::test(
+        result.has_value(), "Ray inside no result" );
+    geode::OpenGeodeMeshException::test(
+        result->polygon == 0, "Ray inside wrong polygon" );
+    geode::OpenGeodeMeshException::test(
+        result->distance == 1, "Ray inside wrong distance" );
 }
 
 void test_ray_edge()
@@ -82,13 +83,15 @@ void test_ray_edge()
     geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
-    OPENGEODE_EXCEPTION( result, "[Test] Ray edge no result" );
-    OPENGEODE_EXCEPTION(
-        result->polygon == 1, "[Test] Ray edge wrong polygon" );
-    OPENGEODE_EXCEPTION(
-        result->distance == 1, "[Test] Ray edge wrong distance" );
-    OPENGEODE_EXCEPTION( tracing.all_intersections().size() == 1,
-        "[Test] Wrong size for ray tracing result for case edge" );
+    geode::OpenGeodeMeshException::test(
+        result.has_value(), "Ray edge no result" );
+    geode::OpenGeodeMeshException::test(
+        result->polygon == 1, "Ray edge wrong polygon" );
+    geode::OpenGeodeMeshException::test(
+        result->distance == 1, "Ray edge wrong distance" );
+    geode::OpenGeodeMeshException::test(
+        tracing.all_intersections().size() == 1,
+        "Wrong size for ray tracing result for case edge" );
 }
 
 void test_ray_parallel()
@@ -107,11 +110,12 @@ void test_ray_parallel()
     geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
     aabb.compute_ray_element_bbox_intersections( ray, tracing );
     const auto result = tracing.closest_polygon();
-    OPENGEODE_EXCEPTION( result, "[Test] Ray edge no result" );
-    OPENGEODE_EXCEPTION(
-        result->polygon == 0, "[Test] Ray edge wrong polygon" );
-    OPENGEODE_EXCEPTION(
-        result->distance == 0, "[Test] Ray edge wrong distance" );
+    geode::OpenGeodeMeshException::test(
+        result.has_value(), "Ray edge no result" );
+    geode::OpenGeodeMeshException::test(
+        result->polygon == 0, "Ray edge wrong polygon" );
+    geode::OpenGeodeMeshException::test(
+        result->distance == 0, "Ray edge wrong distance" );
 }
 
 void test()

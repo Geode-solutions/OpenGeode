@@ -48,8 +48,8 @@ void test_lexicographic_mapping()
     std::vector< geode::index_t > answer{ 0, 9, 5, 6, 1, 10, 4, 7, 2, 3, 8 };
     for( const auto m : geode::Indices{ mapping } )
     {
-        OPENGEODE_EXCEPTION( mapping[m] == answer[m],
-            "[Test] Wrong result in lexicographic sort" );
+        geode::OpenGeodeGeometryException::test(
+            mapping[m] == answer[m], "Wrong result in lexicographic sort" );
     }
 }
 

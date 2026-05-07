@@ -64,7 +64,8 @@ namespace geode
             if( status != MZ_OK )
             {
                 std::filesystem::remove_all( directory_ );
-                throw OpenGeodeException(
+                throw OpenGeodeBasicException( nullptr,
+                    OpenGeodeException::TYPE::internal,
                     "[ZipFile] Error opening zip for writing." );
             }
         }
@@ -96,7 +97,8 @@ namespace geode
             if( status != MZ_OK )
             {
                 std::filesystem::remove_all( directory_ );
-                throw OpenGeodeException(
+                throw OpenGeodeBasicException( nullptr,
+                    OpenGeodeException::TYPE::internal,
                     "[ZipFile::archive_file] Error adding path to zip" );
             }
             std::filesystem::remove( file_path );
@@ -148,7 +150,8 @@ namespace geode
             if( status != MZ_OK )
             {
                 std::filesystem::remove_all( directory_ );
-                throw OpenGeodeException(
+                throw OpenGeodeBasicException( nullptr,
+                    OpenGeodeException::TYPE::internal,
                     "[UnzipFile] Error opening zip for reading" );
             }
         }
@@ -170,9 +173,10 @@ namespace geode
                 if( status != MZ_OK )
                 {
                     std::filesystem::remove_all( directory_ );
-                    throw OpenGeodeException( "[UnzipFile::extract_all] Error "
-                                              "getting entry info in zip "
-                                              "file" );
+                    throw OpenGeodeBasicException( nullptr,
+                        OpenGeodeException::TYPE::internal,
+                        "[UnzipFile::extract_all] Error getting entry info in "
+                        "zip file" );
                 }
 
                 auto file = directory_ / file_info->filename;
@@ -181,8 +185,10 @@ namespace geode
                 if( status != MZ_OK )
                 {
                     std::filesystem::remove_all( directory_ );
-                    throw OpenGeodeException( "[UnzipFile::extract_all] Error "
-                                              "extracting entry file" );
+                    throw OpenGeodeBasicException( nullptr,
+                        OpenGeodeException::TYPE::internal,
+                        "[UnzipFile::extract_all] Error extracting entry "
+                        "file" );
                 }
                 status = mz_zip_reader_goto_next_entry( reader_ );
             }

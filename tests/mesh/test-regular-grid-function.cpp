@@ -57,26 +57,26 @@ void test_scalar_function()
             {
                 if( i == 1 && j == 2 && k == 3 )
                 {
-                    OPENGEODE_EXCEPTION(
+                    geode::OpenGeodeMeshException::test(
                         scalar_function.value(
                             geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == 22,
-                        "[Test] Object function value is wrong." );
+                        "Object function value is wrong." );
                 }
                 else
                 {
-                    OPENGEODE_EXCEPTION(
+                    geode::OpenGeodeMeshException::test(
                         scalar_function.value(
                             geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == 26,
-                        "[Test] Object function value is wrong." );
+                        "Object function value is wrong." );
                 }
             }
         }
     }
     scalar_function.set_value( 217, 22 );
-    OPENGEODE_EXCEPTION( scalar_function.value( 217 ) == 22,
-        "[Test] Object function value is wrong." );
+    geode::OpenGeodeMeshException::test(
+        scalar_function.value( 217 ) == 22, "Object function value is wrong." );
     scalar_function.set_value( { 1, 2, 4 }, 22 );
     scalar_function.set_value( { 1, 3, 4 }, 22 );
     scalar_function.set_value( { 2, 2, 3 }, 22 );
@@ -85,34 +85,34 @@ void test_scalar_function()
     scalar_function.set_value( { 2, 3, 4 }, 22 );
     geode::Point3D point{ { 2.6, 4.1, 11.2 } };
     auto cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 22, 1e-7 ),
-        "[Test] Object function value 1 is wrong." );
+        "Object function value 1 is wrong." );
     point = geode::Point3D{ { 1.5, 0, 1 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 26, 1e-7 ),
-        "[Test] Object function value 2 is wrong." );
+        "Object function value 2 is wrong." );
     point = geode::Point3D{ { 3, 4, 10 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 22, 1e-7 ),
-        "[Test] Object function value 3 is wrong." );
+        "Object function value 3 is wrong." );
     point = geode::Point3D{ { 3, 5, 8.5 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 24, 1e-7 ),
-        "[Test] Object function value 4 is wrong." );
+        "Object function value 4 is wrong." );
     point = geode::Point3D{ { 3.9, 7.4, 11.05 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal(
             scalar_function.value( point, cell_indices[0] ), 25.28, 1e-7 ),
-        "[Test] Object function value 5 is wrong." );
+        "Object function value 5 is wrong." );
 }
 
 void test_point_function()
@@ -133,27 +133,27 @@ void test_point_function()
             {
                 if( i == 1 && j == 2 && k == 3 )
                 {
-                    OPENGEODE_EXCEPTION(
+                    geode::OpenGeodeMeshException::test(
                         ( point_function.value(
                               geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == geode::Point3D{ { 22, -3, -20 } } ),
-                        "[Test] Point function value is wrong." );
+                        "Point function value is wrong." );
                 }
                 else
                 {
-                    OPENGEODE_EXCEPTION(
+                    geode::OpenGeodeMeshException::test(
                         ( point_function.value(
                               geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == geode::Point3D{ { 26, 2, -10 } } ),
-                        "[Test] Point function value is wrong." );
+                        "Point function value is wrong." );
                 }
             }
         }
     }
     point_function.set_value( 217, geode::Point3D{ { 22, -3, -20 } } );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         ( point_function.value( 217 ) == geode::Point3D{ { 22, -3, -20 } } ),
-        "[Test] Point function value is wrong." );
+        "Point function value is wrong." );
     point_function.set_value( { 1, 2, 4 }, geode::Point3D{ { 22, -3, -20 } } );
     point_function.set_value( { 1, 3, 4 }, geode::Point3D{ { 22, -3, -20 } } );
     point_function.set_value( { 2, 2, 3 }, geode::Point3D{ { 22, -3, -20 } } );
@@ -162,33 +162,34 @@ void test_point_function()
     point_function.set_value( { 2, 3, 4 }, geode::Point3D{ { 22, -3, -20 } } );
     geode::Point3D point{ { 2.6, 4.1, 11.2 } };
     auto cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_function.value( point, cell_indices[0] )
             .inexact_equal( geode::Point3D{ { 22, -3, -20 } } ),
-        "[Test] Point function value 1 is wrong." );
+        "Point function value 1 is wrong." );
     point = geode::Point3D{ { 1.5, 0, 1 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( geode::Point3D{ { 26, 2, -10 } } ),
-        "[Test] Point function value 2 is wrong." );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, cell_indices[0] )
+            .inexact_equal( geode::Point3D{ { 26, 2, -10 } } ),
+        "Point function value 2 is wrong." );
     point = geode::Point3D{ { 3, 4, 10 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_function.value( point, cell_indices[0] )
             .inexact_equal( geode::Point3D{ { 22, -3, -20 } } ),
-        "[Test] Point function value 3 is wrong." );
+        "Point function value 3 is wrong." );
     point = geode::Point3D{ { 3, 5, 8.5 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_function.value( point, cell_indices[0] )
             .inexact_equal( geode::Point3D{ { 24, -0.5, -15 } } ),
-        "[Test] Point function value 4 is wrong." );
+        "Point function value 4 is wrong." );
     point = geode::Point3D{ { 3.9, 7.4, 11.05 } };
     cell_indices = grid->cells( point );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_function.value( point, cell_indices[0] )
             .inexact_equal( geode::Point3D{ { 25.28, 1.1, -11.8 } } ),
-        "[Test] Point function value 5 is wrong." );
+        "Point function value 5 is wrong." );
 }
 
 void test()

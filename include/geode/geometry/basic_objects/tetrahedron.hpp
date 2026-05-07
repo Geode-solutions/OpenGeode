@@ -108,28 +108,4 @@ namespace geode
         Tetrahedron( Tetrahedron&& other ) noexcept;
         Tetrahedron& operator=( Tetrahedron&& other ) noexcept;
     };
-
-    class OpenGeodeTetrahedronException : public OpenGeodeException
-    {
-    public:
-        template < typename... Args >
-        explicit OpenGeodeTetrahedronException(
-            const Tetrahedron& tetrahedron_in, const Args&... message )
-            : OpenGeodeException{ absl::StrCat(
-                  message..., " at ", tetrahedron_in.string() ) },
-              tetrahedron{ tetrahedron_in }
-        {
-        }
-
-        OwnerTetrahedron tetrahedron;
-    };
 } // namespace geode
-
-// NOLINTNEXTLINE
-#define OPENGEODE_TETRAHEDRON_EXCEPTION(                                       \
-    dimension, condition, tetrahedron, ... )                                   \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-        throw geode::OpenGeodeTetrahedronException< dimension >                \
-        {                                                                      \
-            tetrahedron, __VA_ARGS__                                           \
-        }

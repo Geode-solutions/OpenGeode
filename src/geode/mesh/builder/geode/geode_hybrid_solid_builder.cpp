@@ -32,7 +32,7 @@ namespace geode
 {
     template < index_t dimension >
     OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
-        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ )
         : OpenGeodeHybridSolidBuilder< dimension >(
               dynamic_cast< OpenGeodeHybridSolid< dimension >& >( vertex_set ) )
     {

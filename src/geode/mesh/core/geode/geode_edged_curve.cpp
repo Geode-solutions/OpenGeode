@@ -55,15 +55,17 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass< internal::EdgesImpl >{} );
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext( impl,
+                            bitsery::ext::BaseClass< internal::EdgesImpl >{} );
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass<
+                                      internal::PointsImpl< dimension > >{} );
+                    } } } );
         }
     };
 
@@ -86,7 +88,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurve< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGEdgedCurveKey )
+        index_t vertex_id, Point< dimension > point, OGEdgedCurveKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
@@ -100,27 +102,30 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurve< dimension >::set_edge_vertex(
-        const EdgeVertex& edge_vertex, index_t vertex_id, OGEdgedCurveKey )
+        const EdgeVertex& edge_vertex,
+        index_t vertex_id,
+        OGEdgedCurveKey /*key*/ )
     {
         impl_->set_edge_vertex( edge_vertex, vertex_id );
     }
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodeEdgedCurve< dimension >::serialize( Archive& archive )
+    void OpenGeodeEdgedCurve< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, OpenGeodeEdgedCurve >{
-                { []( Archive& a, OpenGeodeEdgedCurve& edged_curve ) {
-                     a.ext( edged_curve,
+                { []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
+                     archive.ext( edged_curve,
                          bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
-                     a.object( edged_curve.impl_ );
+                     archive.object( edged_curve.impl_ );
                      edged_curve.impl_->initialize_crs( edged_curve );
                  },
-                    []( Archive& a, OpenGeodeEdgedCurve& edged_curve ) {
-                        a.ext( edged_curve, bitsery::ext::BaseClass<
-                                                EdgedCurve< dimension > >{} );
-                        a.object( edged_curve.impl_ );
+                    []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
+                        archive.ext(
+                            edged_curve, bitsery::ext::BaseClass<
+                                             EdgedCurve< dimension > >{} );
+                        archive.object( edged_curve.impl_ );
                     } } } );
     }
 

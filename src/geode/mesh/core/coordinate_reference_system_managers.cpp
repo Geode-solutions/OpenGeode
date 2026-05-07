@@ -99,14 +99,15 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.crs_manager1D_ );
-                    a.object( impl.crs_manager2D_ );
-                    a.object( impl.crs_manager3D_ );
-                } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& archive, Impl& impl ) {
+                               archive.object( impl.crs_manager1D_ );
+                               archive.object( impl.crs_manager2D_ );
+                               archive.object( impl.crs_manager3D_ );
+                           } } } );
         }
 
     private:
@@ -216,22 +217,25 @@ namespace geode
     }
 
     template < index_t dimension >
-    CoordinateReferenceSystemManager1D& CoordinateReferenceSystemManagers<
-        dimension >::coordinate_reference_system_manager1D( CRSManagersKey )
+    CoordinateReferenceSystemManager1D&
+        CoordinateReferenceSystemManagers< dimension >::
+            coordinate_reference_system_manager1D( CRSManagersKey /*key*/ )
     {
         return impl_->coordinate_reference_system_manager1D();
     }
 
     template < index_t dimension >
-    CoordinateReferenceSystemManager2D& CoordinateReferenceSystemManagers<
-        dimension >::coordinate_reference_system_manager2D( CRSManagersKey )
+    CoordinateReferenceSystemManager2D&
+        CoordinateReferenceSystemManagers< dimension >::
+            coordinate_reference_system_manager2D( CRSManagersKey /*key*/ )
     {
         return impl_->coordinate_reference_system_manager2D();
     }
 
     template < index_t dimension >
-    CoordinateReferenceSystemManager3D& CoordinateReferenceSystemManagers<
-        dimension >::coordinate_reference_system_manager3D( CRSManagersKey )
+    CoordinateReferenceSystemManager3D&
+        CoordinateReferenceSystemManagers< dimension >::
+            coordinate_reference_system_manager3D( CRSManagersKey /*key*/ )
     {
         return impl_->coordinate_reference_system_manager3D();
     }
@@ -239,14 +243,14 @@ namespace geode
     template < index_t dimension >
     CoordinateReferenceSystemManager< dimension >&
         CoordinateReferenceSystemManagers< dimension >::
-            main_coordinate_reference_system_manager( CRSManagersKey )
+            main_coordinate_reference_system_manager( CRSManagersKey /*key*/ )
     {
         return impl_->main_coordinate_reference_system_manager();
     }
 
     template < index_t dimension >
     void CoordinateReferenceSystemManagers< dimension >::set_point(
-        index_t vertex, Point< dimension > point, CRSManagersKey )
+        index_t vertex, Point< dimension > point, CRSManagersKey /*key*/ )
     {
         impl_->set_point( vertex, std::move( point ) );
     }
@@ -254,13 +258,13 @@ namespace geode
     template < index_t dimension >
     template < typename Archive >
     void CoordinateReferenceSystemManagers< dimension >::serialize(
-        Archive& archive )
+        Archive& serializer )
     {
-        archive.ext(
+        serializer.ext(
             *this, Growable< Archive, CoordinateReferenceSystemManagers >{
-                       { []( Archive& a,
+                       { []( Archive& archive,
                              CoordinateReferenceSystemManagers& managers ) {
-                           a.object( managers.impl_ );
+                           archive.object( managers.impl_ );
                        } } } );
     }
 

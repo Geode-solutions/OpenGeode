@@ -99,31 +99,35 @@ void test_basic_accessor( const Mesh& mesh, geode::index_t nb_element_vertices )
 {
     using Accessor = geode::GenericMeshAccessor< Mesh >;
     const Accessor accessor{ mesh };
-    OPENGEODE_EXCEPTION(
-        accessor.nb_elements() == 2, "[Test] Wrong number of elements" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        accessor.nb_elements() == 2, "Wrong number of elements" );
+    geode::OpenGeodeMeshException::test(
         accessor.nb_element_vertices( 0 ) == nb_element_vertices,
-        "[Test] Wrong number of element vertices" );
-    OPENGEODE_EXCEPTION( accessor.nb_element_facets( 0 ) == nb_element_vertices,
-        "[Test] Wrong number of element facets" );
-    OPENGEODE_EXCEPTION( accessor.element_vertex( { 0, 0 } ) == 0,
-        "[Test] Wrong element vertex { 0, 0 }" );
-    OPENGEODE_EXCEPTION( accessor.element_vertex( { 0, 1 } ) == 1,
-        "[Test] Wrong element vertex { 0, 1 }" );
-    OPENGEODE_EXCEPTION(
+        "Wrong number of element vertices" );
+    geode::OpenGeodeMeshException::test(
+        accessor.nb_element_facets( 0 ) == nb_element_vertices,
+        "Wrong number of element facets" );
+    geode::OpenGeodeMeshException::test(
+        accessor.element_vertex( { 0, 0 } ) == 0,
+        "Wrong element vertex { 0, 0 }" );
+    geode::OpenGeodeMeshException::test(
+        accessor.element_vertex( { 0, 1 } ) == 1,
+        "Wrong element vertex { 0, 1 }" );
+    geode::OpenGeodeMeshException::test(
         accessor.element_vertices( 0 ).size() == nb_element_vertices,
-        "[Test] Wrong size of element vertices container" );
+        "Wrong size of element vertices container" );
     const auto attribute =
         accessor.element_attribute_manager()
             .template find_attribute< geode::index_t >( "test_attribute" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         attribute->value( 0 ) == 2 && attribute->value( 1 ) == 5,
-        "[Test] Wrong values of the element attributes." );
-    OPENGEODE_EXCEPTION(
-        accessor.id() == mesh.id(), "[Test] Wrong uuid value." );
-    OPENGEODE_EXCEPTION( accessor.point( 0 ).value( 0 ) == 0
-                             && accessor.point( 0 ).value( 1 ) == 0,
-        "[Test] Wrong point coordinate value." );
+        "Wrong values of the element attributes." );
+    geode::OpenGeodeMeshException::test(
+        accessor.id() == mesh.id(), "Wrong uuid value." );
+    geode::OpenGeodeMeshException::test(
+        accessor.point( 0 ).value( 0 ) == 0
+            && accessor.point( 0 ).value( 1 ) == 0,
+        "Wrong point coordinate value." );
 }
 
 template < typename Mesh >
@@ -131,19 +135,22 @@ void test_adjacent_accessor( const Mesh& mesh )
 {
     using Accessor = geode::GenericMeshAccessor< Mesh >;
     const Accessor accessor{ mesh };
-    OPENGEODE_EXCEPTION( accessor.element_vertex( { 0, 2 } ) == 2,
-        "[Test] Wrong element vertex { 0, 2 }" );
+    geode::OpenGeodeMeshException::test(
+        accessor.element_vertex( { 0, 2 } ) == 2,
+        "Wrong element vertex { 0, 2 }" );
     const typename Accessor::ElementFacet facet{ 0, 0 };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         accessor.element_facet_vertices( facet ).size() == Mesh::dim,
-        "[Test] Wrong number of element facet vertices" );
-    OPENGEODE_EXCEPTION( !accessor.element_adjacent( { 0, 1 } ),
-        "[Test] Wrong element adjacent { 0, 1 }" );
-    OPENGEODE_EXCEPTION( accessor.element_adjacent( { 0, 0 } ) == 1,
-        "[Test] Wrong element adjacent { 0, 0 }" );
+        "Wrong number of element facet vertices" );
+    geode::OpenGeodeMeshException::test( !accessor.element_adjacent( { 0, 1 } ),
+        "Wrong element adjacent { 0, 1 }" );
+    geode::OpenGeodeMeshException::test(
+        accessor.element_adjacent( { 0, 0 } ) == 1,
+        "Wrong element adjacent { 0, 0 }" );
     const typename Accessor::ElementFacet adj{ 0, 0 };
-    OPENGEODE_EXCEPTION( accessor.element_adjacent_facet( { 1, 2 } ) == adj,
-        "[Test] Wrong element adjacent { 1, 2 }" );
+    geode::OpenGeodeMeshException::test(
+        accessor.element_adjacent_facet( { 1, 2 } ) == adj,
+        "Wrong element adjacent { 1, 2 }" );
 }
 
 void test()

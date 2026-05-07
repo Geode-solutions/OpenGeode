@@ -33,6 +33,9 @@
 
 #ifndef NDEBUG
 #    define OPENGEODE_DEBUG
+inline constexpr bool is_debug_build = true;
+#else
+inline constexpr bool is_debug_build = false;
 #endif
 
 #ifdef OPENGEODE_WINDOWS
@@ -58,7 +61,7 @@ public:                                                                        \
 
 #define OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( type )                             \
     static_assert(                                                             \
-        ( type ) == 2 || type == 3, #type " template should be 2 or 3" )
+        ( type ) == 2 || ( type ) == 3, #type " template should be 2 or 3" )
 
 #define OPENGEODE_TEMPLATE_ASSERT_2D( type )                                   \
     static_assert( ( type ) == 2, #type " template should be 2" )
@@ -96,5 +99,6 @@ void geode_unused( const T & /*unused*/ )
 }
 
 #include <geode/basic/assert.hpp>
+#include <geode/basic/library.hpp>
 #include <geode/basic/opengeode_basic_export.hpp>
 #include <geode/basic/types.hpp>

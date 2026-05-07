@@ -51,8 +51,9 @@ namespace geode
             Logger::error( e.what() );
             print_available_extensions< RasterImageOutputFactory< dimension > >(
                 type );
-            throw OpenGeodeException{ "Cannot save RasterImage in file: ",
-                filename };
+            throw OpenGeodeImageException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save RasterImage in file: ", filename };
         }
     }
 

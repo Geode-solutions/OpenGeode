@@ -31,7 +31,7 @@
 namespace geode
 {
     OpenGeodeRegularGridBuilder< 3 >::OpenGeodeRegularGridBuilder(
-        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ )
         : OpenGeodeRegularGridBuilder< 3 >(
               dynamic_cast< OpenGeodeRegularGrid< 3 >& >( vertex_set ) )
     {

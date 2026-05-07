@@ -91,7 +91,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive &archive );
+        void serialize( Archive &serializer );
 
     private:
         std::array< double, dimension > values_;
@@ -139,7 +139,7 @@ namespace geode
         static float converted_item_value(
             const Point< dimension > &point, local_index_t item )
         {
-            OPENGEODE_ASSERT( item < nb_items(),
+            OpenGeodeGeometryException::check_assertion( item < nb_items(),
                 "[GenericAttributeConversion] Accessing "
                 "incorrect item value" );
             return static_cast< float >( point.value( item ) );
@@ -155,44 +155,7 @@ namespace geode
             return dimension;
         }
     };
-
-    template < index_t dimension >
-    class OpenGeodePointException : public OpenGeodeException
-    {
-    public:
-        template < typename... Args >
-        explicit OpenGeodePointException(
-            Point< dimension > point_in, const Args &...message )
-            : OpenGeodeException{ absl::StrCat(
-                  message..., " at ", point_in.string() ) },
-              point{ std::move( point_in ) }
-        {
-        }
-
-        Point< dimension > point;
-    };
-    ALIAS_1D_AND_2D_AND_3D( OpenGeodePointException );
 } // namespace geode
-
-// NOLINTNEXTLINE
-#define OPENGEODE_POINT_EXCEPTION( dimension, condition, point, ... )          \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-        throw geode::OpenGeodePointException< dimension >                      \
-        {                                                                      \
-            point, __VA_ARGS__                                                 \
-        }
-
-// NOLINTNEXTLINE
-#define OPENGEODE_POINT1D_EXCEPTION( condition, point, ... )                   \
-    OPENGEODE_POINT_EXCEPTION( 1, condition, point, __VA_ARGS__ )
-
-// NOLINTNEXTLINE
-#define OPENGEODE_POINT2D_EXCEPTION( condition, point, ... )                   \
-    OPENGEODE_POINT_EXCEPTION( 2, condition, point, __VA_ARGS__ )
-
-// NOLINTNEXTLINE
-#define OPENGEODE_POINT3D_EXCEPTION( condition, point, ... )                   \
-    OPENGEODE_POINT_EXCEPTION( 3, condition, point, __VA_ARGS__ )
 
 namespace std
 {

@@ -49,14 +49,14 @@ void test_rasterize_segment(
         132, 211, 212, 221, 222, 231, 232, 242, 243, 252, 253, 342, 343, 352,
         353, 363, 373 };
 
-    OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells: ", cells.size(), " instead of ",
+    geode::OpenGeodeMeshException::test( answer.size() == cells.size(),
+        "Wrong number of result cells: ", cells.size(), " instead of ",
         answer.size() );
     for( const auto cell : cells )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             answer.find( grid.cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells" );
+            "Wrong result cells" );
     }
 }
 
@@ -68,14 +68,14 @@ void test_rasterize_triangle(
         212, 213, 221, 222, 223, 232, 233, 242, 243, 252, 253, 313, 314, 323,
         324, 333, 334, 343, 344, 352, 353, 354, 363, 364, 373, 414, 415, 424,
         425, 434, 435, 444, 445, 454, 464, 515, 516, 525, 526, 535 };
-    OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells: ", cells.size(), " instead of ",
+    geode::OpenGeodeMeshException::test( answer.size() == cells.size(),
+        "Wrong number of result cells: ", cells.size(), " instead of ",
         answer.size() );
     for( const auto cell : cells )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             answer.find( grid.cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells" );
+            "Wrong result cells" );
     }
 }
 
@@ -87,14 +87,14 @@ void test_rasterize_degenerate_triangle(
         212, 221, 222, 223, 232, 233, 322, 323, 332, 333, 334, 343, 344, 433,
         434, 443, 444, 445, 454, 455, 544, 545, 554, 555, 556, 565, 566, 655,
         656, 665, 666 };
-    OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells: ", cells.size(), " instead of ",
+    geode::OpenGeodeMeshException::test( answer.size() == cells.size(),
+        "Wrong number of result cells: ", cells.size(), " instead of ",
         answer.size() );
     for( const auto cell : cells )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             answer.find( grid.cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells" );
+            "Wrong result cells" );
     }
 }
 
@@ -109,27 +109,27 @@ void test_conservative_rasterize_segment()
 
     const auto cells = geode::rasterize_segment( *grid, segment );
     const absl::flat_hash_set< geode::index_t > answer{ 22, 33, 44, 55, 66 };
-    OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells (rasterize_segment): ",
-        cells.size(), " instead of ", answer.size() );
+    geode::OpenGeodeMeshException::test( answer.size() == cells.size(),
+        "Wrong number of result cells (rasterize_segment): ", cells.size(),
+        " instead of ", answer.size() );
     for( const auto cell : cells )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             answer.find( grid->cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells (rasterize_segment)" );
+            "Wrong result cells (rasterize_segment)" );
     }
     const auto cells2 = geode::conservative_rasterize_segment( *grid, segment );
     const absl::flat_hash_set< geode::index_t > answer2{ 22, 23, 32, 33, 34, 43,
         44, 45, 54, 55, 56, 65, 66 };
-    OPENGEODE_EXCEPTION( answer2.size() == cells2.size(),
-        "[Test] Wrong number of result cells "
+    geode::OpenGeodeMeshException::test( answer2.size() == cells2.size(),
+        "Wrong number of result cells "
         "(conservative_rasterize_segment): ",
         cells2.size(), " instead of ", answer2.size() );
     for( const auto cell : cells2 )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             answer2.find( grid->cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells (conservative_rasterize_segment)" );
+            "Wrong result cells (conservative_rasterize_segment)" );
     }
 }
 
@@ -147,15 +147,15 @@ void test_conservative_rasterize_triangle()
         geode::conservative_rasterize_triangle( *grid, triangle );
     const absl::flat_hash_set< geode::index_t > answer{ 22, 23, 32, 33, 34, 42,
         43, 44, 45, 52, 53, 54, 55, 56, 62, 63, 64, 65, 66 };
-    OPENGEODE_EXCEPTION( answer.size() == cells.size(),
-        "[Test] Wrong number of result cells "
+    geode::OpenGeodeMeshException::test( answer.size() == cells.size(),
+        "Wrong number of result cells "
         "(conservative_rasterize_triangle): ",
         cells.size(), " instead of ", answer.size() );
     for( const auto cell : cells )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             answer.find( grid->cell_index( cell ) ) != answer.end(),
-            "[Test] Wrong result cells (conservative_rasterize_triangle)" );
+            "Wrong result cells (conservative_rasterize_triangle)" );
     }
 }
 
@@ -211,9 +211,9 @@ void test_limit()
     add_cells( all_cells, *grid, triangle6 );
     add_cells( all_cells, *grid, triangle6b );
 
-    OPENGEODE_EXCEPTION( all_cells.size() == 27,
-        "[Test] Wrong number of result cells (rasterize_cube): ",
-        all_cells.size(), " instead of 27" );
+    geode::OpenGeodeMeshException::test( all_cells.size() == 27,
+        "Wrong number of result cells (rasterize_cube): ", all_cells.size(),
+        " instead of 27" );
 }
 
 void test()

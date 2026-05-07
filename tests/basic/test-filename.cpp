@@ -31,26 +31,34 @@
 void test()
 {
     std::string path1 = "/where/is/file.ext";
-    OPENGEODE_EXCEPTION( geode::filename_with_extension( path1 ) == "file.ext",
-        "[Test] Wrong result for path1 with extension" );
-    OPENGEODE_EXCEPTION( geode::filename_without_extension( path1 ) == "file",
-        "[Test] Wrong result for path1 without extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filename_with_extension( path1 ) == "file.ext",
+        "Wrong result for path1 with extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filename_without_extension( path1 ) == "file",
+        "Wrong result for path1 without extension" );
 
     std::string path2 = "file.ext";
-    OPENGEODE_EXCEPTION( geode::filename_with_extension( path2 ) == "file.ext",
-        "[Test] Wrong result for path2 with extension" );
-    OPENGEODE_EXCEPTION( geode::filename_without_extension( path2 ) == "file",
-        "[Test] Wrong result for path2 without extension" );
-    OPENGEODE_EXCEPTION( geode::filepath_without_extension( path2 ) == "file",
-        "[Test] Wrong result for filepath2 without extension" );
-    OPENGEODE_EXCEPTION( geode::filepath_without_filename( path2 ) == "",
-        "[Test] Wrong result for filepath2 without file name" );
+    geode::OpenGeodeBasicException::test(
+        geode::filename_with_extension( path2 ) == "file.ext",
+        "Wrong result for path2 with extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filename_without_extension( path2 ) == "file",
+        "Wrong result for path2 without extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filepath_without_extension( path2 ) == "file",
+        "Wrong result for filepath2 without extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filepath_without_filename( path2 ) == "",
+        "Wrong result for filepath2 without file name" );
 
     std::string path3 = "C:/where/is/file.ext";
-    OPENGEODE_EXCEPTION( geode::filename_with_extension( path3 ) == "file.ext",
-        "[Test] Wrong result for path3 with extension" );
-    OPENGEODE_EXCEPTION( geode::filename_without_extension( path3 ) == "file",
-        "[Test] Wrong result for path3 without extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filename_with_extension( path3 ) == "file.ext",
+        "Wrong result for path3 with extension" );
+    geode::OpenGeodeBasicException::test(
+        geode::filename_without_extension( path3 ) == "file",
+        "Wrong result for path3 without extension" );
 }
 
 OPENGEODE_TEST( "filename" )

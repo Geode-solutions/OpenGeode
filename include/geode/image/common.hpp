@@ -30,5 +30,5 @@
 
 namespace geode
 {
-    OPENGEODE_LIBRARY( opengeode_image_api, OpenGeodeImage );
+    OPENGEODE_LIBRARY( opengeode_image_api, OpenGeode, Image );
 } // namespace geode

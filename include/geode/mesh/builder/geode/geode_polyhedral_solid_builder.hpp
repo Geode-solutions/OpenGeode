@@ -51,7 +51,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePolyhedralSolidBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodePolyhedralSolidBuilder(
             OpenGeodePolyhedralSolid< dimension >& mesh );

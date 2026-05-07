@@ -34,16 +34,18 @@ void check_point( const geode::CoordinateSystem< dimension >& coord_system,
     const geode::Point< dimension >& output )
 {
     const auto coordinates = coord_system.coordinates( input );
-    OPENGEODE_EXCEPTION( coordinates.inexact_equal( output ),
-        "[Test] Wrong coordinates ", dimension, "D" );
+    geode::OpenGeodeGeometryException::test(
+        coordinates.inexact_equal( output ), "Wrong coordinates ", dimension,
+        "D" );
     const auto global_point = coord_system.global_coordinates( coordinates );
-    OPENGEODE_EXCEPTION( input.inexact_equal( global_point ),
-        "[Test] Wrong global coordinates ", dimension, "D" );
+    geode::OpenGeodeGeometryException::test(
+        input.inexact_equal( global_point ), "Wrong global coordinates ",
+        dimension, "D" );
 }
 
 void acute_system2D()
 {
-    geode::Logger::info( "[Test] Acute system 2D" );
+    geode::Logger::info( "Acute system 2D" );
     const geode::CoordinateSystem2D coord_system{
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { 1, 1 } } },
         geode::Point2D{ { 1, 1 } }
@@ -60,7 +62,7 @@ void acute_system2D()
 
 void optuse_system2D()
 {
-    geode::Logger::info( "[Test] Optuse system 2D" );
+    geode::Logger::info( "Optuse system 2D" );
     const geode::CoordinateSystem2D coord_system{
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { -1, 1 } } },
         geode::Point2D{ { 1, 1 } }
@@ -77,7 +79,7 @@ void optuse_system2D()
 
 void orthonormal_system3D()
 {
-    geode::Logger::info( "[Test] Orthonormal system 3D" );
+    geode::Logger::info( "Orthonormal system 3D" );
     const geode::CoordinateSystem3D coord_system{
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 0, 1, 0 } },
             geode::Vector3D{ { 0, 0, 1 } } },
@@ -97,7 +99,7 @@ void orthonormal_system3D()
 
 void acute_system3D()
 {
-    geode::Logger::info( "[Test] Acute system 3D" );
+    geode::Logger::info( "Acute system 3D" );
     const geode::CoordinateSystem3D coord_system{
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 1, 1, 0 } },
             geode::Vector3D{ { 1, 1, 1 } } },
@@ -115,7 +117,7 @@ void acute_system3D()
 
 void optuse_system3D()
 {
-    geode::Logger::info( "[Test] Optuse system3D" );
+    geode::Logger::info( "Optuse system3D" );
     const geode::CoordinateSystem3D coord_system{
         { geode::Vector3D{ { -1, 0, 0 } }, geode::Vector3D{ { -2, -1, 0 } },
             geode::Vector3D{ { 1, 3, 2 } } },

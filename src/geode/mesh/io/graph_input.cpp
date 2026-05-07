@@ -53,8 +53,9 @@ namespace geode
             print_available_extensions< GraphInputFactory >( TYPE );
             Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetInputFactory >( "VertexSet" );
-            throw OpenGeodeException{ "Cannot load Graph from file: ",
-                filename };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load Graph from file: ", filename };
         }
     }
 

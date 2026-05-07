@@ -42,8 +42,8 @@ namespace geode
     class BlockCollections
     {
         OPENGEODE_DISABLE_COPY( BlockCollections );
-        PASSKEY(
-            BlockCollectionsBuilder< dimension >, BlockCollectionsBuilderKey );
+        PASSKEY( BlockCollectionsBuilder< dimension >,
+            BlockCollectionsBuilderKey /*key*/ );
 
     public:
         using Builder = BlockCollectionsBuilder< dimension >;

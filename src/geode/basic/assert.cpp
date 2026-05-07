@@ -27,10 +27,30 @@
 
 #include <absl/debugging/symbolize.h>
 
+#include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
 
 namespace geode
 {
+    OpenGeodeException::~OpenGeodeException() noexcept = default;
+
+    std::string_view OpenGeodeException::type_name() const
+    {
+        if( type_ == geode::OpenGeodeException::TYPE::data )
+        {
+            return "Data";
+        }
+        if( type_ == geode::OpenGeodeException::TYPE::internal )
+        {
+            return "Internal";
+        }
+        if( type_ == geode::OpenGeodeException::TYPE::result )
+        {
+            return "Result";
+        }
+        return "unknown";
+    }
+
     std::string OpenGeodeException::stack_trace() const
     {
         std::string stack_string;
@@ -51,15 +71,11 @@ namespace geode
         return stack_string;
     }
 
-    void geode_assertion_failed( std::string_view condition,
-        std::string_view message,
-        std::string_view file,
-        int line )
+    std::string OpenGeodeException::string() const
     {
-        Logger::error( "File: ", file );
-        Logger::error( "Line: ", line );
-        Logger::error( "Info: ", message );
-        throw OpenGeodeException{ "Assertion failed: ", condition };
+        return absl::StrCat( "OpenGeodeException of type ", type_name(),
+            " from project ", project(), " and library ", library(), ": ",
+            what(), "\n", stack_trace() );
     }
 
     int geode_lippincott()
@@ -68,20 +84,16 @@ namespace geode
         {
             throw;
         }
-        catch( const OpenGeodeDataException& exception )
-        {
-            Logger::critical( "OpenGeodeDataException: ", exception.what(),
-                "\n", exception.stack_trace() );
-        }
-        catch( const OpenGeodeResultException& exception )
-        {
-            Logger::critical( "OpenGeodeResultException: ", exception.what(),
-                "\n", exception.stack_trace() );
-        }
         catch( const OpenGeodeException& exception )
         {
-            Logger::critical( "OpenGeodeException: ", exception.what(), "\n",
-                exception.stack_trace() );
+            Logger::critical( exception.string() );
+            std::reference_wrapper< const OpenGeodeException > current =
+                exception;
+            while( current.get().has_parent() )
+            {
+                current = current.get().parent();
+                Logger::critical( "From: ", current.get().string() );
+            }
         }
         catch( const std::exception& exception )
         {
@@ -106,11 +118,14 @@ namespace geode
         }
         catch( const std::exception& exception )
         {
-            throw OpenGeodeException{ "std::exception, ", exception.what() };
+            throw OpenGeodeBasicException{ nullptr,
+                OpenGeodeException::TYPE::internal, "std::exception, ",
+                exception.what() };
         }
         catch( ... )
         {
-            throw OpenGeodeException{ "Unknown exception" };
+            throw OpenGeodeBasicException{ nullptr,
+                OpenGeodeException::TYPE::internal, "Unknown exception" };
         }
     }
 } // namespace geode

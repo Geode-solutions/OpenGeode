@@ -51,10 +51,11 @@ void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     builder.create_point( geode::Point3D{ { 9.3, 5.3, 6.7 } } );
     builder.create_point( geode::Point3D{ { 7.5, 4.2, 2.8 } } );
     builder.create_point( geode::Point3D{ { 2.2, 3.3, 4.4 } } );
-    OPENGEODE_EXCEPTION( polyhedral_solid.is_vertex_isolated( 0 ),
-        "[Test] Vertices should be isolated before polyhedra creation" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
-        "[Test] PolyhedralSolid should have 8 vertices" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.is_vertex_isolated( 0 ),
+        "Vertices should be isolated before polyhedra creation" );
+    geode::OpenGeodeMeshException::test( polyhedral_solid.nb_vertices() == 8,
+        "PolyhedralSolid should have 8 vertices" );
 }
 
 void test_bounding_box( const geode::PolyhedralSolid3D& polyhedral_solid )
@@ -62,28 +63,29 @@ void test_bounding_box( const geode::PolyhedralSolid3D& polyhedral_solid )
     geode::Point3D answer_min{ { 0.1, 0.2, 0.3 } };
     geode::Point3D answer_max{ { 9.3, 9.4, 6.7 } };
     const auto bbox = polyhedral_solid.bounding_box();
-    OPENGEODE_EXCEPTION( bbox.min() == answer_min,
-        "[Test] Wrong computation of bounding box (min)" );
-    OPENGEODE_EXCEPTION( bbox.max() == answer_max,
-        "[Test] Wrong computation of bounding box (max)" );
+    geode::OpenGeodeMeshException::test(
+        bbox.min() == answer_min, "Wrong computation of bounding box (min)" );
+    geode::OpenGeodeMeshException::test(
+        bbox.max() == answer_max, "Wrong computation of bounding box (max)" );
 }
 
 void test_facets( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.facets().facet_from_vertices( { 0, 1, 2 } ) == 0,
-        "[Test] Wrong facet from vertices" );
+        "Wrong facet from vertices" );
 }
 
 void test_edges( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
     geode::Point3D answer{ { 1.1, 4.8, 3.5 } };
     const auto vertices = polyhedral_solid.edges().edge_vertices( 0 );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edge_barycenter( vertices ) == answer,
-        "[Test] Wrong edge barycenter" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.edge_barycenter( vertices ) == answer,
+        "Wrong edge barycenter" );
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.edge_length( vertices ) - 11.3842 < 1e-6,
-        "[Test] Wrong edge length" );
+        "Wrong edge length" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -96,27 +98,33 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
     builder.create_polyhedron( { 4, 5, 6, 7 },
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 3,
-        "[Test] PolyhedralSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 11,
-        "[Test] PolyhedralSolid should have 11 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 15,
-        "[Test] PolyhedralSolid should have 15 edges" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.is_vertex_isolated( 0 ),
-        "[Test] Vertices should not be isolated after polyhedra creation" );
+    geode::OpenGeodeMeshException::test( polyhedral_solid.nb_polyhedra() == 3,
+        "PolyhedralSolid should have 3 polyhedra" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.facets().nb_facets() == 11,
+        "PolyhedralSolid should have 11 facets" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.edges().nb_edges() == 15,
+        "PolyhedralSolid should have 15 edges" );
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid.is_vertex_isolated( 0 ),
+        "Vertices should not be isolated after polyhedra creation" );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.edges().edge_from_vertices(
             polyhedral_solid.polyhedron_facet_edge_vertices( { { 0, 1 }, 2 } ) )
             == 4,
-        "[Test] Wrong edge index get from PolyhedronFacetEdge" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.vertex_in_polyhedron( 0, 7 ),
-        "[Test] Wrong vertex in polyhedron" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.vertex_in_polyhedron( 1, 5 ),
-        "[Test] Wrong vertex in polyhedron" );
+        "Wrong edge index get from PolyhedronFacetEdge" );
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid.vertex_in_polyhedron( 0, 7 ),
+        "Wrong vertex in polyhedron" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.vertex_in_polyhedron( 1, 5 ).has_value(),
+        "Wrong vertex in polyhedron" );
     geode::PolyhedronVertices answer{ 3, 4, 5, 6 };
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertices( 1 ) == answer,
-        "[Test] Wrong polyhedron vertices list" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_vertices( 1 ) == answer,
+        "Wrong polyhedron vertices list" );
 }
 
 void test_create_facet_attribute(
@@ -144,10 +152,10 @@ void test_create_edge_attribute(
         const auto& vertices = polyhedral_solid.edges().edge_vertices( e );
         attribute->set_value( e, vertices[0] + vertices[1] );
     }
-    OPENGEODE_EXCEPTION( attribute->value( 0 ) == 1,
-        "[Test] Wrong value for attribute on edge 0" );
-    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 3,
-        "[Test] Wrong value for attribute on edge 1" );
+    geode::OpenGeodeMeshException::test(
+        attribute->value( 0 ) == 1, "Wrong value for attribute on edge 0" );
+    geode::OpenGeodeMeshException::test(
+        attribute->value( 1 ) == 3, "Wrong value for attribute on edge 1" );
 }
 
 void test_polyhedron_adjacencies(
@@ -155,47 +163,53 @@ void test_polyhedron_adjacencies(
     geode::PolyhedralSolidBuilder3D& builder )
 {
     builder.compute_polyhedron_adjacencies();
-    OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 0 } ),
-        "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 0, 1 } ) == 1,
-        "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 2 } ),
-        "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 0 } ) == 2,
-        "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 3 } ) == 0,
-        "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 2, 3 } ) == 1,
-        "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid.polyhedron_adjacent( { 0, 0 } ),
+        "PolyhedralSolid adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_adjacent( { 0, 1 } ) == 1,
+        "PolyhedralSolid adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid.polyhedron_adjacent( { 0, 2 } ),
+        "PolyhedralSolid adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_adjacent( { 1, 0 } ) == 2,
+        "PolyhedralSolid adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_adjacent( { 1, 3 } ) == 0,
+        "PolyhedralSolid adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_adjacent( { 2, 3 } ) == 1,
+        "PolyhedralSolid adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.polyhedra_around_vertex( 4 ).size() == 3,
-        "[Test] PolyhedralSolid should have 3 polyhedra around this vertex" );
-    OPENGEODE_EXCEPTION(
+        "PolyhedralSolid should have 3 polyhedra around this vertex" );
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.polyhedron_facets_on_border( 0 ).size() == 4,
-        "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
+        "First polyhedron of PolyhedralSolid should have 4 facets on "
         "border" );
 
     auto edge_id =
         polyhedral_solid.edges().edge_from_vertices( { 5, 4 } ).value();
-    OPENGEODE_EXCEPTION(
-        edge_id == 8, "[Test] Wrong edge index from vertices" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        edge_id == 8, "Wrong edge index from vertices" );
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.polyhedra_around_edge( { 5, 4 } ).size() == 3,
-        "[Test] PolyhedralSolid should have 3 polyhedra around this edge" );
+        "PolyhedralSolid should have 3 polyhedra around this edge" );
     const auto facet_id = polyhedral_solid.facets().facet_from_vertices(
         polyhedral_solid.polyhedron_facet_vertices( { 1, 0 } ) );
     const auto& polyhedra = polyhedral_solid.polyhedra_from_facet_vertices(
         polyhedral_solid.facets().facet_vertices( facet_id.value() ) );
-    OPENGEODE_EXCEPTION(
-        polyhedra.size() == 2, "[Test] Wrong number of polyhedra from facet" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        polyhedra.size() == 2, "Wrong number of polyhedra from facet" );
+    geode::OpenGeodeMeshException::test(
         absl::c_find( polyhedra, geode::PolyhedronFacet{ 1, 0 } )
             != polyhedra.end(),
-        "[Test] Polyhedra from facet should contain (1, 0)" );
-    OPENGEODE_EXCEPTION(
+        "Polyhedra from facet should contain (1, 0)" );
+    geode::OpenGeodeMeshException::test(
         absl::c_find( polyhedra, geode::PolyhedronFacet{ 2, 3 } )
             != polyhedra.end(),
-        "[Test] Polyhedra from facet should contain (2, 3)" );
+        "Polyhedra from facet should contain (2, 3)" );
 }
 
 void test_permutation( const geode::PolyhedralSolid3D& solid,
@@ -203,90 +217,121 @@ void test_permutation( const geode::PolyhedralSolid3D& solid,
 {
     std::vector< geode::index_t > vertex_permutation{ 4, 2, 6, 1, 5, 0, 7, 3 };
     builder.permute_vertices( vertex_permutation );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 5,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 1 } ) == 3,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 2 } ) == 1,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 3 } ) == 7,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 4 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 5 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 0 } ) == 7,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 1 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 2 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 3 } ) == 2,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 0 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 1 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 2 } ) == 2,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 3 } ) == 6,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 0 } ) == 5,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 1 } ) == 3,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 2 } ) == 1,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 3 } ) == 7,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 4 } ) == 0,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 5 } ) == 4,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 0 } ) == 7,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 1 } ) == 0,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 2 } ) == 4,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 3 } ) == 2,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 0 } ) == 0,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 1 } ) == 4,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 2 } ) == 2,
+        "Wrong PolyhedronVertex after vertex permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 3 } ) == 6,
+        "Wrong PolyhedronVertex after vertex permute" );
 
     std::vector< geode::index_t > polyhedron_permutation{ 2, 0, 1 };
     builder.permute_polyhedra( polyhedron_permutation );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 1 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 2 } ) == 2,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 3 } ) == 6,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 0 } ) == 5,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 1 } ) == 3,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 2 } ) == 1,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 3 } ) == 7,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 4 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 5 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 0 } ) == 7,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 1 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 2 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 3 } ) == 2,
-        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 0 } ) == 0,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 1 } ) == 4,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 2 } ) == 2,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 0, 3 } ) == 6,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 0 } ) == 5,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 1 } ) == 3,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 2 } ) == 1,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 3 } ) == 7,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 4 } ) == 0,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 1, 5 } ) == 4,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 0 } ) == 7,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 1 } ) == 0,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 2 } ) == 4,
+        "Wrong PolyhedronVertex after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 3 } ) == 2,
+        "Wrong PolyhedronVertex after polyhedron permute" );
 
-    OPENGEODE_EXCEPTION( !solid.polyhedron_adjacent( { 0, 2 } ),
-        "[Test] Wrong Adjacency after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 3 } ) == 1,
-        "[Test] Wrong Adjacency after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 3 } ) == 2,
-        "[Test] Wrong Adjacency after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 1 } ) == 2,
-        "[Test] Wrong Adjacency after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( !solid.polyhedron_adjacent( { 0, 2 } ),
+        "Wrong Adjacency after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_adjacent( { 2, 3 } ) == 1,
+        "Wrong Adjacency after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_adjacent( { 0, 3 } ) == 2,
+        "Wrong Adjacency after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_adjacent( { 1, 1 } ) == 2,
+        "Wrong Adjacency after polyhedron permute" );
 
     const auto polyhedra_0 = solid.polyhedra_around_vertex( 0 );
-    OPENGEODE_EXCEPTION( polyhedra_0.size() == 3,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
-    OPENGEODE_EXCEPTION( polyhedra_0[0].polyhedron_id == 0,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
-    OPENGEODE_EXCEPTION( polyhedra_0[0].vertex_id == 0,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
-    OPENGEODE_EXCEPTION( polyhedra_0[1].polyhedron_id == 2,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
-    OPENGEODE_EXCEPTION( polyhedra_0[1].vertex_id == 1,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
-    OPENGEODE_EXCEPTION( polyhedra_0[2].polyhedron_id == 1,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
-    OPENGEODE_EXCEPTION( polyhedra_0[2].vertex_id == 4,
-        "[Test] Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test(
+        polyhedra_0.size() == 3, "Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( polyhedra_0[0].polyhedron_id == 0,
+        "Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( polyhedra_0[0].vertex_id == 0,
+        "Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( polyhedra_0[1].polyhedron_id == 2,
+        "Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( polyhedra_0[1].vertex_id == 1,
+        "Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( polyhedra_0[2].polyhedron_id == 1,
+        "Wrong polyhedra_0 after polyhedron permute" );
+    geode::OpenGeodeMeshException::test( polyhedra_0[2].vertex_id == 4,
+        "Wrong polyhedra_0 after polyhedron permute" );
 }
 
 void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -295,33 +340,41 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     std::vector< bool > to_delete( polyhedral_solid.nb_polyhedra(), false );
     to_delete.front() = true;
     builder.delete_polyhedra( to_delete );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 2,
-        "[Test] PolyhedralSolid should have  polyhedra" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 0 } ) == 5,
-        "[Test] PolyhedralSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 1 } ) == 3,
-        "[Test] PolyhedralSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
-        "[Test] PolyhedralSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 3 } ) == 7,
-        "[Test] PolyhedralSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 11,
-        "[Test] PolyhedralSolid should have 11 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 15,
-        "[Test] PolyhedralSolid should have 15 edges" );
+    geode::OpenGeodeMeshException::test( polyhedral_solid.nb_polyhedra() == 2,
+        "PolyhedralSolid should have  polyhedra" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_vertex( { 0, 0 } ) == 5,
+        "PolyhedralSolid vertex index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_vertex( { 0, 1 } ) == 3,
+        "PolyhedralSolid vertex index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
+        "PolyhedralSolid vertex index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_vertex( { 0, 3 } ) == 7,
+        "PolyhedralSolid vertex index is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.facets().nb_facets() == 11,
+        "PolyhedralSolid should have 11 facets" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.edges().nb_edges() == 15,
+        "PolyhedralSolid should have 15 edges" );
     builder.edges_builder().delete_isolated_edges();
     builder.facets_builder().delete_isolated_facets();
-    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 8,
-        "[Test] PolyhedralSolid should have 8 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 12,
-        "[Test] PolyhedralSolid should have 12 edges" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.facets().nb_facets() == 8,
+        "PolyhedralSolid should have 8 facets" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.edges().nb_edges() == 12,
+        "PolyhedralSolid should have 12 edges" );
     auto attribute = polyhedral_solid.edges()
                          .edge_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
-    OPENGEODE_EXCEPTION( attribute->value( 0 ) == 1,
-        "[Test] Wrong value for attribute on edge 0 after vertex deletion" );
-    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 3,
-        "[Test] Wrong value for attribute on edge 1 after vertex deletion" );
+    geode::OpenGeodeMeshException::test( attribute->value( 0 ) == 1,
+        "Wrong value for attribute on edge 0 after vertex deletion" );
+    geode::OpenGeodeMeshException::test( attribute->value( 1 ) == 3,
+        "Wrong value for attribute on edge 1 after vertex deletion" );
 }
 
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -333,42 +386,46 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
         geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
 
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
-        "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->nb_vertices() == 8,
+        "Reloaded PolyhedralSolid should have 8 vertices" );
     for( const auto vertex_id : geode::Range{ polyhedral_solid.nb_vertices() } )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             polyhedral_solid.point( vertex_id )
                 .inexact_equal( new_polyhedral_solid->point( vertex_id ) ),
-            "[Test] Wrong reloaded mesh point coordinates." );
+            "Wrong reloaded mesh point coordinates." );
     }
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->facets().nb_facets() == 11,
-        "[Test] Reloaded PolyhedralSolid should have 11 facets" );
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->edges().nb_edges() == 15,
-        "[Test] Reloaded PolyhedralSolid should have 15 edges" );
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_polyhedra() == 3,
-        "[Test] Reloaded PolyhedralSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->facets().nb_facets() == 11,
+        "Reloaded PolyhedralSolid should have 11 facets" );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->edges().nb_edges() == 15,
+        "Reloaded PolyhedralSolid should have 15 edges" );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->nb_polyhedra() == 3,
+        "Reloaded PolyhedralSolid should have 3 polyhedra" );
+    geode::OpenGeodeMeshException::test(
         new_polyhedral_solid->facets().facet_from_vertices(
             new_polyhedral_solid->polyhedron_facet_vertices( { 1, 0 } ) )
             == polyhedral_solid.facets().facet_from_vertices(
                 polyhedral_solid.polyhedron_facet_vertices( { 1, 0 } ) ),
-        "[Test] Reloaded PolyhedralSolid has wrong polyhedron facet index" );
+        "Reloaded PolyhedralSolid has wrong polyhedron facet index" );
     auto attribute = new_polyhedral_solid->facets()
                          .facet_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
     for( auto f : geode::Range{ new_polyhedral_solid->facets().nb_facets() } )
     {
-        OPENGEODE_EXCEPTION( attribute->value( f ) == f,
-            "[Test] Reloaded PolyhedralSolid has "
+        geode::OpenGeodeMeshException::test( attribute->value( f ) == f,
+            "Reloaded PolyhedralSolid has "
             "wrong attributes on its facets" );
     }
     auto manager = new_polyhedral_solid->texture_manager();
     auto texture_names = manager.texture_names();
-    OPENGEODE_EXCEPTION( texture_names.size() == 1,
-        "[Test] Reloaded PolyhedralSolid has wrong number of textures" );
-    OPENGEODE_EXCEPTION( texture_names[0] == "texture",
-        "[Test] Reloaded PolyhedralSolid has wrong texture name" );
+    geode::OpenGeodeMeshException::test( texture_names.size() == 1,
+        "Reloaded PolyhedralSolid has wrong number of textures" );
+    geode::OpenGeodeMeshException::test( texture_names[0] == "texture",
+        "Reloaded PolyhedralSolid has wrong texture name" );
 }
 
 void test_backward_io( const std::string& filename )
@@ -376,17 +433,21 @@ void test_backward_io( const std::string& filename )
     const auto new_polyhedral_solid =
         geode::load_polyhedral_solid< 3 >( filename );
 
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
-        "[Test] Backward PolyhedralSolid should have 8 vertices" );
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->facets().nb_facets() == 11,
-        "[Test] Backward PolyhedralSolid should have 11 facets" );
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->edges().nb_edges() == 15,
-        "[Test] Backward PolyhedralSolid should have 15 edges" );
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_polyhedra() == 3,
-        "[Test] Backward PolyhedralSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->nb_vertices() == 8,
+        "Backward PolyhedralSolid should have 8 vertices" );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->facets().nb_facets() == 11,
+        "Backward PolyhedralSolid should have 11 facets" );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->edges().nb_edges() == 15,
+        "Backward PolyhedralSolid should have 15 edges" );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->nb_polyhedra() == 3,
+        "Backward PolyhedralSolid should have 3 polyhedra" );
+    geode::OpenGeodeMeshException::test(
         new_polyhedral_solid->polyhedra_around_vertex( 4 ).size() == 3,
-        "[Test] Backward PolyhedralSolid has wrong polyhedra around vertex" );
+        "Backward PolyhedralSolid has wrong polyhedra around vertex" );
 }
 
 void test_barycenters()
@@ -408,16 +469,17 @@ void test_barycenters()
         { 0, 1, 2, 3, 4, 5 }, { { 0, 1, 2 }, { 0, 1, 4, 3 }, { 1, 2, 5, 4 },
                                   { 0, 3, 5, 2 }, { 3, 4, 5 } } );
     const geode::Point3D answer_facet_barycenter{ { a / 3., 0, c / 3. } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid->facet_barycenter(
             polyhedral_solid->polyhedron_facet_vertices( { 0, 0 } ) )
             == answer_facet_barycenter,
-        "[Test] PolyhedralSolid facet_barycenter is not correct" );
+        "PolyhedralSolid facet_barycenter is not correct" );
     const geode::Point3D answer_polyhedron_barycenter{ { a / 3., 0.5 * b,
         c / 3. } };
-    OPENGEODE_EXCEPTION( polyhedral_solid->polyhedron_barycenter( 0 )
-                             == answer_polyhedron_barycenter,
-        "[Test] PolyhedralSolid polyhedron barycenter is not correct" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid->polyhedron_barycenter( 0 )
+            == answer_polyhedron_barycenter,
+        "PolyhedralSolid polyhedron barycenter is not correct" );
 }
 
 void test_normals()
@@ -445,14 +507,16 @@ void test_normals()
     const geode::Point3D answer_facet_normal{ { 0, 0, 1 } };
     const auto polyhedron_facet_normal0 =
         polyhedral_solid->polyhedron_facet_normal( { 0, 1 } ).value();
-    OPENGEODE_EXCEPTION( polyhedron_facet_normal0 == answer_facet_normal,
-        "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (0, "
+    geode::OpenGeodeMeshException::test(
+        polyhedron_facet_normal0 == answer_facet_normal,
+        "PolyhedralSolid polyhedron_facet_normal is not correct (0, "
         "1)" );
 
     const auto polyhedron_facet_normal1 =
         polyhedral_solid->polyhedron_facet_normal( { 1, 1 } ).value();
-    OPENGEODE_EXCEPTION( polyhedron_facet_normal1 == answer_facet_normal * -1.,
-        "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (1, "
+    geode::OpenGeodeMeshException::test(
+        polyhedron_facet_normal1 == answer_facet_normal * -1.,
+        "PolyhedralSolid polyhedron_facet_normal is not correct (1, "
         "1)" );
 }
 
@@ -475,12 +539,13 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
     geode::OpenGeodePolyhedralSolid3D polyhedral_solid2{ std::move(
         *dynamic_cast< geode::OpenGeodePolyhedralSolid3D* >(
             polyhedral_solid_clone.get() ) ) };
-    OPENGEODE_EXCEPTION( polyhedral_solid2.nb_vertices() == 8,
-        "[Test] PolyhedralSolid2 should have 8 vertices" );
-    OPENGEODE_EXCEPTION( polyhedral_solid2.facets().nb_facets() == 8,
+    geode::OpenGeodeMeshException::test( polyhedral_solid2.nb_vertices() == 8,
+        "PolyhedralSolid2 should have 8 vertices" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid2.facets().nb_facets() == 8,
         "[Test]PolyhedralSolid2 should have 8 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid2.nb_polyhedra() == 2,
-        "[Test] PolyhedralSolid2 should have 2 polyhedra" );
+    geode::OpenGeodeMeshException::test( polyhedral_solid2.nb_polyhedra() == 2,
+        "PolyhedralSolid2 should have 2 polyhedra" );
 
     const auto attribute2 =
         polyhedral_solid2.vertex_attribute_manager()
@@ -490,8 +555,9 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
         { { 0, 0 }, 1 }, { { 7, 0 }, 1 }, { { 3, 0 }, 1 } };
     for( const auto v : geode::Range{ polyhedral_solid2.nb_vertices() } )
     {
-        OPENGEODE_EXCEPTION( attribute2->value( v ) == att_answer[v],
-            "[Test] PolyhedralSolid2 attribute is not correct" );
+        geode::OpenGeodeMeshException::test(
+            attribute2->value( v ) == att_answer[v],
+            "PolyhedralSolid2 attribute is not correct" );
     }
 }
 
@@ -500,22 +566,27 @@ void test_set_polyhedron_vertex(
     geode::PolyhedralSolidBuilder3D& builder )
 {
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
-    OPENGEODE_EXCEPTION( polyhedral_solid.facets().is_facet_isolated( 0 ),
-        "[Test] Facet should be isolated before clean" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edges().is_edge_isolated( 1 ),
-        "[Test] Edge should be isolated before clean" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.facets().is_facet_isolated( 0 ),
+        "Facet should be isolated before clean" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.edges().is_edge_isolated( 1 ),
+        "Edge should be isolated before clean" );
     builder.facets_builder().delete_isolated_facets();
     builder.edges_builder().delete_isolated_edges();
-    OPENGEODE_EXCEPTION( !polyhedral_solid.facets().is_facet_isolated( 0 ),
-        "[Test] Facet should not be isolated after clean" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.edges().is_edge_isolated( 1 ),
-        "[Test] Edge should not be isolated after clean" );
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid.facets().is_facet_isolated( 0 ),
+        "Facet should not be isolated after clean" );
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid.edges().is_edge_isolated( 1 ),
+        "Edge should not be isolated after clean" );
 
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 2,
-        "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 2,
+        "PolyhedronVertex after set_polyhedron_vertex is wrong" );
+    geode::OpenGeodeMeshException::test(
         polyhedral_solid.polyhedron_facet_vertex( { { 0, 1 }, 1 } ) == 4,
-        "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is "
+        "PolyhedronFacetVertex after set_polyhedron_vertex is "
         "wrong" );
 }
 
@@ -524,23 +595,27 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
 {
     std::vector< bool > to_delete( polyhedral_solid.nb_polyhedra(), true );
     builder.delete_polyhedra( to_delete );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
-        "[Test] PolyhedralSolid should have 8 vertices" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.is_vertex_isolated( 0 ),
-        "[Test] Vertices should be isolated after polyhedra deletion" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,
-        "[Test] PolyhedralSolid should have 0 polyhedron" );
+    geode::OpenGeodeMeshException::test( polyhedral_solid.nb_vertices() == 8,
+        "PolyhedralSolid should have 8 vertices" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.is_vertex_isolated( 0 ),
+        "Vertices should be isolated after polyhedra deletion" );
+    geode::OpenGeodeMeshException::test( polyhedral_solid.nb_polyhedra() == 0,
+        "PolyhedralSolid should have 0 polyhedron" );
     builder.edges_builder().delete_isolated_edges();
     builder.facets_builder().delete_isolated_facets();
-    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 0,
-        "[Test] PolyhedralSolid should have 0 facet" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 0,
-        "[Test] PolyhedralSolid should have 0 edge" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedra_around_vertex( 0 ).empty(),
-        "[Test] No more polyhedra around vertices" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.facets().nb_facets() == 0,
+        "PolyhedralSolid should have 0 facet" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.edges().nb_edges() == 0,
+        "PolyhedralSolid should have 0 edge" );
+    geode::OpenGeodeMeshException::test(
+        polyhedral_solid.polyhedra_around_vertex( 0 ).empty(),
+        "No more polyhedra around vertices" );
 
     builder.delete_isolated_vertices();
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 0,
+    geode::OpenGeodeMeshException::test( polyhedral_solid.nb_vertices() == 0,
         "[Test]PolyhedralSolid should have 0 vertex" );
 }
 

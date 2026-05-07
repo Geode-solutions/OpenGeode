@@ -35,10 +35,11 @@ void test_comparison()
     const geode::RGBColor color1{ 3, 254, 68 };
     const geode::RGBColor color2 = color1;
 
-    OPENGEODE_EXCEPTION( color1 == color2, "[Test] Colors should be the same" );
+    geode::OpenGeodeImageException::test(
+        color1 == color2, "Colors should be the same" );
     const geode::RGBColor color3{ 4, 254, 68 };
-    OPENGEODE_EXCEPTION(
-        color1 != color3, "[Test] Colors should be different" );
+    geode::OpenGeodeImageException::test(
+        color1 != color3, "Colors should be different" );
 }
 
 void test_color_attribute()
@@ -54,13 +55,14 @@ void test_color_attribute()
             geode::GreyscaleColor >(
             "greyscale_color", geode::GreyscaleColor{} );
     greyscale_attribute->set_value( 0, geode::GreyscaleColor{ 67 } );
-    OPENGEODE_EXCEPTION( rgb_attribute->is_genericable(),
+    geode::OpenGeodeImageException::test( rgb_attribute->is_genericable(),
         "[TEST] Attribute on RGBColor should be genericable." );
-    OPENGEODE_EXCEPTION( greyscale_attribute->is_genericable(),
+    geode::OpenGeodeImageException::test( greyscale_attribute->is_genericable(),
         "[TEST] Attribute on GreyScale should be genericable." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeImageException::test(
         rgb_attribute->generic_value( 0 ) == 3, "[TEST] Wrong generic value" );
-    OPENGEODE_EXCEPTION( greyscale_attribute->generic_value( 0 ) == 67,
+    geode::OpenGeodeImageException::test(
+        greyscale_attribute->generic_value( 0 ) == 67,
         "[TEST] Wrong generic value" );
 }
 

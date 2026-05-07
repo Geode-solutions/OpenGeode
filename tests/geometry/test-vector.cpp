@@ -30,29 +30,30 @@
 void test_length()
 {
     const geode::Vector3D p{ { 1, 2, 4 } };
-    OPENGEODE_EXCEPTION(
-        p.length() == std::sqrt( 1 + 4 + 16 ), "[Test] Wrong vector length" );
+    geode::OpenGeodeGeometryException::test(
+        p.length() == std::sqrt( 1 + 4 + 16 ), "Wrong vector length" );
 
     const auto p_normalized = p.normalize();
-    OPENGEODE_EXCEPTION(
-        p_normalized.length() == 1, "[Test] Wrong vector length" );
+    geode::OpenGeodeGeometryException::test(
+        p_normalized.length() == 1, "Wrong vector length" );
 }
 
 void test_operations()
 {
     const geode::Vector3D unit{ { 0, 2, 0 } };
     const geode::Vector3D p{ { 1, 2, 4 } };
-    OPENGEODE_EXCEPTION( p.dot( unit ) == 4, "[Test] Wrong dot product" );
+    geode::OpenGeodeGeometryException::test(
+        p.dot( unit ) == 4, "Wrong dot product" );
 
     const auto cross_unit =
         geode::Vector3D{ { 1, 0, 0 } }.cross( geode::Vector3D{ { 0, 1, 0 } } );
     const geode::Vector3D answer_unit{ { 0, 0, 1 } };
-    OPENGEODE_EXCEPTION(
-        cross_unit == answer_unit, "[Test] Wrong unit cross product" );
+    geode::OpenGeodeGeometryException::test(
+        cross_unit == answer_unit, "Wrong unit cross product" );
 
     const geode::Vector3D answer{ { -8, 0, 2 } };
-    OPENGEODE_EXCEPTION(
-        p.cross( unit ) == answer, "[Test] Wrong cross product" );
+    geode::OpenGeodeGeometryException::test(
+        p.cross( unit ) == answer, "Wrong cross product" );
 }
 
 void test()

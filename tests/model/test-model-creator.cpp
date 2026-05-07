@@ -128,8 +128,8 @@ void test_create_brep_with_dangling_components()
         { {}, {}, { 0, 1, 2, 3, 4, 5 }, {}, {}, {} },
     };
     creator.create_blocks( corner_uuids, line_uuids, surface_uuids, blocks );
-    OPENGEODE_EXCEPTION(
-        brep.nb_blocks() == blocks.size(), "[Test] Wrong number of blocks" );
+    geode::OpenGeodeModelException::test(
+        brep.nb_blocks() == blocks.size(), "Wrong number of blocks" );
     geode::index_t nb_embedding_blocks{ 0 };
     geode::index_t nb_embedding_surfaces{ 0 };
     for( const auto& corner : brep.corners() )
@@ -137,10 +137,10 @@ void test_create_brep_with_dangling_components()
         nb_embedding_blocks += brep.nb_embedding_blocks( corner );
         nb_embedding_surfaces += brep.nb_embedding_surfaces( corner );
     }
-    OPENGEODE_EXCEPTION( nb_embedding_blocks == 0,
-        "[Test] Wrong number of corner embedding blocks" );
-    OPENGEODE_EXCEPTION( nb_embedding_surfaces == 1,
-        "[Test] Wrong number of corner embedding surfaces" );
+    geode::OpenGeodeModelException::test(
+        nb_embedding_blocks == 0, "Wrong number of corner embedding blocks" );
+    geode::OpenGeodeModelException::test( nb_embedding_surfaces == 1,
+        "Wrong number of corner embedding surfaces" );
     geode::save_brep( brep, "test.og_brep" );
 }
 
@@ -162,8 +162,9 @@ void test_section()
     const auto nb_vertices = points.size();
     geode::Section section;
     geode::SimplicialSectionCreator creator{ section, std::move( points ) };
-    OPENGEODE_EXCEPTION( section.nb_unique_vertices() == nb_vertices,
-        "[Test] Wrong number of unique vertices" );
+    geode::OpenGeodeModelException::test(
+        section.nb_unique_vertices() == nb_vertices,
+        "Wrong number of unique vertices" );
 
     std::vector< geode::CornerDefinition > corner_definitions{
         { 0 },
@@ -174,8 +175,9 @@ void test_section()
         { 5 },
     };
     const auto corners = creator.create_corners( corner_definitions );
-    OPENGEODE_EXCEPTION( corners.size() == corner_definitions.size(),
-        "[Test] Wrong number of corners" );
+    geode::OpenGeodeModelException::test(
+        corners.size() == corner_definitions.size(),
+        "Wrong number of corners" );
 
     std::vector< geode::LineDefinition > line_definitions{
         { { 0, 7, 1 } },
@@ -185,25 +187,25 @@ void test_section()
         { { 4, 10, 5 } },
     };
     const auto lines = creator.create_lines( corners, line_definitions );
-    OPENGEODE_EXCEPTION( lines.size() == line_definitions.size(),
-        "[Test] Wrong number of lines" );
+    geode::OpenGeodeModelException::test(
+        lines.size() == line_definitions.size(), "Wrong number of lines" );
     for( const auto l : geode::Indices{ lines } )
     {
         const auto& line = section.line( lines[l] );
         const auto& mesh = line.mesh();
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeModelException::test(
             mesh.nb_vertices() == line_definitions[l].vertices.size(),
-            "[Test] Wrong number of Line vertices" );
-        OPENGEODE_EXCEPTION(
+            "Wrong number of Line vertices" );
+        geode::OpenGeodeModelException::test(
             mesh.nb_edges() == line_definitions[l].vertices.size() - 1,
-            "[Test] Wrong number of Line edges" );
+            "Wrong number of Line edges" );
         for( const auto& corner : section.boundaries( line ) )
         {
             if( corner.id() != corners[line_definitions[l].vertices.front()]
                 && corner.id() != corners[line_definitions[l].vertices.back()] )
             {
-                OPENGEODE_EXCEPTION(
-                    false, "[Test] Missing Corner in Line boundary" );
+                geode::OpenGeodeModelException::test(
+                    false, "Missing Corner in Line boundary" );
             }
         }
     }
@@ -215,18 +217,19 @@ void test_section()
             { 0, 1, 2, 3 }, { 4 }, {} },
     };
     const auto surfaces = creator.create_surfaces( lines, surface_definitions );
-    OPENGEODE_EXCEPTION( surfaces.size() == surface_definitions.size(),
-        "[Test] Wrong number of surfaces" );
+    geode::OpenGeodeModelException::test(
+        surfaces.size() == surface_definitions.size(),
+        "Wrong number of surfaces" );
     for( const auto s : geode::Indices{ surfaces } )
     {
         const auto& surface = section.surface( surfaces[s] );
         const auto& mesh = surface.mesh();
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeModelException::test(
             mesh.nb_vertices() == surface_definitions[s].vertices.size(),
-            "[Test] Wrong number of Surface vertices" );
-        OPENGEODE_EXCEPTION(
+            "Wrong number of Surface vertices" );
+        geode::OpenGeodeModelException::test(
             mesh.nb_polygons() == surface_definitions[s].triangles.size() / 3,
-            "[Test] Wrong number of Surface triangles" );
+            "Wrong number of Surface triangles" );
         for( const auto& line : section.boundaries( surface ) )
         {
             bool found{ false };
@@ -238,8 +241,8 @@ void test_section()
                     break;
                 }
             }
-            OPENGEODE_EXCEPTION(
-                found, "[Test] Missing Line in Surface boundary" );
+            geode::OpenGeodeModelException::test(
+                found, "Missing Line in Surface boundary" );
         }
         for( const auto& line : section.internal_lines( surface ) )
         {
@@ -252,8 +255,8 @@ void test_section()
                     break;
                 }
             }
-            OPENGEODE_EXCEPTION(
-                found, "[Test] Missing Line in Surface internal lines" );
+            geode::OpenGeodeModelException::test(
+                found, "Missing Line in Surface internal lines" );
         }
     }
 
@@ -265,8 +268,9 @@ void test_section()
     };
     const auto boundaries =
         creator.create_model_boundaries( lines, boundary_definitions );
-    OPENGEODE_EXCEPTION( boundaries.size() == boundary_definitions.size(),
-        "[Test] Wrong number of boundaries" );
+    geode::OpenGeodeModelException::test(
+        boundaries.size() == boundary_definitions.size(),
+        "Wrong number of boundaries" );
     for( const auto b : geode::Indices{ boundaries } )
     {
         const auto& boundary = section.model_boundary( boundaries[b] );
@@ -281,8 +285,8 @@ void test_section()
                     break;
                 }
             }
-            OPENGEODE_EXCEPTION(
-                found, "[Test] Missing Line in ModelBoundary" );
+            geode::OpenGeodeModelException::test(
+                found, "Missing Line in ModelBoundary" );
         }
     }
     geode::save_section( section, "test_section.og_sctn" );

@@ -83,7 +83,7 @@ namespace geode
     template < index_t dimension >
     CornerCollection< dimension >&
         CornerCollections< dimension >::modifiable_corner_collection(
-            const uuid& id, CornerCollectionsBuilderKey )
+            const uuid& id, CornerCollectionsBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -98,7 +98,7 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollections< dimension >::load_corner_collections(
-        std::string_view directory, CornerCollectionsBuilderKey )
+        std::string_view directory, CornerCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
             absl::StrCat( directory, "/corner_collections" ) );
@@ -122,14 +122,14 @@ namespace geode
 
     template < index_t dimension >
     auto CornerCollections< dimension >::modifiable_corner_collections(
-        CornerCollectionsBuilderKey ) -> ModifiableCornerCollectionRange
+        CornerCollectionsBuilderKey /*key*/ ) -> ModifiableCornerCollectionRange
     {
         return { *this };
     }
 
     template < index_t dimension >
     const uuid& CornerCollections< dimension >::create_corner_collection(
-        CornerCollectionsBuilderKey )
+        CornerCollectionsBuilderKey /*key*/ )
     {
         typename CornerCollections< dimension >::Impl::ComponentPtr collection{
             new CornerCollection< dimension >{
@@ -142,7 +142,7 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollections< dimension >::create_corner_collection(
-        uuid corner_collection_id, CornerCollectionsBuilderKey )
+        uuid corner_collection_id, CornerCollectionsBuilderKey /*key*/ )
     {
         typename CornerCollections<
             dimension >::Impl::ComponentPtr corner_collection{
@@ -157,7 +157,7 @@ namespace geode
     template < index_t dimension >
     void CornerCollections< dimension >::delete_corner_collection(
         const CornerCollection< dimension >& collection,
-        CornerCollectionsBuilderKey )
+        CornerCollectionsBuilderKey /*key*/ )
     {
         impl_->delete_component( collection.id() );
     }

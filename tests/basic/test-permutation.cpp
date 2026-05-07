@@ -33,12 +33,13 @@ void test()
 
     geode::permute( data, permutation );
     std::vector< double > data_answer{ 0.3, 0.5, 0.4, 0.1, 0.2 };
-    OPENGEODE_EXCEPTION( data == data_answer, "[Test] Wrong permutation data" );
+    geode::OpenGeodeBasicException::test(
+        data == data_answer, "Wrong permutation data" );
 
     const auto old2new = geode::old2new_permutation( permutation );
     std::vector< geode::index_t > answer_permutation{ 3, 4, 0, 2, 1 };
-    OPENGEODE_EXCEPTION(
-        old2new == answer_permutation, "[Test] Wrong permutation old2new" );
+    geode::OpenGeodeBasicException::test(
+        old2new == answer_permutation, "Wrong permutation old2new" );
 }
 
 OPENGEODE_TEST( "permutation" )

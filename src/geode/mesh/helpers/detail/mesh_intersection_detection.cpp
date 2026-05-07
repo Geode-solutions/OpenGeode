@@ -79,7 +79,9 @@ namespace
             }
             return vertex_id;
         }
-        OPENGEODE_ASSERT_NOT_REACHED( "Should have found a third point index" );
+        throw geode::OpenGeodeMeshException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal,
+            "Should have found a third point index" };
         return geode::NO_ID;
     }
 

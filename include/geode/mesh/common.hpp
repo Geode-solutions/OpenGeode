@@ -30,5 +30,5 @@
 
 namespace geode
 {
-    OPENGEODE_LIBRARY( opengeode_mesh_api, OpenGeodeMesh );
+    OPENGEODE_LIBRARY( opengeode_mesh_api, OpenGeode, Mesh );
 } // namespace geode

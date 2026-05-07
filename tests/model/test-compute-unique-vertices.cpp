@@ -37,8 +37,8 @@ void test_brep()
         geode::DATA_PATH, "rectangular_cuboid_without_uv.og_brep" ) );
     geode::BRepBuilder brep_builder{ brep };
     geode::compute_model_unique_vertices( brep, brep_builder );
-    OPENGEODE_EXCEPTION( brep.nb_unique_vertices() == 8,
-        "[Test] Wrong number of unique vertices" );
+    geode::OpenGeodeModelException::test(
+        brep.nb_unique_vertices() == 8, "Wrong number of unique vertices" );
 }
 
 void test()

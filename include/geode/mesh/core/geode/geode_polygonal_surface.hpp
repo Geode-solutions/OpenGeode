@@ -42,7 +42,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePolygonalSurface );
         PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
-            OGPolygonalSurfaceKey );
+            OGPolygonalSurfaceKey /*key*/ );
 
     public:
         using Builder = OpenGeodePolygonalSurfaceBuilder< dimension >;
@@ -85,33 +85,33 @@ namespace geode
     public:
         void set_vertex( index_t vertex_id,
             Point< dimension > point,
-            OGPolygonalSurfaceKey );
+            OGPolygonalSurfaceKey /*key*/ );
 
         void set_polygon_vertex( const PolygonVertex& polygon_vertex,
             index_t vertex_id,
-            OGPolygonalSurfaceKey );
+            OGPolygonalSurfaceKey /*key*/ );
 
         void set_polygon_adjacent( const PolygonEdge& polygon_edge,
             index_t adjacent_id,
-            OGPolygonalSurfaceKey );
+            OGPolygonalSurfaceKey /*key*/ );
 
-        void add_polygon(
-            absl::Span< const index_t > vertices, OGPolygonalSurfaceKey );
+        void add_polygon( absl::Span< const index_t > vertices,
+            OGPolygonalSurfaceKey /*key*/ );
 
-        void remove_polygons(
-            const std::vector< bool >& to_delete, OGPolygonalSurfaceKey );
+        void remove_polygons( const std::vector< bool >& to_delete,
+            OGPolygonalSurfaceKey /*key*/ );
 
-        void permute_polygons(
-            absl::Span< const index_t > permutation, OGPolygonalSurfaceKey );
+        void permute_polygons( absl::Span< const index_t > permutation,
+            OGPolygonalSurfaceKey /*key*/ );
 
         void copy_polygons(
             const OpenGeodePolygonalSurface< dimension >& surface_mesh,
-            OGPolygonalSurfaceKey );
+            OGPolygonalSurfaceKey /*key*/ );
 
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
         [[nodiscard]] index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;

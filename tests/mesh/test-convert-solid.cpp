@@ -66,49 +66,49 @@ void test_grid_to_solids()
     geode::save_tetrahedral_solid(
         *tet_solid_from_light_grid, "test_densified_tet_from_grid.og_tso3d" );
     const geode::index_t nb_vertices = 6 * 6 * 6;
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_mesh_grid_1.value()->nb_vertices() == nb_vertices,
-        "[Test] Number of vertices in TetrahedralSolid3D from RegularGrid3D as "
+        "Number of vertices in TetrahedralSolid3D from RegularGrid3D as "
         "mesh is not correct." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_mesh_grid_2->nb_vertices() == nb_vertices,
-        "[Test] Number of vertices in TetrahedralSolid3D from RegularGrid3D as "
+        "Number of vertices in TetrahedralSolid3D from RegularGrid3D as "
         "grid is not correct." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         hybrid_solid_from_mesh_grid->nb_vertices() == nb_vertices,
-        "[Test] Number of vertices in HybridSolid3D from RegularGrid3D as "
+        "Number of vertices in HybridSolid3D from RegularGrid3D as "
         "grid is not correct." );
     const geode::index_t nb_densified_vertices =
         nb_vertices + 3 * cells_to_densify.size() + 2 * 5 * 6 + 2 * 5 * 5;
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_light_grid->nb_vertices() == nb_densified_vertices,
-        "[Test] Number of vertices in TetrahedralSolid3D from LightRegularGrid "
+        "Number of vertices in TetrahedralSolid3D from LightRegularGrid "
         "is not correct: ",
         tet_solid_from_light_grid->nb_vertices(), " instead of ",
         nb_densified_vertices );
     const geode::index_t nb_tetrahedra = 5 * 5 * 5 * 6;
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_mesh_grid_1.value()->nb_polyhedra() == nb_tetrahedra,
-        "[Test] Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
+        "Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
         "as mesh is not correct." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_mesh_grid_2->nb_polyhedra() == nb_tetrahedra,
-        "[Test] Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
+        "Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
         "as grid is not correct." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_mesh_grid_2->nb_polyhedra() == nb_tetrahedra,
-        "[Test] Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
+        "Number of tetrahedra in TetrahedralSolid3D from RegularGrid3D "
         "as grid is not correct." );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         hybrid_solid_from_mesh_grid->nb_polyhedra() == mesh_grid->nb_cells(),
-        "[Test] Number of hexahedra in HybridSolid3D from "
+        "Number of hexahedra in HybridSolid3D from "
         "RegularGrid is not correct" );
     for( const auto polyhedron_id :
         geode::Range{ tet_solid_from_light_grid->nb_polyhedra() } )
     {
         const auto tet_volume =
             tet_solid_from_light_grid->polyhedron_volume( polyhedron_id );
-        OPENGEODE_EXCEPTION( tet_volume > 0, "[Test] Polyhedron ",
+        geode::OpenGeodeMeshException::test( tet_volume > 0, "Polyhedron ",
             polyhedron_id,
             " in TetrahedralSolid3D from RegularGrid3D should have a positive "
             "volume, not ",
@@ -116,9 +116,9 @@ void test_grid_to_solids()
     }
     const geode::index_t nb_densified_tetras =
         5 * 5 * ( 2 * 6 + 2 * ( 5 * 2 + 4 ) + 6 * 4 );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         tet_solid_from_light_grid->nb_polyhedra() == nb_densified_tetras,
-        "[Test] Number of tetrahedra in TetrahedralSolid3D from "
+        "Number of tetrahedra in TetrahedralSolid3D from "
         "LightRegularGrid "
         "is not correct: ",
         tet_solid_from_light_grid->nb_polyhedra(), " instead of ",

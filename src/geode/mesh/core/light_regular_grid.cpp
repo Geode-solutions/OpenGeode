@@ -62,13 +62,14 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.cell_attribute_manager_ );
-                    a.object( impl.vertex_attribute_manager_ );
-                } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& archive, Impl& impl ) {
+                               archive.object( impl.cell_attribute_manager_ );
+                               archive.object( impl.vertex_attribute_manager_ );
+                           } } } );
         }
 
     private:
@@ -196,16 +197,17 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void LightRegularGrid< dimension >::serialize( Archive& archive )
+    void LightRegularGrid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
-            Growable< Archive, LightRegularGrid >{
-                { []( Archive& a, LightRegularGrid& grid ) {
-                    a.ext(
-                        grid, bitsery::ext::BaseClass< Grid< dimension > >{} );
-                    a.ext( grid, bitsery::ext::BaseClass< Identifier >{} );
-                    a.object( grid.impl_ );
-                } } } );
+        serializer.ext(
+            *this, Growable< Archive, LightRegularGrid >{
+                       { []( Archive& archive, LightRegularGrid& grid ) {
+                           archive.ext( grid,
+                               bitsery::ext::BaseClass< Grid< dimension > >{} );
+                           archive.ext(
+                               grid, bitsery::ext::BaseClass< Identifier >{} );
+                           archive.object( grid.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api LightRegularGrid< 2 >;

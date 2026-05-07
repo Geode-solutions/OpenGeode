@@ -47,7 +47,7 @@ namespace geode
     class opengeode_mesh_api VertexSetBuilder : public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( VertexSetBuilder );
-        PASSKEY( VertexSet, VertexSetKey );
+        PASSKEY( VertexSet, VertexSetKey /*key*/ );
 
     public:
         VertexSetBuilder( VertexSetBuilder&& ) noexcept = default;

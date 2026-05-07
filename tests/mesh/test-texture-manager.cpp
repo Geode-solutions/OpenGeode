@@ -71,15 +71,16 @@ void check_texture(
     for( const auto i : geode::Range{ 42 } )
     {
         const geode::Point2D coord{ { i * 2., i * 3. } };
-        OPENGEODE_EXCEPTION( texture.texture_coordinates( { i, 0 } ) == coord,
-            "[Test] Wrong texture coordinates" );
+        geode::OpenGeodeMeshException::test(
+            texture.texture_coordinates( { i, 0 } ) == coord,
+            "Wrong texture coordinates" );
     }
     const auto& image = texture.image();
     for( const auto i : geode::LRange{ 100 } )
     {
         const geode::RGBColor color{ i, i, i };
-        OPENGEODE_EXCEPTION(
-            image.color( i ) == color, "[Test] Wrong color image" );
+        geode::OpenGeodeMeshException::test(
+            image.color( i ) == color, "Wrong color image" );
     }
 }
 
@@ -94,7 +95,7 @@ void save( const geode::TextureStorage2D& storage, std::string_view filename )
     geode::Serializer archive{ context, file };
     archive.object( storage );
     archive.adapter().flush();
-    OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+    geode::OpenGeodeMeshException::test( std::get< 1 >( context ).isValid(),
         "[Bitsery::write] Error while writing file: ", filename );
 }
 
@@ -110,9 +111,10 @@ geode::TextureStorage2D load( std::string_view filename )
     geode::TextureStorage2D storage;
     archive.object( storage );
     const auto& adapter = archive.adapter();
-    OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
-                             && adapter.isCompletedSuccessfully()
-                             && std::get< 1 >( context ).isValid(),
+    geode::OpenGeodeMeshException::test(
+        adapter.error() == bitsery::ReaderError::NoError
+            && adapter.isCompletedSuccessfully()
+            && std::get< 1 >( context ).isValid(),
         "[Bitsery::read] Error while reading file: ", filename );
     return storage;
 }

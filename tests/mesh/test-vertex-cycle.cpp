@@ -37,8 +37,8 @@ void test_single_vertex_cycle()
     const geode::detail::VertexCycle< std::array< geode::index_t, 1 > > cycle2{
         { 4 }
     };
-    OPENGEODE_EXCEPTION( cycle1 != cycle2,
-        "[Test] Wrong result for operator!= with cycle1 and cycle2" );
+    geode::OpenGeodeMeshException::test( cycle1 != cycle2,
+        "Wrong result for operator!= with cycle1 and cycle2" );
 }
 
 void test_vertex_cycle()
@@ -66,16 +66,16 @@ void test_vertex_cycle()
         { 3, 1 }
     };
 
-    OPENGEODE_EXCEPTION( cycle1 == cycle2,
-        "[Test] Wrong result for operator== with cycle1 and cycle2" );
-    OPENGEODE_EXCEPTION( cycle1 != cycle3,
-        "[Test] Wrong result for operator!= with cycle1 and cycle3" );
-    OPENGEODE_EXCEPTION( cycle1 == cycle4,
-        "[Test] Wrong result for operator== with cycle1 and cycle4" );
-    OPENGEODE_EXCEPTION( cycle5 == cycle6,
-        "[Test] Wrong result for operator== with cycle5 and cycle6" );
-    OPENGEODE_EXCEPTION( cycle5 != cycle7,
-        "[Test] Wrong result for operator!= with cycle5 and cycle7" );
+    geode::OpenGeodeMeshException::test( cycle1 == cycle2,
+        "Wrong result for operator== with cycle1 and cycle2" );
+    geode::OpenGeodeMeshException::test( cycle1 != cycle3,
+        "Wrong result for operator!= with cycle1 and cycle3" );
+    geode::OpenGeodeMeshException::test( cycle1 == cycle4,
+        "Wrong result for operator== with cycle1 and cycle4" );
+    geode::OpenGeodeMeshException::test( cycle5 == cycle6,
+        "Wrong result for operator== with cycle5 and cycle6" );
+    geode::OpenGeodeMeshException::test( cycle5 != cycle7,
+        "Wrong result for operator!= with cycle5 and cycle7" );
 }
 
 void test_oriented_vertex_cycle()
@@ -96,18 +96,18 @@ void test_oriented_vertex_cycle()
     const geode::detail::OrientedVertexCycle< std::array< geode::index_t, 2 > >
         cycle7{ { 3, 1 } };
 
-    OPENGEODE_EXCEPTION( cycle1 == cycle2,
-        "[Test] Wrong result for operator== with cycle1 and cycle2" );
-    OPENGEODE_EXCEPTION( cycle1 != cycle3,
-        "[Test] Wrong result for operator== with cycle1 and cycle3" );
-    OPENGEODE_EXCEPTION( cycle1 != cycle4,
-        "[Test] Wrong result for operator!= with cycle1 and cycle4" );
-    OPENGEODE_EXCEPTION( cycle1.is_opposite( cycle4 ),
-        "[Test] Wrong result for is_opposite with cycle1 and cycle4" );
-    OPENGEODE_EXCEPTION( cycle5 == cycle6,
-        "[Test] Wrong result for operator== with cycle5 and cycle6" );
-    OPENGEODE_EXCEPTION( cycle5 != cycle7,
-        "[Test] Wrong result for operator!= with cycle5 and cycle7" );
+    geode::OpenGeodeMeshException::test( cycle1 == cycle2,
+        "Wrong result for operator== with cycle1 and cycle2" );
+    geode::OpenGeodeMeshException::test( cycle1 != cycle3,
+        "Wrong result for operator== with cycle1 and cycle3" );
+    geode::OpenGeodeMeshException::test( cycle1 != cycle4,
+        "Wrong result for operator!= with cycle1 and cycle4" );
+    geode::OpenGeodeMeshException::test( cycle1.is_opposite( cycle4 ),
+        "Wrong result for is_opposite with cycle1 and cycle4" );
+    geode::OpenGeodeMeshException::test( cycle5 == cycle6,
+        "Wrong result for operator== with cycle5 and cycle6" );
+    geode::OpenGeodeMeshException::test( cycle5 != cycle7,
+        "Wrong result for operator!= with cycle5 and cycle7" );
 }
 
 void test_several_containers()
@@ -121,10 +121,10 @@ void test_several_containers()
         { 2, 3, 1 }
     };
 
-    OPENGEODE_EXCEPTION( cycle1 == cycle2,
-        "[Test] Wrong result for operator== with cycle1 and cycle2" );
-    OPENGEODE_EXCEPTION( cycle1 != cycle3,
-        "[Test] Wrong result for operator!= with cycle1 and cycle3" );
+    geode::OpenGeodeMeshException::test( cycle1 == cycle2,
+        "Wrong result for operator== with cycle1 and cycle2" );
+    geode::OpenGeodeMeshException::test( cycle1 != cycle3,
+        "Wrong result for operator!= with cycle1 and cycle3" );
 }
 
 void test()

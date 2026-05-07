@@ -356,7 +356,7 @@ namespace geode
     private:
         const EdgedCurve2D& mesh_;
         const Point2D& origin_;
-        DEBUG_CONST OwnerSegment2D segment_;
+        OwnerSegment2D segment_;
         mutable std::vector< EdgeDistance > results_;
         mutable bool are_results_sorted_{ false };
         std::mutex mutex_;
@@ -578,7 +578,7 @@ namespace geode
     private:
         const SurfaceMesh3D& mesh_;
         const Point3D& origin_;
-        DEBUG_CONST OwnerSegment3D segment_;
+        OwnerSegment3D segment_;
         mutable std::vector< PolygonDistance > results_;
         mutable bool are_results_sorted_{ false };
         std::mutex mutex_;

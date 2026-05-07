@@ -25,18 +25,16 @@
 
 #include <memory>
 
-#include <geode/basic/common.hpp>
-
 namespace geode
 {
     template < typename T >
     class PImpl
     {
-        OPENGEODE_DISABLE_COPY( PImpl );
-
     public:
         template < typename... Args >
         explicit PImpl( Args &&... );
+        PImpl( const PImpl< T > &other ) = delete;
+        PImpl< T > &operator=( const PImpl< T > &other ) = delete;
         PImpl( PImpl< T > &&other ) noexcept;
         PImpl< T > &operator=( PImpl< T > &&other ) noexcept;
         ~PImpl();
@@ -48,7 +46,7 @@ namespace geode
         const T &operator*() const;
 
         template < typename Archive >
-        void serialize( Archive &archive );
+        void serialize( Archive &serializer );
 
     private:
         std::unique_ptr< T > pimpl_;

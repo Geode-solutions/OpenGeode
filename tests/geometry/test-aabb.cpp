@@ -86,8 +86,9 @@ void test_build_aabb()
         create_box_vector< dimension >( nb_boxes, box_size );
     const geode::AABBTree< dimension > aabb{ box_vector };
 
-    OPENGEODE_EXCEPTION( aabb.nb_bboxes() == box_vector.size(),
-        "[Test] Build AABB - Wrong number of boxes in the tree" );
+    geode::OpenGeodeGeometryException::test(
+        aabb.nb_bboxes() == box_vector.size(),
+        "Build AABB - Wrong number of boxes in the tree" );
 }
 
 template < geode::index_t dimension >
@@ -145,18 +146,19 @@ void test_nearest_neighbor_search()
             std::tie( box_id, distance ) =
                 aabb.closest_element_box( query, disteval );
 
-            OPENGEODE_EXCEPTION( box_id == global_box_index( i, j, nb_boxes ),
-                "[Test]  Nearest box to point AABB - Wrong nearest box index" );
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeGeometryException::test(
+                box_id == global_box_index( i, j, nb_boxes ),
+                " Nearest box to point AABB - Wrong nearest box index" );
+            geode::OpenGeodeGeometryException::test(
                 distance == geode::point_point_distance( box_center, query ),
-                "[Test]  Nearest box to point AABB - Wrong distance to nearest "
+                " Nearest box to point AABB - Wrong distance to nearest "
                 "box center" );
 
             const auto boxes = aabb.containing_boxes( box_center );
-            OPENGEODE_EXCEPTION( boxes.size() == 1,
-                "[Test] Containing box AABB - Wrong number of boxes" );
-            OPENGEODE_EXCEPTION( boxes[0] == box_id,
-                "[Test] Containing box AABB - Wrong box index" );
+            geode::OpenGeodeGeometryException::test( boxes.size() == 1,
+                "Containing box AABB - Wrong number of boxes" );
+            geode::OpenGeodeGeometryException::test(
+                boxes[0] == box_id, "Containing box AABB - Wrong box index" );
         }
     }
 }
@@ -234,9 +236,9 @@ void test_intersections_with_query_box()
             aabb.compute_bbox_element_bbox_intersections(
                 box_query, eval_intersection );
 
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeGeometryException::test(
                 eval_intersection.box_intersections_.size() == 4,
-                "[Test]  Box-Box intersection - Wrong number of intersected "
+                " Box-Box intersection - Wrong number of intersected "
                 "boxes" );
 
             absl::flat_hash_set< geode::index_t > expected_set;
@@ -244,9 +246,9 @@ void test_intersections_with_query_box()
             expected_set.emplace( global_box_index( i, j + 1, nb_boxes ) );
             expected_set.emplace( global_box_index( i + 1, j, nb_boxes ) );
             expected_set.emplace( global_box_index( i + 1, j + 1, nb_boxes ) );
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeGeometryException::test(
                 eval_intersection.box_intersections_ == expected_set,
-                "[Test] Box-Box intersection - Wrong set of boxes" );
+                "Box-Box intersection - Wrong set of boxes" );
         }
     }
     geode::Point< dimension > query;
@@ -259,14 +261,16 @@ void test_intersections_with_query_box()
     aabb.compute_bbox_element_bbox_intersections(
         box_query, eval_intersection );
 
-    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_.size() == 1,
-        "[Test] Box-Box intersection - Wrong number of intersected boxes" );
+    geode::OpenGeodeGeometryException::test(
+        eval_intersection.box_intersections_.size() == 1,
+        "Box-Box intersection - Wrong number of intersected boxes" );
 
     absl::flat_hash_set< geode::index_t > expected_set;
     expected_set.emplace(
         global_box_index( nb_boxes - 1, nb_boxes - 1, nb_boxes ) );
-    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Box-Box intersection - Wrong set of boxes" );
+    geode::OpenGeodeGeometryException::test(
+        eval_intersection.box_intersections_ == expected_set,
+        "Box-Box intersection - Wrong set of boxes" );
 }
 
 template < geode::index_t dimension >
@@ -320,9 +324,9 @@ void test_intersections_with_ray_trace()
         eval_intersection.box_intersections_.clear();
         aabb.compute_ray_element_bbox_intersections( query, eval_intersection );
 
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeGeometryException::test(
             eval_intersection.box_intersections_.size() == nb_boxes - i,
-            "[Test] Box-Ray intersection - Wrong number of boxes intersected "
+            "Box-Ray intersection - Wrong number of boxes intersected "
             "by the ray " );
 
         absl::flat_hash_set< geode::index_t > expected_set;
@@ -331,9 +335,9 @@ void test_intersections_with_ray_trace()
             expected_set.emplace( global_box_index( i, c + i, nb_boxes ) );
         }
 
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeGeometryException::test(
             eval_intersection.box_intersections_ == expected_set,
-            "[Test] Box-Ray intersection - Wrong set of boxes" );
+            "Box-Ray intersection - Wrong set of boxes" );
     }
     // ray between two boxes
     geode::Point< dimension > ray_origin;
@@ -345,9 +349,9 @@ void test_intersections_with_ray_trace()
     eval_intersection.box_intersections_.clear();
     aabb.compute_ray_element_bbox_intersections( query, eval_intersection );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         eval_intersection.box_intersections_.size() == 2 * nb_boxes,
-        "[Test] Box-Ray intersection - Wrong number of boxes intersected by "
+        "Box-Ray intersection - Wrong number of boxes intersected by "
         "the ray " );
     absl::flat_hash_set< geode::index_t > expected_set;
     for( const auto c : geode::Range{ nb_boxes } )
@@ -355,8 +359,9 @@ void test_intersections_with_ray_trace()
         expected_set.emplace( global_box_index( 0, c, nb_boxes ) );
         expected_set.emplace( global_box_index( 1, c, nb_boxes ) );
     }
-    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Box-Ray intersection - Wrong set of boxes" );
+    geode::OpenGeodeGeometryException::test(
+        eval_intersection.box_intersections_ == expected_set,
+        "Box-Ray intersection - Wrong set of boxes" );
 
     // oblique ray
     ray_direction.set_value( 0, 1.0 );
@@ -370,9 +375,9 @@ void test_intersections_with_ray_trace()
     eval_intersection.box_intersections_.clear();
     aabb.compute_ray_element_bbox_intersections( query2, eval_intersection );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         eval_intersection.box_intersections_.size() == 3 * ( nb_boxes - 1 ) + 1,
-        "[Test] Box-Ray intersection - Wrong number of boxes intersected by "
+        "Box-Ray intersection - Wrong number of boxes intersected by "
         "the ray " );
 
     expected_set.clear();
@@ -388,8 +393,9 @@ void test_intersections_with_ray_trace()
         global_box_index( nb_boxes - 2, nb_boxes - 1, nb_boxes ) );
     expected_set.emplace(
         global_box_index( nb_boxes - 1, nb_boxes - 1, nb_boxes ) );
-    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Box-Ray intersection - Wrong set of boxes" );
+    geode::OpenGeodeGeometryException::test(
+        eval_intersection.box_intersections_ == expected_set,
+        "Box-Ray intersection - Wrong set of boxes" );
 }
 
 template < geode::index_t dimension >
@@ -413,16 +419,16 @@ void test_self_intersections()
     eval_intersection.included_box_.clear();
     aabb.compute_self_element_bbox_intersections( eval_intersection );
 
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
-        "[Test] Box self intersection - Every box should have one box "
+        "Box self intersection - Every box should have one box "
         "inside" );
 
     for( const auto& result : eval_intersection.included_box_ )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeGeometryException::test(
             result.first == result.second - ( nb_boxes * nb_boxes ),
-            "[Test] Box self intersection - Wrong box inclusion result" );
+            "Box self intersection - Wrong box inclusion result" );
     }
 }
 
@@ -459,8 +465,9 @@ void test_other_intersections()
         { 1, 1 }, { 5, 2 }, { 6, 3 } };
     for( const auto& result : action.included_box_ )
     {
-        OPENGEODE_EXCEPTION( answer.at( result.first ) == result.second,
-            "[Test] Box other intersection - Wrong box result" );
+        geode::OpenGeodeGeometryException::test(
+            answer.at( result.first ) == result.second,
+            "Box other intersection - Wrong box result" );
     }
 }
 

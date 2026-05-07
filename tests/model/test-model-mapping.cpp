@@ -47,21 +47,23 @@ void test_copy_mapping()
     }
     copy_mapping.emplace(
         geode::Corner3D::component_type_static(), std::move( corner_mapping ) );
-    OPENGEODE_EXCEPTION( !copy_mapping.has_mapping_type(
-                             geode::Surface3D::component_type_static() ),
-        "[Test] Copy mappings should not exist for Surfaces" );
-    OPENGEODE_EXCEPTION( copy_mapping.has_mapping_type(
-                             geode::Corner3D::component_type_static() ),
-        "[Test] Copy mappings should exist for Corners" );
+    geode::OpenGeodeModelException::test(
+        !copy_mapping.has_mapping_type(
+            geode::Surface3D::component_type_static() ),
+        "Copy mappings should not exist for Surfaces" );
+    geode::OpenGeodeModelException::test(
+        copy_mapping.has_mapping_type(
+            geode::Corner3D::component_type_static() ),
+        "Copy mappings should exist for Corners" );
     const auto& corner_copy_mappings =
         copy_mapping.at( geode::Corner3D::component_type_static() );
-    OPENGEODE_EXCEPTION( corner_copy_mappings.size() == 3,
-        "[Test] Wrong size for CopyMapping Corners" );
+    geode::OpenGeodeModelException::test( corner_copy_mappings.size() == 3,
+        "Wrong size for CopyMapping Corners" );
     for( const auto i : geode::LRange{ 3 } )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeModelException::test(
             corner_copy_mappings.in2out( uuids_in[i] ) == uuids_out[i],
-            "[Test] Wrong mapping for CopyMapping Corners" );
+            "Wrong mapping for CopyMapping Corners" );
     }
 }
 
@@ -85,28 +87,32 @@ void test_generic_mapping()
     }
     generic_mapping.emplace(
         geode::Corner3D::component_type_static(), std::move( corner_mapping ) );
-    OPENGEODE_EXCEPTION( !generic_mapping.has_mapping_type(
-                             geode::Surface3D::component_type_static() ),
-        "[Test] Generic mappings should not exist for Surfaces" );
-    OPENGEODE_EXCEPTION( generic_mapping.has_mapping_type(
-                             geode::Corner3D::component_type_static() ),
-        "[Test] Generic mappings should exist for Corners" );
+    geode::OpenGeodeModelException::test(
+        !generic_mapping.has_mapping_type(
+            geode::Surface3D::component_type_static() ),
+        "Generic mappings should not exist for Surfaces" );
+    geode::OpenGeodeModelException::test(
+        generic_mapping.has_mapping_type(
+            geode::Corner3D::component_type_static() ),
+        "Generic mappings should exist for Corners" );
     const auto& corner_generic_mappings =
         generic_mapping.at( geode::Corner3D::component_type_static() );
-    OPENGEODE_EXCEPTION( corner_generic_mappings.size_in() == 3,
-        "[Test] Wrong size for CopyMapping Corners in" );
-    OPENGEODE_EXCEPTION( corner_generic_mappings.size_out() == 3,
-        "[Test] Wrong size for CopyMapping Corners out" );
+    geode::OpenGeodeModelException::test(
+        corner_generic_mappings.size_in() == 3,
+        "Wrong size for CopyMapping Corners in" );
+    geode::OpenGeodeModelException::test(
+        corner_generic_mappings.size_out() == 3,
+        "Wrong size for CopyMapping Corners out" );
     for( const auto i : geode::LRange{ 3 } )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeModelException::test(
             corner_generic_mappings.in2out( uuids_in[i] ).size()
                 == static_cast< geode::index_t >( 3 - i ),
-            "[Test] Wrong mapping for CopyMapping Corners (in2out)" );
-        OPENGEODE_EXCEPTION(
+            "Wrong mapping for CopyMapping Corners (in2out)" );
+        geode::OpenGeodeModelException::test(
             corner_generic_mappings.out2in( uuids_out[i] ).size()
                 == static_cast< geode::index_t >( i + 1 ),
-            "[Test] Wrong mapping for CopyMapping Corners (out2in)" );
+            "Wrong mapping for CopyMapping Corners (out2in)" );
     }
 }
 
@@ -148,10 +154,10 @@ void test_components_mapping()
                 element_id + 2 } );
     }
 
-    OPENGEODE_EXCEPTION( vertices_mapping.size_in() == 29,
-        "[Test] Wrong size for vertices mappings" );
-    OPENGEODE_EXCEPTION( elements_mapping.size_out() == 21,
-        "[Test] Wrong size for elements mappings" );
+    geode::OpenGeodeModelException::test(
+        vertices_mapping.size_in() == 29, "Wrong size for vertices mappings" );
+    geode::OpenGeodeModelException::test(
+        elements_mapping.size_out() == 21, "Wrong size for elements mappings" );
     for( const auto mesh_id : geode::LRange{ 2 } )
     {
         for( const auto vertex_id : geode::Range{ 10 } )
@@ -160,11 +166,11 @@ void test_components_mapping()
                 { geode::Line3D::component_type_static(), uuids_out[mesh_id] },
                 2 * vertex_id
             };
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeModelException::test(
                 vertices_mapping.in2out( { uuids_in[mesh_id], vertex_id } )
                         .at( 0 )
                     == value,
-                "[Test] Wrong mapping for vertices (in2out)" );
+                "Wrong mapping for vertices (in2out)" );
         }
         for( const auto element_id : geode::Range{ 8 } )
         {
@@ -172,11 +178,11 @@ void test_components_mapping()
                 { geode::Line3D::component_type_static(), uuids_out[mesh_id] },
                 8 - element_id
             };
-            OPENGEODE_EXCEPTION(
+            geode::OpenGeodeModelException::test(
                 elements_mapping.in2out( { uuids_in[mesh_id], element_id } )
                         .at( 0 )
                     == value,
-                "[Test] Wrong mapping for elements (in2out)" );
+                "Wrong mapping for elements (in2out)" );
         }
     }
 }
@@ -210,27 +216,31 @@ void test_merge_mappings()
 
     const auto merged_mapping =
         geode::detail::merge_mappings( generic_mapping, copy_mapping );
-    OPENGEODE_EXCEPTION( !merged_mapping.has_mapping_type(
-                             geode::Surface3D::component_type_static() ),
-        "[Test] Generic mappings should not exist for Surfaces" );
-    OPENGEODE_EXCEPTION( generic_mapping.has_mapping_type(
-                             geode::Corner3D::component_type_static() ),
-        "[Test] Generic mappings should exist for Corners" );
+    geode::OpenGeodeModelException::test(
+        !merged_mapping.has_mapping_type(
+            geode::Surface3D::component_type_static() ),
+        "Generic mappings should not exist for Surfaces" );
+    geode::OpenGeodeModelException::test(
+        generic_mapping.has_mapping_type(
+            geode::Corner3D::component_type_static() ),
+        "Generic mappings should exist for Corners" );
     const auto& corner_merged_mappings =
         merged_mapping.at( geode::Corner3D::component_type_static() );
-    OPENGEODE_EXCEPTION( corner_merged_mappings.size_in() == 3,
-        "[Test] Wrong size for CopyMapping Corners in" );
-    OPENGEODE_EXCEPTION( corner_merged_mappings.size_out() == 3,
-        "[Test] Wrong size for CopyMapping Corners out" );
+    geode::OpenGeodeModelException::test( corner_merged_mappings.size_in() == 3,
+        "Wrong size for CopyMapping Corners in" );
+    geode::OpenGeodeModelException::test(
+        corner_merged_mappings.size_out() == 3,
+        "Wrong size for CopyMapping Corners out" );
     for( const auto i : geode::LRange{ 3 } )
     {
-        OPENGEODE_EXCEPTION( corner_merged_mappings.in2out( uuids_in[i] ).size()
-                                 == static_cast< geode::index_t >( 3 - i ),
-            "[Test] Wrong mapping for CopyMapping Corners (in2out)" );
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeModelException::test(
+            corner_merged_mappings.in2out( uuids_in[i] ).size()
+                == static_cast< geode::index_t >( 3 - i ),
+            "Wrong mapping for CopyMapping Corners (in2out)" );
+        geode::OpenGeodeModelException::test(
             corner_merged_mappings.out2in( uuids_out[i] ).size()
                 == static_cast< geode::index_t >( i + 1 ),
-            "[Test] Wrong mapping for CopyMapping Corners (out2in)" );
+            "Wrong mapping for CopyMapping Corners (out2in)" );
     }
 }
 

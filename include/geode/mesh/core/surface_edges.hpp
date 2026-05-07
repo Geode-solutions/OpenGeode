@@ -47,7 +47,7 @@ namespace geode
     class opengeode_mesh_api SurfaceEdges
     {
         OPENGEODE_DISABLE_COPY( SurfaceEdges );
-        PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey );
+        PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey /*key*/ );
 
     public:
         using Builder = SurfaceEdgesBuilder< dimension >;
@@ -85,37 +85,37 @@ namespace geode
 
     public:
         void update_edge_vertices(
-            absl::Span< const index_t > old2new, SurfaceEdgesKey );
+            absl::Span< const index_t > old2new, SurfaceEdgesKey /*key*/ );
 
         BijectiveMapping< index_t > update_edge_vertex(
             std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id,
-            SurfaceEdgesKey );
+            SurfaceEdgesKey /*key*/ );
 
         void remove_edge(
-            std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey );
+            std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey /*key*/ );
 
         std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete, SurfaceEdgesKey );
+            const std::vector< bool >& to_delete, SurfaceEdgesKey /*key*/ );
 
-        std::vector< index_t > remove_isolated_edges( SurfaceEdgesKey );
+        std::vector< index_t > remove_isolated_edges( SurfaceEdgesKey /*key*/ );
 
         index_t find_or_create_edge(
-            std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey )
+            std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey /*key*/ )
         {
             return find_or_create_edge( std::move( edge_vertices ) );
         }
 
         void overwrite_edges(
-            const SurfaceEdges< dimension >& from, SurfaceEdgesKey );
+            const SurfaceEdges< dimension >& from, SurfaceEdgesKey /*key*/ );
 
     private:
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
