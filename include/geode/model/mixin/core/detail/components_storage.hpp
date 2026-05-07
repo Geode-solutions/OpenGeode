@@ -87,7 +87,11 @@ namespace geode
 
             void add_component( ComponentPtr component )
             {
-                components_.emplace( component->id(), std::move( component ) );
+                const auto [itr, new_uuid] = components_.emplace(
+                    component->id(), std::move( component ) );
+                OPENGEODE_EXCEPTION( new_uuid,
+                    "[ComponentsStorage::add_component] Component with id ",
+                    itr->first.string(), " already exists" );
             }
 
             void save_components( std::string_view filename ) const
