@@ -38,8 +38,9 @@ void test_perpendicular()
     const auto dot_product =
         v.value( 0 ) * perp.value( 0 ) + v.value( 1 ) * perp.value( 1 );
 
-    OPENGEODE_EXCEPTION( perp.length() == 1 && dot_product == 0.,
-        "[Test] Wrong result for normalized_perpendicular" );
+    geode::OpenGeodeGeometryException::test(
+        perp.length() == 1 && dot_product == 0.,
+        "Wrong result for normalized_perpendicular" );
 }
 
 void test_dot_perpendicular()
@@ -49,8 +50,8 @@ void test_dot_perpendicular()
     const auto dot_perp = geode::dot_perpendicular( v1, v2 );
     const auto dot = geode::dot_perpendicular( geode::perpendicular( v1 ), v2 );
 
-    OPENGEODE_EXCEPTION( dot_perp == -1 && dot == 0,
-        "[Test] Wrong result for dot_perpendicular" );
+    geode::OpenGeodeGeometryException::test(
+        dot_perp == -1 && dot == 0, "Wrong result for dot_perpendicular" );
 }
 
 void test()

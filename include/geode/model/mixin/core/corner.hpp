@@ -52,8 +52,8 @@ namespace geode
     class Corner final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( Corner );
-        PASSKEY( Corners< dimension >, CornersKey );
-        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey );
+        PASSKEY( Corners< dimension >, CornersKey /*key*/ );
+        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -104,7 +104,7 @@ namespace geode
         [[nodiscard]] Mesh& modifiable_mesh();
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

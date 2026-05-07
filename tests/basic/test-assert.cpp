@@ -142,7 +142,9 @@ void test_exception()
 {
     try
     {
-        throw geode::OpenGeodeException{ "try ", "some ", "concatenation" };
+        throw geode::OpenGeodeBasicException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "try ", "some ",
+            "concatenation" };
     }
     catch( ... )
     {
@@ -161,34 +163,6 @@ void test_exception()
     try
     {
         throw std::runtime_error{ "test" };
-    }
-    catch( ... )
-    {
-        geode::geode_lippincott();
-    }
-
-    try
-    {
-        geode::geode_assertion_failed(
-            "0 == 1", "0 is never equal to 1.", "this file", 109 );
-    }
-    catch( ... )
-    {
-        geode::geode_lippincott();
-    }
-
-    try
-    {
-        throw geode::OpenGeodeDataException{ "Bad ", "data" };
-    }
-    catch( ... )
-    {
-        geode::geode_lippincott();
-    }
-
-    try
-    {
-        throw geode::OpenGeodeResultException{ "Bad ", "result" };
     }
     catch( ... )
     {

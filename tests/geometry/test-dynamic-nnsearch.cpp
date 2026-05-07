@@ -39,64 +39,64 @@ void test()
     const double radius = 1.1;
     const auto result =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius );
-    OPENGEODE_EXCEPTION( search.nb_points() == 4,
-        "[Test] Error wrong number of initial Points" );
-    OPENGEODE_EXCEPTION( result.size() == 2,
-        "[Test] Error wrong number of Points within the radius 1.1" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        search.nb_points() == 4, "Error wrong number of initial Points" );
+    geode::OpenGeodeGeometryException::test( result.size() == 2,
+        "Error wrong number of Points within the radius 1.1" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result.at( 0 ) ) == geode::Point2D{ { 1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result.at( 1 ) ) == geode::Point2D{ { -1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
+        "Error wrong Point coordinate" );
 
     // with radius = 1.0
     const double radius2 = 1.0;
     const auto result2 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius2 );
-    OPENGEODE_EXCEPTION( search.nb_points() == 4,
-        "[Test] Error wrong number of initial Points" );
-    OPENGEODE_EXCEPTION( result2.size() == 0,
-        "[Test] Error wrong number of Points within the radius 1.0" );
+    geode::OpenGeodeGeometryException::test(
+        search.nb_points() == 4, "Error wrong number of initial Points" );
+    geode::OpenGeodeGeometryException::test( result2.size() == 0,
+        "Error wrong number of Points within the radius 1.0" );
 
     // with radius = 2.1
     const double radius3 = 2.1;
     const auto result3 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius3 );
-    OPENGEODE_EXCEPTION( search.nb_points() == 4,
-        "[Test] Error wrong number of initial Points" );
-    OPENGEODE_EXCEPTION( result3.size() == 3,
-        "[Test] Error wrong number of Points within the radius 2.1" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        search.nb_points() == 4, "Error wrong number of initial Points" );
+    geode::OpenGeodeGeometryException::test( result3.size() == 3,
+        "Error wrong number of Points within the radius 2.1" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result3.at( 0 ) ) == geode::Point2D{ { 1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result3.at( 1 ) ) == geode::Point2D{ { -1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result3.at( 2 ) ) == geode::Point2D{ { 2.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
+        "Error wrong Point coordinate" );
 
     // with radius = 3.1
     const double radius4 = 3.1;
     const auto result4 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius4 );
-    OPENGEODE_EXCEPTION( search.nb_points() == 4,
-        "[Test] Error wrong number of initial Points" );
-    OPENGEODE_EXCEPTION( result4.size() == 4,
-        "[Test] Error wrong number of Points within the radius" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        search.nb_points() == 4, "Error wrong number of initial Points" );
+    geode::OpenGeodeGeometryException::test(
+        result4.size() == 4, "Error wrong number of Points within the radius" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result4.at( 0 ) ) == geode::Point2D{ { 1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result4.at( 1 ) ) == geode::Point2D{ { -1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result4.at( 2 ) ) == geode::Point2D{ { 2.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result4.at( 3 ) ) == geode::Point2D{ { 3.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
+        "Error wrong Point coordinate" );
 
     // test with the add point method
     // with pt1(0.1,0.1)
@@ -104,50 +104,50 @@ void test()
     search.add_point( pt1 );
     const auto result5 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius4 );
-    OPENGEODE_EXCEPTION( search.nb_points() == 5,
-        "[Test] Error wrong number of initial Points" );
-    OPENGEODE_EXCEPTION( result5.size() == 5,
-        "[Test] Error wrong number of Points within the radius" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        search.nb_points() == 5, "Error wrong number of initial Points" );
+    geode::OpenGeodeGeometryException::test(
+        result5.size() == 5, "Error wrong number of Points within the radius" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result5.at( 0 ) ) == geode::Point2D{ { 0.1, 0.1 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result5.at( 1 ) ) == geode::Point2D{ { 1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result5.at( 2 ) ) == geode::Point2D{ { -1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result5.at( 3 ) ) == geode::Point2D{ { 2.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result5.at( 4 ) ) == geode::Point2D{ { 3.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
+        "Error wrong Point coordinate" );
 
     // with pt2(10,10)
     geode::Point2D pt2{ { 10, 10 } };
     search.add_point( pt2 );
     const auto result6 =
         search.radius_neighbors( geode::Point2D{ { 0, 0 } }, radius4 );
-    OPENGEODE_EXCEPTION( search.nb_points() == 6,
-        "[Test] Error wrong number of initial Points" );
-    OPENGEODE_EXCEPTION( result6.size() == 5,
-        "[Test] Error wrong number of Points within the radius" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        search.nb_points() == 6, "Error wrong number of initial Points" );
+    geode::OpenGeodeGeometryException::test(
+        result6.size() == 5, "Error wrong number of Points within the radius" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result6.at( 0 ) ) == geode::Point2D{ { 0.1, 0.1 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result6.at( 1 ) ) == geode::Point2D{ { 1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result6.at( 2 ) ) == geode::Point2D{ { -1.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result6.at( 3 ) ) == geode::Point2D{ { 2.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
-    OPENGEODE_EXCEPTION(
+        "Error wrong Point coordinate" );
+    geode::OpenGeodeGeometryException::test(
         ( search.point( result6.at( 4 ) ) == geode::Point2D{ { 3.0, 0.0 } } ),
-        "[Test] Error wrong Point coordinate" );
+        "Error wrong Point coordinate" );
 }
 
 OPENGEODE_TEST( "dynamic-nnsearch" )

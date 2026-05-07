@@ -32,7 +32,7 @@ namespace geode
 {
     template < index_t dimension >
     OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
-        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ )
         : OpenGeodePointSetBuilder< dimension >(
               dynamic_cast< OpenGeodePointSet< dimension >& >( vertex_set ) )
     {

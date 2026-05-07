@@ -84,7 +84,7 @@ namespace geode
     template < index_t dimension >
     SurfaceCollection< dimension >&
         SurfaceCollections< dimension >::modifiable_surface_collection(
-            const uuid& id, SurfaceCollectionsBuilderKey )
+            const uuid& id, SurfaceCollectionsBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -99,7 +99,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::load_surface_collections(
-        std::string_view directory, SurfaceCollectionsBuilderKey )
+        std::string_view directory, SurfaceCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
             absl::StrCat( directory, "/surface_collections" ) );
@@ -123,14 +123,15 @@ namespace geode
 
     template < index_t dimension >
     auto SurfaceCollections< dimension >::modifiable_surface_collections(
-        SurfaceCollectionsBuilderKey ) -> ModifiableSurfaceCollectionRange
+        SurfaceCollectionsBuilderKey /*key*/ )
+        -> ModifiableSurfaceCollectionRange
     {
         return { *this };
     }
 
     template < index_t dimension >
     const uuid& SurfaceCollections< dimension >::create_surface_collection(
-        SurfaceCollectionsBuilderKey )
+        SurfaceCollectionsBuilderKey /*key*/ )
     {
         typename SurfaceCollections< dimension >::Impl::ComponentPtr collection{
             new SurfaceCollection< dimension >{ typename SurfaceCollection<
@@ -143,7 +144,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::create_surface_collection(
-        uuid surface_collection_id, SurfaceCollectionsBuilderKey )
+        uuid surface_collection_id, SurfaceCollectionsBuilderKey /*key*/ )
     {
         typename SurfaceCollections< dimension >::Impl::ComponentPtr
             surface_collection{ new SurfaceCollection< dimension >{
@@ -157,7 +158,7 @@ namespace geode
     template < index_t dimension >
     void SurfaceCollections< dimension >::delete_surface_collection(
         const SurfaceCollection< dimension >& collection,
-        SurfaceCollectionsBuilderKey )
+        SurfaceCollectionsBuilderKey /*key*/ )
     {
         impl_->delete_component( collection.id() );
     }

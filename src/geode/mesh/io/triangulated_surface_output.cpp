@@ -57,9 +57,9 @@ namespace geode
                 TriangulatedSurfaceOutputFactory< dimension > >( type );
             Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
-            throw OpenGeodeException{
-                "Cannot save TriangulatedSurface in file: ", filename
-            };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save TriangulatedSurface in file: ", filename };
         }
     }
 

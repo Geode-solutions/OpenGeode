@@ -46,7 +46,8 @@ void test_1()
     const auto sorted =
         geode::radial_sort( { s0, s1 }, { d, g, f, c, e, a, b, h } );
     const absl::FixedArray< geode::index_t > answer{ 1, 2, 4, 0, 3, 6, 5, 7 };
-    OPENGEODE_EXCEPTION( sorted == answer, "[Test] Wrong radial sorting" );
+    geode::OpenGeodeGeometryException::test(
+        sorted == answer, "Wrong radial sorting" );
 }
 
 void test_2()
@@ -59,7 +60,8 @@ void test_2()
 
     const auto sorted = geode::radial_sort( { s0, s1 }, { a, b, a, b, c, c } );
     const absl::FixedArray< geode::index_t > answer{ 5, 4, 2, 0, 1, 3 };
-    OPENGEODE_EXCEPTION( sorted == answer, "[Test] Wrong radial sorting" );
+    geode::OpenGeodeGeometryException::test(
+        sorted == answer, "Wrong radial sorting" );
 }
 
 void test()

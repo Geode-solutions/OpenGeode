@@ -65,8 +65,8 @@ void build_test_solid( geode::TetrahedralSolid3D& solid )
         solid_volume +=
             geode::tetrahedron_signed_volume( solid.tetrahedron( tet_id ) );
     }
-    OPENGEODE_EXCEPTION( inexact_equal( solid_volume, 1, 1e-7 ),
-        "[Test] Total volume of tetrahedra should be 1." );
+    geode::OpenGeodeMeshException::test( inexact_equal( solid_volume, 1, 1e-7 ),
+        "Total volume of tetrahedra should be 1." );
 }
 
 void test_scalar_function( geode::TetrahedralSolid3D& solid )
@@ -79,30 +79,32 @@ void test_scalar_function( geode::TetrahedralSolid3D& solid )
     {
         if( i == 2 )
         {
-            OPENGEODE_EXCEPTION( scalar_function.value( i ) == 22,
-                "[Test] Object function value is wrong." );
+            geode::OpenGeodeMeshException::test(
+                scalar_function.value( i ) == 22,
+                "Object function value is wrong." );
         }
         else
         {
-            OPENGEODE_EXCEPTION( scalar_function.value( i ) == 26,
-                "[Test] Object function value is wrong." );
+            geode::OpenGeodeMeshException::test(
+                scalar_function.value( i ) == 26,
+                "Object function value is wrong." );
         }
     }
     scalar_function.set_value( 1, 22 );
     scalar_function.set_value( 3, 22 );
     scalar_function.set_value( 6, 22 );
     geode::Point3D point{ { 0.91, 0.87, 0.19 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal( scalar_function.value( point, 1 ), 22, 1e-7 ),
-        "[Test] Object function value 1 is wrong." );
+        "Object function value 1 is wrong." );
     point = geode::Point3D{ { 0., 0., 1. } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal( scalar_function.value( point, 4 ), 26, 1e-7 ),
-        "[Test] Object function value 2 is wrong." );
+        "Object function value 2 is wrong." );
     point = geode::Point3D{ { 0.5, 0.5, 0.5 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         inexact_equal( scalar_function.value( point, 4 ), 23, 1e-7 ),
-        "[Test] Object function value 3 is wrong." );
+        "Object function value 3 is wrong." );
 }
 
 void test_point_function( geode::TetrahedralSolid3D& solid )
@@ -115,34 +117,37 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
     {
         if( i == 2 )
         {
-            OPENGEODE_EXCEPTION( ( point_function.value( i )
-                                     == geode::Point3D{ { 22, -3, -20 } } ),
-                "[Test] Object function value is wrong." );
+            geode::OpenGeodeMeshException::test(
+                ( point_function.value( i )
+                    == geode::Point3D{ { 22, -3, -20 } } ),
+                "Object function value is wrong." );
         }
         else
         {
-            OPENGEODE_EXCEPTION( ( point_function.value( i )
-                                     == geode::Point3D{ { 26, 3, -10 } } ),
-                "[Test] Object function value is wrong." );
+            geode::OpenGeodeMeshException::test(
+                ( point_function.value( i )
+                    == geode::Point3D{ { 26, 3, -10 } } ),
+                "Object function value is wrong." );
         }
     }
     point_function.set_value( 3, geode::Point3D{ { 22, -3, -20 } } );
     point_function.set_value( 1, geode::Point3D{ { 22, -3, -20 } } );
     point_function.set_value( 6, geode::Point3D{ { 22, -3, -20 } } );
     geode::Point3D point{ { 0.91, 0.87, 0.19 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_function.value( point, 1 )
             .inexact_equal( geode::Point3D{ { 22, -3, -20 } } ),
-        "[Test] Object function value 1 is wrong." );
+        "Object function value 1 is wrong." );
     point = geode::Point3D{ { 0., 0., 1. } };
-    OPENGEODE_EXCEPTION( point_function.value( point, 4 )
-                             .inexact_equal( geode::Point3D{ { 26, 3, -10 } } ),
-        "[Test] Object function value 2 is wrong." );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, 4 )
+            .inexact_equal( geode::Point3D{ { 26, 3, -10 } } ),
+        "Object function value 2 is wrong." );
     point = geode::Point3D{ { 0.5, 0.5, 0.5 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_function.value( point, 4 )
             .inexact_equal( geode::Point3D{ { 23, -1.5, -17.5 } } ),
-        "[Test] Object function value 3 is wrong." );
+        "Object function value 3 is wrong." );
 }
 
 void test()

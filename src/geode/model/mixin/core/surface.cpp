@@ -47,11 +47,11 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this, Growable< Archive,
-                                    Impl >{ { []( Archive& archive2,
-                                                  Impl& impl ) {
+            serializer.ext( *this, Growable< Archive,
+                                       Impl >{ { []( Archive& archive2,
+                                                     Impl& impl ) {
                 archive2.ext( impl,
                     bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
@@ -109,9 +109,9 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void Surface< dimension >::serialize( Archive& archive )
+    void Surface< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, Surface >{
                 { []( Archive& archive2, Surface& surface ) {
                      archive2.object( surface.impl_ );

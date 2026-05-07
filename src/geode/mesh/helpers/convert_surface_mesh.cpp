@@ -124,10 +124,10 @@ namespace
             const geode::Grid< dimension >& /*unused*/,
             absl::Span< const geode::index_t > /*unused*/ )
     {
-        throw geode::OpenGeodeException{
+        throw geode::OpenGeodeMeshException{ nullptr,
+            geode::OpenGeodeException::TYPE::data,
             "[create_triangulated_surface_from_grid] Cannot convert "
-            "SurfaceMesh from RegularGrid3D"
-        };
+            "SurfaceMesh from RegularGrid3D" };
     }
 
     std::array< geode::index_t, 4 > create_triangles_from_cross_pattern(

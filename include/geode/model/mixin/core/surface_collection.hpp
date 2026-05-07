@@ -44,9 +44,10 @@ namespace geode
     class SurfaceCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( SurfaceCollection );
-        PASSKEY( SurfaceCollections< dimension >, SurfaceCollectionsKey );
+        PASSKEY(
+            SurfaceCollections< dimension >, SurfaceCollectionsKey /*key*/ );
         PASSKEY( SurfaceCollectionsBuilder< dimension >,
-            SurfaceCollectionsBuilderKey );
+            SurfaceCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -64,16 +65,18 @@ namespace geode
         }
 
     public:
-        SurfaceCollection( SurfaceCollectionsKey ) : SurfaceCollection() {}
+        SurfaceCollection( SurfaceCollectionsKey /*key*/ ) : SurfaceCollection()
+        {
+        }
 
         void set_surface_collection_name(
-            std::string_view name, SurfaceCollectionsBuilderKey )
+            std::string_view name, SurfaceCollectionsBuilderKey /*key*/ )
         {
             this->set_name( name );
         }
 
         void set_surface_collection_active(
-            bool active, SurfaceCollectionsBuilderKey )
+            bool active, SurfaceCollectionsBuilderKey /*key*/ )
         {
             this->set_active( active );
         }
@@ -82,7 +85,7 @@ namespace geode
         SurfaceCollection() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
     };
     ALIAS_2D_AND_3D( SurfaceCollection );
 } // namespace geode

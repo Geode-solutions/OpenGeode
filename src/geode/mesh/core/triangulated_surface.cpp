@@ -79,12 +79,13 @@ namespace geode
 
     template < index_t dimension >
     template < typename Archive >
-    void TriangulatedSurface< dimension >::serialize( Archive& archive )
+    void TriangulatedSurface< dimension >::serialize( Archive& serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, TriangulatedSurface >{
-                { []( Archive& a, TriangulatedSurface& triangulated_surface ) {
-                    a.ext( triangulated_surface,
+                { []( Archive& archive,
+                      TriangulatedSurface& triangulated_surface ) {
+                    archive.ext( triangulated_surface,
                         bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
                 } } } );
     }

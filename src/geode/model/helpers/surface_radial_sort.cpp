@@ -226,9 +226,9 @@ namespace geode
             const auto& p1 = line.mesh().point( e1 );
             return sort( { p0, p1 }, polygons.second );
         }
-        OPENGEODE_ASSERT_NOT_REACHED(
-            "[surface_radial_sort] Cannot find sorted surfaces on a Line" );
-        return SortedSurfaces{ 0 };
+        throw OpenGeodeMeshException{ line.id(),
+            OpenGeodeException::TYPE::internal,
+            "[surface_radial_sort] Cannot find sorted surfaces on a Line" };
     }
 } // namespace geode
 

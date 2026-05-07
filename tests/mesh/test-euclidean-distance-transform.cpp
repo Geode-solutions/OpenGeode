@@ -88,11 +88,11 @@ void test_distance_transform_2D( double cell_length )
     };
     for( const auto value : values )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             std::fabs( distance_map->value( grid->cell_index( value.first ) )
                        - value.second )
                 < geode::GLOBAL_EPSILON,
-            "[Test] Wrong 2D euclidean distance map" );
+            "Wrong 2D euclidean distance map" );
     }
 }
 void test_distance_transform_3D( double cell_length )
@@ -132,11 +132,11 @@ void test_distance_transform_3D( double cell_length )
     };
     for( const auto value : values )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             std::fabs( distance_map->value( grid->cell_index( value.first ) )
                        - value.second )
                 < geode::GLOBAL_EPSILON,
-            "[Test] Wrong 3D euclidean distance map" );
+            "Wrong 3D euclidean distance map" );
     }
 }
 void test()

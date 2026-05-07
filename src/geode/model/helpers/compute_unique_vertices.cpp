@@ -110,10 +110,10 @@ namespace
             const auto& corner = model.corner( cmv.component_id.id() );
             return corner.mesh().point( cmv.vertex );
         }
-        throw geode::OpenGeodeException{
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::data,
             "[compute_unique_vertices::get_point] Unknown component type: ",
-            cmv.component_id.string()
-        };
+            cmv.component_id.string() };
         const auto& corner = model.corner( cmv.component_id.id() );
         return corner.mesh().point( cmv.vertex );
     }

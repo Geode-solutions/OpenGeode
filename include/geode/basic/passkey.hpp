@@ -60,6 +60,6 @@ namespace geode
         PassKey() = default;
     };
 
-#define PASSKEY( Friend, Key ) using Key = geode::PassKey< Friend >
+#define PASSKEY( Friend, Key /*key*/ ) using Key = geode::PassKey< Friend >
 
 } // namespace geode

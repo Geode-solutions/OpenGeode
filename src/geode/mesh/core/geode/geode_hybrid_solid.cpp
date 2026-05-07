@@ -26,6 +26,8 @@
 #include <array>
 #include <fstream>
 
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
@@ -38,17 +40,14 @@
 
 namespace
 {
-    static constexpr std::array< geode::HybridSolid3D::Type, 9 > TYPES{
-        geode::HybridSolid3D::Type::UNKNOWN,
-        geode::HybridSolid3D::Type::UNKNOWN,
-        geode::HybridSolid3D::Type::UNKNOWN,
-        geode::HybridSolid3D::Type::UNKNOWN,
-        geode::HybridSolid3D::Type::TETRAHEDRON,
-        geode::HybridSolid3D::Type::PYRAMID,
-        geode::HybridSolid3D::Type::PRISM,
-        geode::HybridSolid3D::Type::UNKNOWN,
-        geode::HybridSolid3D::Type::HEXAHEDRON,
-    };
+    static const absl::flat_hash_map< geode::index_t,
+        geode::HybridSolid3D::TYPE >
+        TYPES = {
+            { 4, geode::HybridSolid3D::TYPE::tetrahedron },
+            { 5, geode::HybridSolid3D::TYPE::pyramid },
+            { 6, geode::HybridSolid3D::TYPE::prism },
+            { 8, geode::HybridSolid3D::TYPE::hexahedron },
+        };
 
     template < typename Data >
     geode::PolyhedronEdgesVertices polyhedron_edges_vertices(
@@ -97,7 +96,7 @@ namespace geode
         : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
-        using Type = HybridSolid3D::Type;
+        using TYPE = HybridSolid3D::TYPE;
 
     public:
         explicit Impl( OpenGeodeHybridSolid< dimension >& mesh )
@@ -134,22 +133,22 @@ namespace geode
         {
             switch( polyhedron_type( polyhedron_facet.polyhedron_id ) )
             {
-                case Type::TETRAHEDRON:
+                case TYPE::tetrahedron:
                     return 3;
-                case Type::HEXAHEDRON:
+                case TYPE::hexahedron:
                     return 4;
-                case Type::PRISM:
+                case TYPE::prism:
                     return detail::PRISM_FACET_VERTICES[polyhedron_facet
                                                             .facet_id]
                         .size();
-                case Type::PYRAMID:
+                case TYPE::pyramid:
                     return detail::PYRAMID_FACET_VERTICES[polyhedron_facet
                                                               .facet_id]
                         .size();
-                case Type::UNKNOWN:
-                    throw OpenGeodeException(
-                        "[HybridSolid] Unknown polyhedron type" );
             }
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[HybridSolid] Unknown polyhedron type" };
             return 0;
         }
 
@@ -190,27 +189,26 @@ namespace geode
             const auto vertex_id = polyhedron_facet_vertex.vertex_id;
             switch( polyhedron_type( polyhedron_id ) )
             {
-                case Type::TETRAHEDRON:
+                case TYPE::tetrahedron:
                     return {
                         polyhedron_id,
                         detail::TETRAHEDRON_FACET_VERTICES[facet_id][vertex_id]
                     };
-                case Type::HEXAHEDRON:
+                case TYPE::hexahedron:
                     return {
                         polyhedron_id,
                         detail::HEXAHEDRON_FACET_VERTICES[facet_id][vertex_id]
                     };
-                case Type::PRISM:
+                case TYPE::prism:
                     return { polyhedron_id,
                         detail::PRISM_FACET_VERTICES[facet_id][vertex_id] };
-                case Type::PYRAMID:
+                case TYPE::pyramid:
                     return { polyhedron_id,
                         detail::PYRAMID_FACET_VERTICES[facet_id][vertex_id] };
-                case Type::UNKNOWN:
-                    throw OpenGeodeException(
-                        "[HybridSolid] Unknown polyhedron type" );
             }
-            return {};
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[HybridSolid] Unknown polyhedron type" };
         }
 
         void add_tetrahedron( const std::array< index_t, 4 >& vertices )
@@ -298,22 +296,22 @@ namespace geode
         {
             switch( polyhedron_type( polyhedron ) )
             {
-                case Type::TETRAHEDRON:
+                case TYPE::tetrahedron:
                     return ::polyhedron_edges_vertices(
                         solid, polyhedron, detail::TETRAHEDRON_EDGE_VERTICES );
-                case Type::HEXAHEDRON:
+                case TYPE::hexahedron:
                     return ::polyhedron_edges_vertices(
                         solid, polyhedron, detail::HEXAHEDRON_EDGE_VERTICES );
-                case Type::PRISM:
+                case TYPE::prism:
                     return ::polyhedron_edges_vertices(
                         solid, polyhedron, detail::PRISM_EDGE_VERTICES );
-                case Type::PYRAMID:
+                case TYPE::pyramid:
                     return ::polyhedron_edges_vertices(
                         solid, polyhedron, detail::PYRAMID_EDGE_VERTICES );
-                case Type::UNKNOWN:
-                    throw OpenGeodeException(
-                        "[HybridSolid] Unknown polyhedron type" );
             }
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[HybridSolid] Unknown polyhedron type" };
             return {};
         }
 
@@ -322,28 +320,27 @@ namespace geode
         {
             switch( polyhedron_type( polyhedron ) )
             {
-                case Type::TETRAHEDRON:
+                case TYPE::tetrahedron:
                     return ::polyhedron_facets_vertices(
                         solid, polyhedron, detail::TETRAHEDRON_FACET_VERTICES );
-                case Type::HEXAHEDRON:
+                case TYPE::hexahedron:
                     return ::polyhedron_facets_vertices(
                         solid, polyhedron, detail::HEXAHEDRON_FACET_VERTICES );
-                case Type::PRISM:
+                case TYPE::prism:
                     return ::polyhedron_facets_vertices(
                         solid, polyhedron, detail::PRISM_FACET_VERTICES );
-                case Type::PYRAMID:
+                case TYPE::pyramid:
                     return ::polyhedron_facets_vertices(
                         solid, polyhedron, detail::PYRAMID_FACET_VERTICES );
-                case Type::UNKNOWN:
-                    throw OpenGeodeException(
-                        "[HybridSolid] Unknown polyhedron type" );
             }
-            return {};
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[HybridSolid] Unknown polyhedron type" };
         }
 
-        Type polyhedron_type( index_t polyhedron_id ) const
+        TYPE polyhedron_type( index_t polyhedron_id ) const
         {
-            return TYPES[get_nb_polyhedron_vertices( polyhedron_id )];
+            return TYPES.at( get_nb_polyhedron_vertices( polyhedron_id ) );
         }
 
         void permute_polyhedra( absl::Span< const index_t > permutation )
@@ -415,21 +412,23 @@ namespace geode
         Impl() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.container4b( impl.polyhedron_vertices_,
-                        impl.polyhedron_vertices_.max_size() );
-                    a.container4b( impl.polyhedron_vertex_ptr_,
-                        impl.polyhedron_vertex_ptr_.max_size() );
-                    a.container4b( impl.polyhedron_adjacents_,
-                        impl.polyhedron_adjacents_.max_size() );
-                    a.container4b( impl.polyhedron_adjacent_ptr_,
-                        impl.polyhedron_adjacent_ptr_.max_size() );
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     internal::PointsImpl< dimension > >{} );
-                } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.container4b( impl.polyhedron_vertices_,
+                            impl.polyhedron_vertices_.max_size() );
+                        archive.container4b( impl.polyhedron_vertex_ptr_,
+                            impl.polyhedron_vertex_ptr_.max_size() );
+                        archive.container4b( impl.polyhedron_adjacents_,
+                            impl.polyhedron_adjacents_.max_size() );
+                        archive.container4b( impl.polyhedron_adjacent_ptr_,
+                            impl.polyhedron_adjacent_ptr_.max_size() );
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass<
+                                      internal::PointsImpl< dimension > >{} );
+                    } } } );
         }
 
         void add_vertices( absl::Span< const index_t > vertices )
@@ -464,7 +463,7 @@ namespace geode
 
         std::vector< index_t > polyhedron_adjacents_;
         std::vector< index_t > polyhedron_adjacent_ptr_;
-    }; // namespace geode
+    };
 
     template < index_t dimension >
     OpenGeodeHybridSolid< dimension >::OpenGeodeHybridSolid() : impl_( *this )
@@ -485,7 +484,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGHybridSolidKey )
+        index_t vertex_id, Point< dimension > point, OGHybridSolidKey /*key*/ )
     {
         impl_->set_point( vertex_id, std::move( point ) );
     }
@@ -539,7 +538,7 @@ namespace geode
     void OpenGeodeHybridSolid< dimension >::set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex,
         index_t vertex_id,
-        OGHybridSolidKey )
+        OGHybridSolidKey /*key*/ )
     {
         impl_->set_polyhedron_vertex( polyhedron_vertex, vertex_id );
     }
@@ -548,49 +547,49 @@ namespace geode
     void OpenGeodeHybridSolid< dimension >::set_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet,
         index_t adjacent_id,
-        OGHybridSolidKey )
+        OGHybridSolidKey /*key*/ )
     {
         impl_->set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::remove_polyhedra(
-        const std::vector< bool >& to_delete, OGHybridSolidKey )
+        const std::vector< bool >& to_delete, OGHybridSolidKey /*key*/ )
     {
         impl_->remove_polyhedra( to_delete );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::permute_polyhedra(
-        absl::Span< const index_t > permutation, OGHybridSolidKey )
+        absl::Span< const index_t > permutation, OGHybridSolidKey /*key*/ )
     {
         impl_->permute_polyhedra( permutation );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::add_tetrahedron(
-        const std::array< index_t, 4 >& vertices, OGHybridSolidKey )
+        const std::array< index_t, 4 >& vertices, OGHybridSolidKey /*key*/ )
     {
         impl_->add_tetrahedron( vertices );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::add_hexahedron(
-        const std::array< index_t, 8 >& vertices, OGHybridSolidKey )
+        const std::array< index_t, 8 >& vertices, OGHybridSolidKey /*key*/ )
     {
         impl_->add_hexahedron( vertices );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::add_prism(
-        const std::array< index_t, 6 >& vertices, OGHybridSolidKey )
+        const std::array< index_t, 6 >& vertices, OGHybridSolidKey /*key*/ )
     {
         impl_->add_prism( vertices );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::add_pyramid(
-        const std::array< index_t, 5 >& vertices, OGHybridSolidKey )
+        const std::array< index_t, 5 >& vertices, OGHybridSolidKey /*key*/ )
     {
         impl_->add_pyramid( vertices );
     }
@@ -612,7 +611,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    typename HybridSolid< dimension >::Type
+    typename HybridSolid< dimension >::TYPE
         OpenGeodeHybridSolid< dimension >::polyhedron_type(
             index_t polyhedron_id ) const
     {
@@ -621,28 +620,29 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::copy_polyhedra(
-        const OpenGeodeHybridSolid< dimension >& solid_mesh, OGHybridSolidKey )
+        const OpenGeodeHybridSolid< dimension >& solid_mesh,
+        OGHybridSolidKey /*key*/ )
     {
         impl_->copy_polyhedra( *solid_mesh.impl_ );
     }
 
     template < index_t dimension >
     template < typename Archive >
-    void OpenGeodeHybridSolid< dimension >::serialize( Archive& archive )
+    void OpenGeodeHybridSolid< dimension >::serialize( Archive& serializer )
     {
-        archive.ext(
-            *this, Growable< Archive, OpenGeodeHybridSolid >{
-                       { []( Archive& a, OpenGeodeHybridSolid& solid ) {
-                            a.ext( solid, bitsery::ext::BaseClass<
-                                              HybridSolid< dimension > >{} );
-                            a.object( solid.impl_ );
-                            solid.impl_->initialize_crs( solid );
-                        },
-                           []( Archive& a, OpenGeodeHybridSolid& solid ) {
-                               a.ext( solid, bitsery::ext::BaseClass<
-                                                 HybridSolid< dimension > >{} );
-                               a.object( solid.impl_ );
-                           } } } );
+        serializer.ext( *this,
+            Growable< Archive, OpenGeodeHybridSolid >{
+                { []( Archive& archive, OpenGeodeHybridSolid& solid ) {
+                     archive.ext( solid, bitsery::ext::BaseClass<
+                                             HybridSolid< dimension > >{} );
+                     archive.object( solid.impl_ );
+                     solid.impl_->initialize_crs( solid );
+                 },
+                    []( Archive& archive, OpenGeodeHybridSolid& solid ) {
+                        archive.ext( solid, bitsery::ext::BaseClass<
+                                                HybridSolid< dimension > >{} );
+                        archive.object( solid.impl_ );
+                    } } } );
     }
 
     template class opengeode_mesh_api OpenGeodeHybridSolid< 3 >;

@@ -58,8 +58,9 @@ namespace geode
                 type );
             Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
-            throw OpenGeodeException{ "Cannot save RegularGrid in file: ",
-                filename };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot save RegularGrid in file: ", filename };
         }
     }
 

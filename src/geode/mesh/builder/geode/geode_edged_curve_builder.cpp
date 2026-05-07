@@ -32,7 +32,7 @@ namespace geode
 {
     template < index_t dimension >
     OpenGeodeEdgedCurveBuilder< dimension >::OpenGeodeEdgedCurveBuilder(
-        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ )
         : OpenGeodeEdgedCurveBuilder< dimension >(
               dynamic_cast< OpenGeodeEdgedCurve< dimension >& >( vertex_set ) )
     {

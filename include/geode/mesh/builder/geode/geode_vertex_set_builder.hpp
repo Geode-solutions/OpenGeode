@@ -43,7 +43,7 @@ namespace geode
     {
     public:
         OpenGeodeVertexSetBuilder(
-            VertexSet& vertex_set, MeshBuilderFactoryKey );
+            VertexSet& vertex_set, MeshBuilderFactoryKey /*key*/ );
 
         explicit OpenGeodeVertexSetBuilder( OpenGeodeVertexSet& mesh );
 

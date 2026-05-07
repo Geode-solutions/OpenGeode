@@ -43,17 +43,18 @@ void test_create_vertices(
 {
     builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
     builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
-    OPENGEODE_EXCEPTION( point_set.nb_vertices() == 2,
-        "[Test] PointSet should have 2 vertices" );
+    geode::OpenGeodeMeshException::test(
+        point_set.nb_vertices() == 2, "PointSet should have 2 vertices" );
     builder.create_vertices( 2 );
-    OPENGEODE_EXCEPTION( point_set.nb_vertices() == 4,
-        "[Test] PointSet should have 4 vertices" );
-    OPENGEODE_EXCEPTION( point_set.point( 2 ) == geode::Point3D(),
-        "[Test] Default coordinates are not correct" );
+    geode::OpenGeodeMeshException::test(
+        point_set.nb_vertices() == 4, "PointSet should have 4 vertices" );
+    geode::OpenGeodeMeshException::test(
+        point_set.point( 2 ) == geode::Point3D(),
+        "Default coordinates are not correct" );
     builder.set_point( 2, geode::Point3D{ { 2.3, 5.0, -1.2 } } );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
         point_set.point( 2 ) == geode::Point3D( { 2.3, 5.0, -1.2 } ),
-        "[Test] Point coordinates have not been correctly set" );
+        "Point coordinates have not been correctly set" );
 }
 
 void test_permutation(
@@ -61,21 +62,24 @@ void test_permutation(
 {
     std::vector< geode::index_t > permutation{ 2, 0, 3, 1 };
     builder.permute_vertices( permutation );
-    OPENGEODE_EXCEPTION( point_set.point( 2 ) == geode::Point3D(),
-        "[Test] Point coordinates have not been correctly permuted" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeMeshException::test(
+        point_set.point( 2 ) == geode::Point3D(),
+        "Point coordinates have not been correctly permuted" );
+    geode::OpenGeodeMeshException::test(
         point_set.point( 0 ) == geode::Point3D( { 2.3, 5.0, -1.2 } ),
-        "[Test] Point coordinates have not been correctly permuted" );
+        "Point coordinates have not been correctly permuted" );
 }
 
 void test_bounding_box( const geode::PointSet3D& point_set )
 {
     geode::Point3D answer_min{ { 0.0, 0.0, -1.2 } };
     geode::Point3D answer_max{ { 2.3, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( point_set.bounding_box().min() == answer_min,
-        "[Test] Wrong computation of bounding box (min)" );
-    OPENGEODE_EXCEPTION( point_set.bounding_box().max() == answer_max,
-        "[Test] Wrong computation of bounding box (max)" );
+    geode::OpenGeodeMeshException::test(
+        point_set.bounding_box().min() == answer_min,
+        "Wrong computation of bounding box (min)" );
+    geode::OpenGeodeMeshException::test(
+        point_set.bounding_box().max() == answer_max,
+        "Wrong computation of bounding box (max)" );
 }
 
 void test_create_vertex_attribute( const geode::PointSet3D& point_set )
@@ -84,8 +88,8 @@ void test_create_vertex_attribute( const geode::PointSet3D& point_set )
         point_set.vertex_attribute_manager()
             .find_or_create_attribute< geode::ConstantAttribute, bool >(
                 "test", true );
-    OPENGEODE_EXCEPTION( attribute->value() == true,
-        "[Test] PointSet attribute value should be true" );
+    geode::OpenGeodeMeshException::test(
+        attribute->value() == true, "PointSet attribute value should be true" );
 }
 
 void test_delete_vertex(
@@ -94,11 +98,11 @@ void test_delete_vertex(
     std::vector< bool > to_delete( point_set.nb_vertices(), false );
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION( point_set.nb_vertices() == 3,
-        "[Test] PointSet should have 3 vertices" );
+    geode::OpenGeodeMeshException::test(
+        point_set.nb_vertices() == 3, "PointSet should have 3 vertices" );
     geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( point_set.point( 2 ) == answer,
-        "[Test] PointSet vertex coordinates are not correct" );
+    geode::OpenGeodeMeshException::test( point_set.point( 2 ) == answer,
+        "PointSet vertex coordinates are not correct" );
 }
 
 void test_io( const geode::PointSet3D& point_set, std::string_view filename )
@@ -110,27 +114,27 @@ void test_io( const geode::PointSet3D& point_set, std::string_view filename )
         geode::OpenGeodePointSet3D::impl_name_static(), filename );
     for( const auto vertex_id : geode::Range{ point_set.nb_vertices() } )
     {
-        OPENGEODE_EXCEPTION(
+        geode::OpenGeodeMeshException::test(
             point_set.point( vertex_id )
                 .inexact_equal( point_set2->point( vertex_id ) ),
-            "[Test] Wrong reloaded mesh point coordinates." );
+            "Wrong reloaded mesh point coordinates." );
     }
 }
 
 void test_clone( const geode::PointSet3D& point_set )
 {
     const auto point_set2 = point_set.clone();
-    OPENGEODE_EXCEPTION( point_set2->nb_vertices() == 3,
-        "[Test] PointSet2 should have 3 vertices" );
+    geode::OpenGeodeMeshException::test(
+        point_set2->nb_vertices() == 3, "PointSet2 should have 3 vertices" );
 
     const auto attribute =
         point_set2->vertex_attribute_manager().find_attribute< bool >( "test" );
-    OPENGEODE_EXCEPTION( attribute->value( 0 ) == true,
-        "[Test] PointSet2 attribute value should be true" );
+    geode::OpenGeodeMeshException::test( attribute->value( 0 ) == true,
+        "PointSet2 attribute value should be true" );
 
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( point_set2->point( 2 ) == answer,
-        "[Test] PointSet2 vertex coordinates are not correct" );
+    geode::OpenGeodeMeshException::test( point_set2->point( 2 ) == answer,
+        "PointSet2 vertex coordinates are not correct" );
 }
 
 void test()

@@ -54,9 +54,9 @@ namespace geode
             Logger::error( e.what() );
             print_available_extensions<
                 LightRegularGridInputFactory< dimension > >( type );
-            throw OpenGeodeException{
-                "Cannot load LightRegularGrid from file: ", filename
-            };
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load LightRegularGrid from file: ", filename };
         }
     }
 

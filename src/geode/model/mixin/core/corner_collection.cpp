@@ -30,12 +30,12 @@ namespace geode
 {
     template < index_t dimension >
     template < typename Archive >
-    void CornerCollection< dimension >::serialize( Archive &archive )
+    void CornerCollection< dimension >::serialize( Archive &serializer )
     {
-        archive.ext( *this,
+        serializer.ext( *this,
             Growable< Archive, CornerCollection >{
-                { []( Archive &a, CornerCollection &corner_collection ) {
-                    a.ext( corner_collection,
+                { []( Archive &archive, CornerCollection &corner_collection ) {
+                    archive.ext( corner_collection,
                         bitsery::ext::BaseClass< Component< dimension > >{} );
                 } } } );
     }

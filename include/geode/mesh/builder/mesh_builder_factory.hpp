@@ -57,7 +57,8 @@ namespace geode
         {
             auto* builder = dynamic_cast< MeshBuilder* >(
                 create( mesh.impl_name(), mesh, {} ).release() );
-            OPENGEODE_EXCEPTION( builder,
+            OpenGeodeMeshException::check_exception( builder, nullptr,
+                OpenGeodeException::TYPE::internal,
                 "Cannot create mesh builder with key: ",
                 mesh.impl_name().get() );
             return std::unique_ptr< MeshBuilder >{ builder };

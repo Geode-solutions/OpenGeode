@@ -44,9 +44,9 @@ namespace geode
     class LineCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( LineCollection );
-        PASSKEY( LineCollections< dimension >, LineCollectionsKey );
-        PASSKEY(
-            LineCollectionsBuilder< dimension >, LineCollectionsBuilderKey );
+        PASSKEY( LineCollections< dimension >, LineCollectionsKey /*key*/ );
+        PASSKEY( LineCollectionsBuilder< dimension >,
+            LineCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -64,16 +64,16 @@ namespace geode
         }
 
     public:
-        LineCollection( LineCollectionsKey ) : LineCollection() {}
+        LineCollection( LineCollectionsKey /*key*/ ) : LineCollection() {}
 
         void set_line_collection_name(
-            std::string_view name, LineCollectionsBuilderKey )
+            std::string_view name, LineCollectionsBuilderKey /*key*/ )
         {
             this->set_name( name );
         }
 
         void set_line_collection_active(
-            bool active, LineCollectionsBuilderKey )
+            bool active, LineCollectionsBuilderKey /*key*/ )
         {
             this->set_active( active );
         }
@@ -82,7 +82,7 @@ namespace geode
         LineCollection() = default;
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
     };
     ALIAS_2D_AND_3D( LineCollection );
 } // namespace geode

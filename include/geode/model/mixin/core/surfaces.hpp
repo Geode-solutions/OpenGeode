@@ -44,7 +44,7 @@ namespace geode
     class opengeode_model_api Surfaces
     {
         OPENGEODE_DISABLE_COPY( Surfaces );
-        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey );
+        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey /*key*/ );
 
     public:
         using Builder = SurfacesBuilder< dimension >;

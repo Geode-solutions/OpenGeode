@@ -34,20 +34,22 @@
 void check_concatenation(
     const geode::BRep& brep, absl::Span< const geode::index_t > nb_components )
 {
-    OPENGEODE_EXCEPTION( brep.nb_corners() == nb_components[0],
-        "[Test] Concatenated model has ", brep.nb_corners(),
-        " Corners, should have ", nb_components[0], " Corners" );
-    OPENGEODE_EXCEPTION( brep.nb_lines() == nb_components[1],
-        "[Test] Concatenated model has ", brep.nb_lines(),
-        " Lines, should have ", nb_components[1], " Lines" );
-    OPENGEODE_EXCEPTION( brep.nb_surfaces() == nb_components[2],
-        "[Test] Concatenated model has ", brep.nb_surfaces(),
-        " Surfaces, should have ", nb_components[2], " Surfaces" );
-    OPENGEODE_EXCEPTION( brep.nb_blocks() == nb_components[3],
-        "[Test] Concatenated model has ", brep.nb_blocks(),
-        " Blocks, should have ", nb_components[3], " Blocks" );
-    OPENGEODE_EXCEPTION( brep.nb_model_boundaries() == nb_components[4],
-        "[Test] Concatenated model has ", brep.nb_model_boundaries(),
+    geode::OpenGeodeModelException::test( brep.nb_corners() == nb_components[0],
+        "Concatenated model has ", brep.nb_corners(), " Corners, should have ",
+        nb_components[0], " Corners" );
+    geode::OpenGeodeModelException::test( brep.nb_lines() == nb_components[1],
+        "Concatenated model has ", brep.nb_lines(), " Lines, should have ",
+        nb_components[1], " Lines" );
+    geode::OpenGeodeModelException::test(
+        brep.nb_surfaces() == nb_components[2], "Concatenated model has ",
+        brep.nb_surfaces(), " Surfaces, should have ", nb_components[2],
+        " Surfaces" );
+    geode::OpenGeodeModelException::test( brep.nb_blocks() == nb_components[3],
+        "Concatenated model has ", brep.nb_blocks(), " Blocks, should have ",
+        nb_components[3], " Blocks" );
+    geode::OpenGeodeModelException::test(
+        brep.nb_model_boundaries() == nb_components[4],
+        "Concatenated model has ", brep.nb_model_boundaries(),
         " ModelBoundaries, should have ", nb_components[4],
         " ModelBoundaries" );
 }

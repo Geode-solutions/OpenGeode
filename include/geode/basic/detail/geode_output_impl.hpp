@@ -44,8 +44,9 @@ namespace geode::detail
         filename = absl::StripAsciiWhitespace( filename );
         const auto extension =
             absl::AsciiStrToLower( extension_from_filename( filename ) );
-        OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
-            "Unknown extension: ", extension );
+        OpenGeodeBasicException::check_exception(
+            Factory::has_creator( extension ), nullptr,
+            OpenGeodeException::TYPE::data, "Unknown extension: ", extension );
         return Factory::create(
             extension, expand_predefined_folders( filename ) );
     }

@@ -44,8 +44,9 @@
 template < typename GeodeFactory >
 void check_register( std::string_view extension )
 {
-    OPENGEODE_EXCEPTION( GeodeFactory::has_creator( extension.data() ),
-        "[Test] No creator for extension ", extension, " is not correct" );
+    geode::OpenGeodeMeshException::test(
+        GeodeFactory::has_creator( extension.data() ),
+        "No creator for extension ", extension, " is not correct" );
 }
 
 void test()

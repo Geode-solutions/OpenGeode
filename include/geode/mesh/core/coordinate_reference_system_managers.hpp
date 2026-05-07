@@ -48,7 +48,7 @@ namespace geode
     class CoordinateReferenceSystemManagers
     {
         PASSKEY( CoordinateReferenceSystemManagersBuilder< dimension >,
-            CRSManagersKey );
+            CRSManagersKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -70,19 +70,19 @@ namespace geode
 
     public:
         [[nodiscard]] CoordinateReferenceSystemManager1D&
-            coordinate_reference_system_manager1D( CRSManagersKey );
+            coordinate_reference_system_manager1D( CRSManagersKey /*key*/ );
 
         [[nodiscard]] CoordinateReferenceSystemManager2D&
-            coordinate_reference_system_manager2D( CRSManagersKey );
+            coordinate_reference_system_manager2D( CRSManagersKey /*key*/ );
 
         [[nodiscard]] CoordinateReferenceSystemManager3D&
-            coordinate_reference_system_manager3D( CRSManagersKey );
+            coordinate_reference_system_manager3D( CRSManagersKey /*key*/ );
 
         [[nodiscard]] CoordinateReferenceSystemManager< dimension >&
-            main_coordinate_reference_system_manager( CRSManagersKey );
+            main_coordinate_reference_system_manager( CRSManagersKey /*key*/ );
 
         void set_point(
-            index_t vertex, Point< dimension > point, CRSManagersKey );
+            index_t vertex, Point< dimension > point, CRSManagersKey /*key*/ );
 
     protected:
         CoordinateReferenceSystemManagers();
@@ -93,7 +93,7 @@ namespace geode
 
     private:
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

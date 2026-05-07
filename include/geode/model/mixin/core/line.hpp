@@ -51,8 +51,8 @@ namespace geode
     class Line final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( Line );
-        PASSKEY( Lines< dimension >, LinesKey );
-        PASSKEY( LinesBuilder< dimension >, LinesBuilderKey );
+        PASSKEY( Lines< dimension >, LinesKey /*key*/ );
+        PASSKEY( LinesBuilder< dimension >, LinesBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
@@ -102,7 +102,7 @@ namespace geode
         [[nodiscard]] Mesh& modifiable_mesh();
 
         template < typename Archive >
-        void serialize( Archive& archive );
+        void serialize( Archive& serializer );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

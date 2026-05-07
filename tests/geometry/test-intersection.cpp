@@ -64,11 +64,11 @@ void test_line_sphere_intersection()
 
     const auto intersection_points1 =
         geode::line_sphere_intersection( line1, sphere );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_points1 && intersection_points1.result.value().size() == 2,
-        "[Test] Wrong result for line_sphere_intersection "
+        "Wrong result for line_sphere_intersection "
         "with query line1" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         std::fabs( intersection_points1.result.value().front().value( 0 ) - 2 )
                     - std::sqrt( 3 ) / 2
                 < geode::GLOBAL_EPSILON
@@ -78,24 +78,25 @@ void test_line_sphere_intersection()
                    < geode::GLOBAL_EPSILON
             && intersection_points1.result.value().front().value( 1 ) == 0.5
             && intersection_points1.result.value().back().value( 1 ),
-        "[Test] Wrong result for line_sphere_intersection "
+        "Wrong result for line_sphere_intersection "
         "with query line 1 (coords)" );
 
     const auto intersection_points2 =
         geode::line_sphere_intersection( line2, sphere );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_points2 && intersection_points2.result.value().size() == 1,
-        "[Test] Wrong result for line_sphere_intersection "
+        "Wrong result for line_sphere_intersection "
         "with query line 2" );
     const geode::Point2D result{ { 2.0, 1.0 } };
-    OPENGEODE_EXCEPTION( intersection_points2.result.value().front() == result,
-        "[Test] Wrong result for line_sphere_intersection "
+    geode::OpenGeodeGeometryException::test(
+        intersection_points2.result.value().front() == result,
+        "Wrong result for line_sphere_intersection "
         "with query line 2 (coords)" );
 
     const auto intersection_points3 =
         geode::line_sphere_intersection( line3, sphere );
-    OPENGEODE_EXCEPTION( !intersection_points3,
-        "[Test] Wrong result for line_sphere_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_points3,
+        "Wrong result for line_sphere_intersection "
         "with query line 3" );
 
     // Tests for 3D cases
@@ -122,35 +123,35 @@ void test_segment_sphere_intersection()
 
     const auto intersection_points1 =
         geode::segment_sphere_intersection( segment1, sphere );
-    OPENGEODE_EXCEPTION( !intersection_points1,
-        "[Test] Wrong result for line_sphere_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_points1,
+        "Wrong result for line_sphere_intersection "
         "with query segment 1" );
 
     const auto intersection_points2 =
         geode::segment_sphere_intersection( segment2, sphere );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_points2 && intersection_points2.result.value().size() == 1,
-        "[Test] Wrong result for line_sphere_intersection "
+        "Wrong result for line_sphere_intersection "
         "with query segment 2" );
 
     const auto intersection_points3 =
         geode::segment_sphere_intersection( segment3, sphere );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_points3 && intersection_points3.result.value().size() == 1,
-        "[Test] Wrong result for line_sphere_intersection "
+        "Wrong result for line_sphere_intersection "
         "with query segment 3" );
 
     const auto intersection_points4 =
         geode::segment_sphere_intersection( segment4, sphere );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_points4 && intersection_points4.result.value().size() == 2,
-        "[Test] Wrong result for line_sphere_intersection "
+        "Wrong result for line_sphere_intersection "
         "with query segment 4" );
 
     const auto intersection_points5 =
         geode::segment_sphere_intersection( segment5, sphere );
-    OPENGEODE_EXCEPTION( !intersection_points5,
-        "[Test] Wrong result for line_sphere_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_points5,
+        "Wrong result for line_sphere_intersection "
         "with query segment 5" );
 
     // Tests for 3D cases
@@ -174,28 +175,28 @@ void test_line_line_intersection()
 
     const auto intersection_point =
         geode::line_line_intersection( line1, line2 );
-    OPENGEODE_EXCEPTION( !intersection_point,
-        "[Test] Wrong result for line_line_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_point,
+        "Wrong result for line_line_intersection "
         "with query lines 1 and 2" );
 
     const auto intersection_point1 =
         geode::line_line_intersection( line1, line3 );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point1 && intersection_point1.result.value() == b,
-        "[Test] Wrong result for line_line_intersection with query lines 1 "
+        "Wrong result for line_line_intersection with query lines 1 "
         "and 3" );
 
     const auto intersection_point2 =
         geode::line_line_intersection( line1, line4 );
-    OPENGEODE_EXCEPTION( !intersection_point2,
-        "[Test] Wrong result for line_line_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_point2,
+        "Wrong result for line_line_intersection "
         "with query lines 1 and 4" );
 
     const auto intersection_point3 =
         geode::line_line_intersection( line1, line5 );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point3 && intersection_point3.result.value() == a,
-        "[Test] Wrong result for line_line_intersection with query lines 1 "
+        "Wrong result for line_line_intersection with query lines 1 "
         "and 5" );
 }
 
@@ -221,47 +222,47 @@ void test_segment_segment_intersection()
     const auto intersection_point =
         geode::segment_segment_intersection( segment_cf, segment_de );
     const geode::Point2D result_cf_de{ { 2.5, 0.5 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point && intersection_point.result.value() == result_cf_de,
-        "[Test] Wrong result for segment_segment_intersection "
+        "Wrong result for segment_segment_intersection "
         "with query segment_cf and segment_de" );
 
     const auto intersection_point1 =
         geode::segment_segment_intersection( segment_bc, segment_af );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point1 && intersection_point1.result.value() == b,
-        "[Test] Wrong result for segment_segment_intersection with query "
+        "Wrong result for segment_segment_intersection with query "
         "segment_bc and segment_af" );
 
     const auto intersection_point2 =
         geode::segment_segment_intersection( segment_cd, segment_df );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point2 && intersection_point2.result.value() == d,
-        "[Test] Wrong result for segment_segment_intersection "
+        "Wrong result for segment_segment_intersection "
         "with query segment_cd and segment_df" );
 
     const auto intersection_point3 =
         geode::segment_segment_intersection( segment_ab, segment_cd );
-    OPENGEODE_EXCEPTION( !intersection_point3,
-        "[Test] Wrong result for segment_segment_intersection with query "
+    geode::OpenGeodeGeometryException::test( !intersection_point3,
+        "Wrong result for segment_segment_intersection with query "
         "segment_ab and segment_cd" );
 
     const auto intersection_point4 =
         geode::segment_segment_intersection( segment_ab, segment_ab2 );
-    OPENGEODE_EXCEPTION( !intersection_point4,
-        "[Test] Wrong result for segment_segment_intersection with query "
+    geode::OpenGeodeGeometryException::test( !intersection_point4,
+        "Wrong result for segment_segment_intersection with query "
         "segment_ab and segment_ab2" );
 
     const auto intersection_point5 =
         geode::segment_segment_intersection( segment_ab, segment_ef );
-    OPENGEODE_EXCEPTION( !intersection_point5,
-        "[Test] Wrong result for segment_segment_intersection with query "
+    geode::OpenGeodeGeometryException::test( !intersection_point5,
+        "Wrong result for segment_segment_intersection with query "
         "segment_ab and segment_ef" );
 
     const auto intersection_point6 =
         geode::segment_segment_intersection( segment_bc, segment_df );
-    OPENGEODE_EXCEPTION( !intersection_point6,
-        "[Test] Wrong result for segment_segment_intersection with query "
+    geode::OpenGeodeGeometryException::test( !intersection_point6,
+        "Wrong result for segment_segment_intersection with query "
         "segment_bc and segment_df" );
 }
 
@@ -288,34 +289,34 @@ void test_segment_line_intersection()
     const auto intersection_point =
         geode::segment_line_intersection( segment_de, line_cf );
     const geode::Point2D result_de_cf{ { 2.5, 0.5 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point && intersection_point.result.value() == result_de_cf,
-        "[Test] Wrong result for segment_line_intersection "
+        "Wrong result for segment_line_intersection "
         "with query segment_de and line_cf" );
 
     const auto intersection_point1 =
         geode::segment_line_intersection( segment_ef, line_df );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersection_point1 && intersection_point1.result.value() == f,
-        "[Test] Wrong result for segment_line_intersection "
+        "Wrong result for segment_line_intersection "
         "with query segment_ef and line_df" );
 
     const auto intersection_point2 =
         geode::segment_line_intersection( segment_cd, line_ef );
-    OPENGEODE_EXCEPTION( !intersection_point2,
-        "[Test] Wrong result for segment_line_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_point2,
+        "Wrong result for segment_line_intersection "
         "with query segment_cd and line_ef" );
 
     const auto intersection_point3 =
         geode::segment_line_intersection( segment_ab, line_ef );
-    OPENGEODE_EXCEPTION( !intersection_point3,
-        "[Test] Wrong result for segment_line_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_point3,
+        "Wrong result for segment_line_intersection "
         "with query segment_ab and line_ef" );
 
     const auto intersection_point4 =
         geode::segment_line_intersection( segment_ab, line_ce );
-    OPENGEODE_EXCEPTION( !intersection_point4,
-        "[Test] Wrong result for segment_line_intersection "
+    geode::OpenGeodeGeometryException::test( !intersection_point4,
+        "Wrong result for segment_line_intersection "
         "with query segment_ab and line_ce" );
 }
 
@@ -352,26 +353,26 @@ void test_segment_plane_intersection()
 
     const auto intersect =
         geode::segment_plane_intersection( segment_de, plane );
-    OPENGEODE_EXCEPTION( !intersect,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersect,
+        "Wrong result for segment_plane_intersection with "
         "query segment_de" );
 
     const auto intersect1 =
         geode::segment_plane_intersection( segment_da, plane );
-    OPENGEODE_EXCEPTION( !intersect1,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersect1,
+        "Wrong result for segment_plane_intersection with "
         "query segment_da" );
 
     const auto intersect2 =
         geode::segment_plane_intersection( segment_fg, plane );
-    OPENGEODE_EXCEPTION( !intersect2,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersect2,
+        "Wrong result for segment_plane_intersection with "
         "query segment_fg" );
 
     const auto intersect3 =
         geode::segment_plane_intersection( segment_hi, plane );
-    OPENGEODE_EXCEPTION( intersect3.result.value() == a,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test( intersect3.result.value() == a,
+        "Wrong result for segment_plane_intersection with "
         "query segment_hi" );
 
     const auto intersect4 =
@@ -379,8 +380,9 @@ void test_segment_plane_intersection()
     geode::Point3D answer4{ { 0.5, 0.5, 0.0 } };
     double distance_to_answer =
         geode::point_point_distance( intersect4.result.value(), answer4 );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        distance_to_answer < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_plane_intersection with "
         "query segment_hj" );
 
     const auto intersect5 =
@@ -388,8 +390,9 @@ void test_segment_plane_intersection()
     geode::Point3D answer{ { 0.5, 0.25, 0.0 } };
     distance_to_answer =
         geode::point_point_distance( intersect5.result.value(), answer );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        distance_to_answer < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_plane_intersection with "
         "query segment_ki" );
 
     const auto intersect6 =
@@ -397,20 +400,21 @@ void test_segment_plane_intersection()
     geode::Point3D answer6{ { -4.5, 0.0, 0.0 } };
     distance_to_answer =
         geode::point_point_distance( intersect6.result.value(), answer6 );
-    OPENGEODE_EXCEPTION( distance_to_answer < geode::GLOBAL_EPSILON,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        distance_to_answer < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_plane_intersection with "
         "query segment_li" );
 
     const auto intersect7 =
         geode::segment_plane_intersection( segment_kb, plane );
-    OPENGEODE_EXCEPTION( intersect7.result.value() == b,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test( intersect7.result.value() == b,
+        "Wrong result for segment_plane_intersection with "
         "query segment_kb" );
 
     const auto intersect8 =
         geode::segment_plane_intersection( segment_mn, plane );
-    OPENGEODE_EXCEPTION( !intersect8,
-        "[Test] Wrong result for segment_plane_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersect8,
+        "Wrong result for segment_plane_intersection with "
         "query segment_mn" );
 }
 
@@ -446,58 +450,60 @@ void test_segment_triangle_intersection()
 
     const auto intersection =
         geode::segment_triangle_intersection( segment_de, triangle );
-    OPENGEODE_EXCEPTION( !intersection,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersection,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_de" );
 
     const auto intersection1 =
         geode::segment_triangle_intersection( segment_da, triangle );
-    OPENGEODE_EXCEPTION( !intersection1,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersection1,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_da" );
 
     const auto intersection2 =
         geode::segment_triangle_intersection( segment_fg, triangle );
-    OPENGEODE_EXCEPTION( !intersection2,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersection2,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_fg" );
 
     const auto intersection3 =
         geode::segment_triangle_intersection( segment_hi, triangle );
-    OPENGEODE_EXCEPTION( intersection3.result.value() == a,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( intersection3.result.value() == a,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_hi" );
 
     const auto intersection4 =
         geode::segment_triangle_intersection( segment_hj, triangle );
     geode::Point3D answer{ { 0.5, 0.5, 0.0 } };
-    OPENGEODE_EXCEPTION( intersection4.result.value() == answer,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        intersection4.result.value() == answer,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_hj" );
 
     const auto intersection5 =
         geode::segment_triangle_intersection( segment_ki, triangle );
     geode::Point3D answer5{ { 0.5, 0.25, 0.0 } };
-    OPENGEODE_EXCEPTION( intersection5.result.value() == answer5,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        intersection5.result.value() == answer5,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_ki" );
 
     const auto intersection6 =
         geode::segment_triangle_intersection( segment_li, triangle );
-    OPENGEODE_EXCEPTION( !intersection6,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersection6,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_li" );
 
     const auto intersection7 =
         geode::segment_triangle_intersection( segment_kb, triangle );
-    OPENGEODE_EXCEPTION( intersection7.result.value() == b,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( intersection7.result.value() == b,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_kb" );
 
     const auto intersection8 =
         geode::segment_triangle_intersection( segment_mn, triangle );
-    OPENGEODE_EXCEPTION( !intersection8,
-        "[Test] Wrong result for segment_triangle_intersection with "
+    geode::OpenGeodeGeometryException::test( !intersection8,
+        "Wrong result for segment_triangle_intersection with "
         "query segment_mn" );
 }
 
@@ -511,17 +517,17 @@ void test_line_cylinder_intersection()
     const geode::InfiniteLine3D line_ab{ segment_ab };
     const auto result_ab =
         geode::line_cylinder_intersection( line_ab, cylinder );
-    OPENGEODE_EXCEPTION( result_ab,
-        "[Test] Wrong result for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab,
+        "Wrong result for line_cylinder_intersection with "
         "query line_ab" );
-    OPENGEODE_EXCEPTION( result_ab.result->size() == 2,
-        "[Test] Wrong result size for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab.result->size() == 2,
+        "Wrong result size for line_cylinder_intersection with "
         "query line_ab" );
-    OPENGEODE_EXCEPTION( result_ab.result->front() == a,
-        "[Test] Wrong result values for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab.result->front() == a,
+        "Wrong result values for line_cylinder_intersection with "
         "query line_ab" );
-    OPENGEODE_EXCEPTION( result_ab.result->back() == b,
-        "[Test] Wrong result values for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab.result->back() == b,
+        "Wrong result values for line_cylinder_intersection with "
         "query line_ab" );
 
     const geode::Point3D c{ { 0.5, 0.0, 0.0 } };
@@ -530,19 +536,21 @@ void test_line_cylinder_intersection()
     const geode::InfiniteLine3D line_cd{ segment_cd };
     const auto result_cd =
         geode::line_cylinder_intersection( line_cd, cylinder );
-    OPENGEODE_EXCEPTION( result_cd,
-        "[Test] Wrong result for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_cd,
+        "Wrong result for line_cylinder_intersection with "
         "query line_cd" );
-    OPENGEODE_EXCEPTION( result_cd.result->size() == 2,
-        "[Test] Wrong result size for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_cd.result->size() == 2,
+        "Wrong result size for line_cylinder_intersection with "
         "query line_cd" );
     const geode::Point3D answer_cd0{ { 0.5, -0.2, 0.0 } };
     const geode::Point3D answer_cd1{ { 0.5, 0.2, 0.0 } };
-    OPENGEODE_EXCEPTION( result_cd.result->front() == answer_cd0,
-        "[Test] Wrong result values for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        result_cd.result->front() == answer_cd0,
+        "Wrong result values for line_cylinder_intersection with "
         "query line_cd" );
-    OPENGEODE_EXCEPTION( result_cd.result->back() == answer_cd1,
-        "[Test] Wrong result values for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        result_cd.result->back() == answer_cd1,
+        "Wrong result values for line_cylinder_intersection with "
         "query line_cd" );
 
     const geode::Point3D e{ { 0.2, 0.1, 0.0 } };
@@ -551,18 +559,19 @@ void test_line_cylinder_intersection()
     const geode::InfiniteLine3D line_ef{ segment_ef };
     const auto result_ef =
         geode::line_cylinder_intersection( line_ef, cylinder );
-    OPENGEODE_EXCEPTION( result_ef,
-        "[Test] Wrong result for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ef,
+        "Wrong result for line_cylinder_intersection with "
         "query line_ef" );
-    OPENGEODE_EXCEPTION( result_ef.result->size() == 2,
-        "[Test] Wrong result size for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ef.result->size() == 2,
+        "Wrong result size for line_cylinder_intersection with "
         "query line_ef" );
     const geode::Point3D answer_ef1{ { 0.4, 0.2, 0.0 } };
-    OPENGEODE_EXCEPTION( result_ef.result->front() == a,
-        "[Test] Wrong result values for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ef.result->front() == a,
+        "Wrong result values for line_cylinder_intersection with "
         "query line_ef" );
-    OPENGEODE_EXCEPTION( result_ef.result->back() == answer_ef1,
-        "[Test] Wrong result values for line_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        result_ef.result->back() == answer_ef1,
+        "Wrong result values for line_cylinder_intersection with "
         "query line_ef" );
 }
 
@@ -575,17 +584,17 @@ void test_segment_cylinder_intersection()
 
     const auto result_ab =
         geode::segment_cylinder_intersection( segment_ab, cylinder );
-    OPENGEODE_EXCEPTION( result_ab,
-        "[Test] Wrong result for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab,
+        "Wrong result for segment_cylinder_intersection with "
         "query segment_ab" );
-    OPENGEODE_EXCEPTION( result_ab.result->size() == 2,
-        "[Test] Wrong result size for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab.result->size() == 2,
+        "Wrong result size for segment_cylinder_intersection with "
         "query segment_ab" );
-    OPENGEODE_EXCEPTION( result_ab.result->front() == a,
-        "[Test] Wrong result values for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab.result->front() == a,
+        "Wrong result values for segment_cylinder_intersection with "
         "query segment_ab" );
-    OPENGEODE_EXCEPTION( result_ab.result->back() == b,
-        "[Test] Wrong result values for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_ab.result->back() == b,
+        "Wrong result values for segment_cylinder_intersection with "
         "query segment_ab" );
 
     const geode::Point3D c{ { 0.5, 0.0, 0.0 } };
@@ -593,15 +602,16 @@ void test_segment_cylinder_intersection()
     const geode::Segment3D segment_cd{ c, d };
     const auto result_cd =
         geode::segment_cylinder_intersection( segment_cd, cylinder );
-    OPENGEODE_EXCEPTION( result_cd,
-        "[Test] Wrong result for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_cd,
+        "Wrong result for segment_cylinder_intersection with "
         "query segment_cd" );
-    OPENGEODE_EXCEPTION( result_cd.result->size() == 1,
-        "[Test] Wrong result size for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( result_cd.result->size() == 1,
+        "Wrong result size for segment_cylinder_intersection with "
         "query segment_cd" );
     const geode::Point3D answer_cd{ { 0.5, 0.2, 0.0 } };
-    OPENGEODE_EXCEPTION( result_cd.result->front() == answer_cd,
-        "[Test] Wrong result values for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test(
+        result_cd.result->front() == answer_cd,
+        "Wrong result values for segment_cylinder_intersection with "
         "query segment_cd" );
 
     const geode::Point3D e{ { 0.2, 0.1, 0.0 } };
@@ -609,8 +619,8 @@ void test_segment_cylinder_intersection()
     const geode::Segment3D segment_ef{ e, f };
     const auto result_ef =
         geode::segment_cylinder_intersection( segment_ef, cylinder );
-    OPENGEODE_EXCEPTION( !result_ef,
-        "[Test] Wrong result for segment_cylinder_intersection with "
+    geode::OpenGeodeGeometryException::test( !result_ef,
+        "Wrong result for segment_cylinder_intersection with "
         "query segment_ef" );
 }
 
@@ -620,26 +630,29 @@ void test_plane_plane_intersection()
     const geode::Point3D O{ { 0, 0, 0 } };
     const geode::Plane planeZO{ Z, O };
     const auto OO_result = geode::plane_plane_intersection( planeZO, planeZO );
-    OPENGEODE_EXCEPTION( OO_result.type == geode::INTERSECTION_TYPE::parallel,
-        "[Test] Wrong intersection between planeZO, planeZO" );
+    geode::OpenGeodeGeometryException::test(
+        OO_result.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong intersection between planeZO, planeZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
     const geode::Plane planeZo{ Z, o };
     const auto Oo_result = geode::plane_plane_intersection( planeZO, planeZo );
-    OPENGEODE_EXCEPTION(
-        !Oo_result, "[Test] Wrong intersection between planeZO, planeZo" );
+    geode::OpenGeodeGeometryException::test(
+        !Oo_result, "Wrong intersection between planeZO, planeZo" );
 
     const geode::Vector3D XY{ { 1, 1, 0 } };
     const geode::Plane planeXY0{ XY, o };
     const auto XYO_result =
         geode::plane_plane_intersection( planeZO, planeXY0 );
-    OPENGEODE_EXCEPTION(
-        XYO_result, "[Test] Wrong intersection between planeZO, planeXY0" );
-    OPENGEODE_EXCEPTION( XYO_result.result->origin().inexact_equal( O ),
-        "[Test] Wrong intersection between planeZO, planeXY0" );
+    geode::OpenGeodeGeometryException::test(
+        XYO_result, "Wrong intersection between planeZO, planeXY0" );
+    geode::OpenGeodeGeometryException::test(
+        XYO_result.result->origin().inexact_equal( O ),
+        "Wrong intersection between planeZO, planeXY0" );
     const auto answer = geode::Vector3D{ { -1, 1, 0 } }.normalize();
-    OPENGEODE_EXCEPTION( XYO_result.result->direction().inexact_equal( answer ),
-        "[Test] Wrong intersection between planeZO, planeXY0" );
+    geode::OpenGeodeGeometryException::test(
+        XYO_result.result->direction().inexact_equal( answer ),
+        "Wrong intersection between planeZO, planeXY0" );
 }
 
 void test_plane_circle_intersection()
@@ -650,49 +663,53 @@ void test_plane_circle_intersection()
     const geode::Circle circleZO{ planeZO, 42 };
     const auto OO_result =
         geode::plane_circle_intersection( planeZO, circleZO );
-    OPENGEODE_EXCEPTION( OO_result.type == geode::INTERSECTION_TYPE::parallel,
-        "[Test] Wrong intersection between planeZO, circleZO" );
+    geode::OpenGeodeGeometryException::test(
+        OO_result.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong intersection between planeZO, circleZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
     const geode::Plane planeZo{ Z, o };
     const geode::Circle circleZo{ planeZo, 42 };
     const auto Oo_result =
         geode::plane_circle_intersection( planeZO, circleZo );
-    OPENGEODE_EXCEPTION(
-        !Oo_result, "[Test] Wrong intersection between planeZO, circleZo" );
+    geode::OpenGeodeGeometryException::test(
+        !Oo_result, "Wrong intersection between planeZO, circleZo" );
 
     const geode::Vector3D XY{ { 1, 1, 0 } };
     const geode::Plane planeXY0{ XY, o };
     const geode::Circle circleYZ42{ planeXY0, 42 };
     const auto XY42_result =
         geode::plane_circle_intersection( planeZO, circleYZ42 );
-    OPENGEODE_EXCEPTION(
-        XY42_result, "[Test] Wrong intersection between planeZO, circleYZ42" );
-    OPENGEODE_EXCEPTION( XY42_result.result->size() == 2,
-        "[Test] Wrong intersection between planeZO, circleYZ42" );
+    geode::OpenGeodeGeometryException::test(
+        XY42_result, "Wrong intersection between planeZO, circleYZ42" );
+    geode::OpenGeodeGeometryException::test( XY42_result.result->size() == 2,
+        "Wrong intersection between planeZO, circleYZ42" );
     const double value42{ 29.690065678607 };
     const geode::Point3D answer420{ { value42, -value42, 0 } };
-    OPENGEODE_EXCEPTION( XY42_result.result->at( 0 ).inexact_equal( answer420 ),
-        "[Test] Wrong intersection between planeZO, circleYZ42" );
+    geode::OpenGeodeGeometryException::test(
+        XY42_result.result->at( 0 ).inexact_equal( answer420 ),
+        "Wrong intersection between planeZO, circleYZ42" );
     const geode::Point3D answer421{ { -value42, value42, 0 } };
-    OPENGEODE_EXCEPTION( XY42_result.result->at( 1 ).inexact_equal( answer421 ),
-        "[Test] Wrong intersection between planeZO, circleYZ42" );
+    geode::OpenGeodeGeometryException::test(
+        XY42_result.result->at( 1 ).inexact_equal( answer421 ),
+        "Wrong intersection between planeZO, circleYZ42" );
 
     const geode::Circle circleYZ1{ planeXY0, 1 };
     const auto XY1_result =
         geode::plane_circle_intersection( planeZO, circleYZ1 );
-    OPENGEODE_EXCEPTION(
-        XY1_result, "[Test] Wrong intersection between planeZO, circleYZ1" );
-    OPENGEODE_EXCEPTION( XY1_result.result->size() == 1,
-        "[Test] Wrong intersection between planeZO, circleYZ1" );
-    OPENGEODE_EXCEPTION( XY1_result.result->at( 0 ).inexact_equal( O ),
-        "[Test] Wrong intersection between planeZO, circleYZ1" );
+    geode::OpenGeodeGeometryException::test(
+        XY1_result, "Wrong intersection between planeZO, circleYZ1" );
+    geode::OpenGeodeGeometryException::test( XY1_result.result->size() == 1,
+        "Wrong intersection between planeZO, circleYZ1" );
+    geode::OpenGeodeGeometryException::test(
+        XY1_result.result->at( 0 ).inexact_equal( O ),
+        "Wrong intersection between planeZO, circleYZ1" );
 
     const geode::Circle circleYZ0{ planeXY0, 0.1 };
     const auto XY0_result =
         geode::plane_circle_intersection( planeZO, circleYZ0 );
-    OPENGEODE_EXCEPTION(
-        !XY0_result, "[Test] Wrong intersection between planeZO, circleYZ0" );
+    geode::OpenGeodeGeometryException::test(
+        !XY0_result, "Wrong intersection between planeZO, circleYZ0" );
 }
 
 void test_triangle_circle_intersection()
@@ -707,49 +724,53 @@ void test_triangle_circle_intersection()
     const geode::Triangle3D triangleABC{ A, B, C };
     const auto Oabc_result =
         geode::triangle_circle_intersection( triangleABC, circleZO );
-    OPENGEODE_EXCEPTION( Oabc_result.type == geode::INTERSECTION_TYPE::parallel,
-        "[Test] Wrong intersection between triangleABC, circleZO" );
+    geode::OpenGeodeGeometryException::test(
+        Oabc_result.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong intersection between triangleABC, circleZO" );
 
     const geode::Point3D o{ { 0, 0, 1 } };
     const geode::Plane planeZo{ Z, o };
     const geode::Circle circleZo{ planeZo, 42 };
     const auto oabc_result =
         geode::triangle_circle_intersection( triangleABC, circleZo );
-    OPENGEODE_EXCEPTION( !oabc_result,
-        "[Test] Wrong intersection between triangleABC, circleZo" );
+    geode::OpenGeodeGeometryException::test(
+        !oabc_result, "Wrong intersection between triangleABC, circleZo" );
 
     const geode::Vector3D XY{ { 1, 1, 0 } };
     const geode::Plane planeXY0{ XY, o };
     const geode::Circle circleYZ11{ planeXY0, 1.1 };
     const auto XY11_result =
         geode::triangle_circle_intersection( triangleABC, circleYZ11 );
-    OPENGEODE_EXCEPTION( XY11_result,
-        "[Test] Wrong intersection between triangleABC, circleYZ11" );
-    OPENGEODE_EXCEPTION( XY11_result.result->size() == 2,
-        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+    geode::OpenGeodeGeometryException::test(
+        XY11_result, "Wrong intersection between triangleABC, circleYZ11" );
+    geode::OpenGeodeGeometryException::test( XY11_result.result->size() == 2,
+        "Wrong intersection between triangleABC, circleYZ11" );
     const double value11{ 0.324037034920393 };
     const geode::Point3D answer110{ { -value11, value11, 0 } };
-    OPENGEODE_EXCEPTION( XY11_result.result->at( 0 ).inexact_equal( answer110 ),
-        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+    geode::OpenGeodeGeometryException::test(
+        XY11_result.result->at( 0 ).inexact_equal( answer110 ),
+        "Wrong intersection between triangleABC, circleYZ11" );
     const geode::Point3D answer111{ { value11, -value11, 0 } };
-    OPENGEODE_EXCEPTION( XY11_result.result->at( 1 ).inexact_equal( answer111 ),
-        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+    geode::OpenGeodeGeometryException::test(
+        XY11_result.result->at( 1 ).inexact_equal( answer111 ),
+        "Wrong intersection between triangleABC, circleYZ11" );
 
     const geode::Circle circleYZ1{ planeXY0, 1 };
     const auto XY1_result =
         geode::triangle_circle_intersection( triangleABC, circleYZ1 );
-    OPENGEODE_EXCEPTION( XY1_result,
-        "[Test] Wrong intersection between triangleABC, circleYZ1" );
-    OPENGEODE_EXCEPTION( XY1_result.result->size() == 1,
-        "[Test] Wrong intersection between triangleABC, circleYZ1" );
-    OPENGEODE_EXCEPTION( XY1_result.result->at( 0 ).inexact_equal( O ),
-        "[Test] Wrong intersection between triangleABC, circleYZ1" );
+    geode::OpenGeodeGeometryException::test(
+        XY1_result, "Wrong intersection between triangleABC, circleYZ1" );
+    geode::OpenGeodeGeometryException::test( XY1_result.result->size() == 1,
+        "Wrong intersection between triangleABC, circleYZ1" );
+    geode::OpenGeodeGeometryException::test(
+        XY1_result.result->at( 0 ).inexact_equal( O ),
+        "Wrong intersection between triangleABC, circleYZ1" );
 
     const geode::Circle circleYZ0{ planeXY0, 0.1 };
     const auto XY0_result =
         geode::plane_circle_intersection( planeZO, circleYZ0 );
-    OPENGEODE_EXCEPTION(
-        !XY0_result, "[Test] Wrong intersection between planeZO, circleYZ0" );
+    geode::OpenGeodeGeometryException::test(
+        !XY0_result, "Wrong intersection between planeZO, circleYZ0" );
 }
 
 void test_line_ellipse_intersection_2D()
@@ -765,8 +786,8 @@ void test_line_ellipse_intersection_2D()
     const geode::InfiniteLine2D parallel{ parallel_segment };
     const auto parallel_result =
         geode::line_ellipse_intersection( parallel, ellipse );
-    OPENGEODE_EXCEPTION( !parallel_result,
-        "[Test] Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        !parallel_result, "Wrong intersection between line and ellipse" );
     const geode::Point2D intersecting_once_origin{ { 3.0, 2.0 } };
     const geode::Point2D intersecting_once_dest{ { 3.0, 0.0 } };
     const geode::Segment2D intersecting_once_segment{ intersecting_once_origin,
@@ -774,11 +795,12 @@ void test_line_ellipse_intersection_2D()
     const geode::InfiniteLine2D intersecting_once{ intersecting_once_segment };
     const auto intersecting_once_result =
         geode::line_ellipse_intersection( intersecting_once, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
-        "[Test] Wrong intersection between line and ellipse" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        intersecting_once_result.result->size() == 1,
+        "Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
         intersecting_once_result.result->at( 0 ) == intersecting_once_dest,
-        "[Test] Wrong intersection between line and ellipse" );
+        "Wrong intersection between line and ellipse" );
     const geode::Segment2D intersecting_twice_segment(
         center, geode::Point2D{ { 3, 0 } } );
     const geode::InfiniteLine2D intersecting_twice_line{
@@ -786,14 +808,17 @@ void test_line_ellipse_intersection_2D()
     };
     const auto intersecting_twice_result =
         geode::line_ellipse_intersection( intersecting_twice_line, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
-        "[Test] Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_twice_result.result->size() == 2,
+        "Wrong intersection between line and ellipse" );
     const geode::Point2D result1{ { -3, 0 } };
-    OPENGEODE_EXCEPTION( intersecting_twice_result.result->at( 0 ) == result1,
-        "[Test] Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_twice_result.result->at( 0 ) == result1,
+        "Wrong intersection between line and ellipse" );
     const geode::Point2D result2{ { 3, 0 } };
-    OPENGEODE_EXCEPTION( intersecting_twice_result.result->at( 1 ) == result2,
-        "[Test] Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_twice_result.result->at( 1 ) == result2,
+        "Wrong intersection between line and ellipse" );
 }
 
 void test_line_ellipse_intersection_3D()
@@ -811,8 +836,8 @@ void test_line_ellipse_intersection_3D()
     const geode::InfiniteLine3D parallel{ parallel_segment };
     const auto parallel_result =
         geode::line_ellipse_intersection( parallel, ellipse );
-    OPENGEODE_EXCEPTION( !parallel_result,
-        "[Test] Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        !parallel_result, "Wrong intersection between line and ellipse" );
     const geode::Point3D intersecting_once_origin{ { 3.0, 2.0, 0.0 } };
     const geode::Point3D intersecting_once_dest{ { 3.0, 0.0, 0.0 } };
     const geode::Segment3D intersecting_once_segment{ intersecting_once_origin,
@@ -820,11 +845,12 @@ void test_line_ellipse_intersection_3D()
     const geode::InfiniteLine3D intersecting_once{ intersecting_once_segment };
     const auto intersecting_once_result =
         geode::line_ellipse_intersection( intersecting_once, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
-        "[Test] Wrong intersection between line and ellipse" );
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
+        intersecting_once_result.result->size() == 1,
+        "Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
         intersecting_once_result.result->at( 0 ) == intersecting_once_dest,
-        "[Test] Wrong intersection between line and ellipse" );
+        "Wrong intersection between line and ellipse" );
     const geode::Segment3D intersecting_twice_segment(
         geode::Point3D{ { 0, 0, 1 } }, geode::Point3D{ { 3, 0, 0 } } );
     const geode::InfiniteLine3D intersecting_twice_line{
@@ -832,16 +858,17 @@ void test_line_ellipse_intersection_3D()
     };
     const auto intersecting_twice_result =
         geode::line_ellipse_intersection( intersecting_twice_line, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
-        "[Test] Wrong intersection between line and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_twice_result.result->size() == 2,
+        "Wrong intersection between line and ellipse" );
     const geode::Point3D result1{ { 0, 0, 1 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersecting_twice_result.result->at( 0 ).inexact_equal( result1 ),
-        "[Test] Wrong intersection between line and ellipse" );
+        "Wrong intersection between line and ellipse" );
     const geode::Point3D result2{ { 3, 0, 0 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersecting_twice_result.result->at( 1 ).inexact_equal( result2 ),
-        "[Test] Wrong intersection between line and ellipse" );
+        "Wrong intersection between line and ellipse" );
 }
 
 void test_line_ellipse_intersection()
@@ -862,19 +889,21 @@ void test_segment_ellipse_intersection_2D()
     const geode::Segment2D parallel_segment{ parallel_origin, parallel_dest };
     const auto parallel_result =
         geode::segment_ellipse_intersection( parallel_segment, ellipse );
-    OPENGEODE_EXCEPTION( !parallel_result,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        !parallel_result, "Wrong intersection between segment and ellipse" );
     const geode::Point2D intersecting_once_origin{ { 3.0, 2.0 } };
     const geode::Point2D intersecting_once_dest{ { 3.0, -2.0 } };
     const geode::Segment2D intersecting_once_segment{ intersecting_once_origin,
         intersecting_once_dest };
     const auto intersecting_once_result = geode::segment_ellipse_intersection(
         intersecting_once_segment, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_once_result.result->size() == 1,
+        "Wrong intersection between segment and ellipse" );
     geode::Point2D result{ { 3.0, 0.0 } };
-    OPENGEODE_EXCEPTION( intersecting_once_result.result->at( 0 ) == result,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_once_result.result->at( 0 ) == result,
+        "Wrong intersection between segment and ellipse" );
     const geode::Point2D intersecting_twice_origin{ { -4.0, 0 } };
     const geode::Point2D intersecting_twice_dest{ { 4.0, 0 } };
     const geode::Segment2D intersecting_twice_segment{
@@ -882,24 +911,25 @@ void test_segment_ellipse_intersection_2D()
     };
     const auto intersecting_twice_result = geode::segment_ellipse_intersection(
         intersecting_twice_segment, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_twice_result.result->size() == 2,
+        "Wrong intersection between segment and ellipse" );
     const geode::Point2D result1{ { -3, 0 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersecting_twice_result.result->at( 0 ).inexact_equal( result1 ),
-        "[Test] Wrong intersection between segment and ellipse" );
+        "Wrong intersection between segment and ellipse" );
     const geode::Point2D result2{ { 3, 0 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersecting_twice_result.result->at( 1 ).inexact_equal( result2 ),
-        "[Test] Wrong intersection between segment and ellipse" );
+        "Wrong intersection between segment and ellipse" );
     const geode::Point2D not_intersecting_origin{ { 1.0, 0.0 } };
     const geode::Point2D not_intersecting_dest{ { 2.0, 0.0 } };
     const geode::Segment2D not_intersecting_segment{ not_intersecting_origin,
         not_intersecting_dest };
     const auto not_intersecting_result = geode::segment_ellipse_intersection(
         not_intersecting_segment, ellipse );
-    OPENGEODE_EXCEPTION( !not_intersecting_result,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test( !not_intersecting_result,
+        "Wrong intersection between segment and ellipse" );
 }
 
 void test_segment_ellipse_intersection_3D()
@@ -916,19 +946,21 @@ void test_segment_ellipse_intersection_3D()
     const geode::Segment3D parallel_segment{ parallel_origin, parallel_dest };
     const auto parallel_result =
         geode::segment_ellipse_intersection( parallel_segment, ellipse );
-    OPENGEODE_EXCEPTION( !parallel_result,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        !parallel_result, "Wrong intersection between segment and ellipse" );
     const geode::Point3D intersecting_once_origin{ { 3.0, 2.0, 0 } };
     const geode::Point3D intersecting_once_dest{ { 3.0, -2.0, 0 } };
     const geode::Segment3D intersecting_once_segment{ intersecting_once_origin,
         intersecting_once_dest };
     const auto intersecting_once_result = geode::segment_ellipse_intersection(
         intersecting_once_segment, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_once_result.result->size() == 1,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_once_result.result->size() == 1,
+        "Wrong intersection between segment and ellipse" );
     geode::Point3D result{ { 3.0, 0.0, 0 } };
-    OPENGEODE_EXCEPTION( intersecting_once_result.result->at( 0 ) == result,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_once_result.result->at( 0 ) == result,
+        "Wrong intersection between segment and ellipse" );
     const geode::Point3D intersecting_twice_origin{ { -4.0, 0, 0 } };
     const geode::Point3D intersecting_twice_dest{ { 4.0, 0, 0 } };
     const geode::Segment3D intersecting_twice_segment{
@@ -936,24 +968,25 @@ void test_segment_ellipse_intersection_3D()
     };
     const auto intersecting_twice_result = geode::segment_ellipse_intersection(
         intersecting_twice_segment, ellipse );
-    OPENGEODE_EXCEPTION( intersecting_twice_result.result->size() == 2,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        intersecting_twice_result.result->size() == 2,
+        "Wrong intersection between segment and ellipse" );
     const geode::Point3D result1{ { -3, 0 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersecting_twice_result.result->at( 0 ).inexact_equal( result1 ),
-        "[Test] Wrong intersection between segment and ellipse" );
+        "Wrong intersection between segment and ellipse" );
     const geode::Point3D result2{ { 3, 0 } };
-    OPENGEODE_EXCEPTION(
+    geode::OpenGeodeGeometryException::test(
         intersecting_twice_result.result->at( 1 ).inexact_equal( result2 ),
-        "[Test] Wrong intersection between segment and ellipse" );
+        "Wrong intersection between segment and ellipse" );
     const geode::Point3D not_intersecting_origin{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D not_intersecting_dest{ { 2.0, 0.0, 0.5 } };
     const geode::Segment3D not_intersecting_segment{ not_intersecting_origin,
         not_intersecting_dest };
     const auto not_intersecting_result = geode::segment_ellipse_intersection(
         not_intersecting_segment, ellipse );
-    OPENGEODE_EXCEPTION( !not_intersecting_result,
-        "[Test] Wrong intersection between segment and ellipse" );
+    geode::OpenGeodeGeometryException::test( !not_intersecting_result,
+        "Wrong intersection between segment and ellipse" );
 }
 
 void test_segment_ellipse_intersection()

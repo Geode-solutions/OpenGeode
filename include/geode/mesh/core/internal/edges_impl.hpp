@@ -69,12 +69,13 @@ namespace geode
         private:
             friend class bitsery::Access;
             template < typename Archive >
-            void serialize( Archive& archive )
+            void serialize( Archive& serializer )
             {
-                archive.ext( *this,
+                serializer.ext( *this,
                     Growable< Archive, EdgesImpl >{
-                        { []( Archive& a, EdgesImpl& impl ) {
-                             a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        { []( Archive& archive, EdgesImpl& impl ) {
+                             archive.ext(
+                                 impl.edges_, bitsery::ext::StdSmartPtr{} );
                              const auto& old_edges_properties =
                                  impl.edges_->properties();
                              impl.edges_->set_properties(
@@ -82,8 +83,8 @@ namespace geode
                                      old_edges_properties.interpolable,
                                      false } );
                          },
-                            []( Archive& a, EdgesImpl& impl ) {
-                                a.ext(
+                            []( Archive& archive, EdgesImpl& impl ) {
+                                archive.ext(
                                     impl.edges_, bitsery::ext::StdSmartPtr{} );
                             } } } );
             }

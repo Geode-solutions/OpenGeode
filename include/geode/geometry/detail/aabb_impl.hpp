@@ -117,7 +117,8 @@ namespace geode
         [[nodiscard]] const BoundingBox< dimension >& node(
             index_t index ) const
         {
-            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
+            OpenGeodeGeometryException::check_assertion(
+                index < tree_.size(), "query out of tree" );
             return tree_[index];
         }
 
@@ -129,7 +130,8 @@ namespace geode
         [[nodiscard]] static index_t max_node_index_recursive(
             index_t node_index, index_t element_begin, index_t element_end )
         {
-            OPENGEODE_ASSERT( element_end > element_begin,
+            OpenGeodeGeometryException::check_assertion(
+                element_end > element_begin,
                 "End box index should be after Begin box index" );
             if( is_leaf( element_begin, element_end ) )
             {
@@ -150,9 +152,10 @@ namespace geode
             index_t element_begin,
             index_t element_end )
         {
-            OPENGEODE_ASSERT(
+            OpenGeodeGeometryException::check_assertion(
                 node_index < tree_.size(), "Node index out of tree" );
-            OPENGEODE_ASSERT( element_begin != element_end,
+            OpenGeodeGeometryException::check_assertion(
+                element_begin != element_end,
                 "Begin and End indices should be different" );
             if( is_leaf( element_begin, element_end ) )
             {
@@ -161,9 +164,9 @@ namespace geode
             }
             const auto it = get_recursive_iterators(
                 node_index, element_begin, element_end );
-            OPENGEODE_ASSERT(
+            OpenGeodeGeometryException::check_assertion(
                 it.child_left < tree_.size(), "Left index out of tree" );
-            OPENGEODE_ASSERT(
+            OpenGeodeGeometryException::check_assertion(
                 it.child_right < tree_.size(), "Right index out of tree" );
             initialize_tree_recursive(
                 bboxes, it.child_left, element_begin, it.element_middle );
@@ -183,8 +186,10 @@ namespace geode
             index_t element_end,
             const ACTION& action ) const
         {
-            OPENGEODE_ASSERT( node_index < tree_.size(), "node out of tree" );
-            OPENGEODE_ASSERT( element_begin != element_end,
+            OpenGeodeGeometryException::check_assertion(
+                node_index < tree_.size(), "node out of tree" );
+            OpenGeodeGeometryException::check_assertion(
+                element_begin != element_end,
                 "Begin and End indices should be different" );
 
             // If node is a leaf: compute point-element distance
@@ -251,9 +256,11 @@ namespace geode
             index_t element_end2,
             ACTION& action ) const
         {
-            OPENGEODE_ASSERT( element_end1 != element_begin1,
+            OpenGeodeGeometryException::check_assertion(
+                element_end1 != element_begin1,
                 "No iteration allowed start == end" );
-            OPENGEODE_ASSERT( element_end2 != element_begin2,
+            OpenGeodeGeometryException::check_assertion(
+                element_end2 != element_begin2,
                 "No iteration allowed start == end" );
 
             // Since we are intersecting the AABBTree with *itself*,
@@ -324,9 +331,11 @@ namespace geode
             index_t element_end2,
             ACTION& action ) const
         {
-            OPENGEODE_ASSERT( element_end1 != element_begin1,
+            OpenGeodeGeometryException::check_assertion(
+                element_end1 != element_begin1,
                 "No iteration allowed start == end" );
-            OPENGEODE_ASSERT( element_end2 != element_begin2,
+            OpenGeodeGeometryException::check_assertion(
+                element_end2 != element_begin2,
                 "No iteration allowed start == end" );
 
             // The acceleration is here:
@@ -383,9 +392,10 @@ namespace geode
             index_t element_end,
             ACTION& action ) const
         {
-            OPENGEODE_ASSERT(
+            OpenGeodeGeometryException::check_assertion(
                 node_index < tree_.size(), "Node out of tree range" );
-            OPENGEODE_ASSERT( element_begin != element_end,
+            OpenGeodeGeometryException::check_assertion(
+                element_begin != element_end,
                 "No iteration allowed start == end" );
 
             // Prune sub-tree that does not have intersection
@@ -442,9 +452,10 @@ namespace geode
             const Point< dimension >& query,
             std::vector< index_t >& result ) const
         {
-            OPENGEODE_ASSERT(
+            OpenGeodeGeometryException::check_assertion(
                 node_index < tree_.size(), "Node index out of tree" );
-            OPENGEODE_ASSERT( element_begin != element_end,
+            OpenGeodeGeometryException::check_assertion(
+                element_begin != element_end,
                 "Begin and End indices should be different" );
             if( !node( node_index ).epsilon_contains( query ) )
             {
@@ -481,7 +492,8 @@ namespace geode
         auto distance = action( query, nearest_box );
         impl_->closest_element_box_recursive( query, nearest_box, distance,
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
-        OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
+        OpenGeodeGeometryException::check_assertion(
+            nearest_box != NO_ID, "No box found" );
         return std::make_tuple( nearest_box, distance );
     }
 

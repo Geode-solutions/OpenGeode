@@ -57,7 +57,7 @@ namespace geode
     public:
         ConstantAttribute( T value,
             AttributeProperties properties,
-            AttributeBase::AttributeKey )
+            AttributeBase::AttributeKey /*key*/ )
             : ConstantAttribute( std::move( value ), std::move( properties ) )
         {
         }
@@ -83,7 +83,7 @@ namespace geode
         }
 
         template < typename Modifier >
-        void modify_value( Modifier&& modifier )
+        void modify_value( Modifier modifier )
         {
             modifier( value_ );
         }
@@ -91,13 +91,13 @@ namespace geode
     public:
         void compute_value( index_t /*unused*/,
             index_t /*unused*/,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
         void compute_value( const AttributeLinearInterpolation& /*unused*/,
             index_t /*unused*/,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
@@ -112,38 +112,42 @@ namespace geode
             : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
 
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive& serializer )
         {
-            archive.ext( *this,
-                Growable< Archive, ConstantAttribute< T > >{
-                    { []( Archive& a, ConstantAttribute< T >& attribute ) {
-                        a.ext( attribute, bitsery::ext::BaseClass<
-                                              ReadOnlyAttribute< T > >{} );
-                        a( attribute.value_ );
-                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, ConstantAttribute< T > >{
+                           { []( Archive& archive,
+                                 ConstantAttribute< T >& attribute ) {
+                               archive.ext(
+                                   attribute, bitsery::ext::BaseClass<
+                                                  ReadOnlyAttribute< T > >{} );
+                               archive( attribute.value_ );
+                           } } } );
         }
 
     public:
-        void resize( index_t /*unused*/, AttributeBase::AttributeKey ) override
+        void resize(
+            index_t /*unused*/, AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
-        void reserve( index_t /*unused*/, AttributeBase::AttributeKey ) override
+        void reserve(
+            index_t /*unused*/, AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
         void delete_elements( const std::vector< bool >& /*unused*/,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
         void permute_elements( absl::Span< const index_t > /*unused*/,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
         }
 
         [[nodiscard]] std::shared_ptr< AttributeBase > clone(
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
                 new ConstantAttribute< T >{ value_, this->properties() }
@@ -153,7 +157,7 @@ namespace geode
 
         void copy( const AttributeBase& attribute,
             index_t /*unused*/,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             value_ = dynamic_cast< const ConstantAttribute< T >& >( attribute )
                          .value();
@@ -162,7 +166,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > /* unused */,
             index_t /* unused */,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
                 new ConstantAttribute< T >{ value_, this->properties() }
@@ -173,7 +177,7 @@ namespace geode
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
             const GenericMapping< index_t >& /* unused */,
             index_t /* unused */,
-            AttributeBase::AttributeKey ) const override
+            AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
                 new ConstantAttribute< T >{ value_, this->properties() }
@@ -183,14 +187,14 @@ namespace geode
 
         void import( absl::Span< const index_t > /* unused */,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
         }
 
         void import( const GenericMapping< index_t >& /* unused */,
             const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey ) override
+            AttributeBase::AttributeKey /*key*/ ) override
         {
             import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
         }

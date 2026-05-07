@@ -82,7 +82,7 @@ namespace geode
     template < index_t dimension >
     ModelBoundary< dimension >&
         ModelBoundaries< dimension >::modifiable_model_boundary(
-            const uuid& id, ModelBoundariesBuilderKey )
+            const uuid& id, ModelBoundariesBuilderKey /*key*/ )
     {
         return impl_->component( id );
     }
@@ -97,7 +97,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::load_model_boundaries(
-        std::string_view directory, ModelBoundariesBuilderKey )
+        std::string_view directory, ModelBoundariesBuilderKey /*key*/ )
     {
         impl_->load_components(
             absl::StrCat( directory, "/model_boundaries" ) );
@@ -121,14 +121,14 @@ namespace geode
 
     template < index_t dimension >
     auto ModelBoundaries< dimension >::modifiable_model_boundaries(
-        ModelBoundariesBuilderKey ) -> ModifiableModelBoundaryRange
+        ModelBoundariesBuilderKey /*key*/ ) -> ModifiableModelBoundaryRange
     {
         return { *this };
     }
 
     template < index_t dimension >
     const uuid& ModelBoundaries< dimension >::create_model_boundary(
-        ModelBoundariesBuilderKey )
+        ModelBoundariesBuilderKey /*key*/ )
     {
         typename ModelBoundaries< dimension >::Impl::ComponentPtr boundary{
             new ModelBoundary< dimension >{
@@ -141,7 +141,7 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::create_model_boundary(
-        uuid model_boundary_id, ModelBoundariesBuilderKey )
+        uuid model_boundary_id, ModelBoundariesBuilderKey /*key*/ )
     {
         typename ModelBoundaries< dimension >::Impl::ComponentPtr
             model_boundary{ new ModelBoundary< dimension >{
@@ -153,7 +153,8 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::delete_model_boundary(
-        const ModelBoundary< dimension >& boundary, ModelBoundariesBuilderKey )
+        const ModelBoundary< dimension >& boundary,
+        ModelBoundariesBuilderKey /*key*/ )
     {
         impl_->delete_component( boundary.id() );
     }

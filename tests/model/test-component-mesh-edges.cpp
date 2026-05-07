@@ -138,24 +138,25 @@ void test()
     const auto section = build_section();
     const auto surface_edges = geode::component_mesh_edges(
         section, *section.surfaces().begin(), { 1, 0 } );
-    OPENGEODE_EXCEPTION(
-        surface_edges.line_edges.size() == 1, "[Test] Wrong number of Lines" );
+    geode::OpenGeodeModelException::test(
+        surface_edges.line_edges.size() == 1, "Wrong number of Lines" );
     for( const auto& lines : surface_edges.line_edges )
     {
         for( const auto& line : lines.second )
         {
-            OPENGEODE_EXCEPTION( line == 1, "[Test] Wrong Line edge id" );
+            geode::OpenGeodeModelException::test(
+                line == 1, "Wrong Line edge id" );
         }
     }
-    OPENGEODE_EXCEPTION( surface_edges.surface_edges.size() == 2,
-        "[Test] Wrong number of Surfaces" );
+    geode::OpenGeodeModelException::test(
+        surface_edges.surface_edges.size() == 2, "Wrong number of Surfaces" );
     for( const auto& surfaces : surface_edges.surface_edges )
     {
         for( const auto& surface : surfaces.second )
         {
             const geode::PolygonEdge edge{ 1, 0 };
-            OPENGEODE_EXCEPTION(
-                surface == edge, "[Test] Wrong Surface PolygonEdge" );
+            geode::OpenGeodeModelException::test(
+                surface == edge, "Wrong Surface PolygonEdge" );
         }
     }
 }
