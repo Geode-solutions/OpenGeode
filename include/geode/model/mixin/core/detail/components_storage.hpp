@@ -43,145 +43,141 @@
 #include <geode/model/mixin/core/bitsery_archive.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
-namespace geode
+namespace geode::detail
 {
-    namespace detail
+    template < typename Component >
+    class ComponentsStorage
     {
-        template < typename Component >
-        class ComponentsStorage
+    public:
+        using ComponentPtr = std::unique_ptr< Component >;
+        using ComponentsStore = absl::linked_hash_map< uuid, ComponentPtr >;
+        using Iterator = typename ComponentsStore::const_iterator;
+
+        [[nodiscard]] index_t nb_components() const
         {
-        public:
-            using ComponentPtr = std::unique_ptr< Component >;
-            using ComponentsStore = absl::linked_hash_map< uuid, ComponentPtr >;
-            using Iterator = typename ComponentsStore::const_iterator;
+            return components_.size();
+        }
 
-            [[nodiscard]] index_t nb_components() const
+        [[nodiscard]] bool has_component( const uuid& component_id ) const
+        {
+            return components_.contains( component_id );
+        }
+
+        [[nodiscard]] const Component& component(
+            const uuid& component_id ) const
+        {
+            return *components_.at( component_id );
+        }
+
+        [[nodiscard]] Component& component( const uuid& component_id )
+        {
+            return *components_.at( component_id );
+        }
+
+        [[nodiscard]] Iterator begin() const
+        {
+            return components_.begin();
+        }
+
+        [[nodiscard]] Iterator end() const
+        {
+            return components_.end();
+        }
+
+        void add_component( ComponentPtr component )
+        {
+            const auto [itr, new_uuid] =
+                components_.emplace( component->id(), std::move( component ) );
+            OpenGeodeModelException::check_exception( new_uuid, nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[ComponentsStorage::add_component] Component with id ",
+                itr->first.string(), " already exists" );
+        }
+
+        void save_components( std::string_view filename ) const
+        {
+            std::ofstream file{ to_string( filename ), std::ofstream::binary };
+            TContext context{};
+            BitseryExtensions::register_serialize_pcontext(
+                std::get< 0 >( context ) );
+            Serializer archive{ context, file };
+            archive.object( *this );
+            archive.adapter().flush();
+            OpenGeodeModelException::check_exception(
+                std::get< 1 >( context ).isValid(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[ComponentsStorage::save_components] Error while writing "
+                "file: ",
+                filename );
+        }
+
+        void delete_component( const uuid& component_id )
+        {
+            components_.erase( components_.find( component_id ) );
+        }
+
+        void load_components( std::string_view filename )
+        {
+            if( !std::filesystem::exists( to_string( filename ) ) )
             {
-                return components_.size();
+                return;
             }
+            std::ifstream file{ to_string( filename ), std::ifstream::binary };
+            TContext context{};
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
+            Deserializer archive{ context, file };
+            archive.object( *this );
+            const auto& adapter = archive.adapter();
+            OpenGeodeModelException::check_exception(
+                adapter.error() == bitsery::ReaderError::NoError
+                    && adapter.isCompletedSuccessfully()
+                    && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
+                "[ComponentsStorage::load_components] Error while reading "
+                "file: ",
+                filename );
+        }
 
-            [[nodiscard]] bool has_component( const uuid& id ) const
+        [[nodiscard]] absl::flat_hash_map< std::string, std::string >
+            file_mapping( std::string_view directory ) const
+        {
+            absl::flat_hash_map< std::string, std::string > mapping;
+            for( const auto& file :
+                std::filesystem::directory_iterator( to_string( directory ) ) )
             {
-                return components_.contains( id );
-            }
-
-            [[nodiscard]] const Component& component( const uuid& id ) const
-            {
-                return *components_.at( id );
-            }
-
-            [[nodiscard]] Component& component( const uuid& id )
-            {
-                return *components_.at( id );
-            }
-
-            [[nodiscard]] Iterator begin() const
-            {
-                return components_.begin();
-            }
-
-            [[nodiscard]] Iterator end() const
-            {
-                return components_.end();
-            }
-
-            void add_component( ComponentPtr component )
-            {
-                const auto [itr, new_uuid] = components_.emplace(
-                    component->id(), std::move( component ) );
-                OPENGEODE_EXCEPTION( new_uuid,
-                    "[ComponentsStorage::add_component] Component with id ",
-                    itr->first.string(), " already exists" );
-            }
-
-            void save_components( std::string_view filename ) const
-            {
-                std::ofstream file{ to_string( filename ),
-                    std::ofstream::binary };
-                TContext context{};
-                BitseryExtensions::register_serialize_pcontext(
-                    std::get< 0 >( context ) );
-                Serializer archive{ context, file };
-                archive.object( *this );
-                archive.adapter().flush();
-                OpenGeodeModelException::check_exception(
-                    std::get< 1 >( context ).isValid(), nullptr,
-                    OpenGeodeException::TYPE::internal,
-                    "[ComponentsStorage::save_components] Error while writing "
-                    "file: ",
-                    filename );
-            }
-
-            void delete_component( const uuid& id )
-            {
-                components_.erase( components_.find( id ) );
-            }
-
-            void load_components( std::string_view filename )
-            {
-                if( !std::filesystem::exists( to_string( filename ) ) )
+                auto path = file.path();
+                auto filename = path.replace_extension( "" ).string();
+                if( filename.size() > 36 )
                 {
-                    return;
+                    auto uuid = filename.substr( filename.size() - 36 );
+                    mapping.emplace( std::move( uuid ), file.path().string() );
                 }
-                std::ifstream file{ to_string( filename ),
-                    std::ifstream::binary };
-                TContext context{};
-                BitseryExtensions::register_deserialize_pcontext(
-                    std::get< 0 >( context ) );
-                Deserializer archive{ context, file };
-                archive.object( *this );
-                const auto& adapter = archive.adapter();
-                OpenGeodeModelException::check_exception(
-                    adapter.error() == bitsery::ReaderError::NoError
-                        && adapter.isCompletedSuccessfully()
-                        && std::get< 1 >( context ).isValid(),
-                    nullptr, OpenGeodeException::TYPE::internal,
-                    "[ComponentsStorage::load_components] Error while reading "
-                    "file: ",
-                    filename );
             }
+            return mapping;
+        }
 
-            [[nodiscard]] absl::flat_hash_map< std::string, std::string >
-                file_mapping( std::string_view directory ) const
-            {
-                absl::flat_hash_map< std::string, std::string > mapping;
-                for( const auto& file : std::filesystem::directory_iterator(
-                         to_string( directory ) ) )
-                {
-                    auto path = file.path();
-                    auto filename = path.replace_extension( "" ).string();
-                    if( filename.size() > 36 )
-                    {
-                        auto uuid = filename.substr( filename.size() - 36 );
-                        mapping.emplace(
-                            std::move( uuid ), file.path().string() );
-                    }
-                }
-                return mapping;
-            }
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& serializer )
+        {
+            serializer.ext( *this,
+                Growable< Archive, ComponentsStorage >{
+                    { []( Archive& archive, ComponentsStorage& storage ) {
+                        archive.ext( storage.components_,
+                            bitsery::ext::StdMap{
+                                storage.components_.max_size() },
+                            []( Archive& archive2, uuid& component_id,
+                                ComponentPtr& item ) {
+                                archive2.object( component_id );
+                                archive2.ext(
+                                    item, bitsery::ext::StdSmartPtr{} );
+                            } );
+                    } } } );
+        }
 
-        private:
-            friend class bitsery::Access;
-            template < typename Archive >
-            void serialize( Archive& serializer )
-            {
-                serializer.ext( *this,
-                    Growable< Archive, ComponentsStorage >{
-                        { []( Archive& archive, ComponentsStorage& storage ) {
-                            archive.ext( storage.components_,
-                                bitsery::ext::StdMap{
-                                    storage.components_.max_size() },
-                                []( Archive& archive2, uuid& id,
-                                    ComponentPtr& item ) {
-                                    archive2.object( id );
-                                    archive2.ext(
-                                        item, bitsery::ext::StdSmartPtr{} );
-                                } );
-                        } } } );
-            }
-
-        private:
-            ComponentsStore components_;
-        };
-    } // namespace detail
-} // namespace geode
+    private:
+        ComponentsStore components_;
+    };
+} // namespace geode::detail
