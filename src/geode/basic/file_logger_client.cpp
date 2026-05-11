@@ -50,8 +50,10 @@ namespace geode
 
         void set_file_path( std::string_view file_path )
         {
+            static constexpr auto logger_name = "geode_logger_file";
+            spdlog::drop( logger_name );
             logger_impl_ = spdlog::basic_logger_mt(
-                "basic_logger", to_string( file_path ) );
+                logger_name, std::string( file_path ) );
         }
 
         void trace( const std::string &message )
