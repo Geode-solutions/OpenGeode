@@ -37,6 +37,8 @@ namespace geode
 
         void always_flush();
 
+        void set_file_path( std::string_view file_path );
+
     private:
         void trace( const std::string &message ) override;
 
