@@ -37,16 +37,21 @@ namespace geode
     class FileLoggerClient::Impl
     {
     public:
-        Impl( std::string_view file_path )
-            : logger_impl_( spdlog::basic_logger_mt(
-                  "basic_logger", to_string( file_path ) ) )
+        explicit Impl( std::string_view file_path )
         {
+            set_file_path( file_path );
             spdlog::set_level( spdlog::level::level_enum::trace );
         }
 
         void always_flush()
         {
             logger_impl_->flush_on( spdlog::level::level_enum::trace );
+        }
+
+        void set_file_path( std::string_view file_path )
+        {
+            logger_impl_ = spdlog::basic_logger_mt(
+                "basic_logger", to_string( file_path ) );
         }
 
         void trace( const std::string &message )
@@ -80,7 +85,7 @@ namespace geode
         }
 
     private:
-        std::shared_ptr< spdlog::logger > logger_impl_;
+        std::shared_ptr< spdlog::logger > logger_impl_{ nullptr };
     };
 
     FileLoggerClient::FileLoggerClient( std::string_view file_path )
@@ -93,6 +98,11 @@ namespace geode
     void FileLoggerClient::always_flush()
     {
         impl_->always_flush();
+    }
+
+    void FileLoggerClient::set_file_path( std::string_view file_path )
+    {
+        impl_->set_file_path( file_path );
     }
 
     void FileLoggerClient::trace( const std::string &message )
