@@ -31,9 +31,11 @@ namespace geode
 {
     class opengeode_basic_api FileLoggerClient : public LoggerClient
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( FileLoggerClient );
+
     public:
-        FileLoggerClient( std::string_view file_path );
-        ~FileLoggerClient();
+        explicit FileLoggerClient( std::string_view file_path );
+        ~FileLoggerClient() override;
 
         void always_flush();
 

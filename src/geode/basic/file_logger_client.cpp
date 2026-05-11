@@ -37,7 +37,7 @@ namespace geode
     class FileLoggerClient::Impl
     {
     public:
-        Impl( std::string_view file_path )
+        explicit Impl( std::string_view file_path )
         {
             set_file_path( file_path );
             spdlog::set_level( spdlog::level::level_enum::trace );
@@ -85,7 +85,7 @@ namespace geode
         }
 
     private:
-        std::shared_ptr< spdlog::logger > logger_impl_;
+        std::shared_ptr< spdlog::logger > logger_impl_{ nullptr };
     };
 
     FileLoggerClient::FileLoggerClient( std::string_view file_path )
