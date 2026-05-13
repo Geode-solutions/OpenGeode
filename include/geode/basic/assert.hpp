@@ -164,15 +164,24 @@ namespace geode
         {
             Exception new_exception{ exception.data(), type, message... };
             new_exception.set_parent( std::move( exception ) );
+            throw new_exception;
         }
         catch( const std::exception& exception )
         {
-            throw Exception{ nullptr, type, "std::exception, ",
-                exception.what() };
+            Exception new_exception{ nullptr, type, message... };
+            OpenGeodeBaiscException std_exception{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "std::exception: ", exception.what() };
+            new_exception.set_parent( std::move( std_exception ) );
+            throw new_exception;
         }
         catch( ... )
         {
-            throw Exception{ nullptr, type, "Unknown exception" };
+            Exception new_exception{ nullptr, type, message... };
+            OpenGeodeBaiscException unknown_exception{ nullptr,
+                OpenGeodeException::TYPE::internal, "Unknown exception" };
+            new_exception.set_parent( std::move( unknown_exception ) );
+            throw new_exception;
         }
     }
 } // namespace geode
