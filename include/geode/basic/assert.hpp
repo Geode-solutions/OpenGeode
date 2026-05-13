@@ -153,7 +153,7 @@ namespace geode
      * Catch all exceptions and rethrow an OpenGeodeException
      */
     template < typename Exception, typename... Args >
-    void throw_lippincott(
+    [[noreturn]] void throw_lippincott(
         OpenGeodeException::TYPE type, const Args&... message )
     {
         try
@@ -169,7 +169,7 @@ namespace geode
         catch( const std::exception& exception )
         {
             Exception new_exception{ nullptr, type, message... };
-            OpenGeodeBaiscException std_exception{ nullptr,
+            Exception std_exception{ nullptr,
                 OpenGeodeException::TYPE::internal,
                 "std::exception: ", exception.what() };
             new_exception.set_parent( std::move( std_exception ) );
@@ -178,7 +178,7 @@ namespace geode
         catch( ... )
         {
             Exception new_exception{ nullptr, type, message... };
-            OpenGeodeBaiscException unknown_exception{ nullptr,
+            Exception unknown_exception{ nullptr,
                 OpenGeodeException::TYPE::internal, "Unknown exception" };
             new_exception.set_parent( std::move( unknown_exception ) );
             throw new_exception;
