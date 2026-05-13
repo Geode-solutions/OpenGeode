@@ -105,27 +105,4 @@ namespace geode
         }
         return 1;
     }
-
-    void throw_lippincott()
-    {
-        try
-        {
-            throw;
-        }
-        catch( const OpenGeodeException& /*unused*/ )
-        {
-            throw;
-        }
-        catch( const std::exception& exception )
-        {
-            throw OpenGeodeBasicException{ nullptr,
-                OpenGeodeException::TYPE::internal, "std::exception, ",
-                exception.what() };
-        }
-        catch( ... )
-        {
-            throw OpenGeodeBasicException{ nullptr,
-                OpenGeodeException::TYPE::internal, "Unknown exception" };
-        }
-    }
 } // namespace geode

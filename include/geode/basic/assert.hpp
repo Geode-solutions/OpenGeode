@@ -152,5 +152,29 @@ namespace geode
     /*!
      * Catch all exceptions and rethrow an OpenGeodeException
      */
-    void opengeode_basic_api throw_lippincott();
+    template < typename Exception, typename... Args >
+    void throw_lippincott(
+        OpenGeodeException::TYPE type, const Args&... message )
+    {
+        {
+            try
+            {
+                throw;
+            }
+            catch( OpenGeodeException& exception )
+            {
+                Exception new_exception{ exception.data(), type, message... };
+                new_exception.set_parent( std::move( exception ) );
+            }
+            catch( const std::exception& exception )
+            {
+                throw Exception{ nullptr, type, "std::exception, ",
+                    exception.what() };
+            }
+            catch( ... )
+            {
+                throw Exception{ nullptr, type, "Unknown exception" };
+            }
+        }
+    }
 } // namespace geode
