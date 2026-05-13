@@ -30,7 +30,6 @@
 #include <string>
 
 #include <absl/base/optimization.h>
-#include <absl/debugging/stacktrace.h>
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/opengeode_basic_export.hpp>
@@ -52,10 +51,6 @@ namespace geode
      */
     class opengeode_basic_api OpenGeodeException : public std::runtime_error
     {
-        static constexpr int MAX_STACK_DEPTH = 10;
-        static constexpr int NB_SKIPPED_STACKS = 1;
-        static constexpr int SYMBOL_SIZE = 1024;
-
     public:
         enum struct TYPE : std::uint8_t
         {
@@ -65,9 +60,10 @@ namespace geode
         };
 
         OpenGeodeException( OpenGeodeException&& ) = default;
-        OpenGeodeException( const OpenGeodeException& ) = delete;
-        OpenGeodeException& operator=( const OpenGeodeException& ) = delete;
         OpenGeodeException& operator=( OpenGeodeException&& ) = default;
+
+        OpenGeodeException& operator=( const OpenGeodeException& );
+        OpenGeodeException( const OpenGeodeException& );
 
         ~OpenGeodeException() noexcept override;
 
@@ -93,8 +89,6 @@ namespace geode
             return data_;
         }
 
-        [[nodiscard]] std::string stack_trace() const;
-
         [[nodiscard]] bool has_parent() const
         {
             return parent_ != nullptr;
@@ -107,8 +101,8 @@ namespace geode
 
         void set_parent( OpenGeodeException&& parent )
         {
-            parent_ =
-                std::make_unique< OpenGeodeException >( std::move( parent ) );
+            parent_ = std::make_unique< OpenGeodeException >(
+                std::forward< OpenGeodeException >( parent ) );
         }
 
         [[nodiscard]] std::string string() const;
@@ -126,11 +120,6 @@ namespace geode
               library_{ std::move( library ) },
               data_{ std::move( data ) }
         {
-            stack_.fill( nullptr );
-#ifndef NDEBUG
-            stack_size_ = absl::GetStackTrace(
-                stack_.data(), MAX_STACK_DEPTH, NB_SKIPPED_STACKS );
-#endif
         }
 
     private:
@@ -138,8 +127,6 @@ namespace geode
         std::string project_;
         std::string library_;
         std::any data_;
-        std::array< void*, MAX_STACK_DEPTH > stack_;
-        int stack_size_{ 0 };
         std::unique_ptr< OpenGeodeException > parent_;
     };
 
