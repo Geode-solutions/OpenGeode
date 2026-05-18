@@ -46,6 +46,7 @@ namespace geode
         void always_flush()
         {
             logger_impl_->flush_on( spdlog::level::level_enum::trace );
+            always_flush_ = true;
         }
 
         void set_file_path( std::string_view file_path )
@@ -54,6 +55,10 @@ namespace geode
             spdlog::drop( logger_name );
             logger_impl_ = spdlog::basic_logger_mt(
                 logger_name, std::string( file_path ) );
+            if( always_flush_ )
+            {
+                always_flush();
+            }
         }
 
         void trace( const std::string &message )
@@ -88,6 +93,7 @@ namespace geode
 
     private:
         std::shared_ptr< spdlog::logger > logger_impl_{ nullptr };
+        bool always_flush_{ false };
     };
 
     FileLoggerClient::FileLoggerClient( std::string_view file_path )
