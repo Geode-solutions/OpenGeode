@@ -237,8 +237,9 @@ namespace geode
         bool open_reader()
         {
             memory_stream_ = mz_stream_mem_create();
-            mz_stream_mem_set_buffer( memory_stream_, (void*) zip_data_.data(),
-                (int32_t) zip_data_.size() );
+            mz_stream_mem_set_buffer( memory_stream_,
+                static_cast< void* >( zip_data_.data() ),
+                static_cast< int32_t >( zip_data_.size() ) );
             reader_ = mz_zip_reader_create();
             return mz_zip_reader_open( reader_, memory_stream_ ) == MZ_OK;
         }
