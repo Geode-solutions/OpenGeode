@@ -105,6 +105,8 @@ namespace geode
 
     using ModelAddedComponentMapping = ModelMapping< std::vector< uuid > >;
 
+    using ModelRemovedComponentMapping = ModelMapping< std::vector< uuid > >;
+
     using ModelUnchangedComponentMapping = ModelMapping< std::vector< uuid > >;
 
     using MeshElementMapping = GenericMapping< MeshElement, MeshElement >;
@@ -187,6 +189,7 @@ namespace geode
     {
         ModelGenericMapping component_mapping;
         ModelAddedComponentMapping added_components;
+        ModelRemovedComponentMapping removed_components;
         ModelUnchangedComponentMapping unchanged_components;
     };
 
