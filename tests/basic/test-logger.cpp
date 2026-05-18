@@ -29,6 +29,7 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/logger_client.hpp>
 #include <geode/basic/logger_manager.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -76,6 +77,43 @@ void test_logger()
     geode::Logger::critical( "test ", "critial" );
 }
 
+std::string test_huge_message()
+{
+    std::string huge_message;
+    const geode::index_t MSG_SIZE{ 100000 };
+    huge_message.reserve( MSG_SIZE );
+    for( const auto count : geode::Range{ MSG_SIZE } )
+    {
+        huge_message.push_back( 'A' + ( count % 26 ) );
+    }
+    geode::Logger::info( "Huge message size = ", huge_message.size() );
+    geode::Logger::info( huge_message );
+
+    geode::Logger::info(
+        "Huge message begin = ", huge_message.substr( 0, 50 ) );
+    geode::Logger::info( "Huge message end = ",
+        huge_message.substr( huge_message.size() - 50 ) );
+    return huge_message;
+}
+
+void test_change_log_file( const std::string &huge_msg )
+{
+    geode::Logger::info( "==============================" );
+    geode::Logger::info( "TEST CHANGE LOG FILE" );
+    geode::Logger::info( "==============================" );
+
+    static constexpr auto FILENAME1 = "first.log";
+    auto file_logger = std::make_unique< geode::FileLoggerClient >( FILENAME1 );
+    auto &registered_file_logger = dynamic_cast< geode::FileLoggerClient & >(
+        geode::LoggerManager::register_client( std::move( file_logger ) ) );
+    geode::Logger::info(
+        absl::StrCat( "Message written in first.log", "\n", huge_msg ) );
+    static constexpr auto FILENAME2 = "second.log";
+    registered_file_logger.set_file_path( FILENAME2 );
+    geode::Logger::info(
+        absl::StrCat( "Message written in second.log", "\n", huge_msg ) );
+}
+
 void test()
 {
     geode::OpenGeodeBasicLibrary::initialize();
@@ -84,6 +122,9 @@ void test()
         std::make_unique< geode::FileLoggerClient >( "geode.log" ) );
 
     test_logger();
+    const auto &huge_msg = test_huge_message();
+    test_change_log_file( huge_msg );
+
     geode::Logger::set_level( geode::Logger::LEVEL::err );
     test_logger();
 }
