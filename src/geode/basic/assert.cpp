@@ -25,13 +25,30 @@
 
 #include <cassert>
 
-#include <absl/debugging/symbolize.h>
-
 #include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
 
 namespace geode
 {
+    OpenGeodeException::OpenGeodeException( const OpenGeodeException& other )
+        : std::runtime_error{ other },
+          type_{ other.type_ },
+          project_{ other.project_ },
+          library_{ other.library_ },
+          data_{ other.data_ },
+          parent_{ other.parent_ ? std::make_unique< OpenGeodeException >(
+                                       *other.parent_ )
+                                 : nullptr }
+    {
+    }
+
+    OpenGeodeException& OpenGeodeException::operator=(
+        const OpenGeodeException& other )
+    {
+        *this = OpenGeodeException{ other };
+        return *this;
+    }
+
     OpenGeodeException::~OpenGeodeException() noexcept = default;
 
     std::string_view OpenGeodeException::type_name() const
@@ -51,31 +68,11 @@ namespace geode
         return "unknown";
     }
 
-    std::string OpenGeodeException::stack_trace() const
-    {
-        std::string stack_string;
-        for( auto frame = 0; frame < stack_size_; ++frame )
-        {
-            absl::StrAppend( &stack_string, "  ", frame, ": " );
-            if( std::array< char, SYMBOL_SIZE > symbol; absl::Symbolize(
-                    stack_[frame], symbol.data(), sizeof( symbol ) ) )
-            {
-                absl::StrAppend( &stack_string, symbol.data() );
-            }
-            else
-            {
-                absl::StrAppend( &stack_string, "Unknown" );
-            }
-            absl::StrAppend( &stack_string, "\n" );
-        }
-        return stack_string;
-    }
-
     std::string OpenGeodeException::string() const
     {
         return absl::StrCat( "OpenGeodeException of type ", type_name(),
             " from project ", project(), " and library ", library(), ": ",
-            what(), "\n", stack_trace() );
+            what() );
     }
 
     int geode_lippincott()
@@ -104,28 +101,5 @@ namespace geode
             Logger::critical( "Unknown exception" );
         }
         return 1;
-    }
-
-    void throw_lippincott()
-    {
-        try
-        {
-            throw;
-        }
-        catch( const OpenGeodeException& /*unused*/ )
-        {
-            throw;
-        }
-        catch( const std::exception& exception )
-        {
-            throw OpenGeodeBasicException{ nullptr,
-                OpenGeodeException::TYPE::internal, "std::exception, ",
-                exception.what() };
-        }
-        catch( ... )
-        {
-            throw OpenGeodeBasicException{ nullptr,
-                OpenGeodeException::TYPE::internal, "Unknown exception" };
-        }
     }
 } // namespace geode
