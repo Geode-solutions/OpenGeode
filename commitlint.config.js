@@ -14,6 +14,7 @@ const Configuration = {
     "type-empty": [0],
     "type-enum": [2, "always", ["feat", "fix", "perf"]],
   },
-}
+  defaultIgnores: false,
+};
 
-export default Configuration
+export default Configuration;
