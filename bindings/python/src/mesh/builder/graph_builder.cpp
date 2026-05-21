@@ -42,6 +42,8 @@ namespace geode
             .def( "delete_edges", &GraphBuilder::delete_edges )
             .def( "permute_edges", &GraphBuilder::permute_edges )
             .def( "delete_isolated_vertices",
-                &GraphBuilder::delete_isolated_vertices );
+                static_cast< std::vector< index_t > ( GraphBuilder::* )(
+                    absl::Span< const index_t > ) >(
+                    &GraphBuilder::delete_isolated_vertices ) );
     }
 } // namespace geode

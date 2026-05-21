@@ -196,13 +196,29 @@ namespace geode
     std::vector< index_t > GraphBuilder::delete_isolated_vertices()
     {
         std::vector< bool > to_delete( graph_.nb_vertices(), false );
-        for( const auto v : Range{ graph_.nb_vertices() } )
+        for( const auto vertex_id : Range{ graph_.nb_vertices() } )
         {
-            const auto& edge_vertices = graph_.edges_around_vertex( v );
-            if( edge_vertices.empty() )
+            if( graph_.edges_around_vertex( vertex_id ).empty() )
             {
-                to_delete[v] = true;
+                to_delete[vertex_id] = true;
             }
+        }
+        return delete_vertices( to_delete );
+    }
+
+    std::vector< index_t > GraphBuilder::delete_isolated_vertices(
+        absl::Span< const index_t > isolated_vertices )
+    {
+        std::vector< bool > to_delete( graph_.nb_vertices(), false );
+        for( const auto vertex_id : isolated_vertices )
+        {
+            OpenGeodeMeshException::check_assertion(
+                graph_.edges_around_vertex( vertex_id ).empty(),
+                "[GraphBuilder::delete_isolated_vertices] Given vertex ",
+                vertex_id,
+                " is not "
+                "isolated" );
+            to_delete[vertex_id] = true;
         }
         return delete_vertices( to_delete );
     }
