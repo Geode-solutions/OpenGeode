@@ -109,8 +109,17 @@ function(add_geode_library)
             OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
             DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
             FOLDER "Libraries"
-            UNITY_BUILD ON
     )
+
+    # Enable unity build by default, unless another behavior is
+    # explicitly defined through CMAKE_UNITY_BUILD.
+    if(NOT DEFINED CMAKE_UNITY_BUILD)
+        set_target_properties(${GEODE_LIB_NAME}
+            PROPERTIES
+                UNITY_BUILD ON
+        )
+    endif()
+
     target_compile_options(${GEODE_LIB_NAME} 
         PRIVATE ${COMPILER_WARNINGS}
     )
