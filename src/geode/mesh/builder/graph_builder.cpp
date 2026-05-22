@@ -215,9 +215,7 @@ namespace geode
             OpenGeodeMeshException::check_assertion(
                 graph_.edges_around_vertex( vertex_id ).empty(),
                 "[GraphBuilder::delete_isolated_vertices] Given vertex ",
-                vertex_id,
-                " is not "
-                "isolated" );
+                vertex_id, " is not isolated" );
             to_delete[vertex_id] = true;
         }
         return delete_vertices( to_delete );

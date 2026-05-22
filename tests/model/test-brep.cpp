@@ -1499,7 +1499,8 @@ void test_components_filter()
         absl::StrCat( geode::DATA_PATH, "structural_model.og_brep" ) );
     geode::OpenGeodeModelException::test(
         brep.nb_components_with_relations() == 9,
-        "Wrong number of components with relations" );
+        "Wrong number of components with relations, there are ",
+        brep.nb_components_with_relations(), " instead of 9" );
 }
 
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(

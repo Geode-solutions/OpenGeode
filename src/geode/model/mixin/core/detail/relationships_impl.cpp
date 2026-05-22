@@ -111,9 +111,9 @@ namespace geode
             }
             auto builder = GraphBuilder::create( *graph_ );
             builder->delete_edges( edges_to_delete );
-            std::vector< bool > vertices_to_delete(
-                graph_->nb_vertices(), false );
-            builder->delete_isolated_vertices( { index.value() } );
+            const auto old2new =
+                builder->delete_isolated_vertices( { index.value() } );
+            uuid2index_.update( old2new );
         }
 
         index_t RelationshipsImpl::add_relation_edge(
@@ -192,38 +192,41 @@ namespace geode
             graph_ = impl.graph_->clone();
             initialize_attributes();
             std::vector< index_t > vertices_to_delete;
-            for( const auto v : Range{ graph_->nb_vertices() } )
+            for( const auto vertex_id : Range{ graph_->nb_vertices() } )
             {
-                const auto& component_id = component_from_index( v );
+                const auto& component_id = component_from_index( vertex_id );
                 if( mapping.has_mapping_type( component_id.type() )
                     && mapping.at( component_id.type() )
                         .has_mapping_input( component_id.id() ) )
                 {
                     const auto& new_uuid = mapping.at( component_id.type() )
                                                .in2out( component_id.id() );
-                    ids_->set_value( v, { component_id.type(), new_uuid } );
-                    uuid2index_.set_new_mapping( new_uuid, v );
+                    ids_->set_value(
+                        vertex_id, { component_id.type(), new_uuid } );
+                    uuid2index_.set_new_mapping( new_uuid, vertex_id );
                 }
                 else
                 {
-                    vertices_to_delete.push_back( v );
+                    vertices_to_delete.push_back( vertex_id );
                 }
             }
             if( vertices_to_delete.empty() )
             {
                 return;
             }
-            std::vector< bool > to_delete( graph_->nb_edges(), false );
-            for( const auto v : vertices_to_delete )
+            std::vector< bool > edges_to_delete( graph_->nb_edges(), false );
+            for( const auto vertex_id : vertices_to_delete )
             {
-                for( const auto& edge : graph_->edges_around_vertex( v ) )
+                for( const auto& edge :
+                    graph_->edges_around_vertex( vertex_id ) )
                 {
-                    to_delete[edge.edge_id] = true;
+                    edges_to_delete[edge.edge_id] = true;
                 }
             }
             auto builder = GraphBuilder::create( *graph_ );
-            builder->delete_edges( to_delete );
-            const auto old2new = builder->delete_isolated_vertices();
+            builder->delete_edges( edges_to_delete );
+            const auto old2new =
+                builder->delete_isolated_vertices( vertices_to_delete );
             uuid2index_.update( old2new );
         }
 
