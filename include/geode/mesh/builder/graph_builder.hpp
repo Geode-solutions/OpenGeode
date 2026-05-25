@@ -126,6 +126,14 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_vertices();
 
+        /*!
+         * Delete given isolated vertices (not used as edge endpoint)
+         * @return the mapping between old vertex indices to new ones.
+         * Deleted vertices new index is NO_ID
+         */
+        std::vector< index_t > delete_isolated_vertices(
+            absl::Span< const index_t > isolated_vertices );
+
         void copy( const Graph& graph );
 
     protected:
