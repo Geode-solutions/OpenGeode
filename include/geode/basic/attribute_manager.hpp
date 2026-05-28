@@ -261,7 +261,15 @@ namespace geode
             absl::Span< const index_t > old2new );
 
         void import( const AttributeManager& attribute_manager,
+            absl::Span< const index_t > old2new,
+            std::string_view attribute_name );
+
+        void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );
+
+        void import( const AttributeManager& attribute_manager,
+            const GenericMapping< index_t >& old2new_mapping,
+            std::string_view attribute_name );
 
     private:
         friend class bitsery::Access;
