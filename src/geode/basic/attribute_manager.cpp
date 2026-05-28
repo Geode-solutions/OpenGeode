@@ -253,12 +253,15 @@ namespace geode
 
         void import( const AttributeManager::Impl &attribute_manager,
             absl::Span< const index_t > old2new,
-            const AttributeBase::AttributeKey &key )
+            const AttributeBase::AttributeKey &key,
+            const std::function< bool( const std::string & ) >
+                &attribute_filter )
         {
             for( const auto &[attribute_name, attribute_from] :
                 attribute_manager.attributes_ )
             {
-                if( !attribute_from->properties().transferable )
+                if( !attribute_filter( attribute_name )
+                    || !attribute_from->properties().transferable )
                 {
                     continue;
                 }
@@ -282,12 +285,15 @@ namespace geode
 
         void import( const AttributeManager::Impl &attribute_manager,
             const GenericMapping< index_t > &old2new_mapping,
-            const AttributeBase::AttributeKey &key )
+            const AttributeBase::AttributeKey &key,
+            const std::function< bool( const std::string & ) >
+                &attribute_filter )
         {
             for( const auto &[attribute_name, attribute_from] :
                 attribute_manager.attributes_ )
             {
-                if( !attribute_from->properties().transferable )
+                if( !attribute_filter( attribute_name )
+                    || !attribute_from->properties().transferable )
                 {
                     continue;
                 }
@@ -508,13 +514,35 @@ namespace geode
     void AttributeManager::import( const AttributeManager &attribute_manager,
         absl::Span< const index_t > old2new )
     {
-        impl_->import( *attribute_manager.impl_, old2new, {} );
+        impl_->import(
+            *attribute_manager.impl_, old2new, {}, []( const std::string & ) {
+                return true;
+            } );
+    }
+
+    void AttributeManager::import( const AttributeManager &attribute_manager,
+        absl::Span< const index_t > old2new,
+        const std::function< bool( const std::string & ) > &attribute_filter )
+    {
+        impl_->import(
+            *attribute_manager.impl_, old2new, {}, attribute_filter );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
         const GenericMapping< index_t > &old2new_mapping )
     {
-        impl_->import( *attribute_manager.impl_, old2new_mapping, {} );
+        impl_->import( *attribute_manager.impl_, old2new_mapping, {},
+            []( const std::string & ) {
+                return true;
+            } );
+    }
+
+    void AttributeManager::import( const AttributeManager &attribute_manager,
+        const GenericMapping< index_t > &old2new_mapping,
+        const std::function< bool( const std::string & ) > &attribute_filter )
+    {
+        impl_->import(
+            *attribute_manager.impl_, old2new_mapping, {}, attribute_filter );
     }
 
     void AttributeManager::rename_attribute(
