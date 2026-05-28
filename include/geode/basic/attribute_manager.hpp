@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -260,8 +261,26 @@ namespace geode
         void import( const AttributeManager& attribute_manager,
             absl::Span< const index_t > old2new );
 
+        /*!
+         * @param[in] attribute_filter Filter the attributes to import based on
+         * their name. Must return true for an attribute to be imported.
+         */
+        void import( const AttributeManager& attribute_manager,
+            absl::Span< const index_t > old2new,
+            const std::function< bool( const std::string& ) >&
+                attribute_filter );
+
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );
+
+        /*!
+         * @param[in] attribute_filter Filter the attributes to import based on
+         * their name. Must return true for an attribute to be imported.
+         */
+        void import( const AttributeManager& attribute_manager,
+            const GenericMapping< index_t >& old2new_mapping,
+            const std::function< bool( const std::string& ) >&
+                attribute_filter );
 
     private:
         friend class bitsery::Access;
