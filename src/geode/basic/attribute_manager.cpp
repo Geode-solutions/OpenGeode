@@ -251,75 +251,9 @@ namespace geode
             }
         }
 
+        template < typename T >
         void import( const AttributeManager::Impl &attribute_manager,
-            absl::Span< const index_t > old2new,
-            const AttributeBase::AttributeKey &key )
-        {
-            for( const auto &[attribute_name, attribute_from] :
-                attribute_manager.attributes_ )
-            {
-                if( !attribute_from->properties().transferable )
-                {
-                    continue;
-                }
-                if( attribute_exists( attribute_name ) )
-                {
-                    if( attribute_from->type()
-                        != this->attributes_.at( attribute_name )->type() )
-                    {
-                        continue;
-                    }
-                    this->attributes_.at( attribute_name )
-                        ->import( old2new, attribute_from, key );
-                }
-                else
-                {
-                    attributes_.emplace( attribute_name,
-                        attribute_from->extract( old2new, nb_elements_, key ) );
-                }
-            }
-        }
-
-        void import( const AttributeManager::Impl &attribute_manager,
-            absl::Span< const index_t > old2new,
-            std::string_view attribute_name,
-            const AttributeBase::AttributeKey &key )
-        {
-            auto it = attribute_manager.attributes_.find( attribute_name );
-            OpenGeodeBasicException::check_exception(
-                it != attribute_manager.attributes_.end(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[AttributeManager::import] Could not import attribute '",
-                attribute_name,
-                "'. No attribute with this name exists in the source "
-                "AttributeManager." );
-            OpenGeodeBasicException::check_exception(
-                it->second->properties().transferable, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[AttributeManager::import] Could not import attribute '",
-                attribute_name, "'. The attribute is not transferable." );
-            if( attribute_exists( attribute_name ) )
-            {
-                OpenGeodeBasicException::check_exception(
-                    it->second->type()
-                        == this->attributes_.at( attribute_name )->type(),
-                    nullptr, OpenGeodeException::TYPE::data,
-                    "[AttributeManager::import] Could not import attribute '",
-                    attribute_name,
-                    "'. An attribute with the same name but a different type "
-                    "already exists in the destination AttributeManager." );
-                this->attributes_.at( attribute_name )
-                    ->import( old2new, it->second, key );
-            }
-            else
-            {
-                attributes_.emplace( attribute_name,
-                    it->second->extract( old2new, nb_elements_, key ) );
-            }
-        }
-
-        void import( const AttributeManager::Impl &attribute_manager,
-            const GenericMapping< index_t > &old2new_mapping,
+            const T &old2new_mapping,
             const AttributeBase::AttributeKey &key )
         {
             for( const auto &[attribute_name, attribute_from] :
@@ -348,8 +282,9 @@ namespace geode
             }
         }
 
+        template < typename T >
         void import( const AttributeManager::Impl &attribute_manager,
-            const GenericMapping< index_t > &old2new_mapping,
+            const T &old2new_mapping,
             std::string_view attribute_name,
             const AttributeBase::AttributeKey &key )
         {
