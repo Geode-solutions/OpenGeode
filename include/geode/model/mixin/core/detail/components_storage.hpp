@@ -87,12 +87,13 @@ namespace geode::detail
 
         void add_component( ComponentPtr component )
         {
-            const auto [itr, new_uuid] =
-                components_.emplace( component->id(), std::move( component ) );
-            OpenGeodeModelException::check_exception( new_uuid, nullptr,
+            const auto component_id = component->id();
+            const auto [_, new_uuid] =
+                components_.emplace( component_id, std::move( component ) );
+            OpenGeodeModelException::check_exception( new_uuid, component_id,
                 OpenGeodeException::TYPE::data,
                 "[ComponentsStorage::add_component] Component with id ",
-                itr->first.string(), " already exists" );
+                component_id.string(), " already exists" );
         }
 
         void save_components( std::string_view filename ) const
