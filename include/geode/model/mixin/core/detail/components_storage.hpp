@@ -32,6 +32,7 @@
 #include <absl/strings/match.h>
 
 #include <bitsery/ext/std_map.h>
+#include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/growable.hpp>
 
@@ -89,7 +90,7 @@ namespace geode::detail
             const auto [itr, new_uuid] =
                 components_.emplace( component->id(), std::move( component ) );
             OpenGeodeModelException::check_exception( new_uuid, nullptr,
-                OpenGeodeException::TYPE::internal,
+                OpenGeodeException::TYPE::data,
                 "[ComponentsStorage::add_component] Component with id ",
                 itr->first.string(), " already exists" );
         }
