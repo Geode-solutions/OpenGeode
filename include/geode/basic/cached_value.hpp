@@ -93,7 +93,7 @@ namespace geode
             return false;
         }
 
-        void reset()
+        void reset() const
         {
             computed_ = false;
         }

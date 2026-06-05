@@ -29,63 +29,110 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/logger_client.hpp>
 #include <geode/basic/logger_manager.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/tests/common.hpp>
-
-class CustomClient : public geode::LoggerClient
+namespace
 {
-public:
-    void trace( const std::string &message ) override
+
+    class CustomClient : public geode::LoggerClient
     {
-        std::cout << "Old school logger => " << message << std::endl;
+    public:
+        void trace( const std::string &message ) override
+        {
+            std::cout << "Old school logger => " << message << '\n';
+        }
+
+        void debug( const std::string &message ) override
+        {
+            std::cout << "Old school logger => " << message << '\n';
+        }
+
+        void info( const std::string &message ) override
+        {
+            std::cout << "Old school logger => " << message << '\n';
+        }
+
+        void warn( const std::string &message ) override
+        {
+            std::cout << "Old school logger => " << message << '\n';
+        }
+
+        void error( const std::string &message ) override
+        {
+            std::cout << "Old school logger => " << message << '\n';
+        }
+
+        void critical( const std::string &message ) override
+        {
+            std::cout << "Old school logger => " << message << '\n';
+        }
+    };
+
+    void test_logger()
+    {
+        geode::Logger::trace( "test ", "trace" );
+        geode::Logger::debug( "test ", "debug" );
+        geode::Logger::info( "test ", "info" );
+        geode::Logger::warn( "test ", "warn" );
+        geode::Logger::error( "test ", "error" );
+        geode::Logger::critical( "test ", "critial" );
     }
 
-    void debug( const std::string &message ) override
+    std::string test_huge_message()
     {
-        std::cout << "Old school logger => " << message << std::endl;
+        std::string huge_message;
+        const geode::index_t MSG_SIZE{ 100000 };
+        huge_message.reserve( MSG_SIZE );
+        for( const auto count : geode::Range{ MSG_SIZE } )
+        {
+            huge_message.push_back( 'A' + ( count % 26 ) );
+        }
+        geode::Logger::info( "Huge message size = ", huge_message.size() );
+        geode::Logger::info( huge_message );
+
+        geode::Logger::info(
+            "Huge message begin = ", huge_message.substr( 0, 50 ) );
+        geode::Logger::info( "Huge message end = ",
+            huge_message.substr( huge_message.size() - 50 ) );
+        return huge_message;
     }
 
-    void info( const std::string &message ) override
+    void test_change_log_file( const std::string &huge_msg )
     {
-        std::cout << "Old school logger => " << message << std::endl;
+        geode::Logger::info( "==============================" );
+        geode::Logger::info( "TEST CHANGE LOG FILE" );
+        geode::Logger::info( "==============================" );
+
+        static constexpr auto FILENAME1 = "first.log";
+        auto file_logger =
+            std::make_unique< geode::FileLoggerClient >( FILENAME1 );
+        auto &registered_file_logger =
+            dynamic_cast< geode::FileLoggerClient & >(
+                geode::LoggerManager::register_client(
+                    std::move( file_logger ) ) );
+        geode::Logger::info(
+            absl::StrCat( "Message written in first.log", "\n", huge_msg ) );
+        static constexpr auto FILENAME2 = "second.log";
+        registered_file_logger.set_file_path( FILENAME2 );
+        geode::Logger::info(
+            absl::StrCat( "Message written in second.log", "\n", huge_msg ) );
     }
 
-    void warn( const std::string &message ) override
+    void test()
     {
-        std::cout << "Old school logger => " << message << std::endl;
+        geode::OpenGeodeBasicLibrary::initialize();
+        geode::LoggerManager::register_client(
+            std::make_unique< CustomClient >() );
+        geode::LoggerManager::register_client(
+            std::make_unique< geode::FileLoggerClient >( "geode.log" ) );
+
+        test_logger();
+        const auto &huge_msg = test_huge_message();
+        test_change_log_file( huge_msg );
+
+        geode::Logger::set_level( geode::Logger::LEVEL::err );
+        test_logger();
     }
-
-    void error( const std::string &message ) override
-    {
-        std::cout << "Old school logger => " << message << std::endl;
-    }
-
-    void critical( const std::string &message ) override
-    {
-        std::cout << "Old school logger => " << message << std::endl;
-    }
-};
-
-void test_logger()
-{
-    geode::Logger::trace( "test ", "trace" );
-    geode::Logger::debug( "test ", "debug" );
-    geode::Logger::info( "test ", "info" );
-    geode::Logger::warn( "test ", "warn" );
-    geode::Logger::error( "test ", "error" );
-    geode::Logger::critical( "test ", "critial" );
-}
-
-void test()
-{
-    geode::OpenGeodeBasicLibrary::initialize();
-    geode::LoggerManager::register_client( std::make_unique< CustomClient >() );
-    geode::LoggerManager::register_client(
-        std::make_unique< geode::FileLoggerClient >( "geode.log" ) );
-
-    test_logger();
-    geode::Logger::set_level( geode::Logger::LEVEL::err );
-    test_logger();
-}
-
+} // namespace
 OPENGEODE_TEST( "logger" )

@@ -699,6 +699,7 @@ namespace geode
             {
                 return cached.value();
             }
+            cached.reset();
             cached( compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
             return cached.value();
