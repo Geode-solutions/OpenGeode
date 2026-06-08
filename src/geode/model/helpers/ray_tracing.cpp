@@ -302,14 +302,14 @@ namespace geode
         {
             {
                 absl::ReaderMutexLock read_lock{ mutex_ };
-                auto it = aabb_trees_.find( surface.id() );
+                const auto it = aabb_trees_.find( surface.id() );
                 if( it != aabb_trees_.end() )
                 {
                     return *it->second;
                 }
             }
             absl::MutexLock lock{ mutex_ };
-            auto [it, inserted] = aabb_trees_.emplace(
+            const auto [it, inserted] = aabb_trees_.emplace(
                 surface.id(), std::make_unique< AABBTree3D >(
                                   create_aabb_tree( surface.mesh() ) ) );
             return *it->second;
