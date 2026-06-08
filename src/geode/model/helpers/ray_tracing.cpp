@@ -300,15 +300,14 @@ namespace geode
     private:
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
+            absl::MutexLock lock{ mutex_ };
             {
-                absl::ReaderMutexLock read_lock{ mutex_ };
                 const auto it = aabb_trees_.find( surface.id() );
                 if( it != aabb_trees_.end() )
                 {
                     return *it->second;
                 }
             }
-            absl::MutexLock lock{ mutex_ };
             const auto [it, inserted] = aabb_trees_.emplace(
                 surface.id(), std::make_unique< AABBTree3D >(
                                   create_aabb_tree( surface.mesh() ) ) );
