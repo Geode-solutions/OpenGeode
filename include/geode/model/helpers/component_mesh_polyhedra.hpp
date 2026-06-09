@@ -23,10 +23,6 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
-
-#include <geode/basic/uuid.hpp>
-
 #include <geode/mesh/core/solid_mesh.hpp>
 
 #include <geode/model/common.hpp>
