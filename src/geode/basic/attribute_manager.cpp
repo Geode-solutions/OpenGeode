@@ -293,7 +293,7 @@ namespace geode
                 it != attribute_manager.attributes_.end(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::import] Could not import attribute '",
-                attribute_name,
+                attribute_id,
                 "'. No attribute with this name exists in the source "
                 "AttributeManager." );
             OpenGeodeBasicException::check_exception(

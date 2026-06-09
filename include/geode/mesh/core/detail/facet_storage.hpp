@@ -44,7 +44,6 @@ namespace geode
         class FacetStorage
         {
             using TypedVertexCycle = VertexCycle< VertexContainer >;
-            static constexpr auto ATTRIBUTE_NAME = "facet_vertices";
             friend class bitsery::Access;
 
         public:
@@ -60,14 +59,12 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_( facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >(
-                              "counter", 1u, { false, false, false } ) ),
+                          .template create_attribute< VariableAttribute,
+                              index_t >( 1u, { false, false, false } ) ),
                   vertices_( facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              VertexContainer >( attribute_name(),
-                              VertexContainer(),
-                              { false, false, false } ) )
+                          .template create_attribute< VariableAttribute,
+                              VertexContainer >(
+                              VertexContainer(), { false, false, false } ) )
             {
             }
 
@@ -221,17 +218,10 @@ namespace geode
             }
 
         protected:
-            static constexpr std::string_view attribute_name()
-            {
-                return ATTRIBUTE_NAME;
-            }
-
             void update_attribute()
             {
-                vertices_ =
-                    facet_attribute_manager_.template find_or_create_attribute<
-                        VariableAttribute, VertexContainer >( attribute_name(),
-                        VertexContainer{}, { false, false, false } );
+                vertices_ = facet_attribute_manager_.template find_attribute<
+                    VariableAttribute, VertexContainer >( vertices_->id() );
             }
 
             [[nodiscard]] index_t get_counter( index_t facet_id ) const

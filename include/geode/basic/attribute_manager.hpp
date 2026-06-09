@@ -83,7 +83,7 @@ namespace geode
             OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::find_attribute] Could not find attribute '",
-                name,
+                attribute_id,
                 "'. You have to create an attribute before using it. See "
                 "create_attribute method and derived classes of "
                 "ReadOnlyAttribute." );
@@ -226,21 +226,21 @@ namespace geode
         [[nodiscard]] absl::Mutex& mutex() const;
 
         /*!
-         * Find the Attribute associated with the given name
+         * Find the Attribute associated with the given id
          * regardless the content type
-         * @param[in] name The attribute name to search for
-         * @return The associated store. If the name was not found,
+         * @param[in] id The attribute id to search for
+         * @return The associated store. If the id was not found,
          * the shared pointer is empty.
          */
         [[nodiscard]] std::shared_ptr< AttributeBase > find_attribute_base(
             const geode::uuid& ) const;
 
         /*!
-         * Register an Attribute to the given name.
-         * If the given name already exists in the manager, the new attribute
+         * Register an Attribute to the given id.
+         * If the given id already exists in the manager, the new attribute
          * will override the old one.
          * @param[in] attribute The attribute to register
-         * @param[in] name The associated name to the store
+         * @param[in] id The associated id to the store
          */
         void register_attribute(
             std::shared_ptr< AttributeBase > attribute, const geode::uuid& );
