@@ -23,6 +23,8 @@
 
 #include <geode/geometry/angle.hpp>
 
+#include <geode/geometry/vector.hpp>
+
 namespace
 {
     double radians_to_degrees( double radians )
@@ -38,14 +40,29 @@ namespace
 
 namespace geode
 {
+    Angle::Angle( double radians )
+        : radians_( std::isnan( radians ) ? 0 : radians )
+    {
+    }
+
     Angle Angle::create_from_radians( double radians )
     {
-        return Angle( radians );
+        return Angle{ radians };
     }
 
     Angle Angle::create_from_degrees( double degrees )
     {
-        return Angle( degrees_to_radians( degrees ) );
+        return Angle{ degrees_to_radians( degrees ) };
+    }
+
+    Angle Angle::create_from_vectors(
+        const Vector3D& vector1, const Vector3D& vector2 )
+    {
+        const auto prev = vector1.normalize();
+        const auto next = vector2.normalize();
+        const auto dot = std::clamp( prev.dot( next ), -1.0, 1.0 );
+        const auto angle = std::acos( dot );
+        return Angle{ angle };
     }
 
     double Angle::radians() const
