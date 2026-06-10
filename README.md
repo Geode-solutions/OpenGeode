@@ -2,9 +2,8 @@
 <h3 align="center">Open source framework for representing and manipulating geometric models</h3>
 
 <p align="center">
-  <img src="https://github.com/Geode-solutions/OpenGeode/workflows/CI/badge.svg" alt="Build Status">
-  <img src="https://github.com/Geode-solutions/OpenGeode/workflows/CD/badge.svg" alt="Deploy Status">
-  <img src="https://codecov.io/gh/Geode-solutions/OpenGeode/branch/master/graph/badge.svg" alt="Coverage Status">
+  <img src="https://github.com/Geode-solutions/OpenGeode/actions/workflows/schedule.yml/badge.svg" alt="Build Status">
+  <img src="https://github.com/Geode-solutions/OpenGeode/actions/workflows/deploy.yml/badge.svg" alt="Deploy Status">
   <img src="https://img.shields.io/github/release/Geode-solutions/OpenGeode.svg" alt="Version">
   <img src="https://img.shields.io/pypi/v/opengeode-core" alt="PyPI" >
 </p>
@@ -19,11 +18,20 @@
   <img src="https://img.shields.io/badge/C%2B%2B-17-blue.svg" alt="Language">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="Semantic-release">
-  <a href="https://geode-solutions.com/#slack">
-    <img src="https://opengeode-slack-invite.herokuapp.com/badge.svg" alt="Slack invite">
-  </a>
   <a href="https://doi.org/10.5281/zenodo.3610370">
     <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3610370.svg" alt="DOI">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://geode-solutions.com/#slack">
+    <img src="https://img.icons8.com/?size=20&id=kikR2jIn6485&format=png&color=000000" alt="Slack invite">
+  </a>
+  <a href="https://www.linkedin.com/company/geode-solutions">
+    <img src="https://img.icons8.com/?size=25&id=13930&format=png&color=000000" alt="Linkedin">
+  </a>
+  <a href="mailto:contact@geode-solutions.com">
+    <img src="https://img.icons8.com/?size=24&id=YRRhCXfA0Vd0&format=png&color=999999" alt="Mail Us">
   </a>
 </p>
 
