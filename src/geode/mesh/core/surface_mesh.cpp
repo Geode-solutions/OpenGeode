@@ -537,13 +537,13 @@ namespace geode
                 const std::optional< PolygonVertex >& first_polygon ) const
         {
             const auto& cached = polygons_around_vertex_->value( vertex_id );
-            if( cached.computed()
-                && ( first_polygon
-                     && absl::c_contains(
-                         cached.value().polygons, first_polygon.value() ) ) )
+            if( cached.computed() && first_polygon
+                && absl::c_contains(
+                    cached.value().polygons, first_polygon.value() ) )
             {
                 return cached.value();
             }
+            cached.reset();
             cached( compute_polygons_around_vertex, mesh, vertex_id,
                 first_polygon );
             return cached.value();
