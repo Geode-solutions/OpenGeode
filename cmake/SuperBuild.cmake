@@ -64,7 +64,7 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePybind11.cmake)
 endif()
 
-include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
+# include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
 
 #------------------------------------------------------------------------------------------------
 # Configure CPack

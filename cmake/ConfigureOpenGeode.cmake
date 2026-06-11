@@ -107,3 +107,4 @@ add_custom_target(post_install
         opengeode
 )
 
+install(DIRECTORY ${OpenGeode_PATH_INSTALL}/ DESTINATION .)
