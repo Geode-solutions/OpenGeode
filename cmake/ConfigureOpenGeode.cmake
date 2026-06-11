@@ -95,15 +95,4 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     add_dependencies(download pybind11-download)
 endif()
 
-include(GNUInstallDirs)
-add_custom_target(post_install 
-    ALL
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/bin ${PROJECT_BINARY_DIR}/bin
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/${CMAKE_INSTALL_LIBDIR} ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/cmake ${PROJECT_BINARY_DIR}/cmake
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/include ${PROJECT_BINARY_DIR}/include
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/share ${PROJECT_BINARY_DIR}/share
-    DEPENDS
-        opengeode)
-
 install(DIRECTORY ${OpenGeode_PATH_INSTALL}/ DESTINATION .)
