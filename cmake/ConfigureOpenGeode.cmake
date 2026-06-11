@@ -18,9 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
-    list(APPEND bindings pybind11)
-endif()
+# if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
+#     list(APPEND bindings pybind11)
+# endif()
 
 set(OpenGeode_PATH_BIN ${PROJECT_BINARY_DIR}/opengeode)
 set(OpenGeode_PATH_INSTALL ${OpenGeode_PATH_BIN}/install)
@@ -91,9 +91,9 @@ add_custom_target(download
         spdlog-download
         sqlite-download
 )
-if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
-    add_dependencies(download pybind11-download)
-endif()
+# if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
+#     add_dependencies(download pybind11-download)
+# endif()
 
 # include(GNUInstallDirs)
 # add_custom_target(post_install 
