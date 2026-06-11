@@ -27,7 +27,7 @@ name = "${GEODE_WHEEL_NAME}"
 version = "${WHEEL_VERSION}"
 description = "${GEODE_WHEEL_DESCRIPTION}"
 authors = [{name = "Geode-solutions", email = "contact@geode-solutions.com"}]
-requires-python = ">=3.10,<=3.14"
+requires-python = ">=3.10,<3.15"
 license = {text = "${GEODE_WHEEL_LICENSE}"}
 dynamic = ["dependencies", "readme"]
 
