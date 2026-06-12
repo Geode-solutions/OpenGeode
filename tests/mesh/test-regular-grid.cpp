@@ -353,16 +353,19 @@ void test_closest_vertex( const geode::RegularGrid3D& grid )
 
 void test_clone( const geode::RegularGrid3D& grid )
 {
-    const auto attribute_name = "int_attribute";
-    const auto attribute_name_d = "double_attribute";
+    auto attribute_id = grid.polyhedron_attribute_manager()
+                            .create_attribute< geode::VariableAttribute, int >(
+                                "int_attribute", 0 );
     auto attribute =
         grid.polyhedron_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, int >(
-                attribute_name, 0 );
-    auto attribute_d =
+            .find_attribute< geode::VariableAttribute, int >( attribute_id );
+    auto attribute_d_id =
         grid.vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                attribute_name_d, 0 );
+            .create_attribute< geode::VariableAttribute, double >(
+                "double_attribute", 0 );
+    auto attribute_d = grid.vertex_attribute_manager()
+                           .find_attribute< geode::VariableAttribute, double >(
+                               attribute_d_id );
     for( const auto c : geode::Range{ grid.nb_polyhedra() } )
     {
         attribute->set_value( c, 2 * c );
@@ -414,23 +417,22 @@ void test_clone( const geode::RegularGrid3D& grid )
         "Clone wrong cell length in direction 2" );
 
     geode::OpenGeodeMeshException::test(
-        clone->polyhedron_attribute_manager().attribute_exists(
-            attribute_name ),
+        clone->polyhedron_attribute_manager().attribute_exists( attribute_id ),
         "Clone missing attribute" );
     geode::OpenGeodeMeshException::test(
-        clone->vertex_attribute_manager().attribute_exists( attribute_name_d ),
+        clone->vertex_attribute_manager().attribute_exists( attribute_d_id ),
         "Clone missing attribute" );
     const auto clone_attribute =
-        clone->polyhedron_attribute_manager().find_attribute< int >(
-            attribute_name );
+        clone->polyhedron_attribute_manager().read_attribute< int >(
+            attribute_id );
     for( const auto c : geode::TRange< int >{ clone->nb_polyhedra() } )
     {
         geode::OpenGeodeMeshException::test(
             clone_attribute->value( c ) == 2 * c, "Wrong clone attribute" );
     }
     const auto clone_attribute_d =
-        clone->vertex_attribute_manager().find_attribute< double >(
-            attribute_name_d );
+        clone->vertex_attribute_manager().read_attribute< double >(
+            attribute_d_id );
     for( const auto c : geode::TRange< int >{ clone->nb_vertices() } )
     {
         geode::OpenGeodeMeshException::test(

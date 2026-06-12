@@ -283,12 +283,16 @@ namespace geode
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_( surface.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolygonVertex >( "polygon_around_vertex",
-                          PolygonVertex{},
-                          { false, false, false } ) )
         {
+            const auto attribute_id =
+                surface.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        PolygonVertex >( "polygon_around_vertex",
+                        PolygonVertex{}, { false, false, false } );
+            polygon_around_vertex_ =
+                surface.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        PolygonVertex >( attribute_id );
             initialize_polygons_around_vertex( surface );
         }
 
@@ -431,11 +435,15 @@ namespace geode
         void initialize_polygons_around_vertex(
             const SurfaceMesh< dimension >& surface )
         {
-            polygons_around_vertex_ =
+            const auto attribute_id =
                 surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
+                    .template create_attribute< VariableAttribute,
                         CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
                         CachedPolygons{}, { false, false, false } );
+            polygons_around_vertex_ =
+                surface.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        CachedPolygons >( attribute_id );
         }
 
     private:

@@ -43,34 +43,28 @@ namespace geode
             double value )
             : solid_( solid )
         {
-            OpenGeodeMeshException::check_exception(
-                !solid_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TetrahedralSolidScalarFunction: attribute with "
-                "name '",
-                function_name, "' already exists." );
+            const auto function_id =
+                solid_.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, value, { false, true } );
             function_attribute_ =
                 solid_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, value, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         Impl( const TetrahedralSolid< dimension >& solid,
             std::string_view function_name )
             : solid_( solid )
         {
-            OpenGeodeMeshException::check_exception(
-                solid_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TetrahedralSolidScalarFunction: attribute with "
-                "name '",
-                function_name, "' does not exist." );
+            const auto function_id =
+                solid_.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, 0, { false, true } );
             function_attribute_ =
                 solid_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, 0, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         void set_value( index_t vertex_id, double value )

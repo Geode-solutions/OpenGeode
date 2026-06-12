@@ -52,6 +52,11 @@ namespace geode
                 return image_;
             }
 
+            [[nodiscard]] geode::uuid texture_id() const
+            {
+                return texture_id_;
+            }
+
             void set_image( RasterImage< dimension >&& image )
             {
                 image_ = std::move( image );
@@ -86,11 +91,11 @@ namespace geode
             }
 
             TextureImpl( AttributeManager& manager, std::string_view name )
-                : coordinates_{
-                      manager.find_or_create_attribute< VariableAttribute,
-                          ElementTextureCoordinates >( name, {} )
-                  }
             {
+                texture_id_ = manager.create_attribute< VariableAttribute,
+                    ElementTextureCoordinates >( name, {} );
+                coordinates_ = manager.find_attribute< VariableAttribute,
+                    ElementTextureCoordinates >( texture_id_ );
             }
 
             TextureImpl() = default;
@@ -102,14 +107,24 @@ namespace geode
                 serializer.ext(
                     *this, Growable< Archive, TextureImpl >{
                                { []( Archive& archive, TextureImpl& impl ) {
-                                   archive.object( impl.image_ );
-                                   archive.ext( impl.coordinates_,
-                                       bitsery::ext::StdSmartPtr{} );
-                               } } } );
+                                    archive.object( impl.image_ );
+                                    geode::uuid texture_id;
+                                    archive.object( texture_id );
+                                    impl.texture_id_ = texture_id;
+                                    archive.ext( impl.coordinates_,
+                                        bitsery::ext::StdSmartPtr{} );
+                                },
+                                   []( Archive& archive, TextureImpl& impl ) {
+                                       archive.object( impl.image_ );
+                                       archive.object( impl.texture_id_ );
+                                       archive.ext( impl.coordinates_,
+                                           bitsery::ext::StdSmartPtr{} );
+                                   } } } );
             }
 
         private:
             RasterImage< dimension > image_;
+            geode::uuid texture_id_;
             std::shared_ptr< VariableAttribute< ElementTextureCoordinates > >
                 coordinates_;
         };

@@ -158,7 +158,7 @@ namespace geode
 
         bool attribute_exists( const uuid &attribute_id ) const
         {
-            return absl::c_contains( attributes_, attribute_id );
+            return attributes_.find( attribute_id ) != attributes_.end();
         }
 
         void delete_attribute( const uuid &attribute_id )
@@ -226,10 +226,10 @@ namespace geode
             const AttributeBase::AttributeKey &key )
         {
             nb_elements_ = attribute_manager.nb_elements_;
-            for( const auto &[attribute_name, attribute] :
+            for( const auto &[attribute_id, attribute] :
                 attribute_manager.attributes_ )
             {
-                const auto attribute_it = attributes_.find( attribute_name );
+                const auto attribute_it = attributes_.find( attribute_id );
                 if( attribute_it != attributes_.end() )
                 {
                     try
@@ -239,14 +239,14 @@ namespace geode
                     }
                     catch( const std::bad_cast &e )
                     {
-                        Logger::error( "Attribute \"", attribute_name,
+                        Logger::error( "Attribute \"", attribute_id.string(),
                             "\" cannot be copied: ", e.what() );
                     }
                 }
                 else
                 {
                     attributes_.emplace(
-                        attribute_name, attribute->clone( key ) );
+                        attribute_id, attribute->clone( key ) );
                 }
             }
         }
@@ -293,14 +293,15 @@ namespace geode
                 it != attribute_manager.attributes_.end(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::import] Could not import attribute '",
-                attribute_id,
-                "'. No attribute with this name exists in the source "
+                attribute_id.string(),
+                "'. No attribute with this id exists in the source "
                 "AttributeManager." );
             OpenGeodeBasicException::check_exception(
                 it->second->properties().transferable, nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::import] Could not import attribute '",
-                attribute_name, "'. The attribute is not transferable." );
+                attribute_id.string(),
+                "'. The attribute is not transferable." );
             if( attribute_exists( attribute_id ) )
             {
                 OpenGeodeBasicException::check_exception(
@@ -308,8 +309,8 @@ namespace geode
                         == this->attributes_.at( attribute_id )->type(),
                     nullptr, OpenGeodeException::TYPE::data,
                     "[AttributeManager::import] Could not import attribute '",
-                    attribute_name,
-                    "'. An attribute with the same name but a different type "
+                    attribute_id.string(),
+                    "'. An attribute with the same id but a different type "
                     "already exists in the destination AttributeManager." );
                 this->attributes_.at( attribute_id )
                     ->import( old2new_mapping, it->second, key );
@@ -321,15 +322,6 @@ namespace geode
             }
         }
 
-        // void initialize_attribute_ids( const AttributeBase::AttributeKey &key
-        // )
-        // {
-        //     for( auto &[attribute_id, attribute] : attributes_ )
-        //     {
-        //         attribute->set_id( attribute_id, key );
-        //     }
-        // }
-
         void set_attribute_properties( geode::uuid attribute_id,
             const AttributeProperties &new_properties )
         {
@@ -337,7 +329,7 @@ namespace geode
             OpenGeodeBasicException::check_exception(
                 attribute_it != attributes_.end(), nullptr,
                 OpenGeodeException::TYPE::data,
-                "[AttributeManager::rename_attribute] Attribute ",
+                "[AttributeManager::set_attribute_properties] Attribute ",
                 attribute_id.string(), "does not exist" );
             attribute_it->second->set_properties( new_properties );
         }
@@ -345,30 +337,69 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, Impl >{ { []( Archive &local_archive,
-                                                        Impl &impl ) {
-                    local_archive.value4b( impl.nb_elements_ );
-                    local_archive.ext( impl.attributes_,
-                        bitsery::ext::StdMap{ impl.attributes_.max_size() },
-                        []( Archive &local_archive2, std::string &name,
-                            std::shared_ptr< AttributeBase > &attribute ) {
-                            local_archive2.text1b( name, name.max_size() );
-                            try
-                            {
-                                local_archive2.ext(
-                                    attribute, bitsery::ext::StdSmartPtr{} );
-                            }
-                            catch( ... )
-                            {
-                                throw OpenGeodeBasicException{ nullptr,
-                                    OpenGeodeException::TYPE::internal,
-                                    "[AttributeManager::serialize] Cannot "
-                                    "serialize attribute ",
-                                    name, " holding type ", attribute->type() };
-                            }
-                        } );
-                } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive &local_archive, Impl &impl ) {
+                         local_archive.value4b( impl.nb_elements_ );
+                         absl::linked_hash_map< std::string,
+                             std::shared_ptr< AttributeBase > >
+                             old_map;
+                         local_archive.ext( old_map,
+                             bitsery::ext::StdMap{ old_map.max_size() },
+                             []( Archive &local_archive2, std::string &name,
+                                 std::shared_ptr< AttributeBase > &attribute ) {
+                                 local_archive2.text1b( name, name.max_size() );
+                                 try
+                                 {
+                                     local_archive2.ext( attribute,
+                                         bitsery::ext::StdSmartPtr{} );
+                                 }
+                                 catch( ... )
+                                 {
+                                     throw OpenGeodeBasicException{ nullptr,
+                                         OpenGeodeException::TYPE::internal,
+                                         "[AttributeManager::serialize] Cannot "
+                                         "serialize attribute ",
+                                         name, " holding type ",
+                                         attribute->type() };
+                                 }
+                             } );
+                         for( auto &[attribute_name, attribute] : old_map )
+                         {
+                             IdentifierBuilder builder{ *attribute };
+                             builder.set_name( attribute_name );
+                             impl.attributes_.emplace(
+                                 attribute->id(), std::move( attribute ) );
+                         }
+                     },
+                        []( Archive &local_archive, Impl &impl ) {
+                            local_archive.value4b( impl.nb_elements_ );
+                            local_archive.ext( impl.attributes_,
+                                bitsery::ext::StdMap{
+                                    impl.attributes_.max_size() },
+                                []( Archive &local_archive2,
+                                    geode::uuid &attribute_id,
+                                    std::shared_ptr< AttributeBase >
+                                        &attribute ) {
+                                    local_archive2.object( attribute_id );
+                                    try
+                                    {
+                                        local_archive2.ext( attribute,
+                                            bitsery::ext::StdSmartPtr{} );
+                                    }
+                                    catch( ... )
+                                    {
+                                        throw OpenGeodeBasicException{ nullptr,
+                                            OpenGeodeException::TYPE::internal,
+                                            "[AttributeManager::serialize] "
+                                            "Cannot "
+                                            "serialize attribute with id ",
+                                            attribute_id.string(),
+                                            " holding type ",
+                                            attribute->type() };
+                                    }
+                                } );
+                        } } } );
         }
 
         absl::Mutex &mutex() const
@@ -542,18 +573,16 @@ namespace geode
     template < typename Archive >
     void AttributeManager::serialize( Archive &serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, AttributeManager >{
-                { []( Archive &local_archive,
-                      AttributeManager &attribute_manager ) {
-                     local_archive.object( attribute_manager.impl_ );
-                     const AttributeBase::AttributeKey key;
-                     attribute_manager.impl_->initialize_attribute_names( key );
-                 },
-                    []( Archive &local_archive,
-                        AttributeManager &attribute_manager ) {
-                        local_archive.object( attribute_manager.impl_ );
-                    } } } );
+        serializer.ext(
+            *this, Growable< Archive, AttributeManager >{
+                       { []( Archive &local_archive,
+                             AttributeManager &attribute_manager ) {
+                            local_archive.object( attribute_manager.impl_ );
+                        },
+                           []( Archive &local_archive,
+                               AttributeManager &attribute_manager ) {
+                               local_archive.object( attribute_manager.impl_ );
+                           } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, AttributeManager );

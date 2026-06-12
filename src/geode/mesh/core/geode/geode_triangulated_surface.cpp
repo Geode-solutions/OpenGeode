@@ -46,18 +46,28 @@ namespace geode
 
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh ),
-              triangle_vertices_( mesh.polygon_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 3 > >( "triangle_vertices",
-                          std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
-                          { false, false, false } ) ),
-              triangle_adjacents_( mesh.polygon_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 3 > >( "triangle_adjacents",
-                          std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
-                          { false, false, false } ) )
+            : internal::PointsImpl< dimension >( mesh )
         {
+            const auto triangle_vertices_id =
+                mesh.polygon_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        std::array< index_t, 3 > >( "triangle_vertices",
+                        std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
+                        { false, false, false } );
+            triangle_vertices_ =
+                mesh.polygon_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        std::array< index_t, 3 > >( triangle_vertices_id );
+            const auto triangle_adjacents_id =
+                mesh.polygon_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        std::array< index_t, 3 > >( "triangle_adjacents",
+                        std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
+                        { false, false, false } );
+            triangle_adjacents_ =
+                mesh.polygon_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        std::array< index_t, 3 > >( triangle_adjacents_id );
         }
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const

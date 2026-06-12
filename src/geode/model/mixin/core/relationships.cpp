@@ -236,9 +236,14 @@ namespace geode
 
         void initialize_relation_attribute()
         {
-            relation_type_ = relation_attribute_manager()
-                                 .find_or_create_attribute< VariableAttribute,
-                                     RelationType >( "relation_type", NO_ID );
+            const auto relation_type_attribute_id =
+                relation_attribute_manager()
+                    .create_attribute< VariableAttribute, RelationType >(
+                        "relation_type", NO_ID );
+            relation_type_ =
+                relation_attribute_manager()
+                    .find_attribute< VariableAttribute, RelationType >(
+                        relation_type_attribute_id );
         }
 
         std::string relation_to_string( index_t relation_type ) const

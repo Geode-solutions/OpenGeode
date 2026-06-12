@@ -46,14 +46,19 @@ void test_color_attribute()
 {
     geode::AttributeManager manager;
     manager.resize( 1 );
-    const auto rgb_attribute =
-        manager.find_or_create_attribute< geode::VariableAttribute,
-            geode::RGBColor >( "rgb_color", geode::RGBColor{} );
+    const auto rgb_attribute_id =
+        manager.create_attribute< geode::VariableAttribute, geode::RGBColor >(
+            "rgb_color", geode::RGBColor{} );
+    auto rgb_attribute =
+        manager.find_attribute< geode::VariableAttribute, geode::RGBColor >(
+            rgb_attribute_id );
     rgb_attribute->set_value( 0, { 3, 254, 68 } );
-    const auto greyscale_attribute =
-        manager.find_or_create_attribute< geode::VariableAttribute,
+    const auto greyscale_attribute_id =
+        manager.create_attribute< geode::VariableAttribute,
             geode::GreyscaleColor >(
             "greyscale_color", geode::GreyscaleColor{} );
+    auto greyscale_attribute = manager.find_attribute< geode::VariableAttribute,
+        geode::GreyscaleColor >( greyscale_attribute_id );
     greyscale_attribute->set_value( 0, geode::GreyscaleColor{ 67 } );
     geode::OpenGeodeImageException::test( rgb_attribute->is_genericable(),
         "[TEST] Attribute on RGBColor should be genericable." );

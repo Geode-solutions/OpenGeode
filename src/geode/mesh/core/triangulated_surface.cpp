@@ -60,7 +60,13 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::clone() const
     {
+        DEBUG( "CLONE" );
         auto clone = create( this->impl_name() );
+        DEBUG( "clone" );
+        for( const auto vertex : geode::Range{ clone->nb_vertices() } )
+        {
+            SDEBUG( clone->point( vertex ) );
+        }
         auto builder =
             TriangulatedSurfaceBuilder< dimension >::create( *clone );
         builder->copy_identifier( *this );

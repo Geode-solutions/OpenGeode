@@ -47,12 +47,16 @@ namespace geode
 
     public:
         explicit Impl( Graph& graph )
-            : edges_around_vertex_( graph.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          EdgesAroundVertex >( ATTRIBUTE_NAME,
-                          EdgesAroundVertex{},
-                          { false, false, false } ) )
         {
+            const auto attribute_id =
+                graph.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        EdgesAroundVertex >( ATTRIBUTE_NAME,
+                        EdgesAroundVertex{}, { false, false, false } );
+            edges_around_vertex_ =
+                graph.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        EdgesAroundVertex >( attribute_id );
         }
 
         AttributeManager& edge_attribute_manager() const

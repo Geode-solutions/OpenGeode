@@ -232,10 +232,13 @@ namespace geode
 
         void RelationshipsImpl::initialize_attributes()
         {
-            ids_ =
+            const auto ids_attribute_id =
                 graph_->vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute, ComponentID >(
+                    .create_attribute< VariableAttribute, ComponentID >(
                         "id", ComponentID{} );
+            ids_ = graph_->vertex_attribute_manager()
+                       .find_attribute< VariableAttribute, ComponentID >(
+                           ids_attribute_id );
         }
 
         std::optional< index_t > RelationshipsImpl::vertex_id(

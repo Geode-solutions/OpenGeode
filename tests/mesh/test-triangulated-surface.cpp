@@ -239,10 +239,16 @@ void test_io(
 
 void test_clone( const geode::TriangulatedSurface3D& surface )
 {
-    auto attr_from = surface.edges()
-                         .edge_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "edge_id", 0 );
+    auto attr_from_id =
+        surface.edges()
+            .edge_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "edge_id", 0 );
+    auto attr_from =
+        surface.edges()
+            .edge_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attr_from_id );
     for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         attr_from->set_value( e, e );
@@ -259,7 +265,7 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         "TriangulatedSurface2 should have 2 polygons" );
     auto attr_to = surface2.edges()
                        .edge_attribute_manager()
-                       .find_attribute< geode::index_t >( "edge_id" );
+                       .read_attribute< geode::index_t >( attr_from_id );
     for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         geode::OpenGeodeMeshException::test(

@@ -44,34 +44,28 @@ namespace geode
             double value )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check_exception(
-                !surface_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TriangulatedSurfaceScalarFunction: attribute "
-                "with name '",
-                function_name, "' already exists." );
+            const auto function_id =
+                surface_.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, value, { false, true } );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, value, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         Impl( const TriangulatedSurface< dimension >& surface,
             std::string_view function_name )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check_exception(
-                surface_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TriangulatedSurfaceScalarFunction: attribute "
-                "with name '",
-                function_name, "' does not exist." );
+            const auto function_id =
+                surface_.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, 0, { false, true } );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, 0, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         void set_value( index_t vertex_id, double value )

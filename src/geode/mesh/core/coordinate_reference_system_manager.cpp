@@ -91,6 +91,8 @@ namespace geode
         void register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs )
         {
+            DEBUG( "register_coordinate_reference_system" );
+            DEBUG( name );
             const auto status =
                 crss_.emplace( to_string( name ), std::move( crs ) );
             OpenGeodeMeshException::check_exception( status.second, nullptr,

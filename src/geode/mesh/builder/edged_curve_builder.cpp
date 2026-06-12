@@ -67,16 +67,13 @@ namespace geode
             "[EdgedCurveBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         GraphBuilder::copy( edged_curve );
-        if( edged_curve_.impl_name() == edged_curve.impl_name() )
+        // if( edged_curve_.impl_name() == edged_curve.impl_name() )
+        // {
+        //     do_copy_points( edged_curve );
+        // }
+        for( const auto p : Range{ edged_curve.nb_vertices() } )
         {
-            do_copy_points( edged_curve );
-        }
-        else
-        {
-            for( const auto p : Range{ edged_curve.nb_vertices() } )
-            {
-                this->set_point( p, edged_curve.point( p ) );
-            }
+            this->set_point( p, edged_curve.point( p ) );
         }
     }
 

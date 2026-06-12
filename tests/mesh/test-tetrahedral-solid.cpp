@@ -325,19 +325,30 @@ void test_io(
 
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
-    auto attr_from = solid.facets()
-                         .facet_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "facet_id", 0 );
+    auto attr_from_id =
+        solid.facets()
+            .facet_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "facet_id", 0 );
+    auto attr_from =
+        solid.facets()
+            .facet_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attr_from_id );
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         attr_from->set_value( f, f );
     }
+    auto attr_edge_from_id =
+        solid.edges()
+            .edge_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "edge_id", 0 );
     auto attr_edge_from =
         solid.edges()
             .edge_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute,
-                geode::index_t >( "edge_id", 0 );
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attr_edge_from_id );
     for( const auto e : geode::Range{ solid.edges().nb_edges() } )
     {
         attr_edge_from->set_value( e, e );
@@ -349,7 +360,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
             solid2.get() ) ) };
     const auto attr_to = solid4.facets()
                              .facet_attribute_manager()
-                             .find_attribute< geode::index_t >( "facet_id" );
+                             .read_attribute< geode::index_t >( attr_from_id );
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -367,7 +378,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     const auto attr_edge_to =
         solid4.edges()
             .edge_attribute_manager()
-            .find_attribute< geode::index_t >( "edge_id" );
+            .read_attribute< geode::index_t >( attr_edge_from_id );
     for( const auto e : geode::Range{ solid.edges().nb_edges() } )
     {
         geode::OpenGeodeMeshException::test(

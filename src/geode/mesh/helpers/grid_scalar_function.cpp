@@ -44,31 +44,27 @@ namespace geode
             double value )
             : grid_( grid )
         {
-            OpenGeodeMeshException::check_exception(
-                !grid_.grid_vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create GridScalarFunction: attribute with name ",
-                function_name, " already exists." );
+            const auto function_id =
+                grid_.grid_vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, value, { false, true } );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, value, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         Impl( const Grid< dimension >& grid, std::string_view function_name )
             : grid_( grid )
         {
-            OpenGeodeMeshException::check_exception(
-                grid_.grid_vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create GridScalarFunction: attribute with name",
-                function_name, " does not exist." );
+            const auto function_id =
+                grid_.grid_vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, 0, { false, true } );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, 0, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         void set_value(

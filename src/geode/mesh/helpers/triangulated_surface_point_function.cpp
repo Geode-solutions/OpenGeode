@@ -44,36 +44,30 @@ namespace geode
             Point< point_dimension > value )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check_exception(
-                !surface_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TriangulatedSurfacePointFunction: attribute "
-                "with name '",
-                function_name, "' already exists." );
-            function_attribute_ =
+            const auto function_id =
                 surface_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
+                    .template create_attribute< VariableAttribute,
                         Point< point_dimension > >(
                         function_name, std::move( value ), { false, true } );
+            function_attribute_ =
+                surface_.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        Point< point_dimension > >( function_id );
         }
 
         Impl( const TriangulatedSurface< dimension >& surface,
             std::string_view function_name )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check_exception(
-                surface_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TriangulatedSurfacePointFunction: attribute "
-                "with name '",
-                function_name, "' does not exist." );
-            function_attribute_ =
+            const auto function_id =
                 surface_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
+                    .template create_attribute< VariableAttribute,
                         Point< point_dimension > >( function_name,
                         Point< point_dimension >(), { false, true } );
+            function_attribute_ =
+                surface_.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        Point< point_dimension > >( function_id );
         }
 
         void set_value( index_t vertex_id, Point< point_dimension > value )

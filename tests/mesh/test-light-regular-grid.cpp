@@ -332,10 +332,12 @@ void test_closest_vertex( const geode::LightRegularGrid3D& grid )
 
 void test_attribute( const geode::LightRegularGrid3D& grid )
 {
+    auto attribute_id =
+        grid.cell_attribute_manager()
+            .create_attribute< geode::VariableAttribute, double >( "test", -1 );
     auto attribute =
         grid.cell_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                "toto", -1 );
+            .find_attribute< geode::VariableAttribute, double >( attribute_id );
     attribute->set_value( 10, 10 );
     geode::OpenGeodeMeshException::test(
         attribute->value( 0 ) == -1, "Wrong attribute value" );

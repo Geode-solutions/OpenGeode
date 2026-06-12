@@ -43,17 +43,10 @@ namespace geode
 #define OPENGEODE_TEST( name )                                                 \
     int main()                                                                 \
     {                                                                          \
-        try                                                                    \
-        {                                                                      \
-            geode::OpenGeodeBasicLibrary::initialize();                        \
-            geode::Logger::set_level( geode::Logger::LEVEL::trace );           \
-            test();                                                            \
+        geode::OpenGeodeBasicLibrary::initialize();                            \
+        geode::Logger::set_level( geode::Logger::LEVEL::trace );               \
+        test();                                                                \
                                                                                \
-            geode::Logger::info( "TEST SUCCESS" );                             \
-            return 0;                                                          \
-        }                                                                      \
-        catch( ... )                                                           \
-        {                                                                      \
-            return geode::geode_lippincott();                                  \
-        }                                                                      \
+        geode::Logger::info( "TEST SUCCESS" );                                 \
+        return 0;                                                              \
     }

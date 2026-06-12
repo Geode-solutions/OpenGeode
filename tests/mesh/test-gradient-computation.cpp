@@ -48,11 +48,13 @@ void test_gradient_grid2D()
     auto builder = geode::RegularGridBuilder< 2 >::create( *grid );
     builder->initialize_grid( geode::Point2D{ { 0, 0 } }, { 3, 3 },
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { 0, 1 } } } );
-    const auto scalar_function_name = "scalar_function";
+    auto attribute_id =
+        grid->vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute, double >(
+                "scalar_function", 0 );
     auto attribute =
         grid->vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                scalar_function_name, 0 );
+            .find_attribute< geode::VariableAttribute, double >( attribute_id );
     attribute->set_value( 1, 1 );
     attribute->set_value( 4, 1 );
     attribute->set_value( 6, 1 );
@@ -67,9 +69,9 @@ void test_gradient_grid2D()
     attribute->set_value( 13, 2 );
     attribute->set_value( 14, 3 );
     attribute->set_value( 15, 8 );
-    const auto gradient_name = geode::compute_surface_scalar_function_gradient(
-        *grid, scalar_function_name );
-    geode::Logger::info( "Gradient attribute name: ", gradient_name );
+    const auto gradient_id =
+        geode::compute_surface_scalar_function_gradient( *grid, attribute_id );
+    geode::Logger::info( "Gradient attribute id: ", gradient_id.string() );
     geode::save_regular_grid< 2 >( *grid, "grid_with_gradient.og_rgd2d" );
 }
 
@@ -99,11 +101,13 @@ void test_gradient_triangulated_surface2D()
     builder->create_polygon( { 6, 9, 8 } );
     builder->create_polygon( { 5, 6, 8 } );
     builder->compute_polygon_adjacencies();
-    const auto scalar_function_name = "scalar_function";
+    auto attribute_id =
+        surface->vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute, double >(
+                "scalar_function", 0 );
     auto attribute =
         surface->vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                scalar_function_name, 0 );
+            .find_attribute< geode::VariableAttribute, double >( attribute_id );
     attribute->set_value( 1, 1 );
     attribute->set_value( 2, 1 );
     attribute->set_value( 3, 1 );
@@ -112,9 +116,9 @@ void test_gradient_triangulated_surface2D()
     attribute->set_value( 9, 3 );
     attribute->set_value( 7, 2 );
     attribute->set_value( 8, 2 );
-    const auto gradient_name = geode::compute_surface_scalar_function_gradient(
-        *surface, scalar_function_name );
-    geode::Logger::info( "Gradient attribute name: ", gradient_name );
+    const auto gradient_id = geode::compute_surface_scalar_function_gradient(
+        *surface, attribute_id );
+    geode::Logger::info( "Gradient attribute id: ", gradient_id.string() );
     geode::save_triangulated_surface< 2 >(
         *surface, "mesh_with_gradient.og_tsf2d" );
 }
@@ -126,11 +130,13 @@ void test_gradient_grid3D()
     builder->initialize_grid( geode::Point3D{ { 0, 0, 0 } }, { 2, 2, 2 },
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 0, 1, 0 } },
             geode::Vector3D{ { 0, 0, 1 } } } );
-    const auto scalar_function_name = "scalar_function";
+    auto attribute_id =
+        grid->vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute, double >(
+                "scalar_function", 0 );
     auto attribute =
         grid->vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                scalar_function_name, 0 );
+            .find_attribute< geode::VariableAttribute, double >( attribute_id );
     attribute->set_value( 4, 1 );
     attribute->set_value( 10, 1 );
     attribute->set_value( 12, 1 );
@@ -157,13 +163,14 @@ void test_gradient_grid3D()
     attribute->set_value( 20, 3 );
     attribute->set_value( 24, 3 );
     attribute->set_value( 26, 3 );
-    const auto gradient_name = geode::compute_solid_scalar_function_gradient(
-        *grid, scalar_function_name );
-    geode::Logger::info( "Gradient attribute name: ", gradient_name );
-    const auto [gradient_name_2, vertices_with_no_value] =
+    const auto gradient_id =
+        geode::compute_solid_scalar_function_gradient( *grid, attribute->id() );
+    geode::Logger::info( "Gradient attribute name: ", gradient_id.string() );
+    const auto [gradient_id_2, vertices_with_no_value] =
         geode::internal::compute_solid_scalar_function_gradient(
-            *grid, scalar_function_name, { 0, 1 } );
-    geode::Logger::info( "Gradient attribute name 2: ", gradient_name_2 );
+            *grid, attribute->id(), { 0, 1 } );
+    geode::Logger::info(
+        "Gradient attribute name 2: ", gradient_id_2.string() );
     geode::OpenGeodeMeshException::test( vertices_with_no_value.size() == 7,
         "Wrong number of vertices without value for gradient "
         "computation, ",

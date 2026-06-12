@@ -106,13 +106,18 @@ namespace geode
 
     public:
         Impl()
-            : component_vertices_( unique_vertices_.vertex_attribute_manager()
-                      .find_or_create_attribute< VariableAttribute,
-                          std::vector< ComponentMeshVertex > >(
-                          "component vertices",
-                          std::vector< ComponentMeshVertex >{},
-                          { false, false, false } ) )
         {
+            const auto unique_vertices_attribute_id =
+                unique_vertices_.vertex_attribute_manager()
+                    .create_attribute< VariableAttribute,
+                        std::vector< ComponentMeshVertex > >(
+                        "component vertices",
+                        std::vector< ComponentMeshVertex >{},
+                        { false, false, false } );
+            component_vertices_ = unique_vertices_.vertex_attribute_manager()
+                                      .find_attribute< VariableAttribute,
+                                          std::vector< ComponentMeshVertex > >(
+                                          unique_vertices_attribute_id );
         }
 
         index_t nb_unique_vertices() const
@@ -178,21 +183,19 @@ namespace geode
             const auto& mesh = component.mesh();
             if( it == vertex2unique_vertex_.end() )
             {
-                mesh.vertex_attribute_manager().delete_attribute(
-                    unique_vertices_name );
+                const auto unique_vertices_attribute_id =
+                    mesh.vertex_attribute_manager()
+                        .template create_attribute< VariableAttribute,
+                            index_t >( unique_vertices_name, NO_ID,
+                            { false, false, false } );
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( unique_vertices_name, NO_ID,
-                            { false, false, false } ) );
+                        .template find_attribute< VariableAttribute, index_t >(
+                            unique_vertices_attribute_id ) );
             }
             else
             {
-                auto attribute =
-                    mesh.vertex_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( unique_vertices_name, NO_ID,
-                            { false, false, false } );
+                auto attribute = vertex2unique_vertex_.at( component.id() );
                 attribute->set_properties( { false, false, false } );
                 try
                 {
@@ -215,8 +218,9 @@ namespace geode
         void unregister_component( const MeshComponent& component )
         {
             const auto& mesh = component.mesh();
-            mesh.vertex_attribute_manager().delete_attribute(
-                unique_vertices_name );
+            auto attribute = vertex2unique_vertex_.at( component.id() );
+            const auto attribute_id = attribute->id();
+            mesh.vertex_attribute_manager().delete_attribute( attribute_id );
             vertex2unique_vertex_.erase( component.id() );
             filter_component_vertices( component.id() );
         }

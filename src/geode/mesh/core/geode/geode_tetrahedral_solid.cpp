@@ -48,20 +48,28 @@ namespace geode
 
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh ),
-              tetrahedron_vertices_( mesh.polyhedron_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 4 > >( "tetrahedron_vertices",
-                          std::array< index_t, 4 >{
-                              NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false, false } ) ),
-              tetrahedron_adjacents_( mesh.polyhedron_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 4 > >( "tetrahedron_adjacents",
-                          std::array< index_t, 4 >{
-                              NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false, false } ) )
+            : internal::PointsImpl< dimension >( mesh )
         {
+            const auto tetrahedron_vertices_id =
+                mesh.polyhedron_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( "tetrahedron_vertices",
+                        std::array< index_t, 4 >{ NO_ID, NO_ID, NO_ID, NO_ID },
+                        { false, false, false } );
+            tetrahedron_vertices_ =
+                mesh.polyhedron_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( tetrahedron_vertices_id );
+            const auto tetrahedron_adjacents_id =
+                mesh.polyhedron_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( "tetrahedron_adjacents",
+                        std::array< index_t, 4 >{ NO_ID, NO_ID, NO_ID, NO_ID },
+                        { false, false, false } );
+            tetrahedron_adjacents_ =
+                mesh.polyhedron_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( tetrahedron_adjacents_id );
         }
 
         index_t get_polyhedron_vertex(

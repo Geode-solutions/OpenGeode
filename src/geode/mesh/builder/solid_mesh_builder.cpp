@@ -958,16 +958,6 @@ namespace geode
             solid_mesh_.disable_facets();
         }
         VertexSetBuilder::copy( solid_mesh );
-        if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
-        {
-            do_copy_points( solid_mesh );
-            do_copy_polyhedra( solid_mesh );
-        }
-        else
-        {
-            copy_points( solid_mesh, *this );
-            copy_polyhedra( solid_mesh, *this );
-        }
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
         if( solid_mesh.are_edges_enabled() )
@@ -978,6 +968,13 @@ namespace geode
         {
             solid_mesh_.copy_facets( solid_mesh, {} );
         }
+        // if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
+        // {
+        //     do_copy_points( solid_mesh );
+        //     do_copy_polyhedra( solid_mesh );
+        // }
+        copy_points( solid_mesh, *this );
+        copy_polyhedra( solid_mesh, *this );
     }
 
     template class opengeode_mesh_api SolidMeshBuilder< 3 >;
