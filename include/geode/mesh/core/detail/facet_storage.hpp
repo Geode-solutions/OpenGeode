@@ -58,14 +58,23 @@ namespace geode
 
         protected:
             FacetStorage()
-                : counter_( facet_attribute_manager_
-                          .template create_attribute< VariableAttribute,
-                              index_t >( 1u, { false, false, false } ) ),
-                  vertices_( facet_attribute_manager_
-                          .template create_attribute< VariableAttribute,
-                              VertexContainer >(
-                              VertexContainer(), { false, false, false } ) )
             {
+                const auto counter_attribute_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, index_t >(
+                            "counter", 1u, { false, false, false } );
+                counter_ = facet_attribute_manager_
+                               .find_attribute< VariableAttribute, index_t >(
+                                   counter_attribute_id );
+                const auto vertices_attribute_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, VertexContainer >(
+                            "vertices", VertexContainer{},
+                            { false, false, false } );
+                vertices_ =
+                    facet_attribute_manager_
+                        .find_attribute< VariableAttribute, VertexContainer >(
+                            vertices_attribute_id );
             }
 
             [[nodiscard]] AttributeManager& facet_attribute_manager() const
@@ -233,13 +242,22 @@ namespace geode
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
                 facet_indices_ = from.facet_indices_;
-                counter_ =
+                const auto counter_attribute_id =
                     facet_attribute_manager_
-                        .find_or_create_attribute< VariableAttribute, index_t >(
+                        .create_attribute< VariableAttribute, index_t >(
                             "counter", 1u, { false, false, false } );
-                vertices_ = facet_attribute_manager_.find_or_create_attribute<
-                    VariableAttribute, VertexContainer >( attribute_name(),
-                    VertexContainer{}, { false, false, false } );
+                counter_ = facet_attribute_manager_
+                               .find_attribute< VariableAttribute, index_t >(
+                                   counter_attribute_id );
+                const auto vertices_attribute_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, VertexContainer >(
+                            "vertices", VertexContainer{},
+                            { false, false, false } );
+                vertices_ =
+                    facet_attribute_manager_
+                        .find_attribute< VariableAttribute, VertexContainer >(
+                            vertices_attribute_id );
             }
 
         private:

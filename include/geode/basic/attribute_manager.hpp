@@ -73,7 +73,7 @@ namespace geode
          * @exception OpenGeodeException if no Attribute found
          */
         template < typename T >
-        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
+        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > read_attribute(
             const geode::uuid& attribute_id ) const
         {
             absl::ReaderMutexLock lock{ mutex() };
@@ -83,22 +83,80 @@ namespace geode
             OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::find_attribute] Could not find attribute '",
-                attribute_id,
+                attribute_id.string(),
                 "'. You have to create an attribute before using it. See "
                 "create_attribute method and derived classes of "
                 "ReadOnlyAttribute." );
             return attribute;
         }
 
-        template < typename T >
+        template < template < typename > class Attribute, typename T >
+        [[nodiscard]] std::shared_ptr< Attribute< T > > find_attribute(
+            const geode::uuid& attribute_id )
+        {
+            absl::ReaderMutexLock lock{ mutex() };
+            auto attribute = std::dynamic_pointer_cast< Attribute< T > >(
+                find_attribute_base( attribute_id ) );
+            OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::find_attribute] Could not find attribute '",
+                attribute_id.string(),
+                "'. You have to create an attribute before using it. See "
+                "create_attribute method and derived classes of "
+                "ReadOnlyAttribute." );
+            return attribute;
+        }
+
+        template < template < typename > class Attribute, typename T >
+        void create_attribute( std::string_view attribute_name,
+            const geode::uuid& attribute_id,
+            T default_value,
+            AttributeProperties properties )
+        {
+            absl::MutexLock lock{ mutex() };
+            auto attribute = find_attribute_base( attribute_id );
+            auto typed_attribute =
+                std::dynamic_pointer_cast< Attribute< T > >( attribute );
+            OpenGeodeBasicException::check_exception(
+                typed_attribute.get() == nullptr, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::create_attribute] Attribute '",
+                attribute_id.string(), "' already exists." );
+            typed_attribute.reset( new Attribute< T >{
+                std::move( default_value ), std::move( properties ), {} } );
+            IdentifierBuilder builder{ *typed_attribute };
+            builder.set_name( attribute_name );
+            register_attribute( typed_attribute, attribute_id );
+        }
+
+        template < template < typename > class Attribute, typename T >
+        void create_attribute( std::string_view attribute_name,
+            const geode::uuid& attribute_id,
+            T default_value )
+        {
+            return create_attribute< Attribute, T >( attribute_name,
+                attribute_id, std::move( default_value ),
+                AttributeProperties{} );
+        }
+
+        template < template < typename > class Attribute, typename T >
         [[nodiscard]] geode::uuid create_attribute(
-            T default_value, AttributeProperties properties )
+            std::string_view attribute_name,
+            T default_value,
+            AttributeProperties properties )
         {
             geode::uuid attribute_id;
-            auto typed_attribute = std::make_shared< TypedAttribute< T > >(
-                std::move( default_value ), std::move( properties ), {} );
-            register_attribute( attribute_id, typed_attribute );
+            create_attribute< Attribute, T >( attribute_name, attribute_id,
+                std::move( default_value ), std::move( properties ) );
             return attribute_id;
+        }
+
+        template < template < typename > class Attribute, typename T >
+        [[nodiscard]] geode::uuid create_attribute(
+            std::string_view attribute_name, T default_value )
+        {
+            return create_attribute< Attribute, T >( attribute_name,
+                std::move( default_value ), AttributeProperties{} );
         }
 
         /*!

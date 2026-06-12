@@ -37,13 +37,18 @@ namespace geode
         class EdgesImpl
         {
         public:
-            explicit EdgesImpl( Graph& graph )
-                : edges_( graph.edge_attribute_manager()
-                          .template find_or_create_attribute< VariableAttribute,
-                              std::array< index_t, 2 > >( "edges",
-                              std::array< index_t, 2 >{ NO_ID, NO_ID },
-                              { false, false, false } ) )
+            explicit EdgesImpl( Graph& graph ) : edges_()
             {
+                const auto edge_attribute_id =
+                    graph.edge_attribute_manager()
+                        .template create_attribute< VariableAttribute,
+                            std::array< index_t, 2 > >( "edges",
+                            std::array< index_t, 2 >{ NO_ID, NO_ID },
+                            { false, false, false } );
+                edges_ =
+                    graph.edge_attribute_manager()
+                        .template find_attribute< VariableAttribute,
+                            std::array< index_t, 2 > >( edge_attribute_id );
             }
 
             [[nodiscard]] index_t get_edge_vertex(
