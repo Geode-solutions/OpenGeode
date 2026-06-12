@@ -60,9 +60,9 @@ include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePROJ.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureGDAL.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureJson.cmake)
 
-# if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
-#     include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePybind11.cmake)
-# endif()
+if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
+    include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePybind11.cmake)
+endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
 
