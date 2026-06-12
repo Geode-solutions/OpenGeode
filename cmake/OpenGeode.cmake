@@ -67,17 +67,17 @@ if(NOT BUILD_SHARED_LIBS)
     )
 endif()
 
-# if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
-#     find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
-#     install(
-#         DIRECTORY
-#             ${PYBIND11_INSTALL_PREFIX}/
-#         DESTINATION
-#             .
-#         COMPONENT
-#             public
-#     )
-# endif()
+if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
+    find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
+    install(
+        DIRECTORY
+            ${PYBIND11_INSTALL_PREFIX}/
+        DESTINATION
+            .
+        COMPONENT
+            public
+    )
+endif()
 
 install(
     FILES 
@@ -105,10 +105,10 @@ if(OPENGEODE_WITH_TESTS)
     add_subdirectory(tests)
 endif()
 
-# if(OPENGEODE_WITH_PYTHON)
-#     message(STATUS "Configuring OpenGeode with Python bindings")
-#     add_subdirectory(bindings/python)
-# endif()
+if(OPENGEODE_WITH_PYTHON)
+    message(STATUS "Configuring OpenGeode with Python bindings")
+    add_subdirectory(bindings/python)
+endif()
 
 # Configure CPacks
 if(WIN32)
