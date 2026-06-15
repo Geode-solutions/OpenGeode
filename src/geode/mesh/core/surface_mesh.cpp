@@ -38,6 +38,7 @@
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/geometry/angle.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
@@ -1205,9 +1206,25 @@ namespace geode
         Vector3D normal;
         for( const auto& polygon : polygons_around_vertex( vertex_id ) )
         {
-            if( const auto p_normal = polygon_normal( polygon.polygon_id ) )
+            const auto polygon_id = polygon.polygon_id;
+            if( const auto p_normal = polygon_normal( polygon_id ) )
             {
-                normal = normal + p_normal.value();
+                const auto local_id =
+                    this->vertex_in_polygon( polygon_id, vertex_id );
+                const auto polygon_vertex =
+                    PolygonVertex( polygon_id, local_id.value() );
+                const auto previous_vertex =
+                    this->previous_polygon_vertex( polygon_vertex );
+                const auto next_vertex =
+                    this->next_polygon_vertex( polygon_vertex );
+                const Vector3D prev{ this->point( this->polygon_vertex(
+                                         previous_vertex ) ),
+                    this->point( vertex_id ) };
+                const Vector3D next{ this->point(
+                                         this->polygon_vertex( next_vertex ) ),
+                    this->point( vertex_id ) };
+                const auto angle = Angle::create_from_vectors( prev, next );
+                normal = normal + p_normal.value() * angle.radians();
             }
         }
         try
