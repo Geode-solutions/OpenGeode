@@ -37,6 +37,8 @@ namespace geode
         class EdgesImpl
         {
         public:
+            static constexpr auto EDGES_NAME = "edges";
+
             explicit EdgesImpl( Graph& graph ) : edges_()
             {
                 const auto edge_attribute_id =
@@ -66,6 +68,11 @@ namespace geode
                                              std::array< index_t, 2 >& array ) {
                         array.at( edge_vertex.vertex_id ) = vertex_id;
                     } );
+            }
+
+            [[nodiscard]] const uuid& edges_attribute_id() const
+            {
+                return edges_->id();
             }
 
         protected:

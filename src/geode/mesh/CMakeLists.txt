@@ -326,6 +326,7 @@ add_geode_library(
         "helpers/detail/surface_merger.hpp"
         "helpers/detail/surface_mesh_validity_fix.hpp"
         "helpers/detail/vertex_merger.hpp"
+        "helpers/detail/bitsery_mesh_helper.hpp"
     INTERNAL_HEADERS
         "core/internal/edges_impl.hpp"
         "core/internal/facet_edges_impl.hpp"

@@ -52,6 +52,8 @@ namespace geode
         public:
             static constexpr auto POINTS_NAME = "points";
 
+            PointsImpl() = default;
+
             [[nodiscard]] const Point< dimension >& get_point(
                 index_t vertex_id ) const
             {
@@ -96,6 +98,7 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, PointsImpl >{
                         { []( Archive& archive, PointsImpl& impl ) {
+                             DEBUG( "PointsImpl::serialize" );
                              archive.ext(
                                  impl.points_, bitsery::ext::StdSmartPtr{} );
                              if( !impl.points_ )
@@ -108,10 +111,13 @@ namespace geode
                                  { old_points_properties.assignable,
                                      old_points_properties.interpolable,
                                      false } );
+                             DEBUG( "PointsImpl::serialize end" );
                          },
                             []( Archive& archive, PointsImpl& impl ) {
+                                DEBUG( "PointsImpl::serialize" );
                                 archive.ext(
                                     impl.points_, bitsery::ext::StdSmartPtr{} );
+                                DEBUG( "PointsImpl::serialize end" );
                             } } } );
             }
 
@@ -134,8 +140,6 @@ namespace geode
             }
 
         protected:
-            PointsImpl() = default;
-
             template < typename Mesh >
             explicit PointsImpl( Mesh& mesh )
                 : PointsImpl( mesh.vertex_attribute_manager() )
@@ -151,6 +155,7 @@ namespace geode
             PointsImpl(
                 AttributeManager& manager, std::string_view attribute_name )
             {
+                DEBUG( "PointsImpl" );
                 const auto attribute_id =
                     manager.template create_attribute< VariableAttribute,
                         Point< dimension > >( attribute_name,

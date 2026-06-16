@@ -31,33 +31,35 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodePointSet< dimension >::Impl
-        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodePointSet< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh )
         {
+            detail::template initialize_crs< OpenGeodePointSet< dimension > >(
+                mesh );
         }
 
     private:
         Impl() = default;
 
+    private:
         template < typename Archive >
         void serialize( Archive& serializer )
         {
             serializer.ext(
                 *this, Growable< Archive, Impl >{
                            { []( Archive& archive, Impl& impl ) {
-                               archive.ext( impl,
-                                   bitsery::ext::BaseClass<
-                                       internal::PointsImpl< dimension > >{} );
+                               geode_unused( impl );
+                               internal::PointsImpl< dimension > temp;
+                               archive.object( temp );
                            } } } );
         }
     };
@@ -79,30 +81,38 @@ namespace geode
     OpenGeodePointSet< dimension >::~OpenGeodePointSet() = default;
 
     template < index_t dimension >
-    void OpenGeodePointSet< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGPointSetKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
-
-    template < index_t dimension >
     template < typename Archive >
     void OpenGeodePointSet< dimension >::serialize( Archive& serializer )
     {
         serializer.ext( *this,
             Growable< Archive, OpenGeodePointSet >{
                 { []( Archive& archive, OpenGeodePointSet& point_set ) {
+                     DEBUG( "OpenGeodePointSet::serialize" );
+                     const auto new_attribute_id =
+                         point_set.vertex_attribute_manager()
+                             .attribute_ids_with_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext( point_set,
                          bitsery::ext::BaseClass< PointSet< dimension > >{} );
                      archive.object( point_set.impl_ );
-                     point_set.impl_->initialize_crs( point_set );
                      detail::import_old_attribute< VariableAttribute,
                          Point< dimension > >(
                          point_set.vertex_attribute_manager(),
                          internal::PointsImpl< dimension >::POINTS_NAME,
-                         point_set.impl_->attribute_id() );
+                         new_attribute_id );
+                     detail::template initialize_crs<
+                         OpenGeodePointSet< dimension > >( point_set );
                  },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
+                        DEBUG( "OpenGeodePointSet::serialize" );
+                        const auto new_attribute_id =
+                            point_set.vertex_attribute_manager()
+                                .attribute_ids_with_name( internal::PointsImpl<
+                                    dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
                         archive.ext( point_set, bitsery::ext::BaseClass<
                                                     PointSet< dimension > >{} );
                         archive.object( point_set.impl_ );
@@ -110,7 +120,9 @@ namespace geode
                             Point< dimension > >(
                             point_set.vertex_attribute_manager(),
                             internal::PointsImpl< dimension >::POINTS_NAME,
-                            point_set.impl_->attribute_id() );
+                            new_attribute_id );
+                        detail::template initialize_crs<
+                            OpenGeodePointSet< dimension > >( point_set );
                     },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
                         archive.ext( point_set, bitsery::ext::BaseClass<

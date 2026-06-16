@@ -227,9 +227,11 @@ namespace geode
         std::optional< std::vector< uuid > > attribute_ids_with_name(
             std::string_view name ) const
         {
+            DEBUG( "attribute_ids_with_name" );
             std::vector< uuid > ids;
             for( const auto &[attribute_id, attribute] : attributes_ )
             {
+                DEBUG( attribute->name().value_or( "unknown" ) );
                 if( attribute->name() == name )
                 {
                     ids.push_back( attribute_id );
@@ -399,9 +401,18 @@ namespace geode
                          for( auto &[attribute_name, attribute] : old_map )
                          {
                              IdentifierBuilder builder{ *attribute };
+                             DEBUG( attribute_name );
                              builder.set_name( attribute_name );
                              impl.attributes_.emplace(
                                  attribute->id(), std::move( attribute ) );
+                         }
+                         DEBUG( "AttributeManager::serialize" );
+                         for( const auto &[current_attribute_id,
+                                  current_attribute] : impl.attributes_ )
+                         {
+                             DEBUG( current_attribute->name().value_or(
+                                 "unknown" ) );
+                             SDEBUG( current_attribute_id );
                          }
                      },
                         []( Archive &local_archive, Impl &impl ) {
@@ -431,6 +442,14 @@ namespace geode
                                             attribute->type() };
                                     }
                                 } );
+                            DEBUG( "AttributeManager::serialize" );
+                            for( const auto &[current_attribute_id,
+                                     current_attribute] : impl.attributes_ )
+                            {
+                                DEBUG( current_attribute->name().value_or(
+                                    "unknown" ) );
+                                SDEBUG( current_attribute_id );
+                            }
                         } } } );
         }
 

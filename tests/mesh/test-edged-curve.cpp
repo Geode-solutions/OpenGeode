@@ -346,9 +346,12 @@ void test()
 
     test_io( *edged_curve,
         absl::StrCat( "test.", edged_curve->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v12.", edged_curve->native_extension() ) );
-
+    DEBUG( "v12" );
+    test_backward_io( absl::StrCat( geode::DATA_PATH,
+        "backward_io/v12/test_v12.", edged_curve->native_extension() ) );
+    DEBUG( "v17" );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        edged_curve->native_extension() ) );
     test_permutation( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );
     test_clone( *edged_curve );
