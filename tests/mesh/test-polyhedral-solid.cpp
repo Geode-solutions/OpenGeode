@@ -169,7 +169,7 @@ geode::uuid test_create_edge_attribute(
         attribute->value( 0 ) == 1, "Wrong value for attribute on edge 0" );
     geode::OpenGeodeMeshException::test(
         attribute->value( 1 ) == 3, "Wrong value for attribute on edge 1" );
-    return attribute->id();
+    return attribute_id;
 }
 
 void test_polyhedron_adjacencies(

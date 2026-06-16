@@ -1491,16 +1491,19 @@ void test_backward_io()
             "mesh." );
     }
     test_registry( brep, 4, 13, 17, 7, 1, 0, 0, 0, 0, 0, 0 );
+    DEBUG( "test_backward_io OK" );
 }
 
 void test_components_filter()
 {
+    DEBUG( "test_components_filter" );
     const auto brep = geode::load_brep(
         absl::StrCat( geode::DATA_PATH, "structural_model.og_brep" ) );
     geode::OpenGeodeModelException::test(
         brep.nb_components_with_relations() == 9,
         "Wrong number of components with relations, there are ",
         brep.nb_components_with_relations(), " instead of 9" );
+    DEBUG( "test components filter OK" );
 }
 
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(

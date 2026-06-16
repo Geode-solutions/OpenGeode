@@ -87,7 +87,7 @@ namespace geode
         protected:
             RelationshipsImpl();
 
-            void initialize_attributes();
+            void initialize_attributes( const geode::uuid& id );
 
             [[nodiscard]] std::optional< index_t > vertex_id(
                 const uuid& component_id ) const;
@@ -104,13 +104,24 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, RelationshipsImpl >{
                         { []( Archive& archive, RelationshipsImpl& impl ) {
-                            archive.ext(
-                                impl.graph_, bitsery::ext::StdSmartPtr{} );
-                            archive.object( impl.uuid2index_ );
-                            archive.ext(
-                                impl.ids_, bitsery::ext::StdSmartPtr{} );
-                            impl.delete_isolated_vertices();
-                        } } } );
+                             archive.ext(
+                                 impl.graph_, bitsery::ext::StdSmartPtr{} );
+                             archive.object( impl.uuid2index_ );
+                             archive.ext(
+                                 impl.ids_, bitsery::ext::StdSmartPtr{} );
+                             impl.attribute_id_ = impl.ids_->id();
+                             archive.object( impl.attribute_id_ );
+                             impl.delete_isolated_vertices();
+                         },
+                            []( Archive& archive, RelationshipsImpl& impl ) {
+                                archive.ext(
+                                    impl.graph_, bitsery::ext::StdSmartPtr{} );
+                                archive.object( impl.uuid2index_ );
+                                archive.ext(
+                                    impl.ids_, bitsery::ext::StdSmartPtr{} );
+                                archive.object( impl.attribute_id_ );
+                                impl.delete_isolated_vertices();
+                            } } } );
             }
 
             index_t register_component( const ComponentID& id );
@@ -127,6 +138,7 @@ namespace geode
             std::unique_ptr< Graph > graph_;
             detail::UuidToIndex uuid2index_;
             std::shared_ptr< VariableAttribute< ComponentID > > ids_;
+            geode::uuid attribute_id_;
         };
     } // namespace detail
 } // namespace geode

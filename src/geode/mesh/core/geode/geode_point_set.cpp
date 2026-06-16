@@ -96,7 +96,22 @@ namespace geode
                          bitsery::ext::BaseClass< PointSet< dimension > >{} );
                      archive.object( point_set.impl_ );
                      point_set.impl_->initialize_crs( point_set );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< dimension > >(
+                         point_set.vertex_attribute_manager(),
+                         internal::PointsImpl< dimension >::POINTS_NAME,
+                         point_set.impl_->attribute_id() );
                  },
+                    []( Archive& archive, OpenGeodePointSet& point_set ) {
+                        archive.ext( point_set, bitsery::ext::BaseClass<
+                                                    PointSet< dimension > >{} );
+                        archive.object( point_set.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< dimension > >(
+                            point_set.vertex_attribute_manager(),
+                            internal::PointsImpl< dimension >::POINTS_NAME,
+                            point_set.impl_->attribute_id() );
+                    },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
                         archive.ext( point_set, bitsery::ext::BaseClass<
                                                     PointSet< dimension > >{} );

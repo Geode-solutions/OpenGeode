@@ -231,8 +231,13 @@ namespace
 
     template < geode::index_t dimension >
     void copy_polyhedra( const geode::SolidMesh< dimension >& solid,
+        const geode::SolidMesh< dimension >& solid_to_build,
         geode::SolidMeshBuilder< dimension >& builder )
     {
+        if( solid_to_build.nb_polyhedra() != 0 )
+        {
+            return;
+        }
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
             absl::FixedArray< geode::index_t > vertices(
@@ -958,8 +963,18 @@ namespace geode
             solid_mesh_.disable_facets();
         }
         VertexSetBuilder::copy( solid_mesh );
+        // if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
+        // {
+        //     do_copy_points( solid_mesh );
+        //     do_copy_polyhedra( solid_mesh );
+        // }
+        copy_points( solid_mesh, *this );
+        DEBUG( solid_mesh.impl_name().get() );
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
+        copy_polyhedra( solid_mesh, solid_mesh_, *this );
+        // solid_mesh_.polyhedron_attribute_manager().copy(
+        //     solid_mesh.polyhedron_attribute_manager() );
         if( solid_mesh.are_edges_enabled() )
         {
             solid_mesh_.copy_edges( solid_mesh, {} );
@@ -968,13 +983,6 @@ namespace geode
         {
             solid_mesh_.copy_facets( solid_mesh, {} );
         }
-        // if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
-        // {
-        //     do_copy_points( solid_mesh );
-        //     do_copy_polyhedra( solid_mesh );
-        // }
-        copy_points( solid_mesh, *this );
-        copy_polyhedra( solid_mesh, *this );
     }
 
     template class opengeode_mesh_api SolidMeshBuilder< 3 >;

@@ -38,14 +38,13 @@ void test_convert_brep_section()
         absl::StrCat( geode::DATA_PATH, "random_dfn.og_brep" ) );
     const auto section =
         std::get< 0 >( geode::convert_brep_into_section( brep, 2 ) );
-
     geode::OpenGeodeModelException::test(
         section.nb_corners() == 172, "Section should have 172 corners" );
     geode::OpenGeodeModelException::test(
         section.nb_lines() == 288, "Section should have 288 lines" );
     geode::OpenGeodeModelException::test(
         section.nb_surfaces() == 117, "Section should have 117 surfaces" );
-
+    DEBUG( "converting section into brep" );
     const auto brep2 =
         std::get< 0 >( geode::convert_section_into_brep( section, 2, 10. ) );
 

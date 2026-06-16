@@ -47,6 +47,7 @@ void test()
     //  get the block
     geode::BRepRayTracing brep_ray_tracing{ brep };
     const auto block_id = brep_ray_tracing.block_containing_point( center );
+    SDEBUG( block_id.value() );
     geode::OpenGeodeModelException::test(
         block_id.has_value(), "Failed to recover block_containing_point." );
 

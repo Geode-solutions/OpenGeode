@@ -837,14 +837,14 @@ namespace geode
         //     do_copy_points( surface_mesh );
         //     do_copy_polygons( surface_mesh );
         // }
-        surface_mesh_.polygon_attribute_manager().copy(
-            surface_mesh.polygon_attribute_manager() );
-        copy_points( surface_mesh, *this );
         copy_polygons( surface_mesh, *this );
         if( surface_mesh.are_edges_enabled() )
         {
             surface_mesh_.copy_edges( surface_mesh, {} );
         }
+        surface_mesh_.polygon_attribute_manager().copy(
+            surface_mesh.polygon_attribute_manager() );
+        copy_points( surface_mesh, *this );
     }
 
     template class opengeode_mesh_api SurfaceMeshBuilder< 2 >;

@@ -124,8 +124,12 @@ namespace geode
                 attribute_id.string(), "' already exists." );
             typed_attribute.reset( new Attribute< T >{
                 std::move( default_value ), std::move( properties ), {} } );
+            DEBUG( "create_attribute" );
+            SDEBUG( attribute_id );
+            DEBUG( attribute_name );
             IdentifierBuilder builder{ *typed_attribute };
             builder.set_name( attribute_name );
+            builder.set_id( attribute_id );
             register_attribute( typed_attribute, attribute_id );
         }
 
@@ -259,6 +263,9 @@ namespace geode
          * Get the number of elements in each attribute
          */
         [[nodiscard]] index_t nb_elements() const;
+
+        std::optional< std::vector< geode::uuid > > attribute_ids_with_name(
+            std::string_view name ) const;
 
         void copy( const AttributeManager& attribute_manager );
 

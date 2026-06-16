@@ -164,11 +164,11 @@ void test_gradient_grid3D()
     attribute->set_value( 24, 3 );
     attribute->set_value( 26, 3 );
     const auto gradient_id =
-        geode::compute_solid_scalar_function_gradient( *grid, attribute->id() );
+        geode::compute_solid_scalar_function_gradient( *grid, attribute_id );
     geode::Logger::info( "Gradient attribute name: ", gradient_id.string() );
     const auto [gradient_id_2, vertices_with_no_value] =
         geode::internal::compute_solid_scalar_function_gradient(
-            *grid, attribute->id(), { 0, 1 } );
+            *grid, attribute_id, { 0, 1 } );
     geode::Logger::info(
         "Gradient attribute name 2: ", gradient_id_2.string() );
     geode::OpenGeodeMeshException::test( vertices_with_no_value.size() == 7,

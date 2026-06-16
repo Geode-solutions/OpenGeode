@@ -202,6 +202,8 @@ namespace geode
         {
             for( auto &attribute_it : attributes_ )
             {
+                DEBUG( attribute_it.second->name().value_or( "unknown" ) );
+                SDEBUG( attribute_it.second->id() );
                 attribute_it.second->delete_elements( to_delete, key );
             }
             nb_elements_ -=
@@ -222,14 +224,34 @@ namespace geode
             return nb_elements_;
         }
 
+        std::optional< std::vector< uuid > > attribute_ids_with_name(
+            std::string_view name ) const
+        {
+            std::vector< uuid > ids;
+            for( const auto &[attribute_id, attribute] : attributes_ )
+            {
+                if( attribute->name() == name )
+                {
+                    ids.push_back( attribute_id );
+                }
+            }
+            if( ids.empty() )
+            {
+                return std::nullopt;
+            }
+            return ids;
+        }
+
         void copy( const AttributeManager::Impl &attribute_manager,
             const AttributeBase::AttributeKey &key )
         {
+            DEBUG( "copy attribute_manager" );
             nb_elements_ = attribute_manager.nb_elements_;
             for( const auto &[attribute_id, attribute] :
                 attribute_manager.attributes_ )
             {
                 const auto attribute_it = attributes_.find( attribute_id );
+                SDEBUG( attribute_id );
                 if( attribute_it != attributes_.end() )
                 {
                     try
@@ -245,6 +267,8 @@ namespace geode
                 }
                 else
                 {
+                    DEBUG( "emplace" );
+                    SDEBUG( attribute_id );
                     attributes_.emplace(
                         attribute_id, attribute->clone( key ) );
                 }
@@ -256,6 +280,7 @@ namespace geode
             const T &old2new_mapping,
             const AttributeBase::AttributeKey &key )
         {
+            DEBUG( "import" );
             for( const auto &[attribute_id, attribute_from] :
                 attribute_manager.attributes_ )
             {
@@ -275,6 +300,9 @@ namespace geode
                 }
                 else
                 {
+                    DEBUG( "import emplace" );
+                    SDEBUG( attribute_id );
+                    DEBUG( nb_elements_ );
                     attributes_.emplace(
                         attribute_id, attribute_from->extract( old2new_mapping,
                                           nb_elements_, key ) );
@@ -288,6 +316,7 @@ namespace geode
             geode::uuid attribute_id,
             const AttributeBase::AttributeKey &key )
         {
+            DEBUG( "import" );
             auto it = attribute_manager.attributes_.find( attribute_id );
             OpenGeodeBasicException::check_exception(
                 it != attribute_manager.attributes_.end(), nullptr,
@@ -317,6 +346,9 @@ namespace geode
             }
             else
             {
+                DEBUG( "import emplace" );
+                SDEBUG( attribute_id );
+                DEBUG( nb_elements_ );
                 attributes_.emplace( attribute_id,
                     it->second->extract( old2new_mapping, nb_elements_, key ) );
             }
@@ -506,14 +538,18 @@ namespace geode
     void AttributeManager::delete_elements(
         const std::vector< bool > &to_delete )
     {
+        DEBUG( "delete_elements" );
         if( absl::c_find( to_delete, true ) != to_delete.end() )
         {
+            DEBUG( to_delete.size() );
+            DEBUG( nb_elements() );
             OpenGeodeBasicException::check_assertion(
                 to_delete.size() == nb_elements(),
                 "[AttributeManager::delete_elements] Vector to_delete should "
                 "have the same size as the number of elements" );
             impl_->delete_elements( to_delete, {} );
         }
+        DEBUG( "delete_elements OK" );
     }
 
     void AttributeManager::permute_elements(
@@ -530,6 +566,12 @@ namespace geode
     void AttributeManager::copy( const AttributeManager &attribute_manager )
     {
         impl_->copy( *attribute_manager.impl_, {} );
+    }
+
+    std::optional< std::vector< geode::uuid > >
+        AttributeManager::attribute_ids_with_name( std::string_view name ) const
+    {
+        return impl_->attribute_ids_with_name( name );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,

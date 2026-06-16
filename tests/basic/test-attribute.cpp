@@ -375,71 +375,79 @@ void check_one_attribute_values( geode::AttributeManager& manager,
     {
         geode::OpenGeodeBasicException::test(
             in_att->value( i ) == out_att->value( i ),
-            "At least one value of Attribute ", attribute_id,
+            "At least one value of Attribute ", attribute_id.string(),
             " is not correct after reloading" );
     }
 }
 
-// void check_attribute_values( geode::AttributeManager& manager,
-//     geode::AttributeManager& reloaded_manager )
-// {
-//     check_one_attribute_values< bool >( manager, reloaded_manager, "bool" );
-//     check_one_attribute_values< int >( manager, reloaded_manager, "int" );
-//     check_one_attribute_values< double >( manager, reloaded_manager, "double"
-//     ); check_one_attribute_values< bool >( manager, reloaded_manager,
-//     "bool_var" ); check_one_attribute_values< Foo >( manager,
-//     reloaded_manager, "foo_cst" ); check_one_attribute_values< Foo >(
-//     manager, reloaded_manager, "foo_var" ); check_one_attribute_values< Foo
-//     >( manager, reloaded_manager, "foo_spr" );
-// }
+void check_attribute_values( geode::AttributeManager& manager,
+    geode::AttributeManager& reloaded_manager,
+    const std::array< geode::uuid, 7 >& attribute_to_check )
+{
+    check_one_attribute_values< bool >(
+        manager, reloaded_manager, attribute_to_check[0] );
+    check_one_attribute_values< int >(
+        manager, reloaded_manager, attribute_to_check[1] );
+    check_one_attribute_values< double >(
+        manager, reloaded_manager, attribute_to_check[2] );
+    check_one_attribute_values< bool >(
+        manager, reloaded_manager, attribute_to_check[3] );
+    check_one_attribute_values< Foo >(
+        manager, reloaded_manager, attribute_to_check[4] );
+    check_one_attribute_values< Foo >(
+        manager, reloaded_manager, attribute_to_check[5] );
+    check_one_attribute_values< Foo >(
+        manager, reloaded_manager, attribute_to_check[6] );
+}
 
-// void test_serialize_manager( geode::AttributeManager& manager )
-// {
-//     const auto filename = "manager.out";
-//     std::ofstream file{ filename, std::ofstream::binary };
-//     geode::TContext context{};
-//     geode::register_attribute_type< Foo, geode::Serializer >(
-//         std::get< 0 >( context ), "Foo" );
-//     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
-//     geode::register_attribute_type< std::array< double, 2 >,
-//         geode::Serializer >( std::get< 0 >( context ), "array_double_2" );
-//     geode::Serializer archive{ context, file };
-//     archive.object( manager );
-//     archive.adapter().flush();
-//     geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
-//         "Error while writing file: ", filename );
+void test_serialize_manager( geode::AttributeManager& manager,
+    const std::array< geode::uuid, 7 >& attribute_to_check )
+{
+    const auto filename = "manager.out";
+    std::ofstream file{ filename, std::ofstream::binary };
+    geode::TContext context{};
+    geode::register_attribute_type< Foo, geode::Serializer >(
+        std::get< 0 >( context ), "Foo" );
+    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
+    geode::register_attribute_type< std::array< double, 2 >,
+        geode::Serializer >( std::get< 0 >( context ), "array_double_2" );
+    geode::Serializer archive{ context, file };
+    archive.object( manager );
+    archive.adapter().flush();
+    geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
+        "Error while writing file: ", filename );
 
-//     std::ifstream infile{ filename, std::ifstream::binary };
-//     geode::AttributeManager reloaded_manager;
-//     geode::TContext reload_context{};
-//     geode::register_attribute_type< std::array< double, 30 >,
-//         geode::Serializer >( std::get< 0 >( context ), "array_double_30" );
-//     geode::register_basic_deserialize_pcontext(
-//         std::get< 0 >( reload_context ) );
-//     geode::register_attribute_type< Foo, geode::Deserializer >(
-//         std::get< 0 >( reload_context ), "Foo" );
-//     geode::register_attribute_type< std::array< double, 2 >,
-//         geode::Deserializer >(
-//         std::get< 0 >( reload_context ), "array_double_2" );
-//     geode::Deserializer unarchive{ reload_context, infile };
-//     unarchive.object( reloaded_manager );
-//     const auto& adapter = unarchive.adapter();
-//     geode::OpenGeodeBasicException::test(
-//         adapter.error() == bitsery::ReaderError::NoError
-//             && adapter.isCompletedSuccessfully()
-//             && std::get< 1 >( context ).isValid(),
-//         "Error while reading file: ", filename );
+    std::ifstream infile{ filename, std::ifstream::binary };
+    geode::AttributeManager reloaded_manager;
+    geode::TContext reload_context{};
+    geode::register_attribute_type< std::array< double, 30 >,
+        geode::Serializer >( std::get< 0 >( context ), "array_double_30" );
+    geode::register_basic_deserialize_pcontext(
+        std::get< 0 >( reload_context ) );
+    geode::register_attribute_type< Foo, geode::Deserializer >(
+        std::get< 0 >( reload_context ), "Foo" );
+    geode::register_attribute_type< std::array< double, 2 >,
+        geode::Deserializer >(
+        std::get< 0 >( reload_context ), "array_double_2" );
+    geode::Deserializer unarchive{ reload_context, infile };
+    unarchive.object( reloaded_manager );
+    const auto& adapter = unarchive.adapter();
+    geode::OpenGeodeBasicException::test(
+        adapter.error() == bitsery::ReaderError::NoError
+            && adapter.isCompletedSuccessfully()
+            && std::get< 1 >( context ).isValid(),
+        "Error while reading file: ", filename );
 
-//     geode::OpenGeodeBasicException::test(
-//         reloaded_manager.nb_elements() == manager.nb_elements(),
-//         "Number of elements in reloaded AttributeManager is not "
-//         "correct" );
-//     geode::OpenGeodeBasicException::test(
-//         managers_have_same_attributes( manager, reloaded_manager ),
-//         "Number and names of attributes in reloaded AttributeManager "
-//         "are not correct" );
-//     check_attribute_values( manager, reloaded_manager );
-// }
+    geode::OpenGeodeBasicException::test(
+        reloaded_manager.nb_elements() == manager.nb_elements(),
+        "Number of elements in reloaded AttributeManager is not "
+        "correct" );
+    geode::OpenGeodeBasicException::test(
+        managers_have_same_attributes( manager, reloaded_manager ),
+        "Number and names of attributes in reloaded AttributeManager "
+        "are not correct" );
+    check_attribute_values( manager, reloaded_manager, attribute_to_check );
+}
 
 void test_attribute_types( geode::AttributeManager& manager,
     const geode::uuid& bool_variable_attribute_id )
@@ -729,8 +737,11 @@ void test()
     test_delete_attribute_elements( manager );
     test_sparse_attribute_after_element_deletion(
         manager, double_sparse_attribute_id );
-
-    // test_serialize_manager( manager );
+    std::array< geode::uuid, 7 > attribute_to_check{ constant_attribute_id,
+        int_variable_attribute_id, double_sparse_attribute_id,
+        bool_variable_attribute_id, foo_variable_attribute_id,
+        foo_constant_attribute_id, foo_sparse_attribute_id };
+    test_serialize_manager( manager, attribute_to_check );
     test_copy_manager( manager, bool_variable_attribute_id );
     test_import_manager( manager, bool_variable_attribute_id,
         array_double_attribute_id, double_sparse_attribute_id );

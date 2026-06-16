@@ -55,18 +55,12 @@ namespace geode
             [[nodiscard]] const Point< dimension >& get_point(
                 index_t vertex_id ) const
             {
-                DEBUG( "get_point" );
-                SDEBUG( points_->id() );
                 return points_->value( vertex_id );
             }
 
             void set_point( index_t vertex_id, Point< dimension > point )
             {
-                DEBUG( "set_point" );
-                SDEBUG( point );
                 points_->set_value( vertex_id, std::move( point ) );
-                SDEBUG( points_->id() );
-                SDEBUG( points_->value( vertex_id ) );
             }
 
             [[nodiscard]] index_t nb_points() const
@@ -77,6 +71,11 @@ namespace geode
             [[nodiscard]] std::string_view attribute_name() const
             {
                 return points_->name().value();
+            }
+
+            [[nodiscard]] const uuid& attribute_id() const
+            {
+                return points_->id();
             }
 
             template < typename Mesh >
@@ -141,8 +140,6 @@ namespace geode
             explicit PointsImpl( Mesh& mesh )
                 : PointsImpl( mesh.vertex_attribute_manager() )
             {
-                DEBUG( "PointsImpl::PointsImpl" );
-                DEBUG( "register_as_active_crs" );
                 register_as_active_crs( mesh );
             }
 

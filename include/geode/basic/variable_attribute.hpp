@@ -403,7 +403,9 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete,
             AttributeBase::AttributeKey /*key*/ ) override
         {
+            DEBUG( "delete_elements" );
             delete_vector_elements( to_delete, values_ );
+            DEBUG( "delete_elements OK" );
         }
 
         void permute_elements( absl::Span< const index_t > permutation,

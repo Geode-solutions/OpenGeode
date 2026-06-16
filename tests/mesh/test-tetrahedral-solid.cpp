@@ -368,6 +368,8 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
             "Error in facet attribute transfer during cloning" );
         const auto from_vertices = solid.facets().facet_vertices( f );
         const auto to_vertices = solid4.facets().facet_vertices( f );
+        DEBUG( from_vertices.size() );
+        DEBUG( to_vertices.size() );
         for( const auto v : geode::Indices{ from_vertices } )
         {
             geode::OpenGeodeMeshException::test(

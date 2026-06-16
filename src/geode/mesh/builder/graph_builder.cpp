@@ -178,7 +178,9 @@ namespace geode
             return old2new;
         }
         update_edges_around( graph_, *this, old2new );
+        DEBUG( "edge attribute manager" );
         graph_.edge_attribute_manager().delete_elements( to_delete );
+        DEBUG( "done" );
         do_delete_edges( to_delete, old2new );
         return old2new;
     }

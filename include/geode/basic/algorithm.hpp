@@ -56,6 +56,13 @@ namespace geode
     index_t delete_vector_elements(
         const DeleteContainer& to_delete, ValueContainer& values )
     {
+        DEBUG( "delete_vector_elements" );
+        DEBUG( to_delete.size() );
+        DEBUG( values.size() );
+        if( values.empty() )
+        {
+            exit( 1 );
+        }
         OpenGeodeBasicException::check_assertion(
             to_delete.size() == values.size(),
             "[delete_vector_elements] Number of elements in the two vectors "

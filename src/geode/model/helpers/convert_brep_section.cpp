@@ -62,7 +62,9 @@ namespace
             mappings[geode::Line< dimension >::component_type_static()] );
         geode::detail::copy_surface_components( from, builder_to,
             mappings[geode::Surface< dimension >::component_type_static()] );
+        DEBUG( "copy relationships" );
         builder_to.copy_relationships( mappings, from );
+        DEBUG( "copy relationships ok" );
         return mappings;
     }
 
@@ -481,8 +483,10 @@ namespace geode
     {
         Section section;
         SectionBuilder builder{ section };
+        DEBUG( "copy components" );
         auto mappings =
             copy_components< BRep, SectionBuilder >( brep, builder );
+        DEBUG( "copy components ok" );
         for( const auto& corner : brep.corners() )
         {
             builder.update_corner_mesh(

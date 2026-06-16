@@ -60,7 +60,8 @@ namespace geode
 
         Impl() : RelationshipsImpl()
         {
-            initialize_relation_attribute();
+            geode::uuid relation_attribute_id;
+            initialize_relation_attribute( relation_attribute_id );
         }
 
         RelationType relation_type( const index_t edge_id ) const
@@ -159,7 +160,8 @@ namespace geode
         void copy( const Impl& impl, const ModelCopyMapping& mapping )
         {
             detail::RelationshipsImpl::copy( impl, mapping );
-            initialize_relation_attribute();
+            const auto relation_attribute_id = impl.relation_type_->id();
+            initialize_relation_attribute( relation_attribute_id );
         }
 
         void save( std::string_view directory ) const
@@ -211,8 +213,12 @@ namespace geode
                              impl.relation_type_, bitsery::ext::StdSmartPtr{} );
                          archive.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                          impl.graph_ = graph.clone();
-                         impl.initialize_attributes();
-                         impl.initialize_relation_attribute();
+                         geode::uuid new_attribute_id;
+                         DEBUG( "serialize" );
+                         SDEBUG( new_attribute_id );
+                         geode::uuid new_relation_id;
+                         impl.initialize_attributes( new_attribute_id );
+                         impl.initialize_relation_attribute( new_relation_id );
                          impl.delete_isolated_vertices();
                      },
                         []( Archive& archive, Impl& impl ) {
@@ -234,16 +240,22 @@ namespace geode
                         } } } );
         }
 
-        void initialize_relation_attribute()
+        void initialize_relation_attribute( const geode::uuid& id )
         {
-            const auto relation_type_attribute_id =
-                relation_attribute_manager()
-                    .create_attribute< VariableAttribute, RelationType >(
-                        "relation_type", NO_ID );
+            if( relation_attribute_manager().attribute_exists( id ) )
+            {
+                relation_type_ =
+                    relation_attribute_manager()
+                        .find_attribute< VariableAttribute, RelationType >(
+                            id );
+                return;
+            }
+            relation_attribute_manager()
+                .create_attribute< VariableAttribute, RelationType >(
+                    "relation_type", id, NO_ID );
             relation_type_ =
                 relation_attribute_manager()
-                    .find_attribute< VariableAttribute, RelationType >(
-                        relation_type_attribute_id );
+                    .find_attribute< VariableAttribute, RelationType >( id );
         }
 
         std::string relation_to_string( index_t relation_type ) const

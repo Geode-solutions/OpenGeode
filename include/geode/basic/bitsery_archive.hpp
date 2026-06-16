@@ -31,6 +31,8 @@
 #include <bitsery/ext/inheritance.h>
 #include <bitsery/ext/pointer.h>
 
+#include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/range.hpp>
 
@@ -76,6 +78,40 @@ namespace geode
 
         static void register_deserialize_pcontext( PContext &context );
     };
+} // namespace geode
+
+namespace geode
+{
+    namespace detail
+    {
+        template < template < typename > class Attribute, typename T >
+        void import_old_attribute( AttributeManager &manager,
+            std::string_view old_attribute_name,
+            geode::uuid new_attribute_id )
+        {
+            const auto ids =
+                manager.attribute_ids_with_name( old_attribute_name ).value();
+            geode::uuid old_attribute_id;
+            for( const auto &id : ids )
+            {
+                if( id == new_attribute_id )
+                {
+                    continue;
+                }
+                old_attribute_id = id;
+            }
+            auto old_attribute = manager.read_attribute< T >( ids.at( 0 ) );
+            auto new_attribute =
+                manager.find_attribute< Attribute, T >( new_attribute_id );
+            manager.resize( old_attribute->nb_items() );
+            for( const auto index : geode::Range{ old_attribute->nb_items() } )
+            {
+                new_attribute->set_value(
+                    index, old_attribute->value( index ) );
+            }
+            manager.delete_attribute( old_attribute_id );
+        }
+    } // namespace detail
 } // namespace geode
 
 namespace bitsery

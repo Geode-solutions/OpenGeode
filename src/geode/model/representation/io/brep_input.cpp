@@ -39,37 +39,36 @@ namespace geode
     BRep load_brep( std::string_view filename )
     {
         constexpr auto TYPE = "BRep";
-        try
-        {
-            auto brep = detail::geode_object_input_impl< BRepInputFactory >(
-                TYPE, filename );
-            auto message = absl::StrCat( TYPE, " has: " );
-            detail::add_to_message( message, brep.nb_blocks(), " Blocks, " );
-            detail::add_to_message(
-                message, brep.nb_surfaces(), " Surfaces, " );
-            detail::add_to_message( message, brep.nb_lines(), " Lines, " );
-            detail::add_to_message( message, brep.nb_corners(), " Corners, " );
-            detail::add_to_message(
-                message, brep.nb_model_boundaries(), " ModelBoundaries, " );
-            detail::add_to_message(
-                message, brep.nb_corner_collections(), " CornerCollections, " );
-            detail::add_to_message(
-                message, brep.nb_line_collections(), " LineCollections, " );
-            detail::add_to_message( message, brep.nb_surface_collections(),
-                " SurfaceCollections, " );
-            detail::add_to_message(
-                message, brep.nb_block_collections(), " BlockCollections" );
-            Logger::info( message );
-            return brep;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            print_available_extensions< BRepInputFactory >( TYPE );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::data,
-                "Cannot load BRep from file: ", filename };
-        }
+        // try
+        // {
+        auto brep = detail::geode_object_input_impl< BRepInputFactory >(
+            TYPE, filename );
+        auto message = absl::StrCat( TYPE, " has: " );
+        detail::add_to_message( message, brep.nb_blocks(), " Blocks, " );
+        detail::add_to_message( message, brep.nb_surfaces(), " Surfaces, " );
+        detail::add_to_message( message, brep.nb_lines(), " Lines, " );
+        detail::add_to_message( message, brep.nb_corners(), " Corners, " );
+        detail::add_to_message(
+            message, brep.nb_model_boundaries(), " ModelBoundaries, " );
+        detail::add_to_message(
+            message, brep.nb_corner_collections(), " CornerCollections, " );
+        detail::add_to_message(
+            message, brep.nb_line_collections(), " LineCollections, " );
+        detail::add_to_message(
+            message, brep.nb_surface_collections(), " SurfaceCollections, " );
+        detail::add_to_message(
+            message, brep.nb_block_collections(), " BlockCollections" );
+        Logger::info( message );
+        return brep;
+        // }
+        // catch( const OpenGeodeException& e )
+        // {
+        // Logger::error( e.what() );
+        // print_available_extensions< BRepInputFactory >( TYPE );
+        // throw OpenGeodeModelException{ nullptr,
+        // OpenGeodeException::TYPE::data,
+        //     "Cannot load BRep from file: ", filename };
+        // }
     }
 
     AdditionalFiles brep_additional_files( std::string_view filename )
@@ -81,17 +80,16 @@ namespace geode
 
     Percentage is_brep_loadable( std::string_view filename )
     {
-        try
-        {
-            const auto input =
-                detail::geode_object_input_reader< BRepInputFactory >(
-                    filename );
-            return input->is_loadable();
-        }
-        catch( ... )
-        {
-            return Percentage{ 0 };
-        }
+        // try
+        // {
+        const auto input =
+            detail::geode_object_input_reader< BRepInputFactory >( filename );
+        return input->is_loadable();
+        // }
+        // catch( ... )
+        // {
+        //     return Percentage{ 0 };
+        // }
     }
 
     index_t brep_object_priority( std::string_view filename )

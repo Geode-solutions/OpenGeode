@@ -96,19 +96,23 @@ namespace
         void initialize_attribute_and_id(
             const geode::uuid& scalar_function_id )
         {
+            DEBUG( "initialize_attribute_and_id" );
+            SDEBUG( scalar_function_id );
+            DEBUG( mesh_.vertex_attribute_manager().attribute_exists(
+                scalar_function_id ) );
             geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_exists(
                     scalar_function_id ),
                 nullptr, geode::OpenGeodeException::TYPE::data,
                 "[compute_scalar_function_gradient] No attribute exists with "
-                "given name." );
+                "given id." );
             geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_type(
                     scalar_function_id )
                     == typeid( double ).name(),
                 nullptr, geode::OpenGeodeException::TYPE::data,
                 "[compute_scalar_function_gradient] The attribute linked to "
-                "given name is not scalar." );
+                "given id is not scalar." );
             scalar_function_ =
                 mesh_.vertex_attribute_manager()
                     .template read_attribute< double >( scalar_function_id );
