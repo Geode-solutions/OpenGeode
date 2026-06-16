@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/container/linked_hash_map.h>
 
 #include <geode/basic/uuid.hpp>
 
@@ -71,9 +71,9 @@ namespace geode
 
     struct ModelComponentMeshEdges
     {
-        using LineEdges = absl::flat_hash_map< uuid, std::vector< index_t > >;
+        using LineEdges = absl::linked_hash_map< uuid, std::vector< index_t > >;
         using SurfaceEdges =
-            absl::flat_hash_map< uuid, std::vector< PolygonEdge > >;
+            absl::linked_hash_map< uuid, std::vector< PolygonEdge > >;
         std::array< index_t, 2 > edge_unique_vertices;
         LineEdges line_edges;
         SurfaceEdges surface_edges;
@@ -99,7 +99,7 @@ namespace geode
     struct BRepComponentMeshEdges : public ModelComponentMeshEdges
     {
         using BlockEdges =
-            absl::flat_hash_map< uuid, std::vector< PolyhedronFacetEdge > >;
+            absl::linked_hash_map< uuid, std::vector< PolyhedronFacetEdge > >;
 
         BlockEdges block_edges;
     };

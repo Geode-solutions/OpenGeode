@@ -66,7 +66,7 @@ namespace geode
         template < typename Mesh >
         class Propagator
         {
-            OPENGEODE_DISABLE_COPY_AND_MOVE( Propagator< Mesh > );
+            OPENGEODE_DISABLE_COPY_AND_MOVE( Propagator );
 
         public:
             virtual ~Propagator() = default;

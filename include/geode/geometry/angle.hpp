@@ -27,11 +27,19 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+    ALIAS_3D( Vector );
+} // namespace geode
+
+namespace geode
+{
     class opengeode_geometry_api Angle
     {
     public:
         [[nodiscard]] static Angle create_from_radians( double radians );
         [[nodiscard]] static Angle create_from_degrees( double degrees );
+        [[nodiscard]] static Angle create_from_vectors(
+            const Vector3D& vector1, const Vector3D& vector2 );
 
         [[nodiscard]] double radians() const;
         [[nodiscard]] double degrees() const;
@@ -57,7 +65,7 @@ namespace geode
         [[nodiscard]] Angle normalized_between_0_and_pi() const;
 
     private:
-        explicit Angle( double radians ) : radians_( radians ) {}
+        explicit Angle( double radians );
 
     private:
         double radians_;

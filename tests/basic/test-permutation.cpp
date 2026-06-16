@@ -26,7 +26,7 @@
 
 #include <geode/tests/common.hpp>
 
-void test()
+void test_single_permutation()
 {
     std::vector< double > data{ 0.1, 0.2, 0.3, 0.4, 0.5 };
     std::vector< geode::index_t > permutation{ 2, 4, 3, 0, 1 };
@@ -40,6 +40,23 @@ void test()
     std::vector< geode::index_t > answer_permutation{ 3, 4, 0, 2, 1 };
     geode::OpenGeodeBasicException::test(
         old2new == answer_permutation, "Wrong permutation old2new" );
+}
+
+void test_multiple_permutation()
+{
+    std::vector< double > data{ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 };
+    std::vector< geode::index_t > permutation{ 1, 2, 0 };
+
+    geode::multiple_permute< 2 >( data, permutation );
+    std::vector< double > data_answer{ 0.3, 0.4, 0.5, 0.6, 0.1, 0.2 };
+    geode::OpenGeodeBasicException::test(
+        data == data_answer, "Wrong permutation data" );
+}
+
+void test()
+{
+    test_single_permutation();
+    test_multiple_permutation();
 }
 
 OPENGEODE_TEST( "permutation" )

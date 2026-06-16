@@ -90,7 +90,7 @@ namespace geode
         template < index_t dimension >
         class SurfaceIdentifier
         {
-            OPENGEODE_DISABLE_COPY_AND_MOVE( SurfaceIdentifier< dimension > );
+            OPENGEODE_DISABLE_COPY_AND_MOVE( SurfaceIdentifier );
 
         public:
             explicit SurfaceIdentifier(

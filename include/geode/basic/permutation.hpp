@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <absl/algorithm/container.h>
 #include <absl/container/fixed_array.h>
 #include <absl/types/span.h>
 
@@ -37,9 +38,18 @@
 
 namespace geode
 {
-    template < typename Container >
-    void permute( Container& data, absl::Span< const index_t > permutation )
+    template < index_t nb_elements, typename Container >
+    void multiple_permute(
+        Container& data, absl::Span< const index_t > permutation )
     {
+        OpenGeodeBasicException::check_exception(
+            permutation.size() == data.size() / nb_elements, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[multiple_permute] Data and permutation should have the same "
+            "size" );
+        const auto index = []( const auto i ) {
+            return nb_elements * i;
+        };
         std::vector< bool > visited( permutation.size(), false );
         for( const auto p : Indices{ permutation } )
         {
@@ -49,17 +59,30 @@ namespace geode
             }
             visited[p] = true;
             auto i = p;
-            auto temp = data[i];
+            absl::FixedArray< typename Container::value_type, nb_elements >
+                temp( std::make_move_iterator( data.begin() + index( i ) ),
+                    std::make_move_iterator(
+                        data.begin() + index( i ) + nb_elements ) );
             auto j = permutation[p];
             while( j != p )
             {
-                data[i] = std::move( data[j] );
+                const auto from = index( j );
+                const auto to = index( i );
+                std::move( data.begin() + from,
+                    data.begin() + from + nb_elements, data.begin() + to );
                 visited[j] = true;
                 i = j;
                 j = permutation[i];
             }
-            data[i] = std::move( temp );
+            const auto to = index( i );
+            absl::c_move( temp, data.begin() + to );
         }
+    }
+
+    template < typename Container >
+    void permute( Container& data, absl::Span< const index_t > permutation )
+    {
+        multiple_permute< 1 >( data, permutation );
     }
 
     [[nodiscard]] std::vector< index_t > opengeode_basic_api

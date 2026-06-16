@@ -305,22 +305,23 @@ namespace geode
     private:
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
+            absl::MutexLock lock{ mutex_ };
             {
-                absl::ReaderMutexLock read_lock{ mutex_ };
-                if( aabb_trees_.contains( surface.id() ) )
+                const auto it = aabb_trees_.find( surface.id() );
+                if( it != aabb_trees_.end() )
                 {
-                    return aabb_trees_.at( surface.id() );
+                    return *it->second;
                 }
             }
-            absl::MutexLock lock{ mutex_ };
-            return aabb_trees_
-                .emplace( surface.id(), create_aabb_tree( surface.mesh() ) )
-                .first->second;
+            const auto [it, inserted] = aabb_trees_.emplace(
+                surface.id(), std::make_unique< AABBTree3D >(
+                                  create_aabb_tree( surface.mesh() ) ) );
+            return *it->second;
         }
 
     private:
         const BRep& brep_;
-        absl::flat_hash_map< uuid, AABBTree3D > aabb_trees_;
+        absl::flat_hash_map< uuid, std::unique_ptr< AABBTree3D > > aabb_trees_;
         absl::Mutex mutex_;
     };
 

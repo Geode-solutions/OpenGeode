@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/container/linked_hash_map.h>
 
 #include <geode/basic/uuid.hpp>
 
@@ -58,7 +58,7 @@ namespace geode
     struct ModelComponentMeshPolygons
     {
         using SurfacePolygons =
-            absl::flat_hash_map< uuid, std::vector< index_t > >;
+            absl::linked_hash_map< uuid, std::vector< index_t > >;
         SurfacePolygons surface_polygons;
     };
 
@@ -78,7 +78,7 @@ namespace geode
     struct BRepComponentMeshPolygons : public ModelComponentMeshPolygons
     {
         using BlockPolygons =
-            absl::flat_hash_map< uuid, std::vector< PolyhedronFacet > >;
+            absl::linked_hash_map< uuid, std::vector< PolyhedronFacet > >;
         BlockPolygons block_polygons;
     };
 
