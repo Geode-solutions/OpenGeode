@@ -1209,14 +1209,9 @@ namespace geode
             const auto polygon_id = polygon.polygon_id;
             if( const auto p_normal = polygon_normal( polygon_id ) )
             {
-                const auto local_id =
-                    this->vertex_in_polygon( polygon_id, vertex_id );
-                const auto polygon_vertex =
-                    PolygonVertex( polygon_id, local_id.value() );
                 const auto previous_vertex =
-                    this->previous_polygon_vertex( polygon_vertex );
-                const auto next_vertex =
-                    this->next_polygon_vertex( polygon_vertex );
+                    this->previous_polygon_vertex( polygon );
+                const auto next_vertex = this->next_polygon_vertex( polygon );
                 const Vector3D prev{ this->point( this->polygon_vertex(
                                          previous_vertex ) ),
                     this->point( vertex_id ) };
