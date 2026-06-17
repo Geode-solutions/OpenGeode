@@ -237,6 +237,26 @@ void test_io(
     }
 }
 
+void test_backward_io( const std::string& filename )
+{
+    DEBUG( "test_backward_io" );
+    const auto surface = geode::load_triangulated_surface< 3 >( filename );
+    geode::OpenGeodeMeshException::test( surface->nb_vertices() == 5,
+        "Backward TriangulatedSurface should have 5 vertices" );
+    geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
+        "Backward TriangulatedSurface should have 3 polygons" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_adjacent( { 0, 1 } ) == 1,
+        "TriangulatedSurface adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test( surface->edges().nb_edges() == 7,
+        "Backward TriangulatedSurface should have 7 edges" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_around_vertex( 0 ).value().polygon_id == 0,
+        "Wrong polygon_around_vertex for backward triangulated surface" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 0 ).size() == 1,
+        "Wrong polygons_around_vertex for backward triangulated surface" );
+}
 void test_clone( const geode::TriangulatedSurface3D& surface )
 {
     auto attr_from_id =
@@ -321,7 +341,8 @@ void test()
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
     test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        surface->native_extension() ) );
     test_permutation( *surface, *builder );
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );

@@ -672,11 +672,12 @@ void test()
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ),
         facet_attribute_id );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v7.", polyhedral_solid->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v12.", polyhedral_solid->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v7/test_v7.",
+        polyhedral_solid->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH,
+        "backward_io/v12/test_v12.", polyhedral_solid->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        polyhedral_solid->native_extension() ) );
     test_permutation( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder, edge_attribute_id );
     test_clone( *polyhedral_solid, vertex_attribute_id );

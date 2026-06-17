@@ -47,6 +47,12 @@ namespace geode
                 mesh );
         }
 
+        Impl( OpenGeodePointSet< dimension >& mesh, BITSERY )
+        {
+            detail::template initialize_crs< OpenGeodePointSet< dimension > >(
+                mesh );
+        }
+
     private:
         Impl() = default;
 
@@ -66,6 +72,12 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodePointSet< dimension >::OpenGeodePointSet() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodePointSet< dimension >::OpenGeodePointSet( BITSERY bitsery )
+        : impl_( *this, bitsery )
     {
     }
 
@@ -101,9 +113,10 @@ namespace geode
                          Point< dimension > >(
                          point_set.vertex_attribute_manager(),
                          internal::PointsImpl< dimension >::POINTS_NAME,
-                         new_attribute_id );
+                         new_attribute_id, point_set.nb_vertices() );
                      detail::template initialize_crs<
-                         OpenGeodePointSet< dimension > >( point_set );
+                         OpenGeodePointSet< dimension > >(
+                         point_set, new_attribute_id );
                  },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
                         DEBUG( "OpenGeodePointSet::serialize" );
@@ -120,9 +133,10 @@ namespace geode
                             Point< dimension > >(
                             point_set.vertex_attribute_manager(),
                             internal::PointsImpl< dimension >::POINTS_NAME,
-                            new_attribute_id );
+                            new_attribute_id, point_set.nb_vertices() );
                         detail::template initialize_crs<
-                            OpenGeodePointSet< dimension > >( point_set );
+                            OpenGeodePointSet< dimension > >(
+                            point_set, new_attribute_id );
                     },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
                         archive.ext( point_set, bitsery::ext::BaseClass<

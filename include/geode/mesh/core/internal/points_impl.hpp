@@ -54,6 +54,26 @@ namespace geode
 
             PointsImpl() = default;
 
+            PointsImpl(
+                AttributeManager& manager, std::string_view attribute_name )
+            {
+                DEBUG( "PointsImpl" );
+                const auto attribute_id =
+                    manager.template create_attribute< VariableAttribute,
+                        Point< dimension > >( attribute_name,
+                        Point< dimension >{}, { false, false, false } );
+                points_ = manager.template find_attribute< VariableAttribute,
+                    Point< dimension > >( attribute_id );
+            }
+
+            PointsImpl(
+                AttributeManager& manager, const geode::uuid& attribute_id )
+            {
+                DEBUG( "PointsImpl" );
+                points_ = manager.template find_attribute< VariableAttribute,
+                    Point< dimension > >( attribute_id );
+            }
+
             [[nodiscard]] const Point< dimension >& get_point(
                 index_t vertex_id ) const
             {
@@ -134,34 +154,9 @@ namespace geode
                     std::shared_ptr< CoordinateReferenceSystem< dimension > >{
                         std::make_shared<
                             AttributeCoordinateReferenceSystem< dimension > >(
-                            mesh.vertex_attribute_manager() ) } );
+                            mesh.vertex_attribute_manager(), "points" ) } );
                 crs_manager_builder.set_active_coordinate_reference_system(
                     POINTS_NAME );
-            }
-
-        protected:
-            template < typename Mesh >
-            explicit PointsImpl( Mesh& mesh )
-                : PointsImpl( mesh.vertex_attribute_manager() )
-            {
-                register_as_active_crs( mesh );
-            }
-
-            explicit PointsImpl( AttributeManager& manager )
-                : PointsImpl{ manager, POINTS_NAME }
-            {
-            }
-
-            PointsImpl(
-                AttributeManager& manager, std::string_view attribute_name )
-            {
-                DEBUG( "PointsImpl" );
-                const auto attribute_id =
-                    manager.template create_attribute< VariableAttribute,
-                        Point< dimension > >( attribute_name,
-                        Point< dimension >{}, { false, false, false } );
-                points_ = manager.template find_attribute< VariableAttribute,
-                    Point< dimension > >( attribute_id );
             }
 
         private:

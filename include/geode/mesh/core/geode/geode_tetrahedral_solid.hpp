@@ -25,6 +25,7 @@
 
 #include <array>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -51,6 +52,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeTetrahedralSolid();
+        OpenGeodeTetrahedralSolid( BITSERY );
         OpenGeodeTetrahedralSolid( OpenGeodeTetrahedralSolid&& other ) noexcept;
         OpenGeodeTetrahedralSolid& operator=(
             OpenGeodeTetrahedralSolid&& other ) noexcept;
@@ -85,10 +87,6 @@ namespace geode
         }
 
     public:
-        void set_vertex( index_t vertex_id,
-            Point< dimension > point,
-            OGTetrahedralSolidKey /*key*/ );
-
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
             OGTetrahedralSolidKey /*key*/ );

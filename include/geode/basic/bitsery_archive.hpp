@@ -48,6 +48,11 @@ namespace geode
     using Deserializer =
         bitsery::Deserializer< bitsery::InputStreamAdapter, TContext >;
 
+    enum struct BITSERY
+    {
+        constructor
+    };
+
     /*!
      * Register all the information needed by Bitsery to serialize the objects
      * in the basic library.
@@ -87,8 +92,10 @@ namespace geode
         template < template < typename > class Attribute, typename T >
         void import_old_attribute( AttributeManager &manager,
             std::string_view old_attribute_name,
-            geode::uuid new_attribute_id )
+            geode::uuid new_attribute_id,
+            index_t attribute_size )
         {
+            DEBUG( "import_old_attribute" );
             const auto ids =
                 manager.attribute_ids_with_name( old_attribute_name ).value();
             DEBUG( ids.size() );
@@ -106,14 +113,14 @@ namespace geode
                 manager.read_attribute< T >( old_attribute_id );
             auto new_attribute =
                 manager.find_attribute< Attribute, T >( new_attribute_id );
-            manager.resize( old_attribute->nb_items() );
-            for( const auto index : geode::Range{ old_attribute->nb_items() } )
+            manager.resize( attribute_size );
+            for( const auto index : geode::Range{ attribute_size } )
             {
-                SDEBUG( old_attribute->value( index ) );
                 new_attribute->set_value(
                     index, old_attribute->value( index ) );
             }
             manager.delete_attribute( old_attribute_id );
+            DEBUG( "import_old_attribute done" );
         }
     } // namespace detail
 } // namespace geode

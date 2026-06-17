@@ -323,6 +323,21 @@ void test_io(
         "Reloaded TetrahedralSolid should have 3 polyhedra" );
 }
 
+void test_backward_io( const std::string& filename )
+{
+    DEBUG( "test_backward_io" );
+    const auto solid = geode::load_tetrahedral_solid< 3 >( filename );
+    geode::OpenGeodeMeshException::test( solid->nb_vertices() == 6,
+        "Backward TetrahedralSolid should have 6 vertices" );
+    geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 3,
+        "Backward TetrahedralSolid should have 3 polyhedra" );
+    geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 12,
+        "Backward TetrahedralSolid should have 12 edges" );
+    geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 10,
+        "Backward TetrahedralSolid should have 10 facets" );
+    test_is_on_border( *solid );
+}
+
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
     auto attr_from_id =
@@ -443,7 +458,8 @@ void test()
     test_polyhedron_adjacencies( *solid, *builder );
     test_is_on_border( *solid );
     test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
-
+    test_backward_io( absl::StrCat(
+        geode::DATA_PATH, "backward_io/v17/v17.", solid->native_extension() ) );
     test_permutation( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );

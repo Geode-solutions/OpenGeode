@@ -283,6 +283,11 @@ void test_backward_io( const std::string& filename )
     const auto curve = geode::load_edged_curve< 3 >( filename );
     geode::OpenGeodeMeshException::test( curve->nb_edges() == 4,
         "Backward EdgedCurve has wrong number of edges" );
+    const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
+    geode::OpenGeodeMeshException::test( curve->point( 1 ) == answer,
+        "Backward EdgedCurve vertex coordinates are not correct" );
+    geode::OpenGeodeMeshException::test( curve->edge_vertex( { 0, 0 } ) == 0,
+        "Backward EdgedCurve edge vertex index is not correct" );
     geode::OpenGeodeMeshException::test( curve->nb_vertices() == 4,
         "Backward EdgedCurve has wrong number of vertices" );
 }

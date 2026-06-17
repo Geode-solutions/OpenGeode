@@ -34,6 +34,7 @@
 #include <geode/mesh/core/internal/grid_impl.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
 #include <geode/mesh/core/regular_grid_surface.hpp>
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
 
 namespace
 {
@@ -47,15 +48,21 @@ namespace
 
 namespace geode
 {
-    class OpenGeodeRegularGrid< 2 >::Impl : public internal::PointsImpl< 2 >,
-                                            public internal::GridImpl< 2 >
+    class OpenGeodeRegularGrid< 2 >::Impl : public internal::GridImpl< 2 >
     {
         friend class bitsery::Access;
 
     public:
         Impl( OpenGeodeRegularGrid< 2 >& mesh )
-            : internal::PointsImpl< 2 >( mesh )
         {
+            detail::template initialize_crs< OpenGeodeRegularGrid< 2 > >(
+                mesh );
+        }
+
+        Impl( OpenGeodeRegularGrid< 2 >& mesh, BITSERY )
+        {
+            detail::template initialize_crs< OpenGeodeRegularGrid< 2 > >(
+                mesh );
         }
 
         void update_origin( RegularGrid2D& grid, const Point2D& origin )
@@ -113,18 +120,23 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this, Growable< Archive,
-                                       Impl >{ { []( Archive& archive,
-                                                     Impl& impl ) {
-                archive.ext( impl,
-                    bitsery::ext::BaseClass< internal::PointsImpl< 2 > >{} );
-                archive.ext( impl,
-                    bitsery::ext::BaseClass< internal::GridImpl< 2 > >{} );
-            } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    internal::PointsImpl< 2 > temp;
+                    archive.object( temp );
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass< internal::GridImpl< 2 > >{} );
+                } } } );
         }
     };
 
     OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid() : impl_( *this ) {}
+
+    OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid( BITSERY bitsery )
+        : RegularGrid< 2 >{ bitsery }, impl_( *this, bitsery )
+    {
+    }
 
     OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid(
         OpenGeodeRegularGrid&& ) noexcept = default;
@@ -190,11 +202,41 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodeRegularGrid >{
                 { []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                     const auto new_point_attribute_id =
+                         grid.vertex_attribute_manager()
+                             .attribute_ids_with_name(
+                                 internal::PointsImpl< 2 >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext(
                          grid, bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
                      archive.object( grid.impl_ );
-                     grid.impl_->initialize_crs( grid );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< 2 > >( grid.vertex_attribute_manager(),
+                         internal::PointsImpl< 2 >::POINTS_NAME,
+                         new_point_attribute_id, grid.nb_vertices() );
+                     detail::template initialize_crs<
+                         OpenGeodeRegularGrid< 2 > >(
+                         grid, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                        const auto new_point_attribute_id =
+                            grid.vertex_attribute_manager()
+                                .attribute_ids_with_name(
+                                    internal::PointsImpl< 2 >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        archive.ext( grid,
+                            bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
+                        archive.object( grid.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< 2 > >( grid.vertex_attribute_manager(),
+                            internal::PointsImpl< 2 >::POINTS_NAME,
+                            new_point_attribute_id, grid.nb_vertices() );
+                        detail::template initialize_crs<
+                            OpenGeodeRegularGrid< 2 > >(
+                            grid, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 2 > >{} );

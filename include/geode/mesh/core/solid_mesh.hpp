@@ -29,6 +29,7 @@
 #include <absl/container/inlined_vector.h>
 #include <absl/hash/hash.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -276,6 +277,8 @@ namespace geode
         using Builder = SolidMeshBuilder< dimension >;
         static constexpr auto dim = dimension;
         using VerticesAroundVertex = absl::InlinedVector< index_t, 20 >;
+
+        SolidMesh( BITSERY );
 
         ~SolidMesh();
 

@@ -700,11 +700,12 @@ void test()
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ),
         edge_attribute_id );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v7.", polygonal_surface->native_extension() ) );
-    test_backward_io( absl::StrCat( geode::DATA_PATH, "test_v12.",
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v7/test_v7.",
         polygonal_surface->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH,
+        "backward_io/v12/test_v12.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        polygonal_surface->native_extension() ) );
     test_permutation( *polygonal_surface, *builder );
     test_replace_vertex( *polygonal_surface, *builder );
     test_delete_polygon( *polygonal_surface, *builder, edge_attribute_id );

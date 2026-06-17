@@ -37,19 +37,20 @@
 
 #include <geode/mesh/core/detail/geode_elements.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodeTetrahedralSolid< dimension >::Impl
-        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh )
         {
+            detail::template initialize_crs<
+                OpenGeodeTetrahedralSolid< dimension > >( mesh );
             const auto tetrahedron_vertices_id =
                 mesh.polyhedron_attribute_manager()
                     .template create_attribute< VariableAttribute,
@@ -70,6 +71,12 @@ namespace geode
                 mesh.polyhedron_attribute_manager()
                     .template find_attribute< VariableAttribute,
                         std::array< index_t, 4 > >( tetrahedron_adjacents_id );
+        }
+
+        Impl( OpenGeodeTetrahedralSolid< dimension >& mesh, BITSERY )
+        {
+            detail::template initialize_crs<
+                OpenGeodeTetrahedralSolid< dimension > >( mesh );
         }
 
         index_t get_polyhedron_vertex(
@@ -139,9 +146,8 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         archive.ext(
-                             impl, bitsery::ext::BaseClass<
-                                       internal::PointsImpl< dimension > >{} );
+                         internal::PointsImpl< dimension > temp;
+                         archive.object( temp );
                          archive.ext( impl.tetrahedron_vertices_,
                              bitsery::ext::StdSmartPtr{} );
                          archive.ext( impl.tetrahedron_adjacents_,
@@ -162,9 +168,8 @@ namespace geode
                                  false } );
                      },
                         []( Archive& archive, Impl& impl ) {
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass<
-                                    internal::PointsImpl< dimension > >{} );
+                            internal::PointsImpl< dimension > temp;
+                            archive.object( temp );
                             archive.ext( impl.tetrahedron_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
                             archive.ext( impl.tetrahedron_adjacents_,
@@ -187,6 +192,13 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid(
+        BITSERY bitsery )
+        : TetrahedralSolid< dimension >{ bitsery }, impl_( *this, bitsery )
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid(
         OpenGeodeTetrahedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
@@ -197,14 +209,6 @@ namespace geode
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >::~OpenGeodeTetrahedralSolid() =
         default;
-
-    template < index_t dimension >
-    void OpenGeodeTetrahedralSolid< dimension >::set_vertex( index_t vertex_id,
-        Point< dimension > point,
-        OGTetrahedralSolidKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_vertex(
@@ -241,7 +245,7 @@ namespace geode
                          solid, bitsery::ext::BaseClass<
                                     TetrahedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
-                     solid.impl_->initialize_crs( solid );
+                     //  solid.impl_->initialize_crs( solid );
                  },
                     []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
                         archive.ext(

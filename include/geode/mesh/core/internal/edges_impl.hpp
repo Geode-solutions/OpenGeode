@@ -105,6 +105,5 @@ namespace geode
             std::shared_ptr< VariableAttribute< std::array< index_t, 2 > > >
                 edges_;
         };
-
     } // namespace internal
 } // namespace geode

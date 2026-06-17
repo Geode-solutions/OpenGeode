@@ -37,6 +37,7 @@
 
 #include <geode/mesh/core/detail/geode_elements.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
 
 namespace
 {
@@ -93,17 +94,23 @@ namespace geode
 {
     template < index_t dimension >
     class OpenGeodeHybridSolid< dimension >::Impl
-        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
         using TYPE = HybridSolid3D::TYPE;
 
     public:
         explicit Impl( OpenGeodeHybridSolid< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh )
         {
+            detail::template initialize_crs<
+                OpenGeodeHybridSolid< dimension > >( mesh );
             polyhedron_vertex_ptr_.emplace_back( 0 );
             polyhedron_adjacent_ptr_.emplace_back( 0 );
+        }
+
+        Impl( OpenGeodeHybridSolid< dimension >& mesh, BITSERY )
+        {
+            detail::template initialize_crs<
+                OpenGeodeHybridSolid< dimension > >( mesh );
         }
 
         index_t get_polyhedron_vertex(
@@ -425,9 +432,8 @@ namespace geode
                             impl.polyhedron_adjacents_.max_size() );
                         archive.container4b( impl.polyhedron_adjacent_ptr_,
                             impl.polyhedron_adjacent_ptr_.max_size() );
-                        archive.ext(
-                            impl, bitsery::ext::BaseClass<
-                                      internal::PointsImpl< dimension > >{} );
+                        internal::PointsImpl< dimension > temp;
+                        archive.object( temp );
                     } } } );
         }
 
@@ -471,6 +477,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeHybridSolid< dimension >::OpenGeodeHybridSolid( BITSERY bitsery )
+        : HybridSolid< dimension >{ bitsery }, impl_( *this, bitsery )
+    {
+    }
+
+    template < index_t dimension >
     OpenGeodeHybridSolid< dimension >::OpenGeodeHybridSolid(
         OpenGeodeHybridSolid&& ) noexcept = default;
 
@@ -481,13 +493,6 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeHybridSolid< dimension >::~OpenGeodeHybridSolid() = default;
-
-    template < index_t dimension >
-    void OpenGeodeHybridSolid< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGHybridSolidKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodeHybridSolid< dimension >::get_polyhedron_vertex(
@@ -633,11 +638,42 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodeHybridSolid >{
                 { []( Archive& archive, OpenGeodeHybridSolid& solid ) {
+                     const auto new_point_attribute_id =
+                         solid.vertex_attribute_manager()
+                             .attribute_ids_with_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext( solid, bitsery::ext::BaseClass<
                                              HybridSolid< dimension > >{} );
                      archive.object( solid.impl_ );
-                     solid.impl_->initialize_crs( solid );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< dimension > >( solid.vertex_attribute_manager(),
+                         internal::PointsImpl< dimension >::POINTS_NAME,
+                         new_point_attribute_id, solid.nb_vertices() );
+                     detail::template initialize_crs<
+                         OpenGeodeHybridSolid< dimension > >(
+                         solid, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodeHybridSolid& solid ) {
+                        const auto new_point_attribute_id =
+                            solid.vertex_attribute_manager()
+                                .attribute_ids_with_name( internal::PointsImpl<
+                                    dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        archive.ext( solid, bitsery::ext::BaseClass<
+                                                HybridSolid< dimension > >{} );
+                        archive.object( solid.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< dimension > >(
+                            solid.vertex_attribute_manager(),
+                            internal::PointsImpl< dimension >::POINTS_NAME,
+                            new_point_attribute_id, solid.nb_vertices() );
+                        detail::template initialize_crs<
+                            OpenGeodeHybridSolid< dimension > >(
+                            solid, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodeHybridSolid& solid ) {
                         archive.ext( solid, bitsery::ext::BaseClass<
                                                 HybridSolid< dimension > >{} );

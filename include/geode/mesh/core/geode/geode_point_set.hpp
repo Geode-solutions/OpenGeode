@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -50,6 +51,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePointSet();
+        OpenGeodePointSet( BITSERY );
         OpenGeodePointSet( OpenGeodePointSet&& other ) noexcept;
         OpenGeodePointSet& operator=( OpenGeodePointSet&& other ) noexcept;
         ~OpenGeodePointSet();

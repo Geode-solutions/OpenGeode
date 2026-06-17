@@ -57,6 +57,8 @@ namespace geode
             }
 
         protected:
+            FacetStorage( BITSERY ) {}
+
             FacetStorage()
             {
                 const auto counter_attribute_id =
@@ -70,7 +72,7 @@ namespace geode
                 const auto vertices_attribute_id =
                     facet_attribute_manager_
                         .create_attribute< VariableAttribute, VertexContainer >(
-                            "vertices", VertexContainer{},
+                            "facet_vertices", VertexContainer{},
                             { false, false, false } );
                 SDEBUG( vertices_attribute_id );
                 vertices_ =

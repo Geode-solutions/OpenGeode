@@ -32,6 +32,13 @@
 
 namespace geode
 {
+
+    template < index_t dimension >
+    TriangulatedSurface< dimension >::TriangulatedSurface( BITSERY bitsery )
+        : SurfaceMesh< dimension >{ bitsery }
+    {
+    }
+
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::create()

@@ -39,6 +39,8 @@ namespace geode
     public:
         explicit Impl( OpenGeodeGraph& mesh ) : internal::EdgesImpl( mesh ) {}
 
+        Impl( BITSERY ) {}
+
     private:
         Impl() = default;
 
@@ -55,6 +57,8 @@ namespace geode
     };
 
     OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
+
+    OpenGeodeGraph::OpenGeodeGraph( BITSERY bitsery ) : impl_( bitsery ) {}
 
     OpenGeodeGraph::OpenGeodeGraph( OpenGeodeGraph&& ) noexcept = default;
 

@@ -116,6 +116,10 @@ void test_io( const geode::PointSet3D& point_set, std::string_view filename )
     DEBUG( "test_io" );
     geode::save_point_set( point_set, filename );
     const auto reload = geode::load_point_set< 3 >( filename );
+    SDEBUG( reload->point( 0 ) );
+    SDEBUG( reload->point( 1 ) );
+    SDEBUG( reload->point( 2 ) );
+    SDEBUG( reload->point( 3 ) );
     geode_unused( reload );
     const auto point_set2 = geode::load_point_set< 3 >(
         geode::OpenGeodePointSet3D::impl_name_static(), filename );
@@ -136,11 +140,12 @@ void test_backward_io(
     SDEBUG( point_set->point( 0 ) );
     SDEBUG( point_set->point( 1 ) );
     SDEBUG( point_set->point( 2 ) );
+    SDEBUG( point_set->point( 3 ) );
     geode::OpenGeodeMeshException::test(
         point_set->nb_vertices() == 4, "PointSet should have 4 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
-    geode::OpenGeodeMeshException::test( point_set->point( 2 ) == answer,
-        "PointSet2 vertex coordinates are not correct" );
+    geode::OpenGeodeMeshException::test( point_set->point( 1 ) == answer,
+        "PointSet vertex coordinates are not correct" );
 }
 
 void test_clone(

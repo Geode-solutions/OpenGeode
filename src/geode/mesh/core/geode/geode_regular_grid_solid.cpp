@@ -35,6 +35,7 @@
 #include <geode/mesh/core/internal/grid_impl.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
 
 namespace
 {
@@ -58,8 +59,15 @@ namespace geode
 
     public:
         Impl( OpenGeodeRegularGrid< 3 >& mesh )
-            : internal::PointsImpl< 3 >( mesh )
         {
+            detail::template initialize_crs< OpenGeodeRegularGrid< 3 > >(
+                mesh );
+        }
+
+        Impl( OpenGeodeRegularGrid< 3 >& mesh, BITSERY )
+        {
+            detail::template initialize_crs< OpenGeodeRegularGrid< 3 > >(
+                mesh );
         }
 
         void update_origin( RegularGrid3D& grid, const Point3D& origin )
@@ -128,18 +136,23 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this, Growable< Archive,
-                                       Impl >{ { []( Archive& archive,
-                                                     Impl& impl ) {
-                archive.ext( impl,
-                    bitsery::ext::BaseClass< internal::PointsImpl< 3 > >{} );
-                archive.ext( impl,
-                    bitsery::ext::BaseClass< internal::GridImpl< 3 > >{} );
-            } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    internal::PointsImpl< 3 > temp;
+                    archive.object( temp );
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass< internal::GridImpl< 3 > >{} );
+                } } } );
         }
     };
 
     OpenGeodeRegularGrid< 3 >::OpenGeodeRegularGrid() : impl_( *this ) {}
+
+    OpenGeodeRegularGrid< 3 >::OpenGeodeRegularGrid( BITSERY bitsery )
+        : RegularGrid< 3 >{ bitsery }, impl_( *this, bitsery )
+    {
+    }
 
     OpenGeodeRegularGrid< 3 >::OpenGeodeRegularGrid(
         OpenGeodeRegularGrid&& ) noexcept = default;
@@ -211,11 +224,41 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodeRegularGrid >{
                 { []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                     const auto new_point_attribute_id =
+                         grid.vertex_attribute_manager()
+                             .attribute_ids_with_name(
+                                 internal::PointsImpl< 3 >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext(
                          grid, bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
                      archive.object( grid.impl_ );
-                     grid.impl_->initialize_crs( grid );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< 3 > >( grid.vertex_attribute_manager(),
+                         internal::PointsImpl< 3 >::POINTS_NAME,
+                         new_point_attribute_id, grid.nb_vertices() );
+                     detail::template initialize_crs<
+                         OpenGeodeRegularGrid< 3 > >(
+                         grid, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                        const auto new_point_attribute_id =
+                            grid.vertex_attribute_manager()
+                                .attribute_ids_with_name(
+                                    internal::PointsImpl< 3 >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        archive.ext( grid,
+                            bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
+                        archive.object( grid.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< 3 > >( grid.vertex_attribute_manager(),
+                            internal::PointsImpl< 3 >::POINTS_NAME,
+                            new_point_attribute_id, grid.nb_vertices() );
+                        detail::template initialize_crs<
+                            OpenGeodeRegularGrid< 3 > >(
+                            grid, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 3 > >{} );

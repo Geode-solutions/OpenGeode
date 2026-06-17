@@ -38,17 +38,22 @@
 namespace geode
 {
     template < index_t dimension >
-    class OpenGeodeEdgedCurve< dimension >::Impl
-        : public internal::EdgesImpl,
-          public internal::PointsImpl< dimension >
+    class OpenGeodeEdgedCurve< dimension >::Impl : public internal::EdgesImpl
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeEdgedCurve< dimension >& mesh )
-            : internal::EdgesImpl( mesh ),
-              internal::PointsImpl< dimension >( mesh )
+            : internal::EdgesImpl( mesh )
         {
+            detail::template initialize_crs< OpenGeodeEdgedCurve< dimension > >(
+                mesh );
+        }
+
+        Impl( OpenGeodeEdgedCurve< dimension >& mesh, BITSERY )
+        {
+            detail::template initialize_crs< OpenGeodeEdgedCurve< dimension > >(
+                mesh );
         }
 
     private:
@@ -62,15 +67,20 @@ namespace geode
                     { []( Archive& archive, Impl& impl ) {
                         archive.ext( impl,
                             bitsery::ext::BaseClass< internal::EdgesImpl >{} );
-                        archive.ext(
-                            impl, bitsery::ext::BaseClass<
-                                      internal::PointsImpl< dimension > >{} );
+                        internal::PointsImpl< dimension > temp;
+                        archive.object( temp );
                     } } } );
         }
     };
 
     template < index_t dimension >
     OpenGeodeEdgedCurve< dimension >::OpenGeodeEdgedCurve() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodeEdgedCurve< dimension >::OpenGeodeEdgedCurve( BITSERY bitsery )
+        : impl_( *this, bitsery )
     {
     }
 
@@ -85,13 +95,6 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeEdgedCurve< dimension >::~OpenGeodeEdgedCurve() = default;
-
-    template < index_t dimension >
-    void OpenGeodeEdgedCurve< dimension >::set_vertex(
-        index_t vertex_id, Point< dimension > point, OGEdgedCurveKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodeEdgedCurve< dimension >::get_edge_vertex(
@@ -116,11 +119,44 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodeEdgedCurve >{
                 { []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
+                     const auto new_point_attribute_id =
+                         edged_curve.vertex_attribute_manager()
+                             .attribute_ids_with_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext( edged_curve,
                          bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
                      archive.object( edged_curve.impl_ );
-                     edged_curve.impl_->initialize_crs( edged_curve );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< dimension > >(
+                         edged_curve.vertex_attribute_manager(),
+                         internal::PointsImpl< dimension >::POINTS_NAME,
+                         new_point_attribute_id, edged_curve.nb_vertices() );
+                     detail::template initialize_crs<
+                         OpenGeodeEdgedCurve< dimension > >(
+                         edged_curve, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
+                        const auto new_point_attribute_id =
+                            edged_curve.vertex_attribute_manager()
+                                .attribute_ids_with_name( internal::PointsImpl<
+                                    dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        archive.ext(
+                            edged_curve, bitsery::ext::BaseClass<
+                                             EdgedCurve< dimension > >{} );
+                        archive.object( edged_curve.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< dimension > >(
+                            edged_curve.vertex_attribute_manager(),
+                            internal::PointsImpl< dimension >::POINTS_NAME,
+                            new_point_attribute_id, edged_curve.nb_vertices() );
+                        detail::template initialize_crs<
+                            OpenGeodeEdgedCurve< dimension > >(
+                            edged_curve, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
                         archive.ext(
                             edged_curve, bitsery::ext::BaseClass<

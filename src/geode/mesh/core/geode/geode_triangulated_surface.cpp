@@ -35,19 +35,20 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodeTriangulatedSurface< dimension >::Impl
-        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh )
         {
+            detail::template initialize_crs<
+                OpenGeodeTriangulatedSurface< dimension > >( mesh );
             const auto triangle_vertices_id =
                 mesh.polygon_attribute_manager()
                     .template create_attribute< VariableAttribute,
@@ -68,6 +69,12 @@ namespace geode
                 mesh.polygon_attribute_manager()
                     .template find_attribute< VariableAttribute,
                         std::array< index_t, 3 > >( triangle_adjacents_id );
+        }
+
+        Impl( OpenGeodeTriangulatedSurface< dimension >& mesh, BITSERY )
+        {
+            detail::template initialize_crs<
+                OpenGeodeTriangulatedSurface< dimension > >( mesh );
         }
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
@@ -126,9 +133,8 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         archive.ext(
-                             impl, bitsery::ext::BaseClass<
-                                       internal::PointsImpl< dimension > >{} );
+                         internal::PointsImpl< dimension > temp;
+                         archive.object( temp );
                          archive.ext( impl.triangle_vertices_,
                              bitsery::ext::StdSmartPtr{} );
                          archive.ext( impl.triangle_adjacents_,
@@ -147,9 +153,8 @@ namespace geode
                                  false } );
                      },
                         []( Archive& archive, Impl& impl ) {
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass<
-                                    internal::PointsImpl< dimension > >{} );
+                            internal::PointsImpl< dimension > temp;
+                            archive.object( temp );
                             archive.ext( impl.triangle_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
                             archive.ext( impl.triangle_adjacents_,
@@ -172,6 +177,13 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeTriangulatedSurface< dimension >::OpenGeodeTriangulatedSurface(
+        BITSERY bitsery )
+        : TriangulatedSurface< dimension >{ bitsery }, impl_( *this, bitsery )
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodeTriangulatedSurface< dimension >::OpenGeodeTriangulatedSurface(
         OpenGeodeTriangulatedSurface&& ) noexcept = default;
 
     template < index_t dimension >
@@ -182,15 +194,6 @@ namespace geode
     template < index_t dimension >
     OpenGeodeTriangulatedSurface< dimension >::~OpenGeodeTriangulatedSurface() =
         default;
-
-    template < index_t dimension >
-    void OpenGeodeTriangulatedSurface< dimension >::set_vertex(
-        index_t vertex_id,
-        Point< dimension > point,
-        OGTriangulatedSurfaceKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodeTriangulatedSurface< dimension >::get_polygon_vertex(
@@ -216,12 +219,46 @@ namespace geode
             Growable< Archive, OpenGeodeTriangulatedSurface >{
                 { []( Archive& archive,
                       OpenGeodeTriangulatedSurface& surface ) {
+                     const auto new_point_attribute_id =
+                         surface.vertex_attribute_manager()
+                             .attribute_ids_with_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext(
                          surface, bitsery::ext::BaseClass<
                                       TriangulatedSurface< dimension > >{} );
                      archive.object( surface.impl_ );
-                     surface.impl_->initialize_crs( surface );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< dimension > >(
+                         surface.vertex_attribute_manager(),
+                         internal::PointsImpl< dimension >::POINTS_NAME,
+                         new_point_attribute_id, surface.nb_vertices() );
+                     detail::template initialize_crs<
+                         OpenGeodeTriangulatedSurface< dimension > >(
+                         surface, new_point_attribute_id );
                  },
+                    []( Archive& archive,
+                        OpenGeodeTriangulatedSurface& surface ) {
+                        const auto new_point_attribute_id =
+                            surface.vertex_attribute_manager()
+                                .attribute_ids_with_name( internal::PointsImpl<
+                                    dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        archive.ext(
+                            surface, bitsery::ext::BaseClass<
+                                         TriangulatedSurface< dimension > >{} );
+                        archive.object( surface.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< dimension > >(
+                            surface.vertex_attribute_manager(),
+                            internal::PointsImpl< dimension >::POINTS_NAME,
+                            new_point_attribute_id, surface.nb_vertices() );
+                        detail::template initialize_crs<
+                            OpenGeodeTriangulatedSurface< dimension > >(
+                            surface, new_point_attribute_id );
+                    },
                     []( Archive& archive,
                         OpenGeodeTriangulatedSurface& surface ) {
                         archive.ext(

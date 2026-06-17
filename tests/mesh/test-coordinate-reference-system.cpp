@@ -45,7 +45,7 @@ void test()
     const auto crs_name = "test";
     crs_manager_builder.register_coordinate_reference_system( crs_name,
         std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
-            att_manager ) );
+            att_manager, crs_name ) );
     geode::OpenGeodeMeshException::test(
         crs_manager.nb_coordinate_reference_systems() == 1,
         "Wrong number of CRS" );

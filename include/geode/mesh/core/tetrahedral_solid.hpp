@@ -25,6 +25,8 @@
 
 #include <array>
 
+#include <geode/basic/bitsery_archive.hpp>
+
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
@@ -45,6 +47,8 @@ namespace geode
     public:
         using Builder = TetrahedralSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
+
+        TetrahedralSolid( BITSERY );
 
         /*!
          * Create a new TetrahedralSolid using default data structure.

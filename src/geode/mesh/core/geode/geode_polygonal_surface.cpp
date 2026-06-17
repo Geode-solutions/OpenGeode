@@ -34,6 +34,8 @@
 
 #include <geode/mesh/core/internal/points_impl.hpp>
 
+#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
+
 namespace geode
 {
     template < index_t dimension >
@@ -44,9 +46,16 @@ namespace geode
 
     public:
         explicit Impl( OpenGeodePolygonalSurface< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh )
         {
+            detail::template initialize_crs<
+                OpenGeodePolygonalSurface< dimension > >( mesh );
             polygon_ptr_.emplace_back( 0 );
+        }
+
+        Impl( OpenGeodePolygonalSurface< dimension >& mesh, BITSERY )
+        {
+            detail::template initialize_crs<
+                OpenGeodePolygonalSurface< dimension > >( mesh );
         }
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
@@ -184,19 +193,18 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                        archive.container4b( impl.polygon_vertices_,
-                            impl.polygon_vertices_.max_size() );
-                        archive.container4b( impl.polygon_adjacents_,
-                            impl.polygon_adjacents_.max_size() );
-                        archive.container4b(
-                            impl.polygon_ptr_, impl.polygon_ptr_.max_size() );
-                        archive.ext(
-                            impl, bitsery::ext::BaseClass<
-                                      internal::PointsImpl< dimension > >{} );
-                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& archive, Impl& impl ) {
+                               archive.container4b( impl.polygon_vertices_,
+                                   impl.polygon_vertices_.max_size() );
+                               archive.container4b( impl.polygon_adjacents_,
+                                   impl.polygon_adjacents_.max_size() );
+                               archive.container4b( impl.polygon_ptr_,
+                                   impl.polygon_ptr_.max_size() );
+                               internal::PointsImpl< dimension > temp;
+                               archive.object( temp );
+                           } } } );
         }
 
         index_t get_polygon_adjacent_impl(
@@ -225,6 +233,13 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface(
+        BITSERY bitsery )
+        : PolygonalSurface< dimension >{ bitsery }, impl_( *this, bitsery )
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface(
         OpenGeodePolygonalSurface&& ) noexcept = default;
 
     template < index_t dimension >
@@ -235,14 +250,6 @@ namespace geode
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >::~OpenGeodePolygonalSurface() =
         default;
-
-    template < index_t dimension >
-    void OpenGeodePolygonalSurface< dimension >::set_vertex( index_t vertex_id,
-        Point< dimension > point,
-        OGPolygonalSurfaceKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodePolygonalSurface< dimension >::get_polygon_vertex(
@@ -275,12 +282,45 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodePolygonalSurface >{
                 { []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
+                     const auto new_point_attribute_id =
+                         surface.vertex_attribute_manager()
+                             .attribute_ids_with_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
                      archive.ext(
                          surface, bitsery::ext::BaseClass<
                                       PolygonalSurface< dimension > >{} );
                      archive.object( surface.impl_ );
-                     surface.impl_->initialize_crs( surface );
+                     detail::import_old_attribute< VariableAttribute,
+                         Point< dimension > >(
+                         surface.vertex_attribute_manager(),
+                         internal::PointsImpl< dimension >::POINTS_NAME,
+                         new_point_attribute_id, surface.nb_vertices() );
+                     detail::template initialize_crs<
+                         OpenGeodePolygonalSurface< dimension > >(
+                         surface, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
+                        const auto new_point_attribute_id =
+                            surface.vertex_attribute_manager()
+                                .attribute_ids_with_name( internal::PointsImpl<
+                                    dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        archive.ext(
+                            surface, bitsery::ext::BaseClass<
+                                         PolygonalSurface< dimension > >{} );
+                        archive.object( surface.impl_ );
+                        detail::import_old_attribute< VariableAttribute,
+                            Point< dimension > >(
+                            surface.vertex_attribute_manager(),
+                            internal::PointsImpl< dimension >::POINTS_NAME,
+                            new_point_attribute_id, surface.nb_vertices() );
+                        detail::template initialize_crs<
+                            OpenGeodePolygonalSurface< dimension > >(
+                            surface, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                         archive.ext(
                             surface, bitsery::ext::BaseClass<

@@ -712,9 +712,9 @@ namespace geode
             return cached.value();
         }
 
-    private:
         Impl() = default;
 
+    private:
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -827,6 +827,11 @@ namespace geode
 
     template < index_t dimension >
     SolidMesh< dimension >::SolidMesh() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    SolidMesh< dimension >::SolidMesh( BITSERY )
     {
     }
 
@@ -1742,8 +1747,8 @@ namespace geode
                 { []( Archive& archive, SolidMesh& solid ) {
                      archive.ext(
                          solid, bitsery::ext::BaseClass< VertexSet >{} );
-                     archive.object( solid.impl_ );
                      solid.impl_->initialize_polyhedra_around_vertex( solid );
+                     archive.object( solid.impl_ );
                  },
                     []( Archive& archive, SolidMesh& solid ) {
                         archive.ext(

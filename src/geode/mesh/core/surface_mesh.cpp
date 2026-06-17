@@ -390,7 +390,7 @@ namespace geode
             edges_.reset( new SurfaceEdges< dimension >{ surface } );
         }
 
-        void copy_edges( const SurfaceMesh< dimension >& surface ) const
+        void copy_edges( const SurfaceMesh< dimension >& from_surface ) const
         {
             OpenGeodeMeshException::check_exception( !are_edges_enabled(),
                 nullptr, OpenGeodeException::TYPE::data,
@@ -398,7 +398,7 @@ namespace geode
                 "already enabled." );
             edges_.reset( new SurfaceEdges< dimension >{} );
             SurfaceEdgesBuilder< dimension > edges_builder{ *edges_ };
-            edges_builder.copy( surface.edges() );
+            edges_builder.copy( from_surface.edges() );
         }
 
         void disable_edges() const
@@ -446,9 +446,9 @@ namespace geode
                         CachedPolygons >( attribute_id );
         }
 
-    private:
         Impl() = default;
 
+    private:
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -569,6 +569,11 @@ namespace geode
 
     template < index_t dimension >
     SurfaceMesh< dimension >::SurfaceMesh() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    SurfaceMesh< dimension >::SurfaceMesh( BITSERY )
     {
     }
 
@@ -1098,9 +1103,9 @@ namespace geode
                 { []( Archive& archive, SurfaceMesh& surface ) {
                      archive.ext(
                          surface, bitsery::ext::BaseClass< VertexSet >{} );
-                     archive.object( surface.impl_ );
                      surface.impl_->initialize_polygons_around_vertex(
                          surface );
+                     archive.object( surface.impl_ );
                  },
                     []( Archive& archive, SurfaceMesh& surface ) {
                         archive.ext(

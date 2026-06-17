@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -49,6 +50,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePolyhedralSolid();
+        OpenGeodePolyhedralSolid( BITSERY );
         OpenGeodePolyhedralSolid( OpenGeodePolyhedralSolid&& other ) noexcept;
         OpenGeodePolyhedralSolid& operator=(
             OpenGeodePolyhedralSolid&& other ) noexcept;
@@ -83,10 +85,6 @@ namespace geode
         }
 
     public:
-        void set_vertex( index_t vertex_id,
-            Point< dimension > point,
-            OGPolyhedralSolidKey /*key*/ );
-
         void add_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< local_index_t > > facets,
             OGPolyhedralSolidKey /*key*/ );
