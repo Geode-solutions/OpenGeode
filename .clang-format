@@ -1,5 +1,3 @@
-# DO NOT MODIFY DIRECTLY THIS FILE
-# LOOK AT https://github.com/Geode-solutions/actions
 AccessModifierOffset: -4
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false
