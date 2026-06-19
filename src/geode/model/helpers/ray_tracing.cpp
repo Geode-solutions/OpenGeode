@@ -159,7 +159,6 @@ namespace geode
         bool is_point_inside_surface(
             const Point2D& point, const Surface2D& surface )
         {
-            DEBUG( "is_point_inside_surface" );
             for( const auto& direction : ::directions_2D() )
             {
                 const Ray2D ray{ direction, point };
@@ -167,7 +166,6 @@ namespace geode
                 bool could_determine{ true };
                 for( const auto& line : section_.boundaries( surface ) )
                 {
-                    SDEBUG( line.id() );
                     auto intersections = count_real_intersections_with_boundary(
                         ray, line.mesh(), line_aabb( line ) );
                     if( !intersections.has_value() )
@@ -190,10 +188,8 @@ namespace geode
 
         std::optional< uuid > surface_containing_point( const Point2D& point )
         {
-            SDEBUG( point );
             for( const auto& surface : section_.surfaces() )
             {
-                SDEBUG( surface.id() );
                 if( is_point_inside_surface( point, surface ) )
                 {
                     return surface.id();
@@ -268,7 +264,6 @@ namespace geode
                 bool could_determine{ true };
                 for( const auto& surface : brep_.boundaries( block ) )
                 {
-                    SDEBUG( surface.id() );
                     auto intersections =
                         count_real_intersections_with_boundaries(
                             ray, surface.mesh(), surface_aabb( surface ) );

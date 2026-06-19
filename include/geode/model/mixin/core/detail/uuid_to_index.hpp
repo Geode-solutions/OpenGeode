@@ -78,8 +78,6 @@ namespace geode
             {
                 for( auto& it : uuid2index_ )
                 {
-                    DEBUG( old2new.size() );
-                    DEBUG( it.second );
                     const auto new_index = old2new[it.second];
                     OpenGeodeModelException::check_assertion(
                         new_index != NO_ID,

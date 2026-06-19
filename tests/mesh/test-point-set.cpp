@@ -41,11 +41,8 @@
 void test_create_vertices(
     const geode::PointSet3D& point_set, geode::PointSetBuilder3D& builder )
 {
-    DEBUG( "first point" );
     builder.create_point( geode::Point3D{ { 0.1, 0.2, 0.3 } } );
-    DEBUG( "second point" );
     builder.create_point( geode::Point3D{ { 2.1, 9.4, 6.7 } } );
-    DEBUG( point_set.nb_vertices() );
     geode::OpenGeodeMeshException::test(
         point_set.nb_vertices() == 2, "PointSet should have 2 vertices" );
     builder.create_vertices( 2 );
@@ -113,17 +110,11 @@ void test_delete_vertex(
 
 void test_io( const geode::PointSet3D& point_set, std::string_view filename )
 {
-    DEBUG( "test_io" );
     geode::save_point_set( point_set, filename );
     const auto reload = geode::load_point_set< 3 >( filename );
-    SDEBUG( reload->point( 0 ) );
-    SDEBUG( reload->point( 1 ) );
-    SDEBUG( reload->point( 2 ) );
-    SDEBUG( reload->point( 3 ) );
     geode_unused( reload );
     const auto point_set2 = geode::load_point_set< 3 >(
         geode::OpenGeodePointSet3D::impl_name_static(), filename );
-    DEBUG( point_set.nb_vertices() );
     for( const auto vertex_id : geode::Range{ point_set.nb_vertices() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -137,10 +128,6 @@ void test_backward_io(
     std::string_view filename, const geode::uuid& attribute_id )
 {
     const auto point_set = geode::load_point_set< 3 >( filename );
-    SDEBUG( point_set->point( 0 ) );
-    SDEBUG( point_set->point( 1 ) );
-    SDEBUG( point_set->point( 2 ) );
-    SDEBUG( point_set->point( 3 ) );
     geode::OpenGeodeMeshException::test(
         point_set->nb_vertices() == 4, "PointSet should have 4 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
@@ -169,27 +156,20 @@ void test_clone(
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
-    DEBUG( "test_point_set" );
     auto point_set = geode::PointSet3D::create(
         geode::OpenGeodePointSet3D::impl_name_static() );
-    DEBUG( "builder" );
     auto builder = geode::PointSetBuilder3D::create( *point_set );
-    DEBUG( "test_create_vertices" );
     test_create_vertices( *point_set, *builder );
-    DEBUG( "bounding_box" );
     test_bounding_box( *point_set );
-    DEBUG( "test_create_vertex_attribute" );
     const auto vertex_attribute_id = test_create_vertex_attribute( *point_set );
-    DEBUG( "test_io" );
     test_io(
         *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
-    DEBUG( "test_backward_io" );
     test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
                           point_set->native_extension() ),
         vertex_attribute_id );
-    // test_permutation( *point_set, *builder );
-    // test_delete_vertex( *point_set, *builder );
-    // test_clone( *point_set, vertex_attribute_id );
+    test_permutation( *point_set, *builder );
+    test_delete_vertex( *point_set, *builder );
+    test_clone( *point_set, vertex_attribute_id );
 }
 
 OPENGEODE_TEST( "point-set" )

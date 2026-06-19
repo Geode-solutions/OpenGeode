@@ -66,7 +66,6 @@ std::array< geode::uuid, 6 > add_corners(
     {
         uuids[c] = builder.add_corner();
         builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
-        SDEBUG( uuids[c] );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::impl_name_static() ) );
@@ -164,11 +163,9 @@ geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
         geode::detail::count_range_elements( model.blocks() ) == 1, message );
     geode::OpenGeodeModelException::test(
         model.block( block_uuid ).name() == "block1", "Wrong Block name" );
-    DEBUG( model.nb_active_blocks() );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 1, message );
     builder.set_block_active( block_uuid, false );
-    DEBUG( model.nb_active_blocks() );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 0, "BRep should have 0 active block" );
     geode::OpenGeodeModelException::test(
@@ -1189,7 +1186,6 @@ void test_compare_brep( const geode::BRep& model, const geode::BRep& model2 )
 
 void test_clone( const geode::BRep& brep )
 {
-    DEBUG( "test_clone" );
     geode::BRep brep2;
     geode::BRepBuilder builder{ brep2 };
     builder.copy( brep );
@@ -1492,19 +1488,42 @@ void test_backward_io()
             "mesh." );
     }
     test_registry( brep, 4, 13, 17, 7, 1, 0, 0, 0, 0, 0, 0 );
-    DEBUG( "test_backward_io OK" );
+    auto brep_v17 = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.og_brep" ) );
+    for( const auto& block : brep_v17.blocks() )
+    {
+        geode::OpenGeodeModelException::test( block.id() == block.mesh().id(),
+            "[Backward_IO] Brep block should have the same uuid as its mesh." );
+    }
+    for( const auto& surface : brep_v17.surfaces() )
+    {
+        geode::OpenGeodeModelException::test(
+            surface.id() == surface.mesh().id(),
+            "[Backward_IO] Brep surface should have the same uuid as its "
+            "mesh." );
+    }
+    for( const auto& line : brep_v17.lines() )
+    {
+        geode::OpenGeodeModelException::test( line.id() == line.mesh().id(),
+            "[Backward_IO] Brep line should have the same uuid as its mesh." );
+    }
+    for( const auto& corner : brep_v17.corners() )
+    {
+        geode::OpenGeodeModelException::test( corner.id() == corner.mesh().id(),
+            "[Backward_IO] Brep corner should have the same uuid as its "
+            "mesh." );
+    }
+    test_registry( brep_v17, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
 
 void test_components_filter()
 {
-    DEBUG( "test_components_filter" );
     const auto brep = geode::load_brep(
         absl::StrCat( geode::DATA_PATH, "structural_model.og_brep" ) );
     geode::OpenGeodeModelException::test(
         brep.nb_components_with_relations() == 9,
         "Wrong number of components with relations, there are ",
         brep.nb_components_with_relations(), " instead of 9" );
-    DEBUG( "test components filter OK" );
 }
 
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(

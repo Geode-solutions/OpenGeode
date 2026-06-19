@@ -181,7 +181,6 @@ namespace geode
         template < typename MeshComponent >
         void register_component( const MeshComponent& component )
         {
-            DEBUG( "register_component" );
             auto it = vertex2unique_vertex_.find( component.id() );
             const auto& mesh = component.mesh();
             if( it == vertex2unique_vertex_.end() )
@@ -215,17 +214,14 @@ namespace geode
                 }
                 it->second = std::move( attribute );
             }
-            DEBUG( " register_component done" );
         }
 
         template < typename MeshComponent >
         void unregister_component( const MeshComponent& component )
         {
-            DEBUG( "unregister_component" );
             const auto& mesh = component.mesh();
             auto attribute = vertex2unique_vertex_.at( component.id() );
             const auto attribute_id = attribute->id();
-            SDEBUG( attribute_id );
             mesh.vertex_attribute_manager().delete_attribute( attribute_id );
             vertex2unique_vertex_.erase( component.id() );
             filter_component_vertices( component.id() );
@@ -330,13 +326,11 @@ namespace geode
                     }
                     if( need_to_delete )
                     {
-                        DEBUG( "need to delete" );
                         component_vertices_->modify_value( uv,
                             [&to_delete](
                                 std::vector< ComponentMeshVertex >& vertices ) {
                                 delete_vector_elements( to_delete, vertices );
                             } );
-                        DEBUG( "end need to delete" );
                     }
                 } );
         }

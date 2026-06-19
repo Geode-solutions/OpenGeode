@@ -71,49 +71,38 @@ namespace geode
         {
             SectionBuilder builder{ section };
             const auto level = Logger::level();
-            // Logger::set_level( Logger::LEVEL::warn );
-            // async::parallel_invoke(
-            //     [&builder, &directory] {
-            //         builder.load_identifier( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_corners( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_lines( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_surfaces( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_model_boundaries( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_corner_collections( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_line_collections( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_surface_collections( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_relationships( directory );
-            //     },
-            //     [&builder, &directory] {
-            //         builder.load_unique_vertices( directory );
-            //     } );
-            builder.load_identifier( directory );
-            builder.load_corners( directory );
-            builder.load_lines( directory );
-            builder.load_surfaces( directory );
-            builder.load_model_boundaries( directory );
-            builder.load_corner_collections( directory );
-            builder.load_line_collections( directory );
-            builder.load_surface_collections( directory );
-            DEBUG( "load_relationships" );
-            builder.load_relationships( directory );
-            builder.load_unique_vertices( directory );
+            Logger::set_level( Logger::LEVEL::warn );
+            async::parallel_invoke(
+                [&builder, &directory] {
+                    builder.load_identifier( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_corners( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_lines( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_surfaces( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_model_boundaries( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_corner_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_line_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_surface_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_relationships( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_unique_vertices( directory );
+                } );
             Logger::set_level( level );
             detail::register_all_components( section );
             detail::filter_unsupported_components( section );

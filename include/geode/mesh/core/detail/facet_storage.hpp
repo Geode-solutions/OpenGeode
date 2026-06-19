@@ -65,7 +65,6 @@ namespace geode
                     facet_attribute_manager_
                         .create_attribute< VariableAttribute, index_t >(
                             "counter", 1u, { false, false, false } );
-                SDEBUG( counter_attribute_id );
                 counter_ = facet_attribute_manager_
                                .find_attribute< VariableAttribute, index_t >(
                                    counter_attribute_id );
@@ -74,7 +73,6 @@ namespace geode
                         .create_attribute< VariableAttribute, VertexContainer >(
                             "facet_vertices", VertexContainer{},
                             { false, false, false } );
-                SDEBUG( vertices_attribute_id );
                 vertices_ =
                     facet_attribute_manager_
                         .find_attribute< VariableAttribute, VertexContainer >(
@@ -246,12 +244,9 @@ namespace geode
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
                 facet_indices_ = from.facet_indices_;
-                DEBUG( "overwrite" );
-                SDEBUG( from.counter_->id() );
                 counter_ = facet_attribute_manager_
                                .find_attribute< VariableAttribute, index_t >(
                                    from.counter_->id() );
-                SDEBUG( from.vertices_->id() );
                 vertices_ =
                     facet_attribute_manager_
                         .find_attribute< VariableAttribute, VertexContainer >(

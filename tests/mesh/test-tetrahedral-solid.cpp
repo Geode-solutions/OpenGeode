@@ -325,7 +325,6 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    DEBUG( "test_backward_io" );
     const auto solid = geode::load_tetrahedral_solid< 3 >( filename );
     geode::OpenGeodeMeshException::test( solid->nb_vertices() == 6,
         "Backward TetrahedralSolid should have 6 vertices" );
@@ -383,8 +382,6 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
             "Error in facet attribute transfer during cloning" );
         const auto from_vertices = solid.facets().facet_vertices( f );
         const auto to_vertices = solid4.facets().facet_vertices( f );
-        DEBUG( from_vertices.size() );
-        DEBUG( to_vertices.size() );
         for( const auto v : geode::Indices{ from_vertices } )
         {
             geode::OpenGeodeMeshException::test(

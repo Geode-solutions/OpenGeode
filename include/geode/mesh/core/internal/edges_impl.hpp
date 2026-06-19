@@ -41,7 +41,6 @@ namespace geode
 
             explicit EdgesImpl( Graph& graph ) : edges_()
             {
-                DEBUG( "EdgesImpl" );
                 const auto edge_attribute_id =
                     graph.edge_attribute_manager()
                         .template create_attribute< VariableAttribute,
@@ -87,7 +86,6 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, EdgesImpl >{
                         { []( Archive& archive, EdgesImpl& impl ) {
-                             DEBUG( "serialize EdgesIMPL" );
                              archive.ext(
                                  impl.edges_, bitsery::ext::StdSmartPtr{} );
                              const auto& old_edges_properties =
@@ -96,13 +94,10 @@ namespace geode
                                  { old_edges_properties.assignable,
                                      old_edges_properties.interpolable,
                                      false } );
-                             DEBUG( "serialize EdgesIMPL end" );
                          },
                             []( Archive& archive, EdgesImpl& impl ) {
-                                DEBUG( "serialize EdgesIMPL" );
                                 archive.ext(
                                     impl.edges_, bitsery::ext::StdSmartPtr{} );
-                                DEBUG( "serialize EdgesIMPL end" );
                             } } } );
             }
 

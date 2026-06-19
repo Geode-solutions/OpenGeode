@@ -96,10 +96,6 @@ namespace
         void initialize_attribute_and_id(
             const geode::uuid& scalar_function_id )
         {
-            DEBUG( "initialize_attribute_and_id" );
-            SDEBUG( scalar_function_id );
-            DEBUG( mesh_.vertex_attribute_manager().attribute_exists(
-                scalar_function_id ) );
             geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_exists(
                     scalar_function_id ),

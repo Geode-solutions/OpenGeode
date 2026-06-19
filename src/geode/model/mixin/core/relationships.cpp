@@ -160,7 +160,6 @@ namespace geode
 
         void copy( const Impl& impl, const ModelCopyMapping& mapping )
         {
-            DEBUG( "copy relationships" );
             detail::RelationshipsImpl::copy( impl, mapping );
             initialize_relation_attribute();
         }
@@ -207,49 +206,31 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         DEBUG( "serialize relationships youpi" );
                          OpenGeodeGraph graph{ BITSERY::constructor };
                          archive.object( graph );
-                         DEBUG( graph.nb_edges() );
-                         DEBUG( "serialize relationships youpi 2" );
                          archive.object( impl.uuid2index_ );
-                         DEBUG( "serialize relationships youpi 3" );
                          archive.ext(
                              impl.relation_type_, bitsery::ext::StdSmartPtr{} );
-                         DEBUG( "serialize relationships youpi 4" );
                          archive.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
-                         DEBUG( "serialize relationships youpi 5" );
-                         //  impl.graph_ = graph.clone();
                          impl.graph_ = std::make_unique< OpenGeodeGraph >(
                              std::move( graph ) );
-                         DEBUG( impl.graph_->nb_edges() );
-                         DEBUG( "serialize relationships youpi 6" );
                          impl.initialize_attributes();
-                         DEBUG( "serialize relationships youpi 7" );
                          impl.initialize_relation_attribute();
-                         DEBUG( "serialize relationships youpi 8" );
                          impl.delete_isolated_vertices();
-                         DEBUG( "serialize relationships youpi 9" );
                      },
                         []( Archive& archive, Impl& impl ) {
-                            DEBUG( "serialize relationships a" );
                             impl.graph_ = std::make_unique< OpenGeodeGraph >(
                                 BITSERY::constructor );
                             archive.ext(
                                 impl.graph_, bitsery::ext::StdSmartPtr{} );
-                            DEBUG( "serialize relationships b" );
                             archive.object( impl.uuid2index_ );
-                            DEBUG( "serialize relationships c" );
                             archive.ext( impl.relation_type_,
                                 bitsery::ext::StdSmartPtr{} );
-                            DEBUG( "serialize relationships d" );
                             archive.ext(
                                 impl.ids_, bitsery::ext::StdSmartPtr{} );
-                            DEBUG( "serialize relationships e" );
                             impl.delete_isolated_vertices();
                         },
                         []( Archive& archive, Impl& impl ) {
-                            DEBUG( "serialize relationships hihi" );
                             archive.ext(
                                 impl, bitsery::ext::BaseClass<
                                           detail::RelationshipsImpl >{} );
@@ -260,19 +241,17 @@ namespace geode
 
         void initialize_relation_attribute()
         {
-                        const auto ids =
+            const auto ids =
                 relation_attribute_manager().attribute_ids_with_name(
                     "relation_type" );
             if( ids.has_value() )
             {
-                DEBUG( ids.value().size() );
                 relation_type_ =
                     relation_attribute_manager()
                         .find_attribute< VariableAttribute, RelationType >(
                             ids.value()[0] );
                 return;
             }
-            DEBUG( "create relation_type attribute" );
             const auto id =
                 relation_attribute_manager()
                     .create_attribute< VariableAttribute, RelationType >(

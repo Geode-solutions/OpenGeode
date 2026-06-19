@@ -65,15 +65,12 @@ namespace geode
                          point_set, bitsery::ext::BaseClass< VertexSet >{} );
                  },
                     []( Archive& archive, PointSet& point_set ) {
-                        DEBUG( "PointSet::serialize" );
                         archive.ext(
                             point_set, bitsery::ext::BaseClass< VertexSet >{} );
-                        DEBUG( "PointSet::serialize 2" );
                         archive.ext(
                             point_set, bitsery::ext::BaseClass<
                                            CoordinateReferenceSystemManagers<
                                                dimension > >{} );
-                        DEBUG( "PointSet::serialize 3" );
                     } } } );
     }
 

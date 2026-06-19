@@ -178,9 +178,7 @@ namespace geode
             return old2new;
         }
         update_edges_around( graph_, *this, old2new );
-        DEBUG( "edge attribute manager" );
         graph_.edge_attribute_manager().delete_elements( to_delete );
-        DEBUG( "done" );
         do_delete_edges( to_delete, old2new );
         return old2new;
     }
@@ -239,7 +237,6 @@ namespace geode
 
     void GraphBuilder::copy( const Graph& graph )
     {
-        DEBUG( "GraphBuilder::copy" );
         OpenGeodeMeshException::check_exception(
             graph_.nb_vertices() == 0 && graph_.nb_edges() == 0, nullptr,
             OpenGeodeException::TYPE::data,
@@ -248,10 +245,6 @@ namespace geode
         VertexSetBuilder::copy( graph );
         create_edges( graph.nb_edges() );
         graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );
-        // if( graph_.impl_name() == graph.impl_name() )
-        // {
-        //     do_copy_edges( graph );
-        // }
         for( const auto e : Range{ graph.nb_edges() } )
         {
             for( const auto v : LRange{ 2 } )

@@ -963,18 +963,10 @@ namespace geode
             solid_mesh_.disable_facets();
         }
         VertexSetBuilder::copy( solid_mesh );
-        // if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
-        // {
-        //     do_copy_points( solid_mesh );
-        //     do_copy_polyhedra( solid_mesh );
-        // }
         copy_points( solid_mesh, *this );
-        DEBUG( solid_mesh.impl_name().get() );
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
         copy_polyhedra( solid_mesh, solid_mesh_, *this );
-        // solid_mesh_.polyhedron_attribute_manager().copy(
-        //     solid_mesh.polyhedron_attribute_manager() );
         if( solid_mesh.are_edges_enabled() )
         {
             solid_mesh_.copy_edges( solid_mesh, {} );

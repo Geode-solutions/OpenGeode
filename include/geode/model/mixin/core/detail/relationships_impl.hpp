@@ -108,7 +108,6 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, RelationshipsImpl >{
                         { []( Archive& archive, RelationshipsImpl& impl ) {
-                             DEBUG( "serialize RelationshipsIMPL" );
                              impl.graph_ = std::make_unique< OpenGeodeGraph >(
                                  BITSERY::constructor );
                              archive.ext(

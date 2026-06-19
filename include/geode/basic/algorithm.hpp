@@ -56,9 +56,6 @@ namespace geode
     index_t delete_vector_elements(
         const DeleteContainer& to_delete, ValueContainer& values )
     {
-        DEBUG( "delete_vector_elements" );
-        DEBUG( to_delete.size() );
-        DEBUG( values.size() );
         if( values.empty() )
         {
             exit( 1 );

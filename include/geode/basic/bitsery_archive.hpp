@@ -95,10 +95,8 @@ namespace geode
             geode::uuid new_attribute_id,
             index_t attribute_size )
         {
-            DEBUG( "import_old_attribute" );
             const auto ids =
                 manager.attribute_ids_with_name( old_attribute_name ).value();
-            DEBUG( ids.size() );
             geode::uuid old_attribute_id;
             for( const auto &id : ids )
             {
@@ -106,7 +104,6 @@ namespace geode
                 {
                     continue;
                 }
-                DEBUG( "found old attribute " );
                 old_attribute_id = id;
             }
             auto old_attribute =
@@ -120,7 +117,6 @@ namespace geode
                     index, old_attribute->value( index ) );
             }
             manager.delete_attribute( old_attribute_id );
-            DEBUG( "import_old_attribute done" );
         }
     } // namespace detail
 } // namespace geode

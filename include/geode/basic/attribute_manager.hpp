@@ -125,9 +125,6 @@ namespace geode
             typed_attribute.reset(
                 new Attribute< T >{ std::move( default_value ), attribute_name,
                     std::move( properties ), {} } );
-            DEBUG( "create_attribute" );
-            SDEBUG( attribute_id );
-            DEBUG( attribute_name );
             IdentifierBuilder builder{ *typed_attribute };
             builder.set_id( attribute_id );
             register_attribute( typed_attribute, attribute_id );

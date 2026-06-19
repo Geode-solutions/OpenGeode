@@ -69,42 +69,49 @@ namespace geode
         template < typename Model >
         void load_brep_files( Model& brep, std::string_view directory )
         {
-            DEBUG( "load_brep_files" );
-            DEBUG( "BRepBuilder" );
             BRepBuilder builder{ brep };
-            DEBUG( "BRepBuilder done" );
             const auto level = Logger::level();
-            // Logger::set_level( Logger::LEVEL::trace );
-            DEBUG( "load_identifier" );
-            builder.load_identifier( directory );
-            DEBUG( "load_corners" );
-            builder.load_corners( directory );
-            DEBUG( "load_lines" );
-            builder.load_lines( directory );
-            DEBUG( "load_surfaces" );
-            builder.load_surfaces( directory );
-            DEBUG( "load_blocks" );
-            builder.load_blocks( directory );
-            DEBUG( "load_model_boundaries" );
-            builder.load_model_boundaries( directory );
-            DEBUG( "load_corner_collections" );
-            builder.load_corner_collections( directory );
-            DEBUG( "load_line_collections" );
-            builder.load_line_collections( directory );
-            DEBUG( "load_surface_collections" );
-            builder.load_surface_collections( directory );
-            DEBUG( "load_block_collections" );
-            builder.load_block_collections( directory );
-            DEBUG( "load_relationships" );
-            builder.load_relationships( directory );
-            DEBUG( "load_unique_vertices" );
-            builder.load_unique_vertices( directory );
+            Logger::set_level( Logger::LEVEL::warn );
+            async::parallel_invoke(
+                [&builder, &directory] {
+                    builder.load_identifier( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_corners( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_lines( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_surfaces( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_blocks( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_model_boundaries( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_corner_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_line_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_surface_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_block_collections( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_relationships( directory );
+                },
+                [&builder, &directory] {
+                    builder.load_unique_vertices( directory );
+                } );
             Logger::set_level( level );
-            DEBUG( "register_all_components" );
             detail::register_all_components( brep );
-            DEBUG( "filter_unsupported_components" );
             detail::filter_unsupported_components( brep );
-            DEBUG( "load_brep_files done" );
         }
     } // namespace detail
 } // namespace geode

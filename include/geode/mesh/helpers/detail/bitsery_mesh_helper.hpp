@@ -36,12 +36,10 @@ namespace geode
         template < typename Mesh >
         void initialize_crs( Mesh &mesh )
         {
-            DEBUG( "initialize_crs" );
             CoordinateReferenceSystemManagersBuilder< Mesh::dim >{ mesh }
                 .main_coordinate_reference_system_manager_builder()
                 .delete_coordinate_reference_system(
                     internal::PointsImpl< Mesh::dim >::POINTS_NAME );
-            DEBUG( "delete_crs" );
             auto crs_manager_builder =
                 CoordinateReferenceSystemManagersBuilder< Mesh::dim >{ mesh }
                     .main_coordinate_reference_system_manager_builder();
@@ -52,16 +50,13 @@ namespace geode
                         AttributeCoordinateReferenceSystem< Mesh::dim > >(
                         mesh.vertex_attribute_manager(),
                         internal::PointsImpl< Mesh::dim >::POINTS_NAME ) } );
-            DEBUG( "register_crs" );
             crs_manager_builder.set_active_coordinate_reference_system(
                 internal::PointsImpl< Mesh::dim >::POINTS_NAME );
-            DEBUG( "initialize_crs done" );
         }
 
         template < typename Mesh >
         void initialize_crs( Mesh &mesh, const geode::uuid &attribute_id )
         {
-            DEBUG( "initialize_crs" );
             CoordinateReferenceSystemManagersBuilder< Mesh::dim >{ mesh }
                 .main_coordinate_reference_system_manager_builder()
                 .delete_coordinate_reference_system(
@@ -77,7 +72,6 @@ namespace geode
                         mesh.vertex_attribute_manager(), attribute_id ) } );
             crs_manager_builder.set_active_coordinate_reference_system(
                 internal::PointsImpl< Mesh::dim >::POINTS_NAME );
-            DEBUG( "initialize_crs done" );
         }
     } // namespace detail
 } // namespace geode
