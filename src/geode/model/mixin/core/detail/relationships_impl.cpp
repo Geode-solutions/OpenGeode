@@ -44,9 +44,10 @@ namespace geode
         RelationshipsImpl::RelationshipsImpl() : graph_{ Graph::create() }
         {
             DEBUG( "RelationshipsImpl::RelationshipsImpl" );
-            geode::uuid new_id{};
-            initialize_attributes( new_id );
+            initialize_attributes();
         }
+
+        RelationshipsImpl::RelationshipsImpl( BITSERY ) {}
 
         index_t RelationshipsImpl::nb_components_with_relations() const
         {
@@ -113,6 +114,7 @@ namespace geode
                 edges_to_delete[edge.edge_id] = true;
             }
             auto builder = GraphBuilder::create( *graph_ );
+            DEBUG( graph_->nb_edges() );
             builder->delete_edges( edges_to_delete );
             const auto old2new =
                 builder->delete_isolated_vertices( { index.value() } );
@@ -193,9 +195,16 @@ namespace geode
         void RelationshipsImpl::copy(
             const RelationshipsImpl& impl, const ModelCopyMapping& mapping )
         {
+            DEBUG( impl.graph_->edge_attribute_manager()
+                    .attribute_ids_with_name( "edges" )
+                    .value()
+                    .size() );
             graph_ = impl.graph_->clone();
-            const auto attribute_id = impl.ids_->id();
-            initialize_attributes( attribute_id );
+            DEBUG( graph_->edge_attribute_manager()
+                    .attribute_ids_with_name( "edges" )
+                    .value()
+                    .size() );
+            initialize_attributes();
             std::vector< index_t > vertices_to_delete;
             for( const auto vertex_id : Range{ graph_->nb_vertices() } )
             {
@@ -240,20 +249,25 @@ namespace geode
             uuid2index_.update( old2new );
         }
 
-        void RelationshipsImpl::initialize_attributes( const geode::uuid& id )
+        void RelationshipsImpl::initialize_attributes()
         {
-            if( graph_->vertex_attribute_manager().attribute_exists( id ) )
+            DEBUG( "initialize_attributes" );
+            const auto ids =
+                graph_->vertex_attribute_manager().attribute_ids_with_name(
+                    "id" );
+            DEBUG( ids.has_value() );
+            if( ids.has_value() )
             {
-                DEBUG( "attribute do exists" );
-                ids_ =
-                    graph_->vertex_attribute_manager()
-                        .find_attribute< VariableAttribute, ComponentID >( id );
+                ids_ = graph_->vertex_attribute_manager()
+                           .find_attribute< VariableAttribute, ComponentID >(
+                               ids.value()[0] );
                 return;
             }
-            DEBUG( "initialize_attributes" );
-            graph_->vertex_attribute_manager()
-                .create_attribute< VariableAttribute, ComponentID >(
-                    "id", id, ComponentID{} );
+            DEBUG( "create id attribute" );
+            const auto id =
+                graph_->vertex_attribute_manager()
+                    .create_attribute< VariableAttribute, ComponentID >(
+                        "id", ComponentID{} );
             ids_ = graph_->vertex_attribute_manager()
                        .find_attribute< VariableAttribute, ComponentID >( id );
         }
@@ -290,6 +304,8 @@ namespace geode
 
         void RelationshipsImpl::delete_isolated_vertices()
         {
+            DEBUG( "delete_isolated_vertices" );
+            DEBUG( graph_->nb_vertices() );
             auto builder = GraphBuilder::create( *graph_ );
             const auto old2new = builder->delete_isolated_vertices();
             for( const auto v : Indices{ old2new } )

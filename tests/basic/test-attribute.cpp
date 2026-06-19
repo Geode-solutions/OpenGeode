@@ -462,6 +462,18 @@ void test_attribute_types( geode::AttributeManager& manager,
         "Returned attribute type is not correct (should be undefined)" );
 }
 
+void test_attribute_names( geode::AttributeManager& manager,
+    const geode::uuid& bool_variable_attribute_id )
+{
+    geode::OpenGeodeBasicException::test(
+        manager.find_attribute< geode::VariableAttribute, bool >(
+                   bool_variable_attribute_id )
+                ->name()
+                .value()
+            == "bool",
+        "Returned attribute name is not correct (should be bool)" );
+}
+
 void test_number_of_attributes(
     geode::AttributeManager& manager, geode::index_t nb )
 {
@@ -541,6 +553,7 @@ void test_copy_manager( geode::AttributeManager& manager,
     manager2.reserve( 15 );
     test_attribute_types( manager2, bool_variable_attribute_id );
     test_number_of_attributes( manager2, 8 );
+    test_attribute_names( manager2, bool_variable_attribute_id );
 }
 
 void test_import_manager( geode::AttributeManager& manager,

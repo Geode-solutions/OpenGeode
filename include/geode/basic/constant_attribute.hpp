@@ -56,9 +56,11 @@ namespace geode
 
     public:
         ConstantAttribute( T value,
+            std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
-            : ConstantAttribute( std::move( value ), std::move( properties ) )
+            : ConstantAttribute(
+                  std::move( value ), name, std::move( properties ) )
         {
         }
 
@@ -102,14 +104,18 @@ namespace geode
         }
 
     private:
-        ConstantAttribute( T value, AttributeProperties properties )
-            : ReadOnlyAttribute< T >( std::move( properties ) )
+        ConstantAttribute(
+            T value, std::string_view name, AttributeProperties properties )
+            : ReadOnlyAttribute< T >( name, std::move( properties ) )
         {
             set_value( std::move( value ) );
         }
 
+        ConstantAttribute( std::string_view name )
+            : ReadOnlyAttribute< T >( name, AttributeProperties{} ) {};
+
         ConstantAttribute()
-            : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
+            : ReadOnlyAttribute< T >( "default", AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -150,7 +156,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
+                new ConstantAttribute< T >{
+                    value_, this->name().value(), this->properties() }
             };
             return attribute;
         }
@@ -169,7 +176,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
+                new ConstantAttribute< T >{
+                    value_, this->name().value(), this->properties() }
             };
             return attribute;
         }
@@ -180,7 +188,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
+                new ConstantAttribute< T >{
+                    value_, this->name().value(), this->properties() }
             };
             return attribute;
         }

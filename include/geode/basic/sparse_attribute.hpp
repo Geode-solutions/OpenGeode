@@ -63,10 +63,11 @@ namespace geode
 
     public:
         SparseAttribute( T default_value,
+            std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
             : SparseAttribute(
-                  std::move( default_value ), std::move( properties ) )
+                  std::move( default_value ), name, std::move( properties ) )
         {
         }
 
@@ -113,14 +114,24 @@ namespace geode
         }
 
     private:
-        SparseAttribute( T default_value, AttributeProperties properties )
-            : ReadOnlyAttribute< T >( std::move( properties ) ),
+        SparseAttribute( T default_value,
+            std::string_view name,
+            AttributeProperties properties )
+            : ReadOnlyAttribute< T >( name, std::move( properties ) ),
               default_value_( std::move( default_value ) )
         {
             values_.reserve( 10 );
         }
 
-        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ) {}
+        SparseAttribute( std::string_view name )
+            : ReadOnlyAttribute< T >( name, AttributeProperties{} )
+        {
+        }
+
+        SparseAttribute()
+            : ReadOnlyAttribute< T >( "default", AttributeProperties{} )
+        {
+        }
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -186,7 +197,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
-                new SparseAttribute< T >{ default_value_, this->properties() }
+                new SparseAttribute< T >{
+                    default_value_, this->name().value(), this->properties() }
             };
             attribute->values_ = values_;
             return attribute;
@@ -217,7 +229,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
-                new SparseAttribute< T >{ default_value_, this->properties() }
+                new SparseAttribute< T >{
+                    default_value_, this->name().value(), this->properties() }
             };
             for( const auto i : Indices{ old2new } )
             {
@@ -242,7 +255,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
-                new SparseAttribute< T >{ default_value_, this->properties() }
+                new SparseAttribute< T >{
+                    default_value_, this->name().value(), this->properties() }
             };
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
             {

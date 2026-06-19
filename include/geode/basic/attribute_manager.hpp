@@ -122,13 +122,13 @@ namespace geode
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::create_attribute] Attribute '",
                 attribute_id.string(), "' already exists." );
-            typed_attribute.reset( new Attribute< T >{
-                std::move( default_value ), std::move( properties ), {} } );
+            typed_attribute.reset(
+                new Attribute< T >{ std::move( default_value ), attribute_name,
+                    std::move( properties ), {} } );
             DEBUG( "create_attribute" );
             SDEBUG( attribute_id );
             DEBUG( attribute_name );
             IdentifierBuilder builder{ *typed_attribute };
-            builder.set_name( attribute_name );
             builder.set_id( attribute_id );
             register_attribute( typed_attribute, attribute_id );
         }
@@ -264,7 +264,10 @@ namespace geode
          */
         [[nodiscard]] index_t nb_elements() const;
 
-        std::optional< std::vector< geode::uuid > > attribute_ids_with_name(
+        [[nodiscard]] std::optional< std::string_view > attribute_name(
+            const uuid& ) const;
+
+        std::optional< std::vector< uuid > > attribute_ids_with_name(
             std::string_view name ) const;
 
         void copy( const AttributeManager& attribute_manager );
@@ -274,7 +277,7 @@ namespace geode
 
         void import( const AttributeManager& attribute_manager,
             absl::Span< const index_t > old2new,
-            geode::uuid attribute_id );
+            uuid attribute_id );
 
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );

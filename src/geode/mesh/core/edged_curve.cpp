@@ -68,6 +68,11 @@ namespace geode
     EdgedCurve< dimension >::EdgedCurve() = default;
 
     template < index_t dimension >
+    EdgedCurve< dimension >::EdgedCurve( BITSERY bitsery ) : Graph{ bitsery }
+    {
+    }
+
+    template < index_t dimension >
     EdgedCurve< dimension >::EdgedCurve( EdgedCurve&& ) noexcept = default;
 
     template < index_t dimension >

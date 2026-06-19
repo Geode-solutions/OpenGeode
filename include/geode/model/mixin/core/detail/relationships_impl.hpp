@@ -26,8 +26,10 @@
 #include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/mesh/core/geode/geode_graph.hpp>
 #include <geode/mesh/core/graph.hpp>
 
 #include <geode/model/common.hpp>
@@ -47,6 +49,8 @@ namespace geode
         {
         public:
             using Iterator = typename EdgesAroundVertex::const_iterator;
+
+            RelationshipsImpl( BITSERY );
 
             [[nodiscard]] index_t nb_components_with_relations() const;
 
@@ -87,7 +91,7 @@ namespace geode
         protected:
             RelationshipsImpl();
 
-            void initialize_attributes( const geode::uuid& id );
+            void initialize_attributes();
 
             [[nodiscard]] std::optional< index_t > vertex_id(
                 const uuid& component_id ) const;
@@ -104,13 +108,15 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, RelationshipsImpl >{
                         { []( Archive& archive, RelationshipsImpl& impl ) {
+                             DEBUG( "serialize RelationshipsIMPL" );
+                             impl.graph_ = std::make_unique< OpenGeodeGraph >(
+                                 BITSERY::constructor );
                              archive.ext(
                                  impl.graph_, bitsery::ext::StdSmartPtr{} );
                              archive.object( impl.uuid2index_ );
                              archive.ext(
                                  impl.ids_, bitsery::ext::StdSmartPtr{} );
                              impl.attribute_id_ = impl.ids_->id();
-                             archive.object( impl.attribute_id_ );
                              impl.delete_isolated_vertices();
                          },
                             []( Archive& archive, RelationshipsImpl& impl ) {

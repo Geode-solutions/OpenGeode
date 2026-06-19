@@ -1189,6 +1189,7 @@ void test_compare_brep( const geode::BRep& model, const geode::BRep& model2 )
 
 void test_clone( const geode::BRep& brep )
 {
+    DEBUG( "test_clone" );
     geode::BRep brep2;
     geode::BRepBuilder builder{ brep2 };
     builder.copy( brep );

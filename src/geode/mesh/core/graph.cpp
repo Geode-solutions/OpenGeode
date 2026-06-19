@@ -48,6 +48,7 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
         {
+            DEBUG( "GRAPH IMPL" );
             const auto attribute_id =
                 graph.vertex_attribute_manager()
                     .template create_attribute< VariableAttribute,
@@ -58,6 +59,8 @@ namespace geode
                     .template find_attribute< VariableAttribute,
                         EdgesAroundVertex >( attribute_id );
         }
+
+        Impl() = default;
 
         AttributeManager& edge_attribute_manager() const
         {
@@ -112,8 +115,6 @@ namespace geode
         }
 
     private:
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -123,6 +124,7 @@ namespace geode
                          archive.object( impl.edge_attribute_manager_ );
                          archive.ext( impl.edges_around_vertex_,
                              bitsery::ext::StdSmartPtr{} );
+                         DEBUG( "SERIALIZE GRAPH IMPL" );
                          const auto& old_edges_around_vertex_properties =
                              impl.edges_around_vertex_->properties();
                          impl.edges_around_vertex_->set_properties(
@@ -132,6 +134,7 @@ namespace geode
                                  false } );
                      },
                         []( Archive& archive, Impl& impl ) {
+                            DEBUG( "SERIALIZE GRAPH IMPL" );
                             archive.object( impl.edge_attribute_manager_ );
                             archive.ext( impl.edges_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
@@ -162,6 +165,8 @@ namespace geode
     }
 
     Graph::Graph() : impl_( *this ) {}
+
+    Graph::Graph( BITSERY ) {}
 
     Graph::Graph( Graph&& ) noexcept = default;
 
@@ -282,8 +287,11 @@ namespace geode
     {
         serializer.ext( *this,
             Growable< Archive, Graph >{ { []( Archive& archive, Graph& graph ) {
+                DEBUG( "SERIALIZE GRAPH" );
                 archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
+                DEBUG( "SERIALIZE GRAPH 2" );
                 archive.object( graph.impl_ );
+                DEBUG( "SERIALIZE GRAPH 3" );
             } } } );
     }
 

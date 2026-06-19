@@ -180,6 +180,7 @@ void test()
     test_bounding_box( *point_set );
     DEBUG( "test_create_vertex_attribute" );
     const auto vertex_attribute_id = test_create_vertex_attribute( *point_set );
+    DEBUG( "test_io" );
     test_io(
         *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
     DEBUG( "test_backward_io" );

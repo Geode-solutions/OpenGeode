@@ -150,9 +150,10 @@ namespace geode
         }
 
     protected:
-        AttributeBase( AttributeProperties properties )
+        AttributeBase( std::string_view name, AttributeProperties properties )
             : properties_( std::move( properties ) )
         {
+            set_name( name );
         }
 
     private:
@@ -200,8 +201,9 @@ namespace geode
         }
 
     protected:
-        ReadOnlyAttribute( AttributeProperties properties )
-            : AttributeBase( std::move( properties ) )
+        ReadOnlyAttribute(
+            std::string_view name, AttributeProperties properties )
+            : AttributeBase( name, std::move( properties ) )
         {
         }
 

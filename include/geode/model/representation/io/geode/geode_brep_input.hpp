@@ -74,7 +74,7 @@ namespace geode
             BRepBuilder builder{ brep };
             DEBUG( "BRepBuilder done" );
             const auto level = Logger::level();
-            Logger::set_level( Logger::LEVEL::warn );
+            // Logger::set_level( Logger::LEVEL::trace );
             DEBUG( "load_identifier" );
             builder.load_identifier( directory );
             DEBUG( "load_corners" );

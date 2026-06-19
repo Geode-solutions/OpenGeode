@@ -209,11 +209,15 @@ void test()
     add_boundary_relations( relationships, uuids );
     add_internal_relations( relationships, uuids );
     add_items_in_collections( relationships, uuids );
+    DEBUG( "testing relationships" );
     test_relations( relationships, uuids );
+    DEBUG( "testing attributes" );
     test_attributes( relationships, uuids );
-
+    DEBUG( "saving relationships" );
     relationships.save_relationships( "." );
+    DEBUG( "loading relationships" );
     test_io( absl::StrCat( geode::DATA_PATH, "relationships_v12" ), uuids );
+    DEBUG( "loading relationships 1" );
     test_io( ".", uuids );
 }
 

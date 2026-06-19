@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -49,6 +50,8 @@ namespace geode
     public:
         using Builder = EdgedCurveBuilder< dimension >;
         static constexpr auto dim = dimension;
+
+        EdgedCurve( BITSERY );
 
         ~EdgedCurve();
 

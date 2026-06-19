@@ -451,6 +451,8 @@ namespace geode
 
     Section::Section() = default;
 
+    Section::Section( BITSERY bitsery ) : Topology{ bitsery } {}
+
     Section::Section( Section&& section ) noexcept
         : Topology{ std::move( section ) },
           Corners2D{ std::move( section ) },

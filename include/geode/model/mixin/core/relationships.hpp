@@ -25,6 +25,7 @@
 
 #include <optional>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -357,6 +358,7 @@ namespace geode
 
     public:
         Relationships();
+        Relationships( BITSERY );
         ~Relationships();
 
         [[nodiscard]] index_t nb_components_with_relations() const;

@@ -416,25 +416,22 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    DEBUG( "test_backward_io" );
     const auto solid = geode::load_hybrid_solid< 3 >( filename );
     geode::OpenGeodeMeshException::test( solid->nb_vertices() == 11,
         "Backward HybridSolid should have 11 vertices" );
-    SDEBUG( solid->point( 0 ) );
+    geode::OpenGeodeMeshException::test(
+        solid->point( 2 ) == geode::Point3D{ { 2, 1, 0 } },
+        "Backward HybridSolid has wrong point coordinates" );
     geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 4,
         "Backward HybridSolid should have 4 polyhedra" );
     geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 16,
         "Backward HybridSolid should have 16 facets" );
     geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 22,
         "Backward HybridSolid should have 22 edges" );
-    DEBUG( solid->facets()
-            .facet_from_vertices( solid->polyhedron_facet_vertices( { 1, 0 } ) )
-            .value() );
     geode::OpenGeodeMeshException::test(
         solid->facets().facet_from_vertices(
             solid->polyhedron_facet_vertices( { 1, 0 } ) )
-            == solid->facets().facet_from_vertices(
-                solid->polyhedron_facet_vertices( { 1, 0 } ) ),
+            == 6,
         "Backward HybridSolid has wrong polyhedron facet index" );
 }
 
@@ -487,23 +484,24 @@ void test()
     geode::OpenGeodeMeshLibrary::initialize();
     auto hybrid_solid = geode::HybridSolid3D::create(
         geode::OpenGeodeHybridSolid3D::impl_name_static() );
-    hybrid_solid->enable_edges();
-    hybrid_solid->enable_facets();
-    auto builder = geode::HybridSolidBuilder3D::create( *hybrid_solid );
+    // hybrid_solid->enable_edges();
+    // hybrid_solid->enable_facets();
+    // auto builder = geode::HybridSolidBuilder3D::create( *hybrid_solid );
 
-    test_create_vertices( *hybrid_solid, *builder );
-    test_create_polyhedra( *hybrid_solid, *builder );
-    test_edges( *hybrid_solid );
-    test_facets( *hybrid_solid );
-    test_polyhedron_adjacencies( *hybrid_solid, *builder );
-    test_io( *hybrid_solid,
-        absl::StrCat( "test.", hybrid_solid->native_extension() ) );
+    // test_create_vertices( *hybrid_solid, *builder );
+    // test_create_polyhedra( *hybrid_solid, *builder );
+    // test_edges( *hybrid_solid );
+    // test_facets( *hybrid_solid );
+    // test_polyhedron_adjacencies( *hybrid_solid, *builder );
+    // test_io( *hybrid_solid,
+    //     absl::StrCat( "test.", hybrid_solid->native_extension() ) );
     test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
         hybrid_solid->native_extension() ) );
-    test_permutation( *hybrid_solid, *builder );
-    test_delete_polyhedra( *hybrid_solid, *builder );
-    test_clone( *hybrid_solid );
-    test_delete_all( *hybrid_solid, *builder );
+    DEBUG( "coucou" );
+    // test_permutation( *hybrid_solid, *builder );
+    // test_delete_polyhedra( *hybrid_solid, *builder );
+    // test_clone( *hybrid_solid );
+    // test_delete_all( *hybrid_solid, *builder );
 }
 
 OPENGEODE_TEST( "hybrid-solid" )

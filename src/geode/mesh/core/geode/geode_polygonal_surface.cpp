@@ -52,11 +52,7 @@ namespace geode
             polygon_ptr_.emplace_back( 0 );
         }
 
-        Impl( OpenGeodePolygonalSurface< dimension >& mesh, BITSERY )
-        {
-            detail::template initialize_crs<
-                OpenGeodePolygonalSurface< dimension > >( mesh );
-        }
+        Impl() = default;
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
         {
@@ -188,8 +184,6 @@ namespace geode
         }
 
     private:
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -234,7 +228,7 @@ namespace geode
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface(
         BITSERY bitsery )
-        : PolygonalSurface< dimension >{ bitsery }, impl_( *this, bitsery )
+        : PolygonalSurface< dimension >{ bitsery }
     {
     }
 
@@ -282,41 +276,31 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodePolygonalSurface >{
                 { []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
+                     archive.ext(
+                         surface, bitsery::ext::BaseClass<
+                                      PolygonalSurface< dimension > >{} );
+                     archive.object( surface.impl_ );
                      const auto new_point_attribute_id =
                          surface.vertex_attribute_manager()
                              .attribute_ids_with_name( internal::PointsImpl<
                                  dimension >::POINTS_NAME )
                              .value()
                              .at( 0 );
-                     archive.ext(
-                         surface, bitsery::ext::BaseClass<
-                                      PolygonalSurface< dimension > >{} );
-                     archive.object( surface.impl_ );
-                     detail::import_old_attribute< VariableAttribute,
-                         Point< dimension > >(
-                         surface.vertex_attribute_manager(),
-                         internal::PointsImpl< dimension >::POINTS_NAME,
-                         new_point_attribute_id, surface.nb_vertices() );
                      detail::template initialize_crs<
                          OpenGeodePolygonalSurface< dimension > >(
                          surface, new_point_attribute_id );
                  },
                     []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
+                        archive.ext(
+                            surface, bitsery::ext::BaseClass<
+                                         PolygonalSurface< dimension > >{} );
+                        archive.object( surface.impl_ );
                         const auto new_point_attribute_id =
                             surface.vertex_attribute_manager()
                                 .attribute_ids_with_name( internal::PointsImpl<
                                     dimension >::POINTS_NAME )
                                 .value()
                                 .at( 0 );
-                        archive.ext(
-                            surface, bitsery::ext::BaseClass<
-                                         PolygonalSurface< dimension > >{} );
-                        archive.object( surface.impl_ );
-                        detail::import_old_attribute< VariableAttribute,
-                            Point< dimension > >(
-                            surface.vertex_attribute_manager(),
-                            internal::PointsImpl< dimension >::POINTS_NAME,
-                            new_point_attribute_id, surface.nb_vertices() );
                         detail::template initialize_crs<
                             OpenGeodePolygonalSurface< dimension > >(
                             surface, new_point_attribute_id );

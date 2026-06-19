@@ -245,6 +245,11 @@ void test_backward_io( const std::string& filename )
         "Backward TriangulatedSurface should have 5 vertices" );
     geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
         "Backward TriangulatedSurface should have 3 polygons" );
+    SDEBUG( surface->point( 0 ) );
+    geode::OpenGeodeMeshException::test(
+        surface->point( 0 ) == geode::Point3D{ { 0.1, 0.2, 0.3 } },
+        "Backward TriangulatedSurface should have point ( 0.1, 0.2, 0.3 ) at "
+        "index 0" );
     geode::OpenGeodeMeshException::test(
         surface->polygon_adjacent( { 0, 1 } ) == 1,
         "TriangulatedSurface adjacent index is not correct" );

@@ -28,6 +28,7 @@
 #include <absl/hash/hash.h>
 #include <absl/types/span.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -93,6 +94,7 @@ namespace geode
 
     public:
         VertexIdentifier();
+        VertexIdentifier( BITSERY );
         ~VertexIdentifier();
 
         [[nodiscard]] index_t nb_unique_vertices() const;

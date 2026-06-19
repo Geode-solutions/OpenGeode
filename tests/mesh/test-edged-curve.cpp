@@ -290,6 +290,9 @@ void test_backward_io( const std::string& filename )
         "Backward EdgedCurve edge vertex index is not correct" );
     geode::OpenGeodeMeshException::test( curve->nb_vertices() == 4,
         "Backward EdgedCurve has wrong number of vertices" );
+    geode::OpenGeodeMeshException::test(
+        curve->edges_around_vertex( 0 ).size() == 2,
+        "Backward EdgedCurve has wrong number of edges around vertex 0" );
 }
 
 void test_edge_requests( const geode::EdgedCurve3D& edged_curve,

@@ -65,6 +65,7 @@ void test()
         "Point [", outside.string(), "] should be outside the block." );
 
     // load a section with various surfaces to test 2D
+    DEBUG( "Loading section" );
     auto section = geode::load_section(
         absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
     geode::Point2D section_center{ { 230., 240. } };

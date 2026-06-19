@@ -60,6 +60,8 @@ namespace geode
             const uuid &attribute_id,
             const AttributeBase::AttributeKey &key )
         {
+            DEBUG( "register_attribute" );
+            DEBUG( nb_elements_ );
             attribute->resize( nb_elements_, key );
             attributes_.emplace( attribute_id, attribute );
         }
@@ -224,6 +226,11 @@ namespace geode
             return nb_elements_;
         }
 
+        std::optional< std::string_view > attribute_name( const uuid &id ) const
+        {
+            return attributes_.at( id )->name().value_or( "unknown" );
+        }
+
         std::optional< std::vector< uuid > > attribute_ids_with_name(
             std::string_view name ) const
         {
@@ -374,6 +381,8 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive &local_archive, Impl &impl ) {
+                         DEBUG( "AttributeManager::serialize" );
+                         DEBUG( impl.nb_elements_ );
                          local_archive.value4b( impl.nb_elements_ );
                          absl::linked_hash_map< std::string,
                              std::shared_ptr< AttributeBase > >
@@ -416,6 +425,8 @@ namespace geode
                          }
                      },
                         []( Archive &local_archive, Impl &impl ) {
+                            DEBUG( "AttributeManager::serialize" );
+                            DEBUG( impl.nb_elements_ );
                             local_archive.value4b( impl.nb_elements_ );
                             local_archive.ext( impl.attributes_,
                                 bitsery::ext::StdMap{
@@ -591,6 +602,12 @@ namespace geode
         AttributeManager::attribute_ids_with_name( std::string_view name ) const
     {
         return impl_->attribute_ids_with_name( name );
+    }
+
+    std::optional< std::string_view > AttributeManager::attribute_name(
+        const uuid &id ) const
+    {
+        return impl_->attribute_name( id );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,

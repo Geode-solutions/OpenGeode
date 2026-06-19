@@ -59,11 +59,7 @@ namespace geode
                 mesh );
         }
 
-        Impl( OpenGeodeRegularGrid< 2 >& mesh, BITSERY )
-        {
-            detail::template initialize_crs< OpenGeodeRegularGrid< 2 > >(
-                mesh );
-        }
+        Impl() = default;
 
         void update_origin( RegularGrid2D& grid, const Point2D& origin )
         {
@@ -115,8 +111,6 @@ namespace geode
         }
 
     private:
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -134,7 +128,7 @@ namespace geode
     OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid() : impl_( *this ) {}
 
     OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid( BITSERY bitsery )
-        : RegularGrid< 2 >{ bitsery }, impl_( *this, bitsery )
+        : RegularGrid< 2 >{ bitsery }
     {
     }
 
@@ -202,37 +196,29 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, OpenGeodeRegularGrid >{
                 { []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                     archive.ext(
+                         grid, bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
+                     archive.object( grid.impl_ );
                      const auto new_point_attribute_id =
                          grid.vertex_attribute_manager()
                              .attribute_ids_with_name(
                                  internal::PointsImpl< 2 >::POINTS_NAME )
                              .value()
                              .at( 0 );
-                     archive.ext(
-                         grid, bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
-                     archive.object( grid.impl_ );
-                     detail::import_old_attribute< VariableAttribute,
-                         Point< 2 > >( grid.vertex_attribute_manager(),
-                         internal::PointsImpl< 2 >::POINTS_NAME,
-                         new_point_attribute_id, grid.nb_vertices() );
                      detail::template initialize_crs<
                          OpenGeodeRegularGrid< 2 > >(
                          grid, new_point_attribute_id );
                  },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
+                        archive.ext( grid,
+                            bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
+                        archive.object( grid.impl_ );
                         const auto new_point_attribute_id =
                             grid.vertex_attribute_manager()
                                 .attribute_ids_with_name(
                                     internal::PointsImpl< 2 >::POINTS_NAME )
                                 .value()
                                 .at( 0 );
-                        archive.ext( grid,
-                            bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
-                        archive.object( grid.impl_ );
-                        detail::import_old_attribute< VariableAttribute,
-                            Point< 2 > >( grid.vertex_attribute_manager(),
-                            internal::PointsImpl< 2 >::POINTS_NAME,
-                            new_point_attribute_id, grid.nb_vertices() );
                         detail::template initialize_crs<
                             OpenGeodeRegularGrid< 2 > >(
                             grid, new_point_attribute_id );

@@ -120,6 +120,8 @@ namespace geode
                                           unique_vertices_attribute_id );
         }
 
+        Impl( BITSERY ) {}
+
         index_t nb_unique_vertices() const
         {
             return unique_vertices_.nb_vertices();
@@ -496,6 +498,7 @@ namespace geode
     };
 
     VertexIdentifier::VertexIdentifier() = default;
+    VertexIdentifier::VertexIdentifier( BITSERY bitsery ) : impl_{ bitsery } {}
     VertexIdentifier::VertexIdentifier( VertexIdentifier&& ) noexcept = default;
 
     VertexIdentifier& VertexIdentifier::operator=(

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/identifier.hpp>
 
 #include <geode/model/common.hpp>
@@ -388,6 +389,7 @@ namespace geode
 
     public:
         BRep();
+        BRep( BITSERY );
         BRep( BRep&& brep ) noexcept;
         BRep& operator=( BRep&& brep );
         ~BRep();

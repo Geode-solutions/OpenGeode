@@ -681,6 +681,8 @@ namespace geode
 
     BRep::BRep() = default;
 
+    BRep::BRep( BITSERY bitsery ) : Topology{ bitsery } {}
+
     BRep::BRep( BRep&& brep ) noexcept
         : Topology{ std::move( brep ) },
           Corners3D{ std::move( brep ) },

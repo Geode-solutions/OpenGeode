@@ -239,6 +239,7 @@ namespace geode
 
     void GraphBuilder::copy( const Graph& graph )
     {
+        DEBUG( "GraphBuilder::copy" );
         OpenGeodeMeshException::check_exception(
             graph_.nb_vertices() == 0 && graph_.nb_edges() == 0, nullptr,
             OpenGeodeException::TYPE::data,
