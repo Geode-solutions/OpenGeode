@@ -233,7 +233,11 @@ namespace geode
             std::vector< uuid > ids;
             for( const auto &[attribute_id, attribute] : attributes_ )
             {
-                if( attribute->name() == name )
+                if( !attribute->name().has_value() )
+                {
+                    continue;
+                }
+                if( attribute->name().value() == name )
                 {
                     ids.push_back( attribute_id );
                 }

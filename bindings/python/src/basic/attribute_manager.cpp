@@ -36,30 +36,49 @@ namespace geode
     void python_attribute_class( pybind11::class_< AttributeManager >& manager,
         const std::string& suffix )
     {
-        const auto read_suffix = absl::StrCat( "find_attribute_", suffix );
+        const auto read_suffix = absl::StrCat( "read_attribute_", suffix );
         manager.def(
-            read_suffix.c_str(), &AttributeManager::find_attribute< type > );
-        const auto constant_suffix =
-            absl::StrCat( "find_or_create_attribute_constant_", suffix );
-        manager.def( constant_suffix.c_str(),
+            read_suffix.c_str(), &AttributeManager::read_attribute< type > );
+        const auto create_constant_suffix =
+            absl::StrCat( "create_attribute_constant_", suffix );
+        manager.def( create_constant_suffix.c_str(),
+            static_cast< geode::uuid ( AttributeManager::* )(
+                std::string_view, type ) >(
+                &AttributeManager::create_attribute< ConstantAttribute,
+                    type > ) );
+        const auto find_constant_suffix =
+            absl::StrCat( "find_attribute_constant_", suffix );
+        manager.def( find_constant_suffix.c_str(),
             static_cast< std::shared_ptr< ConstantAttribute< type > > (
-                AttributeManager::* )( std::string_view, type ) >(
-                &AttributeManager::find_or_create_attribute< ConstantAttribute,
+                AttributeManager::* )( const geode::uuid& ) >(
+                &AttributeManager::find_attribute< ConstantAttribute,
                     type > ) );
-        const auto variable_suffix =
-            absl::StrCat( "find_or_create_attribute_variable_", suffix );
-        manager.def( variable_suffix.c_str(),
+        const auto create_variable_suffix =
+            absl::StrCat( "create_attribute_variable_", suffix );
+        manager.def( create_variable_suffix.c_str(),
+            static_cast< geode::uuid ( AttributeManager::* )(
+                std::string_view, type ) >(
+                &AttributeManager::create_attribute< VariableAttribute,
+                    type > ) );
+        const auto find_variable_suffix =
+            absl::StrCat( "find_attribute_variable_", suffix );
+        manager.def( find_variable_suffix.c_str(),
             static_cast< std::shared_ptr< VariableAttribute< type > > (
-                AttributeManager::* )( std::string_view, type ) >(
-                &AttributeManager::find_or_create_attribute< VariableAttribute,
+                AttributeManager::* )( const geode::uuid& ) >(
+                &AttributeManager::find_attribute< VariableAttribute,
                     type > ) );
-        const auto sparse_suffix =
-            absl::StrCat( "find_or_create_attribute_sparse_", suffix );
-        manager.def( sparse_suffix.c_str(),
+        const auto create_sparse_suffix =
+            absl::StrCat( "create_attribute_sparse_", suffix );
+        manager.def( create_sparse_suffix.c_str(),
+            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
+                type ) >( &AttributeManager::create_attribute< SparseAttribute,
+                type > ) );
+        const auto find_sparse_suffix =
+            absl::StrCat( "find_attribute_sparse_", suffix );
+        manager.def( find_sparse_suffix.c_str(),
             static_cast< std::shared_ptr< SparseAttribute< type > > (
-                AttributeManager::* )( std::string_view, type ) >(
-                &AttributeManager::find_or_create_attribute< SparseAttribute,
-                    type > ) );
+                AttributeManager::* )( const geode::uuid& ) >(
+                &AttributeManager::find_attribute< SparseAttribute, type > ) );
     }
 
     void define_attribute_manager( pybind11::module& module )
@@ -69,7 +88,7 @@ namespace geode
         manager.def( pybind11::init<>() )
             .def( "find_generic_attribute",
                 &AttributeManager::find_generic_attribute )
-            .def( "attribute_names", &AttributeManager::attribute_names )
+            .def( "attribute_ids", &AttributeManager::attribute_ids )
             .def( "attribute_type", &AttributeManager::attribute_type )
             .def( "attribute_exists", &AttributeManager::attribute_exists )
             .def( "nb_elements", &AttributeManager::nb_elements )

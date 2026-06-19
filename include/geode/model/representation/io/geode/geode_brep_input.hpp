@@ -71,7 +71,7 @@ namespace geode
         {
             BRepBuilder builder{ brep };
             const auto level = Logger::level();
-            Logger::set_level( Logger::LEVEL::warn );
+            // Logger::set_level( Logger::LEVEL::warn );
             async::parallel_invoke(
                 [&builder, &directory] {
                     builder.load_identifier( directory );
