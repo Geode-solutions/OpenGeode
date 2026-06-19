@@ -23,7 +23,7 @@
 
 #include <geode/model/helpers/ray_tracing.hpp>
 
-#include <absl/synchronization/mutex.h>
+#include <mutex>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -300,7 +300,7 @@ namespace geode
     private:
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
-            absl::MutexLock lock{ mutex_ };
+            std::lock_guard lock{ mutex_ };
             {
                 const auto it = aabb_trees_.find( surface.id() );
                 if( it != aabb_trees_.end() )
@@ -317,7 +317,7 @@ namespace geode
     private:
         const BRep& brep_;
         absl::flat_hash_map< uuid, std::unique_ptr< AABBTree3D > > aabb_trees_;
-        absl::Mutex mutex_;
+        std::mutex mutex_;
     };
 
     BRepRayTracing::BRepRayTracing( const BRep& brep ) : impl_{ brep } {}
