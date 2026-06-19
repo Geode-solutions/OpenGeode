@@ -62,6 +62,7 @@ namespace
         }
         return volume;
     }
+
     std::optional< bool > find_surface_side( const geode::BRep& brep,
         const geode::uuid& surface_uuid,
         const absl::flat_hash_map< geode::uuid, bool >& processed )
@@ -102,7 +103,11 @@ namespace
 
     struct SidedSurface
     {
-        SidedSurface() = default;
+        SidedSurface( const geode::uuid& id_in, bool side_in )
+            : surface_id{ id_in }, side{ side_in }
+        {
+        }
+
         geode::uuid surface_id;
         bool side{ false };
     };
@@ -120,16 +125,14 @@ namespace
         return to_process;
     }
 
-    std::vector< SidedSurface > compute_grouped_sided_surfaces(
+    GroupedSidedSurfaces compute_grouped_sided_surfaces(
         const geode::BRep& brep, std::queue< geode::uuid >& to_process )
     {
-        std::vector< SidedSurface > cur_surfaces;
+        GroupedSidedSurfaces cur_surfaces;
         absl::flat_hash_map< geode::uuid, bool > processed;
         const auto first_surface_uuid = to_process.front();
         to_process.pop();
-        auto& itr = cur_surfaces.emplace_back();
-        itr.surface_id = first_surface_uuid;
-        itr.side = true;
+        cur_surfaces.emplace_back( first_surface_uuid, true );
         processed.emplace( first_surface_uuid, true );
         geode::index_t skip_counter{ 0 };
         while( !to_process.empty() )
@@ -144,14 +147,12 @@ namespace
             {
                 continue;
             }
-            const auto surface_side =
-                find_surface_side( brep, surface_uuid, processed );
-            if( surface_side.has_value() )
+            if( const auto surface_side =
+                    find_surface_side( brep, surface_uuid, processed ) )
             {
-                auto& new_itr = cur_surfaces.emplace_back();
-                new_itr.surface_id = surface_uuid;
-                new_itr.side = surface_side.value();
+                cur_surfaces.emplace_back( surface_uuid, surface_side.value() );
                 processed.emplace( surface_uuid, surface_side.value() );
+                skip_counter = 0;
             }
             else
             {
@@ -175,9 +176,9 @@ namespace
         if( grouped_sided_surfaces.size() > 1 )
         {
             geode::Logger::warn( block.component_id().string(),
-                " has unconnected boundaries. This is either not valid or "
-                "the block boundaries are valid and the block shows one or "
-                "more holes inside it." );
+                " has unconnected boundaries. This block has either "
+                "topologically distinct parts or there are holes between the "
+                "block boundary surfaces." );
         }
         return grouped_sided_surfaces;
     }
@@ -240,14 +241,12 @@ namespace geode
         const auto& grouped_surfaces = sided_surfaces( brep, block );
         std::vector< double > volumes( grouped_surfaces.size() );
         index_t biggest_volume_id{ 0 };
-        double biggest_volume{ 0 };
         for( const auto group_id : geode::Indices{ grouped_surfaces } )
         {
             volumes[group_id] =
                 compute_group_volume( brep, grouped_surfaces[group_id] );
-            if( volumes[group_id] > biggest_volume )
+            if( volumes[group_id] > volumes[biggest_volume_id] )
             {
-                biggest_volume = volumes[group_id];
                 biggest_volume_id = group_id;
             }
         }
