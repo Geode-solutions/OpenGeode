@@ -246,15 +246,21 @@ def test_closest_vertex(grid):
 def test_clone(grid):
     attribute_name = "int_attribute"
     attribute_name_d = "double_attribute"
-    attribute = (
-        grid.polyhedron_attribute_manager().find_or_create_attribute_variable_int(
+    attribute_id = (
+        grid.polyhedron_attribute_manager().create_attribute_variable_int(
             attribute_name, 0
         )
     )
-    attribute_d = (
-        grid.vertex_attribute_manager().find_or_create_attribute_variable_double(
+    attribute = grid.polyhedron_attribute_manager().find_attribute_variable_int(
+        attribute_id
+    )
+    attribute_d_id = (
+        grid.vertex_attribute_manager().create_attribute_variable_double(
             attribute_name_d, 0
         )
+    )
+    attribute_d = grid.vertex_attribute_manager().find_attribute_variable_double(
+        attribute_d_id
     )
     for c in range(grid.nb_cells()):
         attribute.set_value(c, 2 * c)
@@ -263,18 +269,18 @@ def test_clone(grid):
     clone = grid.clone()
     if clone.grid_point([0, 0, 0]) != grid.grid_point([0, 0, 0]):
         raise ValueError("[Test] Wrong clone origin")
-    if not clone.polyhedron_attribute_manager().attribute_exists(attribute_name):
+    if not clone.polyhedron_attribute_manager().attribute_exists(attribute_id):
         raise ValueError("[Test] Clone missing attribute")
-    if not clone.vertex_attribute_manager().attribute_exists(attribute_name_d):
+    if not clone.vertex_attribute_manager().attribute_exists(attribute_d_id):
         raise ValueError("[Test] Clone missing attribute")
-    clone_attribute = clone.polyhedron_attribute_manager().find_attribute_int(
-        attribute_name
+    clone_attribute = clone.polyhedron_attribute_manager().read_attribute_int(
+        attribute_id
     )
     for c in range(clone.nb_cells()):
         if clone_attribute.value(c) != 2 * c:
             raise ValueError("[Test] Wrong clone attribute")
-    clone_attribute_d = clone.vertex_attribute_manager().find_attribute_double(
-        attribute_name_d
+    clone_attribute_d = clone.vertex_attribute_manager().read_attribute_double(
+        attribute_d_id
     )
     for c in range(clone.nb_vertices()):
         if clone_attribute_d.value(c) != 2 * c:

@@ -58,10 +58,12 @@ def test_bounding_box(point_set):
 
 def test_create_vertex_attribute(point_set):
     manager = point_set.vertex_attribute_manager()
-    attribute = point_set.vertex_attribute_manager(
-    ).find_or_create_attribute_constant_bool("test", True)
+    attribute_id = point_set.vertex_attribute_manager(
+    ).create_attribute_constant_bool("test", True)
+    attribute = manager.find_attribute_constant_bool(attribute_id)
     if attribute.constant_value() != True:
         raise ValueError("[Test] PointSet attribute value should be true")
+    return attribute_id
 
 
 def test_delete_vertex(point_set, builder):
@@ -80,12 +82,12 @@ def test_io(point_set, filename):
     new_point_set = mesh.load_point_set3D(filename)
 
 
-def test_clone(point_set):
+def test_clone(point_set, attribute_id):
     point_set2 = point_set.clone()
     if point_set2.nb_vertices() != 3:
         raise ValueError("[Test] PointSet2 should have 3 vertices")
 
-    attribute = point_set2.vertex_attribute_manager().find_attribute_bool("test")
+    attribute = point_set2.vertex_attribute_manager().read_attribute_bool(attribute_id)
     if attribute.value(0) != True:
         raise ValueError("[Test] PointSet2 attribute value should be true")
 
@@ -110,9 +112,9 @@ if __name__ == '__main__':
     builder = mesh.PointSetBuilder3D.create(point_set)
     test_create_vertices(point_set, builder)
     test_bounding_box(point_set)
-    test_create_vertex_attribute(point_set)
+    test_attribute_id =test_create_vertex_attribute(point_set)
     test_io(point_set, "test." + point_set.native_extension())
 
     test_permutation(point_set, builder)
     test_delete_vertex(point_set, builder)
-    test_clone(point_set)
+    test_clone(point_set, test_attribute_id)

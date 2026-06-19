@@ -66,10 +66,13 @@ def test_create_polygons(polygonal_surface, builder):
 
 
 def test_create_edge_attribute(polygonal_surface):
+    attribute_id = polygonal_surface.edges().edge_attribute_manager(
+    ).create_attribute_variable_uint("test", basic.NO_ID)
     attribute = polygonal_surface.edges().edge_attribute_manager(
-    ).find_or_create_attribute_variable_uint("test", basic.NO_ID)
+    ).find_attribute_variable_uint(attribute_id)
     for e in range(polygonal_surface.edges().nb_edges()):
         attribute.set_value(e, e)
+    return attribute_id
 
 
 def test_polygon_adjacencies(polygonal_surface, builder):
@@ -113,7 +116,7 @@ def test_previous_next_on_border(polygonal_surface):
         raise ValueError("[Test] Next edge on border index is not correct")
 
 
-def test_delete_polygon(polygonal_surface, builder):
+def test_delete_polygon(polygonal_surface, builder, attribute_id):
     to_delete = [False] * polygonal_surface.nb_polygons()
     to_delete[0] = True
     builder.delete_polygons(to_delete)
@@ -133,7 +136,7 @@ def test_delete_polygon(polygonal_surface, builder):
         raise ValueError("[Test] PolygonalSurface should have 6 edges")
 
     attribute = polygonal_surface.edges(
-    ).edge_attribute_manager().find_attribute_uint("test")
+    ).edge_attribute_manager().read_attribute_uint(attribute_id)
     for e in range(6):
         if attribute.value(e) != e:
             raise ValueError("[Test] Update of edge attributes after "
@@ -204,7 +207,7 @@ def test_polygon_vertex_normal():
             "[Test] PolygonalSurface polygon vertex normal is not correct")
 
 
-def test_io(polygonal_surface, filename):
+def test_io(polygonal_surface, filename, attribute_id):
     mesh.save_polygonal_surface3D(polygonal_surface, filename)
     new_polygonal_surface = mesh.load_polygonal_surface3D(filename)
 
@@ -218,7 +221,7 @@ def test_io(polygonal_surface, filename):
         raise ValueError(
             "[Test] Reloaded PolygonalSurface should have 3 polygons")
     attribute = new_polygonal_surface.edges(
-    ).edge_attribute_manager().find_attribute_uint("test")
+    ).edge_attribute_manager().read_attribute_uint(attribute_id)
     for e in range(new_polygonal_surface.edges().nb_edges()):
         if attribute.value(e) != e:
             raise ValueError(
@@ -365,7 +368,7 @@ if __name__ == '__main__':
     test_create_vertices(polygonal_surface, builder)
     test_bounding_box(polygonal_surface)
     test_create_polygons(polygonal_surface, builder)
-    test_create_edge_attribute(polygonal_surface)
+    edge_attribute_id = test_create_edge_attribute(polygonal_surface)
     test_polygon_adjacencies(polygonal_surface, builder)
     test_polygon_edges_on_borders(polygonal_surface)
     test_previous_next_on_border(polygonal_surface)
@@ -374,10 +377,10 @@ if __name__ == '__main__':
     test_polygon_normal()
     test_polygon_vertex_normal()
 
-    test_io(polygonal_surface, "test." + polygonal_surface.native_extension())
+    test_io(polygonal_surface, "test." + polygonal_surface.native_extension(),edge_attribute_id)
 
     test_permutation(polygonal_surface, builder)
-    test_delete_polygon(polygonal_surface, builder)
+    test_delete_polygon(polygonal_surface, builder, edge_attribute_id)
     test_clone(polygonal_surface)
     test_set_polygon_vertex(polygonal_surface, builder)
     test_delete_all(polygonal_surface, builder)

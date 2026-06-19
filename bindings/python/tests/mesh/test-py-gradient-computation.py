@@ -35,7 +35,8 @@ def test_gradient_grid2D():
     builder = mesh.RegularGridBuilder2D.create( grid )
     builder.initialize_cartesian_grid( geom.Point2D([ 0, 0 ] ), [ 3, 3 ], 1 )
     scalar_function_name = "scalar_function"
-    attribute = grid.vertex_attribute_manager().find_or_create_attribute_variable_double( scalar_function_name, 0 )
+    attribute_id = grid.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0 )
+    attribute = grid.vertex_attribute_manager().find_attribute_variable_double( attribute_id )
     attribute.set_value( 1, 1 )
     attribute.set_value( 4, 1 )
     attribute.set_value( 6, 1 )
@@ -50,7 +51,7 @@ def test_gradient_grid2D():
     attribute.set_value( 13, 2 )
     attribute.set_value( 14, 3 )
     attribute.set_value( 15, 8 )
-    gradient_name = mesh.compute_surface_scalar_function_gradient2D( grid, scalar_function_name )
+    gradient_name = mesh.compute_surface_scalar_function_gradient2D( grid, attribute_id )
     print("Gradient attribute name: ", gradient_name)
     mesh.save_regular_grid2D( grid, "grid_with_gradient.og_rgd2d" )
 
@@ -80,7 +81,8 @@ def test_gradient_triangulated_surface2D():
     builder.create_polygon( [ 5, 6, 8 ] )
     builder.compute_polygon_adjacencies()
     scalar_function_name = "scalar_function"
-    attribute = surface.vertex_attribute_manager().find_or_create_attribute_variable_double( scalar_function_name, 0 )
+    attribute_id = surface.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0 )
+    attribute = surface.vertex_attribute_manager().find_attribute_variable_double( attribute_id )
     attribute.set_value( 1, 1 )
     attribute.set_value( 2, 1 )
     attribute.set_value( 3, 1 )
@@ -89,7 +91,7 @@ def test_gradient_triangulated_surface2D():
     attribute.set_value( 9, 3 )
     attribute.set_value( 7, 2 )
     attribute.set_value( 8, 2 )
-    gradient_name = mesh.compute_surface_scalar_function_gradient2D( surface, scalar_function_name )
+    gradient_name = mesh.compute_surface_scalar_function_gradient2D( surface, attribute_id )
     print("Gradient attribute name: ", gradient_name)
     mesh.save_triangulated_surface2D( surface, "mesh_with_gradient.og_tsf2d" )
 
@@ -98,7 +100,8 @@ def test_gradient_grid3D():
     builder = mesh.RegularGridBuilder3D.create( grid )
     builder.initialize_cartesian_grid( geom.Point3D([ 0, 0, 0 ]), [ 2, 2, 2 ], 1 )
     scalar_function_name = "scalar_function"
-    attribute = grid.vertex_attribute_manager().find_or_create_attribute_variable_double( scalar_function_name, 0 )
+    attribute_id = grid.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0 )
+    attribute = grid.vertex_attribute_manager().find_attribute_variable_double( attribute_id )
     attribute.set_value( 4, 1 )
     attribute.set_value( 10, 1 )
     attribute.set_value( 12, 1 )
@@ -125,8 +128,8 @@ def test_gradient_grid3D():
     attribute.set_value( 20, 3 )
     attribute.set_value( 24, 3 )
     attribute.set_value( 26, 3 )
-    gradient_name = mesh.compute_solid_scalar_function_gradient3D( grid, scalar_function_name )
-    print("Gradient attribute name: ", gradient_name)
+    gradient_id= mesh.compute_solid_scalar_function_gradient3D( grid, attribute_id )
+    print("Gradient attribute name: ", gradient_id)
     mesh.save_regular_grid3D( grid, "grid_with_gradient.og_rgd3d" )
 
 if __name__ == '__main__':

@@ -33,6 +33,7 @@
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl.hpp>
 #include <geode/basic/uuid.hpp>
 

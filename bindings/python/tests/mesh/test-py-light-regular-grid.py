@@ -287,21 +287,25 @@ def test_closest_vertex(grid):
 
 
 def test_attribute_3d(grid):
-    attribute = grid.cell_attribute_manager().find_or_create_attribute_variable_double(
+    attribute_id = grid.cell_attribute_manager().create_attribute_variable_double(
         "toto", -1
     )
+    attribute = grid.cell_attribute_manager().find_attribute_variable_double(attribute_id)
     attribute.set_value(10, 10)
-    attribute = grid.cell_attribute_manager().find_attribute_double("toto")
+    attribute = grid.cell_attribute_manager().read_attribute_double(attribute_id)
     if attribute.value(0) != -1:
         raise ValueError("[Test] Wrong attribute value")
     if attribute.value(10) != 10:
         raise ValueError("[Test] Wrong attribute value")
     if attribute.value(grid.nb_cells() - 1) != -1:
         raise ValueError("[Test] Wrong attribute value")
-    attribute = (
-        grid.grid_vertex_attribute_manager().find_or_create_attribute_variable_double(
+    attribute_id = (
+        grid.grid_vertex_attribute_manager().create_attribute_variable_double(
             "toto_vertex", 1
         )
+    )
+    attribute = grid.grid_vertex_attribute_manager().find_attribute_variable_double(
+     attribute_id   
     )
     attribute.set_value(10, 10)
     if attribute.value(0) != 1:
@@ -314,21 +318,25 @@ def test_attribute_3d(grid):
 
 def test_attribute_2d():
     grid = mesh.LightRegularGrid2D(geom.Point2D([1.5, 0]), [5, 10], [1.0, 2.0])
-    attribute = grid.cell_attribute_manager().find_or_create_attribute_variable_double(
+    attribute_id = grid.cell_attribute_manager().create_attribute_variable_double(
         "toto", -1
     )
+    attribute = grid.cell_attribute_manager().find_attribute_variable_double(attribute_id)
     attribute.set_value(10, 10)
-    attribute = grid.cell_attribute_manager().find_attribute_double("toto")
+    attribute = grid.cell_attribute_manager().read_attribute_double(attribute_id)
     if attribute.value(0) != -1:
         raise ValueError("[Test] Wrong attribute value")
     if attribute.value(10) != 10:
         raise ValueError("[Test] Wrong attribute value")
     if attribute.value(grid.nb_cells() - 1) != -1:
         raise ValueError("[Test] Wrong attribute value")
-    attribute = (
-        grid.grid_vertex_attribute_manager().find_or_create_attribute_variable_double(
+    attribute_id = (
+        grid.grid_vertex_attribute_manager().create_attribute_variable_double(
             "toto_vertex", 1
         )
+    )
+    attribute = grid.grid_vertex_attribute_manager().find_attribute_variable_double(
+        attribute_id
     )
     attribute.set_value(10, 10)
     if attribute.value(0) != 1:

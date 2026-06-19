@@ -36,7 +36,6 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/identifier.hpp>
-#include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 
@@ -141,8 +140,7 @@ namespace geode
                             archive.object( attribute.properties_ );
                             std::string old_name;
                             archive.text1b( old_name, old_name.max_size() );
-                            IdentifierBuilder builder{ attribute };
-                            builder.set_name( old_name );
+                            attribute.set_name( old_name );
                         },
                         []( Archive& archive, AttributeBase& attribute ) {
                             archive.object( attribute.properties_ );
