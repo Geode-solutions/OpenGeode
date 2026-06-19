@@ -34,7 +34,7 @@
 #include <geode/mesh/core/internal/grid_impl.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
 #include <geode/mesh/core/regular_grid_surface.hpp>
-#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
+#include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
 namespace
 {

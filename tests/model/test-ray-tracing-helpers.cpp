@@ -47,7 +47,6 @@ void test()
     //  get the block
     geode::BRepRayTracing brep_ray_tracing{ brep };
     const auto block_id = brep_ray_tracing.block_containing_point( center );
-    SDEBUG( block_id.value() );
     geode::OpenGeodeModelException::test(
         block_id.has_value(), "Failed to recover block_containing_point." );
 
@@ -65,7 +64,6 @@ void test()
         "Point [", outside.string(), "] should be outside the block." );
 
     // load a section with various surfaces to test 2D
-    DEBUG( "Loading section" );
     auto section = geode::load_section(
         absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
     geode::Point2D section_center{ { 230., 240. } };

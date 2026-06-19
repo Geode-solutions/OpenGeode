@@ -98,16 +98,6 @@ namespace geode
                 return points_->id();
             }
 
-            template < typename Mesh >
-            void initialize_crs( Mesh& mesh )
-            {
-                CoordinateReferenceSystemManagersBuilder< dimension >{ mesh }
-                    .main_coordinate_reference_system_manager_builder()
-                    .delete_coordinate_reference_system( POINTS_NAME );
-                register_as_active_crs( mesh );
-                points_.reset();
-            }
-
         private:
             friend class bitsery::Access;
             template < typename Archive >
@@ -133,24 +123,6 @@ namespace geode
                                 archive.ext(
                                     impl.points_, bitsery::ext::StdSmartPtr{} );
                             } } } );
-            }
-
-            template < typename Mesh >
-            void register_as_active_crs( Mesh& mesh )
-            {
-                auto crs_manager_builder =
-                    CoordinateReferenceSystemManagersBuilder< dimension >{
-                        mesh
-                    }
-                        .main_coordinate_reference_system_manager_builder();
-                crs_manager_builder.register_coordinate_reference_system(
-                    POINTS_NAME,
-                    std::shared_ptr< CoordinateReferenceSystem< dimension > >{
-                        std::make_shared<
-                            AttributeCoordinateReferenceSystem< dimension > >(
-                            mesh.vertex_attribute_manager(), "points" ) } );
-                crs_manager_builder.set_active_coordinate_reference_system(
-                    POINTS_NAME );
             }
 
         private:

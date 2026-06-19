@@ -47,26 +47,8 @@ std::unique_ptr< geode::TriangulatedSurface3D > create_surface()
 
 void test_rescale( geode::TriangulatedSurface3D& surface )
 {
-    DEBUG( "before builder" );
-    SDEBUG( surface.point( 0 ) );
-    SDEBUG( surface.point( 1 ) );
-    SDEBUG( surface.point( 2 ) );
-    SDEBUG( surface.point( 3 ) );
-    SDEBUG( surface.point( 4 ) );
-
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
-    SDEBUG( surface.point( 0 ) );
-    SDEBUG( surface.point( 1 ) );
-    SDEBUG( surface.point( 2 ) );
-    SDEBUG( surface.point( 3 ) );
-    SDEBUG( surface.point( 4 ) );
     geode::rescale_mesh( surface, *builder, { 2, -2, 0.1 } );
-    DEBUG( "rescaled" );
-    SDEBUG( surface.point( 0 ) );
-    SDEBUG( surface.point( 1 ) );
-    SDEBUG( surface.point( 2 ) );
-    SDEBUG( surface.point( 3 ) );
-    SDEBUG( surface.point( 4 ) );
     geode::OpenGeodeMeshException::test(
         surface.point( 0 ).inexact_equal(
             geode::Point3D{ { 0.2, -0.4, 0.03 } } ),

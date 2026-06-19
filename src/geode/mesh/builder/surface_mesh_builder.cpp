@@ -832,11 +832,6 @@ namespace geode
             surface_mesh_.disable_edges();
         }
         VertexSetBuilder::copy( surface_mesh );
-        // if( surface_mesh.impl_name() == surface_mesh_.impl_name() )
-        // {
-        //     do_copy_points( surface_mesh );
-        //     do_copy_polygons( surface_mesh );
-        // }
         copy_polygons( surface_mesh, *this );
         if( surface_mesh.are_edges_enabled() )
         {

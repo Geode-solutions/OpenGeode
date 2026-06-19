@@ -85,42 +85,6 @@ namespace geode
     };
 } // namespace geode
 
-namespace geode
-{
-    namespace detail
-    {
-        template < template < typename > class Attribute, typename T >
-        void import_old_attribute( AttributeManager &manager,
-            std::string_view old_attribute_name,
-            geode::uuid new_attribute_id,
-            index_t attribute_size )
-        {
-            const auto ids =
-                manager.attribute_ids_with_name( old_attribute_name ).value();
-            geode::uuid old_attribute_id;
-            for( const auto &id : ids )
-            {
-                if( id == new_attribute_id )
-                {
-                    continue;
-                }
-                old_attribute_id = id;
-            }
-            auto old_attribute =
-                manager.read_attribute< T >( old_attribute_id );
-            auto new_attribute =
-                manager.find_attribute< Attribute, T >( new_attribute_id );
-            manager.resize( attribute_size );
-            for( const auto index : geode::Range{ attribute_size } )
-            {
-                new_attribute->set_value(
-                    index, old_attribute->value( index ) );
-            }
-            manager.delete_attribute( old_attribute_id );
-        }
-    } // namespace detail
-} // namespace geode
-
 namespace bitsery
 {
     namespace traits

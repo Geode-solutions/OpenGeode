@@ -115,7 +115,6 @@ namespace geode
                              archive.object( impl.uuid2index_ );
                              archive.ext(
                                  impl.ids_, bitsery::ext::StdSmartPtr{} );
-                             impl.attribute_id_ = impl.ids_->id();
                              impl.delete_isolated_vertices();
                          },
                             []( Archive& archive, RelationshipsImpl& impl ) {
@@ -124,7 +123,6 @@ namespace geode
                                 archive.object( impl.uuid2index_ );
                                 archive.ext(
                                     impl.ids_, bitsery::ext::StdSmartPtr{} );
-                                archive.object( impl.attribute_id_ );
                                 impl.delete_isolated_vertices();
                             } } } );
             }
@@ -143,7 +141,6 @@ namespace geode
             std::unique_ptr< Graph > graph_;
             detail::UuidToIndex uuid2index_;
             std::shared_ptr< VariableAttribute< ComponentID > > ids_;
-            geode::uuid attribute_id_;
         };
     } // namespace detail
 } // namespace geode

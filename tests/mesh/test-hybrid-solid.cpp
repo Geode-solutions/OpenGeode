@@ -484,24 +484,23 @@ void test()
     geode::OpenGeodeMeshLibrary::initialize();
     auto hybrid_solid = geode::HybridSolid3D::create(
         geode::OpenGeodeHybridSolid3D::impl_name_static() );
-    // hybrid_solid->enable_edges();
-    // hybrid_solid->enable_facets();
-    // auto builder = geode::HybridSolidBuilder3D::create( *hybrid_solid );
+    hybrid_solid->enable_edges();
+    hybrid_solid->enable_facets();
+    auto builder = geode::HybridSolidBuilder3D::create( *hybrid_solid );
 
-    // test_create_vertices( *hybrid_solid, *builder );
-    // test_create_polyhedra( *hybrid_solid, *builder );
-    // test_edges( *hybrid_solid );
-    // test_facets( *hybrid_solid );
-    // test_polyhedron_adjacencies( *hybrid_solid, *builder );
-    // test_io( *hybrid_solid,
-    //     absl::StrCat( "test.", hybrid_solid->native_extension() ) );
+    test_create_vertices( *hybrid_solid, *builder );
+    test_create_polyhedra( *hybrid_solid, *builder );
+    test_edges( *hybrid_solid );
+    test_facets( *hybrid_solid );
+    test_polyhedron_adjacencies( *hybrid_solid, *builder );
+    test_io( *hybrid_solid,
+        absl::StrCat( "test.", hybrid_solid->native_extension() ) );
     test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
         hybrid_solid->native_extension() ) );
-    DEBUG( "coucou" );
-    // test_permutation( *hybrid_solid, *builder );
-    // test_delete_polyhedra( *hybrid_solid, *builder );
-    // test_clone( *hybrid_solid );
-    // test_delete_all( *hybrid_solid, *builder );
+    test_permutation( *hybrid_solid, *builder );
+    test_delete_polyhedra( *hybrid_solid, *builder );
+    test_clone( *hybrid_solid );
+    test_delete_all( *hybrid_solid, *builder );
 }
 
 OPENGEODE_TEST( "hybrid-solid" )

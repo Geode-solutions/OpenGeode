@@ -37,7 +37,7 @@
 
 #include <geode/mesh/core/detail/geode_elements.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
-#include <geode/mesh/helpers/detail/bitsery_mesh_helper.hpp>
+#include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
 namespace
 {
