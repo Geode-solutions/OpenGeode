@@ -302,22 +302,22 @@ namespace geode
         {
             {
                 std::shared_lock read_lock{ mutex_ };
-                const auto it = aabb_trees_.find( surface.id() );
-                if( it != aabb_trees_.end() )
+                const auto tree_it = aabb_trees_.find( surface.id() );
+                if( tree_it != aabb_trees_.end() )
                 {
-                    return *it->second;
+                    return *tree_it->second;
                 }
             }
             std::lock_guard write_lock{ mutex_ };
-            const auto it = aabb_trees_.find( surface.id() );
-            if( it != aabb_trees_.end() )
+            const auto tree_it = aabb_trees_.find( surface.id() );
+            if( tree_it != aabb_trees_.end() )
             {
-                return *it->second;
+                return *tree_it->second;
             }
-            const auto [it, inserted] = aabb_trees_.emplace(
+            const auto [new_tree_it, inserted] = aabb_trees_.emplace(
                 surface.id(), std::make_unique< AABBTree3D >(
                                   create_aabb_tree( surface.mesh() ) ) );
-            return *it->second;
+            return *new_tree_it->second;
         }
 
     private:
