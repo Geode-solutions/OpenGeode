@@ -23,7 +23,7 @@
 
 #include <geode/model/helpers/ray_tracing.hpp>
 
-#include <mutex>
+#include <absl/base/call_once.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -237,7 +237,15 @@ namespace geode
     class BRepRayTracing::Impl
     {
     public:
-        explicit Impl( const BRep& brep ) : brep_( brep ) {}
+        explicit Impl( const BRep& brep ) : brep_( brep )
+        {
+            aabb_trees_.reserve( brep.nb_surfaces() );
+            for( const auto& surface : brep.surfaces() )
+            {
+                aabb_trees_.emplace(
+                    surface.id(), std::make_unique< CachedTree >() );
+            }
+        }
 
         BoundarySurfaceIntersections find_intersections_with_boundaries(
             const InfiniteLine3D& infinite_line, const Block3D& block )
@@ -298,26 +306,24 @@ namespace geode
         }
 
     private:
+        struct CachedTree
+        {
+            absl::once_flag built;
+            AABBTree3D tree;
+        };
+
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
-            std::lock_guard lock{ mutex_ };
-            {
-                const auto it = aabb_trees_.find( surface.id() );
-                if( it != aabb_trees_.end() )
-                {
-                    return *it->second;
-                }
-            }
-            const auto [it, inserted] = aabb_trees_.emplace(
-                surface.id(), std::make_unique< AABBTree3D >(
-                                  create_aabb_tree( surface.mesh() ) ) );
-            return *it->second;
+            auto& entry = *aabb_trees_.at( surface.id() );
+            absl::call_once( entry.built, [&surface, &entry] {
+                entry.tree = create_aabb_tree( surface.mesh() );
+            } );
+            return entry.tree;
         }
 
     private:
         const BRep& brep_;
-        absl::flat_hash_map< uuid, std::unique_ptr< AABBTree3D > > aabb_trees_;
-        std::mutex mutex_;
+        absl::flat_hash_map< uuid, std::unique_ptr< CachedTree > > aabb_trees_;
     };
 
     BRepRayTracing::BRepRayTracing( const BRep& brep ) : impl_{ brep } {}
