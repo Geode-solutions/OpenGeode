@@ -23,7 +23,8 @@
 
 #include <geode/model/helpers/ray_tracing.hpp>
 
-#include <shared_mutex>
+#include <absl/base/call_once.h>
+#include <absl/synchronization/mutex.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -298,32 +299,34 @@ namespace geode
         }
 
     private:
+        struct CachedTree
+        {
+            absl::once_flag built;
+            AABBTree3D tree;
+        };
+
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
-            {
-                std::shared_lock read_lock{ mutex_ };
-                const auto tree_it = aabb_trees_.find( surface.id() );
-                if( tree_it != aabb_trees_.end() )
-                {
-                    return *tree_it->second;
-                }
-            }
-            std::lock_guard write_lock{ mutex_ };
-            const auto tree_it = aabb_trees_.find( surface.id() );
-            if( tree_it != aabb_trees_.end() )
-            {
-                return *tree_it->second;
-            }
-            const auto [new_tree_it, inserted] = aabb_trees_.emplace(
-                surface.id(), std::make_unique< AABBTree3D >(
-                                  create_aabb_tree( surface.mesh() ) ) );
-            return *new_tree_it->second;
+            auto& entry = cached_tree( surface.id() );
+            absl::call_once( entry.built, [&surface, &entry] {
+                entry.tree = create_aabb_tree( surface.mesh() );
+            } );
+            return entry.tree;
+        }
+
+        CachedTree& cached_tree( const uuid& surface_id )
+        {
+            absl::MutexLock lock{ mutex_ };
+            return *aabb_trees_
+                        .try_emplace(
+                            surface_id, std::make_unique< CachedTree >() )
+                        .first->second;
         }
 
     private:
         const BRep& brep_;
-        absl::flat_hash_map< uuid, std::unique_ptr< AABBTree3D > > aabb_trees_;
-        std::shared_mutex mutex_;
+        absl::flat_hash_map< uuid, std::unique_ptr< CachedTree > > aabb_trees_;
+        absl::Mutex mutex_;
     };
 
     BRepRayTracing::BRepRayTracing( const BRep& brep ) : impl_{ brep } {}
