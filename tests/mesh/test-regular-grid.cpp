@@ -353,16 +353,17 @@ void test_closest_vertex( const geode::RegularGrid3D& grid )
 
 void test_clone( const geode::RegularGrid3D& grid )
 {
-    auto attribute_id = grid.polyhedron_attribute_manager()
-                            .create_attribute< geode::VariableAttribute, int >(
-                                "int_attribute", 0 );
+    auto attribute_id =
+        grid.polyhedron_attribute_manager()
+            .create_attribute< geode::VariableAttribute, int >(
+                "int_attribute", 0, geode::AttributeProperties{} );
     auto attribute =
         grid.polyhedron_attribute_manager()
             .find_attribute< geode::VariableAttribute, int >( attribute_id );
     auto attribute_d_id =
         grid.vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "double_attribute", 0 );
+                "double_attribute", 0, geode::AttributeProperties{} );
     auto attribute_d = grid.vertex_attribute_manager()
                            .find_attribute< geode::VariableAttribute, double >(
                                attribute_d_id );
@@ -423,7 +424,7 @@ void test_clone( const geode::RegularGrid3D& grid )
         clone->vertex_attribute_manager().attribute_exists( attribute_d_id ),
         "Clone missing attribute" );
     const auto clone_attribute =
-        clone->polyhedron_attribute_manager().read_attribute< int >(
+        clone->polyhedron_attribute_manager().find_read_only_attribute< int >(
             attribute_id );
     for( const auto c : geode::TRange< int >{ clone->nb_polyhedra() } )
     {
@@ -431,7 +432,7 @@ void test_clone( const geode::RegularGrid3D& grid )
             clone_attribute->value( c ) == 2 * c, "Wrong clone attribute" );
     }
     const auto clone_attribute_d =
-        clone->vertex_attribute_manager().read_attribute< double >(
+        clone->vertex_attribute_manager().find_read_only_attribute< double >(
             attribute_d_id );
     for( const auto c : geode::TRange< int >{ clone->nb_vertices() } )
     {

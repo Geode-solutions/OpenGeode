@@ -124,7 +124,7 @@ def test_edge_requests(edged_curve, builder):
 
 def test_clone(edged_curve):
     attribute_id = edged_curve.edge_attribute_manager(
-    ).create_attribute_variable_int("test", 0)
+    ).create_attribute_variable_int("test", 0,opengeode_py_basic.AttributeProperties())
 
     attribute = edged_curve.edge_attribute_manager().find_attribute_variable_int(attribute_id)
     attribute.set_value(0, 42)
@@ -135,7 +135,7 @@ def test_clone(edged_curve):
     if edged_curve2.nb_edges() != 3:
         raise ValueError("[Test] EdgedCurve2 should have 3 edge")
 
-    attribute2 = edged_curve2.edge_attribute_manager().read_attribute_int(attribute_id)
+    attribute2 = edged_curve2.edge_attribute_manager().find_read_only_attribute_int(attribute_id)
     if attribute2.value(0) != 42:
         raise ValueError("[Test] EdgedCurve2 attribute should be 42")
 

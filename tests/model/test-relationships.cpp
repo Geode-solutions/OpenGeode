@@ -169,7 +169,8 @@ void test_attributes( const geode::Relationships& relations,
         "Wrong relation uuids from index" );
     auto relation_att_id =
         relations.relation_attribute_manager()
-            .create_attribute< geode::VariableAttribute, int >( "int", 0 );
+            .create_attribute< geode::VariableAttribute, int >(
+                "int", 0, geode::AttributeProperties{} );
     const auto relation_att =
         relations.relation_attribute_manager()
             .find_attribute< geode::VariableAttribute, int >( relation_att_id );

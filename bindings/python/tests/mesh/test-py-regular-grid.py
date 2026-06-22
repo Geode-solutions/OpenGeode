@@ -248,7 +248,7 @@ def test_clone(grid):
     attribute_name_d = "double_attribute"
     attribute_id = (
         grid.polyhedron_attribute_manager().create_attribute_variable_int(
-            attribute_name, 0
+            attribute_name, 0,geode.AttributeProperties()
         )
     )
     attribute = grid.polyhedron_attribute_manager().find_attribute_variable_int(
@@ -256,7 +256,7 @@ def test_clone(grid):
     )
     attribute_d_id = (
         grid.vertex_attribute_manager().create_attribute_variable_double(
-            attribute_name_d, 0
+            attribute_name_d, 0,geode.AttributeProperties()
         )
     )
     attribute_d = grid.vertex_attribute_manager().find_attribute_variable_double(
@@ -273,13 +273,13 @@ def test_clone(grid):
         raise ValueError("[Test] Clone missing attribute")
     if not clone.vertex_attribute_manager().attribute_exists(attribute_d_id):
         raise ValueError("[Test] Clone missing attribute")
-    clone_attribute = clone.polyhedron_attribute_manager().read_attribute_int(
+    clone_attribute = clone.polyhedron_attribute_manager().find_read_only_attribute_int(
         attribute_id
     )
     for c in range(clone.nb_cells()):
         if clone_attribute.value(c) != 2 * c:
             raise ValueError("[Test] Wrong clone attribute")
-    clone_attribute_d = clone.vertex_attribute_manager().read_attribute_double(
+    clone_attribute_d = clone.vertex_attribute_manager().find_read_only_attribute_double(
         attribute_d_id
     )
     for c in range(clone.nb_vertices()):

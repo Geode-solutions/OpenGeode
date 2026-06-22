@@ -227,7 +227,7 @@ namespace geode
             return attributes_.at( id )->name().value_or( "unknown" );
         }
 
-        std::optional< std::vector< uuid > > attribute_ids_with_name(
+        std::optional< std::vector< uuid > > attribute_ids_matching_name(
             std::string_view name ) const
         {
             std::vector< uuid > ids;
@@ -560,9 +560,10 @@ namespace geode
     }
 
     std::optional< std::vector< geode::uuid > >
-        AttributeManager::attribute_ids_with_name( std::string_view name ) const
+        AttributeManager::attribute_ids_matching_name(
+            std::string_view name ) const
     {
-        return impl_->attribute_ids_with_name( name );
+        return impl_->attribute_ids_matching_name( name );
     }
 
     std::optional< std::string_view > AttributeManager::attribute_name(
@@ -579,7 +580,7 @@ namespace geode
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
         absl::Span< const index_t > old2new,
-        geode::uuid attribute_id )
+        const geode::uuid &attribute_id )
     {
         impl_->import( *attribute_manager.impl_, old2new, attribute_id, {} );
     }
@@ -592,7 +593,7 @@ namespace geode
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
         const GenericMapping< index_t > &old2new_mapping,
-        geode::uuid attribute_id )
+        const geode::uuid &attribute_id )
     {
         impl_->import(
             *attribute_manager.impl_, old2new_mapping, attribute_id, {} );

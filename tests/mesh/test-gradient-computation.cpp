@@ -51,7 +51,7 @@ void test_gradient_grid2D()
     auto attribute_id =
         grid->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "scalar_function", 0 );
+                "scalar_function", 0, geode::AttributeProperties{} );
     auto attribute =
         grid->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );
@@ -104,7 +104,7 @@ void test_gradient_triangulated_surface2D()
     auto attribute_id =
         surface->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "scalar_function", 0 );
+                "scalar_function", 0, geode::AttributeProperties{} );
     auto attribute =
         surface->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );
@@ -133,7 +133,7 @@ void test_gradient_grid3D()
     auto attribute_id =
         grid->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "scalar_function", 0 );
+                "scalar_function", 0, geode::AttributeProperties{} );
     auto attribute =
         grid->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );

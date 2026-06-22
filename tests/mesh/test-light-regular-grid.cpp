@@ -334,7 +334,8 @@ void test_attribute( const geode::LightRegularGrid3D& grid )
 {
     auto attribute_id =
         grid.cell_attribute_manager()
-            .create_attribute< geode::VariableAttribute, double >( "test", -1 );
+            .create_attribute< geode::VariableAttribute, double >(
+                "test", -1, geode::AttributeProperties{} );
     auto attribute =
         grid.cell_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );

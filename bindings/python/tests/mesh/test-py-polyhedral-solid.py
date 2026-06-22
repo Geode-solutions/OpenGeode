@@ -73,7 +73,7 @@ def test_create_polyhedra(polyhedral_solid, builder):
 
 def test_create_facet_attribute(polyhedral_solid):
     attribute_id = polyhedral_solid.facets().facet_attribute_manager(
-    ).create_attribute_variable_uint("test", basic.NO_ID)
+    ).create_attribute_variable_uint("test", basic.NO_ID, basic.AttributeProperties())
     attribute = polyhedral_solid.facets().facet_attribute_manager(
     ).find_attribute_variable_uint(attribute_id)
     for f in range(polyhedral_solid.facets().nb_facets()):
@@ -83,7 +83,7 @@ def test_create_facet_attribute(polyhedral_solid):
 
 def test_create_edge_attribute(polyhedral_solid):
     attribute_id = polyhedral_solid.edges().edge_attribute_manager(
-    ).create_attribute_variable_uint("test", basic.NO_ID)
+    ).create_attribute_variable_uint("test", basic.NO_ID, basic.AttributeProperties())
     attribute = polyhedral_solid.edges().edge_attribute_manager(
     ).find_attribute_variable_uint(attribute_id)
     for e in range(polyhedral_solid.edges().nb_edges()):
@@ -166,7 +166,7 @@ def test_delete_polyhedra(polyhedral_solid, builder,edge_attribute_id):
     if polyhedral_solid.edges().nb_edges() != 12:
         raise ValueError("[Test] PolyhedralSolid should have 12 edges")
     attribute = polyhedral_solid.edges(
-    ).edge_attribute_manager().read_attribute_uint(edge_attribute_id)
+    ).edge_attribute_manager().find_read_only_attribute_uint(edge_attribute_id)
     if attribute.value(0) != 1:
         raise ValueError(
             "[Test] Wrong value for attribute on edge 0 after polyhedron deletion")
@@ -192,7 +192,7 @@ def test_io(polyhedral_solid, filename, facet_attribute_id):
         raise ValueError(
             "[Test] Reloaded PolyhedralSolid should have 3 polyhedra")
     attribute = new_polyhedral_solid.facets(
-    ).facet_attribute_manager().read_attribute_uint(facet_attribute_id)
+    ).facet_attribute_manager().find_read_only_attribute_uint(facet_attribute_id)
     for f in range(new_polyhedral_solid.facets().nb_facets()):
         if attribute.value(f) != f:
             raise ValueError(

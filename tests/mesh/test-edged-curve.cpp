@@ -311,9 +311,9 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
 
 void test_clone( const geode::EdgedCurve3D& edged_curve )
 {
-    auto attribute_id =
-        edged_curve.edge_attribute_manager()
-            .create_attribute< geode::VariableAttribute, int >( "edge", 0 );
+    auto attribute_id = edged_curve.edge_attribute_manager()
+                            .create_attribute< geode::VariableAttribute, int >(
+                                "edge", 0, geode::AttributeProperties{} );
     auto attribute =
         edged_curve.edge_attribute_manager()
             .find_attribute< geode::VariableAttribute, int >( attribute_id );
@@ -328,7 +328,7 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
         edged_curve2.nb_edges() == 3, "EdgedCurve2 should have 3 edge" );
 
     const auto attribute2 =
-        edged_curve2.edge_attribute_manager().read_attribute< int >(
+        edged_curve2.edge_attribute_manager().find_read_only_attribute< int >(
             attribute_id );
     geode::OpenGeodeMeshException::test(
         attribute2->value( 0 ) == 42, "EdgedCurve2 attribute should be 42" );

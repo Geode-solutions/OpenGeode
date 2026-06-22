@@ -242,7 +242,7 @@ namespace geode
         void initialize_relation_attribute()
         {
             const auto ids =
-                relation_attribute_manager().attribute_ids_with_name(
+                relation_attribute_manager().attribute_ids_matching_name(
                     "relation_type" );
             if( ids.has_value() )
             {
@@ -255,7 +255,7 @@ namespace geode
             const auto id =
                 relation_attribute_manager()
                     .create_attribute< VariableAttribute, RelationType >(
-                        "relation_type", NO_ID );
+                        "relation_type", NO_ID, geode::AttributeProperties{} );
             relation_type_ =
                 relation_attribute_manager()
                     .find_attribute< VariableAttribute, RelationType >( id );

@@ -118,7 +118,8 @@ void convert_grid_to_surface()
     auto test_attribute_id =
         old_regular_grid_surface->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::Point2D >(
-                "test", geode::Point2D{ { 0., 0. } } );
+                "test", geode::Point2D{ { 0., 0. } },
+                geode::AttributeProperties{} );
     auto test_attribute =
         old_regular_grid_surface->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::Point2D >(
@@ -128,8 +129,9 @@ void convert_grid_to_surface()
             *old_regular_grid )
             .value();
     old_regular_grid_surface2->vertex_attribute_manager()
-        .create_attribute< geode::VariableAttribute, geode::Point2D >(
-            "test", test_attribute_id, geode::Point2D{ { 0., 0. } } );
+        .create_attribute< geode::VariableAttribute, geode::Point2D >( "test",
+            test_attribute_id, geode::Point2D{ { 0., 0. } },
+            geode::AttributeProperties{} );
     auto test_attribute2 =
         old_regular_grid_surface2->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::Point2D >(

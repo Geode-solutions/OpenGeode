@@ -343,7 +343,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         solid.facets()
             .facet_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "facet_id", 0 );
+                "facet_id", 0, geode::AttributeProperties{} );
     auto attr_from =
         solid.facets()
             .facet_attribute_manager()
@@ -357,7 +357,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         solid.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "edge_id", 0 );
+                "edge_id", 0, geode::AttributeProperties{} );
     auto attr_edge_from =
         solid.edges()
             .edge_attribute_manager()
@@ -372,9 +372,10 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     geode::OpenGeodeTetrahedralSolid3D solid4{ std::move(
         *dynamic_cast< geode::OpenGeodeTetrahedralSolid3D* >(
             solid2.get() ) ) };
-    const auto attr_to = solid4.facets()
-                             .facet_attribute_manager()
-                             .read_attribute< geode::index_t >( attr_from_id );
+    const auto attr_to =
+        solid4.facets()
+            .facet_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( attr_from_id );
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -392,7 +393,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     const auto attr_edge_to =
         solid4.edges()
             .edge_attribute_manager()
-            .read_attribute< geode::index_t >( attr_edge_from_id );
+            .find_read_only_attribute< geode::index_t >( attr_edge_from_id );
     for( const auto e : geode::Range{ solid.edges().nb_edges() } )
     {
         geode::OpenGeodeMeshException::test(

@@ -134,7 +134,7 @@ geode::uuid test_create_facet_attribute(
         polyhedral_solid.facets()
             .facet_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "facet_attribute", geode::NO_ID );
+                "facet_attribute", geode::NO_ID, geode::AttributeProperties{} );
     auto attribute =
         polyhedral_solid.facets()
             .facet_attribute_manager()
@@ -154,7 +154,7 @@ geode::uuid test_create_edge_attribute(
         polyhedral_solid.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "test", geode::NO_ID );
+                "test", geode::NO_ID, geode::AttributeProperties{} );
     auto attribute =
         polyhedral_solid.edges()
             .edge_attribute_manager()
@@ -383,9 +383,10 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::OpenGeodeMeshException::test(
         polyhedral_solid.edges().nb_edges() == 12,
         "PolyhedralSolid should have 12 edges" );
-    auto attribute = polyhedral_solid.edges()
-                         .edge_attribute_manager()
-                         .read_attribute< geode::index_t >( edge_attribute_id );
+    auto attribute =
+        polyhedral_solid.edges()
+            .edge_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( edge_attribute_id );
     geode::OpenGeodeMeshException::test( attribute->value( 0 ) == 1,
         "Wrong value for attribute on edge 0 after vertex deletion" );
     geode::OpenGeodeMeshException::test( attribute->value( 1 ) == 3,
@@ -430,7 +431,7 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     auto attribute =
         new_polyhedral_solid->facets()
             .facet_attribute_manager()
-            .read_attribute< geode::index_t >( facet_attribute_id );
+            .find_read_only_attribute< geode::index_t >( facet_attribute_id );
     for( auto f : geode::Range{ new_polyhedral_solid->facets().nb_facets() } )
     {
         geode::OpenGeodeMeshException::test( attribute->value( f ) == f,
@@ -540,10 +541,11 @@ void test_normals()
 geode::uuid test_create_vertex_attribute(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
-    auto attribute_id = polyhedral_solid.vertex_attribute_manager()
-                            .create_attribute< geode::VariableAttribute,
-                                geode::PolyhedronFacetVertex >(
-                                "test", geode::PolyhedronFacetVertex{} );
+    auto attribute_id =
+        polyhedral_solid.vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute,
+                geode::PolyhedronFacetVertex >( "test",
+                geode::PolyhedronFacetVertex{}, geode::AttributeProperties{} );
     auto attribute = polyhedral_solid.vertex_attribute_manager()
                          .find_attribute< geode::VariableAttribute,
                              geode::PolyhedronFacetVertex >( attribute_id );
@@ -569,9 +571,10 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::OpenGeodeMeshException::test( polyhedral_solid2.nb_polyhedra() == 2,
         "PolyhedralSolid2 should have 2 polyhedra" );
 
-    const auto attribute2 = polyhedral_solid2.vertex_attribute_manager()
-                                .read_attribute< geode::PolyhedronFacetVertex >(
-                                    vertex_attribute_id );
+    const auto attribute2 =
+        polyhedral_solid2.vertex_attribute_manager()
+            .find_read_only_attribute< geode::PolyhedronFacetVertex >(
+                vertex_attribute_id );
     std::vector< geode::PolyhedronFacetVertex > att_answer{ { { 4, 0 }, 1 },
         { { 2, 0 }, 1 }, { { 6, 0 }, 1 }, { { 1, 0 }, 1 }, { { 5, 0 }, 1 },
         { { 0, 0 }, 1 }, { { 7, 0 }, 1 }, { { 3, 0 }, 1 } };

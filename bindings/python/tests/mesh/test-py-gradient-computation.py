@@ -35,7 +35,7 @@ def test_gradient_grid2D():
     builder = mesh.RegularGridBuilder2D.create( grid )
     builder.initialize_cartesian_grid( geom.Point2D([ 0, 0 ] ), [ 3, 3 ], 1 )
     scalar_function_name = "scalar_function"
-    attribute_id = grid.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0 )
+    attribute_id = grid.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0,opengeode_py_basic.AttributeProperties() )
     attribute = grid.vertex_attribute_manager().find_attribute_variable_double( attribute_id )
     attribute.set_value( 1, 1 )
     attribute.set_value( 4, 1 )
@@ -81,7 +81,7 @@ def test_gradient_triangulated_surface2D():
     builder.create_polygon( [ 5, 6, 8 ] )
     builder.compute_polygon_adjacencies()
     scalar_function_name = "scalar_function"
-    attribute_id = surface.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0 )
+    attribute_id = surface.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0,opengeode_py_basic.AttributeProperties() )
     attribute = surface.vertex_attribute_manager().find_attribute_variable_double( attribute_id )
     attribute.set_value( 1, 1 )
     attribute.set_value( 2, 1 )
@@ -100,7 +100,7 @@ def test_gradient_grid3D():
     builder = mesh.RegularGridBuilder3D.create( grid )
     builder.initialize_cartesian_grid( geom.Point3D([ 0, 0, 0 ]), [ 2, 2, 2 ], 1 )
     scalar_function_name = "scalar_function"
-    attribute_id = grid.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0 )
+    attribute_id = grid.vertex_attribute_manager().create_attribute_variable_double( scalar_function_name, 0,opengeode_py_basic.AttributeProperties() )
     attribute = grid.vertex_attribute_manager().find_attribute_variable_double( attribute_id )
     attribute.set_value( 4, 1 )
     attribute.set_value( 10, 1 )

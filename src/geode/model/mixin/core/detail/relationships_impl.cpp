@@ -235,7 +235,7 @@ namespace geode
         void RelationshipsImpl::initialize_attributes()
         {
             const auto ids =
-                graph_->vertex_attribute_manager().attribute_ids_with_name(
+                graph_->vertex_attribute_manager().attribute_ids_matching_name(
                     "id" );
             if( ids.has_value() )
             {
@@ -247,7 +247,7 @@ namespace geode
             const auto id =
                 graph_->vertex_attribute_manager()
                     .create_attribute< VariableAttribute, ComponentID >(
-                        "id", ComponentID{} );
+                        "id", ComponentID{}, AttributeProperties{} );
             ids_ = graph_->vertex_attribute_manager()
                        .find_attribute< VariableAttribute, ComponentID >( id );
         }

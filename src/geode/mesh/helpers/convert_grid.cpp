@@ -54,7 +54,7 @@ namespace geode
         auto color_attribute_id =
             grid.cell_attribute_manager()
                 .template create_attribute< VariableAttribute, RGBColor >(
-                    "RGB_data", {} );
+                    "RGB_data", {}, geode::AttributeProperties{} );
         auto color =
             grid.cell_attribute_manager()
                 .template find_attribute< VariableAttribute, RGBColor >(

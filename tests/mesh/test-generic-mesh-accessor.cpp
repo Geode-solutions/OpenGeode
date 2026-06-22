@@ -53,7 +53,7 @@ std::unique_ptr< geode::EdgedCurve3D > create_edged_curve(
     builder->create_edge( 0, 2 );
     edged_curve->edge_attribute_manager()
         .create_attribute< geode::VariableAttribute, geode::index_t >(
-            "edge", attribute_id, 2 );
+            "edge", attribute_id, 2, geode::AttributeProperties{} );
     auto attribute =
         edged_curve->edge_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::index_t >(
@@ -76,7 +76,7 @@ std::unique_ptr< geode::TriangulatedSurface2D > create_surface(
     builder->compute_polygon_adjacencies();
     surface->polygon_attribute_manager()
         .create_attribute< geode::VariableAttribute, geode::index_t >(
-            "surface", attribute_id, 2 );
+            "surface", attribute_id, 2, geode::AttributeProperties{} );
     auto attribute =
         surface->polygon_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::index_t >(
@@ -100,7 +100,7 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid(
     builder->compute_polyhedron_adjacencies();
     solid->polyhedron_attribute_manager()
         .create_attribute< geode::VariableAttribute, geode::index_t >(
-            "solid", attribute_id, 2 );
+            "solid", attribute_id, 2, geode::AttributeProperties{} );
     auto attribute =
         solid->polyhedron_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::index_t >(
@@ -135,7 +135,8 @@ void test_basic_accessor( const Mesh& mesh,
         "Wrong size of element vertices container" );
     const auto attribute =
         accessor.element_attribute_manager()
-            .template read_attribute< geode::index_t >( attribute_id );
+            .template find_read_only_attribute< geode::index_t >(
+                attribute_id );
     geode::OpenGeodeMeshException::test(
         attribute->value( 0 ) == 2 && attribute->value( 1 ) == 5,
         "Wrong values of the element attributes." );

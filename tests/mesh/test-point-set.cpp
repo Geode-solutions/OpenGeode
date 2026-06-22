@@ -84,9 +84,9 @@ void test_bounding_box( const geode::PointSet3D& point_set )
 
 geode::uuid test_create_vertex_attribute( const geode::PointSet3D& point_set )
 {
-    auto attribute_id =
-        point_set.vertex_attribute_manager()
-            .create_attribute< geode::ConstantAttribute, bool >( "bool", true );
+    auto attribute_id = point_set.vertex_attribute_manager()
+                            .create_attribute< geode::ConstantAttribute, bool >(
+                                "bool", true, geode::AttributeProperties{} );
     const auto attribute =
         point_set.vertex_attribute_manager()
             .find_attribute< geode::ConstantAttribute, bool >( attribute_id );
@@ -143,7 +143,7 @@ void test_clone(
         point_set2->nb_vertices() == 3, "PointSet2 should have 3 vertices" );
 
     const auto attribute =
-        point_set2->vertex_attribute_manager().read_attribute< bool >(
+        point_set2->vertex_attribute_manager().find_read_only_attribute< bool >(
             attribute_id );
     geode::OpenGeodeMeshException::test( attribute->value( 0 ) == true,
         "PointSet2 attribute value should be true" );

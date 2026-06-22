@@ -239,13 +239,11 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    DEBUG( "test_backward_io" );
     const auto surface = geode::load_triangulated_surface< 3 >( filename );
     geode::OpenGeodeMeshException::test( surface->nb_vertices() == 5,
         "Backward TriangulatedSurface should have 5 vertices" );
     geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
         "Backward TriangulatedSurface should have 3 polygons" );
-    SDEBUG( surface->point( 0 ) );
     geode::OpenGeodeMeshException::test(
         surface->point( 0 ) == geode::Point3D{ { 0.1, 0.2, 0.3 } },
         "Backward TriangulatedSurface should have point ( 0.1, 0.2, 0.3 ) at "
@@ -268,7 +266,7 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         surface.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "edge_id", 0 );
+                "edge_id", 0, geode::AttributeProperties{} );
     auto attr_from =
         surface.edges()
             .edge_attribute_manager()
@@ -288,9 +286,10 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         "TriangulatedSurface2 should have 5 edges" );
     geode::OpenGeodeMeshException::test( surface2.nb_polygons() == 2,
         "TriangulatedSurface2 should have 2 polygons" );
-    auto attr_to = surface2.edges()
-                       .edge_attribute_manager()
-                       .read_attribute< geode::index_t >( attr_from_id );
+    auto attr_to =
+        surface2.edges()
+            .edge_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( attr_from_id );
     for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         geode::OpenGeodeMeshException::test(

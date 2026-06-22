@@ -201,7 +201,7 @@ namespace geode
                      archive.object( grid.impl_ );
                      const auto new_point_attribute_id =
                          grid.vertex_attribute_manager()
-                             .attribute_ids_with_name(
+                             .attribute_ids_matching_name(
                                  internal::PointsImpl< 2 >::POINTS_NAME )
                              .value()
                              .at( 0 );
@@ -215,7 +215,7 @@ namespace geode
                         archive.object( grid.impl_ );
                         const auto new_point_attribute_id =
                             grid.vertex_attribute_manager()
-                                .attribute_ids_with_name(
+                                .attribute_ids_matching_name(
                                     internal::PointsImpl< 2 >::POINTS_NAME )
                                 .value()
                                 .at( 0 );

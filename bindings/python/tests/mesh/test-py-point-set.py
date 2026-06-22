@@ -59,7 +59,7 @@ def test_bounding_box(point_set):
 def test_create_vertex_attribute(point_set):
     manager = point_set.vertex_attribute_manager()
     attribute_id = point_set.vertex_attribute_manager(
-    ).create_attribute_constant_bool("test", True)
+    ).create_attribute_constant_bool("test", True,opengeode_py_basic.AttributeProperties())
     attribute = manager.find_attribute_constant_bool(attribute_id)
     if attribute.constant_value() != True:
         raise ValueError("[Test] PointSet attribute value should be true")
@@ -87,7 +87,7 @@ def test_clone(point_set, attribute_id):
     if point_set2.nb_vertices() != 3:
         raise ValueError("[Test] PointSet2 should have 3 vertices")
 
-    attribute = point_set2.vertex_attribute_manager().read_attribute_bool(attribute_id)
+    attribute = point_set2.vertex_attribute_manager().find_read_only_attribute_bool(attribute_id)
     if attribute.value(0) != True:
         raise ValueError("[Test] PointSet2 attribute value should be true")
 

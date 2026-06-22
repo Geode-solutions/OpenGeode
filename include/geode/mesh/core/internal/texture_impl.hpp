@@ -94,7 +94,8 @@ namespace geode
             {
                 const auto texture_id =
                     manager.create_attribute< VariableAttribute,
-                        ElementTextureCoordinates >( name, {} );
+                        ElementTextureCoordinates >(
+                        name, {}, geode::AttributeProperties{} );
                 coordinates_ = manager.find_attribute< VariableAttribute,
                     ElementTextureCoordinates >( texture_id );
             }

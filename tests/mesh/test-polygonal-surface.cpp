@@ -74,7 +74,7 @@ geode::uuid test_create_vertex_attribute(
     auto attribute_id =
         polygonal_surface.vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::PolygonEdge >(
-                "test", geode::PolygonEdge{} );
+                "test", geode::PolygonEdge{}, geode::AttributeProperties{} );
     auto attribute =
         polygonal_surface.vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::PolygonEdge >(
@@ -232,7 +232,7 @@ geode::uuid test_create_edge_attribute(
         polygonal_surface.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "edges", geode::NO_ID );
+                "edges", geode::NO_ID, geode::AttributeProperties{} );
     auto attribute =
         polygonal_surface.edges()
             .edge_attribute_manager()
@@ -378,7 +378,7 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
     const auto attribute =
         polygonal_surface.edges()
             .edge_attribute_manager()
-            .read_attribute< geode::index_t >( edge_attribute_id );
+            .find_read_only_attribute< geode::index_t >( edge_attribute_id );
     for( const auto e : geode::Range{ 6 } )
     {
         geode::OpenGeodeMeshException::test( attribute->value( e ) == e,
@@ -508,7 +508,7 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     const auto attribute =
         new_polygonal_surface->edges()
             .edge_attribute_manager()
-            .read_attribute< geode::index_t >( edge_attribute_id );
+            .find_read_only_attribute< geode::index_t >( edge_attribute_id );
     for( const auto e :
         geode::Range{ new_polygonal_surface->edges().nb_edges() } )
     {
@@ -562,9 +562,9 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface,
     geode::OpenGeodeMeshException::test( polygonal_surface2.nb_polygons() == 2,
         "PolygonalSurface2 should have 2 polygons" );
 
-    const auto attribute2 =
-        polygonal_surface2.vertex_attribute_manager()
-            .read_attribute< geode::PolygonEdge >( vertex_attribute_id );
+    const auto attribute2 = polygonal_surface2.vertex_attribute_manager()
+                                .find_read_only_attribute< geode::PolygonEdge >(
+                                    vertex_attribute_id );
     std::vector< geode::PolygonEdge > att_answer{ { 4, 0 }, { 2, 0 }, { 6, 0 },
         { 1, 0 }, { 5, 0 }, { 0, 0 }, { 3, 0 } };
     for( const auto v : geode::Range{ polygonal_surface2.nb_vertices() } )

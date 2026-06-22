@@ -32,9 +32,9 @@ import opengeode_py_basic as basic
 def test_constant_attribute(manager):
     
     constant_attribute_id = manager.create_attribute_constant_bool(
-        "bool", True)
+        "bool", True, basic.AttributeProperties())
     constant_attribute = manager.find_attribute_constant_bool(constant_attribute_id)
-    attribute = manager.read_attribute_bool(constant_attribute_id)
+    attribute = manager.find_read_only_attribute_bool(constant_attribute_id)
     if not attribute.value(0):
         raise ValueError("[Test] Should be equal to True")
 
@@ -46,7 +46,7 @@ def test_constant_attribute(manager):
 
 def test_int_variable_attribute(manager):
     variable_attribute_id = manager.create_attribute_variable_int(
-        "int", 12)
+        "int", 12,basic.AttributeProperties())
     variable_attribute = manager.find_attribute_variable_int(variable_attribute_id)
     variable_attribute.set_value(3, 3)
     if not variable_attribute.is_genericable():
@@ -56,48 +56,48 @@ def test_int_variable_attribute(manager):
     if not variable_attribute.properties().assignable or not variable_attribute.properties().interpolable :
         raise ValueError("[Test] Should be assignable and interpolable")
 
-    read_attribute = manager.read_attribute_int(variable_attribute_id)
+    find_read_only_attribute = manager.find_read_only_attribute_int(variable_attribute_id)
     if variable_attribute.value(3) != 3:
         raise ValueError("[Test] Should be equal to 3")
     if variable_attribute.value(6) != 12:
         raise ValueError("[Test] Should be equal to 12")
-    if read_attribute.value(3) != 3:
+    if find_read_only_attribute.value(3) != 3:
         raise ValueError("[Test] Should be equal to 3")
-    if read_attribute.value(6) != 12:
+    if find_read_only_attribute.value(6) != 12:
         raise ValueError("[Test] Should be equal to 12")
 
     variable_attribute.set_value(3, 5)
     if variable_attribute.value(3) != 5:
         raise ValueError("[Test] Should be equal to 5")
-    if read_attribute.value(3) != 5:
+    if find_read_only_attribute.value(3) != 5:
         raise ValueError("[Test] Should be equal to 5")
 
 
 def test_double_sparse_attribute(manager):
     sparse_attribute_id = manager.create_attribute_sparse_double(
-        "double", 12)
+        "double", 12,basic.AttributeProperties())
     attribute = manager.find_attribute_sparse_double(sparse_attribute_id)
     attribute.set_value(3, 3)
     attribute.set_value(7, 7)
 
-    read_attribute = manager.read_attribute_double(sparse_attribute_id)
+    find_read_only_attribute = manager.find_read_only_attribute_double(sparse_attribute_id)
     if attribute.value(3) != 3:
         raise ValueError("[Test] Should be equal to 3")
     if attribute.value(6) != 12:
         raise ValueError("[Test] Should be equal to 12")
     if attribute.value(7) != 7:
         raise ValueError("[Test] Should be equal to 7")
-    if read_attribute.value(3) != 3:
+    if find_read_only_attribute.value(3) != 3:
         raise ValueError("[Test] Should be equal to 3")
-    if read_attribute.value(6) != 12:
+    if find_read_only_attribute.value(6) != 12:
         raise ValueError("[Test] Should be equal to 12")
-    if read_attribute.value(7) != 7:
+    if find_read_only_attribute.value(7) != 7:
         raise ValueError("[Test] Should be equal to 7")
 
     attribute.set_value(3, 5)
     if attribute.value(3) != 5:
         raise ValueError("[Test] Should be equal to 5")
-    if read_attribute.value(3) != 5:
+    if find_read_only_attribute.value(3) != 5:
         raise ValueError("[Test] Should be equal to 5")
     return sparse_attribute_id
 
@@ -119,7 +119,7 @@ def test_delete_attribute_elements(manager):
 
 
 def test_sparse_attribute_after_element_deletion(manager, double_attribute_id):
-    sparse_attribute = manager.read_attribute_double(double_attribute_id)
+    sparse_attribute = manager.find_read_only_attribute_double(double_attribute_id)
     if sparse_attribute.value(0) != 12:
         raise ValueError("Element 0 of sparse attribute should be 12 ")
     if sparse_attribute.value(5) != 7:

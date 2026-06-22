@@ -74,8 +74,8 @@ namespace geode
          * @exception OpenGeodeException if no Attribute found
          */
         template < typename T >
-        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > read_attribute(
-            const geode::uuid& attribute_id ) const
+        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > >
+            find_read_only_attribute( const geode::uuid& attribute_id ) const
         {
             absl::ReaderMutexLock lock{ mutex() };
             auto attribute =
@@ -83,7 +83,9 @@ namespace geode
                     find_attribute_base( attribute_id ) );
             OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
                 OpenGeodeException::TYPE::data,
-                "[AttributeManager::find_attribute] Could not find attribute '",
+                "[AttributeManager::find_read_only_attribute] Could not find "
+                "attribute "
+                "with id :'",
                 attribute_id.string(),
                 "'. You have to create an attribute before using it. See "
                 "create_attribute method and derived classes of "
@@ -100,7 +102,8 @@ namespace geode
                 find_attribute_base( attribute_id ) );
             OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
                 OpenGeodeException::TYPE::data,
-                "[AttributeManager::find_attribute] Could not find attribute '",
+                "[AttributeManager::find_attribute] Could not find attribute "
+                "with id :  '",
                 attribute_id.string(),
                 "'. You have to create an attribute before using it. See "
                 "create_attribute method and derived classes of "
@@ -121,24 +124,14 @@ namespace geode
             OpenGeodeBasicException::check_exception(
                 typed_attribute.get() == nullptr, nullptr,
                 OpenGeodeException::TYPE::data,
-                "[AttributeManager::create_attribute] Attribute '",
+                "[AttributeManager::create_attribute] Attribute with id '",
                 attribute_id.string(), "' already exists." );
-            typed_attribute.reset(
-                new Attribute< T >{ std::move( default_value ), attribute_name,
-                    std::move( properties ), {} } );
+            typed_attribute = std::make_unique< Attribute< T > >(
+                std::move( default_value ), attribute_name,
+                std::move( properties ), AttributeBase::AttributeKey{} );
             IdentifierBuilder builder{ *typed_attribute };
             builder.set_id( attribute_id );
             register_attribute( typed_attribute, attribute_id );
-        }
-
-        template < template < typename > class Attribute, typename T >
-        void create_attribute( std::string_view attribute_name,
-            const geode::uuid& attribute_id,
-            T default_value )
-        {
-            return create_attribute< Attribute, T >( attribute_name,
-                attribute_id, std::move( default_value ),
-                AttributeProperties{} );
         }
 
         template < template < typename > class Attribute, typename T >
@@ -151,14 +144,6 @@ namespace geode
             create_attribute< Attribute, T >( attribute_name, attribute_id,
                 std::move( default_value ), std::move( properties ) );
             return attribute_id;
-        }
-
-        template < template < typename > class Attribute, typename T >
-        [[nodiscard]] geode::uuid create_attribute(
-            std::string_view attribute_name, T default_value )
-        {
-            return create_attribute< Attribute, T >( attribute_name,
-                std::move( default_value ), AttributeProperties{} );
         }
 
         /*!
@@ -205,26 +190,26 @@ namespace geode
         [[nodiscard]] bool has_interpolable_attributes() const;
 
         /*!
-         * Get all the associated attribute names
+         * Get all the associated attribute ids
          */
         [[nodiscard]] absl::FixedArray< geode::uuid > attribute_ids() const;
 
         /*!
-         * Return true if an attribute matching the given name.
-         * @param[in] name The attribute name to use
+         * Return true if an attribute matching the given id.
+         * @param[in] id The attribute id to use
          */
         [[nodiscard]] bool attribute_exists( const geode::uuid& ) const;
 
         /*!
-         * Delete the attribute matching the given name.
-         * Do nothing if the name does not exist.
-         * @param[in] name The attribute name to delete
+         * Delete the attribute matching the given id.
+         * Do nothing if the id does not exist.
+         * @param[in] id The attribute id to delete
          */
         void delete_attribute( const geode::uuid& );
 
         /*!
-         * Get the typeid name of the attribute type
-         * @param[in] name The attribute name to use
+         * Get the typeid id of the attribute type
+         * @param[in] id The attribute id to use
          */
         [[nodiscard]] std::string_view attribute_type(
             const geode::uuid& ) const;
@@ -265,8 +250,8 @@ namespace geode
         [[nodiscard]] std::optional< std::string_view > attribute_name(
             const uuid& ) const;
 
-        std::optional< std::vector< uuid > > attribute_ids_with_name(
-            std::string_view name ) const;
+        [[nodiscard]] std::optional< std::vector< uuid > >
+            attribute_ids_matching_name( std::string_view name ) const;
 
         void copy( const AttributeManager& attribute_manager );
 
@@ -275,14 +260,14 @@ namespace geode
 
         void import( const AttributeManager& attribute_manager,
             absl::Span< const index_t > old2new,
-            uuid attribute_id );
+            const uuid& attribute_id );
 
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );
 
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping,
-            uuid attribute_id );
+            const uuid& attribute_id );
 
     private:
         friend class bitsery::Access;

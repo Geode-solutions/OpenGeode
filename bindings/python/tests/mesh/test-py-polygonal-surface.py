@@ -67,7 +67,7 @@ def test_create_polygons(polygonal_surface, builder):
 
 def test_create_edge_attribute(polygonal_surface):
     attribute_id = polygonal_surface.edges().edge_attribute_manager(
-    ).create_attribute_variable_uint("test", basic.NO_ID)
+    ).create_attribute_variable_uint("test", basic.NO_ID,basic.AttributeProperties())
     attribute = polygonal_surface.edges().edge_attribute_manager(
     ).find_attribute_variable_uint(attribute_id)
     for e in range(polygonal_surface.edges().nb_edges()):
@@ -136,7 +136,7 @@ def test_delete_polygon(polygonal_surface, builder, attribute_id):
         raise ValueError("[Test] PolygonalSurface should have 6 edges")
 
     attribute = polygonal_surface.edges(
-    ).edge_attribute_manager().read_attribute_uint(attribute_id)
+    ).edge_attribute_manager().find_read_only_attribute_uint(attribute_id)
     for e in range(6):
         if attribute.value(e) != e:
             raise ValueError("[Test] Update of edge attributes after "
@@ -221,7 +221,7 @@ def test_io(polygonal_surface, filename, attribute_id):
         raise ValueError(
             "[Test] Reloaded PolygonalSurface should have 3 polygons")
     attribute = new_polygonal_surface.edges(
-    ).edge_attribute_manager().read_attribute_uint(attribute_id)
+    ).edge_attribute_manager().find_read_only_attribute_uint(attribute_id)
     for e in range(new_polygonal_surface.edges().nb_edges()):
         if attribute.value(e) != e:
             raise ValueError(

@@ -96,7 +96,7 @@ namespace geode
                      archive.object( point_set.impl_ );
                      const auto new_attribute_id =
                          point_set.vertex_attribute_manager()
-                             .attribute_ids_with_name( internal::PointsImpl<
+                             .attribute_ids_matching_name( internal::PointsImpl<
                                  dimension >::POINTS_NAME )
                              .value()
                              .at( 0 );
@@ -110,8 +110,9 @@ namespace geode
                         archive.object( point_set.impl_ );
                         const auto new_attribute_id =
                             point_set.vertex_attribute_manager()
-                                .attribute_ids_with_name( internal::PointsImpl<
-                                    dimension >::POINTS_NAME )
+                                .attribute_ids_matching_name(
+                                    internal::PointsImpl<
+                                        dimension >::POINTS_NAME )
                                 .value()
                                 .at( 0 );
                         detail::template initialize_crs<

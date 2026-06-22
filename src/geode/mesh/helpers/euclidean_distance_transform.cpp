@@ -46,8 +46,8 @@ namespace geode
             const auto distance_map_id =
                 grid.cell_attribute_manager()
                     .template create_attribute< VariableAttribute, double >(
-                        distance_map_name,
-                        std::numeric_limits< double >::max() );
+                        distance_map_name, std::numeric_limits< double >::max(),
+                        geode::AttributeProperties{} );
             distance_map_ =
                 grid.cell_attribute_manager()
                     .template find_attribute< VariableAttribute, double >(

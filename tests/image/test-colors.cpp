@@ -48,15 +48,15 @@ void test_color_attribute()
     manager.resize( 1 );
     const auto rgb_attribute_id =
         manager.create_attribute< geode::VariableAttribute, geode::RGBColor >(
-            "rgb_color", geode::RGBColor{} );
+            "rgb_color", geode::RGBColor{}, geode::AttributeProperties{} );
     auto rgb_attribute =
         manager.find_attribute< geode::VariableAttribute, geode::RGBColor >(
             rgb_attribute_id );
     rgb_attribute->set_value( 0, { 3, 254, 68 } );
     const auto greyscale_attribute_id =
         manager.create_attribute< geode::VariableAttribute,
-            geode::GreyscaleColor >(
-            "greyscale_color", geode::GreyscaleColor{} );
+            geode::GreyscaleColor >( "greyscale_color", geode::GreyscaleColor{},
+            geode::AttributeProperties{} );
     auto greyscale_attribute = manager.find_attribute< geode::VariableAttribute,
         geode::GreyscaleColor >( greyscale_attribute_id );
     greyscale_attribute->set_value( 0, geode::GreyscaleColor{ 67 } );

@@ -541,7 +541,7 @@ namespace geode
                      archive.object( solid.impl_ );
                      const auto new_point_attribute_id =
                          solid.vertex_attribute_manager()
-                             .attribute_ids_with_name( internal::PointsImpl<
+                             .attribute_ids_matching_name( internal::PointsImpl<
                                  dimension >::POINTS_NAME )
                              .value()
                              .at( 0 );
@@ -556,8 +556,9 @@ namespace geode
                         archive.object( solid.impl_ );
                         const auto new_point_attribute_id =
                             solid.vertex_attribute_manager()
-                                .attribute_ids_with_name( internal::PointsImpl<
-                                    dimension >::POINTS_NAME )
+                                .attribute_ids_matching_name(
+                                    internal::PointsImpl<
+                                        dimension >::POINTS_NAME )
                                 .value()
                                 .at( 0 );
                         detail::template initialize_crs<

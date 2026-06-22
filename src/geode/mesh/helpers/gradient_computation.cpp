@@ -74,8 +74,9 @@ namespace
             auto gradient_function_id =
                 mesh_.vertex_attribute_manager()
                     .template create_attribute< geode::VariableAttribute,
-                        geode::Vector< Mesh::dim > >(
-                        gradient_function_name, geode::Vector< Mesh::dim >{} );
+                        geode::Vector< Mesh::dim > >( gradient_function_name,
+                        geode::Vector< Mesh::dim >{},
+                        geode::AttributeProperties{} );
             auto gradient_function =
                 mesh_.vertex_attribute_manager()
                     .template find_attribute< geode::VariableAttribute,
@@ -109,9 +110,9 @@ namespace
                 nullptr, geode::OpenGeodeException::TYPE::data,
                 "[compute_scalar_function_gradient] The attribute linked to "
                 "given id is not scalar." );
-            scalar_function_ =
-                mesh_.vertex_attribute_manager()
-                    .template read_attribute< double >( scalar_function_id );
+            scalar_function_ = mesh_.vertex_attribute_manager()
+                                   .template find_read_only_attribute< double >(
+                                       scalar_function_id );
         }
 
         bool compute_gradient(

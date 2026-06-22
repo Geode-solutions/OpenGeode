@@ -36,14 +36,15 @@ namespace geode
     void python_attribute_class( pybind11::class_< AttributeManager >& manager,
         const std::string& suffix )
     {
-        const auto read_suffix = absl::StrCat( "read_attribute_", suffix );
-        manager.def(
-            read_suffix.c_str(), &AttributeManager::read_attribute< type > );
+        const auto read_suffix =
+            absl::StrCat( "find_read_only_attribute_", suffix );
+        manager.def( read_suffix.c_str(),
+            &AttributeManager::find_read_only_attribute< type > );
         const auto create_constant_suffix =
             absl::StrCat( "create_attribute_constant_", suffix );
         manager.def( create_constant_suffix.c_str(),
             static_cast< geode::uuid ( AttributeManager::* )(
-                std::string_view, type ) >(
+                std::string_view, type, AttributeProperties ) >(
                 &AttributeManager::create_attribute< ConstantAttribute,
                     type > ) );
         const auto find_constant_suffix =
@@ -57,7 +58,7 @@ namespace geode
             absl::StrCat( "create_attribute_variable_", suffix );
         manager.def( create_variable_suffix.c_str(),
             static_cast< geode::uuid ( AttributeManager::* )(
-                std::string_view, type ) >(
+                std::string_view, type, AttributeProperties ) >(
                 &AttributeManager::create_attribute< VariableAttribute,
                     type > ) );
         const auto find_variable_suffix =
@@ -70,9 +71,10 @@ namespace geode
         const auto create_sparse_suffix =
             absl::StrCat( "create_attribute_sparse_", suffix );
         manager.def( create_sparse_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
-                type ) >( &AttributeManager::create_attribute< SparseAttribute,
-                type > ) );
+            static_cast< geode::uuid ( AttributeManager::* )(
+                std::string_view, type, AttributeProperties ) >(
+                &AttributeManager::create_attribute< SparseAttribute,
+                    type > ) );
         const auto find_sparse_suffix =
             absl::StrCat( "find_attribute_sparse_", suffix );
         manager.def( find_sparse_suffix.c_str(),
