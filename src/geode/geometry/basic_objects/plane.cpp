@@ -78,7 +78,6 @@ namespace geode
     Point3D GenericPlane< PointType >::point_on_plane() const
     {
         Point3D point;
-        const auto& mesh = surface.mesh();
         for( const auto d : LRange{ 3 } )
         {
             if( std::fabs( normal_.value( d ) ) < GLOBAL_EPSILON )
