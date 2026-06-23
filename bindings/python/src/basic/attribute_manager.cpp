@@ -101,7 +101,9 @@ namespace geode
             .def( "delete_attribute", &AttributeManager::delete_attribute )
             .def( "set_attribute_properties",
                 &AttributeManager::set_attribute_properties )
-            .def( "delete_elements", &AttributeManager::delete_elements );
+            .def( "delete_elements", &AttributeManager::delete_elements )
+            .def( "attribute_ids_matching_name",
+                &AttributeManager::attribute_ids_matching_name );
         python_attribute_class< bool >( manager, "bool" );
         python_attribute_class< int >( manager, "int" );
         python_attribute_class< unsigned int >( manager, "uint" );
