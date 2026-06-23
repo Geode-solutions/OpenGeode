@@ -1220,7 +1220,7 @@ void test_clone( const geode::BRep& brep )
         brep2.nb_blocks() == 2, "BRep should have 2 blocks" );
     geode::OpenGeodeModelException::test( brep2.nb_model_boundaries() == 6,
         "BRep should have 6 model boundaries" );
-
+    DEBUG( "test_clone" );
     for( const auto& corner : brep.corners() )
     {
         const auto& new_corner = brep2.corner(
@@ -1285,6 +1285,22 @@ void test_clone( const geode::BRep& brep )
             }
             geode::OpenGeodeModelException::test(
                 found, "All Surfaces incidences are not correct" );
+        }
+    }
+    DEBUG( brep2.nb_blocks() );
+    for( const auto& block : brep2.blocks() )
+    {
+        const auto& block_mesh = block.mesh();
+        DEBUG( block_mesh.nb_polyhedra() );
+        for( const auto p : geode::Range{ block_mesh.nb_polyhedra() } )
+        {
+            DEBUG( p );
+            for( const auto v :
+                geode::LRange{ block_mesh.nb_polyhedron_vertices( p ) } )
+            {
+                DEBUG( v );
+                DEBUG( block_mesh.polyhedron_vertex( { p, v } ) );
+            }
         }
     }
     for( const auto& model_boundary : brep.model_boundaries() )
@@ -1607,11 +1623,18 @@ void test()
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_clone( model );
     test_steal_mesh( model );
-
+    DEBUG( "io" );
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
-
+    DEBUG( "start load" );
     auto model2 = geode::load_brep( file_io );
+    for( const auto& surface : model2.surfaces() )
+    {
+        const auto& mesh = surface.mesh();
+        const auto scalar_attributes =
+            mesh.vertex_attribute_manager().attribute_ids_matching_name(
+                "curvature_min" );
+    }
     test_compare_brep( model, model2 );
     test_registry( model2, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 

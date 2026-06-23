@@ -225,6 +225,11 @@ void test_io(
 {
     geode::save_triangulated_surface( surface, filename );
     const auto relaod = geode::load_triangulated_surface< 3 >( filename );
+    const auto point_attributes =
+        relaod->vertex_attribute_manager().attribute_ids_matching_name(
+            "points" );
+    geode::OpenGeodeMeshException::test( point_attributes.has_value(),
+        "TriangulatedSurface should have points attribute" );
     geode_unused( relaod );
     const auto surface2 = geode::load_triangulated_surface< 3 >(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );

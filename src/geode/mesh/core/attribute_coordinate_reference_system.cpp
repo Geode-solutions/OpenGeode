@@ -109,6 +109,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    uuid AttributeCoordinateReferenceSystem< dimension >::attribute_id() const
+    {
+        return impl_->attribute_id();
+    }
+
+    template < index_t dimension >
     index_t AttributeCoordinateReferenceSystem< dimension >::nb_points() const
     {
         return impl_->nb_points();

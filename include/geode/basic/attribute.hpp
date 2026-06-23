@@ -144,6 +144,8 @@ namespace geode
                         },
                         []( Archive& archive, AttributeBase& attribute ) {
                             archive.object( attribute.properties_ );
+                            archive.ext( attribute,
+                                bitsery::ext::BaseClass< Identifier >{} );
                         } } } );
         }
 

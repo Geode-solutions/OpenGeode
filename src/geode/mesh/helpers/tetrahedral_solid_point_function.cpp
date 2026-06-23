@@ -56,14 +56,9 @@ namespace geode
         }
 
         Impl( const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name )
+            const uuid& function_id )
             : solid_( solid )
         {
-            const auto function_id =
-                solid_.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        Point< point_dimension > >( function_name,
-                        Point< point_dimension >(), { false, true } );
             function_attribute_ =
                 solid_.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,
@@ -98,6 +93,11 @@ namespace geode
             return point_value;
         }
 
+        uuid attribute_function_id() const
+        {
+            return function_attribute_->id();
+        }
+
     private:
         const TetrahedralSolid< dimension >& solid_;
         std::shared_ptr< VariableAttribute< Point< point_dimension > > >
@@ -127,8 +127,8 @@ namespace geode
     TetrahedralSolidPointFunction< dimension, point_dimension >::
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name )
-        : impl_{ solid, function_name }
+            const uuid& function_id )
+        : impl_{ solid, function_id }
     {
     }
 
@@ -150,9 +150,9 @@ namespace geode
     TetrahedralSolidPointFunction< dimension, point_dimension >
         TetrahedralSolidPointFunction< dimension, point_dimension >::find(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name )
+            const uuid& function_id )
     {
-        return { solid, function_name };
+        return { solid, function_id };
     }
 
     template < index_t dimension, index_t point_dimension >
@@ -176,6 +176,13 @@ namespace geode
             const Point< dimension >& point, index_t tetrahedron_id ) const
     {
         return impl_->value( point, tetrahedron_id );
+    }
+
+    template < index_t dimension, index_t point_dimension >
+    uuid TetrahedralSolidPointFunction< dimension,
+        point_dimension >::attribute_function_id() const
+    {
+        return impl_->attribute_function_id();
     }
 
     template class opengeode_mesh_api TetrahedralSolidPointFunction< 3, 3 >;

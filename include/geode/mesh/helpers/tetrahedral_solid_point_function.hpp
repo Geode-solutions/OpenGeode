@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/pimpl.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/mesh/common.hpp>
 
@@ -59,13 +60,13 @@ namespace geode
 
         /*!
          * Finds an object function that already exists in the given
-         * TetrahedralSolid, from its given name.
-         * Throws an exception if no attribute with the same name exists.
+         * TetrahedralSolid, from its given uuid.
+         * Throws an exception if no attribute with the same uuid exists.
          */
         [[nodiscard]] static TetrahedralSolidPointFunction< dimension,
             point_dimension >
             find( const TetrahedralSolid< dimension >& solid,
-                std::string_view function_name );
+                const uuid& function_id );
 
         void set_value( index_t vertex_index, Point< point_dimension > value );
 
@@ -75,10 +76,12 @@ namespace geode
         [[nodiscard]] Point< point_dimension > value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
+        [[nodiscard]] uuid attribute_function_id() const;
+
     private:
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name );
+            const uuid& function_id );
 
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,

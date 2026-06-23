@@ -34,6 +34,8 @@
 #include <geode/mesh/builder/solid_edges_builder.hpp>
 #include <geode/mesh/builder/solid_facets_builder.hpp>
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/solid_edges.hpp>
 #include <geode/mesh/core/solid_facets.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
@@ -231,10 +233,10 @@ namespace
 
     template < geode::index_t dimension >
     void copy_polyhedra( const geode::SolidMesh< dimension >& solid,
-        const geode::SolidMesh< dimension >& solid_to_build,
         geode::SolidMeshBuilder< dimension >& builder )
     {
-        if( solid_to_build.nb_polyhedra() != 0 )
+        if( solid.impl_name()
+            == geode::OpenGeodeRegularGrid< dimension >::impl_name_static() )
         {
             return;
         }
@@ -964,9 +966,9 @@ namespace geode
         }
         VertexSetBuilder::copy( solid_mesh );
         copy_points( solid_mesh, *this );
+        copy_polyhedra( solid_mesh, *this );
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
-        copy_polyhedra( solid_mesh, solid_mesh_, *this );
         if( solid_mesh.are_edges_enabled() )
         {
             solid_mesh_.copy_edges( solid_mesh, {} );

@@ -67,6 +67,8 @@ namespace geode
 
         [[nodiscard]] index_t nb_points() const;
 
+        [[nodiscard]] uuid attribute_id() const;
+
     protected:
         AttributeCoordinateReferenceSystem();
 
