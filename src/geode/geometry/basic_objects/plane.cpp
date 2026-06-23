@@ -74,6 +74,29 @@ namespace geode
         return plane_constant;
     }
 
+    template < typename PointType >
+    Point3D GenericPlane< PointType >::point_on_plane() const
+    {
+        Point3D point;
+        const auto& mesh = surface.mesh();
+        for( const auto d : LRange{ 3 } )
+        {
+            if( std::fabs( normal_.value( d ) ) < GLOBAL_EPSILON )
+            {
+                continue;
+            }
+            const auto d1 = ( d + 1 ) % 3;
+            const auto d2 = ( d + 2 ) % 3;
+            point.set_value( d1, 1 );
+            point.set_value( d2, 1 );
+            point.set_value( d, -( plane_constant() + normal_.value( d1 )
+                                    + normal_.value( d2 ) )
+                                    / normal_.value( d ) );
+            break;
+        }
+        return point;
+    }
+
     OwnerPlane::OwnerPlane( const Vector3D& normal, Point3D origin )
         : Base( normal, std::move( origin ) )
     {

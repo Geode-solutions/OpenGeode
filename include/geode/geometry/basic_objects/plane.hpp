@@ -56,6 +56,7 @@ namespace geode
         [[nodiscard]] const Vector3D& normal() const;
         [[nodiscard]] const Point3D& origin() const;
         [[nodiscard]] double plane_constant() const;
+        [[nodiscard]] Point3D point_on_plane() const;
 
     private:
         Vector3D normal_;
