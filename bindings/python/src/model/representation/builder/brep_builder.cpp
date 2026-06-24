@@ -89,6 +89,8 @@ namespace geode
                 &BRepBuilder::add_line_surface_boundary_relationship )
             .def( "add_surface_block_boundary_relationship",
                 &BRepBuilder::add_surface_block_boundary_relationship )
+            .def( "add_corner_line_internal_relationship",
+                &BRepBuilder::add_corner_line_internal_relationship )
             .def( "add_corner_surface_internal_relationship",
                 &BRepBuilder::add_corner_surface_internal_relationship )
             .def( "add_line_surface_internal_relationship",

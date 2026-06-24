@@ -444,6 +444,12 @@ namespace geode
         add_boundary_relation( surface.component_id(), block.component_id() );
     }
 
+    void BRepBuilder::add_corner_line_internal_relationship(
+        const Corner3D& corner, const Line3D& line )
+    {
+        add_internal_relation( corner.component_id(), line.component_id() );
+    }
+
     void BRepBuilder::add_line_surface_internal_relationship(
         const Line3D& line, const Surface3D& surface )
     {
