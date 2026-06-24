@@ -94,8 +94,8 @@ namespace geode
             point.set_value( direction1, value1 );
             point.set_value( direction2, value2 );
             point.set_value( direction,
-                -( plane_constant() + value1 * normal_.value( direction1 )
-                    + value2 * normal_.value( direction2 ) )
+                -( plane_constant() + ( value1 * normal_.value( direction1 ) )
+                    + ( value2 * normal_.value( direction2 ) ) )
                     / normal_.value( direction ) );
             break;
         }
