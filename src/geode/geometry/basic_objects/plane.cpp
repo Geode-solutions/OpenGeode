@@ -86,11 +86,16 @@ namespace geode
             }
             const auto d1 = ( d + 1 ) % 3;
             const auto d2 = ( d + 2 ) % 3;
-            point.set_value( d1, 1 );
-            point.set_value( d2, 1 );
-            point.set_value( d, -( plane_constant() + normal_.value( d1 )
-                                    + normal_.value( d2 ) )
-                                    / normal_.value( d ) );
+            const auto origin1 = origin_.value( d1 );
+            const auto origin2 = origin_.value( d2 );
+            const auto value1 = origin1 > 0 ? origin1 + 1 : origin1 - 1;
+            const auto value2 = origin2 > 0 ? origin2 + 1 : origin2 - 1;
+            point.set_value( d1, value1 );
+            point.set_value( d2, value2 );
+            point.set_value(
+                d, -( plane_constant() + value1 * normal_.value( d1 )
+                       + value2 * normal_.value( d2 ) )
+                       / normal_.value( d ) );
             break;
         }
         return point;
