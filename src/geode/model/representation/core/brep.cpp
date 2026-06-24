@@ -470,7 +470,7 @@ namespace geode
     void BRep::EmbeddingLineRange::operator++()
     {
         Relationships::EmbeddingRangeIterator::operator++();
-        internal::next_filtered_embedding_iterator< Surface3D >( *this );
+        internal::next_filtered_embedding_iterator< Line3D >( *this );
     }
 
     const Line3D& BRep::EmbeddingLineRange::operator*() const
