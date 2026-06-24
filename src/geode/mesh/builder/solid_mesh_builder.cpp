@@ -284,6 +284,21 @@ namespace
                     polyhedron.value(), v );
             }
         }
+        for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+        {
+            for( const auto f :
+                geode::LRange{ solid.nb_polyhedron_facets( p ) } )
+            {
+                const auto polyhedron_adjacent =
+                    solid.polyhedron_adjacent( geode::PolyhedronFacet{ p, f } );
+                if( polyhedron_adjacent )
+                {
+                    builder.set_polyhedron_adjacent(
+                        geode::PolyhedronFacet{ p, f },
+                        polyhedron_adjacent.value() );
+                }
+            }
+        }
     }
 
     template < geode::index_t dimension >

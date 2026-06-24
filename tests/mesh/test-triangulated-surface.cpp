@@ -282,6 +282,32 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         attr_from->set_value( e, e );
     }
     auto surface_clone = surface.clone();
+    for( const auto v : geode::Range{ surface_clone->nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            surface.polygons_around_vertex( v )
+                == surface_clone->polygons_around_vertex( v ),
+            "Polyhedra around vertex should match during cloning" );
+    }
+    for( const auto v : geode::Range{ surface_clone->nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            surface_clone->point( v ) == surface.point( v ),
+            "Wrong cloned mesh point coordinates." );
+    }
+    for( const auto p : geode::Range{ surface_clone->nb_polygons() } )
+    {
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            for( const auto v : geode::LRange{ 2 } )
+            {
+                geode::OpenGeodeMeshException::test(
+                    surface_clone->polygon_edge_vertex( { p, e }, v )
+                        == surface.polygon_edge_vertex( { p, e }, v ),
+                    "polyhedron_facet_vertex should match" );
+            }
+        }
+    }
     geode::OpenGeodeTriangulatedSurface3D surface2{ std::move(
         *dynamic_cast< geode::OpenGeodeTriangulatedSurface3D* >(
             surface_clone.get() ) ) };

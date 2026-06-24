@@ -301,6 +301,17 @@ namespace
                     polygon.value(), v );
             }
         }
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
+            {
+                const geode::PolygonEdge edge{ p, e };
+                if( const auto adj = surface.polygon_adjacent( edge ) )
+                {
+                    builder.set_polygon_adjacent( edge, adj.value() );
+                }
+            }
+        }
     }
 
     template < geode::index_t dimension >

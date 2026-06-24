@@ -376,6 +376,25 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         solid4.facets()
             .facet_attribute_manager()
             .find_read_only_attribute< geode::index_t >( attr_from_id );
+    for( const auto v : geode::Range{ solid4.nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            solid4.point( v ) == solid.point( v ),
+            "Wrong cloned mesh point coordinates." );
+    }
+    for( const auto p : geode::Range{ solid4.nb_polyhedra() } )
+    {
+        for( const auto f : geode::LRange{ 4 } )
+        {
+            for( const auto v : geode::LRange{ 3 } )
+            {
+                geode::OpenGeodeMeshException::test(
+                    solid4.polyhedron_facet_vertex( { { p, f }, v } )
+                        == solid.polyhedron_facet_vertex( { { p, f }, v } ),
+                    "polyhedron_facet_vertex should match" );
+            }
+        }
+    }
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -389,6 +408,13 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
                 from_vertices[v] == to_vertices[v],
                 "Error in facet vertices transfer during cloning" );
         }
+    }
+    for( const auto v : geode::Range{ solid4.nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            solid.polyhedra_around_vertex( v )
+                == solid4.polyhedra_around_vertex( v ),
+            "Polyhedra around vertex should match during cloning" );
     }
     const auto attr_edge_to =
         solid4.edges()
