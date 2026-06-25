@@ -36,6 +36,8 @@ namespace geode
     class opengeode_geometry_api Angle
     {
     public:
+        Angle() = default;
+
         [[nodiscard]] static Angle create_from_radians( double radians );
         [[nodiscard]] static Angle create_from_degrees( double degrees );
         [[nodiscard]] static Angle create_from_vectors(
@@ -68,7 +70,7 @@ namespace geode
         explicit Angle( double radians );
 
     private:
-        double radians_;
+        double radians_{ 0. };
     };
 
 } // namespace geode
