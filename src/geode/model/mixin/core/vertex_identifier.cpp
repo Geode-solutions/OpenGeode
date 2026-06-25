@@ -185,6 +185,18 @@ namespace geode
             const auto& mesh = component.mesh();
             if( it == vertex2unique_vertex_.end() )
             {
+                // find attribute
+                const auto unique_vertices_ids =
+                    mesh.vertex_attribute_manager().attribute_ids_matching_name(
+                        unique_vertices_name );
+                if( unique_vertices_ids.has_value() )
+                {
+                    vertex2unique_vertex_.emplace( component.id(),
+                        mesh.vertex_attribute_manager()
+                            .template find_attribute< VariableAttribute,
+                                index_t >( unique_vertices_ids.value()[0] ) );
+                }
+
                 const auto unique_vertices_attribute_id =
                     mesh.vertex_attribute_manager()
                         .template create_attribute< VariableAttribute,
@@ -419,9 +431,11 @@ namespace geode
                          archive.object( impl.unique_vertices_ );
                          archive.ext( impl.component_vertices_,
                              bitsery::ext::StdSmartPtr{} );
-                         archive.ext( impl.vertex2unique_vertex_,
-                             bitsery::ext::StdMap{
-                                 impl.vertex2unique_vertex_.max_size() },
+                         absl::flat_hash_map< uuid,
+                             std::shared_ptr< VariableAttribute< index_t > > >
+                             old_map;
+                         archive.ext( old_map,
+                             bitsery::ext::StdMap{ old_map.max_size() },
                              []( Archive& archive2, uuid& id,
                                  std::shared_ptr< VariableAttribute<
                                      index_t > >& attribute ) {
@@ -440,9 +454,12 @@ namespace geode
                             archive.object( impl.unique_vertices_ );
                             archive.ext( impl.component_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl.vertex2unique_vertex_,
-                                bitsery::ext::StdMap{
-                                    impl.vertex2unique_vertex_.max_size() },
+                            absl::flat_hash_map< uuid,
+                                std::shared_ptr<
+                                    VariableAttribute< index_t > > >
+                                old_map;
+                            archive.ext( old_map,
+                                bitsery::ext::StdMap{ old_map.max_size() },
                                 []( Archive& archive2, uuid& id,
                                     std::shared_ptr< VariableAttribute<
                                         index_t > >& attribute ) {
@@ -450,6 +467,11 @@ namespace geode
                                     archive2.ext( attribute,
                                         bitsery::ext::StdSmartPtr{} );
                                 } );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.unique_vertices_ );
+                            archive.ext( impl.component_vertices_,
+                                bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
 

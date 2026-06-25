@@ -41,6 +41,7 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/growable.hpp>
+#include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/permutation.hpp>
@@ -200,6 +201,8 @@ namespace geode
                 new SparseAttribute< T >{
                     default_value_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_ = values_;
             return attribute;
         }

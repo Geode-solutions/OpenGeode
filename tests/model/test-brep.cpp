@@ -1478,8 +1478,9 @@ void test_registry( const geode::BRep& brep,
 
 void test_backward_io()
 {
-    const auto brep = geode::load_brep(
+    auto brep = geode::load_brep(
         absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
+    geode::BRepBuilder brep_builder{ brep };
     for( const auto& block : brep.blocks() )
     {
         geode::OpenGeodeModelException::test( block.id() == block.mesh().id(),
@@ -1503,9 +1504,21 @@ void test_backward_io()
             "[Backward_IO] Brep corner should have the same uuid as its "
             "mesh." );
     }
+    for( const auto& surface : brep.surfaces() )
+    {
+        auto vertex_index =
+            brep_builder.surface_mesh_builder( surface.id() )->create_vertex();
+        DEBUG( vertex_index );
+        DEBUG( brep.unique_vertex( { surface.component_id(), vertex_index } ) );
+        geode::OpenGeodeModelException::test(
+            brep.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect brep unique_vertex_id." );
+    }
     test_registry( brep, 4, 13, 17, 7, 1, 0, 0, 0, 0, 0, 0 );
     auto brep_v17 = geode::load_brep(
         absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.og_brep" ) );
+    geode::BRepBuilder brep_builder_v17{ brep_v17 };
     for( const auto& block : brep_v17.blocks() )
     {
         geode::OpenGeodeModelException::test( block.id() == block.mesh().id(),
@@ -1528,6 +1541,16 @@ void test_backward_io()
         geode::OpenGeodeModelException::test( corner.id() == corner.mesh().id(),
             "[Backward_IO] Brep corner should have the same uuid as its "
             "mesh." );
+    }
+    for( const auto& surface : brep_v17.surfaces() )
+    {
+        auto vertex_index =
+            brep_builder_v17.surface_mesh_builder( surface.id() )
+                ->create_vertex();
+        geode::OpenGeodeModelException::test(
+            brep_v17.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect brep unique_vertex_id." );
     }
     test_registry( brep_v17, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
@@ -1628,12 +1651,18 @@ void test()
     geode::save_brep( model, file_io );
     DEBUG( "start load" );
     auto model2 = geode::load_brep( file_io );
+    geode::BRepBuilder model2_builder{ model2 };
     for( const auto& surface : model2.surfaces() )
     {
-        const auto& mesh = surface.mesh();
-        const auto scalar_attributes =
-            mesh.vertex_attribute_manager().attribute_ids_matching_name(
-                "curvature_min" );
+        auto vertex_index = model2_builder.surface_mesh_builder( surface.id() )
+                                ->create_vertex();
+        DEBUG( vertex_index );
+        DEBUG(
+            model2.unique_vertex( { surface.component_id(), vertex_index } ) );
+        geode::OpenGeodeModelException::test(
+            model2.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect model2 unique_vertex_id." );
     }
     test_compare_brep( model, model2 );
     test_registry( model2, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
