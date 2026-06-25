@@ -43,7 +43,7 @@ namespace geode
             .finalize();
 
         pybind11::class_< RayTracingResult >( module, "RayTracingResult" )
-            .def( py::init<>() )
+            .def( pybind11::init<>() )
             .def_readwrite( "position", &RayTracingResult::position )
             .def( "__bool__", &RayTracingResult::operator bool );
 
