@@ -46,7 +46,7 @@ namespace
         auto bbox_with_line = bbox;
         bbox_with_line.add_point( line.origin() );
         const auto diagonal = bbox_with_line.diagonal();
-        return line.origin() - line.direction() * diagonal.length();
+        return line.origin() - ( line.direction() * diagonal.length() );
     }
 
     template < geode::index_t dimension, typename Line >
@@ -56,7 +56,7 @@ namespace
         auto bbox_with_line = bbox;
         bbox_with_line.add_point( line.origin() );
         const auto diagonal = bbox_with_line.diagonal();
-        return line.origin() + line.direction() * diagonal.length();
+        return line.origin() + ( line.direction() * diagonal.length() );
     }
 
     bool test_vertex_mode( const geode::EdgedCurve2D& mesh,
@@ -258,8 +258,8 @@ namespace geode
 
         Impl( const EdgedCurve2D& mesh,
             const Point2D& origin,
-            const OwnerSegment2D& segment )
-            : mesh_( mesh ), origin_( origin ), segment_{ segment }
+            OwnerSegment2D segment )
+            : mesh_( mesh ), origin_( origin ), segment_{ std::move( segment ) }
         {
         }
 
@@ -330,8 +330,8 @@ namespace geode
                 {
                     distance *= -1.;
                 }
-                results_.emplace_back( edge_id, distance, result.second,
-                    std::move( intersection_result ) );
+                results_.emplace_back(
+                    edge_id, distance, result.second, intersection_result );
             }
             return false;
         }
@@ -375,8 +375,8 @@ namespace geode
 
     RayTracing2D::RayTracing2D( const EdgedCurve2D& mesh,
         const Point2D& origin,
-        const OwnerSegment2D& segment )
-        : impl_{ mesh, origin, segment }
+        OwnerSegment2D segment )
+        : impl_{ mesh, origin, std::move( segment ) }
     {
     }
 
@@ -446,8 +446,8 @@ namespace geode
 
         Impl( const SurfaceMesh3D& mesh,
             const Point3D& origin,
-            const OwnerSegment3D& segment )
-            : mesh_( mesh ), origin_( origin ), segment_{ segment }
+            OwnerSegment3D segment )
+            : mesh_( mesh ), origin_( origin ), segment_{ std::move( segment ) }
         {
         }
 
@@ -491,14 +491,14 @@ namespace geode
 
         bool compute( index_t polygon_id )
         {
-            const auto& p0 =
+            const auto& point0 =
                 mesh_.point( mesh_.polygon_vertex( { polygon_id, 0 } ) );
-            for( const auto e :
+            for( const auto edge :
                 LRange{ 1, mesh_.nb_polygon_edges( polygon_id ) - 1 } )
             {
                 const auto edge_vertices =
-                    mesh_.polygon_edge_vertices( { polygon_id, e } );
-                const Triangle3D triangle{ p0,
+                    mesh_.polygon_edge_vertices( { polygon_id, edge } );
+                const Triangle3D triangle{ point0,
                     mesh_.point( edge_vertices.front() ),
                     mesh_.point( edge_vertices.back() ) };
                 const auto result = segment_triangle_intersection_detection(
@@ -523,12 +523,12 @@ namespace geode
                         std::move( intersection_result ) );
                     break;
                 }
-                for( const auto e2 : LRange{ 3 } )
+                for( const auto edge2 : LRange{ 3 } )
                 {
-                    auto [ray_edge_distance, ray_point, _] =
-                        segment_segment_distance( Segment3D{ segment_ },
-                            { triangle.vertices()[e2].get(),
-                                triangle.vertices()[( e2 + 1 ) % 3].get() } );
+                    auto [ray_edge_distance, ray_point,
+                        _] = segment_segment_distance( Segment3D{ segment_ },
+                        { triangle.vertices()[edge2].get(),
+                            triangle.vertices()[( edge2 + 1 ) % 3].get() } );
                     if( ray_edge_distance > GLOBAL_EPSILON )
                     {
                         continue;
@@ -601,8 +601,8 @@ namespace geode
 
     RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh,
         const Point3D& origin,
-        const OwnerSegment3D& segment )
-        : impl_{ mesh, origin, segment }
+        OwnerSegment3D segment )
+        : impl_{ mesh, origin, std::move( segment ) }
     {
     }
 

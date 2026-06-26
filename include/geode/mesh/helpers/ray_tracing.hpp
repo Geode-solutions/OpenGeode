@@ -84,7 +84,7 @@ namespace geode
             const InfiniteLine2D& infinite_line );
         RayTracing2D( const EdgedCurve2D& mesh,
             const Point2D& origin,
-            const OwnerSegment2D& segment );
+            OwnerSegment2D segment );
         RayTracing2D( RayTracing2D&& other ) noexcept;
         ~RayTracing2D();
 
@@ -139,7 +139,7 @@ namespace geode
             const InfiniteLine3D& infinite_line );
         RayTracing3D( const SurfaceMesh3D& mesh,
             const Point3D& origin,
-            const OwnerSegment3D& segment );
+            OwnerSegment3D segment );
         RayTracing3D( RayTracing3D&& other ) noexcept;
         ~RayTracing3D();
 
