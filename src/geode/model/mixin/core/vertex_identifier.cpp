@@ -181,51 +181,44 @@ namespace geode
         template < typename MeshComponent >
         void register_component( const MeshComponent& component )
         {
-            auto it = vertex2unique_vertex_.find( component.id() );
             const auto& mesh = component.mesh();
-            if( it == vertex2unique_vertex_.end() )
-            {
-                // find attribute
-                const auto unique_vertices_ids =
-                    mesh.vertex_attribute_manager().attribute_ids_matching_name(
-                        unique_vertices_name );
-                if( unique_vertices_ids.has_value() )
-                {
-                    vertex2unique_vertex_.emplace( component.id(),
-                        mesh.vertex_attribute_manager()
-                            .template find_attribute< VariableAttribute,
-                                index_t >( unique_vertices_ids.value()[0] ) );
-                }
-
-                const auto unique_vertices_attribute_id =
-                    mesh.vertex_attribute_manager()
-                        .template create_attribute< VariableAttribute,
-                            index_t >( unique_vertices_name, NO_ID,
-                            { false, false, false } );
+            const auto unique_vertices_attribute_id =
+                mesh.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, index_t >(
+                        unique_vertices_name, NO_ID, { false, false, false } );
+            const auto [_, inserted] =
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_attribute< VariableAttribute, index_t >(
                             unique_vertices_attribute_id ) );
-            }
-            else
-            {
-                auto attribute = vertex2unique_vertex_.at( component.id() );
-                attribute->set_properties( { false, false, false } );
-                try
-                {
-                    for( const auto v : Range{ mesh.nb_vertices() } )
-                    {
-                        attribute->set_value( v, it->second->value( v ) );
-                    }
-                }
-                catch( const std::out_of_range& )
-                {
-                    Logger::warn(
-                        "Registering MeshComponent: ", component.id().string(),
-                        " in VertexIdentifier, wrong number of vertices." );
-                }
-                it->second = std::move( attribute );
-            }
+            OpenGeodeModelException::check_exception( inserted,
+                component.component_id(), OpenGeodeException::TYPE::data,
+                "[VertexIdentifier::register_component] Component ",
+                component.id().string(), " is already registered." );
+        }
+
+        template < typename MeshComponent >
+        void load_component( const MeshComponent& component )
+        {
+            const auto& mesh = component.mesh();
+            const auto unique_vertices_ids =
+                mesh.vertex_attribute_manager().attribute_ids_matching_name(
+                    unique_vertices_name );
+            DEBUG( unique_vertices_ids.has_value() );
+            OpenGeodeModelException::check_exception(
+                unique_vertices_ids.has_value(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[VertexIdentifier::load_component] Unique vertices "
+                "attribute not found." );
+            const auto [_, inserted] =
+                vertex2unique_vertex_.emplace( component.id(),
+                    mesh.vertex_attribute_manager()
+                        .template find_attribute< VariableAttribute, index_t >(
+                            unique_vertices_ids.value().front() ) );
+            OpenGeodeModelException::check_exception( inserted,
+                component.component_id(), OpenGeodeException::TYPE::data,
+                "[VertexIdentifier::load_component] Component ",
+                component.id().string(), " is already registered." );
         }
 
         template < typename MeshComponent >
@@ -561,6 +554,13 @@ namespace geode
     }
 
     template < typename MeshComponent >
+    void VertexIdentifier::load_mesh_component(
+        const MeshComponent& component, BuilderKey /*key*/ )
+    {
+        impl_->load_component( component );
+    }
+
+    template < typename MeshComponent >
     void VertexIdentifier::register_mesh_component(
         const MeshComponent& component, BuilderKey /*key*/ )
     {
@@ -627,6 +627,21 @@ namespace geode
     {
         return impl_->delete_isolated_vertices();
     }
+
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Corner2D&, BuilderKey /*key*/ );
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Corner3D&, BuilderKey /*key*/ );
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Line2D&, BuilderKey /*key*/ );
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Line3D&, BuilderKey /*key*/ );
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Surface2D&, BuilderKey /*key*/ );
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Surface3D&, BuilderKey /*key*/ );
+    template void opengeode_model_api VertexIdentifier::load_mesh_component(
+        const Block3D&, BuilderKey /*key*/ );
 
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
         const Corner2D&, BuilderKey /*key*/ );

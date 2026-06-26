@@ -39,6 +39,15 @@ namespace geode
         }
 
         template < typename ModelBuilder, typename MeshComponent >
+        void add_loaded_mesh_component(
+            ModelBuilder& builder, const MeshComponent& component )
+        {
+            builder.load_mesh_component( component );
+            builder.add_mesh_component(
+                component.component_type(), component.id() );
+        }
+
+        template < typename ModelBuilder, typename MeshComponent >
         void remove_mesh_component(
             ModelBuilder& builder, const MeshComponent& component )
         {
@@ -76,14 +85,14 @@ namespace geode
             {
                 for( const auto& component : model.First::components() )
                 {
-                    detail::add_mesh_component( builder, component );
+                    detail::add_loaded_mesh_component( builder, component );
                 }
             }
             else
             {
                 for( const auto& component : model.First::components() )
                 {
-                    detail::add_mesh_component( builder, component );
+                    detail::add_loaded_mesh_component( builder, component );
                 }
                 register_mesh_components< Model, MeshComponents... >(
                     model, builder );

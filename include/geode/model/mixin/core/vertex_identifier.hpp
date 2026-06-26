@@ -144,6 +144,13 @@ namespace geode
             const MeshComponent& component, BuilderKey /*key*/ );
 
         /*!
+         * Add a component in the VertexIdentifier
+         */
+        template < typename MeshComponent >
+        void load_mesh_component(
+            const MeshComponent& component, BuilderKey /*key*/ );
+
+        /*!
          * Remove a component from the VertexIdentifier and delete corresponding
          * information (i.e. the attribute on component mesh).
          */

@@ -75,9 +75,12 @@ namespace geode
 
     index_t VertexSetBuilder::create_vertices( index_t nb )
     {
+        DEBUG( "create_vertices" );
         const auto first_added_vertex = vertex_set_.nb_vertices();
+        DEBUG( vertex_set_.vertex_attribute_manager().nb_elements() );
         vertex_set_.vertex_attribute_manager().resize(
             first_added_vertex + nb );
+        DEBUG( vertex_set_.vertex_attribute_manager().nb_elements() );
         do_create_vertices( nb );
         return first_added_vertex;
     }
