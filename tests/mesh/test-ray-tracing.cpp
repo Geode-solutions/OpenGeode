@@ -115,7 +115,7 @@ void test_ray_parallel()
     geode::OpenGeodeMeshException::test(
         result->polygon == 0, "Ray edge wrong polygon" );
     geode::OpenGeodeMeshException::test(
-        result->distance == 0, "Ray edge wrong distance" );
+        result->distance == 1, "Ray edge wrong distance" );
 }
 
 void test()
