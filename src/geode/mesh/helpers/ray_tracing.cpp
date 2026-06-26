@@ -382,6 +382,8 @@ namespace geode
 
     RayTracing2D::RayTracing2D( RayTracing2D&& ) noexcept = default;
 
+    RayTracing2D& RayTracing2D::operator=( RayTracing2D&& ) noexcept = default;
+
     RayTracing2D::~RayTracing2D() = default;
 
     std::optional< RayTracing2D::EdgeDistance >
@@ -520,7 +522,7 @@ namespace geode
                         distance *= -1.;
                     }
                     results_.emplace_back( polygon_id, distance, result.second,
-                        std::move( intersection_result ) );
+                        intersection_result );
                     break;
                 }
                 for( const auto edge2 : LRange{ 3 } )
@@ -607,6 +609,8 @@ namespace geode
     }
 
     RayTracing3D::RayTracing3D( RayTracing3D&& ) noexcept = default;
+
+    RayTracing3D& RayTracing3D::operator=( RayTracing3D&& ) noexcept = default;
 
     RayTracing3D::~RayTracing3D() = default;
 

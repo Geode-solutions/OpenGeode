@@ -48,6 +48,8 @@ namespace geode
 {
     class opengeode_mesh_api RayTracing2D
     {
+        OPENGEODE_DISABLE_COPY( RayTracing2D );
+
     public:
         struct EdgeDistance
         {
@@ -60,7 +62,7 @@ namespace geode
                 : edge{ edge_in },
                   distance{ distance_in },
                   position{ position_in },
-                  point{ std::move( point_in ) }
+                  point{ point_in }
             {
             }
 
@@ -86,6 +88,7 @@ namespace geode
             const Point2D& origin,
             OwnerSegment2D segment );
         RayTracing2D( RayTracing2D&& other ) noexcept;
+        RayTracing2D& operator=( RayTracing2D&& other ) noexcept;
         ~RayTracing2D();
 
         [[nodiscard]] std::optional< EdgeDistance > closest_edge() const;
@@ -103,6 +106,8 @@ namespace geode
 
     class opengeode_mesh_api RayTracing3D
     {
+        OPENGEODE_DISABLE_COPY( RayTracing3D );
+
     public:
         struct PolygonDistance
         {
@@ -115,7 +120,7 @@ namespace geode
                 : polygon{ polygon_in },
                   distance{ distance_in },
                   position{ position_in },
-                  point{ std::move( point_in ) }
+                  point{ point_in }
             {
             }
 
@@ -141,6 +146,7 @@ namespace geode
             const Point3D& origin,
             OwnerSegment3D segment );
         RayTracing3D( RayTracing3D&& other ) noexcept;
+        RayTracing3D& operator=( RayTracing3D&& other ) noexcept;
         ~RayTracing3D();
 
         [[nodiscard]] std::optional< PolygonDistance > closest_polygon() const;

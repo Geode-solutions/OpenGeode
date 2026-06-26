@@ -34,96 +34,99 @@
 
 #include <geode/tests/common.hpp>
 
-void test_ray_inside()
+namespace
 {
-    geode::Logger::info( "Test ray inside" );
-    auto mesh = geode::SurfaceMesh3D::create();
-    auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
-    builder->create_point( geode::Point3D{ { -1, -1, 1 } } );
-    builder->create_point( geode::Point3D{ { 1, -1, 1 } } );
-    builder->create_point( geode::Point3D{ { 0, 1, 1 } } );
-    builder->create_point( geode::Point3D{ { -1, -1, 2 } } );
-    builder->create_point( geode::Point3D{ { 1, -1, 2 } } );
-    builder->create_point( geode::Point3D{ { 0, 1, 2 } } );
-    builder->create_polygon( { 0, 1, 2 } );
-    builder->create_polygon( { 3, 4, 5 } );
+    void test_ray_inside()
+    {
+        geode::Logger::info( "Test ray inside" );
+        auto mesh = geode::SurfaceMesh3D::create();
+        auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
+        builder->create_point( geode::Point3D{ { -1, -1, 1 } } );
+        builder->create_point( geode::Point3D{ { 1, -1, 1 } } );
+        builder->create_point( geode::Point3D{ { 0, 1, 1 } } );
+        builder->create_point( geode::Point3D{ { -1, -1, 2 } } );
+        builder->create_point( geode::Point3D{ { 1, -1, 2 } } );
+        builder->create_point( geode::Point3D{ { 0, 1, 2 } } );
+        builder->create_polygon( { 0, 1, 2 } );
+        builder->create_polygon( { 3, 4, 5 } );
 
-    const auto aabb = geode::create_aabb_tree( *mesh );
-    const geode::Vector3D direction{ { 0, 0, 1 } };
-    const geode::Point3D origin{ { 0, 0, 0 } };
-    const geode::Ray3D ray{ direction, origin };
-    geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
-    aabb.compute_ray_element_bbox_intersections( ray, tracing );
-    const auto result = tracing.closest_polygon();
-    geode::OpenGeodeMeshException::test(
-        result.has_value(), "Ray inside no result" );
-    geode::OpenGeodeMeshException::test(
-        result->polygon == 0, "Ray inside wrong polygon" );
-    geode::OpenGeodeMeshException::test(
-        result->distance == 1, "Ray inside wrong distance" );
-}
+        const auto aabb = geode::create_aabb_tree( *mesh );
+        const geode::Vector3D direction{ { 0, 0, 1 } };
+        const geode::Point3D origin{ { 0, 0, 0 } };
+        const geode::Ray3D ray{ direction, origin };
+        geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+        aabb.compute_ray_element_bbox_intersections( ray, tracing );
+        const auto result = tracing.closest_polygon();
+        geode::OpenGeodeMeshException::test(
+            result.has_value(), "Ray inside no result" );
+        geode::OpenGeodeMeshException::test(
+            result->polygon == 0, "Ray inside wrong polygon" );
+        geode::OpenGeodeMeshException::test(
+            result->distance == 1, "Ray inside wrong distance" );
+    }
 
-void test_ray_edge()
-{
-    geode::Logger::info( "Test ray edge" );
-    auto mesh = geode::SurfaceMesh3D::create();
-    auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
-    builder->create_point( geode::Point3D{ { 1, -1, 0 } } );
-    builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
-    builder->create_point( geode::Point3D{ { 1, 0, -1 } } );
-    builder->create_point( geode::Point3D{ { 1, 0, 3 } } );
-    builder->create_polygon( { 0, 1, 2 } );
-    builder->create_polygon( { 1, 0, 3 } );
-    builder->compute_polygon_adjacencies();
+    void test_ray_edge()
+    {
+        geode::Logger::info( "Test ray edge" );
+        auto mesh = geode::SurfaceMesh3D::create();
+        auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
+        builder->create_point( geode::Point3D{ { 1, -1, 0 } } );
+        builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
+        builder->create_point( geode::Point3D{ { 1, 0, -1 } } );
+        builder->create_point( geode::Point3D{ { 1, 0, 3 } } );
+        builder->create_polygon( { 0, 1, 2 } );
+        builder->create_polygon( { 1, 0, 3 } );
+        builder->compute_polygon_adjacencies();
 
-    const auto aabb = geode::create_aabb_tree( *mesh );
-    const geode::Vector3D direction{ { 1, 0, 0 } };
-    const geode::Point3D origin{ { 0, 0, 1 } };
-    const geode::Ray3D ray{ direction, origin };
-    geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
-    aabb.compute_ray_element_bbox_intersections( ray, tracing );
-    const auto result = tracing.closest_polygon();
-    geode::OpenGeodeMeshException::test(
-        result.has_value(), "Ray edge no result" );
-    geode::OpenGeodeMeshException::test(
-        result->polygon == 1, "Ray edge wrong polygon" );
-    geode::OpenGeodeMeshException::test(
-        result->distance == 1, "Ray edge wrong distance" );
-    geode::OpenGeodeMeshException::test(
-        tracing.all_intersections().size() == 1,
-        "Wrong size for ray tracing result for case edge" );
-}
+        const auto aabb = geode::create_aabb_tree( *mesh );
+        const geode::Vector3D direction{ { 1, 0, 0 } };
+        const geode::Point3D origin{ { 0, 0, 1 } };
+        const geode::Ray3D ray{ direction, origin };
+        geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+        aabb.compute_ray_element_bbox_intersections( ray, tracing );
+        const auto result = tracing.closest_polygon();
+        geode::OpenGeodeMeshException::test(
+            result.has_value(), "Ray edge no result" );
+        geode::OpenGeodeMeshException::test(
+            result->polygon == 1, "Ray edge wrong polygon" );
+        geode::OpenGeodeMeshException::test(
+            result->distance == 1, "Ray edge wrong distance" );
+        geode::OpenGeodeMeshException::test(
+            tracing.all_intersections().size() == 1,
+            "Wrong size for ray tracing result for case edge" );
+    }
 
-void test_ray_parallel()
-{
-    geode::Logger::info( "Test ray parallel" );
-    auto mesh = geode::SurfaceMesh3D::create();
-    auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
-    builder->create_point( geode::Point3D{ { -1, -1, 0 } } );
-    builder->create_point( geode::Point3D{ { -1, 1, 0 } } );
-    builder->create_point( geode::Point3D{ { -2, 0, 0 } } );
-    builder->create_polygon( { 0, 1, 2 } );
-    const auto aabb = geode::create_aabb_tree( *mesh );
-    const geode::Vector3D direction{ { -1, 0, 0 } };
-    const geode::Point3D origin{ { 0, 0, 0 } };
-    const geode::Ray3D ray{ direction, origin };
-    geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
-    aabb.compute_ray_element_bbox_intersections( ray, tracing );
-    const auto result = tracing.closest_polygon();
-    geode::OpenGeodeMeshException::test(
-        result.has_value(), "Ray edge no result" );
-    geode::OpenGeodeMeshException::test(
-        result->polygon == 0, "Ray edge wrong polygon" );
-    geode::OpenGeodeMeshException::test(
-        result->distance == 1, "Ray edge wrong distance" );
-}
+    void test_ray_parallel()
+    {
+        geode::Logger::info( "Test ray parallel" );
+        auto mesh = geode::SurfaceMesh3D::create();
+        auto builder = geode::SurfaceMeshBuilder3D::create( *mesh );
+        builder->create_point( geode::Point3D{ { -1, -1, 0 } } );
+        builder->create_point( geode::Point3D{ { -1, 1, 0 } } );
+        builder->create_point( geode::Point3D{ { -2, 0, 0 } } );
+        builder->create_polygon( { 0, 1, 2 } );
+        const auto aabb = geode::create_aabb_tree( *mesh );
+        const geode::Vector3D direction{ { -1, 0, 0 } };
+        const geode::Point3D origin{ { 0, 0, 0 } };
+        const geode::Ray3D ray{ direction, origin };
+        geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+        aabb.compute_ray_element_bbox_intersections( ray, tracing );
+        const auto result = tracing.closest_polygon();
+        geode::OpenGeodeMeshException::test(
+            result.has_value(), "Ray edge no result" );
+        geode::OpenGeodeMeshException::test(
+            result->polygon == 0, "Ray edge wrong polygon" );
+        geode::OpenGeodeMeshException::test(
+            result->distance == 1, "Ray edge wrong distance" );
+    }
 
-void test()
-{
-    geode::OpenGeodeMeshLibrary::initialize();
-    test_ray_inside();
-    test_ray_edge();
-    test_ray_parallel();
-}
+    void test()
+    {
+        geode::OpenGeodeMeshLibrary::initialize();
+        test_ray_inside();
+        test_ray_edge();
+        test_ray_parallel();
+    }
+} // namespace
 
 OPENGEODE_TEST( "ray-tracing" )
