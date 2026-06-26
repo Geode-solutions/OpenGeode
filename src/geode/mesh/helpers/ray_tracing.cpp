@@ -330,7 +330,6 @@ namespace geode
                 {
                     distance *= -1.;
                 }
-                std::lock_guard< std::mutex > lock{ mutex_ };
                 results_.emplace_back( edge_id, distance, result.second,
                     std::move( intersection_result ) );
             }
@@ -359,7 +358,6 @@ namespace geode
         OwnerSegment2D segment_;
         mutable std::vector< EdgeDistance > results_;
         mutable bool are_results_sorted_{ false };
-        std::mutex mutex_;
     };
 
     RayTracing2D::RayTracing2D(
@@ -521,14 +519,13 @@ namespace geode
                     {
                         distance *= -1.;
                     }
-                    std::lock_guard< std::mutex > lock{ mutex_ };
                     results_.emplace_back( polygon_id, distance, result.second,
                         std::move( intersection_result ) );
                     break;
                 }
                 for( const auto e2 : LRange{ 3 } )
                 {
-                    auto [ray_edge_distance, point, _] =
+                    auto [ray_edge_distance, ray_point, _] =
                         segment_segment_distance( Segment3D{ segment_ },
                             { triangle.vertices()[e2].get(),
                                 triangle.vertices()[( e2 + 1 ) % 3].get() } );
@@ -536,23 +533,29 @@ namespace geode
                     {
                         continue;
                     }
-                    if( Vector3D{ origin_, point }.dot( segment_.direction() )
-                        < 0 )
+                    const Vector3D origin_target{ origin_, ray_point };
+                    auto distance = origin_target.length();
+                    if( origin_target.dot( segment_.direction() ) < 0 )
                     {
-                        ray_edge_distance *= -1.;
+                        distance *= -1.;
                     }
-                    std::lock_guard< std::mutex > lock{ mutex_ };
-                    results_.emplace_back( polygon_id, ray_edge_distance,
-                        result.second, std::move( point ) );
-                }
-                const auto [distance, __, triangle_point] =
-                    segment_triangle_distance( segment_, triangle );
-                if( distance < GLOBAL_EPSILON )
-                {
-                    std::lock_guard< std::mutex > lock{ mutex_ };
                     results_.emplace_back(
-                        polygon_id, distance, result.second, triangle_point );
+                        polygon_id, distance, result.second, ray_point );
                 }
+                const auto [triangle_distance, ray_point, _] =
+                    segment_triangle_distance( segment_, triangle );
+                if( triangle_distance > GLOBAL_EPSILON )
+                {
+                    continue;
+                }
+                const Vector3D origin_target{ origin_, ray_point };
+                auto distance = origin_target.length();
+                if( origin_target.dot( segment_.direction() ) < 0 )
+                {
+                    distance *= -1.;
+                }
+                results_.emplace_back(
+                    polygon_id, distance, result.second, ray_point );
                 break;
             }
             return false;
@@ -581,7 +584,6 @@ namespace geode
         OwnerSegment3D segment_;
         mutable std::vector< PolygonDistance > results_;
         mutable bool are_results_sorted_{ false };
-        std::mutex mutex_;
     };
 
     RayTracing3D::RayTracing3D(
