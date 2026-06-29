@@ -244,13 +244,39 @@ namespace geode
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
                 facet_indices_ = from.facet_indices_;
+                const auto counter_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, index_t >(
+                            "counter", 1u, { false, false, false } );
                 counter_ = facet_attribute_manager_
                                .find_attribute< VariableAttribute, index_t >(
-                                   from.counter_->id() );
+                                   counter_id );
+                const auto old_counter_attribute =
+                    from.facet_attribute_manager()
+                        .template find_read_only_attribute< index_t >(
+                            from.counter_->id() );
+                const auto vertices_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, VertexContainer >(
+                            "facet_vertices", VertexContainer{},
+                            { false, false, false } );
                 vertices_ =
                     facet_attribute_manager_
                         .find_attribute< VariableAttribute, VertexContainer >(
+                            vertices_id );
+                const auto old_vertices_attribute =
+                    from.facet_attribute_manager()
+                        .template find_read_only_attribute< VertexContainer >(
                             from.vertices_->id() );
+                for( const auto& [_, facet_id] : facet_indices_ )
+                {
+                    const auto old_counter_value =
+                        old_counter_attribute->value( facet_id );
+                    counter_->set_value( facet_id, old_counter_value );
+                    const auto old_vertices_value =
+                        old_vertices_attribute->value( facet_id );
+                    vertices_->set_value( facet_id, old_vertices_value );
+                }
             }
 
         private:

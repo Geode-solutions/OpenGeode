@@ -249,31 +249,36 @@ namespace geode
             return ids;
         }
 
-        void copy( const AttributeManager::Impl &attribute_manager,
+        void copy( const AttributeManager::Impl &attribute_manager_from,
             const AttributeBase::AttributeKey &key )
         {
-            nb_elements_ = attribute_manager.nb_elements_;
-            for( const auto &[attribute_id, attribute] :
-                attribute_manager.attributes_ )
+            nb_elements_ = attribute_manager_from.nb_elements_;
+            for( const auto &[attribute_id_from, attribute_from] :
+                attribute_manager_from.attributes_ )
             {
-                const auto attribute_it = attributes_.find( attribute_id );
+                if( !attribute_from->properties().transferable )
+                {
+                    continue;
+                }
+                const auto attribute_it = attributes_.find( attribute_id_from );
                 if( attribute_it != attributes_.end() )
                 {
                     try
                     {
                         attribute_it->second->copy(
-                            *attribute, nb_elements_, key );
+                            *attribute_from, nb_elements_, key );
                     }
                     catch( const std::bad_cast &e )
                     {
-                        Logger::error( "Attribute \"", attribute_id.string(),
+                        Logger::error( "Attribute \"",
+                            attribute_id_from.string(),
                             "\" cannot be copied: ", e.what() );
                     }
                 }
                 else
                 {
                     attributes_.emplace(
-                        attribute_id, attribute->clone( key ) );
+                        attribute_id_from, attribute_from->clone( key ) );
                 }
             }
         }
