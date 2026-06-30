@@ -246,6 +246,20 @@ namespace geode
     }
 
     Section::InternalCornerRange Section::internal_corners(
+        const Line2D& line ) const
+    {
+        return { *this, line };
+    }
+
+    Section::InternalCornerRange::InternalCornerRange(
+        const Section& section, const Line2D& line )
+        : Relationships::InternalRangeIterator( section, line.id() ),
+          section_( section )
+    {
+        internal::next_filtered_internal_iterator< Corner2D >( *this );
+    }
+
+    Section::InternalCornerRange Section::internal_corners(
         const Surface2D& surface ) const
     {
         return { *this, surface };
@@ -289,6 +303,51 @@ namespace geode
     {
         return section_.corner(
             Relationships::InternalRangeIterator::operator*().id() );
+    }
+
+    Section::EmbeddingLineRange Section::embedding_lines(
+        const Corner2D& corner ) const
+    {
+        return { *this, corner };
+    }
+
+    Section::EmbeddingLineRange::EmbeddingLineRange(
+        const Section& section, const Corner2D& corner )
+        : Relationships::EmbeddingRangeIterator( section, corner.id() ),
+          section_( section )
+    {
+        internal::next_filtered_embedding_iterator< Line2D >( *this );
+    }
+
+    Section::EmbeddingLineRange::EmbeddingLineRange(
+        const EmbeddingLineRange& range )
+        : Relationships::EmbeddingRangeIterator{ range },
+          section_( range.section_ )
+    {
+    }
+
+    Section::EmbeddingLineRange::~EmbeddingLineRange() = default;
+
+    auto Section::EmbeddingLineRange::begin() const -> const EmbeddingLineRange&
+    {
+        return *this;
+    }
+
+    auto Section::EmbeddingLineRange::end() const -> const EmbeddingLineRange&
+    {
+        return *this;
+    }
+
+    void Section::EmbeddingLineRange::operator++()
+    {
+        Relationships::EmbeddingRangeIterator::operator++();
+        internal::next_filtered_embedding_iterator< Line2D >( *this );
+    }
+
+    const Line2D& Section::EmbeddingLineRange::operator*() const
+    {
+        return section_.line(
+            Relationships::EmbeddingRangeIterator::operator*().id() );
     }
 
     Section::EmbeddingSurfaceRange Section::embedding_surfaces(
@@ -521,6 +580,11 @@ namespace geode
         return { *this, collection };
     }
 
+    index_t Section::nb_internal_corners( const Line2D& line ) const
+    {
+        return detail::count_range_elements( internal_corners( line ) );
+    }
+
     index_t Section::nb_internal_corners( const Surface2D& surface ) const
     {
         return detail::count_range_elements( internal_corners( surface ) );
@@ -529,6 +593,11 @@ namespace geode
     index_t Section::nb_internal_lines( const Surface2D& surface ) const
     {
         return detail::count_range_elements( internal_lines( surface ) );
+    }
+
+    index_t Section::nb_embedding_lines( const Corner2D& corner ) const
+    {
+        return detail::count_range_elements( embedding_lines( corner ) );
     }
 
     index_t Section::nb_embedding_surfaces( const Corner2D& corner ) const
@@ -556,6 +625,12 @@ namespace geode
         const Line2D& line, const Surface2D& surface ) const
     {
         return Relationships::is_boundary( line.id(), surface.id() );
+    }
+
+    bool Section::is_internal(
+        const Corner2D& corner, const Line2D& line ) const
+    {
+        return Relationships::is_internal( corner.id(), line.id() );
     }
 
     bool Section::is_internal(

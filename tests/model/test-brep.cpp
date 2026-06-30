@@ -66,7 +66,6 @@ std::array< geode::uuid, 6 > add_corners(
     {
         uuids[c] = builder.add_corner();
         builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
-        SDEBUG( uuids[c] );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::impl_name_static() ) );
@@ -164,11 +163,9 @@ geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
         geode::detail::count_range_elements( model.blocks() ) == 1, message );
     geode::OpenGeodeModelException::test(
         model.block( block_uuid ).name() == "block1", "Wrong Block name" );
-    DEBUG( model.nb_active_blocks() );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 1, message );
     builder.set_block_active( block_uuid, false );
-    DEBUG( model.nb_active_blocks() );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 0, "BRep should have 0 active block" );
     geode::OpenGeodeModelException::test(
@@ -374,7 +371,7 @@ void add_corner_line_boundary_relation( const geode::BRep& model,
     builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[6] ) );
     builder.add_corner_line_boundary_relationship(
-        model.corner( corner_uuids[3] ), model.line( line_uuids[8] ) );
+        model.corner( corner_uuids[3] ), model.line( line_uuids[7] ) );
     builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[3] ) );
     builder.add_corner_line_boundary_relationship(
@@ -386,7 +383,7 @@ void add_corner_line_boundary_relation( const geode::BRep& model,
     builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[7] ) );
     builder.add_corner_line_boundary_relationship(
-        model.corner( corner_uuids[5] ), model.line( line_uuids[8] ) );
+        model.corner( corner_uuids[5] ), model.line( line_uuids[6] ) );
 
     for( const auto& corner_id : corner_uuids )
     {
@@ -402,18 +399,27 @@ void add_corner_line_boundary_relation( const geode::BRep& model,
             "All Corners should be connected to 3 Lines" );
     }
 
-    for( const auto& line_id : line_uuids )
+    for( const auto& line_id : geode::Range{ line_uuids.size() - 1 } )
     {
-        for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
+        for( const auto& boundary :
+            model.boundaries( model.line( line_uuids[line_id] ) ) )
         {
             geode::OpenGeodeModelException::test(
                 absl::c_find( corner_uuids, boundary.id() )
                     != corner_uuids.end(),
                 "All Lines incidences should be Corners" );
         }
-        geode::OpenGeodeModelException::test(
-            model.nb_boundaries( line_id ) == 2,
-            "All Lines should be connected to 2 Corners" );
+        const auto nb_boundaries = model.nb_boundaries( line_uuids[line_id] );
+        if( line_id < 6 )
+        {
+            geode::OpenGeodeModelException::test( nb_boundaries == 2,
+                "Line should be connected to 2 Corners, not ", nb_boundaries );
+        }
+        else
+        {
+            geode::OpenGeodeModelException::test( nb_boundaries == 3,
+                "Line should be connected to 3 Corners, not ", nb_boundaries );
+        }
     }
 }
 
@@ -625,11 +631,14 @@ void add_block_in_block_collection( const geode::BRep& model,
 void add_internal_corner_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
     absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids,
     absl::Span< const geode::uuid > surface_uuids,
     const geode::uuid& block_uuid )
 {
     for( const auto& corner_id : corner_uuids )
     {
+        builder.add_corner_line_internal_relationship(
+            model.corner( corner_id ), model.line( line_uuids.back() ) );
         builder.add_corner_surface_internal_relationship(
             model.corner( corner_id ), model.surface( surface_uuids.front() ) );
         builder.add_corner_block_internal_relationship(
@@ -638,6 +647,16 @@ void add_internal_corner_relations( const geode::BRep& model,
 
     for( const auto& corner_id : corner_uuids )
     {
+        for( const auto& embedding :
+            model.embedding_lines( model.corner( corner_id ) ) )
+        {
+            geode::OpenGeodeModelException::test(
+                line_uuids.back() == embedding.id(),
+                "All Corners should be embedded in the same Line" );
+            geode::OpenGeodeModelException::test(
+                model.nb_internal_corners( embedding ) == corner_uuids.size(),
+                "Line should embed all Corners" );
+        }
         for( const auto& embedding :
             model.embedding_surfaces( model.corner( corner_id ) ) )
         {
@@ -658,8 +677,11 @@ void add_internal_corner_relations( const geode::BRep& model,
                 "Block should embed all Corners" );
         }
         geode::OpenGeodeModelException::test(
-            model.nb_embeddings( corner_id ) == 2,
-            "All Corners should be embedded to 1 Block and 1 Surface" );
+            model.nb_embeddings( corner_id ) == 3,
+            "All Corners should be embedded to 1 Block, 1 Surface and 1 Line" );
+        geode::OpenGeodeModelException::test(
+            model.nb_embedding_lines( model.corner( corner_id ) ) == 1,
+            "All Corners should be embedded to 1 Line" );
         geode::OpenGeodeModelException::test(
             model.nb_embedding_surfaces( model.corner( corner_id ) ) == 1,
             "All Corners should be embedded to 1 Surface" );
@@ -1560,7 +1582,7 @@ void test()
     add_block_in_block_collection(
         model, builder, block_uuid, block_collection_uuid );
     add_internal_corner_relations(
-        model, builder, corner_uuids, surface_uuids, block_uuid );
+        model, builder, corner_uuids, line_uuids, surface_uuids, block_uuid );
     add_internal_line_relations(
         model, builder, line_uuids, surface_uuids, block_uuid );
     add_internal_surface_block_relations(

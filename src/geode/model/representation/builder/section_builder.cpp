@@ -366,6 +366,12 @@ namespace geode
         add_boundary_relation( line.component_id(), surface.component_id() );
     }
 
+    void SectionBuilder::add_corner_line_internal_relationship(
+        const Corner2D& corner, const Line2D& line )
+    {
+        add_internal_relation( corner.component_id(), line.component_id() );
+    }
+
     void SectionBuilder::add_corner_surface_internal_relationship(
         const Corner2D& corner, const Surface2D& surface )
     {
