@@ -25,6 +25,7 @@
 
 #include <array>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -52,6 +53,7 @@ namespace geode
         static constexpr index_t dim{ 3 };
 
         OpenGeodeRegularGrid();
+        OpenGeodeRegularGrid( BITSERY );
         OpenGeodeRegularGrid( OpenGeodeRegularGrid&& other ) noexcept;
         OpenGeodeRegularGrid& operator=(
             OpenGeodeRegularGrid&& other ) noexcept;

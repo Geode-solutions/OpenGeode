@@ -82,14 +82,17 @@ void test_bounding_box( const geode::PointSet3D& point_set )
         "Wrong computation of bounding box (max)" );
 }
 
-void test_create_vertex_attribute( const geode::PointSet3D& point_set )
+geode::uuid test_create_vertex_attribute( const geode::PointSet3D& point_set )
 {
-    auto attribute =
+    auto attribute_id = point_set.vertex_attribute_manager()
+                            .create_attribute< geode::ConstantAttribute, bool >(
+                                "bool", true, geode::AttributeProperties{} );
+    const auto attribute =
         point_set.vertex_attribute_manager()
-            .find_or_create_attribute< geode::ConstantAttribute, bool >(
-                "test", true );
+            .find_attribute< geode::ConstantAttribute, bool >( attribute_id );
     geode::OpenGeodeMeshException::test(
         attribute->value() == true, "PointSet attribute value should be true" );
+    return attribute_id;
 }
 
 void test_delete_vertex(
@@ -121,14 +124,27 @@ void test_io( const geode::PointSet3D& point_set, std::string_view filename )
     }
 }
 
-void test_clone( const geode::PointSet3D& point_set )
+void test_backward_io(
+    std::string_view filename, const geode::uuid& attribute_id )
+{
+    const auto point_set = geode::load_point_set< 3 >( filename );
+    geode::OpenGeodeMeshException::test(
+        point_set->nb_vertices() == 4, "PointSet should have 4 vertices" );
+    const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
+    geode::OpenGeodeMeshException::test( point_set->point( 1 ) == answer,
+        "PointSet vertex coordinates are not correct" );
+}
+
+void test_clone(
+    const geode::PointSet3D& point_set, const geode::uuid& attribute_id )
 {
     const auto point_set2 = point_set.clone();
     geode::OpenGeodeMeshException::test(
         point_set2->nb_vertices() == 3, "PointSet2 should have 3 vertices" );
 
     const auto attribute =
-        point_set2->vertex_attribute_manager().find_attribute< bool >( "test" );
+        point_set2->vertex_attribute_manager().find_read_only_attribute< bool >(
+            attribute_id );
     geode::OpenGeodeMeshException::test( attribute->value( 0 ) == true,
         "PointSet2 attribute value should be true" );
 
@@ -145,13 +161,15 @@ void test()
     auto builder = geode::PointSetBuilder3D::create( *point_set );
     test_create_vertices( *point_set, *builder );
     test_bounding_box( *point_set );
-    test_create_vertex_attribute( *point_set );
+    const auto vertex_attribute_id = test_create_vertex_attribute( *point_set );
     test_io(
         *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+                          point_set->native_extension() ),
+        vertex_attribute_id );
     test_permutation( *point_set, *builder );
     test_delete_vertex( *point_set, *builder );
-    test_clone( *point_set );
+    test_clone( *point_set, vertex_attribute_id );
 }
 
 OPENGEODE_TEST( "point-set" )

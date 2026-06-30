@@ -68,13 +68,17 @@ void test_bounding_box( const geode::PolygonalSurface3D& polygonal_surface )
         "Wrong computation of bounding box (max)" );
 }
 
-void test_create_vertex_attribute(
+geode::uuid test_create_vertex_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
+    auto attribute_id =
+        polygonal_surface.vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::PolygonEdge >(
+                "test", geode::PolygonEdge{}, geode::AttributeProperties{} );
     auto attribute =
         polygonal_surface.vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute,
-                geode::PolygonEdge >( "test", geode::PolygonEdge{} );
+            .find_attribute< geode::VariableAttribute, geode::PolygonEdge >(
+                attribute_id );
     for( const auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
         attribute->set_value( v, geode::PolygonEdge{ v, 0 } );
@@ -82,6 +86,7 @@ void test_create_vertex_attribute(
             geode::PolygonEdge{} != attribute->value( v ),
             "PolygonalSurface attribute assignation is not correct" );
     }
+    return attribute_id;
 }
 
 void test_permutation( const geode::PolygonalSurface3D& surface,
@@ -220,17 +225,24 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
         "Wrong polygon vertices list" );
 }
 
-void test_create_edge_attribute(
+geode::uuid test_create_edge_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    auto attribute = polygonal_surface.edges()
-                         .edge_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test", geode::NO_ID );
+    auto attribute_id =
+        polygonal_surface.edges()
+            .edge_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "edges", geode::NO_ID, geode::AttributeProperties{} );
+    auto attribute =
+        polygonal_surface.edges()
+            .edge_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attribute_id );
     for( const auto e : geode::Range{ polygonal_surface.edges().nb_edges() } )
     {
         attribute->set_value( e, e );
     }
+    return attribute_id;
 }
 
 void test_polygon_adjacencies(
@@ -337,7 +349,8 @@ void test_polygon_edge_requests(
 }
 
 void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
-    geode::PolygonalSurfaceBuilder3D& builder )
+    geode::PolygonalSurfaceBuilder3D& builder,
+    const geode::uuid edge_attribute_id )
 {
     std::vector< bool > to_delete( polygonal_surface.nb_polygons(), false );
     to_delete.front() = true;
@@ -362,9 +375,10 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
     geode::OpenGeodeMeshException::test(
         polygonal_surface.edges().nb_edges() == 6,
         "PolygonalSurface should have 6 edges" );
-    const auto attribute = polygonal_surface.edges()
-                               .edge_attribute_manager()
-                               .find_attribute< geode::index_t >( "test" );
+    const auto attribute =
+        polygonal_surface.edges()
+            .edge_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( edge_attribute_id );
     for( const auto e : geode::Range{ 6 } )
     {
         geode::OpenGeodeMeshException::test( attribute->value( e ) == e,
@@ -461,7 +475,8 @@ void test_polygon_vertex_normal()
 }
 
 void test_io( const geode::PolygonalSurface3D& polygonal_surface,
-    const std::string& filename )
+    const std::string& filename,
+    const geode::uuid edge_attribute_id )
 {
     geode::save_polygonal_surface( polygonal_surface, filename );
     const auto reloaded = geode::load_polygonal_surface< 3 >( filename );
@@ -490,9 +505,10 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
         new_polygonal_surface->edges().edge_from_vertices( { 1, 0 } )
             == polygonal_surface.edges().edge_from_vertices( { 1, 0 } ),
         "Reloaded PolygonalSurface has wrong polygon edge index" );
-    const auto attribute = new_polygonal_surface->edges()
-                               .edge_attribute_manager()
-                               .find_attribute< geode::index_t >( "test" );
+    const auto attribute =
+        new_polygonal_surface->edges()
+            .edge_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( edge_attribute_id );
     for( const auto e :
         geode::Range{ new_polygonal_surface->edges().nb_edges() } )
     {
@@ -531,7 +547,8 @@ void test_backward_io( const std::string& filename )
         "Backward polygons around failed" );
 }
 
-void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
+void test_clone( const geode::PolygonalSurface3D& polygonal_surface,
+    geode::uuid vertex_attribute_id )
 {
     const auto polygonal_surface_clone = polygonal_surface.clone();
     geode::OpenGeodePolygonalSurface3D polygonal_surface2{ std::move(
@@ -546,7 +563,8 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
         "PolygonalSurface2 should have 2 polygons" );
 
     const auto attribute2 = polygonal_surface2.vertex_attribute_manager()
-                                .find_attribute< geode::PolygonEdge >( "test" );
+                                .find_read_only_attribute< geode::PolygonEdge >(
+                                    vertex_attribute_id );
     std::vector< geode::PolygonEdge > att_answer{ { 4, 0 }, { 2, 0 }, { 6, 0 },
         { 1, 0 }, { 5, 0 }, { 0, 0 }, { 3, 0 } };
     for( const auto v : geode::Range{ polygonal_surface2.nb_vertices() } )
@@ -576,9 +594,6 @@ void test_set_polygon_vertex(
 void test_replace_vertex( const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
-    const auto att = polygonal_surface.edges()
-                         .edge_attribute_manager()
-                         .find_attribute< geode::index_t >( "counter" );
     const auto new_id = builder.create_vertex();
     const auto polygons_around = polygonal_surface.polygons_around_vertex( 1 );
     builder.replace_vertex( 1, new_id );
@@ -667,9 +682,11 @@ void test()
 
     test_create_vertices( *polygonal_surface, *builder );
     test_bounding_box( *polygonal_surface );
-    test_create_vertex_attribute( *polygonal_surface );
+    const auto vertex_attribute_id =
+        test_create_vertex_attribute( *polygonal_surface );
     test_create_polygons( *polygonal_surface, *builder );
-    test_create_edge_attribute( *polygonal_surface );
+    const auto edge_attribute_id =
+        test_create_edge_attribute( *polygonal_surface );
     test_polygon_adjacencies( *polygonal_surface, *builder );
     test_polygon_edges_on_borders( *polygonal_surface );
     test_previous_next_on_border( *polygonal_surface );
@@ -681,16 +698,18 @@ void test()
     test_texture( *polygonal_surface );
 
     test_io( *polygonal_surface,
-        absl::StrCat( "test.", polygonal_surface->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v7.", polygonal_surface->native_extension() ) );
-    test_backward_io( absl::StrCat( geode::DATA_PATH, "test_v12.",
+        absl::StrCat( "test.", polygonal_surface->native_extension() ),
+        edge_attribute_id );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v7/test_v7.",
         polygonal_surface->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH,
+        "backward_io/v12/test_v12.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        polygonal_surface->native_extension() ) );
     test_permutation( *polygonal_surface, *builder );
     test_replace_vertex( *polygonal_surface, *builder );
-    test_delete_polygon( *polygonal_surface, *builder );
-    test_clone( *polygonal_surface );
+    test_delete_polygon( *polygonal_surface, *builder, edge_attribute_id );
+    test_clone( *polygonal_surface, vertex_attribute_id );
     test_set_polygon_vertex( *polygonal_surface, *builder );
     test_delete_all( *polygonal_surface, *builder );
 

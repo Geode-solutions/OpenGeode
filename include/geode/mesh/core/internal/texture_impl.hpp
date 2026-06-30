@@ -52,6 +52,11 @@ namespace geode
                 return image_;
             }
 
+            [[nodiscard]] const geode::uuid& texture_id() const
+            {
+                return coordinates_->id();
+            }
+
             void set_image( RasterImage< dimension >&& image )
             {
                 image_ = std::move( image );
@@ -86,11 +91,13 @@ namespace geode
             }
 
             TextureImpl( AttributeManager& manager, std::string_view name )
-                : coordinates_{
-                      manager.find_or_create_attribute< VariableAttribute,
-                          ElementTextureCoordinates >( name, {} )
-                  }
             {
+                const auto texture_id =
+                    manager.create_attribute< VariableAttribute,
+                        ElementTextureCoordinates >(
+                        name, {}, geode::AttributeProperties{} );
+                coordinates_ = manager.find_attribute< VariableAttribute,
+                    ElementTextureCoordinates >( texture_id );
             }
 
             TextureImpl() = default;

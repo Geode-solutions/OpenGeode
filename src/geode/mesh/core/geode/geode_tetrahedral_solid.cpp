@@ -37,32 +37,43 @@
 
 #include <geode/mesh/core/detail/geode_elements.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodeTetrahedralSolid< dimension >::Impl
-        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh ),
-              tetrahedron_vertices_( mesh.polyhedron_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 4 > >( "tetrahedron_vertices",
-                          std::array< index_t, 4 >{
-                              NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false, false } ) ),
-              tetrahedron_adjacents_( mesh.polyhedron_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 4 > >( "tetrahedron_adjacents",
-                          std::array< index_t, 4 >{
-                              NO_ID, NO_ID, NO_ID, NO_ID },
-                          { false, false, false } ) )
         {
+            detail::template initialize_crs<
+                OpenGeodeTetrahedralSolid< dimension > >( mesh );
+            const auto tetrahedron_vertices_id =
+                mesh.polyhedron_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( "tetrahedron_vertices",
+                        std::array< index_t, 4 >{ NO_ID, NO_ID, NO_ID, NO_ID },
+                        { false, false, false } );
+            tetrahedron_vertices_ =
+                mesh.polyhedron_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( tetrahedron_vertices_id );
+            const auto tetrahedron_adjacents_id =
+                mesh.polyhedron_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( "tetrahedron_adjacents",
+                        std::array< index_t, 4 >{ NO_ID, NO_ID, NO_ID, NO_ID },
+                        { false, false, false } );
+            tetrahedron_adjacents_ =
+                mesh.polyhedron_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        std::array< index_t, 4 > >( tetrahedron_adjacents_id );
         }
+
+        Impl() = default;
 
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const
@@ -123,17 +134,14 @@ namespace geode
         }
 
     private:
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         archive.ext(
-                             impl, bitsery::ext::BaseClass<
-                                       internal::PointsImpl< dimension > >{} );
+                         internal::PointsImpl< dimension > temp;
+                         archive.object( temp );
                          archive.ext( impl.tetrahedron_vertices_,
                              bitsery::ext::StdSmartPtr{} );
                          archive.ext( impl.tetrahedron_adjacents_,
@@ -154,9 +162,8 @@ namespace geode
                                  false } );
                      },
                         []( Archive& archive, Impl& impl ) {
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass<
-                                    internal::PointsImpl< dimension > >{} );
+                            internal::PointsImpl< dimension > temp;
+                            archive.object( temp );
                             archive.ext( impl.tetrahedron_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
                             archive.ext( impl.tetrahedron_adjacents_,
@@ -179,6 +186,13 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid(
+        BITSERY bitsery )
+        : TetrahedralSolid< dimension >{ bitsery }
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid(
         OpenGeodeTetrahedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
@@ -189,14 +203,6 @@ namespace geode
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >::~OpenGeodeTetrahedralSolid() =
         default;
-
-    template < index_t dimension >
-    void OpenGeodeTetrahedralSolid< dimension >::set_vertex( index_t vertex_id,
-        Point< dimension > point,
-        OGTetrahedralSolidKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_vertex(
@@ -233,8 +239,32 @@ namespace geode
                          solid, bitsery::ext::BaseClass<
                                     TetrahedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
-                     solid.impl_->initialize_crs( solid );
+                     const auto new_point_attribute_id =
+                         solid.vertex_attribute_manager()
+                             .attribute_ids_matching_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
+                     detail::template initialize_crs<
+                         OpenGeodeTetrahedralSolid< dimension > >(
+                         solid, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass<
+                                       TetrahedralSolid< dimension > >{} );
+                        archive.object( solid.impl_ );
+                        const auto new_point_attribute_id =
+                            solid.vertex_attribute_manager()
+                                .attribute_ids_matching_name(
+                                    internal::PointsImpl<
+                                        dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        detail::template initialize_crs<
+                            OpenGeodeTetrahedralSolid< dimension > >(
+                            solid, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
                         archive.ext(
                             solid, bitsery::ext::BaseClass<

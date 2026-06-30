@@ -34,7 +34,6 @@
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/internal/grid_shape_function.hpp>
-
 namespace
 {
     template < typename Mesh >
@@ -42,10 +41,10 @@ namespace
     {
     public:
         ScalarGradientComputer(
-            const Mesh& mesh, std::string_view scalar_function_name )
+            const Mesh& mesh, const geode::uuid& scalar_function_id )
             : mesh_( mesh ), vertex_has_value_( mesh.nb_vertices(), true )
         {
-            initialize_attribute_and_name( scalar_function_name );
+            initialize_attribute_and_id( scalar_function_id );
             for( const auto vertex_id : geode::Range{ mesh_.nb_vertices() } )
             {
                 if( std::isnan( scalar_function_->value( vertex_id ) ) )
@@ -56,26 +55,32 @@ namespace
         }
 
         ScalarGradientComputer( const Mesh& mesh,
-            std::string_view scalar_function_name,
+            const geode::uuid& scalar_function_id,
             absl::Span< const geode::index_t > no_value_vertices )
             : mesh_( mesh ), vertex_has_value_( mesh.nb_vertices(), true )
         {
-            initialize_attribute_and_name( scalar_function_name );
+            initialize_attribute_and_id( scalar_function_id );
             for( const auto vertex_id : no_value_vertices )
             {
                 vertex_has_value_[vertex_id] = false;
             }
         }
 
-        std::tuple< std::string, std::vector< geode::index_t > >
+        std::tuple< geode::uuid, std::vector< geode::index_t > >
             compute_scalar_function_gradient() const
         {
+            const auto gradient_function_name =
+                absl::StrCat( scalar_function_->name().value(), "_gradient" );
+            auto gradient_function_id =
+                mesh_.vertex_attribute_manager()
+                    .template create_attribute< geode::VariableAttribute,
+                        geode::Vector< Mesh::dim > >( gradient_function_name,
+                        geode::Vector< Mesh::dim >{},
+                        geode::AttributeProperties{} );
             auto gradient_function =
                 mesh_.vertex_attribute_manager()
-                    .template find_or_create_attribute<
-                        geode::VariableAttribute, geode::Vector< Mesh::dim > >(
-                        output_gradient_attribute_name_,
-                        geode::Vector< Mesh::dim >{} );
+                    .template find_attribute< geode::VariableAttribute,
+                        geode::Vector< Mesh::dim > >( gradient_function_id );
             std::vector< geode::index_t > no_gradient_value_vertices;
             for( const auto vertex_id : geode::Range{ mesh_.nb_vertices() } )
             {
@@ -84,39 +89,30 @@ namespace
                     no_gradient_value_vertices.push_back( vertex_id );
                 }
             }
-            return std::make_tuple( output_gradient_attribute_name_,
-                std::move( no_gradient_value_vertices ) );
+            return std::make_tuple(
+                gradient_function_id, std::move( no_gradient_value_vertices ) );
         }
 
     private:
-        void initialize_attribute_and_name(
-            std::string_view scalar_function_name )
+        void initialize_attribute_and_id(
+            const geode::uuid& scalar_function_id )
         {
             geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_exists(
-                    scalar_function_name ),
+                    scalar_function_id ),
                 nullptr, geode::OpenGeodeException::TYPE::data,
                 "[compute_scalar_function_gradient] No attribute exists with "
-                "given name." );
+                "given id." );
             geode::OpenGeodeMeshException::check_exception(
                 mesh_.vertex_attribute_manager().attribute_type(
-                    scalar_function_name )
+                    scalar_function_id )
                     == typeid( double ).name(),
                 nullptr, geode::OpenGeodeException::TYPE::data,
                 "[compute_scalar_function_gradient] The attribute linked to "
-                "given name is not scalar." );
-            scalar_function_ =
-                mesh_.vertex_attribute_manager()
-                    .template find_attribute< double >( scalar_function_name );
-            output_gradient_attribute_name_ =
-                absl::StrCat( scalar_function_name, "_gradient" );
-            geode::index_t counter{ 0 };
-            while( mesh_.vertex_attribute_manager().attribute_exists(
-                absl::StrCat( output_gradient_attribute_name_, counter ) ) )
-            {
-                counter++;
-            }
-            absl::StrAppend( &output_gradient_attribute_name_, counter );
+                "given id is not scalar." );
+            scalar_function_ = mesh_.vertex_attribute_manager()
+                                   .template find_read_only_attribute< double >(
+                                       scalar_function_id );
         }
 
         bool compute_gradient(
@@ -197,7 +193,6 @@ namespace
     private:
         const Mesh& mesh_;
         std::shared_ptr< geode::ReadOnlyAttribute< double > > scalar_function_;
-        std::string output_gradient_attribute_name_;
         std::vector< bool > vertex_has_value_;
     };
 } // namespace
@@ -205,61 +200,60 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    std::string compute_surface_scalar_function_gradient(
-        const SurfaceMesh< dimension >& mesh,
-        std::string_view scalar_function_name )
+    geode::uuid compute_surface_scalar_function_gradient(
+        const SurfaceMesh< dimension >& mesh, const uuid& scalar_function_id )
     {
-        ::ScalarGradientComputer computer{ mesh, scalar_function_name };
+        ::ScalarGradientComputer computer{ mesh, scalar_function_id };
         return std::get< 0 >( computer.compute_scalar_function_gradient() );
     }
 
-    std::string compute_solid_scalar_function_gradient(
-        const SolidMesh3D& mesh, std::string_view scalar_function_name )
+    geode::uuid compute_solid_scalar_function_gradient(
+        const SolidMesh3D& mesh, const uuid& scalar_function_id )
     {
-        ::ScalarGradientComputer computer{ mesh, scalar_function_name };
+        ::ScalarGradientComputer computer{ mesh, scalar_function_id };
         return std::get< 0 >( computer.compute_scalar_function_gradient() );
     }
 
-    template std::string opengeode_mesh_api
+    template geode::uuid opengeode_mesh_api
         compute_surface_scalar_function_gradient(
-            const SurfaceMesh2D&, std::string_view );
-    template std::string opengeode_mesh_api
+            const SurfaceMesh2D&, const uuid& );
+    template geode::uuid opengeode_mesh_api
         compute_surface_scalar_function_gradient(
-            const SurfaceMesh3D&, std::string_view );
+            const SurfaceMesh3D&, const uuid& );
 
     namespace internal
     {
         template < index_t dimension >
-        std::tuple< std::string, std::vector< index_t > >
+        std::tuple< geode::uuid, std::vector< index_t > >
             compute_surface_scalar_function_gradient(
                 const SurfaceMesh< dimension >& mesh,
-                std::string_view scalar_function_name,
+                const uuid& scalar_function_id,
                 absl::Span< const index_t > no_value_vertices )
         {
-            ::ScalarGradientComputer computer{ mesh, scalar_function_name,
+            ::ScalarGradientComputer computer{ mesh, scalar_function_id,
                 no_value_vertices };
             return computer.compute_scalar_function_gradient();
         }
 
-        std::tuple< std::string, std::vector< index_t > >
+        std::tuple< geode::uuid, std::vector< index_t > >
             compute_solid_scalar_function_gradient( const SolidMesh3D& mesh,
-                std::string_view scalar_function_name,
+                const uuid& scalar_function_id,
                 absl::Span< const index_t > no_value_vertices )
         {
-            ::ScalarGradientComputer computer{ mesh, scalar_function_name,
+            ::ScalarGradientComputer computer{ mesh, scalar_function_id,
                 no_value_vertices };
             return computer.compute_scalar_function_gradient();
         }
 
-        template std::tuple< std::string, std::vector< index_t > >
+        template std::tuple< geode::uuid, std::vector< index_t > >
             opengeode_mesh_api compute_surface_scalar_function_gradient(
                 const SurfaceMesh2D&,
-                std::string_view,
+                const uuid&,
                 absl::Span< const index_t > );
-        template std::tuple< std::string, std::vector< index_t > >
+        template std::tuple< geode::uuid, std::vector< index_t > >
             opengeode_mesh_api compute_surface_scalar_function_gradient(
                 const SurfaceMesh3D&,
-                std::string_view,
+                const uuid&,
                 absl::Span< const index_t > );
     } // namespace internal
 } // namespace geode

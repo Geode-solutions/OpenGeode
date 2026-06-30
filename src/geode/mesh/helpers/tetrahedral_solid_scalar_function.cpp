@@ -43,34 +43,24 @@ namespace geode
             double value )
             : solid_( solid )
         {
-            OpenGeodeMeshException::check_exception(
-                !solid_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TetrahedralSolidScalarFunction: attribute with "
-                "name '",
-                function_name, "' already exists." );
+            const auto function_id =
+                solid_.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, value, { false, true } );
             function_attribute_ =
                 solid_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, value, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         Impl( const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name )
+            const uuid& function_id )
             : solid_( solid )
         {
-            OpenGeodeMeshException::check_exception(
-                solid_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TetrahedralSolidScalarFunction: attribute with "
-                "name '",
-                function_name, "' does not exist." );
             function_attribute_ =
                 solid_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, 0, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         void set_value( index_t vertex_id, double value )
@@ -101,6 +91,11 @@ namespace geode
             return point_value;
         }
 
+        uuid attribute_function_id() const
+        {
+            return function_attribute_->id();
+        }
+
     private:
         const TetrahedralSolid< dimension >& solid_;
         std::shared_ptr< VariableAttribute< double > > function_attribute_;
@@ -121,9 +116,8 @@ namespace geode
 
     template < index_t dimension >
     TetrahedralSolidScalarFunction< dimension >::TetrahedralSolidScalarFunction(
-        const TetrahedralSolid< dimension >& solid,
-        std::string_view function_name )
-        : impl_{ solid, function_name }
+        const TetrahedralSolid< dimension >& solid, const uuid& function_id )
+        : impl_{ solid, function_id }
     {
     }
 
@@ -145,9 +139,9 @@ namespace geode
     TetrahedralSolidScalarFunction< dimension >
         TetrahedralSolidScalarFunction< dimension >::find(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name )
+            const uuid& function_id )
     {
-        return { solid, function_name };
+        return { solid, function_id };
     }
 
     template < index_t dimension >
@@ -169,6 +163,13 @@ namespace geode
         const Point< dimension >& point, index_t tetrahedron_id ) const
     {
         return impl_->value( point, tetrahedron_id );
+    }
+
+    template < index_t dimension >
+    uuid TetrahedralSolidScalarFunction< dimension >::attribute_function_id()
+        const
+    {
+        return impl_->attribute_function_id();
     }
 
     template class opengeode_mesh_api TetrahedralSolidScalarFunction< 3 >;

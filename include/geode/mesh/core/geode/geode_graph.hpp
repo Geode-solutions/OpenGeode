@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -44,6 +45,7 @@ namespace geode
         using Builder = OpenGeodeGraphBuilder;
 
         OpenGeodeGraph();
+        OpenGeodeGraph( BITSERY );
         OpenGeodeGraph( OpenGeodeGraph&& other ) noexcept;
         OpenGeodeGraph& operator=( OpenGeodeGraph&& other ) noexcept;
         ~OpenGeodeGraph();

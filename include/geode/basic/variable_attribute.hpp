@@ -36,6 +36,7 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/growable.hpp>
+#include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/permutation.hpp>
@@ -57,10 +58,11 @@ namespace geode
 
     public:
         VariableAttribute( T default_value,
+            std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
             : VariableAttribute(
-                  std::move( default_value ), std::move( properties ) )
+                  std::move( default_value ), name, std::move( properties ) )
         {
         }
 
@@ -106,15 +108,20 @@ namespace geode
         }
 
     protected:
-        VariableAttribute( T default_value, AttributeProperties properties )
-            : ReadOnlyAttribute< T >( std::move( properties ) ),
+        VariableAttribute( T default_value,
+            std::string_view name,
+            AttributeProperties properties )
+            : ReadOnlyAttribute< T >( name, std::move( properties ) ),
               default_value_( std::move( default_value ) )
         {
             values_.reserve( 10 );
         }
 
+        VariableAttribute( std::string_view name )
+            : ReadOnlyAttribute< T >( name, AttributeProperties{} ) {};
+
         VariableAttribute()
-            : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
+            : ReadOnlyAttribute< T >( "default", AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -170,8 +177,11 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
-                new VariableAttribute< T >{ default_value_, this->properties() }
+                new VariableAttribute< T >{
+                    default_value_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_ = values_;
             return attribute;
         }
@@ -199,7 +209,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
-                new VariableAttribute< T >{ default_value_, this->properties() }
+                new VariableAttribute< T >{
+                    default_value_, this->name().value(), this->properties() }
             };
             attribute->values_.resize( nb_elements, default_value_ );
             for( const auto i : Indices{ old2new } )
@@ -228,7 +239,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
-                new VariableAttribute< T >{ default_value_, this->properties() }
+                new VariableAttribute< T >{
+                    default_value_, this->name().value(), this->properties() }
             };
             attribute->values_.resize( nb_elements, default_value_ );
             for( const auto& [input, outputs] : old2new_mapping.in2out_map() )
@@ -307,9 +319,10 @@ namespace geode
 
     public:
         VariableAttribute( bool default_value,
+            std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
-            : VariableAttribute( default_value, std::move( properties ) )
+            : VariableAttribute( default_value, name, std::move( properties ) )
         {
         }
 
@@ -355,15 +368,22 @@ namespace geode
         }
 
     protected:
-        VariableAttribute( bool default_value, AttributeProperties properties )
-            : ReadOnlyAttribute< bool >( std::move( properties ) ),
+        VariableAttribute( bool default_value,
+            std::string_view name,
+            AttributeProperties properties )
+            : ReadOnlyAttribute< bool >( name, std::move( properties ) ),
               default_value_( default_value )
         {
             values_.reserve( 10 );
         }
 
+        VariableAttribute( std::string_view name )
+            : ReadOnlyAttribute< bool >( name, AttributeProperties{} ) {};
+
         VariableAttribute()
-            : ReadOnlyAttribute< bool >( AttributeProperties{} ) {};
+            : ReadOnlyAttribute< bool >( "default", AttributeProperties{} )
+        {
+        }
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -417,7 +437,8 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->properties() }
+                    static_cast< bool >( default_value_ ), this->name().value(),
+                    this->properties() }
             };
             attribute->values_ = values_;
             return attribute;
@@ -447,7 +468,8 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->properties() }
+                    static_cast< bool >( default_value_ ), this->name().value(),
+                    this->properties() }
             };
             attribute->values_.resize( nb_elements, default_value_ );
             for( const auto i : Indices{ old2new } )
@@ -477,7 +499,8 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->properties() }
+                    static_cast< bool >( default_value_ ), this->name().value(),
+                    this->properties() }
             };
             attribute->values_.resize( nb_elements, default_value_ );
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )

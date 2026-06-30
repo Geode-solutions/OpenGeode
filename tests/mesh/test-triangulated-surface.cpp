@@ -225,6 +225,11 @@ void test_io(
 {
     geode::save_triangulated_surface( surface, filename );
     const auto relaod = geode::load_triangulated_surface< 3 >( filename );
+    const auto point_attributes =
+        relaod->vertex_attribute_manager().attribute_ids_matching_name(
+            "points" );
+    geode::OpenGeodeMeshException::test( point_attributes.has_value(),
+        "TriangulatedSurface should have points attribute" );
     geode_unused( relaod );
     const auto surface2 = geode::load_triangulated_surface< 3 >(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
@@ -237,17 +242,72 @@ void test_io(
     }
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto surface = geode::load_triangulated_surface< 3 >( filename );
+    geode::OpenGeodeMeshException::test( surface->nb_vertices() == 5,
+        "Backward TriangulatedSurface should have 5 vertices" );
+    geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
+        "Backward TriangulatedSurface should have 3 polygons" );
+    geode::OpenGeodeMeshException::test(
+        surface->point( 0 ) == geode::Point3D{ { 0.1, 0.2, 0.3 } },
+        "Backward TriangulatedSurface should have point ( 0.1, 0.2, 0.3 ) at "
+        "index 0" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_adjacent( { 0, 1 } ) == 1,
+        "TriangulatedSurface adjacent index is not correct" );
+    geode::OpenGeodeMeshException::test( surface->edges().nb_edges() == 7,
+        "Backward TriangulatedSurface should have 7 edges" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_around_vertex( 0 ).value().polygon_id == 0,
+        "Wrong polygon_around_vertex for backward triangulated surface" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 0 ).size() == 1,
+        "Wrong polygons_around_vertex for backward triangulated surface" );
+}
 void test_clone( const geode::TriangulatedSurface3D& surface )
 {
-    auto attr_from = surface.edges()
-                         .edge_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "edge_id", 0 );
+    auto attr_from_id =
+        surface.edges()
+            .edge_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "edge_id", 0, geode::AttributeProperties{} );
+    auto attr_from =
+        surface.edges()
+            .edge_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attr_from_id );
     for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         attr_from->set_value( e, e );
     }
     auto surface_clone = surface.clone();
+    for( const auto v : geode::Range{ surface_clone->nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            surface.polygons_around_vertex( v )
+                == surface_clone->polygons_around_vertex( v ),
+            "Polyhedra around vertex should match during cloning" );
+    }
+    for( const auto v : geode::Range{ surface_clone->nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            surface_clone->point( v ) == surface.point( v ),
+            "Wrong cloned mesh point coordinates." );
+    }
+    for( const auto p : geode::Range{ surface_clone->nb_polygons() } )
+    {
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            for( const auto v : geode::LRange{ 2 } )
+            {
+                geode::OpenGeodeMeshException::test(
+                    surface_clone->polygon_edge_vertex( { p, e }, v )
+                        == surface.polygon_edge_vertex( { p, e }, v ),
+                    "polyhedron_facet_vertex should match" );
+            }
+        }
+    }
     geode::OpenGeodeTriangulatedSurface3D surface2{ std::move(
         *dynamic_cast< geode::OpenGeodeTriangulatedSurface3D* >(
             surface_clone.get() ) ) };
@@ -257,9 +317,10 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         "TriangulatedSurface2 should have 5 edges" );
     geode::OpenGeodeMeshException::test( surface2.nb_polygons() == 2,
         "TriangulatedSurface2 should have 2 polygons" );
-    auto attr_to = surface2.edges()
-                       .edge_attribute_manager()
-                       .find_attribute< geode::index_t >( "edge_id" );
+    auto attr_to =
+        surface2.edges()
+            .edge_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( attr_from_id );
     for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -315,7 +376,8 @@ void test()
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
     test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        surface->native_extension() ) );
     test_permutation( *surface, *builder );
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );

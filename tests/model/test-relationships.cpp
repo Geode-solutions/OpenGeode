@@ -167,10 +167,13 @@ void test_attributes( const geode::Relationships& relations,
     geode::OpenGeodeModelException::test(
         std::get< 1 >( output ).id() == uuids[0],
         "Wrong relation uuids from index" );
-    auto relation_att =
+    auto relation_att_id =
         relations.relation_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, int >(
-                "int", 0 );
+            .create_attribute< geode::VariableAttribute, int >(
+                "int", 0, geode::AttributeProperties{} );
+    const auto relation_att =
+        relations.relation_attribute_manager()
+            .find_attribute< geode::VariableAttribute, int >( relation_att_id );
     relation_att->set_value( 0, 1 );
     geode::OpenGeodeModelException::test(
         relation_att->value(
@@ -209,7 +212,6 @@ void test()
     add_items_in_collections( relationships, uuids );
     test_relations( relationships, uuids );
     test_attributes( relationships, uuids );
-
     relationships.save_relationships( "." );
     test_io( absl::StrCat( geode::DATA_PATH, "relationships_v12" ), uuids );
     test_io( ".", uuids );

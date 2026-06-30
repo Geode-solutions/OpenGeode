@@ -66,7 +66,6 @@ std::array< geode::uuid, 6 > add_corners(
     {
         uuids[c] = builder.add_corner();
         builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
-        SDEBUG( uuids[c] );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::impl_name_static() ) );
@@ -164,11 +163,9 @@ geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
         geode::detail::count_range_elements( model.blocks() ) == 1, message );
     geode::OpenGeodeModelException::test(
         model.block( block_uuid ).name() == "block1", "Wrong Block name" );
-    DEBUG( model.nb_active_blocks() );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 1, message );
     builder.set_block_active( block_uuid, false );
-    DEBUG( model.nb_active_blocks() );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 0, "BRep should have 0 active block" );
     geode::OpenGeodeModelException::test(
@@ -1223,7 +1220,7 @@ void test_clone( const geode::BRep& brep )
         brep2.nb_blocks() == 2, "BRep should have 2 blocks" );
     geode::OpenGeodeModelException::test( brep2.nb_model_boundaries() == 6,
         "BRep should have 6 model boundaries" );
-
+    DEBUG( "test_clone" );
     for( const auto& corner : brep.corners() )
     {
         const auto& new_corner = brep2.corner(
@@ -1288,6 +1285,22 @@ void test_clone( const geode::BRep& brep )
             }
             geode::OpenGeodeModelException::test(
                 found, "All Surfaces incidences are not correct" );
+        }
+    }
+    DEBUG( brep2.nb_blocks() );
+    for( const auto& block : brep2.blocks() )
+    {
+        const auto& block_mesh = block.mesh();
+        DEBUG( block_mesh.nb_polyhedra() );
+        for( const auto p : geode::Range{ block_mesh.nb_polyhedra() } )
+        {
+            DEBUG( p );
+            for( const auto v :
+                geode::LRange{ block_mesh.nb_polyhedron_vertices( p ) } )
+            {
+                DEBUG( v );
+                DEBUG( block_mesh.polyhedron_vertex( { p, v } ) );
+            }
         }
     }
     for( const auto& model_boundary : brep.model_boundaries() )
@@ -1465,8 +1478,9 @@ void test_registry( const geode::BRep& brep,
 
 void test_backward_io()
 {
-    const auto brep = geode::load_brep(
+    auto brep = geode::load_brep(
         absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
+    geode::BRepBuilder brep_builder{ brep };
     for( const auto& block : brep.blocks() )
     {
         geode::OpenGeodeModelException::test( block.id() == block.mesh().id(),
@@ -1490,7 +1504,55 @@ void test_backward_io()
             "[Backward_IO] Brep corner should have the same uuid as its "
             "mesh." );
     }
+    for( const auto& surface : brep.surfaces() )
+    {
+        auto vertex_index =
+            brep_builder.surface_mesh_builder( surface.id() )->create_vertex();
+        DEBUG( vertex_index );
+        DEBUG( brep.unique_vertex( { surface.component_id(), vertex_index } ) );
+        geode::OpenGeodeModelException::test(
+            brep.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect brep unique_vertex_id." );
+    }
     test_registry( brep, 4, 13, 17, 7, 1, 0, 0, 0, 0, 0, 0 );
+    auto brep_v17 = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.og_brep" ) );
+    geode::BRepBuilder brep_builder_v17{ brep_v17 };
+    for( const auto& block : brep_v17.blocks() )
+    {
+        geode::OpenGeodeModelException::test( block.id() == block.mesh().id(),
+            "[Backward_IO] Brep block should have the same uuid as its mesh." );
+    }
+    for( const auto& surface : brep_v17.surfaces() )
+    {
+        geode::OpenGeodeModelException::test(
+            surface.id() == surface.mesh().id(),
+            "[Backward_IO] Brep surface should have the same uuid as its "
+            "mesh." );
+    }
+    for( const auto& line : brep_v17.lines() )
+    {
+        geode::OpenGeodeModelException::test( line.id() == line.mesh().id(),
+            "[Backward_IO] Brep line should have the same uuid as its mesh." );
+    }
+    for( const auto& corner : brep_v17.corners() )
+    {
+        geode::OpenGeodeModelException::test( corner.id() == corner.mesh().id(),
+            "[Backward_IO] Brep corner should have the same uuid as its "
+            "mesh." );
+    }
+    for( const auto& surface : brep_v17.surfaces() )
+    {
+        auto vertex_index =
+            brep_builder_v17.surface_mesh_builder( surface.id() )
+                ->create_vertex();
+        geode::OpenGeodeModelException::test(
+            brep_v17.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect brep unique_vertex_id." );
+    }
+    test_registry( brep_v17, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
 
 void test_components_filter()
@@ -1584,11 +1646,24 @@ void test()
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_clone( model );
     test_steal_mesh( model );
-
+    DEBUG( "io" );
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
-
+    DEBUG( "start load" );
     auto model2 = geode::load_brep( file_io );
+    geode::BRepBuilder model2_builder{ model2 };
+    for( const auto& surface : model2.surfaces() )
+    {
+        auto vertex_index = model2_builder.surface_mesh_builder( surface.id() )
+                                ->create_vertex();
+        DEBUG( vertex_index );
+        DEBUG(
+            model2.unique_vertex( { surface.component_id(), vertex_index } ) );
+        geode::OpenGeodeModelException::test(
+            model2.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect model2 unique_vertex_id." );
+    }
     test_compare_brep( model, model2 );
     test_registry( model2, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 

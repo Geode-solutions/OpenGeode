@@ -34,6 +34,8 @@
 #include <geode/mesh/builder/solid_edges_builder.hpp>
 #include <geode/mesh/builder/solid_facets_builder.hpp>
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/solid_edges.hpp>
 #include <geode/mesh/core/solid_facets.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
@@ -233,6 +235,11 @@ namespace
     void copy_polyhedra( const geode::SolidMesh< dimension >& solid,
         geode::SolidMeshBuilder< dimension >& builder )
     {
+        if( solid.impl_name()
+            == geode::OpenGeodeRegularGrid< dimension >::impl_name_static() )
+        {
+            return;
+        }
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
             absl::FixedArray< geode::index_t > vertices(
@@ -275,6 +282,21 @@ namespace
             {
                 builder.associate_polyhedron_vertex_to_vertex(
                     polyhedron.value(), v );
+            }
+        }
+        for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+        {
+            for( const auto f :
+                geode::LRange{ solid.nb_polyhedron_facets( p ) } )
+            {
+                const auto polyhedron_adjacent =
+                    solid.polyhedron_adjacent( geode::PolyhedronFacet{ p, f } );
+                if( polyhedron_adjacent )
+                {
+                    builder.set_polyhedron_adjacent(
+                        geode::PolyhedronFacet{ p, f },
+                        polyhedron_adjacent.value() );
+                }
             }
         }
     }
@@ -958,16 +980,8 @@ namespace geode
             solid_mesh_.disable_facets();
         }
         VertexSetBuilder::copy( solid_mesh );
-        if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
-        {
-            do_copy_points( solid_mesh );
-            do_copy_polyhedra( solid_mesh );
-        }
-        else
-        {
-            copy_points( solid_mesh, *this );
-            copy_polyhedra( solid_mesh, *this );
-        }
+        copy_points( solid_mesh, *this );
+        copy_polyhedra( solid_mesh, *this );
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
         if( solid_mesh.are_edges_enabled() )

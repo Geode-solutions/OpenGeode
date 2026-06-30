@@ -37,7 +37,7 @@ namespace geode
 
     OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
         OpenGeodeVertexSet& mesh )
-        : VertexSetBuilder( mesh ), geode_vertex_set_( mesh )
+        : VertexSetBuilder( mesh )
     {
     }
 

@@ -29,6 +29,7 @@
 #include <absl/container/inlined_vector.h>
 #include <absl/hash/hash.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -110,6 +111,8 @@ namespace geode
 
     public:
         using Builder = GraphBuilder;
+
+        Graph( BITSERY );
 
         ~Graph();
 

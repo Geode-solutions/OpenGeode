@@ -47,13 +47,19 @@ namespace geode
 
     public:
         explicit Impl( Graph& graph )
-            : edges_around_vertex_( graph.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          EdgesAroundVertex >( ATTRIBUTE_NAME,
-                          EdgesAroundVertex{},
-                          { false, false, false } ) )
         {
+            const auto attribute_id =
+                graph.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        EdgesAroundVertex >( ATTRIBUTE_NAME,
+                        EdgesAroundVertex{}, { false, false, false } );
+            edges_around_vertex_ =
+                graph.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        EdgesAroundVertex >( attribute_id );
         }
+
+        Impl() = default;
 
         AttributeManager& edge_attribute_manager() const
         {
@@ -108,8 +114,6 @@ namespace geode
         }
 
     private:
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -158,6 +162,8 @@ namespace geode
     }
 
     Graph::Graph() : impl_( *this ) {}
+
+    Graph::Graph( BITSERY ) {}
 
     Graph::Graph( Graph&& ) noexcept = default;
 

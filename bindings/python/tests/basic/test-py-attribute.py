@@ -30,61 +30,80 @@ import opengeode_py_basic as basic
 
 
 def test_constant_attribute(manager):
-    constant_attribute = manager.find_or_create_attribute_constant_bool(
-        "bool", True)
-
-    attribute = manager.find_attribute_bool("bool")
+    
+    constant_attribute_id = manager.create_attribute_constant_bool(
+        "bool", True, basic.AttributeProperties())
+    constant_attribute = manager.find_attribute_constant_bool(constant_attribute_id)
+    attribute = manager.find_read_only_attribute_bool(constant_attribute_id)
     if not attribute.value(0):
         raise ValueError("[Test] Should be equal to True")
 
     constant_attribute.set_value(False)
     if attribute.value(12):
         raise ValueError("[Test] Should be equal to False")
+    return constant_attribute_id
 
 
 def test_int_variable_attribute(manager):
-    variable_attribute = manager.find_or_create_attribute_variable_int(
-        "int", 12)
+    variable_attribute_id = manager.create_attribute_variable_int(
+        "int", 12,basic.AttributeProperties())
+    variable_attribute = manager.find_attribute_variable_int(variable_attribute_id)
     variable_attribute.set_value(3, 3)
     if not variable_attribute.is_genericable():
         raise ValueError("[Test] Should be genericable")
     
-    manager.set_attribute_properties("int",basic.AttributeProperties(True,True))
+    manager.set_attribute_properties(variable_attribute_id,basic.AttributeProperties(True,True))
     if not variable_attribute.properties().assignable or not variable_attribute.properties().interpolable :
         raise ValueError("[Test] Should be assignable and interpolable")
 
-    attribute = manager.find_attribute_int("int")
-    if attribute.value(3) != 3:
+    find_read_only_attribute = manager.find_read_only_attribute_int(variable_attribute_id)
+    if variable_attribute.value(3) != 3:
         raise ValueError("[Test] Should be equal to 3")
-    if attribute.value(6) != 12:
+    if variable_attribute.value(6) != 12:
+        raise ValueError("[Test] Should be equal to 12")
+    if find_read_only_attribute.value(3) != 3:
+        raise ValueError("[Test] Should be equal to 3")
+    if find_read_only_attribute.value(6) != 12:
         raise ValueError("[Test] Should be equal to 12")
 
     variable_attribute.set_value(3, 5)
-    if attribute.value(3) != 5:
+    if variable_attribute.value(3) != 5:
+        raise ValueError("[Test] Should be equal to 5")
+    if find_read_only_attribute.value(3) != 5:
         raise ValueError("[Test] Should be equal to 5")
 
 
 def test_double_sparse_attribute(manager):
-    sparse_attribute = manager.find_or_create_attribute_sparse_double(
-        "double", 12)
-    sparse_attribute.set_value(3, 3)
-    sparse_attribute.set_value(7, 7)
+    sparse_attribute_id = manager.create_attribute_sparse_double(
+        "double", 12,basic.AttributeProperties())
+    attribute = manager.find_attribute_sparse_double(sparse_attribute_id)
+    attribute.set_value(3, 3)
+    attribute.set_value(7, 7)
 
-    attribute = manager.find_attribute_double("double")
+    find_read_only_attribute = manager.find_read_only_attribute_double(sparse_attribute_id)
     if attribute.value(3) != 3:
         raise ValueError("[Test] Should be equal to 3")
     if attribute.value(6) != 12:
         raise ValueError("[Test] Should be equal to 12")
     if attribute.value(7) != 7:
         raise ValueError("[Test] Should be equal to 7")
+    if find_read_only_attribute.value(3) != 3:
+        raise ValueError("[Test] Should be equal to 3")
+    if find_read_only_attribute.value(6) != 12:
+        raise ValueError("[Test] Should be equal to 12")
+    if find_read_only_attribute.value(7) != 7:
+        raise ValueError("[Test] Should be equal to 7")
 
-    sparse_attribute.set_value(3, 5)
+    attribute.set_value(3, 5)
     if attribute.value(3) != 5:
         raise ValueError("[Test] Should be equal to 5")
+    if find_read_only_attribute.value(3) != 5:
+        raise ValueError("[Test] Should be equal to 5")
+    return sparse_attribute_id
 
 
 def test_number_of_attributes(manager, nb):
-    if len(manager.attribute_names()) != nb:
+    if len(manager.attribute_ids()) != nb:
         raise ValueError(
             "[Test] Not the correct number of attributes in the manager")
 
@@ -99,8 +118,8 @@ def test_delete_attribute_elements(manager):
             "[Test] Two attribute elements should have been removed")
 
 
-def test_sparse_attribute_after_element_deletion(manager):
-    sparse_attribute = manager.find_attribute_double("double")
+def test_sparse_attribute_after_element_deletion(manager, double_attribute_id):
+    sparse_attribute = manager.find_read_only_attribute_double(double_attribute_id)
     if sparse_attribute.value(0) != 12:
         raise ValueError("Element 0 of sparse attribute should be 12 ")
     if sparse_attribute.value(5) != 7:
@@ -114,17 +133,17 @@ if __name__ == '__main__':
     manager.resize(10)
     if manager.nb_elements() != 10:
         raise ValueError("[Test] Manager should have 10 elements")
-    test_constant_attribute(manager)
+    bool_attribute_id = test_constant_attribute(manager)
     test_int_variable_attribute(manager)
     test_double_sparse_attribute(manager)
-    test_double_sparse_attribute(manager)
+    double_attribute_id = test_double_sparse_attribute(manager)
     test_delete_attribute_elements(manager)
-    test_sparse_attribute_after_element_deletion(manager)
+    test_sparse_attribute_after_element_deletion(manager,double_attribute_id)
+    test_number_of_attributes(manager, 4)
+    manager.delete_attribute(bool_attribute_id)
     test_number_of_attributes(manager, 3)
-    manager.delete_attribute("bool")
-    test_number_of_attributes(manager, 2)
     manager.clear_attributes()
-    test_number_of_attributes(manager, 2)
+    test_number_of_attributes(manager, 3)
     manager.resize(10)
     if manager.nb_elements() != 10:
         raise ValueError("[Test] Manager should have 10 elements")

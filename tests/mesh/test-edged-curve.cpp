@@ -283,8 +283,16 @@ void test_backward_io( const std::string& filename )
     const auto curve = geode::load_edged_curve< 3 >( filename );
     geode::OpenGeodeMeshException::test( curve->nb_edges() == 4,
         "Backward EdgedCurve has wrong number of edges" );
+    const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
+    geode::OpenGeodeMeshException::test( curve->point( 1 ) == answer,
+        "Backward EdgedCurve vertex coordinates are not correct" );
+    geode::OpenGeodeMeshException::test( curve->edge_vertex( { 0, 0 } ) == 0,
+        "Backward EdgedCurve edge vertex index is not correct" );
     geode::OpenGeodeMeshException::test( curve->nb_vertices() == 4,
         "Backward EdgedCurve has wrong number of vertices" );
+    geode::OpenGeodeMeshException::test(
+        curve->edges_around_vertex( 0 ).size() == 2,
+        "Backward EdgedCurve has wrong number of edges around vertex 0" );
 }
 
 void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
@@ -303,12 +311,13 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
 
 void test_clone( const geode::EdgedCurve3D& edged_curve )
 {
+    auto attribute_id = edged_curve.edge_attribute_manager()
+                            .create_attribute< geode::VariableAttribute, int >(
+                                "edge", 0, geode::AttributeProperties{} );
     auto attribute =
         edged_curve.edge_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, int >(
-                "test", 0 );
+            .find_attribute< geode::VariableAttribute, int >( attribute_id );
     attribute->set_value( 0, 42 );
-
     const auto edged_curve_clone = edged_curve.clone();
     geode::OpenGeodeEdgedCurve3D edged_curve2{ std::move(
         *dynamic_cast< geode::OpenGeodeEdgedCurve3D* >(
@@ -319,7 +328,8 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
         edged_curve2.nb_edges() == 3, "EdgedCurve2 should have 3 edge" );
 
     const auto attribute2 =
-        edged_curve2.edge_attribute_manager().find_attribute< int >( "test" );
+        edged_curve2.edge_attribute_manager().find_read_only_attribute< int >(
+            attribute_id );
     geode::OpenGeodeMeshException::test(
         attribute2->value( 0 ) == 42, "EdgedCurve2 attribute should be 42" );
 }
@@ -344,9 +354,10 @@ void test()
 
     test_io( *edged_curve,
         absl::StrCat( "test.", edged_curve->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v12.", edged_curve->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH,
+        "backward_io/v12/test_v12.", edged_curve->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        edged_curve->native_extension() ) );
     test_permutation( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );
     test_clone( *edged_curve );

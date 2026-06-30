@@ -37,8 +37,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Impl( AttributeManager& manager )
-            : internal::PointsImpl< dimension >{ manager }
+        Impl( AttributeManager& manager, const geode::uuid& uuid )
+            : internal::PointsImpl< dimension >{ manager, uuid }
         {
         }
         Impl( AttributeManager& manager, std::string_view attribute_name )
@@ -68,8 +68,9 @@ namespace geode
 
     template < index_t dimension >
     AttributeCoordinateReferenceSystem< dimension >::
-        AttributeCoordinateReferenceSystem( AttributeManager& manager )
-        : impl_{ manager }
+        AttributeCoordinateReferenceSystem(
+            AttributeManager& manager, const geode::uuid& uuid )
+        : impl_{ manager, uuid }
     {
     }
 
@@ -105,6 +106,12 @@ namespace geode
         AttributeCoordinateReferenceSystem< dimension >::attribute_name() const
     {
         return impl_->attribute_name();
+    }
+
+    template < index_t dimension >
+    uuid AttributeCoordinateReferenceSystem< dimension >::attribute_id() const
+    {
+        return impl_->attribute_id();
     }
 
     template < index_t dimension >

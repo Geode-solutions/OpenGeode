@@ -27,6 +27,8 @@
 
 #include <absl/container/inlined_vector.h>
 
+#include <geode/basic/bitsery_archive.hpp>
+
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
@@ -51,6 +53,8 @@ namespace geode
     public:
         using Builder = PolyhedralSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
+
+        PolyhedralSolid( BITSERY );
 
         /*!
          * Create a new PolyhedralSolid using default data structure.

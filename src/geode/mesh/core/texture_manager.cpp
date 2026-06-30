@@ -73,8 +73,10 @@ namespace geode
 
         void delete_texture( std::string_view name )
         {
+            const auto& texture = textures_.find_texture( name, {} );
+            const auto texture_id = texture.texture_id();
             textures_.delete_texture( name, {} );
-            manager_.delete_attribute( name );
+            manager_.delete_attribute( texture_id );
         }
 
     private:

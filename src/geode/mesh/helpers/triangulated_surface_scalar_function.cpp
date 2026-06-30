@@ -44,34 +44,24 @@ namespace geode
             double value )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check_exception(
-                !surface_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TriangulatedSurfaceScalarFunction: attribute "
-                "with name '",
-                function_name, "' already exists." );
+            const auto function_id =
+                surface_.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, double >(
+                        function_name, value, { false, true } );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, value, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         Impl( const TriangulatedSurface< dimension >& surface,
-            std::string_view function_name )
+            const uuid& function_id )
             : surface_( surface )
         {
-            OpenGeodeMeshException::check_exception(
-                surface_.vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create TriangulatedSurfaceScalarFunction: attribute "
-                "with name '",
-                function_name, "' does not exist." );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, 0, { false, true } );
+                    .template find_attribute< VariableAttribute, double >(
+                        function_id );
         }
 
         void set_value( index_t vertex_id, double value )
@@ -102,6 +92,11 @@ namespace geode
             return point_value;
         }
 
+        uuid attribute_function_id() const
+        {
+            return function_attribute_->id();
+        }
+
     private:
         const TriangulatedSurface< dimension >& surface_;
         std::shared_ptr< VariableAttribute< double > > function_attribute_;
@@ -127,8 +122,8 @@ namespace geode
     TriangulatedSurfaceScalarFunction< dimension >::
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& surface,
-            std::string_view function_name )
-        : impl_{ surface, function_name }
+            const uuid& function_id )
+        : impl_{ surface, function_id }
     {
     }
 
@@ -150,9 +145,9 @@ namespace geode
     TriangulatedSurfaceScalarFunction< dimension >
         TriangulatedSurfaceScalarFunction< dimension >::find(
             const TriangulatedSurface< dimension >& surface,
-            std::string_view function_name )
+            const uuid& function_id )
     {
-        return { surface, function_name };
+        return { surface, function_id };
     }
 
     template < index_t dimension >
@@ -174,6 +169,13 @@ namespace geode
         const Point< dimension >& point, index_t triangle_id ) const
     {
         return impl_->value( point, triangle_id );
+    }
+
+    template < index_t dimension >
+    uuid TriangulatedSurfaceScalarFunction< dimension >::attribute_function_id()
+        const
+    {
+        return impl_->attribute_function_id();
     }
 
     template class opengeode_mesh_api TriangulatedSurfaceScalarFunction< 2 >;

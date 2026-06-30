@@ -72,15 +72,20 @@ def test_create_polyhedra(polyhedral_solid, builder):
 
 
 def test_create_facet_attribute(polyhedral_solid):
+    attribute_id = polyhedral_solid.facets().facet_attribute_manager(
+    ).create_attribute_variable_uint("test", basic.NO_ID, basic.AttributeProperties())
     attribute = polyhedral_solid.facets().facet_attribute_manager(
-    ).find_or_create_attribute_variable_uint("test", basic.NO_ID)
+    ).find_attribute_variable_uint(attribute_id)
     for f in range(polyhedral_solid.facets().nb_facets()):
         attribute.set_value(f, f)
+    return attribute_id
 
 
 def test_create_edge_attribute(polyhedral_solid):
+    attribute_id = polyhedral_solid.edges().edge_attribute_manager(
+    ).create_attribute_variable_uint("test", basic.NO_ID, basic.AttributeProperties())
     attribute = polyhedral_solid.edges().edge_attribute_manager(
-    ).find_or_create_attribute_variable_uint("test", basic.NO_ID)
+    ).find_attribute_variable_uint(attribute_id)
     for e in range(polyhedral_solid.edges().nb_edges()):
         vertices = polyhedral_solid.edges().edge_vertices(e)
         attribute.set_value(e, vertices[0] + vertices[1])
@@ -88,6 +93,7 @@ def test_create_edge_attribute(polyhedral_solid):
         raise ValueError("[Test] Wrong value for attribute on edge 0")
     if attribute.value(1) != 3:
         raise ValueError("[Test] Wrong value for attribute on edge 1")
+    return attribute_id
 
 
 def test_polyhedron_adjacencies(polyhedral_solid, builder):
@@ -135,7 +141,7 @@ def test_polyhedron_adjacencies(polyhedral_solid, builder):
         raise ValueError("[Test] Polyhedra from facet should contain (2, 3)")
 
 
-def test_delete_polyhedra(polyhedral_solid, builder):
+def test_delete_polyhedra(polyhedral_solid, builder,edge_attribute_id):
     to_delete = [False] * polyhedral_solid.nb_polyhedra()
     to_delete[0] = True
     builder.delete_polyhedra(to_delete)
@@ -160,7 +166,7 @@ def test_delete_polyhedra(polyhedral_solid, builder):
     if polyhedral_solid.edges().nb_edges() != 12:
         raise ValueError("[Test] PolyhedralSolid should have 12 edges")
     attribute = polyhedral_solid.edges(
-    ).edge_attribute_manager().find_attribute_uint("test")
+    ).edge_attribute_manager().find_read_only_attribute_uint(edge_attribute_id)
     if attribute.value(0) != 1:
         raise ValueError(
             "[Test] Wrong value for attribute on edge 0 after polyhedron deletion")
@@ -169,7 +175,7 @@ def test_delete_polyhedra(polyhedral_solid, builder):
             "[Test] Wrong value for attribute on edge 1 after polyhedron deletion")
 
 
-def test_io(polyhedral_solid, filename):
+def test_io(polyhedral_solid, filename, facet_attribute_id):
     mesh.save_polyhedral_solid3D(polyhedral_solid, filename)
     new_polyhedral_solid = mesh.load_polyhedral_solid3D(filename)
 
@@ -186,7 +192,7 @@ def test_io(polyhedral_solid, filename):
         raise ValueError(
             "[Test] Reloaded PolyhedralSolid should have 3 polyhedra")
     attribute = new_polyhedral_solid.facets(
-    ).facet_attribute_manager().find_attribute_uint("test")
+    ).facet_attribute_manager().find_read_only_attribute_uint(facet_attribute_id)
     for f in range(new_polyhedral_solid.facets().nb_facets()):
         if attribute.value(f) != f:
             raise ValueError(
@@ -404,13 +410,13 @@ if __name__ == '__main__':
 
     test_create_vertices(polyhedral_solid, builder)
     test_create_polyhedra(polyhedral_solid, builder)
-    test_create_facet_attribute(polyhedral_solid)
-    test_create_edge_attribute(polyhedral_solid)
+    facet_attribute_id = test_create_facet_attribute(polyhedral_solid)
+    edge_attribute_id = test_create_edge_attribute(polyhedral_solid)
     test_polyhedron_adjacencies(polyhedral_solid, builder)
-    test_io(polyhedral_solid, "test." + polyhedral_solid.native_extension())
+    test_io(polyhedral_solid, "test." + polyhedral_solid.native_extension(),facet_attribute_id)
 
     test_permutation(polyhedral_solid, builder)
-    test_delete_polyhedra(polyhedral_solid, builder)
+    test_delete_polyhedra(polyhedral_solid, builder,edge_attribute_id)
     test_clone(polyhedral_solid)
     test_set_polyhedron_vertex(polyhedral_solid, builder)
     test_delete_all(polyhedral_solid, builder)
