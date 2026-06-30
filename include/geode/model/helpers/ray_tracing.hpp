@@ -46,13 +46,32 @@ namespace geode
 
 namespace geode
 {
+    struct RayTracingResult
+    {
+        enum struct POSITION
+        {
+            outside,
+            inside,
+            on_border
+        };
+
+        operator bool() const
+        {
+            return position == POSITION::inside;
+        }
+
+        POSITION position{ POSITION::outside };
+    };
+
     class opengeode_model_api SectionRayTracing
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( SectionRayTracing );
+
     public:
         SectionRayTracing( const Section& section );
         ~SectionRayTracing();
 
-        bool is_point_inside_surface(
+        [[nodiscard]] RayTracingResult is_point_inside_surface(
             const Point2D& point, const Surface2D& surface );
 
         [[nodiscard]] std::optional< uuid > surface_containing_point(
@@ -64,6 +83,8 @@ namespace geode
 
     class opengeode_model_api BRepRayTracing
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( BRepRayTracing );
+
     public:
         using BoundarySurfaceIntersections = absl::flat_hash_map< uuid,
             std::vector< RayTracing3D::PolygonDistance > >;
@@ -75,7 +96,7 @@ namespace geode
             find_intersections_with_boundaries(
                 const InfiniteLine3D& infinite_line, const Block3D& block );
 
-        [[nodiscard]] bool is_point_inside_block(
+        [[nodiscard]] RayTracingResult is_point_inside_block(
             const Point3D& point, const Block3D& block );
 
         [[nodiscard]] std::optional< uuid > block_containing_point(
@@ -85,8 +106,8 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
 
-    [[nodiscard]] bool opengeode_model_api is_point_inside_closed_surface(
-        const Point3D& point,
-        const SurfaceMesh3D& surface,
-        const AABBTree3D& surface_aabb );
+    [[nodiscard]] RayTracingResult opengeode_model_api
+        is_point_inside_closed_surface( const Point3D& point,
+            const SurfaceMesh3D& surface,
+            const AABBTree3D& surface_aabb );
 } // namespace geode

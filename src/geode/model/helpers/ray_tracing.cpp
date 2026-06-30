@@ -83,36 +83,13 @@ namespace
     }
 
     std::vector< geode::RayTracing2D::EdgeDistance >
-        find_intersections_with_boundary( const geode::Ray2D& ray,
+        find_intersections_with_boundaries( const geode::Ray2D& ray,
             const geode::EdgedCurve2D& curve,
             const geode::AABBTree2D& aabb )
     {
         geode::RayTracing2D ray_tracing{ curve, aabb.bounding_box(), ray };
         aabb.compute_ray_element_bbox_intersections( ray, ray_tracing );
         return ray_tracing.all_intersections();
-    }
-
-    std::optional< geode::index_t > count_real_intersections_with_boundary(
-        const geode::Ray2D& ray,
-        const geode::EdgedCurve2D& curve,
-        const geode::AABBTree2D& aabb )
-    {
-        geode::index_t nb_intersections{ 0 };
-        const auto tracing =
-            find_intersections_with_boundary( ray, curve, aabb );
-        for( const auto& intersection : tracing )
-        {
-            if( intersection.position != geode::POSITION::inside )
-            {
-                return std::nullopt;
-            }
-            if( std::fabs( intersection.distance ) <= geode::GLOBAL_EPSILON )
-            {
-                continue;
-            }
-            nb_intersections++;
-        }
-        return nb_intersections;
     }
 
     std::vector< geode::RayTracing3D::PolygonDistance >
@@ -125,27 +102,33 @@ namespace
         return ray_tracing.all_intersections();
     }
 
-    std::optional< geode::index_t > count_real_intersections_with_boundaries(
-        const geode::Ray3D& ray,
-        const geode::SurfaceMesh3D& surface,
-        const geode::AABBTree3D& aabb )
+    template < typename Mesh >
+    std::optional< std::tuple< geode::index_t, bool > >
+        count_real_intersections_with_boundaries(
+            const geode::Ray< Mesh::dim >& ray,
+            const Mesh& mesh,
+            const geode::AABBTree< Mesh::dim >& aabb )
     {
-        geode::index_t nb_intersections{ 0 };
+        std::optional< std::tuple< geode::index_t, bool > > result{
+            std::in_place, 0, false
+        };
+        auto& [nb_intersections, on_border] = result.value();
         const auto tracing =
-            find_intersections_with_boundaries( ray, surface, aabb );
+            find_intersections_with_boundaries( ray, mesh, aabb );
         for( const auto& intersection : tracing )
         {
+            if( std::fabs( intersection.distance ) <= geode::GLOBAL_EPSILON )
+            {
+                on_border = true;
+                break;
+            }
             if( intersection.position != geode::POSITION::inside )
             {
                 return std::nullopt;
             }
-            if( std::fabs( intersection.distance ) <= geode::GLOBAL_EPSILON )
-            {
-                continue;
-            }
             nb_intersections++;
         }
-        return nb_intersections;
+        return result;
     }
 } // namespace
 
@@ -156,7 +139,7 @@ namespace geode
     public:
         explicit Impl( const Section& section ) : section_( section ) {}
 
-        bool is_point_inside_surface(
+        RayTracingResult is_point_inside_surface(
             const Point2D& point, const Surface2D& surface )
         {
             for( const auto& direction : ::directions_2D() )
@@ -166,23 +149,32 @@ namespace geode
                 bool could_determine{ true };
                 for( const auto& line : section_.boundaries( surface ) )
                 {
-                    auto intersections = count_real_intersections_with_boundary(
-                        ray, line.mesh(), line_aabb( line ) );
-                    if( !intersections.has_value() )
+                    const auto result =
+                        count_real_intersections_with_boundaries(
+                            ray, line.mesh(), line_aabb( line ) );
+                    if( !result )
                     {
                         could_determine = false;
                         break;
                     }
-                    nb_intersections += intersections.value();
+                    const auto [nb_current_intersections, on_border] =
+                        result.value();
+                    if( on_border )
+                    {
+                        return { RayTracingResult::POSITION::on_border };
+                    }
+                    nb_intersections += nb_current_intersections;
                 }
                 if( could_determine )
                 {
-                    return ( nb_intersections % 2 == 1 );
+                    return { ( nb_intersections % 2 == 1 )
+                                 ? geode::RayTracingResult::POSITION::inside
+                                 : geode::RayTracingResult::POSITION::outside };
                 }
             }
             throw OpenGeodeModelException{ point,
                 OpenGeodeException::TYPE::internal,
-                "Cannot determine the point is inside the surface 2D or not "
+                "Cannot determine if the point is inside the surface 2D or not "
                 "(ambiguous intersection with rays)." };
         }
 
@@ -222,7 +214,7 @@ namespace geode
 
     SectionRayTracing::~SectionRayTracing() = default;
 
-    bool SectionRayTracing::is_point_inside_surface(
+    RayTracingResult SectionRayTracing::is_point_inside_surface(
         const Point2D& point, const Surface2D& surface )
     {
         return impl_->is_point_inside_surface( point, surface );
@@ -263,7 +255,8 @@ namespace geode
             return result;
         }
 
-        bool is_point_inside_block( const Point3D& point, const Block3D& block )
+        RayTracingResult is_point_inside_block(
+            const Point3D& point, const Block3D& block )
         {
             for( const auto& direction : ::directions_3D() )
             {
@@ -272,24 +265,32 @@ namespace geode
                 bool could_determine{ true };
                 for( const auto& surface : brep_.boundaries( block ) )
                 {
-                    auto intersections =
+                    const auto result =
                         count_real_intersections_with_boundaries(
                             ray, surface.mesh(), surface_aabb( surface ) );
-                    if( !intersections.has_value() )
+                    if( !result )
                     {
                         could_determine = false;
                         break;
                     }
-                    nb_intersections += intersections.value();
+                    const auto [nb_current_intersections, on_border] =
+                        result.value();
+                    if( on_border )
+                    {
+                        return { RayTracingResult::POSITION::on_border };
+                    }
+                    nb_intersections += nb_current_intersections;
                 }
                 if( could_determine )
                 {
-                    return ( nb_intersections % 2 == 1 );
+                    return { ( nb_intersections % 2 == 1 )
+                                 ? geode::RayTracingResult::POSITION::inside
+                                 : geode::RayTracingResult::POSITION::outside };
                 }
             }
             throw OpenGeodeModelException{ point,
                 OpenGeodeException::TYPE::internal,
-                "Cannot determine the point is inside the block or not "
+                "Cannot determine if the point is inside the block or not "
                 "(ambiguous intersection with rays)." };
         }
 
@@ -338,7 +339,7 @@ namespace geode
             infinite_line, block );
     }
 
-    bool BRepRayTracing::is_point_inside_block(
+    RayTracingResult BRepRayTracing::is_point_inside_block(
         const Point3D& point, const Block3D& block )
     {
         return impl_->is_point_inside_block( point, block );
@@ -350,27 +351,35 @@ namespace geode
         return impl_->block_containing_point( point );
     }
 
-    bool is_point_inside_closed_surface( const Point3D& point,
+    RayTracingResult is_point_inside_closed_surface( const Point3D& point,
         const SurfaceMesh3D& surface,
         const AABBTree3D& surface_aabb )
     {
         if( !surface_aabb.bounding_box().contains( point ) )
         {
-            return false;
+            return { RayTracingResult::POSITION::outside };
         }
         for( const auto& direction : ::directions_3D() )
         {
             const Ray3D ray{ direction, point };
-            auto nb_intersections = count_real_intersections_with_boundaries(
+            const auto result = count_real_intersections_with_boundaries(
                 ray, surface, surface_aabb );
-            if( nb_intersections.has_value() )
+            if( !result )
             {
-                return ( nb_intersections.value() % 2 == 1 );
+                continue;
             }
+            const auto [nb_intersections, on_border] = result.value();
+            if( on_border )
+            {
+                return { RayTracingResult::POSITION::on_border };
+            }
+            return { ( nb_intersections % 2 == 1 )
+                         ? geode::RayTracingResult::POSITION::inside
+                         : geode::RayTracingResult::POSITION::outside };
         }
         throw OpenGeodeModelException{ point,
             OpenGeodeException::TYPE::internal,
-            "Cannot determine the point is inside the closed surface 3D or not "
-            "(ambiguous intersection with rays)." };
+            "Cannot determine if the point is inside the closed surface 3D or "
+            "not (ambiguous intersection with rays)." };
     }
 } // namespace geode

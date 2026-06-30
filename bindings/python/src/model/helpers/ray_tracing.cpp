@@ -23,6 +23,8 @@
 
 #include "../../common.hpp"
 
+#include <pybind11/native_enum.h>
+
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/representation/core/brep.hpp>
 
@@ -32,6 +34,19 @@ namespace geode
 {
     void define_model_ray_tracing( pybind11::module& module )
     {
+        pybind11::native_enum< RayTracingResult::POSITION >(
+            module, "POSITION", "enum.Enum" )
+            .value( "outside", RayTracingResult::POSITION::outside )
+            .value( "inside", RayTracingResult::POSITION::inside )
+            .value( "on_border", RayTracingResult::POSITION::on_border )
+            .export_values()
+            .finalize();
+
+        pybind11::class_< RayTracingResult >( module, "RayTracingResult" )
+            .def( pybind11::init<>() )
+            .def_readwrite( "position", &RayTracingResult::position )
+            .def( "__bool__", &RayTracingResult::operator bool );
+
         pybind11::class_< BRepRayTracing >( module, "BRepRayTracing" )
             .def( pybind11::init< const BRep& >() )
             .def( "is_point_inside_block",
