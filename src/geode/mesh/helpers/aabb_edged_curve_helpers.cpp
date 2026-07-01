@@ -29,8 +29,6 @@
 
 #include <geode/mesh/helpers/aabb_edged_curve_helpers.hpp>
 
-#include <async++.h>
-
 #include <geode/geometry/aabb.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/coordinate_system.hpp>
@@ -48,13 +46,13 @@ namespace geode
     {
         absl::FixedArray< BoundingBox< dimension > > box_vector(
             mesh.nb_edges() );
-        async::parallel_for( async::irange( index_t{ 0 }, mesh.nb_edges() ),
-            [&box_vector, &mesh]( index_t e ) {
-                BoundingBox< dimension > bbox;
-                bbox.add_point( mesh.point( mesh.edge_vertex( { e, 0 } ) ) );
-                bbox.add_point( mesh.point( mesh.edge_vertex( { e, 1 } ) ) );
-                box_vector[e] = std::move( bbox );
-            } );
+        for( const auto e : Range{ mesh.nb_edges() } )
+        {
+            box_vector[e].add_point(
+                mesh.point( mesh.edge_vertex( { e, 0 } ) ) );
+            box_vector[e].add_point(
+                mesh.point( mesh.edge_vertex( { e, 1 } ) ) );
+        }
         return AABBTree< dimension >{ box_vector };
     }
 
