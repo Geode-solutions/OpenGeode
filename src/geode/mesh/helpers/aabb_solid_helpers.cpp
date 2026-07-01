@@ -62,15 +62,16 @@ namespace geode
     {
         const auto tetrahedron_vertices =
             mesh_.tetrahedron( cur_box ).vertices();
-        const auto p0 =
+        const auto point0 =
             coordinate_system_.coordinates( tetrahedron_vertices[0] );
-        const auto p1 =
+        const auto point1 =
             coordinate_system_.coordinates( tetrahedron_vertices[1] );
-        const auto p2 =
+        const auto point2 =
             coordinate_system_.coordinates( tetrahedron_vertices[2] );
-        const auto p3 =
+        const auto point3 =
             coordinate_system_.coordinates( tetrahedron_vertices[3] );
-        const Tetrahedron tetrahedron_in_metric_space{ p0, p1, p2, p3 };
+        const Tetrahedron tetrahedron_in_metric_space{ point0, point1, point2,
+            point3 };
         const auto query_in_metric_space =
             coordinate_system_.coordinates( query );
         return std::get< 0 >( point_tetrahedron_distance(
