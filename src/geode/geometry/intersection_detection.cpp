@@ -37,7 +37,7 @@
 
 namespace
 {
-    static constexpr std::array< geode::POSITION, 4 > VERTEX_ID_TO_POSITION{
+    constexpr std::array< geode::POSITION, 4 > VERTEX_ID_TO_POSITION{
         geode::POSITION::vertex0, geode::POSITION::vertex1,
         geode::POSITION::vertex2, geode::POSITION::vertex0
     };
@@ -56,19 +56,17 @@ namespace
                     largest_axis = other_axis;
                 }
             }
+            return largest_axis;
         }
-        else
+        auto bbox = triangle.bounding_box();
+        bbox.add_box( segment.bounding_box() );
+        const auto diagonal = bbox.diagonal();
+        for( const auto other_axis : geode::LRange{ 2 } )
         {
-            auto bbox = triangle.bounding_box();
-            bbox.add_box( segment.bounding_box() );
-            const auto diagonal = bbox.diagonal();
-            for( const auto other_axis : geode::LRange{ 2 } )
+            if( std::fabs( diagonal.value( other_axis ) )
+                < std::fabs( diagonal.value( largest_axis ) ) )
             {
-                if( std::fabs( diagonal.value( other_axis ) )
-                    < std::fabs( diagonal.value( largest_axis ) ) )
-                {
-                    largest_axis = other_axis;
-                }
+                largest_axis = other_axis;
             }
         }
         return largest_axis;
@@ -280,10 +278,8 @@ namespace geode
             {
                 return { POSITION::vertex0, POSITION::vertex0 };
             }
-            else // s0_p1_position == POSITION::vertex1
-            {
-                return { POSITION::parallel, POSITION::parallel };
-            }
+            // s0_p1_position == POSITION::vertex1
+            return { POSITION::parallel, POSITION::parallel };
         }
         if( s0_p0_position == POSITION::vertex1 )
         {
@@ -292,10 +288,8 @@ namespace geode
             {
                 return { POSITION::vertex0, POSITION::vertex1 };
             }
-            else // s0_p1_position == POSITION::vertex0
-            {
-                return { POSITION::parallel, POSITION::parallel };
-            }
+            // s0_p1_position == POSITION::vertex0
+            return { POSITION::parallel, POSITION::parallel };
         }
         if( s1_p0_position == POSITION::vertex0 )
         {
@@ -304,10 +298,8 @@ namespace geode
             {
                 return { POSITION::vertex0, POSITION::vertex0 };
             }
-            else // s1_p1_position == POSITION::vertex1
-            {
-                return { POSITION::parallel, POSITION::parallel };
-            }
+            // s1_p1_position == POSITION::vertex1
+            return { POSITION::parallel, POSITION::parallel };
         }
         if( s1_p0_position == POSITION::vertex1 )
         {
@@ -316,10 +308,8 @@ namespace geode
             {
                 return { POSITION::vertex1, POSITION::vertex0 };
             }
-            else // s1_p1_position == POSITION::vertex0
-            {
-                return { POSITION::parallel, POSITION::parallel };
-            }
+            // s1_p1_position == POSITION::vertex0
+            return { POSITION::parallel, POSITION::parallel };
         }
         return { POSITION::outside, POSITION::outside };
     }

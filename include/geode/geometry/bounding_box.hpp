@@ -87,15 +87,15 @@ namespace geode
          * the bbox in 2D)
          */
         template < index_t T = dimension >
-        [[nodiscard]] typename std::enable_if< T == 2 || T == 3, bool >::type
-            intersects( const Triangle< T >& triangle ) const;
+        [[nodiscard]] std::enable_if_t< T == 2 || T == 3, bool > intersects(
+            const Triangle< T >& triangle ) const;
 
         /*!
          * Returns true if the element is crossing, is inside, or is containing
          * the bbox
          */
         template < index_t T = dimension >
-        [[nodiscard]] typename std::enable_if< T == 3, bool >::type intersects(
+        [[nodiscard]] std::enable_if_t< T == 3, bool > intersects(
             const Tetrahedron& tetra ) const;
 
         /*!
@@ -115,12 +115,12 @@ namespace geode
             const Segment< dimension >& segment ) const;
 
         template < index_t T = dimension >
-        [[nodiscard]] typename std::enable_if< T == 2 || T == 3, bool >::type
+        [[nodiscard]] std::enable_if_t< T == 2 || T == 3, bool >
             epsilon_intersects( const Triangle< T >& triangle ) const;
 
         template < index_t T = dimension >
-        [[nodiscard]] typename std::enable_if< T == 3, bool >::type
-            epsilon_intersects( const Tetrahedron& tetra ) const;
+        [[nodiscard]] std::enable_if_t< T == 3, bool > epsilon_intersects(
+            const Tetrahedron& tetra ) const;
 
         /*!
          * Returns the distance between the point and the box.

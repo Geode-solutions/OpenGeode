@@ -370,15 +370,15 @@ namespace geode
          */
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
-            polygon_normal( index_t polygon_id ) const;
+        std::enable_if_t< T == 3, std::optional< Vector3D > > polygon_normal(
+            index_t polygon_id ) const;
 
         /*!
          * Return the normal at a polygon vertex
          */
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+        std::enable_if_t< T == 3, std::optional< Vector3D > >
             polygon_vertex_normal( index_t vertex_id ) const;
 
         /*!

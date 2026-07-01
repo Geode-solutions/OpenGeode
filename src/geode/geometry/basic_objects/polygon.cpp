@@ -133,7 +133,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+    std::enable_if_t< T == 3, std::optional< Vector3D > >
         GenericPolygon< PointType, dimension >::normal() const
     {
         Vector3D normal;
@@ -160,7 +160,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< Plane > >::type
+    std::enable_if_t< T == 3, std::optional< Plane > >
         GenericPolygon< PointType, dimension >::plane() const
     {
         if( const auto polygon_normal = this->normal() )
@@ -173,7 +173,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< OwnerPlane > >::type
+    std::enable_if_t< T == 3, std::optional< OwnerPlane > >
         GenericPolygon< PointType, dimension >::owner_plane() const
     {
         if( const auto polygon_normal = this->normal() )

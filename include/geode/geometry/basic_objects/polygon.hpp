@@ -63,15 +63,13 @@ namespace geode
         [[nodiscard]] Point< dimension > barycenter() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
-            normal() const;
+        std::enable_if_t< T == 3, std::optional< Vector3D > > normal() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< Plane > >::type
-            plane() const;
+        std::enable_if_t< T == 3, std::optional< Plane > > plane() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< OwnerPlane > >::type
+        std::enable_if_t< T == 3, std::optional< OwnerPlane > >
             owner_plane() const;
         [[nodiscard]] index_t nb_vertices() const;
         void set_point( index_t vertex, PointType point );
