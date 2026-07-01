@@ -184,12 +184,12 @@ namespace
                 third_point_index( triangle_vertices, common_points ) );
             const auto& other_third_point = mesh.point(
                 third_point_index( other_triangle_vertices, common_points ) );
-            if( geode::segment_segment_intersection_detection(
+            if( geode::segment_segment_intersection_detection< 2 >(
                     { common_point0, third_point },
                     { common_point1, other_third_point } )
                         .first
                     != geode::POSITION::outside
-                || geode::segment_segment_intersection_detection(
+                || geode::segment_segment_intersection_detection< 2 >(
                        { common_point1, third_point },
                        { common_point0, other_third_point } )
                            .first

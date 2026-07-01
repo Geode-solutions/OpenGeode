@@ -50,9 +50,11 @@ namespace geode
      * Returns outside-outside if there is no intersection or parallel-pallel
      * if all points are colinear
      */
-    [[nodiscard]] SegmentSegmentIntersection opengeode_geometry_api
+    template < index_t dimension >
+    [[nodiscard]] SegmentSegmentIntersection
         segment_segment_intersection_detection(
-            const Segment2D& segment0, const Segment2D& segment1 );
+            const Segment< dimension >& segment0,
+            const Segment< dimension >& segment1 );
 
     /*!
      * Detect the configuration between two 2D colinear segments
