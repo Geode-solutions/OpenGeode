@@ -29,8 +29,6 @@
 
 #include <geode/mesh/helpers/aabb_surface_helpers.hpp>
 
-#include <async++.h>
-
 #include <geode/geometry/aabb.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/coordinate_system.hpp>

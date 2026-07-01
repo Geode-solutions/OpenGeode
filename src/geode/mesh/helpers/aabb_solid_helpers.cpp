@@ -23,8 +23,6 @@
 
 #include <geode/mesh/helpers/aabb_solid_helpers.hpp>
 
-#include <async++.h>
-
 #include <geode/geometry/aabb.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/distance.hpp>
