@@ -47,16 +47,14 @@ namespace geode
     {
         absl::FixedArray< BoundingBox< dimension > > box_vector(
             mesh.nb_polygons() );
-        async::parallel_for( async::irange( index_t{ 0 }, mesh.nb_polygons() ),
-            [&box_vector, &mesh]( index_t p ) {
-                BoundingBox< dimension > bbox;
-                for( const auto v : LRange{ mesh.nb_polygon_vertices( p ) } )
-                {
-                    bbox.add_point(
-                        mesh.point( mesh.polygon_vertex( { p, v } ) ) );
-                }
-                box_vector[p] = std::move( bbox );
-            } );
+        for( const auto p : Range{ mesh.nb_polygons() } )
+        {
+            for( const auto v : LRange{ mesh.nb_polygon_vertices( p ) } )
+            {
+                box_vector[p].add_point(
+                    mesh.point( mesh.polygon_vertex( { p, v } ) ) );
+            }
+        }
         return AABBTree< dimension >{ box_vector };
     }
 
