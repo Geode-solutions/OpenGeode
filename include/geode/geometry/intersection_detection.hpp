@@ -45,7 +45,7 @@ namespace geode
     using SegmentTriangleIntersection = std::pair< POSITION, POSITION >;
 
     /*!
-     * Detect if there is an intersection between two 2D segments
+     * Detect if there is an intersection between two segments
      * @return the position of the intersection on the two segments.
      * Returns outside-outside if there is no intersection or parallel-pallel
      * if all points are colinear
