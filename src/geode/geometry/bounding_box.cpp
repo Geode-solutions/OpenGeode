@@ -654,8 +654,8 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, bool >::type
-        BoundingBox< dimension >::intersects( const Tetrahedron& tetra ) const
+    std::enable_if_t< T == 3, bool > BoundingBox< dimension >::intersects(
+        const Tetrahedron& tetra ) const
     {
         if( point_tetrahedron_position( center(), tetra ) == POSITION::inside )
         {
@@ -681,7 +681,7 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, bool >::type
+    std::enable_if_t< T == 3, bool >
         BoundingBox< dimension >::epsilon_intersects(
             const Tetrahedron& tetra ) const
     {

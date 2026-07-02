@@ -71,7 +71,7 @@ namespace geode
     }
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 2, double >::type
+    std::enable_if_t< T == 2, double >
         GenericLine< PointType, dimension >::line_constant() const
     {
         double line_constant{ 0.0 };

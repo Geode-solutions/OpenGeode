@@ -64,23 +64,21 @@ namespace geode
         [[nodiscard]] Point< dimension > barycenter() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< Vector3D > >::type
-            normal() const;
+        std::enable_if_t< T == 3, std::optional< Vector3D > > normal() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< Plane > >::type
-            plane() const;
+        std::enable_if_t< T == 3, std::optional< Plane > > plane() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< OwnerPlane > >::type
+        std::enable_if_t< T == 3, std::optional< OwnerPlane > >
             owner_plane() const;
         template < index_t T = dimension >
         [[nodiscard]]
-        typename std::enable_if< T == 3, std::optional< local_index_t > >::type
+        std::enable_if_t< T == 3, std::optional< local_index_t > >
             pivot() const;
         template < index_t T = dimension >
-        [[nodiscard]] typename std::enable_if< T == 3,
-            std::optional< std::pair< local_index_t, Vector3D > > >::type
+        [[nodiscard]] std::enable_if_t< T == 3,
+            std::optional< std::pair< local_index_t, Vector3D > > >
             pivot_and_normal() const;
         void set_point( local_index_t vertex, PointType point );
         [[nodiscard]] const std::array< PointType, 3 >& vertices() const;
