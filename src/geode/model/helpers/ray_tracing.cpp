@@ -137,7 +137,15 @@ namespace geode
     class SectionRayTracing::Impl
     {
     public:
-        explicit Impl( const Section& section ) : section_( section ) {}
+        explicit Impl( const Section& section ) : section_( section )
+        {
+            aabb_trees_.reserve( section.nb_lines() );
+            for( const auto& line : section.lines() )
+            {
+                aabb_trees_.emplace(
+                    line.id(), std::make_unique< CachedTree >() );
+            }
+        }
 
         RayTracingResult is_point_inside_surface(
             const Point2D& point, const Surface2D& surface )
@@ -191,20 +199,24 @@ namespace geode
         }
 
     private:
+        struct CachedTree
+        {
+            absl::once_flag built;
+            AABBTree2D tree;
+        };
+
         const AABBTree2D& line_aabb( const Line2D& line )
         {
-            if( aabb_trees_.contains( line.id() ) )
-            {
-                return aabb_trees_.at( line.id() );
-            }
-            return aabb_trees_
-                .emplace( line.id(), create_aabb_tree( line.mesh() ) )
-                .first->second;
+            auto& entry = *aabb_trees_.at( line.id() );
+            absl::call_once( entry.built, [&line, &entry] {
+                entry.tree = create_aabb_tree( line.mesh() );
+            } );
+            return entry.tree;
         }
 
     private:
         const Section& section_;
-        absl::flat_hash_map< uuid, AABBTree2D > aabb_trees_;
+        absl::flat_hash_map< uuid, std::unique_ptr< CachedTree > > aabb_trees_;
     };
 
     SectionRayTracing::SectionRayTracing( const Section& section )
