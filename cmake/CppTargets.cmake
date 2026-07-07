@@ -246,13 +246,18 @@ endfunction()
 option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test)
     cmake_parse_arguments(GEODE_TEST
-        "ESSENTIAL;UNSTABLE"
+        "ESSENTIAL;UNSTABLE;LOCAL"
         "SOURCE;FIXTURES_SETUP;FIXTURES_REQUIRED"
         "DEPENDENCIES"
         ${ARGN}
     )
     _add_geode_executable(${GEODE_TEST_SOURCE} "Tests" ${GEODE_TEST_DEPENDENCIES})
     add_test(NAME ${target_name} COMMAND ${target_name})
+    set_tests_properties(${target_name} 
+        PROPERTIES 
+            TIMEOUT 300
+            FAIL_REGULAR_EXPRESSION "Sanitizer"
+    )
     if(GEODE_TEST_ESSENTIAL)
         add_dependencies(essential ${target_name})
         set_tests_properties(${target_name} 
@@ -263,7 +268,13 @@ function(add_geode_test)
         set_tests_properties(${target_name}
             PROPERTIES 
                 LABELS unstable
-        ) 
+        )
+    elseif(GEODE_TEST_LOCAL)
+        set_tests_properties(${target_name}
+            PROPERTIES 
+                LABELS local
+                TIMEOUT 0
+        )
     endif()
     if(GEODE_TEST_FIXTURES_SETUP)
         set_tests_properties(${target_name}
@@ -277,11 +288,6 @@ function(add_geode_test)
                 FIXTURES_REQUIRED ${GEODE_TEST_FIXTURES_REQUIRED}
         ) 
     endif()
-    set_tests_properties(${target_name} 
-        PROPERTIES 
-            TIMEOUT 300
-            FAIL_REGULAR_EXPRESSION "Sanitizer"
-    )
     _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
     if(WIN32)
         list(JOIN directories "\\;" directories)
