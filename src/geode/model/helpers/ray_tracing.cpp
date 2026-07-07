@@ -137,15 +137,7 @@ namespace geode
     class SectionRayTracing::Impl
     {
     public:
-        explicit Impl( const Section& section ) : section_( section )
-        {
-            aabb_trees_.reserve( section.nb_lines() );
-            for( const auto& line : section.lines() )
-            {
-                aabb_trees_.emplace(
-                    line.id(), std::make_unique< CachedTree >() );
-            }
-        }
+        explicit Impl( const Section& section ) : section_( section ) {}
 
         RayTracingResult is_point_inside_surface(
             const Point2D& point, const Surface2D& surface )
@@ -199,24 +191,20 @@ namespace geode
         }
 
     private:
-        struct CachedTree
-        {
-            absl::once_flag built;
-            AABBTree2D tree;
-        };
-
         const AABBTree2D& line_aabb( const Line2D& line )
         {
-            auto& entry = *aabb_trees_.at( line.id() );
-            absl::call_once( entry.built, [&line, &entry] {
-                entry.tree = create_aabb_tree( line.mesh() );
-            } );
-            return entry.tree;
+            if( aabb_trees_.contains( line.id() ) )
+            {
+                return aabb_trees_.at( line.id() );
+            }
+            return aabb_trees_
+                .emplace( line.id(), create_aabb_tree( line.mesh() ) )
+                .first->second;
         }
 
     private:
         const Section& section_;
-        absl::flat_hash_map< uuid, std::unique_ptr< CachedTree > > aabb_trees_;
+        absl::flat_hash_map< uuid, AABBTree2D > aabb_trees_;
     };
 
     SectionRayTracing::SectionRayTracing( const Section& section )
@@ -241,15 +229,7 @@ namespace geode
     class BRepRayTracing::Impl
     {
     public:
-        explicit Impl( const BRep& brep ) : brep_( brep )
-        {
-            aabb_trees_.reserve( brep.nb_surfaces() );
-            for( const auto& surface : brep.surfaces() )
-            {
-                aabb_trees_.emplace(
-                    surface.id(), std::make_unique< CachedTree >() );
-            }
-        }
+        explicit Impl( const BRep& brep ) : brep_( brep ) {}
 
         BoundarySurfaceIntersections find_intersections_with_boundaries(
             const InfiniteLine3D& infinite_line, const Block3D& block )
@@ -319,24 +299,20 @@ namespace geode
         }
 
     private:
-        struct CachedTree
-        {
-            absl::once_flag built;
-            AABBTree3D tree;
-        };
-
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
-            auto& entry = *aabb_trees_.at( surface.id() );
-            absl::call_once( entry.built, [&surface, &entry] {
-                entry.tree = create_aabb_tree( surface.mesh() );
-            } );
-            return entry.tree;
+            if( aabb_trees_.contains( surface.id() ) )
+            {
+                return aabb_trees_.at( surface.id() );
+            }
+            return aabb_trees_
+                .emplace( surface.id(), create_aabb_tree( surface.mesh() ) )
+                .first->second;
         }
 
     private:
         const BRep& brep_;
-        absl::flat_hash_map< uuid, std::unique_ptr< CachedTree > > aabb_trees_;
+        absl::flat_hash_map< uuid, AABBTree3D > aabb_trees_;
     };
 
     BRepRayTracing::BRepRayTracing( const BRep& brep ) : impl_{ brep } {}
