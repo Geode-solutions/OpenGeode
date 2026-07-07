@@ -23,8 +23,6 @@
 
 #include <geode/model/helpers/ray_tracing.hpp>
 
-#include <absl/base/call_once.h>
-
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/aabb.hpp>
