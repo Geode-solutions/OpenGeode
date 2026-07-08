@@ -324,7 +324,7 @@ namespace geode
         std::string result{ "[" };
         for( const Point< dimension >& point : vertices_ )
         {
-            absl::StrAppend( &result, sep, point.string() ", " );
+            absl::StrAppend( &result, point.string(), ", " );
         }
         result.pop_back();
         result.pop_back();
