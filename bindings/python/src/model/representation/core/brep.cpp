@@ -111,6 +111,20 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
+            .def( "nb_internal_corners_of_line",
+                static_cast< index_t ( BRep::* )( const Line3D& ) const >(
+                    &BRep::nb_internal_corners ) )
+            .def(
+                "internal_corners_of_line",
+                []( const BRep& brep, const Line3D& line ) {
+                    std::vector< const Corner3D* > components;
+                    for( const auto& component : brep.internal_corners( line ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "nb_internal_corners_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
                     &BRep::nb_internal_corners ) )
@@ -177,6 +191,21 @@ namespace geode
                     std::vector< const Surface3D* > components;
                     for( const auto& component :
                         brep.internal_surfaces( block ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
+            .def( "nb_embedding_lines_of_corner",
+                static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
+                    &BRep::nb_embedding_lines ) )
+            .def(
+                "embedding_lines_of_corner",
+                []( const BRep& brep, const Corner3D& corner ) {
+                    std::vector< const Line3D* > components;
+                    for( const auto& component :
+                        brep.embedding_lines( corner ) )
                     {
                         components.push_back( &component );
                     }
@@ -332,6 +361,9 @@ namespace geode
             .def( "is_block_boundary",
                 static_cast< bool ( BRep::* )( const Surface3D&,
                     const Block3D& ) const >( &BRep::is_boundary ) )
+            .def( "is_corner_in_line_internals",
+                static_cast< bool ( BRep::* )( const Corner3D&, const Line3D& )
+                        const >( &BRep::is_internal ) )
             .def( "is_corner_in_surface_internals",
                 static_cast< bool ( BRep::* )( const Corner3D&,
                     const Surface3D& ) const >( &BRep::is_internal ) )

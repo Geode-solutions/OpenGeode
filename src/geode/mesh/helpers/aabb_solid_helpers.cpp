@@ -23,8 +23,6 @@
 
 #include <geode/mesh/helpers/aabb_solid_helpers.hpp>
 
-#include <async++.h>
-
 #include <geode/geometry/aabb.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/distance.hpp>
@@ -39,16 +37,14 @@ namespace geode
     {
         absl::FixedArray< BoundingBox< dimension > > box_vector(
             mesh.nb_polyhedra() );
-        async::parallel_for( async::irange( index_t{ 0 }, mesh.nb_polyhedra() ),
-            [&box_vector, &mesh]( index_t p ) {
-                BoundingBox< dimension > bbox;
-                for( const auto v : LRange{ mesh.nb_polyhedron_vertices( p ) } )
-                {
-                    bbox.add_point(
-                        mesh.point( mesh.polyhedron_vertex( { p, v } ) ) );
-                }
-                box_vector[p] = std::move( bbox );
-            } );
+        for( const auto p : Range{ mesh.nb_polyhedra() } )
+        {
+            for( const auto v : LRange{ mesh.nb_polyhedron_vertices( p ) } )
+            {
+                box_vector[p].add_point(
+                    mesh.point( mesh.polyhedron_vertex( { p, v } ) ) );
+            }
+        }
         return AABBTree< dimension >{ box_vector };
     }
 
@@ -66,15 +62,16 @@ namespace geode
     {
         const auto tetrahedron_vertices =
             mesh_.tetrahedron( cur_box ).vertices();
-        const auto p0 =
+        const auto point0 =
             coordinate_system_.coordinates( tetrahedron_vertices[0] );
-        const auto p1 =
+        const auto point1 =
             coordinate_system_.coordinates( tetrahedron_vertices[1] );
-        const auto p2 =
+        const auto point2 =
             coordinate_system_.coordinates( tetrahedron_vertices[2] );
-        const auto p3 =
+        const auto point3 =
             coordinate_system_.coordinates( tetrahedron_vertices[3] );
-        const Tetrahedron tetrahedron_in_metric_space{ p0, p1, p2, p3 };
+        const Tetrahedron tetrahedron_in_metric_space{ point0, point1, point2,
+            point3 };
         const auto query_in_metric_space =
             coordinate_system_.coordinates( query );
         return std::get< 0 >( point_tetrahedron_distance(

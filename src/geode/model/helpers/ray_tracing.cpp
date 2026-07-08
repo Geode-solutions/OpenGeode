@@ -23,8 +23,6 @@
 
 #include <geode/model/helpers/ray_tracing.hpp>
 
-#include <absl/base/call_once.h>
-
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/aabb.hpp>
@@ -229,15 +227,7 @@ namespace geode
     class BRepRayTracing::Impl
     {
     public:
-        explicit Impl( const BRep& brep ) : brep_( brep )
-        {
-            aabb_trees_.reserve( brep.nb_surfaces() );
-            for( const auto& surface : brep.surfaces() )
-            {
-                aabb_trees_.emplace(
-                    surface.id(), std::make_unique< CachedTree >() );
-            }
-        }
+        explicit Impl( const BRep& brep ) : brep_( brep ) {}
 
         BoundarySurfaceIntersections find_intersections_with_boundaries(
             const InfiniteLine3D& infinite_line, const Block3D& block )
@@ -307,24 +297,20 @@ namespace geode
         }
 
     private:
-        struct CachedTree
-        {
-            absl::once_flag built;
-            AABBTree3D tree;
-        };
-
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
-            auto& entry = *aabb_trees_.at( surface.id() );
-            absl::call_once( entry.built, [&surface, &entry] {
-                entry.tree = create_aabb_tree( surface.mesh() );
-            } );
-            return entry.tree;
+            if( aabb_trees_.contains( surface.id() ) )
+            {
+                return aabb_trees_.at( surface.id() );
+            }
+            return aabb_trees_
+                .emplace( surface.id(), create_aabb_tree( surface.mesh() ) )
+                .first->second;
         }
 
     private:
         const BRep& brep_;
-        absl::flat_hash_map< uuid, std::unique_ptr< CachedTree > > aabb_trees_;
+        absl::flat_hash_map< uuid, AABBTree3D > aabb_trees_;
     };
 
     BRepRayTracing::BRepRayTracing( const BRep& brep ) : impl_{ brep } {}

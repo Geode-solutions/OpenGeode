@@ -34,7 +34,9 @@ namespace geode
     void define_intersection_detection( pybind11::module& module )
     {
         module.def( "segment_segment_intersection_detection2D",
-            &segment_segment_intersection_detection );
+            &segment_segment_intersection_detection< 2 > );
+        module.def( "segment_segment_intersection_detection3D",
+            &segment_segment_intersection_detection< 3 > );
         module.def( "colinear_segment_segment_intersection_detection2D",
             &colinear_segment_segment_intersection_detection );
         module.def( "segment_line_intersection_detection2D",

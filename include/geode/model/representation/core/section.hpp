@@ -187,6 +187,7 @@ namespace geode
             : public Relationships::InternalRangeIterator
         {
         public:
+            InternalCornerRange( const Section& section, const Line2D& line );
             InternalCornerRange(
                 const Section& section, const Surface2D& surface );
             InternalCornerRange( const InternalCornerRange& range );
@@ -199,6 +200,27 @@ namespace geode
             void operator++();
 
             [[nodiscard]] const Corner2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
+        class opengeode_model_api EmbeddingLineRange
+            : public Relationships::EmbeddingRangeIterator
+        {
+        public:
+            EmbeddingLineRange(
+                const Section& section, const Corner2D& corner );
+            EmbeddingLineRange( const EmbeddingLineRange& range );
+            ~EmbeddingLineRange();
+
+            [[nodiscard]] const EmbeddingLineRange& begin() const;
+
+            [[nodiscard]] const EmbeddingLineRange& end() const;
+
+            void operator++();
+
+            [[nodiscard]] const Line2D& operator*() const;
 
         private:
             const Section& section_;
@@ -308,6 +330,11 @@ namespace geode
         [[nodiscard]] IncidentSurfaceRange incidences(
             const Line2D& line ) const;
 
+        [[nodiscard]] index_t nb_internal_corners( const Line2D& line ) const;
+
+        [[nodiscard]] InternalCornerRange internal_corners(
+            const Line2D& line ) const;
+
         [[nodiscard]] index_t nb_internal_corners(
             const Surface2D& surface ) const;
 
@@ -319,6 +346,12 @@ namespace geode
 
         [[nodiscard]] InternalLineRange internal_lines(
             const Surface2D& surface ) const;
+
+        [[nodiscard]] index_t nb_embedding_lines(
+            const Corner2D& corner ) const;
+
+        [[nodiscard]] EmbeddingLineRange embedding_lines(
+            const Corner2D& corner ) const;
 
         [[nodiscard]] index_t nb_embedding_surfaces(
             const Corner2D& corner ) const;
@@ -350,6 +383,9 @@ namespace geode
 
         [[nodiscard]] bool is_boundary(
             const Line2D& line, const Surface2D& surface ) const;
+
+        [[nodiscard]] bool is_internal(
+            const Corner2D& corner, const Line2D& line ) const;
 
         [[nodiscard]] bool is_internal(
             const Corner2D& corner, const Surface2D& surface ) const;

@@ -60,7 +60,7 @@ namespace
         {
             const auto next_apex = ( apex + edge ) % polygon.size();
             const auto next_next_apex =
-                next_apex + 1 == polygon.size() ? 0u : next_apex + 1;
+                next_apex + 1 == polygon.size() ? 0U : next_apex + 1;
             triangles.emplace_back( geode::PolygonVertices{
                 polygon[apex], polygon[next_apex], polygon[next_next_apex] } );
         }
@@ -135,7 +135,7 @@ namespace
     }
 
     template < typename Mesh >
-    typename std::enable_if< Mesh::dim == 3, bool >::type triangles_intersect(
+    std::enable_if_t< Mesh::dim == 3, bool > triangles_intersect(
         const Mesh& mesh,
         const geode::PolygonVertices& triangle_vertices,
         const geode::PolygonVertices& other_triangle_vertices,
@@ -159,18 +159,14 @@ namespace
                           == geode::POSITION::parallel;
         }
         const auto triangle = mesh_triangle( mesh, triangle_vertices );
-        if( triangle_intersects_other( triangle, other_triangle,
-                triangle_vertices, other_triangle_vertices, common_points )
-            || triangle_intersects_other( other_triangle, triangle,
-                other_triangle_vertices, triangle_vertices, common_points ) )
-        {
-            return true;
-        }
-        return false;
+        return triangle_intersects_other( triangle, other_triangle,
+                   triangle_vertices, other_triangle_vertices, common_points )
+               || triangle_intersects_other( other_triangle, triangle,
+                   other_triangle_vertices, triangle_vertices, common_points );
     }
 
     template < typename Mesh >
-    typename std::enable_if< Mesh::dim == 2, bool >::type triangles_intersect(
+    std::enable_if_t< Mesh::dim == 2, bool > triangles_intersect(
         const Mesh& mesh,
         const geode::PolygonVertices& triangle_vertices,
         const geode::PolygonVertices& other_triangle_vertices,
@@ -184,12 +180,12 @@ namespace
                 third_point_index( triangle_vertices, common_points ) );
             const auto& other_third_point = mesh.point(
                 third_point_index( other_triangle_vertices, common_points ) );
-            if( geode::segment_segment_intersection_detection(
+            if( geode::segment_segment_intersection_detection< 2 >(
                     { common_point0, third_point },
                     { common_point1, other_third_point } )
                         .first
                     != geode::POSITION::outside
-                || geode::segment_segment_intersection_detection(
+                || geode::segment_segment_intersection_detection< 2 >(
                        { common_point1, third_point },
                        { common_point0, other_third_point } )
                            .first

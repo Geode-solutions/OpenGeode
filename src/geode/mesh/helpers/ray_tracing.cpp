@@ -312,8 +312,8 @@ namespace geode
         bool compute( index_t edge_id )
         {
             const auto segment = mesh_.segment( edge_id );
-            const auto result =
-                segment_segment_intersection_detection( segment_, segment );
+            const auto result = segment_segment_intersection_detection< 2 >(
+                segment_, segment );
             if( result.first == POSITION::outside )
             {
                 return false;

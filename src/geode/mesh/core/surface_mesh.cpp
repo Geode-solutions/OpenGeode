@@ -1202,7 +1202,7 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+    std::enable_if_t< T == 3, std::optional< Vector3D > >
         SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
@@ -1212,7 +1212,7 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+    std::enable_if_t< T == 3, std::optional< Vector3D > >
         SurfaceMesh< dimension >::polygon_vertex_normal(
             index_t vertex_id ) const
     {

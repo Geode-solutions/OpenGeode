@@ -119,7 +119,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< Vector3D > >::type
+    std::enable_if_t< T == 3, std::optional< Vector3D > >
         GenericTriangle< PointType, dimension >::normal() const
     {
         if( const auto result = pivot_and_normal() )
@@ -131,7 +131,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< Plane > >::type
+    std::enable_if_t< T == 3, std::optional< Plane > >
         GenericTriangle< PointType, dimension >::plane() const
     {
         if( const auto triangle_normal = this->normal() )
@@ -144,7 +144,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< OwnerPlane > >::type
+    std::enable_if_t< T == 3, std::optional< OwnerPlane > >
         GenericTriangle< PointType, dimension >::owner_plane() const
     {
         if( const auto triangle_normal = this->normal() )
@@ -157,7 +157,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, std::optional< local_index_t > >::type
+    std::enable_if_t< T == 3, std::optional< local_index_t > >
         GenericTriangle< PointType, dimension >::pivot() const
     {
         if( const auto result = pivot_and_normal() )
@@ -169,8 +169,8 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3,
-        std::optional< std::pair< local_index_t, Vector3D > > >::type
+    std::enable_if_t< T == 3,
+        std::optional< std::pair< local_index_t, Vector3D > > >
         GenericTriangle< PointType, dimension >::pivot_and_normal() const
     {
         const auto result = simple_pivot_and_normal(

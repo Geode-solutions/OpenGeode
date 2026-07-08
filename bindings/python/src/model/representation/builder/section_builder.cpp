@@ -79,6 +79,8 @@ namespace geode
                 &SectionBuilder::add_corner_line_boundary_relationship )
             .def( "add_line_surface_boundary_relationship",
                 &SectionBuilder::add_line_surface_boundary_relationship )
+            .def( "add_corner_line_internal_relationship",
+                &SectionBuilder::add_corner_line_internal_relationship )
             .def( "add_corner_surface_internal_relationship",
                 &SectionBuilder::add_corner_surface_internal_relationship )
             .def( "add_line_surface_internal_relationship",
