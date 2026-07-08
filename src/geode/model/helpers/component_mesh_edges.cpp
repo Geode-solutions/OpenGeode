@@ -307,8 +307,7 @@ namespace geode
                     if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                             { pair[0], pair[1] } ) )
                     {
-                        edges[block.id()].emplace_back(
-                            std::move( edge.value() ) );
+                        edges[block.id()].emplace_back( edge.value() );
                     }
                 }
             }
@@ -339,7 +338,7 @@ namespace geode
                 if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                         { pair[0], pair[1] } ) )
                 {
-                    edges.emplace_back( std::move( edge.value() ) );
+                    edges.emplace_back( edge.value() );
                 }
             }
             geode::sort_unique( edges );
