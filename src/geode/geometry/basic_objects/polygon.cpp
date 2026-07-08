@@ -90,6 +90,43 @@ namespace
         }
         return polygons;
     }
+
+    template < typename PointType >
+    void reoriente_triangulation(
+        const geode::GenericPolygon< PointType, 2 >& /*polygon*/,
+        std::vector< std::array< geode::index_t, 3 > >& /*triangles*/ )
+    {
+    }
+
+    template < typename PointType >
+    void reoriente_triangulation(
+        const geode::GenericPolygon< PointType, 3 >& polygon,
+        std::vector< std::array< geode::index_t, 3 > >& triangles )
+    {
+        const auto normal =
+            polygon.normal().value_or( geode::Vector3D{ { 0, 0, 1 } } );
+        geode::index_t nb_same_orientation{ 0 };
+        for( const auto& triangle : triangles )
+        {
+            const auto& p0 = polygon.vertices()[triangle[0]];
+            const auto& p1 = polygon.vertices()[triangle[1]];
+            const auto& p2 = polygon.vertices()[triangle[2]];
+            const auto triangle_normal =
+                geode::Triangle< 3 >{ p0, p1, p2 }.normal();
+            if( triangle_normal && triangle_normal->dot( normal ) > 0 )
+            {
+                nb_same_orientation++;
+            }
+        }
+        if( nb_same_orientation > triangles.size() / 2 )
+        {
+            return;
+        }
+        for( auto& triangle : triangles )
+        {
+            std::swap( triangle[1], triangle[2] );
+        }
+    }
 } // namespace
 
 namespace geode
@@ -220,7 +257,6 @@ namespace geode
     std::vector< std::array< index_t, 3 > >
         GenericPolygon< PointType, dimension >::triangulate() const
     {
-        const std::array polygons{ vertices_ };
         const auto new_triangles =
             mapbox::earcut< index_t >( polygon_points( *this ) );
         const auto nb_new_triangles = new_triangles.size() / 3;
@@ -232,6 +268,7 @@ namespace geode
                 new_triangles[3 * trgl], new_triangles[3 * trgl + 1],
                 new_triangles[3 * trgl + 2] } );
         }
+        reoriente_triangulation( *this, result );
         return result;
     }
 
