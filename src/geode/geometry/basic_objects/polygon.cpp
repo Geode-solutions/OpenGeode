@@ -39,29 +39,26 @@
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
 
-namespace mapbox
+namespace mapbox::util
 {
-    namespace util
+    template < std::size_t coord, geode::index_t dimension >
+    struct nth< coord, geode::Point< dimension > >
     {
-        template < std::size_t coord, geode::index_t dimension >
-        struct nth< coord, geode::Point< dimension > >
+        static auto get( const geode::Point< dimension >& point )
         {
-            inline static auto get( const geode::Point< dimension >& point )
-            {
-                return point.value( coord );
-            };
+            return point.value( coord );
         };
+    };
 
-        template < std::size_t coord, geode::index_t dimension >
-        struct nth< coord, geode::RefPoint< dimension > >
+    template < std::size_t coord, geode::index_t dimension >
+    struct nth< coord, geode::RefPoint< dimension > >
+    {
+        static auto get( const geode::RefPoint< dimension >& point )
         {
-            inline static auto get( const geode::RefPoint< dimension >& point )
-            {
-                return point.get().value( coord );
-            };
+            return point.get().value( coord );
         };
-    } // namespace util
-} // namespace mapbox
+    };
+} // namespace mapbox::util
 
 namespace
 {
@@ -89,6 +86,44 @@ namespace
             polygons[0][v] = point.project_point( axis_to_remove );
         }
         return polygons;
+    }
+
+    template < typename PointType >
+    void reoriente_triangulation(
+        const geode::GenericPolygon< PointType, 2 >& /*polygon*/,
+        std::vector< std::array< geode::index_t, 3 > >& /*triangles*/ )
+    {
+    }
+
+    template < typename PointType >
+    void reoriente_triangulation(
+        const geode::GenericPolygon< PointType, 3 >& polygon,
+        std::vector< std::array< geode::index_t, 3 > >& triangles )
+    {
+        const auto normal =
+            polygon.normal().value_or( geode::Vector3D{ { 0, 0, 1 } } );
+        geode::index_t nb_same_orientation{ 0 };
+        for( const auto& triangle : triangles )
+        {
+            const auto& vertices = polygon.vertices();
+            const auto& point0 = vertices[triangle[0]];
+            const auto& point1 = vertices[triangle[1]];
+            const auto& point2 = vertices[triangle[2]];
+            const auto triangle_normal =
+                geode::Triangle< 3 >{ point0, point1, point2 }.normal();
+            if( triangle_normal && triangle_normal->dot( normal ) > 0 )
+            {
+                nb_same_orientation++;
+            }
+        }
+        if( nb_same_orientation > triangles.size() / 2 )
+        {
+            return;
+        }
+        for( auto& triangle : triangles )
+        {
+            std::swap( triangle[1], triangle[2] );
+        }
     }
 } // namespace
 
@@ -137,13 +172,13 @@ namespace geode
         GenericPolygon< PointType, dimension >::normal() const
     {
         Vector3D normal;
-        const auto& p0 = vertices_[0];
+        const auto& point0 = vertices_[0];
         for( const auto v : Range{ 2, nb_vertices() } )
         {
-            const auto& p1 = vertices_[v - 1];
-            const auto& p2 = vertices_[v];
+            const auto& point1 = vertices_[v - 1];
+            const auto& point2 = vertices_[v];
             if( const auto triangle_normal =
-                    Triangle< T >{ p0, p1, p2 }.normal() )
+                    Triangle< T >{ point0, point1, point2 }.normal() )
             {
                 normal += triangle_normal.value();
             }
@@ -220,7 +255,6 @@ namespace geode
     std::vector< std::array< index_t, 3 > >
         GenericPolygon< PointType, dimension >::triangulate() const
     {
-        const std::array polygons{ vertices_ };
         const auto new_triangles =
             mapbox::earcut< index_t >( polygon_points( *this ) );
         const auto nb_new_triangles = new_triangles.size() / 3;
@@ -228,10 +262,11 @@ namespace geode
         result.reserve( nb_new_triangles );
         for( const auto trgl : Range{ nb_new_triangles } )
         {
-            result.emplace_back( std::array< index_t, 3 >{
-                new_triangles[3 * trgl], new_triangles[3 * trgl + 1],
-                new_triangles[3 * trgl + 2] } );
+            const auto cur_trgl = 3 * trgl;
+            result.emplace_back( std::array{ new_triangles[cur_trgl],
+                new_triangles[cur_trgl + 1], new_triangles[cur_trgl + 2] } );
         }
+        reoriente_triangulation( *this, result );
         return result;
     }
 
@@ -264,7 +299,7 @@ namespace geode
             geode::Segment< dimension >{
                 vertices_[max_length_edge], vertices_[next] }
         };
-        auto opposite_vertex = 0;
+        index_t opposite_vertex{ 0 };
         for( const auto vertex : geode::Range{ nb_vertices } )
         {
             if( vertex == max_length_edge || vertex == next )
@@ -287,12 +322,12 @@ namespace geode
     std::string GenericPolygon< PointType, dimension >::string() const
     {
         std::string result{ "[" };
-        auto sep = "";
         for( const Point< dimension >& point : vertices_ )
         {
-            absl::StrAppend( &result, sep, point.string() );
-            sep = ", ";
+            absl::StrAppend( &result, point.string(), ", " );
         }
+        result.pop_back();
+        result.pop_back();
         result += "]";
         return result;
     }
