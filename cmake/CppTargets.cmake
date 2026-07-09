@@ -258,13 +258,7 @@ function(add_geode_test)
             TIMEOUT 300
             FAIL_REGULAR_EXPRESSION "Sanitizer"
     )
-    if(GEODE_TEST_ESSENTIAL)
-        add_dependencies(essential ${target_name})
-        set_tests_properties(${target_name} 
-            PROPERTIES 
-                LABELS essential
-        ) 
-    elseif(GEODE_TEST_UNSTABLE)
+    if(GEODE_TEST_UNSTABLE)
         set_tests_properties(${target_name}
             PROPERTIES 
                 LABELS unstable
@@ -275,6 +269,12 @@ function(add_geode_test)
                 LABELS local
                 TIMEOUT 0
         )
+    else()
+        add_dependencies(essential ${target_name})
+        set_tests_properties(${target_name} 
+            PROPERTIES 
+                LABELS essential
+        ) 
     endif()
     if(GEODE_TEST_FIXTURES_SETUP)
         set_tests_properties(${target_name}
