@@ -59,6 +59,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/ConfigureSQLite.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePROJ.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureGDAL.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureJson.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/ConfigureZlib.cmake)
 
 if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePybind11.cmake)
