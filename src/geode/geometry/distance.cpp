@@ -1211,6 +1211,10 @@ namespace geode
                 point0 = vertices0[non_colocated_points0[0]].get();
                 point1 = cur_pt;
             }
+            if( min_distance <= GLOBAL_EPSILON )
+            {
+                return std::tuple{ min_distance, point0, point1 };
+            }
         }
         if( non_colocated_points1.size() == 1 )
         {
@@ -1221,6 +1225,10 @@ namespace geode
                 min_distance = cur_distance;
                 point0 = cur_pt;
                 point1 = vertices1[non_colocated_points1[0]].get();
+            }
+            if( min_distance <= GLOBAL_EPSILON )
+            {
+                return std::tuple{ min_distance, point0, point1 };
             }
         }
         if( non_colocated_points0.size() == 1
@@ -1235,6 +1243,10 @@ namespace geode
                 point0 = cur_pt0;
                 point1 = cur_pt1;
             }
+            if( min_distance <= GLOBAL_EPSILON )
+            {
+                return std::tuple{ min_distance, point0, point1 };
+            }
         }
         if( non_colocated_points0.size() > 1 )
         {
@@ -1246,6 +1258,10 @@ namespace geode
                 point0 = cur_pt0;
                 point1 = cur_pt1;
             }
+            if( min_distance <= GLOBAL_EPSILON )
+            {
+                return std::tuple{ min_distance, point0, point1 };
+            }
         }
         if( non_colocated_points1.size() > 1 )
         {
@@ -1256,6 +1272,10 @@ namespace geode
                 min_distance = cur_distance;
                 point0 = cur_pt0;
                 point1 = cur_pt1;
+            }
+            if( min_distance <= GLOBAL_EPSILON )
+            {
+                return std::tuple{ min_distance, point0, point1 };
             }
         }
         return std::tuple{ min_distance, point0, point1 };
