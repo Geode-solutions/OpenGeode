@@ -54,6 +54,7 @@ namespace geode
         [[nodiscard]] static TetrahedralSolidScalarFunction< dimension > create(
             const TetrahedralSolid< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             double value );
 
         /*!
@@ -78,6 +79,7 @@ namespace geode
         TetrahedralSolidScalarFunction(
             const TetrahedralSolid< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             double value );
 
         TetrahedralSolidScalarFunction(

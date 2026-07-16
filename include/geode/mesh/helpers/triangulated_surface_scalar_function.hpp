@@ -52,6 +52,7 @@ namespace geode
         [[nodiscard]] static TriangulatedSurfaceScalarFunction< dimension >
             create( const TriangulatedSurface< dimension >& solid,
                 std::string_view function_name,
+                const uuid& function_id,
                 double value );
 
         /*!
@@ -70,7 +71,7 @@ namespace geode
         [[nodiscard]] double value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
-        [[nodiscard]] uuid attribute_function_id() const;
+        [[nodiscard]] const uuid& attribute_function_id() const;
 
     private:
         TriangulatedSurfaceScalarFunction(
@@ -80,6 +81,7 @@ namespace geode
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             double value );
 
     private:

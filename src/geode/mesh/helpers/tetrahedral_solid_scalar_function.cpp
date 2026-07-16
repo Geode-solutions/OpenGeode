@@ -40,13 +40,13 @@ namespace geode
     public:
         Impl( const TetrahedralSolid< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             double value )
             : solid_( solid )
         {
-            const auto function_id =
-                solid_.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute, double >(
-                        function_name, value, { false, true } );
+            solid_.vertex_attribute_manager()
+                .template create_attribute< VariableAttribute, double >(
+                    function_name, function_id, value, { false, true } );
             function_attribute_ =
                 solid_.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute, double >(
@@ -109,8 +109,9 @@ namespace geode
     TetrahedralSolidScalarFunction< dimension >::TetrahedralSolidScalarFunction(
         const TetrahedralSolid< dimension >& solid,
         std::string_view function_name,
+        const uuid& function_id,
         double value )
-        : impl_{ solid, function_name, value }
+        : impl_{ solid, function_name, function_id, value }
     {
     }
 
@@ -130,9 +131,10 @@ namespace geode
         TetrahedralSolidScalarFunction< dimension >::create(
             const TetrahedralSolid< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             double value )
     {
-        return { solid, function_name, value };
+        return { solid, function_name, function_id, value };
     }
 
     template < index_t dimension >

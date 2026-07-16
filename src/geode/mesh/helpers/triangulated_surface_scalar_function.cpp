@@ -41,13 +41,13 @@ namespace geode
     public:
         Impl( const TriangulatedSurface< dimension >& surface,
             std::string_view function_name,
+            const uuid& function_id,
             double value )
             : surface_( surface )
         {
-            const auto function_id =
-                surface_.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute, double >(
-                        function_name, value, { false, true } );
+            surface_.vertex_attribute_manager()
+                .template create_attribute< VariableAttribute, double >(
+                    function_name, function_id, value, { false, true } );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute, double >(
@@ -92,7 +92,7 @@ namespace geode
             return point_value;
         }
 
-        uuid attribute_function_id() const
+        const uuid& attribute_function_id() const
         {
             return function_attribute_->id();
         }
@@ -113,8 +113,9 @@ namespace geode
         TriangulatedSurfaceScalarFunction(
             const TriangulatedSurface< dimension >& surface,
             std::string_view function_name,
+            const uuid& function_id,
             double value )
-        : impl_{ surface, function_name, value }
+        : impl_{ surface, function_name, function_id, value }
     {
     }
 
@@ -136,9 +137,10 @@ namespace geode
         TriangulatedSurfaceScalarFunction< dimension >::create(
             const TriangulatedSurface< dimension >& surface,
             std::string_view function_name,
+            const uuid& function_id,
             double value )
     {
-        return { surface, function_name, value };
+        return { surface, function_name, function_id, value };
     }
 
     template < index_t dimension >
@@ -172,8 +174,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    uuid TriangulatedSurfaceScalarFunction< dimension >::attribute_function_id()
-        const
+    const uuid&
+        TriangulatedSurfaceScalarFunction< dimension >::attribute_function_id()
+            const
     {
         return impl_->attribute_function_id();
     }

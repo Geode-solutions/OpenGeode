@@ -41,14 +41,14 @@ namespace geode
     public:
         Impl( const TriangulatedSurface< dimension >& surface,
             std::string_view function_name,
+            const uuid& function_id,
             Point< point_dimension > value )
             : surface_( surface )
         {
-            const auto function_id =
-                surface_.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        Point< point_dimension > >(
-                        function_name, std::move( value ), { false, true } );
+            surface_.vertex_attribute_manager()
+                .template create_attribute< VariableAttribute,
+                    Point< point_dimension > >( function_name, function_id,
+                    std::move( value ), { false, true } );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,
@@ -118,8 +118,9 @@ namespace geode
         TriangulatedSurfacePointFunction(
             const TriangulatedSurface< dimension >& surface,
             std::string_view function_name,
+            const uuid& function_id,
             Point< point_dimension > value )
-        : impl_{ surface, function_name, value }
+        : impl_{ surface, function_name, function_id, value }
     {
     }
 
@@ -141,9 +142,10 @@ namespace geode
         TriangulatedSurfacePointFunction< dimension, point_dimension >::create(
             const TriangulatedSurface< dimension >& surface,
             std::string_view function_name,
+            const uuid& function_id,
             Point< point_dimension > value )
     {
-        return { surface, function_name, value };
+        return { surface, function_name, function_id, value };
     }
 
     template < index_t dimension, index_t point_dimension >

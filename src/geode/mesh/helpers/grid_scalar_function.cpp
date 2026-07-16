@@ -54,13 +54,9 @@ namespace geode
                         function_id );
         }
 
-        Impl( const Grid< dimension >& grid, std::string_view function_name )
+        Impl( const Grid< dimension >& grid, const uuid& function_id )
             : grid_( grid )
         {
-            const auto function_id =
-                grid_.grid_vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute, double >(
-                        function_name, 0, { false, true } );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
                     .template find_attribute< VariableAttribute, double >(
@@ -130,8 +126,8 @@ namespace geode
 
     template < index_t dimension >
     GridScalarFunction< dimension >::GridScalarFunction(
-        const Grid< dimension >& grid, std::string_view function_name )
-        : impl_{ grid, function_name }
+        const Grid< dimension >& grid, const uuid& function_id )
+        : impl_{ grid, function_id }
     {
     }
 
@@ -149,9 +145,9 @@ namespace geode
 
     template < index_t dimension >
     GridScalarFunction< dimension > GridScalarFunction< dimension >::find(
-        const Grid< dimension >& grid, std::string_view function_name )
+        const Grid< dimension >& grid, const uuid& function_id )
     {
-        return { grid, function_name };
+        return { grid, function_id };
     }
 
     template < index_t dimension >

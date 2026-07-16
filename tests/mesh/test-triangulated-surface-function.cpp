@@ -75,7 +75,7 @@ void test_scalar_function( geode::TriangulatedSurface2D& surface )
 {
     const auto function_name = "scalar_function";
     auto scalar_function = geode::TriangulatedSurfaceScalarFunction2D::create(
-        surface, function_name, 26 );
+        surface, function_name, geode::uuid{}, 26 );
     scalar_function.set_value( 4, 22 );
     scalar_function.set_value( 6, 22 );
     for( const auto i : geode::LRange{ 7 } )
@@ -111,9 +111,10 @@ void test_scalar_function( geode::TriangulatedSurface2D& surface )
 void test_point_function( geode::TriangulatedSurface2D& surface )
 {
     const auto function_name = "point_function";
+    const geode::uuid function_id{};
     auto point_function =
         geode::TriangulatedSurfacePointFunction< 2, 2 >::create(
-            surface, function_name, geode::Point2D{ { 26, 3 } } );
+            surface, function_name, function_id, geode::Point2D{ { 26, 3 } } );
     point_function.set_value( 4, geode::Point2D{ { 22, -3 } } );
     point_function.set_value( 6, geode::Point2D{ { 22, -3 } } );
     for( const auto i : geode::LRange{ 7 } )

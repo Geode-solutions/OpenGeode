@@ -56,6 +56,7 @@ namespace geode
             point_dimension >
             create( const TetrahedralSolid< dimension >& solid,
                 std::string_view function_name,
+                const uuid& function_id,
                 Point< point_dimension > value );
 
         /*!
@@ -86,6 +87,7 @@ namespace geode
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             Point< point_dimension > value );
 
     private:
