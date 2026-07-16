@@ -52,6 +52,10 @@ namespace
         const std::array< geode::index_t, 2 >& edge_unique_vertices,
         const geode::ComponentType& type )
     {
+        if( edge_unique_vertices[0] == edge_unique_vertices[1] )
+        {
+            return {};
+        }
         return geode::component_mesh_vertex_pairs(
             model.component_mesh_vertices( edge_unique_vertices[0] ),
             model.component_mesh_vertices( edge_unique_vertices[1] ), type );
@@ -62,6 +66,10 @@ namespace
         const std::array< geode::index_t, 2 >& edge_unique_vertices,
         const geode::ComponentID& component )
     {
+        if( edge_unique_vertices[0] == edge_unique_vertices[1] )
+        {
+            return {};
+        }
         return geode::component_mesh_vertex_pairs(
             model.component_mesh_vertices( edge_unique_vertices[0] ),
             model.component_mesh_vertices( edge_unique_vertices[1] ),
@@ -299,8 +307,7 @@ namespace geode
                     if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                             { pair[0], pair[1] } ) )
                     {
-                        edges[block.id()].emplace_back(
-                            std::move( edge.value() ) );
+                        edges[block.id()].emplace_back( edge.value() );
                     }
                 }
             }
@@ -331,7 +338,7 @@ namespace geode
                 if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                         { pair[0], pair[1] } ) )
                 {
-                    edges.emplace_back( std::move( edge.value() ) );
+                    edges.emplace_back( edge.value() );
                 }
             }
             geode::sort_unique( edges );

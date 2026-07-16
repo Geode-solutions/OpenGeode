@@ -57,6 +57,7 @@ ExternalProject_Add(opengeode
         -DPYBIND11_PYTHON_VERSION:STRING=${PYTHON_VERSION}
         -DCMAKE_INSTALL_PREFIX:PATH=${OpenGeode_PATH_INSTALL}
         -DJSON_INSTALL_PREFIX:PATH=${JSON_INSTALL_PREFIX}
+        -DZLIB_INSTALL_PREFIX:PATH=${ZLIB_INSTALL_PREFIX}
     BINARY_DIR ${OpenGeode_PATH_BIN}
     DEPENDS
         abseil
@@ -68,6 +69,7 @@ ExternalProject_Add(opengeode
         nanoflann
         spdlog
         json
+        zlib
         ${bindings}
 )
 
