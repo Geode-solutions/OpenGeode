@@ -247,9 +247,6 @@ namespace geode
          */
         [[nodiscard]] index_t nb_elements() const;
 
-        [[nodiscard]] std::optional< std::string_view > attribute_name(
-            const uuid& ) const;
-
         [[nodiscard]] std::optional< std::vector< uuid > >
             attribute_ids_matching_name( std::string_view name ) const;
 

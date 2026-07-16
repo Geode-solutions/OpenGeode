@@ -222,11 +222,6 @@ namespace geode
             return nb_elements_;
         }
 
-        std::optional< std::string_view > attribute_name( const uuid &id ) const
-        {
-            return attributes_.at( id )->name().value_or( "unknown" );
-        }
-
         std::optional< std::vector< uuid > > attribute_ids_matching_name(
             std::string_view name ) const
         {
@@ -569,12 +564,6 @@ namespace geode
             std::string_view name ) const
     {
         return impl_->attribute_ids_matching_name( name );
-    }
-
-    std::optional< std::string_view > AttributeManager::attribute_name(
-        const uuid &id ) const
-    {
-        return impl_->attribute_name( id );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
