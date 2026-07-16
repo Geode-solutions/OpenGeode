@@ -55,7 +55,7 @@ namespace geode
         }
 
         template < typename Mesh >
-        void initialize_crs( Mesh &mesh, const geode::uuid &attribute_id )
+        void initialize_crs( Mesh &mesh, const uuid &attribute_id )
         {
             CoordinateReferenceSystemManagersBuilder< Mesh::dim >{ mesh }
                 .main_coordinate_reference_system_manager_builder()

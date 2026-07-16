@@ -43,7 +43,7 @@ namespace geode
 
     public:
         explicit AttributeCoordinateReferenceSystem(
-            AttributeManager& manager, const geode::uuid& uuid );
+            AttributeManager& manager, const uuid& uuid );
         AttributeCoordinateReferenceSystem(
             AttributeManager& manager, std::string_view attribute_name );
         ~AttributeCoordinateReferenceSystem();

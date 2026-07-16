@@ -52,7 +52,7 @@ namespace geode
                 return image_;
             }
 
-            [[nodiscard]] const geode::uuid& texture_id() const
+            [[nodiscard]] const uuid& texture_id() const
             {
                 return coordinates_->id();
             }

@@ -24,7 +24,6 @@
 #pragma once
 
 #include <geode/basic/pimpl.hpp>
-#include <geode/basic/uuid.hpp>
 
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/grid.hpp>
@@ -33,6 +32,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
+    struct uuid;
 } // namespace geode
 
 namespace geode

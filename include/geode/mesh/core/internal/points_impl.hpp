@@ -65,8 +65,7 @@ namespace geode
                     Point< dimension > >( attribute_id );
             }
 
-            PointsImpl(
-                AttributeManager& manager, const geode::uuid& attribute_id )
+            PointsImpl( AttributeManager& manager, const uuid& attribute_id )
             {
                 points_ = manager.template find_attribute< VariableAttribute,
                     Point< dimension > >( attribute_id );

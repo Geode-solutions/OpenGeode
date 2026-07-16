@@ -25,36 +25,35 @@
 
 #include <geode/mesh/common.hpp>
 
-#include <geode/basic/uuid.hpp>
-
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     ALIAS_2D_AND_3D( SurfaceMesh );
     ALIAS_3D( SolidMesh );
+    struct uuid;
 } // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
-    [[nodiscard]] geode::uuid compute_surface_scalar_function_gradient(
+    [[nodiscard]] uuid compute_surface_scalar_function_gradient(
         const SurfaceMesh< dimension >& mesh, const uuid& scalar_function_id );
 
-    [[nodiscard]] geode::uuid opengeode_mesh_api
+    [[nodiscard]] uuid opengeode_mesh_api
         compute_solid_scalar_function_gradient(
             const SolidMesh3D& mesh, const uuid& scalar_function_id );
 
     namespace internal
     {
         template < index_t dimension >
-        [[nodiscard]] std::tuple< geode::uuid, std::vector< index_t > >
+        [[nodiscard]] std::tuple< uuid, std::vector< index_t > >
             compute_surface_scalar_function_gradient(
                 const SurfaceMesh< dimension >& mesh,
                 const uuid& scalar_function_id,
                 absl::Span< const index_t > no_value_vertices );
 
-        [[nodiscard]] std::tuple< geode::uuid, std::vector< index_t > >
+        [[nodiscard]] std::tuple< uuid, std::vector< index_t > >
             opengeode_mesh_api compute_solid_scalar_function_gradient(
                 const SolidMesh3D& mesh,
                 const uuid& scalar_function_id,
