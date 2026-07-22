@@ -102,7 +102,7 @@ namespace geode
 
     class VertexIdentifier::Impl
     {
-        const std::string unique_vertices_name = "unique vertices";
+        constexpr static auto UNIQUE_VERTICES_NAME = "unique vertices";
 
     public:
         Impl()
@@ -185,7 +185,7 @@ namespace geode
             const auto unique_vertices_attribute_id =
                 mesh.vertex_attribute_manager()
                     .template create_attribute< VariableAttribute, index_t >(
-                        unique_vertices_name, NO_ID, { false, false, false } );
+                        UNIQUE_VERTICES_NAME, NO_ID, { false, false, false } );
             const auto [_, inserted] =
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
@@ -203,7 +203,7 @@ namespace geode
             const auto& mesh = component.mesh();
             const auto unique_vertices_ids =
                 mesh.vertex_attribute_manager().attribute_ids_matching_name(
-                    unique_vertices_name );
+                    UNIQUE_VERTICES_NAME );
             DEBUG( unique_vertices_ids.has_value() );
             OpenGeodeModelException::check_exception(
                 unique_vertices_ids.has_value(), nullptr,
