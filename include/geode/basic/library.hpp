@@ -84,7 +84,9 @@ namespace geode
         {                                                                      \
         }                                                                      \
                                                                                \
-        template < typename DataProvider, typename MessageProvider >           \
+        template < typename DataProvider,                                      \
+            typename MessageProvider,                                          \
+            typename ExceptionClass = project_name##library_name##Exception >  \
         static void exception( bool condition,                                 \
             DataProvider&& data_provider,                                      \
             TYPE type,                                                         \
@@ -92,8 +94,8 @@ namespace geode
         {                                                                      \
             if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
             {                                                                  \
-                throw project_name##library_name##Exception{ data_provider(),  \
-                    type, message_provider() };                                \
+                throw ExceptionClass{ data_provider(), type,                   \
+                    message_provider() };                                      \
             }                                                                  \
         }                                                                      \
                                                                                \
