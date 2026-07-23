@@ -25,6 +25,7 @@
 
 #include <bitsery/ext/inheritance.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/growable.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -41,6 +42,9 @@ namespace geode
     {
     public:
         using Builder = OpenGeodeVertexSetBuilder;
+
+        OpenGeodeVertexSet() = default;
+        OpenGeodeVertexSet( BITSERY ) {};
 
         [[nodiscard]] static MeshImpl impl_name_static()
         {

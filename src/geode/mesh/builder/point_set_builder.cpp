@@ -65,16 +65,9 @@ namespace geode
             "[PointSetBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
         VertexSetBuilder::copy( point_set );
-        if( point_set_.impl_name() == point_set.impl_name() )
+        for( const auto p : Range{ point_set.nb_vertices() } )
         {
-            do_copy_points( point_set );
-        }
-        else
-        {
-            for( const auto p : Range{ point_set.nb_vertices() } )
-            {
-                this->set_point( p, point_set.point( p ) );
-            }
+            this->set_point( p, point_set.point( p ) );
         }
     }
 

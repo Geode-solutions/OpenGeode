@@ -301,6 +301,17 @@ namespace
                     polygon.value(), v );
             }
         }
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
+            {
+                const geode::PolygonEdge edge{ p, e };
+                if( const auto adj = surface.polygon_adjacent( edge ) )
+                {
+                    builder.set_polygon_adjacent( edge, adj.value() );
+                }
+            }
+        }
     }
 
     template < geode::index_t dimension >
@@ -832,22 +843,14 @@ namespace geode
             surface_mesh_.disable_edges();
         }
         VertexSetBuilder::copy( surface_mesh );
-        if( surface_mesh.impl_name() == surface_mesh_.impl_name() )
-        {
-            do_copy_points( surface_mesh );
-            do_copy_polygons( surface_mesh );
-        }
-        else
-        {
-            copy_points( surface_mesh, *this );
-            copy_polygons( surface_mesh, *this );
-        }
-        surface_mesh_.polygon_attribute_manager().copy(
-            surface_mesh.polygon_attribute_manager() );
+        copy_polygons( surface_mesh, *this );
         if( surface_mesh.are_edges_enabled() )
         {
             surface_mesh_.copy_edges( surface_mesh, {} );
         }
+        surface_mesh_.polygon_attribute_manager().copy(
+            surface_mesh.polygon_attribute_manager() );
+        copy_points( surface_mesh, *this );
     }
 
     template class opengeode_mesh_api SurfaceMeshBuilder< 2 >;

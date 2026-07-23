@@ -61,6 +61,8 @@ namespace geode
         void set_texture_coordinates(
             const EdgeVertex& vertex, const Point1D& coordinates ) const;
 
+        [[nodiscard]] uuid texture_id() const;
+
     private:
         Texture();
 

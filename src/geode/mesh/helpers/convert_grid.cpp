@@ -51,9 +51,14 @@ namespace geode
             cells_number, cells_directions };
         IdentifierBuilder builder{ grid };
         internal::copy_meta_info( raster, builder );
-        auto color = grid.cell_attribute_manager()
-                         .template find_or_create_attribute< VariableAttribute,
-                             RGBColor >( "RGB_data", {} );
+        auto color_attribute_id =
+            grid.cell_attribute_manager()
+                .template create_attribute< VariableAttribute, RGBColor >(
+                    "RGB_data", {}, geode::AttributeProperties{} );
+        auto color =
+            grid.cell_attribute_manager()
+                .template find_attribute< VariableAttribute, RGBColor >(
+                    color_attribute_id );
         for( const auto cell_id : geode::Range{ raster.nb_cells() } )
         {
             color->set_value( cell_id, raster.color( cell_id ) );

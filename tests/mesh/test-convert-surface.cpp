@@ -115,22 +115,27 @@ void convert_grid_to_surface()
         absl::StrCat( geode::DATA_PATH, "old_regular_grid.og_rgd2d" ) );
     const auto old_regular_grid_surface =
         geode::convert_grid_into_triangulated_surface( *old_regular_grid );
+    auto test_attribute_id =
+        old_regular_grid_surface->vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::Point2D >(
+                "test", geode::Point2D{ { 0., 0. } },
+                geode::AttributeProperties{} );
     auto test_attribute =
         old_regular_grid_surface->vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute,
-                geode::Point2D >( "test", geode::Point2D{ { 0., 0. } } );
-    auto pt_attribute = old_regular_grid_surface->vertex_attribute_manager()
-                            .find_attribute< geode::Point2D >( "points" );
+            .find_attribute< geode::VariableAttribute, geode::Point2D >(
+                test_attribute_id );
     const auto old_regular_grid_surface2 =
         geode::convert_surface_mesh_into_triangulated_surface(
             *old_regular_grid )
             .value();
+    old_regular_grid_surface2->vertex_attribute_manager()
+        .create_attribute< geode::VariableAttribute, geode::Point2D >( "test",
+            test_attribute_id, geode::Point2D{ { 0., 0. } },
+            geode::AttributeProperties{} );
     auto test_attribute2 =
         old_regular_grid_surface2->vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute,
-                geode::Point2D >( "test", geode::Point2D{ { 0., 0. } } );
-    auto pt_attribute2 = old_regular_grid_surface2->vertex_attribute_manager()
-                             .find_attribute< geode::Point2D >( "points" );
+            .find_attribute< geode::VariableAttribute, geode::Point2D >(
+                test_attribute_id );
 }
 
 void triangulate_surface()

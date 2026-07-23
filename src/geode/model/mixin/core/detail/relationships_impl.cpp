@@ -46,6 +46,8 @@ namespace geode
             initialize_attributes();
         }
 
+        RelationshipsImpl::RelationshipsImpl( BITSERY ) {}
+
         index_t RelationshipsImpl::nb_components_with_relations() const
         {
             return graph_->nb_vertices();
@@ -232,10 +234,22 @@ namespace geode
 
         void RelationshipsImpl::initialize_attributes()
         {
-            ids_ =
+            const auto ids =
+                graph_->vertex_attribute_manager().attribute_ids_matching_name(
+                    "id" );
+            if( ids.has_value() )
+            {
+                ids_ = graph_->vertex_attribute_manager()
+                           .find_attribute< VariableAttribute, ComponentID >(
+                               ids.value()[0] );
+                return;
+            }
+            const auto id =
                 graph_->vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute, ComponentID >(
-                        "id", ComponentID{} );
+                    .create_attribute< VariableAttribute, ComponentID >(
+                        "id", ComponentID{}, AttributeProperties{} );
+            ids_ = graph_->vertex_attribute_manager()
+                       .find_attribute< VariableAttribute, ComponentID >( id );
         }
 
         std::optional< index_t > RelationshipsImpl::vertex_id(

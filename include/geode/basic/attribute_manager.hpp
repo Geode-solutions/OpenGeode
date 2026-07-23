@@ -33,7 +33,9 @@
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl.hpp>
+#include <geode/basic/uuid.hpp>
 
 namespace geode
 {
@@ -59,10 +61,10 @@ namespace geode
          * @return nullptr if no attribute matches the given name.
          */
         [[nodiscard]] std::shared_ptr< AttributeBase > find_generic_attribute(
-            std::string_view name ) const
+            const geode::uuid& attribute_id ) const
         {
             absl::ReaderMutexLock lock{ mutex() };
-            return find_attribute_base( name );
+            return find_attribute_base( attribute_id );
         }
 
         /*!
@@ -72,82 +74,76 @@ namespace geode
          * @exception OpenGeodeException if no Attribute found
          */
         template < typename T >
-        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
-            std::string_view name ) const
+        [[nodiscard]] std::shared_ptr< ReadOnlyAttribute< T > >
+            find_read_only_attribute( const geode::uuid& attribute_id ) const
         {
             absl::ReaderMutexLock lock{ mutex() };
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
-                    find_attribute_base( name ) );
+                    find_attribute_base( attribute_id ) );
             OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
                 OpenGeodeException::TYPE::data,
-                "[AttributeManager::find_attribute] Could not find attribute '",
-                name,
+                "[AttributeManager::find_read_only_attribute] Could not find "
+                "attribute "
+                "with id :'",
+                attribute_id.string(),
                 "'. You have to create an attribute before using it. See "
-                "find_or_create_attribute method and derived classes of "
+                "create_attribute method and derived classes of "
                 "ReadOnlyAttribute." );
             return attribute;
         }
 
-        /*!
-         * Recover or create the attribute from the manager
-         * and the attribute name.
-         * If the recovered Attribute is not a of the same type than the
-         * attribute, it replaces it by the Attribute corresponding to the
-         * attribute.
-         * @param[in] name The associated attribute name to look for
-         * @param[in] default_value The default value to use when new attribute
-         * element are created
-         * @param[in] properties The AttributeProperties to set the attribute
-         * flags for future modifications
-         * @tparam Attribute The attribute type to look for,
-         * such as ConstantAttribute
-         * @tparam T The type of the Attribute element
-         * @exception OpenGeodeException if the Attribute replacement failed
-         */
         template < template < typename > class Attribute, typename T >
-        std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            std::string_view name,
-            T default_value,
-            AttributeProperties properties )
+        [[nodiscard]] std::shared_ptr< Attribute< T > > find_attribute(
+            const geode::uuid& attribute_id )
         {
-            {
-                absl::ReaderMutexLock lock{ mutex() };
-                auto attribute = find_attribute_base( name );
-                auto typed_attribute =
-                    std::dynamic_pointer_cast< Attribute< T > >( attribute );
-                if( typed_attribute.get() )
-                {
-                    return typed_attribute;
-                }
-            }
-            absl::MutexLock lock{ mutex() };
-            auto attribute = find_attribute_base( name );
-            auto typed_attribute =
-                std::dynamic_pointer_cast< Attribute< T > >( attribute );
-            if( typed_attribute.get() )
-            {
-                return typed_attribute;
-            }
-            OpenGeodeBasicException::check_exception( attribute.use_count() < 2,
-                nullptr, OpenGeodeException::TYPE::internal,
-                "[AttributeManager::find_or_create_attribute] Do not "
-                "instantiate an attribute "
-                "if an instantiated attribute of the same name "
-                "with different storage already exists." );
-
-            typed_attribute.reset( new Attribute< T >{
-                std::move( default_value ), std::move( properties ), {} } );
-            register_attribute( typed_attribute, name );
-            return typed_attribute;
+            absl::ReaderMutexLock lock{ mutex() };
+            auto attribute = std::dynamic_pointer_cast< Attribute< T > >(
+                find_attribute_base( attribute_id ) );
+            OpenGeodeBasicException::check_exception( attribute.get(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::find_attribute] Could not find attribute "
+                "with id :  '",
+                attribute_id.string(),
+                "'. You have to create an attribute before using it. See "
+                "create_attribute method and derived classes of "
+                "ReadOnlyAttribute." );
+            return attribute;
         }
 
         template < template < typename > class Attribute, typename T >
-        std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            std::string_view name, T default_value )
+        void create_attribute( std::string_view attribute_name,
+            const geode::uuid& attribute_id,
+            T default_value,
+            AttributeProperties properties )
         {
-            return find_or_create_attribute< Attribute, T >(
-                name, std::move( default_value ), AttributeProperties{} );
+            absl::MutexLock lock{ mutex() };
+            auto attribute = find_attribute_base( attribute_id );
+            auto typed_attribute =
+                std::dynamic_pointer_cast< Attribute< T > >( attribute );
+            OpenGeodeBasicException::check_exception(
+                typed_attribute.get() == nullptr, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::create_attribute] Attribute with id '",
+                attribute_id.string(), "' already exists." );
+            typed_attribute = std::make_unique< Attribute< T > >(
+                std::move( default_value ), attribute_name,
+                std::move( properties ), AttributeBase::AttributeKey{} );
+            IdentifierBuilder builder{ *typed_attribute };
+            builder.set_id( attribute_id );
+            register_attribute( typed_attribute, attribute_id );
+        }
+
+        template < template < typename > class Attribute, typename T >
+        [[nodiscard]] geode::uuid create_attribute(
+            std::string_view attribute_name,
+            T default_value,
+            AttributeProperties properties )
+        {
+            geode::uuid attribute_id;
+            create_attribute< Attribute, T >( attribute_name, attribute_id,
+                std::move( default_value ), std::move( properties ) );
+            return attribute_id;
         }
 
         /*!
@@ -194,35 +190,31 @@ namespace geode
         [[nodiscard]] bool has_interpolable_attributes() const;
 
         /*!
-         * Get all the associated attribute names
+         * Get all the associated attribute ids
          */
-        [[nodiscard]] absl::FixedArray< std::string_view >
-            attribute_names() const;
+        [[nodiscard]] absl::FixedArray< geode::uuid > attribute_ids() const;
 
         /*!
-         * Return true if an attribute matching the given name.
-         * @param[in] name The attribute name to use
+         * Return true if an attribute matching the given id.
+         * @param[in] id The attribute id to use
          */
-        [[nodiscard]] bool attribute_exists( std::string_view name ) const;
+        [[nodiscard]] bool attribute_exists( const geode::uuid& ) const;
 
         /*!
-         * Delete the attribute matching the given name.
-         * Do nothing if the name does not exist.
-         * @param[in] name The attribute name to delete
+         * Delete the attribute matching the given id.
+         * Do nothing if the id does not exist.
+         * @param[in] id The attribute id to delete
          */
-        void delete_attribute( std::string_view name );
+        void delete_attribute( const geode::uuid& );
 
         /*!
-         * Get the typeid name of the attribute type
-         * @param[in] name The attribute name to use
+         * Get the typeid id of the attribute type
+         * @param[in] id The attribute id to use
          */
         [[nodiscard]] std::string_view attribute_type(
-            std::string_view name ) const;
+            const geode::uuid& ) const;
 
-        void rename_attribute(
-            std::string_view old_name, std::string_view new_name );
-
-        void set_attribute_properties( std::string_view attribute_name,
+        void set_attribute_properties( geode::uuid attribute_id,
             const AttributeProperties& new_properties );
 
         /*!
@@ -255,6 +247,9 @@ namespace geode
          */
         [[nodiscard]] index_t nb_elements() const;
 
+        [[nodiscard]] std::optional< std::vector< uuid > >
+            attribute_ids_matching_name( std::string_view name ) const;
+
         void copy( const AttributeManager& attribute_manager );
 
         void import( const AttributeManager& attribute_manager,
@@ -262,14 +257,14 @@ namespace geode
 
         void import( const AttributeManager& attribute_manager,
             absl::Span< const index_t > old2new,
-            std::string_view attribute_name );
+            const uuid& attribute_id );
 
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );
 
         void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping,
-            std::string_view attribute_name );
+            const uuid& attribute_id );
 
     private:
         friend class bitsery::Access;
@@ -279,24 +274,24 @@ namespace geode
         [[nodiscard]] absl::Mutex& mutex() const;
 
         /*!
-         * Find the Attribute associated with the given name
+         * Find the Attribute associated with the given id
          * regardless the content type
-         * @param[in] name The attribute name to search for
-         * @return The associated store. If the name was not found,
+         * @param[in] id The attribute id to search for
+         * @return The associated store. If the id was not found,
          * the shared pointer is empty.
          */
         [[nodiscard]] std::shared_ptr< AttributeBase > find_attribute_base(
-            std::string_view name ) const;
+            const geode::uuid& ) const;
 
         /*!
-         * Register an Attribute to the given name.
-         * If the given name already exists in the manager, the new attribute
+         * Register an Attribute to the given id.
+         * If the given id already exists in the manager, the new attribute
          * will override the old one.
          * @param[in] attribute The attribute to register
-         * @param[in] name The associated name to the store
+         * @param[in] id The associated id to the store
          */
         void register_attribute(
-            std::shared_ptr< AttributeBase > attribute, std::string_view name );
+            std::shared_ptr< AttributeBase > attribute, const geode::uuid& );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

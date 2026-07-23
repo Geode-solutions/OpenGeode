@@ -25,6 +25,7 @@
 
 #include <array>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -51,6 +52,7 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeTriangulatedSurface();
+        OpenGeodeTriangulatedSurface( BITSERY bitsery );
         OpenGeodeTriangulatedSurface(
             OpenGeodeTriangulatedSurface&& other ) noexcept;
         OpenGeodeTriangulatedSurface& operator=(
@@ -86,10 +88,6 @@ namespace geode
         }
 
     public:
-        void set_vertex( index_t vertex_id,
-            Point< dimension > point,
-            OGTriangulatedSurfaceKey /*key*/ );
-
         void set_polygon_vertex( const PolygonVertex& polygon_vertex,
             index_t vertex_id,
             OGTriangulatedSurfaceKey /*key*/ );

@@ -31,6 +31,12 @@
 namespace geode
 {
     template < index_t dimension >
+    HybridSolid< dimension >::HybridSolid( BITSERY bitsery )
+        : SolidMesh< dimension >{ bitsery }
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< HybridSolid< dimension > >
         HybridSolid< dimension >::create()
     {

@@ -47,6 +47,12 @@ namespace geode
             vertex_identifier_.register_mesh_component( component, {} );
         }
 
+        template < typename MeshComponent >
+        void load_mesh_component( const MeshComponent& component )
+        {
+            vertex_identifier_.load_mesh_component( component, {} );
+        }
+
         /*!
          * Remove a component from the VertexIdentifier and delete corresponding
          * information (i.e. the attribute on component mesh).

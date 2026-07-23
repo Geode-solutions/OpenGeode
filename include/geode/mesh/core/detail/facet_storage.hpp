@@ -44,7 +44,6 @@ namespace geode
         class FacetStorage
         {
             using TypedVertexCycle = VertexCycle< VertexContainer >;
-            static constexpr auto ATTRIBUTE_NAME = "facet_vertices";
             friend class bitsery::Access;
 
         public:
@@ -58,17 +57,26 @@ namespace geode
             }
 
         protected:
+            FacetStorage( BITSERY ) {}
+
             FacetStorage()
-                : counter_( facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >(
-                              "counter", 1u, { false, false, false } ) ),
-                  vertices_( facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              VertexContainer >( attribute_name(),
-                              VertexContainer(),
-                              { false, false, false } ) )
             {
+                const auto counter_attribute_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, index_t >(
+                            "counter", 1u, { false, false, false } );
+                counter_ = facet_attribute_manager_
+                               .find_attribute< VariableAttribute, index_t >(
+                                   counter_attribute_id );
+                const auto vertices_attribute_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, VertexContainer >(
+                            "facet_vertices", VertexContainer{},
+                            { false, false, false } );
+                vertices_ =
+                    facet_attribute_manager_
+                        .find_attribute< VariableAttribute, VertexContainer >(
+                            vertices_attribute_id );
             }
 
             [[nodiscard]] AttributeManager& facet_attribute_manager() const
@@ -221,17 +229,10 @@ namespace geode
             }
 
         protected:
-            static constexpr std::string_view attribute_name()
-            {
-                return ATTRIBUTE_NAME;
-            }
-
             void update_attribute()
             {
-                vertices_ =
-                    facet_attribute_manager_.template find_or_create_attribute<
-                        VariableAttribute, VertexContainer >( attribute_name(),
-                        VertexContainer{}, { false, false, false } );
+                vertices_ = facet_attribute_manager_.template find_attribute<
+                    VariableAttribute, VertexContainer >( vertices_->id() );
             }
 
             [[nodiscard]] index_t get_counter( index_t facet_id ) const
@@ -243,13 +244,39 @@ namespace geode
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
                 facet_indices_ = from.facet_indices_;
-                counter_ =
+                const auto counter_id =
                     facet_attribute_manager_
-                        .find_or_create_attribute< VariableAttribute, index_t >(
+                        .create_attribute< VariableAttribute, index_t >(
                             "counter", 1u, { false, false, false } );
-                vertices_ = facet_attribute_manager_.find_or_create_attribute<
-                    VariableAttribute, VertexContainer >( attribute_name(),
-                    VertexContainer{}, { false, false, false } );
+                counter_ = facet_attribute_manager_
+                               .find_attribute< VariableAttribute, index_t >(
+                                   counter_id );
+                const auto old_counter_attribute =
+                    from.facet_attribute_manager()
+                        .template find_read_only_attribute< index_t >(
+                            from.counter_->id() );
+                const auto vertices_id =
+                    facet_attribute_manager_
+                        .create_attribute< VariableAttribute, VertexContainer >(
+                            "facet_vertices", VertexContainer{},
+                            { false, false, false } );
+                vertices_ =
+                    facet_attribute_manager_
+                        .find_attribute< VariableAttribute, VertexContainer >(
+                            vertices_id );
+                const auto old_vertices_attribute =
+                    from.facet_attribute_manager()
+                        .template find_read_only_attribute< VertexContainer >(
+                            from.vertices_->id() );
+                for( const auto& [_, facet_id] : facet_indices_ )
+                {
+                    const auto old_counter_value =
+                        old_counter_attribute->value( facet_id );
+                    counter_->set_value( facet_id, old_counter_value );
+                    const auto old_vertices_value =
+                        old_vertices_attribute->value( facet_id );
+                    vertices_->set_value( facet_id, old_vertices_value );
+                }
             }
 
         private:

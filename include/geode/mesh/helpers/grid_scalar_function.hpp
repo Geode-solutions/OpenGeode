@@ -32,6 +32,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
+    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -55,11 +56,11 @@ namespace geode
 
         /*!
          * Finds an object function that already exists in the given
-         * Grid, from its given name.
+         * Grid, from its given id.
          * Throws an exception if no attribute with the same name exists.
          */
         [[nodiscard]] static GridScalarFunction< dimension > find(
-            const Grid< dimension >& grid, std::string_view function_name );
+            const Grid< dimension >& grid, const uuid& function_id );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
@@ -79,7 +80,7 @@ namespace geode
 
     private:
         GridScalarFunction(
-            const Grid< dimension >& grid, std::string_view function_name );
+            const Grid< dimension >& grid, const uuid& function_id );
 
         GridScalarFunction( const Grid< dimension >& grid,
             std::string_view function_name,

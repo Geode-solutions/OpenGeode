@@ -28,6 +28,7 @@
 #include <absl/hash/hash.h>
 #include <absl/types/span.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -93,6 +94,7 @@ namespace geode
 
     public:
         VertexIdentifier();
+        VertexIdentifier( BITSERY );
         ~VertexIdentifier();
 
         [[nodiscard]] index_t nb_unique_vertices() const;
@@ -139,6 +141,13 @@ namespace geode
          */
         template < typename MeshComponent >
         void register_mesh_component(
+            const MeshComponent& component, BuilderKey /*key*/ );
+
+        /*!
+         * Add a component in the VertexIdentifier
+         */
+        template < typename MeshComponent >
+        void load_mesh_component(
             const MeshComponent& component, BuilderKey /*key*/ );
 
         /*!

@@ -73,7 +73,7 @@ void test_scalar_function( geode::TetrahedralSolid3D& solid )
 {
     const auto function_name = "scalar_function";
     auto scalar_function = geode::TetrahedralSolidScalarFunction3D::create(
-        solid, function_name, 26 );
+        solid, function_name, geode::uuid{}, 26 );
     scalar_function.set_value( 2, 22 );
     for( const auto i : geode::LRange{ 8 } )
     {
@@ -110,8 +110,9 @@ void test_scalar_function( geode::TetrahedralSolid3D& solid )
 void test_point_function( geode::TetrahedralSolid3D& solid )
 {
     const auto function_name = "point_function";
+    const geode::uuid function_id{};
     auto point_function = geode::TetrahedralSolidPointFunction< 3, 3 >::create(
-        solid, function_name, geode::Point3D{ { 26, 3, -10 } } );
+        solid, function_name, function_id, geode::Point3D{ { 26, 3, -10 } } );
     point_function.set_value( 2, geode::Point3D{ { 22, -3, -20 } } );
     for( const auto i : geode::LRange{ 8 } )
     {

@@ -52,6 +52,25 @@ namespace geode
         public:
             static constexpr auto POINTS_NAME = "points";
 
+            PointsImpl() = default;
+
+            PointsImpl(
+                AttributeManager& manager, std::string_view attribute_name )
+            {
+                const auto attribute_id =
+                    manager.template create_attribute< VariableAttribute,
+                        Point< dimension > >( attribute_name,
+                        Point< dimension >{}, { false, false, false } );
+                points_ = manager.template find_attribute< VariableAttribute,
+                    Point< dimension > >( attribute_id );
+            }
+
+            PointsImpl( AttributeManager& manager, const uuid& attribute_id )
+            {
+                points_ = manager.template find_attribute< VariableAttribute,
+                    Point< dimension > >( attribute_id );
+            }
+
             [[nodiscard]] const Point< dimension >& get_point(
                 index_t vertex_id ) const
             {
@@ -70,17 +89,12 @@ namespace geode
 
             [[nodiscard]] std::string_view attribute_name() const
             {
-                return points_->name();
+                return points_->name().value();
             }
 
-            template < typename Mesh >
-            void initialize_crs( Mesh& mesh )
+            [[nodiscard]] const uuid& attribute_id() const
             {
-                CoordinateReferenceSystemManagersBuilder< dimension >{ mesh }
-                    .main_coordinate_reference_system_manager_builder()
-                    .delete_coordinate_reference_system( POINTS_NAME );
-                register_as_active_crs( mesh );
-                points_.reset();
+                return points_->id();
             }
 
         private:
@@ -108,49 +122,6 @@ namespace geode
                                 archive.ext(
                                     impl.points_, bitsery::ext::StdSmartPtr{} );
                             } } } );
-            }
-
-            template < typename Mesh >
-            void register_as_active_crs( Mesh& mesh )
-            {
-                auto crs_manager_builder =
-                    CoordinateReferenceSystemManagersBuilder< dimension >{
-                        mesh
-                    }
-                        .main_coordinate_reference_system_manager_builder();
-                crs_manager_builder.register_coordinate_reference_system(
-                    POINTS_NAME,
-                    std::shared_ptr< CoordinateReferenceSystem< dimension > >{
-                        std::make_shared<
-                            AttributeCoordinateReferenceSystem< dimension > >(
-                            mesh.vertex_attribute_manager() ) } );
-                crs_manager_builder.set_active_coordinate_reference_system(
-                    POINTS_NAME );
-            }
-
-        protected:
-            PointsImpl() = default;
-
-            template < typename Mesh >
-            explicit PointsImpl( Mesh& mesh )
-                : PointsImpl( mesh.vertex_attribute_manager() )
-            {
-                register_as_active_crs( mesh );
-            }
-
-            explicit PointsImpl( AttributeManager& manager )
-                : PointsImpl{ manager, POINTS_NAME }
-            {
-            }
-
-            PointsImpl(
-                AttributeManager& manager, std::string_view attribute_name )
-                : points_{ manager
-                          .template find_or_create_attribute< VariableAttribute,
-                              Point< dimension > >( attribute_name,
-                              Point< dimension >{},
-                              { false, false, false } ) }
-            {
             }
 
         private:

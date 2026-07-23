@@ -27,6 +27,7 @@
 
 #include <absl/types/span.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>

@@ -35,6 +35,7 @@
 #include <geode/basic/attribute_utils.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/growable.hpp>
+#include <geode/basic/identifier.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 
@@ -48,7 +49,7 @@ namespace geode
     /*!
      * Base class defining the virtual API used by the AttributeManager.
      */
-    class AttributeBase
+    class AttributeBase : public Identifier
     {
         OPENGEODE_DISABLE_COPY( AttributeBase );
         friend class bitsery::Access;
@@ -69,11 +70,6 @@ namespace geode
 
         [[nodiscard]] virtual std::string_view type() = 0;
 
-        [[nodiscard]] std::string_view name() const
-        {
-            return name_;
-        }
-
         [[nodiscard]] const AttributeProperties& properties() const
         {
             return properties_;
@@ -85,11 +81,6 @@ namespace geode
         }
 
     public:
-        void set_name( std::string_view name, AttributeKey /*key*/ )
-        {
-            name_ = to_string( name );
-        }
-
         [[nodiscard]] virtual std::shared_ptr< AttributeBase > clone(
             AttributeKey /*key*/ ) const = 0;
 
@@ -147,20 +138,26 @@ namespace geode
                      },
                         []( Archive& archive, AttributeBase& attribute ) {
                             archive.object( attribute.properties_ );
-                            archive.text1b(
-                                attribute.name_, attribute.name_.max_size() );
+                            std::string old_name;
+                            archive.text1b( old_name, old_name.max_size() );
+                            attribute.set_name( old_name );
+                        },
+                        []( Archive& archive, AttributeBase& attribute ) {
+                            archive.object( attribute.properties_ );
+                            archive.ext( attribute,
+                                bitsery::ext::BaseClass< Identifier >{} );
                         } } } );
         }
 
     protected:
-        AttributeBase( AttributeProperties properties )
+        AttributeBase( std::string_view name, AttributeProperties properties )
             : properties_( std::move( properties ) )
         {
+            set_name( name );
         }
 
     private:
         AttributeProperties properties_;
-        std::string name_;
     };
 
     /*!
@@ -204,8 +201,9 @@ namespace geode
         }
 
     protected:
-        ReadOnlyAttribute( AttributeProperties properties )
-            : AttributeBase( std::move( properties ) )
+        ReadOnlyAttribute(
+            std::string_view name, AttributeProperties properties )
+            : AttributeBase( name, std::move( properties ) )
         {
         }
 

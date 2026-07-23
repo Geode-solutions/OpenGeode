@@ -195,7 +195,8 @@ namespace geode
             OpenGeodeException::TYPE::data,
             "[RegularGridBuilder::copy] Cannot copy a mesh into an "
             "already initialized mesh." );
-        SolidMeshBuilder3D::copy( grid );
         GridBuilder3D::copy( grid );
+
+        SolidMeshBuilder3D::copy( grid );
     }
 } // namespace geode

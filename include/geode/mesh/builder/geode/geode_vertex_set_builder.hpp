@@ -59,8 +59,5 @@ namespace geode
 
         void do_permute_vertices( absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) final;
-
-    private:
-        [[maybe_unused]] OpenGeodeVertexSet& geode_vertex_set_;
     };
 } // namespace geode

@@ -168,9 +168,10 @@ void test()
     test_create_vertices( *graph, *builder );
     test_create_edges( *graph, *builder );
     test_io( *graph, absl::StrCat( "test.", graph->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "test_v7.", graph->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH,
+        "/backward_io/v7/test_v7.", graph->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "/backward_io/v17/v17.",
+        graph->native_extension() ) );
     test_delete_edge( *graph, *builder );
     test_clone( *graph );
     test_delete_isolated_vertices( *graph, *builder );

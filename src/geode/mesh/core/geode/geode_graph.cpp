@@ -39,9 +39,9 @@ namespace geode
     public:
         explicit Impl( OpenGeodeGraph& mesh ) : internal::EdgesImpl( mesh ) {}
 
-    private:
         Impl() = default;
 
+    private:
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -55,6 +55,8 @@ namespace geode
     };
 
     OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
+
+    OpenGeodeGraph::OpenGeodeGraph( BITSERY bitsery ) : Graph{ bitsery } {}
 
     OpenGeodeGraph::OpenGeodeGraph( OpenGeodeGraph&& ) noexcept = default;
 

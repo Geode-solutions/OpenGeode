@@ -31,6 +31,8 @@
 #include <bitsery/ext/inheritance.h>
 #include <bitsery/ext/pointer.h>
 
+#include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/range.hpp>
 
@@ -45,6 +47,11 @@ namespace geode
         bitsery::Serializer< bitsery::OutputBufferedStreamAdapter, TContext >;
     using Deserializer =
         bitsery::Deserializer< bitsery::InputStreamAdapter, TContext >;
+
+    enum struct BITSERY
+    {
+        constructor
+    };
 
     /*!
      * Register all the information needed by Bitsery to serialize the objects

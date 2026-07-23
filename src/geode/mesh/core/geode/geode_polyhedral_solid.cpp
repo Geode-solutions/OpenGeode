@@ -33,23 +33,26 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/internal/points_impl.hpp>
+#include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class OpenGeodePolyhedralSolid< dimension >::Impl
-        : public internal::PointsImpl< dimension >
     {
         friend class bitsery::Access;
 
     public:
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
-            : internal::PointsImpl< dimension >( mesh )
         {
+            detail::template initialize_crs<
+                OpenGeodePolyhedralSolid< dimension > >( mesh );
             polyhedron_vertex_ptr_.emplace_back( 0 );
             polyhedron_facet_ptr_.emplace_back( 0 );
             polyhedron_adjacent_ptr_.emplace_back( 0 );
         }
+
+        Impl() = default;
 
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const
@@ -319,8 +322,6 @@ namespace geode
         }
 
     private:
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -345,9 +346,8 @@ namespace geode
                              impl.polyhedron_adjacents_.max_size() );
                          archive.container4b( impl.polyhedron_adjacent_ptr_,
                              impl.polyhedron_adjacent_ptr_.max_size() );
-                         archive.ext(
-                             impl, bitsery::ext::BaseClass<
-                                       internal::PointsImpl< dimension > >{} );
+                         internal::PointsImpl< dimension > temp;
+                         archive.object( temp );
                      },
                         []( Archive& archive, Impl& impl ) {
                             archive.container4b( impl.polyhedron_vertices_,
@@ -362,9 +362,8 @@ namespace geode
                                 impl.polyhedron_adjacents_.max_size() );
                             archive.container4b( impl.polyhedron_adjacent_ptr_,
                                 impl.polyhedron_adjacent_ptr_.max_size() );
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass<
-                                    internal::PointsImpl< dimension > >{} );
+                            internal::PointsImpl< dimension > temp;
+                            archive.object( temp );
                         } } } );
         }
 
@@ -416,6 +415,13 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodePolyhedralSolid< dimension >::OpenGeodePolyhedralSolid(
+        BITSERY bitsery )
+        : PolyhedralSolid< dimension >{ bitsery }
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodePolyhedralSolid< dimension >::OpenGeodePolyhedralSolid(
         OpenGeodePolyhedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
@@ -426,14 +432,6 @@ namespace geode
     template < index_t dimension >
     OpenGeodePolyhedralSolid< dimension >::~OpenGeodePolyhedralSolid() =
         default;
-
-    template < index_t dimension >
-    void OpenGeodePolyhedralSolid< dimension >::set_vertex( index_t vertex_id,
-        Point< dimension > point,
-        OGPolyhedralSolidKey /*key*/ )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
 
     template < index_t dimension >
     index_t OpenGeodePolyhedralSolid< dimension >::get_polyhedron_vertex(
@@ -541,8 +539,32 @@ namespace geode
                      archive.ext( solid, bitsery::ext::BaseClass<
                                              PolyhedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
-                     solid.impl_->initialize_crs( solid );
+                     const auto new_point_attribute_id =
+                         solid.vertex_attribute_manager()
+                             .attribute_ids_matching_name( internal::PointsImpl<
+                                 dimension >::POINTS_NAME )
+                             .value()
+                             .at( 0 );
+                     detail::template initialize_crs<
+                         OpenGeodePolyhedralSolid< dimension > >(
+                         solid, new_point_attribute_id );
                  },
+                    []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
+                        archive.ext(
+                            solid, bitsery::ext::BaseClass<
+                                       PolyhedralSolid< dimension > >{} );
+                        archive.object( solid.impl_ );
+                        const auto new_point_attribute_id =
+                            solid.vertex_attribute_manager()
+                                .attribute_ids_matching_name(
+                                    internal::PointsImpl<
+                                        dimension >::POINTS_NAME )
+                                .value()
+                                .at( 0 );
+                        detail::template initialize_crs<
+                            OpenGeodePolyhedralSolid< dimension > >(
+                            solid, new_point_attribute_id );
+                    },
                     []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
                         archive.ext(
                             solid, bitsery::ext::BaseClass<

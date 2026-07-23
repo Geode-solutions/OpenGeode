@@ -31,6 +31,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
+    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -53,17 +54,18 @@ namespace geode
             point_dimension >
             create( const TriangulatedSurface< dimension >& solid,
                 std::string_view function_name,
+                const uuid& function_id,
                 Point< point_dimension > value );
 
         /*!
          * Finds an object function that already exists in the given
-         * TriangulatedSurface, from its given name.
-         * Throws an exception if no attribute with the same name exists.
+         * TriangulatedSurface, from its given id.
+         * Throws an exception if no attribute with the same id exists.
          */
         [[nodiscard]] static TriangulatedSurfacePointFunction< dimension,
             point_dimension >
             find( const TriangulatedSurface< dimension >& solid,
-                std::string_view function_name );
+                const uuid& function_id );
 
         void set_value( index_t vertex_index, Point< point_dimension > value );
 
@@ -73,14 +75,17 @@ namespace geode
         [[nodiscard]] Point< point_dimension > value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
+        [[nodiscard]] uuid attribute_function_id() const;
+
     private:
         TriangulatedSurfacePointFunction(
             const TriangulatedSurface< dimension >& solid,
-            std::string_view function_name );
+            const uuid& function_id );
 
         TriangulatedSurfacePointFunction(
             const TriangulatedSurface< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             Point< point_dimension > value );
 
     private:

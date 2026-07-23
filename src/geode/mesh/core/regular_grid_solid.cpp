@@ -32,6 +32,10 @@
 
 namespace geode
 {
+    RegularGrid< 3 >::RegularGrid( BITSERY bitsery ) : SolidMesh< 3 >{ bitsery }
+    {
+    }
+
     std::unique_ptr< RegularGrid< 3 > > RegularGrid< 3 >::create()
     {
         return MeshFactory::create_default_mesh< RegularGrid< 3 > >(

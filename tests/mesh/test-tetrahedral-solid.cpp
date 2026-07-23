@@ -323,21 +323,46 @@ void test_io(
         "Reloaded TetrahedralSolid should have 3 polyhedra" );
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto solid = geode::load_tetrahedral_solid< 3 >( filename );
+    geode::OpenGeodeMeshException::test( solid->nb_vertices() == 6,
+        "Backward TetrahedralSolid should have 6 vertices" );
+    geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 3,
+        "Backward TetrahedralSolid should have 3 polyhedra" );
+    geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 12,
+        "Backward TetrahedralSolid should have 12 edges" );
+    geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 10,
+        "Backward TetrahedralSolid should have 10 facets" );
+    test_is_on_border( *solid );
+}
+
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
-    auto attr_from = solid.facets()
-                         .facet_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "facet_id", 0 );
+    auto attr_from_id =
+        solid.facets()
+            .facet_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "facet_id", 0, geode::AttributeProperties{} );
+    auto attr_from =
+        solid.facets()
+            .facet_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attr_from_id );
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         attr_from->set_value( f, f );
     }
+    auto attr_edge_from_id =
+        solid.edges()
+            .edge_attribute_manager()
+            .create_attribute< geode::VariableAttribute, geode::index_t >(
+                "edge_id", 0, geode::AttributeProperties{} );
     auto attr_edge_from =
         solid.edges()
             .edge_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute,
-                geode::index_t >( "edge_id", 0 );
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attr_edge_from_id );
     for( const auto e : geode::Range{ solid.edges().nb_edges() } )
     {
         attr_edge_from->set_value( e, e );
@@ -347,9 +372,29 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     geode::OpenGeodeTetrahedralSolid3D solid4{ std::move(
         *dynamic_cast< geode::OpenGeodeTetrahedralSolid3D* >(
             solid2.get() ) ) };
-    const auto attr_to = solid4.facets()
-                             .facet_attribute_manager()
-                             .find_attribute< geode::index_t >( "facet_id" );
+    const auto attr_to =
+        solid4.facets()
+            .facet_attribute_manager()
+            .find_read_only_attribute< geode::index_t >( attr_from_id );
+    for( const auto v : geode::Range{ solid4.nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            solid4.point( v ) == solid.point( v ),
+            "Wrong cloned mesh point coordinates." );
+    }
+    for( const auto p : geode::Range{ solid4.nb_polyhedra() } )
+    {
+        for( const auto f : geode::LRange{ 4 } )
+        {
+            for( const auto v : geode::LRange{ 3 } )
+            {
+                geode::OpenGeodeMeshException::test(
+                    solid4.polyhedron_facet_vertex( { { p, f }, v } )
+                        == solid.polyhedron_facet_vertex( { { p, f }, v } ),
+                    "polyhedron_facet_vertex should match" );
+            }
+        }
+    }
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -364,10 +409,17 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
                 "Error in facet vertices transfer during cloning" );
         }
     }
+    for( const auto v : geode::Range{ solid4.nb_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            solid.polyhedra_around_vertex( v )
+                == solid4.polyhedra_around_vertex( v ),
+            "Polyhedra around vertex should match during cloning" );
+    }
     const auto attr_edge_to =
         solid4.edges()
             .edge_attribute_manager()
-            .find_attribute< geode::index_t >( "edge_id" );
+            .find_read_only_attribute< geode::index_t >( attr_edge_from_id );
     for( const auto e : geode::Range{ solid.edges().nb_edges() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -430,7 +482,8 @@ void test()
     test_polyhedron_adjacencies( *solid, *builder );
     test_is_on_border( *solid );
     test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
-
+    test_backward_io( absl::StrCat(
+        geode::DATA_PATH, "backward_io/v17/v17.", solid->native_extension() ) );
     test_permutation( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );

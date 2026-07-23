@@ -414,6 +414,27 @@ void test_io(
         "Reloaded HybridSolid has wrong polyhedron facet index" );
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto solid = geode::load_hybrid_solid< 3 >( filename );
+    geode::OpenGeodeMeshException::test( solid->nb_vertices() == 11,
+        "Backward HybridSolid should have 11 vertices" );
+    geode::OpenGeodeMeshException::test(
+        solid->point( 2 ) == geode::Point3D{ { 2, 1, 0 } },
+        "Backward HybridSolid has wrong point coordinates" );
+    geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 4,
+        "Backward HybridSolid should have 4 polyhedra" );
+    geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 16,
+        "Backward HybridSolid should have 16 facets" );
+    geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 22,
+        "Backward HybridSolid should have 22 edges" );
+    geode::OpenGeodeMeshException::test(
+        solid->facets().facet_from_vertices(
+            solid->polyhedron_facet_vertices( { 1, 0 } ) )
+            == 6,
+        "Backward HybridSolid has wrong polyhedron facet index" );
+}
+
 void test_clone( const geode::HybridSolid3D& hybrid_solid )
 {
     const auto hybrid_solid_clone = hybrid_solid.clone();
@@ -474,7 +495,8 @@ void test()
     test_polyhedron_adjacencies( *hybrid_solid, *builder );
     test_io( *hybrid_solid,
         absl::StrCat( "test.", hybrid_solid->native_extension() ) );
-
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        hybrid_solid->native_extension() ) );
     test_permutation( *hybrid_solid, *builder );
     test_delete_polyhedra( *hybrid_solid, *builder );
     test_clone( *hybrid_solid );

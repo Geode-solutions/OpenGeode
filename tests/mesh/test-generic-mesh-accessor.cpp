@@ -41,7 +41,8 @@
 #include <geode/mesh/helpers/generic_solid_accessor.hpp>
 #include <geode/mesh/helpers/generic_surface_accessor.hpp>
 
-std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
+std::unique_ptr< geode::EdgedCurve3D > create_edged_curve(
+    const geode::uuid& attribute_id )
 {
     auto edged_curve = geode::EdgedCurve3D::create();
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
@@ -50,14 +51,19 @@ std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
     builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
     builder->create_edge( 0, 1 );
     builder->create_edge( 0, 2 );
-    auto attribute = edged_curve->edge_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test_attribute", 2 );
+    edged_curve->edge_attribute_manager()
+        .create_attribute< geode::VariableAttribute, geode::index_t >(
+            "edge", attribute_id, 2, geode::AttributeProperties{} );
+    auto attribute =
+        edged_curve->edge_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attribute_id );
     attribute->set_value( 1, 5 );
     return edged_curve;
 }
 
-std::unique_ptr< geode::TriangulatedSurface2D > create_surface()
+std::unique_ptr< geode::TriangulatedSurface2D > create_surface(
+    const geode::uuid& attribute_id )
 {
     auto surface = geode::TriangulatedSurface2D::create();
     auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
@@ -68,14 +74,19 @@ std::unique_ptr< geode::TriangulatedSurface2D > create_surface()
     builder->create_triangle( { 0, 1, 2 } );
     builder->create_triangle( { 0, 3, 1 } );
     builder->compute_polygon_adjacencies();
-    auto attribute = surface->polygon_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test_attribute", 2 );
+    surface->polygon_attribute_manager()
+        .create_attribute< geode::VariableAttribute, geode::index_t >(
+            "surface", attribute_id, 2, geode::AttributeProperties{} );
+    auto attribute =
+        surface->polygon_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attribute_id );
     attribute->set_value( 1, 5 );
     return surface;
 }
 
-std::unique_ptr< geode::TetrahedralSolid3D > create_solid()
+std::unique_ptr< geode::TetrahedralSolid3D > create_solid(
+    const geode::uuid& attribute_id )
 {
     auto solid = geode::TetrahedralSolid3D::create();
     auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
@@ -87,15 +98,21 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid()
     builder->create_tetrahedron( { 0, 1, 2, 3 } );
     builder->create_tetrahedron( { 3, 2, 4, 1 } );
     builder->compute_polyhedron_adjacencies();
-    auto attribute = solid->polyhedron_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test_attribute", 2 );
+    solid->polyhedron_attribute_manager()
+        .create_attribute< geode::VariableAttribute, geode::index_t >(
+            "solid", attribute_id, 2, geode::AttributeProperties{} );
+    auto attribute =
+        solid->polyhedron_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                attribute_id );
     attribute->set_value( 1, 5 );
     return solid;
 }
 
 template < typename Mesh >
-void test_basic_accessor( const Mesh& mesh, geode::index_t nb_element_vertices )
+void test_basic_accessor( const Mesh& mesh,
+    geode::index_t nb_element_vertices,
+    const geode::uuid& attribute_id )
 {
     using Accessor = geode::GenericMeshAccessor< Mesh >;
     const Accessor accessor{ mesh };
@@ -118,7 +135,8 @@ void test_basic_accessor( const Mesh& mesh, geode::index_t nb_element_vertices )
         "Wrong size of element vertices container" );
     const auto attribute =
         accessor.element_attribute_manager()
-            .template find_attribute< geode::index_t >( "test_attribute" );
+            .template find_read_only_attribute< geode::index_t >(
+                attribute_id );
     geode::OpenGeodeMeshException::test(
         attribute->value( 0 ) == 2 && attribute->value( 1 ) == 5,
         "Wrong values of the element attributes." );
@@ -157,14 +175,17 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     geode::Logger::info( "Test Surface" );
-    const auto edged_curve = create_edged_curve();
-    test_basic_accessor( *edged_curve, 2 );
-    const auto surface = create_surface();
-    test_basic_accessor( *surface, 3 );
+    geode::uuid edge_curve_attribute_uuid;
+    const auto edged_curve = create_edged_curve( edge_curve_attribute_uuid );
+    test_basic_accessor( *edged_curve, 2, edge_curve_attribute_uuid );
+    geode::uuid surface_attribute_uuid;
+    const auto surface = create_surface( surface_attribute_uuid );
+    test_basic_accessor( *surface, 3, surface_attribute_uuid );
     test_adjacent_accessor( *surface );
     geode::Logger::info( "Test Solid" );
-    const auto solid = create_solid();
-    test_basic_accessor( *solid, 4 );
+    geode::uuid solid_attribute_uuid;
+    const auto solid = create_solid( solid_attribute_uuid );
+    test_basic_accessor( *solid, 4, solid_attribute_uuid );
     test_adjacent_accessor( *solid );
 }
 

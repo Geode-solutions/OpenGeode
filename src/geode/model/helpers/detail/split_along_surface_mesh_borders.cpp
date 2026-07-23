@@ -126,7 +126,6 @@ namespace geode
                             .get();
                     } )
                     .get();
-                DEBUG( "end of split" );
                 return mapping;
             }
 

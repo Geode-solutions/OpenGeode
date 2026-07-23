@@ -23,6 +23,7 @@
 
 #include <geode/model/representation/io/geode/geode_brep_input.hpp>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/zip_file.hpp>
 
@@ -43,7 +44,7 @@ namespace geode
     {
         const UnzipFile zip_reader{ filename(), uuid{}.string() };
         zip_reader.extract_all();
-        BRep brep;
+        BRep brep{ BITSERY::constructor };
         detail::load_brep_files( brep, zip_reader.directory() );
         return brep;
     }
