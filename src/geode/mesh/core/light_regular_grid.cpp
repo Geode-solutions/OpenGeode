@@ -196,6 +196,29 @@ namespace geode
     }
 
     template < index_t dimension >
+    LightRegularGrid< dimension > LightRegularGrid< dimension >::clone() const
+    {
+        auto origin_position = this->vertex_indices( 0 );
+        auto origin = this->grid_point( origin_position );
+        std::array< index_t, dimension > cells_number;
+        std::array< Vector< dimension >, dimension > directions;
+        for( const auto axis : LRange{ dimension } )
+        {
+            cells_number[axis] = this->nb_cells_in_direction( axis );
+            directions[axis] = Vector< dimension >{ origin,
+                this->grid_point(
+                    this->next_vertex( origin_position, axis ).value() ) };
+        }
+        LightRegularGrid< dimension > clone{ origin, cells_number, directions };
+        IdentifierBuilder builder{ clone };
+        builder.copy_identifier( *this );
+        clone.grid_vertex_attribute_manager().copy(
+            this->grid_vertex_attribute_manager() );
+        clone.cell_attribute_manager().copy( this->cell_attribute_manager() );
+        return clone;
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void LightRegularGrid< dimension >::serialize( Archive& serializer )
     {
