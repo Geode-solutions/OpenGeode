@@ -84,9 +84,17 @@ void test_bounding_box( const geode::PointSet3D& point_set )
 
 geode::uuid test_create_vertex_attribute( const geode::PointSet3D& point_set )
 {
-    auto attribute_id = point_set.vertex_attribute_manager()
-                            .create_attribute< geode::ConstantAttribute, bool >(
-                                "bool", true, geode::AttributeProperties{} );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< bool > attribute_values;
+    attribute_values.default_value = true;
+    attribute_values.no_value = true;
+    auto attribute_id =
+        point_set.vertex_attribute_manager()
+            .create_attribute< geode::ConstantAttribute, bool >(
+                "bool", attribute_values, attribute_properties );
     const auto attribute =
         point_set.vertex_attribute_manager()
             .find_attribute< geode::ConstantAttribute, bool >( attribute_id );

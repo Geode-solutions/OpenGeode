@@ -56,12 +56,13 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        ConstantAttribute( T value,
+        ConstantAttribute( AttributeValues< T > values,
             std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
-            : ConstantAttribute(
-                  std::move( value ), name, std::move( properties ) )
+            : ConstantAttribute( std::move( values.default_value ),
+                  name,
+                  std::move( properties ) )
         {
         }
 

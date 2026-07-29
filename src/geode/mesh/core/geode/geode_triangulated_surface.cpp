@@ -49,12 +49,18 @@ namespace geode
         {
             detail::template initialize_crs<
                 OpenGeodeTriangulatedSurface< dimension > >( mesh );
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< std::array< index_t, 3 > > attribute_values;
+            attribute_values.default_value = { NO_ID, NO_ID, NO_ID };
+            attribute_values.no_value = { NO_ID, NO_ID, NO_ID };
             const auto triangle_vertices_id =
                 mesh.polygon_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         std::array< index_t, 3 > >( "triangle_vertices",
-                        std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
-                        { false, false, false } );
+                        attribute_values, attribute_properties );
             triangle_vertices_ =
                 mesh.polygon_attribute_manager()
                     .template find_attribute< VariableAttribute,
@@ -63,8 +69,7 @@ namespace geode
                 mesh.polygon_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         std::array< index_t, 3 > >( "triangle_adjacents",
-                        std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID },
-                        { false, false, false } );
+                        attribute_values, attribute_properties );
             triangle_adjacents_ =
                 mesh.polygon_attribute_manager()
                     .template find_attribute< VariableAttribute,

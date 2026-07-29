@@ -115,11 +115,17 @@ void convert_grid_to_surface()
         absl::StrCat( geode::DATA_PATH, "old_regular_grid.og_rgd2d" ) );
     const auto old_regular_grid_surface =
         geode::convert_grid_into_triangulated_surface( *old_regular_grid );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::Point2D > attribute_values;
+    attribute_values.default_value = geode::Point2D{};
+    attribute_values.no_value = geode::Point2D{};
     auto test_attribute_id =
         old_regular_grid_surface->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::Point2D >(
-                "test", geode::Point2D{ { 0., 0. } },
-                geode::AttributeProperties{} );
+                "test", attribute_values, attribute_properties );
     auto test_attribute =
         old_regular_grid_surface->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::Point2D >(
@@ -129,9 +135,8 @@ void convert_grid_to_surface()
             *old_regular_grid )
             .value();
     old_regular_grid_surface2->vertex_attribute_manager()
-        .create_attribute< geode::VariableAttribute, geode::Point2D >( "test",
-            test_attribute_id, geode::Point2D{ { 0., 0. } },
-            geode::AttributeProperties{} );
+        .create_attribute< geode::VariableAttribute, geode::Point2D >(
+            "test", test_attribute_id, attribute_values, attribute_properties );
     auto test_attribute2 =
         old_regular_grid_surface2->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::Point2D >(

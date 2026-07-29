@@ -107,13 +107,21 @@ namespace geode
     public:
         Impl()
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< std::vector< ComponentMeshVertex > >
+                component_vertices_attribute_values;
+            component_vertices_attribute_values.default_value = {};
+            component_vertices_attribute_values.no_value = {};
             const auto unique_vertices_attribute_id =
                 unique_vertices_.vertex_attribute_manager()
                     .create_attribute< VariableAttribute,
                         std::vector< ComponentMeshVertex > >(
                         "component vertices",
-                        std::vector< ComponentMeshVertex >{},
-                        { false, false, false } );
+                        component_vertices_attribute_values,
+                        attribute_properties );
             component_vertices_ = unique_vertices_.vertex_attribute_manager()
                                       .find_attribute< VariableAttribute,
                                           std::vector< ComponentMeshVertex > >(
@@ -181,11 +189,19 @@ namespace geode
         template < typename MeshComponent >
         void register_component( const MeshComponent& component )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< index_t > unqiue_vertex_attribute_values;
+            unqiue_vertex_attribute_values.default_value = NO_ID;
+            unqiue_vertex_attribute_values.no_value = NO_ID;
             const auto& mesh = component.mesh();
             const auto unique_vertices_attribute_id =
                 mesh.vertex_attribute_manager()
                     .template create_attribute< VariableAttribute, index_t >(
-                        UNIQUE_VERTICES_NAME, NO_ID, { false, false, false } );
+                        UNIQUE_VERTICES_NAME, unqiue_vertex_attribute_values,
+                        attribute_properties );
             const auto [_, inserted] =
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
@@ -204,7 +220,6 @@ namespace geode
             const auto unique_vertices_ids =
                 mesh.vertex_attribute_manager().attribute_ids_matching_name(
                     UNIQUE_VERTICES_NAME );
-            DEBUG( unique_vertices_ids.has_value() );
             OpenGeodeModelException::check_exception(
                 unique_vertices_ids.has_value(), nullptr,
                 OpenGeodeException::TYPE::data,

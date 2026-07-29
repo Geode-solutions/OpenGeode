@@ -332,10 +332,17 @@ void test_closest_vertex( const geode::LightRegularGrid3D& grid )
 
 void test_attribute( const geode::LightRegularGrid3D& grid )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = -1;
+    attribute_values.no_value = -1;
     auto attribute_id =
         grid.cell_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "test", -1, geode::AttributeProperties{} );
+                "test", attribute_values, attribute_properties );
     auto attribute =
         grid.cell_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );

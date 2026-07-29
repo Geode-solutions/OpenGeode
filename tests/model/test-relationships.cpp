@@ -167,10 +167,17 @@ void test_attributes( const geode::Relationships& relations,
     geode::OpenGeodeModelException::test(
         std::get< 1 >( output ).id() == uuids[0],
         "Wrong relation uuids from index" );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< int > attribute_values;
+    attribute_values.default_value = 0;
+    attribute_values.no_value = 0;
     auto relation_att_id =
         relations.relation_attribute_manager()
             .create_attribute< geode::VariableAttribute, int >(
-                "int", 0, geode::AttributeProperties{} );
+                "int", attribute_values, attribute_properties );
     const auto relation_att =
         relations.relation_attribute_manager()
             .find_attribute< geode::VariableAttribute, int >( relation_att_id );

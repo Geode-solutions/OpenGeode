@@ -252,10 +252,18 @@ namespace geode
                             ids.value()[0] );
                 return;
             }
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = true;
+            AttributeValues< RelationType > ids_attribute_values;
+            ids_attribute_values.default_value = NO_ID;
+            ids_attribute_values.no_value = NO_ID;
             const auto id =
                 relation_attribute_manager()
                     .create_attribute< VariableAttribute, RelationType >(
-                        "relation_type", NO_ID, geode::AttributeProperties{} );
+                        "relation_type", ids_attribute_values,
+                        attribute_properties );
             relation_type_ =
                 relation_attribute_manager()
                     .find_attribute< VariableAttribute, RelationType >( id );

@@ -72,8 +72,15 @@ def test_create_polyhedra(polyhedral_solid, builder):
 
 
 def test_create_facet_attribute(polyhedral_solid):
+    properties = basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = basic.AttributeValuesUInt()
+    values.default_value = basic.NO_ID
+    values.no_value = basic.NO_ID
     attribute_id = polyhedral_solid.facets().facet_attribute_manager(
-    ).create_attribute_variable_uint("test", basic.NO_ID, basic.AttributeProperties())
+    ).create_attribute_variable_uint("test", values, properties)
     attribute = polyhedral_solid.facets().facet_attribute_manager(
     ).find_attribute_variable_uint(attribute_id)
     for f in range(polyhedral_solid.facets().nb_facets()):
@@ -82,8 +89,15 @@ def test_create_facet_attribute(polyhedral_solid):
 
 
 def test_create_edge_attribute(polyhedral_solid):
+    properties = basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = basic.AttributeValuesUInt()
+    values.default_value = basic.NO_ID
+    values.no_value = basic.NO_ID
     attribute_id = polyhedral_solid.edges().edge_attribute_manager(
-    ).create_attribute_variable_uint("test", basic.NO_ID, basic.AttributeProperties())
+    ).create_attribute_variable_uint("test", values, properties)
     attribute = polyhedral_solid.edges().edge_attribute_manager(
     ).find_attribute_variable_uint(attribute_id)
     for e in range(polyhedral_solid.edges().nb_edges()):

@@ -114,7 +114,7 @@ namespace geode
         template < template < typename > class Attribute, typename T >
         void create_attribute( std::string_view attribute_name,
             const geode::uuid& attribute_id,
-            T default_value,
+            AttributeValues< T > default_values,
             AttributeProperties properties )
         {
             absl::MutexLock lock{ mutex() };
@@ -127,7 +127,7 @@ namespace geode
                 "[AttributeManager::create_attribute] Attribute with id '",
                 attribute_id.string(), "' already exists." );
             typed_attribute = std::make_unique< Attribute< T > >(
-                std::move( default_value ), attribute_name,
+                std::move( default_values ), attribute_name,
                 std::move( properties ), AttributeBase::AttributeKey{} );
             IdentifierBuilder builder{ *typed_attribute };
             builder.set_id( attribute_id );
@@ -137,12 +137,12 @@ namespace geode
         template < template < typename > class Attribute, typename T >
         [[nodiscard]] geode::uuid create_attribute(
             std::string_view attribute_name,
-            T default_value,
+            AttributeValues< T > default_values,
             AttributeProperties properties )
         {
             geode::uuid attribute_id;
             create_attribute< Attribute, T >( attribute_name, attribute_id,
-                std::move( default_value ), std::move( properties ) );
+                std::move( default_values ), std::move( properties ) );
             return attribute_id;
         }
 

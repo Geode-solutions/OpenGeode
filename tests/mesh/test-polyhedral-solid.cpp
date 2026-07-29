@@ -130,11 +130,18 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
 geode::uuid test_create_facet_attribute(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = geode::NO_ID;
+    attribute_values.no_value = geode::NO_ID;
     auto attribute_id =
         polyhedral_solid.facets()
             .facet_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "facet_attribute", geode::NO_ID, geode::AttributeProperties{} );
+                "facet_attribute", attribute_values, attribute_properties );
     auto attribute =
         polyhedral_solid.facets()
             .facet_attribute_manager()
@@ -150,11 +157,18 @@ geode::uuid test_create_facet_attribute(
 geode::uuid test_create_edge_attribute(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = geode::NO_ID;
+    attribute_values.no_value = geode::NO_ID;
     auto attribute_id =
         polyhedral_solid.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "test", geode::NO_ID, geode::AttributeProperties{} );
+                "test", attribute_values, attribute_properties );
     auto attribute =
         polyhedral_solid.edges()
             .edge_attribute_manager()
@@ -541,11 +555,17 @@ void test_normals()
 geode::uuid test_create_vertex_attribute(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
-    auto attribute_id =
-        polyhedral_solid.vertex_attribute_manager()
-            .create_attribute< geode::VariableAttribute,
-                geode::PolyhedronFacetVertex >( "test",
-                geode::PolyhedronFacetVertex{}, geode::AttributeProperties{} );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::PolyhedronFacetVertex > attribute_values;
+    attribute_values.default_value = geode::PolyhedronFacetVertex{};
+    attribute_values.no_value = geode::PolyhedronFacetVertex{};
+    auto attribute_id = polyhedral_solid.vertex_attribute_manager()
+                            .create_attribute< geode::VariableAttribute,
+                                geode::PolyhedronFacetVertex >( "test",
+                                attribute_values, attribute_properties );
     auto attribute = polyhedral_solid.vertex_attribute_manager()
                          .find_attribute< geode::VariableAttribute,
                              geode::PolyhedronFacetVertex >( attribute_id );

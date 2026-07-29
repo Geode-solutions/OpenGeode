@@ -43,11 +43,19 @@ namespace geode
             std::string_view distance_map_name )
             : grid_( grid ), squared_cell_length_{}
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = true;
+            AttributeValues< double > distance_map_values;
+            distance_map_values.default_value =
+                std::numeric_limits< double >::max();
+            distance_map_values.no_value = std::numeric_limits< double >::max();
             const auto distance_map_id =
                 grid.cell_attribute_manager()
                     .template create_attribute< VariableAttribute, double >(
-                        distance_map_name, std::numeric_limits< double >::max(),
-                        geode::AttributeProperties{} );
+                        distance_map_name, distance_map_values,
+                        attribute_properties );
             distance_map_ =
                 grid.cell_attribute_manager()
                     .template find_attribute< VariableAttribute, double >(

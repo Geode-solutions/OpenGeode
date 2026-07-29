@@ -440,11 +440,18 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< PolyhedronVertex > polyhedron_around_vertex_values;
+            polyhedron_around_vertex_values.default_value = PolyhedronVertex{};
+            polyhedron_around_vertex_values.no_value = PolyhedronVertex{};
             const auto attribute_id =
                 solid.vertex_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         PolyhedronVertex >( "polyhedron_around_vertex",
-                        PolyhedronVertex{}, { false, false, false } );
+                        polyhedron_around_vertex_values, attribute_properties );
             polyhedron_around_vertex_ =
                 solid.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,
@@ -681,11 +688,18 @@ namespace geode
         void initialize_polyhedra_around_vertex(
             const SolidMesh< dimension >& solid )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< CachedPolyhedra > polyhedron_around_vertex_values;
+            polyhedron_around_vertex_values.default_value = CachedPolyhedra{};
+            polyhedron_around_vertex_values.no_value = CachedPolyhedra{};
             const auto attribute_id =
                 solid.vertex_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
-                        CachedPolyhedra{}, { false, false, false } );
+                        polyhedron_around_vertex_values, attribute_properties );
             polyhedra_around_vertex_ =
                 solid.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,

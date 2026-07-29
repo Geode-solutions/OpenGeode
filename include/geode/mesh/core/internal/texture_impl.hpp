@@ -92,10 +92,17 @@ namespace geode
 
             TextureImpl( AttributeManager& manager, std::string_view name )
             {
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< ElementTextureCoordinates > coordinates_values;
+                coordinates_values.default_value = {};
+                coordinates_values.no_value = {};
                 const auto texture_id =
                     manager.create_attribute< VariableAttribute,
                         ElementTextureCoordinates >(
-                        name, {}, geode::AttributeProperties{} );
+                        name, coordinates_values, attribute_properties );
                 coordinates_ = manager.find_attribute< VariableAttribute,
                     ElementTextureCoordinates >( texture_id );
             }

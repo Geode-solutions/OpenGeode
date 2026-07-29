@@ -244,10 +244,17 @@ namespace geode
                                ids.value()[0] );
                 return;
             }
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = true;
+            AttributeValues< ComponentID > ids_attribute_values;
+            ids_attribute_values.default_value = ComponentID{};
+            ids_attribute_values.no_value = ComponentID{};
             const auto id =
                 graph_->vertex_attribute_manager()
                     .create_attribute< VariableAttribute, ComponentID >(
-                        "id", ComponentID{}, AttributeProperties{} );
+                        "id", ids_attribute_values, attribute_properties );
             ids_ = graph_->vertex_attribute_manager()
                        .find_attribute< VariableAttribute, ComponentID >( id );
         }

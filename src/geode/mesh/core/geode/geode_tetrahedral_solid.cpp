@@ -51,12 +51,18 @@ namespace geode
         {
             detail::template initialize_crs<
                 OpenGeodeTetrahedralSolid< dimension > >( mesh );
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< std::array< index_t, 4 > > attribute_values;
+            attribute_values.default_value = { NO_ID, NO_ID, NO_ID, NO_ID };
+            attribute_values.no_value = { NO_ID, NO_ID, NO_ID, NO_ID };
             const auto tetrahedron_vertices_id =
                 mesh.polyhedron_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         std::array< index_t, 4 > >( "tetrahedron_vertices",
-                        std::array< index_t, 4 >{ NO_ID, NO_ID, NO_ID, NO_ID },
-                        { false, false, false } );
+                        attribute_values, attribute_properties );
             tetrahedron_vertices_ =
                 mesh.polyhedron_attribute_manager()
                     .template find_attribute< VariableAttribute,
@@ -65,8 +71,7 @@ namespace geode
                 mesh.polyhedron_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         std::array< index_t, 4 > >( "tetrahedron_adjacents",
-                        std::array< index_t, 4 >{ NO_ID, NO_ID, NO_ID, NO_ID },
-                        { false, false, false } );
+                        attribute_values, attribute_properties );
             tetrahedron_adjacents_ =
                 mesh.polyhedron_attribute_manager()
                     .template find_attribute< VariableAttribute,

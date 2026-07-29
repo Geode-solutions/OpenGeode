@@ -44,11 +44,19 @@ namespace geode
             Point< point_dimension > value )
             : grid_( grid )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = true;
+            attribute_properties.transferable = true;
+            AttributeValues< Point< point_dimension > >
+                function_attribute_values;
+            function_attribute_values.default_value = value;
+            function_attribute_values.no_value = Point< point_dimension >{};
             const auto function_id =
                 grid_.grid_vertex_attribute_manager()
                     .template create_attribute< VariableAttribute,
-                        Point< point_dimension > >(
-                        function_name, std::move( value ), { false, true } );
+                        Point< point_dimension > >( function_name,
+                        function_attribute_values, attribute_properties );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,
@@ -58,11 +66,20 @@ namespace geode
         Impl( const Grid< dimension >& grid, std::string_view attribute_name )
             : grid_( grid )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = true;
+            attribute_properties.transferable = true;
+            AttributeValues< Point< point_dimension > >
+                function_attribute_values;
+            function_attribute_values.default_value =
+                Point< point_dimension >{};
+            function_attribute_values.no_value = Point< point_dimension >{};
             const auto attribute_id =
                 grid_.grid_vertex_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         Point< point_dimension > >( attribute_name,
-                        Point< point_dimension >(), { false, true } );
+                        function_attribute_values, attribute_properties );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,

@@ -51,9 +51,16 @@ std::unique_ptr< geode::EdgedCurve3D > create_edged_curve(
     builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
     builder->create_edge( 0, 1 );
     builder->create_edge( 0, 2 );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = 2;
+    attribute_values.no_value = 0;
     edged_curve->edge_attribute_manager()
         .create_attribute< geode::VariableAttribute, geode::index_t >(
-            "edge", attribute_id, 2, geode::AttributeProperties{} );
+            "edge", attribute_id, attribute_values, attribute_properties );
     auto attribute =
         edged_curve->edge_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::index_t >(
@@ -74,9 +81,16 @@ std::unique_ptr< geode::TriangulatedSurface2D > create_surface(
     builder->create_triangle( { 0, 1, 2 } );
     builder->create_triangle( { 0, 3, 1 } );
     builder->compute_polygon_adjacencies();
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = 2;
+    attribute_values.no_value = 0;
     surface->polygon_attribute_manager()
         .create_attribute< geode::VariableAttribute, geode::index_t >(
-            "surface", attribute_id, 2, geode::AttributeProperties{} );
+            "surface", attribute_id, attribute_values, attribute_properties );
     auto attribute =
         surface->polygon_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::index_t >(
@@ -98,9 +112,16 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid(
     builder->create_tetrahedron( { 0, 1, 2, 3 } );
     builder->create_tetrahedron( { 3, 2, 4, 1 } );
     builder->compute_polyhedron_adjacencies();
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = 2;
+    attribute_values.no_value = 0;
     solid->polyhedron_attribute_manager()
         .create_attribute< geode::VariableAttribute, geode::index_t >(
-            "solid", attribute_id, 2, geode::AttributeProperties{} );
+            "solid", attribute_id, attribute_values, attribute_properties );
     auto attribute =
         solid->polyhedron_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::index_t >(

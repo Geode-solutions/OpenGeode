@@ -48,11 +48,18 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< EdgesAroundVertex > edges_around_vertex_values;
+            edges_around_vertex_values.default_value = EdgesAroundVertex{};
+            edges_around_vertex_values.no_value = EdgesAroundVertex{};
             const auto attribute_id =
                 graph.vertex_attribute_manager()
                     .template create_attribute< VariableAttribute,
                         EdgesAroundVertex >( ATTRIBUTE_NAME,
-                        EdgesAroundVertex{}, { false, false, false } );
+                        edges_around_vertex_values, attribute_properties );
             edges_around_vertex_ =
                 graph.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute,

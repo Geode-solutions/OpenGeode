@@ -311,9 +311,17 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
 
 void test_clone( const geode::EdgedCurve3D& edged_curve )
 {
-    auto attribute_id = edged_curve.edge_attribute_manager()
-                            .create_attribute< geode::VariableAttribute, int >(
-                                "edge", 0, geode::AttributeProperties{} );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< int > attribute_values;
+    attribute_values.default_value = 0;
+    attribute_values.no_value = 0;
+    auto attribute_id =
+        edged_curve.edge_attribute_manager()
+            .create_attribute< geode::VariableAttribute, int >(
+                "edge", attribute_values, attribute_properties );
     auto attribute =
         edged_curve.edge_attribute_manager()
             .find_attribute< geode::VariableAttribute, int >( attribute_id );
