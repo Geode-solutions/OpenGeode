@@ -51,6 +51,12 @@ namespace geode
                 return polygons != other.polygons;
             }
 
+            [[nodiscard]] bool operator==(
+                const PolygonsAroundVertexImpl& other ) const
+            {
+                return !operator!=( other );
+            }
+
             friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& serializer )

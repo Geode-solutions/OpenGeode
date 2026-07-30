@@ -82,6 +82,15 @@ namespace geode
             return default_values_.default_value;
         }
 
+        [[nodiscard]] bool has_value( index_t element ) const override
+        {
+            if( value( element ) == default_values_.no_value )
+            {
+                return false;
+            }
+            return true;
+        }
+
         void set_value( index_t element, T value )
         {
             values_[element] = std::move( value );

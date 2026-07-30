@@ -71,6 +71,11 @@ namespace geode
             return value_;
         }
 
+        [[nodiscard]] bool has_value( index_t /*unused*/ ) const override
+        {
+            return true;
+        }
+
         [[nodiscard]] const T& value() const
         {
             return value_;

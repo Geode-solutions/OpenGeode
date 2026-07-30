@@ -84,6 +84,15 @@ namespace geode
             return value_;
         }
 
+        bool operator==( const CachedValue& other ) const
+        {
+            if( computed() && other.computed() )
+            {
+                return value() == other.value();
+            }
+            return false;
+        }
+
         bool operator!=( const CachedValue& other ) const
         {
             if( computed() && other.computed() )
