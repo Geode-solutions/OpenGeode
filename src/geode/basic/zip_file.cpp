@@ -143,17 +143,19 @@ namespace geode
         Impl( std::string_view file, std::string_view unarchive_temp_filename )
         {
             directory_ = create_directory( file, unarchive_temp_filename );
-            if( !load_zip_into_memory( file ) )
+            if( !load_zip_into_memory( file ) || !open_reader() )
             {
-                throw OpenGeodeBasicException( nullptr,
-                    OpenGeodeException::TYPE::internal,
-                    "[UnzipFile] Failed to read zip file into memory" );
-            }
-            if( !open_reader() )
-            {
-                throw OpenGeodeBasicException( nullptr,
-                    OpenGeodeException::TYPE::internal,
-                    "[UnzipFile] Error opening zip for reading" );
+                Logger::info( "[UnzipFile] Couldn't open zip in memory, trying "
+                              "to open on disk, this could take more time" );
+                reader_ = nullptr;
+                memory_stream_ = nullptr;
+                if( !create_reader_from_disk( file ) )
+                {
+                    std::filesystem::remove_all( directory_ );
+                    throw OpenGeodeBasicException( nullptr,
+                        OpenGeodeException::TYPE::internal,
+                        "[UnzipFile] Error opening zip for reading" );
+                }
             }
         }
 
@@ -190,8 +192,8 @@ namespace geode
                 }
                 auto out_path = directory_ / info->filename;
                 std::filesystem::create_directories( out_path.parent_path() );
-                FILE* f = fopen( out_path.string().c_str(), "wb" );
-                if( !f )
+                FILE* file = fopen( out_path.string().c_str(), "wb" );
+                if( !file )
                 {
                     status = mz_zip_reader_goto_next_entry( reader_ );
                     continue;
@@ -204,11 +206,11 @@ namespace geode
                                  reader_, buffer.data(), BUF_SIZE ) )
                            > 0 )
                     {
-                        fwrite( buffer.data(), 1, bytes_read, f );
+                        fwrite( buffer.data(), 1, bytes_read, file );
                     }
                     mz_zip_reader_entry_close( reader_ );
                 }
-                fclose( f );
+                fclose( file );
                 status = mz_zip_reader_goto_next_entry( reader_ );
             }
         }
@@ -242,6 +244,13 @@ namespace geode
                 static_cast< int32_t >( zip_data_.size() ) );
             reader_ = mz_zip_reader_create();
             return mz_zip_reader_open( reader_, memory_stream_ ) == MZ_OK;
+        }
+
+        bool create_reader_from_disk( std::string_view file )
+        {
+            reader_ = mz_zip_reader_create();
+            return mz_zip_reader_open_file( reader_, to_string( file ).c_str() )
+                   == MZ_OK;
         }
 
     private:
