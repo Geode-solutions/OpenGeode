@@ -94,6 +94,8 @@ namespace geode
 
         [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
+        [[nodiscard]] LightRegularGrid< dimension > clone() const;
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
