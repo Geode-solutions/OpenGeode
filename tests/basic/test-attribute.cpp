@@ -109,8 +109,15 @@ namespace geode
 void test_constant_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< bool > attribute_values;
+    attribute_values.default_value = true;
+    attribute_values.no_value = true;
     manager.create_attribute< geode::ConstantAttribute, bool >(
-        "bool", attribute_id, true, { true, true } );
+        "bool", attribute_id, attribute_values, attribute_properties );
     auto constant_attribute =
         manager.find_attribute< geode::ConstantAttribute, bool >(
             attribute_id );
@@ -134,8 +141,15 @@ void test_constant_attribute(
 void test_foo_constant_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = false;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< Foo > attribute_values;
+    attribute_values.default_value = Foo{};
+    attribute_values.no_value = Foo{};
     manager.create_attribute< geode::ConstantAttribute, Foo >(
-        "foo", attribute_id, Foo{}, geode::AttributeProperties{} );
+        "foo", attribute_id, attribute_values, attribute_properties );
     auto constant_attribute =
         manager.find_attribute< geode::ConstantAttribute, Foo >( attribute_id );
     constant_attribute->modify_value( []( Foo& foo ) {
@@ -149,8 +163,15 @@ void test_foo_constant_attribute(
 void test_foo_variable_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = false;
+    attribute_properties.transferable = false;
+    geode::AttributeValues< Foo > attribute_values;
+    attribute_values.default_value = Foo{};
+    attribute_values.no_value = Foo{};
     manager.create_attribute< geode::VariableAttribute, Foo >(
-        "foo2", attribute_id, Foo{}, { false, false, false } );
+        "foo2", attribute_id, attribute_values, attribute_properties );
     auto variable_attribute =
         manager.find_attribute< geode::VariableAttribute, Foo >( attribute_id );
     manager.set_attribute_properties( attribute_id, { true, false, true } );
@@ -180,12 +201,20 @@ void test_foo_variable_attribute(
 void test_int_variable_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< int > attribute_values;
+    attribute_values.default_value = 12;
+    attribute_values.no_value = geode::NO_ID;
     manager.create_attribute< geode::VariableAttribute, int >(
-        "int", attribute_id, 12, { true, true } );
+        "int", attribute_id, attribute_values, attribute_properties );
     auto variable_attribute =
         manager.find_attribute< geode::VariableAttribute, int >( attribute_id );
     geode::OpenGeodeBasicException::test(
-        variable_attribute->default_value() == 12, "Wrong default value" );
+        variable_attribute->default_values().default_value == 12,
+        "Wrong default value" );
     variable_attribute->set_value( 3, 3 );
 
     const auto attribute =
@@ -203,8 +232,15 @@ void test_int_variable_attribute(
 void test_foo_sparse_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = false;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< Foo > attribute_values;
+    attribute_values.default_value = Foo{};
+    attribute_values.no_value = Foo{};
     manager.create_attribute< geode::SparseAttribute, Foo >(
-        "foo", attribute_id, Foo{}, geode::AttributeProperties{} );
+        "foo", attribute_id, attribute_values, attribute_properties );
     auto sparse_attribute =
         manager.find_attribute< geode::SparseAttribute, Foo >( attribute_id );
     sparse_attribute->modify_value( 3, []( Foo& foo ) {
@@ -226,13 +262,21 @@ void test_foo_sparse_attribute(
 void test_double_sparse_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 12.;
+    attribute_values.no_value = geode::NO_ID;
     manager.create_attribute< geode::SparseAttribute, double >(
-        "double", attribute_id, 12., { true, true } );
+        "double", attribute_id, attribute_values, attribute_properties );
     auto sparse_attribute =
         manager.find_attribute< geode::SparseAttribute, double >(
             attribute_id );
     geode::OpenGeodeBasicException::test(
-        sparse_attribute->default_value() == 12, "Wrong default value" );
+        sparse_attribute->default_values().default_value == 12,
+        "Wrong default value" );
     sparse_attribute->set_value( 3, 3 );
     sparse_attribute->set_value( 7, 7 );
     manager.assign_attribute_value( 3, 2 );
@@ -257,18 +301,28 @@ void test_double_sparse_attribute(
 
 void test_double_array_attribute( geode::AttributeManager& manager )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< std::array< double, 3 > > attribute_values;
+    attribute_values.default_value = { { 10., 11., 12. } };
+    attribute_values.no_value = { { 0., 0., 0. } };
     const auto attribute_id =
         manager.create_attribute< geode::VariableAttribute,
             std::array< double, 3 > >(
-            "double_array", { { 10., 11., 12. } }, { true, true } );
+            "double_array", attribute_values, attribute_properties );
     auto array_attribute = manager.find_attribute< geode::VariableAttribute,
         std::array< double, 3 > >( attribute_id );
     geode::OpenGeodeBasicException::test(
-        array_attribute->default_value()[0] == 10., "Wrong default value" );
+        array_attribute->default_values().default_value[0] == 10.,
+        "Wrong default value" );
     geode::OpenGeodeBasicException::test(
-        array_attribute->default_value()[1] == 11., "Wrong default value" );
+        array_attribute->default_values().default_value[1] == 11.,
+        "Wrong default value" );
     geode::OpenGeodeBasicException::test(
-        array_attribute->default_value()[2] == 12., "Wrong default value" );
+        array_attribute->default_values().default_value[2] == 12.,
+        "Wrong default value" );
     array_attribute->set_value( 3, { { 1., 2., 3. } } );
     array_attribute->set_value( 7, { { 2., 5., 7. } } );
     manager.assign_attribute_value( 3, 2 );
@@ -320,14 +374,22 @@ void test_double_array_attribute( geode::AttributeManager& manager )
 void test_bool_variable_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< bool > attribute_values;
+    attribute_values.default_value = false;
+    attribute_values.no_value = false;
     manager.create_attribute< geode::VariableAttribute, bool >(
-        "bool", attribute_id, false, { true, true } );
+        "bool", attribute_id, attribute_values, attribute_properties );
 
     auto variable_attribute =
         manager.find_attribute< geode::VariableAttribute, bool >(
             attribute_id );
     geode::OpenGeodeBasicException::test(
-        variable_attribute->default_value() == false, "Wrong default value" );
+        variable_attribute->default_values().default_value == false,
+        "Wrong default value" );
     variable_attribute->set_value( 3, true );
 
     const auto attribute =
@@ -527,10 +589,16 @@ geode::uuid test_generic_value( geode::AttributeManager& manager,
         manager.find_read_only_attribute< double >( double_attribute_id );
     geode::OpenGeodeBasicException::test( double_attr->generic_value( 7 ) == 7,
         "Generic value for element 7 of double attribute should be 7" );
-
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< std::array< double, 2 > > attribute_values;
+    attribute_values.default_value = {};
+    attribute_values.no_value = {};
     auto array_attr_id = manager.create_attribute< geode::VariableAttribute,
-        std::array< double, 2 > >( "array_double_2", std::array< double, 2 >(),
-        geode::AttributeProperties{} );
+        std::array< double, 2 > >(
+        "array_double_2", attribute_values, attribute_properties );
     auto array_attr = manager.find_attribute< geode::VariableAttribute,
         std::array< double, 2 > >( array_attr_id );
     array_attr->set_value( 2, { 3.1, 1.3 } );
@@ -554,6 +622,7 @@ void test_copy_manager( geode::AttributeManager& manager,
     const geode::uuid& bool_variable_attribute_id )
 {
     geode::AttributeManager manager2;
+    test_number_of_attributes( manager, 8 );
     manager2.copy( manager );
     manager2.reserve( 15 );
     test_attribute_types( manager2, bool_variable_attribute_id );
@@ -610,9 +679,16 @@ void test_multi_import_manager()
 {
     geode::AttributeManager from1;
     from1.resize( 10 );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = true;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute1_values;
+    attribute1_values.default_value = 42.;
+    attribute1_values.no_value = geode::NO_ID;
     auto attr1_from1_id =
         from1.create_attribute< geode::VariableAttribute, geode::index_t >(
-            " variable", 42, geode::AttributeProperties{} );
+            " variable", attribute1_values, attribute_properties );
     auto attr1_from1 =
         from1.find_attribute< geode::VariableAttribute, geode::index_t >(
             attr1_from1_id );
@@ -620,14 +696,20 @@ void test_multi_import_manager()
     {
         attr1_from1->set_value( i, i );
     }
+    geode::AttributeValues< double > attribute2_values;
+    attribute2_values.default_value = 1.0;
+    attribute2_values.no_value = std::numeric_limits< double >::max();
     auto attr2_from1_id =
         from1.create_attribute< geode::ConstantAttribute, double >(
-            "constant", 1.0, geode::AttributeProperties{} );
+            "constant", attribute2_values, attribute_properties );
     auto attr2_from1 = from1.find_attribute< geode::ConstantAttribute, double >(
         attr2_from1_id );
+    geode::AttributeValues< std::string > attribute3_values;
+    attribute3_values.default_value = "default";
+    attribute3_values.no_value = "no_value";
     auto attr3_from1_id =
         from1.create_attribute< geode::SparseAttribute, std::string >(
-            "sparse", "default", geode::AttributeProperties{} );
+            "sparse", attribute3_values, attribute_properties );
     auto attr3_from1 =
         from1.find_attribute< geode::SparseAttribute, std::string >(
             attr3_from1_id );
@@ -635,8 +717,12 @@ void test_multi_import_manager()
 
     geode::AttributeManager from2;
     from2.resize( 10 );
+    geode::AttributeValues< geode::index_t > second_attribute1_values;
+    second_attribute1_values.default_value = 42.;
+    second_attribute1_values.no_value = geode::NO_ID;
     from2.create_attribute< geode::VariableAttribute, geode::index_t >(
-        " variable", attr1_from1_id, 42, geode::AttributeProperties{} );
+        " variable", attr1_from1_id, second_attribute1_values,
+        attribute_properties );
     auto attr1_from2 =
         from2.find_attribute< geode::VariableAttribute, geode::index_t >(
             attr1_from1_id );
@@ -644,12 +730,18 @@ void test_multi_import_manager()
     {
         attr1_from2->set_value( i, from2.nb_elements() - i );
     }
-    from2.create_attribute< geode::ConstantAttribute, double >(
-        "constant", attr2_from1_id, 2.0, geode::AttributeProperties{} );
+    geode::AttributeValues< double > second_attribute2_values;
+    second_attribute2_values.default_value = 2.0;
+    second_attribute2_values.no_value = std::numeric_limits< double >::max();
+    from2.create_attribute< geode::ConstantAttribute, double >( "constant",
+        attr2_from1_id, second_attribute2_values, attribute_properties );
     auto attr2_from2 = from2.find_attribute< geode::ConstantAttribute, double >(
         attr2_from1_id );
+    geode::AttributeValues< std::string > second_attribute3_values;
+    second_attribute3_values.default_value = "another_default";
+    second_attribute3_values.no_value = "another_no_value";
     from2.create_attribute< geode::SparseAttribute, std::string >( "sparse",
-        attr3_from1_id, "another_default", geode::AttributeProperties{} );
+        attr3_from1_id, second_attribute3_values, attribute_properties );
     auto attr3_from2 =
         from2.find_attribute< geode::SparseAttribute, std::string >(
             attr3_from1_id );

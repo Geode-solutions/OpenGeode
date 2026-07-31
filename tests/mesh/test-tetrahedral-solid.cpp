@@ -339,11 +339,18 @@ void test_backward_io( const std::string& filename )
 
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = 0;
+    attribute_values.no_value = geode::NO_ID;
     auto attr_from_id =
         solid.facets()
             .facet_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "facet_id", 0, geode::AttributeProperties{} );
+                "facet_id", attribute_values, attribute_properties );
     auto attr_from =
         solid.facets()
             .facet_attribute_manager()
@@ -357,7 +364,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         solid.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "edge_id", 0, geode::AttributeProperties{} );
+                "edge_id", attribute_values, attribute_properties );
     auto attr_edge_from =
         solid.edges()
             .edge_attribute_manager()

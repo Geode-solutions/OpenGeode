@@ -48,10 +48,17 @@ void test_gradient_grid2D()
     auto builder = geode::RegularGridBuilder< 2 >::create( *grid );
     builder->initialize_grid( geode::Point2D{ { 0, 0 } }, { 3, 3 },
         { geode::Vector2D{ { 1, 0 } }, geode::Vector2D{ { 0, 1 } } } );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 0;
+    attribute_values.no_value = 0;
     auto attribute_id =
         grid->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "scalar_function", 0, geode::AttributeProperties{} );
+                "scalar_function", attribute_values, attribute_properties );
     auto attribute =
         grid->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );
@@ -101,10 +108,17 @@ void test_gradient_triangulated_surface2D()
     builder->create_polygon( { 6, 9, 8 } );
     builder->create_polygon( { 5, 6, 8 } );
     builder->compute_polygon_adjacencies();
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 0;
+    attribute_values.no_value = 0;
     auto attribute_id =
         surface->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "scalar_function", 0, geode::AttributeProperties{} );
+                "scalar_function", attribute_values, attribute_properties );
     auto attribute =
         surface->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );
@@ -130,10 +144,17 @@ void test_gradient_grid3D()
     builder->initialize_grid( geode::Point3D{ { 0, 0, 0 } }, { 2, 2, 2 },
         { geode::Vector3D{ { 1, 0, 0 } }, geode::Vector3D{ { 0, 1, 0 } },
             geode::Vector3D{ { 0, 0, 1 } } } );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 0;
+    attribute_values.no_value = 0;
     auto attribute_id =
         grid->vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "scalar_function", 0, geode::AttributeProperties{} );
+                "scalar_function", attribute_values, attribute_properties );
     auto attribute =
         grid->vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, double >( attribute_id );

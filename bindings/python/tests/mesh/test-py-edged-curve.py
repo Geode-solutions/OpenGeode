@@ -123,8 +123,16 @@ def test_edge_requests(edged_curve, builder):
 
 
 def test_clone(edged_curve):
+
+    properties = opengeode_py_basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = opengeode_py_basic.AttributeValuesInt()
+    values.default_value = 0
+    values.no_value = 0
     attribute_id = edged_curve.edge_attribute_manager(
-    ).create_attribute_variable_int("test", 0,opengeode_py_basic.AttributeProperties())
+    ).create_attribute_variable_int("test", values,properties)
 
     attribute = edged_curve.edge_attribute_manager().find_attribute_variable_int(attribute_id)
     attribute.set_value(0, 42)

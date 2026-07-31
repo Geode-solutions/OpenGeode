@@ -63,12 +63,12 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        SparseAttribute( T default_value,
+        SparseAttribute( AttributeValues< T > default_values,
             std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
             : SparseAttribute(
-                  std::move( default_value ), name, std::move( properties ) )
+                  std::move( default_values ), name, std::move( properties ) )
         {
         }
 
@@ -79,7 +79,16 @@ namespace geode
             {
                 return value_it->second;
             }
-            return default_value_;
+            return default_values_.default_value;
+        }
+
+        [[nodiscard]] bool has_value( index_t element ) const override
+        {
+            if( value( element ) == default_values_.no_value )
+            {
+                return false;
+            }
+            return true;
         }
 
         void set_value( index_t element, T value )
@@ -87,15 +96,16 @@ namespace geode
             values_[element] = std::move( value );
         }
 
-        [[nodiscard]] const T& default_value() const
+        [[nodiscard]] const AttributeValues< T >& default_values() const
         {
-            return default_value_;
+            return default_values_;
         }
 
         template < typename Modifier >
         void modify_value( index_t element, Modifier modifier )
         {
-            auto [value_it, _] = values_.emplace( element, default_value_ );
+            auto [value_it, _] =
+                values_.emplace( element, default_values_.default_value );
             modifier( value_it->second );
         }
 
@@ -115,11 +125,11 @@ namespace geode
         }
 
     private:
-        SparseAttribute( T default_value,
+        SparseAttribute( AttributeValues< T > default_values,
             std::string_view name,
             AttributeProperties properties )
             : ReadOnlyAttribute< T >( name, std::move( properties ) ),
-              default_value_( std::move( default_value ) )
+              default_values_( std::move( default_values ) )
         {
             values_.reserve( 10 );
         }
@@ -140,18 +150,36 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, SparseAttribute< T > >{
                     { []( Archive& archive, SparseAttribute< T >& attribute ) {
-                        archive.ext(
-                            attribute, bitsery::ext::BaseClass<
-                                           ReadOnlyAttribute< T > >{} );
-                        archive( attribute.default_value_ );
-                        archive.ext( attribute.values_,
-                            bitsery::ext::StdMap{
-                                attribute.values_.max_size() },
-                            []( Archive& archive2, index_t& i, T& item ) {
-                                archive2.value4b( i );
-                                archive2( item );
-                            } );
-                    } } } );
+                         archive.ext(
+                             attribute, bitsery::ext::BaseClass<
+                                            ReadOnlyAttribute< T > >{} );
+                         T old_default_value;
+                         archive( old_default_value );
+                         attribute.default_values_.default_value =
+                             old_default_value;
+                         attribute.default_values_.no_value = old_default_value;
+                         archive.ext( attribute.values_,
+                             bitsery::ext::StdMap{
+                                 attribute.values_.max_size() },
+                             []( Archive& archive2, index_t& i, T& item ) {
+                                 archive2.value4b( i );
+                                 archive2( item );
+                             } );
+                     },
+                        []( Archive& archive,
+                            SparseAttribute< T >& attribute ) {
+                            archive.ext(
+                                attribute, bitsery::ext::BaseClass<
+                                               ReadOnlyAttribute< T > >{} );
+                            archive( attribute.default_values_ );
+                            archive.ext( attribute.values_,
+                                bitsery::ext::StdMap{
+                                    attribute.values_.max_size() },
+                                []( Archive& archive2, index_t& i, T& item ) {
+                                    archive2.value4b( i );
+                                    archive2( item );
+                                } );
+                        } } } );
             values_.reserve( 10 );
         }
 
@@ -175,7 +203,8 @@ namespace geode
             values_.reserve( old_values.size() );
             for( auto& [index, value] : old_values )
             {
-                if( !to_delete[index] && value != default_value_ )
+                if( !to_delete[index]
+                    && value != default_values_.default_value )
                 {
                     values_.emplace( old2new[index], std::move( value ) );
                 }
@@ -199,7 +228,7 @@ namespace geode
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
                 new SparseAttribute< T >{
-                    default_value_, this->name().value(), this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
             IdentifierBuilder builder{ *attribute };
             builder.set_id( this->id() );
@@ -213,12 +242,13 @@ namespace geode
         {
             const auto& typed_attribute =
                 dynamic_cast< const SparseAttribute< T >& >( attribute );
-            default_value_ = typed_attribute.default_value_;
+            default_values_ = typed_attribute.default_values_;
             if( nb_elements != 0 )
             {
                 for( const auto i : Range{ nb_elements } )
                 {
-                    if( typed_attribute.value( i ) != default_value_ )
+                    if( typed_attribute.value( i )
+                        != default_values_.default_value )
                     {
                         values_[i] = typed_attribute.value( i );
                     }
@@ -233,12 +263,13 @@ namespace geode
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
                 new SparseAttribute< T >{
-                    default_value_, this->name().value(), this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
-                if( value( i ) != default_value_ && new_index != NO_ID )
+                if( value( i ) != default_values_.default_value
+                    && new_index != NO_ID )
                 {
                     OpenGeodeBasicException::check_exception(
                         new_index < nb_elements, nullptr,
@@ -259,11 +290,11 @@ namespace geode
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
                 new SparseAttribute< T >{
-                    default_value_, this->name().value(), this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
             {
-                if( value( in ) != default_value_ )
+                if( value( in ) != default_values_.default_value )
                 {
                     for( const auto new_index : outs )
                     {
@@ -302,7 +333,8 @@ namespace geode
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
-                if( from.value( i ) != default_value_ && new_index != NO_ID )
+                if( from.value( i ) != default_values_.default_value
+                    && new_index != NO_ID )
                 {
                     this->set_value( new_index, from.value( i ) );
                 }
@@ -314,7 +346,7 @@ namespace geode
         {
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
             {
-                if( from.value( in ) != default_value_ )
+                if( from.value( in ) != default_values_.default_value )
                 {
                     for( const auto new_index : outs )
                     {
@@ -325,7 +357,7 @@ namespace geode
         }
 
     private:
-        T default_value_;
+        AttributeValues< T > default_values_;
         absl::flat_hash_map< index_t, T > values_{};
     };
 } // namespace geode

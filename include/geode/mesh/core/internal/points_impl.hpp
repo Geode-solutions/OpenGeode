@@ -57,10 +57,17 @@ namespace geode
             PointsImpl(
                 AttributeManager& manager, std::string_view attribute_name )
             {
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< Point< dimension > > points_values;
+                points_values.default_value = Point< dimension >{};
+                points_values.no_value = Point< dimension >{};
                 const auto attribute_id =
                     manager.template create_attribute< VariableAttribute,
-                        Point< dimension > >( attribute_name,
-                        Point< dimension >{}, { false, false, false } );
+                        Point< dimension > >(
+                        attribute_name, points_values, attribute_properties );
                 points_ = manager.template find_attribute< VariableAttribute,
                     Point< dimension > >( attribute_id );
             }

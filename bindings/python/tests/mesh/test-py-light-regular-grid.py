@@ -287,8 +287,15 @@ def test_closest_vertex(grid):
 
 
 def test_attribute_3d(grid):
+    properties = geode.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    first_values = geode.AttributeValuesDouble()
+    first_values.default_value = -1
+    first_values.no_value = -1
     attribute_id = grid.cell_attribute_manager().create_attribute_variable_double(
-        "toto", -1,geode.AttributeProperties()
+        "toto", first_values,properties
     )
     attribute = grid.cell_attribute_manager().find_attribute_variable_double(attribute_id)
     attribute.set_value(10, 10)
@@ -299,9 +306,12 @@ def test_attribute_3d(grid):
         raise ValueError("[Test] Wrong attribute value")
     if attribute.value(grid.nb_cells() - 1) != -1:
         raise ValueError("[Test] Wrong attribute value")
+    second_values = geode.AttributeValuesDouble()
+    second_values.default_value = 1
+    second_values.no_value = 1
     attribute_id = (
         grid.grid_vertex_attribute_manager().create_attribute_variable_double(
-            "toto_vertex", 1,geode.AttributeProperties()
+            "toto_vertex", second_values,properties
         )
     )
     attribute = grid.grid_vertex_attribute_manager().find_attribute_variable_double(
@@ -318,8 +328,15 @@ def test_attribute_3d(grid):
 
 def test_attribute_2d():
     grid = mesh.LightRegularGrid2D(geom.Point2D([1.5, 0]), [5, 10], [1.0, 2.0])
+    properties = geode.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    first_values = geode.AttributeValuesDouble()
+    first_values.default_value = -1
+    first_values.no_value = -1
     attribute_id = grid.cell_attribute_manager().create_attribute_variable_double(
-        "toto", -1,geode.AttributeProperties()
+        "toto", first_values,properties
     )
     attribute = grid.cell_attribute_manager().find_attribute_variable_double(attribute_id)
     attribute.set_value(10, 10)
@@ -330,9 +347,12 @@ def test_attribute_2d():
         raise ValueError("[Test] Wrong attribute value")
     if attribute.value(grid.nb_cells() - 1) != -1:
         raise ValueError("[Test] Wrong attribute value")
+    second_values = geode.AttributeValuesDouble()
+    second_values.default_value = 1
+    second_values.no_value = 1
     attribute_id = (
         grid.grid_vertex_attribute_manager().create_attribute_variable_double(
-            "toto_vertex", 1,geode.AttributeProperties()
+            "toto_vertex",second_values,properties
         )
     )
     attribute = grid.grid_vertex_attribute_manager().find_attribute_variable_double(

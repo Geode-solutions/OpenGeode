@@ -61,18 +61,28 @@ namespace geode
 
             FacetStorage()
             {
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< index_t > counter_values;
+                counter_values.default_value = 1u;
+                counter_values.no_value = NO_ID;
                 const auto counter_attribute_id =
                     facet_attribute_manager_
                         .create_attribute< VariableAttribute, index_t >(
-                            "counter", 1u, { false, false, false } );
+                            "counter", counter_values, attribute_properties );
                 counter_ = facet_attribute_manager_
                                .find_attribute< VariableAttribute, index_t >(
                                    counter_attribute_id );
+                AttributeValues< VertexContainer > vertices_values;
+                vertices_values.default_value = VertexContainer{};
+                vertices_values.no_value = VertexContainer{};
                 const auto vertices_attribute_id =
                     facet_attribute_manager_
                         .create_attribute< VariableAttribute, VertexContainer >(
-                            "facet_vertices", VertexContainer{},
-                            { false, false, false } );
+                            "facet_vertices", vertices_values,
+                            attribute_properties );
                 vertices_ =
                     facet_attribute_manager_
                         .find_attribute< VariableAttribute, VertexContainer >(
@@ -244,10 +254,17 @@ namespace geode
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
                 facet_indices_ = from.facet_indices_;
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< index_t > counter_values;
+                counter_values.default_value = 1u;
+                counter_values.no_value = NO_ID;
                 const auto counter_id =
                     facet_attribute_manager_
                         .create_attribute< VariableAttribute, index_t >(
-                            "counter", 1u, { false, false, false } );
+                            "counter", counter_values, attribute_properties );
                 counter_ = facet_attribute_manager_
                                .find_attribute< VariableAttribute, index_t >(
                                    counter_id );
@@ -255,11 +272,14 @@ namespace geode
                     from.facet_attribute_manager()
                         .template find_read_only_attribute< index_t >(
                             from.counter_->id() );
+                AttributeValues< VertexContainer > vertices_values;
+                vertices_values.default_value = VertexContainer{};
+                vertices_values.no_value = VertexContainer{};
                 const auto vertices_id =
                     facet_attribute_manager_
                         .create_attribute< VariableAttribute, VertexContainer >(
-                            "facet_vertices", VertexContainer{},
-                            { false, false, false } );
+                            "facet_vertices", vertices_values,
+                            attribute_properties );
                 vertices_ =
                     facet_attribute_manager_
                         .find_attribute< VariableAttribute, VertexContainer >(

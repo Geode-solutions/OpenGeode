@@ -66,8 +66,15 @@ def test_create_polygons(polygonal_surface, builder):
 
 
 def test_create_edge_attribute(polygonal_surface):
+    properties = basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = basic.AttributeValuesUInt()
+    values.default_value = basic.NO_ID
+    values.no_value = basic.NO_ID
     attribute_id = polygonal_surface.edges().edge_attribute_manager(
-    ).create_attribute_variable_uint("test", basic.NO_ID,basic.AttributeProperties())
+    ).create_attribute_variable_uint("test", values,properties)
     attribute = polygonal_surface.edges().edge_attribute_manager(
     ).find_attribute_variable_uint(attribute_id)
     for e in range(polygonal_surface.edges().nb_edges()):

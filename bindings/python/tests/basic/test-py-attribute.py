@@ -31,8 +31,15 @@ import opengeode_py_basic as basic
 
 def test_constant_attribute(manager):
     
+    properties = basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = basic.AttributeValuesBool()
+    values.default_value = True
+    values.no_value = False
     constant_attribute_id = manager.create_attribute_constant_bool(
-        "bool", True, basic.AttributeProperties())
+        "bool", values, properties)
     constant_attribute = manager.find_attribute_constant_bool(constant_attribute_id)
     attribute = manager.find_read_only_attribute_bool(constant_attribute_id)
     if not attribute.value(0):
@@ -45,14 +52,27 @@ def test_constant_attribute(manager):
 
 
 def test_int_variable_attribute(manager):
+
+    properties = basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = basic.AttributeValuesInt()
+    values.default_value = 12
+    values.no_value = 12
     variable_attribute_id = manager.create_attribute_variable_int(
-        "int", 12,basic.AttributeProperties())
+        "int", values, properties)
     variable_attribute = manager.find_attribute_variable_int(variable_attribute_id)
     variable_attribute.set_value(3, 3)
     if not variable_attribute.is_genericable():
         raise ValueError("[Test] Should be genericable")
+
+    new_properties = basic.AttributeProperties()
+    new_properties.assignable = True
+    new_properties.interpolable = True
+    properties.transferable = True
+    manager.set_attribute_properties(variable_attribute_id,new_properties)
     
-    manager.set_attribute_properties(variable_attribute_id,basic.AttributeProperties(True,True))
     if not variable_attribute.properties().assignable or not variable_attribute.properties().interpolable :
         raise ValueError("[Test] Should be assignable and interpolable")
 
@@ -74,8 +94,16 @@ def test_int_variable_attribute(manager):
 
 
 def test_double_sparse_attribute(manager):
+
+    properties = basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = basic.AttributeValuesDouble()
+    values.default_value = 12
+    values.no_value = 12
     sparse_attribute_id = manager.create_attribute_sparse_double(
-        "double", 12,basic.AttributeProperties())
+        "double", values,properties)
     attribute = manager.find_attribute_sparse_double(sparse_attribute_id)
     attribute.set_value(3, 3)
     attribute.set_value(7, 7)

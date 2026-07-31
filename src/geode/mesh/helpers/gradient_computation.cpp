@@ -69,14 +69,21 @@ namespace
         std::tuple< geode::uuid, std::vector< geode::index_t > >
             compute_scalar_function_gradient() const
         {
+            geode::AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = true;
+            geode::AttributeValues< geode::Vector< Mesh::dim > >
+                distance_map_values;
+            distance_map_values.default_value = geode::Vector< Mesh::dim >{};
+            distance_map_values.no_value = geode::Vector< Mesh::dim >{};
             const auto gradient_function_name =
                 absl::StrCat( scalar_function_->name().value(), "_gradient" );
             auto gradient_function_id =
                 mesh_.vertex_attribute_manager()
                     .template create_attribute< geode::VariableAttribute,
                         geode::Vector< Mesh::dim > >( gradient_function_name,
-                        geode::Vector< Mesh::dim >{},
-                        geode::AttributeProperties{} );
+                        distance_map_values, attribute_properties );
             auto gradient_function =
                 mesh_.vertex_attribute_manager()
                     .template find_attribute< geode::VariableAttribute,

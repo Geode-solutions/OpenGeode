@@ -70,6 +70,8 @@ namespace geode
 
         [[nodiscard]] virtual std::string_view type() = 0;
 
+        [[nodiscard]] virtual bool has_value( index_t element ) const = 0;
+
         [[nodiscard]] const AttributeProperties& properties() const
         {
             return properties_;
@@ -171,6 +173,8 @@ namespace geode
 
     public:
         [[nodiscard]] virtual const T& value( index_t element ) const = 0;
+
+        [[nodiscard]] bool has_value( index_t element ) const override = 0;
 
         [[nodiscard]] std::string_view type() final
         {

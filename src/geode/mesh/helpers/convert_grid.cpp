@@ -51,10 +51,17 @@ namespace geode
             cells_number, cells_directions };
         IdentifierBuilder builder{ grid };
         internal::copy_meta_info( raster, builder );
+        AttributeProperties attribute_properties;
+        attribute_properties.assignable = false;
+        attribute_properties.interpolable = false;
+        attribute_properties.transferable = true;
+        AttributeValues< RGBColor > color_values;
+        color_values.default_value = RGBColor{};
+        color_values.no_value = RGBColor{};
         auto color_attribute_id =
             grid.cell_attribute_manager()
                 .template create_attribute< VariableAttribute, RGBColor >(
-                    "RGB_data", {}, geode::AttributeProperties{} );
+                    "RGB_data", color_values, attribute_properties );
         auto color =
             grid.cell_attribute_manager()
                 .template find_attribute< VariableAttribute, RGBColor >(

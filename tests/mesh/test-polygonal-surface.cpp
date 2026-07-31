@@ -71,10 +71,17 @@ void test_bounding_box( const geode::PolygonalSurface3D& polygonal_surface )
 geode::uuid test_create_vertex_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::PolygonEdge > attribute_values;
+    attribute_values.default_value = geode::PolygonEdge{};
+    attribute_values.no_value = geode::PolygonEdge{};
     auto attribute_id =
         polygonal_surface.vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::PolygonEdge >(
-                "test", geode::PolygonEdge{}, geode::AttributeProperties{} );
+                "test", attribute_values, attribute_properties );
     auto attribute =
         polygonal_surface.vertex_attribute_manager()
             .find_attribute< geode::VariableAttribute, geode::PolygonEdge >(
@@ -228,11 +235,18 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
 geode::uuid test_create_edge_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::index_t > attribute_values;
+    attribute_values.default_value = geode::NO_ID;
+    attribute_values.no_value = geode::NO_ID;
     auto attribute_id =
         polygonal_surface.edges()
             .edge_attribute_manager()
             .create_attribute< geode::VariableAttribute, geode::index_t >(
-                "edges", geode::NO_ID, geode::AttributeProperties{} );
+                "edges", attribute_values, attribute_properties );
     auto attribute =
         polygonal_surface.edges()
             .edge_attribute_manager()

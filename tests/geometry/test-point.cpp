@@ -65,18 +65,28 @@ void test_interpolation()
 {
     geode::AttributeManager manager;
     manager.resize( 10 );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::Point< 3 > > attribute_values;
+    attribute_values.default_value = geode::Point3D{ { 10., 11., 12. } };
+    attribute_values.no_value = geode::Point3D{};
     auto attribute_id =
         manager.create_attribute< geode::VariableAttribute, geode::Point< 3 > >(
-            "points", geode::Point3D{ { 10., 11., 12. } }, { false, true } );
+            "points", attribute_values, attribute_properties );
     auto attribute =
         manager.find_attribute< geode::VariableAttribute, geode::Point< 3 > >(
             attribute_id );
     geode::OpenGeodeGeometryException::test(
-        attribute->default_value().value( 0 ) == 10., "Wrong default value" );
+        attribute->default_values().default_value.value( 0 ) == 10.,
+        "Wrong default value" );
     geode::OpenGeodeGeometryException::test(
-        attribute->default_value().value( 1 ) == 11., "Wrong default value" );
+        attribute->default_values().default_value.value( 1 ) == 11.,
+        "Wrong default value" );
     geode::OpenGeodeGeometryException::test(
-        attribute->default_value().value( 2 ) == 12., "Wrong default value" );
+        attribute->default_values().default_value.value( 2 ) == 12.,
+        "Wrong default value" );
     attribute->set_value( 3, geode::Point3D{ { 1., 2., 3. } } );
     attribute->set_value( 7, geode::Point3D{ { 2., 5., 7. } } );
     manager.interpolate_attribute_value( { { 1, 7 }, { 0.5, 0.3 } }, 4 );

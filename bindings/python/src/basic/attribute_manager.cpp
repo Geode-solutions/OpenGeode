@@ -43,13 +43,13 @@ namespace geode
         const auto create_constant_suffix =
             absl::StrCat( "create_attribute_constant_", suffix );
         manager.def( create_constant_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )(
-                std::string_view, type, AttributeProperties ) >(
+            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
+                AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< ConstantAttribute,
                     type > ) );
         manager.def( create_constant_suffix.c_str(),
-            static_cast< void ( AttributeManager::* )(
-                std::string_view, const uuid&, type, AttributeProperties ) >(
+            static_cast< void ( AttributeManager::* )( std::string_view,
+                const uuid&, AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< ConstantAttribute,
                     type > ) );
         const auto find_constant_suffix =
@@ -62,13 +62,13 @@ namespace geode
         const auto create_variable_suffix =
             absl::StrCat( "create_attribute_variable_", suffix );
         manager.def( create_variable_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )(
-                std::string_view, type, AttributeProperties ) >(
+            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
+                AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< VariableAttribute,
                     type > ) );
         manager.def( create_variable_suffix.c_str(),
-            static_cast< void ( AttributeManager::* )(
-                std::string_view, const uuid&, type, AttributeProperties ) >(
+            static_cast< void ( AttributeManager::* )( std::string_view,
+                const uuid&, AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< VariableAttribute,
                     type > ) );
         const auto find_variable_suffix =
@@ -81,13 +81,13 @@ namespace geode
         const auto create_sparse_suffix =
             absl::StrCat( "create_attribute_sparse_", suffix );
         manager.def( create_sparse_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )(
-                std::string_view, type, AttributeProperties ) >(
+            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
+                AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< SparseAttribute,
                     type > ) );
         manager.def( create_sparse_suffix.c_str(),
-            static_cast< void ( AttributeManager::* )(
-                std::string_view, const uuid&, type, AttributeProperties ) >(
+            static_cast< void ( AttributeManager::* )( std::string_view,
+                const uuid&, AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< SparseAttribute,
                     type > ) );
         const auto find_sparse_suffix =

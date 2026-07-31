@@ -353,17 +353,28 @@ void test_closest_vertex( const geode::RegularGrid3D& grid )
 
 void test_clone( const geode::RegularGrid3D& grid )
 {
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< int > attribute_values_int;
+    attribute_values_int.default_value = 0;
+    attribute_values_int.no_value = 0;
     auto attribute_id =
         grid.polyhedron_attribute_manager()
             .create_attribute< geode::VariableAttribute, int >(
-                "int_attribute", 0, geode::AttributeProperties{} );
+                "int_attribute", attribute_values_int, attribute_properties );
     auto attribute =
         grid.polyhedron_attribute_manager()
             .find_attribute< geode::VariableAttribute, int >( attribute_id );
+    geode::AttributeValues< double > attribute_values_double;
+    attribute_values_double.default_value = 0;
+    attribute_values_double.no_value = 0;
     auto attribute_d_id =
         grid.vertex_attribute_manager()
             .create_attribute< geode::VariableAttribute, double >(
-                "double_attribute", 0, geode::AttributeProperties{} );
+                "double_attribute", attribute_values_double,
+                attribute_properties );
     auto attribute_d = grid.vertex_attribute_manager()
                            .find_attribute< geode::VariableAttribute, double >(
                                attribute_d_id );

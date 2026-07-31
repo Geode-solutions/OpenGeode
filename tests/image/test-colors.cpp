@@ -46,17 +46,27 @@ void test_color_attribute()
 {
     geode::AttributeManager manager;
     manager.resize( 1 );
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< geode::RGBColor > attribute_values;
+    attribute_values.default_value = geode::RGBColor{};
+    attribute_values.no_value = geode::RGBColor{};
     const auto rgb_attribute_id =
         manager.create_attribute< geode::VariableAttribute, geode::RGBColor >(
-            "rgb_color", geode::RGBColor{}, geode::AttributeProperties{} );
+            "rgb_color", attribute_values, attribute_properties );
     auto rgb_attribute =
         manager.find_attribute< geode::VariableAttribute, geode::RGBColor >(
             rgb_attribute_id );
     rgb_attribute->set_value( 0, { 3, 254, 68 } );
+    geode::AttributeValues< geode::GreyscaleColor > grey_attribute_values;
+    grey_attribute_values.default_value = geode::GreyscaleColor{};
+    grey_attribute_values.no_value = geode::GreyscaleColor{};
     const auto greyscale_attribute_id =
         manager.create_attribute< geode::VariableAttribute,
-            geode::GreyscaleColor >( "greyscale_color", geode::GreyscaleColor{},
-            geode::AttributeProperties{} );
+            geode::GreyscaleColor >(
+            "greyscale_color", grey_attribute_values, attribute_properties );
     auto greyscale_attribute = manager.find_attribute< geode::VariableAttribute,
         geode::GreyscaleColor >( greyscale_attribute_id );
     greyscale_attribute->set_value( 0, geode::GreyscaleColor{ 67 } );

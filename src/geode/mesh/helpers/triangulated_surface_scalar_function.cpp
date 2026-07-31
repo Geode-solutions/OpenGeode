@@ -45,9 +45,18 @@ namespace geode
             double value )
             : surface_( surface )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = true;
+            attribute_properties.transferable = true;
+            AttributeValues< double > function_attribute_values;
+            function_attribute_values.default_value = value;
+            function_attribute_values.no_value =
+                std::numeric_limits< double >::max();
             surface_.vertex_attribute_manager()
                 .template create_attribute< VariableAttribute, double >(
-                    function_name, function_id, value, { false, true } );
+                    function_name, function_id, function_attribute_values,
+                    attribute_properties );
             function_attribute_ =
                 surface_.vertex_attribute_manager()
                     .template find_attribute< VariableAttribute, double >(

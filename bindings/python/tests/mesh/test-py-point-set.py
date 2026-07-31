@@ -58,8 +58,15 @@ def test_bounding_box(point_set):
 
 def test_create_vertex_attribute(point_set):
     manager = point_set.vertex_attribute_manager()
+    properties = opengeode_py_basic.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    values = opengeode_py_basic.AttributeValuesBool()
+    values.default_value = True
+    values.no_value = True
     attribute_id = point_set.vertex_attribute_manager(
-    ).create_attribute_constant_bool("test", True,opengeode_py_basic.AttributeProperties())
+    ).create_attribute_constant_bool("test", values,properties)
     attribute = manager.find_attribute_constant_bool(attribute_id)
     if attribute.constant_value() != True:
         raise ValueError("[Test] PointSet attribute value should be true")

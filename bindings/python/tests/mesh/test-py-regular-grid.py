@@ -246,17 +246,27 @@ def test_closest_vertex(grid):
 def test_clone(grid):
     attribute_name = "int_attribute"
     attribute_name_d = "double_attribute"
+    properties = geode.AttributeProperties()
+    properties.assignable = False
+    properties.interpolable = False
+    properties.transferable = True
+    int_values = geode.AttributeValuesInt()
+    int_values.default_value = 0
+    int_values.no_value = 0
     attribute_id = (
         grid.polyhedron_attribute_manager().create_attribute_variable_int(
-            attribute_name, 0,geode.AttributeProperties()
+            attribute_name, int_values, properties
         )
     )
     attribute = grid.polyhedron_attribute_manager().find_attribute_variable_int(
         attribute_id
     )
+    double_values = geode.AttributeValuesDouble()
+    double_values.default_value = 0
+    double_values.no_value = 0
     attribute_d_id = (
         grid.vertex_attribute_manager().create_attribute_variable_double(
-            attribute_name_d, 0,geode.AttributeProperties()
+            attribute_name_d, double_values,properties
         )
     )
     attribute_d = grid.vertex_attribute_manager().find_attribute_variable_double(

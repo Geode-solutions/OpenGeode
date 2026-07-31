@@ -57,12 +57,12 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        VariableAttribute( T default_value,
+        VariableAttribute( AttributeValues< T > default_values,
             std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
             : VariableAttribute(
-                  std::move( default_value ), name, std::move( properties ) )
+                  std::move( default_values ), name, std::move( properties ) )
         {
         }
 
@@ -71,14 +71,23 @@ namespace geode
             return values_[element];
         }
 
+        [[nodiscard]] bool has_value( index_t element ) const override
+        {
+            if( values_[element] == default_values_.no_value )
+            {
+                return false;
+            }
+            return true;
+        }
+
         void set_value( index_t element, T value )
         {
             values_[element] = std::move( value );
         }
 
-        [[nodiscard]] const T& default_value() const
+        [[nodiscard]] const AttributeValues< T >& default_values() const
         {
-            return default_value_;
+            return default_values_;
         }
 
         template < typename Modifier >
@@ -108,11 +117,11 @@ namespace geode
         }
 
     protected:
-        VariableAttribute( T default_value,
+        VariableAttribute( AttributeValues< T > default_values,
             std::string_view name,
             AttributeProperties properties )
             : ReadOnlyAttribute< T >( name, std::move( properties ) ),
-              default_value_( std::move( default_value ) )
+              default_values_( std::move( default_values ) )
         {
             values_.reserve( 10 );
         }
@@ -126,20 +135,35 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, VariableAttribute< T > >{
-                           { []( Archive& archive,
-                                 VariableAttribute< T >& attribute ) {
-                               archive.ext(
-                                   attribute, bitsery::ext::BaseClass<
-                                                  ReadOnlyAttribute< T > >{} );
-                               archive( attribute.default_value_ );
-                               archive.container( attribute.values_,
-                                   attribute.values_.max_size(),
-                                   []( Archive& archive2, T& item ) {
-                                       archive2( item );
-                                   } );
-                           } } } );
+            serializer.ext( *this,
+                Growable< Archive, VariableAttribute< T > >{
+                    { []( Archive& archive,
+                          VariableAttribute< T >& attribute ) {
+                         T old_value;
+                         archive.ext(
+                             attribute, bitsery::ext::BaseClass<
+                                            ReadOnlyAttribute< T > >{} );
+                         archive( old_value );
+                         attribute.default_values_.default_value = old_value;
+                         attribute.default_values_.no_value = old_value;
+                         archive.container( attribute.values_,
+                             attribute.values_.max_size(),
+                             []( Archive& archive2, T& item ) {
+                                 archive2( item );
+                             } );
+                     },
+                        []( Archive& archive,
+                            VariableAttribute< T >& attribute ) {
+                            archive.ext(
+                                attribute, bitsery::ext::BaseClass<
+                                               ReadOnlyAttribute< T > >{} );
+                            archive( attribute.default_values_ );
+                            archive.container( attribute.values_,
+                                attribute.values_.max_size(),
+                                []( Archive& archive2, T& item ) {
+                                    archive2( item );
+                                } );
+                        } } } );
             values_.reserve( 10 );
         }
 
@@ -152,7 +176,7 @@ namespace geode
                 const auto next_capacity = capacity * 2;
                 values_.reserve( std::max( size, next_capacity ) );
             }
-            values_.resize( size, default_value_ );
+            values_.resize( size, default_values_.default_value );
         }
 
         void reserve(
@@ -178,7 +202,7 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{
-                    default_value_, this->name().value(), this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
             IdentifierBuilder builder{ *attribute };
             builder.set_id( this->id() );
@@ -192,10 +216,10 @@ namespace geode
         {
             const auto& typed_attribute =
                 dynamic_cast< const VariableAttribute< T >& >( attribute );
-            default_value_ = typed_attribute.default_value_;
+            default_values_ = typed_attribute.default_values_;
             if( nb_elements != 0 )
             {
-                values_.resize( nb_elements, default_value_ );
+                values_.resize( nb_elements, default_values_.default_value );
                 for( const auto i : Range{ nb_elements } )
                 {
                     values_[i] = typed_attribute.value( i );
@@ -210,9 +234,10 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{
-                    default_value_, this->name().value(), this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
-            attribute->values_.resize( nb_elements, default_value_ );
+            attribute->values_.resize(
+                nb_elements, default_values_.default_value );
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
@@ -240,9 +265,10 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{
-                    default_value_, this->name().value(), this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
-            attribute->values_.resize( nb_elements, default_value_ );
+            attribute->values_.resize(
+                nb_elements, default_values_.default_value );
             for( const auto& [input, outputs] : old2new_mapping.in2out_map() )
             {
                 for( const auto new_index : outputs )
@@ -303,7 +329,7 @@ namespace geode
         }
 
     private:
-        T default_value_;
+        AttributeValues< T > default_values_;
         std::vector< T > values_{};
     };
 
@@ -318,7 +344,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        VariableAttribute( bool default_value,
+        VariableAttribute( AttributeValues< bool > default_value,
             std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
@@ -331,14 +357,23 @@ namespace geode
             return reinterpret_cast< const bool& >( values_[element] );
         }
 
+        [[nodiscard]] bool has_value( index_t element ) const override
+        {
+            if( value( element ) == default_values_.no_value )
+            {
+                return false;
+            }
+            return true;
+        }
+
         void set_value( index_t element, bool value )
         {
             values_[element] = std::move( value );
         }
 
-        [[nodiscard]] bool default_value() const
+        [[nodiscard]] AttributeValues< bool > default_values() const
         {
-            return default_value_;
+            return default_values_;
         }
 
         template < typename Modifier >
@@ -368,11 +403,11 @@ namespace geode
         }
 
     protected:
-        VariableAttribute( bool default_value,
+        VariableAttribute( AttributeValues< bool > default_values,
             std::string_view name,
             AttributeProperties properties )
             : ReadOnlyAttribute< bool >( name, std::move( properties ) ),
-              default_value_( default_value )
+              default_values_( default_values )
         {
             values_.reserve( 10 );
         }
@@ -392,13 +427,25 @@ namespace geode
                 Growable< Archive, VariableAttribute< bool > >{
                     { []( Archive& archive,
                           VariableAttribute< bool >& attribute ) {
-                        archive.ext(
-                            attribute, bitsery::ext::BaseClass<
-                                           ReadOnlyAttribute< bool > >{} );
-                        archive.value1b( attribute.default_value_ );
-                        archive.container1b(
-                            attribute.values_, attribute.values_.max_size() );
-                    } } } );
+                         bool old_value;
+                         archive.ext(
+                             attribute, bitsery::ext::BaseClass<
+                                            ReadOnlyAttribute< bool > >{} );
+                         archive.value1b( old_value );
+                         attribute.default_values_.default_value = old_value;
+                         attribute.default_values_.no_value = old_value;
+                         archive.container1b(
+                             attribute.values_, attribute.values_.max_size() );
+                     },
+                        []( Archive& archive,
+                            VariableAttribute< bool >& attribute ) {
+                            archive.ext(
+                                attribute, bitsery::ext::BaseClass<
+                                               ReadOnlyAttribute< bool > >{} );
+                            archive( attribute.default_values_ );
+                            archive.container1b( attribute.values_,
+                                attribute.values_.max_size() );
+                        } } } );
             values_.reserve( 10 );
         }
 
@@ -411,7 +458,8 @@ namespace geode
                 const auto next_capacity = capacity * 2;
                 values_.reserve( std::max( size, next_capacity ) );
             }
-            values_.resize( size, default_value_ );
+            values_.resize( size,
+                static_cast< unsigned char >( default_values_.default_value ) );
         }
 
         void reserve(
@@ -437,8 +485,7 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->name().value(),
-                    this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
             attribute->values_ = values_;
             return attribute;
@@ -450,7 +497,7 @@ namespace geode
         {
             const auto& typed_attribute =
                 dynamic_cast< const VariableAttribute< bool >& >( attribute );
-            default_value_ = typed_attribute.default_value_;
+            default_values_ = typed_attribute.default_values_;
             if( nb_elements != 0 )
             {
                 values_.resize( nb_elements );
@@ -468,10 +515,10 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->name().value(),
-                    this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
-            attribute->values_.resize( nb_elements, default_value_ );
+            attribute->values_.resize( nb_elements,
+                static_cast< unsigned char >( default_values_.default_value ) );
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
@@ -499,10 +546,10 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->name().value(),
-                    this->properties() }
+                    default_values_, this->name().value(), this->properties() }
             };
-            attribute->values_.resize( nb_elements, default_value_ );
+            attribute->values_.resize( nb_elements,
+                static_cast< unsigned char >( default_values_.default_value ) );
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
             {
                 for( const auto new_index : outs )
@@ -564,7 +611,7 @@ namespace geode
         }
 
     private:
-        unsigned char default_value_;
+        AttributeValues< bool > default_values_;
         std::vector< unsigned char > values_{};
     };
 } // namespace geode
