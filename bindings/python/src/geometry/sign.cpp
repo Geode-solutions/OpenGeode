@@ -34,10 +34,10 @@ namespace geode
     {
         module.def( "tetrahedron_volume_sign", &tetrahedron_volume_sign );
         module.def( "triangle_area_sign2D",
-            static_cast< Sign ( * )( const Triangle2D& ) >(
+            static_cast< SIGN ( * )( const Triangle2D& ) >(
                 &triangle_area_sign ) );
         module.def( "triangle_area_sign3D",
-            static_cast< Sign ( * )( const Triangle3D&, local_index_t ) >(
+            static_cast< SIGN ( * )( const Triangle3D&, local_index_t ) >(
                 &triangle_area_sign ) );
     }
 } // namespace geode
