@@ -78,7 +78,7 @@ namespace geode
         {
             if( inspect_required_ )
             {
-                geode::Logger::warn(
+                geode::Logger::warning(
                     "[Input] The file loader notified INCONSISTENCIES in the "
                     "given data file. In consequence, the loaded structure is "
                     "likely BROKEN, and there is NO GUARANTEE that any further "

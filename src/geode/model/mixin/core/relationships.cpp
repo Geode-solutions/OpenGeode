@@ -148,7 +148,7 @@ namespace geode
             {
                 const auto relation_type =
                     relation_type_->value( component_id.value() );
-                Logger::warn( "There is already a ",
+                Logger::warning( "There is already a ",
                     relation_to_string( relation_type ), " between (",
                     from.string(), " and ", to.string(), ")" );
                 return component_id.value();

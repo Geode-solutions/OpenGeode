@@ -40,7 +40,7 @@ namespace geode
         const Section& section, std::string_view directory ) const
     {
         const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
+        Logger::set_level( Logger::LEVEL::warning );
         async::parallel_invoke(
             [&directory, &section] {
                 section.save_identifier( directory );

@@ -74,15 +74,15 @@ namespace geode
 
         void log_warn( const std::string &message )
         {
-            if( level_ <= LEVEL::warn )
+            if( level_ <= LEVEL::warning )
             {
-                LoggerManager::warn( message );
+                LoggerManager::warning( message );
             }
         }
 
         void log_error( const std::string &message )
         {
-            if( level_ <= LEVEL::err )
+            if( level_ <= LEVEL::error )
             {
                 LoggerManager::error( message );
             }
@@ -103,8 +103,8 @@ namespace geode
                 { geode::Logger::LEVEL::trace, geode::Logger::log_trace },
                 { geode::Logger::LEVEL::debug, geode::Logger::log_debug },
                 { geode::Logger::LEVEL::info, geode::Logger::log_info },
-                { geode::Logger::LEVEL::warn, geode::Logger::log_warn },
-                { geode::Logger::LEVEL::err, geode::Logger::log_error },
+                { geode::Logger::LEVEL::warning, geode::Logger::log_warn },
+                { geode::Logger::LEVEL::error, geode::Logger::log_error },
                 { geode::Logger::LEVEL::critical, geode::Logger::log_critical }
             };
 

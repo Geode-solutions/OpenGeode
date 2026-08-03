@@ -53,7 +53,7 @@ namespace
             std::cout << "Old school logger => " << message << '\n';
         }
 
-        void warn( const std::string &message ) override
+        void warning( const std::string &message ) override
         {
             std::cout << "Old school logger => " << message << '\n';
         }
@@ -74,7 +74,7 @@ namespace
         geode::Logger::trace( "test ", "trace" );
         geode::Logger::debug( "test ", "debug" );
         geode::Logger::info( "test ", "info" );
-        geode::Logger::warn( "test ", "warn" );
+        geode::Logger::warning( "test ", "warning" );
         geode::Logger::error( "test ", "error" );
         geode::Logger::critical( "test ", "critial" );
     }
@@ -131,7 +131,7 @@ namespace
         const auto &huge_msg = test_huge_message();
         test_change_log_file( huge_msg );
 
-        geode::Logger::set_level( geode::Logger::LEVEL::err );
+        geode::Logger::set_level( geode::Logger::LEVEL::error );
         test_logger();
     }
 } // namespace
