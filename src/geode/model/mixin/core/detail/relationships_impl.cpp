@@ -124,8 +124,8 @@ namespace geode
             if( const auto component_id =
                     relation_edge_index( from.id(), to.id() ) )
             {
-                Logger::warn( "This relation already exists (", from.string(),
-                    " and ", to.string(), ")" );
+                Logger::warning( "This relation already exists (",
+                    from.string(), " and ", to.string(), ")" );
                 return component_id.value();
             }
             const auto index = GraphBuilder::create( *graph_ )->create_edge(

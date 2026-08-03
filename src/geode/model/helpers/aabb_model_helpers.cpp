@@ -57,7 +57,7 @@ namespace
         }
         if( nb_non_empty_elements < nb_elements )
         {
-            geode::Logger::warn( absl::StrCat( "[create_model_aabb] ",
+            geode::Logger::warning( absl::StrCat( "[create_model_aabb] ",
                 nb_elements - nb_non_empty_elements, " out of ", nb_elements,
                 " components have empty meshes, not included in the "
                 "AABBTree." ) );

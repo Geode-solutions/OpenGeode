@@ -211,8 +211,9 @@ namespace geode
             {
                 if( edge_id == mesh.nb_edges() - 1 )
                 {
-                    Logger::warn( "[surface_radial_sort] Degenerated polygons "
-                                  "has been found on all the edges of Line ",
+                    Logger::warning(
+                        "[surface_radial_sort] Degenerated polygons "
+                        "has been found on all the edges of Line ",
                         line.id().string(),
                         ". The result of surface_radial_sort is not "
                         "guaranteed." );

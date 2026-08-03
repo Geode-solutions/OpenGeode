@@ -71,7 +71,7 @@ namespace geode
         {
             SectionBuilder builder{ section };
             const auto level = Logger::level();
-            Logger::set_level( Logger::LEVEL::warn );
+            Logger::set_level( Logger::LEVEL::warning );
             async::parallel_invoke(
                 [&builder, &directory] {
                     builder.load_identifier( directory );

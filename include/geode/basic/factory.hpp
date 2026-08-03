@@ -82,7 +82,7 @@ namespace geode
                         Creator( create_function_impl< DerivedClass > ) )
                     .second )
             {
-                Logger::warn(
+                Logger::warning(
                     "Factory: Trying to register twice the same key" );
             }
         }

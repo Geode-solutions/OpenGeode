@@ -42,7 +42,7 @@ namespace geode
 
         void info( const std::string &message ) override;
 
-        void warn( const std::string &message ) override;
+        void warning( const std::string &message ) override;
 
         void error( const std::string &message ) override;
 
