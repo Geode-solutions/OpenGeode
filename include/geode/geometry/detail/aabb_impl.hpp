@@ -498,6 +498,21 @@ namespace geode
     }
 
     template < index_t dimension >
+    template < typename EvalDistance >
+    void AABBTree< dimension >::compute_point_element_box_distances(
+        const Point< dimension >& query, const EvalDistance& action ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
+        auto nearest_box = NO_ID;
+        auto distance = std::numeric_limits< double >::max();
+        impl_->closest_element_box_recursive( query, nearest_box, distance,
+            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+    }
+
+    template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_bbox_element_bbox_intersections(
         const BoundingBox< dimension >& box, EvalIntersection& action ) const
