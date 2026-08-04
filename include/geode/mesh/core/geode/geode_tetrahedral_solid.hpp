@@ -44,10 +44,10 @@ namespace geode
     class OpenGeodeTetrahedralSolid : public TetrahedralSolid< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeTetrahedralSolid );
-        PASSKEY( OpenGeodeTetrahedralSolidBuilder< dimension >,
-            OGTetrahedralSolidKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodeTetrahedralSolidBuilder< dimension >,
+            OGTetrahedralSolidKey /*key*/ );
         using Builder = OpenGeodeTetrahedralSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
 

@@ -44,13 +44,13 @@ namespace geode
     class SurfaceCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( SurfaceCollection );
+        friend class bitsery::Access;
+
+    public:
         PASSKEY(
             SurfaceCollections< dimension >, SurfaceCollectionsKey /*key*/ );
         PASSKEY( SurfaceCollectionsBuilder< dimension >,
             SurfaceCollectionsBuilderKey /*key*/ );
-        friend class bitsery::Access;
-
-    public:
         SurfaceCollection( SurfaceCollection&& other ) noexcept = default;
         ~SurfaceCollection() = default;
 

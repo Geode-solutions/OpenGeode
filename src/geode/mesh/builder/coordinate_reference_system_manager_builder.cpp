@@ -32,22 +32,28 @@ namespace geode
         register_coordinate_reference_system( std::string_view name,
             std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs )
     {
-        crs_manager_.register_coordinate_reference_system(
-            name, std::move( crs ), {} );
+        crs_manager_.register_coordinate_reference_system( name,
+            std::move( crs ),
+            typename CoordinateReferenceSystemManager<
+                dimension >::CRSManagerKey{} );
     }
 
     template < index_t dimension >
     void CoordinateReferenceSystemManagerBuilder<
         dimension >::delete_coordinate_reference_system( std::string_view name )
     {
-        crs_manager_.delete_coordinate_reference_system( name, {} );
+        crs_manager_.delete_coordinate_reference_system(
+            name, typename CoordinateReferenceSystemManager<
+                      dimension >::CRSManagerKey{} );
     }
 
     template < index_t dimension >
     void CoordinateReferenceSystemManagerBuilder< dimension >::
         set_active_coordinate_reference_system( std::string_view name )
     {
-        crs_manager_.set_active_coordinate_reference_system( name, {} );
+        crs_manager_.set_active_coordinate_reference_system(
+            name, typename CoordinateReferenceSystemManager<
+                      dimension >::CRSManagerKey{} );
     }
 
     template < index_t dimension >
@@ -55,7 +61,9 @@ namespace geode
         CoordinateReferenceSystemManagerBuilder<
             dimension >::active_coordinate_reference_system()
     {
-        return crs_manager_.modifiable_active_coordinate_reference_system( {} );
+        return crs_manager_.modifiable_active_coordinate_reference_system(
+            typename CoordinateReferenceSystemManager<
+                dimension >::CRSManagerKey{} );
     }
 
     template < index_t dimension >
@@ -63,7 +71,9 @@ namespace geode
         CoordinateReferenceSystemManagerBuilder<
             dimension >::coordinate_reference_system( std::string_view name )
     {
-        return crs_manager_.modifiable_coordinate_reference_system( name, {} );
+        return crs_manager_.modifiable_coordinate_reference_system(
+            name, typename CoordinateReferenceSystemManager<
+                      dimension >::CRSManagerKey{} );
     }
 
     template class opengeode_mesh_api

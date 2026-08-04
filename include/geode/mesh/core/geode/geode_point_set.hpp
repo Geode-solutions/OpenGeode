@@ -44,9 +44,9 @@ namespace geode
     class OpenGeodePointSet : public PointSet< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePointSet );
-        PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey /*key*/ );
         using Builder = OpenGeodePointSetBuilder< dimension >;
         static constexpr auto dim = dimension;
 

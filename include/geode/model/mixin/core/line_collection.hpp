@@ -44,12 +44,12 @@ namespace geode
     class LineCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( LineCollection );
-        PASSKEY( LineCollections< dimension >, LineCollectionsKey /*key*/ );
-        PASSKEY( LineCollectionsBuilder< dimension >,
-            LineCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( LineCollections< dimension >, LineCollectionsKey /*key*/ );
+        PASSKEY( LineCollectionsBuilder< dimension >,
+            LineCollectionsBuilderKey /*key*/ );
         LineCollection( LineCollection&& other ) noexcept = default;
         ~LineCollection() = default;
 

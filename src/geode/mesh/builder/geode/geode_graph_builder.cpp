@@ -69,7 +69,8 @@ namespace geode
     void OpenGeodeGraphBuilder::do_set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        geode_graph_.set_edge_vertex( edge_vertex, vertex_id, {} );
+        geode_graph_.set_edge_vertex(
+            edge_vertex, vertex_id, OpenGeodeGraph::OGGraphKey() );
     }
 
     void OpenGeodeGraphBuilder::do_create_edge()

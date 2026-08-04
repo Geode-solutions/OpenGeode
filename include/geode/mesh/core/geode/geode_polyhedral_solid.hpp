@@ -42,10 +42,10 @@ namespace geode
     class OpenGeodePolyhedralSolid : public PolyhedralSolid< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePolyhedralSolid );
-        PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
-            OGPolyhedralSolidKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
+            OGPolyhedralSolidKey /*key*/ );
         using Builder = OpenGeodePolyhedralSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
 

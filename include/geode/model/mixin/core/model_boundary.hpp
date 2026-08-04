@@ -44,12 +44,12 @@ namespace geode
     class ModelBoundary : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( ModelBoundary );
-        PASSKEY( ModelBoundaries< dimension >, ModelBoundariesKey /*key*/ );
-        PASSKEY( ModelBoundariesBuilder< dimension >,
-            ModelBoundariesBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( ModelBoundaries< dimension >, ModelBoundariesKey /*key*/ );
+        PASSKEY( ModelBoundariesBuilder< dimension >,
+            ModelBoundariesBuilderKey /*key*/ );
         ModelBoundary( ModelBoundary&& other ) noexcept = default;
         ~ModelBoundary() = default;
 

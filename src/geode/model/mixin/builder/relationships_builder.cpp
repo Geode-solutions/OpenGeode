@@ -32,43 +32,49 @@ namespace geode
 
     void RelationshipsBuilder::unregister_component( const uuid& component_id )
     {
-        relationships_.remove_component( component_id, {} );
+        relationships_.remove_component(
+            component_id, Relationships::RelationshipsBuilderKey{} );
     }
 
     index_t RelationshipsBuilder::add_boundary_relation(
         const ComponentID& boundary, const ComponentID& incidence )
     {
-        return relationships_.add_boundary_relation( boundary, incidence, {} );
+        return relationships_.add_boundary_relation(
+            boundary, incidence, Relationships::RelationshipsBuilderKey{} );
     }
 
     index_t RelationshipsBuilder::add_internal_relation(
         const ComponentID& internal, const ComponentID& embedding )
     {
-        return relationships_.add_internal_relation( internal, embedding, {} );
+        return relationships_.add_internal_relation(
+            internal, embedding, Relationships::RelationshipsBuilderKey{} );
     }
 
     index_t RelationshipsBuilder::add_item_in_collection(
         const ComponentID& item, const ComponentID& collection )
     {
-        return relationships_.add_item_in_collection( item, collection, {} );
+        return relationships_.add_item_in_collection(
+            item, collection, Relationships::RelationshipsBuilderKey{} );
     }
 
     void RelationshipsBuilder::remove_relation(
         const uuid& component_id1, const uuid& component_id2 )
     {
-        return relationships_.remove_relation(
-            component_id1, component_id2, {} );
+        return relationships_.remove_relation( component_id1, component_id2,
+            Relationships::RelationshipsBuilderKey{} );
     }
 
     void RelationshipsBuilder::copy_relationships(
         const ModelCopyMapping& mapping, const Relationships& relationships )
     {
-        relationships_.copy_relationships( mapping, relationships, {} );
+        relationships_.copy_relationships(
+            mapping, relationships, Relationships::RelationshipsBuilderKey{} );
     }
 
     void RelationshipsBuilder::load_relationships( std::string_view directory )
     {
-        relationships_.load_relationships( directory, {} );
+        relationships_.load_relationships(
+            directory, Relationships::RelationshipsBuilderKey{} );
     }
 
 } // namespace geode

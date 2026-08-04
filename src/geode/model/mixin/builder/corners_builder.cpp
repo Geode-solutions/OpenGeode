@@ -42,49 +42,60 @@ namespace geode
     const uuid& CornersBuilder< dimension >::create_corner(
         const MeshImpl& impl )
     {
-        return corners_.create_corner( impl, {} );
+        return corners_.create_corner(
+            impl, typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornersBuilder< dimension >::create_corner( uuid corner_id )
     {
-        corners_.create_corner( std::move( corner_id ), {} );
+        corners_.create_corner( std::move( corner_id ),
+            typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornersBuilder< dimension >::create_corner(
         uuid corner_id, const MeshImpl& impl )
     {
-        corners_.create_corner( std::move( corner_id ), impl, {} );
+        corners_.create_corner( std::move( corner_id ), impl,
+            typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornersBuilder< dimension >::delete_corner(
         const Corner< dimension >& corner )
     {
-        corners_.delete_corner( corner, {} );
+        corners_.delete_corner(
+            corner, typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornersBuilder< dimension >::load_corners( std::string_view directory )
     {
-        return corners_.load_corners( directory, {} );
+        return corners_.load_corners(
+            directory, typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     std::unique_ptr< PointSetBuilder< dimension > >
         CornersBuilder< dimension >::corner_mesh_builder( const uuid& id )
     {
-        return PointSetBuilder< dimension >::create(
-            corners_.modifiable_corner( id, {} ).modifiable_mesh(
-                typename Corner< dimension >::CornersBuilderKey{} ) );
+        return PointSetBuilder< dimension >::create( corners_
+                .modifiable_corner(
+                    id, typename Corners< dimension >::CornersBuilderKey{} )
+                .modifiable_mesh(
+                    typename Corner< dimension >::CornersBuilderKey{} ) );
     }
 
     template < index_t dimension >
     void CornersBuilder< dimension >::set_corner_name(
         const uuid& id, std::string_view name )
     {
-        corners_.modifiable_corner( id, {} ).set_corner_name( name, {} );
+        corners_
+            .modifiable_corner(
+                id, typename Corners< dimension >::CornersBuilderKey{} )
+            .set_corner_name(
+                name, typename Corners< dimension >::CornersBuilderKey{} );
         corner_mesh_builder( id )->set_name( name );
     }
 
@@ -92,31 +103,43 @@ namespace geode
     void CornersBuilder< dimension >::set_corner_active(
         const uuid& id, bool active )
     {
-        corners_.modifiable_corner( id, {} ).set_corner_active( active, {} );
+        corners_
+            .modifiable_corner(
+                id, typename Corners< dimension >::CornersBuilderKey{} )
+            .set_corner_active(
+                active, typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornersBuilder< dimension >::set_corner_mesh(
         const uuid& id, std::unique_ptr< PointSet< dimension > > mesh )
     {
-        corners_.modifiable_corner( id, {} ).set_mesh( std::move( mesh ),
-            typename Corner< dimension >::CornersBuilderKey{} );
+        corners_
+            .modifiable_corner(
+                id, typename Corners< dimension >::CornersBuilderKey{} )
+            .set_mesh( std::move( mesh ),
+                typename Corner< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     PointSet< dimension >& CornersBuilder< dimension >::modifiable_corner_mesh(
         const uuid& id )
     {
-        return corners_.modifiable_corner( id, {} ).modifiable_mesh(
-            typename Corner< dimension >::CornersBuilderKey{} );
+        return corners_
+            .modifiable_corner(
+                id, typename Corner< dimension >::CornersBuilderKey{} )
+            .modifiable_mesh(
+                typename Corner< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > >
         CornersBuilder< dimension >::steal_corner_mesh( const uuid& id )
     {
-        return corners_.modifiable_corner( id, {} ).steal_mesh(
-            typename Corner< dimension >::CornersBuilderKey{} );
+        return corners_
+            .modifiable_corner(
+                id, typename Corner< dimension >::CornersBuilderKey{} )
+            .steal_mesh( typename Corner< dimension >::CornersBuilderKey{} );
     }
 
     template class opengeode_model_api CornersBuilder< 2 >;

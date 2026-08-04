@@ -51,6 +51,7 @@ namespace geode
      */
     class opengeode_model_api Relationships
     {
+    public:
         PASSKEY( RelationshipsBuilder, RelationshipsBuilderKey /*key*/ );
 
     public:

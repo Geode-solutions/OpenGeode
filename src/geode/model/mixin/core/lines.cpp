@@ -113,13 +113,13 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::load_lines(
-        std::string_view directory, LinesBuilderKey /*key*/ )
+        std::string_view directory, LinesBuilderKey key )
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
-        for( auto& line : modifiable_lines( {} ) )
+        for( auto& line : modifiable_lines( key ) )
         {
             tasks[count++] = async::spawn( [&line, &mapping] {
                 const auto file = mapping.at( line.id().string() );
@@ -195,7 +195,8 @@ namespace geode
         uuid line_id, const MeshImpl& impl, LinesBuilderKey /*key*/ )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
-            new Line< dimension >{ impl, {} }
+            new Line< dimension >{
+                impl, typename Line< dimension >::LinesKey{} }
         };
         IdentifierBuilder{ *line }.set_id( std::move( line_id ) );
         impl_->add_component( std::move( line ) );

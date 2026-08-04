@@ -42,10 +42,10 @@ namespace geode
     class OpenGeodePolygonalSurface : public PolygonalSurface< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePolygonalSurface );
-        PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
-            OGPolygonalSurfaceKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
+            OGPolygonalSurfaceKey /*key*/ );
         using Builder = OpenGeodePolygonalSurfaceBuilder< dimension >;
         static constexpr auto dim = dimension;
 

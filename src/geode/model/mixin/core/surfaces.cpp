@@ -137,13 +137,13 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::load_surfaces(
-        std::string_view directory, SurfacesBuilderKey /*key*/ )
+        std::string_view directory, SurfacesBuilderKey key )
     {
         impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
         const auto mapping = impl_->file_mapping( directory );
         absl::FixedArray< async::task< void > > tasks( nb_surfaces() );
         index_t count{ 0 };
-        for( auto& surface : modifiable_surfaces( {} ) )
+        for( auto& surface : modifiable_surfaces( key ) )
         {
             tasks[count++] = async::spawn( [&surface, &mapping] {
                 const auto file = mapping.at( surface.id().string() );
@@ -232,7 +232,8 @@ namespace geode
         uuid surface_id, const MeshImpl& impl, SurfacesBuilderKey /*key*/ )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
-            new Surface< dimension >{ impl, {} }
+            new Surface< dimension >{
+                impl, typename Surface< dimension >::SurfacesKey{} }
         };
         IdentifierBuilder{ *surface }.set_id( std::move( surface_id ) );
         impl_->add_component( std::move( surface ) );

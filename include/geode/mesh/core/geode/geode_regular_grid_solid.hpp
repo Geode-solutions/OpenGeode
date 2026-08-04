@@ -46,9 +46,9 @@ namespace geode
     class opengeode_mesh_api OpenGeodeRegularGrid< 3 > : public RegularGrid< 3 >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeRegularGrid );
-        PASSKEY( OpenGeodeRegularGridBuilder< 3 >, OGRegularGridKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodeRegularGridBuilder< 3 >, OGRegularGridKey /*key*/ );
         using Builder = OpenGeodeRegularGridBuilder< 3 >;
         static constexpr index_t dim{ 3 };
 

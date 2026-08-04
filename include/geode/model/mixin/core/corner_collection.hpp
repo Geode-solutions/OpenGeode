@@ -44,12 +44,12 @@ namespace geode
     class CornerCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( CornerCollection );
-        PASSKEY( CornerCollections< dimension >, CornerCollectionsKey /*key*/ );
-        PASSKEY( CornerCollectionsBuilder< dimension >,
-            CornerCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( CornerCollections< dimension >, CornerCollectionsKey /*key*/ );
+        PASSKEY( CornerCollectionsBuilder< dimension >,
+            CornerCollectionsBuilderKey /*key*/ );
         CornerCollection( CornerCollection&& other ) noexcept = default;
         ~CornerCollection() = default;
 

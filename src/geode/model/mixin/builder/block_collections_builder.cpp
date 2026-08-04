@@ -31,7 +31,9 @@ namespace geode
     template < index_t dimension >
     const uuid& BlockCollectionsBuilder< dimension >::create_block_collection()
     {
-        return block_collections_.create_block_collection( {} );
+        return block_collections_.create_block_collection(
+            typename BlockCollections<
+                dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
@@ -39,37 +41,53 @@ namespace geode
         uuid block_collection_id )
     {
         block_collections_.create_block_collection(
-            std::move( block_collection_id ), {} );
+            std::move( block_collection_id ),
+            typename BlockCollections<
+                dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::delete_block_collection(
         const BlockCollection< dimension >& collection )
     {
-        block_collections_.delete_block_collection( collection, {} );
+        block_collections_.delete_block_collection(
+            collection, typename BlockCollections<
+                            dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::load_block_collections(
         std::string_view directory )
     {
-        return block_collections_.load_block_collections( directory, {} );
+        return block_collections_.load_block_collections(
+            directory, typename BlockCollections<
+                           dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::set_block_collection_name(
         const uuid& id, std::string_view name )
     {
-        block_collections_.modifiable_block_collection( id, {} )
-            .set_block_collection_name( name, {} );
+        block_collections_
+            .modifiable_block_collection(
+                id, typename BlockCollections<
+                        dimension >::BlockCollectionsBuilderKey{} )
+            .set_block_collection_name(
+                name, typename BlockCollections<
+                          dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::set_block_collection_active(
         const uuid& id, bool active )
     {
-        block_collections_.modifiable_block_collection( id, {} )
-            .set_block_collection_active( active, {} );
+        block_collections_
+            .modifiable_block_collection(
+                id, typename BlockCollections<
+                        dimension >::BlockCollectionsBuilderKey{} )
+            .set_block_collection_active(
+                active, typename BlockCollections<
+                            dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template class opengeode_model_api BlockCollectionsBuilder< 2 >;

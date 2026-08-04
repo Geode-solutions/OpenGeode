@@ -44,12 +44,12 @@ namespace geode
     class BlockCollection : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( BlockCollection );
-        PASSKEY( BlockCollections< dimension >, BlockCollectionsKey /*key*/ );
-        PASSKEY( BlockCollectionsBuilder< dimension >,
-            BlockCollectionsBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( BlockCollections< dimension >, BlockCollectionsKey /*key*/ );
+        PASSKEY( BlockCollectionsBuilder< dimension >,
+            BlockCollectionsBuilderKey /*key*/ );
         BlockCollection( BlockCollection&& other ) noexcept = default;
         ~BlockCollection() = default;
 

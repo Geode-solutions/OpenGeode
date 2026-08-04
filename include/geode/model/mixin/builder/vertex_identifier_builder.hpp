@@ -44,13 +44,15 @@ namespace geode
         template < typename MeshComponent >
         void register_mesh_component( const MeshComponent& component )
         {
-            vertex_identifier_.register_mesh_component( component, {} );
+            vertex_identifier_.register_mesh_component(
+                component, VertexIdentifier::BuilderKey{} );
         }
 
         template < typename MeshComponent >
         void load_mesh_component( const MeshComponent& component )
         {
-            vertex_identifier_.load_mesh_component( component, {} );
+            vertex_identifier_.load_mesh_component(
+                component, VertexIdentifier::BuilderKey{} );
         }
 
         /*!
@@ -60,7 +62,8 @@ namespace geode
         template < typename MeshComponent >
         void unregister_mesh_component( const MeshComponent& component )
         {
-            vertex_identifier_.unregister_mesh_component( component, {} );
+            vertex_identifier_.unregister_mesh_component(
+                component, VertexIdentifier::BuilderKey{} );
         }
 
         /*!

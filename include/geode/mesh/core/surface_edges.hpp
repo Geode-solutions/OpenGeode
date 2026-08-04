@@ -48,9 +48,9 @@ namespace geode
     class opengeode_mesh_api SurfaceEdges
     {
         OPENGEODE_DISABLE_COPY( SurfaceEdges );
-        PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey /*key*/ );
 
     public:
+        PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey /*key*/ );
         using Builder = SurfaceEdgesBuilder< dimension >;
         static constexpr auto dim = dimension;
 

@@ -90,9 +90,8 @@ namespace geode
      */
     class opengeode_model_api VertexIdentifier
     {
-        PASSKEY( VertexIdentifierBuilder, BuilderKey /*key*/ );
-
     public:
+        PASSKEY( VertexIdentifierBuilder, BuilderKey /*key*/ );
         VertexIdentifier();
         VertexIdentifier( BITSERY );
         ~VertexIdentifier();

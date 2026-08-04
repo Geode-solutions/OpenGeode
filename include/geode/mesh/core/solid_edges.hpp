@@ -49,9 +49,9 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidEdges );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey /*key*/ );
 
     public:
+        PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey /*key*/ );
         using Builder = SolidEdgesBuilder< dimension >;
         static constexpr auto dim = dimension;
 
