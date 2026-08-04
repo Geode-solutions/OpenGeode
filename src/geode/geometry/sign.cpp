@@ -40,21 +40,21 @@ namespace
 
 namespace geode
 {
-    Sign tetrahedron_volume_sign( const Tetrahedron& tetra )
+    SIGN tetrahedron_volume_sign( const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
         return internal::side( GEO::PCK::orient_3d(
             vertices[0], vertices[1], vertices[2], vertices[3] ) );
     }
 
-    Sign triangle_area_sign( const Triangle2D& triangle )
+    SIGN triangle_area_sign( const Triangle2D& triangle )
     {
         const auto& vertices = triangle.vertices();
         return internal::side(
             GEO::PCK::orient_2d( vertices[0], vertices[1], vertices[2] ) );
     }
 
-    Sign polygon_area_sign( const Polygon2D& polygon )
+    SIGN polygon_area_sign( const Polygon2D& polygon )
     {
         const auto& polygon_vertices = polygon.vertices();
         const auto& p1 = polygon_vertices[0];
@@ -64,15 +64,15 @@ namespace geode
             const auto& p3 = polygon_vertices[static_cast< local_index_t >(
                 other_index + 1 )];
             const auto sign = triangle_area_sign( { p1, p2, p3 } );
-            if( sign != Sign::zero )
+            if( sign != SIGN::zero )
             {
                 return sign;
             }
         }
-        return geode::Sign::zero;
+        return geode::SIGN::zero;
     }
 
-    Sign triangle_area_sign( const Triangle3D& triangle, local_index_t axis )
+    SIGN triangle_area_sign( const Triangle3D& triangle, local_index_t axis )
     {
         const auto axis1 = new_axis[axis][0];
         const auto axis2 = new_axis[axis][1];
