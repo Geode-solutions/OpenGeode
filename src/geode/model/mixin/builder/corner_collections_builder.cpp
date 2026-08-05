@@ -32,7 +32,9 @@ namespace geode
     const uuid&
         CornerCollectionsBuilder< dimension >::create_corner_collection()
     {
-        return corner_collections_.create_corner_collection( {} );
+        return corner_collections_.create_corner_collection(
+            typename CornerCollections<
+                dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
@@ -40,37 +42,53 @@ namespace geode
         uuid corner_collection_id )
     {
         corner_collections_.create_corner_collection(
-            std::move( corner_collection_id ), {} );
+            std::move( corner_collection_id ),
+            typename CornerCollections<
+                dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::delete_corner_collection(
         const CornerCollection< dimension >& collection )
     {
-        corner_collections_.delete_corner_collection( collection, {} );
+        corner_collections_.delete_corner_collection(
+            collection, typename CornerCollections<
+                            dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::load_corner_collections(
         std::string_view directory )
     {
-        return corner_collections_.load_corner_collections( directory, {} );
+        return corner_collections_.load_corner_collections(
+            directory, typename CornerCollections<
+                           dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::set_corner_collection_name(
         const uuid& id, std::string_view name )
     {
-        corner_collections_.modifiable_corner_collection( id, {} )
-            .set_corner_collection_name( name, {} );
+        corner_collections_
+            .modifiable_corner_collection(
+                id, typename CornerCollections<
+                        dimension >::CornerCollectionsBuilderKey{} )
+            .set_corner_collection_name(
+                name, typename CornerCollections<
+                          dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::set_corner_collection_active(
         const uuid& id, bool active )
     {
-        corner_collections_.modifiable_corner_collection( id, {} )
-            .set_corner_collection_active( active, {} );
+        corner_collections_
+            .modifiable_corner_collection(
+                id, typename CornerCollections<
+                        dimension >::CornerCollectionsBuilderKey{} )
+            .set_corner_collection_active(
+                active, typename CornerCollections<
+                            dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template class opengeode_model_api CornerCollectionsBuilder< 2 >;

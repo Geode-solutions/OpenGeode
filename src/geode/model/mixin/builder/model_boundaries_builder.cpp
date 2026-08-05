@@ -31,45 +31,62 @@ namespace geode
     template < index_t dimension >
     const uuid& ModelBoundariesBuilder< dimension >::create_model_boundary()
     {
-        return model_boundaries_.create_model_boundary( {} );
+        return model_boundaries_.create_model_boundary(
+            typename ModelBoundaries<
+                dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::create_model_boundary(
         uuid model_boundary_id )
     {
-        model_boundaries_.create_model_boundary(
-            std::move( model_boundary_id ), {} );
+        model_boundaries_.create_model_boundary( std::move( model_boundary_id ),
+            typename ModelBoundaries<
+                dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::delete_model_boundary(
         const ModelBoundary< dimension >& boundary )
     {
-        model_boundaries_.delete_model_boundary( boundary, {} );
+        model_boundaries_.delete_model_boundary(
+            boundary, typename ModelBoundaries<
+                          dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::load_model_boundaries(
         std::string_view directory )
     {
-        return model_boundaries_.load_model_boundaries( directory, {} );
+        return model_boundaries_.load_model_boundaries(
+            directory, typename ModelBoundaries<
+                           dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::set_model_boundary_name(
         const uuid& id, std::string_view name )
     {
-        model_boundaries_.modifiable_model_boundary( id, {} )
-            .set_model_boundary_name( name, {} );
+        model_boundaries_
+            .modifiable_model_boundary(
+                id, typename ModelBoundaries<
+                        dimension >::ModelBoundariesBuilderKey{} )
+            .set_model_boundary_name(
+                name, typename ModelBoundaries<
+                          dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::set_model_boundary_active(
         const uuid& id, bool active )
     {
-        model_boundaries_.modifiable_model_boundary( id, {} )
-            .set_model_boundary_active( active, {} );
+        model_boundaries_
+            .modifiable_model_boundary(
+                id, typename ModelBoundaries<
+                        dimension >::ModelBoundariesBuilderKey{} )
+            .set_model_boundary_active(
+                active, typename ModelBoundaries<
+                            dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template class opengeode_model_api ModelBoundariesBuilder< 2 >;

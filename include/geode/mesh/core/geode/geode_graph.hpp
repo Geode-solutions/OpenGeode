@@ -39,11 +39,9 @@ namespace geode
 {
     class opengeode_mesh_api OpenGeodeGraph : public Graph
     {
-        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey /*key*/ );
-
     public:
         using Builder = OpenGeodeGraphBuilder;
-
+        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey /*key*/ );
         OpenGeodeGraph();
         OpenGeodeGraph( BITSERY );
         OpenGeodeGraph( OpenGeodeGraph&& other ) noexcept;

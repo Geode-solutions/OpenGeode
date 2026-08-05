@@ -647,7 +647,8 @@ namespace geode
     void SolidMeshBuilder< dimension >::reset_polyhedra_around_vertex(
         index_t vertex_id )
     {
-        solid_mesh_.reset_polyhedra_around_vertex( vertex_id, {} );
+        solid_mesh_.reset_polyhedra_around_vertex(
+            vertex_id, typename SolidMesh< dimension >::SolidMeshKey{} );
     }
 
     template < index_t dimension >
@@ -662,8 +663,8 @@ namespace geode
             polyhedron_vertex.vertex_id != NO_ID,
             "[SolidMeshBuilder::associate_polyhedron_vertex_to_vertex] "
             "PolyhedronVertex invalid" );
-        solid_mesh_.associate_polyhedron_vertex_to_vertex(
-            polyhedron_vertex, vertex_id, {} );
+        solid_mesh_.associate_polyhedron_vertex_to_vertex( polyhedron_vertex,
+            vertex_id, typename SolidMesh< dimension >::SolidMeshKey{} );
     }
 
     template < index_t dimension >
@@ -671,8 +672,8 @@ namespace geode
         SolidMeshBuilder< dimension >::disassociate_polyhedron_vertex_to_vertex(
             index_t vertex_id )
     {
-        solid_mesh_.associate_polyhedron_vertex_to_vertex(
-            PolyhedronVertex{}, vertex_id, {} );
+        solid_mesh_.associate_polyhedron_vertex_to_vertex( PolyhedronVertex{},
+            vertex_id, typename SolidMesh< dimension >::SolidMeshKey{} );
     }
 
     template < index_t dimension >
@@ -798,7 +799,8 @@ namespace geode
     SolidEdgesBuilder< dimension >
         SolidMeshBuilder< dimension >::edges_builder()
     {
-        return SolidEdgesBuilder< dimension >{ solid_mesh_.edges( {} ) };
+        return SolidEdgesBuilder< dimension >{ solid_mesh_.edges(
+            typename SolidMesh< dimension >::SolidMeshKey{} ) };
     }
 
     template < index_t dimension >
@@ -862,7 +864,8 @@ namespace geode
     SolidFacetsBuilder< dimension >
         SolidMeshBuilder< dimension >::facets_builder()
     {
-        return SolidFacetsBuilder< dimension >{ solid_mesh_.facets( {} ) };
+        return SolidFacetsBuilder< dimension >{ solid_mesh_.facets(
+            typename SolidMesh< dimension >::SolidMeshKey{} ) };
     }
 
     template < index_t dimension >
@@ -986,11 +989,13 @@ namespace geode
             solid_mesh.polyhedron_attribute_manager() );
         if( solid_mesh.are_edges_enabled() )
         {
-            solid_mesh_.copy_edges( solid_mesh, {} );
+            solid_mesh_.copy_edges(
+                solid_mesh, typename SolidMesh< dimension >::SolidMeshKey{} );
         }
         if( solid_mesh.are_facets_enabled() )
         {
-            solid_mesh_.copy_facets( solid_mesh, {} );
+            solid_mesh_.copy_facets(
+                solid_mesh, typename SolidMesh< dimension >::SolidMeshKey{} );
         }
     }
 

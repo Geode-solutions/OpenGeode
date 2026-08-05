@@ -44,10 +44,10 @@ namespace geode
     class OpenGeodeHybridSolid : public HybridSolid< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeHybridSolid );
-        PASSKEY( OpenGeodeHybridSolidBuilder< dimension >,
-            OGHybridSolidKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodeHybridSolidBuilder< dimension >,
+            OGHybridSolidKey /*key*/ );
         using Builder = OpenGeodeHybridSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
 

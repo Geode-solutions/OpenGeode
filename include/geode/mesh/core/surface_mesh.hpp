@@ -164,9 +164,9 @@ namespace geode
           public CoordinateReferenceSystemManagers< dimension >
     {
         OPENGEODE_DISABLE_COPY( SurfaceMesh );
-        PASSKEY( SurfaceMeshBuilder< dimension >, SurfaceMeshKey /*key*/ );
 
     public:
+        PASSKEY( SurfaceMeshBuilder< dimension >, SurfaceMeshKey /*key*/ );
         using Builder = SurfaceMeshBuilder< dimension >;
         static constexpr auto dim = dimension;
         using VerticesAroundVertex = absl::InlinedVector< index_t, 10 >;

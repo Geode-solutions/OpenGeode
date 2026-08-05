@@ -115,13 +115,13 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::load_corners(
-        std::string_view directory, CornersBuilderKey /*key*/ )
+        std::string_view directory, CornersBuilderKey key )
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
-        for( auto& corner : modifiable_corners( {} ) )
+        for( auto& corner : modifiable_corners( key ) )
         {
             tasks[count++] = async::spawn( [&corner, &mapping] {
                 const auto file = mapping.at( corner.id().string() );
@@ -199,7 +199,8 @@ namespace geode
         uuid corner_id, const MeshImpl& impl, CornersBuilderKey /*key*/ )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
-            new Corner< dimension >{ impl, {} }
+            new Corner< dimension >{
+                impl, typename Corner< dimension >::CornersKey{} }
         };
         IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
         impl_->add_component( std::move( corner ) );

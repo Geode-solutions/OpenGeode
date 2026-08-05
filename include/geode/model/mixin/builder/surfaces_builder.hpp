@@ -56,8 +56,12 @@ namespace geode
         [[nodiscard]] std::unique_ptr< typename Mesh::Builder >
             surface_mesh_builder( const uuid& id )
         {
-            auto& mesh = surfaces_.modifiable_surface( id, {} ).modifiable_mesh(
-                typename Surface< dimension >::SurfacesBuilderKey{} );
+            auto& mesh =
+                surfaces_
+                    .modifiable_surface( id,
+                        typename Surface< dimension >::SurfacesBuilderKey{} )
+                    .modifiable_mesh(
+                        typename Surface< dimension >::SurfacesBuilderKey{} );
             return MeshBuilderFactory::create_mesh_builder<
                 typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
         }

@@ -114,13 +114,15 @@ namespace geode
     void GraphBuilder::associate_edge_vertex_to_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        graph_.associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
+        graph_.associate_edge_vertex_to_vertex(
+            edge_vertex, vertex_id, Graph::GraphKey{} );
     }
 
     void GraphBuilder::disassociate_edge_vertex_to_vertex(
         const EdgeVertex& edge_vertex )
     {
-        graph_.disassociate_edge_vertex_to_vertex( edge_vertex, {} );
+        graph_.disassociate_edge_vertex_to_vertex(
+            edge_vertex, Graph::GraphKey{} );
     }
 
     index_t GraphBuilder::create_edge()
@@ -166,7 +168,8 @@ namespace geode
     void GraphBuilder::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges )
     {
-        graph_.set_edges_around_vertex( vertex_id, std::move( edges ), {} );
+        graph_.set_edges_around_vertex(
+            vertex_id, std::move( edges ), Graph::GraphKey{} );
     }
 
     std::vector< index_t > GraphBuilder::delete_edges(

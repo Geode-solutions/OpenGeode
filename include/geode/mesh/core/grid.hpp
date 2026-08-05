@@ -52,10 +52,10 @@ namespace geode
     class Grid : public CellArray< dimension >
     {
         OPENGEODE_DISABLE_COPY( Grid );
-        PASSKEY( GridBuilder< dimension >, GridKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( GridBuilder< dimension >, GridKey /*key*/ );
         using Builder = GridBuilder< dimension >;
         static constexpr auto dim = dimension;
         using CellIndices = typename CellArray< dimension >::CellIndices;

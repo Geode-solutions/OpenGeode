@@ -107,9 +107,9 @@ namespace geode
      */
     class opengeode_mesh_api Graph : public VertexSet
     {
+    public:
         PASSKEY( GraphBuilder, GraphKey /*key*/ );
 
-    public:
         using Builder = GraphBuilder;
 
         Graph( BITSERY );

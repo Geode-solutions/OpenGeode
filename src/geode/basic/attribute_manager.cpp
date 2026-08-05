@@ -457,17 +457,18 @@ namespace geode
         std::shared_ptr< AttributeBase > attribute,
         const geode::uuid &attribute_id )
     {
-        return impl_->register_attribute( attribute, attribute_id, {} );
+        return impl_->register_attribute(
+            attribute, attribute_id, AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::resize( index_t size )
     {
-        impl_->resize( size, {} );
+        impl_->resize( size, AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::reserve( index_t capacity )
     {
-        impl_->reserve( capacity, {} );
+        impl_->reserve( capacity, AttributeBase::AttributeKey{} );
     }
 
     bool AttributeManager::has_assignable_attributes() const
@@ -483,19 +484,22 @@ namespace geode
     void AttributeManager::assign_attribute_value(
         index_t from_element, index_t to_element )
     {
-        impl_->assign_attribute_value( from_element, to_element, {} );
+        impl_->assign_attribute_value(
+            from_element, to_element, AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::copy_attribute_value(
         index_t from_element, index_t to_element )
     {
-        impl_->copy_attribute_value( from_element, to_element, {} );
+        impl_->copy_attribute_value(
+            from_element, to_element, AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::interpolate_attribute_value(
         const AttributeLinearInterpolation &interpolation, index_t to_element )
     {
-        impl_->interpolate_attribute_value( interpolation, to_element, {} );
+        impl_->interpolate_attribute_value(
+            interpolation, to_element, AttributeBase::AttributeKey{} );
     }
 
     absl::FixedArray< geode::uuid > AttributeManager::attribute_ids() const
@@ -527,7 +531,7 @@ namespace geode
 
     void AttributeManager::clear_attributes()
     {
-        impl_->clear_attributes( {} );
+        impl_->clear_attributes( AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::delete_elements(
@@ -539,14 +543,14 @@ namespace geode
                 to_delete.size() == nb_elements(),
                 "[AttributeManager::delete_elements] Vector to_delete should "
                 "have the same size as the number of elements" );
-            impl_->delete_elements( to_delete, {} );
+            impl_->delete_elements( to_delete, AttributeBase::AttributeKey{} );
         }
     }
 
     void AttributeManager::permute_elements(
         absl::Span< const index_t > permutation )
     {
-        impl_->permute_elements( permutation, {} );
+        impl_->permute_elements( permutation, AttributeBase::AttributeKey{} );
     }
 
     index_t AttributeManager::nb_elements() const
@@ -556,7 +560,7 @@ namespace geode
 
     void AttributeManager::copy( const AttributeManager &attribute_manager )
     {
-        impl_->copy( *attribute_manager.impl_, {} );
+        impl_->copy( *attribute_manager.impl_, AttributeBase::AttributeKey{} );
     }
 
     std::optional< std::vector< geode::uuid > >
@@ -569,28 +573,31 @@ namespace geode
     void AttributeManager::import( const AttributeManager &attribute_manager,
         absl::Span< const index_t > old2new )
     {
-        impl_->import( *attribute_manager.impl_, old2new, {} );
+        impl_->import(
+            *attribute_manager.impl_, old2new, AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
         absl::Span< const index_t > old2new,
         const geode::uuid &attribute_id )
     {
-        impl_->import( *attribute_manager.impl_, old2new, attribute_id, {} );
+        impl_->import( *attribute_manager.impl_, old2new, attribute_id,
+            AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
         const GenericMapping< index_t > &old2new_mapping )
     {
-        impl_->import( *attribute_manager.impl_, old2new_mapping, {} );
+        impl_->import( *attribute_manager.impl_, old2new_mapping,
+            AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
         const GenericMapping< index_t > &old2new_mapping,
         const geode::uuid &attribute_id )
     {
-        impl_->import(
-            *attribute_manager.impl_, old2new_mapping, attribute_id, {} );
+        impl_->import( *attribute_manager.impl_, old2new_mapping, attribute_id,
+            AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::set_attribute_properties(

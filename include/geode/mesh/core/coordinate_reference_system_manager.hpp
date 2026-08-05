@@ -47,11 +47,11 @@ namespace geode
     template < index_t dimension >
     class CoordinateReferenceSystemManager
     {
-        PASSKEY( CoordinateReferenceSystemManagerBuilder< dimension >,
-            CRSManagerKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( CoordinateReferenceSystemManagerBuilder< dimension >,
+            CRSManagerKey /*key*/ );
         CoordinateReferenceSystemManager();
         CoordinateReferenceSystemManager(
             CoordinateReferenceSystemManager&& other ) noexcept;

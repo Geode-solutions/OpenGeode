@@ -38,24 +38,28 @@ namespace geode
     void ComponentRegistryBuilder::add_mesh_component(
         const ComponentType& type, const uuid& id )
     {
-        registry_.add_mesh_component( type, id, {} );
+        registry_.add_mesh_component(
+            type, id, ComponentRegistry::RegistryBuilder{} );
     }
 
     void ComponentRegistryBuilder::add_collection_component(
         const ComponentType& type, const uuid& id )
     {
-        registry_.add_collection_component( type, id, {} );
+        registry_.add_collection_component(
+            type, id, ComponentRegistry::RegistryBuilder{} );
     }
 
     void ComponentRegistryBuilder::remove_mesh_component(
         const ComponentType& type, const uuid& id )
     {
-        registry_.remove_mesh_component( type, id, {} );
+        registry_.remove_mesh_component(
+            type, id, ComponentRegistry::RegistryBuilder{} );
     }
 
     void ComponentRegistryBuilder::remove_collection_component(
         const ComponentType& type, const uuid& id )
     {
-        registry_.remove_collection_component( type, id, {} );
+        registry_.remove_collection_component(
+            type, id, ComponentRegistry::RegistryBuilder{} );
     }
 } // namespace geode

@@ -44,10 +44,10 @@ namespace geode
     class OpenGeodeTriangulatedSurface : public TriangulatedSurface< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeTriangulatedSurface );
-        PASSKEY( OpenGeodeTriangulatedSurfaceBuilder< dimension >,
-            OGTriangulatedSurfaceKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodeTriangulatedSurfaceBuilder< dimension >,
+            OGTriangulatedSurfaceKey /*key*/ );
         using Builder = OpenGeodeTriangulatedSurfaceBuilder< dimension >;
         static constexpr auto dim = dimension;
 

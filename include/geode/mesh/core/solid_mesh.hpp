@@ -271,9 +271,9 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidMesh );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey /*key*/ );
 
     public:
+        PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey /*key*/ );
         using Builder = SolidMeshBuilder< dimension >;
         static constexpr auto dim = dimension;
         using VerticesAroundVertex = absl::InlinedVector< index_t, 20 >;

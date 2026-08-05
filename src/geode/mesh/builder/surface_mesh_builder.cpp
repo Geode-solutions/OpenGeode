@@ -397,7 +397,8 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::reset_polygons_around_vertex(
         index_t vertex_id )
     {
-        surface_mesh_.reset_polygons_around_vertex( vertex_id, {} );
+        surface_mesh_.reset_polygons_around_vertex(
+            vertex_id, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >
@@ -412,16 +413,16 @@ namespace geode
             polygon_vertex.vertex_id != NO_LID,
             "[SurfaceMeshBuilder::associate_polygon_vertex_to_vertex] "
             "PolygonVertex invalid" );
-        surface_mesh_.associate_polygon_vertex_to_vertex(
-            polygon_vertex, vertex_id, {} );
+        surface_mesh_.associate_polygon_vertex_to_vertex( polygon_vertex,
+            vertex_id, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::disassociate_polygon_vertex_to_vertex(
         index_t vertex_id )
     {
-        surface_mesh_.associate_polygon_vertex_to_vertex(
-            PolygonVertex{}, vertex_id, {} );
+        surface_mesh_.associate_polygon_vertex_to_vertex( PolygonVertex{},
+            vertex_id, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >
@@ -727,7 +728,8 @@ namespace geode
     SurfaceEdgesBuilder< dimension >
         SurfaceMeshBuilder< dimension >::edges_builder()
     {
-        return SurfaceEdgesBuilder< dimension >{ surface_mesh_.edges( {} ) };
+        return SurfaceEdgesBuilder< dimension >{ surface_mesh_.edges(
+            typename SurfaceMesh< dimension >::SurfaceMeshKey{} ) };
     }
 
     template < index_t dimension >
@@ -846,7 +848,8 @@ namespace geode
         copy_polygons( surface_mesh, *this );
         if( surface_mesh.are_edges_enabled() )
         {
-            surface_mesh_.copy_edges( surface_mesh, {} );
+            surface_mesh_.copy_edges( surface_mesh,
+                typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
         }
         surface_mesh_.polygon_attribute_manager().copy(
             surface_mesh.polygon_attribute_manager() );

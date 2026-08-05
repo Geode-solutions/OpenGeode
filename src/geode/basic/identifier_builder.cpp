@@ -35,22 +35,22 @@ namespace geode
 
     void IdentifierBuilder::set_id( const uuid& unique_id )
     {
-        identifier_.set_id( unique_id, {} );
+        identifier_.set_id( unique_id, Identifier::IdentifierKey{} );
     }
 
     void IdentifierBuilder::set_name( std::string_view name )
     {
-        identifier_.set_name( name, {} );
+        identifier_.set_name( name, Identifier::IdentifierKey{} );
     }
 
     void IdentifierBuilder::copy_identifier( const Identifier& other )
     {
-        identifier_.copy_identifier( other, {} );
+        identifier_.copy_identifier( other, Identifier::IdentifierKey{} );
     }
 
     void IdentifierBuilder::load_identifier( std::string_view directory )
     {
-        identifier_.load_identifier( directory, {} );
+        identifier_.load_identifier( directory, Identifier::IdentifierKey{} );
     }
 
 } // namespace geode
