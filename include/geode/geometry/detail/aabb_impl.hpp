@@ -486,7 +486,7 @@ namespace geode
     {
         if( nb_bboxes() == 0 )
         {
-            return std::make_tuple( NO_ID, 0 );
+            return { NO_ID, 0 };
         }
         auto nearest_box = impl_->closest_element_box_hint( query );
         auto distance = action( query, nearest_box );
@@ -494,7 +494,7 @@ namespace geode
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
         OpenGeodeGeometryException::check_assertion(
             nearest_box != NO_ID, "No box found" );
-        return std::make_tuple( nearest_box, distance );
+        return { nearest_box, distance };
     }
 
     template < index_t dimension >

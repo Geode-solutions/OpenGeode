@@ -158,8 +158,7 @@ namespace
             const geode::Segment< dimension >& segment )
     {
         const auto nearest_p = point_segment_projection( point, segment );
-        return std::make_tuple(
-            point_point_distance( point, nearest_p ), nearest_p );
+        return { point_point_distance( point, nearest_p ), nearest_p };
     }
 
     template < geode::index_t dimension >
@@ -169,8 +168,7 @@ namespace
             const geode::InfiniteLine< dimension >& line )
     {
         const auto nearest_p = point_line_projection( point, line );
-        return std::make_tuple(
-            point_point_distance( point, nearest_p ), nearest_p );
+        return { point_point_distance( point, nearest_p ), nearest_p };
     }
 
     std::tuple< double, geode::Point3D > no_pivot_point_triangle_distance(
@@ -337,12 +335,12 @@ namespace
                 }
             }
         }
-
-        geode::Point3D closest_point{ vertices[v0].get() + edge0 * p[0]
-                                      + edge1 * p[1] };
-        const auto distance =
-            geode::point_point_distance( point, closest_point );
-        return std::make_tuple( distance, std::move( closest_point ) );
+        std::tuple< double, geode::Point3D > result;
+        auto& [distance, closest_point] = result;
+        closest_point =
+            geode::Point3D{ vertices[v0].get() + edge0 * p[0] + edge1 * p[1] };
+        distance = geode::point_point_distance( point, closest_point );
+        return result;
     }
 
     std::pair< std::vector< geode::local_index_t >,
@@ -429,7 +427,7 @@ namespace
                 }
             }
         }
-        return std::make_tuple( min_distance, point0, point1 );
+        return { min_distance, point0, point1 };
     }
 
     std::tuple< double, geode::Point3D, geode::Point3D > test_close_triangles(
@@ -474,7 +472,7 @@ namespace
                 }
             }
         }
-        return std::make_tuple( min_distance, point0, point1 );
+        return { min_distance, point0, point1 };
     }
 
     template < geode::index_t dimension >
@@ -733,43 +731,52 @@ namespace
             point_point_distance( closest_on_segment0, closest_on_segment1 );
         if( distance < geode::GLOBAL_EPSILON )
         {
-            return std::make_tuple(
-                distance, closest_on_segment0, closest_on_segment1 );
+            return std::tuple< double, geode::Point< dimension >,
+                geode::Point< dimension > >{ distance, closest_on_segment0,
+                closest_on_segment1 };
         }
         const auto distance_to_closest0 =
             point_segment_distance( closest_on_segment0, segment1 );
         if( distance_to_closest0 < geode::GLOBAL_EPSILON )
         {
-            return std::make_tuple( distance_to_closest0, closest_on_segment0,
-                point_segment_projection( closest_on_segment0, segment1 ) );
+            return std::tuple< double, geode::Point< dimension >,
+                geode::Point< dimension > >{ distance_to_closest0,
+                closest_on_segment0,
+                point_segment_projection( closest_on_segment0, segment1 ) };
         }
         const auto distance_to_closest1 =
             point_segment_distance( closest_on_segment1, segment0 );
         if( distance_to_closest1 < geode::GLOBAL_EPSILON )
         {
-            return std::make_tuple( distance_to_closest1,
+            return std::tuple< double, geode::Point< dimension >,
+                geode::Point< dimension > >{ distance_to_closest1,
                 point_segment_projection( closest_on_segment1, segment0 ),
-                closest_on_segment1 );
+                closest_on_segment1 };
         }
         if( distance_to_closest0 < distance )
         {
             if( distance_to_closest1 < distance_to_closest0 )
             {
-                return std::make_tuple( distance_to_closest1,
+                return std::tuple< double, geode::Point< dimension >,
+                    geode::Point< dimension > >{ distance_to_closest1,
                     point_segment_projection( closest_on_segment1, segment0 ),
-                    closest_on_segment1 );
+                    closest_on_segment1 };
             }
-            return std::make_tuple( distance_to_closest0, closest_on_segment0,
-                point_segment_projection( closest_on_segment0, segment1 ) );
+            return std::tuple< double, geode::Point< dimension >,
+                geode::Point< dimension > >{ distance_to_closest0,
+                closest_on_segment0,
+                point_segment_projection( closest_on_segment0, segment1 ) };
         }
         if( distance_to_closest1 < distance )
         {
-            return std::make_tuple( distance_to_closest1,
+            return std::tuple< double, geode::Point< dimension >,
+                geode::Point< dimension > >{ distance_to_closest1,
                 point_segment_projection( closest_on_segment1, segment0 ),
-                closest_on_segment1 );
+                closest_on_segment1 };
         }
-        return std::make_tuple(
-            distance, closest_on_segment0, closest_on_segment1 );
+        return std::tuple< double, geode::Point< dimension >,
+            geode::Point< dimension > >{ distance, closest_on_segment0,
+            closest_on_segment1 };
     }
 
     template < geode::index_t dimension >
@@ -817,8 +824,7 @@ namespace
             }
             step /= 2;
         }
-        return std::make_tuple(
-            current_distance, current_point, current_point );
+        return { current_distance, current_point, current_point };
     }
 
 } // namespace
@@ -940,13 +946,14 @@ namespace geode
             s0 = -b0 / a00;
             s1 = 0;
         }
-
-        auto closest_on_line = line.origin() + line.direction() * s0;
-        auto closest_on_segment =
-            segment.vertices()[0].get() + segDirection * s1;
-        return std::make_tuple(
-            point_point_distance( closest_on_line, closest_on_segment ),
-            std::move( closest_on_segment ), std::move( closest_on_line ) );
+        std::tuple< double, geode::Point< dimension >,
+            geode::Point< dimension > >
+            result;
+        auto& [distance, closest_on_segment, closest_on_line] = result;
+        closest_on_line = line.origin() + line.direction() * s0;
+        closest_on_segment = segment.vertices()[0].get() + segDirection * s1;
+        distance = point_point_distance( closest_on_line, closest_on_segment );
+        return result;
     }
 
     template < index_t dimension >
@@ -995,7 +1002,7 @@ namespace geode
     {
         if( may_point_be_in_triangle( point, triangle ) )
         {
-            return std::make_tuple( 0.0, point );
+            return { 0.0, point };
         }
         const auto& vertices = triangle.vertices();
         std::array< Point2D, 3 > closest;
@@ -1037,7 +1044,7 @@ namespace geode
                 closest_point = closest[2];
             }
         }
-        return std::make_tuple( result, closest_point );
+        return { result, closest_point };
     }
 
     std::tuple< double, Point3D, Point3D > line_triangle_distance(
@@ -1091,7 +1098,7 @@ namespace geode
             if( b0 >= 0 && b1 >= 0 && b2 >= 0 )
             {
                 // The point Y is contained by the triangle.
-                return std::make_tuple( 0, Y, Y );
+                return { 0, Y, Y };
             }
         }
 
@@ -1123,8 +1130,7 @@ namespace geode
             }
         }
 
-        return std::make_tuple(
-            smallest_distance, closest_on_line, closest_on_edge );
+        return { smallest_distance, closest_on_line, closest_on_edge };
     }
 
     std::tuple< double, Point3D, Point3D > segment_triangle_distance(
@@ -1137,9 +1143,9 @@ namespace geode
             point_segment_projection( closest_on_line, segment );
         const auto reprojection_on_triangle =
             point_triangle_projection( closest_on_segment, triangle );
-        return std::make_tuple( point_point_distance( closest_on_segment,
-                                    reprojection_on_triangle ),
-            closest_on_segment, reprojection_on_triangle );
+        return { point_point_distance(
+                     closest_on_segment, reprojection_on_triangle ),
+            closest_on_segment, reprojection_on_triangle };
     }
 
     std::tuple< double, Point3D, Point3D >
@@ -1290,7 +1296,7 @@ namespace geode
             std::distance( lambdas.begin(), absl::c_min_element( lambdas ) ) );
         if( lambdas[facet] >= 0 )
         {
-            return std::make_tuple( 0.0, point );
+            return { 0.0, point };
         }
         const auto& facet_vertices =
             Tetrahedron::tetrahedron_facet_vertex[facet];
@@ -1314,7 +1320,7 @@ namespace geode
             {
                 return output;
             }
-            return std::make_tuple( -std::get< 0 >( output ), nearest_point );
+            return { -std::get< 0 >( output ), nearest_point };
         }
         return no_pivot_point_triangle_distance( point, triangle );
     }
@@ -1325,7 +1331,7 @@ namespace geode
         const Vector3D v{ plane.origin(), point };
         const auto distance = v.dot( plane.normal() );
         const Point3D projected_p{ point - plane.normal() * distance };
-        return std::make_tuple( distance, projected_p );
+        return { distance, projected_p };
     }
 
     std::tuple< double, Point3D > point_plane_distance(
@@ -1335,7 +1341,7 @@ namespace geode
         Point3D projected_p;
         std::tie( distance, projected_p ) =
             point_plane_signed_distance( point, plane );
-        return std::make_tuple( std::fabs( distance ), projected_p );
+        return { std::fabs( distance ), projected_p };
     }
 
     template < index_t dimension >
@@ -1347,12 +1353,11 @@ namespace geode
         {
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
-            return std::make_tuple( sphere.radius(),
-                sphere.origin() + dummy_direction * sphere.radius() );
+            return { sphere.radius(),
+                sphere.origin() + dummy_direction * sphere.radius() };
         }
-        return std::make_tuple(
-            std::fabs( center_to_point.length() - sphere.radius() ),
-            sphere.origin() + center_to_point.normalize() * sphere.radius() );
+        return { std::fabs( center_to_point.length() - sphere.radius() ),
+            sphere.origin() + center_to_point.normalize() * sphere.radius() };
     }
 
     template < index_t dimension >
@@ -1364,11 +1369,11 @@ namespace geode
         {
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
-            return std::make_tuple( -sphere.radius(),
-                sphere.origin() + dummy_direction * sphere.radius() );
+            return { -sphere.radius(),
+                sphere.origin() + dummy_direction * sphere.radius() };
         }
-        return std::make_tuple( center_to_point.length() - sphere.radius(),
-            sphere.origin() + center_to_point.normalize() * sphere.radius() );
+        return { center_to_point.length() - sphere.radius(),
+            sphere.origin() + center_to_point.normalize() * sphere.radius() };
     }
 
     template < index_t dimension >
@@ -1381,7 +1386,7 @@ namespace geode
         {
             return signed_distance;
         }
-        return std::make_tuple( 0, point );
+        return { 0, point };
     }
 
     std::tuple< double, Point3D > point_circle_distance(
@@ -1412,17 +1417,15 @@ namespace geode
                 other_direction
                 - circle.plane().normal()
                       * other_direction.dot( circle.plane().normal() );
-            return std::make_tuple(
-                std::sqrt( circle.radius() * circle.radius()
-                           + distance_to_plane * distance_to_plane ),
+            return { std::sqrt( circle.radius() * circle.radius()
+                                + distance_to_plane * distance_to_plane ),
                 circle.plane().origin()
-                    + other_projected_on_plane.normalize() * circle.radius() );
+                    + other_projected_on_plane.normalize() * circle.radius() };
         }
         const auto nearest_point =
             circle.plane().origin()
             + center_to_projected_point.normalize() * circle.radius();
-        return std::make_tuple(
-            point_point_distance( point, nearest_point ), nearest_point );
+        return { point_point_distance( point, nearest_point ), nearest_point };
     }
 
     std::tuple< double, Point3D > point_circle_signed_distance(
@@ -1436,7 +1439,7 @@ namespace geode
         {
             distance = -distance;
         }
-        return std::make_tuple( distance, nearest_point );
+        return { distance, nearest_point };
     }
 
     std::tuple< double, Point3D > point_disk_distance(
@@ -1450,8 +1453,7 @@ namespace geode
         if( point_point_distance( disk.plane().origin(), projected_on_plane )
             <= disk.radius() )
         {
-            return std::make_tuple(
-                std::fabs( distance_to_plane ), projected_on_plane );
+            return { std::fabs( distance_to_plane ), projected_on_plane };
         }
         return point_circle_distance( point, disk );
     }

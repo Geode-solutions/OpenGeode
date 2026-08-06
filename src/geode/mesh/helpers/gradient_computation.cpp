@@ -69,6 +69,8 @@ namespace
         std::tuple< geode::uuid, std::vector< geode::index_t > >
             compute_scalar_function_gradient() const
         {
+            std::tuple< geode::uuid, std::vector< geode::index_t > > result;
+            auto& [gradient_function_id, no_gradient_value_vertices] = result;
             geode::AttributeProperties attribute_properties;
             attribute_properties.assignable = false;
             attribute_properties.interpolable = false;
@@ -79,7 +81,7 @@ namespace
             distance_map_values.no_value = geode::Vector< Mesh::dim >{};
             const auto gradient_function_name =
                 absl::StrCat( scalar_function_->name().value(), "_gradient" );
-            auto gradient_function_id =
+            gradient_function_id =
                 mesh_.vertex_attribute_manager()
                     .template create_attribute< geode::VariableAttribute,
                         geode::Vector< Mesh::dim > >( gradient_function_name,
@@ -88,7 +90,6 @@ namespace
                 mesh_.vertex_attribute_manager()
                     .template find_attribute< geode::VariableAttribute,
                         geode::Vector< Mesh::dim > >( gradient_function_id );
-            std::vector< geode::index_t > no_gradient_value_vertices;
             for( const auto vertex_id : geode::Range{ mesh_.nb_vertices() } )
             {
                 if( !compute_gradient( *gradient_function, vertex_id ) )
@@ -96,8 +97,7 @@ namespace
                     no_gradient_value_vertices.push_back( vertex_id );
                 }
             }
-            return std::make_tuple(
-                gradient_function_id, std::move( no_gradient_value_vertices ) );
+            return result;
         }
 
     private:

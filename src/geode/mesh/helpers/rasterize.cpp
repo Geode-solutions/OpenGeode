@@ -117,7 +117,7 @@ namespace
                 increments[i] = -1;
             }
         }
-        return std::make_tuple( deltas, increments );
+        return { deltas, increments };
     }
 
     template < geode::index_t dimension >
@@ -173,7 +173,7 @@ namespace
                 }
             }
         }
-        return std::make_tuple( major_edge, major_axis );
+        return { major_edge, major_axis };
     }
 
     template < geode::index_t dimension >
@@ -956,8 +956,9 @@ namespace
             geode::index_t vertex_id ) const
         {
             auto& vertex_jks = painted_vertices_[vertex_id];
-            auto oriented_jk =
-                std::make_tuple( current_j, current_k, counter_clockwise_ );
+            std::tuple< geode::index_t, geode::index_t, bool > oriented_jk{
+                current_j, current_k, counter_clockwise_
+            };
             if( absl::c_find( vertex_jks, oriented_jk ) == vertex_jks.end() )
             {
                 vertex_jks.emplace_back( std::move( oriented_jk ) );
@@ -971,8 +972,9 @@ namespace
             const Edge& edge ) const
         {
             auto& edge_jks = painted_edges_[edge];
-            auto oriented_jk =
-                std::make_tuple( current_j, current_k, counter_clockwise_ );
+            std::tuple< geode::index_t, geode::index_t, bool > oriented_jk{
+                current_j, current_k, counter_clockwise_
+            };
             if( absl::c_find( edge_jks, oriented_jk ) == edge_jks.end() )
             {
                 edge_jks.emplace_back( std::move( oriented_jk ) );

@@ -71,9 +71,13 @@ namespace
     {
         const auto nb_non_empty_elements =
             count_non_empty_elements( range, nb_elements );
+        std::tuple< geode::AABBTree< dimension >,
+            absl::FixedArray< geode::uuid > >
+            result( geode::AABBTree< dimension >{},
+                absl::FixedArray< geode::uuid >{ nb_non_empty_elements } );
+        auto& [aabb, mapping] = result;
         absl::FixedArray< geode::BoundingBox< dimension > > boxes(
             nb_non_empty_elements );
-        absl::FixedArray< geode::uuid > mapping( nb_non_empty_elements );
         absl::FixedArray< async::task< void > > tasks( nb_non_empty_elements );
         geode::index_t id{ 0 };
         for( const auto& element : range )
@@ -92,8 +96,8 @@ namespace
         {
             task.get();
         }
-        return std::make_tuple(
-            geode::AABBTree< dimension >{ boxes }, std::move( mapping ) );
+        aabb = geode::AABBTree< dimension >{ boxes };
+        return result;
     }
 
     template < geode::index_t dimension, typename Range >

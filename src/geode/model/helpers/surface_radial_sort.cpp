@@ -131,7 +131,7 @@ namespace
             }
         }
         geode::sort_unique( polygons );
-        return std::make_pair( !degenerate_polygon, polygons );
+        return { !degenerate_polygon, polygons };
     }
 
     geode::SortedSurfaces sort( const geode::Segment3D& segment,
