@@ -86,10 +86,11 @@ namespace
             {
                 continue;
             }
-            tasks[id] = async::spawn( [id, &mapping, &boxes, &element] {
-                mapping[id] = element.id();
-                boxes[id] = element.mesh().bounding_box();
-            } );
+            tasks[id] = async::spawn(
+                [id, &captured_mapping = mapping, &boxes, &element] {
+                    captured_mapping[id] = element.id();
+                    boxes[id] = element.mesh().bounding_box();
+                } );
             id++;
         }
         for( auto& task : async::when_all( tasks ).get() )
