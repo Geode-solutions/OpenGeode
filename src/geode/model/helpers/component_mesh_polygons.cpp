@@ -241,11 +241,12 @@ namespace
         }
         else if( facets_block_vertices.size() >= 2 )
         {
+            auto& facets_unique_vertices_ref = facets_unique_vertices;
             geode::OpenGeodeModelException::check_assertion(
                 polygon_unique_vertices_cycle.is_opposite(
                     geode::detail::OrientedVertexCycle<
                         geode::PolygonVertices >{
-                        facets_unique_vertices[1].vertices } ),
+                        facets_unique_vertices_ref[1].vertices } ),
                 "[block_vertices_from_surface_polygon] The block facets found "
                 "from the polygon vertices have the same orientation." );
         }
@@ -426,11 +427,12 @@ namespace
             is_opposite = true;
             return result;
         }
+        auto& surface_edges_unique_vertices_ref = surface_edges_unique_vertices;
         geode::OpenGeodeModelException::check_assertion(
             edge_unique_vertices[0]
-                    == surface_edges_unique_vertices[0].vertices[1]
+                    == surface_edges_unique_vertices_ref[0].vertices[1]
                 && edge_unique_vertices[1]
-                       == surface_edges_unique_vertices[0].vertices[0],
+                       == surface_edges_unique_vertices_ref[0].vertices[0],
             "[block_vertices_from_surface_polygon] The surface edges "
             "found from the polygon vertices don't have the same unique "
             "vertices." );
