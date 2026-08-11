@@ -479,10 +479,10 @@ namespace geode
     std::tuple< Section, ModelCopyMapping > convert_brep_into_section(
         const BRep& brep, local_index_t axis_to_remove )
     {
-        Section section;
+        std::tuple< Section, ModelCopyMapping > result;
+        auto& [section, mappings] = result;
         SectionBuilder builder{ section };
-        auto mappings =
-            copy_components< BRep, SectionBuilder >( brep, builder );
+        mappings = copy_components< BRep, SectionBuilder >( brep, builder );
         for( const auto& corner : brep.corners() )
         {
             builder.update_corner_mesh(
@@ -508,7 +508,7 @@ namespace geode
         }
         copy_unique_vertices( brep, builder, mappings );
         detail::build_model_boundaries( section, builder );
-        return std::make_tuple( std::move( section ), std::move( mappings ) );
+        return result;
     }
 
     std::tuple< BRep, ModelCopyMapping > convert_section_into_brep(
@@ -516,10 +516,10 @@ namespace geode
         local_index_t axis_to_add,
         double axis_coordinate )
     {
-        BRep brep;
+        std::tuple< BRep, ModelCopyMapping > result;
+        auto& [brep, mappings] = result;
         BRepBuilder builder{ brep };
-        auto mappings =
-            copy_components< Section, BRepBuilder >( section, builder );
+        mappings = copy_components< Section, BRepBuilder >( section, builder );
         for( const auto& corner : section.corners() )
         {
             builder.update_corner_mesh(
@@ -545,7 +545,7 @@ namespace geode
                     surface.mesh(), axis_to_add, axis_coordinate ) );
         }
         copy_unique_vertices( section, builder, mappings );
-        return std::make_tuple( std::move( brep ), std::move( mappings ) );
+        return result;
     }
 
     BRep extrude_section_to_brep(

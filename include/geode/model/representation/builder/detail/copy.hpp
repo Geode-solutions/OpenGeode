@@ -313,8 +313,8 @@ namespace geode
             for( const auto& component : range )
             {
                 tasks[count] = async::spawn( [&result, count, &component] {
-                    result[count] = std::make_pair(
-                        component.id(), component.mesh().clone() );
+                    result[count] = { component.id(),
+                        component.mesh().clone() };
                 } );
                 count++;
             }

@@ -184,8 +184,7 @@ namespace geode
         {
             const auto id0 = graph_->edge_vertex( { component_id, 0 } );
             const auto id1 = graph_->edge_vertex( { component_id, 1 } );
-            return std::make_tuple(
-                component_from_index( id0 ), component_from_index( id1 ) );
+            return { component_from_index( id0 ), component_from_index( id1 ) };
         }
 
         void RelationshipsImpl::copy(

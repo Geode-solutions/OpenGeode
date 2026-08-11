@@ -103,10 +103,12 @@ namespace geode
                                         mesh_border_facets( block );
                                     SplitAlongSolidFacets block_splitter{ mesh,
                                         *builder };
-                                    return std::make_pair( block.id(),
-                                        block_splitter
-                                            .duplicate_points_and_process_solid_facets_and_edges(
-                                                solid_info ) );
+                                    std::pair< uuid, MeshesElementsMapping >
+                                        split_result{ block.id(),
+                                            block_splitter
+                                                .duplicate_points_and_process_solid_facets_and_edges(
+                                                    solid_info ) };
+                                    return split_result;
                                 } );
                         }
                         async::when_all( duplicate_tasks )

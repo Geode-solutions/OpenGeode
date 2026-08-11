@@ -123,7 +123,6 @@ namespace
         geode::ModelToMeshMappings >
         convert_model_into_curve( const Model& model )
     {
-        geode::ModelToMeshMappings model2mesh;
         std::vector<
             std::reference_wrapper< const geode::EdgedCurve< Model::dim > > >
             meshes;
@@ -132,14 +131,17 @@ namespace
         {
             meshes.emplace_back( line.mesh() );
         }
-        auto mesh =
-            geode::detail::create_mesh< geode::EdgedCurve< Model::dim > >(
-                meshes );
+        std::tuple< std::unique_ptr< geode::EdgedCurve< Model::dim > >,
+            geode::ModelToMeshMappings >
+            result;
+        auto& [mesh, model2mesh] = result;
+        mesh = geode::detail::create_mesh< geode::EdgedCurve< Model::dim > >(
+            meshes );
         auto mesh_builder =
             geode::EdgedCurveBuilder< Model::dim >::create( *mesh );
         build_edges_from_model( model, model2mesh, *mesh_builder );
         map_corner_vertices( model, model2mesh );
-        return std::make_pair( std::move( mesh ), std::move( model2mesh ) );
+        return result;
     }
 
     template < geode::index_t dim >
@@ -252,17 +254,19 @@ namespace
         {
             meshes.emplace_back( surface.mesh() );
         }
-        auto mesh =
-            geode::detail::create_mesh< geode::SurfaceMesh< Model::dim > >(
-                meshes );
+        std::tuple< std::unique_ptr< geode::SurfaceMesh< Model::dim > >,
+            geode::ModelToMeshMappings >
+            result;
+        auto& [mesh, model2mesh] = result;
+        mesh = geode::detail::create_mesh< geode::SurfaceMesh< Model::dim > >(
+            meshes );
         auto mesh_builder =
             geode::SurfaceMeshBuilder< Model::dim >::create( *mesh );
-        geode::ModelToMeshMappings model2mesh;
         build_polygons_from_model( model, *mesh_builder, model2mesh );
         mesh_builder->compute_polygon_adjacencies();
         map_line_edges( model, model2mesh, *mesh );
         map_corner_vertices( model, model2mesh );
-        return std::make_pair( std::move( mesh ), std::move( model2mesh ) );
+        return result;
     }
 
     void set_block_polyhedra_adjacencies(
@@ -426,9 +430,11 @@ namespace geode
         {
             meshes.emplace_back( block.mesh() );
         }
-        auto mesh = geode::detail::create_mesh< SolidMesh3D >( meshes );
+        std::tuple< std::unique_ptr< geode::SolidMesh3D >, ModelToMeshMappings >
+            result;
+        auto& [mesh, brep2mesh] = result;
+        mesh = geode::detail::create_mesh< SolidMesh3D >( meshes );
         auto mesh_builder = geode::SolidMeshBuilder< 3 >::create( *mesh );
-        ModelToMeshMappings brep2mesh;
         for( const auto unique_vertex :
             geode::Range{ brep.nb_unique_vertices() } )
         {
@@ -453,6 +459,6 @@ namespace geode
             map_line_edges( brep, brep2mesh, *mesh );
             map_corner_vertices( brep, brep2mesh );
         }
-        return std::make_pair( std::move( mesh ), std::move( brep2mesh ) );
+        return result;
     }
 } // namespace geode

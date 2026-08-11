@@ -217,7 +217,7 @@ namespace
                 axis = i;
             }
         }
-        return std::make_tuple( axis, length );
+        return { axis, length };
     }
 } // namespace
 

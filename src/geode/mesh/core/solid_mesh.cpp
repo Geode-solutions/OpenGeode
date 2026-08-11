@@ -167,7 +167,8 @@ namespace
         geode::PolyhedronFacet facet,
         const std::array< geode::index_t, 2 >& edge_vertices )
     {
-        geode::PolyhedraAroundEdge result;
+        std::tuple< geode::PolyhedraAroundEdge, bool > result;
+        auto& [polyhedra_around_edge, found] = result;
         const auto first_polyhedron = facet.polyhedron_id;
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
@@ -176,7 +177,7 @@ namespace
             if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
             {
                 const auto adj_facet = adj.value();
-                result.push_back( adj_facet.polyhedron_id );
+                polyhedra_around_edge.push_back( adj_facet.polyhedron_id );
                 for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
                          adj_facet.polyhedron_id ) } )
                 {
@@ -194,7 +195,8 @@ namespace
             }
             else
             {
-                return std::make_tuple( std::move( result ), false );
+                found = false;
+                return result;
             }
         } while( facet.polyhedron_id != first_polyhedron
                  && safety_count < MAX_SAFETY_COUNT );
@@ -209,7 +211,8 @@ namespace
             " ", solid.point( edge_vertices[1] ).string(),
             "). This is probably related to a bug in the polyhedron "
             "adjacencies." );
-        return std::make_tuple( std::move( result ), true );
+        found = true;
+        return result;
     }
 
     template < geode::index_t dimension >

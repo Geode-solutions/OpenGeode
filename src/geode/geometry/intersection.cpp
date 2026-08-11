@@ -1003,9 +1003,9 @@ namespace geode
         const auto compute_corectness = [&line]( const Plane& plane )
             -> CorrectnessInfo< OwnerInfiniteLine3D >::Correctness {
             auto output = point_plane_distance( line.origin(), plane );
-            return std::make_pair( std::get< 0 >( output ) <= GLOBAL_EPSILON,
+            return { std::get< 0 >( output ) <= GLOBAL_EPSILON,
                 OwnerInfiniteLine3D{
-                    line.direction(), std::move( std::get< 1 >( output ) ) } );
+                    line.direction(), std::move( std::get< 1 >( output ) ) } };
         };
         auto first_correctness = compute_corectness( plane0 );
         auto second_correctness = compute_corectness( plane1 );
