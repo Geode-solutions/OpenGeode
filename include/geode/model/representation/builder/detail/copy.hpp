@@ -53,7 +53,7 @@ namespace geode
 
         template < typename ModelFrom, typename ModelTo >
         void copy_corner_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -77,16 +77,17 @@ namespace geode
                 const auto& id = mapping.in2out( corner.id() );
                 if( const auto name = corner.name() )
                 {
-                    builder_to.set_corner_name( to.corner( id ), name.value() );
+                    builder_to.set_corner_name(
+                        model_to.corner( id ), name.value() );
                 }
                 builder_to.set_corner_active(
-                    to.corner( id ), corner.is_active() );
+                    model_to.corner( id ), corner.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_line_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -110,15 +111,17 @@ namespace geode
                 const auto& id = mapping.in2out( line.id() );
                 if( const auto name = line.name() )
                 {
-                    builder_to.set_line_name( to.line( id ), name.value() );
+                    builder_to.set_line_name(
+                        model_to.line( id ), name.value() );
                 }
-                builder_to.set_line_active( to.line( id ), line.is_active() );
+                builder_to.set_line_active(
+                    model_to.line( id ), line.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_surface_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -144,16 +147,16 @@ namespace geode
                 if( const auto name = surface.name() )
                 {
                     builder_to.set_surface_name(
-                        to.surface( id ), name.value() );
+                        model_to.surface( id ), name.value() );
                 }
                 builder_to.set_surface_active(
-                    to.surface( id ), surface.is_active() );
+                    model_to.surface( id ), surface.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_block_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -177,16 +180,17 @@ namespace geode
                 const auto& id = mapping.in2out( block.id() );
                 if( const auto name = block.name() )
                 {
-                    builder_to.set_block_name( to.block( id ), name.value() );
+                    builder_to.set_block_name(
+                        model_to.block( id ), name.value() );
                 }
                 builder_to.set_block_active(
-                    to.block( id ), block.is_active() );
+                    model_to.block( id ), block.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_model_boundary_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -206,16 +210,16 @@ namespace geode
                 if( const auto name = model_boundary.name() )
                 {
                     builder_to.set_model_boundary_name(
-                        to.model_boundary( id ), name.value() );
+                        model_to.model_boundary( id ), name.value() );
                 }
                 builder_to.set_model_boundary_active(
-                    to.model_boundary( id ), model_boundary.is_active() );
+                    model_to.model_boundary( id ), model_boundary.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_corner_collection_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -235,16 +239,17 @@ namespace geode
                 if( const auto name = corner_collection.name() )
                 {
                     builder_to.set_corner_collection_name(
-                        to.corner_collection( id ), name.value() );
+                        model_to.corner_collection( id ), name.value() );
                 }
                 builder_to.set_corner_collection_active(
-                    to.corner_collection( id ), corner_collection.is_active() );
+                    model_to.corner_collection( id ),
+                    corner_collection.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_line_collection_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -264,16 +269,17 @@ namespace geode
                 if( const auto name = line_collection.name() )
                 {
                     builder_to.set_line_collection_name(
-                        to.line_collection( id ), name.value() );
+                        model_to.line_collection( id ), name.value() );
                 }
                 builder_to.set_line_collection_active(
-                    to.line_collection( id ), line_collection.is_active() );
+                    model_to.line_collection( id ),
+                    line_collection.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_surface_collection_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -293,17 +299,17 @@ namespace geode
                 if( const auto name = surface_collection.name() )
                 {
                     builder_to.set_surface_collection_name(
-                        to.surface_collection( id ), name.value() );
+                        model_to.surface_collection( id ), name.value() );
                 }
                 builder_to.set_surface_collection_active(
-                    to.surface_collection( id ),
+                    model_to.surface_collection( id ),
                     surface_collection.is_active() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_block_collection_components( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             Mapping& mapping )
         {
@@ -323,10 +329,11 @@ namespace geode
                 if( const auto name = block_collection.name() )
                 {
                     builder_to.set_block_collection_name(
-                        to.block_collection( id ), name.value() );
+                        model_to.block_collection( id ), name.value() );
                 }
                 builder_to.set_block_collection_active(
-                    to.block_collection( id ), block_collection.is_active() );
+                    model_to.block_collection( id ),
+                    block_collection.is_active() );
             }
         }
 
@@ -355,7 +362,7 @@ namespace geode
 
         template < typename ModelFrom, typename ModelTo >
         void copy_corner_geometry( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             const Mapping& corners )
         {
@@ -363,14 +370,14 @@ namespace geode
                      from.corners(), from.nb_corners() ) )
             {
                 builder_to.update_corner_mesh(
-                    to.corner( corners.in2out( corner.first ) ),
+                    model_to.corner( corners.in2out( corner.first ) ),
                     std::move( corner.second ) );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_line_geometry( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             const Mapping& lines )
         {
@@ -378,14 +385,14 @@ namespace geode
                      from.lines(), from.nb_lines() ) )
             {
                 builder_to.update_line_mesh(
-                    to.line( lines.in2out( line.first ) ),
+                    model_to.line( lines.in2out( line.first ) ),
                     std::move( line.second ) );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_surface_geometry( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             const Mapping& surfaces )
         {
@@ -393,14 +400,14 @@ namespace geode
                      from.surfaces(), from.nb_surfaces() ) )
             {
                 builder_to.update_surface_mesh(
-                    to.surface( surfaces.in2out( surface.first ) ),
+                    model_to.surface( surfaces.in2out( surface.first ) ),
                     std::move( surface.second ) );
             }
         }
 
         template < typename ModelFrom, typename ModelTo >
         void copy_block_geometry( const ModelFrom& from,
-            const ModelTo& to,
+            const ModelTo& model_to,
             typename ModelTo::Builder& builder_to,
             const Mapping& blocks )
         {
@@ -408,7 +415,7 @@ namespace geode
                      from.blocks(), from.nb_blocks() ) )
             {
                 builder_to.update_block_mesh(
-                    to.block( blocks.in2out( block.first ) ),
+                    model_to.block( blocks.in2out( block.first ) ),
                     std::move( block.second ) );
             }
         }

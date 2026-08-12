@@ -33,9 +33,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
-    ALIAS_2D_AND_3D( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surfaces );
-    ALIAS_2D_AND_3D( Surfaces );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 
