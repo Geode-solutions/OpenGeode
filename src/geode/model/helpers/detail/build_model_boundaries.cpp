@@ -64,7 +64,8 @@ namespace
         const auto& model_boundary_id = builder.add_model_boundary();
         if( name )
         {
-            builder.set_model_boundary_name( model_boundary_id, name.value() );
+            builder.set_model_boundary_name(
+                model.model_boundary( model_boundary_id ), name.value() );
         }
         const auto& boundary = model.model_boundary( model_boundary_id );
         return boundary;

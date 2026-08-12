@@ -127,8 +127,7 @@ namespace geode
                         TetrahedralSolid3D::type_name_static() ) );
                 const auto& block = model().block( block_id );
                 auto mesh_builder =
-                    builder().block_mesh_builder< TetrahedralSolid3D >(
-                        block_id );
+                    builder().block_mesh_builder< TetrahedralSolid3D >( block );
                 for( const auto vertex : definition.vertices )
                 {
                     create_point( *mesh_builder, block, vertex );

@@ -86,7 +86,7 @@ void add_inactive_surface( geode::BRep& brep )
 {
     geode::BRepBuilder builder{ brep };
     const auto new_surface_id = builder.add_surface();
-    builder.set_surface_active( new_surface_id, false );
+    builder.set_surface_active( brep.surface( new_surface_id ), false );
 }
 
 void test()

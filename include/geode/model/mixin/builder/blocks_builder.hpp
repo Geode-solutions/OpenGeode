@@ -50,28 +50,29 @@ namespace geode
 
         /*!
          * Get a pointer to the builder of a Block mesh
-         * @param[in] id Unique index of the Block
+         * @param[in] Block Block component to get the builder of
          */
         template < typename Mesh = SolidMesh< dimension > >
         [[nodiscard]] std::unique_ptr< typename Mesh::Builder >
-            block_mesh_builder( const uuid& id )
+            block_mesh_builder( const Block< dimension >& block )
         {
             auto& mesh =
                 blocks_
-                    .modifiable_block(
-                        id, typename Block< dimension >::BlocksBuilderKey{} )
+                    .modifiable_block( block.id(),
+                        typename Block< dimension >::BlocksBuilderKey{} )
                     .modifiable_mesh(
                         typename Block< dimension >::BlocksBuilderKey{} );
             return MeshBuilderFactory::create_mesh_builder<
                 typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
         }
 
-        void set_block_name( const uuid& id, std::string_view name );
+        void set_block_name(
+            const Block< dimension >& block, std::string_view name );
 
-        void set_block_active( const uuid& id, bool active );
+        void set_block_active( const Block< dimension >& block, bool active );
 
         [[nodiscard]] std::unique_ptr< SolidMesh< dimension > >
-            steal_block_mesh( const uuid& id );
+            steal_block_mesh( const Block< dimension >& block );
 
     protected:
         explicit BlocksBuilder( Blocks< dimension >& blocks )

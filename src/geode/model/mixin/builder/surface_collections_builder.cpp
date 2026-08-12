@@ -67,12 +67,13 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::set_surface_collection_name(
-        const uuid& id, std::string_view name )
+        const SurfaceCollection< dimension >& surface_collection,
+        std::string_view name )
     {
         surface_collections_
-            .modifiable_surface_collection(
-                id, typename SurfaceCollections<
-                        dimension >::SurfaceCollectionsBuilderKey{} )
+            .modifiable_surface_collection( surface_collection.id(),
+                typename SurfaceCollections<
+                    dimension >::SurfaceCollectionsBuilderKey{} )
             .set_surface_collection_name(
                 name, typename SurfaceCollections<
                           dimension >::SurfaceCollectionsBuilderKey{} );
@@ -80,12 +81,12 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::set_surface_collection_active(
-        const uuid& id, bool active )
+        const SurfaceCollection< dimension >& surface_collection, bool active )
     {
         surface_collections_
-            .modifiable_surface_collection(
-                id, typename SurfaceCollections<
-                        dimension >::SurfaceCollectionsBuilderKey{} )
+            .modifiable_surface_collection( surface_collection.id(),
+                typename SurfaceCollections<
+                    dimension >::SurfaceCollectionsBuilderKey{} )
             .set_surface_collection_active(
                 active, typename SurfaceCollections<
                             dimension >::SurfaceCollectionsBuilderKey{} );

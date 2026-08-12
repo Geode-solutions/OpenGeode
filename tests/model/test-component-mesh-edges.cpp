@@ -53,7 +53,8 @@ geode::Section build_section()
 
     {
         const auto& line_id = builder.add_line();
-        auto line_builder = builder.line_mesh_builder( line_id );
+        auto line_builder =
+            builder.line_mesh_builder( section.line( line_id ) );
         line_builder->create_point( points[0] );
         line_builder->create_point( points[1] );
         line_builder->create_point( points[2] );
@@ -81,7 +82,7 @@ geode::Section build_section()
                 geode::TriangulatedSurface2D::type_name_static() ) );
         auto surface_builder =
             builder.surface_mesh_builder< geode::TriangulatedSurface2D >(
-                surface_id );
+                section.surface( surface_id ) );
         surface_builder->create_point( points[0] );
         surface_builder->create_point( points[1] );
         surface_builder->create_point( points[2] );
@@ -108,7 +109,7 @@ geode::Section build_section()
                 geode::TriangulatedSurface2D::type_name_static() ) );
         auto surface_builder =
             builder.surface_mesh_builder< geode::TriangulatedSurface2D >(
-                surface_id );
+                section.surface( surface_id ) );
         surface_builder->create_point( points[0] );
         surface_builder->create_point( points[1] );
         surface_builder->create_point( points[2] );

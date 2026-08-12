@@ -66,12 +66,13 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::set_block_collection_name(
-        const uuid& id, std::string_view name )
+        const BlockCollection< dimension >& block_collection,
+        std::string_view name )
     {
         block_collections_
-            .modifiable_block_collection(
-                id, typename BlockCollections<
-                        dimension >::BlockCollectionsBuilderKey{} )
+            .modifiable_block_collection( block_collection.id(),
+                typename BlockCollections<
+                    dimension >::BlockCollectionsBuilderKey{} )
             .set_block_collection_name(
                 name, typename BlockCollections<
                           dimension >::BlockCollectionsBuilderKey{} );
@@ -79,12 +80,12 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollectionsBuilder< dimension >::set_block_collection_active(
-        const uuid& id, bool active )
+        const BlockCollection< dimension >& block_collection, bool active )
     {
         block_collections_
-            .modifiable_block_collection(
-                id, typename BlockCollections<
-                        dimension >::BlockCollectionsBuilderKey{} )
+            .modifiable_block_collection( block_collection.id(),
+                typename BlockCollections<
+                    dimension >::BlockCollectionsBuilderKey{} )
             .set_block_collection_active(
                 active, typename BlockCollections<
                             dimension >::BlockCollectionsBuilderKey{} );

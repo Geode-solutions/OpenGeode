@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/model/mixin/builder/corner_collections_builder.hpp>
+#include <geode/model/mixin/core/corner_collection.hpp>
 
 #define PYTHON_CORNER_COLLECTIONS_BUILDER( dimension )                         \
     const auto name##dimension =                                               \

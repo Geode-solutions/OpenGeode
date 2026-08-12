@@ -28,6 +28,7 @@
 #include <geode/mesh/builder/point_set_builder.hpp>
 
 #include <geode/model/mixin/builder/corners_builder.hpp>
+#include <geode/model/mixin/core/corner.hpp>
 
 #define PYTHON_CORNERS_BUILDER( dimension )                                    \
     const auto name##dimension =                                               \

@@ -49,17 +49,19 @@ namespace geode
 
         /*!
          * Get a pointer to the builder of a Corner mesh
-         * @param[in] id Unique index of the Corner
+         * @param[in] corner Corner in the model
          */
         [[nodiscard]] std::unique_ptr< PointSetBuilder< dimension > >
-            corner_mesh_builder( const uuid& id );
+            corner_mesh_builder( const Corner< dimension >& corner );
 
-        void set_corner_name( const uuid& id, std::string_view name );
+        void set_corner_name(
+            const Corner< dimension >& corner, std::string_view name );
 
-        void set_corner_active( const uuid& id, bool active );
+        void set_corner_active(
+            const Corner< dimension >& corner, bool active );
 
         [[nodiscard]] std::unique_ptr< PointSet< dimension > >
-            steal_corner_mesh( const uuid& id );
+            steal_corner_mesh( const Corner< dimension >& corner );
 
     protected:
         explicit CornersBuilder( Corners< dimension >& corners )

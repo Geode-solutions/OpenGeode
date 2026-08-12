@@ -82,7 +82,7 @@ def add_model_boundaries(section, builder):
     for i in range(nb):
         uuids.append(builder.add_model_boundary())
         builder.set_model_boundary_name(
-            uuids[-1], "boundary" + str(len(uuids)))
+            section.model_boundary(uuids[-1]), "boundary" + str(len(uuids)))
 
     temp_boundary = section.model_boundary(builder.add_model_boundary())
     builder.remove_model_boundary(temp_boundary)
@@ -98,7 +98,7 @@ def add_corner_collections(section, builder):
     for i in range(nb):
         uuids.append(builder.add_corner_collection())
         builder.set_corner_collection_name(
-            uuids[-1], "collection" + str(len(uuids)))
+            section.corner_collection(uuids[-1]), "collection" + str(len(uuids)))
 
     temp_collection = section.corner_collection(builder.add_corner_collection())
     builder.remove_corner_collection(temp_collection)
@@ -114,7 +114,7 @@ def add_line_collections(section, builder):
     for i in range(nb):
         uuids.append(builder.add_line_collection())
         builder.set_line_collection_name(
-            uuids[-1], "collection" + str(len(uuids)))
+            section.line_collection(uuids[-1]), "collection" + str(len(uuids)))
 
     temp_collection = section.line_collection(builder.add_line_collection())
     builder.remove_line_collection(temp_collection)
@@ -130,7 +130,7 @@ def add_surface_collections(section, builder):
     for i in range(nb):
         uuids.append(builder.add_surface_collection())
         builder.set_surface_collection_name(
-            uuids[-1], "collection" + str(len(uuids)))
+            section.surface_collection(uuids[-1]), "collection" + str(len(uuids)))
 
     temp_collection = section.surface_collection(builder.add_surface_collection())
     builder.remove_surface_collection(temp_collection)

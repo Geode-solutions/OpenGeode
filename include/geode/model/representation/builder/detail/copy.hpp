@@ -51,23 +51,25 @@ namespace geode
     {
         using Mapping = ModelCopyMapping::Mapping;
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_corner_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_corner_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& corner : from.corners() )
             {
                 if( mapping.has_mapping_input( corner.id() ) )
                 {
                     const auto& id = mapping.in2out( corner.id() );
-                    ModelFrom::dim == BuilderTo::dim
+                    ModelFrom::dim == ModelTo::dim
                         ? builder_to.add_corner( id, corner.mesh().impl_name() )
                         : builder_to.add_corner( id );
                 }
                 else
                 {
                     const auto& id =
-                        ModelFrom::dim == BuilderTo::dim
+                        ModelFrom::dim == ModelTo::dim
                             ? builder_to.add_corner( corner.mesh().impl_name() )
                             : builder_to.add_corner();
                     mapping.map( corner.id(), id );
@@ -75,29 +77,32 @@ namespace geode
                 const auto& id = mapping.in2out( corner.id() );
                 if( const auto name = corner.name() )
                 {
-                    builder_to.set_corner_name( id, name.value() );
+                    builder_to.set_corner_name( to.corner( id ), name.value() );
                 }
-                builder_to.set_corner_active( id, corner.is_active() );
+                builder_to.set_corner_active(
+                    to.corner( id ), corner.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_line_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_line_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& line : from.lines() )
             {
                 if( mapping.has_mapping_input( line.id() ) )
                 {
                     const auto& id = mapping.in2out( line.id() );
-                    ModelFrom::dim == BuilderTo::dim
+                    ModelFrom::dim == ModelTo::dim
                         ? builder_to.add_line( id, line.mesh().impl_name() )
                         : builder_to.add_line( id );
                 }
                 else
                 {
                     const auto& id =
-                        ModelFrom::dim == BuilderTo::dim
+                        ModelFrom::dim == ModelTo::dim
                             ? builder_to.add_line( line.mesh().impl_name() )
                             : builder_to.add_line();
                     mapping.map( line.id(), id );
@@ -105,29 +110,31 @@ namespace geode
                 const auto& id = mapping.in2out( line.id() );
                 if( const auto name = line.name() )
                 {
-                    builder_to.set_line_name( id, name.value() );
+                    builder_to.set_line_name( to.line( id ), name.value() );
                 }
-                builder_to.set_line_active( id, line.is_active() );
+                builder_to.set_line_active( to.line( id ), line.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_surface_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_surface_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& surface : from.surfaces() )
             {
                 if( mapping.has_mapping_input( surface.id() ) )
                 {
                     const auto& id = mapping.in2out( surface.id() );
-                    ModelFrom::dim == BuilderTo::dim
+                    ModelFrom::dim == ModelTo::dim
                         ? builder_to.add_surface(
                               id, surface.mesh().impl_name() )
                         : builder_to.add_surface( id );
                 }
                 else
                 {
-                    const auto& id = ModelFrom::dim == BuilderTo::dim
+                    const auto& id = ModelFrom::dim == ModelTo::dim
                                          ? builder_to.add_surface(
                                                surface.mesh().impl_name() )
                                          : builder_to.add_surface();
@@ -136,29 +143,33 @@ namespace geode
                 const auto& id = mapping.in2out( surface.id() );
                 if( const auto name = surface.name() )
                 {
-                    builder_to.set_surface_name( id, name.value() );
+                    builder_to.set_surface_name(
+                        to.surface( id ), name.value() );
                 }
-                builder_to.set_surface_active( id, surface.is_active() );
+                builder_to.set_surface_active(
+                    to.surface( id ), surface.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_block_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_block_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& block : from.blocks() )
             {
                 if( mapping.has_mapping_input( block.id() ) )
                 {
                     const auto& id = mapping.in2out( block.id() );
-                    ModelFrom::dim == BuilderTo::dim
+                    ModelFrom::dim == ModelTo::dim
                         ? builder_to.add_block( id, block.mesh().impl_name() )
                         : builder_to.add_block( id );
                 }
                 else
                 {
                     const auto& id =
-                        ModelFrom::dim == BuilderTo::dim
+                        ModelFrom::dim == ModelTo::dim
                             ? builder_to.add_block( block.mesh().impl_name() )
                             : builder_to.add_block();
                     mapping.map( block.id(), id );
@@ -166,15 +177,18 @@ namespace geode
                 const auto& id = mapping.in2out( block.id() );
                 if( const auto name = block.name() )
                 {
-                    builder_to.set_block_name( id, name.value() );
+                    builder_to.set_block_name( to.block( id ), name.value() );
                 }
-                builder_to.set_block_active( id, block.is_active() );
+                builder_to.set_block_active(
+                    to.block( id ), block.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_model_boundary_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_model_boundary_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& model_boundary : from.model_boundaries() )
             {
@@ -191,16 +205,19 @@ namespace geode
                 const auto& id = mapping.in2out( model_boundary.id() );
                 if( const auto name = model_boundary.name() )
                 {
-                    builder_to.set_model_boundary_name( id, name.value() );
+                    builder_to.set_model_boundary_name(
+                        to.model_boundary( id ), name.value() );
                 }
                 builder_to.set_model_boundary_active(
-                    id, model_boundary.is_active() );
+                    to.model_boundary( id ), model_boundary.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_corner_collection_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_corner_collection_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& corner_collection : from.corner_collections() )
             {
@@ -217,16 +234,19 @@ namespace geode
                 const auto& id = mapping.in2out( corner_collection.id() );
                 if( const auto name = corner_collection.name() )
                 {
-                    builder_to.set_corner_collection_name( id, name.value() );
+                    builder_to.set_corner_collection_name(
+                        to.corner_collection( id ), name.value() );
                 }
                 builder_to.set_corner_collection_active(
-                    id, corner_collection.is_active() );
+                    to.corner_collection( id ), corner_collection.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_line_collection_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_line_collection_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& line_collection : from.line_collections() )
             {
@@ -243,16 +263,19 @@ namespace geode
                 const auto& id = mapping.in2out( line_collection.id() );
                 if( const auto name = line_collection.name() )
                 {
-                    builder_to.set_line_collection_name( id, name.value() );
+                    builder_to.set_line_collection_name(
+                        to.line_collection( id ), name.value() );
                 }
                 builder_to.set_line_collection_active(
-                    id, line_collection.is_active() );
+                    to.line_collection( id ), line_collection.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_surface_collection_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_surface_collection_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& surface_collection : from.surface_collections() )
             {
@@ -269,16 +292,20 @@ namespace geode
                 const auto& id = mapping.in2out( surface_collection.id() );
                 if( const auto name = surface_collection.name() )
                 {
-                    builder_to.set_surface_collection_name( id, name.value() );
+                    builder_to.set_surface_collection_name(
+                        to.surface_collection( id ), name.value() );
                 }
                 builder_to.set_surface_collection_active(
-                    id, surface_collection.is_active() );
+                    to.surface_collection( id ),
+                    surface_collection.is_active() );
             }
         }
 
-        template < typename ModelFrom, typename BuilderTo >
-        void copy_block_collection_components(
-            const ModelFrom& from, BuilderTo& builder_to, Mapping& mapping )
+        template < typename ModelFrom, typename ModelTo >
+        void copy_block_collection_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to,
+            Mapping& mapping )
         {
             for( const auto& block_collection : from.block_collections() )
             {
@@ -295,10 +322,11 @@ namespace geode
                 const auto& id = mapping.in2out( block_collection.id() );
                 if( const auto name = block_collection.name() )
                 {
-                    builder_to.set_block_collection_name( id, name.value() );
+                    builder_to.set_block_collection_name(
+                        to.block_collection( id ), name.value() );
                 }
                 builder_to.set_block_collection_active(
-                    id, block_collection.is_active() );
+                    to.block_collection( id ), block_collection.is_active() );
             }
         }
 

@@ -49,17 +49,18 @@ namespace geode
 
         /*!
          * Get a pointer to the builder of a Line mesh
-         * @param[in] id Unique index of the Line
+         * @param[in] line Line component to get the builder of
          */
         [[nodiscard]] std::unique_ptr< EdgedCurveBuilder< dimension > >
-            line_mesh_builder( const uuid& id );
+            line_mesh_builder( const Line< dimension >& line );
 
-        void set_line_name( const uuid& id, std::string_view name );
+        void set_line_name(
+            const Line< dimension >& line, std::string_view name );
 
-        void set_line_active( const uuid& id, bool active );
+        void set_line_active( const Line< dimension >& line, bool active );
 
         [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > >
-            steal_line_mesh( const uuid& id );
+            steal_line_mesh( const Line< dimension >& line );
 
     protected:
         explicit LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}

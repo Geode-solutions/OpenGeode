@@ -199,7 +199,8 @@ void test_update_unique_vertices()
     SurfaceProviderBuilder builder( provider );
 
     const auto& surface_id = builder.add_surface();
-    auto surf_builder = builder.surface_mesh_builder( surface_id );
+    auto surf_builder =
+        builder.surface_mesh_builder( provider.surface( surface_id ) );
     const auto surface_cid = provider.surface( surface_id ).component_id();
     builder.create_unique_vertices( 5 );
     for( const auto i : geode::Range{ 10 } )
@@ -252,13 +253,13 @@ void test()
     const auto& corner1_id = builder.add_corner();
     const auto& corner2_id = builder.add_corner();
     const auto& corner3_id = builder.add_corner();
-    builder.corner_mesh_builder( corner0_id )
+    builder.corner_mesh_builder( provider.corner( corner0_id ) )
         ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
-    builder.corner_mesh_builder( corner1_id )
+    builder.corner_mesh_builder( provider.corner( corner1_id ) )
         ->create_point( geode::Point2D{ { 1.1, 4.3 } } );
-    builder.corner_mesh_builder( corner2_id )
+    builder.corner_mesh_builder( provider.corner( corner2_id ) )
         ->create_point( geode::Point2D{ { 0.9, -3.7 } } );
-    builder.corner_mesh_builder( corner3_id )
+    builder.corner_mesh_builder( provider.corner( corner3_id ) )
         ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
 
     geode::VertexIdentifierBuilder vertex_id_builder{ vertex_identifier };

@@ -66,12 +66,13 @@ namespace geode
 
     template < index_t dimension >
     void LineCollectionsBuilder< dimension >::set_line_collection_name(
-        const uuid& id, std::string_view name )
+        const LineCollection< dimension >& line_collection,
+        std::string_view name )
     {
         line_collections_
-            .modifiable_line_collection(
-                id, typename LineCollections<
-                        dimension >::LineCollectionsBuilderKey{} )
+            .modifiable_line_collection( line_collection.id(),
+                typename LineCollections<
+                    dimension >::LineCollectionsBuilderKey{} )
             .set_line_collection_name(
                 name, typename LineCollections<
                           dimension >::LineCollectionsBuilderKey{} );
@@ -79,12 +80,12 @@ namespace geode
 
     template < index_t dimension >
     void LineCollectionsBuilder< dimension >::set_line_collection_active(
-        const uuid& id, bool active )
+        const LineCollection< dimension >& line_collection, bool active )
     {
         line_collections_
-            .modifiable_line_collection(
-                id, typename LineCollections<
-                        dimension >::LineCollectionsBuilderKey{} )
+            .modifiable_line_collection( line_collection.id(),
+                typename LineCollections<
+                    dimension >::LineCollectionsBuilderKey{} )
             .set_line_collection_active(
                 active, typename LineCollections<
                             dimension >::LineCollectionsBuilderKey{} );

@@ -77,23 +77,23 @@ namespace geode
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_name(
-        const uuid& id, std::string_view name )
+        const Block< dimension >& block, std::string_view name )
     {
         blocks_
             .modifiable_block(
-                id, typename Blocks< dimension >::BlocksBuilderKey{} )
+                block.id(), typename Blocks< dimension >::BlocksBuilderKey{} )
             .set_block_name(
                 name, typename Blocks< dimension >::BlocksBuilderKey{} );
-        block_mesh_builder( id )->set_name( name );
+        block_mesh_builder( block )->set_name( name );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_active(
-        const uuid& id, bool active )
+        const Block< dimension >& block, bool active )
     {
         blocks_
             .modifiable_block(
-                id, typename Blocks< dimension >::BlocksBuilderKey{} )
+                block.id(), typename Blocks< dimension >::BlocksBuilderKey{} )
             .set_block_active(
                 active, typename Blocks< dimension >::BlocksBuilderKey{} );
     }
@@ -121,11 +121,12 @@ namespace geode
 
     template < index_t dimension >
     std::unique_ptr< SolidMesh< dimension > >
-        BlocksBuilder< dimension >::steal_block_mesh( const uuid& id )
+        BlocksBuilder< dimension >::steal_block_mesh(
+            const Block< dimension >& block )
     {
         return blocks_
             .modifiable_block(
-                id, typename Blocks< dimension >::BlocksBuilderKey{} )
+                block.id(), typename Blocks< dimension >::BlocksBuilderKey{} )
             .steal_mesh( typename Block< dimension >::BlocksBuilderKey{} );
     }
 
