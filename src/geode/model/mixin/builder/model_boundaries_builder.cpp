@@ -65,12 +65,13 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::set_model_boundary_name(
-        const uuid& id, std::string_view name )
+        const ModelBoundary< dimension >& model_boundary,
+        std::string_view name )
     {
         model_boundaries_
-            .modifiable_model_boundary(
-                id, typename ModelBoundaries<
-                        dimension >::ModelBoundariesBuilderKey{} )
+            .modifiable_model_boundary( model_boundary.id(),
+                typename ModelBoundaries<
+                    dimension >::ModelBoundariesBuilderKey{} )
             .set_model_boundary_name(
                 name, typename ModelBoundaries<
                           dimension >::ModelBoundariesBuilderKey{} );
@@ -78,12 +79,12 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::set_model_boundary_active(
-        const uuid& id, bool active )
+        const ModelBoundary< dimension >& model_boundary, bool active )
     {
         model_boundaries_
-            .modifiable_model_boundary(
-                id, typename ModelBoundaries<
-                        dimension >::ModelBoundariesBuilderKey{} )
+            .modifiable_model_boundary( model_boundary.id(),
+                typename ModelBoundaries<
+                    dimension >::ModelBoundariesBuilderKey{} )
             .set_model_boundary_active(
                 active, typename ModelBoundaries<
                             dimension >::ModelBoundariesBuilderKey{} );

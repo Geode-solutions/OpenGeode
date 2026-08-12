@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/model/mixin/builder/surface_collections_builder.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
 
 #define PYTHON_SURFACE_COLLECTIONS_BUILDER( dimension )                        \
     const auto name##dimension =                                               \

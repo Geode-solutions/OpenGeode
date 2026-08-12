@@ -98,23 +98,23 @@ namespace geode
     {
         ModelCopyMapping mappings;
         detail::copy_corner_components(
-            brep, *this, mappings[Corner3D::component_type_static()] );
+            brep, brep_, *this, mappings[Corner3D::component_type_static()] );
         detail::copy_line_components(
-            brep, *this, mappings[Line3D::component_type_static()] );
+            brep, brep_, *this, mappings[Line3D::component_type_static()] );
         detail::copy_surface_components(
-            brep, *this, mappings[Surface3D::component_type_static()] );
+            brep, brep_, *this, mappings[Surface3D::component_type_static()] );
         detail::copy_block_components(
-            brep, *this, mappings[Block3D::component_type_static()] );
-        detail::copy_model_boundary_components(
-            brep, *this, mappings[ModelBoundary3D::component_type_static()] );
-        detail::copy_corner_collection_components( brep, *this,
+            brep, brep_, *this, mappings[Block3D::component_type_static()] );
+        detail::copy_model_boundary_components( brep, brep_, *this,
+            mappings[ModelBoundary3D::component_type_static()] );
+        detail::copy_corner_collection_components( brep, brep_, *this,
             mappings[CornerCollection3D::component_type_static()] );
-        detail::copy_line_collection_components(
-            brep, *this, mappings[LineCollection3D::component_type_static()] );
-        detail::copy_surface_collection_components( brep, *this,
+        detail::copy_line_collection_components( brep, brep_, *this,
+            mappings[LineCollection3D::component_type_static()] );
+        detail::copy_surface_collection_components( brep, brep_, *this,
             mappings[SurfaceCollection3D::component_type_static()] );
-        detail::copy_block_collection_components(
-            brep, *this, mappings[BlockCollection3D::component_type_static()] );
+        detail::copy_block_collection_components( brep, brep_, *this,
+            mappings[BlockCollection3D::component_type_static()] );
         return mappings;
     }
 
@@ -122,23 +122,23 @@ namespace geode
         ModelCopyMapping& mapping, const BRep& brep )
     {
         detail::copy_corner_components(
-            brep, *this, mapping[Corner3D::component_type_static()] );
+            brep, brep_, *this, mapping[Corner3D::component_type_static()] );
         detail::copy_line_components(
-            brep, *this, mapping[Line3D::component_type_static()] );
+            brep, brep_, *this, mapping[Line3D::component_type_static()] );
         detail::copy_surface_components(
-            brep, *this, mapping[Surface3D::component_type_static()] );
+            brep, brep_, *this, mapping[Surface3D::component_type_static()] );
         detail::copy_block_components(
-            brep, *this, mapping[Block3D::component_type_static()] );
-        detail::copy_model_boundary_components(
-            brep, *this, mapping[ModelBoundary3D::component_type_static()] );
-        detail::copy_corner_collection_components(
-            brep, *this, mapping[CornerCollection3D::component_type_static()] );
-        detail::copy_line_collection_components(
-            brep, *this, mapping[LineCollection3D::component_type_static()] );
-        detail::copy_surface_collection_components( brep, *this,
+            brep, brep_, *this, mapping[Block3D::component_type_static()] );
+        detail::copy_model_boundary_components( brep, brep_, *this,
+            mapping[ModelBoundary3D::component_type_static()] );
+        detail::copy_corner_collection_components( brep, brep_, *this,
+            mapping[CornerCollection3D::component_type_static()] );
+        detail::copy_line_collection_components( brep, brep_, *this,
+            mapping[LineCollection3D::component_type_static()] );
+        detail::copy_surface_collection_components( brep, brep_, *this,
             mapping[SurfaceCollection3D::component_type_static()] );
-        detail::copy_block_collection_components(
-            brep, *this, mapping[BlockCollection3D::component_type_static()] );
+        detail::copy_block_collection_components( brep, brep_, *this,
+            mapping[BlockCollection3D::component_type_static()] );
     }
 
     void BRepBuilder::copy_component_geometry(
@@ -521,25 +521,25 @@ namespace geode
         {
             if( cmv.component_id.type() == Block3D::component_type_static() )
             {
-                block_mesh_builder( cmv.component_id.id() )
+                block_mesh_builder( brep_.block( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
             else if( cmv.component_id.type()
                      == Surface3D::component_type_static() )
             {
-                surface_mesh_builder( cmv.component_id.id() )
+                surface_mesh_builder( brep_.surface( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
             else if( cmv.component_id.type()
                      == Line3D::component_type_static() )
             {
-                line_mesh_builder( cmv.component_id.id() )
+                line_mesh_builder( brep_.line( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
             else if( cmv.component_id.type()
                      == Corner3D::component_type_static() )
             {
-                corner_mesh_builder( cmv.component_id.id() )
+                corner_mesh_builder( brep_.corner( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
         }

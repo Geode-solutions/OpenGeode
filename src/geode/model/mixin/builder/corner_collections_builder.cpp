@@ -67,12 +67,13 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::set_corner_collection_name(
-        const uuid& id, std::string_view name )
+        const CornerCollection< dimension >& corner_collection,
+        std::string_view name )
     {
         corner_collections_
-            .modifiable_corner_collection(
-                id, typename CornerCollections<
-                        dimension >::CornerCollectionsBuilderKey{} )
+            .modifiable_corner_collection( corner_collection.id(),
+                typename CornerCollections<
+                    dimension >::CornerCollectionsBuilderKey{} )
             .set_corner_collection_name(
                 name, typename CornerCollections<
                           dimension >::CornerCollectionsBuilderKey{} );
@@ -80,12 +81,12 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollectionsBuilder< dimension >::set_corner_collection_active(
-        const uuid& id, bool active )
+        const CornerCollection< dimension >& corner_collection, bool active )
     {
         corner_collections_
-            .modifiable_corner_collection(
-                id, typename CornerCollections<
-                        dimension >::CornerCollectionsBuilderKey{} )
+            .modifiable_corner_collection( corner_collection.id(),
+                typename CornerCollections<
+                    dimension >::CornerCollectionsBuilderKey{} )
             .set_corner_collection_active(
                 active, typename CornerCollections<
                             dimension >::CornerCollectionsBuilderKey{} );

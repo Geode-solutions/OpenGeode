@@ -68,8 +68,7 @@ namespace geode
                 {
                     const auto& corner_id = builder_.add_corner();
                     const auto& corner = model_.corner( corner_id );
-                    auto mesh_builder =
-                        builder_.corner_mesh_builder( corner_id );
+                    auto mesh_builder = builder_.corner_mesh_builder( corner );
                     create_point( *mesh_builder, corner, definition.vertex );
                     corners.push_back( corner_id );
                 }
@@ -85,7 +84,7 @@ namespace geode
                 {
                     const auto& line_id = builder_.add_line();
                     const auto& line = model_.line( line_id );
-                    auto mesh_builder = builder_.line_mesh_builder( line_id );
+                    auto mesh_builder = builder_.line_mesh_builder( line );
                     const auto& vertices = definition.vertices;
                     for( const auto vertex : vertices )
                     {
@@ -119,7 +118,7 @@ namespace geode
                             dimension >::type_name_static() ) );
                     const auto& surface = model_.surface( surface_id );
                     auto mesh_builder =
-                        builder_.surface_mesh_builder( surface_id );
+                        builder_.surface_mesh_builder( surface );
                     for( const auto vertex : definition.vertices )
                     {
                         create_point( *mesh_builder, surface, vertex );

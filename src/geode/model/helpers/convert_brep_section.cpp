@@ -50,17 +50,18 @@
 
 namespace
 {
-    template < typename ModelFrom, typename BuilderTo >
-    geode::ModelCopyMapping copy_components(
-        const ModelFrom& from, BuilderTo& builder_to )
+    template < typename ModelFrom, typename ModelTo >
+    geode::ModelCopyMapping copy_components( const ModelFrom& from,
+        const ModelTo& to,
+        typename ModelTo::Builder& builder_to )
     {
         geode::ModelCopyMapping mappings;
-        const auto dimension = BuilderTo::dim;
-        geode::detail::copy_corner_components( from, builder_to,
+        const auto dimension = ModelTo::dim;
+        geode::detail::copy_corner_components( from, to, builder_to,
             mappings[geode::Corner< dimension >::component_type_static()] );
-        geode::detail::copy_line_components( from, builder_to,
+        geode::detail::copy_line_components( from, to, builder_to,
             mappings[geode::Line< dimension >::component_type_static()] );
-        geode::detail::copy_surface_components( from, builder_to,
+        geode::detail::copy_surface_components( from, to, builder_to,
             mappings[geode::Surface< dimension >::component_type_static()] );
         builder_to.copy_relationships( mappings, from );
         return mappings;
@@ -177,7 +178,7 @@ namespace
                 corner_slice0, line );
             brep_builder_.add_corner_line_boundary_relationship(
                 corner_slice1, line );
-            auto line_builder = brep_builder_.line_mesh_builder( line.id() );
+            auto line_builder = brep_builder_.line_mesh_builder( line );
             const auto corner_slice0_vid =
                 line_builder->create_point( corner_slice0.mesh().point( 0 ) );
             brep_builder_.set_unique_vertex(
@@ -201,7 +202,7 @@ namespace
                 if( const auto name = model_boundary.name() )
                 {
                     brep_builder_.set_model_boundary_name(
-                        new_id, name.value() );
+                        brep_.model_boundary( new_id ), name.value() );
                 }
                 for( const auto& item :
                     section_.model_boundary_items( model_boundary ) )
@@ -237,7 +238,7 @@ namespace
                 section_line, surface );
 
             auto surface_builder =
-                brep_builder_.surface_mesh_builder( surface.id() );
+                brep_builder_.surface_mesh_builder( surface );
             for( const auto edge_id :
                 geode::Range{ line_slice0.mesh().nb_edges() } )
             {
@@ -271,7 +272,7 @@ namespace
                 }
             }
             auto surface_builder =
-                brep_builder_.surface_mesh_builder( surface.id() );
+                brep_builder_.surface_mesh_builder( surface );
             auto pt_id = surface_builder->create_point(
                 line.mesh().point( line_pointid ) );
             brep_builder_.set_unique_vertex(
@@ -339,7 +340,7 @@ namespace
                 section_surface, block );
             auto block_builder =
                 brep_builder_.block_mesh_builder< geode::HybridSolid3D >(
-                    block.id() );
+                    block );
             for( const auto tgl_id :
                 geode::Range{ surface_slice0.mesh().nb_polygons() } )
             {
@@ -371,7 +372,7 @@ namespace
                     return cmv.vertex;
                 }
             }
-            auto block_builder = brep_builder_.block_mesh_builder( block.id() );
+            auto block_builder = brep_builder_.block_mesh_builder( block );
             auto pt_id = block_builder->create_point(
                 surface.mesh().point( surf_pointid ) );
             brep_builder_.set_unique_vertex(
@@ -482,7 +483,7 @@ namespace geode
         std::tuple< Section, ModelCopyMapping > result;
         auto& [section, mappings] = result;
         SectionBuilder builder{ section };
-        mappings = copy_components< BRep, SectionBuilder >( brep, builder );
+        mappings = copy_components< BRep, Section >( brep, section, builder );
         for( const auto& corner : brep.corners() )
         {
             builder.update_corner_mesh(
@@ -519,7 +520,7 @@ namespace geode
         std::tuple< BRep, ModelCopyMapping > result;
         auto& [brep, mappings] = result;
         BRepBuilder builder{ brep };
-        mappings = copy_components< Section, BRepBuilder >( section, builder );
+        mappings = copy_components< Section, BRep >( section, brep, builder );
         for( const auto& corner : section.corners() )
         {
             builder.update_corner_mesh(

@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/model/mixin/builder/line_collections_builder.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
 
 #define PYTHON_LINE_COLLECTIONS_BUILDER( dimension )                           \
     const auto name##dimension =                                               \

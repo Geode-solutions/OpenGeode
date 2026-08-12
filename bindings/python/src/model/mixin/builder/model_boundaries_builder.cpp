@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/model/mixin/builder/model_boundaries_builder.hpp>
+#include <geode/model/mixin/core/model_boundary.hpp>
 
 #define PYTHON_MODEL_BOUNDARIES_BUILDER( dimension )                           \
     const auto name##dimension =                                               \

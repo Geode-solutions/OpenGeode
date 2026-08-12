@@ -126,7 +126,7 @@ namespace
         {
             const auto& mesh = surface.mesh();
             geode::triangulate_surface_mesh(
-                mesh, *builder.surface_mesh_builder( surface.id() ) );
+                mesh, *builder.surface_mesh_builder( surface ) );
         }
     }
 

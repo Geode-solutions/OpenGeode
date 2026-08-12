@@ -28,6 +28,7 @@
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 
 #include <geode/model/mixin/builder/lines_builder.hpp>
+#include <geode/model/mixin/core/line.hpp>
 
 #define PYTHON_LINES_BUILDER( dimension )                                      \
     const auto name##dimension =                                               \

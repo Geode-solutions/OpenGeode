@@ -43,9 +43,12 @@ namespace geode
     public:
         void load_line_collections( std::string_view directory );
 
-        void set_line_collection_name( const uuid& id, std::string_view name );
+        void set_line_collection_name(
+            const LineCollection< dimension >& line_collection,
+            std::string_view name );
 
-        void set_line_collection_active( const uuid& id, bool active );
+        void set_line_collection_active(
+            const LineCollection< dimension >& line_collection, bool active );
 
     protected:
         explicit LineCollectionsBuilder(

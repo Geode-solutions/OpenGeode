@@ -65,7 +65,8 @@ std::array< geode::uuid, 6 > add_corners(
     for( const auto c : geode::Range{ 6 } )
     {
         uuids[c] = builder.add_corner();
-        builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
+        builder.set_corner_name(
+            model.corner( uuids[c] ), absl::StrCat( "corner", c + 1 ) );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::impl_name_static() ) );
@@ -78,8 +79,8 @@ std::array< geode::uuid, 6 > add_corners(
         model.corner( uuids[3] ).name() == "corner4", "Wrong Corner name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_corners() == 6, message );
-    builder.set_corner_active( uuids[1], false );
-    builder.set_corner_active( uuids[4], false );
+    builder.set_corner_active( model.corner( uuids[1] ), false );
+    builder.set_corner_active( model.corner( uuids[4] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_corners() == 4, "BRep should have 4 active corners" );
     geode::OpenGeodeModelException::test(
@@ -94,7 +95,8 @@ std::array< geode::uuid, 9 > add_lines(
     for( const auto l : geode::Range{ 9 } )
     {
         uuids[l] = builder.add_line();
-        builder.set_line_name( uuids[l], absl::StrCat( "line", l + 1 ) );
+        builder.set_line_name(
+            model.line( uuids[l] ), absl::StrCat( "line", l + 1 ) );
     }
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve3D::impl_name_static() ) );
@@ -107,8 +109,8 @@ std::array< geode::uuid, 9 > add_lines(
         model.line( uuids[3] ).name() == "line4", "Wrong Line name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_lines() == 9, message );
-    builder.set_line_active( uuids[1], false );
-    builder.set_line_active( uuids[4], false );
+    builder.set_line_active( model.line( uuids[1] ), false );
+    builder.set_line_active( model.line( uuids[4] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_lines() == 7, "BRep should have 7 active lines" );
     geode::OpenGeodeModelException::test(
@@ -124,7 +126,8 @@ std::array< geode::uuid, 5 > add_surfaces(
     {
         uuids[s] = builder.add_surface(
             geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
-        builder.set_surface_name( uuids[s], absl::StrCat( "surface", s + 1 ) );
+        builder.set_surface_name(
+            model.surface( uuids[s] ), absl::StrCat( "surface", s + 1 ) );
     }
     for( const auto s : geode::Range{ 2, 5 } )
     {
@@ -141,8 +144,8 @@ std::array< geode::uuid, 5 > add_surfaces(
         model.surface( uuids[1] ).name() == "surface2", "Wrong Surface name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_surfaces() == 5, message );
-    builder.set_surface_active( uuids[1], false );
-    builder.set_surface_active( uuids[4], false );
+    builder.set_surface_active( model.surface( uuids[1] ), false );
+    builder.set_surface_active( model.surface( uuids[4] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_surfaces() == 3, "BRep should have 3 active surfaces" );
     geode::OpenGeodeModelException::test(
@@ -153,7 +156,7 @@ std::array< geode::uuid, 5 > add_surfaces(
 geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
 {
     geode::uuid block_uuid = builder.add_block();
-    builder.set_block_name( block_uuid, "block1" );
+    builder.set_block_name( model.block( block_uuid ), "block1" );
     const auto& temp_block = model.block( builder.add_block(
         geode::OpenGeodePolyhedralSolid3D::impl_name_static() ) );
     builder.remove_block( temp_block );
@@ -165,7 +168,7 @@ geode::uuid add_block( const geode::BRep& model, geode::BRepBuilder& builder )
         model.block( block_uuid ).name() == "block1", "Wrong Block name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 1, message );
-    builder.set_block_active( block_uuid, false );
+    builder.set_block_active( model.block( block_uuid ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_blocks() == 0, "BRep should have 0 active block" );
     geode::OpenGeodeModelException::test(
@@ -180,8 +183,8 @@ std::array< geode::uuid, 3 > add_model_boundaries(
     for( const auto mb : geode::Range{ 3 } )
     {
         uuids[mb] = builder.add_model_boundary();
-        builder.set_model_boundary_name(
-            uuids[mb], absl::StrCat( "boundary", mb + 1 ) );
+        builder.set_model_boundary_name( model.model_boundary( uuids[mb] ),
+            absl::StrCat( "boundary", mb + 1 ) );
     }
     const auto& temp_boundary =
         model.model_boundary( builder.add_model_boundary() );
@@ -198,8 +201,10 @@ std::array< geode::uuid, 3 > add_model_boundaries(
         "Wrong ModelBoundary name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_model_boundaries() == 3, message );
-    builder.set_model_boundary_active( uuids[1], false );
-    builder.set_model_boundary_active( uuids[2], false );
+    builder.set_model_boundary_active(
+        model.model_boundary( uuids[1] ), false );
+    builder.set_model_boundary_active(
+        model.model_boundary( uuids[2] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_model_boundaries() == 1,
         "BRep should have 1 active model boundary" );
@@ -216,7 +221,8 @@ std::array< geode::uuid, 2 > add_corner_collections(
     {
         uuids[mb] = builder.add_corner_collection();
         builder.set_corner_collection_name(
-            uuids[mb], absl::StrCat( "corner_collection", mb + 1 ) );
+            model.corner_collection( uuids[mb] ),
+            absl::StrCat( "corner_collection", mb + 1 ) );
     }
     const auto& temp_collection =
         model.corner_collection( builder.add_corner_collection() );
@@ -234,7 +240,8 @@ std::array< geode::uuid, 2 > add_corner_collections(
         "Wrong CornerCollection name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_corner_collections() == 2, message );
-    builder.set_corner_collection_active( uuids[1], false );
+    builder.set_corner_collection_active(
+        model.corner_collection( uuids[1] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_corner_collections() == 1,
         "BRep should have 1 active corner collection" );
@@ -251,8 +258,8 @@ std::array< geode::uuid, 2 > add_line_collections(
     for( const auto mb : geode::Indices{ uuids } )
     {
         uuids[mb] = builder.add_line_collection();
-        builder.set_line_collection_name(
-            uuids[mb], absl::StrCat( "line_collection", mb + 1 ) );
+        builder.set_line_collection_name( model.line_collection( uuids[mb] ),
+            absl::StrCat( "line_collection", mb + 1 ) );
     }
     const auto& temp_collection =
         model.line_collection( builder.add_line_collection() );
@@ -270,7 +277,8 @@ std::array< geode::uuid, 2 > add_line_collections(
         "Wrong LineCollection name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_line_collections() == 2, message );
-    builder.set_line_collection_active( uuids[1], false );
+    builder.set_line_collection_active(
+        model.line_collection( uuids[1] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_line_collections() == 1,
         "BRep should have 1 active line collection" );
@@ -287,7 +295,8 @@ std::array< geode::uuid, 2 > add_surface_collections(
     {
         uuids[mb] = builder.add_surface_collection();
         builder.set_surface_collection_name(
-            uuids[mb], absl::StrCat( "surface_collection", mb + 1 ) );
+            model.surface_collection( uuids[mb] ),
+            absl::StrCat( "surface_collection", mb + 1 ) );
     }
     const auto& temp_collection =
         model.surface_collection( builder.add_surface_collection() );
@@ -305,7 +314,8 @@ std::array< geode::uuid, 2 > add_surface_collections(
         "Wrong SurfaceCollection name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_surface_collections() == 2, message );
-    builder.set_surface_collection_active( uuids[1], false );
+    builder.set_surface_collection_active(
+        model.surface_collection( uuids[1] ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_surface_collections() == 1,
         "BRep should have 1 active surface collection" );
@@ -319,7 +329,8 @@ geode::uuid add_block_collection(
 {
     geode::uuid block_uuid;
     block_uuid = builder.add_block_collection();
-    builder.set_block_collection_name( block_uuid, "block_collection1" );
+    builder.set_block_collection_name(
+        model.block_collection( block_uuid ), "block_collection1" );
     const auto& temp_collection =
         model.block_collection( builder.add_block_collection() );
     builder.remove_block_collection( temp_collection );
@@ -334,7 +345,8 @@ geode::uuid add_block_collection(
         "Wrong BlockCollection name" );
     geode::OpenGeodeModelException::test(
         model.nb_active_block_collections() == 1, message );
-    builder.set_block_collection_active( block_uuid, false );
+    builder.set_block_collection_active(
+        model.block_collection( block_uuid ), false );
     geode::OpenGeodeModelException::test(
         model.nb_active_block_collections() == 0,
         "BRep should have 0 active block collection" );
@@ -798,7 +810,8 @@ void add_internal_surface_block_relations( const geode::BRep& model,
     }
 }
 
-void set_geometry( geode::BRepBuilder& builder,
+void set_geometry( const geode::BRep& model,
+    geode::BRepBuilder& builder,
     absl::Span< const geode::uuid > corner_uuids,
     absl::Span< const geode::uuid > line_uuids,
     absl::Span< const geode::uuid > surface_uuids )
@@ -812,80 +825,114 @@ void set_geometry( geode::BRepBuilder& builder,
     points[5] = geode::Point3D{ { 2., 2., 2. } };
     for( const auto i : geode::Range{ 6 } )
     {
-        builder.corner_mesh_builder( corner_uuids[i] )
+        builder.corner_mesh_builder( model.corner( corner_uuids[i] ) )
             ->create_point( points[i] );
     }
-    builder.line_mesh_builder( line_uuids[0] )->create_point( points[0] );
-    builder.line_mesh_builder( line_uuids[0] )->create_point( points[1] );
-    builder.line_mesh_builder( line_uuids[1] )->create_point( points[1] );
-    builder.line_mesh_builder( line_uuids[1] )->create_point( points[2] );
-    builder.line_mesh_builder( line_uuids[2] )->create_point( points[0] );
-    builder.line_mesh_builder( line_uuids[2] )->create_point( points[2] );
-    builder.line_mesh_builder( line_uuids[3] )->create_point( points[1] );
-    builder.line_mesh_builder( line_uuids[3] )->create_point( points[4] );
-    builder.line_mesh_builder( line_uuids[4] )->create_point( points[2] );
-    builder.line_mesh_builder( line_uuids[4] )->create_point( points[5] );
-    builder.line_mesh_builder( line_uuids[5] )->create_point( points[0] );
-    builder.line_mesh_builder( line_uuids[5] )->create_point( points[3] );
-    builder.line_mesh_builder( line_uuids[6] )->create_point( points[3] );
-    builder.line_mesh_builder( line_uuids[6] )->create_point( points[4] );
-    builder.line_mesh_builder( line_uuids[7] )->create_point( points[4] );
-    builder.line_mesh_builder( line_uuids[7] )->create_point( points[5] );
-    builder.line_mesh_builder( line_uuids[8] )->create_point( points[3] );
-    builder.line_mesh_builder( line_uuids[8] )->create_point( points[5] );
+    builder.line_mesh_builder( model.line( line_uuids[0] ) )
+        ->create_point( points[0] );
+    builder.line_mesh_builder( model.line( line_uuids[0] ) )
+        ->create_point( points[1] );
+    builder.line_mesh_builder( model.line( line_uuids[1] ) )
+        ->create_point( points[1] );
+    builder.line_mesh_builder( model.line( line_uuids[1] ) )
+        ->create_point( points[2] );
+    builder.line_mesh_builder( model.line( line_uuids[2] ) )
+        ->create_point( points[0] );
+    builder.line_mesh_builder( model.line( line_uuids[2] ) )
+        ->create_point( points[2] );
+    builder.line_mesh_builder( model.line( line_uuids[3] ) )
+        ->create_point( points[1] );
+    builder.line_mesh_builder( model.line( line_uuids[3] ) )
+        ->create_point( points[4] );
+    builder.line_mesh_builder( model.line( line_uuids[4] ) )
+        ->create_point( points[2] );
+    builder.line_mesh_builder( model.line( line_uuids[4] ) )
+        ->create_point( points[5] );
+    builder.line_mesh_builder( model.line( line_uuids[5] ) )
+        ->create_point( points[0] );
+    builder.line_mesh_builder( model.line( line_uuids[5] ) )
+        ->create_point( points[3] );
+    builder.line_mesh_builder( model.line( line_uuids[6] ) )
+        ->create_point( points[3] );
+    builder.line_mesh_builder( model.line( line_uuids[6] ) )
+        ->create_point( points[4] );
+    builder.line_mesh_builder( model.line( line_uuids[7] ) )
+        ->create_point( points[4] );
+    builder.line_mesh_builder( model.line( line_uuids[7] ) )
+        ->create_point( points[5] );
+    builder.line_mesh_builder( model.line( line_uuids[8] ) )
+        ->create_point( points[3] );
+    builder.line_mesh_builder( model.line( line_uuids[8] ) )
+        ->create_point( points[5] );
     for( const auto i : geode::Range{ 9 } )
     {
-        builder.line_mesh_builder( line_uuids[i] )->create_edge( 0, 1 );
+        builder.line_mesh_builder( model.line( line_uuids[i] ) )
+            ->create_edge( 0, 1 );
     }
 
     builder
         .surface_mesh_builder< geode::TriangulatedSurface3D >(
-            surface_uuids[0] )
+            model.surface( surface_uuids[0] ) )
         ->create_point( points[0] );
     builder
         .surface_mesh_builder< geode::TriangulatedSurface3D >(
-            surface_uuids[0] )
+            model.surface( surface_uuids[0] ) )
         ->create_point( points[1] );
     builder
         .surface_mesh_builder< geode::TriangulatedSurface3D >(
-            surface_uuids[0] )
+            model.surface( surface_uuids[0] ) )
         ->create_point( points[2] );
     builder
         .surface_mesh_builder< geode::TriangulatedSurface3D >(
-            surface_uuids[0] )
+            model.surface( surface_uuids[0] ) )
         ->create_polygon( { 0, 1, 2 } );
 
-    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[0] );
-    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[1] );
-    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[4] );
-    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[3] );
-    builder.surface_mesh_builder( surface_uuids[1] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[1] ) )
+        ->create_point( points[0] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[1] ) )
+        ->create_point( points[1] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[1] ) )
+        ->create_point( points[4] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[1] ) )
+        ->create_point( points[3] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[1] ) )
         ->create_polygon( { 0, 1, 2 } );
-    builder.surface_mesh_builder( surface_uuids[1] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[1] ) )
         ->create_polygon( { 0, 2, 3 } );
 
-    builder.surface_mesh_builder( surface_uuids[2] )->create_point( points[4] );
-    builder.surface_mesh_builder( surface_uuids[2] )->create_point( points[1] );
-    builder.surface_mesh_builder( surface_uuids[2] )->create_point( points[2] );
-    builder.surface_mesh_builder( surface_uuids[2] )->create_point( points[5] );
-    builder.surface_mesh_builder( surface_uuids[2] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[2] ) )
+        ->create_point( points[4] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[2] ) )
+        ->create_point( points[1] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[2] ) )
+        ->create_point( points[2] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[2] ) )
+        ->create_point( points[5] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[2] ) )
         ->create_polygon( { 0, 1, 2 } );
-    builder.surface_mesh_builder( surface_uuids[2] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[2] ) )
         ->create_polygon( { 0, 2, 3 } );
 
-    builder.surface_mesh_builder( surface_uuids[3] )->create_point( points[3] );
-    builder.surface_mesh_builder( surface_uuids[3] )->create_point( points[0] );
-    builder.surface_mesh_builder( surface_uuids[3] )->create_point( points[2] );
-    builder.surface_mesh_builder( surface_uuids[3] )->create_point( points[5] );
-    builder.surface_mesh_builder( surface_uuids[3] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[3] ) )
+        ->create_point( points[3] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[3] ) )
+        ->create_point( points[0] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[3] ) )
+        ->create_point( points[2] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[3] ) )
+        ->create_point( points[5] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[3] ) )
         ->create_polygon( { 0, 1, 2 } );
-    builder.surface_mesh_builder( surface_uuids[3] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[3] ) )
         ->create_polygon( { 0, 2, 3 } );
 
-    builder.surface_mesh_builder( surface_uuids[4] )->create_point( points[3] );
-    builder.surface_mesh_builder( surface_uuids[4] )->create_point( points[4] );
-    builder.surface_mesh_builder( surface_uuids[4] )->create_point( points[5] );
-    builder.surface_mesh_builder( surface_uuids[4] )
+    builder.surface_mesh_builder( model.surface( surface_uuids[4] ) )
+        ->create_point( points[3] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[4] ) )
+        ->create_point( points[4] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[4] ) )
+        ->create_point( points[5] );
+    builder.surface_mesh_builder( model.surface( surface_uuids[4] ) )
         ->create_polygon( { 0, 1, 2 } );
 }
 
@@ -1532,7 +1579,7 @@ void test_backward_io()
     for( const auto& surface : brep.surfaces() )
     {
         auto vertex_index =
-            brep_builder.surface_mesh_builder( surface.id() )->create_vertex();
+            brep_builder.surface_mesh_builder( surface )->create_vertex();
         DEBUG( vertex_index );
         DEBUG( brep.unique_vertex( { surface.component_id(), vertex_index } ) );
         geode::OpenGeodeModelException::test(
@@ -1570,8 +1617,7 @@ void test_backward_io()
     for( const auto& surface : brep_v17.surfaces() )
     {
         auto vertex_index =
-            brep_builder_v17.surface_mesh_builder( surface.id() )
-                ->create_vertex();
+            brep_builder_v17.surface_mesh_builder( surface )->create_vertex();
         geode::OpenGeodeModelException::test(
             brep_v17.unique_vertex( { surface.component_id(), vertex_index } )
                 == geode::NO_ID,
@@ -1628,7 +1674,7 @@ void test()
 
     test_registry( model, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 
-    set_geometry( builder, corner_uuids, line_uuids, surface_uuids );
+    set_geometry( model, builder, corner_uuids, line_uuids, surface_uuids );
 
     add_corner_line_boundary_relation(
         model, builder, corner_uuids, line_uuids );
@@ -1679,8 +1725,8 @@ void test()
     geode::BRepBuilder model2_builder{ model2 };
     for( const auto& surface : model2.surfaces() )
     {
-        auto vertex_index = model2_builder.surface_mesh_builder( surface.id() )
-                                ->create_vertex();
+        auto vertex_index =
+            model2_builder.surface_mesh_builder( surface )->create_vertex();
         DEBUG( vertex_index );
         DEBUG(
             model2.unique_vertex( { surface.component_id(), vertex_index } ) );

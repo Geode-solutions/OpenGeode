@@ -91,19 +91,19 @@ namespace geode
     ModelCopyMapping SectionBuilder::copy_components( const Section& section )
     {
         ModelCopyMapping mappings;
-        detail::copy_corner_components(
-            section, *this, mappings[Corner2D::component_type_static()] );
-        detail::copy_line_components(
-            section, *this, mappings[Line2D::component_type_static()] );
-        detail::copy_surface_components(
-            section, *this, mappings[Surface2D::component_type_static()] );
-        detail::copy_model_boundary_components( section, *this,
+        detail::copy_corner_components( section, section_, *this,
+            mappings[Corner2D::component_type_static()] );
+        detail::copy_line_components( section, section_, *this,
+            mappings[Line2D::component_type_static()] );
+        detail::copy_surface_components( section, section_, *this,
+            mappings[Surface2D::component_type_static()] );
+        detail::copy_model_boundary_components( section, section_, *this,
             mappings[ModelBoundary2D::component_type_static()] );
-        detail::copy_corner_collection_components( section, *this,
+        detail::copy_corner_collection_components( section, section_, *this,
             mappings[CornerCollection2D::component_type_static()] );
-        detail::copy_line_collection_components( section, *this,
+        detail::copy_line_collection_components( section, section_, *this,
             mappings[LineCollection2D::component_type_static()] );
-        detail::copy_surface_collection_components( section, *this,
+        detail::copy_surface_collection_components( section, section_, *this,
             mappings[SurfaceCollection2D::component_type_static()] );
         return mappings;
     }
@@ -111,19 +111,19 @@ namespace geode
     void SectionBuilder::copy_components(
         ModelCopyMapping& mapping, const Section& section )
     {
-        detail::copy_corner_components(
-            section, *this, mapping[Corner2D::component_type_static()] );
-        detail::copy_line_components(
-            section, *this, mapping[Line2D::component_type_static()] );
-        detail::copy_surface_components(
-            section, *this, mapping[Surface2D::component_type_static()] );
-        detail::copy_model_boundary_components(
-            section, *this, mapping[ModelBoundary2D::component_type_static()] );
-        detail::copy_corner_collection_components( section, *this,
+        detail::copy_corner_components( section, section_, *this,
+            mapping[Corner2D::component_type_static()] );
+        detail::copy_line_components( section, section_, *this,
+            mapping[Line2D::component_type_static()] );
+        detail::copy_surface_components( section, section_, *this,
+            mapping[Surface2D::component_type_static()] );
+        detail::copy_model_boundary_components( section, section_, *this,
+            mapping[ModelBoundary2D::component_type_static()] );
+        detail::copy_corner_collection_components( section, section_, *this,
             mapping[CornerCollection2D::component_type_static()] );
-        detail::copy_line_collection_components( section, *this,
+        detail::copy_line_collection_components( section, section_, *this,
             mapping[LineCollection2D::component_type_static()] );
-        detail::copy_surface_collection_components( section, *this,
+        detail::copy_surface_collection_components( section, section_, *this,
             mapping[SurfaceCollection2D::component_type_static()] );
     }
 
@@ -419,19 +419,20 @@ namespace geode
         {
             if( cmv.component_id.type() == Surface2D::component_type_static() )
             {
-                surface_mesh_builder( cmv.component_id.id() )
+                surface_mesh_builder(
+                    section_.surface( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
             else if( cmv.component_id.type()
                      == Line2D::component_type_static() )
             {
-                line_mesh_builder( cmv.component_id.id() )
+                line_mesh_builder( section_.line( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
             else if( cmv.component_id.type()
                      == Corner2D::component_type_static() )
             {
-                corner_mesh_builder( cmv.component_id.id() )
+                corner_mesh_builder( section_.corner( cmv.component_id.id() ) )
                     ->set_point( cmv.vertex, point );
             }
         }

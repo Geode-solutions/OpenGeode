@@ -48,38 +48,44 @@ namespace geode
     namespace detail
     {
         void opengeode_model_api transfer_brep_metadata( const BRep& old_brep,
+            const BRep& new_brep,
             BRepBuilder& new_brep_builder,
             const ModelGenericMapping& component_mapping );
 
         void opengeode_model_api transfer_section_metadata(
             const Section& old_section,
+            const Section& new_section,
             SectionBuilder& new_section_builder,
             const ModelGenericMapping& component_mapping );
 
-        template < typename ModelBuilder >
+        template < typename Model >
         void transfer_pointsets_metadata(
             absl::Span< const std::reference_wrapper<
-                const PointSet< ModelBuilder::dim > > > pointsets,
-            ModelBuilder& model_builder,
+                const PointSet< Model::dim > > > pointsets,
+            const Model& model,
+            typename Model::Builder& builder,
             const ModelGenericMapping& component_mapping );
 
-        template < typename ModelBuilder >
+        template < typename Model >
         void transfer_curves_metadata(
             absl::Span< const std::reference_wrapper<
-                const EdgedCurve< ModelBuilder::dim > > > curves,
-            ModelBuilder& model_builder,
+                const EdgedCurve< Model::dim > > > curves,
+            const Model& model,
+            typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping );
 
-        template < typename ModelBuilder >
+        template < typename Model >
         void transfer_surfaces_metadata(
             absl::Span< const std::reference_wrapper<
-                const SurfaceMesh< ModelBuilder::dim > > > surfaces,
-            ModelBuilder& model_builder,
+                const SurfaceMesh< Model::dim > > > surfaces,
+            const Model& model,
+            typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping );
 
         void opengeode_model_api transfer_solids_metadata(
             absl::Span< const std::reference_wrapper< const SolidMesh3D > >
                 solids,
+            const BRep& model,
             BRepBuilder& model_builder,
             const ModelGenericMapping& component_mapping );
     } // namespace detail
