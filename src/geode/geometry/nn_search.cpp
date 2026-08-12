@@ -160,6 +160,12 @@ namespace geode
             index_t nb_unique_points{ 0 };
             for( const auto point_id : Range{ nb_points } )
             {
+                OpenGeodeGeometryException::check_exception(
+                    mapping[point_id] != NO_ID, point( point_id ),
+                    OpenGeodeException::TYPE::data,
+                    "[NNSearch::colocated_index_mapping] Issue with a point "
+                    "coordinate for point id ",
+                    point_id, ": ", point( point_id ).string() );
                 if( mapping[point_id] == point_id )
                 {
                     nb_unique_points++;
