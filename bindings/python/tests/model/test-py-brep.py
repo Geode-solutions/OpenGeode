@@ -346,7 +346,7 @@ def add_surfaces_in_model_boundaries(brep, builder, surface_uuids, boundary_uuid
         if brep.nb_collections(surface_id) != 1:
             raise ValueError("[Test] All Surfaces should be in 1 collection")
         for collection in brep.collections(surface_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.ModelBoundary3D.component_type_static()
             ):
                 raise ValueError(
