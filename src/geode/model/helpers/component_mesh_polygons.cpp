@@ -69,7 +69,7 @@ namespace
             for( const auto& cmv : model.component_mesh_vertices(
                      facet_unique_vertices[polygon_vertex_id] ) )
             {
-                if( cmv.component_id.id() == block.id() )
+                if( cmv.component_id.id == block.id() )
                 {
                     block_facet_from_unique_vertices[polygon_vertex_id]
                         .emplace_back( cmv.vertex );
@@ -311,7 +311,7 @@ namespace
             for( const auto& cmv : model.component_mesh_vertices(
                      edge_unique_vertices[edge_vertex_id] ) )
             {
-                if( cmv.component_id.id() == surface.id() )
+                if( cmv.component_id.id == surface.id() )
                 {
                     surface_edge_from_unique_vertices[edge_vertex_id]
                         .emplace_back( cmv.vertex );
@@ -643,7 +643,7 @@ namespace geode
             polygons.reserve( surface_pairs.size() );
             for( auto& surface_pair : surface_pairs )
             {
-                const auto& surface = model.surface( surface_pair.first.id() );
+                const auto& surface = model.surface( surface_pair.first.id );
                 const auto& mesh = surface.mesh();
                 for( auto& pair : surface_pair.second )
                 {
@@ -680,7 +680,7 @@ namespace geode
             polygons.reserve( block_pairs.size() );
             for( const auto& block_pair : block_pairs )
             {
-                const auto& block = model.block( block_pair.first.id() );
+                const auto& block = model.block( block_pair.first.id );
                 const auto& mesh = block.mesh();
                 for( const auto& pair : block_pair.second )
                 {

@@ -108,7 +108,7 @@ namespace geode
             }
             return graph_component_id(
                        { edge_id.value(), BOUNDARY_EDGE_VERTEX } )
-                       .id()
+                       .id
                    == from;
         }
 
@@ -122,7 +122,7 @@ namespace geode
             }
             return graph_component_id(
                        { edge_id.value(), INTERNAL_EDGE_VERTEX } )
-                       .id()
+                       .id
                    == from;
         }
 
@@ -135,7 +135,7 @@ namespace geode
                 return false;
             }
             return graph_component_id( { edge_id.value(), ITEM_EDGE_VERTEX } )
-                       .id()
+                       .id
                    == from;
         }
 
@@ -144,7 +144,7 @@ namespace geode
             const RelationType type )
         {
             if( const auto component_id =
-                    relation_edge_index( from.id(), to.id() ) )
+                    relation_edge_index( from.id, to.id ) )
             {
                 const auto relation_type =
                     relation_type_->value( component_id.value() );

@@ -92,29 +92,29 @@ namespace
     const geode::Point< Model::dim >& get_point_base(
         const Model& model, const geode::ComponentMeshVertex& cmv )
     {
-        if( cmv.component_id.type()
+        if( cmv.component_id.type
             == geode::Surface< Model::dim >::component_type_static() )
         {
-            const auto& surface = model.surface( cmv.component_id.id() );
+            const auto& surface = model.surface( cmv.component_id.id );
             return surface.mesh().point( cmv.vertex );
         }
-        if( cmv.component_id.type()
+        if( cmv.component_id.type
             == geode::Line< Model::dim >::component_type_static() )
         {
-            const auto& line = model.line( cmv.component_id.id() );
+            const auto& line = model.line( cmv.component_id.id );
             return line.mesh().point( cmv.vertex );
         }
-        if( cmv.component_id.type()
+        if( cmv.component_id.type
             == geode::Corner< Model::dim >::component_type_static() )
         {
-            const auto& corner = model.corner( cmv.component_id.id() );
+            const auto& corner = model.corner( cmv.component_id.id );
             return corner.mesh().point( cmv.vertex );
         }
         throw geode::OpenGeodeModelException{ nullptr,
             geode::OpenGeodeException::TYPE::data,
             "[compute_unique_vertices::get_point] Unknown component type: ",
             cmv.component_id.string() };
-        const auto& corner = model.corner( cmv.component_id.id() );
+        const auto& corner = model.corner( cmv.component_id.id );
         return corner.mesh().point( cmv.vertex );
     }
 
@@ -127,10 +127,10 @@ namespace
     const geode::Point3D& get_point(
         const geode::BRep& model, const geode::ComponentMeshVertex& cmv )
     {
-        if( cmv.component_id.type()
+        if( cmv.component_id.type
             == geode::Block< 3 >::component_type_static() )
         {
-            const auto& block = model.block( cmv.component_id.id() );
+            const auto& block = model.block( cmv.component_id.id );
             return block.mesh().point( cmv.vertex );
         }
         return get_point_base< geode::BRep >( model, cmv );

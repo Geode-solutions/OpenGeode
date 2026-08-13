@@ -162,10 +162,10 @@ void test_attributes( const geode::Relationships& relations,
         "Wrong relation index from uuids" );
     const auto output = relations.relation_from_index( 0 );
     geode::OpenGeodeModelException::test(
-        std::get< 0 >( output ).id() == uuids[1],
+        std::get< 0 >( output ).id == uuids[1],
         "Wrong relation uuids from index" );
     geode::OpenGeodeModelException::test(
-        std::get< 1 >( output ).id() == uuids[0],
+        std::get< 1 >( output ).id == uuids[0],
         "Wrong relation uuids from index" );
     geode::AttributeProperties attribute_properties;
     attribute_properties.assignable = false;

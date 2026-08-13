@@ -122,7 +122,7 @@ namespace geode
             const ComponentID& from, const ComponentID& to )
         {
             if( const auto component_id =
-                    relation_edge_index( from.id(), to.id() ) )
+                    relation_edge_index( from.id, to.id ) )
             {
                 Logger::warning( "This relation already exists (",
                     from.string(), " and ", to.string(), ")" );
@@ -196,14 +196,14 @@ namespace geode
             for( const auto vertex_id : Range{ graph_->nb_vertices() } )
             {
                 const auto& component_id = component_from_index( vertex_id );
-                if( mapping.has_mapping_type( component_id.type() )
-                    && mapping.at( component_id.type() )
-                        .has_mapping_input( component_id.id() ) )
+                if( mapping.has_mapping_type( component_id.type )
+                    && mapping.at( component_id.type )
+                        .has_mapping_input( component_id.id ) )
                 {
-                    const auto& new_uuid = mapping.at( component_id.type() )
-                                               .in2out( component_id.id() );
+                    const auto& new_uuid = mapping.at( component_id.type )
+                                               .in2out( component_id.id );
                     ids_->set_value(
-                        vertex_id, { component_id.type(), new_uuid } );
+                        vertex_id, { component_id.type, new_uuid } );
                     uuid2index_.set_new_mapping( new_uuid, vertex_id );
                 }
                 else
@@ -273,7 +273,7 @@ namespace geode
             const ComponentID& component_id )
         {
             const auto index = GraphBuilder::create( *graph_ )->create_vertex();
-            uuid2index_.set_new_mapping( component_id.id(), index );
+            uuid2index_.set_new_mapping( component_id.id, index );
             ids_->set_value( index, component_id );
             return index;
         }
@@ -281,7 +281,7 @@ namespace geode
         index_t RelationshipsImpl::find_or_create_vertex_id(
             const ComponentID& component_id )
         {
-            if( const auto index = vertex_id( component_id.id() ) )
+            if( const auto index = vertex_id( component_id.id ) )
             {
                 return index.value();
             }

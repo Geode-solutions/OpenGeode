@@ -417,22 +417,20 @@ namespace geode
         for( const auto& cmv :
             section_.component_mesh_vertices( unique_vertex ) )
         {
-            if( cmv.component_id.type() == Surface2D::component_type_static() )
+            if( cmv.component_id.type == Surface2D::component_type_static() )
             {
-                surface_mesh_builder(
-                    section_.surface( cmv.component_id.id() ) )
+                surface_mesh_builder( section_.surface( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
-            else if( cmv.component_id.type()
-                     == Line2D::component_type_static() )
+            else if( cmv.component_id.type == Line2D::component_type_static() )
             {
-                line_mesh_builder( section_.line( cmv.component_id.id() ) )
+                line_mesh_builder( section_.line( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
-            else if( cmv.component_id.type()
+            else if( cmv.component_id.type
                      == Corner2D::component_type_static() )
             {
-                corner_mesh_builder( section_.corner( cmv.component_id.id() ) )
+                corner_mesh_builder( section_.corner( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
         }
