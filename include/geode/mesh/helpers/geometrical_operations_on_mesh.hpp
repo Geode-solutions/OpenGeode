@@ -29,12 +29,10 @@
 
 namespace geode
 {
-    template < template < index_t > class Mesh,
-        template < index_t > class MeshBuilder,
-        index_t dimension >
-    void translate_mesh( Mesh< dimension >& mesh,
-        MeshBuilder< dimension >& builder,
-        const Vector< dimension >& translation )
+    template < class Mesh >
+    void translate_mesh( Mesh& mesh,
+        typename Mesh::Builder& builder,
+        const Vector< Mesh::dim >& translation )
     {
         for( const auto v : Range{ mesh.nb_vertices() } )
         {
@@ -42,17 +40,15 @@ namespace geode
         }
     }
 
-    template < template < index_t > class Mesh,
-        template < index_t > class MeshBuilder,
-        index_t dimension >
-    void rescale_mesh( Mesh< dimension >& mesh,
-        MeshBuilder< dimension >& builder,
-        const std::array< double, dimension >& scale )
+    template < class Mesh >
+    void rescale_mesh( Mesh& mesh,
+        typename Mesh::Builder& builder,
+        const std::array< double, Mesh::dim >& scale )
     {
         for( const auto v : Range{ mesh.nb_vertices() } )
         {
             auto point = mesh.point( v );
-            for( const auto d : LRange{ dimension } )
+            for( const auto d : LRange{ Mesh::dim } )
             {
                 point.set_value( d, point.value( d ) * scale[d] );
             }
