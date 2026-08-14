@@ -39,6 +39,8 @@ namespace geode
             .def( pybind11::init<>() )
             .def( pybind11::init< ComponentType, uuid >() )
             .def( "string", &ComponentID::string )
+            .def_readwrite( "type", &ComponentID::type )
+            .def_readwrite( "id", &ComponentID::id )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self );
     }
