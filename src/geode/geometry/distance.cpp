@@ -486,10 +486,10 @@ namespace
         /* Algorithm and code found on
          * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
          */
-        const geode::Vector< dimension > P1mP0{ segment0.vertices()[1],
-            segment0.vertices()[0] };
-        const geode::Vector< dimension > Q1mQ0{ segment1.vertices()[1],
-            segment1.vertices()[0] };
+        const geode::Vector< dimension > P1mP0{ segment0.vertices()[0],
+            segment0.vertices()[1] };
+        const geode::Vector< dimension > Q1mQ0{ segment1.vertices()[0],
+            segment1.vertices()[1] };
         const geode::Vector< dimension > P0mQ0{ segment1.vertices()[0],
             segment0.vertices()[0] };
         const auto a = P1mP0.dot( P1mP0 );
