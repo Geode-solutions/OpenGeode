@@ -56,7 +56,6 @@ namespace geode
             GenericSegment< PointType, dimension >&& other ) noexcept;
 
         [[nodiscard]] Vector< dimension > direction() const;
-        [[nodiscard]] Vector< dimension > normalized_direction() const;
         [[nodiscard]] Point< dimension > barycenter() const;
         [[nodiscard]] double length() const;
         void set_point( local_index_t vertex, PointType point );

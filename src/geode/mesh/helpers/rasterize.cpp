@@ -238,10 +238,12 @@ namespace
         const auto& vertices = triangle_in_grid.vertices();
         for( const auto e : geode::LRange{ 3 } )
         {
-            result[e].first = geode::Vector2D{
-                { -1 * edges_in_grid[e].direction().value( plane_axes[1] ),
-                    edges_in_grid[e].direction().value( plane_axes[0] ) }
-            } * normal_orientation;
+            result[e].first =
+                geode::Vector2D{
+                    { -1 * edges_in_grid[e].direction().value( plane_axes[1] ),
+                        edges_in_grid[e].direction().value( plane_axes[0] ) }
+                }
+                * normal_orientation * edges_in_grid[e].length();
             const auto& vertex = vertices[e];
             result[e].second = -result[e].first.dot( geode::Vector2D{
                                    { vertex.value( plane_axes[0] ),
@@ -564,8 +566,8 @@ namespace
         const auto pt1_in_grid =
             grid.grid_coordinate_system().coordinates( seg_vertices[1] );
         const geode::Segment2D segment_in_grid{ pt0_in_grid, pt1_in_grid };
-        const auto normal_in_grid =
-            geode::perpendicular( segment_in_grid.direction() );
+        const auto normal_in_grid = geode::perpendicular(
+            segment_in_grid.direction() * segment_in_grid.length() );
         const geode::InfiniteLine2D line_in_grid{ segment_in_grid };
         const auto critical_point = compute_critical_point( normal_in_grid );
 
