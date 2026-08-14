@@ -486,8 +486,10 @@ namespace
         /* Algorithm and code found on
          * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
          */
-        const auto P1mP0 = segment0.direction();
-        const auto Q1mQ0 = segment1.direction();
+        const geode::Vector< dimension > P1mP0{ segment0.vertices()[0],
+            segment0.vertices()[1] };
+        const geode::Vector< dimension > Q1mQ0{ segment1.vertices()[0],
+            segment1.vertices()[1] };
         const geode::Vector< dimension > P0mQ0{ segment1.vertices()[0],
             segment0.vertices()[0] };
         const auto a = P1mP0.dot( P1mP0 );
@@ -799,7 +801,7 @@ namespace
         auto step = longest_segment.length() / 2;
         auto current_distance =
             geode::point_segment_distance( current_point, shortest_segment );
-        const auto segment_direction = longest_segment.normalized_direction();
+        const auto segment_direction = longest_segment.direction();
         while( step > geode::GLOBAL_EPSILON )
         {
             const auto point_at_step_plus =
@@ -898,7 +900,8 @@ namespace geode
         segment_line_distance( const Segment< dimension >& segment,
             const InfiniteLine< dimension >& line )
     {
-        const auto segDirection = segment.direction();
+        const Vector< dimension > segDirection{ segment.vertices()[0],
+            segment.vertices()[1] };
         const Vector< dimension > diff{ segment.vertices()[0], line.origin() };
         const auto a00 = line.direction().dot( line.direction() );
         const auto a01 = -line.direction().dot( segDirection );

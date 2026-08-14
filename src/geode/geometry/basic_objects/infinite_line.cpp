@@ -38,7 +38,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericLine< PointType, dimension >::GenericLine(
         const Segment< dimension >& segment )
-        : GenericLine( segment.normalized_direction(), segment.vertices()[0] )
+        : GenericLine( segment.direction(), segment.vertices()[0] )
     {
     }
     template < typename PointType, index_t dimension >
