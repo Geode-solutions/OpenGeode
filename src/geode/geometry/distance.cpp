@@ -900,7 +900,7 @@ namespace geode
         segment_line_distance( const Segment< dimension >& segment,
             const InfiniteLine< dimension >& line )
     {
-        const Segment< dimension > segDirection{ segment.vertices()[0],
+        const Vector< dimension > segDirection{ segment.vertices()[0],
             segment.vertices()[1] };
         const Vector< dimension > diff{ segment.vertices()[0], line.origin() };
         const auto a00 = line.direction().dot( line.direction() );
