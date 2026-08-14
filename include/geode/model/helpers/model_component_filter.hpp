@@ -29,7 +29,7 @@ namespace geode
 {
     class BRep;
     class Section;
-    class ComponentID;
+    struct ComponentID;
 } // namespace geode
 
 namespace geode

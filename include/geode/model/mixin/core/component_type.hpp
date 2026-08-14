@@ -44,35 +44,13 @@ namespace geode
     /*!
      * Identify a component by its type and a unique index
      */
-    class ComponentID
+    struct ComponentID
     {
-    public:
         ComponentID() : ComponentID( ComponentType{ "undefined" }, uuid{} ) {}
 
-        ComponentID( ComponentType component_type, uuid id )
-            : type_( std::move( component_type ) ), id_( std::move( id ) )
-        {
-        }
-
-        [[nodiscard]] const uuid& id() const&
-        {
-            return id_;
-        }
-
-        [[nodiscard]] uuid&& id() &&
-        {
-            return std::move( id_ );
-        }
-
-        [[nodiscard]] const ComponentType& type() const&
-        {
-            return type_;
-        }
-
-        [[nodiscard]] ComponentType&& type() &&
-        {
-            return std::move( type_ );
-        }
+        ComponentID( ComponentType component_type, uuid input_id )
+            : type{ std::move( component_type ) },
+              id{ std::move( input_id ) } {};
 
         [[nodiscard]] bool operator!=( const ComponentID& other ) const
         {
@@ -81,28 +59,31 @@ namespace geode
 
         [[nodiscard]] bool operator==( const ComponentID& other ) const
         {
-            return type_.get() == other.type_.get() && id_ == other.id_;
+            return type.get() == other.type.get() && id == other.id;
         }
 
         [[nodiscard]] bool operator<( const ComponentID& other ) const
         {
-            if( type_.get() != other.type_.get() )
+            if( type.get() != other.type.get() )
             {
-                return type_.get() < other.type_.get();
+                return type.get() < other.type.get();
             }
-            return id_ < other.id_;
+            return id < other.id;
         }
 
         [[nodiscard]] std::string string() const
         {
-            return absl::StrCat( type_.get(), " ", id_.string() );
+            return absl::StrCat( type.get(), " ", id.string() );
         }
 
         template < typename H >
         friend H AbslHashValue( H h, const ComponentID& value )
         {
-            return H::combine( std::move( h ), value.type_, value.id_ );
+            return H::combine( std::move( h ), value.type, value.id );
         }
+
+        ComponentType type;
+        uuid id;
 
     private:
         friend class bitsery::Access;
@@ -112,14 +93,10 @@ namespace geode
             serializer.ext(
                 *this, Growable< Archive, ComponentID >{
                            { []( Archive& archive, ComponentID& component_id ) {
-                               archive.object( component_id.type_ );
-                               archive.object( component_id.id_ );
+                               archive.object( component_id.type );
+                               archive.object( component_id.id );
                            } } } );
         }
-
-    private:
-        ComponentType type_;
-        uuid id_;
     };
 
 } // namespace geode

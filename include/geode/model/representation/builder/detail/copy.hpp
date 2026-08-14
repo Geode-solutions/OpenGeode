@@ -433,10 +433,10 @@ namespace geode
                     for( const auto& mesh_vertex :
                         from.component_mesh_vertices( v ) )
                     {
-                        const auto& type = mesh_vertex.component_id.type();
+                        const auto& type = mesh_vertex.component_id.type;
                         builder_to.set_unique_vertex(
                             { { type, mapping.at( type ).in2out(
-                                          mesh_vertex.component_id.id() ) },
+                                          mesh_vertex.component_id.id ) },
                                 mesh_vertex.vertex },
                             first_new_unique_vertex_id + v );
                     }

@@ -266,7 +266,7 @@ namespace
                 brep_.unique_vertex( { line.component_id(), line_pointid } );
             for( const auto& cmv : brep_.component_mesh_vertices( uvertex_id ) )
             {
-                if( cmv.component_id.id() == surface.id() )
+                if( cmv.component_id.id == surface.id() )
                 {
                     return cmv.vertex;
                 }
@@ -367,7 +367,7 @@ namespace
                 brep_.unique_vertex( { surface.component_id(), surf_pointid } );
             for( const auto& cmv : brep_.component_mesh_vertices( uvertex_id ) )
             {
-                if( cmv.component_id.id() == block.id() )
+                if( cmv.component_id.id == block.id() )
                 {
                     return cmv.vertex;
                 }

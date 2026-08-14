@@ -346,7 +346,7 @@ def add_surfaces_in_model_boundaries(brep, builder, surface_uuids, boundary_uuid
         if brep.nb_collections(surface_id) != 1:
             raise ValueError("[Test] All Surfaces should be in 1 collection")
         for collection in brep.collections(surface_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.ModelBoundary3D.component_type_static()
             ):
                 raise ValueError(
@@ -368,7 +368,7 @@ def add_corners_in_corner_collections(brep, builder, corner_uuids, collection_uu
         if brep.nb_collections(corner_id) != 1:
             raise ValueError("[Test] All Corners should be in 1 collection")
         for collection in brep.collections(corner_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.CornerCollection3D.component_type_static()
             ):
                 raise ValueError(
@@ -390,7 +390,7 @@ def add_lines_in_line_collections(brep, builder, line_uuids, collection_uuids):
         if brep.nb_collections(line_id) != 1:
             raise ValueError("[Test] All Lines should be in 1 collection")
         for collection in brep.collections(line_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.LineCollection3D.component_type_static()
             ):
                 raise ValueError(
@@ -412,9 +412,9 @@ def add_surfaces_in_surface_collections(brep, builder, surface_uuids, collection
         if brep.nb_collections(surface_id) != 2:
             raise ValueError("[Test] All Surfaces should be in 2 collections")
         for collection in brep.collections(surface_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.SurfaceCollection3D.component_type_static()
-            ) and not collection.type().matches(
+            ) and not collection.type.matches(
                 model.ModelBoundary3D.component_type_static()
             ):
                 raise ValueError(
@@ -430,7 +430,7 @@ def add_blocks_in_block_collections(brep, builder, block_uuid, collection_uuid):
     if brep.nb_collections(block_uuid) != 1:
         raise ValueError("[Test] All Blocks should be in 1 collection")
     for collection in brep.collections(block_uuid):
-        if not collection.type().matches(
+        if not collection.type.matches(
             model.BlockCollection3D.component_type_static()
         ):
             raise ValueError(

@@ -218,7 +218,7 @@ def add_lines_in_model_boundaries(section, builder, line_uuids, boundary_uuids):
         if section.nb_collections(line_uuids[i]) != 1:
             raise ValueError("[Test] This Line should be in 1 collection")
         for collection in section.collections(line_uuids[i]):
-            if not collection.type().matches(model.ModelBoundary2D.component_type_static()):
+            if not collection.type.matches(model.ModelBoundary2D.component_type_static()):
                 raise ValueError(
                     "[Test] This Line should be in 1 collection of type Boundary")
     if section.nb_collections(line_uuids[4]) != 0:
@@ -237,7 +237,7 @@ def add_corners_in_corner_collections(section, builder, corner_uuids, collection
         if section.nb_collections(corner_id) != 1:
             raise ValueError("[Test] All Corners should be in 1 collection")
         for collection in section.collections(corner_id):
-            if not collection.type().matches(model.CornerCollection2D.component_type_static()):
+            if not collection.type.matches(model.CornerCollection2D.component_type_static()):
                 raise ValueError(
                     "[Test] This corner should be in 1 collection of type CornerCollection")
 
@@ -253,7 +253,7 @@ def add_lines_in_line_collections(section, builder, line_uuids, collection_uuids
         if section.nb_collections(line_uuids[i]) != 2:
             raise ValueError("[Test] This Line should be in 2 collections")
         for collection in section.collections(line_uuids[i]):
-            if not collection.type().matches(model.LineCollection2D.component_type_static()) and not collection.type().matches(model.ModelBoundary2D.component_type_static()):
+            if not collection.type.matches(model.LineCollection2D.component_type_static()) and not collection.type.matches(model.ModelBoundary2D.component_type_static()):
                 raise ValueError(
                     "[Test] This line should be in 2 collection of type LineCollection and ModelBoundary")
     for i in range(3,5):
@@ -261,7 +261,7 @@ def add_lines_in_line_collections(section, builder, line_uuids, collection_uuids
             raise ValueError(
                 "[Test] Last Lines should be in 1 collection (of type LineCollection)")
         for collection in section.collections(line_uuids[i]):
-            if not collection.type().matches(model.LineCollection2D.component_type_static()):
+            if not collection.type.matches(model.LineCollection2D.component_type_static()):
                 raise ValueError(
                     "[Test] This line should be in 1 collection of type LineCollection")
 
@@ -274,7 +274,7 @@ def add_surfaces_in_surface_collections(section, builder, surface_uuids, collect
         if section.nb_collections(surface_id) != 1:
             raise ValueError("[Test] All Surfaces should be in 1 collections")
         for collection in section.collections(surface_id):
-            if not collection.type().matches(model.SurfaceCollection2D.component_type_static()):
+            if not collection.type.matches(model.SurfaceCollection2D.component_type_static()):
                 raise ValueError(
                     "[Test] This surface should be in 2 collections of type SurfaceCollection")
 

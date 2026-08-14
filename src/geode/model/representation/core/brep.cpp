@@ -81,7 +81,7 @@ namespace geode
     const Corner3D& BRep::BoundaryCornerRange::operator*() const
     {
         return brep_.corner(
-            Relationships::BoundaryRangeIterator::operator*().id() );
+            Relationships::BoundaryRangeIterator::operator*().id );
     }
 
     BRep::BoundaryLineRange BRep::boundaries( const Surface3D& surface ) const
@@ -116,7 +116,7 @@ namespace geode
     const Line3D& BRep::BoundaryLineRange::operator*() const
     {
         return brep_.line(
-            Relationships::BoundaryRangeIterator::operator*().id() );
+            Relationships::BoundaryRangeIterator::operator*().id );
     }
 
     BRep::BoundarySurfaceRange BRep::boundaries( const Block3D& block ) const
@@ -153,7 +153,7 @@ namespace geode
     const Surface3D& BRep::BoundarySurfaceRange::operator*() const
     {
         return brep_.surface(
-            Relationships::BoundaryRangeIterator::operator*().id() );
+            Relationships::BoundaryRangeIterator::operator*().id );
     }
 
     BRep::IncidentLineRange BRep::incidences( const Corner3D& corner ) const
@@ -188,7 +188,7 @@ namespace geode
     const Line3D& BRep::IncidentLineRange::operator*() const
     {
         return brep_.line(
-            Relationships::IncidenceRangeIterator::operator*().id() );
+            Relationships::IncidenceRangeIterator::operator*().id );
     }
 
     BRep::IncidentSurfaceRange BRep::incidences( const Line3D& line ) const
@@ -225,7 +225,7 @@ namespace geode
     const Surface3D& BRep::IncidentSurfaceRange::operator*() const
     {
         return brep_.surface(
-            Relationships::IncidenceRangeIterator::operator*().id() );
+            Relationships::IncidenceRangeIterator::operator*().id );
     }
 
     BRep::IncidentBlockRange BRep::incidences( const Surface3D& surface ) const
@@ -261,7 +261,7 @@ namespace geode
     const Block3D& BRep::IncidentBlockRange::operator*() const
     {
         return brep_.block(
-            Relationships::IncidenceRangeIterator::operator*().id() );
+            Relationships::IncidenceRangeIterator::operator*().id );
     }
 
     BRep::InternalLineRange BRep::internal_lines(
@@ -317,7 +317,7 @@ namespace geode
     const Line3D& BRep::InternalLineRange::operator*() const
     {
         return brep_.line(
-            Relationships::InternalRangeIterator::operator*().id() );
+            Relationships::InternalRangeIterator::operator*().id );
     }
 
     BRep::InternalCornerRange BRep::internal_corners( const Line3D& line ) const
@@ -387,7 +387,7 @@ namespace geode
     const Corner3D& BRep::InternalCornerRange::operator*() const
     {
         return brep_.corner(
-            Relationships::InternalRangeIterator::operator*().id() );
+            Relationships::InternalRangeIterator::operator*().id );
     }
 
     BRep::InternalSurfaceRange BRep::internal_surfaces(
@@ -432,7 +432,7 @@ namespace geode
     const Surface3D& BRep::InternalSurfaceRange::operator*() const
     {
         return brep_.surface(
-            Relationships::InternalRangeIterator::operator*().id() );
+            Relationships::InternalRangeIterator::operator*().id );
     }
 
     BRep::EmbeddingLineRange BRep::embedding_lines(
@@ -476,7 +476,7 @@ namespace geode
     const Line3D& BRep::EmbeddingLineRange::operator*() const
     {
         return brep_.line(
-            Relationships::EmbeddingRangeIterator::operator*().id() );
+            Relationships::EmbeddingRangeIterator::operator*().id );
     }
 
     BRep::EmbeddingSurfaceRange BRep::embedding_surfaces(
@@ -536,7 +536,7 @@ namespace geode
     const Surface3D& BRep::EmbeddingSurfaceRange::operator*() const
     {
         return brep_.surface(
-            Relationships::EmbeddingRangeIterator::operator*().id() );
+            Relationships::EmbeddingRangeIterator::operator*().id );
     }
 
     BRep::EmbeddingBlockRange BRep::embedding_blocks(
@@ -607,7 +607,7 @@ namespace geode
     const Block3D& BRep::EmbeddingBlockRange::operator*() const
     {
         return brep_.block(
-            Relationships::EmbeddingRangeIterator::operator*().id() );
+            Relationships::EmbeddingRangeIterator::operator*().id );
     }
 
     BRep::ItemCornerRange::ItemCornerRange(
@@ -636,8 +636,7 @@ namespace geode
 
     const Corner3D& BRep::ItemCornerRange::operator*() const
     {
-        return brep_.corner(
-            Relationships::ItemRangeIterator::operator*().id() );
+        return brep_.corner( Relationships::ItemRangeIterator::operator*().id );
     }
 
     BRep::ItemLineRange::ItemLineRange(
@@ -666,7 +665,7 @@ namespace geode
 
     const Line3D& BRep::ItemLineRange::operator*() const
     {
-        return brep_.line( Relationships::ItemRangeIterator::operator*().id() );
+        return brep_.line( Relationships::ItemRangeIterator::operator*().id );
     }
 
     BRep::ItemSurfaceRange::ItemSurfaceRange(
@@ -702,7 +701,7 @@ namespace geode
     const Surface3D& BRep::ItemSurfaceRange::operator*() const
     {
         return brep_.surface(
-            Relationships::ItemRangeIterator::operator*().id() );
+            Relationships::ItemRangeIterator::operator*().id );
     }
 
     BRep::ItemBlockRange::ItemBlockRange(
@@ -731,8 +730,7 @@ namespace geode
 
     const Block3D& BRep::ItemBlockRange::operator*() const
     {
-        return brep_.block(
-            Relationships::ItemRangeIterator::operator*().id() );
+        return brep_.block( Relationships::ItemRangeIterator::operator*().id );
     }
 
     BRep::BRep() = default;

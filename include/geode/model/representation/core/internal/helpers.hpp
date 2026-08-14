@@ -36,7 +36,7 @@ namespace geode
         {
             while( iterator.operator!=( iterator )
                    && iterator.Relationships::InternalRangeIterator::operator*()
-                              .type()
+                              .type
                           != Filter::component_type_static() )
             {
                 iterator.Relationships::InternalRangeIterator::operator++();
@@ -49,7 +49,7 @@ namespace geode
             while(
                 iterator.operator!=( iterator )
                 && iterator.Relationships::EmbeddingRangeIterator::operator*()
-                           .type()
+                           .type
                        != Filter::component_type_static() )
             {
                 iterator.Relationships::EmbeddingRangeIterator::operator++();
