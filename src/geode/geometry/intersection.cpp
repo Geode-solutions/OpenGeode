@@ -272,8 +272,7 @@ namespace geode
         //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
         //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
         //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-        const auto segment_normalized_direction =
-            segment.normalized_direction();
+        const auto segment_normalized_direction = segment.direction();
         auto d_dot_n = segment_normalized_direction.dot( normal );
         signed_index_t sign;
         if( d_dot_n > 0. )
@@ -538,7 +537,7 @@ namespace geode
         // is x^2 + y^2 = r^2, where r is the cylinder radius. The end
         // caps are |z| = h/2, where h is the cylinder height.
         const auto basis =
-            compute_orthogonal_basis( cylinder.axis().normalized_direction() );
+            compute_orthogonal_basis( cylinder.axis().direction() );
         const auto& W = basis[0];
         const auto& U = basis[1];
         const auto& V = basis[2];
@@ -796,7 +795,7 @@ namespace geode
                     {
                         const geode::Vector3D point_to_vertex{ results[r],
                             cylinder.axis().vertices()[v] };
-                        if( cylinder.axis().normalized_direction().dot(
+                        if( cylinder.axis().direction().dot(
                                 point_to_vertex.normalize() )
                             <= GLOBAL_EPSILON )
                         {

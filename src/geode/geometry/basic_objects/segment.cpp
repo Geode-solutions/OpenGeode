@@ -60,14 +60,9 @@ namespace geode
             OpenGeodeException::TYPE::data,
             "[Segment::direction] Segment length too small (",
             direction.length(), ")" );
-        return direction;
+        return direction.normalize();
     }
-    template < typename PointType, index_t dimension >
-    Vector< dimension >
-        GenericSegment< PointType, dimension >::normalized_direction() const
-    {
-        return direction().normalize();
-    }
+
     template < typename PointType, index_t dimension >
     Point< dimension >
         GenericSegment< PointType, dimension >::barycenter() const
