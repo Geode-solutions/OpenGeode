@@ -486,7 +486,6 @@ namespace
         /* Algorithm and code found on
          * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
          */
-        const auto Q1mQ0 = segment1.direction() * segment1.length();
         const geode::Vector< dimension > P1mP0{ segment0.vertices()[1],
             segment0.vertices()[0] };
         const geode::Vector< dimension > Q1mQ0{ segment1.vertices()[1],
@@ -901,7 +900,7 @@ namespace geode
         segment_line_distance( const Segment< dimension >& segment,
             const InfiniteLine< dimension >& line )
     {
-        const Segment< dimension > seg{ segment.vertices()[0],
+        const Segment< dimension > segDirection{ segment.vertices()[0],
             segment.vertices()[1] };
         const Vector< dimension > diff{ segment.vertices()[0], line.origin() };
         const auto a00 = line.direction().dot( line.direction() );
