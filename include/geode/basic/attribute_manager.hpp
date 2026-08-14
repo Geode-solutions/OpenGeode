@@ -253,13 +253,6 @@ namespace geode
         void copy( const AttributeManager& attribute_manager );
 
         void import( const AttributeManager& attribute_manager,
-            absl::Span< const index_t > old2new );
-
-        void import( const AttributeManager& attribute_manager,
-            absl::Span< const index_t > old2new,
-            const uuid& attribute_id );
-
-        void import( const AttributeManager& attribute_manager,
             const GenericMapping< index_t >& old2new_mapping );
 
         void import( const AttributeManager& attribute_manager,

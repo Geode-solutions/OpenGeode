@@ -571,21 +571,6 @@ namespace geode
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,
-        absl::Span< const index_t > old2new )
-    {
-        impl_->import(
-            *attribute_manager.impl_, old2new, AttributeBase::AttributeKey{} );
-    }
-
-    void AttributeManager::import( const AttributeManager &attribute_manager,
-        absl::Span< const index_t > old2new,
-        const geode::uuid &attribute_id )
-    {
-        impl_->import( *attribute_manager.impl_, old2new, attribute_id,
-            AttributeBase::AttributeKey{} );
-    }
-
-    void AttributeManager::import( const AttributeManager &attribute_manager,
         const GenericMapping< index_t > &old2new_mapping )
     {
         impl_->import( *attribute_manager.impl_, old2new_mapping,

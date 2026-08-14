@@ -100,10 +100,6 @@ namespace geode
             index_t nb_elements,
             AttributeKey /*key*/ ) const = 0;
 
-        virtual void import( absl::Span< const index_t > old2new,
-            const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey /*key*/ ) = 0;
-
         virtual void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
             AttributeBase::AttributeKey /*key*/ ) = 0;

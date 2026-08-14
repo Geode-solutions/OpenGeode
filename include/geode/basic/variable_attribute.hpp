@@ -287,33 +287,12 @@ namespace geode
             return attribute;
         }
 
-        void import( absl::Span< const index_t > old2new,
-            const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey /*key*/ ) override
-        {
-            import( old2new,
-                dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
-        }
-
         void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
             AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new_mapping,
                 dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
-        }
-
-        void import( absl::Span< const index_t > old2new,
-            const ReadOnlyAttribute< T >& from )
-        {
-            for( const auto i : Indices{ old2new } )
-            {
-                const auto new_index = old2new[i];
-                if( new_index != NO_ID )
-                {
-                    this->set_value( new_index, from.value( i ) );
-                }
-            }
         }
 
         void import( const GenericMapping< index_t >& old2new_mapping,
@@ -569,33 +548,12 @@ namespace geode
             return attribute;
         }
 
-        void import( absl::Span< const index_t > old2new,
-            const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey /*key*/ ) override
-        {
-            import( old2new,
-                dynamic_cast< const ReadOnlyAttribute< bool >& >( *from ) );
-        }
-
         void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
             AttributeBase::AttributeKey /*key*/ ) override
         {
             import( old2new_mapping,
                 dynamic_cast< const ReadOnlyAttribute< bool >& >( *from ) );
-        }
-
-        void import( absl::Span< const index_t > old2new,
-            const ReadOnlyAttribute< bool >& from )
-        {
-            for( const auto i : Indices{ old2new } )
-            {
-                const auto new_index = old2new[i];
-                if( new_index != NO_ID )
-                {
-                    this->set_value( new_index, from.value( i ) );
-                }
-            }
         }
 
         void import( const GenericMapping< index_t >& old2new_mapping,

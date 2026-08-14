@@ -203,13 +203,6 @@ namespace geode
             return attribute;
         }
 
-        void import( absl::Span< const index_t > /* unused */,
-            const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey /*key*/ ) override
-        {
-            import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
-        }
-
         void import( const GenericMapping< index_t >& /* unused */,
             const std::shared_ptr< AttributeBase >& from,
             AttributeBase::AttributeKey /*key*/ ) override
