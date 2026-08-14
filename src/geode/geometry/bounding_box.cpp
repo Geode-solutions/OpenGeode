@@ -91,7 +91,7 @@ namespace
         const auto box_extent = box.diagonal() / 2.;
         const auto segment_origin = segment.barycenter() - box.center();
         const auto segment_extent = segment.length() / 2.;
-        const auto segment_direction = segment.normalized_direction();
+        const auto segment_direction = segment.direction();
         for( const auto i : geode::LRange{ dimension } )
         {
             const auto lhs = std::fabs( segment_origin.value( i ) );
