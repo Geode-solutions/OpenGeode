@@ -80,9 +80,9 @@ namespace geode
             {
                 const auto& component_id =
                     model.component_with_relation( vertex );
-                if( !checker.apply( component_id.type() ) )
+                if( !checker.apply( component_id.type ) )
                 {
-                    components_to_remove.push_back( component_id.id() );
+                    components_to_remove.push_back( component_id.id );
                 }
             }
             for( const auto& component : components_to_remove )

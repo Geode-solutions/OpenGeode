@@ -38,12 +38,9 @@ namespace geode
         pybind11::class_< ComponentID >( module, "ComponentID" )
             .def( pybind11::init<>() )
             .def( pybind11::init< ComponentType, uuid >() )
-            .def( "id", static_cast< const uuid& (ComponentID::*) () const& >(
-                            &ComponentID::id ) )
-            .def( "type",
-                static_cast< const ComponentType& (ComponentID::*) () const& >(
-                    &ComponentID::type ) )
             .def( "string", &ComponentID::string )
+            .def_readwrite( "type", &ComponentID::type )
+            .def_readwrite( "id", &ComponentID::id )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self );
     }

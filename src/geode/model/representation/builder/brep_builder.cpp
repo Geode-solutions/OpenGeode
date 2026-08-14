@@ -519,27 +519,26 @@ namespace geode
     {
         for( const auto& cmv : brep_.component_mesh_vertices( unique_vertex ) )
         {
-            if( cmv.component_id.type() == Block3D::component_type_static() )
+            if( cmv.component_id.type == Block3D::component_type_static() )
             {
-                block_mesh_builder( brep_.block( cmv.component_id.id() ) )
+                block_mesh_builder( brep_.block( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
-            else if( cmv.component_id.type()
+            else if( cmv.component_id.type
                      == Surface3D::component_type_static() )
             {
-                surface_mesh_builder( brep_.surface( cmv.component_id.id() ) )
+                surface_mesh_builder( brep_.surface( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
-            else if( cmv.component_id.type()
-                     == Line3D::component_type_static() )
+            else if( cmv.component_id.type == Line3D::component_type_static() )
             {
-                line_mesh_builder( brep_.line( cmv.component_id.id() ) )
+                line_mesh_builder( brep_.line( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
-            else if( cmv.component_id.type()
+            else if( cmv.component_id.type
                      == Corner3D::component_type_static() )
             {
-                corner_mesh_builder( brep_.corner( cmv.component_id.id() ) )
+                corner_mesh_builder( brep_.corner( cmv.component_id.id ) )
                     ->set_point( cmv.vertex, point );
             }
         }

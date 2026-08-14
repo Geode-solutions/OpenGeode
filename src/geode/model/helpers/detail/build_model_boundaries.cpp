@@ -39,7 +39,7 @@ namespace
     {
         for( const auto& collection : model.collections( component_id ) )
         {
-            if( collection.type()
+            if( collection.type
                 == geode::ModelBoundary< Model::dim >::component_type_static() )
             {
                 return true;

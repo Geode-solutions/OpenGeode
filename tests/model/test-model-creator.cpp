@@ -279,7 +279,7 @@ void test_section()
             bool found{ false };
             for( const auto b2 : boundary_definitions[b].boundaries )
             {
-                if( line.id() == lines[b2] )
+                if( line.id == lines[b2] )
                 {
                     found = true;
                     break;
