@@ -46,6 +46,12 @@ namespace geode
                                          public Relationships,
                                          public VertexIdentifier
     {
+    public:
+        Topology( BITSERY bitsery )
+            : Relationships{ bitsery }, VertexIdentifier{ bitsery }
+        {
+        }
+
     protected:
         Topology() = default;
         Topology( Topology&& other ) = default;

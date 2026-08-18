@@ -34,8 +34,8 @@ namespace std
     }
 
     size_t hash< geode::ComponentID >::operator()(
-        const geode::ComponentID& id ) const
+        const geode::ComponentID& component_id ) const
     {
-        return absl::Hash< geode::uuid >()( id.id() );
+        return absl::Hash< geode::uuid >()( component_id.id );
     }
 } // namespace std

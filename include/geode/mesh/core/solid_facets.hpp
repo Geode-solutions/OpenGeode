@@ -42,9 +42,9 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidFacets );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey /*key*/ );
 
     public:
+        PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey /*key*/ );
         using Builder = SolidFacetsBuilder< dimension >;
         static constexpr auto dim = dimension;
 

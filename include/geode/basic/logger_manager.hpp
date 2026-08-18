@@ -47,7 +47,7 @@ namespace geode
 
         static void info( const std::string &message );
 
-        static void warn( const std::string &message );
+        static void warning( const std::string &message );
 
         static void error( const std::string &message );
 

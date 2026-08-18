@@ -145,13 +145,13 @@ namespace geode
 
     template < index_t dimension >
     void Blocks< dimension >::load_blocks(
-        std::string_view directory, BlocksBuilderKey /*unused*/ )
+        std::string_view directory, BlocksBuilderKey builder_key )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
-        for( auto& block : modifiable_blocks( {} ) )
+        for( auto& block : modifiable_blocks( builder_key ) )
         {
             tasks[count++] = async::spawn( [&block, &mapping] {
                 const auto file = mapping.at( block.id().string() );
@@ -199,7 +199,8 @@ namespace geode
         const MeshImpl& impl, BlocksBuilderKey /*unused*/ )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
-            new Block< dimension >{ impl, {} }
+            new Block< dimension >{
+                impl, typename Block< dimension >::BlocksKey{} }
         };
         const auto& id = block->id();
         impl_->add_component( std::move( block ) );
@@ -222,7 +223,8 @@ namespace geode
         uuid block_id, const MeshImpl& impl, BlocksBuilderKey /*unused*/ )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
-            new Block< dimension >{ impl, {} }
+            new Block< dimension >{
+                impl, typename Block< dimension >::BlocksKey{} }
         };
         IdentifierBuilder{ *block }.set_id( std::move( block_id ) );
         impl_->add_component( std::move( block ) );

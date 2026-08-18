@@ -33,7 +33,7 @@ namespace geode
     ALIAS_2D( Polygon );
     class Tetrahedron;
     enum struct SIDE;
-    using Sign = SIDE;
+    using SIGN = SIDE;
 } // namespace geode
 
 namespace geode
@@ -41,21 +41,21 @@ namespace geode
     /*!
      * Return the sign of a tetrahedron volume.
      */
-    [[nodiscard]] Sign opengeode_geometry_api tetrahedron_volume_sign(
+    [[nodiscard]] SIGN opengeode_geometry_api tetrahedron_volume_sign(
         const Tetrahedron& tetra );
 
     /*!
      * Return the sign of a 2D triangle area.
      */
-    [[nodiscard]] Sign opengeode_geometry_api triangle_area_sign(
+    [[nodiscard]] SIGN opengeode_geometry_api triangle_area_sign(
         const Triangle2D& triangle );
 
-    [[nodiscard]] Sign opengeode_geometry_api polygon_area_sign(
+    [[nodiscard]] SIGN opengeode_geometry_api polygon_area_sign(
         const Polygon2D& polygon );
 
     /*!
      * Return the sign of a 3D triangle area aligned on X- Y- or Z-axis.
      */
-    [[nodiscard]] Sign opengeode_geometry_api triangle_area_sign(
+    [[nodiscard]] SIGN opengeode_geometry_api triangle_area_sign(
         const Triangle3D& triangle, local_index_t axis );
 } // namespace geode

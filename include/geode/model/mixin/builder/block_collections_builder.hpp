@@ -43,9 +43,12 @@ namespace geode
     public:
         void load_block_collections( std::string_view directory );
 
-        void set_block_collection_name( const uuid& id, std::string_view name );
+        void set_block_collection_name(
+            const BlockCollection< dimension >& block_collection,
+            std::string_view name );
 
-        void set_block_collection_active( const uuid& id, bool active );
+        void set_block_collection_active(
+            const BlockCollection< dimension >& block_collection, bool active );
 
     protected:
         explicit BlockCollectionsBuilder(

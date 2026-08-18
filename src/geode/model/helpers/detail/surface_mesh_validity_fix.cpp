@@ -50,8 +50,7 @@ namespace geode
             const Surface< Model::dim >& surface )
         {
             const auto& mesh = surface.mesh();
-            auto mesh_builder =
-                model_builder.surface_mesh_builder( surface.id() );
+            auto mesh_builder = model_builder.surface_mesh_builder( surface );
             const auto vertex_mappings =
                 repair_non_manifold_vertices( mesh, *mesh_builder );
             for( const auto& [old_vertex, new_vertices] :

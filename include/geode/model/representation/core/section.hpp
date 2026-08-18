@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/algorithm.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/identifier.hpp>
 
 #include <geode/model/common.hpp>
@@ -308,6 +309,7 @@ namespace geode
 
     public:
         Section();
+        Section( BITSERY );
         Section( Section&& section ) noexcept;
         Section& operator=( Section&& section );
         ~Section();

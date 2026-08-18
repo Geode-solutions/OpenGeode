@@ -172,12 +172,11 @@ namespace geode
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
         const auto dir = segment.direction();
-        const auto length = dir.length();
         const auto& vertices = segment.vertices();
         const Vector< dimension > v0p{ vertices[0], point };
-        const auto dot0 = v0p.dot( dir ) / length;
+        const auto dot0 = v0p.dot( dir );
         const Vector< dimension > v1p{ vertices[1], point };
-        const auto dot1 = -v1p.dot( dir ) / length;
+        const auto dot1 = -v1p.dot( dir );
         const auto sum = dot0 + dot1;
         OpenGeodeGeometryException::check_exception( sum != 0, point,
             OpenGeodeException::TYPE::data,

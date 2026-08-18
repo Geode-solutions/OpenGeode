@@ -301,6 +301,17 @@ namespace
                     polygon.value(), v );
             }
         }
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
+            {
+                const geode::PolygonEdge edge{ p, e };
+                if( const auto adj = surface.polygon_adjacent( edge ) )
+                {
+                    builder.set_polygon_adjacent( edge, adj.value() );
+                }
+            }
+        }
     }
 
     template < geode::index_t dimension >
@@ -386,7 +397,8 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::reset_polygons_around_vertex(
         index_t vertex_id )
     {
-        surface_mesh_.reset_polygons_around_vertex( vertex_id, {} );
+        surface_mesh_.reset_polygons_around_vertex(
+            vertex_id, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >
@@ -401,16 +413,16 @@ namespace geode
             polygon_vertex.vertex_id != NO_LID,
             "[SurfaceMeshBuilder::associate_polygon_vertex_to_vertex] "
             "PolygonVertex invalid" );
-        surface_mesh_.associate_polygon_vertex_to_vertex(
-            polygon_vertex, vertex_id, {} );
+        surface_mesh_.associate_polygon_vertex_to_vertex( polygon_vertex,
+            vertex_id, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::disassociate_polygon_vertex_to_vertex(
         index_t vertex_id )
     {
-        surface_mesh_.associate_polygon_vertex_to_vertex(
-            PolygonVertex{}, vertex_id, {} );
+        surface_mesh_.associate_polygon_vertex_to_vertex( PolygonVertex{},
+            vertex_id, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >
@@ -716,7 +728,8 @@ namespace geode
     SurfaceEdgesBuilder< dimension >
         SurfaceMeshBuilder< dimension >::edges_builder()
     {
-        return SurfaceEdgesBuilder< dimension >{ surface_mesh_.edges( {} ) };
+        return SurfaceEdgesBuilder< dimension >{ surface_mesh_.edges(
+            typename SurfaceMesh< dimension >::SurfaceMeshKey{} ) };
     }
 
     template < index_t dimension >
@@ -832,22 +845,15 @@ namespace geode
             surface_mesh_.disable_edges();
         }
         VertexSetBuilder::copy( surface_mesh );
-        if( surface_mesh.impl_name() == surface_mesh_.impl_name() )
+        copy_polygons( surface_mesh, *this );
+        if( surface_mesh.are_edges_enabled() )
         {
-            do_copy_points( surface_mesh );
-            do_copy_polygons( surface_mesh );
-        }
-        else
-        {
-            copy_points( surface_mesh, *this );
-            copy_polygons( surface_mesh, *this );
+            surface_mesh_.copy_edges( surface_mesh,
+                typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
         }
         surface_mesh_.polygon_attribute_manager().copy(
             surface_mesh.polygon_attribute_manager() );
-        if( surface_mesh.are_edges_enabled() )
-        {
-            surface_mesh_.copy_edges( surface_mesh, {} );
-        }
+        copy_points( surface_mesh, *this );
     }
 
     template class opengeode_mesh_api SurfaceMeshBuilder< 2 >;

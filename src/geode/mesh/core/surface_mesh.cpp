@@ -284,12 +284,23 @@ namespace geode
 
     public:
         Impl( SurfaceMesh& surface )
-            : polygon_around_vertex_( surface.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolygonVertex >( "polygon_around_vertex",
-                          PolygonVertex{},
-                          { false, false, false } ) )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< PolygonVertex > polygon_around_vertex_values;
+            polygon_around_vertex_values.default_value = PolygonVertex{};
+            polygon_around_vertex_values.no_value = PolygonVertex{};
+            const auto attribute_id =
+                surface.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        PolygonVertex >( "polygon_around_vertex",
+                        polygon_around_vertex_values, attribute_properties );
+            polygon_around_vertex_ =
+                surface.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        PolygonVertex >( attribute_id );
             initialize_polygons_around_vertex( surface );
         }
 
@@ -387,7 +398,7 @@ namespace geode
             edges_.reset( new SurfaceEdges< dimension >{ surface } );
         }
 
-        void copy_edges( const SurfaceMesh< dimension >& surface ) const
+        void copy_edges( const SurfaceMesh< dimension >& from_surface ) const
         {
             OpenGeodeMeshException::check_exception( !are_edges_enabled(),
                 nullptr, OpenGeodeException::TYPE::data,
@@ -395,7 +406,7 @@ namespace geode
                 "already enabled." );
             edges_.reset( new SurfaceEdges< dimension >{} );
             SurfaceEdgesBuilder< dimension > edges_builder{ *edges_ };
-            edges_builder.copy( surface.edges() );
+            edges_builder.copy( from_surface.edges() );
         }
 
         void disable_edges() const
@@ -432,16 +443,27 @@ namespace geode
         void initialize_polygons_around_vertex(
             const SurfaceMesh< dimension >& surface )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< CachedPolygons > polygon_around_vertex_values;
+            polygon_around_vertex_values.default_value = CachedPolygons{};
+            polygon_around_vertex_values.no_value = CachedPolygons{};
+            const auto attribute_id =
+                surface.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
+                        polygon_around_vertex_values, attribute_properties );
             polygons_around_vertex_ =
                 surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
-                        CachedPolygons{}, { false, false, false } );
+                    .template find_attribute< VariableAttribute,
+                        CachedPolygons >( attribute_id );
         }
 
-    private:
         Impl() = default;
 
+    private:
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -562,6 +584,11 @@ namespace geode
 
     template < index_t dimension >
     SurfaceMesh< dimension >::SurfaceMesh() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    SurfaceMesh< dimension >::SurfaceMesh( BITSERY )
     {
     }
 
@@ -1091,9 +1118,9 @@ namespace geode
                 { []( Archive& archive, SurfaceMesh& surface ) {
                      archive.ext(
                          surface, bitsery::ext::BaseClass< VertexSet >{} );
-                     archive.object( surface.impl_ );
                      surface.impl_->initialize_polygons_around_vertex(
                          surface );
+                     archive.object( surface.impl_ );
                  },
                     []( Archive& archive, SurfaceMesh& surface ) {
                         archive.ext(

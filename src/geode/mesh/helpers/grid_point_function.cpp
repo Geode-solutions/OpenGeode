@@ -44,33 +44,46 @@ namespace geode
             Point< point_dimension > value )
             : grid_( grid )
         {
-            OpenGeodeMeshException::check_exception(
-                !grid_.grid_vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create GridPointFunction: attribute with name ",
-                function_name, " already exists." );
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = true;
+            attribute_properties.transferable = true;
+            AttributeValues< Point< point_dimension > >
+                function_attribute_values;
+            function_attribute_values.default_value = value;
+            function_attribute_values.no_value = Point< point_dimension >{};
+            const auto function_id =
+                grid_.grid_vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        Point< point_dimension > >( function_name,
+                        function_attribute_values, attribute_properties );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        Point< point_dimension > >(
-                        function_name, std::move( value ), { false, true } );
+                    .template find_attribute< VariableAttribute,
+                        Point< point_dimension > >( function_id );
         }
 
-        Impl( const Grid< dimension >& grid, std::string_view function_name )
+        Impl( const Grid< dimension >& grid, std::string_view attribute_name )
             : grid_( grid )
         {
-            OpenGeodeMeshException::check_exception(
-                grid_.grid_vertex_attribute_manager().attribute_exists(
-                    function_name ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "Cannot create GridPointFunction: attribute with name",
-                function_name, " does not exist." );
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = true;
+            attribute_properties.transferable = true;
+            AttributeValues< Point< point_dimension > >
+                function_attribute_values;
+            function_attribute_values.default_value =
+                Point< point_dimension >{};
+            function_attribute_values.no_value = Point< point_dimension >{};
+            const auto attribute_id =
+                grid_.grid_vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        Point< point_dimension > >( attribute_name,
+                        function_attribute_values, attribute_properties );
             function_attribute_ =
                 grid_.grid_vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        Point< point_dimension > >( function_name,
-                        Point< point_dimension >(), { false, true } );
+                    .template find_attribute< VariableAttribute,
+                        Point< point_dimension > >( attribute_id );
         }
 
         void set_value(

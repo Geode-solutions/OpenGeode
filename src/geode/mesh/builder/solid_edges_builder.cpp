@@ -44,21 +44,24 @@ namespace geode
     index_t SolidEdgesBuilder< dimension >::find_or_create_edge(
         std::array< index_t, 2 > edge_vertices )
     {
-        return edges_->find_or_create_edge( std::move( edge_vertices ), {} );
+        return edges_->find_or_create_edge( std::move( edge_vertices ),
+            typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template < index_t dimension >
     void SolidEdgesBuilder< dimension >::remove_edge(
         std::array< index_t, 2 > edge_vertices )
     {
-        edges_->remove_edge( std::move( edge_vertices ), {} );
+        edges_->remove_edge( std::move( edge_vertices ),
+            typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template < index_t dimension >
     std::vector< index_t >
         SolidEdgesBuilder< dimension >::delete_isolated_edges()
     {
-        return edges_->remove_isolated_edges( {} );
+        return edges_->remove_isolated_edges(
+            typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template < index_t dimension >
@@ -68,15 +71,17 @@ namespace geode
             index_t edge_vertex_id,
             index_t new_vertex_id )
     {
-        return edges_->update_edge_vertex(
-            std::move( edge_vertices ), edge_vertex_id, new_vertex_id, {} );
+        return edges_->update_edge_vertex( std::move( edge_vertices ),
+            edge_vertex_id, new_vertex_id,
+            typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template < index_t dimension >
     void SolidEdgesBuilder< dimension >::update_edge_vertices(
         absl::Span< const index_t > old2new )
     {
-        edges_->update_edge_vertices( old2new, {} );
+        edges_->update_edge_vertices(
+            old2new, typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template < index_t dimension >
@@ -87,14 +92,16 @@ namespace geode
             nullptr, OpenGeodeException::TYPE::data,
             "[SolidEdgesBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
-        edges_->overwrite_edges( edges, {} );
+        edges_->overwrite_edges(
+            edges, typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template < index_t dimension >
     std::vector< index_t > SolidEdgesBuilder< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
-        return edges_->delete_edges( to_delete, {} );
+        return edges_->delete_edges(
+            to_delete, typename SolidEdges< dimension >::SolidEdgesKey() );
     }
 
     template class opengeode_mesh_api SolidEdgesBuilder< 3 >;

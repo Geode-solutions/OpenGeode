@@ -158,30 +158,30 @@ namespace
     {
         polygons_area_sign_info( geode::index_t nb_init,
             geode::index_t nb_polygons,
-            geode::Sign sign_init )
+            geode::SIGN sign_init )
             : nb_bad_polygons{ nb_init }, area_sign{ nb_polygons, sign_init }
         {
         }
 
         geode::index_t nb_bad_polygons;
         std::queue< geode::index_t > queue;
-        absl::FixedArray< geode::Sign > area_sign;
+        absl::FixedArray< geode::SIGN > area_sign;
     };
 
     polygons_area_sign_info compute_polygon_area_sign(
         const geode::SurfaceMesh2D& mesh )
     {
         polygons_area_sign_info area_sign_info{ 0, mesh.nb_polygons(),
-            geode::Sign::zero };
+            geode::SIGN::zero };
         for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
         {
             area_sign_info.area_sign[polygon_id] =
                 geode::polygon_area_sign( mesh.polygon( polygon_id ) );
-            if( area_sign_info.area_sign[polygon_id] == geode::Sign::negative )
+            if( area_sign_info.area_sign[polygon_id] == geode::SIGN::negative )
             {
                 area_sign_info.nb_bad_polygons++;
             }
-            else if( area_sign_info.area_sign[polygon_id] == geode::Sign::zero )
+            else if( area_sign_info.area_sign[polygon_id] == geode::SIGN::zero )
             {
                 area_sign_info.queue.emplace( polygon_id );
             }
@@ -211,7 +211,7 @@ namespace
                 }
                 const auto adj = mesh.polygon_adjacent_edge( edge ).value();
                 if( area_sign_info.area_sign[adj.polygon_id]
-                    == geode::Sign::zero )
+                    == geode::SIGN::zero )
                 {
                     continue;
                 }
@@ -227,24 +227,24 @@ namespace
                     break;
                 }
                 if( area_sign_info.area_sign[adj.polygon_id]
-                    == geode::Sign::positive )
+                    == geode::SIGN::positive )
                 {
                     area_sign_info.area_sign[cur_polygon] =
-                        geode::Sign::negative;
+                        geode::SIGN::negative;
                 }
                 else
                 {
                     area_sign_info.area_sign[cur_polygon] =
-                        geode::Sign::positive;
+                        geode::SIGN::positive;
                 }
                 break;
             }
-            if( area_sign_info.area_sign[cur_polygon] == geode::Sign::zero )
+            if( area_sign_info.area_sign[cur_polygon] == geode::SIGN::zero )
             {
                 area_sign_info.queue.emplace( cur_polygon );
             }
             else if( area_sign_info.area_sign[cur_polygon]
-                     == geode::Sign::negative )
+                     == geode::SIGN::negative )
             {
                 area_sign_info.nb_bad_polygons++;
             }
@@ -267,7 +267,7 @@ namespace
         geode::index_t count{ 0 };
         for( const auto p : geode::Range{ mesh.nb_polygons() } )
         {
-            if( area_sign_info.area_sign[p] == geode::Sign::negative )
+            if( area_sign_info.area_sign[p] == geode::SIGN::negative )
             {
                 bad_polygons[count++] = p;
             }

@@ -52,11 +52,11 @@ namespace geode
     class Corner final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( Corner );
-        PASSKEY( Corners< dimension >, CornersKey /*key*/ );
-        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( Corners< dimension >, CornersKey /*key*/ );
+        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey /*key*/ );
         using Mesh = PointSet< dimension >;
 
         Corner( Corner&& other ) noexcept;

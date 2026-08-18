@@ -43,13 +43,13 @@
     const auto translate_name##mesh##dimension = absl::StrCat(                 \
         "translate_", mesh_name, std::to_string( dimension ), "D" );           \
     module.def( translate_name##mesh##dimension.c_str(),                       \
-        &translate_mesh< mesh, mesh##Builder, dimension > )
+        &translate_mesh< mesh##dimension##D > )
 
 #define PYTHON_RESCALE( mesh, mesh_name, dimension )                           \
     const auto rescale_name##mesh##dimension = absl::StrCat(                   \
         "rescale_", mesh_name, std::to_string( dimension ), "D" );             \
     module.def( rescale_name##mesh##dimension.c_str(),                         \
-        &rescale_mesh< mesh, mesh##Builder, dimension > )
+        &rescale_mesh< mesh##dimension##D > )
 
 namespace geode
 {

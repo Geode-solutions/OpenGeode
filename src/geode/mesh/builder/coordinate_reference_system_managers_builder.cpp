@@ -36,7 +36,9 @@ namespace geode
             dimension >::coordinate_reference_system_manager_builder1D()
     {
         return CoordinateReferenceSystemManagerBuilder1D{
-            crs_managers_.coordinate_reference_system_manager1D( {} )
+            crs_managers_.coordinate_reference_system_manager1D(
+                typename CoordinateReferenceSystemManagers<
+                    dimension >::CRSManagersKey{} )
         };
     }
 
@@ -46,7 +48,9 @@ namespace geode
             dimension >::coordinate_reference_system_manager_builder2D()
     {
         return CoordinateReferenceSystemManagerBuilder2D{
-            crs_managers_.coordinate_reference_system_manager2D( {} )
+            crs_managers_.coordinate_reference_system_manager2D(
+                typename CoordinateReferenceSystemManagers<
+                    dimension >::CRSManagersKey{} )
         };
     }
 
@@ -56,7 +60,9 @@ namespace geode
             dimension >::coordinate_reference_system_manager_builder3D()
     {
         return CoordinateReferenceSystemManagerBuilder3D{
-            crs_managers_.coordinate_reference_system_manager3D( {} )
+            crs_managers_.coordinate_reference_system_manager3D(
+                typename CoordinateReferenceSystemManagers<
+                    dimension >::CRSManagersKey{} )
         };
     }
 
@@ -66,7 +72,9 @@ namespace geode
             dimension >::main_coordinate_reference_system_manager_builder()
     {
         return CoordinateReferenceSystemManagerBuilder< dimension >{
-            crs_managers_.main_coordinate_reference_system_manager( {} )
+            crs_managers_.main_coordinate_reference_system_manager(
+                typename CoordinateReferenceSystemManagers<
+                    dimension >::CRSManagersKey{} )
         };
     }
 
@@ -74,7 +82,9 @@ namespace geode
     void CoordinateReferenceSystemManagersBuilder< dimension >::set_point(
         index_t vertex, Point< dimension > point )
     {
-        crs_managers_.set_point( vertex, std::move( point ), {} );
+        crs_managers_.set_point( vertex, std::move( point ),
+            typename CoordinateReferenceSystemManagers<
+                dimension >::CRSManagersKey{} );
     }
 
     template class opengeode_mesh_api

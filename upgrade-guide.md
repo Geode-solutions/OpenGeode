@@ -1,5 +1,31 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v17.x.x to v18.0.0
+
+### Motivations
+
+The main motivation of this release is to allow attributes to be identified using a `geode::uuid` instead of a `std::string`/`std::string_view` name. This gives more flexibility around attribute lifecycle (creation, lookup, renaming) and lays the groundwork for supporting missing/no-data values on attributes.
+
+### Breaking Changes
+
+- **Attributes**: Split `AttributeManager::find_or_create_attribute` into two methods: `find_attribute`, which finds an attribute based on a `uuid`, and `create_attribute`, which returns the `uuid` of the created attribute.
+
+- **Attributes**: Attributes now support a no-value ("no data") property, allowing an attribute to represent unset/missing values explicitly. This property adds a parameter to the newly created `create_attribute` methods.
+
+- **AttributeManager**: The `import` method overload taking a `span` has been removed; it now takes a `GenericMapping` instead.
+
+- **ComponentID**: `ComponentID` changed from a `class` to a `struct`, which changes access to its members.
+
+- **Segment**: `Segment::direction()` now returns a normalized direction vector (previously unnormalized).
+
+- **ModelBuilders**: Parameters of several model builder functions have changed such as set_surface_name that takes a component insted of an uuid.
+
+- **Passkey**: The `Passkey` constructor is now `explicit`, preventing implicit construction/conversion.
+
+- **Sign**: `Sign` struct has been renamed to `SIGN`.
+
+- **Logger**: `Logger::warn` renamed to `Logger::warning`.
+
 ## Upgrading from OpenGeode v14.x.x to v15.0.0
 
 ### Motivations

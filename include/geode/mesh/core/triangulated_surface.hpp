@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
+
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
@@ -44,6 +46,8 @@ namespace geode
     public:
         using Builder = TriangulatedSurfaceBuilder< dimension >;
         static constexpr auto dim = dimension;
+
+        TriangulatedSurface( BITSERY );
 
         /*!
          * Create a new TriangulatedSurface using default data structure.

@@ -182,7 +182,7 @@ namespace geode
         if( result->pivot != NO_LID )
         {
             return std::optional< std::pair< local_index_t, Vector3D > >{
-                std::make_pair( result->pivot, result->normal )
+                std::in_place, result->pivot, result->normal
             };
         }
         const auto max = absl::c_max_element( result->lengths );
@@ -205,7 +205,10 @@ namespace geode
             {
                 return std::nullopt;
             }
-            return std::make_pair( e2, result_left->normal );
+            return std::optional<
+                std::pair< local_index_t, Vector< dimension > > >{
+                std::in_place, e2, result_left->normal
+            };
         }
         return std::nullopt;
     }

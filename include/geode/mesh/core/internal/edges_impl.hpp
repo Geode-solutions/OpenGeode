@@ -37,13 +37,26 @@ namespace geode
         class EdgesImpl
         {
         public:
-            explicit EdgesImpl( Graph& graph )
-                : edges_( graph.edge_attribute_manager()
-                          .template find_or_create_attribute< VariableAttribute,
-                              std::array< index_t, 2 > >( "edges",
-                              std::array< index_t, 2 >{ NO_ID, NO_ID },
-                              { false, false, false } ) )
+            static constexpr auto EDGES_NAME = "edges";
+
+            explicit EdgesImpl( Graph& graph ) : edges_()
             {
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< std::array< index_t, 2 > > edges_values;
+                edges_values.default_value = { NO_ID, NO_ID };
+                edges_values.no_value = { NO_ID, NO_ID };
+                const auto edge_attribute_id =
+                    graph.edge_attribute_manager()
+                        .template create_attribute< VariableAttribute,
+                            std::array< index_t, 2 > >(
+                            "edges", edges_values, attribute_properties );
+                edges_ =
+                    graph.edge_attribute_manager()
+                        .template find_attribute< VariableAttribute,
+                            std::array< index_t, 2 > >( edge_attribute_id );
             }
 
             [[nodiscard]] index_t get_edge_vertex(
@@ -61,6 +74,11 @@ namespace geode
                                              std::array< index_t, 2 >& array ) {
                         array.at( edge_vertex.vertex_id ) = vertex_id;
                     } );
+            }
+
+            [[nodiscard]] const uuid& edges_attribute_id() const
+            {
+                return edges_->id();
             }
 
         protected:
@@ -93,6 +111,5 @@ namespace geode
             std::shared_ptr< VariableAttribute< std::array< index_t, 2 > > >
                 edges_;
         };
-
     } // namespace internal
 } // namespace geode

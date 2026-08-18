@@ -44,10 +44,10 @@ namespace geode
     class ModelBoundaries
     {
         OPENGEODE_DISABLE_COPY( ModelBoundaries );
-        PASSKEY( ModelBoundariesBuilder< dimension >,
-            ModelBoundariesBuilderKey /*key*/ );
 
     public:
+        PASSKEY( ModelBoundariesBuilder< dimension >,
+            ModelBoundariesBuilderKey /*key*/ );
         using Builder = ModelBoundariesBuilder< dimension >;
         using Type = ModelBoundary< dimension >;
 

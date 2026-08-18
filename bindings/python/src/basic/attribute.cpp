@@ -53,23 +53,47 @@ namespace geode
             std::shared_ptr< VariableAttribute< type > > >(
             module, variable_name.c_str() )
             .def( "set_value", &VariableAttribute< type >::set_value )
-            .def( "default_value", &VariableAttribute< type >::default_value );
+            .def(
+                "default_values", &VariableAttribute< type >::default_values );
         const auto sparse_name = absl::StrCat( "SparseAttribute", typestr );
         pybind11::class_< SparseAttribute< type >, ReadOnlyAttribute< type >,
             std::shared_ptr< SparseAttribute< type > > >(
             module, sparse_name.c_str() )
             .def( "set_value", &SparseAttribute< type >::set_value )
-            .def( "default_value", &SparseAttribute< type >::default_value );
+            .def( "default_values", &SparseAttribute< type >::default_values );
+    }
+
+    template < typename type >
+    void python_attribute_values_class(
+        pybind11::module& module, const std::string& typestr )
+    {
+        const auto values_name = absl::StrCat( "AttributeValues", typestr );
+        pybind11::class_< AttributeValues< type > >(
+            module, values_name.c_str() )
+            .def( pybind11::init<>() )
+            .def_readwrite(
+                "default_value", &AttributeValues< type >::default_value )
+            .def_readwrite( "no_value", &AttributeValues< type >::no_value );
     }
 
     void define_attributes( pybind11::module& module )
     {
         pybind11::class_< AttributeProperties >( module, "AttributeProperties" )
             .def( pybind11::init<>() )
-            .def( pybind11::init< bool, bool >() )
             .def_readwrite( "assignable", &AttributeProperties::assignable )
+            .def_readwrite( "interpolable", &AttributeProperties::interpolable )
             .def_readwrite(
-                "interpolable", &AttributeProperties::interpolable );
+                "transferable", &AttributeProperties::transferable );
+
+        python_attribute_values_class< bool >( module, "Bool" );
+        python_attribute_values_class< int >( module, "Int" );
+        python_attribute_values_class< unsigned int >( module, "UInt" );
+        python_attribute_values_class< float >( module, "Float" );
+        python_attribute_values_class< double >( module, "Double" );
+        python_attribute_values_class< std::array< double, 2 > >(
+            module, "ArrayDouble2" );
+        python_attribute_values_class< std::array< double, 3 > >(
+            module, "ArrayDouble3" );
 
         pybind11::class_< AttributeBase, std::shared_ptr< AttributeBase > >(
             module, "AttributeBase" )

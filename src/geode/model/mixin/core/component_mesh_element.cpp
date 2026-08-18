@@ -30,7 +30,7 @@ namespace std
     size_t hash< geode::ComponentMeshElement >::operator()(
         const geode::ComponentMeshElement& cme ) const
     {
-        return absl::Hash< geode::uuid >()( cme.component_id.id() )
+        return absl::Hash< geode::uuid >()( cme.component_id.id )
                ^ absl::Hash< geode::index_t >()( cme.element_id );
     }
 } // namespace std

@@ -114,13 +114,15 @@ namespace geode
     void GraphBuilder::associate_edge_vertex_to_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        graph_.associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
+        graph_.associate_edge_vertex_to_vertex(
+            edge_vertex, vertex_id, Graph::GraphKey{} );
     }
 
     void GraphBuilder::disassociate_edge_vertex_to_vertex(
         const EdgeVertex& edge_vertex )
     {
-        graph_.disassociate_edge_vertex_to_vertex( edge_vertex, {} );
+        graph_.disassociate_edge_vertex_to_vertex(
+            edge_vertex, Graph::GraphKey{} );
     }
 
     index_t GraphBuilder::create_edge()
@@ -166,7 +168,8 @@ namespace geode
     void GraphBuilder::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges )
     {
-        graph_.set_edges_around_vertex( vertex_id, std::move( edges ), {} );
+        graph_.set_edges_around_vertex(
+            vertex_id, std::move( edges ), Graph::GraphKey{} );
     }
 
     std::vector< index_t > GraphBuilder::delete_edges(
@@ -245,22 +248,15 @@ namespace geode
         VertexSetBuilder::copy( graph );
         create_edges( graph.nb_edges() );
         graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );
-        if( graph_.impl_name() == graph.impl_name() )
+        for( const auto e : Range{ graph.nb_edges() } )
         {
-            do_copy_edges( graph );
-        }
-        else
-        {
-            for( const auto e : Range{ graph.nb_edges() } )
+            for( const auto v : LRange{ 2 } )
             {
-                for( const auto v : LRange{ 2 } )
+                const EdgeVertex id{ e, v };
+                const auto vertex = graph.edge_vertex( id );
+                if( vertex != NO_ID )
                 {
-                    const EdgeVertex id{ e, v };
-                    const auto vertex = graph.edge_vertex( id );
-                    if( vertex != NO_ID )
-                    {
-                        set_edge_vertex( id, vertex );
-                    }
+                    set_edge_vertex( id, vertex );
                 }
             }
         }

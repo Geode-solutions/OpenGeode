@@ -57,7 +57,7 @@ namespace
         }
         if( nb_non_empty_elements < nb_elements )
         {
-            geode::Logger::warn( absl::StrCat( "[create_model_aabb] ",
+            geode::Logger::warning( absl::StrCat( "[create_model_aabb] ",
                 nb_elements - nb_non_empty_elements, " out of ", nb_elements,
                 " components have empty meshes, not included in the "
                 "AABBTree." ) );
@@ -71,9 +71,13 @@ namespace
     {
         const auto nb_non_empty_elements =
             count_non_empty_elements( range, nb_elements );
+        std::tuple< geode::AABBTree< dimension >,
+            absl::FixedArray< geode::uuid > >
+            result( geode::AABBTree< dimension >{},
+                absl::FixedArray< geode::uuid >{ nb_non_empty_elements } );
+        auto& [aabb, mapping] = result;
         absl::FixedArray< geode::BoundingBox< dimension > > boxes(
             nb_non_empty_elements );
-        absl::FixedArray< geode::uuid > mapping( nb_non_empty_elements );
         absl::FixedArray< async::task< void > > tasks( nb_non_empty_elements );
         geode::index_t id{ 0 };
         for( const auto& element : range )
@@ -82,18 +86,19 @@ namespace
             {
                 continue;
             }
-            tasks[id] = async::spawn( [id, &mapping, &boxes, &element] {
-                mapping[id] = element.id();
-                boxes[id] = element.mesh().bounding_box();
-            } );
+            tasks[id] = async::spawn(
+                [id, &captured_mapping = mapping, &boxes, &element] {
+                    captured_mapping[id] = element.id();
+                    boxes[id] = element.mesh().bounding_box();
+                } );
             id++;
         }
         for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
-        return std::make_tuple(
-            geode::AABBTree< dimension >{ boxes }, std::move( mapping ) );
+        aabb = geode::AABBTree< dimension >{ boxes };
+        return result;
     }
 
     template < geode::index_t dimension, typename Range >

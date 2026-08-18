@@ -63,6 +63,8 @@ namespace geode
             initialize_relation_attribute();
         }
 
+        Impl( BITSERY bitsery ) : RelationshipsImpl( bitsery ) {}
+
         RelationType relation_type( const index_t edge_id ) const
         {
             return relation_type_->value( edge_id );
@@ -106,7 +108,7 @@ namespace geode
             }
             return graph_component_id(
                        { edge_id.value(), BOUNDARY_EDGE_VERTEX } )
-                       .id()
+                       .id
                    == from;
         }
 
@@ -120,7 +122,7 @@ namespace geode
             }
             return graph_component_id(
                        { edge_id.value(), INTERNAL_EDGE_VERTEX } )
-                       .id()
+                       .id
                    == from;
         }
 
@@ -133,7 +135,7 @@ namespace geode
                 return false;
             }
             return graph_component_id( { edge_id.value(), ITEM_EDGE_VERTEX } )
-                       .id()
+                       .id
                    == from;
         }
 
@@ -142,11 +144,11 @@ namespace geode
             const RelationType type )
         {
             if( const auto component_id =
-                    relation_edge_index( from.id(), to.id() ) )
+                    relation_edge_index( from.id, to.id ) )
             {
                 const auto relation_type =
                     relation_type_->value( component_id.value() );
-                Logger::warn( "There is already a ",
+                Logger::warning( "There is already a ",
                     relation_to_string( relation_type ), " between (",
                     from.string(), " and ", to.string(), ")" );
                 return component_id.value();
@@ -204,18 +206,21 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         OpenGeodeGraph graph;
+                         OpenGeodeGraph graph{ BITSERY::constructor };
                          archive.object( graph );
                          archive.object( impl.uuid2index_ );
                          archive.ext(
                              impl.relation_type_, bitsery::ext::StdSmartPtr{} );
                          archive.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
-                         impl.graph_ = graph.clone();
+                         impl.graph_ = std::make_unique< OpenGeodeGraph >(
+                             std::move( graph ) );
                          impl.initialize_attributes();
                          impl.initialize_relation_attribute();
                          impl.delete_isolated_vertices();
                      },
                         []( Archive& archive, Impl& impl ) {
+                            impl.graph_ = std::make_unique< OpenGeodeGraph >(
+                                BITSERY::constructor );
                             archive.ext(
                                 impl.graph_, bitsery::ext::StdSmartPtr{} );
                             archive.object( impl.uuid2index_ );
@@ -236,9 +241,32 @@ namespace geode
 
         void initialize_relation_attribute()
         {
-            relation_type_ = relation_attribute_manager()
-                                 .find_or_create_attribute< VariableAttribute,
-                                     RelationType >( "relation_type", NO_ID );
+            const auto ids =
+                relation_attribute_manager().attribute_ids_matching_name(
+                    "relation_type" );
+            if( ids.has_value() )
+            {
+                relation_type_ =
+                    relation_attribute_manager()
+                        .find_attribute< VariableAttribute, RelationType >(
+                            ids.value()[0] );
+                return;
+            }
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = true;
+            AttributeValues< RelationType > ids_attribute_values;
+            ids_attribute_values.default_value = NO_ID;
+            ids_attribute_values.no_value = NO_ID;
+            const auto id =
+                relation_attribute_manager()
+                    .create_attribute< VariableAttribute, RelationType >(
+                        "relation_type", ids_attribute_values,
+                        attribute_properties );
+            relation_type_ =
+                relation_attribute_manager()
+                    .find_attribute< VariableAttribute, RelationType >( id );
         }
 
         std::string relation_to_string( index_t relation_type ) const
@@ -267,6 +295,7 @@ namespace geode
     };
 
     Relationships::Relationships() = default;
+    Relationships::Relationships( BITSERY bitsery ) : impl_{ bitsery } {}
     Relationships::Relationships( Relationships&& ) noexcept = default;
     Relationships& Relationships::operator=(
         Relationships&& ) noexcept = default;

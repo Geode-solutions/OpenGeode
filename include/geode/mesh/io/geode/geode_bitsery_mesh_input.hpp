@@ -32,7 +32,8 @@
 #include <geode/mesh/core/bitsery_archive.hpp>
 
 #define BITSERY_READ( Mesh )                                                   \
-    [[nodiscard]] std::unique_ptr< Mesh > read( const MeshImpl& impl ) final   \
+    [[nodiscard]] std::unique_ptr< Mesh > read( const MeshImpl& /*impl*/ )     \
+        final                                                                  \
     {                                                                          \
         std::ifstream file{ to_string( this->filename() ),                     \
             std::ifstream::binary };                                           \
@@ -44,7 +45,8 @@
         BitseryExtensions::register_deserialize_pcontext(                      \
             std::get< 0 >( context ) );                                        \
         Deserializer archive{ context, file };                                 \
-        auto mesh = Mesh::create( impl );                                      \
+        std::unique_ptr< Mesh > mesh{ new OpenGeode##Mesh{                     \
+            BITSERY::constructor } };                                          \
         archive.object( dynamic_cast< OpenGeode##Mesh& >( *mesh ) );           \
         const auto& adapter = archive.adapter();                               \
         geode::OpenGeodeMeshException::check_exception(                        \

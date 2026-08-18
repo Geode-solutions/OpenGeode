@@ -49,7 +49,8 @@ namespace geode
     void OpenGeodeRegularGridBuilder< 3 >::update_origin(
         const Point3D& origin )
     {
-        geode_regular_grid_.update_origin( origin, {} );
+        geode_regular_grid_.update_origin(
+            origin, OpenGeodeRegularGrid< 3 >::OGRegularGridKey{} );
         this->set_grid_origin( origin );
     }
 
@@ -57,7 +58,7 @@ namespace geode
         Point3D origin, std::array< Vector3D, 3 > directions )
     {
         geode_regular_grid_.update_origin_and_directions(
-            origin, directions, {} );
+            origin, directions, OpenGeodeRegularGrid< 3 >::OGRegularGridKey{} );
         this->set_grid_origin( std::move( origin ) );
         this->set_grid_directions( std::move( directions ) );
     }

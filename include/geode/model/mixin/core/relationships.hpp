@@ -25,6 +25,7 @@
 
 #include <optional>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -50,6 +51,7 @@ namespace geode
      */
     class opengeode_model_api Relationships
     {
+    public:
         PASSKEY( RelationshipsBuilder, RelationshipsBuilderKey /*key*/ );
 
     public:
@@ -357,6 +359,7 @@ namespace geode
 
     public:
         Relationships();
+        Relationships( BITSERY );
         ~Relationships();
 
         [[nodiscard]] index_t nb_components_with_relations() const;

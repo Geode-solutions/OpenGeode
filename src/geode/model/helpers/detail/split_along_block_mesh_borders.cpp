@@ -71,8 +71,7 @@ namespace geode
                     adjacency_tasks[adjacency_count++] =
                         async::spawn( [this, &block] {
                             const auto& mesh = block.mesh();
-                            auto builder =
-                                builder_.block_mesh_builder( block.id() );
+                            auto builder = builder_.block_mesh_builder( block );
                             const auto facets_list =
                                 mesh_border_facets( block );
                             SplitAlongSolidFacets block_splitter{ mesh,
@@ -97,16 +96,18 @@ namespace geode
                             duplicate_tasks[duplicate_count++] =
                                 async::spawn( [this, &block, solid_info] {
                                     const auto& mesh = block.mesh();
-                                    auto builder = builder_.block_mesh_builder(
-                                        block.id() );
+                                    auto builder =
+                                        builder_.block_mesh_builder( block );
                                     const auto facets_list =
                                         mesh_border_facets( block );
                                     SplitAlongSolidFacets block_splitter{ mesh,
                                         *builder };
-                                    return std::make_pair( block.id(),
-                                        block_splitter
-                                            .duplicate_points_and_process_solid_facets_and_edges(
-                                                solid_info ) );
+                                    std::pair< uuid, MeshesElementsMapping >
+                                        split_result{ block.id(),
+                                            block_splitter
+                                                .duplicate_points_and_process_solid_facets_and_edges(
+                                                    solid_info ) };
+                                    return split_result;
                                 } );
                         }
                         async::when_all( duplicate_tasks )
@@ -138,7 +139,7 @@ namespace geode
             CMVmappings split_block( const Block3D& block )
             {
                 const auto& mesh = block.mesh();
-                auto builder = builder_.block_mesh_builder( block.id() );
+                auto builder = builder_.block_mesh_builder( block );
                 const auto facets_list = mesh_border_facets( block );
                 SplitAlongSolidFacets block_splitter{ mesh, *builder };
                 auto mapping =

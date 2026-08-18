@@ -47,6 +47,8 @@ namespace geode
         using Builder = PolygonalSurfaceBuilder< dimension >;
         static constexpr auto dim = dimension;
 
+        PolygonalSurface( BITSERY );
+
         /*!
          * Create a new PolygonalSurface using default data structure.
          */

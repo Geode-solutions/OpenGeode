@@ -31,6 +31,12 @@
 namespace geode
 {
     template < index_t dimension >
+    PolyhedralSolid< dimension >::PolyhedralSolid( BITSERY bitsery )
+        : SolidMesh< dimension >{ bitsery }
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::create()
     {

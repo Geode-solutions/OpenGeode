@@ -353,16 +353,31 @@ void test_closest_vertex( const geode::RegularGrid3D& grid )
 
 void test_clone( const geode::RegularGrid3D& grid )
 {
-    const auto attribute_name = "int_attribute";
-    const auto attribute_name_d = "double_attribute";
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = true;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< int > attribute_values_int;
+    attribute_values_int.default_value = 0;
+    attribute_values_int.no_value = 0;
+    auto attribute_id =
+        grid.polyhedron_attribute_manager()
+            .create_attribute< geode::VariableAttribute, int >(
+                "int_attribute", attribute_values_int, attribute_properties );
     auto attribute =
         grid.polyhedron_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, int >(
-                attribute_name, 0 );
-    auto attribute_d =
+            .find_attribute< geode::VariableAttribute, int >( attribute_id );
+    geode::AttributeValues< double > attribute_values_double;
+    attribute_values_double.default_value = 0;
+    attribute_values_double.no_value = 0;
+    auto attribute_d_id =
         grid.vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                attribute_name_d, 0 );
+            .create_attribute< geode::VariableAttribute, double >(
+                "double_attribute", attribute_values_double,
+                attribute_properties );
+    auto attribute_d = grid.vertex_attribute_manager()
+                           .find_attribute< geode::VariableAttribute, double >(
+                               attribute_d_id );
     for( const auto c : geode::Range{ grid.nb_polyhedra() } )
     {
         attribute->set_value( c, 2 * c );
@@ -414,23 +429,22 @@ void test_clone( const geode::RegularGrid3D& grid )
         "Clone wrong cell length in direction 2" );
 
     geode::OpenGeodeMeshException::test(
-        clone->polyhedron_attribute_manager().attribute_exists(
-            attribute_name ),
+        clone->polyhedron_attribute_manager().attribute_exists( attribute_id ),
         "Clone missing attribute" );
     geode::OpenGeodeMeshException::test(
-        clone->vertex_attribute_manager().attribute_exists( attribute_name_d ),
+        clone->vertex_attribute_manager().attribute_exists( attribute_d_id ),
         "Clone missing attribute" );
     const auto clone_attribute =
-        clone->polyhedron_attribute_manager().find_attribute< int >(
-            attribute_name );
+        clone->polyhedron_attribute_manager().find_read_only_attribute< int >(
+            attribute_id );
     for( const auto c : geode::TRange< int >{ clone->nb_polyhedra() } )
     {
         geode::OpenGeodeMeshException::test(
             clone_attribute->value( c ) == 2 * c, "Wrong clone attribute" );
     }
     const auto clone_attribute_d =
-        clone->vertex_attribute_manager().find_attribute< double >(
-            attribute_name_d );
+        clone->vertex_attribute_manager().find_read_only_attribute< double >(
+            attribute_d_id );
     for( const auto c : geode::TRange< int >{ clone->nb_vertices() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -453,6 +467,19 @@ void test_io( const geode::RegularGrid3D& grid, std::string_view filename )
     geode::OpenGeodeMeshException::test(
         grid.nb_cells_in_direction( 2 ) == reload->nb_cells_in_direction( 2 ),
         "Wrong reload nb_cells_in_direction(2)" );
+}
+
+void test_backward_io( std::string_view filename )
+{
+    const auto grid = geode::load_regular_grid< 3 >( filename );
+    geode::OpenGeodeMeshException::test(
+        grid->nb_cells() == 750, "Wrong Backward grid nb_cells()" );
+    geode::OpenGeodeMeshException::test( grid->nb_cells_in_direction( 0 ) == 5,
+        "Wrong Backward grid nb_cells_in_direction(0)" );
+    geode::OpenGeodeMeshException::test( grid->nb_cells_in_direction( 1 ) == 10,
+        "Wrong Backward grid nb_cells_in_direction(1)" );
+    geode::OpenGeodeMeshException::test( grid->nb_cells_in_direction( 2 ) == 15,
+        "Wrong Backward grid nb_cells_in_direction(2)" );
 }
 
 void test_adjacencies2D()
@@ -539,14 +566,16 @@ void test()
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
 
-    auto grid_v12 = geode::load_regular_grid< 3 >(
-        absl::StrCat( geode::DATA_PATH, "test_v12.og_rgd3d" ) );
+    auto grid_v12 =
+        geode::load_regular_grid< 3 >( absl::StrCat( geode::DATA_PATH,
+            "backward_io/v12/test_v12.", grid->native_extension() ) );
     auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
     builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid_v12 );
-
+    test_backward_io( absl::StrCat(
+        geode::DATA_PATH, "backward_io/v17/v17.", grid->native_extension() ) );
     test_adjacencies2D();
 }
 

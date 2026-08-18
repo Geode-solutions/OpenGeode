@@ -146,9 +146,10 @@ namespace
                 other, other_corner.mesh().nb_vertices(),
                 other_corner.component_id() );
             const auto& corner = model.corner( corner_id );
+            other_builder.unregister_mesh_component( other_corner );
             builder.update_corner_mesh(
-                corner, other_builder.steal_corner_mesh( other_corner_id ) );
-            auto mesh_builder = builder.corner_mesh_builder( corner_id );
+                corner, other_builder.steal_corner_mesh( other_corner ) );
+            auto mesh_builder = builder.corner_mesh_builder( corner );
             mesh_builder->set_id( corner.id() );
             if( const auto name = corner.name() )
             {
@@ -175,9 +176,10 @@ namespace
             const auto line_unique_vertices = save_mesh_unique_vertices( other,
                 other_line.mesh().nb_vertices(), other_line.component_id() );
             const auto& line = model.line( line_id );
+            other_builder.unregister_mesh_component( other_line );
             builder.update_line_mesh(
-                line, other_builder.steal_line_mesh( other_line_id ) );
-            auto mesh_builder = builder.line_mesh_builder( line_id );
+                line, other_builder.steal_line_mesh( other_line ) );
+            auto mesh_builder = builder.line_mesh_builder( line );
             mesh_builder->set_id( line.id() );
             if( const auto name = line.name() )
             {
@@ -205,9 +207,10 @@ namespace
                 other, other_surface.mesh().nb_vertices(),
                 other_surface.component_id() );
             const auto& surface = model.surface( surface_id );
+            other_builder.unregister_mesh_component( other_surface );
             builder.update_surface_mesh(
-                surface, other_builder.steal_surface_mesh( other_surface_id ) );
-            auto mesh_builder = builder.surface_mesh_builder( surface_id );
+                surface, other_builder.steal_surface_mesh( other_surface ) );
+            auto mesh_builder = builder.surface_mesh_builder( surface );
             mesh_builder->set_id( surface.id() );
             if( const auto name = surface.name() )
             {
@@ -234,9 +237,10 @@ namespace
             const auto block_unique_vertices = save_mesh_unique_vertices( other,
                 other_block.mesh().nb_vertices(), other_block.component_id() );
             const auto& block = model.block( block_id );
+            other_builder.unregister_mesh_component( other_block );
             builder.update_block_mesh(
-                block, other_builder.steal_block_mesh( other_block_id ) );
-            auto mesh_builder = builder.block_mesh_builder( block_id );
+                block, other_builder.steal_block_mesh( other_block ) );
+            auto mesh_builder = builder.block_mesh_builder( block );
             mesh_builder->set_id( block.id() );
             if( const auto name = block.name() )
             {

@@ -167,7 +167,8 @@ namespace
         geode::PolyhedronFacet facet,
         const std::array< geode::index_t, 2 >& edge_vertices )
     {
-        geode::PolyhedraAroundEdge result;
+        std::tuple< geode::PolyhedraAroundEdge, bool > result;
+        auto& [polyhedra_around_edge, found] = result;
         const auto first_polyhedron = facet.polyhedron_id;
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
@@ -176,7 +177,7 @@ namespace
             if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
             {
                 const auto adj_facet = adj.value();
-                result.push_back( adj_facet.polyhedron_id );
+                polyhedra_around_edge.push_back( adj_facet.polyhedron_id );
                 for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
                          adj_facet.polyhedron_id ) } )
                 {
@@ -194,7 +195,8 @@ namespace
             }
             else
             {
-                return std::make_tuple( std::move( result ), false );
+                found = false;
+                return result;
             }
         } while( facet.polyhedron_id != first_polyhedron
                  && safety_count < MAX_SAFETY_COUNT );
@@ -209,7 +211,8 @@ namespace
             " ", solid.point( edge_vertices[1] ).string(),
             "). This is probably related to a bug in the polyhedron "
             "adjacencies." );
-        return std::make_tuple( std::move( result ), true );
+        found = true;
+        return result;
     }
 
     template < geode::index_t dimension >
@@ -435,17 +438,27 @@ namespace geode
         using CachedPolyhedra =
             CachedValue< internal::PolyhedraAroundVertexImpl >;
         static constexpr auto POLYHEDRA_AROUND_VERTEX_NAME =
-
             "polyhedra_around_vertex";
 
     public:
         explicit Impl( SolidMesh& solid )
-            : polyhedron_around_vertex_( solid.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolyhedronVertex >( "polyhedron_around_vertex",
-                          PolyhedronVertex{},
-                          { false, false, false } ) )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< PolyhedronVertex > polyhedron_around_vertex_values;
+            polyhedron_around_vertex_values.default_value = PolyhedronVertex{};
+            polyhedron_around_vertex_values.no_value = PolyhedronVertex{};
+            const auto attribute_id =
+                solid.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        PolyhedronVertex >( "polyhedron_around_vertex",
+                        polyhedron_around_vertex_values, attribute_properties );
+            polyhedron_around_vertex_ =
+                solid.vertex_attribute_manager()
+                    .template find_attribute< VariableAttribute,
+                        PolyhedronVertex >( attribute_id );
             initialize_polyhedra_around_vertex( solid );
         }
 
@@ -678,11 +691,22 @@ namespace geode
         void initialize_polyhedra_around_vertex(
             const SolidMesh< dimension >& solid )
         {
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = false;
+            AttributeValues< CachedPolyhedra > polyhedron_around_vertex_values;
+            polyhedron_around_vertex_values.default_value = CachedPolyhedra{};
+            polyhedron_around_vertex_values.no_value = CachedPolyhedra{};
+            const auto attribute_id =
+                solid.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute,
+                        CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
+                        polyhedron_around_vertex_values, attribute_properties );
             polyhedra_around_vertex_ =
                 solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        CachedPolyhedra >( POLYHEDRA_AROUND_VERTEX_NAME,
-                        CachedPolyhedra{}, { false, false, false } );
+                    .template find_attribute< VariableAttribute,
+                        CachedPolyhedra >( attribute_id );
         }
 
         const internal::PolyhedraAroundVertexImpl&
@@ -705,9 +729,9 @@ namespace geode
             return cached.value();
         }
 
-    private:
         Impl() = default;
 
+    private:
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -820,6 +844,11 @@ namespace geode
 
     template < index_t dimension >
     SolidMesh< dimension >::SolidMesh() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    SolidMesh< dimension >::SolidMesh( BITSERY )
     {
     }
 
@@ -1735,8 +1764,8 @@ namespace geode
                 { []( Archive& archive, SolidMesh& solid ) {
                      archive.ext(
                          solid, bitsery::ext::BaseClass< VertexSet >{} );
-                     archive.object( solid.impl_ );
                      solid.impl_->initialize_polyhedra_around_vertex( solid );
+                     archive.object( solid.impl_ );
                  },
                     []( Archive& archive, SolidMesh& solid ) {
                         archive.ext(

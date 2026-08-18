@@ -34,7 +34,7 @@ namespace geode
         zero
     };
 
-    using Sign = SIDE;
+    using SIGN = SIDE;
 
     enum struct POSITION
     {

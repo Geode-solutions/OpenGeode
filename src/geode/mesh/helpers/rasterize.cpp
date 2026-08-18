@@ -117,7 +117,7 @@ namespace
                 increments[i] = -1;
             }
         }
-        return std::make_tuple( deltas, increments );
+        return { deltas, increments };
     }
 
     template < geode::index_t dimension >
@@ -173,7 +173,7 @@ namespace
                 }
             }
         }
-        return std::make_tuple( major_edge, major_axis );
+        return { major_edge, major_axis };
     }
 
     template < geode::index_t dimension >
@@ -238,10 +238,12 @@ namespace
         const auto& vertices = triangle_in_grid.vertices();
         for( const auto e : geode::LRange{ 3 } )
         {
-            result[e].first = geode::Vector2D{
-                { -1 * edges_in_grid[e].direction().value( plane_axes[1] ),
-                    edges_in_grid[e].direction().value( plane_axes[0] ) }
-            } * normal_orientation;
+            result[e].first =
+                geode::Vector2D{
+                    { -1 * edges_in_grid[e].direction().value( plane_axes[1] ),
+                        edges_in_grid[e].direction().value( plane_axes[0] ) }
+                }
+                * normal_orientation * edges_in_grid[e].length();
             const auto& vertex = vertices[e];
             result[e].second = -result[e].first.dot( geode::Vector2D{
                                    { vertex.value( plane_axes[0] ),
@@ -564,8 +566,8 @@ namespace
         const auto pt1_in_grid =
             grid.grid_coordinate_system().coordinates( seg_vertices[1] );
         const geode::Segment2D segment_in_grid{ pt0_in_grid, pt1_in_grid };
-        const auto normal_in_grid =
-            geode::perpendicular( segment_in_grid.direction() );
+        const auto normal_in_grid = geode::perpendicular(
+            segment_in_grid.direction() * segment_in_grid.length() );
         const geode::InfiniteLine2D line_in_grid{ segment_in_grid };
         const auto critical_point = compute_critical_point( normal_in_grid );
 
@@ -956,8 +958,9 @@ namespace
             geode::index_t vertex_id ) const
         {
             auto& vertex_jks = painted_vertices_[vertex_id];
-            auto oriented_jk =
-                std::make_tuple( current_j, current_k, counter_clockwise_ );
+            std::tuple< geode::index_t, geode::index_t, bool > oriented_jk{
+                current_j, current_k, counter_clockwise_
+            };
             if( absl::c_find( vertex_jks, oriented_jk ) == vertex_jks.end() )
             {
                 vertex_jks.emplace_back( std::move( oriented_jk ) );
@@ -971,8 +974,9 @@ namespace
             const Edge& edge ) const
         {
             auto& edge_jks = painted_edges_[edge];
-            auto oriented_jk =
-                std::make_tuple( current_j, current_k, counter_clockwise_ );
+            std::tuple< geode::index_t, geode::index_t, bool > oriented_jk{
+                current_j, current_k, counter_clockwise_
+            };
             if( absl::c_find( edge_jks, oriented_jk ) == edge_jks.end() )
             {
                 edge_jks.emplace_back( std::move( oriented_jk ) );

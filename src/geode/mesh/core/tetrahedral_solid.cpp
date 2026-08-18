@@ -104,7 +104,7 @@ namespace
             const auto adj_optional = solid.polyhedron_adjacent( facet );
             if( !adj_optional )
             {
-                return std::make_pair( true, false );
+                return { true, false };
             }
             const auto adj = adj_optional.value();
             result.push_back( adj );
@@ -124,7 +124,7 @@ namespace
             }
             if( v0.size() != 1 || v1.size() != 1 )
             {
-                return std::make_pair( false, false );
+                return { false, false };
             }
             const auto adj_facet = ::tetrahedron_facet_from_vertices(
                 solid, facet, vertices_adj, adj );
@@ -150,12 +150,18 @@ namespace
                 "[TetrahedralSolid3D::propagate_around_edge] Next "
                 "facet not found" );
         } while( facet.polyhedron_id != first_polyhedron );
-        return std::make_pair( true, true );
+        return { true, true };
     }
 } // namespace
 
 namespace geode
 {
+    template < index_t dimension >
+    TetrahedralSolid< dimension >::TetrahedralSolid( BITSERY bitsery )
+        : SolidMesh< dimension >{ bitsery }
+    {
+    }
+
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create()

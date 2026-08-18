@@ -144,7 +144,7 @@ namespace geode
             edges.reserve( line_pairs.size() );
             for( const auto& line_pair : line_pairs )
             {
-                const auto& line = model.line( line_pair.first.id() );
+                const auto& line = model.line( line_pair.first.id );
                 const auto& mesh = line.mesh();
                 for( const auto& pair : line_pair.second )
                 {
@@ -221,7 +221,7 @@ namespace geode
             edges.reserve( surface_pairs.size() );
             for( const auto& [surface_id, edge_pairs] : surface_pairs )
             {
-                const auto& surface = model.surface( surface_id.id() );
+                const auto& surface = model.surface( surface_id.id );
                 const auto& mesh = surface.mesh();
                 for( const auto& pair : edge_pairs )
                 {
@@ -300,7 +300,7 @@ namespace geode
             edges.reserve( block_pairs.size() );
             for( const auto& block_pair : block_pairs )
             {
-                const auto& block = model.block( block_pair.first.id() );
+                const auto& block = model.block( block_pair.first.id );
                 const auto& mesh = block.mesh();
                 for( const auto& pair : block_pair.second )
                 {

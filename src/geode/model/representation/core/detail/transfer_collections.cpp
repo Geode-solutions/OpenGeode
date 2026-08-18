@@ -75,7 +75,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_corner_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -138,7 +138,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_corner_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -186,7 +186,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_line_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -247,7 +247,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_line_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -296,7 +296,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_surface_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -360,7 +360,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_surface_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -408,7 +408,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_block_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -469,7 +469,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_block_collection_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -517,7 +517,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_model_boundary_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -580,7 +580,7 @@ namespace
                 if( const auto name = model_bdry.name() )
                 {
                     new_model_builder.set_model_boundary_name(
-                        model_bdry.id(), name.value() );
+                        model_bdry, name.value() );
                 }
             }
             const auto& new_model_bdry =
@@ -628,7 +628,7 @@ namespace
                 if( const auto name = collection_in.name() )
                 {
                     new_model_builder.set_model_boundary_name(
-                        collection_in.id(), name.value() );
+                        collection_in, name.value() );
                 }
             }
             const auto& new_collection =
@@ -688,7 +688,7 @@ namespace
                 if( const auto name = model_bdry.name() )
                 {
                     new_model_builder.set_model_boundary_name(
-                        model_bdry.id(), name.value() );
+                        model_bdry, name.value() );
                 }
             }
             const auto& new_model_bdry =

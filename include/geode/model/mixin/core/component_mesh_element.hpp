@@ -46,7 +46,7 @@ namespace geode
 
         [[nodiscard]] MeshElement mesh_element() const
         {
-            return { component_id.id(), element_id };
+            return { component_id.id, element_id };
         }
 
         [[nodiscard]] bool operator==( const ComponentMeshElement& other ) const

@@ -48,33 +48,42 @@ namespace geode
 
         index_t nb_textures() const
         {
-            return textures_.nb_textures( {} );
+            return textures_.nb_textures(
+                typename TextureStorage< dimension >::TextureManagerKey{} );
         }
 
         Texture< dimension >& find_or_create_texture( std::string_view name )
         {
-            return textures_.find_or_create_texture( manager_, name, {} );
+            return textures_.find_or_create_texture( manager_, name,
+                typename TextureStorage< dimension >::TextureManagerKey{} );
         }
 
         const Texture< dimension >& find_texture( std::string_view name ) const
         {
-            return textures_.find_texture( name, {} );
+            return textures_.find_texture( name,
+                typename TextureStorage< dimension >::TextureManagerKey{} );
         }
 
         absl::FixedArray< std::string_view > texture_names() const
         {
-            return textures_.texture_names( {} );
+            return textures_.texture_names(
+                typename TextureStorage< dimension >::TextureManagerKey{} );
         }
 
         bool texture_exists( std::string_view name ) const
         {
-            return textures_.texture_exists( name, {} );
+            return textures_.texture_exists( name,
+                typename TextureStorage< dimension >::TextureManagerKey{} );
         }
 
         void delete_texture( std::string_view name )
         {
-            textures_.delete_texture( name, {} );
-            manager_.delete_attribute( name );
+            const auto& texture = textures_.find_texture( name,
+                typename TextureStorage< dimension >::TextureManagerKey{} );
+            const auto texture_id = texture.texture_id();
+            textures_.delete_texture( name,
+                typename TextureStorage< dimension >::TextureManagerKey{} );
+            manager_.delete_attribute( texture_id );
         }
 
     private:

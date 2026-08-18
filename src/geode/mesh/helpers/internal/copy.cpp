@@ -21,6 +21,8 @@
  *
  */
 
+#include <geode/basic/mapping.hpp>
+
 #include <geode/mesh/helpers/internal/copy.hpp>
 
 #include <async++.h>
@@ -32,13 +34,13 @@ namespace geode
         void copy_attributes(
             const AttributeManager& manager_in, AttributeManager& manager_out )
         {
-            absl::FixedArray< index_t > old2new( manager_in.nb_elements() );
-            async::parallel_for(
-                async::irange( index_t{ 0 }, manager_in.nb_elements() ),
-                [&old2new]( index_t i ) {
-                    old2new[i] = i;
-                } );
-            manager_out.import( manager_in, old2new );
+            GenericMapping< index_t > mapping;
+            for( const auto attribute_element :
+                geode::Range{ manager_in.nb_elements() } )
+            {
+                mapping.map( attribute_element, attribute_element );
+            }
+            manager_out.import( manager_in, mapping );
         }
     } // namespace internal
 } // namespace geode

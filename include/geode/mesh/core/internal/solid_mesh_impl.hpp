@@ -51,6 +51,12 @@ namespace geode
                 return polyhedra != other.polyhedra;
             }
 
+            [[nodiscard]] bool operator==(
+                const PolyhedraAroundVertexImpl& other ) const
+            {
+                return !operator!=( other );
+            }
+
             friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& serializer )

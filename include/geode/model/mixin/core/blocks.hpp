@@ -48,9 +48,9 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( Blocks );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey /*key*/ );
 
     public:
+        PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey /*key*/ );
         using Builder = BlocksBuilder< dimension >;
         using Type = Block< dimension >;
 

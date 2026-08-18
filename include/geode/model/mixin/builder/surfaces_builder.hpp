@@ -50,24 +50,30 @@ namespace geode
 
         /*!
          * Get a pointer to the builder of a Surface mesh
-         * @param[in] id Unique index of the Surface
+         * @param[in] surface Surface component to get the builder of
          */
         template < typename Mesh = SurfaceMesh< dimension > >
         [[nodiscard]] std::unique_ptr< typename Mesh::Builder >
-            surface_mesh_builder( const uuid& id )
+            surface_mesh_builder( const Surface< dimension >& surface )
         {
-            auto& mesh = surfaces_.modifiable_surface( id, {} ).modifiable_mesh(
-                typename Surface< dimension >::SurfacesBuilderKey{} );
+            auto& mesh =
+                surfaces_
+                    .modifiable_surface( surface.id(),
+                        typename Surface< dimension >::SurfacesBuilderKey{} )
+                    .modifiable_mesh(
+                        typename Surface< dimension >::SurfacesBuilderKey{} );
             return MeshBuilderFactory::create_mesh_builder<
                 typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
         }
 
-        void set_surface_name( const uuid& id, std::string_view name );
+        void set_surface_name(
+            const Surface< dimension >& surface, std::string_view name );
 
-        void set_surface_active( const uuid& id, bool active );
+        void set_surface_active(
+            const Surface< dimension >& surface, bool active );
 
         [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
-            steal_surface_mesh( const uuid& id );
+            steal_surface_mesh( const Surface< dimension >& surface );
 
     protected:
         explicit SurfacesBuilder( Surfaces< dimension >& surfaces )

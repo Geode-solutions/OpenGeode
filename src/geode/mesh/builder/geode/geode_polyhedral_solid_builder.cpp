@@ -88,8 +88,10 @@ namespace geode
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        geode_polyhedral_solid_.set_polyhedron_vertex(
-            polyhedron_vertex, vertex_id, {} );
+        geode_polyhedral_solid_.set_polyhedron_vertex( polyhedron_vertex,
+            vertex_id,
+            typename OpenGeodePolyhedralSolid<
+                dimension >::OGPolyhedralSolidKey() );
     }
 
     template < index_t dimension >
@@ -97,7 +99,9 @@ namespace geode
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< local_index_t > > facets )
     {
-        geode_polyhedral_solid_.add_polyhedron( vertices, facets, {} );
+        geode_polyhedral_solid_.add_polyhedron( vertices, facets,
+            typename OpenGeodePolyhedralSolid<
+                dimension >::OGPolyhedralSolidKey() );
     }
 
     template < index_t dimension >
@@ -105,16 +109,20 @@ namespace geode
         do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
     {
-        geode_polyhedral_solid_.set_polyhedron_adjacent(
-            polyhedron_facet, adjacent_id, {} );
+        geode_polyhedral_solid_.set_polyhedron_adjacent( polyhedron_facet,
+            adjacent_id,
+            typename OpenGeodePolyhedralSolid<
+                dimension >::OGPolyhedralSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::
         do_unset_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet )
     {
-        geode_polyhedral_solid_.set_polyhedron_adjacent(
-            polyhedron_facet, NO_ID, {} );
+        geode_polyhedral_solid_.set_polyhedron_adjacent( polyhedron_facet,
+            NO_ID,
+            typename OpenGeodePolyhedralSolid<
+                dimension >::OGPolyhedralSolidKey() );
     }
 
     template < index_t dimension >
@@ -122,7 +130,9 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_polyhedral_solid_.remove_polyhedra( to_delete, {} );
+        geode_polyhedral_solid_.remove_polyhedra(
+            to_delete, typename OpenGeodePolyhedralSolid<
+                           dimension >::OGPolyhedralSolidKey() );
     }
 
     template < index_t dimension >
@@ -130,7 +140,9 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_polyhedral_solid_.permute_polyhedra( permutation, {} );
+        geode_polyhedral_solid_.permute_polyhedra(
+            permutation, typename OpenGeodePolyhedralSolid<
+                             dimension >::OGPolyhedralSolidKey() );
     }
 
     template < index_t dimension >
@@ -147,7 +159,8 @@ namespace geode
         geode_polyhedral_solid_.copy_polyhedra(
             dynamic_cast< const OpenGeodePolyhedralSolid< dimension >& >(
                 solid_mesh ),
-            {} );
+            typename OpenGeodePolyhedralSolid<
+                dimension >::OGPolyhedralSolidKey() );
     }
 
     template class opengeode_mesh_api OpenGeodePolyhedralSolidBuilder< 3 >;

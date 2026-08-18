@@ -44,10 +44,10 @@ namespace geode
     class CornerCollections
     {
         OPENGEODE_DISABLE_COPY( CornerCollections );
-        PASSKEY( CornerCollectionsBuilder< dimension >,
-            CornerCollectionsBuilderKey /*key*/ );
 
     public:
+        PASSKEY( CornerCollectionsBuilder< dimension >,
+            CornerCollectionsBuilderKey /*key*/ );
         using Builder = CornerCollectionsBuilder< dimension >;
         using Type = CornerCollection< dimension >;
 
