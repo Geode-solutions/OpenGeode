@@ -1624,6 +1624,42 @@ void test_backward_io()
             "[Backward_IO] Incorrect brep unique_vertex_id." );
     }
     test_registry( brep_v17, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
+    auto brep_v18_0 = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_0/v18_0.og_brep" ) );
+    geode::BRepBuilder brep_builder_v18{ brep_v18_0 };
+    for( const auto& block : brep_v18_0.blocks() )
+    {
+        geode::OpenGeodeModelException::test( block.id() == block.mesh().id(),
+            "[Backward_IO] Brep block should have the same uuid as its mesh." );
+    }
+    for( const auto& surface : brep_v18_0.surfaces() )
+    {
+        geode::OpenGeodeModelException::test(
+            surface.id() == surface.mesh().id(),
+            "[Backward_IO] Brep surface should have the same uuid as its "
+            "mesh." );
+    }
+    for( const auto& line : brep_v18_0.lines() )
+    {
+        geode::OpenGeodeModelException::test( line.id() == line.mesh().id(),
+            "[Backward_IO] Brep line should have the same uuid as its mesh." );
+    }
+    for( const auto& corner : brep_v18_0.corners() )
+    {
+        geode::OpenGeodeModelException::test( corner.id() == corner.mesh().id(),
+            "[Backward_IO] Brep corner should have the same uuid as its "
+            "mesh." );
+    }
+    for( const auto& surface : brep_v18_0.surfaces() )
+    {
+        auto vertex_index =
+            brep_builder_v18.surface_mesh_builder( surface )->create_vertex();
+        geode::OpenGeodeModelException::test(
+            brep_v18_0.unique_vertex( { surface.component_id(), vertex_index } )
+                == geode::NO_ID,
+            "[Backward_IO] Incorrect brep unique_vertex_id." );
+    }
+    test_registry( brep_v18_0, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
 
 void test_components_filter()
@@ -1717,19 +1753,14 @@ void test()
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_clone( model );
     test_steal_mesh( model );
-    DEBUG( "io" );
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
-    DEBUG( "start load" );
     auto model2 = geode::load_brep( file_io );
     geode::BRepBuilder model2_builder{ model2 };
     for( const auto& surface : model2.surfaces() )
     {
         auto vertex_index =
             model2_builder.surface_mesh_builder( surface )->create_vertex();
-        DEBUG( vertex_index );
-        DEBUG(
-            model2.unique_vertex( { surface.component_id(), vertex_index } ) );
         geode::OpenGeodeModelException::test(
             model2.unique_vertex( { surface.component_id(), vertex_index } )
                 == geode::NO_ID,

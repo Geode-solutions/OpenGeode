@@ -134,6 +134,8 @@ namespace geode
          */
         void save_unique_vertices( std::string_view directory ) const;
 
+        [[nodiscard]] const uuid& unique_vertex_attribute_id() const;
+
     public:
         /*!
          * Add a component in the VertexIdentifier

@@ -186,6 +186,11 @@ namespace geode
             return false;
         }
 
+        const uuid& unique_vertex_attribute_id() const
+        {
+            return unique_vertex_id_;
+        }
+
         template < typename MeshComponent >
         void register_component( const MeshComponent& component )
         {
@@ -193,20 +198,19 @@ namespace geode
             attribute_properties.assignable = false;
             attribute_properties.interpolable = false;
             attribute_properties.transferable = false;
-            AttributeValues< index_t > unqiue_vertex_attribute_values;
-            unqiue_vertex_attribute_values.default_value = NO_ID;
-            unqiue_vertex_attribute_values.no_value = NO_ID;
+            AttributeValues< index_t > unique_vertex_attribute_values;
+            unique_vertex_attribute_values.default_value = NO_ID;
+            unique_vertex_attribute_values.no_value = NO_ID;
             const auto& mesh = component.mesh();
-            const auto unique_vertices_attribute_id =
-                mesh.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute, index_t >(
-                        UNIQUE_VERTICES_NAME, unqiue_vertex_attribute_values,
-                        attribute_properties );
+            mesh.vertex_attribute_manager()
+                .template create_attribute< VariableAttribute, index_t >(
+                    UNIQUE_VERTICES_NAME, unique_vertex_id_,
+                    unique_vertex_attribute_values, attribute_properties );
             const auto [_, inserted] =
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_attribute< VariableAttribute, index_t >(
-                            unique_vertices_attribute_id ) );
+                            unique_vertex_id_ ) );
             OpenGeodeModelException::check_exception( inserted,
                 component.component_id(), OpenGeodeException::TYPE::data,
                 "[VertexIdentifier::register_component] Component ",
@@ -217,19 +221,51 @@ namespace geode
         void load_component( const MeshComponent& component )
         {
             const auto& mesh = component.mesh();
-            const auto unique_vertices_ids =
-                mesh.vertex_attribute_manager().attribute_ids_matching_name(
-                    UNIQUE_VERTICES_NAME );
-            OpenGeodeModelException::check_exception(
-                unique_vertices_ids.has_value(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[VertexIdentifier::load_component] Unique vertices "
-                "attribute not found." );
+            if( !mesh.vertex_attribute_manager().attribute_exists(
+                    unique_vertex_id_ ) )
+            {
+                // For old files before v18 of OpenGeode the unique vertices
+                // attribute was not identified with an id but with a name
+                // This changes the id of the attribute to unique_vertex_id_
+                const auto unique_vertices_ids =
+                    mesh.vertex_attribute_manager().attribute_ids_matching_name(
+                        UNIQUE_VERTICES_NAME );
+                OpenGeodeModelException::check_exception(
+                    unique_vertices_ids.has_value(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[VertexIdentifier::load_component] Unique vertices "
+                    "attribute not found." );
+                OpenGeodeModelException::check_exception(
+                    unique_vertices_ids.value().size() == 1, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[VertexIdentifier::load_component] Unique vertices "
+                    "attribute is not unique." );
+                const auto old_attribute =
+                    mesh.vertex_attribute_manager()
+                        .template find_attribute< VariableAttribute, index_t >(
+                            unique_vertices_ids.value().front() );
+                mesh.vertex_attribute_manager()
+                    .template create_attribute< VariableAttribute, index_t >(
+                        UNIQUE_VERTICES_NAME, unique_vertex_id_,
+                        old_attribute->default_values(),
+                        old_attribute->properties() );
+                const auto new_attribute =
+                    mesh.vertex_attribute_manager()
+                        .template find_attribute< VariableAttribute, index_t >(
+                            unique_vertex_id_ );
+                for( const auto vertex : Range{ mesh.nb_vertices() } )
+                {
+                    new_attribute->set_value(
+                        vertex, old_attribute->value( vertex ) );
+                }
+                mesh.vertex_attribute_manager().delete_attribute(
+                    unique_vertices_ids.value().front() );
+            }
             const auto [_, inserted] =
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_attribute< VariableAttribute, index_t >(
-                            unique_vertices_ids.value().front() ) );
+                            unique_vertex_id_ ) );
             OpenGeodeModelException::check_exception( inserted,
                 component.component_id(), OpenGeodeException::TYPE::data,
                 "[VertexIdentifier::load_component] Component ",
@@ -479,6 +515,12 @@ namespace geode
                             archive.object( impl.unique_vertices_ );
                             archive.ext( impl.component_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.unique_vertices_ );
+                            archive.ext( impl.component_vertices_,
+                                bitsery::ext::StdSmartPtr{} );
+                            archive.object( impl.unique_vertex_id_ );
                         } } } );
         }
 
@@ -518,6 +560,7 @@ namespace geode
         absl::flat_hash_map< uuid,
             std::shared_ptr< VariableAttribute< index_t > > >
             vertex2unique_vertex_;
+        geode::uuid unique_vertex_id_;
     };
 
     VertexIdentifier::VertexIdentifier() = default;
@@ -565,6 +608,11 @@ namespace geode
     {
         return impl_->has_component_mesh_vertices(
             unique_vertex_id, component_id );
+    }
+
+    const uuid& VertexIdentifier::unique_vertex_attribute_id() const
+    {
+        return impl_->unique_vertex_attribute_id();
     }
 
     template < typename MeshComponent >
