@@ -224,42 +224,8 @@ namespace geode
             if( !mesh.vertex_attribute_manager().attribute_exists(
                     unique_vertex_id_ ) )
             {
-                // For old files before v18 of OpenGeode the unique vertices
-                // attribute was not identified with an id but with a name
-                // This changes the id of the attribute to unique_vertex_id_
-                const auto unique_vertices_ids =
-                    mesh.vertex_attribute_manager().attribute_ids_matching_name(
-                        UNIQUE_VERTICES_NAME );
-                OpenGeodeModelException::check_exception(
-                    unique_vertices_ids.has_value(), nullptr,
-                    OpenGeodeException::TYPE::data,
-                    "[VertexIdentifier::load_component] Unique vertices "
-                    "attribute not found." );
-                OpenGeodeModelException::check_exception(
-                    unique_vertices_ids.value().size() == 1, nullptr,
-                    OpenGeodeException::TYPE::data,
-                    "[VertexIdentifier::load_component] Unique vertices "
-                    "attribute is not unique." );
-                const auto old_attribute =
-                    mesh.vertex_attribute_manager()
-                        .template find_attribute< VariableAttribute, index_t >(
-                            unique_vertices_ids.value().front() );
-                mesh.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute, index_t >(
-                        UNIQUE_VERTICES_NAME, unique_vertex_id_,
-                        old_attribute->default_values(),
-                        old_attribute->properties() );
-                const auto new_attribute =
-                    mesh.vertex_attribute_manager()
-                        .template find_attribute< VariableAttribute, index_t >(
-                            unique_vertex_id_ );
-                for( const auto vertex : Range{ mesh.nb_vertices() } )
-                {
-                    new_attribute->set_value(
-                        vertex, old_attribute->value( vertex ) );
-                }
-                mesh.vertex_attribute_manager().delete_attribute(
-                    unique_vertices_ids.value().front() );
+                import_old_attribute_based_on_name(
+                    mesh.vertex_attribute_manager(), mesh.nb_vertices() );
             }
             const auto [_, inserted] =
                 vertex2unique_vertex_.emplace( component.id(),
@@ -550,6 +516,45 @@ namespace geode
                                        to_keep, component_mesh_vertices ) );
                     }
                 } );
+        }
+
+        void import_old_attribute_based_on_name(
+            AttributeManager& vertex_attribute_manager,
+            const index_t nb_vertices )
+        {
+            const auto unique_vertices_ids =
+                vertex_attribute_manager.attribute_ids_matching_name(
+                    UNIQUE_VERTICES_NAME );
+            OpenGeodeModelException::check_exception(
+                unique_vertices_ids.has_value(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[VertexIdentifier::load_component] Unique vertices "
+                "attribute not found." );
+            OpenGeodeModelException::check_exception(
+                unique_vertices_ids.value().size() == 1, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[VertexIdentifier::load_component] Unique vertices "
+                "attribute is not unique." );
+            const auto old_attribute =
+                vertex_attribute_manager
+                    .template find_attribute< VariableAttribute, index_t >(
+                        unique_vertices_ids.value().front() );
+            vertex_attribute_manager
+                .template create_attribute< VariableAttribute, index_t >(
+                    UNIQUE_VERTICES_NAME, unique_vertex_id_,
+                    old_attribute->default_values(),
+                    old_attribute->properties() );
+            const auto new_attribute =
+                vertex_attribute_manager
+                    .template find_attribute< VariableAttribute, index_t >(
+                        unique_vertex_id_ );
+            for( const auto vertex : Range{ nb_vertices } )
+            {
+                new_attribute->set_value(
+                    vertex, old_attribute->value( vertex ) );
+            }
+            vertex_attribute_manager.delete_attribute(
+                unique_vertices_ids.value().front() );
         }
 
     private:
