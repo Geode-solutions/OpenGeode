@@ -84,6 +84,8 @@ namespace
         }
         const auto unique_vertices =
             save_unique_vertices( model, mesh, surface.component_id() );
+        const auto& unique_vertex_attribute_id =
+            model.unique_vertex_attribute_id();
         if( mesh_type
             == geode::TriangulatedSurface< Model::dim >::type_name_static() )
         {
@@ -94,15 +96,19 @@ namespace
                 geode::OpenGeodeException::TYPE::internal,
                 "[do_convert_surface] Cannot convert SurfaceMesh "
                 "to TriangulatedSurface" );
+            tri_surface.value()->vertex_attribute_manager().delete_attribute(
+                unique_vertex_attribute_id );
             builder.update_surface_mesh(
                 surface, std::move( tri_surface ).value() );
         }
         else if( mesh_type
                  == geode::PolygonalSurface< Model::dim >::type_name_static() )
         {
-            builder.update_surface_mesh( surface,
-                std::move( geode::convert_surface_mesh_into_polygonal_surface(
-                    mesh ) ) );
+            auto poly_surface =
+                geode::convert_surface_mesh_into_polygonal_surface( mesh );
+            poly_surface->vertex_attribute_manager().delete_attribute(
+                unique_vertex_attribute_id );
+            builder.update_surface_mesh( surface, std::move( poly_surface ) );
         }
         set_unique_vertices( builder, unique_vertices, surface.component_id() );
     }
@@ -149,6 +155,8 @@ namespace
         }
         const auto unique_vertices =
             save_unique_vertices( model, mesh, block.component_id() );
+        const auto& unique_vertex_attribute_id =
+            model.unique_vertex_attribute_id();
         if( mesh_type == geode::TetrahedralSolid3D::type_name_static() )
         {
             auto tet_solid =
@@ -158,6 +166,8 @@ namespace
                 geode::OpenGeodeException::TYPE::internal,
                 "[do_convert_block] Cannot convert "
                 "SolidMesh to TetrahedralSolid" );
+            tet_solid.value()->vertex_attribute_manager().delete_attribute(
+                unique_vertex_attribute_id );
             builder.update_block_mesh( block, std::move( tet_solid ).value() );
         }
         else if( mesh_type == geode::HybridSolid3D::type_name_static() )
@@ -168,6 +178,8 @@ namespace
                 hybrid_solid.has_value(), nullptr,
                 geode::OpenGeodeException::TYPE::internal,
                 "[do_convert_block] Cannot convert SolidMesh to HybridSolid" );
+            hybrid_solid.value()->vertex_attribute_manager().delete_attribute(
+                unique_vertex_attribute_id );
             builder.update_block_mesh(
                 block, std::move( hybrid_solid ).value() );
         }
