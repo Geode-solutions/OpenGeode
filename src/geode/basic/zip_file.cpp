@@ -145,7 +145,7 @@ namespace geode
             if( !std::filesystem::exists( file ) )
             {
                 throw OpenGeodeBasicException( nullptr,
-                    OpenGeodeException::TYPE::internal,
+                    OpenGeodeException::TYPE::data,
                     "[UnzipFile] File to unzip doesn't exist" );
             }
             directory_ = create_directory( file, unarchive_temp_filename );
