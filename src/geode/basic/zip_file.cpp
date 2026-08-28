@@ -142,6 +142,12 @@ namespace geode
     public:
         Impl( std::string_view file, std::string_view unarchive_temp_filename )
         {
+            if( !std::filesystem::exists( file ) )
+            {
+                throw OpenGeodeBasicException( nullptr,
+                    OpenGeodeException::TYPE::internal,
+                    "[UnzipFile] File to unzip doesn't exist" );
+            }
             directory_ = create_directory( file, unarchive_temp_filename );
             if( !load_zip_into_memory( file ) || !open_reader() )
             {
