@@ -52,7 +52,7 @@ void test()
 
     const auto line_id = builder.add_line();
     const auto& line = brep.line( line_id );
-    auto line_builder = builder.line_mesh_builder( line_id );
+    auto line_builder = builder.line_mesh_builder( line );
     line_builder->create_point( points[0] );
     builder.set_unique_vertex( { line.component_id(), 0 }, 0 );
     line_builder->create_point( points[1] );
@@ -61,7 +61,7 @@ void test()
 
     const auto surface0_id = builder.add_surface();
     const auto& surface0 = brep.surface( surface0_id );
-    auto surface0_builder = builder.surface_mesh_builder( surface0_id );
+    auto surface0_builder = builder.surface_mesh_builder( surface0 );
     surface0_builder->create_point( points[0] );
     builder.set_unique_vertex( { surface0.component_id(), 0 }, 0 );
     surface0_builder->create_point( points[1] );
@@ -72,7 +72,7 @@ void test()
 
     const auto surface1_id = builder.add_surface();
     const auto& surface1 = brep.surface( surface1_id );
-    auto surface1_builder = builder.surface_mesh_builder( surface1_id );
+    auto surface1_builder = builder.surface_mesh_builder( surface1 );
     surface1_builder->create_point( points[0] );
     builder.set_unique_vertex( { surface1.component_id(), 0 }, 0 );
     surface1_builder->create_point( points[1] );
@@ -83,7 +83,7 @@ void test()
 
     const auto surface2_id = builder.add_surface();
     const auto& surface2 = brep.surface( surface2_id );
-    auto surface2_builder = builder.surface_mesh_builder( surface2_id );
+    auto surface2_builder = builder.surface_mesh_builder( surface2 );
     surface2_builder->create_point( points[1] );
     builder.set_unique_vertex( { surface2.component_id(), 0 }, 1 );
     surface2_builder->create_point( points[0] );

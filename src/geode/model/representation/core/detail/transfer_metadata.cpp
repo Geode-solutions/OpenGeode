@@ -44,6 +44,7 @@ namespace
 {
     template < typename Model >
     void transfer_model_corner_metadata( const Model& old_model,
+        const Model& new_model,
         typename Model::Builder& builder,
         const geode::ModelGenericMapping& component_mapping )
     {
@@ -74,12 +75,13 @@ namespace
                 absl::StrAppend( &out_name, corner_name, "+" );
             }
             out_name.pop_back();
-            builder.set_corner_name( out_uuid, out_name );
+            builder.set_corner_name( new_model.corner( out_uuid ), out_name );
         }
     }
 
     template < typename Model >
     void transfer_model_line_metadata( const Model& old_model,
+        const Model& new_model,
         typename Model::Builder& builder,
         const geode::ModelGenericMapping& component_mapping )
     {
@@ -110,12 +112,13 @@ namespace
                 absl::StrAppend( &out_name, line_name, "+" );
             }
             out_name.pop_back();
-            builder.set_line_name( out_uuid, out_name );
+            builder.set_line_name( new_model.line( out_uuid ), out_name );
         }
     }
 
     template < typename Model >
     void transfer_model_surface_metadata( const Model& old_model,
+        const Model& new_model,
         typename Model::Builder& builder,
         const geode::ModelGenericMapping& component_mapping )
     {
@@ -146,11 +149,12 @@ namespace
                 absl::StrAppend( &out_name, surface_name, "+" );
             }
             out_name.pop_back();
-            builder.set_surface_name( out_uuid, out_name );
+            builder.set_surface_name( new_model.surface( out_uuid ), out_name );
         }
     }
 
     void transfer_model_block_metadata( const geode::BRep& old_model,
+        const geode::BRep& new_model,
         typename geode::BRepBuilder& builder,
         const geode::ModelGenericMapping& component_mapping )
     {
@@ -181,7 +185,7 @@ namespace
                 absl::StrAppend( &out_name, surface_name, "+" );
             }
             out_name.pop_back();
-            builder.set_block_name( out_uuid, out_name );
+            builder.set_block_name( new_model.block( out_uuid ), out_name );
         }
     }
 } // namespace
@@ -191,47 +195,49 @@ namespace geode
     namespace detail
     {
         void opengeode_model_api transfer_brep_metadata( const BRep& old_brep,
+            const BRep& new_brep,
             BRepBuilder& new_brep_builder,
             const ModelGenericMapping& component_mapping )
         {
             transfer_model_corner_metadata(
-                old_brep, new_brep_builder, component_mapping );
+                old_brep, new_brep, new_brep_builder, component_mapping );
             transfer_model_line_metadata(
-                old_brep, new_brep_builder, component_mapping );
+                old_brep, new_brep, new_brep_builder, component_mapping );
             transfer_model_surface_metadata(
-                old_brep, new_brep_builder, component_mapping );
+                old_brep, new_brep, new_brep_builder, component_mapping );
             transfer_model_block_metadata(
-                old_brep, new_brep_builder, component_mapping );
+                old_brep, new_brep, new_brep_builder, component_mapping );
         }
 
         void opengeode_model_api transfer_section_metadata(
             const Section& old_section,
+            const Section& new_section,
             SectionBuilder& new_section_builder,
             const ModelGenericMapping& component_mapping )
         {
-            transfer_model_corner_metadata(
-                old_section, new_section_builder, component_mapping );
-            transfer_model_line_metadata(
-                old_section, new_section_builder, component_mapping );
-            transfer_model_surface_metadata(
-                old_section, new_section_builder, component_mapping );
+            transfer_model_corner_metadata( old_section, new_section,
+                new_section_builder, component_mapping );
+            transfer_model_line_metadata( old_section, new_section,
+                new_section_builder, component_mapping );
+            transfer_model_surface_metadata( old_section, new_section,
+                new_section_builder, component_mapping );
         }
 
-        template < typename ModelBuilder >
+        template < typename Model >
         void transfer_pointsets_metadata(
             absl::Span< const std::reference_wrapper<
-                const PointSet< ModelBuilder::dim > > > pointsets,
-            ModelBuilder& model_builder,
+                const PointSet< Model::dim > > > pointsets,
+            const Model& model,
+            typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type( geode::Corner<
-                    ModelBuilder::dim >::component_type_static() ) )
+            if( !component_mapping.has_mapping_type(
+                    geode::Corner< Model::dim >::component_type_static() ) )
             {
                 return;
             }
             for( const auto& out2in_mapping : component_mapping
-                     .at( geode::Corner<
-                         ModelBuilder::dim >::component_type_static() )
+                     .at( geode::Corner< Model::dim >::component_type_static() )
                      .out2in_map() )
             {
                 std::string out_name{ "" };
@@ -241,10 +247,9 @@ namespace geode
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    const auto in_pointset = absl::c_find_if(
-                        pointsets, [&in_uuid]( const std::reference_wrapper<
-                                       const PointSet< ModelBuilder::dim > >&
-                                           pointset_ref ) {
+                    const auto in_pointset = absl::c_find_if( pointsets,
+                        [&in_uuid]( const std::reference_wrapper<
+                            const PointSet< Model::dim > >& pointset_ref ) {
                             return pointset_ref.get().id() == in_uuid;
                         } );
                     OpenGeodeModelException::check_exception(
@@ -260,26 +265,26 @@ namespace geode
                 if( !out_name.empty() )
                 {
                     model_builder.set_corner_name(
-                        out2in_mapping.first, out_name );
+                        model.corner( out2in_mapping.first ), out_name );
                 }
             }
         }
 
-        template < typename ModelBuilder >
+        template < typename Model >
         void transfer_curves_metadata(
             absl::Span< const std::reference_wrapper<
-                const EdgedCurve< ModelBuilder::dim > > > curves,
-            ModelBuilder& model_builder,
+                const EdgedCurve< Model::dim > > > curves,
+            const Model& model,
+            typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type( geode::Line<
-                    ModelBuilder::dim >::component_type_static() ) )
+            if( !component_mapping.has_mapping_type(
+                    geode::Line< Model::dim >::component_type_static() ) )
             {
                 return;
             }
             for( const auto& out2in_mapping : component_mapping
-                     .at( geode::Line<
-                         ModelBuilder::dim >::component_type_static() )
+                     .at( geode::Line< Model::dim >::component_type_static() )
                      .out2in_map() )
             {
                 std::string out_name{ "" };
@@ -289,10 +294,9 @@ namespace geode
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    const auto in_curve = absl::c_find_if(
-                        curves, [&in_uuid]( const std::reference_wrapper<
-                                    const EdgedCurve< ModelBuilder::dim > >&
-                                        curve_ref ) {
+                    const auto in_curve = absl::c_find_if( curves,
+                        [&in_uuid]( const std::reference_wrapper<
+                            const EdgedCurve< Model::dim > >& curve_ref ) {
                             return curve_ref.get().id() == in_uuid;
                         } );
                     OpenGeodeModelException::check_exception(
@@ -308,27 +312,28 @@ namespace geode
                 if( !out_name.empty() )
                 {
                     model_builder.set_line_name(
-                        out2in_mapping.first, out_name );
+                        model.line( out2in_mapping.first ), out_name );
                 }
             }
         }
 
-        template < typename ModelBuilder >
+        template < typename Model >
         void transfer_surfaces_metadata(
             absl::Span< const std::reference_wrapper<
-                const SurfaceMesh< ModelBuilder::dim > > > surfaces,
-            ModelBuilder& model_builder,
+                const SurfaceMesh< Model::dim > > > surfaces,
+            const Model& model,
+            typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type( geode::Surface<
-                    ModelBuilder::dim >::component_type_static() ) )
+            if( !component_mapping.has_mapping_type(
+                    geode::Surface< Model::dim >::component_type_static() ) )
             {
                 return;
             }
-            for( const auto& out2in_mapping : component_mapping
-                     .at( geode::Surface<
-                         ModelBuilder::dim >::component_type_static() )
-                     .out2in_map() )
+            for( const auto& out2in_mapping :
+                component_mapping
+                    .at( geode::Surface< Model::dim >::component_type_static() )
+                    .out2in_map() )
             {
                 std::string out_name{ "" };
                 for( const auto& in_uuid : out2in_mapping.second )
@@ -337,10 +342,9 @@ namespace geode
                     {
                         absl::StrAppend( &out_name, "+" );
                     }
-                    const auto in_surface = absl::c_find_if(
-                        surfaces, [&in_uuid]( const std::reference_wrapper<
-                                      const SurfaceMesh< ModelBuilder::dim > >&
-                                          surface_ref ) {
+                    const auto in_surface = absl::c_find_if( surfaces,
+                        [&in_uuid]( const std::reference_wrapper<
+                            const SurfaceMesh< Model::dim > >& surface_ref ) {
                             return surface_ref.get().id() == in_uuid;
                         } );
                     OpenGeodeModelException::check_exception(
@@ -356,7 +360,7 @@ namespace geode
                 if( !out_name.empty() )
                 {
                     model_builder.set_surface_name(
-                        out2in_mapping.first, out_name );
+                        model.surface( out2in_mapping.first ), out_name );
                 }
             }
         }
@@ -364,6 +368,7 @@ namespace geode
         void transfer_solids_metadata(
             absl::Span< const std::reference_wrapper< const SolidMesh3D > >
                 solids,
+            const BRep& model,
             BRepBuilder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
@@ -402,40 +407,46 @@ namespace geode
                 if( !out_name.empty() )
                 {
                     model_builder.set_block_name(
-                        out2in_mapping.first, out_name );
+                        model.block( out2in_mapping.first ), out_name );
                 }
             }
         }
 
         template void opengeode_model_api transfer_pointsets_metadata(
             absl::Span< const std::reference_wrapper< const PointSet2D > >,
+            const Section& model,
             SectionBuilder&,
             const ModelGenericMapping& );
 
         template void opengeode_model_api transfer_pointsets_metadata(
             absl::Span< const std::reference_wrapper< const PointSet3D > >,
+            const BRep&,
             BRepBuilder&,
             const ModelGenericMapping& );
 
         template void opengeode_model_api transfer_curves_metadata(
             absl::Span< const std::reference_wrapper< const EdgedCurve2D > >
                 curves,
+            const Section& model,
             SectionBuilder& model_builder,
             const ModelGenericMapping& component_mapping );
 
         template void opengeode_model_api transfer_curves_metadata(
             absl::Span< const std::reference_wrapper< const EdgedCurve3D > >
                 curves,
+            const BRep& model,
             BRepBuilder& model_builder,
             const ModelGenericMapping& component_mapping );
 
         template void opengeode_model_api transfer_surfaces_metadata(
             absl::Span< const std::reference_wrapper< const SurfaceMesh2D > >,
+            const Section&,
             SectionBuilder&,
             const ModelGenericMapping& );
 
         template void opengeode_model_api transfer_surfaces_metadata(
             absl::Span< const std::reference_wrapper< const SurfaceMesh3D > >,
+            const BRep&,
             BRepBuilder&,
             const ModelGenericMapping& );
     } // namespace detail

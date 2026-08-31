@@ -46,6 +46,8 @@ namespace geode
             initialize_attributes();
         }
 
+        RelationshipsImpl::RelationshipsImpl( BITSERY ) {}
+
         index_t RelationshipsImpl::nb_components_with_relations() const
         {
             return graph_->nb_vertices();
@@ -120,10 +122,10 @@ namespace geode
             const ComponentID& from, const ComponentID& to )
         {
             if( const auto component_id =
-                    relation_edge_index( from.id(), to.id() ) )
+                    relation_edge_index( from.id, to.id ) )
             {
-                Logger::warn( "This relation already exists (", from.string(),
-                    " and ", to.string(), ")" );
+                Logger::warning( "This relation already exists (",
+                    from.string(), " and ", to.string(), ")" );
                 return component_id.value();
             }
             const auto index = GraphBuilder::create( *graph_ )->create_edge(
@@ -182,8 +184,7 @@ namespace geode
         {
             const auto id0 = graph_->edge_vertex( { component_id, 0 } );
             const auto id1 = graph_->edge_vertex( { component_id, 1 } );
-            return std::make_tuple(
-                component_from_index( id0 ), component_from_index( id1 ) );
+            return { component_from_index( id0 ), component_from_index( id1 ) };
         }
 
         void RelationshipsImpl::copy(
@@ -195,14 +196,14 @@ namespace geode
             for( const auto vertex_id : Range{ graph_->nb_vertices() } )
             {
                 const auto& component_id = component_from_index( vertex_id );
-                if( mapping.has_mapping_type( component_id.type() )
-                    && mapping.at( component_id.type() )
-                        .has_mapping_input( component_id.id() ) )
+                if( mapping.has_mapping_type( component_id.type )
+                    && mapping.at( component_id.type )
+                        .has_mapping_input( component_id.id ) )
                 {
-                    const auto& new_uuid = mapping.at( component_id.type() )
-                                               .in2out( component_id.id() );
+                    const auto& new_uuid = mapping.at( component_id.type )
+                                               .in2out( component_id.id );
                     ids_->set_value(
-                        vertex_id, { component_id.type(), new_uuid } );
+                        vertex_id, { component_id.type, new_uuid } );
                     uuid2index_.set_new_mapping( new_uuid, vertex_id );
                 }
                 else
@@ -232,10 +233,29 @@ namespace geode
 
         void RelationshipsImpl::initialize_attributes()
         {
-            ids_ =
+            const auto ids =
+                graph_->vertex_attribute_manager().attribute_ids_matching_name(
+                    "id" );
+            if( ids.has_value() )
+            {
+                ids_ = graph_->vertex_attribute_manager()
+                           .find_attribute< VariableAttribute, ComponentID >(
+                               ids.value()[0] );
+                return;
+            }
+            AttributeProperties attribute_properties;
+            attribute_properties.assignable = false;
+            attribute_properties.interpolable = false;
+            attribute_properties.transferable = true;
+            AttributeValues< ComponentID > ids_attribute_values;
+            ids_attribute_values.default_value = ComponentID{};
+            ids_attribute_values.no_value = ComponentID{};
+            const auto id =
                 graph_->vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute, ComponentID >(
-                        "id", ComponentID{} );
+                    .create_attribute< VariableAttribute, ComponentID >(
+                        "id", ids_attribute_values, attribute_properties );
+            ids_ = graph_->vertex_attribute_manager()
+                       .find_attribute< VariableAttribute, ComponentID >( id );
         }
 
         std::optional< index_t > RelationshipsImpl::vertex_id(
@@ -253,7 +273,7 @@ namespace geode
             const ComponentID& component_id )
         {
             const auto index = GraphBuilder::create( *graph_ )->create_vertex();
-            uuid2index_.set_new_mapping( component_id.id(), index );
+            uuid2index_.set_new_mapping( component_id.id, index );
             ids_->set_value( index, component_id );
             return index;
         }
@@ -261,7 +281,7 @@ namespace geode
         index_t RelationshipsImpl::find_or_create_vertex_id(
             const ComponentID& component_id )
         {
-            if( const auto index = vertex_id( component_id.id() ) )
+            if( const auto index = vertex_id( component_id.id ) )
             {
                 return index.value();
             }

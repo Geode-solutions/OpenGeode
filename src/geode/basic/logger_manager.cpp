@@ -61,11 +61,11 @@ namespace geode
             }
         }
 
-        void warn( const std::string &message )
+        void warning( const std::string &message )
         {
             for( auto &logger : loggers_ )
             {
-                logger->warn( message );
+                logger->warning( message );
             }
         }
 
@@ -114,9 +114,9 @@ namespace geode
         instance().impl_->info( message );
     }
 
-    void LoggerManager::warn( const std::string &message )
+    void LoggerManager::warning( const std::string &message )
     {
-        instance().impl_->warn( message );
+        instance().impl_->warning( message );
     }
 
     void LoggerManager::error( const std::string &message )

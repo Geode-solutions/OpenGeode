@@ -45,19 +45,6 @@ namespace geode
     {
         AttributeProperties() = default;
 
-        AttributeProperties( bool is_assignable, bool is_interpolable )
-            : assignable( is_assignable ), interpolable( is_interpolable )
-        {
-        }
-
-        AttributeProperties(
-            bool is_assignable, bool is_interpolable, bool is_transferable )
-            : assignable( is_assignable ),
-              interpolable( is_interpolable ),
-              transferable( is_transferable )
-        {
-        }
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -78,6 +65,26 @@ namespace geode
         bool assignable{ false };
         bool interpolable{ false };
         bool transferable{ true };
+    };
+
+    template < typename AttributeType >
+    struct AttributeValues
+    {
+        AttributeValues() = default;
+
+        template < typename Archive >
+        void serialize( Archive& serializer )
+        {
+            serializer.ext(
+                *this, Growable< Archive, AttributeValues >{
+                           { []( Archive& archive, AttributeValues& values ) {
+                               archive( values.default_value );
+                               archive( values.no_value );
+                           } } } );
+        }
+
+        AttributeType default_value;
+        AttributeType no_value;
     };
 
     /*!
@@ -105,7 +112,7 @@ namespace geode
             const AttributeLinearInterpolation& /*unused*/,
             const Attribute< AttributeType >& attribute )
         {
-            return attribute.default_value();
+            return attribute.default_values().default_value;
         }
     };
 

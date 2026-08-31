@@ -43,7 +43,7 @@ def add_corners(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_corner())
-        builder.set_corner_name(uuids[-1], "corner" + str(len(uuids)))
+        builder.set_corner_name(brep.corner(uuids[-1]),"corner" + str(len(uuids)))
 
     temp_corner = brep.corner(builder.add_corner())
     builder.remove_corner(temp_corner)
@@ -59,7 +59,7 @@ def add_lines(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_line())
-        builder.set_line_name(uuids[-1], "line" + str(len(uuids)))
+        builder.set_line_name(brep.line(uuids[-1]), "line" + str(len(uuids)))
 
     temp_line = brep.line(builder.add_line())
     builder.remove_line(temp_line)
@@ -75,7 +75,7 @@ def add_surfaces(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_surface())
-        builder.set_surface_name(uuids[-1], "surface" + str(len(uuids)))
+        builder.set_surface_name(brep.surface(uuids[-1]), "surface" + str(len(uuids)))
 
     temp_surface = brep.surface(builder.add_surface())
     builder.remove_surface(temp_surface)
@@ -88,7 +88,7 @@ def add_surfaces(brep, builder):
 
 def add_block(brep, builder):
     uuid = builder.add_block()
-    builder.set_block_name(uuid, "block1")
+    builder.set_block_name(brep.block(uuid), "block1")
 
     temp_block = brep.block(builder.add_block())
     builder.remove_block(temp_block)
@@ -104,7 +104,7 @@ def add_model_boundaries(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_model_boundary())
-        builder.set_model_boundary_name(uuids[-1], "boundary" + str(len(uuids)))
+        builder.set_model_boundary_name(brep.model_boundary(uuids[-1]), "boundary" + str(len(uuids)))
 
     temp_boundary = brep.model_boundary(builder.add_model_boundary())
     builder.remove_model_boundary(temp_boundary)
@@ -120,7 +120,7 @@ def add_corner_collections(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_corner_collection())
-        builder.set_corner_collection_name(uuids[-1], "collection" + str(len(uuids)))
+        builder.set_corner_collection_name(brep.corner_collection(uuids[-1]), "collection" + str(len(uuids)))
 
     temp_collection = brep.corner_collection(builder.add_corner_collection())
     builder.remove_corner_collection(temp_collection)
@@ -136,7 +136,7 @@ def add_line_collections(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_line_collection())
-        builder.set_line_collection_name(uuids[-1], "collection" + str(len(uuids)))
+        builder.set_line_collection_name(brep.line_collection(uuids[-1]), "collection" + str(len(uuids)))
 
     temp_collection = brep.line_collection(builder.add_line_collection())
     builder.remove_line_collection(temp_collection)
@@ -152,7 +152,7 @@ def add_surface_collections(brep, builder):
     uuids = []
     for i in range(nb):
         uuids.append(builder.add_surface_collection())
-        builder.set_surface_collection_name(uuids[-1], "collection" + str(len(uuids)))
+        builder.set_surface_collection_name(brep.surface_collection(uuids[-1]), "collection" + str(len(uuids)))
 
     temp_collection = brep.surface_collection(builder.add_surface_collection())
     builder.remove_surface_collection(temp_collection)
@@ -165,7 +165,7 @@ def add_surface_collections(brep, builder):
 
 def add_block_collection(brep, builder):
     uuid = builder.add_block_collection()
-    builder.set_block_collection_name(uuid, "collection1")
+    builder.set_block_collection_name(brep.block_collection(uuid), "collection1")
 
     temp_collection = brep.block_collection(builder.add_block_collection())
     builder.remove_block_collection(temp_collection)
@@ -346,7 +346,7 @@ def add_surfaces_in_model_boundaries(brep, builder, surface_uuids, boundary_uuid
         if brep.nb_collections(surface_id) != 1:
             raise ValueError("[Test] All Surfaces should be in 1 collection")
         for collection in brep.collections(surface_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.ModelBoundary3D.component_type_static()
             ):
                 raise ValueError(
@@ -368,7 +368,7 @@ def add_corners_in_corner_collections(brep, builder, corner_uuids, collection_uu
         if brep.nb_collections(corner_id) != 1:
             raise ValueError("[Test] All Corners should be in 1 collection")
         for collection in brep.collections(corner_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.CornerCollection3D.component_type_static()
             ):
                 raise ValueError(
@@ -390,7 +390,7 @@ def add_lines_in_line_collections(brep, builder, line_uuids, collection_uuids):
         if brep.nb_collections(line_id) != 1:
             raise ValueError("[Test] All Lines should be in 1 collection")
         for collection in brep.collections(line_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.LineCollection3D.component_type_static()
             ):
                 raise ValueError(
@@ -412,9 +412,9 @@ def add_surfaces_in_surface_collections(brep, builder, surface_uuids, collection
         if brep.nb_collections(surface_id) != 2:
             raise ValueError("[Test] All Surfaces should be in 2 collections")
         for collection in brep.collections(surface_id):
-            if not collection.type().matches(
+            if not collection.type.matches(
                 model.SurfaceCollection3D.component_type_static()
-            ) and not collection.type().matches(
+            ) and not collection.type.matches(
                 model.ModelBoundary3D.component_type_static()
             ):
                 raise ValueError(
@@ -430,7 +430,7 @@ def add_blocks_in_block_collections(brep, builder, block_uuid, collection_uuid):
     if brep.nb_collections(block_uuid) != 1:
         raise ValueError("[Test] All Blocks should be in 1 collection")
     for collection in brep.collections(block_uuid):
-        if not collection.type().matches(
+        if not collection.type.matches(
             model.BlockCollection3D.component_type_static()
         ):
             raise ValueError(

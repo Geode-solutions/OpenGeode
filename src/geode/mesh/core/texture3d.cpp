@@ -105,6 +105,11 @@ namespace geode
         impl_->set_texture_coordinates( vertex, coordinates );
     }
 
+    geode::uuid Texture< 3 >::texture_id() const
+    {
+        return impl_->texture_id();
+    }
+
     template < typename Archive >
     void Texture< 3 >::serialize( Archive& serializer )
     {

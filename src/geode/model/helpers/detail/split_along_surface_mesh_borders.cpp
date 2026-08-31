@@ -126,7 +126,6 @@ namespace geode
                             .get();
                     } )
                     .get();
-                DEBUG( "end of split" );
                 return mapping;
             }
 
@@ -152,19 +151,19 @@ namespace geode
             void remove_adjacencies_along_internal_lines(
                 const Surface< dimension >& surface )
             {
-                auto builder = builder_.surface_mesh_builder( surface.id() );
+                auto builder = builder_.surface_mesh_builder( surface );
                 remove_adjacencies_along_internal_lines( surface, *builder );
             }
 
             CMVmappings duplicate_points( const Surface< dimension >& surface )
             {
-                auto builder = builder_.surface_mesh_builder( surface.id() );
+                auto builder = builder_.surface_mesh_builder( surface );
                 return duplicate_points( surface, *builder );
             }
 
             CMVmappings split_points( const Surface< dimension >& surface )
             {
-                auto builder = builder_.surface_mesh_builder( surface.id() );
+                auto builder = builder_.surface_mesh_builder( surface );
                 remove_adjacencies_along_internal_lines( surface, *builder );
                 const auto result = duplicate_points( surface, *builder );
                 return result;

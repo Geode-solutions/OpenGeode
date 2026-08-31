@@ -46,7 +46,7 @@ namespace geode
             const Block3D& block )
         {
             const auto& mesh = block.mesh();
-            auto mesh_builder = model_builder.block_mesh_builder( block.id() );
+            auto mesh_builder = model_builder.block_mesh_builder( block );
             const auto vertex_mappings =
                 repair_non_manifold_vertices( mesh, *mesh_builder );
             for( const auto& [old_vertex, new_vertices] :

@@ -44,6 +44,10 @@ namespace geode
 
         public:
             FacetEdgesImpl() = default;
+            FacetEdgesImpl( BITSERY bitsery )
+                : detail::FacetStorage< std::array< index_t, 2 > >( bitsery )
+            {
+            }
 
             [[nodiscard]] std::optional< index_t > find_edge(
                 const std::array< index_t, 2 >& edge_vertices ) const

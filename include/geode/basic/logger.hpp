@@ -36,7 +36,7 @@ namespace geode
     /*!
      * Custom OpenGeode logger. Can be used with several levels:
      *    Logger::info( "My information is ", 42 );
-     *    Logger::warn( "My warning is ", 42, " or more" );
+     *    Logger::warning( "My warning is ", 42, " or more" );
      */
     class opengeode_basic_api Logger
     {
@@ -46,8 +46,8 @@ namespace geode
             trace,
             debug,
             info,
-            warn,
-            err,
+            warning,
+            error,
             critical,
             off
         };
@@ -81,7 +81,7 @@ namespace geode
         }
 
         template < typename... Args >
-        static void warn( const Args &...args )
+        static void warning( const Args &...args )
         {
             log_warn( absl::StrCat( args... ) );
         }

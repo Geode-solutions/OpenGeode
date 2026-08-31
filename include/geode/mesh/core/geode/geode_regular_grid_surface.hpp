@@ -25,6 +25,7 @@
 
 #include <array>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -45,13 +46,14 @@ namespace geode
     class opengeode_mesh_api OpenGeodeRegularGrid< 2 > : public RegularGrid< 2 >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeRegularGrid );
-        PASSKEY( OpenGeodeRegularGridBuilder< 2 >, OGRegularGridKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodeRegularGridBuilder< 2 >, OGRegularGridKey /*key*/ );
         using Builder = OpenGeodeRegularGridBuilder< 2 >;
         static constexpr index_t dim{ 2 };
 
         OpenGeodeRegularGrid();
+        OpenGeodeRegularGrid( BITSERY );
         OpenGeodeRegularGrid( OpenGeodeRegularGrid&& other ) noexcept;
         OpenGeodeRegularGrid& operator=(
             OpenGeodeRegularGrid&& other ) noexcept;

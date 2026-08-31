@@ -28,6 +28,7 @@
 #include <absl/hash/hash.h>
 #include <absl/types/span.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -89,10 +90,10 @@ namespace geode
      */
     class opengeode_model_api VertexIdentifier
     {
-        PASSKEY( VertexIdentifierBuilder, BuilderKey /*key*/ );
-
     public:
+        PASSKEY( VertexIdentifierBuilder, BuilderKey /*key*/ );
         VertexIdentifier();
+        VertexIdentifier( BITSERY );
         ~VertexIdentifier();
 
         [[nodiscard]] index_t nb_unique_vertices() const;
@@ -133,12 +134,21 @@ namespace geode
          */
         void save_unique_vertices( std::string_view directory ) const;
 
+        [[nodiscard]] const uuid& unique_vertex_attribute_id() const;
+
     public:
         /*!
          * Add a component in the VertexIdentifier
          */
         template < typename MeshComponent >
         void register_mesh_component(
+            const MeshComponent& component, BuilderKey /*key*/ );
+
+        /*!
+         * Add a component in the VertexIdentifier
+         */
+        template < typename MeshComponent >
+        void load_mesh_component(
             const MeshComponent& component, BuilderKey /*key*/ );
 
         /*!

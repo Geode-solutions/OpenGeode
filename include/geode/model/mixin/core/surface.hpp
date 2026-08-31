@@ -51,11 +51,11 @@ namespace geode
     class Surface final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY( Surface );
-        PASSKEY( Surfaces< dimension >, SurfacesKey /*key*/ );
-        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( Surfaces< dimension >, SurfacesKey /*key*/ );
+        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey /*key*/ );
         using Mesh = SurfaceMesh< dimension >;
 
         Surface( Surface&& other ) noexcept;

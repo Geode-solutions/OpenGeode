@@ -117,7 +117,7 @@ namespace geode
                 unique_vertices0, unique_vertices1 ),
             [type]( const ComponentMeshVertex& cmv0,
                 const ComponentMeshVertex& cmv1 ) {
-                return cmv0.component_id.type() == type
+                return cmv0.component_id.type == type
                        && cmv0.component_id == cmv1.component_id;
             } );
     }
@@ -162,7 +162,7 @@ namespace geode
                 unique_vertices0, unique_vertices1, unique_vertices2 ),
             [type]( const ComponentMeshVertex& cmv0,
                 const ComponentMeshVertex& cmv1 ) {
-                return cmv0.component_id.type() == type
+                return cmv0.component_id.type == type
                        && cmv0.component_id == cmv1.component_id;
             } );
     }
@@ -206,7 +206,7 @@ namespace geode
         return ::component_mesh_vertex_generic< dimension >(
             unique_vertices, [type]( const ComponentMeshVertex& cmv0,
                                  const ComponentMeshVertex& cmv1 ) {
-                return cmv0.component_id.type() == type
+                return cmv0.component_id.type == type
                        && cmv0.component_id == cmv1.component_id;
             } );
     }

@@ -43,9 +43,8 @@ namespace geode
 {
     class opengeode_model_api ComponentRegistry
     {
-        PASSKEY( ComponentRegistryBuilder, RegistryBuilder );
-
     public:
+        PASSKEY( ComponentRegistryBuilder, RegistryBuilder );
         using Registry =
             absl::flat_hash_map< ComponentType, std::vector< uuid > >;
 

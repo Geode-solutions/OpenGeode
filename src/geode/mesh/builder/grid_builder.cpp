@@ -39,7 +39,7 @@ namespace geode
     template < index_t dimension >
     void GridBuilder< dimension >::set_grid_origin( Point< dimension > origin )
     {
-        grid_.set_grid_origin( origin, {} );
+        grid_.set_grid_origin( origin, typename Grid< dimension >::GridKey{} );
     }
 
     template < index_t dimension >
@@ -47,21 +47,22 @@ namespace geode
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_length )
     {
-        grid_.set_grid_dimensions(
-            std::move( cells_number ), std::move( cells_length ), {} );
+        grid_.set_grid_dimensions( std::move( cells_number ),
+            std::move( cells_length ), typename Grid< dimension >::GridKey{} );
     }
 
     template < index_t dimension >
     void GridBuilder< dimension >::set_grid_directions(
         std::array< Vector< dimension >, dimension > directions )
     {
-        grid_.set_grid_directions( std::move( directions ), {} );
+        grid_.set_grid_directions(
+            std::move( directions ), typename Grid< dimension >::GridKey{} );
     }
 
     template < index_t dimension >
     void GridBuilder< dimension >::copy( const Grid< dimension >& grid )
     {
-        grid_.copy( grid, {} );
+        grid_.copy( grid, typename Grid< dimension >::GridKey{} );
     }
 
     template class opengeode_mesh_api GridBuilder< 2 >;

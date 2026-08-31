@@ -25,6 +25,7 @@
 
 #include <array>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -43,14 +44,15 @@ namespace geode
     class OpenGeodeHybridSolid : public HybridSolid< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeHybridSolid );
-        PASSKEY( OpenGeodeHybridSolidBuilder< dimension >,
-            OGHybridSolidKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodeHybridSolidBuilder< dimension >,
+            OGHybridSolidKey /*key*/ );
         using Builder = OpenGeodeHybridSolidBuilder< dimension >;
         static constexpr auto dim = dimension;
 
         OpenGeodeHybridSolid();
+        OpenGeodeHybridSolid( BITSERY );
         OpenGeodeHybridSolid( OpenGeodeHybridSolid&& other ) noexcept;
         OpenGeodeHybridSolid& operator=(
             OpenGeodeHybridSolid&& other ) noexcept;
@@ -85,10 +87,6 @@ namespace geode
         }
 
     public:
-        void set_vertex( index_t vertex_id,
-            Point< dimension > point,
-            OGHybridSolidKey /*key*/ );
-
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
             OGHybridSolidKey /*key*/ );

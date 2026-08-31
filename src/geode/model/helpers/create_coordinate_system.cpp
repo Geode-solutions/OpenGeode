@@ -62,19 +62,19 @@ namespace
     {
         for( const auto& corner : model.corners() )
         {
-            auto mesh_builder = builder.corner_mesh_builder( corner.id() );
+            auto mesh_builder = builder.corner_mesh_builder( corner );
             set_generic_active_coordinate_system(
                 *mesh_builder, coordinate_system_name );
         }
         for( const auto& line : model.lines() )
         {
-            auto mesh_builder = builder.line_mesh_builder( line.id() );
+            auto mesh_builder = builder.line_mesh_builder( line );
             set_generic_active_coordinate_system(
                 *mesh_builder, coordinate_system_name );
         }
         for( const auto& surface : model.surfaces() )
         {
-            auto mesh_builder = builder.surface_mesh_builder( surface.id() );
+            auto mesh_builder = builder.surface_mesh_builder( surface );
             set_generic_active_coordinate_system(
                 *mesh_builder, coordinate_system_name );
         }
@@ -90,21 +90,21 @@ namespace
         for( const auto& corner : model.corners() )
         {
             const auto& mesh = corner.mesh();
-            auto mesh_builder = builder.corner_mesh_builder( corner.id() );
+            auto mesh_builder = builder.corner_mesh_builder( corner );
             create_point_set_coordinate_system( mesh, *mesh_builder,
                 new_coordinate_system_name, input, output );
         }
         for( const auto& line : model.lines() )
         {
             const auto& mesh = line.mesh();
-            auto mesh_builder = builder.line_mesh_builder( line.id() );
+            auto mesh_builder = builder.line_mesh_builder( line );
             create_edged_curve_coordinate_system( mesh, *mesh_builder,
                 new_coordinate_system_name, input, output );
         }
         for( const auto& surface : model.surfaces() )
         {
             const auto& mesh = surface.mesh();
-            auto mesh_builder = builder.surface_mesh_builder( surface.id() );
+            auto mesh_builder = builder.surface_mesh_builder( surface );
             create_surface_mesh_coordinate_system( mesh, *mesh_builder,
                 new_coordinate_system_name, input, output );
         }
@@ -124,7 +124,7 @@ namespace geode
         for( const auto& block : model.blocks() )
         {
             const auto& mesh = block.mesh();
-            auto mesh_builder = builder.block_mesh_builder( block.id() );
+            auto mesh_builder = builder.block_mesh_builder( block );
             create_solid_mesh_coordinate_system( mesh, *mesh_builder,
                 new_coordinate_system_name, input, output );
         }
@@ -148,7 +148,7 @@ namespace geode
             model, builder, coordinate_system_name );
         for( const auto& block : model.blocks() )
         {
-            auto mesh_builder = builder.block_mesh_builder( block.id() );
+            auto mesh_builder = builder.block_mesh_builder( block );
             set_generic_active_coordinate_system(
                 *mesh_builder, coordinate_system_name );
         }

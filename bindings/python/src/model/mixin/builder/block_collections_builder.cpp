@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/model/mixin/builder/block_collections_builder.hpp>
+#include <geode/model/mixin/core/block_collection.hpp>
 
 #define PYTHON_BLOCK_COLLECTIONS_BUILDER( dimension )                          \
     const auto name##dimension =                                               \

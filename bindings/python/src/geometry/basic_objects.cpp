@@ -42,8 +42,6 @@
         .def( pybind11::init< const Point< dimension >&,                       \
             const Point< dimension >& >() )                                    \
         .def( "direction", &Segment##dimension##D::direction )                 \
-        .def( "normalized_direction",                                          \
-            &Segment##dimension##D::normalized_direction )                     \
         .def( "barycenter", &Segment##dimension##D::barycenter )               \
         .def( "length", &Segment##dimension##D::length )                       \
         .def( "vertices", &Segment##dimension##D::vertices )                   \

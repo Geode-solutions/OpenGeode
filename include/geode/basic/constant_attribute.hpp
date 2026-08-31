@@ -36,6 +36,7 @@
 #include <geode/basic/common.hpp>
 #include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/growable.hpp>
+#include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 
@@ -55,16 +56,24 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        ConstantAttribute( T value,
+        ConstantAttribute( AttributeValues< T > values,
+            std::string_view name,
             AttributeProperties properties,
             AttributeBase::AttributeKey /*key*/ )
-            : ConstantAttribute( std::move( value ), std::move( properties ) )
+            : ConstantAttribute( std::move( values.default_value ),
+                  name,
+                  std::move( properties ) )
         {
         }
 
         [[nodiscard]] const T& value( index_t /*unused*/ ) const override
         {
             return value_;
+        }
+
+        [[nodiscard]] bool has_value( index_t /*unused*/ ) const override
+        {
+            return true;
         }
 
         [[nodiscard]] const T& value() const
@@ -102,14 +111,18 @@ namespace geode
         }
 
     private:
-        ConstantAttribute( T value, AttributeProperties properties )
-            : ReadOnlyAttribute< T >( std::move( properties ) )
+        ConstantAttribute(
+            T value, std::string_view name, AttributeProperties properties )
+            : ReadOnlyAttribute< T >( name, std::move( properties ) )
         {
             set_value( std::move( value ) );
         }
 
+        ConstantAttribute( std::string_view name )
+            : ReadOnlyAttribute< T >( name, AttributeProperties{} ) {};
+
         ConstantAttribute()
-            : ReadOnlyAttribute< T >( AttributeProperties{} ) {};
+            : ReadOnlyAttribute< T >( "default", AttributeProperties{} ) {};
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -150,8 +163,11 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
+                new ConstantAttribute< T >{
+                    value_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             return attribute;
         }
 
@@ -169,7 +185,8 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
+                new ConstantAttribute< T >{
+                    value_, this->name().value(), this->properties() }
             };
             return attribute;
         }
@@ -180,16 +197,10 @@ namespace geode
             AttributeBase::AttributeKey /*key*/ ) const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
+                new ConstantAttribute< T >{
+                    value_, this->name().value(), this->properties() }
             };
             return attribute;
-        }
-
-        void import( absl::Span< const index_t > /* unused */,
-            const std::shared_ptr< AttributeBase >& from,
-            AttributeBase::AttributeKey /*key*/ ) override
-        {
-            import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
         }
 
         void import( const GenericMapping< index_t >& /* unused */,

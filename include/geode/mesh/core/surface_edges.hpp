@@ -27,6 +27,7 @@
 
 #include <absl/types/span.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
@@ -47,9 +48,9 @@ namespace geode
     class opengeode_mesh_api SurfaceEdges
     {
         OPENGEODE_DISABLE_COPY( SurfaceEdges );
-        PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey /*key*/ );
 
     public:
+        PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey /*key*/ );
         using Builder = SurfaceEdgesBuilder< dimension >;
         static constexpr auto dim = dimension;
 

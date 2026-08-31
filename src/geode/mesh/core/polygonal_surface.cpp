@@ -29,6 +29,12 @@
 namespace geode
 {
     template < index_t dimension >
+    PolygonalSurface< dimension >::PolygonalSurface( BITSERY bitsery )
+        : SurfaceMesh< dimension >{ bitsery }
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create()
     {

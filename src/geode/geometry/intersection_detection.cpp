@@ -197,7 +197,7 @@ namespace
         if( geode::tetrahedron_volume_sign( geode::Tetrahedron{
                 segment0.vertices()[0].get(), segment0.vertices()[1].get(),
                 segment1.vertices()[0].get(), segment1.vertices()[1].get() } )
-            != geode::Sign::zero )
+            != geode::SIGN::zero )
         {
             return { geode::POSITION::outside, geode::POSITION::outside };
         }

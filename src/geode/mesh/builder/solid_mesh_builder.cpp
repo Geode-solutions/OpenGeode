@@ -34,6 +34,8 @@
 #include <geode/mesh/builder/solid_edges_builder.hpp>
 #include <geode/mesh/builder/solid_facets_builder.hpp>
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/solid_edges.hpp>
 #include <geode/mesh/core/solid_facets.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
@@ -233,6 +235,11 @@ namespace
     void copy_polyhedra( const geode::SolidMesh< dimension >& solid,
         geode::SolidMeshBuilder< dimension >& builder )
     {
+        if( solid.impl_name()
+            == geode::OpenGeodeRegularGrid< dimension >::impl_name_static() )
+        {
+            return;
+        }
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
             absl::FixedArray< geode::index_t > vertices(
@@ -275,6 +282,21 @@ namespace
             {
                 builder.associate_polyhedron_vertex_to_vertex(
                     polyhedron.value(), v );
+            }
+        }
+        for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+        {
+            for( const auto f :
+                geode::LRange{ solid.nb_polyhedron_facets( p ) } )
+            {
+                const auto polyhedron_adjacent =
+                    solid.polyhedron_adjacent( geode::PolyhedronFacet{ p, f } );
+                if( polyhedron_adjacent )
+                {
+                    builder.set_polyhedron_adjacent(
+                        geode::PolyhedronFacet{ p, f },
+                        polyhedron_adjacent.value() );
+                }
             }
         }
     }
@@ -625,7 +647,8 @@ namespace geode
     void SolidMeshBuilder< dimension >::reset_polyhedra_around_vertex(
         index_t vertex_id )
     {
-        solid_mesh_.reset_polyhedra_around_vertex( vertex_id, {} );
+        solid_mesh_.reset_polyhedra_around_vertex(
+            vertex_id, typename SolidMesh< dimension >::SolidMeshKey{} );
     }
 
     template < index_t dimension >
@@ -640,8 +663,8 @@ namespace geode
             polyhedron_vertex.vertex_id != NO_ID,
             "[SolidMeshBuilder::associate_polyhedron_vertex_to_vertex] "
             "PolyhedronVertex invalid" );
-        solid_mesh_.associate_polyhedron_vertex_to_vertex(
-            polyhedron_vertex, vertex_id, {} );
+        solid_mesh_.associate_polyhedron_vertex_to_vertex( polyhedron_vertex,
+            vertex_id, typename SolidMesh< dimension >::SolidMeshKey{} );
     }
 
     template < index_t dimension >
@@ -649,8 +672,8 @@ namespace geode
         SolidMeshBuilder< dimension >::disassociate_polyhedron_vertex_to_vertex(
             index_t vertex_id )
     {
-        solid_mesh_.associate_polyhedron_vertex_to_vertex(
-            PolyhedronVertex{}, vertex_id, {} );
+        solid_mesh_.associate_polyhedron_vertex_to_vertex( PolyhedronVertex{},
+            vertex_id, typename SolidMesh< dimension >::SolidMeshKey{} );
     }
 
     template < index_t dimension >
@@ -776,7 +799,8 @@ namespace geode
     SolidEdgesBuilder< dimension >
         SolidMeshBuilder< dimension >::edges_builder()
     {
-        return SolidEdgesBuilder< dimension >{ solid_mesh_.edges( {} ) };
+        return SolidEdgesBuilder< dimension >{ solid_mesh_.edges(
+            typename SolidMesh< dimension >::SolidMeshKey{} ) };
     }
 
     template < index_t dimension >
@@ -840,7 +864,8 @@ namespace geode
     SolidFacetsBuilder< dimension >
         SolidMeshBuilder< dimension >::facets_builder()
     {
-        return SolidFacetsBuilder< dimension >{ solid_mesh_.facets( {} ) };
+        return SolidFacetsBuilder< dimension >{ solid_mesh_.facets(
+            typename SolidMesh< dimension >::SolidMeshKey{} ) };
     }
 
     template < index_t dimension >
@@ -958,25 +983,19 @@ namespace geode
             solid_mesh_.disable_facets();
         }
         VertexSetBuilder::copy( solid_mesh );
-        if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
-        {
-            do_copy_points( solid_mesh );
-            do_copy_polyhedra( solid_mesh );
-        }
-        else
-        {
-            copy_points( solid_mesh, *this );
-            copy_polyhedra( solid_mesh, *this );
-        }
+        copy_points( solid_mesh, *this );
+        copy_polyhedra( solid_mesh, *this );
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
         if( solid_mesh.are_edges_enabled() )
         {
-            solid_mesh_.copy_edges( solid_mesh, {} );
+            solid_mesh_.copy_edges(
+                solid_mesh, typename SolidMesh< dimension >::SolidMeshKey{} );
         }
         if( solid_mesh.are_facets_enabled() )
         {
-            solid_mesh_.copy_facets( solid_mesh, {} );
+            solid_mesh_.copy_facets(
+                solid_mesh, typename SolidMesh< dimension >::SolidMeshKey{} );
         }
     }
 

@@ -82,7 +82,8 @@ namespace geode
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        geode_edged_curve_.set_edge_vertex( edge_vertex, vertex_id, {} );
+        geode_edged_curve_.set_edge_vertex( edge_vertex, vertex_id,
+            typename OpenGeodeEdgedCurve< dimension >::OGEdgedCurveKey() );
     }
 
     template < index_t dimension >

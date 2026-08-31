@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -41,14 +42,15 @@ namespace geode
     class OpenGeodePolygonalSurface : public PolygonalSurface< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodePolygonalSurface );
-        PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
-            OGPolygonalSurfaceKey /*key*/ );
 
     public:
+        PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
+            OGPolygonalSurfaceKey /*key*/ );
         using Builder = OpenGeodePolygonalSurfaceBuilder< dimension >;
         static constexpr auto dim = dimension;
 
         OpenGeodePolygonalSurface();
+        OpenGeodePolygonalSurface( BITSERY );
         OpenGeodePolygonalSurface( OpenGeodePolygonalSurface&& other ) noexcept;
         OpenGeodePolygonalSurface& operator=(
             OpenGeodePolygonalSurface&& other ) noexcept;
@@ -83,10 +85,6 @@ namespace geode
         }
 
     public:
-        void set_vertex( index_t vertex_id,
-            Point< dimension > point,
-            OGPolygonalSurfaceKey /*key*/ );
-
         void set_polygon_vertex( const PolygonVertex& polygon_vertex,
             index_t vertex_id,
             OGPolygonalSurfaceKey /*key*/ );

@@ -44,10 +44,10 @@ namespace geode
     class SurfaceCollections
     {
         OPENGEODE_DISABLE_COPY( SurfaceCollections );
-        PASSKEY( SurfaceCollectionsBuilder< dimension >,
-            SurfaceCollectionsBuilderKey /*key*/ );
 
     public:
+        PASSKEY( SurfaceCollectionsBuilder< dimension >,
+            SurfaceCollectionsBuilderKey /*key*/ );
         using Builder = SurfaceCollectionsBuilder< dimension >;
         using Type = SurfaceCollection< dimension >;
 

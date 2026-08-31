@@ -44,10 +44,11 @@ namespace geode
 {
     class opengeode_basic_api Identifier
     {
-        PASSKEY( IdentifierBuilder, IdentifierKey /*key*/ );
         friend class bitsery::Access;
 
     public:
+        PASSKEY( IdentifierBuilder, IdentifierKey /*key*/ );
+
         Identifier( Identifier&& other ) noexcept;
         ~Identifier();
 

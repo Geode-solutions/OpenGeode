@@ -68,7 +68,13 @@ namespace geode
             detail::VertexCycle< PolyhedronFacetVertices >;
 
     public:
-        Impl() = default;
+        Impl()
+            : detail::FacetStorage< PolyhedronFacetVertices >{
+                  BITSERY::constructor
+              }
+        {
+        }
+
         Impl( const SolidMesh< dimension >& solid )
         {
             for( const auto p : Range{ solid.nb_polyhedra() } )

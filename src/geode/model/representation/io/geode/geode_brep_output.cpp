@@ -50,7 +50,7 @@ namespace geode
         const BRep& brep, std::string_view directory ) const
     {
         const auto level = Logger::level();
-        Logger::set_level( Logger::LEVEL::warn );
+        Logger::set_level( Logger::LEVEL::warning );
         async::parallel_invoke(
             [&directory, &brep] {
                 brep.save_identifier( directory );

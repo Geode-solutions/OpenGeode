@@ -26,6 +26,8 @@
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
+#include <geode/basic/bitsery_archive.hpp>
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( HybridSolidBuilder );
@@ -50,6 +52,8 @@ namespace geode
             prism,
             pyramid
         };
+
+        HybridSolid( BITSERY );
 
         /*!
          * Create a new HybridSolid using default data structure.

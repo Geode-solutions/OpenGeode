@@ -31,6 +31,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
+    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -53,16 +54,17 @@ namespace geode
         [[nodiscard]] static TetrahedralSolidScalarFunction< dimension > create(
             const TetrahedralSolid< dimension >& solid,
             std::string_view function_name,
+            const uuid& function_id,
             double value );
 
         /*!
          * Finds an object function that already exists in the given
-         * TetrahedralSolid, from its given name.
-         * Throws an exception if no attribute with the same name exists.
+         * TetrahedralSolid, from its given id.
+         * Throws an exception if no attribute with the same id exists.
          */
         [[nodiscard]] static TetrahedralSolidScalarFunction< dimension > find(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name );
+            const uuid& function_id );
 
         void set_value( index_t vertex_index, double value );
 
@@ -71,15 +73,18 @@ namespace geode
         [[nodiscard]] double value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
+        [[nodiscard]] uuid attribute_function_id() const;
+
     private:
         TetrahedralSolidScalarFunction(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name );
+            std::string_view function_name,
+            const uuid& function_id,
+            double value );
 
         TetrahedralSolidScalarFunction(
             const TetrahedralSolid< dimension >& solid,
-            std::string_view function_name,
-            double value );
+            const uuid& function_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

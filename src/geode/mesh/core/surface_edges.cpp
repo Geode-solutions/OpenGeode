@@ -64,7 +64,10 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Impl() = default;
+        Impl() : internal::FacetEdgesImpl< dimension >{ BITSERY::constructor }
+        {
+        }
+
         Impl( const SurfaceMesh< dimension >& surface )
         {
             for( const auto p : Range{ surface.nb_polygons() } )

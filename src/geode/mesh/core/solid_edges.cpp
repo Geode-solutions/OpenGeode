@@ -65,7 +65,10 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Impl() = default;
+        Impl() : internal::FacetEdgesImpl< dimension >{ BITSERY::constructor }
+        {
+        }
+
         Impl( const SolidMesh< dimension >& solid )
         {
             for( const auto p : Range{ solid.nb_polyhedra() } )

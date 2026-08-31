@@ -26,8 +26,10 @@
 #include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/mesh/core/geode/geode_graph.hpp>
 #include <geode/mesh/core/graph.hpp>
 
 #include <geode/model/common.hpp>
@@ -47,6 +49,8 @@ namespace geode
         {
         public:
             using Iterator = typename EdgesAroundVertex::const_iterator;
+
+            RelationshipsImpl( BITSERY );
 
             [[nodiscard]] index_t nb_components_with_relations() const;
 
@@ -104,13 +108,23 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, RelationshipsImpl >{
                         { []( Archive& archive, RelationshipsImpl& impl ) {
-                            archive.ext(
-                                impl.graph_, bitsery::ext::StdSmartPtr{} );
-                            archive.object( impl.uuid2index_ );
-                            archive.ext(
-                                impl.ids_, bitsery::ext::StdSmartPtr{} );
-                            impl.delete_isolated_vertices();
-                        } } } );
+                             impl.graph_ = std::make_unique< OpenGeodeGraph >(
+                                 BITSERY::constructor );
+                             archive.ext(
+                                 impl.graph_, bitsery::ext::StdSmartPtr{} );
+                             archive.object( impl.uuid2index_ );
+                             archive.ext(
+                                 impl.ids_, bitsery::ext::StdSmartPtr{} );
+                             impl.delete_isolated_vertices();
+                         },
+                            []( Archive& archive, RelationshipsImpl& impl ) {
+                                archive.ext(
+                                    impl.graph_, bitsery::ext::StdSmartPtr{} );
+                                archive.object( impl.uuid2index_ );
+                                archive.ext(
+                                    impl.ids_, bitsery::ext::StdSmartPtr{} );
+                                impl.delete_isolated_vertices();
+                            } } } );
             }
 
             index_t register_component( const ComponentID& id );

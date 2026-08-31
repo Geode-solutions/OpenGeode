@@ -48,9 +48,9 @@ namespace geode
     class TextureStorage
     {
         friend class bitsery::Access;
-        PASSKEY( TextureManager< dimension >, TextureManagerKey /*key*/ );
 
     public:
+        PASSKEY( TextureManager< dimension >, TextureManagerKey /*key*/ );
         TextureStorage();
         TextureStorage( TextureStorage&& other ) noexcept;
         ~TextureStorage();

@@ -82,52 +82,57 @@ namespace geode
     void OpenGeodeHybridSolidBuilder< dimension >::do_set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        geode_hybrid_solid_.set_polyhedron_vertex(
-            polyhedron_vertex, vertex_id, {} );
+        geode_hybrid_solid_.set_polyhedron_vertex( polyhedron_vertex, vertex_id,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        geode_hybrid_solid_.add_tetrahedron( vertices, {} );
+        geode_hybrid_solid_.add_tetrahedron( vertices,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_hexahedron(
         const std::array< index_t, 8 >& vertices )
     {
-        geode_hybrid_solid_.add_hexahedron( vertices, {} );
+        geode_hybrid_solid_.add_hexahedron( vertices,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_prism(
         const std::array< index_t, 6 >& vertices )
     {
-        geode_hybrid_solid_.add_prism( vertices, {} );
+        geode_hybrid_solid_.add_prism( vertices,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_pyramid(
         const std::array< index_t, 5 >& vertices )
     {
-        geode_hybrid_solid_.add_pyramid( vertices, {} );
+        geode_hybrid_solid_.add_pyramid( vertices,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_set_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
     {
-        geode_hybrid_solid_.set_polyhedron_adjacent(
-            polyhedron_facet, adjacent_id, {} );
+        geode_hybrid_solid_.set_polyhedron_adjacent( polyhedron_facet,
+            adjacent_id,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_unset_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet )
     {
-        geode_hybrid_solid_.set_polyhedron_adjacent(
-            polyhedron_facet, NO_ID, {} );
+        geode_hybrid_solid_.set_polyhedron_adjacent( polyhedron_facet, NO_ID,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
@@ -135,7 +140,8 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_hybrid_solid_.remove_polyhedra( to_delete, {} );
+        geode_hybrid_solid_.remove_polyhedra( to_delete,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
@@ -143,7 +149,8 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_hybrid_solid_.permute_polyhedra( permutation, {} );
+        geode_hybrid_solid_.permute_polyhedra( permutation,
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template < index_t dimension >
@@ -160,7 +167,7 @@ namespace geode
         geode_hybrid_solid_.copy_polyhedra(
             dynamic_cast< const OpenGeodeHybridSolid< dimension >& >(
                 solid_mesh ),
-            {} );
+            typename OpenGeodeHybridSolid< dimension >::OGHybridSolidKey() );
     }
 
     template class opengeode_mesh_api OpenGeodeHybridSolidBuilder< 3 >;

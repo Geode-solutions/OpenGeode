@@ -28,6 +28,7 @@
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/compact_value.h>
 
+#include <geode/basic/logger.hpp>
 #include <geode/basic/types.hpp>
 
 namespace geode

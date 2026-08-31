@@ -69,7 +69,7 @@ namespace
             for( const auto& cmv : model.component_mesh_vertices(
                      facet_unique_vertices[polygon_vertex_id] ) )
             {
-                if( cmv.component_id.id() == block.id() )
+                if( cmv.component_id.id == block.id() )
                 {
                     block_facet_from_unique_vertices[polygon_vertex_id]
                         .emplace_back( cmv.vertex );
@@ -216,38 +216,42 @@ namespace
             const geode::Block3D& block,
             const geode::PolygonVertices& polygon_unique_vertices )
     {
+        std::tuple< absl::InlinedVector< geode::BlockPolyhedronFacet, 2 >,
+            absl::InlinedVector< geode::BlockPolyhedronFacet, 2 >, bool >
+            result;
+        auto& [facets_block_vertices, facets_unique_vertices, is_opposite] =
+            result;
+        is_opposite = false;
         auto output = polygon_vertices_to_block_facets_vertices(
             model, block, polygon_unique_vertices );
-        auto& facets_block_vertices = std::get< 0 >( output );
-        auto& facets_unique_vertices = std::get< 1 >( output );
+        facets_block_vertices = std::get< 0 >( output );
+        facets_unique_vertices = std::get< 1 >( output );
 
         if( facets_block_vertices.empty() )
         {
-            return std::make_tuple( std::move( facets_block_vertices ),
-                std::move( facets_unique_vertices ), false );
+            return result;
         }
-
         geode::detail::OrientedVertexCycle< geode::PolygonVertices >
             polygon_unique_vertices_cycle{ polygon_unique_vertices };
         if( polygon_unique_vertices_cycle.is_opposite(
                 geode::detail::OrientedVertexCycle< geode::PolygonVertices >{
                     facets_unique_vertices[0].vertices } ) )
         {
-            return std::make_tuple( std::move( facets_block_vertices ),
-                std::move( facets_unique_vertices ), false );
+            return result;
         }
         else if( facets_block_vertices.size() >= 2 )
         {
+            auto& facets_unique_vertices_ref = facets_unique_vertices;
             geode::OpenGeodeModelException::check_assertion(
                 polygon_unique_vertices_cycle.is_opposite(
                     geode::detail::OrientedVertexCycle<
                         geode::PolygonVertices >{
-                        facets_unique_vertices[1].vertices } ),
+                        facets_unique_vertices_ref[1].vertices } ),
                 "[block_vertices_from_surface_polygon] The block facets found "
                 "from the polygon vertices have the same orientation." );
         }
-        return std::make_tuple( std::move( facets_block_vertices ),
-            std::move( facets_unique_vertices ), true );
+        is_opposite = true;
+        return result;
     }
 
     absl::InlinedVector< geode::BlockPolyhedronFacet, 2 >
@@ -307,7 +311,7 @@ namespace
             for( const auto& cmv : model.component_mesh_vertices(
                      edge_unique_vertices[edge_vertex_id] ) )
             {
-                if( cmv.component_id.id() == surface.id() )
+                if( cmv.component_id.id == surface.id() )
                 {
                     surface_edge_from_unique_vertices[edge_vertex_id]
                         .emplace_back( cmv.vertex );
@@ -403,33 +407,36 @@ namespace
     {
         auto output = edge_vertices_to_surface_vertices< dimension, ModelType >(
             model, surface, edge_unique_vertices );
-        auto& surface_edges_vertices = std::get< 0 >( output );
-        auto& surface_edges_unique_vertices = std::get< 1 >( output );
-
+        std::tuple< absl::InlinedVector< geode::SurfacePolygonEdge, 2 >,
+            absl::InlinedVector< geode::SurfacePolygonEdge, 2 >, bool >
+            result;
+        auto& [surface_edges_vertices, surface_edges_unique_vertices,
+            is_opposite] = result;
+        is_opposite = false;
+        surface_edges_vertices = std::get< 0 >( output );
+        surface_edges_unique_vertices = std::get< 1 >( output );
         if( surface_edges_vertices.empty() )
         {
-            return std::make_tuple( std::move( surface_edges_vertices ),
-                std::move( surface_edges_unique_vertices ), false );
+            return result;
         }
-
         if( edge_unique_vertices[0]
                 == surface_edges_unique_vertices[0].vertices[0]
             && edge_unique_vertices[1]
                    == surface_edges_unique_vertices[0].vertices[1] )
         {
-            return std::make_tuple( std::move( surface_edges_vertices ),
-                std::move( surface_edges_unique_vertices ), true );
+            is_opposite = true;
+            return result;
         }
+        auto& surface_edges_unique_vertices_ref = surface_edges_unique_vertices;
         geode::OpenGeodeModelException::check_assertion(
             edge_unique_vertices[0]
-                    == surface_edges_unique_vertices[0].vertices[1]
+                    == surface_edges_unique_vertices_ref[0].vertices[1]
                 && edge_unique_vertices[1]
-                       == surface_edges_unique_vertices[0].vertices[0],
+                       == surface_edges_unique_vertices_ref[0].vertices[0],
             "[block_vertices_from_surface_polygon] The surface edges "
             "found from the polygon vertices don't have the same unique "
             "vertices." );
-        return std::make_tuple( std::move( surface_edges_vertices ),
-            std::move( surface_edges_unique_vertices ), false );
+        return result;
     }
 
     absl::InlinedVector< geode::SurfacePolygonEdge, 2 >
@@ -636,7 +643,7 @@ namespace geode
             polygons.reserve( surface_pairs.size() );
             for( auto& surface_pair : surface_pairs )
             {
-                const auto& surface = model.surface( surface_pair.first.id() );
+                const auto& surface = model.surface( surface_pair.first.id );
                 const auto& mesh = surface.mesh();
                 for( auto& pair : surface_pair.second )
                 {
@@ -673,7 +680,7 @@ namespace geode
             polygons.reserve( block_pairs.size() );
             for( const auto& block_pair : block_pairs )
             {
-                const auto& block = model.block( block_pair.first.id() );
+                const auto& block = model.block( block_pair.first.id );
                 const auto& mesh = block.mesh();
                 for( const auto& pair : block_pair.second )
                 {

@@ -29,6 +29,7 @@
 #include <absl/container/inlined_vector.h>
 #include <absl/hash/hash.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -270,12 +271,14 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( SolidMesh );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey /*key*/ );
 
     public:
+        PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey /*key*/ );
         using Builder = SolidMeshBuilder< dimension >;
         static constexpr auto dim = dimension;
         using VerticesAroundVertex = absl::InlinedVector< index_t, 20 >;
+
+        SolidMesh( BITSERY );
 
         ~SolidMesh();
 

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -38,12 +39,11 @@ namespace geode
 {
     class opengeode_mesh_api OpenGeodeGraph : public Graph
     {
-        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey /*key*/ );
-
     public:
         using Builder = OpenGeodeGraphBuilder;
-
+        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey /*key*/ );
         OpenGeodeGraph();
+        OpenGeodeGraph( BITSERY );
         OpenGeodeGraph( OpenGeodeGraph&& other ) noexcept;
         OpenGeodeGraph& operator=( OpenGeodeGraph&& other ) noexcept;
         ~OpenGeodeGraph();

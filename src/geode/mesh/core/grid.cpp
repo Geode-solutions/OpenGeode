@@ -185,8 +185,11 @@ namespace geode
                 OpenGeodeMeshException::check_exception( diff == 0 || diff == 1,
                     nullptr, OpenGeodeException::TYPE::data,
                     "[Grid::cell_local_vertex] vertex [", vertex_id[0], ",",
-                    vertex_id[1], "] is not part of cell [", cell_id[0], ",",
-                    cell_id[1], "] vertices." );
+                    vertex_id[1],
+                    dimension == 3 ? absl::StrCat( ",", vertex_id[2] ) : "",
+                    "] is not part of cell [", cell_id[0], ",", cell_id[1],
+                    dimension == 3 ? absl::StrCat( ",", cell_id[2] ) : "",
+                    "] vertices." );
                 result += diff * ( 1 << d );
             }
             return result;

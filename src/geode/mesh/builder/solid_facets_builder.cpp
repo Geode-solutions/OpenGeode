@@ -42,14 +42,16 @@ namespace geode
     index_t SolidFacetsBuilder< dimension >::find_or_create_facet(
         PolyhedronFacetVertices facet_vertices )
     {
-        return facets_->find_or_create_facet( std::move( facet_vertices ), {} );
+        return facets_->find_or_create_facet( std::move( facet_vertices ),
+            typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template < index_t dimension >
     std::vector< index_t >
         SolidFacetsBuilder< dimension >::delete_isolated_facets()
     {
-        return facets_->remove_isolated_facets( {} );
+        return facets_->remove_isolated_facets(
+            typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template < index_t dimension >
@@ -57,7 +59,8 @@ namespace geode
         SolidFacetsBuilder< dimension >::update_facet_vertices(
             absl::Span< const index_t > old2new )
     {
-        return facets_->update_facet_vertices( old2new, {} );
+        return facets_->update_facet_vertices(
+            old2new, typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template < index_t dimension >
@@ -71,22 +74,25 @@ namespace geode
             facet_vertex_id < facet_vertices.size(),
             "[SolidFacetsBuilder::update_facet_vertex] "
             "Accessing an invalid vertex in facet" );
-        return facets_->update_facet_vertex(
-            std::move( facet_vertices ), facet_vertex_id, new_vertex_id, {} );
+        return facets_->update_facet_vertex( std::move( facet_vertices ),
+            facet_vertex_id, new_vertex_id,
+            typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template < index_t dimension >
     void SolidFacetsBuilder< dimension >::remove_facet(
         PolyhedronFacetVertices facet_vertices )
     {
-        facets_->remove_facet( std::move( facet_vertices ), {} );
+        facets_->remove_facet( std::move( facet_vertices ),
+            typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template < index_t dimension >
     std::vector< index_t > SolidFacetsBuilder< dimension >::delete_facets(
         const std::vector< bool >& to_delete )
     {
-        return facets_->delete_facets( to_delete, {} );
+        return facets_->delete_facets(
+            to_delete, typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template < index_t dimension >
@@ -97,7 +103,8 @@ namespace geode
             nullptr, OpenGeodeException::TYPE::data,
             "[SolidFacetsBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
-        facets_->overwrite_facets( facets, {} );
+        facets_->overwrite_facets(
+            facets, typename SolidFacets< dimension >::SolidFacetsKey() );
     }
 
     template class opengeode_mesh_api SolidFacetsBuilder< 3 >;

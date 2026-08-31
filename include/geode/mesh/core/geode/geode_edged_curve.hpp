@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -41,14 +42,15 @@ namespace geode
     class OpenGeodeEdgedCurve : public EdgedCurve< dimension >
     {
         OPENGEODE_DISABLE_COPY( OpenGeodeEdgedCurve );
-        PASSKEY(
-            OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey /*key*/ );
 
     public:
+        PASSKEY(
+            OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey /*key*/ );
         using Builder = OpenGeodeEdgedCurveBuilder< dimension >;
         static constexpr auto dim = dimension;
 
         OpenGeodeEdgedCurve();
+        OpenGeodeEdgedCurve( BITSERY );
         OpenGeodeEdgedCurve( OpenGeodeEdgedCurve&& other ) noexcept;
         OpenGeodeEdgedCurve& operator=( OpenGeodeEdgedCurve&& other ) noexcept;
         ~OpenGeodeEdgedCurve();
@@ -82,10 +84,6 @@ namespace geode
         }
 
     public:
-        void set_vertex( index_t vertex_id,
-            Point< dimension > point,
-            OGEdgedCurveKey /*key*/ );
-
         void set_edge_vertex( const EdgeVertex& edge_vertex,
             index_t vertex_id,
             OGEdgedCurveKey /*key*/ );

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.hpp>
+
 #include <geode/mesh/common.hpp>
 #include <geode/mesh/core/grid.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
@@ -47,6 +49,8 @@ namespace geode
     public:
         using Builder = RegularGridBuilder< 3 >;
         static constexpr index_t dim{ 3 };
+
+        RegularGrid( BITSERY );
 
         /*!
          * Create a new RegularGrid using default data structure.

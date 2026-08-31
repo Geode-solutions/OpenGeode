@@ -76,7 +76,7 @@ namespace geode
             logger_impl_->info( message );
         }
 
-        void warn( const std::string &message )
+        void warning( const std::string &message )
         {
             logger_impl_->warn( message );
         }
@@ -128,9 +128,9 @@ namespace geode
         impl_->info( message );
     }
 
-    void FileLoggerClient::warn( const std::string &message )
+    void FileLoggerClient::warning( const std::string &message )
     {
-        impl_->warn( message );
+        impl_->warning( message );
     }
 
     void FileLoggerClient::error( const std::string &message )

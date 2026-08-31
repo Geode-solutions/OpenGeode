@@ -140,7 +140,7 @@ namespace geode
                 }
                 catch( const OpenGeodeException& e )
                 {
-                    Logger::warn( e.what() );
+                    Logger::warning( e.what() );
                 }
             }
 

@@ -175,7 +175,7 @@ namespace
         }
         if( grouped_sided_surfaces.size() > 1 )
         {
-            geode::Logger::warn( block.component_id().string(),
+            geode::Logger::warning( block.component_id().string(),
                 " has unconnected boundaries. This block has either "
                 "topologically distinct parts or there are holes between the "
                 "block boundary surfaces." );

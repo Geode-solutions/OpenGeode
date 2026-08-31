@@ -43,9 +43,11 @@ namespace geode
     public:
         void load_model_boundaries( std::string_view directory );
 
-        void set_model_boundary_name( const uuid& id, std::string_view name );
+        void set_model_boundary_name(
+            const ModelBoundary< dimension >& id, std::string_view name );
 
-        void set_model_boundary_active( const uuid& id, bool active );
+        void set_model_boundary_active(
+            const ModelBoundary< dimension >& id, bool active );
 
     protected:
         explicit ModelBoundariesBuilder(

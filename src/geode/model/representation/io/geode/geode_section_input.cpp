@@ -25,6 +25,7 @@
 
 #include <async++.h>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/zip_file.hpp>
 
@@ -43,7 +44,7 @@ namespace geode
     {
         const UnzipFile zip_reader{ filename(), uuid{}.string() };
         zip_reader.extract_all();
-        Section section;
+        Section section{ BITSERY::constructor };
         detail::load_section_files( section, zip_reader.directory() );
         return section;
     }

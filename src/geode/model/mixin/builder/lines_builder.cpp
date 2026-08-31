@@ -41,80 +41,104 @@ namespace geode
     template < index_t dimension >
     const uuid& LinesBuilder< dimension >::create_line( const MeshImpl& impl )
     {
-        return lines_.create_line( impl, {} );
+        return lines_.create_line(
+            impl, typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::create_line( uuid line_id )
     {
-        lines_.create_line( std::move( line_id ), {} );
+        lines_.create_line( std::move( line_id ),
+            typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::create_line(
         uuid line_id, const MeshImpl& impl )
     {
-        lines_.create_line( std::move( line_id ), impl, {} );
+        lines_.create_line( std::move( line_id ), impl,
+            typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::delete_line( const Line< dimension >& line )
     {
-        lines_.delete_line( line, {} );
+        lines_.delete_line(
+            line, typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::load_lines( std::string_view directory )
     {
-        return lines_.load_lines( directory, {} );
+        return lines_.load_lines(
+            directory, typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurveBuilder< dimension > >
-        LinesBuilder< dimension >::line_mesh_builder( const uuid& id )
+        LinesBuilder< dimension >::line_mesh_builder(
+            const Line< dimension >& line )
     {
-        return EdgedCurveBuilder< dimension >::create(
-            lines_.modifiable_line( id, {} ).modifiable_mesh(
-                typename Line< dimension >::LinesBuilderKey{} ) );
+        return EdgedCurveBuilder< dimension >::create( lines_
+                .modifiable_line(
+                    line.id(), typename Lines< dimension >::LinesBuilderKey{} )
+                .modifiable_mesh(
+                    typename Line< dimension >::LinesBuilderKey{} ) );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_name(
-        const uuid& id, std::string_view name )
+        const Line< dimension >& line, std::string_view name )
     {
-        lines_.modifiable_line( id, {} ).set_line_name( name, {} );
-        line_mesh_builder( id )->set_name( name );
+        lines_
+            .modifiable_line(
+                line.id(), typename Lines< dimension >::LinesBuilderKey{} )
+            .set_line_name(
+                name, typename Lines< dimension >::LinesBuilderKey{} );
+        line_mesh_builder( line )->set_name( name );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_active(
-        const uuid& id, bool active )
+        const Line< dimension >& line, bool active )
     {
-        lines_.modifiable_line( id, {} ).set_line_active( active, {} );
+        lines_
+            .modifiable_line(
+                line.id(), typename Lines< dimension >::LinesBuilderKey{} )
+            .set_line_active(
+                active, typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_mesh(
         const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh )
     {
-        lines_.modifiable_line( id, {} ).set_mesh(
-            std::move( mesh ), typename Line< dimension >::LinesBuilderKey{} );
+        lines_
+            .modifiable_line(
+                id, typename Lines< dimension >::LinesBuilderKey{} )
+            .set_mesh( std::move( mesh ),
+                typename Line< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     EdgedCurve< dimension >& LinesBuilder< dimension >::modifiable_line_mesh(
         const uuid& id )
     {
-        return lines_.modifiable_line( id, {} ).modifiable_mesh(
-            typename Line< dimension >::LinesBuilderKey{} );
+        return lines_
+            .modifiable_line(
+                id, typename Lines< dimension >::LinesBuilderKey{} )
+            .modifiable_mesh( typename Line< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > >
-        LinesBuilder< dimension >::steal_line_mesh( const uuid& id )
+        LinesBuilder< dimension >::steal_line_mesh(
+            const Line< dimension >& line )
     {
-        return lines_.modifiable_line( id, {} ).steal_mesh(
-            typename Line< dimension >::LinesBuilderKey{} );
+        return lines_
+            .modifiable_line(
+                line.id(), typename Lines< dimension >::LinesBuilderKey{} )
+            .steal_mesh( typename Line< dimension >::LinesBuilderKey{} );
     }
 
     template class opengeode_model_api LinesBuilder< 2 >;

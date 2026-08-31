@@ -47,9 +47,9 @@ namespace geode
     class opengeode_model_api Corners
     {
         OPENGEODE_DISABLE_COPY( Corners );
-        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey /*key*/ );
 
     public:
+        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey /*key*/ );
         using Builder = CornersBuilder< dimension >;
         using Type = Corner< dimension >;
 

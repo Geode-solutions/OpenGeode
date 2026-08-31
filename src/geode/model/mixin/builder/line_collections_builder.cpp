@@ -31,7 +31,9 @@ namespace geode
     template < index_t dimension >
     const uuid& LineCollectionsBuilder< dimension >::create_line_collection()
     {
-        return line_collections_.create_line_collection( {} );
+        return line_collections_.create_line_collection(
+            typename LineCollections<
+                dimension >::LineCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
@@ -39,37 +41,54 @@ namespace geode
         uuid line_collection_id )
     {
         line_collections_.create_line_collection(
-            std::move( line_collection_id ), {} );
+            std::move( line_collection_id ),
+            typename LineCollections<
+                dimension >::LineCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void LineCollectionsBuilder< dimension >::delete_line_collection(
         const LineCollection< dimension >& collection )
     {
-        line_collections_.delete_line_collection( collection, {} );
+        line_collections_.delete_line_collection(
+            collection, typename LineCollections<
+                            dimension >::LineCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void LineCollectionsBuilder< dimension >::load_line_collections(
         std::string_view directory )
     {
-        return line_collections_.load_line_collections( directory, {} );
+        return line_collections_.load_line_collections(
+            directory, typename LineCollections<
+                           dimension >::LineCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void LineCollectionsBuilder< dimension >::set_line_collection_name(
-        const uuid& id, std::string_view name )
+        const LineCollection< dimension >& line_collection,
+        std::string_view name )
     {
-        line_collections_.modifiable_line_collection( id, {} )
-            .set_line_collection_name( name, {} );
+        line_collections_
+            .modifiable_line_collection( line_collection.id(),
+                typename LineCollections<
+                    dimension >::LineCollectionsBuilderKey{} )
+            .set_line_collection_name(
+                name, typename LineCollections<
+                          dimension >::LineCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void LineCollectionsBuilder< dimension >::set_line_collection_active(
-        const uuid& id, bool active )
+        const LineCollection< dimension >& line_collection, bool active )
     {
-        line_collections_.modifiable_line_collection( id, {} )
-            .set_line_collection_active( active, {} );
+        line_collections_
+            .modifiable_line_collection( line_collection.id(),
+                typename LineCollections<
+                    dimension >::LineCollectionsBuilderKey{} )
+            .set_line_collection_active(
+                active, typename LineCollections<
+                            dimension >::LineCollectionsBuilderKey{} );
     }
 
     template class opengeode_model_api LineCollectionsBuilder< 2 >;

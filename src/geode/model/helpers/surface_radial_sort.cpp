@@ -105,7 +105,7 @@ namespace
             geode::component_mesh_vertex_pairs( vertices0, vertices1,
                 geode::Surface3D::component_type_static() ) )
         {
-            const auto& surface_id = vertex_pairs.first.id();
+            const auto& surface_id = vertex_pairs.first.id;
             const auto& surface = brep.surface( surface_id );
             const auto& surface_mesh = surface.mesh();
             for( const auto& pair : vertex_pairs.second )
@@ -131,7 +131,7 @@ namespace
             }
         }
         geode::sort_unique( polygons );
-        return std::make_pair( !degenerate_polygon, polygons );
+        return { !degenerate_polygon, polygons };
     }
 
     geode::SortedSurfaces sort( const geode::Segment3D& segment,
@@ -211,8 +211,9 @@ namespace geode
             {
                 if( edge_id == mesh.nb_edges() - 1 )
                 {
-                    Logger::warn( "[surface_radial_sort] Degenerated polygons "
-                                  "has been found on all the edges of Line ",
+                    Logger::warning(
+                        "[surface_radial_sort] Degenerated polygons "
+                        "has been found on all the edges of Line ",
                         line.id().string(),
                         ". The result of surface_radial_sort is not "
                         "guaranteed." );

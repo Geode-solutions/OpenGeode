@@ -41,72 +41,93 @@ namespace geode
     template < index_t dimension >
     const uuid& BlocksBuilder< dimension >::create_block( const MeshImpl& impl )
     {
-        return blocks_.create_block( impl, {} );
+        return blocks_.create_block(
+            impl, typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::create_block( uuid block_id )
     {
-        blocks_.create_block( std::move( block_id ), {} );
+        blocks_.create_block( std::move( block_id ),
+            typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::create_block(
         uuid block_id, const MeshImpl& impl )
     {
-        blocks_.create_block( std::move( block_id ), impl, {} );
+        blocks_.create_block( std::move( block_id ), impl,
+            typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::delete_block(
         const Block< dimension >& block )
     {
-        blocks_.delete_block( block, {} );
+        blocks_.delete_block(
+            block, typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::load_blocks( std::string_view directory )
     {
-        return blocks_.load_blocks( directory, {} );
+        return blocks_.load_blocks(
+            directory, typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_name(
-        const uuid& id, std::string_view name )
+        const Block< dimension >& block, std::string_view name )
     {
-        blocks_.modifiable_block( id, {} ).set_block_name( name, {} );
-        block_mesh_builder( id )->set_name( name );
+        blocks_
+            .modifiable_block(
+                block.id(), typename Blocks< dimension >::BlocksBuilderKey{} )
+            .set_block_name(
+                name, typename Blocks< dimension >::BlocksBuilderKey{} );
+        block_mesh_builder( block )->set_name( name );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_active(
-        const uuid& id, bool active )
+        const Block< dimension >& block, bool active )
     {
-        blocks_.modifiable_block( id, {} ).set_block_active( active, {} );
+        blocks_
+            .modifiable_block(
+                block.id(), typename Blocks< dimension >::BlocksBuilderKey{} )
+            .set_block_active(
+                active, typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_mesh(
         const uuid& id, std::unique_ptr< SolidMesh< dimension > > mesh )
     {
-        blocks_.modifiable_block( id, {} ).set_mesh( std::move( mesh ),
-            typename Block< dimension >::BlocksBuilderKey{} );
+        blocks_
+            .modifiable_block(
+                id, typename Blocks< dimension >::BlocksBuilderKey{} )
+            .set_mesh( std::move( mesh ),
+                typename Block< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     SolidMesh< dimension >& BlocksBuilder< dimension >::modifiable_block_mesh(
         const uuid& id )
     {
-        return blocks_.modifiable_block( id, {} ).modifiable_mesh(
-            typename Block< dimension >::BlocksBuilderKey{} );
+        return blocks_
+            .modifiable_block(
+                id, typename Blocks< dimension >::BlocksBuilderKey{} )
+            .modifiable_mesh( typename Block< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >
     std::unique_ptr< SolidMesh< dimension > >
-        BlocksBuilder< dimension >::steal_block_mesh( const uuid& id )
+        BlocksBuilder< dimension >::steal_block_mesh(
+            const Block< dimension >& block )
     {
-        return blocks_.modifiable_block( id, {} ).steal_mesh(
-            typename Block< dimension >::BlocksBuilderKey{} );
+        return blocks_
+            .modifiable_block(
+                block.id(), typename Blocks< dimension >::BlocksBuilderKey{} )
+            .steal_mesh( typename Block< dimension >::BlocksBuilderKey{} );
     }
 
     template class opengeode_model_api BlocksBuilder< 3 >;

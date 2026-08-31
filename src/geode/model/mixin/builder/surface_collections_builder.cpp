@@ -32,7 +32,9 @@ namespace geode
     const uuid&
         SurfaceCollectionsBuilder< dimension >::create_surface_collection()
     {
-        return surface_collections_.create_surface_collection( {} );
+        return surface_collections_.create_surface_collection(
+            typename SurfaceCollections<
+                dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
@@ -40,37 +42,54 @@ namespace geode
         uuid surface_collection_id )
     {
         surface_collections_.create_surface_collection(
-            std::move( surface_collection_id ), {} );
+            std::move( surface_collection_id ),
+            typename SurfaceCollections<
+                dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::delete_surface_collection(
         const SurfaceCollection< dimension >& collection )
     {
-        surface_collections_.delete_surface_collection( collection, {} );
+        surface_collections_.delete_surface_collection(
+            collection, typename SurfaceCollections<
+                            dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::load_surface_collections(
         std::string_view directory )
     {
-        return surface_collections_.load_surface_collections( directory, {} );
+        return surface_collections_.load_surface_collections(
+            directory, typename SurfaceCollections<
+                           dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::set_surface_collection_name(
-        const uuid& id, std::string_view name )
+        const SurfaceCollection< dimension >& surface_collection,
+        std::string_view name )
     {
-        surface_collections_.modifiable_surface_collection( id, {} )
-            .set_surface_collection_name( name, {} );
+        surface_collections_
+            .modifiable_surface_collection( surface_collection.id(),
+                typename SurfaceCollections<
+                    dimension >::SurfaceCollectionsBuilderKey{} )
+            .set_surface_collection_name(
+                name, typename SurfaceCollections<
+                          dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >
     void SurfaceCollectionsBuilder< dimension >::set_surface_collection_active(
-        const uuid& id, bool active )
+        const SurfaceCollection< dimension >& surface_collection, bool active )
     {
-        surface_collections_.modifiable_surface_collection( id, {} )
-            .set_surface_collection_active( active, {} );
+        surface_collections_
+            .modifiable_surface_collection( surface_collection.id(),
+                typename SurfaceCollections<
+                    dimension >::SurfaceCollectionsBuilderKey{} )
+            .set_surface_collection_active(
+                active, typename SurfaceCollections<
+                            dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template class opengeode_model_api SurfaceCollectionsBuilder< 2 >;

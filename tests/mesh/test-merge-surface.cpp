@@ -142,7 +142,6 @@ void test_import()
     }
     geode::NNSearch3D nns( points );
     const auto mappings = nns.colocated_index_mapping( geode::GLOBAL_EPSILON );
-    DEBUG( mappings.nb_colocated_points() );
     geode::OpenGeodeMeshException::test( mappings.nb_colocated_points() == 0,
         "Should be no more colocated points" );
     for( const auto p : geode::Indices{ points } )
