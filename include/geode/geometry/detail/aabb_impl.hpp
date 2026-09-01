@@ -180,7 +180,7 @@ namespace geode
         template < typename ACTION >
         void closest_element_box_recursive( const Point< dimension >& query,
             index_t& nearest_box,
-            double& distance,
+            double& squared_distance,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -197,52 +197,52 @@ namespace geode
             if( is_leaf( element_begin, element_end ) )
             {
                 const auto cur_box = mapping_morton( element_begin );
-                Point< dimension > cur_nearest_point;
                 const auto cur_distance = action( query, cur_box );
-                if( cur_distance < distance )
+                const auto cur_squared_distance = cur_distance * cur_distance;
+                if( cur_squared_distance < squared_distance )
                 {
                     nearest_box = cur_box;
-                    distance = cur_distance;
+                    squared_distance = cur_squared_distance;
                 }
                 return;
             }
             const auto it = get_recursive_iterators(
                 node_index, element_begin, element_end );
-            const auto distance_left =
-                node( it.child_left ).signed_distance( query );
-            const auto distance_right =
-                node( it.child_right ).signed_distance( query );
+            const auto squared_distance_left =
+                node( it.child_left ).squared_signed_distance( query );
+            const auto squared_distance_right =
+                node( it.child_right ).squared_signed_distance( query );
 
             // Traverse the "nearest" child first, so that it has more chances
             // to prune the traversal of the other child.
-            if( distance_left < distance_right )
+            if( squared_distance_left < squared_distance_right )
             {
-                if( distance_left < distance )
+                if( squared_distance_left < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_left, element_begin, it.element_middle,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_left, element_begin,
+                        it.element_middle, action );
                 }
-                if( distance_right < distance )
+                if( squared_distance_right < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_right, it.element_middle, element_end,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_right, it.element_middle,
+                        element_end, action );
                 }
             }
             else
             {
-                if( distance_right < distance )
+                if( squared_distance_right < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_right, it.element_middle, element_end,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_right, it.element_middle,
+                        element_end, action );
                 }
-                if( distance_left < distance )
+                if( squared_distance_left < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_left, element_begin, it.element_middle,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_left, element_begin,
+                        it.element_middle, action );
                 }
             }
         }
@@ -490,11 +490,12 @@ namespace geode
         }
         auto nearest_box = impl_->closest_element_box_hint( query );
         auto distance = action( query, nearest_box );
+        distance *= distance;
         impl_->closest_element_box_recursive( query, nearest_box, distance,
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
         OpenGeodeGeometryException::check_assertion(
             nearest_box != NO_ID, "No box found" );
-        return { nearest_box, distance };
+        return { nearest_box, std::sqrt( distance ) };
     }
 
     template < index_t dimension >

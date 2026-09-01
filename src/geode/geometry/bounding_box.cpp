@@ -740,9 +740,15 @@ namespace geode
                 return diagonal_value > max_value;
             } );
     }
-
     template < index_t dimension >
     double BoundingBox< dimension >::signed_distance(
+        const Point< dimension >& point ) const
+    {
+        return std::sqrt( squared_signed_distance( point ) );
+    }
+
+    template < index_t dimension >
+    double BoundingBox< dimension >::squared_signed_distance(
         const Point< dimension >& point ) const
     {
         bool inside{ true };
@@ -763,18 +769,9 @@ namespace geode
         }
         if( !inside )
         {
-            return result.length();
+            return result.length2();
         }
-        const auto Pmin = point - min_;
-        const auto Pmax = point - max_;
-        auto inner_distance = std::numeric_limits< double >::max();
-        for( const auto c : LRange{ dimension } )
-        {
-            const auto local_distance = std::min(
-                std::fabs( Pmin.value( c ) ), std::fabs( Pmax.value( c ) ) );
-            inner_distance = std::min( inner_distance, local_distance );
-        }
-        return -inner_distance;
+        return 0;
     }
 
     template < index_t dimension >

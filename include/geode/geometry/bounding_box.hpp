@@ -122,11 +122,10 @@ namespace geode
         [[nodiscard]] std::enable_if_t< T == 3, bool > epsilon_intersects(
             const Tetrahedron& tetra ) const;
 
-        /*!
-         * Returns the distance between the point and the box.
-         * If the point is inside the box, the distance is negative.
-         */
         [[nodiscard]] double signed_distance(
+            const Point< dimension >& point ) const;
+
+        [[nodiscard]] double squared_signed_distance(
             const Point< dimension >& point ) const;
 
         [[nodiscard]] const Point< dimension >& min() const;
