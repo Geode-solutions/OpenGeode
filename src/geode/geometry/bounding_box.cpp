@@ -740,6 +740,7 @@ namespace geode
                 return diagonal_value > max_value;
             } );
     }
+
     template < index_t dimension >
     double BoundingBox< dimension >::signed_distance(
         const Point< dimension >& point ) const
@@ -751,27 +752,22 @@ namespace geode
     double BoundingBox< dimension >::squared_signed_distance(
         const Point< dimension >& point ) const
     {
-        bool inside{ true };
-        Vector< dimension > result;
-        for( const auto c : LRange{ dimension } )
+        double squared_distance{ 0 };
+        for( const auto dim : LRange{ dimension } )
         {
-            const auto value = point.value( c );
-            if( value < min_.value( c ) )
+            const auto value = point.value( dim );
+            if( value < min_.value( dim ) )
             {
-                inside = false;
-                result.set_value( c, value - min_.value( c ) );
+                const auto diff = value - min_.value( dim );
+                squared_distance += diff * diff;
             }
-            else if( value > max_.value( c ) )
+            else if( value > max_.value( dim ) )
             {
-                inside = false;
-                result.set_value( c, value - max_.value( c ) );
+                const auto diff = value - max_.value( dim );
+                squared_distance += diff * diff;
             }
         }
-        if( !inside )
-        {
-            return result.length2();
-        }
-        return 0;
+        return squared_distance;
     }
 
     template < index_t dimension >

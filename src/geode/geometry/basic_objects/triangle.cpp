@@ -38,17 +38,12 @@
 
 namespace
 {
-    struct PivotNormalResult
+    std::optional< geode::internal::PivotNormalResult > simple_pivot_and_normal(
+        std::array< geode::RefPoint3D, 3 > points )
     {
-        geode::local_index_t pivot{ geode::NO_LID };
-        geode::Vector3D normal{ { 0, 0, 0 } };
-        std::array< double, 3 > lengths;
-    };
-
-    std::optional< PivotNormalResult > simple_pivot_and_normal(
-        const std::array< geode::RefPoint3D, 3 >& points )
-    {
-        std::optional< PivotNormalResult > result{ std::in_place };
+        std::optional< geode::internal::PivotNormalResult > result{
+            std::in_place
+        };
         for( const auto pivot : geode::LRange{ 3 } )
         {
             const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
@@ -173,8 +168,9 @@ namespace geode
         std::optional< std::pair< local_index_t, Vector3D > > >
         GenericTriangle< PointType, dimension >::pivot_and_normal() const
     {
-        const auto result = simple_pivot_and_normal(
-            { vertices_[0], vertices_[1], vertices_[2] } );
+        const auto result = pivot_and_normal_(
+            simple_pivot_and_normal, std::array< RefPoint3D, 3 >{ vertices_[0],
+                                         vertices_[1], vertices_[2] } );
         if( !result )
         {
             return std::nullopt;
