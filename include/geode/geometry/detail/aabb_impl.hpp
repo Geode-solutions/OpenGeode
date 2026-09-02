@@ -116,7 +116,8 @@ namespace geode
         }
 
         [[nodiscard]] Iterator get_recursive_iterators( index_t node_index,
-            index_t element_begin, index_t element_end ) const
+            index_t element_begin,
+            index_t element_end ) const
         {
             Iterator it;
             it.element_middle =
@@ -153,8 +154,7 @@ namespace geode
                 node_index < tree_.size(), "Node index out of tree" );
             if( is_leaf( element_begin, element_end ) )
             {
-                tree_[node_index].box =
-                    bboxes[element_order_[element_begin]];
+                tree_[node_index].box = bboxes[element_order_[element_begin]];
                 return node_index;
             }
             BoundingBox< dimension > range_box;
@@ -437,8 +437,7 @@ namespace geode
                 const auto it = get_recursive_iterators(
                     node_index, element_begin, element_end );
                 if( node( it.child_left ).squared_signed_distance( query )
-                    < node( it.child_right ).squared_signed_distance(
-                        query ) )
+                    < node( it.child_right ).squared_signed_distance( query ) )
                 {
                     element_end = it.element_middle;
                     node_index = it.child_left;
