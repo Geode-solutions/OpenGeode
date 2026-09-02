@@ -100,6 +100,10 @@ namespace geode
         [[nodiscard]] std::tuple< index_t, double > closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const;
 
+        template < typename EvalDistance >
+        void compute_point_element_box_distances(
+            const Point< dimension >& query, const EvalDistance& action ) const;
+
         /*!
          * @brief Computes the intersections between a given
          * box and the all element boxes.

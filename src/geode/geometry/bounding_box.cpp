@@ -745,36 +745,29 @@ namespace geode
     double BoundingBox< dimension >::signed_distance(
         const Point< dimension >& point ) const
     {
-        bool inside{ true };
-        Vector< dimension > result;
-        for( const auto c : LRange{ dimension } )
+        return std::sqrt( squared_signed_distance( point ) );
+    }
+
+    template < index_t dimension >
+    double BoundingBox< dimension >::squared_signed_distance(
+        const Point< dimension >& point ) const
+    {
+        double squared_distance{ 0 };
+        for( const auto dim : LRange{ dimension } )
         {
-            const auto value = point.value( c );
-            if( value < min_.value( c ) )
+            const auto value = point.value( dim );
+            if( value < min_.value( dim ) )
             {
-                inside = false;
-                result.set_value( c, value - min_.value( c ) );
+                const auto diff = value - min_.value( dim );
+                squared_distance += diff * diff;
             }
-            else if( value > max_.value( c ) )
+            else if( value > max_.value( dim ) )
             {
-                inside = false;
-                result.set_value( c, value - max_.value( c ) );
+                const auto diff = value - max_.value( dim );
+                squared_distance += diff * diff;
             }
         }
-        if( !inside )
-        {
-            return result.length();
-        }
-        const auto Pmin = point - min_;
-        const auto Pmax = point - max_;
-        auto inner_distance = std::numeric_limits< double >::max();
-        for( const auto c : LRange{ dimension } )
-        {
-            const auto local_distance = std::min(
-                std::fabs( Pmin.value( c ) ), std::fabs( Pmax.value( c ) ) );
-            inner_distance = std::min( inner_distance, local_distance );
-        }
-        return -inner_distance;
+        return squared_distance;
     }
 
     template < index_t dimension >

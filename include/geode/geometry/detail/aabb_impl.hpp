@@ -29,33 +29,48 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
+
+#include <absl/algorithm/container.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/aabb.hpp>
-#include <geode/geometry/points_sort.hpp>
 
 namespace geode
 {
     /*!
      * AABB tree structure implementation
-     * The tree is store in s single vector following this example:
+     * The tree is stored in a single vector, laid out in depth-first
+     * pre-order: a node is always immediately followed by its whole left
+     * subtree, so its left child is implicitly at (node_index + 1); only
+     * the right child needs an explicit stored offset. This guarantees an
+     * exact storage of 2 * nb_bboxes() - 1 nodes (no gaps, unlike a
+     * power-of-two implicit heap layout) and keeps a node's left child
+     * adjacent in memory, which is friendlier to the cache while
+     * descending the tree.
      *                          ROOT
      *                        /      \
      *                      A1        A2
      *                    /    \     /   \
      *                  B1     B2   B3    B4
      *  where B* are the input bboxes
-     *  Storage: |empty|ROOT|A1|A2|B1|B2|B3|B4|
+     *  Storage: |ROOT|A1|B1|B2|A2|B3|B4|
+     *
+     * Each internal node splits its element range along the longest axis
+     * of that range's actual bounding box, at the centroid median (rather
+     * than a fixed pre-computed order such as a Morton curve). This keeps
+     * sibling boxes tight and minimally overlapping, which is what lets
+     * queries prune branches instead of having to visit both children.
      */
     template < index_t dimension >
     class AABBTree< dimension >::Impl
     {
     public:
-        static constexpr index_t ROOT_INDEX{ 1 };
+        static constexpr index_t ROOT_INDEX{ 0 };
 
         struct Iterator
         {
@@ -64,37 +79,34 @@ namespace geode
             index_t child_right;
         };
 
+    private:
+        struct Node
+        {
+            BoundingBox< dimension > box;
+            // Index of the right child in tree_. Meaningless for leaves,
+            // whose left child slot (node_index + 1) does not exist.
+            index_t right_child{ NO_ID };
+        };
+
     public:
         Impl() = default;
 
         Impl( absl::Span< const BoundingBox< dimension > > bboxes )
-            : mapping_morton_( [&bboxes]() {
-                  absl::FixedArray< Point< dimension > > points(
-                      bboxes.size() );
-                  for( const auto i : Indices{ bboxes } )
-                  {
-                      points[i] = bboxes[i].min() + bboxes[i].max();
-                  }
-                  return morton_mapping< dimension >( points );
-              }() )
+            : element_order_( bboxes.size() )
         {
-            if( bboxes.empty() )
+            if( !bboxes.empty() )
             {
-                tree_.resize( ROOT_INDEX );
-            }
-            else
-            {
-                const auto max_node_index =
-                    max_node_index_recursive( ROOT_INDEX, 0, bboxes.size() );
-                tree_.resize( ROOT_INDEX + max_node_index );
+                absl::c_iota( element_order_, index_t{ 0 } );
+                tree_.resize( 2 * bboxes.size() - 1 );
+                index_t next_free_index{ 0 };
                 initialize_tree_recursive(
-                    bboxes, ROOT_INDEX, 0, bboxes.size() );
+                    bboxes, next_free_index, 0, bboxes.size() );
             }
         }
 
         [[nodiscard]] index_t nb_bboxes() const
         {
-            return mapping_morton_.size();
+            return element_order_.size();
         }
 
         [[nodiscard]] static bool is_leaf(
@@ -103,14 +115,15 @@ namespace geode
             return element_begin + 1 == element_end;
         }
 
-        [[nodiscard]] static Iterator get_recursive_iterators(
-            index_t node_index, index_t element_begin, index_t element_end )
+        [[nodiscard]] Iterator get_recursive_iterators( index_t node_index,
+            index_t element_begin,
+            index_t element_end ) const
         {
             Iterator it;
             it.element_middle =
                 element_begin + ( element_end - element_begin ) / 2;
-            it.child_left = 2 * node_index;
-            it.child_right = 2 * node_index + 1;
+            it.child_left = node_index + 1;
+            it.child_right = tree_[node_index].right_child;
             return it;
         }
 
@@ -119,68 +132,61 @@ namespace geode
         {
             OpenGeodeGeometryException::check_assertion(
                 index < tree_.size(), "query out of tree" );
-            return tree_[index];
+            return tree_[index].box;
         }
 
-        [[nodiscard]] index_t mapping_morton( index_t index ) const
+        [[nodiscard]] index_t element_order( index_t index ) const
         {
-            return mapping_morton_[index];
+            return element_order_[index];
         }
 
-        [[nodiscard]] static index_t max_node_index_recursive(
-            index_t node_index, index_t element_begin, index_t element_end )
-        {
-            OpenGeodeGeometryException::check_assertion(
-                element_end > element_begin,
-                "End box index should be after Begin box index" );
-            if( is_leaf( element_begin, element_end ) )
-            {
-                return node_index;
-            }
-            const auto it = get_recursive_iterators(
-                node_index, element_begin, element_end );
-            const auto node_left = max_node_index_recursive(
-                it.child_left, element_begin, it.element_middle );
-            const auto node_right = max_node_index_recursive(
-                it.child_right, it.element_middle, element_end );
-            return std::max( node_left, node_right );
-        }
-
-        void initialize_tree_recursive(
+        index_t initialize_tree_recursive(
             absl::Span< const BoundingBox< dimension > > bboxes,
-            index_t node_index,
+            index_t& next_free_index,
             index_t element_begin,
             index_t element_end )
         {
             OpenGeodeGeometryException::check_assertion(
-                node_index < tree_.size(), "Node index out of tree" );
-            OpenGeodeGeometryException::check_assertion(
                 element_begin != element_end,
                 "Begin and End indices should be different" );
+            const auto node_index = next_free_index++;
+            OpenGeodeGeometryException::check_assertion(
+                node_index < tree_.size(), "Node index out of tree" );
             if( is_leaf( element_begin, element_end ) )
             {
-                tree_[node_index] = bboxes[mapping_morton_[element_begin]];
-                return;
+                tree_[node_index].box = bboxes[element_order_[element_begin]];
+                return node_index;
             }
-            const auto it = get_recursive_iterators(
-                node_index, element_begin, element_end );
-            OpenGeodeGeometryException::check_assertion(
-                it.child_left < tree_.size(), "Left index out of tree" );
-            OpenGeodeGeometryException::check_assertion(
-                it.child_right < tree_.size(), "Right index out of tree" );
-            initialize_tree_recursive(
-                bboxes, it.child_left, element_begin, it.element_middle );
-            initialize_tree_recursive(
-                bboxes, it.child_right, it.element_middle, element_end );
+            BoundingBox< dimension > range_box;
+            for( const auto i : Range{ element_begin, element_end } )
+            {
+                range_box.add_box( bboxes[element_order_[i]] );
+            }
+            const auto axis = std::get< 0 >( range_box.largest_length() );
+            const auto element_middle =
+                element_begin + ( element_end - element_begin ) / 2;
+            std::nth_element( element_order_.begin() + element_begin,
+                element_order_.begin() + element_middle,
+                element_order_.begin() + element_end,
+                [&bboxes, axis]( index_t index1, index_t index2 ) {
+                    return bboxes[index1].center().value( axis )
+                           < bboxes[index2].center().value( axis );
+                } );
+            const auto left_index = initialize_tree_recursive(
+                bboxes, next_free_index, element_begin, element_middle );
+            const auto right_index = initialize_tree_recursive(
+                bboxes, next_free_index, element_middle, element_end );
+            tree_[node_index].right_child = right_index;
             // before box_union
-            tree_[node_index].add_box( node( it.child_left ) );
-            tree_[node_index].add_box( node( it.child_right ) );
+            tree_[node_index].box.add_box( node( left_index ) );
+            tree_[node_index].box.add_box( node( right_index ) );
+            return node_index;
         }
 
         template < typename ACTION >
         void closest_element_box_recursive( const Point< dimension >& query,
             index_t& nearest_box,
-            double& distance,
+            double& squared_distance,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -196,53 +202,53 @@ namespace geode
             // and replace current if nearer
             if( is_leaf( element_begin, element_end ) )
             {
-                const auto cur_box = mapping_morton( element_begin );
-                Point< dimension > cur_nearest_point;
+                const auto cur_box = element_order( element_begin );
                 const auto cur_distance = action( query, cur_box );
-                if( cur_distance < distance )
+                const auto cur_squared_distance = cur_distance * cur_distance;
+                if( cur_squared_distance < squared_distance )
                 {
                     nearest_box = cur_box;
-                    distance = cur_distance;
+                    squared_distance = cur_squared_distance;
                 }
                 return;
             }
             const auto it = get_recursive_iterators(
                 node_index, element_begin, element_end );
-            const auto distance_left =
-                node( it.child_left ).signed_distance( query );
-            const auto distance_right =
-                node( it.child_right ).signed_distance( query );
+            const auto squared_distance_left =
+                node( it.child_left ).squared_signed_distance( query );
+            const auto squared_distance_right =
+                node( it.child_right ).squared_signed_distance( query );
 
             // Traverse the "nearest" child first, so that it has more chances
             // to prune the traversal of the other child.
-            if( distance_left < distance_right )
+            if( squared_distance_left < squared_distance_right )
             {
-                if( distance_left < distance )
+                if( squared_distance_left < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_left, element_begin, it.element_middle,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_left, element_begin,
+                        it.element_middle, action );
                 }
-                if( distance_right < distance )
+                if( squared_distance_right < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_right, it.element_middle, element_end,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_right, it.element_middle,
+                        element_end, action );
                 }
             }
             else
             {
-                if( distance_right < distance )
+                if( squared_distance_right < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_right, it.element_middle, element_end,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_right, it.element_middle,
+                        element_end, action );
                 }
-                if( distance_left < distance )
+                if( squared_distance_left < squared_distance )
                 {
-                    closest_element_box_recursive( query, nearest_box, distance,
-                        it.child_left, element_begin, it.element_middle,
-                        action );
+                    closest_element_box_recursive( query, nearest_box,
+                        squared_distance, it.child_left, element_begin,
+                        it.element_middle, action );
                 }
             }
         }
@@ -286,8 +292,8 @@ namespace geode
                 {
                     return false;
                 }
-                return action( mapping_morton( element_begin1 ),
-                    mapping_morton( element_begin2 ) );
+                return action( element_order( element_begin1 ),
+                    element_order( element_begin2 ) );
             }
 
             // If node2 has more polygons than node1, then
@@ -350,8 +356,8 @@ namespace geode
             if( is_leaf( element_begin1, element_end1 )
                 && is_leaf( element_begin2, element_end2 ) )
             {
-                return action( mapping_morton( element_begin1 ),
-                    other_tree.impl_->mapping_morton( element_begin2 ) );
+                return action( element_order( element_begin1 ),
+                    other_tree.impl_->element_order( element_begin2 ) );
             }
 
             // If node2 has more polygons than node1, then
@@ -360,7 +366,7 @@ namespace geode
             //   intersect node1's two children with node2
             if( element_end2 - element_begin2 > element_end1 - element_begin1 )
             {
-                const auto it = get_recursive_iterators(
+                const auto it = other_tree.impl_->get_recursive_iterators(
                     node_index2, element_begin2, element_end2 );
                 if( other_intersect_recursive( node_index1, element_begin1,
                         element_end1, other_tree, it.child_left, element_begin2,
@@ -406,7 +412,7 @@ namespace geode
 
             if( is_leaf( element_begin, element_end ) )
             {
-                return action( mapping_morton( element_begin ) );
+                return action( element_order( element_begin ) );
             }
 
             const auto it = get_recursive_iterators(
@@ -430,8 +436,8 @@ namespace geode
             {
                 const auto it = get_recursive_iterators(
                     node_index, element_begin, element_end );
-                if( node( it.child_left ).signed_distance( query )
-                    < node( it.child_right ).signed_distance( query ) )
+                if( node( it.child_left ).squared_signed_distance( query )
+                    < node( it.child_right ).squared_signed_distance( query ) )
                 {
                     element_end = it.element_middle;
                     node_index = it.child_left;
@@ -443,7 +449,7 @@ namespace geode
                 }
             }
 
-            return mapping_morton( element_begin );
+            return element_order( element_begin );
         }
 
         void containing_boxes_recursive( index_t node_index,
@@ -463,7 +469,7 @@ namespace geode
             }
             if( is_leaf( element_begin, element_end ) )
             {
-                result.push_back( mapping_morton( element_begin ) );
+                result.push_back( element_order( element_begin ) );
                 return;
             }
             const auto it = get_recursive_iterators(
@@ -475,8 +481,8 @@ namespace geode
         }
 
     private:
-        std::vector< BoundingBox< dimension > > tree_;
-        std::vector< index_t > mapping_morton_;
+        std::vector< Node > tree_;
+        std::vector< index_t > element_order_;
     };
 
     template < index_t dimension >
@@ -490,11 +496,27 @@ namespace geode
         }
         auto nearest_box = impl_->closest_element_box_hint( query );
         auto distance = action( query, nearest_box );
+        distance *= distance;
         impl_->closest_element_box_recursive( query, nearest_box, distance,
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
         OpenGeodeGeometryException::check_assertion(
             nearest_box != NO_ID, "No box found" );
-        return { nearest_box, distance };
+        return { nearest_box, std::sqrt( distance ) };
+    }
+
+    template < index_t dimension >
+    template < typename EvalDistance >
+    void AABBTree< dimension >::compute_point_element_box_distances(
+        const Point< dimension >& query, const EvalDistance& action ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
+        auto nearest_box = NO_ID;
+        auto distance = std::numeric_limits< double >::max();
+        impl_->closest_element_box_recursive( query, nearest_box, distance,
+            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
     template < index_t dimension >

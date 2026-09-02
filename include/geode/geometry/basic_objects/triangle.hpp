@@ -25,6 +25,8 @@
 
 #include <optional>
 
+#include <geode/basic/cached_value.hpp>
+
 #include <geode/geometry/common.hpp>
 #include <geode/geometry/vector.hpp>
 
@@ -43,6 +45,16 @@ namespace geode
 
 namespace geode
 {
+    namespace internal
+    {
+        struct PivotNormalResult
+        {
+            geode::local_index_t pivot{ geode::NO_LID };
+            geode::Vector3D normal{ { 0, 0, 0 } };
+            std::array< double, 3 > lengths;
+        };
+    } // namespace internal
+
     template < typename PointType, index_t dimension >
     class GenericTriangle
     {
@@ -91,6 +103,8 @@ namespace geode
 
     private:
         std::array< PointType, 3 > vertices_;
+        CachedValue< std::optional< internal::PivotNormalResult > >
+            pivot_and_normal_;
     };
 
     template < index_t dimension >
