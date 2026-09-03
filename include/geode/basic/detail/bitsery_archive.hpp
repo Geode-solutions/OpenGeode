@@ -103,6 +103,8 @@ namespace geode
                 context, "double" );
             register_attribute_type_for_all_containers< Serializer, index_t >(
                 context, "index_t" );
+            register_attribute_type_for_all_containers< Serializer, uuid >(
+                context, "uuid" );
             register_inlinedvector< Serializer >( context );
         }
     } // namespace detail
