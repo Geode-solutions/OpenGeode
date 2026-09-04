@@ -27,7 +27,6 @@
 #include <geode/geometry/frame.hpp>
 #include <geode/geometry/intersection.hpp>
 
-#include <mutex>
 #include <numeric>
 
 #include <absl/algorithm/container.h>
@@ -133,29 +132,28 @@ namespace geode
         {
             typename NNSearch< dimension >::ColocatedInfo result;
             const auto nb_points = nn_search.nb_points();
-            std::vector< index_t > mapping( nb_points, NO_ID );
-            std::mutex mutex;
+            std::vector< std::vector< index_t > > neighbor_vertices(
+                nb_points );
             async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
-                [&epsilon, &mapping, &mutex, this]( index_t point_id ) {
-                    if( mapping[point_id] != NO_ID )
-                    {
-                        return;
-                    }
-                    const auto neighbor_vertices =
+                [&epsilon, &neighbor_vertices, this]( index_t point_id ) {
+                    neighbor_vertices[point_id] =
                         neighbors( point( point_id ), epsilon );
-                    std::lock_guard< std::mutex > lock( mutex );
-                    if( mapping[point_id] != NO_ID )
-                    {
-                        return;
-                    }
-                    for( const auto vertex_id : neighbor_vertices )
-                    {
-                        if( mapping[vertex_id] == NO_ID )
-                        {
-                            mapping[vertex_id] = point_id;
-                        }
-                    }
                 } );
+            std::vector< index_t > mapping( nb_points, NO_ID );
+            for( const auto point_id : Range{ nb_points } )
+            {
+                if( mapping[point_id] != NO_ID )
+                {
+                    continue;
+                }
+                for( const auto vertex_id : neighbor_vertices[point_id] )
+                {
+                    if( mapping[vertex_id] == NO_ID )
+                    {
+                        mapping[vertex_id] = point_id;
+                    }
+                }
+            }
             result.colocated_input_points = mapping;
             index_t nb_unique_points{ 0 };
             for( const auto point_id : Range{ nb_points } )
