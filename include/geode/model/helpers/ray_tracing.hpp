@@ -71,6 +71,8 @@ namespace geode
         SectionRayTracing( const Section& section );
         ~SectionRayTracing();
 
+        void prepare( const Surface2D& surface );
+
         [[nodiscard]] RayTracingResult is_point_inside_surface(
             const Point2D& point, const Surface2D& surface );
 
@@ -91,6 +93,8 @@ namespace geode
 
         BRepRayTracing( const BRep& brep );
         ~BRepRayTracing();
+
+        void prepare( const Block3D& block );
 
         [[nodiscard]] BoundarySurfaceIntersections
             find_intersections_with_boundaries(
