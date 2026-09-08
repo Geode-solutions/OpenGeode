@@ -313,16 +313,16 @@ namespace geode
             geode::uuid attribute_id,
             const AttributeBase::AttributeKey &key )
         {
-            auto it = attribute_manager.attributes_.find( attribute_id );
+            auto iter = attribute_manager.attributes_.find( attribute_id );
             OpenGeodeBasicException::check_exception(
-                it != attribute_manager.attributes_.end(), nullptr,
+                iter != attribute_manager.attributes_.end(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::import] Could not import attribute '",
                 attribute_id.string(),
                 "'. No attribute with this id exists in the source "
                 "AttributeManager." );
             OpenGeodeBasicException::check_exception(
-                it->second->properties().transferable, nullptr,
+                iter->second->properties().transferable, nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::import] Could not import attribute '",
                 attribute_id.string(),
@@ -330,7 +330,7 @@ namespace geode
             if( attribute_exists( attribute_id ) )
             {
                 OpenGeodeBasicException::check_exception(
-                    it->second->type()
+                    iter->second->type()
                         == this->attributes_.at( attribute_id )->type(),
                     nullptr, OpenGeodeException::TYPE::data,
                     "[AttributeManager::import] Could not import attribute '",
@@ -338,12 +338,13 @@ namespace geode
                     "'. An attribute with the same id but a different type "
                     "already exists in the destination AttributeManager." );
                 this->attributes_.at( attribute_id )
-                    ->import( old2new_mapping, it->second, key );
+                    ->import( old2new_mapping, iter->second, key );
             }
             else
             {
-                attributes_.emplace( attribute_id,
-                    it->second->extract( old2new_mapping, nb_elements_, key ) );
+                attributes_.emplace(
+                    attribute_id, iter->second->extract(
+                                      old2new_mapping, nb_elements_, key ) );
             }
         }
 
@@ -455,7 +456,7 @@ namespace geode
         std::shared_ptr< AttributeBase > attribute,
         const geode::uuid &attribute_id )
     {
-        return impl_->register_attribute(
+        impl_->register_attribute(
             attribute, attribute_id, AttributeBase::AttributeKey{} );
     }
 
