@@ -265,6 +265,8 @@ namespace geode
                 new SparseAttribute< T >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
@@ -292,6 +294,8 @@ namespace geode
                 new SparseAttribute< T >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
             {
                 if( value( in ) != default_values_.default_value )
