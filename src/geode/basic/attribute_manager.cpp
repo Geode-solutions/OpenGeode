@@ -278,9 +278,8 @@ namespace geode
             }
         }
 
-        template < typename T >
         void import( const AttributeManager::Impl &attribute_manager,
-            const T &old2new_mapping,
+            const GenericMapping< index_t > &old2new_mapping,
             const AttributeBase::AttributeKey &key )
         {
             for( const auto &[attribute_id, attribute_from] :
@@ -309,9 +308,8 @@ namespace geode
             }
         }
 
-        template < typename T >
         void import( const AttributeManager::Impl &attribute_manager,
-            const T &old2new_mapping,
+            const GenericMapping< index_t > &old2new_mapping,
             geode::uuid attribute_id,
             const AttributeBase::AttributeKey &key )
         {
