@@ -470,6 +470,8 @@ namespace geode
                 new VariableAttribute< bool >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_ = values_;
             return attribute;
         }

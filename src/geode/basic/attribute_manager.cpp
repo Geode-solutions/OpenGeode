@@ -53,6 +53,13 @@ namespace geode
             {
                 return nullptr;
             }
+            OpenGeodeBasicException::check_exception(
+                attribute_it->second->id() == attribute_id, nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[AttributeManager::find_attribute_base] Attribute id "
+                "mismatch, key is ",
+                attribute_id.string(), " but attribute id is ",
+                attribute_it->second->id().string() );
             return attribute_it->second;
         }
 
@@ -60,6 +67,13 @@ namespace geode
             const uuid &attribute_id,
             const AttributeBase::AttributeKey &key )
         {
+            OpenGeodeBasicException::check_exception(
+                attribute->id() == attribute_id, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::register_attribute] Attribute id "
+                "mismatch, key is ",
+                attribute_id.string(), " but given attribute id is ",
+                attribute->id().string() );
             attribute->resize( nb_elements_, key );
             attributes_.emplace( attribute_id, attribute );
         }
