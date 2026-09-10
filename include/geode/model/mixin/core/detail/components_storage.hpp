@@ -67,11 +67,13 @@ namespace geode::detail
         [[nodiscard]] const Component& component(
             const uuid& component_id ) const
         {
+            check_matching_component_id( component_id );
             return *components_.at( component_id );
         }
 
         [[nodiscard]] Component& component( const uuid& component_id )
         {
+            check_matching_component_id( component_id );
             return *components_.at( component_id );
         }
 
@@ -177,6 +179,17 @@ namespace geode::detail
                                     item, bitsery::ext::StdSmartPtr{} );
                             } );
                     } } } );
+        }
+
+        void check_matching_component_id( const uuid& component_id ) const
+        {
+            OpenGeodeModelException::check_exception(
+                components_.at( component_id )->id() == component_id, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[ComponentsStorage::check_matching_component_id] Component "
+                "with id ",
+                components_.at( component_id )->id().string(),
+                " does not match its stored id ", component_id.string() );
         }
 
     private:

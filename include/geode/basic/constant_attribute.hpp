@@ -188,6 +188,8 @@ namespace geode
                 new ConstantAttribute< T >{
                     value_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             return attribute;
         }
 
@@ -200,6 +202,8 @@ namespace geode
                 new ConstantAttribute< T >{
                     value_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             return attribute;
         }
 

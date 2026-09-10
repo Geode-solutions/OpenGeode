@@ -236,6 +236,8 @@ namespace geode
                 new VariableAttribute< T >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_.resize(
                 nb_elements, default_values_.default_value );
             for( const auto i : Indices{ old2new } )
@@ -267,6 +269,8 @@ namespace geode
                 new VariableAttribute< T >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_.resize(
                 nb_elements, default_values_.default_value );
             for( const auto& [input, outputs] : old2new_mapping.in2out_map() )
@@ -466,6 +470,8 @@ namespace geode
                 new VariableAttribute< bool >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_ = values_;
             return attribute;
         }
@@ -496,6 +502,8 @@ namespace geode
                 new VariableAttribute< bool >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_.resize( nb_elements,
                 static_cast< unsigned char >( default_values_.default_value ) );
             for( const auto i : Indices{ old2new } )
@@ -527,6 +535,8 @@ namespace geode
                 new VariableAttribute< bool >{
                     default_values_, this->name().value(), this->properties() }
             };
+            IdentifierBuilder builder{ *attribute };
+            builder.set_id( this->id() );
             attribute->values_.resize( nb_elements,
                 static_cast< unsigned char >( default_values_.default_value ) );
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
