@@ -60,6 +60,23 @@ void test()
     const auto pivot2 = triangle2.pivot();
     geode::OpenGeodeGeometryException::test(
         !pivot2, "Pivot of triangle2 should not be calculated" );
+
+    const geode::Point3D flat0{
+        { 33566.2651233045, 25138.4986462893, -2492.99708294131 }
+    };
+    const geode::Point3D flat1{
+        { 33984.3154256702, 25601.9798292691, -2496.22014502399 }
+    };
+    const geode::Point3D flat2{
+        { 33775.2894528137, 25370.2373676621, -2494.5090680561 }
+    };
+    const geode::Triangle3D flat_triangle{ flat0, flat1, flat2 };
+    const auto flat_normal = flat_triangle.normal();
+    geode::OpenGeodeGeometryException::test(
+        !flat_normal, "Normal of flat triangle should not be calculated" );
+    const auto flat_pivot = flat_triangle.pivot();
+    geode::OpenGeodeGeometryException::test(
+        !flat_pivot, "Pivot of flat triangle should not be calculated" );
 }
 
 OPENGEODE_TEST( "distance" )

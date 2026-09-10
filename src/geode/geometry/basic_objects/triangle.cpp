@@ -27,7 +27,7 @@
 
 #include <geode/basic/logger.hpp>
 
-#include <absl/algorithm/container.h>
+#include <absl/strings/str_cat.h>
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
@@ -48,12 +48,12 @@ namespace
         {
             const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
             const geode::Vector3D edge{ points[pivot], points[next] };
-            result->lengths[pivot] = edge.length();
-            if( result->lengths[pivot] < geode::GLOBAL_EPSILON )
+            const auto edge_length = edge.length();
+            if( edge_length < geode::GLOBAL_EPSILON )
             {
                 return std::nullopt;
             }
-            const auto edge0 = edge / result->lengths[pivot];
+            const auto edge0 = edge / edge_length;
             const auto prev = pivot == 0 ? 2 : pivot - 1;
             auto edge1 = geode::Vector3D{ points[pivot], points[prev] };
             const auto length1 = edge1.length();
@@ -179,31 +179,6 @@ namespace geode
         {
             return std::optional< std::pair< local_index_t, Vector3D > >{
                 std::in_place, result->pivot, result->normal
-            };
-        }
-        const auto max = absl::c_max_element( result->lengths );
-        const local_index_t longest_e =
-            std::distance( result->lengths.begin(), max );
-        const Point3D& point0 = vertices_[longest_e];
-        const auto e1 = longest_e == 2 ? 0 : longest_e + 1;
-        const Point3D& point1 = vertices_[e1];
-        const auto e2 = e1 == 2 ? 0 : e1 + 1;
-        const Point3D& point2 = vertices_[e2];
-        if( point_segment_distance( point2, { point0, point1 } )
-            > GLOBAL_EPSILON )
-        {
-            const auto ratio = result->lengths[e2]
-                               / ( result->lengths[e2] + result->lengths[e1] );
-            const auto new_point = point0 * ( 1. - ratio ) + point1 * ratio;
-            const auto result_left =
-                simple_pivot_and_normal( { point0, new_point, point2 } );
-            if( !result_left || result_left->pivot == NO_LID )
-            {
-                return std::nullopt;
-            }
-            return std::optional<
-                std::pair< local_index_t, Vector< dimension > > >{
-                std::in_place, e2, result_left->normal
             };
         }
         return std::nullopt;
