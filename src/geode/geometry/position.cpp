@@ -315,6 +315,11 @@ namespace geode
         const Point3D& point, const Triangle3D& triangle )
     {
         const auto& vertices = triangle.vertices();
+        if( point == vertices[0].get() || point == vertices[1].get()
+            || point == vertices[2].get() )
+        {
+            return SIDE::zero;
+        }
         return internal::side( GEO::PCK::orient_3d(
             vertices[0], vertices[1], vertices[2], point ) );
     }

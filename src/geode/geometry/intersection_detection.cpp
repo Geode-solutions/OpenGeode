@@ -228,6 +228,20 @@ namespace
         return segment_segment_intersection_detection2D(
             segment0_projection, segment1_projection );
     }
+
+    GEO::SIGN segment_triangle_edge_orient_3d( const geode::Point3D& segment_v0,
+        const geode::Point3D& triangle_vA,
+        const geode::Point3D& triangle_vB,
+        const geode::Point3D& segment_v1 )
+    {
+        if( segment_v0 == triangle_vA || segment_v0 == triangle_vB
+            || segment_v1 == triangle_vA || segment_v1 == triangle_vB )
+        {
+            return GEO::zero;
+        }
+        return GEO::PCK::orient_3d(
+            segment_v0, triangle_vA, triangle_vB, segment_v1 );
+    }
 } // namespace
 
 namespace geode
@@ -388,17 +402,17 @@ namespace geode
             return { POSITION::outside, POSITION::outside };
         }
 
-        const auto sign01 =
-            GEO::PCK::orient_3d( segment.vertices()[0], triangle.vertices()[0],
-                triangle.vertices()[1], segment.vertices()[1] );
+        const auto sign01 = ::segment_triangle_edge_orient_3d(
+            segment.vertices()[0], triangle.vertices()[0],
+            triangle.vertices()[1], segment.vertices()[1] );
 
-        const auto sign12 =
-            GEO::PCK::orient_3d( segment.vertices()[0], triangle.vertices()[1],
-                triangle.vertices()[2], segment.vertices()[1] );
+        const auto sign12 = ::segment_triangle_edge_orient_3d(
+            segment.vertices()[0], triangle.vertices()[1],
+            triangle.vertices()[2], segment.vertices()[1] );
 
-        const auto sign20 =
-            GEO::PCK::orient_3d( segment.vertices()[0], triangle.vertices()[2],
-                triangle.vertices()[0], segment.vertices()[1] );
+        const auto sign20 = ::segment_triangle_edge_orient_3d(
+            segment.vertices()[0], triangle.vertices()[2],
+            triangle.vertices()[0], segment.vertices()[1] );
 
         const auto triangle_position =
             internal::triangle_intersection_detection( internal::side( sign01 ),
