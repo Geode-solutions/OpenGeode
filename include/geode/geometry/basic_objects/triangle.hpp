@@ -51,7 +51,6 @@ namespace geode
         {
             geode::local_index_t pivot{ geode::NO_LID };
             geode::Vector3D normal{ { 0, 0, 0 } };
-            std::array< double, 3 > lengths;
         };
     } // namespace internal
 
