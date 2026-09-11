@@ -188,6 +188,14 @@ namespace geode
             return std::nullopt;
         }
 
+        void prepare( const Surface2D& surface )
+        {
+            for( const auto& line : section_.boundaries( surface ) )
+            {
+                line_aabb( line );
+            }
+        }
+
     private:
         const AABBTree2D& line_aabb( const Line2D& line )
         {
@@ -211,6 +219,11 @@ namespace geode
     }
 
     SectionRayTracing::~SectionRayTracing() = default;
+
+    void SectionRayTracing::prepare( const Surface2D& surface )
+    {
+        impl_->prepare( surface );
+    }
 
     RayTracingResult SectionRayTracing::is_point_inside_surface(
         const Point2D& point, const Surface2D& surface )
@@ -296,6 +309,14 @@ namespace geode
             return std::nullopt;
         }
 
+        void prepare( const Block3D& block )
+        {
+            for( const auto& surface : brep_.boundaries( block ) )
+            {
+                surface_aabb( surface );
+            }
+        }
+
     private:
         const AABBTree3D& surface_aabb( const Surface3D& surface )
         {
@@ -316,6 +337,11 @@ namespace geode
     BRepRayTracing::BRepRayTracing( const BRep& brep ) : impl_{ brep } {}
 
     BRepRayTracing::~BRepRayTracing() = default;
+
+    void BRepRayTracing::prepare( const Block3D& block )
+    {
+        impl_->prepare( block );
+    }
 
     auto BRepRayTracing::find_intersections_with_boundaries(
         const InfiniteLine3D& infinite_line, const Block3D& block )

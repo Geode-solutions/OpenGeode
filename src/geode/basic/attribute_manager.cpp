@@ -59,7 +59,9 @@ namespace geode
                 "[AttributeManager::find_attribute_base] Attribute id "
                 "mismatch, key is ",
                 attribute_id.string(), " but attribute id is ",
-                attribute_it->second->id().string() );
+                attribute_it->second->id().string(), " (name: ",
+                attribute_it->second->name().value_or( "undefined" ),
+                ", type: ", attribute_it->second->type(), ")" );
             return attribute_it->second;
         }
 
@@ -73,7 +75,9 @@ namespace geode
                 "[AttributeManager::register_attribute] Attribute id "
                 "mismatch, key is ",
                 attribute_id.string(), " but given attribute id is ",
-                attribute->id().string() );
+                attribute->id().string(),
+                " (name: ", attribute->name().value_or( "undefined" ),
+                ", type: ", attribute->type(), ")" );
             attribute->resize( nb_elements_, key );
             attributes_.emplace( attribute_id, attribute );
         }
