@@ -77,7 +77,7 @@ namespace geode
             {
                 if( std::isnan( default_values_.no_value ) )
                 {
-                    return std::isnan( value( element ) );
+                    return !std::isnan( value( element ) );
                 }
             }
             return values_[element] != default_values_.no_value;
