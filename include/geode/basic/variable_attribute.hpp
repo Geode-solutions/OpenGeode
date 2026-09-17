@@ -73,11 +73,14 @@ namespace geode
 
         [[nodiscard]] bool has_value( index_t element ) const override
         {
-            if( values_[element] == default_values_.no_value )
+            if constexpr( std::is_floating_point_v< T > )
             {
-                return false;
+                if( std::isnan( default_values_.no_value ) )
+                {
+                    return !std::isnan( value( element ) );
+                }
             }
-            return true;
+            return values_[element] != default_values_.no_value;
         }
 
         void set_value( index_t element, T value )
@@ -342,11 +345,7 @@ namespace geode
 
         [[nodiscard]] bool has_value( index_t element ) const override
         {
-            if( value( element ) == default_values_.no_value )
-            {
-                return false;
-            }
-            return true;
+            return value( element ) != default_values_.no_value;
         }
 
         void set_value( index_t element, bool value )
