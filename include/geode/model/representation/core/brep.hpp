@@ -34,6 +34,7 @@
 #include <geode/model/mixin/core/line_collections.hpp>
 #include <geode/model/mixin/core/lines.hpp>
 #include <geode/model/mixin/core/model_boundaries.hpp>
+#include <geode/model/mixin/core/physical_properties.hpp>
 #include <geode/model/mixin/core/surface_collections.hpp>
 #include <geode/model/mixin/core/surfaces.hpp>
 #include <geode/model/mixin/core/topology.hpp>
@@ -72,6 +73,7 @@ namespace geode
      * @extends LineCollections
      * @extends SurfaceCollections
      * @extends BlockCollections
+     * @extends PhysicalProperties
      */
     class opengeode_model_api BRep : public Topology,
                                      public Corners3D,
@@ -83,6 +85,7 @@ namespace geode
                                      public LineCollections3D,
                                      public SurfaceCollections3D,
                                      public BlockCollections3D,
+                                     public PhysicalProperties,
                                      public Identifier
     {
     public:

@@ -748,6 +748,7 @@ namespace geode
           LineCollections3D{ std::move( brep ) },
           SurfaceCollections3D{ std::move( brep ) },
           BlockCollections3D{ std::move( brep ) },
+          PhysicalProperties{ std::move( brep ) },
           Identifier{ std::move( brep ) }
     {
     }
@@ -764,6 +765,7 @@ namespace geode
         LineCollections3D::operator=( std::move( brep ) );
         SurfaceCollections3D::operator=( std::move( brep ) );
         BlockCollections3D::operator=( std::move( brep ) );
+        PhysicalProperties::operator=( std::move( brep ) );
         Identifier::operator=( std::move( brep ) );
         return *this;
     }

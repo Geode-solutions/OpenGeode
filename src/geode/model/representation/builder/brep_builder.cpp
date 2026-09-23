@@ -62,6 +62,7 @@ namespace geode
           LineCollectionsBuilder3D( brep ),
           SurfaceCollectionsBuilder3D( brep ),
           BlockCollectionsBuilder3D( brep ),
+          PhysicalPropertiesBuilder( brep ),
           IdentifierBuilder( brep ),
           brep_( brep )
     {
