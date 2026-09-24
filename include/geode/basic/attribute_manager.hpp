@@ -208,6 +208,15 @@ namespace geode
         void delete_attribute( const geode::uuid& );
 
         /*!
+         * Create a new attribute with the given id by copying the values
+         * of an existing attribute of this manager.
+         * @param[in] attribute_id The id of the attribute to copy.
+         * @param[in] new_attribute_id The id to give to the new attribute.
+         */
+        void copy_attribute( const geode::uuid& attribute_id,
+            const geode::uuid& new_attribute_id );
+
+        /*!
          * Get the typeid id of the attribute type
          * @param[in] id The attribute id to use
          */

@@ -189,6 +189,29 @@ namespace geode
             }
         }
 
+        void copy_attribute( const uuid &attribute_id,
+            const uuid &new_attribute_id,
+            const AttributeBase::AttributeKey &key )
+        {
+            absl::MutexLock lock{ mutex_ };
+            const auto attribute_it = attributes_.find( attribute_id );
+            OpenGeodeBasicException::check_exception(
+                attribute_it != attributes_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::copy_attribute] Could not find "
+                "attribute with id: '",
+                attribute_id.string(), "'." );
+            OpenGeodeBasicException::check_exception(
+                attributes_.find( new_attribute_id ) == attributes_.end(),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[AttributeManager::copy_attribute] Attribute with id '",
+                new_attribute_id.string(), "' already exists." );
+            auto new_attribute = attribute_it->second->clone( key );
+            IdentifierBuilder builder{ *new_attribute };
+            builder.set_id( new_attribute_id );
+            attributes_.emplace( new_attribute_id, std::move( new_attribute ) );
+        }
+
         std::string_view attribute_type( const uuid &attribute_id ) const
         {
             const auto attribute_it = attributes_.find( attribute_id );
@@ -533,6 +556,13 @@ namespace geode
     void AttributeManager::delete_attribute( const geode::uuid &attribute_id )
     {
         impl_->delete_attribute( attribute_id );
+    }
+
+    void AttributeManager::copy_attribute(
+        const geode::uuid &attribute_id, const geode::uuid &new_attribute_id )
+    {
+        impl_->copy_attribute(
+            attribute_id, new_attribute_id, AttributeBase::AttributeKey{} );
     }
 
     std::string_view AttributeManager::attribute_type(

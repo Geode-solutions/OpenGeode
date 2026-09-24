@@ -42,6 +42,8 @@ namespace geode
 
     enum struct PHYSICAL_PROPERTY_NAME
     {
+        porosity,
+        permeability
     };
 
     class opengeode_model_api PhysicalProperties
