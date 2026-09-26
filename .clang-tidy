@@ -14,6 +14,7 @@ Checks: >
   -misc-no-recursion,
   -misc-include-cleaner,
   -misc-const-correctness,
+  -modernize-use-scoped-lock,
   -modernize-use-trailing-return-type,
   -portability-avoid-pragma-once,
   -readability-use-anyofallof,
