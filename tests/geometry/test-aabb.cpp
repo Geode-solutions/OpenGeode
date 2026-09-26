@@ -181,31 +181,36 @@ public:
         return false;
     }
 
-    // test box strict inclusion
-    bool box_contains_box( geode::index_t box1, geode::index_t box2 )
+public:
+    std::mutex mutex_;
+    absl::flat_hash_set< geode::index_t > box_intersections_;
+
+private:
+    absl::Span< const geode::BoundingBox< dimension > > bounding_boxes_;
+};
+
+template < geode::index_t dimension >
+class BoxAABBInclusion
+{
+public:
+    explicit BoxAABBInclusion(
+        absl::Span< const geode::BoundingBox< dimension > > bounding_boxes )
+        : bounding_boxes_( bounding_boxes )
+    {
+    }
+
+    [[nodiscard]] bool box_contains_box(
+        geode::index_t box1, geode::index_t box2 ) const
     {
         return bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
                && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() );
     }
-    bool operator()( geode::index_t box1, geode::index_t box2 )
-    {
-        if( box_contains_box( box1, box2 ) )
-        {
-            std::lock_guard< std::mutex > lock( mutex_ );
-            included_box_.emplace_back( box1, box2 );
-        }
-        else if( box_contains_box( box2, box1 ) )
-        {
-            std::lock_guard< std::mutex > lock( mutex_ );
-            included_box_.emplace_back( box2, box1 );
-        }
-        return false;
-    }
 
-public:
-    std::mutex mutex_;
-    absl::flat_hash_set< geode::index_t > box_intersections_;
-    std::vector< std::pair< geode::index_t, geode::index_t > > included_box_;
+    [[nodiscard]] bool operator()(
+        geode::index_t box1, geode::index_t box2 ) const
+    {
+        return box_contains_box( box1, box2 ) || box_contains_box( box2, box1 );
+    }
 
 private:
     absl::Span< const geode::BoundingBox< dimension > > bounding_boxes_;
@@ -414,22 +419,28 @@ void test_self_intersections()
 
     geode::AABBTree< dimension > aabb{ box_vector };
 
-    BoxAABBIntersection< dimension > eval_intersection{ box_vector };
-    // investigate box inclusions
-    eval_intersection.included_box_.clear();
-    aabb.compute_self_element_bbox_intersections( eval_intersection );
+    const BoxAABBInclusion< dimension > box_inclusion{ box_vector };
+    const auto included_boxes =
+        aabb.compute_self_element_bbox_intersections( box_inclusion );
 
     geode::OpenGeodeGeometryException::test(
-        eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
+        included_boxes.size() == nb_boxes * nb_boxes,
         "Box self intersection - Every box should have one box "
         "inside" );
 
-    for( const auto& result : eval_intersection.included_box_ )
+    for( const auto& [box1, box2] : included_boxes )
     {
+        const auto container =
+            box_inclusion.box_contains_box( box1, box2 ) ? box1 : box2;
+        const auto contained = container == box1 ? box2 : box1;
         geode::OpenGeodeGeometryException::test(
-            result.first == result.second - ( nb_boxes * nb_boxes ),
+            container == contained - ( nb_boxes * nb_boxes ),
             "Box self intersection - Wrong box inclusion result" );
     }
+    geode::OpenGeodeGeometryException::test(
+        aabb.compute_self_element_bbox_intersections( box_inclusion )
+            == included_boxes,
+        "Box self intersection - Result order should be deterministic" );
 }
 
 template < geode::index_t dimension >
