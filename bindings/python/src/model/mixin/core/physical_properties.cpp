@@ -44,11 +44,10 @@ namespace geode
 
         pybind11::class_< PhysicalProperties, pybind11::smart_holder >(
             module, "PhysicalProperties" )
-            .def( pybind11::init<>() )
             .def( "has_physical_property",
                 &PhysicalProperties::has_physical_property )
-            .def( "physical_property_attribute",
-                &PhysicalProperties::physical_property_attribute,
+            .def( "physical_property_info",
+                &PhysicalProperties::physical_property_info,
                 pybind11::return_value_policy::reference_internal );
     }
 } // namespace geode

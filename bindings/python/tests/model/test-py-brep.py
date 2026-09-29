@@ -795,7 +795,7 @@ def test_physical_properties(brep, attribute_id):
         raise ValueError("[Test] BRep should have porosity physical property")
     if brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.permeability):
         raise ValueError("[Test] BRep should not have permeability physical property")
-    info = brep.physical_property_attribute(model.PHYSICAL_PROPERTY_NAME.porosity)
+    info = brep.physical_property_info(model.PHYSICAL_PROPERTY_NAME.porosity)
     if info.component_type.get() != model.Block3D.component_type_static().get():
         raise ValueError("[Test] Wrong porosity physical property component type")
     if info.attribute_id.string() != attribute_id.string():
@@ -881,6 +881,13 @@ if __name__ == "__main__":
     test_surface_item_ranges(brep, surface_uuids, surface_collection_uuids)
     test_block_item_ranges(brep, block_uuid, block_collection_uuid)
     physical_attribute_id = basic.uuid()
+    porosity_values = basic.AttributeValuesDouble()
+    porosity_values.default_value = 0.2
+    porosity_values.no_value = -1.0
+    for block in brep.blocks():
+        block.mesh().polyhedron_attribute_manager().create_attribute_variable_double(
+            "porosity", physical_attribute_id, porosity_values, basic.AttributeProperties()
+        )
     builder.set_physical_property(
         model.PHYSICAL_PROPERTY_NAME.porosity,
         model.Block3D.component_type_static(),

@@ -21,6 +21,8 @@
  *
  */
 
+#include <tuple>
+
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/assert.hpp>
@@ -1350,8 +1352,8 @@ void test_physical_properties( const geode::BRep& model,
             && !model.has_physical_property(
                 geode::PHYSICAL_PROPERTY_NAME::permeability ),
         context, " Wrong physical properties." );
-    const auto& info = model.physical_property_attribute(
-        geode::PHYSICAL_PROPERTY_NAME::porosity );
+    const auto& info =
+        model.physical_property_info( geode::PHYSICAL_PROPERTY_NAME::porosity );
     geode::OpenGeodeModelException::test(
         info.component_type == geode::Block3D::component_type_static()
             && info.attribute_id == attribute_id,

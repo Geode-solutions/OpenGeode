@@ -67,10 +67,17 @@ namespace geode
             return properties_.contains( name );
         }
 
-        [[nodiscard]] const PhysicalProperties::Info& property_attribute(
+        [[nodiscard]] const PhysicalProperties::Info& property_info(
             PHYSICAL_PROPERTY_NAME name ) const
         {
-            return properties_.at( name );
+            const auto property_it = properties_.find( name );
+            OpenGeodeModelException::check_exception(
+                property_it != properties_.end(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[PhysicalProperties::physical_property_info] Physical "
+                "property not found. Use has_physical_property before "
+                "calling this method." );
+            return property_it->second;
         }
 
         void set_property( PHYSICAL_PROPERTY_NAME name,
@@ -153,8 +160,6 @@ namespace geode
 
     PhysicalProperties::PhysicalProperties() = default;
 
-    PhysicalProperties::PhysicalProperties( BITSERY ) {}
-
     PhysicalProperties::~PhysicalProperties() = default;
 
     PhysicalProperties::PhysicalProperties(
@@ -169,11 +174,10 @@ namespace geode
         return impl_->has_property( name );
     }
 
-    const PhysicalProperties::Info&
-        PhysicalProperties::physical_property_attribute(
-            PHYSICAL_PROPERTY_NAME name ) const
+    const PhysicalProperties::Info& PhysicalProperties::physical_property_info(
+        PHYSICAL_PROPERTY_NAME name ) const
     {
-        return impl_->property_attribute( name );
+        return impl_->property_info( name );
     }
 
     void PhysicalProperties::save_physical_properties(

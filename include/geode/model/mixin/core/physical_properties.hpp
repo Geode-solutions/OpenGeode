@@ -72,13 +72,12 @@ namespace geode
         };
 
         PhysicalProperties();
-        PhysicalProperties( BITSERY );
         ~PhysicalProperties();
 
         [[nodiscard]] bool has_physical_property(
             PHYSICAL_PROPERTY_NAME name ) const;
 
-        [[nodiscard]] const Info& physical_property_attribute(
+        [[nodiscard]] const Info& physical_property_info(
             PHYSICAL_PROPERTY_NAME name ) const;
 
         void save_physical_properties( std::string_view directory ) const;
