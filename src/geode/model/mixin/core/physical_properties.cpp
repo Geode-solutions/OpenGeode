@@ -48,12 +48,11 @@ namespace geode
     template < typename Archive >
     void PhysicalProperties::PhysicalPropertyInfo::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, PhysicalPropertyInfo >{
-                       { []( Archive& a, PhysicalPropertyInfo& info ) {
-                           a.object( info.component_type );
-                           a.object( info.attribute_id );
-                       } } } );
+        archive.ext( *this, Growable< Archive, PhysicalPropertyInfo >{
+                                { []( Archive& a, PhysicalPropertyInfo& info ) {
+                                    a.object( info.component_type );
+                                    a.object( info.attribute_id );
+                                } } } );
     }
 
     class PhysicalProperties::Impl
@@ -90,7 +89,8 @@ namespace geode
 
         void save( std::string_view directory ) const
         {
-            const auto filename = absl::StrCat( directory, "/physical_properties" );
+            const auto filename =
+                absl::StrCat( directory, "/physical_properties" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
@@ -107,7 +107,8 @@ namespace geode
 
         void load( std::string_view directory )
         {
-            const auto filename = absl::StrCat( directory, "/physical_properties" );
+            const auto filename =
+                absl::StrCat( directory, "/physical_properties" );
             if( !std::filesystem::exists( filename ) )
             {
                 return;
