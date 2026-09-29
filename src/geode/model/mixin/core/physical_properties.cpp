@@ -40,19 +40,19 @@
 
 namespace geode
 {
-    PhysicalProperties::PhysicalPropertyInfo::PhysicalPropertyInfo()
+    PhysicalProperties::Info::Info()
         : component_type( bitsery::Access::create< ComponentType >() )
     {
     }
 
     template < typename Archive >
-    void PhysicalProperties::PhysicalPropertyInfo::serialize( Archive& archive )
+    void PhysicalProperties::Info::serialize( Archive& archive )
     {
-        archive.ext( *this, Growable< Archive, PhysicalPropertyInfo >{
-                                { []( Archive& a, PhysicalPropertyInfo& info ) {
-                                    a.object( info.component_type );
-                                    a.object( info.attribute_id );
-                                } } } );
+        archive.ext(
+            *this, Growable< Archive, Info >{ { []( Archive& a, Info& info ) {
+                a.object( info.component_type );
+                a.object( info.attribute_id );
+            } } } );
     }
 
     class PhysicalProperties::Impl
@@ -67,8 +67,8 @@ namespace geode
             return properties_.contains( name );
         }
 
-        [[nodiscard]] const PhysicalProperties::PhysicalPropertyInfo&
-            property_attribute( PHYSICAL_PROPERTY_NAME name ) const
+        [[nodiscard]] const PhysicalProperties::Info& property_attribute(
+            PHYSICAL_PROPERTY_NAME name ) const
         {
             return properties_.at( name );
         }
@@ -77,9 +77,9 @@ namespace geode
             ComponentType component_type,
             uuid attribute_id )
         {
-            properties_.insert_or_assign( name,
-                PhysicalProperties::PhysicalPropertyInfo{
-                    std::move( component_type ), std::move( attribute_id ) } );
+            properties_.insert_or_assign(
+                name, PhysicalProperties::Info{ std::move( component_type ),
+                          std::move( attribute_id ) } );
         }
 
         void copy( const Impl& other )
@@ -139,7 +139,7 @@ namespace geode
                     a.ext( impl.properties_,
                         bitsery::ext::StdMap{ impl.properties_.max_size() },
                         []( Archive& a2, PHYSICAL_PROPERTY_NAME& name,
-                            PhysicalPropertyInfo& info ) {
+                            Info& info ) {
                             a2.value4b( name );
                             a2.object( info );
                         } );
@@ -147,8 +147,7 @@ namespace geode
         }
 
     private:
-        absl::flat_hash_map< PHYSICAL_PROPERTY_NAME,
-            PhysicalProperties::PhysicalPropertyInfo >
+        absl::flat_hash_map< PHYSICAL_PROPERTY_NAME, PhysicalProperties::Info >
             properties_;
     };
 
@@ -170,7 +169,7 @@ namespace geode
         return impl_->has_property( name );
     }
 
-    const PhysicalProperties::PhysicalPropertyInfo&
+    const PhysicalProperties::Info&
         PhysicalProperties::physical_property_attribute(
             PHYSICAL_PROPERTY_NAME name ) const
     {

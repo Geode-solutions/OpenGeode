@@ -53,10 +53,9 @@ namespace geode
     public:
         PASSKEY( PhysicalPropertiesBuilder, BuilderKey );
 
-        struct PhysicalPropertyInfo
+        struct Info
         {
-            PhysicalPropertyInfo(
-                ComponentType component_type_in, uuid attribute_id_in )
+            Info( ComponentType component_type_in, uuid attribute_id_in )
                 : component_type( std::move( component_type_in ) ),
                   attribute_id( std::move( attribute_id_in ) )
             {
@@ -67,7 +66,7 @@ namespace geode
 
         private:
             friend class bitsery::Access;
-            PhysicalPropertyInfo();
+            Info();
             template < typename Archive >
             void serialize( Archive& archive );
         };
@@ -79,7 +78,7 @@ namespace geode
         [[nodiscard]] bool has_physical_property(
             PHYSICAL_PROPERTY_NAME name ) const;
 
-        [[nodiscard]] const PhysicalPropertyInfo& physical_property_attribute(
+        [[nodiscard]] const Info& physical_property_attribute(
             PHYSICAL_PROPERTY_NAME name ) const;
 
         void save_physical_properties( std::string_view directory ) const;

@@ -790,6 +790,18 @@ def test_clone(brep):
         raise ValueError("[Test] BRep should have 1 block collections")
 
 
+def test_physical_properties(brep, attribute_id):
+    if not brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.porosity):
+        raise ValueError("[Test] BRep should have porosity physical property")
+    if brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.permeability):
+        raise ValueError("[Test] BRep should not have permeability physical property")
+    info = brep.physical_property_attribute(model.PHYSICAL_PROPERTY_NAME.porosity)
+    if info.component_type.get() != model.Block3D.component_type_static().get():
+        raise ValueError("[Test] Wrong porosity physical property component type")
+    if info.attribute_id.string() != attribute_id.string():
+        raise ValueError("[Test] Wrong porosity physical property attribute id")
+
+
 def test_registry(brep):
 
     mesh_registry = brep.mesh_components()
@@ -868,10 +880,21 @@ if __name__ == "__main__":
     test_line_item_ranges(brep, line_uuids, line_collection_uuids)
     test_surface_item_ranges(brep, surface_uuids, surface_collection_uuids)
     test_block_item_ranges(brep, block_uuid, block_collection_uuid)
+    physical_attribute_id = basic.uuid()
+    builder.set_physical_property(
+        model.PHYSICAL_PROPERTY_NAME.porosity,
+        model.Block3D.component_type_static(),
+        physical_attribute_id,
+    )
+    test_physical_properties(brep, physical_attribute_id)
     test_clone(brep)
+    brep_copy = model.BRep()
+    model.BRepBuilder(brep_copy).copy(brep)
+    test_physical_properties(brep_copy, physical_attribute_id)
 
     file_io = "test." + brep.native_extension()
     model.save_brep(brep, file_io)
 
     brep2 = model.load_brep(file_io)
     test_reloaded_brep(brep2)
+    test_physical_properties(brep2, physical_attribute_id)
