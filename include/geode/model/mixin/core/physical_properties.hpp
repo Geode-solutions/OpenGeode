@@ -42,7 +42,7 @@ namespace geode
 namespace geode
 {
 
-    enum struct PHYSICAL_PROPERTY_NAME : std::uint32_t
+    enum struct PHYSICAL_PROPERTY_NAME
     {
         porosity,
         permeability
