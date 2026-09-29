@@ -24,6 +24,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
+
+#include <geode/basic/attribute_manager.hpp>
 
 #include <geode/mesh/core/mesh_id.hpp>
 
@@ -61,6 +64,21 @@ namespace geode
 
         [[nodiscard]] std::unique_ptr< EdgedCurve< dimension > >
             steal_line_mesh( const Line< dimension >& line );
+
+        template < template < typename > class Attribute, typename T >
+        void create_lines_attribute( std::string_view attribute_name,
+            const uuid& attribute_id,
+            AttributeValues< T > default_values,
+            AttributeProperties properties )
+        {
+            for( const auto& line : lines_.lines() )
+            {
+                line.mesh()
+                    .edge_attribute_manager()
+                    .template create_attribute< Attribute, T >( attribute_name,
+                        attribute_id, default_values, properties );
+            }
+        }
 
     protected:
         explicit LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
