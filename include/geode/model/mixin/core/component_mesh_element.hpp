@@ -55,6 +55,12 @@ namespace geode
                    && element_id == other.element_id;
         }
 
+        [[nodiscard]] bool operator!=( const ComponentMeshElement& other ) const
+        {
+            return component_id != other.component_id
+                   || element_id != other.element_id;
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
