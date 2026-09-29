@@ -24,7 +24,9 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 #include <geode/basic/uuid.hpp>
@@ -40,7 +42,7 @@ namespace geode
 namespace geode
 {
 
-    enum struct PHYSICAL_PROPERTY_NAME
+    enum struct PHYSICAL_PROPERTY_NAME : std::uint32_t
     {
         porosity,
         permeability
@@ -53,11 +55,25 @@ namespace geode
 
         struct PhysicalPropertyInfo
         {
+            PhysicalPropertyInfo(
+                ComponentType component_type_in, uuid attribute_id_in )
+                : component_type( std::move( component_type_in ) ),
+                  attribute_id( std::move( attribute_id_in ) )
+            {
+            }
+
             ComponentType component_type;
             uuid attribute_id;
+
+        private:
+            friend class bitsery::Access;
+            PhysicalPropertyInfo();
+            template < typename Archive >
+            void serialize( Archive& archive );
         };
 
         PhysicalProperties();
+        PhysicalProperties( BITSERY );
         ~PhysicalProperties();
 
         [[nodiscard]] bool has_physical_property(
@@ -66,11 +82,19 @@ namespace geode
         [[nodiscard]] const PhysicalPropertyInfo& physical_property_attribute(
             PHYSICAL_PROPERTY_NAME name ) const;
 
+        void save_physical_properties( std::string_view directory ) const;
+
     public:
         void set_physical_property( PHYSICAL_PROPERTY_NAME name,
             ComponentType component_type,
             uuid attribute_id,
             BuilderKey /*key*/ );
+
+        void copy_physical_properties(
+            const PhysicalProperties& other, BuilderKey /*key*/ );
+
+        void load_physical_properties(
+            std::string_view directory, BuilderKey /*key*/ );
 
     protected:
         PhysicalProperties( PhysicalProperties&& other ) noexcept;

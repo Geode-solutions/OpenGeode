@@ -27,6 +27,8 @@
 
 #include <async++.h>
 
+#include <bitsery/ext/std_map.h>
+
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute_manager.hpp>

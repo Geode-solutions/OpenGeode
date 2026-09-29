@@ -85,6 +85,7 @@ namespace geode
         auto mapping = copy_components( brep );
         copy_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );
+        copy_physical_properties( brep );
         return mapping;
     }
 

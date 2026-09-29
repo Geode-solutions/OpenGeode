@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/physical_properties.hpp>
 
@@ -53,6 +55,10 @@ namespace geode
         void set_physical_property( PHYSICAL_PROPERTY_NAME name,
             ComponentType component_type,
             uuid attribute_id );
+
+        void copy_physical_properties( const PhysicalProperties& other );
+
+        void load_physical_properties( std::string_view directory );
 
     private:
         PhysicalProperties& physical_properties_;

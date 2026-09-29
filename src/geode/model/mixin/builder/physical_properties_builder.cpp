@@ -42,4 +42,18 @@ namespace geode
             std::move( component_type ), std::move( attribute_id ),
             PhysicalProperties::BuilderKey{} );
     }
+
+    void PhysicalPropertiesBuilder::copy_physical_properties(
+        const PhysicalProperties& other )
+    {
+        physical_properties_.copy_physical_properties(
+            other, PhysicalProperties::BuilderKey{} );
+    }
+
+    void PhysicalPropertiesBuilder::load_physical_properties(
+        std::string_view directory )
+    {
+        physical_properties_.load_physical_properties(
+            directory, PhysicalProperties::BuilderKey{} );
+    }
 } // namespace geode

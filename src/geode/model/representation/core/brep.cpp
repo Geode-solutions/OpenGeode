@@ -781,6 +781,7 @@ namespace geode
         clone_builder.copy_components( mappings, *this );
         clone_builder.copy_relationships( mappings, *this );
         clone_builder.copy_component_geometry( mappings, *this );
+        clone_builder.copy_physical_properties( *this );
         return model_clone;
     }
 

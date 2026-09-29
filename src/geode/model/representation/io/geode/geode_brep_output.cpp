@@ -62,6 +62,9 @@ namespace geode
                 brep.save_unique_vertices( directory );
             },
             [&directory, &brep] {
+                brep.save_physical_properties( directory );
+            },
+            [&directory, &brep] {
                 brep.save_corners( directory );
             },
             [&directory, &brep] {

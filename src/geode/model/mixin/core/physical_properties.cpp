@@ -23,16 +23,46 @@
 
 #include <geode/model/mixin/core/physical_properties.hpp>
 
-#include <absl/container/flat_hash_map.h>
+#include <filesystem>
+#include <fstream>
 
+#include <bitsery/ext/std_map.h>
+
+#include <absl/container/flat_hash_map.h>
+#include <absl/strings/str_cat.h>
+
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/model/mixin/core/bitsery_archive.hpp>
+#include <geode/model/mixin/core/component_type.hpp>
+
 namespace geode
 {
+    PhysicalProperties::PhysicalPropertyInfo::PhysicalPropertyInfo()
+        : component_type( bitsery::Access::create< ComponentType >() )
+    {
+    }
+
+    template < typename Archive >
+    void PhysicalProperties::PhysicalPropertyInfo::serialize( Archive& archive )
+    {
+        archive.ext(
+            *this, Growable< Archive, PhysicalPropertyInfo >{
+                       { []( Archive& a, PhysicalPropertyInfo& info ) {
+                           a.object( info.component_type );
+                           a.object( info.attribute_id );
+                       } } } );
+    }
+
     class PhysicalProperties::Impl
     {
     public:
+        Impl() = default;
+
+        Impl( BITSERY ) {}
+
         [[nodiscard]] bool has_property( PHYSICAL_PROPERTY_NAME name ) const
         {
             return properties_.contains( name );
@@ -53,6 +83,68 @@ namespace geode
                     std::move( component_type ), std::move( attribute_id ) } );
         }
 
+        void copy( const Impl& other )
+        {
+            properties_ = other.properties_;
+        }
+
+        void save( std::string_view directory ) const
+        {
+            const auto filename = absl::StrCat( directory, "/physical_properties" );
+            std::ofstream file{ filename, std::ofstream::binary };
+            TContext context{};
+            BitseryExtensions::register_serialize_pcontext(
+                std::get< 0 >( context ) );
+            Serializer archive{ context, file };
+            archive.object( *this );
+            archive.adapter().flush();
+            OpenGeodeModelException::check_exception(
+                std::get< 1 >( context ).isValid(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[PhysicalProperties::save] Error while writing file: ",
+                filename );
+        }
+
+        void load( std::string_view directory )
+        {
+            const auto filename = absl::StrCat( directory, "/physical_properties" );
+            if( !std::filesystem::exists( filename ) )
+            {
+                return;
+            }
+            std::ifstream file{ filename, std::ifstream::binary };
+            TContext context{};
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
+            Deserializer archive{ context, file };
+            archive.object( *this );
+            const auto& adapter = archive.adapter();
+            OpenGeodeModelException::check_exception(
+                adapter.error() == bitsery::ReaderError::NoError
+                    && adapter.isCompletedSuccessfully()
+                    && std::get< 1 >( context ).isValid(),
+                nullptr, OpenGeodeException::TYPE::internal,
+                "[PhysicalProperties::load] Error while reading file: ",
+                filename );
+        }
+
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
+                    a.ext( impl.properties_,
+                        bitsery::ext::StdMap{ impl.properties_.max_size() },
+                        []( Archive& a2, PHYSICAL_PROPERTY_NAME& name,
+                            PhysicalPropertyInfo& info ) {
+                            a2.value4b( name );
+                            a2.object( info );
+                        } );
+                } } } );
+        }
+
     private:
         absl::flat_hash_map< PHYSICAL_PROPERTY_NAME,
             PhysicalProperties::PhysicalPropertyInfo >
@@ -60,6 +152,8 @@ namespace geode
     };
 
     PhysicalProperties::PhysicalProperties() = default;
+
+    PhysicalProperties::PhysicalProperties( BITSERY ) {}
 
     PhysicalProperties::~PhysicalProperties() = default;
 
@@ -80,6 +174,24 @@ namespace geode
             PHYSICAL_PROPERTY_NAME name ) const
     {
         return impl_->property_attribute( name );
+    }
+
+    void PhysicalProperties::save_physical_properties(
+        std::string_view directory ) const
+    {
+        impl_->save( directory );
+    }
+
+    void PhysicalProperties::copy_physical_properties(
+        const PhysicalProperties& other, BuilderKey /*key*/ )
+    {
+        impl_->copy( *other.impl_ );
+    }
+
+    void PhysicalProperties::load_physical_properties(
+        std::string_view directory, BuilderKey /*key*/ )
+    {
+        impl_->load( directory );
     }
 
     void PhysicalProperties::set_physical_property( PHYSICAL_PROPERTY_NAME name,
