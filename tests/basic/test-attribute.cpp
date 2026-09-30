@@ -229,6 +229,25 @@ void test_int_variable_attribute(
         "Int variable value 3 should be equal to 5" );
 }
 
+geode::uuid test_copy_attribute(
+    geode::AttributeManager& manager, const geode::uuid& attribute_id )
+{
+    geode::uuid new_attribute_id;
+    manager.copy_attribute( attribute_id, new_attribute_id );
+    const auto original =
+        manager.find_read_only_attribute< int >( attribute_id );
+    const auto copy =
+        manager.find_read_only_attribute< int >( new_attribute_id );
+    for( const auto e : geode::Range{ manager.nb_elements() } )
+    {
+        geode::OpenGeodeBasicException::test(
+            copy->value( e ) == original->value( e ),
+            "Copied attribute value at element ", e,
+            " should be equal to the original attribute value" );
+    }
+    return new_attribute_id;
+}
+
 void test_foo_sparse_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
@@ -837,6 +856,9 @@ void test()
     test_foo_constant_attribute( manager, foo_constant_attribute_id );
     geode::uuid int_variable_attribute_id;
     test_int_variable_attribute( manager, int_variable_attribute_id );
+    const auto copied_int_attribute_id =
+        test_copy_attribute( manager, int_variable_attribute_id );
+    manager.delete_attribute( copied_int_attribute_id );
     geode::uuid bool_variable_attribute_id;
     test_bool_variable_attribute( manager, bool_variable_attribute_id );
     geode::uuid foo_variable_attribute_id;

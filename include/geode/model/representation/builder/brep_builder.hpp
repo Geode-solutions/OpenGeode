@@ -34,6 +34,7 @@
 #include <geode/model/mixin/builder/line_collections_builder.hpp>
 #include <geode/model/mixin/builder/lines_builder.hpp>
 #include <geode/model/mixin/builder/model_boundaries_builder.hpp>
+#include <geode/model/mixin/builder/physical_properties_builder.hpp>
 #include <geode/model/mixin/builder/surface_collections_builder.hpp>
 #include <geode/model/mixin/builder/surfaces_builder.hpp>
 #include <geode/model/mixin/builder/topology_builder.hpp>
@@ -87,6 +88,7 @@ namespace geode
      * @extends LineCollectionsBuilder3D
      * @extends SurfaceCollectionsBuilder3D
      * @extends BlockCollectionsBuilder3D
+     * @extends PhysicalPropertiesBuilder
      */
     class opengeode_model_api BRepBuilder : public TopologyBuilder,
                                             public CornersBuilder3D,
@@ -98,6 +100,7 @@ namespace geode
                                             public LineCollectionsBuilder3D,
                                             public SurfaceCollectionsBuilder3D,
                                             public BlockCollectionsBuilder3D,
+                                            public PhysicalPropertiesBuilder,
                                             public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( BRepBuilder );

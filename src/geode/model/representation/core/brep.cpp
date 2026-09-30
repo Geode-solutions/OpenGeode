@@ -748,6 +748,7 @@ namespace geode
           LineCollections3D{ std::move( brep ) },
           SurfaceCollections3D{ std::move( brep ) },
           BlockCollections3D{ std::move( brep ) },
+          PhysicalProperties{ std::move( brep ) },
           Identifier{ std::move( brep ) }
     {
     }
@@ -764,6 +765,7 @@ namespace geode
         LineCollections3D::operator=( std::move( brep ) );
         SurfaceCollections3D::operator=( std::move( brep ) );
         BlockCollections3D::operator=( std::move( brep ) );
+        PhysicalProperties::operator=( std::move( brep ) );
         Identifier::operator=( std::move( brep ) );
         return *this;
     }
@@ -779,6 +781,7 @@ namespace geode
         clone_builder.copy_components( mappings, *this );
         clone_builder.copy_relationships( mappings, *this );
         clone_builder.copy_component_geometry( mappings, *this );
+        clone_builder.copy_physical_properties( *this );
         return model_clone;
     }
 

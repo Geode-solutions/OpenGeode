@@ -21,13 +21,17 @@
  *
  */
 
+#include <tuple>
+
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/assert.hpp>
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
 
@@ -1256,11 +1260,113 @@ void test_compare_brep( const geode::BRep& model, const geode::BRep& model2 )
     }
 }
 
-void test_clone( const geode::BRep& brep )
+template < typename AttributeManager >
+void test_components_attribute_values( const geode::uuid& attribute_id,
+    double expected_value,
+    const AttributeManager& attribute_manager,
+    std::string_view context )
+{
+    auto& manager = attribute_manager();
+    geode::OpenGeodeModelException::test(
+        manager.attribute_exists( attribute_id ), context,
+        " Attribute not found." );
+    const auto attribute =
+        manager.template find_attribute< geode::VariableAttribute, double >(
+            attribute_id );
+    geode::OpenGeodeModelException::test(
+        attribute->default_values().default_value == expected_value, context,
+        " Wrong attribute default value." );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        geode::OpenGeodeModelException::test(
+            attribute->value( element ) == expected_value, context,
+            " Wrong attribute value." );
+    }
+}
+
+void test_block_physical_attribute( const geode::BRep& model,
+    const geode::uuid& attribute_id,
+    std::string_view context )
+{
+    for( const auto& block : model.blocks() )
+    {
+        test_components_attribute_values(
+            attribute_id, 0.2,
+            [&block]() -> geode::AttributeManager& {
+                return block.mesh().polyhedron_attribute_manager();
+            },
+            context );
+    }
+}
+
+void test_components_attribute( geode::BRep& model )
+{
+    geode::BRepBuilder builder{ model };
+    geode::AttributeValues< double > values;
+    values.default_value = 1.;
+    values.no_value = -1.;
+    const geode::uuid surface_attribute_id;
+    builder.create_surfaces_attribute< geode::VariableAttribute, double >(
+        "surface_attribute", surface_attribute_id, values, {} );
+    const geode::uuid line_attribute_id;
+    builder.create_lines_attribute< geode::VariableAttribute, double >(
+        "line_attribute", line_attribute_id, values, {} );
+    const geode::uuid corner_attribute_id;
+    builder.create_corners_attribute< geode::VariableAttribute, double >(
+        "corner_attribute", corner_attribute_id, values, {} );
+    for( const auto& surface : model.surfaces() )
+    {
+        test_components_attribute_values(
+            surface_attribute_id, 1.,
+            [&surface]() -> geode::AttributeManager& {
+                return surface.mesh().polygon_attribute_manager();
+            },
+            "[Test] surfaces attribute" );
+    }
+    for( const auto& line : model.lines() )
+    {
+        test_components_attribute_values(
+            line_attribute_id, 1.,
+            [&line]() -> geode::AttributeManager& {
+                return line.mesh().edge_attribute_manager();
+            },
+            "[Test] lines attribute" );
+    }
+    for( const auto& corner : model.corners() )
+    {
+        test_components_attribute_values(
+            corner_attribute_id, 1.,
+            [&corner]() -> geode::AttributeManager& {
+                return corner.mesh().vertex_attribute_manager();
+            },
+            "[Test] corners attribute" );
+    }
+}
+
+void test_physical_properties( const geode::BRep& model,
+    const geode::uuid& attribute_id,
+    std::string_view context )
+{
+    geode::OpenGeodeModelException::test(
+        model.has_physical_property( geode::PHYSICAL_PROPERTY_NAME::porosity )
+            && !model.has_physical_property(
+                geode::PHYSICAL_PROPERTY_NAME::permeability ),
+        context, " Wrong physical properties." );
+    const auto& info =
+        model.physical_property_info( geode::PHYSICAL_PROPERTY_NAME::porosity );
+    geode::OpenGeodeModelException::test(
+        info.component_type == geode::Block3D::component_type_static()
+            && info.attribute_id == attribute_id,
+        context, " Wrong physical property info." );
+    test_block_physical_attribute( model, attribute_id, context );
+}
+
+void test_clone( const geode::BRep& brep, const geode::uuid& attribute_id )
 {
     geode::BRep brep2;
     geode::BRepBuilder builder{ brep2 };
     builder.copy( brep );
+    test_physical_properties( brep2, attribute_id, "[Test] copy" );
     geode::OpenGeodeModelException::test(
         brep2.nb_corners() == 6, "BRep should have 6 corners" );
     geode::OpenGeodeModelException::test(
@@ -1751,7 +1857,18 @@ void test()
     test_surface_collection_ranges(
         model, surface_uuids, surface_collection_uuids );
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
-    test_clone( model );
+    const geode::uuid physical_attribute_id;
+    geode::AttributeValues< double > porosity_values;
+    porosity_values.default_value = 0.2;
+    porosity_values.no_value = -1.;
+    builder.create_blocks_attribute< geode::VariableAttribute, double >(
+        "porosity", physical_attribute_id, porosity_values, {} );
+    builder.set_physical_property( geode::PHYSICAL_PROPERTY_NAME::porosity,
+        geode::Block3D::component_type_static(), physical_attribute_id );
+    test_physical_properties(
+        model.clone(), physical_attribute_id, "[Test] clone" );
+    test_clone( model, physical_attribute_id );
+    test_components_attribute( model );
     test_steal_mesh( model );
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
@@ -1767,6 +1884,7 @@ void test()
             "[Backward_IO] Incorrect model2 unique_vertex_id." );
     }
     test_compare_brep( model, model2 );
+    test_physical_properties( model2, physical_attribute_id, "[Test] reload" );
     test_registry( model2, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 
     geode::BRep model3{ std::move( model2 ) };

@@ -62,6 +62,7 @@ namespace geode
           LineCollectionsBuilder3D( brep ),
           SurfaceCollectionsBuilder3D( brep ),
           BlockCollectionsBuilder3D( brep ),
+          PhysicalPropertiesBuilder( brep ),
           IdentifierBuilder( brep ),
           brep_( brep )
     {
@@ -84,6 +85,7 @@ namespace geode
         auto mapping = copy_components( brep );
         copy_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );
+        copy_physical_properties( brep );
         return mapping;
     }
 
