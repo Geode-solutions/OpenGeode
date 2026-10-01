@@ -296,8 +296,10 @@ namespace geode
                 "[AttributeManager::create_time_step_attribute] Time of "
                 "attribute '",
                 name, "' should be finite, not ", time );
-            for( const auto &[attribute_id, attribute] : attributes_ )
+            for( const auto &id_attribute : attributes_ )
             {
+                const auto &attribute_id = id_attribute.first;
+                const auto &attribute = id_attribute.second;
                 if( attribute->name() != name )
                 {
                     continue;

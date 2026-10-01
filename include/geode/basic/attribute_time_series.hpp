@@ -27,6 +27,8 @@
 #include <string_view>
 #include <vector>
 
+#include <absl/container/fixed_array.h>
+
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
@@ -86,13 +88,13 @@ namespace geode
         /*!
          * Get the values of one element at every step, in time order.
          */
-        [[nodiscard]] std::vector< T > element_values( index_t element ) const
+        [[nodiscard]] absl::FixedArray< T > element_values(
+            index_t element ) const
         {
-            std::vector< T > values;
-            values.reserve( attributes_.size() );
-            for( const auto& attribute : attributes_ )
+            absl::FixedArray< T > values( attributes_.size() );
+            for( const auto step : Indices{ attributes_ } )
             {
-                values.push_back( attribute->value( element ) );
+                values[step] = attributes_[step]->value( element );
             }
             return values;
         }

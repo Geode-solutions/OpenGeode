@@ -48,14 +48,6 @@ namespace geode
     struct AttributeProperties
     {
         AttributeProperties() = default;
-        AttributeProperties( bool is_assignable,
-            bool is_interpolable,
-            bool is_transferable = true )
-            : assignable( is_assignable ),
-              interpolable( is_interpolable ),
-              transferable( is_transferable )
-        {
-        }
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -88,7 +80,7 @@ namespace geode
         bool assignable{ false };
         bool interpolable{ false };
         bool transferable{ true };
-        std::optional< double > time;
+        std::optional< double > time{};
     };
 
     template < typename AttributeType >
