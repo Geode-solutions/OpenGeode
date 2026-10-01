@@ -82,8 +82,7 @@ namespace geode
             .def( pybind11::init<>() )
             .def_readwrite( "assignable", &AttributeProperties::assignable )
             .def_readwrite( "interpolable", &AttributeProperties::interpolable )
-            .def_readwrite(
-                "transferable", &AttributeProperties::transferable )
+            .def_readwrite( "transferable", &AttributeProperties::transferable )
             .def_readwrite( "time", &AttributeProperties::time );
 
         python_attribute_values_class< bool >( module, "Bool" );
