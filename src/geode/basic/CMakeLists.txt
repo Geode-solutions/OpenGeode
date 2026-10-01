@@ -53,6 +53,7 @@ add_geode_library(
         "algorithm.hpp"
         "assert.hpp"
         "attribute_manager.hpp"
+        "attribute_time_series.hpp"
         "attribute_utils.hpp"
         "attribute.hpp"
         "bitsery_archive.hpp"

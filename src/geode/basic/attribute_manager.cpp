@@ -24,8 +24,10 @@
 #include <geode/basic/attribute_manager.hpp>
 
 #include <algorithm>
+#include <cmath>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/flat_hash_set.h>
 #include <absl/container/linked_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
@@ -283,6 +285,84 @@ namespace geode
                 return std::nullopt;
             }
             return ids;
+        }
+
+        void check_new_time_step(
+            std::string_view name, double time, std::string_view type ) const
+        {
+            absl::ReaderMutexLock lock{ mutex_ };
+            OpenGeodeBasicException::check_exception( std::isfinite( time ),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[AttributeManager::create_time_step_attribute] Time of "
+                "attribute '",
+                name, "' should be finite, not ", time );
+            for( const auto &[attribute_id, attribute] : attributes_ )
+            {
+                if( attribute->name() != name )
+                {
+                    continue;
+                }
+                const auto &step_time = attribute->properties().time;
+                OpenGeodeBasicException::check_exception( step_time.has_value(),
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[AttributeManager::create_time_step_attribute] Attribute "
+                    "'",
+                    name, "' already exists without time (id: ",
+                    attribute_id.string(), ")." );
+                OpenGeodeBasicException::check_exception(
+                    attribute->type() == type, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[AttributeManager::create_time_step_attribute] Time "
+                    "series '",
+                    name, "' already holds type ", attribute->type(),
+                    ", cannot add a step of type ", type, "." );
+                OpenGeodeBasicException::check_exception(
+                    step_time.value() != time, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[AttributeManager::create_time_step_attribute] Time "
+                    "series '",
+                    name, "' already has a step at time ", time, "." );
+            }
+        }
+
+        std::vector< AttributeTimeStep > time_steps(
+            std::string_view name ) const
+        {
+            absl::ReaderMutexLock lock{ mutex_ };
+            std::vector< AttributeTimeStep > steps;
+            for( const auto &[attribute_id, attribute] : attributes_ )
+            {
+                const auto &time = attribute->properties().time;
+                if( time && attribute->name() == name )
+                {
+                    steps.push_back( { time.value(), attribute_id } );
+                }
+            }
+            absl::c_sort( steps, []( const AttributeTimeStep &lhs,
+                                     const AttributeTimeStep &rhs ) {
+                return lhs.time < rhs.time;
+            } );
+            return steps;
+        }
+
+        std::vector< std::string > time_series_names() const
+        {
+            absl::ReaderMutexLock lock{ mutex_ };
+            std::vector< std::string > names;
+            absl::flat_hash_set< std::string_view > found_names;
+            for( const auto &[attribute_id, attribute] : attributes_ )
+            {
+                const auto &name = attribute->name();
+                if( !attribute->properties().time || !name )
+                {
+                    continue;
+                }
+                if( found_names.emplace( name.value() ).second )
+                {
+                    names.emplace_back( name.value() );
+                }
+            }
+            return names;
         }
 
         void copy( const AttributeManager::Impl &attribute_manager_from,
@@ -615,6 +695,24 @@ namespace geode
             std::string_view name ) const
     {
         return impl_->attribute_ids_matching_name( name );
+    }
+
+    void AttributeManager::check_new_time_step( std::string_view attribute_name,
+        double time,
+        std::string_view type ) const
+    {
+        impl_->check_new_time_step( attribute_name, time, type );
+    }
+
+    std::vector< AttributeTimeStep > AttributeManager::time_steps(
+        std::string_view attribute_name ) const
+    {
+        return impl_->time_steps( attribute_name );
+    }
+
+    std::vector< std::string > AttributeManager::time_series_names() const
+    {
+        return impl_->time_series_names();
     }
 
     void AttributeManager::import( const AttributeManager &attribute_manager,

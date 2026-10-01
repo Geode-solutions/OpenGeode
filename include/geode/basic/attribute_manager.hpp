@@ -40,6 +40,16 @@
 namespace geode
 {
     /*!
+     * One step of a time series: the attribute holding the values at the
+     * given time.
+     */
+    struct AttributeTimeStep
+    {
+        double time;
+        uuid attribute_id;
+    };
+
+    /*!
      * This class manages all its associated Attributes.
      * Each Attribute is registered and can be retrieved by a given name.
      */
@@ -147,6 +157,41 @@ namespace geode
         }
 
         /*!
+         * Create one step of a time series.
+         * A time series is the set of attributes sharing a name and having a
+         * time in their AttributeProperties.
+         * @param[in] attribute_name The name of the series.
+         * @param[in] time The time of this step, stored in properties.time.
+         * @exception OpenGeodeException if time is not finite, if an
+         * attribute with this name has no time, a different type or the same
+         * time.
+         */
+        template < template < typename > class Attribute, typename T >
+        [[nodiscard]] geode::uuid create_time_step_attribute(
+            std::string_view attribute_name,
+            double time,
+            AttributeValues< T > default_values,
+            AttributeProperties properties )
+        {
+            check_new_time_step( attribute_name, time, typeid( T ).name() );
+            properties.time = time;
+            return create_attribute< Attribute, T >( attribute_name,
+                std::move( default_values ), std::move( properties ) );
+        }
+
+        /*!
+         * Get the steps of the time series with the given name, sorted by
+         * time. Empty if no attribute with this name has a time.
+         */
+        [[nodiscard]] std::vector< AttributeTimeStep > time_steps(
+            std::string_view attribute_name ) const;
+
+        /*!
+         * Get the distinct names of the attributes having a time.
+         */
+        [[nodiscard]] std::vector< std::string > time_series_names() const;
+
+        /*!
          * Resize all the attributes to the given size
          * @param[in] size The new attribute size
          */
@@ -223,6 +268,11 @@ namespace geode
         [[nodiscard]] std::string_view attribute_type(
             const geode::uuid& ) const;
 
+        /*!
+         * Replace all the properties of the attribute.
+         * @warning The time is replaced too: passing properties with an empty
+         * time removes the attribute from its time series.
+         */
         void set_attribute_properties( geode::uuid attribute_id,
             const AttributeProperties& new_properties );
 
@@ -294,6 +344,13 @@ namespace geode
          */
         void register_attribute(
             std::shared_ptr< AttributeBase > attribute, const geode::uuid& );
+
+        /*!
+         * Check that a new step can be added to the time series.
+         */
+        void check_new_time_step( std::string_view attribute_name,
+            double time,
+            std::string_view type ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <optional>
+
 #include <absl/types/span.h>
+
+#include <bitsery/ext/std_optional.h>
 
 #include <geode/basic/common.hpp>
 #include <geode/basic/growable.hpp>
@@ -44,6 +48,14 @@ namespace geode
     struct AttributeProperties
     {
         AttributeProperties() = default;
+        AttributeProperties( bool is_assignable,
+            bool is_interpolable,
+            bool is_transferable = true )
+            : assignable( is_assignable ),
+              interpolable( is_interpolable ),
+              transferable( is_transferable )
+        {
+        }
 
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -59,12 +71,24 @@ namespace geode
                             archive.value1b( properties.assignable );
                             archive.value1b( properties.interpolable );
                             archive.value1b( properties.transferable );
+                        },
+                        []( Archive& archive,
+                            AttributeProperties& properties ) {
+                            archive.value1b( properties.assignable );
+                            archive.value1b( properties.interpolable );
+                            archive.value1b( properties.transferable );
+                            archive.ext( properties.time,
+                                bitsery::ext::StdOptional{},
+                                []( Archive& archive2, double& value ) {
+                                    archive2.value8b( value );
+                                } );
                         } } } );
         }
 
         bool assignable{ false };
         bool interpolable{ false };
         bool transferable{ true };
+        std::optional< double > time;
     };
 
     template < typename AttributeType >

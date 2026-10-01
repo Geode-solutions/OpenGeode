@@ -22,11 +22,13 @@
  */
 
 #include <fstream>
+#include <sstream>
 
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/bitsery_attribute.hpp>
 #include <geode/basic/logger.hpp>
@@ -844,6 +846,166 @@ void test_permutation( geode::AttributeManager& manager,
         double_attribute->value( 7 ) );
 }
 
+double pressure_value( double time, double element_tag )
+{
+    return 100 * time + element_tag;
+}
+
+void check_pressure_series( const geode::AttributeManager& manager,
+    const std::vector< double >& expected_times )
+{
+    const geode::AttributeTimeSeries< double > pressure{ manager, "pressure" };
+    geode::OpenGeodeBasicException::test(
+        pressure.nb_time_steps() == expected_times.size(),
+        "Wrong number of pressure steps: ", pressure.nb_time_steps() );
+    for( const auto step : geode::Indices{ expected_times } )
+    {
+        geode::OpenGeodeBasicException::test(
+            pressure.time( step ) == expected_times[step],
+            "Wrong time for pressure step ", step );
+    }
+    const auto tag = manager.find_read_only_attribute< double >(
+        manager.attribute_ids_matching_name( "tag" ).value().front() );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        const auto values = pressure.element_values( element );
+        for( const auto step : geode::Indices{ values } )
+        {
+            const auto expected =
+                pressure_value( pressure.time( step ), tag->value( element ) );
+            geode::OpenGeodeBasicException::test(
+                values[step] == expected
+                    && pressure.value( step, element ) == expected,
+                "Wrong pressure for element ", element, " at step ", step, ": ",
+                values[step], " instead of ", expected );
+        }
+    }
+}
+
+geode::AttributeManager create_time_series_manager()
+{
+    geode::AttributeManager manager;
+    manager.resize( 10 );
+    auto tag = manager.find_attribute< geode::VariableAttribute, double >(
+        manager.create_attribute< geode::VariableAttribute, double >(
+            "tag", { -1, -1 }, {} ) );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        tag->set_value( element, element );
+    }
+    for( const auto time : { 0., 10., 5. } )
+    {
+        auto step = manager.find_attribute< geode::VariableAttribute, double >(
+            manager
+                .create_time_step_attribute< geode::VariableAttribute, double >(
+                    "pressure", time, { pressure_value( time, -1 ), 0 }, {} ) );
+        for( const auto element : geode::Range{ manager.nb_elements() } )
+        {
+            step->set_value( element, pressure_value( time, element ) );
+        }
+    }
+    for( const auto time : { 1., 2. } )
+    {
+        auto step = manager.find_attribute< geode::VariableAttribute,
+            std::array< double, 3 > >(
+            manager.create_time_step_attribute< geode::VariableAttribute,
+                std::array< double, 3 > >(
+                "velocity", time, { { 0, 0, 0 }, { 0, 0, 0 } }, {} ) );
+        step->set_value( 3, { time, 0, 0 } );
+    }
+    return manager;
+}
+
+void test_time_series_creation( geode::AttributeManager& manager )
+{
+    const auto steps = manager.time_steps( "pressure" );
+    geode::OpenGeodeBasicException::test(
+        steps.size() == 3 && steps[0].time == 0 && steps[1].time == 5
+            && steps[2].time == 10,
+        "Pressure steps should be sorted by time" );
+    geode::OpenGeodeBasicException::test(
+        manager.time_steps( "tag" ).empty(), "Tag should have no time step" );
+    const geode::AttributeTimeSeries< double > pressure{ manager, "pressure" };
+    geode::OpenGeodeBasicException::test(
+        pressure.step_attribute( 2 ).properties().time == 10,
+        "Wrong step attribute" );
+    const geode::AttributeTimeSeries< std::array< double, 3 > > velocity{
+        manager, "velocity"
+    };
+    const auto velocity_values = velocity.element_values( 3 );
+    geode::OpenGeodeBasicException::test( velocity_values.size() == 2
+                                              && velocity_values[0][0] == 1
+                                              && velocity_values[1][0] == 2,
+        "Wrong velocity_values" );
+    check_pressure_series( manager, { 0, 5, 10 } );
+}
+
+void test_time_series_element_edition( geode::AttributeManager& manager )
+{
+    std::vector< geode::index_t > permutation{ 2, 1, 4, 6, 7, 8, 5, 9, 3, 0 };
+    manager.permute_elements( permutation );
+    check_pressure_series( manager, { 0, 5, 10 } );
+    std::vector< bool > to_delete( manager.nb_elements(), false );
+    to_delete[1] = true;
+    to_delete[6] = true;
+    manager.delete_elements( to_delete );
+    check_pressure_series( manager, { 0, 5, 10 } );
+    manager.resize( manager.nb_elements() + 2 );
+    check_pressure_series( manager, { 0, 5, 10 } );
+}
+
+void test_time_series_transfer( const geode::AttributeManager& manager )
+{
+    geode::AttributeManager copied;
+    copied.copy( manager );
+    check_pressure_series( copied, { 0, 5, 10 } );
+
+    geode::AttributeManager imported;
+    imported.resize( 3 );
+    geode::GenericMapping< geode::index_t > old2new_mapping;
+    old2new_mapping.map( 4, 0 );
+    old2new_mapping.map( 2, 1 );
+    old2new_mapping.map( 7, 2 );
+    imported.import( manager, old2new_mapping );
+    check_pressure_series( imported, { 0, 5, 10 } );
+    geode::OpenGeodeBasicException::test(
+        imported.time_steps( "velocity" ).size() == 2,
+        "Velocity steps should be imported" );
+}
+
+void test_time_series_serialization( const geode::AttributeManager& manager )
+{
+    std::stringstream stream;
+    geode::TContext context{};
+    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
+    geode::Serializer archive{ context, stream };
+    archive.object( manager );
+    archive.adapter().flush();
+
+    geode::AttributeManager reloaded;
+    geode::TContext reload_context{};
+    geode::register_basic_deserialize_pcontext(
+        std::get< 0 >( reload_context ) );
+    geode::Deserializer unarchive{ reload_context, stream };
+    unarchive.object( reloaded );
+    geode::OpenGeodeBasicException::test(
+        unarchive.adapter().error() == bitsery::ReaderError::NoError,
+        "Error while reading time series" );
+    check_pressure_series( reloaded, { 0, 5, 10 } );
+    geode::OpenGeodeBasicException::test(
+        reloaded.time_steps( "velocity" ).size() == 2,
+        "Velocity steps should be reloaded" );
+}
+
+void test_time_series()
+{
+    auto manager = create_time_series_manager();
+    test_time_series_creation( manager );
+    test_time_series_element_edition( manager );
+    test_time_series_transfer( manager );
+    test_time_series_serialization( manager );
+}
+
 void test()
 {
     geode::AttributeManager manager;
@@ -895,6 +1057,7 @@ void test()
     test_double_array_attribute( manager );
     manager.clear();
     test_number_of_attributes( manager, 0 );
+    test_time_series();
 }
 
 OPENGEODE_TEST( "attribute" )

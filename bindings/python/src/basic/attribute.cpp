@@ -83,7 +83,8 @@ namespace geode
             .def_readwrite( "assignable", &AttributeProperties::assignable )
             .def_readwrite( "interpolable", &AttributeProperties::interpolable )
             .def_readwrite(
-                "transferable", &AttributeProperties::transferable );
+                "transferable", &AttributeProperties::transferable )
+            .def_readwrite( "time", &AttributeProperties::time );
 
         python_attribute_values_class< bool >( module, "Bool" );
         python_attribute_values_class< int >( module, "Int" );
