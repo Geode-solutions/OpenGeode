@@ -555,6 +555,37 @@ void test_grid( const geode::RegularGrid3D& grid )
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
+void test_old_io()
+{
+    geode::Logger::debug( "Reading old grid." );
+    const auto old_grid = geode::load_regular_grid< 3 >(
+        absl::StrCat( geode::DATA_PATH, "old_grid.og_rgd3d" ) );
+    const auto bbox = old_grid->bounding_box();
+    const auto grid_bbox = old_grid->grid_bounding_box();
+    geode::OpenGeodeMeshException::test(
+        bbox.min() == grid_bbox.min() && bbox.max() == grid_bbox.max(),
+        "Different results for bounding_box and grid_bounding_box" );
+    const auto grid_point = old_grid->grid_point( { 0, 0, 0 } );
+    const auto& point = old_grid->point( 0 );
+    geode::OpenGeodeMeshException::test(
+        grid_point == point, "Different results for grid_point and point" );
+
+    geode::Logger::debug( "Reading v12." );
+    auto grid_v12 =
+        geode::load_regular_grid< 3 >( absl::StrCat( geode::DATA_PATH,
+            "backward_io/v12/test_v12.", old_grid->native_extension() ) );
+    geode::Logger::debug( "Reading v12 point." );
+    SDEBUG( grid_v12->point( 0 ) );
+    auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
+    builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } } );
+    test_grid( *grid_v12 );
+    geode::Logger::debug( "Reading v17." );
+    test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
+        old_grid->native_extension() ) );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -565,17 +596,7 @@ void test()
         { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
-
-    auto grid_v12 =
-        geode::load_regular_grid< 3 >( absl::StrCat( geode::DATA_PATH,
-            "backward_io/v12/test_v12.", grid->native_extension() ) );
-    auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
-    builder_v12->update_origin_and_directions( geode::Point3D{ { 1.5, 0, 1 } },
-        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
-            geode::Vector3D{ { 0, -3, 0 } } } );
-    test_grid( *grid_v12 );
-    test_backward_io( absl::StrCat(
-        geode::DATA_PATH, "backward_io/v17/v17.", grid->native_extension() ) );
+    test_old_io();
     test_adjacencies2D();
 }
 
