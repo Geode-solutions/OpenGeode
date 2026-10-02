@@ -156,6 +156,37 @@ def test_sparse_attribute_after_element_deletion(manager, double_attribute_id):
         raise ValueError("Element 7 of sparse attribute should be 12 ")
 
 
+def test_time_series():
+    manager = basic.AttributeManager()
+    manager.resize(4)
+    values = basic.AttributeValuesDouble()
+    values.default_value = 0
+    values.no_value = 0
+    for time in [10.0, 0.0, 5.0]:
+        properties = basic.AttributeProperties()
+        if properties.time is not None:
+            raise ValueError("[Test] Default properties should have no time")
+        attribute_id = manager.create_time_step_attribute_variable_double(
+            "pressure", time, values, properties
+        )
+        attribute = manager.find_attribute_variable_double(attribute_id)
+        attribute.set_value(2, 100 * time)
+        if attribute.properties().time != time:
+            raise ValueError("[Test] Step should hold its time")
+    if manager.time_series_names() != ["pressure"]:
+        raise ValueError("[Test] Wrong time series names")
+    steps = manager.time_steps("pressure")
+    if [step.time for step in steps] != [0.0, 5.0, 10.0]:
+        raise ValueError("[Test] Steps should be sorted by time")
+    series = basic.AttributeTimeSeriesDouble(manager, "pressure")
+    if series.nb_time_steps() != 3 or series.time(1) != 5.0:
+        raise ValueError("[Test] Wrong time series steps")
+    if series.element_values(2) != [0.0, 500.0, 1000.0]:
+        raise ValueError("[Test] Wrong element values")
+    if series.value(1, 2) != 500.0 or series.step_attribute(1).value(2) != 500.0:
+        raise ValueError("[Test] Wrong step value")
+
+
 if __name__ == '__main__':
     manager = basic.AttributeManager()
     manager.resize(10)
@@ -177,3 +208,4 @@ if __name__ == '__main__':
         raise ValueError("[Test] Manager should have 10 elements")
     manager.clear()
     test_number_of_attributes(manager, 0)
+    test_time_series()

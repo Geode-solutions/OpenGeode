@@ -24,6 +24,7 @@
 #include "../common.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/constant_attribute.hpp>
 #include <geode/basic/sparse_attribute.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -96,10 +97,46 @@ namespace geode
             static_cast< std::shared_ptr< SparseAttribute< type > > (
                 AttributeManager::* )( const geode::uuid& ) >(
                 &AttributeManager::find_attribute< SparseAttribute, type > ) );
+        const auto create_time_step_constant_suffix =
+            absl::StrCat( "create_time_step_attribute_constant_", suffix );
+        manager.def( create_time_step_constant_suffix.c_str(),
+            &AttributeManager::create_time_step_attribute< ConstantAttribute,
+                type > );
+        const auto create_time_step_variable_suffix =
+            absl::StrCat( "create_time_step_attribute_variable_", suffix );
+        manager.def( create_time_step_variable_suffix.c_str(),
+            &AttributeManager::create_time_step_attribute< VariableAttribute,
+                type > );
+        const auto create_time_step_sparse_suffix =
+            absl::StrCat( "create_time_step_attribute_sparse_", suffix );
+        manager.def( create_time_step_sparse_suffix.c_str(),
+            &AttributeManager::create_time_step_attribute< SparseAttribute,
+                type > );
+    }
+
+    template < typename type >
+    void python_attribute_time_series_class(
+        pybind11::module& module, const std::string& typestr )
+    {
+        const auto name = absl::StrCat( "AttributeTimeSeries", typestr );
+        pybind11::class_< AttributeTimeSeries< type > >( module, name.c_str() )
+            .def(
+                pybind11::init< const AttributeManager&, std::string_view >() )
+            .def( "nb_time_steps", &AttributeTimeSeries< type >::nb_time_steps )
+            .def( "time", &AttributeTimeSeries< type >::time )
+            .def( "step_attribute",
+                &AttributeTimeSeries< type >::step_attribute,
+                pybind11::return_value_policy::reference_internal )
+            .def( "value", &AttributeTimeSeries< type >::value )
+            .def( "element_values",
+                &AttributeTimeSeries< type >::element_values );
     }
 
     void define_attribute_manager( pybind11::module& module )
     {
+        pybind11::class_< AttributeTimeStep >( module, "AttributeTimeStep" )
+            .def_readonly( "time", &AttributeTimeStep::time )
+            .def_readonly( "attribute_id", &AttributeTimeStep::attribute_id );
         pybind11::class_< AttributeManager > manager(
             module, "AttributeManager" );
         manager.def( pybind11::init<>() )
@@ -119,7 +156,9 @@ namespace geode
                 &AttributeManager::set_attribute_properties )
             .def( "delete_elements", &AttributeManager::delete_elements )
             .def( "attribute_ids_matching_name",
-                &AttributeManager::attribute_ids_matching_name );
+                &AttributeManager::attribute_ids_matching_name )
+            .def( "time_steps", &AttributeManager::time_steps )
+            .def( "time_series_names", &AttributeManager::time_series_names );
         python_attribute_class< bool >( manager, "bool" );
         python_attribute_class< int >( manager, "int" );
         python_attribute_class< unsigned int >( manager, "uint" );
@@ -129,5 +168,14 @@ namespace geode
             manager, "arraydouble2" );
         python_attribute_class< std::array< double, 3 > >(
             manager, "arraydouble3" );
+        python_attribute_time_series_class< bool >( module, "Bool" );
+        python_attribute_time_series_class< int >( module, "Int" );
+        python_attribute_time_series_class< unsigned int >( module, "UInt" );
+        python_attribute_time_series_class< float >( module, "Float" );
+        python_attribute_time_series_class< double >( module, "Double" );
+        python_attribute_time_series_class< std::array< double, 2 > >(
+            module, "ArrayDouble2" );
+        python_attribute_time_series_class< std::array< double, 3 > >(
+            module, "ArrayDouble3" );
     }
 } // namespace geode
