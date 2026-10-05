@@ -29,6 +29,9 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include <absl/types/span.h>
 
 #include <geode/basic/pimpl.hpp>
@@ -125,24 +128,26 @@ namespace geode
             EvalIntersection& action ) const;
 
         /*!
-         * @brief Computes the self intersections of the element boxes.
+         * @brief Computes the self intersections of the element boxes, in
+         * parallel.
          * @param[in] action The functor to run when two boxes intersect
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box1, index_t cur_element_box2
-         * );
+         * ) const;
          * @note cur_element_box1 and cur_element_box2 are the element box
-         * indices that intersect.
-         * @note the operator defines what to do when two boxes of the
-         * tree ( \p cur_element_box1 and \p cur_element_box2 ) intersect each
-         * other (for example: test real intersection between each element in
-         * boxes and store the result.)
-         * @note The returned boolean indicates if the search should stop or
-         * continue. Return true to stop the search, false to continue.
+         * indices that intersect. Each pair is evaluated once.
+         * @note the operator is called concurrently from several threads, it
+         * must be thread-safe. It tests the two elements (for example: real
+         * intersection between the elements in the boxes) and returns true if
+         * the pair should be kept.
+         * @return The kept pairs. Their order is deterministic: it does not
+         * depend on the number of threads.
          */
         template < class EvalIntersection >
-        void compute_self_element_bbox_intersections(
-            EvalIntersection& action ) const;
+        [[nodiscard]] std::vector< std::pair< index_t, index_t > >
+            compute_self_element_bbox_intersections(
+                const EvalIntersection& action ) const;
 
         /*!
          * @brief Computes all the intersections of the element boxes between

@@ -31,8 +31,13 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
+#include <vector>
 
 #include <absl/algorithm/container.h>
+#include <absl/container/fixed_array.h>
+
+#include <async++.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -71,6 +76,7 @@ namespace geode
     {
     public:
         static constexpr index_t ROOT_INDEX{ 0 };
+        static constexpr index_t SELF_INTERSECTION_CHUNK_SIZE{ 128 };
 
         struct Iterator
         {
@@ -254,77 +260,100 @@ namespace geode
         }
 
         template < typename ACTION >
-        bool self_intersect_recursive( index_t node_index1,
-            index_t element_begin1,
-            index_t element_end1,
-            index_t node_index2,
-            index_t element_begin2,
-            index_t element_end2,
-            ACTION& action ) const
+        [[nodiscard]] std::vector< std::pair< index_t, index_t > >
+            self_intersect( const ACTION& action ) const
         {
-            OpenGeodeGeometryException::check_assertion(
-                element_end1 != element_begin1,
-                "No iteration allowed start == end" );
-            OpenGeodeGeometryException::check_assertion(
-                element_end2 != element_begin2,
-                "No iteration allowed start == end" );
-
-            // Since we are intersecting the AABBTree with *itself*,
-            // we can prune half of the cases by skipping the test
-            // whenever node2's polygon index interval is greated than
-            // node1's polygon index interval.
-            if( element_end2 <= element_begin1 )
+            const auto nb_chunks =
+                ( nb_bboxes() + SELF_INTERSECTION_CHUNK_SIZE - 1 )
+                / SELF_INTERSECTION_CHUNK_SIZE;
+            absl::FixedArray< std::vector< std::pair< index_t, index_t > > >
+                chunk_pairs( nb_chunks );
+            async::parallel_for( async::irange( index_t{ 0 }, nb_chunks ),
+                [this, &action, &chunk_pairs]( index_t chunk ) {
+                    const auto chunk_begin =
+                        chunk * SELF_INTERSECTION_CHUNK_SIZE;
+                    const auto chunk_end =
+                        std::min( chunk_begin + SELF_INTERSECTION_CHUNK_SIZE,
+                            nb_bboxes() );
+                    for( const auto position : Range{ chunk_begin, chunk_end } )
+                    {
+                        leaf_self_intersect_recursive( leaf_node( position ),
+                            position, ROOT_INDEX, 0, nb_bboxes(), action,
+                            chunk_pairs[chunk] );
+                    }
+                } );
+            std::size_t nb_pairs{ 0 };
+            for( const auto& pairs : chunk_pairs )
             {
-                return false;
+                nb_pairs += pairs.size();
             }
-
-            // The acceleration is here:
-            if( !node( node_index1 ).epsilon_intersects( node( node_index2 ) ) )
+            std::vector< std::pair< index_t, index_t > > result;
+            result.reserve( nb_pairs );
+            for( const auto& pairs : chunk_pairs )
             {
-                return false;
+                result.insert( result.end(), pairs.begin(), pairs.end() );
             }
+            return result;
+        }
 
-            // Simple case: leaf - leaf intersection.
-            if( is_leaf( element_begin1, element_end1 )
-                && is_leaf( element_begin2, element_end2 ) )
-            {
-                if( node_index1 == node_index2 )
-                {
-                    return false;
-                }
-                return action( element_order( element_begin1 ),
-                    element_order( element_begin2 ) );
-            }
-
-            // If node2 has more polygons than node1, then
-            //   intersect node2's two children with node1
-            // else
-            //   intersect node1's two children with node2
-            if( element_end2 - element_begin2 > element_end1 - element_begin1 )
+        [[nodiscard]] index_t leaf_node( index_t position ) const
+        {
+            index_t element_begin{ 0 };
+            index_t element_end{ nb_bboxes() };
+            index_t node_index{ ROOT_INDEX };
+            while( !is_leaf( element_begin, element_end ) )
             {
                 const auto it = get_recursive_iterators(
-                    node_index2, element_begin2, element_end2 );
-                if( self_intersect_recursive( node_index1, element_begin1,
-                        element_end1, it.child_left, element_begin2,
-                        it.element_middle, action ) )
+                    node_index, element_begin, element_end );
+                if( position < it.element_middle )
                 {
-                    return true;
+                    element_end = it.element_middle;
+                    node_index = it.child_left;
                 }
-                return self_intersect_recursive( node_index1, element_begin1,
-                    element_end1, it.child_right, it.element_middle,
-                    element_end2, action );
+                else
+                {
+                    element_begin = it.element_middle;
+                    node_index = it.child_right;
+                }
+            }
+            return node_index;
+        }
+
+        template < typename ACTION >
+        void leaf_self_intersect_recursive( index_t leaf_node_index,
+            index_t leaf_position,
+            index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            const ACTION& action,
+            std::vector< std::pair< index_t, index_t > >& pairs ) const
+        {
+            if( element_end <= leaf_position + 1 )
+            {
+                return;
+            }
+            if( !node( leaf_node_index )
+                    .epsilon_intersects( node( node_index ) ) )
+            {
+                return;
+            }
+            if( is_leaf( element_begin, element_end ) )
+            {
+                const auto element = element_order( leaf_position );
+                const auto other_element = element_order( element_begin );
+                if( action( element, other_element ) )
+                {
+                    pairs.emplace_back( element, other_element );
+                }
+                return;
             }
             const auto it = get_recursive_iterators(
-                node_index1, element_begin1, element_end1 );
-            if( self_intersect_recursive( it.child_left, element_begin1,
-                    it.element_middle, node_index2, element_begin2,
-                    element_end2, action ) )
-            {
-                return true;
-            }
-            return self_intersect_recursive( it.child_right, it.element_middle,
-                element_end1, node_index2, element_begin2, element_end2,
-                action );
+                node_index, element_begin, element_end );
+            leaf_self_intersect_recursive( leaf_node_index, leaf_position,
+                it.child_left, element_begin, it.element_middle, action,
+                pairs );
+            leaf_self_intersect_recursive( leaf_node_index, leaf_position,
+                it.child_right, it.element_middle, element_end, action, pairs );
         }
 
         template < typename ACTION >
@@ -532,15 +561,15 @@ namespace geode
 
     template < index_t dimension >
     template < class EvalIntersection >
-    void AABBTree< dimension >::compute_self_element_bbox_intersections(
-        EvalIntersection& action ) const
+    std::vector< std::pair< index_t, index_t > >
+        AABBTree< dimension >::compute_self_element_bbox_intersections(
+            const EvalIntersection& action ) const
     {
         if( nb_bboxes() == 0 )
         {
-            return;
+            return {};
         }
-        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
-            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+        return impl_->self_intersect( action );
     }
 
     template < index_t dimension >
