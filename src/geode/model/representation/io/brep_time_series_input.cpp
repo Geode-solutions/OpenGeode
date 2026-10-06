@@ -21,7 +21,6 @@
  *
  */
 
-
 #include <geode/model/representation/io/brep_time_series_input.hpp>
 
 #include <string_view>
@@ -79,8 +78,9 @@ namespace geode
         try
         {
             const Timer timer;
-            auto input = detail::geode_object_input_reader<
-                BRepTimeSeriesInputFactory >( filename );
+            auto input =
+                detail::geode_object_input_reader< BRepTimeSeriesInputFactory >(
+                    filename );
             input->read( brep );
             Logger::info(
                 TYPE, " loaded from ", filename, " in ", timer.duration() );
