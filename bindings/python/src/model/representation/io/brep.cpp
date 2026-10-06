@@ -27,6 +27,7 @@
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 #include <geode/model/representation/io/brep_output.hpp>
+#include <geode/model/representation/io/brep_time_series_input.hpp>
 
 namespace geode
 {
@@ -38,7 +39,13 @@ namespace geode
         module.def( "is_brep_loadable", &is_brep_loadable );
         module.def( "is_brep_saveable", &is_brep_saveable );
         module.def( "brep_additional_files", &brep_additional_files );
+        module.def( "load_brep_time_series", &load_brep_time_series );
+        module.def(
+            "is_brep_time_series_loadable", &is_brep_time_series_loadable );
+        module.def( "brep_time_series_additional_files",
+            &brep_time_series_additional_files );
         PYTHON_FACTORY_CLASS( BRepInputFactory );
         PYTHON_FACTORY_CLASS( BRepOutputFactory );
+        PYTHON_FACTORY_CLASS( BRepTimeSeriesInputFactory );
     }
 } // namespace geode
