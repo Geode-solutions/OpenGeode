@@ -141,7 +141,19 @@ namespace geode
             module, "AttributeManager" );
         manager.def( pybind11::init<>() )
             .def( "find_generic_attribute",
-                &AttributeManager::find_generic_attribute )
+                // std::optional makes the generated stub return
+                // `AttributeBase | None`: a null shared_ptr becomes None
+                []( const AttributeManager& attribute_manager,
+                    const uuid& attribute_id )
+                    -> std::optional< std::shared_ptr< AttributeBase > > {
+                    if( auto attribute =
+                            attribute_manager.find_generic_attribute(
+                                attribute_id ) )
+                    {
+                        return attribute;
+                    }
+                    return std::nullopt;
+                } )
             .def( "attribute_ids", &AttributeManager::attribute_ids )
             .def( "attribute_type", &AttributeManager::attribute_type )
             .def( "attribute_exists", &AttributeManager::attribute_exists )
