@@ -55,10 +55,10 @@ namespace geode
 
         /*!
          * Recover the non-typed/generic Attribute from the attribute
-         * name. This can be used when attribute type is not known in a
+         * id. This can be used when attribute type is not known in a
          * context.
-         * @param[in] name The associated attribute name to look for.
-         * @return nullptr if no attribute matches the given name.
+         * @param[in] attribute_id The associated attribute id to look for.
+         * @return nullptr if no attribute matches the given id.
          */
         [[nodiscard]] std::shared_ptr< AttributeBase > find_generic_attribute(
             const geode::uuid& attribute_id ) const
