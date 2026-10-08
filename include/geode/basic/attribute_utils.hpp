@@ -95,9 +95,9 @@ namespace geode
                 Growable< Archive, AttributeValues >{
                     { []( Archive& archive, AttributeValues& values ) {
                          archive( values.default_value );
-                         AttributeType no_value;
-                         archive( no_value );
-                         values.no_value = std::move( no_value );
+                         AttributeType no_value_value;
+                         archive( no_value_value );
+                         values.no_value = std::move( no_value_value );
                      },
                         []( Archive& archive, AttributeValues& values ) {
                             archive( values.default_value );
