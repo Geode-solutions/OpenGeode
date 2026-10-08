@@ -116,7 +116,6 @@ namespace geode
             AttributeValues< std::vector< ComponentMeshVertex > >
                 component_vertices_attribute_values;
             component_vertices_attribute_values.default_value = {};
-            component_vertices_attribute_values.no_value = {};
             const auto unique_vertices_attribute_id =
                 unique_vertices_.vertex_attribute_manager()
                     .create_attribute< VariableAttribute,

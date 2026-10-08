@@ -91,16 +91,26 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, AttributeValues >{
-                           { []( Archive& archive, AttributeValues& values ) {
-                               archive( values.default_value );
-                               archive( values.no_value );
-                           } } } );
+            serializer.ext( *this,
+                Growable< Archive, AttributeValues >{
+                    { []( Archive& archive, AttributeValues& values ) {
+                         archive( values.default_value );
+                         AttributeType no_value;
+                         archive( no_value );
+                         values.no_value = std::move( no_value );
+                     },
+                        []( Archive& archive, AttributeValues& values ) {
+                            archive( values.default_value );
+                            archive.ext( values.no_value,
+                                bitsery::ext::StdOptional{},
+                                []( Archive& archive2, AttributeType& value ) {
+                                    archive2( value );
+                                } );
+                        } } } );
         }
 
         AttributeType default_value;
-        AttributeType no_value;
+        std::optional< AttributeType > no_value{};
     };
 
     /*!
