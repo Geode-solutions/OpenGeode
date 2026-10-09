@@ -653,20 +653,17 @@ namespace geode
 
     bool AttributeManager::has_assignable_attributes() const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->has_assignable_attributes();
     }
 
     bool AttributeManager::has_interpolable_attributes() const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->has_interpolable_attributes();
     }
 
     void AttributeManager::assign_attribute_value(
         index_t from_element, index_t to_element )
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         impl_->assign_attribute_value(
             from_element, to_element, AttributeBase::AttributeKey{} );
     }
@@ -674,7 +671,6 @@ namespace geode
     void AttributeManager::copy_attribute_value(
         index_t from_element, index_t to_element )
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         impl_->copy_attribute_value(
             from_element, to_element, AttributeBase::AttributeKey{} );
     }
@@ -682,21 +678,18 @@ namespace geode
     void AttributeManager::interpolate_attribute_value(
         const AttributeLinearInterpolation &interpolation, index_t to_element )
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         impl_->interpolate_attribute_value(
             interpolation, to_element, AttributeBase::AttributeKey{} );
     }
 
     absl::FixedArray< geode::uuid > AttributeManager::attribute_ids() const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->attribute_ids();
     }
 
     bool AttributeManager::attribute_exists(
         const geode::uuid &attribute_id ) const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->attribute_exists( attribute_id );
     }
 
@@ -715,7 +708,6 @@ namespace geode
     std::string_view AttributeManager::attribute_type(
         const geode::uuid &attribute_id ) const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->attribute_type( attribute_id );
     }
 
@@ -778,7 +770,6 @@ namespace geode
         AttributeManager::attribute_ids_matching_name(
             std::string_view name ) const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->attribute_ids_matching_name( name );
     }
 
