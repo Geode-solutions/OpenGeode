@@ -319,6 +319,28 @@ void test_double_sparse_attribute(
         attribute->value( 3 ) == 5, "Should be equal to 5" );
 }
 
+void test_sparse_attribute_resize()
+{
+    geode::AttributeManager manager;
+    manager.resize( 10 );
+    const geode::uuid attribute_id;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 12.;
+    manager.create_attribute< geode::SparseAttribute, double >( "sparse",
+        attribute_id, attribute_values, geode::AttributeProperties{} );
+    auto sparse_attribute =
+        manager.find_attribute< geode::SparseAttribute, double >(
+            attribute_id );
+    sparse_attribute->set_value( 2, 2 );
+    sparse_attribute->set_value( 8, 8 );
+    manager.resize( 5 );
+    manager.resize( 10 );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 2 ) == 2,
+        "Sparse value 2 should be kept after resize" );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 8 ) == 12,
+        "Sparse value 8 should be reset after shrinking" );
+}
+
 void test_double_array_attribute( geode::AttributeManager& manager )
 {
     geode::AttributeProperties attribute_properties;
@@ -582,14 +604,16 @@ void test_sparse_attribute_after_element_deletion(
 {
     const auto sparse_attribute =
         manager.find_read_only_attribute< double >( double_attribute_id );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 0 ) == 12,
-        "Element 0 of sparse attribute should be 12 " );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 3 ) == 3,
-        "Element 3 of sparse attribute should be 3 " );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 5 ) == 8.1,
-        "Element 5 of sparse attribute should be 8.1 " );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 7 ) == 7,
-        "Element 7 of sparse attribute should be 7 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 0 ) == 3,
+        "Element 0 of sparse attribute should be 3 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 1 ) == 12,
+        "Element 1 of sparse attribute should be 12 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 2 ) == 8.1,
+        "Element 2 of sparse attribute should be 8.1 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 3 ) == 7,
+        "Element 3 of sparse attribute should be 7 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 6 ) == 5,
+        "Element 6 of sparse attribute should be 5 " );
 }
 
 geode::uuid test_generic_value( geode::AttributeManager& manager,
@@ -943,14 +967,20 @@ void test_permutation( geode::AttributeManager& manager,
 
     auto double_attribute =
         manager.find_read_only_attribute< double >( double_att_id );
-    geode::OpenGeodeBasicException::test( double_attribute->value( 2 ) == 12,
-        "Attribute value 2 should be equal to 3, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 0 ) == 3,
+        "Attribute value 0 should be equal to 3, not ",
+        double_attribute->value( 0 ) );
+    geode::OpenGeodeBasicException::test( double_attribute->value( 2 ) == 8.1,
+        "Attribute value 2 should be equal to 8.1, not ",
         double_attribute->value( 2 ) );
-    geode::OpenGeodeBasicException::test( double_attribute->value( 4 ) == 3,
-        "Attribute value 4 should be equal to 3, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 4 ) == 7,
+        "Attribute value 4 should be equal to 7, not ",
         double_attribute->value( 4 ) );
-    geode::OpenGeodeBasicException::test( double_attribute->value( 7 ) == 8.1,
-        "Attribute value 7 should be equal to 8.1, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 8 ) == 5,
+        "Attribute value 8 should be equal to 5, not ",
+        double_attribute->value( 8 ) );
+    geode::OpenGeodeBasicException::test( double_attribute->value( 7 ) == 12,
+        "Attribute value 7 should be equal to 12, not ",
         double_attribute->value( 7 ) );
 }
 
@@ -1141,6 +1171,7 @@ void test()
         manager, foo_sparse_attribute_id, double_sparse_attribute_id );
     test_permutation(
         manager, int_variable_attribute_id, double_sparse_attribute_id );
+    test_sparse_attribute_resize();
     test_delete_attribute_elements( manager );
     test_sparse_attribute_after_element_deletion(
         manager, double_sparse_attribute_id );
