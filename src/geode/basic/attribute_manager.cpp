@@ -760,7 +760,6 @@ namespace geode
 
     index_t AttributeManager::nb_elements() const
     {
-        absl::ReaderMutexLock lock{ impl_->mutex() };
         return impl_->nb_elements();
     }
 
