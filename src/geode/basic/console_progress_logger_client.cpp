@@ -23,6 +23,8 @@
 
 #include <geode/basic/console_progress_logger_client.hpp>
 
+#include <cmath>
+
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/logger.hpp>
@@ -61,26 +63,44 @@ namespace geode
             index_t current,
             index_t nb_steps )
         {
+            const auto info = info_.find( progress_logger_id );
+            if( info == info_.end() )
+            {
+                return;
+            }
+            if( nb_steps == 0 )
+            {
+                Logger::log( level, info->second.message, " ", current );
+                return;
+            }
             const auto percent =
                 std::floor( static_cast< double >( current ) / nb_steps * 100 );
-            Logger::log( level, info_.at( progress_logger_id ).message, " ",
-                current, "/", nb_steps, " (", percent, "%)" );
+            Logger::log( level, info->second.message, " ", current, "/",
+                nb_steps, " (", percent, "%)" );
         }
 
         void completed( const uuid& progress_logger_id, Logger::LEVEL level )
         {
-            const auto& info = info_.at( progress_logger_id );
-            Logger::log(
-                level, info.message, " completed in ", info.timer.duration() );
-            info_.erase( progress_logger_id );
+            const auto info = info_.find( progress_logger_id );
+            if( info == info_.end() )
+            {
+                return;
+            }
+            Logger::log( level, info->second.message, " completed in ",
+                info->second.timer.duration() );
+            info_.erase( info );
         }
 
         void failed( const uuid& progress_logger_id, Logger::LEVEL level )
         {
-            const auto& info = info_.at( progress_logger_id );
-            Logger::log(
-                level, info.message, " failed in ", info.timer.duration() );
-            info_.erase( progress_logger_id );
+            const auto info = info_.find( progress_logger_id );
+            if( info == info_.end() )
+            {
+                return;
+            }
+            Logger::log( level, info->second.message, " failed in ",
+                info->second.timer.duration() );
+            info_.erase( info );
         }
 
     private:
