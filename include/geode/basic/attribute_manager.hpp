@@ -250,6 +250,7 @@ namespace geode
          * of an existing attribute of this manager.
          * @param[in] attribute_id The id of the attribute to copy.
          * @param[in] new_attribute_id The id to give to the new attribute.
+         * @exception OpenGeodeException if the attribute is a time series step.
          */
         void copy_attribute( const geode::uuid& attribute_id,
             const geode::uuid& new_attribute_id );

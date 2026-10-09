@@ -209,13 +209,17 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::data,
                 "[AttributeManager::copy_attribute] Attribute with id '",
                 new_attribute_id.string(), "' already exists." );
+            // A copy keeps the name, it would duplicate the step time or
+            // break the time series if the time was removed
+            OpenGeodeBasicException::check_exception(
+                !attribute_it->second->properties().time.has_value(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::copy_attribute] Cannot copy attribute '",
+                attribute_id.string(), "': it is a step of time series '",
+                attribute_it->second->name().value_or( "" ), "'." );
             auto new_attribute = attribute_it->second->clone( key );
             IdentifierBuilder builder{ *new_attribute };
             builder.set_id( new_attribute_id );
-            // A copy is not a new step of the time series
-            auto properties = new_attribute->properties();
-            properties.time.reset();
-            new_attribute->set_properties( properties );
             attributes_.emplace( new_attribute_id, std::move( new_attribute ) );
         }
 

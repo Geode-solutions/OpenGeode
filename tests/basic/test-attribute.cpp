@@ -1135,6 +1135,33 @@ void test_time_series_serialization( const geode::AttributeManager& manager )
         "Velocity steps should be reloaded" );
 }
 
+void test_time_series_copy_step( geode::AttributeManager& manager )
+{
+    const auto step_id = manager.time_steps( "pressure" ).front().attribute_id;
+    const auto nb_attributes = manager.attribute_ids().size();
+    bool thrown{ false };
+    try
+    {
+        manager.copy_attribute( step_id, geode::uuid{} );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeBasicException::test(
+        thrown, "Copying a time series step should throw" );
+    geode::OpenGeodeBasicException::test(
+        manager.attribute_ids().size() == nb_attributes,
+        "Failed copy should not add an attribute" );
+    const auto new_step_id =
+        manager.create_time_step_attribute< geode::VariableAttribute, double >(
+            "pressure", 20, { pressure_value( 20, -1 ), 0 }, {} );
+    geode::OpenGeodeBasicException::test(
+        manager.time_steps( "pressure" ).size() == 4
+            && manager.attribute_exists( new_step_id ),
+        "Time series should still accept new steps" );
+}
+
 void test_time_series()
 {
     auto manager = create_time_series_manager();
@@ -1142,6 +1169,7 @@ void test_time_series()
     test_time_series_element_edition( manager );
     test_time_series_transfer( manager );
     test_time_series_serialization( manager );
+    test_time_series_copy_step( manager );
 }
 
 void test()
