@@ -23,6 +23,8 @@
 
 #include <geode/basic/library.hpp>
 
+#include <mutex>
+
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -34,16 +36,17 @@ namespace geode
         void call_initialize( Library& library, const char* library_name )
         {
             geode_unused( library_name );
-            if( !is_loaded_ )
-            {
-                is_loaded_ = true;
+            // If do_initialize throws, the flag is not set and a later call
+            // will retry the initialization
+            std::call_once( is_loaded_, [&library, library_name] {
+                geode_unused( library_name );
                 library.do_initialize();
-                DEBUG_LOGGER( library_name, "Library initialized" );
-            }
+                DEBUG_LOGGER( library_name, " library initialized" );
+            } );
         }
 
     private:
-        bool is_loaded_{ false };
+        std::once_flag is_loaded_;
     };
 
     Library::Library() = default;
