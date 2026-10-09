@@ -235,6 +235,11 @@ namespace
                 }
                 const auto solid_edge =
                     mesh.edges().edge_from_vertices( unique_vertices ).value();
+                geode::OpenGeodeModelException::check_assertion(
+                    !model2mesh.line_edges_mapping.has_mapping_output(
+                        solid_edge ),
+                    "[map_line_edges] Mesh edge ", solid_edge,
+                    " is already mapped to another Line edge." );
                 model2mesh.line_edges_mapping.map(
                     { line.id(), line_edge }, solid_edge );
             }
@@ -387,6 +392,11 @@ namespace
                     mesh.facets()
                         .facet_from_vertices( unique_vertices )
                         .value();
+                geode::OpenGeodeModelException::check_assertion(
+                    !brep2mesh.surface_polygons_mapping.has_mapping_output(
+                        solid_facet ),
+                    "[map_polygons_to_solid_facets] Solid facet ", solid_facet,
+                    " is already mapped to another Surface polygon." );
                 brep2mesh.surface_polygons_mapping.map(
                     { surface.id(), surface_polygon }, solid_facet );
             }
