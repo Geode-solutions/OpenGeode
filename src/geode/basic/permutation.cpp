@@ -29,18 +29,22 @@
 
 #include <geode/basic/permutation.hpp>
 
-#include <async++.h>
-
 namespace geode
 {
     std::vector< index_t > old2new_permutation(
         absl::Span< const index_t > permutation )
     {
-        std::vector< index_t > old2new( permutation.size() );
-        async::parallel_for( async::irange( size_t{ 0 }, permutation.size() ),
-            [&old2new, &permutation]( size_t index ) {
-                old2new[permutation[index]] = index;
-            } );
+        std::vector< index_t > old2new( permutation.size(), NO_ID );
+        for( const auto new_index : Indices{ permutation } )
+        {
+            const auto old_index = permutation[new_index];
+            OpenGeodeBasicException::check_exception(
+                old_index < permutation.size() && old2new[old_index] == NO_ID,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[old2new_permutation] Input is not a permutation: value ",
+                old_index, " is out of range or duplicated" );
+            old2new[old_index] = new_index;
+        }
         return old2new;
     }
 } // namespace geode
