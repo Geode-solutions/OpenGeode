@@ -23,8 +23,12 @@
 
 #include <geode/basic/filename.hpp>
 
+#include <cstdlib>
 #include <filesystem>
 #include <string_view>
+
+#include <absl/strings/match.h>
+#include <absl/strings/str_cat.h>
 
 namespace geode
 {
@@ -56,19 +60,35 @@ namespace geode
 
     std::string_view extension_from_filename( std::string_view filename )
     {
-        return filename.substr( filename.find_last_of( '.' ) + 1 );
+        const auto separator = filename.find_last_of( "/\\" );
+        const auto name = separator == std::string_view::npos
+                              ? filename
+                              : filename.substr( separator + 1 );
+        const auto dot = name.find_last_of( '.' );
+        if( dot == std::string_view::npos || dot == 0 )
+        {
+            return {};
+        }
+        return name.substr( dot + 1 );
     }
 
     std::string expand_predefined_folders( std::string_view path )
     {
-        if( path.empty() )
+        const auto is_home = path == "~" || absl::StartsWith( path, "~/" )
+                             || absl::StartsWith( path, "~\\" );
+        if( !is_home )
         {
             return to_string( path );
         }
-        if( path[0] == '~' )
+        const auto* home = std::getenv( "HOME" );
+        if( home == nullptr )
         {
-            return absl::StrCat( std::getenv( "HOME" ), path.substr( 1 ) );
+            home = std::getenv( "USERPROFILE" );
         }
-        return to_string( path );
+        if( home == nullptr )
+        {
+            return to_string( path );
+        }
+        return absl::StrCat( home, path.substr( 1 ) );
     }
 } // namespace geode
