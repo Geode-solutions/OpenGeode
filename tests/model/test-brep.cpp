@@ -1343,12 +1343,30 @@ void test_components_attribute( geode::BRep& model )
     }
 }
 
-void test_physical_properties( const geode::BRep& model,
+void test_surface_physical_attribute( const geode::BRep& model,
     const geode::uuid& attribute_id,
+    std::string_view context )
+{
+    for( const auto& surface : model.surfaces() )
+    {
+        test_components_attribute_values(
+            attribute_id, 1e7,
+            [&surface]() -> geode::AttributeManager& {
+                return surface.mesh().polygon_attribute_manager();
+            },
+            context );
+    }
+}
+
+void test_physical_properties( const geode::BRep& model,
+    const geode::uuid& block_attribute_id,
+    const geode::uuid& surface_attribute_id,
     std::string_view context )
 {
     geode::OpenGeodeModelException::test(
         model.has_physical_property( geode::PHYSICAL_PROPERTY_NAME::porosity )
+            && model.has_physical_property(
+                geode::PHYSICAL_PROPERTY_NAME::boundary_pressure )
             && !model.has_physical_property(
                 geode::PHYSICAL_PROPERTY_NAME::permeability ),
         context, " Wrong physical properties." );
@@ -1356,17 +1374,27 @@ void test_physical_properties( const geode::BRep& model,
         model.physical_property_info( geode::PHYSICAL_PROPERTY_NAME::porosity );
     geode::OpenGeodeModelException::test(
         info.component_type == geode::Block3D::component_type_static()
-            && info.attribute_id == attribute_id,
+            && info.attribute_id == block_attribute_id,
         context, " Wrong physical property info." );
-    test_block_physical_attribute( model, attribute_id, context );
+    test_block_physical_attribute( model, block_attribute_id, context );
+    const auto& surface_info = model.physical_property_info(
+        geode::PHYSICAL_PROPERTY_NAME::boundary_pressure );
+    geode::OpenGeodeModelException::test(
+        surface_info.component_type == geode::Surface3D::component_type_static()
+            && surface_info.attribute_id == surface_attribute_id,
+        context, " Wrong surface physical property info." );
+    test_surface_physical_attribute( model, surface_attribute_id, context );
 }
 
-void test_clone( const geode::BRep& brep, const geode::uuid& attribute_id )
+void test_clone( const geode::BRep& brep,
+    const geode::uuid& block_attribute_id,
+    const geode::uuid& surface_attribute_id )
 {
     geode::BRep brep2;
     geode::BRepBuilder builder{ brep2 };
     builder.copy( brep );
-    test_physical_properties( brep2, attribute_id, "[Test] copy" );
+    test_physical_properties(
+        brep2, block_attribute_id, surface_attribute_id, "[Test] copy" );
     geode::OpenGeodeModelException::test(
         brep2.nb_corners() == 6, "BRep should have 6 corners" );
     geode::OpenGeodeModelException::test(
@@ -1865,9 +1893,18 @@ void test()
         "porosity", physical_attribute_id, porosity_values, {} );
     builder.set_physical_property( geode::PHYSICAL_PROPERTY_NAME::porosity,
         geode::Block3D::component_type_static(), physical_attribute_id );
-    test_physical_properties(
-        model.clone(), physical_attribute_id, "[Test] clone" );
-    test_clone( model, physical_attribute_id );
+    const geode::uuid boundary_attribute_id;
+    geode::AttributeValues< double > pressure_values;
+    pressure_values.default_value = 1e7;
+    pressure_values.no_value = -1.;
+    builder.create_surfaces_attribute< geode::VariableAttribute, double >(
+        "pressure", boundary_attribute_id, pressure_values, {} );
+    builder.set_physical_property(
+        geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
+        geode::Surface3D::component_type_static(), boundary_attribute_id );
+    test_physical_properties( model.clone(), physical_attribute_id,
+        boundary_attribute_id, "[Test] clone" );
+    test_clone( model, physical_attribute_id, boundary_attribute_id );
     test_components_attribute( model );
     test_steal_mesh( model );
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
@@ -1884,7 +1921,8 @@ void test()
             "[Backward_IO] Incorrect model2 unique_vertex_id." );
     }
     test_compare_brep( model, model2 );
-    test_physical_properties( model2, physical_attribute_id, "[Test] reload" );
+    test_physical_properties(
+        model2, physical_attribute_id, boundary_attribute_id, "[Test] reload" );
     test_registry( model2, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 
     geode::BRep model3{ std::move( model2 ) };

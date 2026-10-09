@@ -26,7 +26,6 @@
 #include <numeric>
 
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 
 #include <geode/mesh/builder/mesh_builder_factory.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>

@@ -34,7 +34,6 @@
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/common.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
