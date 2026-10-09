@@ -90,7 +90,6 @@ geode::uuid test_create_vertex_attribute( const geode::PointSet3D& point_set )
     attribute_properties.transferable = true;
     geode::AttributeValues< bool > attribute_values;
     attribute_values.default_value = true;
-    attribute_values.no_value = true;
     auto attribute_id =
         point_set.vertex_attribute_manager()
             .create_attribute< geode::ConstantAttribute, bool >(

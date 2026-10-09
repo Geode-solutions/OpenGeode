@@ -37,7 +37,8 @@ def test_constant_attribute(manager):
     properties.transferable = True
     values = basic.AttributeValuesBool()
     values.default_value = True
-    values.no_value = False
+    if values.no_value is not None:
+        raise ValueError("[Test] no_value should be None by default")
     constant_attribute_id = manager.create_attribute_constant_bool(
         "bool", values, properties)
     constant_attribute = manager.find_attribute_constant_bool(constant_attribute_id)

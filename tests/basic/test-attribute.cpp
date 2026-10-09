@@ -117,7 +117,6 @@ void test_constant_attribute(
     attribute_properties.transferable = true;
     geode::AttributeValues< bool > attribute_values;
     attribute_values.default_value = true;
-    attribute_values.no_value = true;
     manager.create_attribute< geode::ConstantAttribute, bool >(
         "bool", attribute_id, attribute_values, attribute_properties );
     auto constant_attribute =
@@ -401,7 +400,6 @@ void test_bool_variable_attribute(
     attribute_properties.transferable = true;
     geode::AttributeValues< bool > attribute_values;
     attribute_values.default_value = false;
-    attribute_values.no_value = false;
     manager.create_attribute< geode::VariableAttribute, bool >(
         "bool", attribute_id, attribute_values, attribute_properties );
 
@@ -616,7 +614,6 @@ geode::uuid test_generic_value( geode::AttributeManager& manager,
     attribute_properties.transferable = true;
     geode::AttributeValues< std::array< double, 2 > > attribute_values;
     attribute_values.default_value = {};
-    attribute_values.no_value = {};
     auto array_attr_id = manager.create_attribute< geode::VariableAttribute,
         std::array< double, 2 > >(
         "array_double_2", attribute_values, attribute_properties );
@@ -817,6 +814,117 @@ void test_multi_import_manager()
     }
 }
 
+void check_no_value_attributes( const geode::AttributeManager& manager,
+    const geode::uuid& int_id,
+    const geode::uuid& index_id,
+    const geode::uuid& double_id,
+    const geode::uuid& bool_id )
+{
+    const auto int_attribute =
+        manager.find_read_only_attribute< int >( int_id );
+    const auto index_attribute =
+        manager.find_read_only_attribute< geode::index_t >( index_id );
+    const auto double_attribute =
+        manager.find_read_only_attribute< double >( double_id );
+    const auto bool_attribute =
+        manager.find_read_only_attribute< bool >( bool_id );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        geode::OpenGeodeBasicException::test(
+            int_attribute->has_value( element ),
+            "Attribute without no_value should always have a value" );
+        geode::OpenGeodeBasicException::test(
+            bool_attribute->has_value( element ),
+            "Bool attribute without no_value should always have a value" );
+        geode::OpenGeodeBasicException::test(
+            index_attribute->has_value( element ) == ( element % 2 == 0 ),
+            "Wrong has_value for index attribute element ", element );
+        geode::OpenGeodeBasicException::test(
+            double_attribute->has_value( element ) == ( element == 3 ),
+            "Wrong has_value for double attribute element ", element );
+    }
+}
+
+void test_no_value()
+{
+    geode::AttributeManager manager;
+    manager.resize( 6 );
+    geode::AttributeValues< int > int_values;
+    int_values.default_value = 0;
+    const auto int_id =
+        manager.create_attribute< geode::VariableAttribute, int >(
+            "int", int_values, {} );
+    geode::OpenGeodeBasicException::test(
+        !manager.find_attribute< geode::VariableAttribute, int >( int_id )
+            ->default_values()
+            .no_value.has_value(),
+        "no_value should be empty by default" );
+    geode::AttributeValues< geode::index_t > index_values;
+    index_values.default_value = geode::NO_ID;
+    index_values.no_value = geode::NO_ID;
+    const auto index_id =
+        manager.create_attribute< geode::VariableAttribute, geode::index_t >(
+            "index", index_values, {} );
+    auto index_attribute =
+        manager.find_attribute< geode::VariableAttribute, geode::index_t >(
+            index_id );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        if( element % 2 == 0 )
+        {
+            index_attribute->set_value( element, element );
+        }
+    }
+    geode::AttributeValues< double > double_values;
+    double_values.default_value = std::nan( "" );
+    double_values.no_value = std::nan( "" );
+    const auto double_id =
+        manager.create_attribute< geode::SparseAttribute, double >(
+            "double", double_values, {} );
+    manager.find_attribute< geode::SparseAttribute, double >( double_id )
+        ->set_value( 3, 3. );
+    geode::AttributeValues< bool > bool_values;
+    bool_values.default_value = false;
+    const auto bool_id =
+        manager.create_attribute< geode::VariableAttribute, bool >(
+            "bool", bool_values, {} );
+    check_no_value_attributes( manager, int_id, index_id, double_id, bool_id );
+
+    const auto filename = "no_value_manager.out";
+    std::ofstream file{ filename, std::ofstream::binary };
+    geode::TContext context{};
+    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
+    geode::Serializer archive{ context, file };
+    archive.object( manager );
+    archive.adapter().flush();
+    file.close();
+    geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
+        "Error while writing file: ", filename );
+
+    std::ifstream infile{ filename, std::ifstream::binary };
+    geode::AttributeManager reloaded_manager;
+    geode::TContext reload_context{};
+    geode::register_basic_deserialize_pcontext(
+        std::get< 0 >( reload_context ) );
+    geode::Deserializer unarchive{ reload_context, infile };
+    unarchive.object( reloaded_manager );
+    const auto& adapter = unarchive.adapter();
+    geode::OpenGeodeBasicException::test(
+        adapter.error() == bitsery::ReaderError::NoError
+            && adapter.isCompletedSuccessfully()
+            && std::get< 1 >( reload_context ).isValid(),
+        "Error while reading file: ", filename );
+    check_no_value_attributes(
+        reloaded_manager, int_id, index_id, double_id, bool_id );
+    const auto reloaded_index =
+        reloaded_manager
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                index_id );
+    geode::OpenGeodeBasicException::test(
+        reloaded_index->default_values().no_value == geode::NO_ID,
+        "Wrong no_value after reloading" );
+}
+
 void test_permutation( geode::AttributeManager& manager,
     const geode::uuid& int_att_id,
     const geode::uuid& double_att_id )
@@ -909,8 +1017,8 @@ geode::AttributeManager create_time_series_manager()
         auto step = manager.find_attribute< geode::VariableAttribute,
             std::array< double, 3 > >(
             manager.create_time_step_attribute< geode::VariableAttribute,
-                std::array< double, 3 > >(
-                "velocity", time, { { 0, 0, 0 }, { 0, 0, 0 } }, {} ) );
+                std::array< double, 3 > >( "velocity", time,
+                { { 0, 0, 0 }, std::array< double, 3 >{ 0, 0, 0 } }, {} ) );
         step->set_value( 3, { time, 0, 0 } );
     }
     return manager;
@@ -1045,6 +1153,7 @@ void test()
     test_import_manager( manager, bool_variable_attribute_id,
         array_double_attribute_id, double_sparse_attribute_id );
     test_multi_import_manager();
+    test_no_value();
     test_attribute_types( manager, bool_variable_attribute_id );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( bool_variable_attribute_id );
