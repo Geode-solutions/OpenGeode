@@ -33,6 +33,16 @@ namespace geode
             module, "PHYSICAL_PROPERTY_NAME" )
             .value( "porosity", PHYSICAL_PROPERTY_NAME::porosity )
             .value( "permeability", PHYSICAL_PROPERTY_NAME::permeability )
+            .value(
+                "boundary_pressure", PHYSICAL_PROPERTY_NAME::boundary_pressure )
+            .value( "boundary_temperature",
+                PHYSICAL_PROPERTY_NAME::boundary_temperature )
+            .value( "boundary_oil_fraction",
+                PHYSICAL_PROPERTY_NAME::boundary_oil_fraction )
+            .value( "boundary_gas_fraction",
+                PHYSICAL_PROPERTY_NAME::boundary_gas_fraction )
+            .value( "boundary_water_fraction",
+                PHYSICAL_PROPERTY_NAME::boundary_water_fraction )
             .export_values();
 
         pybind11::class_< PhysicalProperties::Info >( module, "Info" )
