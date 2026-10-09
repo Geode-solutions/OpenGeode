@@ -244,11 +244,87 @@ void test_merge_mappings()
     }
 }
 
+void test_merge_model_mappings()
+{
+    const auto corner_type = geode::Corner3D::component_type_static();
+    const auto line_type = geode::Line3D::component_type_static();
+    const auto surface_type = geode::Surface3D::component_type_static();
+    const geode::uuid corner_in;
+    const geode::uuid corner_mid;
+    const geode::uuid corner_out;
+    const geode::uuid surface_in;
+    const geode::uuid surface_mid;
+    const geode::uuid surface_out;
+    const geode::uuid line_in;
+    const geode::uuid line_mid;
+
+    geode::ModelMappings mappings1;
+    mappings1.mesh_vertices_mapping[corner_type].map(
+        { corner_in, 0 }, { corner_mid, 0 } );
+    for( const auto v : geode::Range{ 3 } )
+    {
+        mappings1.mesh_vertices_mapping[surface_type].map(
+            { surface_in, v }, { surface_mid, v + 1 } );
+    }
+    mappings1.mesh_element_mapping[surface_type].map(
+        { surface_in, 0 }, { surface_mid, 1 } );
+    mappings1.mesh_element_mapping[surface_type].map(
+        { surface_in, 0 }, { surface_mid, 2 } );
+    mappings1.mesh_element_mapping[line_type].map(
+        { line_in, 0 }, { line_mid, 0 } );
+
+    geode::ModelMappings mappings2;
+    mappings2.mesh_vertices_mapping[corner_type].map(
+        { corner_mid, 0 }, { corner_out, 0 } );
+    for( const auto v : geode::Range{ 1, 4 } )
+    {
+        mappings2.mesh_vertices_mapping[surface_type].map(
+            { surface_mid, v }, { surface_out, 2 * v } );
+    }
+    mappings2.mesh_element_mapping[surface_type].map(
+        { surface_mid, 1 }, { surface_out, 5 } );
+    mappings2.mesh_element_mapping[surface_type].map(
+        { surface_mid, 2 }, { surface_out, 7 } );
+
+    const auto merged = geode::detail::merge_mappings( mappings1, mappings2 );
+    const auto& corner_vertices =
+        merged.mesh_vertices_mapping.at( corner_type );
+    geode::OpenGeodeModelException::test(
+        corner_vertices.size_in() == 1
+            && corner_vertices.in2out( { corner_in, 0 } ).at( 0 )
+                   == geode::MeshVertex{ corner_out, 0 },
+        "Wrong merged corner vertex mapping" );
+    const auto& surface_vertices =
+        merged.mesh_vertices_mapping.at( surface_type );
+    geode::OpenGeodeModelException::test( surface_vertices.size_in() == 3,
+        "Wrong merged surface vertex mapping size" );
+    for( const auto v : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeModelException::test(
+            surface_vertices.in2out( { surface_in, v } ).at( 0 )
+                == geode::MeshVertex{ surface_out, 2 * ( v + 1 ) },
+            "Wrong merged surface vertex mapping" );
+    }
+    const auto& surface_elements =
+        merged.mesh_element_mapping.at( surface_type );
+    geode::OpenGeodeModelException::test(
+        surface_elements.in2out( { surface_in, 0 } ).size() == 2,
+        "Wrong merged surface element mapping" );
+    geode::OpenGeodeModelException::test(
+        !merged.mesh_element_mapping.has_mapping_type( line_type ),
+        "Line element mapping should be absent: only in first mappings" );
+    geode::OpenGeodeModelException::test(
+        !merged.mesh_element_mapping.has_mapping_type( corner_type ),
+        "Corner element mapping should be absent" );
+}
+
 void test()
 {
     test_copy_mapping();
     test_generic_mapping();
     test_components_mapping();
+    test_merge_mappings();
+    test_merge_model_mappings();
 }
 
 OPENGEODE_TEST( "model-mapping" )
