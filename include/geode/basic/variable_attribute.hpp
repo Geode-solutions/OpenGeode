@@ -67,6 +67,8 @@ namespace geode
 
         [[nodiscard]] const T& value( index_t element ) const override
         {
+            OpenGeodeBasicException::check_assertion( element < values_.size(),
+                "[VariableAttribute::value] Invalid element ", element );
             return values_[element];
         }
 
@@ -89,6 +91,8 @@ namespace geode
 
         void set_value( index_t element, T value )
         {
+            OpenGeodeBasicException::check_assertion( element < values_.size(),
+                "[VariableAttribute::set_value] Invalid element ", element );
             values_[element] = std::move( value );
         }
 
@@ -140,6 +144,25 @@ namespace geode
             : ReadOnlyAttribute< T >( "default", AttributeProperties{} ) {};
 
         template < typename Archive >
+        static void serialize_values(
+            Archive& archive, std::vector< T >& values )
+        {
+            if constexpr( std::is_arithmetic_v< T > )
+            {
+                // Same layout as per item serialization, but in bulk
+                archive.template container< sizeof( T ) >(
+                    values, values.max_size() );
+            }
+            else
+            {
+                archive.container( values, values.max_size(),
+                    []( Archive& archive2, T& item ) {
+                        archive2( item );
+                    } );
+            }
+        }
+
+        template < typename Archive >
         void serialize( Archive& serializer )
         {
             serializer.ext( *this,
@@ -153,11 +176,7 @@ namespace geode
                          archive( old_value );
                          attribute.default_values_.default_value = old_value;
                          attribute.default_values_.no_value = old_value;
-                         archive.container( attribute.values_,
-                             attribute.values_.max_size(),
-                             []( Archive& archive2, T& item ) {
-                                 archive2( item );
-                             } );
+                         serialize_values( archive, attribute.values_ );
                      },
                         []( Archive& archive,
                             VariableAttribute< T >& attribute ) {
@@ -165,11 +184,7 @@ namespace geode
                                 attribute, bitsery::ext::BaseClass<
                                                ReadOnlyAttribute< T > >{} );
                             archive( attribute.default_values_ );
-                            archive.container( attribute.values_,
-                                attribute.values_.max_size(),
-                                []( Archive& archive2, T& item ) {
-                                    archive2( item );
-                                } );
+                            serialize_values( archive, attribute.values_ );
                         } } } );
             values_.reserve( 10 );
         }
@@ -177,11 +192,10 @@ namespace geode
         void resize(
             index_t size, AttributeBase::AttributeKey /*key*/ ) override
         {
-            const auto capacity = static_cast< index_t >( values_.capacity() );
-            if( size > capacity )
+            if( size > values_.capacity() )
             {
-                const auto next_capacity = capacity * 2;
-                values_.reserve( std::max( size, next_capacity ) );
+                values_.reserve(
+                    std::max< size_t >( size, values_.capacity() * 2 ) );
             }
             values_.resize( size, default_values_.default_value );
         }
@@ -224,14 +238,11 @@ namespace geode
             const auto& typed_attribute =
                 dynamic_cast< const VariableAttribute< T >& >( attribute );
             default_values_ = typed_attribute.default_values_;
-            if( nb_elements != 0 )
-            {
-                values_.resize( nb_elements, default_values_.default_value );
-                for( const auto i : Range{ nb_elements } )
-                {
-                    values_[i] = typed_attribute.value( i );
-                }
-            }
+            const auto nb_copied = std::min< size_t >(
+                nb_elements, typed_attribute.values_.size() );
+            values_.assign( typed_attribute.values_.begin(),
+                typed_attribute.values_.begin() + nb_copied );
+            values_.resize( nb_elements, default_values_.default_value );
         }
 
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
@@ -313,6 +324,12 @@ namespace geode
             {
                 for( const auto new_index : outs )
                 {
+                    OpenGeodeBasicException::check_exception(
+                        new_index < values_.size(), nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[VariableAttribute::import] The given mapping "
+                        "contains values that go beyond the number of "
+                        "elements." );
                     this->set_value( new_index, from.value( in ) );
                 }
             }
@@ -359,10 +376,12 @@ namespace geode
 
         void set_value( index_t element, bool value )
         {
-            values_[element] = std::move( value );
+            OpenGeodeBasicException::check_assertion( element < values_.size(),
+                "[VariableAttribute::set_value] Invalid element ", element );
+            values_[element] = value;
         }
 
-        [[nodiscard]] AttributeValues< bool > default_values() const
+        [[nodiscard]] const AttributeValues< bool >& default_values() const
         {
             return default_values_;
         }
@@ -436,17 +455,21 @@ namespace geode
                             archive.container1b( attribute.values_,
                                 attribute.values_.max_size() );
                         } } } );
+            // Values read from a file may not be valid booleans
+            for( auto& value : values_ )
+            {
+                value = static_cast< unsigned char >( value != 0 );
+            }
             values_.reserve( 10 );
         }
 
         void resize(
             index_t size, AttributeBase::AttributeKey /*key*/ ) override
         {
-            const auto capacity = static_cast< index_t >( values_.capacity() );
-            if( size > capacity )
+            if( size > values_.capacity() )
             {
-                const auto next_capacity = capacity * 2;
-                values_.reserve( std::max( size, next_capacity ) );
+                values_.reserve(
+                    std::max< size_t >( size, values_.capacity() * 2 ) );
             }
             values_.resize( size,
                 static_cast< unsigned char >( default_values_.default_value ) );
@@ -490,14 +513,12 @@ namespace geode
             const auto& typed_attribute =
                 dynamic_cast< const VariableAttribute< bool >& >( attribute );
             default_values_ = typed_attribute.default_values_;
-            if( nb_elements != 0 )
-            {
-                values_.resize( nb_elements );
-                for( const auto i : Range{ nb_elements } )
-                {
-                    values_[i] = typed_attribute.value( i );
-                }
-            }
+            const auto nb_copied = std::min< size_t >(
+                nb_elements, typed_attribute.values_.size() );
+            values_.assign( typed_attribute.values_.begin(),
+                typed_attribute.values_.begin() + nb_copied );
+            values_.resize( nb_elements,
+                static_cast< unsigned char >( default_values_.default_value ) );
         }
 
         [[nodiscard]] std::shared_ptr< AttributeBase > extract(
@@ -580,6 +601,12 @@ namespace geode
             {
                 for( const auto new_index : outs )
                 {
+                    OpenGeodeBasicException::check_exception(
+                        new_index < values_.size(), nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[VariableAttribute::import] The given mapping "
+                        "contains values that go beyond the number of "
+                        "elements." );
                     this->set_value( new_index, from.value( in ) );
                 }
             }

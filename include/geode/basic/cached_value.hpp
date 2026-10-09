@@ -95,11 +95,7 @@ namespace geode
 
         bool operator!=( const CachedValue& other ) const
         {
-            if( computed() && other.computed() )
-            {
-                return value() != other.value();
-            }
-            return false;
+            return !( *this == other );
         }
 
         void reset() const
@@ -137,7 +133,7 @@ namespace geode
 
     private:
         mutable std::atomic< bool > computed_{ false };
-        mutable ReturnType value_;
+        mutable ReturnType value_{};
         mutable absl::Mutex mutex_;
     };
 } // namespace geode

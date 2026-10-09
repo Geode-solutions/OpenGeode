@@ -109,7 +109,7 @@ namespace geode
                         } } } );
         }
 
-        AttributeType default_value;
+        AttributeType default_value{};
         std::optional< AttributeType > no_value{};
     };
 
@@ -153,6 +153,7 @@ namespace geode
                 OpenGeodeException::TYPE::data,
                 "[AttributeLinearInterpolation] Both arrays should have the "
                 "same size" );
+
             for( const auto index : Indices{ indices } )
             {
                 indices_[index] = indices[index];
@@ -181,6 +182,10 @@ namespace geode
             const Attribute< Type >& attribute )                               \
         {                                                                      \
             Type result{ 0 };                                                  \
+            if( interpolator.indices_.empty() )                                \
+            {                                                                  \
+                return attribute.default_values().default_value;               \
+            }                                                                  \
             bool is_same{ true };                                              \
             const auto& first_value =                                          \
                 attribute.value( interpolator.indices_[0] );                   \
@@ -216,6 +221,10 @@ namespace geode
         {                                                                      \
             std::array< Type, array_size > result;                             \
             result.fill( 0 );                                                  \
+            if( interpolator.indices_.empty() )                                \
+            {                                                                  \
+                return attribute.default_values().default_value;               \
+            }                                                                  \
             bool is_same{ true };                                              \
             const auto& first_value =                                          \
                 attribute.value( interpolator.indices_[0] );                   \
