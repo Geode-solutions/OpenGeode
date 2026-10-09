@@ -20,10 +20,9 @@
  * SOFTWARE.
  *
  */
+#include <atomic>
 #include <geode/basic/logger.hpp>
 #include <iostream>
-
-#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/logger_manager.hpp>
 #include <geode/basic/pimpl_impl.hpp>
@@ -35,22 +34,44 @@ namespace geode
     public:
         LEVEL level() const
         {
-            return level_;
+            return level_.load( std::memory_order_relaxed );
         }
 
         void set_level( LEVEL level )
         {
-            level_ = level;
+            level_.store( level, std::memory_order_relaxed );
         }
 
         void log( LEVEL level, const std::string &message )
         {
-            leveled_log.at( level )( message );
+            switch( level )
+            {
+                case LEVEL::trace:
+                    log_trace( message );
+                    return;
+                case LEVEL::debug:
+                    log_debug( message );
+                    return;
+                case LEVEL::info:
+                    log_info( message );
+                    return;
+                case LEVEL::warning:
+                    log_warn( message );
+                    return;
+                case LEVEL::error:
+                    log_error( message );
+                    return;
+                case LEVEL::critical:
+                    log_critical( message );
+                    return;
+                case LEVEL::off:
+                    return;
+            }
         }
 
         void log_trace( const std::string &message )
         {
-            if( level_ <= LEVEL::trace )
+            if( level() <= LEVEL::trace )
             {
                 LoggerManager::trace( message );
             }
@@ -58,7 +79,7 @@ namespace geode
 
         void log_debug( const std::string &message )
         {
-            if( level_ <= LEVEL::debug )
+            if( level() <= LEVEL::debug )
             {
                 LoggerManager::debug( message );
             }
@@ -66,7 +87,7 @@ namespace geode
 
         void log_info( const std::string &message )
         {
-            if( level_ <= LEVEL::info )
+            if( level() <= LEVEL::info )
             {
                 LoggerManager::info( message );
             }
@@ -74,7 +95,7 @@ namespace geode
 
         void log_warn( const std::string &message )
         {
-            if( level_ <= LEVEL::warning )
+            if( level() <= LEVEL::warning )
             {
                 LoggerManager::warning( message );
             }
@@ -82,7 +103,7 @@ namespace geode
 
         void log_error( const std::string &message )
         {
-            if( level_ <= LEVEL::error )
+            if( level() <= LEVEL::error )
             {
                 LoggerManager::error( message );
             }
@@ -90,25 +111,14 @@ namespace geode
 
         void log_critical( const std::string &message )
         {
-            if( level_ <= LEVEL::critical )
+            if( level() <= LEVEL::critical )
             {
                 LoggerManager::critical( message );
             }
         }
 
     private:
-        const absl::flat_hash_map< geode::Logger::LEVEL,
-            std::function< void( const std::string & ) > >
-            leveled_log{
-                { geode::Logger::LEVEL::trace, geode::Logger::log_trace },
-                { geode::Logger::LEVEL::debug, geode::Logger::log_debug },
-                { geode::Logger::LEVEL::info, geode::Logger::log_info },
-                { geode::Logger::LEVEL::warning, geode::Logger::log_warn },
-                { geode::Logger::LEVEL::error, geode::Logger::log_error },
-                { geode::Logger::LEVEL::critical, geode::Logger::log_critical }
-            };
-
-        LEVEL level_{ LEVEL::info };
+        std::atomic< LEVEL > level_{ LEVEL::info };
     };
 
     Logger::Logger() = default;
@@ -131,7 +141,12 @@ namespace geode
         instance().impl_->set_level( level );
     }
 
-    void Logger::log( LEVEL level, const std::string &message )
+    bool Logger::is_enabled( LEVEL level )
+    {
+        return level != LEVEL::off && level >= instance().impl_->level();
+    }
+
+    void Logger::log_message( LEVEL level, const std::string &message )
     {
         instance().impl_->log( level, message );
     }

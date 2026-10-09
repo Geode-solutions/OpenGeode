@@ -30,6 +30,7 @@
 #include <vector>
 
 #include <absl/strings/ascii.h>
+#include <absl/strings/str_join.h>
 
 #include <geode/basic/filename.hpp>
 #include <geode/basic/logger.hpp>
@@ -46,7 +47,9 @@ namespace geode::detail
             absl::AsciiStrToLower( extension_from_filename( filename ) );
         OpenGeodeBasicException::check_exception(
             Factory::has_creator( extension ), nullptr,
-            OpenGeodeException::TYPE::data, "Unknown extension: ", extension );
+            OpenGeodeException::TYPE::data, "Unknown extension \"", extension,
+            "\" for file \"", filename, "\". Available extensions: ",
+            absl::StrJoin( Factory::list_creators(), ", " ) );
         return Factory::create(
             extension, expand_predefined_folders( filename ) );
     }
@@ -57,21 +60,15 @@ namespace geode::detail
     {
         const Timer timer;
         auto output = geode_object_output_writer< Factory >( filename );
-        const auto directories = filepath_without_filename( filename );
+        const auto directories = filepath_without_filename(
+            std::filesystem::path{ expand_predefined_folders( filename ) } );
         if( !directories.empty() )
         {
             std::filesystem::create_directories( directories );
         }
         auto output_filenames = output->write( object );
-        std::string joined_filenames;
-        for( const auto& output_filename : output_filenames )
-        {
-            absl::StrAppend( &joined_filenames, output_filename, ", " );
-        }
-        joined_filenames.pop_back();
-        joined_filenames.pop_back();
-        Logger::info(
-            type, " saved in ", joined_filenames, " in ", timer.duration() );
+        Logger::info( type, " saved in ",
+            absl::StrJoin( output_filenames, ", " ), " in ", timer.duration() );
         return output_filenames;
     }
 } // namespace geode::detail

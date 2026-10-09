@@ -31,7 +31,7 @@ namespace geode
     std::vector< std::string_view > string_split( std::string_view string )
     {
         return absl::StrSplit( absl::StripAsciiWhitespace( string ),
-            absl::ByAnyChar( " 	" ) /* space + tab */, absl::SkipWhitespace() );
+            absl::ByAnyChar( " \t" ), absl::SkipWhitespace() );
     }
 
     bool string_starts_with( std::string_view string, std::string_view check )
@@ -44,7 +44,7 @@ namespace geode
         index_t value{ 0 };
         const auto status = absl::SimpleAtoi( string, &value );
         OpenGeodeBasicException::check_exception( status, nullptr,
-            OpenGeodeException::TYPE::internal,
+            OpenGeodeException::TYPE::data,
             "[string_to_index] Cannot convert string \"", string,
             "\" to index" );
         return value;
@@ -55,7 +55,7 @@ namespace geode
         int value{ 0 };
         const auto status = absl::SimpleAtoi( string, &value );
         OpenGeodeBasicException::check_exception( status, nullptr,
-            OpenGeodeException::TYPE::internal,
+            OpenGeodeException::TYPE::data,
             "[string_to_int] Cannot convert string \"", string, "\" to int" );
         return value;
     }
@@ -65,7 +65,7 @@ namespace geode
         float value{ 0 };
         const auto status = absl::SimpleAtof( string, &value );
         OpenGeodeBasicException::check_exception( status, nullptr,
-            OpenGeodeException::TYPE::internal,
+            OpenGeodeException::TYPE::data,
             "[string_to_float] Cannot convert string \"", string,
             "\" to float" );
         return value;
@@ -76,7 +76,7 @@ namespace geode
         double value{ 0 };
         const auto status = absl::SimpleAtod( string, &value );
         OpenGeodeBasicException::check_exception( status, nullptr,
-            OpenGeodeException::TYPE::internal,
+            OpenGeodeException::TYPE::data,
             "[string_to_double] Cannot convert string \"", string,
             "\" to double" );
         return value;

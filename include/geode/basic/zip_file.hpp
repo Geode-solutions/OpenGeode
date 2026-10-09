@@ -40,11 +40,20 @@ namespace geode
             std::string_view file, std::string_view archive_temp_filename );
         ~ZipFile();
 
-        void archive_files( absl::Span< const std::string_view >& files ) const;
+        void archive_files( absl::Span< const std::string_view > files ) const;
 
         void archive_file( std::string_view file ) const;
 
         [[nodiscard]] std::string directory() const;
+
+        /*!
+         * Write the archive to its final location.
+         * Called by the destructor if not done before, unless an exception is
+         * being thrown, in which case the archive is discarded and any
+         * existing file is left untouched.
+         * @exception OpenGeodeException if the archive cannot be written.
+         */
+        void finalize();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -26,6 +26,30 @@
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
+namespace
+{
+    template < geode::index_t dimension >
+    void check_cells_number(
+        const std::array< geode::index_t, dimension >& cells_number )
+    {
+        std::uint64_t result{ 1 };
+        for( const auto nb_cells : cells_number )
+        {
+            result *= nb_cells;
+            geode::OpenGeodeBasicException::check_exception(
+                result < geode::NO_ID, nullptr,
+                geode::OpenGeodeException::TYPE::data,
+                "[CellArray] Too many cells, the total number of cells "
+                "should be lower than ",
+                geode::NO_ID );
+        }
+        geode::OpenGeodeBasicException::check_exception( result != 0, nullptr,
+            geode::OpenGeodeException::TYPE::data,
+            "[CellArray] Creation of a array with no cells in one "
+            "direction." );
+    }
+} // namespace
+
 namespace geode
 {
     template < index_t dimension >
@@ -36,6 +60,7 @@ namespace geode
         explicit Impl( std::array< index_t, dimension > cells_number )
             : cells_number_( std::move( cells_number ) )
         {
+            check_cells_number< dimension >( cells_number_ );
         }
 
         index_t nb_cells() const
@@ -56,6 +81,9 @@ namespace geode
         std::optional< CellIndices > next_cell(
             const CellIndices& index, index_t direction ) const
         {
+            OpenGeodeBasicException::check_assertion(
+                index.at( direction ) < nb_cells_in_direction( direction ),
+                "[CellArray::next_cell] Invalid cell index" );
             if( index[direction] + 1 < nb_cells_in_direction( direction ) )
             {
                 std::optional< CellIndices > result{ index };
@@ -68,6 +96,9 @@ namespace geode
         std::optional< CellIndices > previous_cell(
             const CellIndices& index, index_t direction ) const
         {
+            OpenGeodeBasicException::check_assertion(
+                index.at( direction ) < nb_cells_in_direction( direction ),
+                "[CellArray::previous_cell] Invalid cell index" );
             if( index[direction] > 0 )
             {
                 std::optional< CellIndices > result{ index };
@@ -93,11 +124,8 @@ namespace geode
         void set_array_dimensions(
             std::array< index_t, dimension > cells_number )
         {
+            check_cells_number< dimension >( cells_number );
             cells_number_ = std::move( cells_number );
-            OpenGeodeBasicException::check_exception( nb_cells() != 0, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CellArray] Creation of a array with no cells "
-                "in one direction." );
         }
 
         void copy( const CellArray< dimension >::Impl& impl )

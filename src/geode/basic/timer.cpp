@@ -23,7 +23,9 @@
 
 #include <geode/basic/timer.hpp>
 
-#include <absl/time/clock.h>
+#include <chrono>
+
+#include <absl/time/time.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -31,6 +33,8 @@ namespace geode
 {
     class Timer::Impl
     {
+        using Clock = std::chrono::steady_clock;
+
     public:
         Impl()
         {
@@ -39,7 +43,7 @@ namespace geode
 
         absl::Duration raw_duration() const
         {
-            return absl::Now() - start_time_;
+            return absl::FromChrono( Clock::now() - start_time_ );
         }
 
         std::string duration() const
@@ -49,11 +53,11 @@ namespace geode
 
         void reset()
         {
-            start_time_ = absl::Now();
+            start_time_ = Clock::now();
         }
 
     private:
-        absl::Time start_time_;
+        Clock::time_point start_time_;
     };
 
     Timer::Timer() = default;

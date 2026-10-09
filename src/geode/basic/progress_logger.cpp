@@ -23,9 +23,11 @@
 
 #include <geode/basic/progress_logger.hpp>
 
-#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <exception>
 
-#include <absl/time/clock.h>
+#include <absl/time/time.h>
 
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
@@ -36,62 +38,94 @@ namespace geode
 {
     class ProgressLogger::Impl
     {
+        using Clock = std::chrono::steady_clock;
+
     public:
         Impl(
             Logger::LEVEL level, const std::string& message, index_t nb_steps )
             : nb_steps_( nb_steps ),
-              current_time_{ absl::Now() },
-              level_( level )
+              next_refresh_{ now() + refresh_interval_.load() },
+              level_( level ),
+              nb_uncaught_exceptions_{ std::uncaught_exceptions() }
         {
-            ProgressLoggerManager::start( id_, level, message, nb_steps_ );
+            ProgressLoggerManager::start( id_, level, message, nb_steps );
         }
 
         ~Impl()
         {
-            if( current_ == nb_steps_ )
+            try
             {
-                ProgressLoggerManager::completed( id_, level_ );
+                if( current_ == nb_steps_
+                    && std::uncaught_exceptions() <= nb_uncaught_exceptions_ )
+                {
+                    ProgressLoggerManager::completed( id_, level_ );
+                }
+                else
+                {
+                    ProgressLoggerManager::failed( id_, level_ );
+                }
             }
-            else
+            catch( ... )
             {
-                ProgressLoggerManager::failed( id_, level_ );
+                try
+                {
+                    geode_lippincott();
+                }
+                catch( ... )
+                {
+                }
             }
         }
 
         index_t increment( index_t nb_increments )
         {
-            const std::lock_guard< std::mutex > locking{ lock_ };
-            current_ += nb_increments;
-            auto now = absl::Now();
-            if( now - current_time_ > refresh_interval_ )
+            const auto current =
+                current_.fetch_add( nb_increments, std::memory_order_relaxed )
+                + nb_increments;
+            const auto current_time = now();
+            auto next_refresh = next_refresh_.load( std::memory_order_relaxed );
+            if( current_time >= next_refresh
+                && next_refresh_.compare_exchange_strong( next_refresh,
+                    current_time
+                        + refresh_interval_.load( std::memory_order_relaxed ),
+                    std::memory_order_relaxed ) )
             {
-                current_time_ = now;
-                ProgressLoggerManager::update(
-                    id_, level_, current_, nb_steps_ );
+                ProgressLoggerManager::update( id_, level_, current,
+                    nb_steps_.load( std::memory_order_relaxed ) );
             }
-            return current_;
+            return current;
         }
 
         index_t increment_nb_steps( index_t nb_steps )
         {
-            const std::lock_guard< std::mutex > locking{ lock_ };
-            nb_steps_ += nb_steps;
-            return nb_steps_;
+            return nb_steps_.fetch_add( nb_steps, std::memory_order_relaxed )
+                   + nb_steps;
         }
 
         void set_refresh_interval( absl::Duration refresh_interval )
         {
-            refresh_interval_ = std::move( refresh_interval );
+            refresh_interval_.store(
+                absl::ToInt64Nanoseconds( refresh_interval ),
+                std::memory_order_relaxed );
+        }
+
+    private:
+        static std::int64_t now()
+        {
+            return std::chrono::duration_cast< std::chrono::nanoseconds >(
+                Clock::now().time_since_epoch() )
+                .count();
         }
 
     private:
         uuid id_;
-        index_t nb_steps_;
-        index_t current_{ 0 };
-        absl::Time current_time_;
-        std::mutex lock_;
-        absl::Duration refresh_interval_{ absl::Seconds( 1 ) };
+        std::atomic< index_t > nb_steps_;
+        std::atomic< index_t > current_{ 0 };
+        std::atomic< std::int64_t > refresh_interval_{ absl::ToInt64Nanoseconds(
+            absl::Seconds( 1 ) ) };
+        std::atomic< std::int64_t > next_refresh_;
         Logger::LEVEL level_;
+        int nb_uncaught_exceptions_;
     };
 
     ProgressLogger::ProgressLogger(

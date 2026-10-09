@@ -78,9 +78,10 @@ namespace geode
     std::vector< std::string > OpenGeodeSectionOutput::write(
         const Section& section ) const
     {
-        const ZipFile zip_writer{ filename(), uuid{}.string() };
+        ZipFile zip_writer{ filename(), uuid{}.string() };
         save_section_files( section, zip_writer.directory() );
         archive_section_files( zip_writer );
+        zip_writer.finalize();
         return { to_string( filename() ) };
     }
 } // namespace geode

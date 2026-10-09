@@ -37,9 +37,11 @@ namespace geode
     class ConsoleLoggerClient::Impl
     {
     public:
-        Impl() : logger_impl_( spdlog::stdout_color_mt( "console" ) )
+        Impl()
+            : logger_impl_( std::make_shared< spdlog::logger >( "console",
+                  std::make_shared< spdlog::sinks::stdout_color_sink_mt >() ) )
         {
-            spdlog::set_level( spdlog::level::level_enum::trace );
+            logger_impl_->set_level( spdlog::level::level_enum::trace );
         }
 
         void trace( const std::string &message )

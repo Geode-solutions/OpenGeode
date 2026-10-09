@@ -27,7 +27,7 @@
 
 #include <geode/tests/common.hpp>
 
-void test()
+void test_generation()
 {
     for( const auto i : geode::Range{ 100 } )
     {
@@ -43,6 +43,37 @@ void test()
         geode::OpenGeodeBasicException::test(
             id == same, "UUIDs should be equal" );
     }
+    const geode::uuid upper{ "0198D5E1-A2B3-7C4D-8E5F-60718293A4B5" };
+    geode::OpenGeodeBasicException::test(
+        upper.string() == "0198d5e1-a2b3-7c4d-8e5f-60718293a4b5",
+        "Upper case UUID should be parsed" );
+}
+
+void test_invalid_string()
+{
+    for( const auto* invalid : { "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz",
+             " 198d5e1-a2b3-7c4d-8e5f-60718293a4b5",
+             "0198d5e1-a2b3-7c4d-8e5f-60718293a4b+" } )
+    {
+        bool thrown{ false };
+        try
+        {
+            const geode::uuid id{ invalid };
+            geode_unused( id );
+        }
+        catch( const geode::OpenGeodeException& )
+        {
+            thrown = true;
+        }
+        geode::OpenGeodeBasicException::test(
+            thrown, "Invalid UUID string should be rejected: ", invalid );
+    }
+}
+
+void test()
+{
+    test_generation();
+    test_invalid_string();
 }
 
 OPENGEODE_TEST( "uuid" )

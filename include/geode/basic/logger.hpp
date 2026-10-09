@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -56,46 +57,72 @@ namespace geode
 
         static void set_level( LEVEL level );
 
+        /*!
+         * Return true if a message of the given level would be logged.
+         */
+        [[nodiscard]] static bool is_enabled( LEVEL level );
+
         template < typename... Args >
         static void log( LEVEL level, const Args &...args )
         {
-            log( level, absl::StrCat( args... ) );
+            if( is_enabled( level ) )
+            {
+                log_message( level, absl::StrCat( args... ) );
+            }
         }
 
         template < typename... Args >
         static void trace( const Args &...args )
         {
-            log_trace( absl::StrCat( args... ) );
+            if( is_enabled( LEVEL::trace ) )
+            {
+                log_trace( absl::StrCat( args... ) );
+            }
         }
 
         template < typename... Args >
         static void debug( const Args &...args )
         {
-            log_debug( absl::StrCat( args... ) );
+            if( is_enabled( LEVEL::debug ) )
+            {
+                log_debug( absl::StrCat( args... ) );
+            }
         }
 
         template < typename... Args >
         static void info( const Args &...args )
         {
-            log_info( absl::StrCat( args... ) );
+            if( is_enabled( LEVEL::info ) )
+            {
+                log_info( absl::StrCat( args... ) );
+            }
         }
 
         template < typename... Args >
         static void warning( const Args &...args )
         {
-            log_warn( absl::StrCat( args... ) );
+            if( is_enabled( LEVEL::warning ) )
+            {
+                log_warn( absl::StrCat( args... ) );
+            }
         }
 
         template < typename... Args >
         static void error( const Args &...args )
         {
-            log_error( absl::StrCat( args... ) );
+            if( is_enabled( LEVEL::error ) )
+            {
+                log_error( absl::StrCat( args... ) );
+            }
         }
 
         template < typename... Args >
         static void critical( const Args &...args )
         {
-            log_critical( absl::StrCat( args... ) );
+            if( is_enabled( LEVEL::critical ) )
+            {
+                log_critical( absl::StrCat( args... ) );
+            }
         }
 
     private:
@@ -104,7 +131,7 @@ namespace geode
 
         [[nodiscard]] static Logger &instance();
 
-        static void log( LEVEL level, const std::string &message );
+        static void log_message( LEVEL level, const std::string &message );
         static void log_trace( const std::string &message );
         static void log_debug( const std::string &message );
         static void log_info( const std::string &message );

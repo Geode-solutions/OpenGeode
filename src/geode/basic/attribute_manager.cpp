@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
@@ -90,11 +91,11 @@ namespace geode
             {
                 return;
             }
-            nb_elements_ = size;
             for( auto &attribute_it : attributes_ )
             {
                 attribute_it.second->resize( size, key );
             }
+            nb_elements_ = size;
         }
 
         void reserve( index_t capacity, const AttributeBase::AttributeKey &key )
@@ -208,6 +209,14 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::data,
                 "[AttributeManager::copy_attribute] Attribute with id '",
                 new_attribute_id.string(), "' already exists." );
+            // A copy keeps the name, it would duplicate the step time or
+            // break the time series if the time was removed
+            OpenGeodeBasicException::check_exception(
+                !attribute_it->second->properties().time.has_value(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::copy_attribute] Cannot copy attribute '",
+                attribute_id.string(), "': it is a step of time series '",
+                attribute_it->second->name().value_or( "" ), "'." );
             auto new_attribute = attribute_it->second->clone( key );
             IdentifierBuilder builder{ *new_attribute };
             builder.set_id( new_attribute_id );
@@ -290,7 +299,6 @@ namespace geode
         void check_new_time_step(
             std::string_view name, double time, std::string_view type ) const
         {
-            absl::ReaderMutexLock lock{ mutex_ };
             OpenGeodeBasicException::check_exception( std::isfinite( time ),
                 nullptr, OpenGeodeException::TYPE::data,
                 "[AttributeManager::create_time_step_attribute] Time of "
@@ -399,6 +407,10 @@ namespace geode
                         attribute_id_from, attribute_from->clone( key ) );
                 }
             }
+            for( auto &attribute_it : attributes_ )
+            {
+                attribute_it.second->resize( nb_elements_, key );
+            }
         }
 
         void import( const AttributeManager::Impl &attribute_manager,
@@ -412,15 +424,21 @@ namespace geode
                 {
                     continue;
                 }
-                if( attribute_exists( attribute_id ) )
+                const auto attribute_it = attributes_.find( attribute_id );
+                if( attribute_it != attributes_.end() )
                 {
-                    if( attribute_from->type()
-                        != this->attributes_.at( attribute_id )->type() )
+                    if( attribute_from->type() != attribute_it->second->type() )
                     {
+                        Logger::warning( "[AttributeManager::import] "
+                                         "Attribute \"",
+                            attribute_id.string(),
+                            "\" not imported: types differ (",
+                            attribute_from->type(), " vs ",
+                            attribute_it->second->type(), ")" );
                         continue;
                     }
-                    this->attributes_.at( attribute_id )
-                        ->import( old2new_mapping, attribute_from, key );
+                    attribute_it->second->import(
+                        old2new_mapping, attribute_from, key );
                 }
                 else
                 {
@@ -479,8 +497,41 @@ namespace geode
                 attribute_it != attributes_.end(), nullptr,
                 OpenGeodeException::TYPE::data,
                 "[AttributeManager::set_attribute_properties] Attribute ",
-                attribute_id.string(), "does not exist" );
-            attribute_it->second->set_properties( new_properties );
+                attribute_id.string(), " does not exist" );
+            const auto &attribute = attribute_it->second;
+            if( new_properties.time
+                && new_properties.time != attribute->properties().time )
+            {
+                check_time_step_change(
+                    attribute_id, *attribute, new_properties.time.value() );
+            }
+            attribute->set_properties( new_properties );
+        }
+
+        void check_time_step_change( const uuid &attribute_id,
+            AttributeBase &attribute,
+            double time ) const
+        {
+            OpenGeodeBasicException::check_exception( std::isfinite( time ),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[AttributeManager::set_attribute_properties] Time should be "
+                "finite, not ",
+                time );
+            for( const auto &[other_id, other] : attributes_ )
+            {
+                if( other_id == attribute_id
+                    || other->name() != attribute.name() )
+                {
+                    continue;
+                }
+                const auto &other_time = other->properties().time;
+                OpenGeodeBasicException::check_exception(
+                    !other_time || other_time.value() != time, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[AttributeManager::set_attribute_properties] Time series "
+                    "already has a step at time ",
+                    time );
+            }
         }
 
         template < typename Archive >
@@ -497,7 +548,8 @@ namespace geode
                              bitsery::ext::StdMap{ old_map.max_size() },
                              []( Archive &local_archive2, std::string &name,
                                  std::shared_ptr< AttributeBase > &attribute ) {
-                                 local_archive2.text1b( name, name.max_size() );
+                                 local_archive2.text1b(
+                                     name, MAX_SERIALIZED_NAME_SIZE );
                                  try
                                  {
                                      local_archive2.ext( attribute,
@@ -510,7 +562,9 @@ namespace geode
                                          "[AttributeManager::serialize] Cannot "
                                          "serialize attribute ",
                                          name, " holding type ",
-                                         attribute->type() };
+                                         attribute
+                                             ? attribute->type()
+                                             : std::string_view{ "unknown" } };
                                  }
                              } );
                          for( auto &[attribute_name, attribute] : old_map )
@@ -545,7 +599,9 @@ namespace geode
                                             "serialize attribute with id ",
                                             attribute_id.string(),
                                             " holding type ",
-                                            attribute->type() };
+                                            attribute ? attribute->type()
+                                                      : std::string_view{
+                                                            "unknown" } };
                                     }
                                 } );
                         } } } );
@@ -585,11 +641,13 @@ namespace geode
 
     void AttributeManager::resize( index_t size )
     {
+        absl::MutexLock lock{ impl_->mutex() };
         impl_->resize( size, AttributeBase::AttributeKey{} );
     }
 
     void AttributeManager::reserve( index_t capacity )
     {
+        absl::MutexLock lock{ impl_->mutex() };
         impl_->reserve( capacity, AttributeBase::AttributeKey{} );
     }
 
@@ -655,11 +713,13 @@ namespace geode
 
     void AttributeManager::clear()
     {
+        absl::MutexLock lock{ impl_->mutex() };
         impl_->clear();
     }
 
     void AttributeManager::clear_attributes()
     {
+        absl::MutexLock lock{ impl_->mutex() };
         impl_->clear_attributes( AttributeBase::AttributeKey{} );
     }
 
@@ -668,8 +728,10 @@ namespace geode
     {
         if( absl::c_find( to_delete, true ) != to_delete.end() )
         {
-            OpenGeodeBasicException::check_assertion(
-                to_delete.size() == nb_elements(),
+            absl::MutexLock lock{ impl_->mutex() };
+            OpenGeodeBasicException::check_exception(
+                to_delete.size() == impl_->nb_elements(), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[AttributeManager::delete_elements] Vector to_delete should "
                 "have the same size as the number of elements" );
             impl_->delete_elements( to_delete, AttributeBase::AttributeKey{} );
@@ -679,6 +741,12 @@ namespace geode
     void AttributeManager::permute_elements(
         absl::Span< const index_t > permutation )
     {
+        absl::MutexLock lock{ impl_->mutex() };
+        OpenGeodeBasicException::check_exception(
+            permutation.size() == impl_->nb_elements(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[AttributeManager::permute_elements] Permutation should have the "
+            "same size as the number of elements" );
         impl_->permute_elements( permutation, AttributeBase::AttributeKey{} );
     }
 
@@ -689,6 +757,12 @@ namespace geode
 
     void AttributeManager::copy( const AttributeManager &attribute_manager )
     {
+        if( &attribute_manager == this )
+        {
+            return;
+        }
+        absl::MutexLock lock{ impl_->mutex() };
+        absl::ReaderMutexLock from_lock{ attribute_manager.impl_->mutex() };
         impl_->copy( *attribute_manager.impl_, AttributeBase::AttributeKey{} );
     }
 
@@ -720,6 +794,12 @@ namespace geode
     void AttributeManager::import( const AttributeManager &attribute_manager,
         const GenericMapping< index_t > &old2new_mapping )
     {
+        absl::MutexLock lock{ impl_->mutex() };
+        std::optional< absl::ReaderMutexLock > from_lock;
+        if( &attribute_manager != this )
+        {
+            from_lock.emplace( attribute_manager.impl_->mutex() );
+        }
         impl_->import( *attribute_manager.impl_, old2new_mapping,
             AttributeBase::AttributeKey{} );
     }
@@ -728,6 +808,12 @@ namespace geode
         const GenericMapping< index_t > &old2new_mapping,
         const geode::uuid &attribute_id )
     {
+        absl::MutexLock lock{ impl_->mutex() };
+        std::optional< absl::ReaderMutexLock > from_lock;
+        if( &attribute_manager != this )
+        {
+            from_lock.emplace( attribute_manager.impl_->mutex() );
+        }
         impl_->import( *attribute_manager.impl_, old2new_mapping, attribute_id,
             AttributeBase::AttributeKey{} );
     }
@@ -735,6 +821,7 @@ namespace geode
     void AttributeManager::set_attribute_properties(
         geode::uuid attribute_id, const AttributeProperties &new_properties )
     {
+        absl::MutexLock lock{ impl_->mutex() };
         impl_->set_attribute_properties( attribute_id, new_properties );
     }
 
