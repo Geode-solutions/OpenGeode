@@ -63,18 +63,6 @@ void check_concatenation(
         " ModelBoundaries" );
 }
 
-template < typename Range >
-geode::index_t count_items( Range&& range )
-{
-    geode::index_t count{ 0 };
-    for( const auto& item : range )
-    {
-        geode_unused( item );
-        count++;
-    }
-    return count;
-}
-
 void add_collections( geode::BRep& brep )
 {
     geode::BRepBuilder builder{ brep };
@@ -105,54 +93,31 @@ void add_collections( geode::BRep& brep )
     }
 }
 
+template < typename CollectionRange >
+void check_collection_items( const geode::BRep& brep,
+    const geode::BRep& brep2,
+    CollectionRange&& collections,
+    const geode::ModelCopyMapping& mapping )
+{
+    for( const auto& collection : collections )
+    {
+        const auto& copy_id =
+            mapping.at( collection.component_type() ).in2out( collection.id() );
+        geode::OpenGeodeModelException::test(
+            brep.nb_items( copy_id ) == brep2.nb_items( collection.id() ),
+            "Wrong number of items in concatenated ",
+            collection.component_type().get() );
+    }
+}
+
 void check_collections( const geode::BRep& brep,
     const geode::BRep& brep2,
     const geode::ModelCopyMapping& mapping )
 {
-    const auto& corner_mapping =
-        mapping.at( geode::CornerCollection3D::component_type_static() );
-    for( const auto& collection : brep2.corner_collections() )
-    {
-        const auto& copy =
-            brep.corner_collection( corner_mapping.in2out( collection.id() ) );
-        geode::OpenGeodeModelException::test(
-            count_items( brep.corner_collection_items( copy ) )
-                == count_items( brep2.corner_collection_items( collection ) ),
-            "Wrong number of items in concatenated CornerCollection" );
-    }
-    const auto& line_mapping =
-        mapping.at( geode::LineCollection3D::component_type_static() );
-    for( const auto& collection : brep2.line_collections() )
-    {
-        const auto& copy =
-            brep.line_collection( line_mapping.in2out( collection.id() ) );
-        geode::OpenGeodeModelException::test(
-            count_items( brep.line_collection_items( copy ) )
-                == count_items( brep2.line_collection_items( collection ) ),
-            "Wrong number of items in concatenated LineCollection" );
-    }
-    const auto& surface_mapping =
-        mapping.at( geode::SurfaceCollection3D::component_type_static() );
-    for( const auto& collection : brep2.surface_collections() )
-    {
-        const auto& copy = brep.surface_collection(
-            surface_mapping.in2out( collection.id() ) );
-        geode::OpenGeodeModelException::test(
-            count_items( brep.surface_collection_items( copy ) )
-                == count_items( brep2.surface_collection_items( collection ) ),
-            "Wrong number of items in concatenated SurfaceCollection" );
-    }
-    const auto& block_mapping =
-        mapping.at( geode::BlockCollection3D::component_type_static() );
-    for( const auto& collection : brep2.block_collections() )
-    {
-        const auto& copy =
-            brep.block_collection( block_mapping.in2out( collection.id() ) );
-        geode::OpenGeodeModelException::test(
-            count_items( brep.block_collection_items( copy ) )
-                == count_items( brep2.block_collection_items( collection ) ),
-            "Wrong number of items in concatenated BlockCollection" );
-    }
+    check_collection_items( brep, brep2, brep2.corner_collections(), mapping );
+    check_collection_items( brep, brep2, brep2.line_collections(), mapping );
+    check_collection_items( brep, brep2, brep2.surface_collections(), mapping );
+    check_collection_items( brep, brep2, brep2.block_collections(), mapping );
 }
 
 void test()

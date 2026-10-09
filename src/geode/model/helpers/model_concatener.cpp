@@ -42,49 +42,22 @@
 
 namespace
 {
-    void copy_model_boundaries_relationships2d( geode::Section& model,
-        geode::SectionBuilder& builder,
-        const geode::Section& other_model,
+    template < typename Model, typename CollectionRange >
+    void copy_collection_items( const Model& other_model,
+        typename Model::Builder& builder,
+        CollectionRange&& collections,
         const geode::ModelCopyMapping& mapping )
     {
-        const auto& line_mapping =
-            mapping.at( geode::Line2D::component_type_static() );
-        const auto& boundary_mapping =
-            mapping.at( geode::ModelBoundary2D::component_type_static() );
-        for( const auto& model_boundary : other_model.model_boundaries() )
+        for( const auto& collection : collections )
         {
-            const auto& boundary_copy = model.model_boundary(
-                boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& item :
-                other_model.model_boundary_items( model_boundary ) )
+            const auto collection_type = collection.component_type();
+            const geode::ComponentID collection_copy{ collection_type,
+                mapping.at( collection_type ).in2out( collection.id() ) };
+            for( const auto& item : other_model.items( collection.id() ) )
             {
-                const auto& item_copy =
-                    model.line( line_mapping.in2out( item.id() ) );
-                builder.add_line_in_model_boundary( item_copy, boundary_copy );
-            }
-        }
-    }
-
-    void copy_model_boundaries_relationships3d( geode::BRep& model,
-        geode::BRepBuilder& builder,
-        const geode::BRep& other_model,
-        const geode::ModelCopyMapping& mapping )
-    {
-        const auto& surface_mapping =
-            mapping.at( geode::Surface3D::component_type_static() );
-        const auto& boundary_mapping =
-            mapping.at( geode::ModelBoundary3D::component_type_static() );
-        for( const auto& model_boundary : other_model.model_boundaries() )
-        {
-            const auto& boundary_copy = model.model_boundary(
-                boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& item :
-                other_model.model_boundary_items( model_boundary ) )
-            {
-                const auto& item_copy =
-                    model.surface( surface_mapping.in2out( item.id() ) );
-                builder.add_surface_in_model_boundary(
-                    item_copy, boundary_copy );
+                builder.add_item_in_collection(
+                    { item.type, mapping.at( item.type ).in2out( item.id ) },
+                    collection_copy );
             }
         }
     }
@@ -133,30 +106,6 @@ namespace
                     model.corner( corner_mapping.in2out( corner.id() ) );
                 builder.add_corner_block_internal_relationship(
                     corner_copy, block_copy );
-            }
-        }
-    }
-
-    void copy_block_collections_relationships( geode::BRep& model,
-        geode::BRepBuilder& builder,
-        const geode::BRep& other_model,
-        const geode::ModelCopyMapping& mapping )
-    {
-        const auto& block_mapping =
-            mapping.at( geode::Block3D::component_type_static() );
-        const auto& collection_mapping =
-            mapping.at( geode::BlockCollection3D::component_type_static() );
-        for( const auto& collection : other_model.block_collections() )
-        {
-            const auto& collection_copy = model.block_collection(
-                collection_mapping.in2out( collection.id() ) );
-            for( const auto& item :
-                other_model.block_collection_items( collection ) )
-            {
-                const auto& item_copy =
-                    model.block( block_mapping.in2out( item.id() ) );
-                builder.add_block_in_block_collection(
-                    item_copy, collection_copy );
             }
         }
     }
@@ -247,57 +196,14 @@ namespace geode
         void copy_collections_relationships(
             const Model& other_model, const ModelCopyMapping& mapping )
         {
-            const auto& corner_mapping =
-                mapping.at( Corner< dimension >::component_type_static() );
-            const auto& corner_collection_mapping = mapping.at(
-                CornerCollection< dimension >::component_type_static() );
-            for( const auto& collection : other_model.corner_collections() )
-            {
-                const auto& collection_copy = model_.corner_collection(
-                    corner_collection_mapping.in2out( collection.id() ) );
-                for( const auto& item :
-                    other_model.corner_collection_items( collection ) )
-                {
-                    const auto& item_copy =
-                        model_.corner( corner_mapping.in2out( item.id() ) );
-                    builder_.add_corner_in_corner_collection(
-                        item_copy, collection_copy );
-                }
-            }
-            const auto& line_mapping =
-                mapping.at( Line< dimension >::component_type_static() );
-            const auto& line_collection_mapping = mapping.at(
-                LineCollection< dimension >::component_type_static() );
-            for( const auto& collection : other_model.line_collections() )
-            {
-                const auto& collection_copy = model_.line_collection(
-                    line_collection_mapping.in2out( collection.id() ) );
-                for( const auto& item :
-                    other_model.line_collection_items( collection ) )
-                {
-                    const auto& item_copy =
-                        model_.line( line_mapping.in2out( item.id() ) );
-                    builder_.add_line_in_line_collection(
-                        item_copy, collection_copy );
-                }
-            }
-            const auto& surface_mapping =
-                mapping.at( Surface< dimension >::component_type_static() );
-            const auto& surface_collection_mapping = mapping.at(
-                SurfaceCollection< dimension >::component_type_static() );
-            for( const auto& collection : other_model.surface_collections() )
-            {
-                const auto& collection_copy = model_.surface_collection(
-                    surface_collection_mapping.in2out( collection.id() ) );
-                for( const auto& item :
-                    other_model.surface_collection_items( collection ) )
-                {
-                    const auto& item_copy =
-                        model_.surface( surface_mapping.in2out( item.id() ) );
-                    builder_.add_surface_in_surface_collection(
-                        item_copy, collection_copy );
-                }
-            }
+            copy_collection_items( other_model, builder_,
+                other_model.model_boundaries(), mapping );
+            copy_collection_items( other_model, builder_,
+                other_model.corner_collections(), mapping );
+            copy_collection_items( other_model, builder_,
+                other_model.line_collections(), mapping );
+            copy_collection_items( other_model, builder_,
+                other_model.surface_collections(), mapping );
         }
 
     private:
@@ -311,8 +217,6 @@ namespace geode
     {
         copy_line_relationships( other_model, mapping );
         copy_surface_relationships( other_model, mapping );
-        copy_model_boundaries_relationships2d(
-            model_, builder_, other_model, mapping );
         copy_collections_relationships( other_model, mapping );
     }
 
@@ -323,11 +227,9 @@ namespace geode
         copy_line_relationships( other_model, mapping );
         copy_surface_relationships( other_model, mapping );
         copy_block_relationships( model_, builder_, other_model, mapping );
-        copy_model_boundaries_relationships3d(
-            model_, builder_, other_model, mapping );
         copy_collections_relationships( other_model, mapping );
-        copy_block_collections_relationships(
-            model_, builder_, other_model, mapping );
+        copy_collection_items(
+            other_model, builder_, other_model.block_collections(), mapping );
     }
 
     template < typename Model >
