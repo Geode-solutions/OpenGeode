@@ -736,7 +736,7 @@ namespace geode
     std::vector< index_t > SurfaceMeshBuilder< dimension >::delete_polygons(
         const std::vector< bool >& to_delete )
     {
-        const auto old2new = detail::mapping_after_deletion( to_delete );
+        const auto old2new = mapping_after_deletion( to_delete );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
             return old2new;

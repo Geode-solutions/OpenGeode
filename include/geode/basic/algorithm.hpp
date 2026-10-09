@@ -83,6 +83,29 @@ namespace geode
     }
 
     /*!
+     * Compute the mapping between old and new indices after deletion.
+     * @param[in] to_delete If to_delete[i] is true the i-th element is
+     * deleted, else the element is kept.
+     * @return The old2new mapping: new index of each element, NO_ID if
+     * deleted
+     */
+    template < typename DeleteContainer >
+    [[nodiscard]] std::vector< index_t > mapping_after_deletion(
+        const DeleteContainer& to_delete )
+    {
+        std::vector< index_t > old2new( to_delete.size(), NO_ID );
+        index_t current_id{ 0 };
+        for( const auto i : Indices{ to_delete } )
+        {
+            if( !to_delete[i] )
+            {
+                old2new[i] = current_id++;
+            }
+        }
+        return old2new;
+    }
+
+    /*!
      * Create a new vector containing only some elements from a given vector.
      * @param[in] to_keep Vector of the same size than in_values. If to_keep[i]
      * is true the i-th element is kept.

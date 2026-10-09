@@ -39,7 +39,6 @@
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_utils.hpp>
 #include <geode/basic/common.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
@@ -205,7 +204,7 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete,
             AttributeBase::AttributeKey /*key*/ ) override
         {
-            const auto old2new = detail::mapping_after_deletion( to_delete );
+            const auto old2new = mapping_after_deletion( to_delete );
             auto old_values = std::move( values_ );
             values_ = decltype( values_ )();
             values_.reserve( old_values.size() );

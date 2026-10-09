@@ -105,7 +105,6 @@ add_geode_library(
         "detail/enable_debug_logger.hpp"
         "detail/geode_input_impl.hpp"
         "detail/geode_output_impl.hpp"
-        "detail/mapping_after_deletion.hpp"
     INTERNAL_HEADERS
         "internal/array_impl.hpp"
     PUBLIC_DEPENDENCIES

@@ -125,6 +125,21 @@ void test_extract_vector_elements()
         "Extract elements result (keep_all) for double is not correct" );
 }
 
+void test_mapping_after_deletion()
+{
+    const auto to_delete = create_bool_vector();
+    const auto old2new = geode::mapping_after_deletion( to_delete );
+    const std::vector< geode::index_t > answer{ 0, geode::NO_ID, 1, 2 };
+    geode::OpenGeodeBasicException::test(
+        old2new == answer, "Mapping after deletion is not correct" );
+
+    const std::vector< bool > delete_none( 4, false );
+    const auto identity = geode::mapping_after_deletion( delete_none );
+    const std::vector< geode::index_t > identity_answer{ 0, 1, 2, 3 };
+    geode::OpenGeodeBasicException::test( identity == identity_answer,
+        "Mapping after deletion without deletion is not correct" );
+}
+
 void test_sort_unique()
 {
     std::vector< int > data{ 1, 2, 3, 1, 2, 3, 3, 4, 5, 4, 5, 6, 7 };
@@ -139,6 +154,7 @@ void test()
 {
     test_delete_vector_elements();
     test_extract_vector_elements();
+    test_mapping_after_deletion();
     test_sort_unique();
 }
 
