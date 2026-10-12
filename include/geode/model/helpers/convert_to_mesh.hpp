@@ -49,13 +49,13 @@ namespace geode
     struct ModelToMeshMappings
     {
         using MeshElementToIndexMapping =
-            GenericMapping< MeshElement, index_t >;
+            BijectiveMapping< MeshElement, index_t >;
 
         MeshElementToIndexMapping corner_vertices_mapping;
         MeshElementToIndexMapping line_edges_mapping;
         MeshElementToIndexMapping surface_polygons_mapping;
         MeshElementToIndexMapping solid_polyhedra_mapping;
-        BijectiveMapping< geode::index_t > unique_vertices_mapping;
+        BijectiveMapping< index_t > unique_vertices_mapping;
     };
 
     [[nodiscard]] std::tuple< std::unique_ptr< EdgedCurve2D >,
