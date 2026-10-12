@@ -23,16 +23,6 @@
 
 #include <geode/model/helpers/detail/mappings_merger.hpp>
 
-#include <geode/model/mixin/core/block.hpp>
-#include <geode/model/mixin/core/block_collection.hpp>
-#include <geode/model/mixin/core/corner.hpp>
-#include <geode/model/mixin/core/corner_collection.hpp>
-#include <geode/model/mixin/core/line.hpp>
-#include <geode/model/mixin/core/line_collection.hpp>
-#include <geode/model/mixin/core/model_boundary.hpp>
-#include <geode/model/mixin/core/surface.hpp>
-#include <geode/model/mixin/core/surface_collection.hpp>
-
 namespace
 {
     class GenericandCopyMappingsMerger
@@ -87,58 +77,44 @@ namespace
         const geode::ModelCopyMapping& mappings2_;
     };
 
-    class GenericMappingsMerger
+    template < typename Mapping >
+    Mapping merge_generic_mappings(
+        const Mapping& mappings1, const Mapping& mappings2 )
     {
-    public:
-        GenericMappingsMerger( const geode::ModelGenericMapping& mappings1,
-            const geode::ModelGenericMapping& mappings2 )
-            : mappings1_( mappings1 ), mappings2_( mappings2 )
+        Mapping result;
+        for( const auto& in2between : mappings1.in2out_map() )
         {
-        }
-
-        geode::ModelGenericMapping merge()
-        {
-            geode::ModelGenericMapping result;
-            for( const auto& component_mapping :
-                mappings1_.components_mappings() )
+            for( const auto& between_id : in2between.second )
             {
-                if( mappings2_.has_mapping_type( component_mapping.first ) )
+                if( !mappings2.has_mapping_input( between_id ) )
                 {
-                    result.emplace( component_mapping.first,
-                        merge_mappings( component_mapping.second,
-                            mappings2_.at( component_mapping.first ) ) );
+                    continue;
+                }
+                for( const auto& out_id : mappings2.in2out( between_id ) )
+                {
+                    result.map( in2between.first, out_id );
                 }
             }
-            return result;
         }
+        return result;
+    }
 
-    private:
-        geode::ModelGenericMapping::Mapping merge_mappings(
-            const geode::ModelGenericMapping::Mapping& mappings1,
-            const geode::ModelGenericMapping::Mapping& mappings2 )
+    template < typename Mapping >
+    geode::ModelMapping< Mapping > merge_model_mappings(
+        const geode::ModelMapping< Mapping >& mappings1,
+        const geode::ModelMapping< Mapping >& mappings2 )
+    {
+        geode::ModelMapping< Mapping > result;
+        for( const auto& [type, mapping] : mappings1.components_mappings() )
         {
-            geode::ModelGenericMapping::Mapping result;
-            for( const auto& in2between : mappings1.in2out_map() )
+            if( mappings2.has_mapping_type( type ) )
             {
-                for( const auto& between_id : in2between.second )
-                {
-                    if( !mappings2.has_mapping_input( between_id ) )
-                    {
-                        continue;
-                    }
-                    for( const auto& out_id : mappings2.in2out( between_id ) )
-                    {
-                        result.map( in2between.first, out_id );
-                    }
-                }
+                result.emplace( type,
+                    merge_generic_mappings( mapping, mappings2.at( type ) ) );
             }
-            return result;
         }
-
-    private:
-        const geode::ModelGenericMapping& mappings1_;
-        const geode::ModelGenericMapping& mappings2_;
-    };
+        return result;
+    }
 
     class CopyToGenericMappings
     {
@@ -176,79 +152,6 @@ namespace
         geode::ModelGenericMapping result_;
     };
 
-    geode::MeshElementMapping merge_element_mappings(
-        const geode::MeshElementMapping& mappings1,
-        const geode::MeshElementMapping& mappings2 )
-    {
-        geode::MeshElementMapping result;
-        for( const auto& first_mapping : mappings1.in2out_map() )
-        {
-            for( const auto& intermediate_element : first_mapping.second )
-            {
-                if( !mappings2.has_mapping_input( intermediate_element ) )
-                {
-                    continue;
-                }
-                for( const auto& out_element :
-                    mappings2.in2out( intermediate_element ) )
-                {
-                    result.map( first_mapping.first, out_element );
-                }
-            }
-        }
-        return result;
-    }
-
-    geode::MeshVertexMapping merge_vertex_mappings(
-        const geode::MeshVertexMapping& mappings1,
-        const geode::MeshVertexMapping& mappings2 )
-    {
-        geode::MeshVertexMapping result;
-        for( const auto& first_mapping : mappings1.in2out_map() )
-        {
-            for( const auto& intermediate_vertex : first_mapping.second )
-            {
-                if( !mappings2.has_mapping_input( intermediate_vertex ) )
-                {
-                    continue;
-                }
-                for( const auto& out_vertex :
-                    mappings2.in2out( intermediate_vertex ) )
-                {
-                    result.map( first_mapping.first, out_vertex );
-                }
-            }
-        }
-        return result;
-    }
-
-    template < typename ModelMappingType >
-    ModelMappingType base_merge_mappings(
-        const ModelMappingType& mappings1, const ModelMappingType& mappings2 )
-    {
-        ModelMappingType result;
-        result.component_mapping = geode::detail::merge_mappings(
-            mappings1.component_mapping, mappings2.component_mapping );
-        result.mesh_element_mapping.corners =
-            merge_element_mappings( mappings1.mesh_element_mapping.corners,
-                mappings2.mesh_element_mapping.corners );
-        result.mesh_element_mapping.lines =
-            merge_element_mappings( mappings1.mesh_element_mapping.lines,
-                mappings2.mesh_element_mapping.lines );
-        result.mesh_element_mapping.surfaces =
-            merge_element_mappings( mappings1.mesh_element_mapping.surfaces,
-                mappings2.mesh_element_mapping.surfaces );
-        result.mesh_vertices_mapping.corners =
-            merge_vertex_mappings( mappings1.mesh_vertices_mapping.corners,
-                mappings2.mesh_vertices_mapping.corners );
-        result.mesh_vertices_mapping.lines =
-            merge_vertex_mappings( mappings1.mesh_vertices_mapping.lines,
-                mappings2.mesh_vertices_mapping.lines );
-        result.mesh_vertices_mapping.surfaces =
-            merge_vertex_mappings( mappings1.mesh_vertices_mapping.surfaces,
-                mappings2.mesh_vertices_mapping.surfaces );
-        return result;
-    }
 } // namespace
 
 namespace geode
@@ -267,8 +170,7 @@ namespace geode
             const ModelGenericMapping& mappings1,
             const ModelGenericMapping& mappings2 )
         {
-            GenericMappingsMerger merger{ mappings1, mappings2 };
-            return merger.merge();
+            return merge_model_mappings( mappings1, mappings2 );
         }
 
         ModelGenericMapping copy_to_generic_mappings(
@@ -278,22 +180,18 @@ namespace geode
             return transferer.transfer();
         }
 
-        SectionMappings merge_mappings(
-            const SectionMappings& mappings1, const SectionMappings& mappings2 )
+        ModelMappings merge_mappings(
+            const ModelMappings& mappings1, const ModelMappings& mappings2 )
         {
-            return base_merge_mappings( mappings1, mappings2 );
-        }
-
-        BRepMappings merge_mappings(
-            const BRepMappings& mappings1, const BRepMappings& mappings2 )
-        {
-            auto result = base_merge_mappings( mappings1, mappings2 );
-            result.mesh_element_mapping.blocks =
-                merge_element_mappings( mappings1.mesh_element_mapping.blocks,
-                    mappings2.mesh_element_mapping.blocks );
-            result.mesh_vertices_mapping.blocks =
-                merge_vertex_mappings( mappings1.mesh_vertices_mapping.blocks,
-                    mappings2.mesh_vertices_mapping.blocks );
+            ModelMappings result;
+            result.component_mapping = merge_model_mappings(
+                mappings1.component_mapping, mappings2.component_mapping );
+            result.mesh_element_mapping =
+                merge_model_mappings( mappings1.mesh_element_mapping,
+                    mappings2.mesh_element_mapping );
+            result.mesh_vertices_mapping =
+                merge_model_mappings( mappings1.mesh_vertices_mapping,
+                    mappings2.mesh_vertices_mapping );
             return result;
         }
     } // namespace detail
