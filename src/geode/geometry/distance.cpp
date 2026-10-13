@@ -475,41 +475,66 @@ namespace
         return { min_distance, point0, point1 };
     }
 
-    template < geode::index_t dimension >
-    std::optional< std::tuple< double,
-        geode::Point< dimension >,
-        geode::Point< dimension > > >
-        approximate_segment_segment_distance(
-            const geode::Segment< dimension >& segment0,
-            const geode::Segment< dimension >& segment1 )
+    struct SegmentSegmentTerms
     {
-        /* Algorithm and code found on
-         * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
-         */
-        const geode::Vector< dimension > P1mP0{ segment0.vertices()[0],
-            segment0.vertices()[1] };
-        const geode::Vector< dimension > Q1mQ0{ segment1.vertices()[0],
-            segment1.vertices()[1] };
-        const geode::Vector< dimension > P0mQ0{ segment1.vertices()[0],
-            segment0.vertices()[0] };
+        // det = a*c - b*b, s_numerator = b*e - c*d, t_numerator = a*e - b*d
+        // computed with cross products to avoid cancellations for nearly
+        // parallel segments (Binet-Cauchy identity)
+        double det{ 0 };
+        double s_numerator{ 0 };
+        double t_numerator{ 0 };
+    };
+
+    SegmentSegmentTerms segment_segment_terms( const geode::Vector1D& /*u*/,
+        const geode::Vector1D& /*v*/,
+        const geode::Vector1D& /*w*/ )
+    {
+        return {};
+    }
+
+    SegmentSegmentTerms segment_segment_terms( const geode::Vector2D& u,
+        const geode::Vector2D& v,
+        const geode::Vector2D& w )
+    {
+        const auto uv = geode::dot_perpendicular( u, v );
+        return { uv * uv, uv * geode::dot_perpendicular( v, w ),
+            uv * geode::dot_perpendicular( u, w ) };
+    }
+
+    SegmentSegmentTerms segment_segment_terms( const geode::Vector3D& u,
+        const geode::Vector3D& v,
+        const geode::Vector3D& w )
+    {
+        const auto uv = u.cross( v );
+        return { uv.length2(), uv.dot( v.cross( w ) ), uv.dot( u.cross( w ) ) };
+    }
+
+    /*
+     * Parameters (s, t) of the closest points P0 + s*(P1-P0) and
+     * Q0 + t*(Q1-Q0) of two non-degenerated segments.
+     * Algorithm and code found on
+     * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
+     */
+    template < geode::index_t dimension >
+    std::pair< double, double > segment_segment_parameters(
+        const geode::Vector< dimension >& P1mP0,
+        const geode::Vector< dimension >& Q1mQ0,
+        const geode::Vector< dimension >& P0mQ0 )
+    {
+        // Below this relative value of sin^2(angle), segments are considered
+        // parallel
+        static constexpr double PARALLEL_EPSILON{ 1e-20 };
         const auto a = P1mP0.dot( P1mP0 );
         const auto b = P1mP0.dot( Q1mQ0 );
         const auto c = Q1mQ0.dot( Q1mQ0 );
         const auto d = P1mP0.dot( P0mQ0 );
         const auto e = Q1mQ0.dot( P0mQ0 );
-        const auto ac = a * c;
-        const auto bb = b * b;
-        double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
-        if( ac > bb )
+        const auto terms = segment_segment_terms( P1mP0, Q1mQ0, P0mQ0 );
+        double s, t, nd, bmd, bpe;
+        if( terms.det > PARALLEL_EPSILON * a * c )
         {
-            if( std::log2( std::abs( ac ) / std::abs( ac - bb ) ) > 20 )
-            {
-                return std::nullopt;
-            }
-            const auto det = ac - bb;
-            bte = b * e;
-            ctd = c * d;
-            if( bte <= ctd ) // s <= 0
+            const auto det = terms.det;
+            if( terms.s_numerator <= 0 ) // s <= 0
             {
                 s = 0;
                 if( e <= 0 ) // t <= 0
@@ -550,11 +575,7 @@ namespace
             }
             else // s > 0
             {
-                if( std::log2( std::abs( bte ) / std::abs( bte - ctd ) ) > 20 )
-                {
-                    return std::nullopt;
-                }
-                s = bte - ctd;
+                s = terms.s_numerator;
                 if( s >= det ) // s >= 1
                 {
                     // s = 1
@@ -598,9 +619,7 @@ namespace
                 }
                 else // 0 < s < 1
                 {
-                    ate = a * e;
-                    btd = b * d;
-                    if( ate <= btd ) // t <= 0
+                    if( terms.t_numerator <= 0 ) // t <= 0
                     {
                         // region 7
                         t = 0;
@@ -620,12 +639,7 @@ namespace
                     }
                     else // t > 0
                     {
-                        if( std::log2( std::abs( ate ) / std::abs( ate - btd ) )
-                            > 20 )
-                        {
-                            return std::nullopt;
-                        }
-                        t = ate - btd;
+                        t = terms.t_numerator;
                         if( t >= det ) // t >= 1
                         {
                             // region 3
@@ -725,108 +739,37 @@ namespace
             }
         }
 
-        const auto closest_on_segment0 =
-            segment0.vertices()[0].get() + P1mP0 * s;
-        const auto closest_on_segment1 =
-            segment1.vertices()[0].get() + Q1mQ0 * t;
-        const auto distance =
-            point_point_distance( closest_on_segment0, closest_on_segment1 );
-        if( distance < geode::GLOBAL_EPSILON )
-        {
-            return std::tuple< double, geode::Point< dimension >,
-                geode::Point< dimension > >{ distance, closest_on_segment0,
-                closest_on_segment1 };
-        }
-        const auto distance_to_closest0 =
-            point_segment_distance( closest_on_segment0, segment1 );
-        if( distance_to_closest0 < geode::GLOBAL_EPSILON )
-        {
-            return std::tuple< double, geode::Point< dimension >,
-                geode::Point< dimension > >{ distance_to_closest0,
-                closest_on_segment0,
-                point_segment_projection( closest_on_segment0, segment1 ) };
-        }
-        const auto distance_to_closest1 =
-            point_segment_distance( closest_on_segment1, segment0 );
-        if( distance_to_closest1 < geode::GLOBAL_EPSILON )
-        {
-            return std::tuple< double, geode::Point< dimension >,
-                geode::Point< dimension > >{ distance_to_closest1,
-                point_segment_projection( closest_on_segment1, segment0 ),
-                closest_on_segment1 };
-        }
-        if( distance_to_closest0 < distance )
-        {
-            if( distance_to_closest1 < distance_to_closest0 )
-            {
-                return std::tuple< double, geode::Point< dimension >,
-                    geode::Point< dimension > >{ distance_to_closest1,
-                    point_segment_projection( closest_on_segment1, segment0 ),
-                    closest_on_segment1 };
-            }
-            return std::tuple< double, geode::Point< dimension >,
-                geode::Point< dimension > >{ distance_to_closest0,
-                closest_on_segment0,
-                point_segment_projection( closest_on_segment0, segment1 ) };
-        }
-        if( distance_to_closest1 < distance )
-        {
-            return std::tuple< double, geode::Point< dimension >,
-                geode::Point< dimension > >{ distance_to_closest1,
-                point_segment_projection( closest_on_segment1, segment0 ),
-                closest_on_segment1 };
-        }
-        return std::tuple< double, geode::Point< dimension >,
-            geode::Point< dimension > >{ distance, closest_on_segment0,
-            closest_on_segment1 };
+        return { s, t };
     }
 
     template < geode::index_t dimension >
-    std::tuple< double, geode::Point< dimension >, geode::Point< dimension > >
-        dichotomic_segment_segment_distance(
-            const geode::Segment< dimension >& segment0,
-            const geode::Segment< dimension >& segment1 )
+    geode::Point< dimension > segment_point(
+        const geode::Segment< dimension >& segment,
+        const geode::Vector< dimension >& direction,
+        double parameter )
     {
-        const auto longest_segment =
-            ( segment0.length() > segment1.length() ) ? segment0 : segment1;
-        const auto shortest_segment =
-            ( segment0.length() < segment1.length() ) ? segment0 : segment1;
-        auto current_point =
-            ( geode::point_segment_distance(
-                  longest_segment.vertices()[0].get(), shortest_segment )
-                < geode::point_segment_distance(
-                    longest_segment.vertices()[1].get(), shortest_segment ) )
-                ? longest_segment.vertices()[0].get()
-                : longest_segment.vertices()[1].get();
-        auto step = longest_segment.length() / 2;
-        auto current_distance =
-            geode::point_segment_distance( current_point, shortest_segment );
-        const auto segment_direction = longest_segment.direction();
-        while( step > geode::GLOBAL_EPSILON )
+        if( parameter <= 0 )
         {
-            const auto point_at_step_plus =
-                current_point + segment_direction * step;
-            const auto point_at_step_minus =
-                current_point - segment_direction * step;
-            const auto distance_plus = geode::point_segment_distance(
-                point_at_step_plus, shortest_segment );
-            const auto distance_minus = geode::point_segment_distance(
-                point_at_step_minus, shortest_segment );
-            if( distance_plus < current_distance
-                && current_point != longest_segment.vertices()[1].get() )
-            {
-                current_distance = distance_plus;
-                current_point = point_at_step_plus;
-            }
-            if( distance_minus < current_distance
-                && current_point != longest_segment.vertices()[0].get() )
-            {
-                current_distance = distance_minus;
-                current_point = point_at_step_minus;
-            }
-            step /= 2;
+            return segment.vertices()[0].get();
         }
-        return { current_distance, current_point, current_point };
+        if( parameter >= 1 )
+        {
+            return segment.vertices()[1].get();
+        }
+        return segment.vertices()[0].get() + direction * parameter;
+    }
+
+    double clamp_parameter( double numerator, double denominator )
+    {
+        if( numerator <= 0 )
+        {
+            return 0;
+        }
+        if( numerator >= denominator )
+        {
+            return 1;
+        }
+        return numerator / denominator;
     }
 
 } // namespace
@@ -887,12 +830,47 @@ namespace geode
         segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 )
     {
-        if( const auto approximation =
-                approximate_segment_segment_distance( segment0, segment1 ) )
+        const auto& P0 = segment0.vertices()[0].get();
+        const auto& Q0 = segment1.vertices()[0].get();
+        const Vector< dimension > P1mP0{ P0, segment0.vertices()[1] };
+        const Vector< dimension > Q1mQ0{ Q0, segment1.vertices()[1] };
+        const auto a = P1mP0.length2();
+        const auto c = Q1mQ0.length2();
+        constexpr auto SQUARED_EPSILON = GLOBAL_EPSILON * GLOBAL_EPSILON;
+        if( a <= SQUARED_EPSILON )
         {
-            return approximation.value();
+            if( c <= SQUARED_EPSILON )
+            {
+                return { point_point_distance( P0, Q0 ), P0, Q0 };
+            }
+            const auto t = clamp_parameter(
+                Vector< dimension >{ Q0, P0 }.dot( Q1mQ0 ), c );
+            auto closest1 = segment_point( segment1, Q1mQ0, t );
+            const auto distance = point_point_distance( P0, closest1 );
+            return { distance, P0, std::move( closest1 ) };
         }
-        return dichotomic_segment_segment_distance( segment0, segment1 );
+        if( c <= SQUARED_EPSILON )
+        {
+            const auto s = clamp_parameter(
+                Vector< dimension >{ P0, Q0 }.dot( P1mP0 ), a );
+            auto closest0 = segment_point( segment0, P1mP0, s );
+            const auto distance = point_point_distance( closest0, Q0 );
+            return { distance, std::move( closest0 ), Q0 };
+        }
+        auto [s, t] = segment_segment_parameters< dimension >(
+            P1mP0, Q1mQ0, Vector< dimension >{ Q0, P0 } );
+        // Polish: closest point on segment1 to P(s), then closest point on
+        // segment0 to Q(t) (each step can only decrease the distance)
+        t = clamp_parameter(
+            Vector< dimension >{ Q0, segment_point( segment0, P1mP0, s ) }.dot(
+                Q1mQ0 ),
+            c );
+        auto closest1 = segment_point( segment1, Q1mQ0, t );
+        s = clamp_parameter(
+            Vector< dimension >{ P0, closest1 }.dot( P1mP0 ), a );
+        auto closest0 = segment_point( segment0, P1mP0, s );
+        const auto distance = point_point_distance( closest0, closest1 );
+        return { distance, std::move( closest0 ), std::move( closest1 ) };
     }
 
     template < index_t dimension >

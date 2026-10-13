@@ -485,10 +485,110 @@ void test_segment_segment_distance_3d()
         "segment_gh" );
 }
 
+void test_segment_segment_distance_near_parallel_fixed()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 10.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 2.0, 1.0, 0.0 } };
+    const geode::Point3D d{ { 5.0, 1.0, 1e-5 } };
+    const geode::Segment3D segment_ab{ a, b };
+    const geode::Segment3D segment_cd{ c, d };
+    const geode::Point3D result0{ { 2.0, 0.0, 0.0 } };
+    const auto [distance, closest0, closest1] =
+        geode::segment_segment_distance( segment_ab, segment_cd );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - 1 ) < 1e-12 && closest0.inexact_equal( result0 )
+            && closest1.inexact_equal( c ),
+        "Wrong result for segment_segment_distance with near parallel "
+        "segments: ",
+        distance, " ", closest0.string(), " ", closest1.string() );
+    const auto [swapped_distance, swapped_closest0, swapped_closest1] =
+        geode::segment_segment_distance( segment_cd, segment_ab );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( swapped_distance - 1 ) < 1e-12
+            && swapped_closest0.inexact_equal( c )
+            && swapped_closest1.inexact_equal( result0 ),
+        "Wrong result for segment_segment_distance with swapped near "
+        "parallel segments" );
+
+    const geode::Point3D e{ { 1.0, 1.0, 1.0 } };
+    const geode::Point3D f{ { 1.0 + 5e-7, 1.0, 1.0 } };
+    const geode::Point3D g{ { 1.0, 1.0 + 1e-7, 1.0 } };
+    const geode::Point3D h{ { 1.0 + 5e-7, 1.0 + 1.1e-7, 1.0 } };
+    const auto [tiny_distance, tiny_closest0, tiny_closest1] =
+        geode::segment_segment_distance(
+            geode::Segment3D{ e, f }, geode::Segment3D{ g, h } );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( tiny_distance - 1e-7 ) < 1e-12,
+        "Wrong result for segment_segment_distance with tiny near parallel "
+        "segments: ",
+        tiny_distance );
+}
+
+void test_segment_segment_distance_near_parallel_random()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > coordinate{ -5, 5 };
+    std::uniform_real_distribution< double > unit{ -1, 1 };
+    std::uniform_real_distribution< double > exponent{ -12, -3 };
+    const auto random_vector = [&]( double scale ) {
+        return geode::Vector3D{
+            { unit( generator ), unit( generator ), unit( generator ) }
+        } * scale;
+    };
+    for( const auto unused : geode::Range{ 2000 } )
+    {
+        geode_unused( unused );
+        const geode::Point3D p0{ { coordinate( generator ),
+            coordinate( generator ), coordinate( generator ) } };
+        const auto direction = random_vector( 3 );
+        const geode::Point3D p1 = p0 + direction;
+        const auto angle = std::pow( 10., exponent( generator ) );
+        const auto q0 =
+            p0 + direction * unit( generator ) + random_vector( 0.5 );
+        const auto q1 = q0
+                        + ( direction + random_vector( angle ) )
+                              * ( 0.5 + std::fabs( unit( generator ) ) );
+        const geode::Segment3D segment0{ p0, p1 };
+        const geode::Segment3D segment1{ q0, q1 };
+        const auto [distance, closest0, closest1] =
+            geode::segment_segment_distance( segment0, segment1 );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs(
+                geode::point_point_distance( closest0, closest1 ) - distance )
+                < 1e-12,
+            "Wrong result for segment_segment_distance: distance does not "
+            "match closest points" );
+        geode::OpenGeodeGeometryException::test(
+            geode::point_segment_distance( closest0, segment0 ) < 1e-12
+                && geode::point_segment_distance( closest1, segment1 ) < 1e-12,
+            "Wrong result for segment_segment_distance: closest points not "
+            "on segments" );
+        auto brute_force = std::numeric_limits< double >::max();
+        constexpr geode::index_t nb_samples{ 1000 };
+        for( const auto i : geode::Range{ nb_samples + 1 } )
+        {
+            const auto ratio = static_cast< double >( i ) / nb_samples;
+            brute_force = std::min(
+                brute_force, geode::point_segment_distance(
+                                 p0 + ( p1 - p0 ) * ratio, segment1 ) );
+            brute_force = std::min(
+                brute_force, geode::point_segment_distance(
+                                 q0 + ( q1 - q0 ) * ratio, segment0 ) );
+        }
+        geode::OpenGeodeGeometryException::test( distance <= brute_force + 1e-9,
+            "Wrong result for segment_segment_distance with near parallel "
+            "segments: ",
+            distance, " | brute force: ", brute_force );
+    }
+}
+
 void test_segment_segment_distance()
 {
     test_segment_segment_distance_2d();
     test_segment_segment_distance_3d();
+    test_segment_segment_distance_near_parallel_fixed();
+    test_segment_segment_distance_near_parallel_random();
 }
 
 void test_segment_line_distance()
