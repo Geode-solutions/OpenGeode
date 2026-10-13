@@ -24,10 +24,10 @@
 #include <geode/geometry/points_sort.hpp>
 
 #include <algorithm>
-
-#include <async++.h>
+#include <limits>
 
 #include <absl/algorithm/container.h>
+#include <absl/container/inlined_vector.h>
 
 #include <geode/geometry/point.hpp>
 
@@ -114,6 +114,103 @@ namespace
         template < geode::index_t > typename Comparator >
     void morton_mapping( absl::Span< const geode::Point3D > points,
         const itr& begin,
+        const itr& end );
+
+    template < template < geode::index_t > typename Comparator >
+    void morton_mapping_from_axis( geode::local_index_t axis,
+        absl::Span< const geode::Point3D > points,
+        const itr& begin,
+        const itr& end )
+    {
+        if( axis == 0 )
+        {
+            morton_mapping< 0, Comparator >( points, begin, end );
+        }
+        else if( axis == 1 )
+        {
+            morton_mapping< 1, Comparator >( points, begin, end );
+        }
+        else
+        {
+            morton_mapping< 2, Comparator >( points, begin, end );
+        }
+    }
+
+    // Splitting along an axis where all points have (almost) the same
+    // coordinate interleaves points that are far apart along the other
+    // axes, which breaks the curve locality (e.g. flat 3D data).
+    // Such axes are skipped and the range is split as in 2D/1D.
+    template < template < geode::index_t > typename Comparator >
+    bool morton_mapping_skipping_flat_axes(
+        const std::array< geode::local_index_t, 3 >& axes,
+        absl::Span< const geode::Point3D > points,
+        const itr& begin,
+        const itr& end )
+    {
+        static constexpr double FLAT_RATIO{ 1e-3 };
+        std::array< double, 3 > min;
+        min.fill( std::numeric_limits< double >::max() );
+        std::array< double, 3 > max;
+        max.fill( std::numeric_limits< double >::lowest() );
+        for( auto it = begin; it != end; ++it )
+        {
+            const auto& point = points[*it];
+            for( const auto d : geode::LRange{ 3 } )
+            {
+                min[d] = std::min( min[d], point.value( d ) );
+                max[d] = std::max( max[d], point.value( d ) );
+            }
+        }
+        double max_extent{ 0 };
+        for( const auto d : geode::LRange{ 3 } )
+        {
+            max_extent = std::max( max_extent, max[d] - min[d] );
+        }
+        if( max_extent == 0 )
+        {
+            // All points are colocated: any order is fine
+            return true;
+        }
+        absl::InlinedVector< geode::local_index_t, 3 > kept_axes;
+        for( const auto axis : axes )
+        {
+            if( max[axis] - min[axis] > FLAT_RATIO * max_extent )
+            {
+                kept_axes.push_back( axis );
+            }
+        }
+        if( kept_axes.size() == 3 )
+        {
+            return false;
+        }
+        if( kept_axes.size() == 1 )
+        {
+            const Comparator< 3 > compX{ points, kept_axes[0] };
+            const auto m1 = split_container( begin, end, compX );
+            morton_mapping_from_axis< Comparator >(
+                kept_axes[0], points, begin, m1 );
+            morton_mapping_from_axis< Comparator >(
+                kept_axes[0], points, m1, end );
+            return true;
+        }
+        const Comparator< 3 > compX{ points, kept_axes[0] };
+        const Comparator< 3 > compY{ points, kept_axes[1] };
+        const auto m0 = begin;
+        const auto m4 = end;
+        const auto m2 = split_container( m0, m4, compX );
+        const auto m1 = split_container( m0, m2, compY );
+        const auto m3 = split_container( m2, m4, compY );
+        morton_mapping_from_axis< Comparator >( kept_axes[1], points, m0, m1 );
+        morton_mapping_from_axis< Comparator >( kept_axes[0], points, m1, m2 );
+        morton_mapping_from_axis< Comparator >( kept_axes[0], points, m2, m3 );
+        morton_mapping_from_axis< Comparator >( kept_axes[1], points, m3, m4 );
+        return true;
+    }
+
+    template < geode::local_index_t COORDX,
+        template < geode::index_t > typename Comparator >
+    void morton_mapping( absl::Span< const geode::Point3D > points,
+        const itr& begin,
         const itr& end )
     {
         if( end - begin <= 1 )
@@ -122,6 +219,11 @@ namespace
         }
         constexpr geode::local_index_t COORDY = COORDX == 2 ? 0 : COORDX + 1;
         constexpr geode::local_index_t COORDZ = COORDY == 2 ? 0 : COORDY + 1;
+        if( morton_mapping_skipping_flat_axes< Comparator >(
+                { COORDX, COORDY, COORDZ }, points, begin, end ) )
+        {
+            return;
+        }
 
         const Comparator< 3 > compX{ points, COORDX };
         const Comparator< 3 > compY{ points, COORDY };
@@ -220,10 +322,7 @@ namespace geode
         absl::Span< const Point< dimension > > points )
     {
         std::vector< index_t > mapping( points.size() );
-        async::parallel_for( async::irange( size_t{ 0 }, mapping.size() ),
-            [&mapping]( index_t i ) {
-                mapping[i] = i;
-            } );
+        absl::c_iota( mapping, index_t{ 0 } );
         absl::c_sort( mapping, [&points]( index_t i, index_t j ) {
             return lexicographic_compare( points[i], points[j] );
         } );
@@ -235,10 +334,7 @@ namespace geode
         absl::Span< const Point< dimension > > points )
     {
         std::vector< index_t > mapping( points.size() );
-        async::parallel_for( async::irange( size_t{ 0 }, mapping.size() ),
-            [&mapping]( index_t i ) {
-                mapping[i] = i;
-            } );
+        absl::c_iota( mapping, index_t{ 0 } );
         ::morton_mapping< 0_uc, Morton_cmp >(
             points, mapping.begin(), mapping.end() );
         return mapping;
@@ -249,10 +345,7 @@ namespace geode
         absl::Span< const Point< dimension > > points )
     {
         std::vector< index_t > mapping( points.size() );
-        async::parallel_for( async::irange( size_t{ 0 }, mapping.size() ),
-            [&mapping]( index_t i ) {
-                mapping[i] = i;
-            } );
+        absl::c_iota( mapping, index_t{ 0 } );
         ::morton_mapping< 0_uc, Hilbert_cmp >(
             points, mapping.begin(), mapping.end() );
         return mapping;
