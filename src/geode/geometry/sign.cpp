@@ -57,19 +57,50 @@ namespace geode
     SIGN polygon_area_sign( const Polygon2D& polygon )
     {
         const auto& polygon_vertices = polygon.vertices();
+        const auto nb_vertices = polygon.nb_vertices();
+        if( nb_vertices < 3 )
+        {
+            return SIGN::zero;
+        }
+        // The lexicographically smallest vertex is on the convex hull: the
+        // polygon orientation is the orientation of its corner
+        index_t min_vertex{ 0 };
+        for( const auto v : Range{ 1, nb_vertices } )
+        {
+            if( polygon_vertices[v].get() < polygon_vertices[min_vertex].get() )
+            {
+                min_vertex = v;
+            }
+        }
+        const Point2D& corner = polygon_vertices[min_vertex];
+        auto prev = min_vertex;
+        auto next = min_vertex;
+        do
+        {
+            prev = prev == 0 ? nb_vertices - 1 : prev - 1;
+        } while( prev != min_vertex && polygon_vertices[prev].get() == corner );
+        do
+        {
+            next = next + 1 == nb_vertices ? 0 : next + 1;
+        } while( next != min_vertex && polygon_vertices[next].get() == corner );
+        const auto corner_sign = triangle_area_sign(
+            { polygon_vertices[prev], corner, polygon_vertices[next] } );
+        if( corner_sign != SIGN::zero )
+        {
+            return corner_sign;
+        }
         const auto& p1 = polygon_vertices[0];
-        for( const auto other_index : LRange{ 1, polygon_vertices.size() - 1 } )
+        for( const auto other_index : Range{ 1, nb_vertices - 1 } )
         {
             const auto& p2 = polygon_vertices[other_index];
-            const auto& p3 = polygon_vertices[static_cast< local_index_t >(
-                other_index + 1 )];
+            const auto& p3 = polygon_vertices[other_index + 1];
             const auto sign = triangle_area_sign( { p1, p2, p3 } );
             if( sign != SIGN::zero )
             {
                 return sign;
             }
         }
-        return geode::SIGN::zero;
+        return SIGN::zero;
     }
 
     SIGN triangle_area_sign( const Triangle3D& triangle, local_index_t axis )
