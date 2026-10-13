@@ -1301,8 +1301,127 @@ void test_point_ellipse_distance_3d()
         "point" );
 }
 
+template < geode::index_t dimension >
+double ellipse_level( const geode::Ellipse< dimension >& ellipse,
+    const geode::Point< dimension >& point )
+{
+    const geode::Vector< dimension > center_to_point{ ellipse.center(), point };
+    double level{ 0 };
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        const auto& axis = ellipse.axes().direction( d );
+        const auto coordinate = center_to_point.dot( axis ) / axis.length2();
+        level += coordinate * coordinate;
+    }
+    return level;
+}
+
+double brute_force_ellipse_distance(
+    const geode::Ellipse2D& ellipse, const geode::Point2D& point )
+{
+    const auto& axes = ellipse.axes();
+    auto min_distance = std::numeric_limits< double >::max();
+    constexpr geode::index_t nb_samples{ 4000 };
+    for( const auto s : geode::Range{ nb_samples } )
+    {
+        const auto angle = 2. * M_PI * s / nb_samples;
+        const auto sample = ellipse.center()
+                            + axes.direction( 0 ) * std::cos( angle )
+                            + axes.direction( 1 ) * std::sin( angle );
+        min_distance = std::min(
+            min_distance, geode::point_point_distance( point, sample ) );
+    }
+    return min_distance;
+}
+
+double brute_force_ellipse_distance(
+    const geode::Ellipse3D& ellipse, const geode::Point3D& point )
+{
+    const auto& axes = ellipse.axes();
+    auto min_distance = std::numeric_limits< double >::max();
+    constexpr geode::index_t nb_samples{ 100 };
+    for( const auto s0 : geode::Range{ nb_samples + 1 } )
+    {
+        const auto theta = M_PI * s0 / nb_samples;
+        for( const auto s1 : geode::Range{ 2 * nb_samples } )
+        {
+            const auto phi = M_PI * s1 / nb_samples;
+            const auto sample =
+                ellipse.center()
+                + axes.direction( 0 ) * ( std::sin( theta ) * std::cos( phi ) )
+                + axes.direction( 1 ) * ( std::sin( theta ) * std::sin( phi ) )
+                + axes.direction( 2 ) * std::cos( theta );
+            min_distance = std::min(
+                min_distance, geode::point_point_distance( point, sample ) );
+        }
+    }
+    return min_distance;
+}
+
+template < geode::index_t dimension >
+void check_point_ellipse_distance( const geode::Ellipse< dimension >& ellipse,
+    const geode::Point< dimension >& point )
+{
+    const auto [distance, closest_point] =
+        geode::point_ellipse_distance( point, ellipse );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( ellipse_level( ellipse, closest_point ) - 1 ) < 1e-9,
+        "Wrong result for point_ellipse_distance with query ", point.string(),
+        ": closest point ", closest_point.string(), " not on ellipse" );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs(
+            geode::point_point_distance( point, closest_point ) - distance )
+            < 1e-9,
+        "Wrong result for point_ellipse_distance with query ", point.string(),
+        ": distance does not match closest point" );
+    const auto brute_force = brute_force_ellipse_distance( ellipse, point );
+    geode::OpenGeodeGeometryException::test( distance <= brute_force + 1e-9,
+        "Wrong result for point_ellipse_distance with query ", point.string(),
+        ": ", distance, " | brute force: ", brute_force );
+}
+
+void test_point_ellipse_distance_random()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -4, 4 };
+    const geode::Point2D origin2d{ { 0, 0 } };
+    const geode::Point2D center2d{ { 0.5, -0.25 } };
+    const geode::Frame2D sorted_frame2d{ { geode::Vector2D{ { 2, 0 } },
+        geode::Vector2D{ { 0, 1 } } } };
+    const geode::Frame2D unsorted_frame2d{ { geode::Vector2D{ { 1, 0 } },
+        geode::Vector2D{ { 0, 2 } } } };
+    const geode::Frame2D rotated_frame2d{ { geode::Vector2D{ { 0.6, 0.8 } },
+        geode::Vector2D{ { -2.4, 1.8 } } } };
+    const geode::Ellipse2D sorted2d{ center2d, sorted_frame2d };
+    const geode::Ellipse2D unsorted2d{ center2d, unsorted_frame2d };
+    const geode::Ellipse2D rotated2d{ center2d, rotated_frame2d };
+    check_point_ellipse_distance( geode::Ellipse2D{ origin2d, sorted_frame2d },
+        geode::Point2D{ { -3, -0.5 } } );
+    for( const auto unused : geode::Range{ 200 } )
+    {
+        geode_unused( unused );
+        const geode::Point2D query{ { distribution( generator ),
+            distribution( generator ) } };
+        check_point_ellipse_distance( sorted2d, query );
+        check_point_ellipse_distance( unsorted2d, query );
+        check_point_ellipse_distance( rotated2d, query );
+    }
+    const geode::Point3D center3d{ { 0.5, -0.25, 1 } };
+    const geode::Frame3D frame3d{ { geode::Vector3D{ { 0, 0, 1 } },
+        geode::Vector3D{ { 0, 3, 0 } }, geode::Vector3D{ { 2, 0, 0 } } } };
+    const geode::Ellipse3D ellipse3d{ center3d, frame3d };
+    for( const auto unused : geode::Range{ 50 } )
+    {
+        geode_unused( unused );
+        const geode::Point3D query{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        check_point_ellipse_distance( ellipse3d, query );
+    }
+}
+
 void test_point_ellipse_distance()
 {
+    test_point_ellipse_distance_random();
     test_point_ellipse_distance_2d();
     test_point_ellipse_distance_3d();
     test_point_ellipse_distance_2d_not_aligned();

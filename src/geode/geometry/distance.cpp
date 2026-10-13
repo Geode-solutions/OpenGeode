@@ -1521,7 +1521,7 @@ namespace geode
         {
             const auto p = locE[i] / emin;
             pSqr[i] = p * p;
-            numerator[i] = p * zPos[i];
+            numerator[i] = pSqr[i] * zPos[i];
         }
         double s{ 0 };
         auto smin = zPos[number_of_components - 1] - 1;
@@ -1586,12 +1586,12 @@ namespace geode
         {
             if( query_point_coordinates[i] > 0 )
             {
-                ePos.at( numpos ) = extents[i];
-                yPos.at( numpos ) = query_point_coordinates[i];
+                ePos[numpos] = extents[i];
+                yPos[numpos] = query_point_coordinates[i];
                 ++numpos;
                 continue;
             }
-            closest_point_coordinates.at( numpos ) = 0.;
+            closest_point_coordinates[i] = 0.;
         }
         if( query_point_coordinates[dimension - 1] > 0 )
         {
@@ -1665,59 +1665,36 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > SquaredDistance(
-        const Ellipse< dimension >& ellipse,
+    std::tuple< double, std::array< double, dimension > > SquaredDistance(
+        const std::array< double, dimension >& extents,
         const std::array< double, dimension >& query_point_coordinates )
     {
-        std::array< bool, dimension > is_query_points_coordinates_negative;
-        std::tuple< double, Point< dimension > > result;
-        auto& [squared_distance, closest_point] = result;
+        // Sort the axes by decreasing extent and reflect the query point in
+        // the first orthant
+        std::array< index_t, dimension > sorted_axes;
+        absl::c_iota( sorted_axes, 0 );
+        absl::c_stable_sort( sorted_axes, [&extents]( index_t a, index_t b ) {
+            return extents[a] > extents[b];
+        } );
+        std::array< double, dimension > sorted_extents;
+        std::array< double, dimension > sorted_coordinates;
         for( const auto i : geode::LRange{ dimension } )
         {
-            is_query_points_coordinates_negative[i] =
-                ( query_point_coordinates[i] < 0. );
+            const auto axis = sorted_axes[i];
+            sorted_extents[i] = extents[axis];
+            sorted_coordinates[i] = std::fabs( query_point_coordinates[axis] );
         }
-        std::array< std::pair< double, index_t >, dimension >
-            axis_sorted_by_decreasing_extent;
+        auto result = SqrDistanceSpecial< dimension >(
+            sorted_extents, sorted_coordinates );
+        // Restore the axis order and the reflections
+        const auto sorted_closest_coordinates = std::get< 1 >( result );
+        auto& closest_coordinates = std::get< 1 >( result );
         for( const auto i : geode::LRange{ dimension } )
         {
-            auto& [extent, axis] = axis_sorted_by_decreasing_extent.at( i );
-            extent = ellipse.axes().direction( i ).length();
-            axis = i;
-        };
-        absl::c_sort( axis_sorted_by_decreasing_extent,
-            []( const std::pair< double, index_t >& a,
-                const std::pair< double, index_t >& b ) {
-                return a.second < b.second;
-            } );
-        std::array< index_t, dimension > reverse_permutation;
-        for( const auto i : geode::LRange{ dimension } )
-        {
-            reverse_permutation.at(
-                axis_sorted_by_decreasing_extent[i].second ) = i;
-        }
-        std::array< double, dimension > extents;
-        std::array< double, dimension > locY;
-        for( const auto i : geode::LRange{ dimension } )
-        {
-            const auto j = axis_sorted_by_decreasing_extent[i].second;
-            extents[i] = ellipse.axes().direction( j ).length();
-            locY[i] = std::fabs( query_point_coordinates[j] );
-        }
-        auto [squared_distance_special, closest_point_coordinates] =
-            SqrDistanceSpecial< dimension >( extents, locY );
-        squared_distance = squared_distance_special;
-        for( const auto i : geode::LRange{ dimension } )
-        {
-            const auto j = reverse_permutation[i];
-            if( is_query_points_coordinates_negative[i] )
-            {
-                closest_point_coordinates[j] = -closest_point_coordinates[j];
-            }
-        }
-        for( const auto i : geode::LRange{ dimension } )
-        {
-            closest_point.set_value( i, closest_point_coordinates[i] );
+            const auto axis = sorted_axes[i];
+            closest_coordinates[axis] = query_point_coordinates[axis] < 0.
+                                            ? -sorted_closest_coordinates[i]
+                                            : sorted_closest_coordinates[i];
         }
         return result;
     }
@@ -1726,23 +1703,26 @@ namespace geode
     std::tuple< double, Point< dimension > > point_ellipse_distance(
         const Point< dimension >& point, const Ellipse< dimension >& ellipse )
     {
-        std::tuple< double, Point< dimension > > result;
+        std::array< Vector< dimension >, dimension > unit_axes;
+        std::array< double, dimension > extents;
         std::array< double, dimension > point_coordinates;
         const Vector< dimension > center_to_point{ ellipse.center(), point };
         for( const auto i : geode::LRange{ dimension } )
         {
-            point_coordinates[i] = center_to_point.dot(
-                ellipse.axes().direction( i ).normalize() );
+            const auto& axis = ellipse.axes().direction( i );
+            extents[i] = axis.length();
+            unit_axes[i] = axis / extents[i];
+            point_coordinates[i] = center_to_point.dot( unit_axes[i] );
         }
-        auto& [distance, closest_point] = result;
-        const auto [squared_distance, closest_point_result] =
-            SquaredDistance< dimension >( ellipse, point_coordinates );
-        distance = std::sqrt( squared_distance );
-        closest_point = ellipse.center();
+        const auto [squared_distance, closest_point_coordinates] =
+            SquaredDistance< dimension >( extents, point_coordinates );
+        std::tuple< double, Point< dimension > > result{
+            std::sqrt( squared_distance ), ellipse.center()
+        };
+        auto& closest_point = std::get< 1 >( result );
         for( const auto i : geode::LRange{ dimension } )
         {
-            closest_point += ellipse.axes().direction( i ).normalize()
-                             * closest_point_result.value( i );
+            closest_point += unit_axes[i] * closest_point_coordinates[i];
         }
         return result;
     }
