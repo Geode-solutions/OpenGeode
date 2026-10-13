@@ -21,6 +21,8 @@
  *
  */
 
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -568,6 +570,69 @@ void test_point_inside_polygon()
     }
 }
 
+void test_exact_predicates_near_degenerate()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1e3, 1e3 };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        auto x0 = distribution( generator );
+        auto x1 = distribution( generator );
+        if( x0 == x1 )
+        {
+            continue;
+        }
+        if( x0 > x1 )
+        {
+            std::swap( x0, x1 );
+        }
+        const auto x2 = distribution( generator );
+        // Points on the line y = x are exactly collinear
+        const geode::Point2D p0{ { x0, x0 } };
+        const geode::Point2D p1{ { x1, x1 } };
+        const geode::Segment2D segment{ p0, p1 };
+        geode::OpenGeodeGeometryException::test(
+            geode::point_side_to_segment(
+                geode::Point2D{ { x2, x2 } }, segment )
+                == geode::SIDE::zero,
+            "Wrong side for collinear point" );
+        const auto side_up = geode::point_side_to_segment(
+            geode::Point2D{ { x2, std::nextafter( x2, 1e300 ) } }, segment );
+        const auto side_down = geode::point_side_to_segment(
+            geode::Point2D{ { x2, std::nextafter( x2, -1e300 ) } }, segment );
+        geode::OpenGeodeGeometryException::test(
+            side_up != geode::SIDE::zero && side_down != geode::SIDE::zero
+                && side_up != side_down,
+            "Wrong side for points one ulp away from the line" );
+
+        // Points on the plane x = y are exactly coplanar
+        const auto z0 = distribution( generator );
+        const auto z1 = distribution( generator );
+        const geode::Point3D q0{ { x0, x0, z0 } };
+        const geode::Point3D q1{ { x1, x1, z0 } };
+        const geode::Point3D q2{ { x2, x2, z1 } };
+        const geode::Triangle3D triangle{ q0, q1, q2 };
+        const auto x3 = distribution( generator );
+        const auto z3 = distribution( generator );
+        geode::OpenGeodeGeometryException::test(
+            geode::point_side_to_triangle(
+                geode::Point3D{ { x3, x3, z3 } }, triangle )
+                == geode::SIDE::zero,
+            "Wrong side for coplanar point" );
+        const auto side_above = geode::point_side_to_triangle(
+            geode::Point3D{ { x3, std::nextafter( x3, 1e300 ), z3 } },
+            triangle );
+        const auto side_below = geode::point_side_to_triangle(
+            geode::Point3D{ { x3, std::nextafter( x3, -1e300 ), z3 } },
+            triangle );
+        geode::OpenGeodeGeometryException::test(
+            side_above != geode::SIDE::zero && side_below != geode::SIDE::zero
+                && side_above != side_below,
+            "Wrong side for points one ulp away from the plane" );
+    }
+}
+
 void test()
 {
     test_point_side_to_segment();
@@ -577,6 +642,7 @@ void test()
     test_point_triangle_position();
     test_point_tetrahedron_position();
     test_point_inside_polygon();
+    test_exact_predicates_near_degenerate();
 }
 
 OPENGEODE_TEST( "position" )
