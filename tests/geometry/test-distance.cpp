@@ -1027,6 +1027,32 @@ void test_point_circle_distance()
         "a and circle_x" );
 }
 
+void test_point_circle_signed_distance_far_from_origin()
+{
+    const geode::Point3D center{ { 0.0, 0.0, 10.0 } };
+    const geode::Vector3D normal{ { 0.0, 0.0, 1.0 } };
+    const geode::Plane plane{ normal, center };
+    const geode::Circle circle{ plane, 1 };
+
+    const auto [distance_below, closest_below] =
+        geode::point_circle_signed_distance(
+            geode::Point3D{ { 1.0, 0.0, 9.0 } }, circle );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance_below + 1 ) < geode::GLOBAL_EPSILON,
+        "Wrong result for point_circle_signed_distance below the circle "
+        "plane: ",
+        distance_below );
+
+    const auto [distance_above, closest_above] =
+        geode::point_circle_signed_distance(
+            geode::Point3D{ { 1.0, 0.0, 11.0 } }, circle );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance_above - 1 ) < geode::GLOBAL_EPSILON,
+        "Wrong result for point_circle_signed_distance above the circle "
+        "plane: ",
+        distance_above );
+}
+
 void test_line_triangle_distance()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -1312,6 +1338,7 @@ void test()
     test_point_plane_distance();
     test_point_sphere_distance();
     test_point_circle_distance();
+    test_point_circle_signed_distance_far_from_origin();
     test_line_triangle_distance();
     test_segment_triangle_distance();
     test_triangle_triangle_distance();
