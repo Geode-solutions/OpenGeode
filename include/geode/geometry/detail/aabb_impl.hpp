@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -76,7 +77,7 @@ namespace geode
     {
     public:
         static constexpr index_t ROOT_INDEX{ 0 };
-        static constexpr index_t SELF_INTERSECTION_CHUNK_SIZE{ 128 };
+        static constexpr index_t LEAF_QUERY_CHUNK_SIZE{ 128 };
 
         struct Iterator
         {
@@ -263,23 +264,45 @@ namespace geode
         [[nodiscard]] std::vector< std::pair< index_t, index_t > >
             self_intersect( const ACTION& action ) const
         {
-            const auto nb_chunks =
-                ( nb_bboxes() + SELF_INTERSECTION_CHUNK_SIZE - 1 )
-                / SELF_INTERSECTION_CHUNK_SIZE;
+            return parallel_leaf_queries(
+                [this, &action]( index_t position,
+                    std::vector< std::pair< index_t, index_t > >& pairs ) {
+                    leaf_self_intersect_recursive( leaf_node( position ),
+                        position, ROOT_INDEX, 0, nb_bboxes(), action, pairs );
+                } );
+        }
+
+        template < typename ACTION >
+        [[nodiscard]] std::vector< std::pair< index_t, index_t > >
+            other_intersect( const AABBTree< dimension >& other_tree,
+                const ACTION& action ) const
+        {
+            const auto& other = *other_tree.impl_;
+            return parallel_leaf_queries(
+                [this, &other, &action]( index_t position,
+                    std::vector< std::pair< index_t, index_t > >& pairs ) {
+                    leaf_other_intersect_recursive( leaf_node( position ),
+                        position, other, ROOT_INDEX, 0, other.nb_bboxes(),
+                        action, pairs );
+                } );
+        }
+
+        template < typename LeafQuery >
+        [[nodiscard]] std::vector< std::pair< index_t, index_t > >
+            parallel_leaf_queries( const LeafQuery& leaf_query ) const
+        {
+            const auto nb_chunks = ( nb_bboxes() + LEAF_QUERY_CHUNK_SIZE - 1 )
+                                   / LEAF_QUERY_CHUNK_SIZE;
             absl::FixedArray< std::vector< std::pair< index_t, index_t > > >
                 chunk_pairs( nb_chunks );
             async::parallel_for( async::irange( index_t{ 0 }, nb_chunks ),
-                [this, &action, &chunk_pairs]( index_t chunk ) {
-                    const auto chunk_begin =
-                        chunk * SELF_INTERSECTION_CHUNK_SIZE;
-                    const auto chunk_end =
-                        std::min( chunk_begin + SELF_INTERSECTION_CHUNK_SIZE,
-                            nb_bboxes() );
+                [this, &leaf_query, &chunk_pairs]( index_t chunk ) {
+                    const auto chunk_begin = chunk * LEAF_QUERY_CHUNK_SIZE;
+                    const auto chunk_end = std::min(
+                        chunk_begin + LEAF_QUERY_CHUNK_SIZE, nb_bboxes() );
                     for( const auto position : Range{ chunk_begin, chunk_end } )
                     {
-                        leaf_self_intersect_recursive( leaf_node( position ),
-                            position, ROOT_INDEX, 0, nb_bboxes(), action,
-                            chunk_pairs[chunk] );
+                        leaf_query( position, chunk_pairs[chunk] );
                     }
                 } );
             std::size_t nb_pairs{ 0 };
@@ -289,9 +312,9 @@ namespace geode
             }
             std::vector< std::pair< index_t, index_t > > result;
             result.reserve( nb_pairs );
-            for( const auto& pairs : chunk_pairs )
+            for( auto& pairs : chunk_pairs )
             {
-                result.insert( result.end(), pairs.begin(), pairs.end() );
+                absl::c_move( pairs, std::back_inserter( result ) );
             }
             return result;
         }
@@ -357,67 +380,38 @@ namespace geode
         }
 
         template < typename ACTION >
-        bool other_intersect_recursive( index_t node_index1,
-            index_t element_begin1,
-            index_t element_end1,
-            const AABBTree< dimension >& other_tree,
-            index_t node_index2,
-            index_t element_begin2,
-            index_t element_end2,
-            ACTION& action ) const
+        void leaf_other_intersect_recursive( index_t leaf_node_index,
+            index_t leaf_position,
+            const Impl& other,
+            index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            const ACTION& action,
+            std::vector< std::pair< index_t, index_t > >& pairs ) const
         {
-            OpenGeodeGeometryException::check_assertion(
-                element_end1 != element_begin1,
-                "No iteration allowed start == end" );
-            OpenGeodeGeometryException::check_assertion(
-                element_end2 != element_begin2,
-                "No iteration allowed start == end" );
-
-            // The acceleration is here:
-            if( !node( node_index1 )
-                    .epsilon_intersects(
-                        other_tree.impl_->node( node_index2 ) ) )
+            if( !node( leaf_node_index )
+                    .epsilon_intersects( other.node( node_index ) ) )
             {
-                return false;
+                return;
             }
-
-            // Simple case: leaf - leaf intersection.
-            if( is_leaf( element_begin1, element_end1 )
-                && is_leaf( element_begin2, element_end2 ) )
+            if( is_leaf( element_begin, element_end ) )
             {
-                return action( element_order( element_begin1 ),
-                    other_tree.impl_->element_order( element_begin2 ) );
-            }
-
-            // If node2 has more polygons than node1, then
-            //   intersect node2's two children with node1
-            // else
-            //   intersect node1's two children with node2
-            if( element_end2 - element_begin2 > element_end1 - element_begin1 )
-            {
-                const auto it = other_tree.impl_->get_recursive_iterators(
-                    node_index2, element_begin2, element_end2 );
-                if( other_intersect_recursive( node_index1, element_begin1,
-                        element_end1, other_tree, it.child_left, element_begin2,
-                        it.element_middle, action ) )
+                const auto element = element_order( leaf_position );
+                const auto other_element = other.element_order( element_begin );
+                if( action( element, other_element ) )
                 {
-                    return true;
+                    pairs.emplace_back( element, other_element );
                 }
-                return other_intersect_recursive( node_index1, element_begin1,
-                    element_end1, other_tree, it.child_right, it.element_middle,
-                    element_end2, action );
+                return;
             }
-            const auto it = get_recursive_iterators(
-                node_index1, element_begin1, element_end1 );
-            if( other_intersect_recursive( it.child_left, element_begin1,
-                    it.element_middle, other_tree, node_index2, element_begin2,
-                    element_end2, action ) )
-            {
-                return true;
-            }
-            return other_intersect_recursive( it.child_right, it.element_middle,
-                element_end1, other_tree, node_index2, element_begin2,
-                element_end2, action );
+            const auto it = other.get_recursive_iterators(
+                node_index, element_begin, element_end );
+            leaf_other_intersect_recursive( leaf_node_index, leaf_position,
+                other, it.child_left, element_begin, it.element_middle, action,
+                pairs );
+            leaf_other_intersect_recursive( leaf_node_index, leaf_position,
+                other, it.child_right, it.element_middle, element_end, action,
+                pairs );
         }
 
         template < typename BOX_FILTER, typename ACTION >
@@ -574,16 +568,16 @@ namespace geode
 
     template < index_t dimension >
     template < class EvalIntersection >
-    void AABBTree< dimension >::compute_other_element_bbox_intersections(
-        const AABBTree< dimension >& other_tree,
-        EvalIntersection& action ) const
+    std::vector< std::pair< index_t, index_t > >
+        AABBTree< dimension >::compute_other_element_bbox_intersections(
+            const AABBTree< dimension >& other_tree,
+            const EvalIntersection& action ) const
     {
         if( nb_bboxes() == 0 || other_tree.nb_bboxes() == 0 )
         {
-            return;
+            return {};
         }
-        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
-            other_tree, Impl::ROOT_INDEX, 0, other_tree.nb_bboxes(), action );
+        return impl_->other_intersect( other_tree, action );
     }
 
     template < index_t dimension >

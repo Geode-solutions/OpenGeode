@@ -443,20 +443,14 @@ void test_self_intersections()
         "Box self intersection - Result order should be deterministic" );
 }
 
-template < geode::index_t dimension >
 class OtherAABBIntersection
 {
 public:
-    bool operator()( geode::index_t box1, geode::index_t box2 )
+    [[nodiscard]] bool operator()(
+        geode::index_t /*box1*/, geode::index_t /*box2*/ ) const
     {
-        std::lock_guard< std::mutex > lock( mutex_ );
-        included_box_.push_back( { box1, box2 } );
-        return false;
+        return true;
     }
-
-public:
-    std::vector< std::pair< geode::index_t, geode::index_t > > included_box_;
-    std::mutex mutex_;
 };
 
 template < geode::index_t dimension >
@@ -469,17 +463,22 @@ void test_other_intersections()
         5, 0.2 ) };
     const geode::AABBTree< dimension > other{ create_box_vector< dimension >(
         2, 0.4 ) };
-    OtherAABBIntersection< dimension > action;
-    aabb.compute_other_element_bbox_intersections( other, action );
+    const auto intersecting_boxes =
+        aabb.compute_other_element_bbox_intersections(
+            other, OtherAABBIntersection{} );
 
     absl::flat_hash_map< geode::index_t, geode::index_t > answer{ { 0, 0 },
         { 1, 1 }, { 5, 2 }, { 6, 3 } };
-    for( const auto& result : action.included_box_ )
+    for( const auto& [box, other_box] : intersecting_boxes )
     {
-        geode::OpenGeodeGeometryException::test(
-            answer.at( result.first ) == result.second,
+        geode::OpenGeodeGeometryException::test( answer.at( box ) == other_box,
             "Box other intersection - Wrong box result" );
     }
+    geode::OpenGeodeGeometryException::test(
+        aabb.compute_other_element_bbox_intersections(
+            other, OtherAABBIntersection{} )
+            == intersecting_boxes,
+        "Box other intersection - Result order should be deterministic" );
 }
 
 template < geode::index_t dimension >

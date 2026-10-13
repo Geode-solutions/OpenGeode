@@ -156,16 +156,20 @@ namespace geode
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * bool operator()( index_t cur_element_box1, index_t cur_element_box2
-         * );
+         * ) const;
          * @note cur_element_box1 and cur_element_box2 are the element box
          * indices that intersect in the current tree and in the other tree.
-         * @note The returned boolean indicates if the search should stop or
-         * continue. Return true to stop the search, false to continue.
+         * @note the operator is called concurrently from several threads, it
+         * must be thread-safe. It tests the two elements and returns true if
+         * the pair should be kept.
+         * @return The kept pairs. Their order is deterministic: it does not
+         * depend on the number of threads.
          */
         template < class EvalIntersection >
-        void compute_other_element_bbox_intersections(
-            const AABBTree< dimension >& other_tree,
-            EvalIntersection& action ) const;
+        [[nodiscard]] std::vector< std::pair< index_t, index_t > >
+            compute_other_element_bbox_intersections(
+                const AABBTree< dimension >& other_tree,
+                const EvalIntersection& action ) const;
 
         /*!
          * @brief Computes the intersections between a given ray and all
