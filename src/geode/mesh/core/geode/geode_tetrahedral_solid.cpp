@@ -33,11 +33,11 @@
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/permutation.hpp>
 #include <geode/basic/pimpl_impl.hpp>
-#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/detail/geode_elements.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
 #include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
@@ -138,11 +138,7 @@ namespace geode
 
         void remove_legacy_attributes( AttributeManager& manager )
         {
-            for( const auto& attribute_id : legacy_attributes_ )
-            {
-                manager.delete_attribute( attribute_id );
-            }
-            legacy_attributes_.clear();
+            legacy_attributes_.remove_from( manager );
         }
 
     private:
@@ -151,18 +147,8 @@ namespace geode
         {
             internal::PointsImpl< dimension > temp;
             archive.object( temp );
-            std::shared_ptr< VariableAttribute< Tetrahedron > > vertices;
-            std::shared_ptr< VariableAttribute< Tetrahedron > > adjacents;
-            archive.ext( vertices, bitsery::ext::StdSmartPtr{} );
-            archive.ext( adjacents, bitsery::ext::StdSmartPtr{} );
-            tetrahedron_vertices_.resize( vertices->size() );
-            tetrahedron_adjacents_.resize( adjacents->size() );
-            for( const auto p : Indices{ tetrahedron_vertices_ } )
-            {
-                tetrahedron_vertices_[p] = vertices->value( p );
-                tetrahedron_adjacents_[p] = adjacents->value( p );
-            }
-            legacy_attributes_ = { vertices->id(), adjacents->id() };
+            legacy_attributes_.deserialize( archive, tetrahedron_vertices_ );
+            legacy_attributes_.deserialize( archive, tetrahedron_adjacents_ );
         }
 
         template < typename Archive >
@@ -194,7 +180,7 @@ namespace geode
     private:
         std::vector< Tetrahedron > tetrahedron_vertices_;
         std::vector< Tetrahedron > tetrahedron_adjacents_;
-        std::vector< uuid > legacy_attributes_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < index_t dimension >

@@ -29,8 +29,8 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/permutation.hpp>
-#include <geode/basic/variable_attribute.hpp>
 
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/graph.hpp>
 
 namespace geode
@@ -84,25 +84,14 @@ namespace geode
 
             void remove_legacy_attributes( AttributeManager& manager )
             {
-                for( const auto& attribute_id : legacy_attributes_ )
-                {
-                    manager.delete_attribute( attribute_id );
-                }
-                legacy_attributes_.clear();
+                legacy_attributes_.remove_from( manager );
             }
 
         private:
             template < typename Archive >
             void deserialize_legacy_storage( Archive& archive )
             {
-                std::shared_ptr< VariableAttribute< Edge > > edges;
-                archive.ext( edges, bitsery::ext::StdSmartPtr{} );
-                edges_.resize( edges->size() );
-                for( const auto e : Indices{ edges_ } )
-                {
-                    edges_[e] = edges->value( e );
-                }
-                legacy_attributes_ = { edges->id() };
+                legacy_attributes_.deserialize( archive, edges_ );
             }
 
             friend class bitsery::Access;
@@ -128,7 +117,7 @@ namespace geode
 
         private:
             std::vector< Edge > edges_;
-            std::vector< uuid > legacy_attributes_;
+            detail::LegacyAttributes legacy_attributes_;
         };
     } // namespace internal
 } // namespace geode

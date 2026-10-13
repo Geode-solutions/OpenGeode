@@ -34,6 +34,7 @@
 #include <geode/basic/range.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
 
 namespace geode
@@ -239,18 +240,10 @@ namespace geode
             template < typename Archive >
             void deserialize_legacy_storage( Archive& archive )
             {
-                std::shared_ptr< VariableAttribute< index_t > > counter;
-                std::shared_ptr< VariableAttribute< VertexContainer > >
-                    vertices;
-                archive.ext( counter, bitsery::ext::StdSmartPtr{} );
-                archive.ext( vertices, bitsery::ext::StdSmartPtr{} );
-                counters_.resize( counter->size() );
-                for( const auto f : Indices{ counters_ } )
-                {
-                    counters_[f] = counter->value( f );
-                }
-                facet_attribute_manager_.delete_attribute( counter->id() );
-                facet_attribute_manager_.delete_attribute( vertices->id() );
+                LegacyAttributes legacy_attributes;
+                legacy_attributes.deserialize( archive, counters_ );
+                legacy_attributes.skip< VertexContainer >( archive );
+                legacy_attributes.remove_from( facet_attribute_manager_ );
                 initialize_vertices();
             }
 

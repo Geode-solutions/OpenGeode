@@ -33,10 +33,10 @@
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/permutation.hpp>
 #include <geode/basic/pimpl_impl.hpp>
-#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
 
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
 #include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
@@ -124,11 +124,7 @@ namespace geode
 
         void remove_legacy_attributes( AttributeManager& manager )
         {
-            for( const auto& attribute_id : legacy_attributes_ )
-            {
-                manager.delete_attribute( attribute_id );
-            }
-            legacy_attributes_.clear();
+            legacy_attributes_.remove_from( manager );
         }
 
     private:
@@ -137,18 +133,8 @@ namespace geode
         {
             internal::PointsImpl< dimension > temp;
             archive.object( temp );
-            std::shared_ptr< VariableAttribute< Triangle > > vertices;
-            std::shared_ptr< VariableAttribute< Triangle > > adjacents;
-            archive.ext( vertices, bitsery::ext::StdSmartPtr{} );
-            archive.ext( adjacents, bitsery::ext::StdSmartPtr{} );
-            triangle_vertices_.resize( vertices->size() );
-            triangle_adjacents_.resize( adjacents->size() );
-            for( const auto p : Indices{ triangle_vertices_ } )
-            {
-                triangle_vertices_[p] = vertices->value( p );
-                triangle_adjacents_[p] = adjacents->value( p );
-            }
-            legacy_attributes_ = { vertices->id(), adjacents->id() };
+            legacy_attributes_.deserialize( archive, triangle_vertices_ );
+            legacy_attributes_.deserialize( archive, triangle_adjacents_ );
         }
 
         template < typename Archive >
@@ -179,7 +165,7 @@ namespace geode
     private:
         std::vector< Triangle > triangle_vertices_;
         std::vector< Triangle > triangle_adjacents_;
-        std::vector< uuid > legacy_attributes_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < index_t dimension >
@@ -256,8 +242,6 @@ namespace geode
                         archive.object( surface.impl_ );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
-                        surface.impl_->remove_legacy_attributes(
-                            surface.polygon_attribute_manager() );
                         const auto new_point_attribute_id =
                             surface.vertex_attribute_manager()
                                 .attribute_ids_matching_name(
@@ -275,8 +259,6 @@ namespace geode
                             surface, bitsery::ext::BaseClass<
                                          TriangulatedSurface< dimension > >{} );
                         archive.object( surface.impl_ );
-                        surface.impl_->remove_legacy_attributes(
-                            surface.polygon_attribute_manager() );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
                     } } } );

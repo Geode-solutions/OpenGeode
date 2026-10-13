@@ -38,6 +38,7 @@
 
 #include <geode/mesh/builder/graph_builder.hpp>
 #include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
@@ -110,25 +111,14 @@ namespace geode
 
         void remove_legacy_attributes( AttributeManager& manager )
         {
-            for( const auto& attribute_id : legacy_attributes_ )
-            {
-                manager.delete_attribute( attribute_id );
-            }
-            legacy_attributes_.clear();
+            legacy_attributes_.remove_from( manager );
         }
 
     private:
         template < typename Archive >
-        void deserialize_legacy_edges_around_vertex( Archive& archive )
+        void deserialize_legacy_storage( Archive& archive )
         {
-            std::shared_ptr< VariableAttribute< EdgesAroundVertex > > attribute;
-            archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
-            edges_around_vertex_.resize( attribute->size() );
-            for( const auto v : Indices{ edges_around_vertex_ } )
-            {
-                edges_around_vertex_[v] = attribute->value( v );
-            }
-            legacy_attributes_.push_back( attribute->id() );
+            legacy_attributes_.deserialize( archive, edges_around_vertex_ );
         }
 
         template < typename Archive >
@@ -138,11 +128,11 @@ namespace geode
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.object( impl.edge_attribute_manager_ );
-                         impl.deserialize_legacy_edges_around_vertex( archive );
+                         impl.deserialize_legacy_storage( archive );
                      },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.edge_attribute_manager_ );
-                            impl.deserialize_legacy_edges_around_vertex(
+                            impl.deserialize_legacy_storage(
                                 archive );
                         },
                         []( Archive& archive, Impl& impl ) {
@@ -160,7 +150,7 @@ namespace geode
     private:
         mutable AttributeManager edge_attribute_manager_;
         std::vector< EdgesAroundVertex > edges_around_vertex_;
-        std::vector< uuid > legacy_attributes_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < typename Archive >
@@ -349,4 +339,4 @@ namespace std
         return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
                ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
     }
-} // namespace std
+} // namespace std

@@ -53,6 +53,7 @@
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
 #include <geode/mesh/core/internal/solid_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
@@ -682,11 +683,7 @@ namespace geode
 
         void remove_legacy_attributes( AttributeManager& manager )
         {
-            for( const auto& attribute_id : legacy_attributes_ )
-            {
-                manager.delete_attribute( attribute_id );
-            }
-            legacy_attributes_.clear();
+            legacy_attributes_.remove_from( manager );
         }
 
         const internal::PolyhedraAroundVertexImpl&
@@ -715,23 +712,14 @@ namespace geode
         template < typename Archive >
         void deserialize_legacy_polyhedron_around_vertex( Archive& archive )
         {
-            std::shared_ptr< VariableAttribute< PolyhedronVertex > > attribute;
-            archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
-            polyhedron_around_vertex_.resize( attribute->size() );
-            for( const auto v : Indices{ polyhedron_around_vertex_ } )
-            {
-                polyhedron_around_vertex_[v] = attribute->value( v );
-            }
+            legacy_attributes_.deserialize( archive, polyhedron_around_vertex_ );
             polyhedra_around_vertex_.resize( polyhedron_around_vertex_.size() );
-            legacy_attributes_.push_back( attribute->id() );
         }
 
         template < typename Archive >
         void deserialize_legacy_polyhedra_around_vertex( Archive& archive )
         {
-            std::shared_ptr< VariableAttribute< CachedPolyhedra > > attribute;
-            archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
-            legacy_attributes_.push_back( attribute->id() );
+            legacy_attributes_.skip< CachedPolyhedra >( archive );
         }
 
         template < typename Archive >
@@ -808,7 +796,7 @@ namespace geode
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
         mutable TextureStorage3D texture_storage_;
-        std::vector< uuid > legacy_attributes_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < index_t dimension >
@@ -1851,4 +1839,4 @@ namespace std
                ^ absl::Hash< geode::index_t >()(
                    polyhedron_facet_edge.edge_id );
     }
-} // namespace std
+} // namespace std

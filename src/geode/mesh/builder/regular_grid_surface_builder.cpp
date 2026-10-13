@@ -56,8 +56,7 @@ namespace geode
             std::move( cells_number ), std::move( cells_length ) );
         const auto nb_u = grid_.nb_cells_in_direction( 0 );
         const auto nb_v = grid_.nb_cells_in_direction( 1 );
-        grid_.vertex_attribute_manager().resize( ( nb_u + 1 ) * ( nb_v + 1 ) );
-        do_resize_vertex_storage( ( nb_u + 1 ) * ( nb_v + 1 ) );
+        resize_vertices( ( nb_u + 1 ) * ( nb_v + 1 ) );
         grid_.polygon_attribute_manager().resize( grid_.nb_cells() );
         async::parallel_invoke(
             [this, nb_u, nb_v] {

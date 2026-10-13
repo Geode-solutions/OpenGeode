@@ -52,6 +52,7 @@
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/detail/facet_storage.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/internal/surface_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
@@ -435,11 +436,7 @@ namespace geode
 
         void remove_legacy_attributes( AttributeManager& manager )
         {
-            for( const auto& attribute_id : legacy_attributes_ )
-            {
-                manager.delete_attribute( attribute_id );
-            }
-            legacy_attributes_.clear();
+            legacy_attributes_.remove_from( manager );
         }
 
         Impl() = default;
@@ -448,23 +445,14 @@ namespace geode
         template < typename Archive >
         void deserialize_legacy_polygon_around_vertex( Archive& archive )
         {
-            std::shared_ptr< VariableAttribute< PolygonVertex > > attribute;
-            archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
-            polygon_around_vertex_.resize( attribute->size() );
-            for( const auto v : Indices{ polygon_around_vertex_ } )
-            {
-                polygon_around_vertex_[v] = attribute->value( v );
-            }
+            legacy_attributes_.deserialize( archive, polygon_around_vertex_ );
             polygons_around_vertex_.resize( polygon_around_vertex_.size() );
-            legacy_attributes_.push_back( attribute->id() );
         }
 
         template < typename Archive >
         void deserialize_legacy_polygons_around_vertex( Archive& archive )
         {
-            std::shared_ptr< VariableAttribute< CachedPolygons > > attribute;
-            archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
-            legacy_attributes_.push_back( attribute->id() );
+            legacy_attributes_.skip< CachedPolygons >( archive );
         }
 
         template < typename Archive >
@@ -545,7 +533,7 @@ namespace geode
         mutable std::vector< CachedPolygons > polygons_around_vertex_;
         mutable std::unique_ptr< SurfaceEdges< dimension > > edges_;
         mutable TextureStorage2D texture_storage_;
-        std::vector< uuid > legacy_attributes_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < index_t dimension >
@@ -1304,4 +1292,4 @@ namespace std
         return absl::Hash< geode::index_t >()( polygon_edge.polygon_id )
                ^ absl::Hash< geode::index_t >()( polygon_edge.edge_id );
     }
-} // namespace std
+} // namespace std

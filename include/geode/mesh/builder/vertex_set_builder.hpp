@@ -105,12 +105,18 @@ namespace geode
         virtual void do_create_vertex() = 0;
 
         /*!
+         * Resize the vertex AttributeManager and the data model storage
+         * indexed by vertices. Use it instead of resizing the vertex
+         * AttributeManager directly.
+         */
+        void resize_vertices( index_t nb_vertices );
+
+    private:
+        /*!
          * Resize the data model storage indexed by vertices.
-         * Called each time the number of vertices grows.
          */
         virtual void do_resize_vertex_storage( index_t /*nb_vertices*/ ) {}
 
-    private:
         virtual void do_create_vertices( index_t nb ) = 0;
 
         virtual void do_delete_vertices( const std::vector< bool >& to_delete,
