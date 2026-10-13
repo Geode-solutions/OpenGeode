@@ -35,6 +35,8 @@
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
+#include <geode/geometry/perpendicular.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace
 {
@@ -72,6 +74,19 @@ namespace
             }
         }
         return result;
+    }
+
+    double squared_double_area(
+        const geode::Vector2D& edge0, const geode::Vector2D& edge1 )
+    {
+        const auto double_area = geode::dot_perpendicular( edge0, edge1 );
+        return double_area * double_area;
+    }
+
+    double squared_double_area(
+        const geode::Vector3D& edge0, const geode::Vector3D& edge1 )
+    {
+        return edge0.cross( edge1 ).length2();
     }
 } // namespace
 
@@ -294,16 +309,18 @@ namespace geode
     template < typename PointType, index_t dimension >
     bool GenericTriangle< PointType, dimension >::is_degenerated() const
     {
-        const Point< dimension >& point0 = vertices_.at( 0 );
-        const Point< dimension >& point1 = vertices_.at( 1 );
-        const Segment< dimension > edge{ point0, point1 };
-        if( edge.is_degenerated() )
-        {
-            return true;
-        }
-        const Point< dimension >& point2 = vertices_.at( 2 );
-        return point_line_distance( point2, InfiniteLine< dimension >{ edge } )
-               <= GLOBAL_EPSILON;
+        // The triangle is degenerated if its minimum height, i.e. twice its
+        // area divided by its longest edge length, is below GLOBAL_EPSILON.
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        const Point< dimension >& point2 = vertices_[2];
+        const Vector< dimension > edge01{ point0, point1 };
+        const Vector< dimension > edge02{ point0, point2 };
+        const Vector< dimension > edge12{ point1, point2 };
+        const auto max_length2 = std::max(
+            { edge01.length2(), edge02.length2(), edge12.length2() } );
+        return squared_double_area( edge01, edge02 )
+               <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_length2;
     }
 
     template < typename PointType, index_t dimension >

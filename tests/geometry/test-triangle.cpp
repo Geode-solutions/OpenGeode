@@ -21,16 +21,74 @@
  *
  */
 
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/distance.hpp>
 
 #include <geode/tests/common.hpp>
+
+void test_degenerated_consistency()
+{
+    const geode::Point3D p0{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D p1{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D p2{ { 3.0, 2.5e-6, 0.0 } };
+    const geode::Point3D p3{ { 0.0, 0.0, 1.0 } };
+    const geode::Triangle3D triangle{ p0, p1, p2 };
+    geode::OpenGeodeGeometryException::test( triangle.is_degenerated(),
+        "Triangle with minimum height below epsilon should be degenerated" );
+    const geode::Tetrahedron tetra{ p0, p1, p2, p3 };
+    geode::OpenGeodeGeometryException::test( tetra.is_degenerated(),
+        "Tetrahedron with a degenerated facet should be degenerated" );
+    const geode::Tetrahedron tetra2{ p3, p0, p1, p2 };
+    geode::OpenGeodeGeometryException::test( tetra2.is_degenerated(),
+        "Tetrahedron with a degenerated facet should be degenerated" );
+
+    const geode::Point3D q2{ { 3.0, 1e-3, 0.0 } };
+    const geode::Triangle3D triangle2{ p0, p1, q2 };
+    geode::OpenGeodeGeometryException::test( !triangle2.is_degenerated(),
+        "Flat but valid triangle should not be degenerated" );
+    const geode::Point3D q3{ { 1.0, 1.0, 5e-7 } };
+    const geode::Point3D q4{ { 0.0, 1.0, 0.0 } };
+    const geode::Tetrahedron flat_tetra{ p0, p1, q3, q4 };
+    geode::OpenGeodeGeometryException::test(
+        flat_tetra.is_degenerated(), "Flat tetrahedron should be degenerated" );
+    const geode::Tetrahedron tetra3{ p0, p1, q4, p3 };
+    geode::OpenGeodeGeometryException::test( !tetra3.is_degenerated(),
+        "Valid tetrahedron should not be degenerated" );
+
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1., 1. };
+    std::uniform_real_distribution< double > exponent{ -9., -4. };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        const geode::Point3D a{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        const geode::Point3D b{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        const auto height = std::pow( 10., exponent( generator ) );
+        const auto t = distribution( generator ) * 2;
+        const geode::Vector3D ab{ a, b };
+        const auto offset = ab.cross( geode::Vector3D{ { 0.3, 0.5, 0.7 } } );
+        const geode::Point3D c = a + ab * t + offset.normalize() * height;
+        const geode::Triangle3D random_triangle{ a, b, c };
+        if( !random_triangle.normal() )
+        {
+            geode::OpenGeodeGeometryException::test(
+                random_triangle.is_degenerated(),
+                "Triangle without normal should be degenerated: ",
+                random_triangle.string() );
+        }
+    }
+}
 
 void test()
 {
@@ -60,6 +118,7 @@ void test()
     const auto pivot2 = triangle2.pivot();
     geode::OpenGeodeGeometryException::test(
         !pivot2, "Pivot of triangle2 should not be calculated" );
+    test_degenerated_consistency();
 }
 
 OPENGEODE_TEST( "distance" )
