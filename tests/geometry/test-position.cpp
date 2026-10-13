@@ -633,6 +633,39 @@ void test_exact_predicates_near_degenerate()
     }
 }
 
+void test_exact_orientation_large_coordinates()
+{
+    // Products of large coordinates where an FMA contraction in the exact
+    // arithmetic would lose the error terms.
+    std::mt19937 generator{ 7 };
+    std::uniform_real_distribution< double > distribution{ -1e8, 1e8 };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        const auto x0 = distribution( generator );
+        const auto x1 = distribution( generator );
+        const auto x2 = distribution( generator );
+        const geode::Point2D p0{ { x0, 3 * x0 } };
+        const geode::Point2D p1{ { x1, 3 * x1 } };
+        const auto y2 = 3 * x2;
+        const auto side_up = geode::point_side_to_segment(
+            geode::Point2D{ { x2, std::nextafter( y2, 1e300 ) } },
+            geode::Segment2D{ p0, p1 } );
+        const auto side_down = geode::point_side_to_segment(
+            geode::Point2D{ { x2, std::nextafter( y2, -1e300 ) } },
+            geode::Segment2D{ p0, p1 } );
+        geode::OpenGeodeGeometryException::test(
+            x0 == x1
+                || ( side_up != side_down && side_up != geode::SIDE::zero
+                     && side_down != geode::SIDE::zero )
+                || ( geode::point_side_to_segment(
+                         geode::Point2D{ { x2, y2 } }, { p0, p1 } )
+                     != geode::SIDE::zero ),
+            "Wrong side for points one ulp away from a line with large "
+            "coordinates" );
+    }
+}
+
 void test()
 {
     test_point_side_to_segment();
@@ -643,6 +676,7 @@ void test()
     test_point_tetrahedron_position();
     test_point_inside_polygon();
     test_exact_predicates_near_degenerate();
+    test_exact_orientation_large_coordinates();
 }
 
 OPENGEODE_TEST( "position" )

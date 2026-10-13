@@ -110,6 +110,7 @@ add_geode_library(
         "internal/position_from_sides.hpp"
         "internal/predicates.hpp"
     SKIP_UNITY
+        "internal/predicates.cpp"
         "position.cpp"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
@@ -120,3 +121,13 @@ add_geode_library(
         earcut_hpp::earcut_hpp
         nanoflann::nanoflann
 )
+
+# Exact predicates rely on exact floating-point rounding of each operation:
+# forbid contraction of a*b+c into fused multiply-add instructions.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set_source_files_properties(
+        "${PROJECT_SOURCE_DIR}/src/geode/geometry/internal/predicates.cpp"
+        PROPERTIES
+            COMPILE_OPTIONS "-ffp-contract=off"
+    )
+endif()
