@@ -23,6 +23,8 @@
 
 #include <geode/geometry/mensuration.hpp>
 
+#include <optional>
+
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/distance.hpp>
@@ -30,6 +32,79 @@
 
 namespace geode
 {
+    namespace
+    {
+        double cross_product_length( const Vector3D& cross )
+        {
+            return cross.length();
+        }
+
+        double cross_product_length( double cross )
+        {
+            return std::fabs( cross );
+        }
+
+        double cross_product_length2( const Vector3D& cross )
+        {
+            return cross.length2();
+        }
+
+        double cross_product_length2( double cross )
+        {
+            return cross * cross;
+        }
+
+        Vector3D cross_product( const Vector3D& lhs, const Vector3D& rhs )
+        {
+            return lhs.cross( rhs );
+        }
+
+        double cross_product( const Vector2D& lhs, const Vector2D& rhs )
+        {
+            return dot_perpendicular( lhs, rhs );
+        }
+
+        // Cross product of the two edges adjacent to the vertex opposite to
+        // the longest edge (same orientation as the triangle), or nullopt if
+        // the triangle height is below GLOBAL_EPSILON.
+        template < index_t dimension >
+        auto triangle_cross_product( const Triangle< dimension >& triangle )
+            -> std::optional< decltype( cross_product(
+                std::declval< Vector< dimension > >(),
+                std::declval< Vector< dimension > >() ) ) >
+        {
+            const auto& vertices = triangle.vertices();
+            std::array< double, 3 > lengths2;
+            for( const auto e : LRange{ 3 } )
+            {
+                lengths2[e] = Vector< dimension >{ vertices[e],
+                    vertices[e == 2 ? 0 : e + 1] }
+                                  .length2();
+            }
+            local_index_t longest{ 0 };
+            if( lengths2[1] > lengths2[longest] )
+            {
+                longest = 1;
+            }
+            if( lengths2[2] > lengths2[longest] )
+            {
+                longest = 2;
+            }
+            const auto next = longest == 2 ? 0 : longest + 1;
+            const auto opposite = next == 2 ? 0 : next + 1;
+            const auto cross = cross_product(
+                Vector< dimension >{ vertices[opposite], vertices[longest] },
+                Vector< dimension >{ vertices[opposite], vertices[next] } );
+            // height = |cross| / longest length
+            if( cross_product_length2( cross )
+                <= GLOBAL_EPSILON * GLOBAL_EPSILON * lengths2[longest] )
+            {
+                return std::nullopt;
+            }
+            return cross;
+        }
+    } // namespace
+
     static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
         SIGNED_VOLUME_VERTICES_ORDER{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
             { 1, 0, 2 } } };
@@ -37,41 +112,24 @@ namespace geode
     template < index_t dimension >
     double triangle_area( const Triangle< dimension >& triangle )
     {
-        const auto& tri_v = triangle.vertices();
-        // Heron's formula
-        const auto l0 = point_point_distance( tri_v[0].get(), tri_v[1].get() );
-        const auto l1 = point_point_distance( tri_v[1].get(), tri_v[2].get() );
-        const auto l2 = point_point_distance( tri_v[2].get(), tri_v[0].get() );
-        const auto p = ( l0 + l1 + l2 ) / 2;
-        if( p - l0 <= GLOBAL_EPSILON )
+        const auto cross = triangle_cross_product< dimension >( triangle );
+        if( !cross )
         {
             return 0;
         }
-        if( p - l1 <= GLOBAL_EPSILON )
-        {
-            return 0;
-        }
-        if( p - l2 <= GLOBAL_EPSILON )
-        {
-            return 0;
-        }
-        auto area2 = p * ( p - l0 ) * ( p - l1 ) * ( p - l2 );
-        if( area2 <= 0 )
-        {
-            area2 = 0;
-        }
-        return std::sqrt( area2 );
+        return cross_product_length( cross.value() ) / 2.;
     }
 
     double triangle_signed_area(
         const Triangle3D& triangle, const Vector3D& direction )
     {
-        const auto area = triangle_area( triangle );
-        if( const auto normal = triangle.normal() )
+        const auto cross = triangle_cross_product< 3 >( triangle );
+        if( !cross )
         {
-            return direction.dot( normal.value() ) > 0 ? area : -area;
+            return 0;
         }
-        return area;
+        const auto area = cross->length() / 2.;
+        return direction.dot( cross.value() ) > 0 ? area : -area;
     }
 
     double triangle_signed_area( const Triangle2D& triangle )

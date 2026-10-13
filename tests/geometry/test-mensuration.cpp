@@ -85,10 +85,53 @@ void test_triangle_area_3d()
         "with query triangle triangle3D_3" );
 }
 
+void check_needle_area( const geode::Point3D& a,
+    const geode::Point3D& b,
+    const geode::Point3D& c,
+    double expected )
+{
+    const auto area3d = geode::triangle_area( geode::Triangle3D{ a, b, c } );
+    const geode::Point2D a2d{ { a.value( 0 ), a.value( 1 ) } };
+    const geode::Point2D b2d{ { b.value( 0 ), b.value( 1 ) } };
+    const geode::Point2D c2d{ { c.value( 0 ), c.value( 1 ) } };
+    const auto area2d =
+        geode::triangle_area( geode::Triangle2D{ a2d, b2d, c2d } );
+    const auto tolerance = expected == 0 ? 0 : 1e-12 * expected;
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( area3d - expected ) <= tolerance,
+        "Wrong result for 3D needle triangle_area: ", area3d,
+        " | expected: ", expected );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( area2d - expected ) <= tolerance,
+        "Wrong result for 2D needle triangle_area: ", area2d,
+        " | expected: ", expected );
+    const geode::Vector3D upward{ { 0.0, 0.0, 1.0 } };
+    const auto signed_area =
+        geode::triangle_signed_area( geode::Triangle3D{ a, b, c }, upward );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( signed_area - expected ) <= tolerance,
+        "Wrong result for 3D needle triangle_signed_area: ", signed_area,
+        " | expected: ", expected );
+}
+
+void test_needle_triangle_area()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    check_needle_area( a, geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0.5, 1e-3, 0 } }, 5e-4 );
+    check_needle_area( a, geode::Point3D{ { 100, 0, 0 } },
+        geode::Point3D{ { 50, 0.005, 0 } }, 0.25 );
+    check_needle_area(
+        a, geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0.5, 0, 0 } }, 0 );
+    check_needle_area( a, geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0.5, 1e-7, 0 } }, 0 );
+}
+
 void test_triangle_area()
 {
     test_triangle_area_2d();
     test_triangle_area_3d();
+    test_needle_triangle_area();
 }
 
 void test_triangle_signed_area_2d()
@@ -205,8 +248,8 @@ void test_tetrahedron_signed_volume2()
 
 void test()
 {
-    // test_triangle_area();
-    // test_triangle_signed_area();
+    test_triangle_area();
+    test_triangle_signed_area();
     // test_tetrahedron_signed_volume();
     test_tetrahedron_signed_volume2();
 }
