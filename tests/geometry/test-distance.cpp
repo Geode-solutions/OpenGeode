@@ -1401,6 +1401,23 @@ void test_random_triangle_triangle_distance()
     }
 }
 
+void test_nan_point_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Triangle3D degenerated{ a, b, b };
+    const auto nan = std::numeric_limits< double >::quiet_NaN();
+    const geode::Point3D point{ { nan, nan, nan } };
+    const auto [distance, closest] =
+        geode::point_triangle_distance( point, degenerated );
+    geode::OpenGeodeGeometryException::test( std::isnan( distance ),
+        "Wrong point_triangle_distance with NaN point" );
+    const auto [signed_distance, signed_closest] =
+        geode::point_triangle_signed_distance( point, degenerated );
+    geode::OpenGeodeGeometryException::test( std::isnan( signed_distance ),
+        "Wrong point_triangle_signed_distance with NaN point" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1419,6 +1436,7 @@ void test()
     test_degenerated_segment_triangle_distance();
     test_degenerated_triangle_triangle_distance();
     test_random_triangle_triangle_distance();
+    test_nan_point_triangle_distance();
 }
 
 OPENGEODE_TEST( "distance" )

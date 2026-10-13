@@ -176,7 +176,7 @@ namespace
     {
         std::array< std::tuple< double, geode::Point3D >, 3 > edge_distances;
         auto min_distance = std::numeric_limits< double >::max();
-        geode::local_index_t selected_edge{ geode::NO_LID };
+        geode::local_index_t selected_edge{ 0 };
         const auto& vertices = triangle.vertices();
         for( const auto e : geode::LRange{ 3 } )
         {
