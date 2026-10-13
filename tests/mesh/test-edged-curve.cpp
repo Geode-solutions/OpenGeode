@@ -293,6 +293,11 @@ void test_backward_io( const std::string& filename )
     geode::OpenGeodeMeshException::test(
         curve->edges_around_vertex( 0 ).size() == 2,
         "Backward EdgedCurve has wrong number of edges around vertex 0" );
+    geode::OpenGeodeMeshException::test(
+        !curve->edge_attribute_manager()
+             .attribute_ids_matching_name( "edges" )
+             .has_value(),
+        "Backward EdgedCurve should not have legacy attribute edges" );
 }
 
 void test_edge_requests( const geode::EdgedCurve3D& edged_curve,

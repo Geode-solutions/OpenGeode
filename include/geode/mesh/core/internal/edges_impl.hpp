@@ -25,8 +25,11 @@
 
 #include <bitsery/brief_syntax/array.h>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/growable.hpp>
+#include <geode/basic/permutation.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/mesh/core/graph.hpp>
 
@@ -36,55 +39,72 @@ namespace geode
     {
         class EdgesImpl
         {
-        public:
-            static constexpr auto EDGES_NAME = "edges";
+            using Edge = std::array< index_t, 2 >;
+            static constexpr Edge NO_EDGE{ NO_ID, NO_ID };
 
-            explicit EdgesImpl( Graph& graph ) : edges_()
-            {
-                AttributeProperties attribute_properties;
-                attribute_properties.assignable = false;
-                attribute_properties.interpolable = false;
-                attribute_properties.transferable = false;
-                AttributeValues< std::array< index_t, 2 > > edges_values;
-                edges_values.default_value = { NO_ID, NO_ID };
-                edges_values.no_value = { NO_ID, NO_ID };
-                const auto edge_attribute_id =
-                    graph.edge_attribute_manager()
-                        .template create_attribute< VariableAttribute,
-                            std::array< index_t, 2 > >(
-                            "edges", edges_values, attribute_properties );
-                edges_ =
-                    graph.edge_attribute_manager()
-                        .template find_attribute< VariableAttribute,
-                            std::array< index_t, 2 > >( edge_attribute_id );
-            }
+        public:
+            EdgesImpl() = default;
 
             [[nodiscard]] index_t get_edge_vertex(
                 const EdgeVertex& edge_vertex ) const
             {
-                return edges_->value(
-                    edge_vertex.edge_id )[edge_vertex.vertex_id];
+                return edges_[edge_vertex.edge_id][edge_vertex.vertex_id];
             }
 
             void set_edge_vertex(
                 const EdgeVertex& edge_vertex, const index_t vertex_id )
             {
-                edges_->modify_value(
-                    edge_vertex.edge_id, [&edge_vertex, vertex_id](
-                                             std::array< index_t, 2 >& array ) {
-                        array.at( edge_vertex.vertex_id ) = vertex_id;
-                    } );
+                edges_[edge_vertex.edge_id][edge_vertex.vertex_id] = vertex_id;
             }
 
-            [[nodiscard]] const uuid& edges_attribute_id() const
+            void add_edge()
             {
-                return edges_->id();
+                edges_.push_back( NO_EDGE );
             }
 
-        protected:
-            EdgesImpl() = default;
+            void add_edges( const index_t nb )
+            {
+                edges_.resize( edges_.size() + nb, NO_EDGE );
+            }
+
+            void remove_edges( const std::vector< bool >& to_delete )
+            {
+                delete_vector_elements( to_delete, edges_ );
+            }
+
+            void permute_edges( absl::Span< const index_t > permutation )
+            {
+                permute( edges_, permutation );
+            }
+
+            void copy_edges( const EdgesImpl& impl )
+            {
+                edges_ = impl.edges_;
+            }
+
+            void remove_legacy_attributes( AttributeManager& manager )
+            {
+                for( const auto& attribute_id : legacy_attributes_ )
+                {
+                    manager.delete_attribute( attribute_id );
+                }
+                legacy_attributes_.clear();
+            }
 
         private:
+            template < typename Archive >
+            void deserialize_legacy_storage( Archive& archive )
+            {
+                std::shared_ptr< VariableAttribute< Edge > > edges;
+                archive.ext( edges, bitsery::ext::StdSmartPtr{} );
+                edges_.resize( edges->size() );
+                for( const auto e : Indices{ edges_ } )
+                {
+                    edges_[e] = edges->value( e );
+                }
+                legacy_attributes_ = { edges->id() };
+            }
+
             friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& serializer )
@@ -92,24 +112,23 @@ namespace geode
                 serializer.ext( *this,
                     Growable< Archive, EdgesImpl >{
                         { []( Archive& archive, EdgesImpl& impl ) {
-                             archive.ext(
-                                 impl.edges_, bitsery::ext::StdSmartPtr{} );
-                             const auto& old_edges_properties =
-                                 impl.edges_->properties();
-                             impl.edges_->set_properties(
-                                 { old_edges_properties.assignable,
-                                     old_edges_properties.interpolable,
-                                     false } );
+                             impl.deserialize_legacy_storage( archive );
                          },
                             []( Archive& archive, EdgesImpl& impl ) {
-                                archive.ext(
-                                    impl.edges_, bitsery::ext::StdSmartPtr{} );
+                                impl.deserialize_legacy_storage( archive );
+                            },
+                            []( Archive& archive, EdgesImpl& impl ) {
+                                archive.container( impl.edges_,
+                                    impl.edges_.max_size(),
+                                    []( Archive& archive2, Edge& edge ) {
+                                        archive2.container4b( edge );
+                                    } );
                             } } } );
             }
 
         private:
-            std::shared_ptr< VariableAttribute< std::array< index_t, 2 > > >
-                edges_;
+            std::vector< Edge > edges_;
+            std::vector< uuid > legacy_attributes_;
         };
     } // namespace internal
 } // namespace geode
