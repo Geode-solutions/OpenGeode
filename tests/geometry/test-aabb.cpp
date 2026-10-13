@@ -481,6 +481,22 @@ void test_other_intersections()
         "Box other intersection - Result order should be deterministic" );
 }
 
+void test_aabb_with_empty_box()
+{
+    geode::Logger::info( "TEST", "AABB with empty box" );
+    std::vector< geode::BoundingBox3D > boxes( 3 );
+    boxes[0].add_point( geode::Point3D{ { 0, 0, 0 } } );
+    boxes[0].add_point( geode::Point3D{ { 1, 1, 1 } } );
+    boxes[2].add_point( geode::Point3D{ { 2, 2, 2 } } );
+    boxes[2].add_point( geode::Point3D{ { 3, 3, 3 } } );
+    const geode::AABBTree3D aabb{ boxes };
+    const auto& box = aabb.bounding_box();
+    geode::OpenGeodeGeometryException::test(
+        box.min() == geode::Point3D{ { 0, 0, 0 } }
+            && box.max() == geode::Point3D{ { 3, 3, 3 } },
+        "AABB with empty box - Wrong bounding box ", box.string() );
+}
+
 template < geode::index_t dimension >
 void do_test()
 {
@@ -496,6 +512,7 @@ void test()
 {
     do_test< 2 >();
     do_test< 3 >();
+    test_aabb_with_empty_box();
 }
 
 OPENGEODE_TEST( "aabb" )

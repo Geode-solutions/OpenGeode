@@ -293,8 +293,13 @@ namespace geode
     void BoundingBox< dimension >::add_box(
         const BoundingBox< dimension >& box )
     {
-        add_point( box.min_ );
-        add_point( box.max_ );
+        for( const auto i : LRange{ dimension } )
+        {
+            min_.set_value(
+                i, std::min( min_.value( i ), box.min_.value( i ) ) );
+            max_.set_value(
+                i, std::max( max_.value( i ), box.max_.value( i ) ) );
+        }
     }
 
     template < index_t dimension >
