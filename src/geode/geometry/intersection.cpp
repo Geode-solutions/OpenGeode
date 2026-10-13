@@ -146,6 +146,43 @@ namespace
         return std::sqrt( axial_distance * axial_distance
                           + radial_distance * radial_distance );
     }
+    /*
+     * Keep the line intersections located on the segment, with their
+     * correctness information.
+     */
+    template < typename SegmentType, typename PointType >
+    geode::IntersectionResult< absl::InlinedVector< PointType, 2 > >
+        filter_segment_intersections(
+            geode::IntersectionResult< absl::InlinedVector< PointType, 2 > >
+                line_intersections,
+            const SegmentType& segment )
+    {
+        using Intersections = absl::InlinedVector< PointType, 2 >;
+        const auto& points = line_intersections.result.value();
+        const auto& correctness = line_intersections.correctness.value();
+        Intersections segment_intersections;
+        typename geode::CorrectnessInfo< Intersections >::Correctness
+            first_correctness{ correctness.first.first, {} };
+        typename geode::CorrectnessInfo< Intersections >::Correctness
+            second_correctness{ correctness.second.first, {} };
+        for( const auto i : geode::Indices{ points } )
+        {
+            if( geode::point_segment_distance( points[i], segment )
+                > geode::GLOBAL_EPSILON )
+            {
+                continue;
+            }
+            segment_intersections.push_back( points[i] );
+            first_correctness.second.push_back( correctness.first.second[i] );
+            second_correctness.second.push_back( correctness.second.second[i] );
+        }
+        if( segment_intersections.empty() )
+        {
+            return { geode::INTERSECTION_TYPE::none };
+        }
+        return { std::move( segment_intersections ),
+            { first_correctness, second_correctness } };
+    }
 } // namespace
 
 namespace geode
@@ -273,22 +310,8 @@ namespace geode
             InfiniteLine< dimension >{ segment }, sphere );
         if( line_intersections )
         {
-            absl::InlinedVector< Point< dimension >, 2 > segment_intersections;
-            segment_intersections.reserve(
-                line_intersections.result.value().size() );
-            for( auto&& point : line_intersections.result.value() )
-            {
-                if( point_segment_distance( point, segment ) <= GLOBAL_EPSILON )
-                {
-                    segment_intersections.emplace_back( point );
-                }
-            }
-            if( segment_intersections.empty() )
-            {
-                return { INTERSECTION_TYPE::none };
-            }
-            return { std::move( segment_intersections ),
-                std::move( line_intersections.correctness.value() ) };
+            return filter_segment_intersections(
+                std::move( line_intersections ), segment );
         }
         return line_intersections.type;
     }
@@ -880,22 +903,8 @@ namespace geode
             line_cylinder_intersection( InfiniteLine3D{ segment }, cylinder );
         if( line_intersections )
         {
-            absl::InlinedVector< Point3D, 2 > segment_intersections;
-            segment_intersections.reserve(
-                line_intersections.result.value().size() );
-            for( auto&& point : line_intersections.result.value() )
-            {
-                if( point_segment_distance( point, segment ) <= GLOBAL_EPSILON )
-                {
-                    segment_intersections.emplace_back( point );
-                }
-            }
-            if( segment_intersections.empty() )
-            {
-                return { INTERSECTION_TYPE::none };
-            }
-            return { std::move( segment_intersections ),
-                std::move( line_intersections.correctness.value() ) };
+            return filter_segment_intersections(
+                std::move( line_intersections ), segment );
         }
         return line_intersections.type;
     }
@@ -920,7 +929,8 @@ namespace geode
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
             first_correctness{ true, {} };
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
-            second_correctness{ true, {} };
+            second_correctness{ plane_intersection.correctness->second.first,
+                {} };
         auto& intersections = plane_intersection.result.value();
         for( const auto i : Indices{ intersections } )
         {
@@ -975,21 +985,23 @@ namespace geode
         }
         absl::InlinedVector< Point3D, 2 > result;
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
-            first_correctness;
+            first_correctness{ true, {} };
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
-            second_correctness;
+            second_correctness{ true, {} };
         const auto compute_correctness = [&first_correctness,
                                              &second_correctness, &plane,
                                              &circle](
                                              const Point3D& intersection ) {
             auto plane_output = point_plane_distance( intersection, plane );
             first_correctness.first =
-                std::get< 0 >( plane_output ) <= GLOBAL_EPSILON;
+                first_correctness.first
+                && std::get< 0 >( plane_output ) <= GLOBAL_EPSILON;
             first_correctness.second.emplace_back(
                 std::move( std::get< 1 >( plane_output ) ) );
             auto circle_output = point_circle_distance( intersection, circle );
             second_correctness.first =
-                std::get< 0 >( circle_output ) <= GLOBAL_EPSILON;
+                second_correctness.first
+                && std::get< 0 >( circle_output ) <= GLOBAL_EPSILON;
             second_correctness.second.emplace_back(
                 std::move( std::get< 1 >( circle_output ) ) );
         };
@@ -1170,22 +1182,8 @@ namespace geode
             InfiniteLine< dimension >{ segment }, ellipse );
         if( line_intersections )
         {
-            absl::InlinedVector< Point< dimension >, 2 > segment_intersections;
-            segment_intersections.reserve(
-                line_intersections.result.value().size() );
-            for( auto&& point : line_intersections.result.value() )
-            {
-                if( point_segment_distance( point, segment ) <= GLOBAL_EPSILON )
-                {
-                    segment_intersections.emplace_back( point );
-                }
-            }
-            if( segment_intersections.empty() )
-            {
-                return { INTERSECTION_TYPE::none };
-            }
-            return { std::move( segment_intersections ),
-                std::move( line_intersections.correctness.value() ) };
+            return filter_segment_intersections(
+                std::move( line_intersections ), segment );
         }
         return line_intersections.type;
     }

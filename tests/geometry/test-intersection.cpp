@@ -1160,6 +1160,64 @@ void test_line_cylinder_perpendicular()
         "Wrong result for line_cylinder_intersection with oblique line" );
 }
 
+template < typename Result >
+bool has_consistent_correctness( const Result& result )
+{
+    return result.has_intersection()
+           && result.correctness->first.second.size() == result.result->size()
+           && result.correctness->second.second.size() == result.result->size();
+}
+
+void test_segment_intersections_correctness()
+{
+    const geode::Point3D origin{ { 0, 0, 0 } };
+    const geode::Point3D outside{ { 2, 0, 0 } };
+    const geode::Sphere3D sphere{ origin, 1 };
+    const auto sphere_result = geode::segment_sphere_intersection(
+        geode::Segment3D{ origin, outside }, sphere );
+    geode::OpenGeodeGeometryException::test(
+        sphere_result.result->size() == 1
+            && has_consistent_correctness( sphere_result )
+            && sphere_result.correctness->second.second.front().inexact_equal(
+                geode::Point3D{ { 1, 0, 0 } } ),
+        "Wrong correctness for segment_sphere_intersection" );
+
+    const geode::Point3D x_axis{ { 1, 0, 0 } };
+    const geode::Cylinder cylinder{ geode::Segment3D{ origin, x_axis }, 0.2 };
+    const geode::Point3D c{ { 0.5, 0.0, 0.0 } };
+    const geode::Point3D d{ { 0.5, 1.0, 0.0 } };
+    const auto cylinder_result = geode::segment_cylinder_intersection(
+        geode::Segment3D{ c, d }, cylinder );
+    geode::OpenGeodeGeometryException::test(
+        cylinder_result.result->size() == 1
+            && has_consistent_correctness( cylinder_result ),
+        "Wrong correctness for segment_cylinder_intersection" );
+
+    const geode::Point2D center{ { 0.0, 0.0 } };
+    const geode::Point2D far{ { 4.0, 0.0 } };
+    const geode::Frame2D frame{ { geode::Vector2D{ { 3.0, 0.0 } },
+        geode::Vector2D{ { 0.0, 2.0 } } } };
+    const geode::Ellipse2D ellipse{ center, frame };
+    const auto ellipse_result = geode::segment_ellipse_intersection(
+        geode::Segment2D{ center, far }, ellipse );
+    geode::OpenGeodeGeometryException::test(
+        ellipse_result.result->size() == 1
+            && has_consistent_correctness( ellipse_result )
+            && ellipse_result.correctness->second.second.front().inexact_equal(
+                geode::Point2D{ { 3, 0 } } ),
+        "Wrong correctness for segment_ellipse_intersection" );
+
+    const geode::Plane plane{ geode::Vector3D{ { 0, 0, 1 } }, origin };
+    const geode::Plane circle_plane{ geode::Vector3D{ { 1, 0, 0 } }, origin };
+    const geode::Circle circle{ circle_plane, 1 };
+    const auto circle_result =
+        geode::plane_circle_intersection( plane, circle );
+    geode::OpenGeodeGeometryException::test(
+        circle_result.result->size() == 2
+            && has_consistent_correctness( circle_result ),
+        "Wrong correctness for plane_circle_intersection" );
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -1178,6 +1236,7 @@ void test()
     test_segment_ellipse_intersection();
     test_degenerated_segment_intersections();
     test_line_cylinder_perpendicular();
+    test_segment_intersections_correctness();
 }
 
 OPENGEODE_TEST( "intersection" )
