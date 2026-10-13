@@ -451,14 +451,9 @@ namespace
                         base_vertices[vertex1].get() )
                     <= geode::GLOBAL_EPSILON )
                 {
-                    DEBUG( vertex0 );
-                    DEBUG( vertex1 );
-                    SDEBUG( base_vertices[0].get() );
-                    SDEBUG( base_vertices[1].get() );
-                    SDEBUG( base_vertices[2].get() );
-                    SDEBUG( other_triangle.vertices()[0].get() );
-                    SDEBUG( other_triangle.vertices()[1].get() );
-                    SDEBUG( other_triangle.vertices()[2].get() );
+                    // Colocated vertices: the edge is degenerated, its
+                    // vertices are tested through the other edges
+                    continue;
                 }
                 const geode::Segment3D edge{ base_vertices[vertex0],
                     base_vertices[vertex1] };

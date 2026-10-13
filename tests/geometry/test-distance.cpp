@@ -1323,6 +1323,28 @@ void test_degenerated_segment_triangle_distance()
     }
 }
 
+void test_degenerated_triangle_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D d{ { 1.0, 0.0, 1.0 } };
+    const geode::Point3D e{ { 0.0, 1.0, 1.0 } };
+    const geode::Triangle3D degenerated{ a, b, b };
+    const geode::Triangle3D triangle{ c, d, e };
+    const auto result0 =
+        geode::triangle_triangle_distance( degenerated, triangle );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( std::get< 0 >( result0 ) - 1. ) <= geode::GLOBAL_EPSILON,
+        "Wrong triangle_triangle_distance with degenerated triangle" );
+    const auto result1 =
+        geode::triangle_triangle_distance( triangle, degenerated );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( std::get< 0 >( result1 ) - 1. ) <= geode::GLOBAL_EPSILON,
+        "Wrong triangle_triangle_distance with degenerated triangle "
+        "(reversed)" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1339,6 +1361,7 @@ void test()
     test_triangle_triangle_distance();
     test_point_ellipse_distance();
     test_degenerated_segment_triangle_distance();
+    test_degenerated_triangle_triangle_distance();
 }
 
 OPENGEODE_TEST( "distance" )
