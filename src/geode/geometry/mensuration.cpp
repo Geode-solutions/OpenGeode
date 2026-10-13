@@ -47,11 +47,10 @@ namespace geode
             double length2;
         };
 
-        // Cross product of the two edges adjacent to the vertex opposite to
-        // the longest edge (all three edge pairs give the same result in exact
-        // arithmetic, this one is the most accurate), with the orientation of
-        // the triangle, or nullopt if the triangle height is below
-        // GLOBAL_EPSILON. Selections are branchless.
+        // Cross product of two triangle edges, with the orientation of the
+        // triangle, or nullopt if the triangle height is below GLOBAL_EPSILON.
+        // Picking the most accurate edge pair would only gain precision below
+        // GLOBAL_EPSILON, at the cost of unpredictable branches.
         std::optional< TriangleCross3D > triangle_cross_product(
             const Triangle3D& triangle )
         {
@@ -71,21 +70,11 @@ namespace geode
             const auto length2_0 = e0x * e0x + e0y * e0y + e0z * e0z;
             const auto length2_1 = e1x * e1x + e1y * e1y + e1z * e1z;
             const auto length2_2 = e2x * e2x + e2y * e2y + e2z * e2z;
-            const auto longest0 =
-                length2_0 >= length2_1 && length2_0 >= length2_2;
-            const auto longest1 = !longest0 && length2_1 >= length2_2;
-            // Pick the two edges following the longest one
-            const auto ax = longest0 ? e1x : ( longest1 ? e2x : e0x );
-            const auto ay = longest0 ? e1y : ( longest1 ? e2y : e0y );
-            const auto az = longest0 ? e1z : ( longest1 ? e2z : e0z );
-            const auto bx = longest0 ? e2x : ( longest1 ? e0x : e1x );
-            const auto by = longest0 ? e2y : ( longest1 ? e0y : e1y );
-            const auto bz = longest0 ? e2z : ( longest1 ? e0z : e1z );
             const auto max_length2 =
                 std::max( { length2_0, length2_1, length2_2 } );
-            const auto cx = ay * bz - az * by;
-            const auto cy = az * bx - ax * bz;
-            const auto cz = ax * by - ay * bx;
+            const auto cx = e0y * e1z - e0z * e1y;
+            const auto cy = e0z * e1x - e0x * e1z;
+            const auto cz = e0x * e1y - e0y * e1x;
             const auto length2 = cx * cx + cy * cy + cz * cz;
             // height = |cross| / longest length
             if( length2 <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_length2 )
@@ -111,16 +100,9 @@ namespace geode
             const auto length2_0 = e0x * e0x + e0y * e0y;
             const auto length2_1 = e1x * e1x + e1y * e1y;
             const auto length2_2 = e2x * e2x + e2y * e2y;
-            const auto longest0 =
-                length2_0 >= length2_1 && length2_0 >= length2_2;
-            const auto longest1 = !longest0 && length2_1 >= length2_2;
-            const auto ax = longest0 ? e1x : ( longest1 ? e2x : e0x );
-            const auto ay = longest0 ? e1y : ( longest1 ? e2y : e0y );
-            const auto bx = longest0 ? e2x : ( longest1 ? e0x : e1x );
-            const auto by = longest0 ? e2y : ( longest1 ? e0y : e1y );
             const auto max_length2 =
                 std::max( { length2_0, length2_1, length2_2 } );
-            const auto cross = ax * by - ay * bx;
+            const auto cross = e0x * e1y - e0y * e1x;
             const auto length2 = cross * cross;
             if( length2 <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_length2 )
             {

@@ -21,8 +21,13 @@
  *
  */
 
+#include <array>
+#include <cmath>
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/geometry/point.hpp>
 
@@ -127,11 +132,74 @@ void test_needle_triangle_area()
         geode::Point3D{ { 0.5, 1e-7, 0 } }, 0 );
 }
 
+void test_random_triangle_area()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > coordinate{ -100, 100 };
+    std::uniform_real_distribution< double > height{ 1e-3, 1 };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        std::array< geode::Point3D, 3 > points;
+        for( auto& point : points )
+        {
+            point = geode::Point3D{ { coordinate( generator ),
+                coordinate( generator ), coordinate( generator ) } };
+        }
+        if( trial % 2 == 0 )
+        {
+            // Needle: third point close to the middle of the first edge
+            points[2] = ( points[0] + points[1] ) / 2.
+                        + geode::Point3D{ { 0, 0, height( generator ) } };
+        }
+        std::array< long double, 3 > e0, e1;
+        long double max_length2{ 0 };
+        for( const auto v : geode::LRange{ 3 } )
+        {
+            long double length2{ 0 };
+            for( const auto d : geode::LRange{ 3 } )
+            {
+                const auto diff = static_cast< long double >(
+                                      points[( v + 1 ) % 3].value( d ) )
+                                  - points[v].value( d );
+                length2 += diff * diff;
+            }
+            max_length2 = std::max( max_length2, length2 );
+        }
+        for( const auto d : geode::LRange{ 3 } )
+        {
+            e0[d] = static_cast< long double >( points[1].value( d ) )
+                    - points[0].value( d );
+            e1[d] = static_cast< long double >( points[2].value( d ) )
+                    - points[0].value( d );
+        }
+        const auto cx = e0[1] * e1[2] - e0[2] * e1[1];
+        const auto cy = e0[2] * e1[0] - e0[0] * e1[2];
+        const auto cz = e0[0] * e1[1] - e0[1] * e1[0];
+        const auto expected = static_cast< double >(
+            std::sqrt( cx * cx + cy * cy + cz * cz ) / 2 );
+        // Precision is only required above GLOBAL_EPSILON (height error)
+        const auto tolerance =
+            geode::GLOBAL_EPSILON
+            * static_cast< double >( std::sqrt( max_length2 ) ) * 1e-3;
+        for( const auto rotation : geode::LRange{ 3 } )
+        {
+            const auto area = geode::triangle_area( geode::Triangle3D{
+                points[rotation], points[( rotation + 1 ) % 3],
+                points[( rotation + 2 ) % 3] } );
+            geode::OpenGeodeGeometryException::test(
+                std::fabs( area - expected ) <= tolerance,
+                "Wrong result for random triangle_area: ", area,
+                " | expected: ", expected );
+        }
+    }
+}
+
 void test_triangle_area()
 {
     test_triangle_area_2d();
     test_triangle_area_3d();
     test_needle_triangle_area();
+    test_random_triangle_area();
 }
 
 void test_triangle_signed_area_2d()
