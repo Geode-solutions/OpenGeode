@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <random>
 
+#include <absl/algorithm/container.h>
+
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/frame.hpp>
 #include <geode/geometry/nn_search.hpp>
@@ -227,11 +229,58 @@ void random_colocation_test()
         "[Test] Random points should have colocated points" );
 }
 
+void large_search_test()
+{
+    // Large point sets build their tree with several threads
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 1 };
+    std::vector< geode::Point2D > points;
+    for( const auto unused : geode::Range{ 150000 } )
+    {
+        geode_unused( unused );
+        points.emplace_back( geode::Point2D{
+            { distribution( generator ), distribution( generator ) } } );
+    }
+    const geode::NNSearch2D search{ points };
+    for( const auto unused : geode::Range{ 100 } )
+    {
+        geode_unused( unused );
+        const geode::Point2D query{ { distribution( generator ),
+            distribution( generator ) } };
+        geode::index_t expected{ 0 };
+        for( const auto p : geode::Indices{ points } )
+        {
+            if( geode::point_point_distance( query, points[p] )
+                < geode::point_point_distance( query, points[expected] ) )
+            {
+                expected = p;
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            search.closest_neighbor( query ) == expected,
+            "[Test] Wrong closest neighbor in large point set" );
+        auto neighbors = search.radius_neighbors( query, 0.01 );
+        absl::c_sort( neighbors );
+        std::vector< geode::index_t > expected_neighbors;
+        for( const auto p : geode::Indices{ points } )
+        {
+            if( geode::point_point_distance( query, points[p] ) < 0.01 )
+            {
+                expected_neighbors.push_back( p );
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            neighbors == expected_neighbors,
+            "[Test] Wrong radius neighbors in large point set" );
+    }
+}
+
 void test()
 {
     first_test();
     second_test();
     random_colocation_test();
+    large_search_test();
 }
 
 OPENGEODE_TEST( "nnsearch" )

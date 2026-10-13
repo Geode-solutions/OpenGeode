@@ -47,7 +47,8 @@ namespace geode
     {
     public:
         explicit Impl( std::vector< Point< dimension > > points )
-            : cloud_{ std::move( points ) }, nn_tree_{ dimension, cloud_ }
+            : cloud_{ std::move( points ) },
+              nn_tree_{ dimension, cloud_, build_parameters( cloud_ ) }
         {
             nn_tree_.buildIndex();
         }
@@ -267,6 +268,17 @@ namespace geode
         }
 
     private:
+        struct PointCloud;
+
+        // Build large trees with several threads (0 = all available)
+        static nanoflann::KDTreeSingleIndexAdaptorParams build_parameters(
+            const PointCloud& cloud )
+        {
+            static constexpr index_t PARALLEL_BUILD_MIN_SIZE{ 100000 };
+            return { 10, nanoflann::KDTreeSingleIndexAdaptorFlags::None,
+                cloud.points.size() < PARALLEL_BUILD_MIN_SIZE ? 1u : 0u };
+        }
+
         std::array< double, dimension > copy(
             const Point< dimension >& point ) const
         {
