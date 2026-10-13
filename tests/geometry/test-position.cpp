@@ -24,6 +24,8 @@
 #include <cmath>
 #include <limits>
 #include <random>
+#include <string>
+#include <tuple>
 
 #include <absl/algorithm/container.h>
 
@@ -655,6 +657,43 @@ void test_random_positions_against_exact_sides()
     }
 }
 
+void test_position_to_index_and_string()
+{
+    const std::array<
+        std::tuple< geode::POSITION, geode::local_index_t, std::string >, 21 >
+        expected{ { { geode::POSITION::outside, geode::NO_LID, "NO_LID" },
+            { geode::POSITION::inside, geode::NO_LID, "NO_LID" },
+            { geode::POSITION::vertex0, 0, "vertex0" },
+            { geode::POSITION::vertex1, 1, "vertex1" },
+            { geode::POSITION::vertex2, 2, "vertex2" },
+            { geode::POSITION::vertex3, 3, "vertex3" },
+            { geode::POSITION::edge0, 0, "edge0" },
+            { geode::POSITION::edge1, 1, "edge1" },
+            { geode::POSITION::edge2, 2, "edge2" },
+            { geode::POSITION::edge01, 0, "edge01" },
+            { geode::POSITION::edge02, 1, "edge02" },
+            { geode::POSITION::edge03, 2, "edge03" },
+            { geode::POSITION::edge12, 3, "edge12" },
+            { geode::POSITION::edge13, 4, "edge13" },
+            { geode::POSITION::edge23, 5, "edge23" },
+            { geode::POSITION::facet0, 0, "facet0" },
+            { geode::POSITION::facet1, 1, "facet1" },
+            { geode::POSITION::facet2, 2, "facet2" },
+            { geode::POSITION::facet3, 3, "facet3" },
+            { geode::POSITION::parallel, geode::NO_LID, "NO_LID" },
+            { static_cast< geode::POSITION >( 100 ), geode::NO_LID,
+                "NO_LID" } } };
+    for( const auto& [position, index, name] : expected )
+    {
+        geode::OpenGeodeGeometryException::test(
+            geode::detail::position_to_index( position ) == index,
+            "[Test] Wrong position_to_index for ", name );
+        geode::OpenGeodeGeometryException::test(
+            geode::detail::position_to_string( position ) == name,
+            "[Test] Wrong position_to_string for ", name );
+    }
+}
+
 void test_point_side_to_triangle()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -690,6 +729,7 @@ void test()
     test_point_triangle_position();
     test_point_tetrahedron_position();
     test_nan_point_position();
+    test_position_to_index_and_string();
     test_random_positions_against_exact_sides();
 }
 
