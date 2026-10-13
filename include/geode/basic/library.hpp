@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <cstdio>
+#include <cstdlib>
+
 #include <absl/base/optimization.h>
 
 #include <geode/basic/logger.hpp>
@@ -111,7 +114,8 @@ namespace geode
                         #library_name, " assertion failed" );                  \
                     geode::Logger::critical(                                   \
                         "Message: ", message_provider() );                     \
-                    exit( 1 );                                                 \
+                    std::fflush( nullptr );                                    \
+                    std::abort();                                              \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -122,7 +126,7 @@ namespace geode
             if( ABSL_PREDICT_FALSE( !( condition ) ) )                         \
             {                                                                  \
                 geode::Logger::critical( "Test failed: ", message... );        \
-                exit( 1 );                                                     \
+                std::exit( 1 );                                                \
             }                                                                  \
         }                                                                      \
     }

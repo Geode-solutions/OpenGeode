@@ -27,9 +27,9 @@
 
 #include <bitsery/ext/std_map.h>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -155,8 +155,7 @@ namespace geode
             std::vector< index_t > delete_facets(
                 const std::vector< bool >& to_delete )
             {
-                const auto old2new =
-                    detail::mapping_after_deletion( to_delete );
+                const auto old2new = mapping_after_deletion( to_delete );
                 std::vector< TypedVertexCycle > key_to_erase;
                 key_to_erase.reserve( old2new.size() );
                 for( auto& cycle : facet_indices_ )
@@ -223,8 +222,7 @@ namespace geode
                     }
                 }
                 facet_attribute_manager_.delete_elements( to_delete );
-                const auto cycle_old2new =
-                    detail::mapping_after_deletion( to_delete );
+                const auto cycle_old2new = mapping_after_deletion( to_delete );
                 for( auto& cycle : facet_indices_ )
                 {
                     cycle.second = cycle_old2new[cycle.second];

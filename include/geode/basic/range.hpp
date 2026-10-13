@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <limits>
+#include <type_traits>
 #include <vector>
 
 #include <absl/base/casts.h>
@@ -31,6 +34,22 @@
 
 namespace geode
 {
+    namespace detail
+    {
+        template < typename Type, typename T >
+        [[nodiscard]] constexpr Type range_bound( T value )
+        {
+            if constexpr( std::is_integral_v< T > )
+            {
+                const auto max = std::numeric_limits< Type >::max();
+                OpenGeodeBasicException::check_assertion(
+                    static_cast< std::make_unsigned_t< T > >( value ) <= max,
+                    "[Range] Invalid range: ", value, " > ", max );
+            }
+            return static_cast< Type >( value );
+        }
+    } // namespace detail
+
     template < typename Type >
     class IncrementOperator
     {
@@ -122,7 +141,10 @@ namespace geode
     public:
         template < typename T1, typename T2 >
         constexpr TRange( T1 begin, T2 end )
-            : BaseRange< Type, IncrementOperator >( begin, end )
+            : BaseRange< Type, IncrementOperator >(
+                  std::min( detail::range_bound< Type >( begin ),
+                      detail::range_bound< Type >( end ) ),
+                  detail::range_bound< Type >( end ) )
         {
         }
 
@@ -156,14 +178,22 @@ namespace geode
     public:
         template < typename T1, typename T2 >
         constexpr TReverseRange( T1 begin, T2 end )
-            : BaseRange< Type, DecrementOperator >( begin - 1, end - 1 )
+            : BaseRange< Type, DecrementOperator >(
+                  static_cast< Type >(
+                      std::max( detail::range_bound< Type >( begin ),
+                          detail::range_bound< Type >( end ) )
+                      - 1 ),
+                  static_cast< Type >(
+                      detail::range_bound< Type >( end ) - 1 ) )
         {
         }
 
         template < typename T >
         constexpr explicit TReverseRange( T begin )
             : BaseRange< Type, DecrementOperator >(
-                  begin - 1, static_cast< Type >( -1 ) )
+                  static_cast< Type >(
+                      detail::range_bound< Type >( begin ) - 1 ),
+                  static_cast< Type >( -1 ) )
         {
         }
 
@@ -213,35 +243,4 @@ namespace geode
     };
     using Indices = TIndices< index_t >;
     using LIndices = TIndices< local_index_t >;
-
-    template < typename Type >
-    class EraserRange : public BaseRange< index_t, DecrementOperator >
-    {
-    public:
-        explicit EraserRange( std::vector< Type >& values )
-            : BaseRange< index_t, DecrementOperator >( values.size() - 1, -1 ),
-              values_( values )
-        {
-        }
-
-        const EraserRange< Type >& begin() const
-        {
-            return *this;
-        }
-
-        const EraserRange< Type >& end() const
-        {
-            return *this;
-        }
-
-        Type&& operator*()
-        {
-            auto&& value = std::move( values_[this->current()] );
-            values_.pop_back();
-            return std::move( value );
-        }
-
-    private:
-        std::vector< Type >& values_;
-    };
 } // namespace geode

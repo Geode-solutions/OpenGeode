@@ -42,11 +42,12 @@ namespace geode::internal
         [[nodiscard]] index_t cell_index( const CellArray< dimension >& array,
             const CellIndices& index ) const
         {
-            const auto nb_u = array.nb_cells_in_direction( 0 );
-            auto cell_id = index[0] + ( index[1] * nb_u );
-            if( dimension == 3 )
+            index_t cell_id{ index[0] };
+            index_t offset{ 1 };
+            for( const auto d : LRange{ 1, dimension } )
             {
-                cell_id += index[2] * nb_u * array.nb_cells_in_direction( 1 );
+                offset *= array.nb_cells_in_direction( d - 1 );
+                cell_id += index[d] * offset;
             }
             return cell_id;
         }
@@ -59,15 +60,9 @@ namespace geode::internal
             CellIndices cell_id;
             for( const auto d : LRange{ dimension } )
             {
-                index_t offset{ 1 };
-                for( const auto d2 : LRange{ dimension - d - 1 } )
-                {
-                    offset *= array.nb_cells_in_direction( d2 );
-                }
-                const auto value =
-                    static_cast< index_t >( std::floor( index / offset ) );
-                cell_id[dimension - d - 1] = value;
-                index -= value * offset;
+                const auto nb_cells = array.nb_cells_in_direction( d );
+                cell_id[d] = index % nb_cells;
+                index /= nb_cells;
             }
             return cell_id;
         }

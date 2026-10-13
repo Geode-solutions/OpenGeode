@@ -23,6 +23,7 @@
 
 #include <geode/basic/identifier.hpp>
 
+#include <filesystem>
 #include <fstream>
 
 #include <bitsery/ext/std_optional.h>
@@ -59,7 +60,11 @@ namespace geode
         void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/identifier" );
-            std::ofstream file{ filename, std::ofstream::binary };
+            std::ofstream file{ std::filesystem::u8path( filename ),
+                std::ofstream::binary };
+            OpenGeodeBasicException::check_exception( file.is_open(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[Identifier::save] Cannot open file: ", filename );
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
                 std::get< 0 >( context ) );
@@ -67,7 +72,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OpenGeodeBasicException::check_exception(
-                std::get< 1 >( context ).isValid(), nullptr,
+                file.good() && std::get< 1 >( context ).isValid(), nullptr,
                 OpenGeodeException::TYPE::internal,
                 "[Identifier::save] Error while writing file: ", filename );
         }
@@ -75,7 +80,8 @@ namespace geode
         void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/identifier" );
-            std::ifstream file{ filename, std::ifstream::binary };
+            std::ifstream file{ std::filesystem::u8path( filename ),
+                std::ifstream::binary };
             if( !file )
             {
                 return;
@@ -101,27 +107,28 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& local_archive, Impl& impl ) {
-                         local_archive.object( impl.id_ );
-                         std::string old_name;
-                         local_archive.text1b( old_name, old_name.max_size() );
-                         if( old_name != DEFAULT_NAME )
-                         {
-                             impl.name_.emplace( std::move( old_name ) );
-                         }
-                     },
-                        []( Archive& local_archive, Impl& impl ) {
-                            local_archive.object( impl.id_ );
-                            local_archive.ext( impl.name_,
-                                bitsery::ext::StdOptional{},
-                                []( Archive& local_archive2,
-                                    std::string& name ) {
-                                    local_archive2.text1b(
-                                        name, name.max_size() );
-                                } );
-                        } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& local_archive, Impl& impl ) {
+                                local_archive.object( impl.id_ );
+                                std::string old_name;
+                                local_archive.text1b(
+                                    old_name, MAX_SERIALIZED_NAME_SIZE );
+                                if( old_name != DEFAULT_NAME )
+                                {
+                                    impl.name_.emplace( std::move( old_name ) );
+                                }
+                            },
+                               []( Archive& local_archive, Impl& impl ) {
+                                   local_archive.object( impl.id_ );
+                                   local_archive.ext( impl.name_,
+                                       bitsery::ext::StdOptional{},
+                                       []( Archive& local_archive2,
+                                           std::string& name ) {
+                                           local_archive2.text1b(
+                                               name, MAX_SERIALIZED_NAME_SIZE );
+                                       } );
+                               } } } );
         }
 
     private:

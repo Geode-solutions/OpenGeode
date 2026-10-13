@@ -40,6 +40,16 @@
 namespace geode
 {
     /*!
+     * One step of a time series: the attribute holding the values at the
+     * given time.
+     */
+    struct AttributeTimeStep
+    {
+        double time;
+        uuid attribute_id;
+    };
+
+    /*!
      * This class manages all its associated Attributes.
      * Each Attribute is registered and can be retrieved by a given name.
      */
@@ -55,10 +65,10 @@ namespace geode
 
         /*!
          * Recover the non-typed/generic Attribute from the attribute
-         * name. This can be used when attribute type is not known in a
+         * id. This can be used when attribute type is not known in a
          * context.
-         * @param[in] name The associated attribute name to look for.
-         * @return nullptr if no attribute matches the given name.
+         * @param[in] attribute_id The associated attribute id to look for.
+         * @return nullptr if no attribute matches the given id.
          */
         [[nodiscard]] std::shared_ptr< AttributeBase > find_generic_attribute(
             const geode::uuid& attribute_id ) const
@@ -118,20 +128,9 @@ namespace geode
             AttributeProperties properties )
         {
             absl::MutexLock lock{ mutex() };
-            auto attribute = find_attribute_base( attribute_id );
-            auto typed_attribute =
-                std::dynamic_pointer_cast< Attribute< T > >( attribute );
-            OpenGeodeBasicException::check_exception(
-                typed_attribute.get() == nullptr, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[AttributeManager::create_attribute] Attribute with id '",
-                attribute_id.string(), "' already exists." );
-            typed_attribute = std::make_unique< Attribute< T > >(
-                std::move( default_values ), attribute_name,
-                std::move( properties ), AttributeBase::AttributeKey{} );
-            IdentifierBuilder builder{ *typed_attribute };
-            builder.set_id( attribute_id );
-            register_attribute( typed_attribute, attribute_id );
+            create_attribute_unlocked< Attribute, T >( attribute_name,
+                attribute_id, std::move( default_values ),
+                std::move( properties ) );
         }
 
         template < template < typename > class Attribute, typename T >
@@ -145,6 +144,45 @@ namespace geode
                 std::move( default_values ), std::move( properties ) );
             return attribute_id;
         }
+
+        /*!
+         * Create one step of a time series.
+         * A time series is the set of attributes sharing a name and having a
+         * time in their AttributeProperties.
+         * @param[in] attribute_name The name of the series.
+         * @param[in] time The time of this step, stored in properties.time.
+         * @exception OpenGeodeException if time is not finite, if an
+         * attribute with this name has no time, a different type or the same
+         * time.
+         */
+        template < template < typename > class Attribute, typename T >
+        [[nodiscard]] geode::uuid create_time_step_attribute(
+            std::string_view attribute_name,
+            double time,
+            AttributeValues< T > default_values,
+            AttributeProperties properties )
+        {
+            geode::uuid attribute_id;
+            absl::MutexLock lock{ mutex() };
+            check_new_time_step( attribute_name, time, typeid( T ).name() );
+            properties.time = time;
+            create_attribute_unlocked< Attribute, T >( attribute_name,
+                attribute_id, std::move( default_values ),
+                std::move( properties ) );
+            return attribute_id;
+        }
+
+        /*!
+         * Get the steps of the time series with the given name, sorted by
+         * time. Empty if no attribute with this name has a time.
+         */
+        [[nodiscard]] std::vector< AttributeTimeStep > time_steps(
+            std::string_view attribute_name ) const;
+
+        /*!
+         * Get the distinct names of the attributes having a time.
+         */
+        [[nodiscard]] std::vector< std::string > time_series_names() const;
 
         /*!
          * Resize all the attributes to the given size
@@ -208,12 +246,27 @@ namespace geode
         void delete_attribute( const geode::uuid& );
 
         /*!
+         * Create a new attribute with the given id by copying the values
+         * of an existing attribute of this manager.
+         * @param[in] attribute_id The id of the attribute to copy.
+         * @param[in] new_attribute_id The id to give to the new attribute.
+         * @exception OpenGeodeException if the attribute is a time series step.
+         */
+        void copy_attribute( const geode::uuid& attribute_id,
+            const geode::uuid& new_attribute_id );
+
+        /*!
          * Get the typeid id of the attribute type
          * @param[in] id The attribute id to use
          */
         [[nodiscard]] std::string_view attribute_type(
             const geode::uuid& ) const;
 
+        /*!
+         * Replace all the properties of the attribute.
+         * @warning The time is replaced too: passing properties with an empty
+         * time removes the attribute from its time series.
+         */
         void set_attribute_properties( geode::uuid attribute_id,
             const AttributeProperties& new_properties );
 
@@ -238,7 +291,8 @@ namespace geode
         /*!
          * Permute attribute elements.
          * @param[in] permutation Vector of size @function nb_elements().
-         * Each value correponds to the destination index.
+         * permutation[new_index] is the old index of the element moved to
+         * new_index.
          */
         void permute_elements( absl::Span< const index_t > permutation );
 
@@ -260,6 +314,26 @@ namespace geode
             const uuid& attribute_id );
 
     private:
+        template < template < typename > class Attribute, typename T >
+        void create_attribute_unlocked( std::string_view attribute_name,
+            const geode::uuid& attribute_id,
+            AttributeValues< T > default_values,
+            AttributeProperties properties )
+        {
+            OpenGeodeBasicException::check_exception(
+                find_attribute_base( attribute_id ) == nullptr, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::create_attribute] Attribute with id '",
+                attribute_id.string(), "' already exists." );
+            std::shared_ptr< Attribute< T > > typed_attribute =
+                std::make_unique< Attribute< T > >( std::move( default_values ),
+                    attribute_name, std::move( properties ),
+                    AttributeBase::AttributeKey{} );
+            IdentifierBuilder builder{ *typed_attribute };
+            builder.set_id( attribute_id );
+            register_attribute( typed_attribute, attribute_id );
+        }
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& serializer );
@@ -278,13 +352,19 @@ namespace geode
 
         /*!
          * Register an Attribute to the given id.
-         * If the given id already exists in the manager, the new attribute
-         * will override the old one.
+         * The given id should not already exist in the manager.
          * @param[in] attribute The attribute to register
          * @param[in] id The associated id to the store
          */
         void register_attribute(
             std::shared_ptr< AttributeBase > attribute, const geode::uuid& );
+
+        /*!
+         * Check that a new step can be added to the time series.
+         */
+        void check_new_time_step( std::string_view attribute_name,
+            double time,
+            std::string_view type ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -26,10 +26,14 @@
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/corner.hpp>
+#include <geode/model/mixin/core/corner_collection.hpp>
 #include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>
 #include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/builder/detail/copy.hpp>
 #include <geode/model/representation/builder/section_builder.hpp>
@@ -38,49 +42,22 @@
 
 namespace
 {
-    void copy_model_boundaries_relationships2d( geode::Section& model,
-        geode::SectionBuilder& builder,
-        const geode::Section& other_model,
+    template < typename Model, typename CollectionRange >
+    void copy_collection_items( const Model& other_model,
+        typename Model::Builder& builder,
+        CollectionRange&& collections,
         const geode::ModelCopyMapping& mapping )
     {
-        const auto& line_mapping =
-            mapping.at( geode::Line2D::component_type_static() );
-        const auto& boundary_mapping =
-            mapping.at( geode::ModelBoundary2D::component_type_static() );
-        for( const auto& model_boundary : other_model.model_boundaries() )
+        for( const auto& collection : collections )
         {
-            const auto& boundary_copy = model.model_boundary(
-                boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& item :
-                other_model.model_boundary_items( model_boundary ) )
+            const auto collection_type = collection.component_type();
+            const geode::ComponentID collection_copy{ collection_type,
+                mapping.at( collection_type ).in2out( collection.id() ) };
+            for( const auto& item : other_model.items( collection.id() ) )
             {
-                const auto& item_copy =
-                    model.line( line_mapping.in2out( item.id() ) );
-                builder.add_line_in_model_boundary( item_copy, boundary_copy );
-            }
-        }
-    }
-
-    void copy_model_boundaries_relationships3d( geode::BRep& model,
-        geode::BRepBuilder& builder,
-        const geode::BRep& other_model,
-        const geode::ModelCopyMapping& mapping )
-    {
-        const auto& surface_mapping =
-            mapping.at( geode::Surface3D::component_type_static() );
-        const auto& boundary_mapping =
-            mapping.at( geode::ModelBoundary2D::component_type_static() );
-        for( const auto& model_boundary : other_model.model_boundaries() )
-        {
-            const auto& boundary_copy = model.model_boundary(
-                boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& item :
-                other_model.model_boundary_items( model_boundary ) )
-            {
-                const auto& item_copy =
-                    model.surface( surface_mapping.in2out( item.id() ) );
-                builder.add_surface_in_model_boundary(
-                    item_copy, boundary_copy );
+                builder.add_item_in_collection(
+                    { item.type, mapping.at( item.type ).in2out( item.id ) },
+                    collection_copy );
             }
         }
     }
@@ -216,6 +193,19 @@ namespace geode
             }
         }
 
+        void copy_collections_relationships(
+            const Model& other_model, const ModelCopyMapping& mapping )
+        {
+            copy_collection_items( other_model, builder_,
+                other_model.model_boundaries(), mapping );
+            copy_collection_items( other_model, builder_,
+                other_model.corner_collections(), mapping );
+            copy_collection_items( other_model, builder_,
+                other_model.line_collections(), mapping );
+            copy_collection_items( other_model, builder_,
+                other_model.surface_collections(), mapping );
+        }
+
     private:
         Model& model_;
         ModelBuilder builder_;
@@ -227,8 +217,7 @@ namespace geode
     {
         copy_line_relationships( other_model, mapping );
         copy_surface_relationships( other_model, mapping );
-        copy_model_boundaries_relationships2d(
-            model_, builder_, other_model, mapping );
+        copy_collections_relationships( other_model, mapping );
     }
 
     template <>
@@ -238,8 +227,9 @@ namespace geode
         copy_line_relationships( other_model, mapping );
         copy_surface_relationships( other_model, mapping );
         copy_block_relationships( model_, builder_, other_model, mapping );
-        copy_model_boundaries_relationships3d(
-            model_, builder_, other_model, mapping );
+        copy_collections_relationships( other_model, mapping );
+        copy_collection_items(
+            other_model, builder_, other_model.block_collections(), mapping );
     }
 
     template < typename Model >

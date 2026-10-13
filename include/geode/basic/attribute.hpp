@@ -137,7 +137,8 @@ namespace geode
                         []( Archive& archive, AttributeBase& attribute ) {
                             archive.object( attribute.properties_ );
                             std::string old_name;
-                            archive.text1b( old_name, old_name.max_size() );
+                            archive.text1b(
+                                old_name, MAX_SERIALIZED_NAME_SIZE );
                             attribute.set_name( old_name );
                         },
                         []( Archive& archive, AttributeBase& attribute ) {

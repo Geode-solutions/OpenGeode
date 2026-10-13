@@ -23,8 +23,8 @@
 
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/permutation.hpp>
 
@@ -807,7 +807,7 @@ namespace geode
     std::vector< index_t > SolidMeshBuilder< dimension >::delete_polyhedra(
         const std::vector< bool >& to_delete )
     {
-        const auto old2new = detail::mapping_after_deletion( to_delete );
+        const auto old2new = mapping_after_deletion( to_delete );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
             return old2new;

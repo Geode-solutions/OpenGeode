@@ -43,14 +43,25 @@ namespace geode
         Container& data, absl::Span< const index_t > permutation )
     {
         OpenGeodeBasicException::check_exception(
-            permutation.size() == data.size() / nb_elements, nullptr,
-            OpenGeodeException::TYPE::data,
+            data.size() % nb_elements == 0
+                && permutation.size() == data.size() / nb_elements,
+            nullptr, OpenGeodeException::TYPE::data,
             "[multiple_permute] Data and permutation should have the same "
             "size" );
         const auto index = []( const auto i ) {
             return nb_elements * i;
         };
         std::vector< bool > visited( permutation.size(), false );
+        for( const auto value : permutation )
+        {
+            OpenGeodeBasicException::check_exception(
+                value < permutation.size() && !visited[value], nullptr,
+                OpenGeodeException::TYPE::data,
+                "[multiple_permute] Input is not a permutation: value ", value,
+                " is out of range or duplicated" );
+            visited[value] = true;
+        }
+        visited.assign( permutation.size(), false );
         for( const auto p : Indices{ permutation } )
         {
             if( visited[p] )

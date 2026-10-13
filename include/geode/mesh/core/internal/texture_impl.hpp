@@ -98,7 +98,6 @@ namespace geode
                 attribute_properties.transferable = false;
                 AttributeValues< ElementTextureCoordinates > coordinates_values;
                 coordinates_values.default_value = {};
-                coordinates_values.no_value = {};
                 const auto texture_id =
                     manager.create_attribute< VariableAttribute,
                         ElementTextureCoordinates >(

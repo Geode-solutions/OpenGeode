@@ -23,6 +23,9 @@
 
 #include <geode/basic/library.hpp>
 
+#include <atomic>
+#include <mutex>
+
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -34,16 +37,37 @@ namespace geode
         void call_initialize( Library& library, const char* library_name )
         {
             geode_unused( library_name );
-            if( !is_loaded_ )
+            if( is_loaded_.load( std::memory_order_acquire ) )
             {
-                is_loaded_ = true;
-                library.do_initialize();
-                DEBUG_LOGGER( library_name, "Library initialized" );
+                return;
             }
+            // Recursive so that a re-entrant call from do_initialize returns
+            // instead of deadlocking, other threads wait for the end
+            const std::lock_guard< std::recursive_mutex > locking{ lock_ };
+            if( is_loading_ || is_loaded_.load( std::memory_order_relaxed ) )
+            {
+                return;
+            }
+            is_loading_ = true;
+            try
+            {
+                library.do_initialize();
+            }
+            catch( ... )
+            {
+                // A later call will retry the initialization
+                is_loading_ = false;
+                throw;
+            }
+            is_loading_ = false;
+            is_loaded_.store( true, std::memory_order_release );
+            DEBUG_LOGGER( library_name, " library initialized" );
         }
 
     private:
-        bool is_loaded_{ false };
+        std::recursive_mutex lock_;
+        bool is_loading_{ false };
+        std::atomic< bool > is_loaded_{ false };
     };
 
     Library::Library() = default;

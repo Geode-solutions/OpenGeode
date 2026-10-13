@@ -30,9 +30,14 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
 
+#include <absl/container/fixed_array.h>
 #include <absl/container/flat_hash_map.h>
+#include <absl/strings/str_cat.h>
+#include <absl/synchronization/mutex.h>
 
 #include <geode/basic/common.hpp>
 #include <geode/basic/logger.hpp>
@@ -77,34 +82,37 @@ namespace geode
             static_assert( std::is_constructible_v< DerivedClass, Args... >,
                 "DerivedClass is not constructible with Args..." );
             auto &store = get_store();
-            if( !store
-                    .emplace( std::move( key ),
-                        Creator( create_function_impl< DerivedClass > ) )
+            absl::MutexLock lock{ store.mutex };
+            if( !store.creators
+                    .emplace(
+                        key, Creator( create_function_impl< DerivedClass > ) )
                     .second )
             {
-                Logger::warning(
-                    "Factory: Trying to register twice the same key" );
+                Logger::warning( "Factory: Trying to register twice the same "
+                                 "key",
+                    key_string( key ) );
             }
         }
 
         [[nodiscard]] static std::unique_ptr< BaseClass > create(
             const Key &key, Args... args )
         {
-            const auto &store = get_store();
-            const auto creator = store.find( key );
-            OpenGeodeBasicException::check_exception( creator != store.end(),
+            const auto creator = find_creator( key );
+            OpenGeodeBasicException::check_exception( creator != nullptr,
                 nullptr, OpenGeodeException::TYPE::data,
-                "[Factory::create] Factory does not "
-                "contain the requested key" );
-            return creator->second( std::forward< Args >( args )... );
+                "[Factory::create] Factory does not contain the requested "
+                "key",
+                key_string( key ) );
+            return creator( std::forward< Args >( args )... );
         }
 
         [[nodiscard]] static absl::FixedArray< Key > list_creators()
         {
             const auto &store = get_store();
-            absl::FixedArray< Key > creators( store.size() );
+            absl::ReaderMutexLock lock{ store.mutex };
+            absl::FixedArray< Key > creators( store.creators.size() );
             index_t count{ 0 };
-            for( const auto &creator : store )
+            for( const auto &creator : store.creators )
             {
                 creators[count++] = creator.first;
             }
@@ -113,8 +121,7 @@ namespace geode
 
         [[nodiscard]] static bool has_creator( const Key &key )
         {
-            const auto &store = get_store();
-            return store.find( key ) != store.end();
+            return find_creator( key ) != nullptr;
         }
 
     private:
@@ -122,16 +129,48 @@ namespace geode
         [[nodiscard]] static std::unique_ptr< BaseClass > create_function_impl(
             Args... args )
         {
-            return std::unique_ptr< BaseClass >{ new DerivedClass{
-                std::forward< Args >( args )... } };
+            return std::make_unique< DerivedClass >(
+                std::forward< Args >( args )... );
         }
 
-        [[nodiscard]] static FactoryStore &get_store()
+        [[nodiscard]] static Creator find_creator( const Key &key )
+        {
+            const auto &store = get_store();
+            absl::ReaderMutexLock lock{ store.mutex };
+            const auto creator = store.creators.find( key );
+            if( creator == store.creators.end() )
+            {
+                return nullptr;
+            }
+            return creator->second;
+        }
+
+        [[nodiscard]] static std::string key_string( const Key &key )
+        {
+            if constexpr( std::is_convertible_v< const Key &,
+                              std::string_view > )
+            {
+                return absl::StrCat( ": \"", std::string_view{ key }, "\"" );
+            }
+            else
+            {
+                geode_unused( key );
+                return {};
+            }
+        }
+
+        struct Store
+        {
+            mutable absl::Mutex mutex;
+            FactoryStore creators;
+        };
+
+        [[nodiscard]] static Store &get_store()
         {
             return Singleton::instance< Factory >().store_;
         }
 
     private:
-        FactoryStore store_;
+        Store store_;
     };
 } // namespace geode

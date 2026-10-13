@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <optional>
+
 #include <absl/types/span.h>
+
+#include <bitsery/ext/std_optional.h>
 
 #include <geode/basic/common.hpp>
 #include <geode/basic/growable.hpp>
@@ -59,12 +63,24 @@ namespace geode
                             archive.value1b( properties.assignable );
                             archive.value1b( properties.interpolable );
                             archive.value1b( properties.transferable );
+                        },
+                        []( Archive& archive,
+                            AttributeProperties& properties ) {
+                            archive.value1b( properties.assignable );
+                            archive.value1b( properties.interpolable );
+                            archive.value1b( properties.transferable );
+                            archive.ext( properties.time,
+                                bitsery::ext::StdOptional{},
+                                []( Archive& archive2, double& value ) {
+                                    archive2.value8b( value );
+                                } );
                         } } } );
         }
 
         bool assignable{ false };
         bool interpolable{ false };
         bool transferable{ true };
+        std::optional< double > time{};
     };
 
     template < typename AttributeType >
@@ -75,16 +91,26 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, AttributeValues >{
-                           { []( Archive& archive, AttributeValues& values ) {
-                               archive( values.default_value );
-                               archive( values.no_value );
-                           } } } );
+            serializer.ext( *this,
+                Growable< Archive, AttributeValues >{
+                    { []( Archive& archive, AttributeValues& values ) {
+                         archive( values.default_value );
+                         AttributeType no_value_value;
+                         archive( no_value_value );
+                         values.no_value = std::move( no_value_value );
+                     },
+                        []( Archive& archive, AttributeValues& values ) {
+                            archive( values.default_value );
+                            archive.ext( values.no_value,
+                                bitsery::ext::StdOptional{},
+                                []( Archive& archive2, AttributeType& value ) {
+                                    archive2( value );
+                                } );
+                        } } } );
         }
 
-        AttributeType default_value;
-        AttributeType no_value;
+        AttributeType default_value{};
+        std::optional< AttributeType > no_value{};
     };
 
     /*!
@@ -127,6 +153,7 @@ namespace geode
                 OpenGeodeException::TYPE::data,
                 "[AttributeLinearInterpolation] Both arrays should have the "
                 "same size" );
+
             for( const auto index : Indices{ indices } )
             {
                 indices_[index] = indices[index];
@@ -155,6 +182,10 @@ namespace geode
             const Attribute< Type >& attribute )                               \
         {                                                                      \
             Type result{ 0 };                                                  \
+            if( interpolator.indices_.empty() )                                \
+            {                                                                  \
+                return attribute.default_values().default_value;               \
+            }                                                                  \
             bool is_same{ true };                                              \
             const auto& first_value =                                          \
                 attribute.value( interpolator.indices_[0] );                   \
@@ -190,6 +221,10 @@ namespace geode
         {                                                                      \
             std::array< Type, array_size > result;                             \
             result.fill( 0 );                                                  \
+            if( interpolator.indices_.empty() )                                \
+            {                                                                  \
+                return attribute.default_values().default_value;               \
+            }                                                                  \
             bool is_same{ true };                                              \
             const auto& first_value =                                          \
                 attribute.value( interpolator.indices_[0] );                   \

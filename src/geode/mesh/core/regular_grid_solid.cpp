@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.hpp>
 
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
@@ -101,14 +102,24 @@ namespace geode
                          grid, bitsery::ext::BaseClass< SolidMesh< 3 > >{} );
                      archive.ext(
                          grid, bitsery::ext::BaseClass< Grid< 3 > >{} );
-                     GridBuilder3D builder{ grid };
-                     builder.set_grid_origin( grid.grid_point( { 0, 0, 0 } ) );
                  },
                     []( Archive& archive, RegularGrid< 3 >& grid ) {
                         archive.ext(
                             grid, bitsery::ext::BaseClass< SolidMesh< 3 > >{} );
                         archive.ext(
                             grid, bitsery::ext::BaseClass< Grid< 3 > >{} );
+                        GridBuilder3D builder{ grid };
+                        builder.set_grid_origin( grid.point( 0 ) );
+                        builder.set_grid_directions( { geode::Vector3D{
+                                                           grid.point( 0 ),
+                                                           grid.point( 1 ) },
+                            geode::Vector3D{ grid.point( 0 ),
+                                grid.point(
+                                    grid.nb_vertices_in_direction( 0 ) ) },
+                            geode::Vector3D{ grid.point( 0 ),
+                                grid.point( grid.nb_vertices_in_direction( 0 )
+                                            * grid.nb_vertices_in_direction(
+                                                1 ) ) } } );
                     } } } );
     }
 

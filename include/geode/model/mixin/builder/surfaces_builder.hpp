@@ -24,6 +24,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
+
+#include <geode/basic/attribute_manager.hpp>
 
 #include <geode/mesh/builder/mesh_builder_factory.hpp>
 #include <geode/mesh/core/mesh_id.hpp>
@@ -74,6 +77,21 @@ namespace geode
 
         [[nodiscard]] std::unique_ptr< SurfaceMesh< dimension > >
             steal_surface_mesh( const Surface< dimension >& surface );
+
+        template < template < typename > class Attribute, typename T >
+        void create_surfaces_attribute( std::string_view attribute_name,
+            const uuid& attribute_id,
+            AttributeValues< T > default_values,
+            AttributeProperties properties )
+        {
+            for( const auto& surface : surfaces_.surfaces() )
+            {
+                surface.mesh()
+                    .polygon_attribute_manager()
+                    .template create_attribute< Attribute, T >( attribute_name,
+                        attribute_id, default_values, properties );
+            }
+        }
 
     protected:
         explicit SurfacesBuilder( Surfaces< dimension >& surfaces )

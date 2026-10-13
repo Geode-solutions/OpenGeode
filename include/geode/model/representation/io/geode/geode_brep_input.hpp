@@ -77,6 +77,9 @@ namespace geode
                     builder.load_identifier( directory );
                 },
                 [&builder, &directory] {
+                    builder.load_physical_properties( directory );
+                },
+                [&builder, &directory] {
                     builder.load_corners( directory );
                 },
                 [&builder, &directory] {

@@ -22,11 +22,13 @@
  */
 
 #include <fstream>
+#include <sstream>
 
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/bitsery_attribute.hpp>
 #include <geode/basic/logger.hpp>
@@ -115,7 +117,6 @@ void test_constant_attribute(
     attribute_properties.transferable = true;
     geode::AttributeValues< bool > attribute_values;
     attribute_values.default_value = true;
-    attribute_values.no_value = true;
     manager.create_attribute< geode::ConstantAttribute, bool >(
         "bool", attribute_id, attribute_values, attribute_properties );
     auto constant_attribute =
@@ -229,6 +230,25 @@ void test_int_variable_attribute(
         "Int variable value 3 should be equal to 5" );
 }
 
+geode::uuid test_copy_attribute(
+    geode::AttributeManager& manager, const geode::uuid& attribute_id )
+{
+    geode::uuid new_attribute_id;
+    manager.copy_attribute( attribute_id, new_attribute_id );
+    const auto original =
+        manager.find_read_only_attribute< int >( attribute_id );
+    const auto copy =
+        manager.find_read_only_attribute< int >( new_attribute_id );
+    for( const auto e : geode::Range{ manager.nb_elements() } )
+    {
+        geode::OpenGeodeBasicException::test(
+            copy->value( e ) == original->value( e ),
+            "Copied attribute value at element ", e,
+            " should be equal to the original attribute value" );
+    }
+    return new_attribute_id;
+}
+
 void test_foo_sparse_attribute(
     geode::AttributeManager& manager, const geode::uuid& attribute_id )
 {
@@ -297,6 +317,28 @@ void test_double_sparse_attribute(
     sparse_attribute->set_value( 3, 5 );
     geode::OpenGeodeBasicException::test(
         attribute->value( 3 ) == 5, "Should be equal to 5" );
+}
+
+void test_sparse_attribute_resize()
+{
+    geode::AttributeManager manager;
+    manager.resize( 10 );
+    const geode::uuid attribute_id;
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 12.;
+    manager.create_attribute< geode::SparseAttribute, double >( "sparse",
+        attribute_id, attribute_values, geode::AttributeProperties{} );
+    auto sparse_attribute =
+        manager.find_attribute< geode::SparseAttribute, double >(
+            attribute_id );
+    sparse_attribute->set_value( 2, 2 );
+    sparse_attribute->set_value( 8, 8 );
+    manager.resize( 5 );
+    manager.resize( 10 );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 2 ) == 2,
+        "Sparse value 2 should be kept after resize" );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 8 ) == 12,
+        "Sparse value 8 should be reset after shrinking" );
 }
 
 void test_double_array_attribute( geode::AttributeManager& manager )
@@ -380,7 +422,6 @@ void test_bool_variable_attribute(
     attribute_properties.transferable = true;
     geode::AttributeValues< bool > attribute_values;
     attribute_values.default_value = false;
-    attribute_values.no_value = false;
     manager.create_attribute< geode::VariableAttribute, bool >(
         "bool", attribute_id, attribute_values, attribute_properties );
 
@@ -563,14 +604,16 @@ void test_sparse_attribute_after_element_deletion(
 {
     const auto sparse_attribute =
         manager.find_read_only_attribute< double >( double_attribute_id );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 0 ) == 12,
-        "Element 0 of sparse attribute should be 12 " );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 3 ) == 3,
-        "Element 3 of sparse attribute should be 3 " );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 5 ) == 8.1,
-        "Element 5 of sparse attribute should be 8.1 " );
-    geode::OpenGeodeBasicException::test( sparse_attribute->value( 7 ) == 7,
-        "Element 7 of sparse attribute should be 7 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 0 ) == 3,
+        "Element 0 of sparse attribute should be 3 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 1 ) == 12,
+        "Element 1 of sparse attribute should be 12 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 2 ) == 8.1,
+        "Element 2 of sparse attribute should be 8.1 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 3 ) == 7,
+        "Element 3 of sparse attribute should be 7 " );
+    geode::OpenGeodeBasicException::test( sparse_attribute->value( 6 ) == 5,
+        "Element 6 of sparse attribute should be 5 " );
 }
 
 geode::uuid test_generic_value( geode::AttributeManager& manager,
@@ -595,7 +638,6 @@ geode::uuid test_generic_value( geode::AttributeManager& manager,
     attribute_properties.transferable = true;
     geode::AttributeValues< std::array< double, 2 > > attribute_values;
     attribute_values.default_value = {};
-    attribute_values.no_value = {};
     auto array_attr_id = manager.create_attribute< geode::VariableAttribute,
         std::array< double, 2 > >(
         "array_double_2", attribute_values, attribute_properties );
@@ -796,6 +838,117 @@ void test_multi_import_manager()
     }
 }
 
+void check_no_value_attributes( const geode::AttributeManager& manager,
+    const geode::uuid& int_id,
+    const geode::uuid& index_id,
+    const geode::uuid& double_id,
+    const geode::uuid& bool_id )
+{
+    const auto int_attribute =
+        manager.find_read_only_attribute< int >( int_id );
+    const auto index_attribute =
+        manager.find_read_only_attribute< geode::index_t >( index_id );
+    const auto double_attribute =
+        manager.find_read_only_attribute< double >( double_id );
+    const auto bool_attribute =
+        manager.find_read_only_attribute< bool >( bool_id );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        geode::OpenGeodeBasicException::test(
+            int_attribute->has_value( element ),
+            "Attribute without no_value should always have a value" );
+        geode::OpenGeodeBasicException::test(
+            bool_attribute->has_value( element ),
+            "Bool attribute without no_value should always have a value" );
+        geode::OpenGeodeBasicException::test(
+            index_attribute->has_value( element ) == ( element % 2 == 0 ),
+            "Wrong has_value for index attribute element ", element );
+        geode::OpenGeodeBasicException::test(
+            double_attribute->has_value( element ) == ( element == 3 ),
+            "Wrong has_value for double attribute element ", element );
+    }
+}
+
+void test_no_value()
+{
+    geode::AttributeManager manager;
+    manager.resize( 6 );
+    geode::AttributeValues< int > int_values;
+    int_values.default_value = 0;
+    const auto int_id =
+        manager.create_attribute< geode::VariableAttribute, int >(
+            "int", int_values, {} );
+    geode::OpenGeodeBasicException::test(
+        !manager.find_attribute< geode::VariableAttribute, int >( int_id )
+            ->default_values()
+            .no_value.has_value(),
+        "no_value should be empty by default" );
+    geode::AttributeValues< geode::index_t > index_values;
+    index_values.default_value = geode::NO_ID;
+    index_values.no_value = geode::NO_ID;
+    const auto index_id =
+        manager.create_attribute< geode::VariableAttribute, geode::index_t >(
+            "index", index_values, {} );
+    auto index_attribute =
+        manager.find_attribute< geode::VariableAttribute, geode::index_t >(
+            index_id );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        if( element % 2 == 0 )
+        {
+            index_attribute->set_value( element, element );
+        }
+    }
+    geode::AttributeValues< double > double_values;
+    double_values.default_value = std::nan( "" );
+    double_values.no_value = std::nan( "" );
+    const auto double_id =
+        manager.create_attribute< geode::SparseAttribute, double >(
+            "double", double_values, {} );
+    manager.find_attribute< geode::SparseAttribute, double >( double_id )
+        ->set_value( 3, 3. );
+    geode::AttributeValues< bool > bool_values;
+    bool_values.default_value = false;
+    const auto bool_id =
+        manager.create_attribute< geode::VariableAttribute, bool >(
+            "bool", bool_values, {} );
+    check_no_value_attributes( manager, int_id, index_id, double_id, bool_id );
+
+    const auto filename = "no_value_manager.out";
+    std::ofstream file{ filename, std::ofstream::binary };
+    geode::TContext context{};
+    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
+    geode::Serializer archive{ context, file };
+    archive.object( manager );
+    archive.adapter().flush();
+    file.close();
+    geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
+        "Error while writing file: ", filename );
+
+    std::ifstream infile{ filename, std::ifstream::binary };
+    geode::AttributeManager reloaded_manager;
+    geode::TContext reload_context{};
+    geode::register_basic_deserialize_pcontext(
+        std::get< 0 >( reload_context ) );
+    geode::Deserializer unarchive{ reload_context, infile };
+    unarchive.object( reloaded_manager );
+    const auto& adapter = unarchive.adapter();
+    geode::OpenGeodeBasicException::test(
+        adapter.error() == bitsery::ReaderError::NoError
+            && adapter.isCompletedSuccessfully()
+            && std::get< 1 >( reload_context ).isValid(),
+        "Error while reading file: ", filename );
+    check_no_value_attributes(
+        reloaded_manager, int_id, index_id, double_id, bool_id );
+    const auto reloaded_index =
+        reloaded_manager
+            .find_attribute< geode::VariableAttribute, geode::index_t >(
+                index_id );
+    geode::OpenGeodeBasicException::test(
+        reloaded_index->default_values().no_value == geode::NO_ID,
+        "Wrong no_value after reloading" );
+}
+
 void test_permutation( geode::AttributeManager& manager,
     const geode::uuid& int_att_id,
     const geode::uuid& double_att_id )
@@ -814,15 +967,209 @@ void test_permutation( geode::AttributeManager& manager,
 
     auto double_attribute =
         manager.find_read_only_attribute< double >( double_att_id );
-    geode::OpenGeodeBasicException::test( double_attribute->value( 2 ) == 12,
-        "Attribute value 2 should be equal to 3, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 0 ) == 3,
+        "Attribute value 0 should be equal to 3, not ",
+        double_attribute->value( 0 ) );
+    geode::OpenGeodeBasicException::test( double_attribute->value( 2 ) == 8.1,
+        "Attribute value 2 should be equal to 8.1, not ",
         double_attribute->value( 2 ) );
-    geode::OpenGeodeBasicException::test( double_attribute->value( 4 ) == 3,
-        "Attribute value 4 should be equal to 3, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 4 ) == 7,
+        "Attribute value 4 should be equal to 7, not ",
         double_attribute->value( 4 ) );
-    geode::OpenGeodeBasicException::test( double_attribute->value( 7 ) == 8.1,
-        "Attribute value 7 should be equal to 8.1, not ",
+    geode::OpenGeodeBasicException::test( double_attribute->value( 8 ) == 5,
+        "Attribute value 8 should be equal to 5, not ",
+        double_attribute->value( 8 ) );
+    geode::OpenGeodeBasicException::test( double_attribute->value( 7 ) == 12,
+        "Attribute value 7 should be equal to 12, not ",
         double_attribute->value( 7 ) );
+}
+
+double pressure_value( double time, double element_tag )
+{
+    return 100 * time + element_tag;
+}
+
+void check_pressure_series( const geode::AttributeManager& manager,
+    const std::vector< double >& expected_times )
+{
+    const geode::AttributeTimeSeries< double > pressure{ manager, "pressure" };
+    geode::OpenGeodeBasicException::test(
+        pressure.nb_time_steps() == expected_times.size(),
+        "Wrong number of pressure steps: ", pressure.nb_time_steps() );
+    for( const auto step : geode::Indices{ expected_times } )
+    {
+        geode::OpenGeodeBasicException::test(
+            pressure.time( step ) == expected_times[step],
+            "Wrong time for pressure step ", step );
+    }
+    const auto tag = manager.find_read_only_attribute< double >(
+        manager.attribute_ids_matching_name( "tag" ).value().front() );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        const auto values = pressure.element_values( element );
+        for( const auto step : geode::Indices{ values } )
+        {
+            const auto expected =
+                pressure_value( pressure.time( step ), tag->value( element ) );
+            geode::OpenGeodeBasicException::test(
+                values[step] == expected
+                    && pressure.value( step, element ) == expected,
+                "Wrong pressure for element ", element, " at step ", step, ": ",
+                values[step], " instead of ", expected );
+        }
+    }
+}
+
+geode::AttributeManager create_time_series_manager()
+{
+    geode::AttributeManager manager;
+    manager.resize( 10 );
+    auto tag = manager.find_attribute< geode::VariableAttribute, double >(
+        manager.create_attribute< geode::VariableAttribute, double >(
+            "tag", { -1, -1 }, {} ) );
+    for( const auto element : geode::Range{ manager.nb_elements() } )
+    {
+        tag->set_value( element, element );
+    }
+    for( const auto time : { 0., 10., 5. } )
+    {
+        auto step = manager.find_attribute< geode::VariableAttribute, double >(
+            manager
+                .create_time_step_attribute< geode::VariableAttribute, double >(
+                    "pressure", time, { pressure_value( time, -1 ), 0 }, {} ) );
+        for( const auto element : geode::Range{ manager.nb_elements() } )
+        {
+            step->set_value( element, pressure_value( time, element ) );
+        }
+    }
+    for( const auto time : { 1., 2. } )
+    {
+        auto step = manager.find_attribute< geode::VariableAttribute,
+            std::array< double, 3 > >(
+            manager.create_time_step_attribute< geode::VariableAttribute,
+                std::array< double, 3 > >( "velocity", time,
+                { { 0, 0, 0 }, std::array< double, 3 >{ 0, 0, 0 } }, {} ) );
+        step->set_value( 3, { time, 0, 0 } );
+    }
+    return manager;
+}
+
+void test_time_series_creation( geode::AttributeManager& manager )
+{
+    const auto steps = manager.time_steps( "pressure" );
+    geode::OpenGeodeBasicException::test(
+        steps.size() == 3 && steps[0].time == 0 && steps[1].time == 5
+            && steps[2].time == 10,
+        "Pressure steps should be sorted by time" );
+    geode::OpenGeodeBasicException::test(
+        manager.time_steps( "tag" ).empty(), "Tag should have no time step" );
+    const geode::AttributeTimeSeries< double > pressure{ manager, "pressure" };
+    geode::OpenGeodeBasicException::test(
+        pressure.step_attribute( 2 ).properties().time == 10,
+        "Wrong step attribute" );
+    const geode::AttributeTimeSeries< std::array< double, 3 > > velocity{
+        manager, "velocity"
+    };
+    const auto velocity_values = velocity.element_values( 3 );
+    geode::OpenGeodeBasicException::test( velocity_values.size() == 2
+                                              && velocity_values[0][0] == 1
+                                              && velocity_values[1][0] == 2,
+        "Wrong velocity_values" );
+    check_pressure_series( manager, { 0, 5, 10 } );
+}
+
+void test_time_series_element_edition( geode::AttributeManager& manager )
+{
+    std::vector< geode::index_t > permutation{ 2, 1, 4, 6, 7, 8, 5, 9, 3, 0 };
+    manager.permute_elements( permutation );
+    check_pressure_series( manager, { 0, 5, 10 } );
+    std::vector< bool > to_delete( manager.nb_elements(), false );
+    to_delete[1] = true;
+    to_delete[6] = true;
+    manager.delete_elements( to_delete );
+    check_pressure_series( manager, { 0, 5, 10 } );
+    manager.resize( manager.nb_elements() + 2 );
+    check_pressure_series( manager, { 0, 5, 10 } );
+}
+
+void test_time_series_transfer( const geode::AttributeManager& manager )
+{
+    geode::AttributeManager copied;
+    copied.copy( manager );
+    check_pressure_series( copied, { 0, 5, 10 } );
+
+    geode::AttributeManager imported;
+    imported.resize( 3 );
+    geode::GenericMapping< geode::index_t > old2new_mapping;
+    old2new_mapping.map( 4, 0 );
+    old2new_mapping.map( 2, 1 );
+    old2new_mapping.map( 7, 2 );
+    imported.import( manager, old2new_mapping );
+    check_pressure_series( imported, { 0, 5, 10 } );
+    geode::OpenGeodeBasicException::test(
+        imported.time_steps( "velocity" ).size() == 2,
+        "Velocity steps should be imported" );
+}
+
+void test_time_series_serialization( const geode::AttributeManager& manager )
+{
+    std::stringstream stream;
+    geode::TContext context{};
+    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
+    geode::Serializer archive{ context, stream };
+    archive.object( manager );
+    archive.adapter().flush();
+
+    geode::AttributeManager reloaded;
+    geode::TContext reload_context{};
+    geode::register_basic_deserialize_pcontext(
+        std::get< 0 >( reload_context ) );
+    geode::Deserializer unarchive{ reload_context, stream };
+    unarchive.object( reloaded );
+    geode::OpenGeodeBasicException::test(
+        unarchive.adapter().error() == bitsery::ReaderError::NoError,
+        "Error while reading time series" );
+    check_pressure_series( reloaded, { 0, 5, 10 } );
+    geode::OpenGeodeBasicException::test(
+        reloaded.time_steps( "velocity" ).size() == 2,
+        "Velocity steps should be reloaded" );
+}
+
+void test_time_series_copy_step( geode::AttributeManager& manager )
+{
+    const auto step_id = manager.time_steps( "pressure" ).front().attribute_id;
+    const auto nb_attributes = manager.attribute_ids().size();
+    bool thrown{ false };
+    try
+    {
+        manager.copy_attribute( step_id, geode::uuid{} );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeBasicException::test(
+        thrown, "Copying a time series step should throw" );
+    geode::OpenGeodeBasicException::test(
+        manager.attribute_ids().size() == nb_attributes,
+        "Failed copy should not add an attribute" );
+    const auto new_step_id =
+        manager.create_time_step_attribute< geode::VariableAttribute, double >(
+            "pressure", 20, { pressure_value( 20, -1 ), 0 }, {} );
+    geode::OpenGeodeBasicException::test(
+        manager.time_steps( "pressure" ).size() == 4
+            && manager.attribute_exists( new_step_id ),
+        "Time series should still accept new steps" );
+}
+
+void test_time_series()
+{
+    auto manager = create_time_series_manager();
+    test_time_series_creation( manager );
+    test_time_series_element_edition( manager );
+    test_time_series_transfer( manager );
+    test_time_series_serialization( manager );
+    test_time_series_copy_step( manager );
 }
 
 void test()
@@ -837,6 +1184,9 @@ void test()
     test_foo_constant_attribute( manager, foo_constant_attribute_id );
     geode::uuid int_variable_attribute_id;
     test_int_variable_attribute( manager, int_variable_attribute_id );
+    const auto copied_int_attribute_id =
+        test_copy_attribute( manager, int_variable_attribute_id );
+    manager.delete_attribute( copied_int_attribute_id );
     geode::uuid bool_variable_attribute_id;
     test_bool_variable_attribute( manager, bool_variable_attribute_id );
     geode::uuid foo_variable_attribute_id;
@@ -849,6 +1199,7 @@ void test()
         manager, foo_sparse_attribute_id, double_sparse_attribute_id );
     test_permutation(
         manager, int_variable_attribute_id, double_sparse_attribute_id );
+    test_sparse_attribute_resize();
     test_delete_attribute_elements( manager );
     test_sparse_attribute_after_element_deletion(
         manager, double_sparse_attribute_id );
@@ -861,6 +1212,7 @@ void test()
     test_import_manager( manager, bool_variable_attribute_id,
         array_double_attribute_id, double_sparse_attribute_id );
     test_multi_import_manager();
+    test_no_value();
     test_attribute_types( manager, bool_variable_attribute_id );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( bool_variable_attribute_id );
@@ -873,6 +1225,7 @@ void test()
     test_double_array_attribute( manager );
     manager.clear();
     test_number_of_attributes( manager, 0 );
+    test_time_series();
 }
 
 OPENGEODE_TEST( "attribute" )

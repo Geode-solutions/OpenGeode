@@ -50,6 +50,7 @@ namespace geode
     void define_block_collections( pybind11::module& );
     void define_surface( pybind11::module& );
     void define_surfaces( pybind11::module& );
+    void define_physical_properties( pybind11::module& );
     void define_relationships( pybind11::module& );
     void define_vertex_identifier( pybind11::module& );
     void define_topology( pybind11::module& );
@@ -64,6 +65,7 @@ namespace geode
     void define_surface_collections_builder( pybind11::module& );
     void define_block_collections_builder( pybind11::module& );
     void define_surfaces_builder( pybind11::module& );
+    void define_physical_properties_builder( pybind11::module& );
     void define_relationships_builder( pybind11::module& );
     void define_vertex_identifier_builder( pybind11::module& );
     void define_topology_builder( pybind11::module& );
@@ -128,6 +130,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_block_collections( module );
     geode::define_surface( module );
     geode::define_surfaces( module );
+    geode::define_physical_properties( module );
     geode::define_relationships( module );
     geode::define_vertex_identifier( module );
     geode::define_topology( module );
@@ -142,6 +145,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_surface_collections_builder( module );
     geode::define_block_collections_builder( module );
     geode::define_surfaces_builder( module );
+    geode::define_physical_properties_builder( module );
     geode::define_relationships_builder( module );
     geode::define_vertex_identifier_builder( module );
     geode::define_topology_builder( module );

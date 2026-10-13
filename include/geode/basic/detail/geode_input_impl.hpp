@@ -23,10 +23,12 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 
 #include <absl/strings/ascii.h>
+#include <absl/strings/str_join.h>
 
 #include <geode/basic/filename.hpp>
 #include <geode/basic/identifier.hpp>
@@ -45,7 +47,9 @@ namespace geode::detail
             absl::AsciiStrToLower( extension_from_filename( filename ) );
         OpenGeodeBasicException::check_exception(
             Factory::has_creator( extension ), nullptr,
-            OpenGeodeException::TYPE::data, "Unknown extension: ", extension );
+            OpenGeodeException::TYPE::data, "Unknown extension \"", extension,
+            "\" for file \"", filename, "\". Available extensions: ",
+            absl::StrJoin( Factory::list_creators(), ", " ) );
         return Factory::create(
             extension, expand_predefined_folders( filename ) );
     }
@@ -57,6 +61,10 @@ namespace geode::detail
     {
         const Timer timer;
         auto input = geode_object_input_reader< Factory >( filename );
+        OpenGeodeBasicException::check_exception(
+            std::filesystem::exists( input->filename() ), nullptr,
+            OpenGeodeException::TYPE::data, "[", type, "] File \"", filename,
+            "\" does not exist" );
         auto object = input->read( std::forward< Args >( args )... );
         Logger::info(
             type, " loaded from ", filename, " in ", timer.duration() );

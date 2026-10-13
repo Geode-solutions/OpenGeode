@@ -28,11 +28,16 @@
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/compact_value.h>
 
-#include <geode/basic/logger.hpp>
-#include <geode/basic/types.hpp>
+#include <geode/basic/common.hpp>
 
 namespace geode
 {
+    /*!
+     * Maximum size of a serialized name. Prevents corrupted files from
+     * requesting huge allocations.
+     */
+    inline constexpr std::size_t MAX_SERIALIZED_NAME_SIZE = 1u << 20;
+
     template < typename Archive, typename T >
     class Growable
     {
@@ -57,7 +62,13 @@ namespace geode
         {
             index_t current_version{ 0 };
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
-            serializers_.at( current_version - 1 )( des, obj );
+            OpenGeodeBasicException::check_exception(
+                current_version >= 1 && current_version <= version_, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[Growable::deserialize] Unsupported version ", current_version,
+                " (latest known version is ", version_,
+                "): file may be corrupted or written by a newer release" );
+            serializers_[current_version - 1]( des, obj );
         }
 
     private:

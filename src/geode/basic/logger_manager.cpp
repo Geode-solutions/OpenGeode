@@ -23,6 +23,8 @@
 
 #include <geode/basic/logger_manager.hpp>
 
+#include <absl/synchronization/mutex.h>
+
 #include <geode/basic/logger_client.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -34,11 +36,13 @@ namespace geode
         LoggerClient &register_client(
             std::unique_ptr< LoggerClient > &&client )
         {
+            absl::MutexLock lock{ mutex_ };
             return *loggers_.emplace_back( std::move( client ) );
         }
 
         void trace( const std::string &message )
         {
+            absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
                 logger->trace( message );
@@ -47,6 +51,7 @@ namespace geode
 
         void debug( const std::string &message )
         {
+            absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
                 logger->debug( message );
@@ -55,6 +60,7 @@ namespace geode
 
         void info( const std::string &message )
         {
+            absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
                 logger->info( message );
@@ -63,6 +69,7 @@ namespace geode
 
         void warning( const std::string &message )
         {
+            absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
                 logger->warning( message );
@@ -71,6 +78,7 @@ namespace geode
 
         void error( const std::string &message )
         {
+            absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
                 logger->error( message );
@@ -79,6 +87,7 @@ namespace geode
 
         void critical( const std::string &message )
         {
+            absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
                 logger->critical( message );
@@ -86,6 +95,7 @@ namespace geode
         }
 
     private:
+        absl::Mutex mutex_;
         std::vector< std::unique_ptr< LoggerClient > > loggers_;
     };
 

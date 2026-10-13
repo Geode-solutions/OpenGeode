@@ -34,7 +34,6 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/cached_value.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 

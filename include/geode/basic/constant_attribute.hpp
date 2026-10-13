@@ -34,7 +34,6 @@
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/common.hpp>
-#include <geode/basic/detail/mapping_after_deletion.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/mapping.hpp>
@@ -207,11 +206,18 @@ namespace geode
             return attribute;
         }
 
-        void import( const GenericMapping< index_t >& /* unused */,
+        void import( const GenericMapping< index_t >& old2new_mapping,
             const std::shared_ptr< AttributeBase >& from,
             AttributeBase::AttributeKey /*key*/ ) override
         {
-            import( dynamic_cast< const ReadOnlyAttribute< T >& >( *from ) );
+            const auto& in2out = old2new_mapping.in2out_map();
+            if( in2out.empty() )
+            {
+                return;
+            }
+            this->set_value(
+                dynamic_cast< const ReadOnlyAttribute< T >& >( *from ).value(
+                    in2out.begin()->first ) );
         }
 
         void import( const ReadOnlyAttribute< T >& from )
@@ -220,6 +226,6 @@ namespace geode
         }
 
     private:
-        T value_;
+        T value_{};
     };
 } // namespace geode
