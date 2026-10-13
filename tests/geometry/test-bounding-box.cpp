@@ -392,6 +392,36 @@ void test_large_triangle3d_epsilon_intersections()
     }
 }
 
+void test_1d_line_intersections()
+{
+    geode::BoundingBox1D bbox;
+    bbox.add_point( geode::Point1D{ { 0 } } );
+    bbox.add_point( geode::Point1D{ { 1 } } );
+    const geode::Vector1D positive{ { 1 } };
+    const geode::Vector1D negative{ { -1 } };
+    const auto check_ray = [&bbox]( const geode::Vector1D& direction,
+                               double origin, bool expected ) {
+        const geode::OwnerRay1D ray{ direction, geode::Point1D{ { origin } } };
+        geode::OpenGeodeGeometryException::test(
+            bbox.intersects( ray ) == expected
+                && bbox.epsilon_intersects( ray ) == expected,
+            "Wrong 1D ray intersection with origin ", origin, " and direction ",
+            direction.value( 0 ) );
+        const geode::OwnerInfiniteLine1D line{ direction,
+            geode::Point1D{ { origin } } };
+        geode::OpenGeodeGeometryException::test(
+            bbox.intersects( line ) && bbox.epsilon_intersects( line ),
+            "Wrong 1D line intersection with origin ", origin,
+            " and direction ", direction.value( 0 ) );
+    };
+    check_ray( positive, 0.5, true );
+    check_ray( negative, 0.5, true );
+    check_ray( positive, -1, true );
+    check_ray( negative, -1, false );
+    check_ray( positive, 2, false );
+    check_ray( negative, 2, true );
+}
+
 void test()
 {
     test_bbox();
@@ -402,6 +432,7 @@ void test()
     test_triangle2d_intersections();
     test_triangle3d_intersections();
     test_large_triangle3d_epsilon_intersections();
+    test_1d_line_intersections();
 }
 
 OPENGEODE_TEST( "bounding-box" )

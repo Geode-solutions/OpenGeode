@@ -203,16 +203,12 @@ namespace
     }
 
     template <>
-    bool line_epsilon_intersects< 1 >( const geode::BoundingBox< 1 >& box,
-        const geode::GenericLine< geode::RefPoint< 1 >, 1 >& line )
+    bool line_epsilon_intersects< 1 >( const geode::BoundingBox< 1 >& /*box*/,
+        const geode::GenericLine< geode::RefPoint< 1 >, 1 >& /*line*/ )
     {
-        if( line.direction().value( 0 ) > 0 )
-        {
-            return line.origin().value( 0 )
-                   < box.min().value( 0 ) - geode::GLOBAL_EPSILON;
-        }
-        return line.origin().value( 0 )
-               > box.max().value( 0 ) + geode::GLOBAL_EPSILON;
+        // A 1D line covers the whole axis. Rays pointing away from the box
+        // are rejected beforehand by ray_quick_skip.
+        return true;
     }
 
     template < geode::index_t dimension >
@@ -238,11 +234,7 @@ namespace
     bool line_intersects< 1 >( const geode::BoundingBox< 1 >& box,
         const geode::GenericLine< geode::RefPoint< 1 >, 1 >& line )
     {
-        if( line.direction().value( 0 ) > 0 )
-        {
-            return line.origin().value( 0 ) < box.min().value( 0 );
-        }
-        return line.origin().value( 0 ) > box.max().value( 0 );
+        return line_epsilon_intersects< 1 >( box, line );
     }
 
     template < geode::index_t dimension, typename Condition >
