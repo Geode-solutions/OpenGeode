@@ -1293,21 +1293,49 @@ namespace geode
     std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        const auto lambdas =
-            safe_tetrahedron_barycentric_coordinates( point, tetra );
-        const auto facet = static_cast< local_index_t >(
-            std::distance( lambdas.begin(), absl::c_min_element( lambdas ) ) );
-        if( lambdas[facet] >= 0 )
+        std::array< double, 4 > lambdas;
+        bool degenerated{ false };
+        try
+        {
+            lambdas = tetrahedron_barycentric_coordinates( point, tetra );
+            degenerated = !absl::c_all_of( lambdas, []( double lambda ) {
+                return std::isfinite( lambda );
+            } );
+        }
+        catch( const OpenGeodeException& /*unused*/ )
+        {
+            degenerated = true;
+        }
+        if( !degenerated && absl::c_all_of( lambdas, []( double lambda ) {
+                return lambda >= 0;
+            } ) )
         {
             return { 0.0, point };
         }
-        const auto& facet_vertices =
-            Tetrahedron::tetrahedron_facet_vertex[facet];
+        // The closest point lies on a facet seen from the point (negative
+        // barycentric coordinate), not necessarily the most negative one
         const auto& vertices = tetra.vertices();
-        const auto output = point_triangle_distance( point,
-            Triangle3D{ vertices[facet_vertices[0]],
-                vertices[facet_vertices[1]], vertices[facet_vertices[2]] } );
-        return output;
+        std::tuple< double, Point3D > result{
+            std::numeric_limits< double >::max(), point
+        };
+        for( const auto facet : LRange{ 4 } )
+        {
+            if( !degenerated && lambdas[facet] >= 0 )
+            {
+                continue;
+            }
+            const auto& facet_vertices =
+                Tetrahedron::tetrahedron_facet_vertex[facet];
+            auto output = point_triangle_distance(
+                point, Triangle3D{ vertices[facet_vertices[0]],
+                           vertices[facet_vertices[1]],
+                           vertices[facet_vertices[2]] } );
+            if( std::get< 0 >( output ) < std::get< 0 >( result ) )
+            {
+                result = std::move( output );
+            }
+        }
+        return result;
     }
 
     std::tuple< double, Point3D > point_triangle_signed_distance(

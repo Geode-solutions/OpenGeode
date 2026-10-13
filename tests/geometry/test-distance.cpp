@@ -36,9 +36,13 @@
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/distance.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/position.hpp>
 #include <geode/geometry/projection.hpp>
 
 #include <geode/tests/common.hpp>
+
+#include <random>
 
 void test_point_segment_distance_2d()
 {
@@ -1327,6 +1331,54 @@ void test_triangle_triangle_distance()
         "epsilon (non conformal parts only)" );
 }
 
+void test_point_skewed_tetrahedron_distance()
+{
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 4, 0.2, 0.1 } };
+    const geode::Point3D c{ { 3.5, 1, 0.3 } };
+    const geode::Point3D d{ { 0.5, 0.3, 0.8 } };
+    const geode::Tetrahedron tetra{ a, b, c, d };
+    const auto& vertices = tetra.vertices();
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -2, 6 };
+    for( const auto unused : geode::Range{ 1000 } )
+    {
+        geode_unused( unused );
+        const geode::Point3D query{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        const auto [distance, closest_point] =
+            geode::point_tetrahedron_distance( query, tetra );
+        if( distance == 0 )
+        {
+            geode::OpenGeodeGeometryException::test(
+                geode::point_tetrahedron_position( query, tetra )
+                    != geode::POSITION::outside,
+                "Wrong null result for point_tetrahedron_distance with "
+                "query ",
+                query.string() );
+            continue;
+        }
+        auto brute_force = std::numeric_limits< double >::max();
+        for( const auto& facet : geode::Tetrahedron::tetrahedron_facet_vertex )
+        {
+            brute_force = std::min( brute_force,
+                std::get< 0 >( geode::point_triangle_distance(
+                    query, geode::Triangle3D{ vertices[facet[0]],
+                               vertices[facet[1]], vertices[facet[2]] } ) ) );
+        }
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - brute_force ) < 1e-12,
+            "Wrong result for point_tetrahedron_distance with query ",
+            query.string(), ": ", distance, " | expected: ", brute_force );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs(
+                geode::point_point_distance( query, closest_point ) - distance )
+                < 1e-12,
+            "Wrong closest point for point_tetrahedron_distance with query ",
+            query.string() );
+    }
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1335,6 +1387,7 @@ void test()
     test_point_line_distance();
     test_point_triangle_distance();
     test_point_tetrahedron_distance();
+    test_point_skewed_tetrahedron_distance();
     test_point_plane_distance();
     test_point_sphere_distance();
     test_point_circle_distance();
