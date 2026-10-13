@@ -35,33 +35,76 @@
 
 namespace
 {
-    geode::BoundingBox1D triangle_1d_projection(
-        const geode::Triangle3D& triangle, const geode::Vector3D& normal )
+    /*
+     * Return true if the given axis separates the triangle and the box, with
+     * a tolerance of epsilon (a length) between their projections.
+     * The axis does not need to be normalized.
+     */
+    bool is_separating_axis( const geode::Vector3D& axis,
+        const geode::Triangle3D& triangle,
+        const geode::Vector3D& box_center,
+        const geode::Vector3D& box_half_diagonal,
+        double epsilon )
     {
         const auto& vertices = triangle.vertices();
-        geode::BoundingBox1D interval;
-        interval.add_point( geode::Point1D{
-            { normal.dot( geode::Vector3D{ vertices[0].get() } ) } } );
-        interval.add_point( geode::Point1D{
-            { normal.dot( geode::Vector3D{ vertices[1].get() } ) } } );
-        interval.add_point( geode::Point1D{
-            { normal.dot( geode::Vector3D{ vertices[2].get() } ) } } );
-        return interval;
+        const auto projection0 =
+            axis.dot( geode::Vector3D{ vertices[0].get() } );
+        const auto projection1 =
+            axis.dot( geode::Vector3D{ vertices[1].get() } );
+        const auto projection2 =
+            axis.dot( geode::Vector3D{ vertices[2].get() } );
+        const auto triangle_min =
+            std::min( { projection0, projection1, projection2 } );
+        const auto triangle_max =
+            std::max( { projection0, projection1, projection2 } );
+        const auto box_origin = axis.dot( box_center );
+        const auto box_extent =
+            std::fabs( axis.value( 0 ) * box_half_diagonal.value( 0 ) )
+            + std::fabs( axis.value( 1 ) * box_half_diagonal.value( 1 ) )
+            + std::fabs( axis.value( 2 ) * box_half_diagonal.value( 2 ) );
+        // Projections are scaled by the axis length: so is the tolerance
+        const auto tolerance = epsilon == 0 ? 0. : epsilon * axis.length();
+        return triangle_min - ( box_origin + box_extent ) > tolerance
+               || ( box_origin - box_extent ) - triangle_max > tolerance;
     }
 
-    geode::BoundingBox1D bbox_1d_projection(
-        const geode::BoundingBox3D& box, const geode::Vector3D& normal )
+    bool triangle_box_intersects( const geode::BoundingBox3D& box,
+        const geode::Triangle3D& triangle,
+        double epsilon )
     {
-        const auto box_diagonal = box.diagonal();
-        const auto origin = normal.dot( geode::Vector3D{ box.center() } );
-        const auto maximum_extent =
-            ( std::fabs( normal.value( 0 ) * box_diagonal.value( 0 ) )
-                + std::fabs( normal.value( 1 ) * box_diagonal.value( 1 ) )
-                + std::fabs( normal.value( 2 ) * box_diagonal.value( 2 ) ) )
-            / 2.;
-        return geode::BoundingBox1D{ geode::Point1D{
-                                         { origin - maximum_extent } },
-            geode::Point1D{ { origin + maximum_extent } } };
+        // Separating axis theorem. Box face directions are already tested
+        // by the triangle bounding box test of the caller.
+        const auto& vertices = triangle.vertices();
+        const geode::Vector3D box_center{ box.center() };
+        const auto box_half_diagonal = box.diagonal() / 2.;
+        const std::array< geode::Vector3D, 3 > edges{
+            geode::Vector3D{ vertices[0].get(), vertices[1].get() },
+            geode::Vector3D{ vertices[0].get(), vertices[2].get() },
+            geode::Vector3D{ vertices[1].get(), vertices[2].get() }
+        };
+
+        // Test direction of triangle normal.
+        if( is_separating_axis( edges[0].cross( edges[1] ), triangle,
+                box_center, box_half_diagonal, epsilon ) )
+        {
+            return false;
+        }
+
+        // Test direction of triangle-box edge cross products.
+        for( const auto i0 : geode::LRange{ 3 } )
+        {
+            for( const auto i1 : geode::LRange{ 3 } )
+            {
+                geode::Vector3D axis;
+                axis.set_value( i1, 1 );
+                if( is_separating_axis( edges[i0].cross( axis ), triangle,
+                        box_center, box_half_diagonal, epsilon ) )
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     template < geode::index_t dimension >
@@ -478,58 +521,7 @@ namespace geode
         {
             return false;
         }
-        const Vector3D box_center{ center() };
-        const auto box_diagonal = diagonal();
-        const std::array< Vector3D, 3 > edges{ Vector3D{ vertices[0].get(),
-                                                   vertices[1].get() },
-            Vector3D{ vertices[0].get(), vertices[2].get() },
-            Vector3D{ vertices[1].get(), vertices[2].get() } };
-
-        // Test direction of triangle normal.
-        const auto triangle_normal = edges[0].cross( edges[1] );
-        if( !bbox_1d_projection( *this, triangle_normal )
-                .contains( Point1D{ { triangle_normal.dot(
-                    Vector3D{ vertices[0].get() } ) } } ) )
-        {
-            return false;
-        }
-
-        // Test direction of box faces.
-        for( const auto i : LRange{ 3 } )
-        {
-            Vector3D axis;
-            axis.set_value( i, 1 );
-            const auto triangle_interval =
-                triangle_1d_projection( triangle, axis );
-            const auto center_value = box_center.value( i );
-            const auto extent = box_diagonal.value( i ) / 2.;
-            const BoundingBox1D box_interval{ Point1D{
-                                                  { center_value - extent } },
-                Point1D{ { center_value + extent } } };
-            if( !triangle_interval.intersects( box_interval ) )
-            {
-                return false;
-            }
-        }
-
-        // Test direction of triangle-box edge cross products.
-        for( const auto i0 : LRange{ 3 } )
-        {
-            for( const auto i1 : LRange{ 3 } )
-            {
-                Vector3D axis;
-                axis.set_value( i1, 1 );
-                const auto normal = edges[i0].cross( axis );
-                const auto triangle_interval =
-                    triangle_1d_projection( triangle, normal );
-                const auto box_interval = bbox_1d_projection( *this, normal );
-                if( !triangle_interval.intersects( box_interval ) )
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return triangle_box_intersects( *this, triangle, 0. );
     }
 
     template <>
@@ -549,58 +541,7 @@ namespace geode
         {
             return false;
         }
-        const Vector3D box_center{ center() };
-        const auto box_diagonal = diagonal();
-        const std::array< Vector3D, 3 > edges{ Vector3D{ vertices[0].get(),
-                                                   vertices[1].get() },
-            Vector3D{ vertices[0].get(), vertices[2].get() },
-            Vector3D{ vertices[1].get(), vertices[2].get() } };
-
-        // Test direction of triangle normal.
-        const auto triangle_normal = edges[0].cross( edges[1] );
-        if( !bbox_1d_projection( *this, triangle_normal )
-                .epsilon_contains( Point1D{ { triangle_normal.dot(
-                    Vector3D{ vertices[0].get() } ) } } ) )
-        {
-            return false;
-        }
-
-        // Test direction of box faces.
-        for( const auto i : LRange{ 3 } )
-        {
-            Vector3D axis;
-            axis.set_value( i, 1 );
-            const auto triangle_interval =
-                triangle_1d_projection( triangle, axis );
-            const auto center_value = box_center.value( i );
-            const auto extent = box_diagonal.value( i ) / 2.;
-            const BoundingBox1D box_interval{ Point1D{
-                                                  { center_value - extent } },
-                Point1D{ { center_value + extent } } };
-            if( !triangle_interval.epsilon_intersects( box_interval ) )
-            {
-                return false;
-            }
-        }
-
-        // Test direction of triangle-box edge cross products.
-        for( const auto i0 : LRange{ 3 } )
-        {
-            for( const auto i1 : LRange{ 3 } )
-            {
-                Vector3D axis;
-                axis.set_value( i1, 1 );
-                const auto normal = edges[i0].cross( axis );
-                const auto triangle_interval =
-                    triangle_1d_projection( triangle, normal );
-                const auto box_interval = bbox_1d_projection( *this, normal );
-                if( !triangle_interval.epsilon_intersects( box_interval ) )
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return triangle_box_intersects( *this, triangle, GLOBAL_EPSILON );
     }
 
     template <>

@@ -354,6 +354,44 @@ void test_segment_intersections()
         bbox.intersects( crossing2 ), "Wrong result with crossing2" );
 }
 
+void test_large_triangle3d_epsilon_intersections()
+{
+    geode::BoundingBox3D box;
+    box.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    box.add_point( geode::Point3D{ { 1, 1, 1 } } );
+    const auto size = 2e4;
+    for( const auto& [offset, expected] :
+        { std::make_pair( 0.5e-6, true ), std::make_pair( 1e-3, false ) } )
+    {
+        const geode::Point3D a{ { -size, -size, 1 + offset } };
+        const geode::Point3D b{ { size, -size, 1 + offset } };
+        const geode::Point3D c{ { 0, size, 1 + offset } };
+        geode::OpenGeodeGeometryException::test(
+            box.epsilon_intersects( geode::Triangle3D{ a, b, c } ) == expected,
+            "Wrong epsilon_intersects with large horizontal triangle at "
+            "offset ",
+            offset );
+
+        // Triangle on a tilted plane, beyond the (1,1,1) box corner
+        const auto normal = geode::Vector3D{ { 1, 1, 1 } }.normalize();
+        const auto u = geode::Vector3D{ { 1, -1, 0 } }.normalize();
+        const auto v = normal.cross( u );
+        const auto center = geode::Point3D{ { 1, 1, 1 } } + normal * offset;
+        const geode::Point3D d{ center + u * size };
+        const geode::Point3D e{ center
+                                + ( u * -0.5 + v * std::sqrt( 0.75 ) ) * size };
+        const geode::Point3D f{ center
+                                + ( u * -0.5 - v * std::sqrt( 0.75 ) ) * size };
+        const geode::Triangle3D tilted{ d, e, f };
+        geode::OpenGeodeGeometryException::test(
+            box.epsilon_intersects( tilted ) == expected,
+            "Wrong epsilon_intersects with large tilted triangle at offset ",
+            offset );
+        geode::OpenGeodeGeometryException::test( !box.intersects( tilted ),
+            "Wrong intersects with large tilted triangle at offset ", offset );
+    }
+}
+
 void test()
 {
     test_bbox();
@@ -363,6 +401,7 @@ void test()
     test_tetra_intersections();
     test_triangle2d_intersections();
     test_triangle3d_intersections();
+    test_large_triangle3d_epsilon_intersections();
 }
 
 OPENGEODE_TEST( "bounding-box" )
