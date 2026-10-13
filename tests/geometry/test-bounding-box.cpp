@@ -21,6 +21,8 @@
  *
  */
 
+#include <random>
+
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
@@ -28,7 +30,9 @@
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/information.hpp>
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/position.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -374,6 +378,122 @@ void test_add_empty_box()
         "Adding a box to an empty box should give the box" );
 }
 
+// Liang-Barsky clipping of the segment by the box
+template < geode::index_t dimension >
+bool reference_segment_intersects( const geode::BoundingBox< dimension >& box,
+    const geode::Point< dimension >& p0,
+    const geode::Point< dimension >& p1 )
+{
+    double t_min{ 0 };
+    double t_max{ 1 };
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        const auto delta = p1.value( d ) - p0.value( d );
+        if( delta == 0 )
+        {
+            if( p0.value( d ) < box.min().value( d )
+                || p0.value( d ) > box.max().value( d ) )
+            {
+                return false;
+            }
+            continue;
+        }
+        auto t0 = ( box.min().value( d ) - p0.value( d ) ) / delta;
+        auto t1 = ( box.max().value( d ) - p0.value( d ) ) / delta;
+        if( t0 > t1 )
+        {
+            std::swap( t0, t1 );
+        }
+        t_min = std::max( t_min, t0 );
+        t_max = std::min( t_max, t1 );
+    }
+    return t_min <= t_max;
+}
+
+void test_random_shape_intersections()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -3, 3 };
+    const auto random_point3d = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    const auto random_point2d = [&generator, &distribution] {
+        return geode::Point2D{ { distribution( generator ),
+            distribution( generator ) } };
+    };
+    geode::BoundingBox3D box3d;
+    box3d.add_point( geode::Point3D{ { -1, -1, -1 } } );
+    box3d.add_point( geode::Point3D{ { 1, 1, 1 } } );
+    geode::BoundingBox2D box2d;
+    box2d.add_point( geode::Point2D{ { -1, -1 } } );
+    box2d.add_point( geode::Point2D{ { 1, 1 } } );
+    for( const auto unused : geode::Range{ 20000 } )
+    {
+        geode_unused( unused );
+        const auto a = random_point3d();
+        const auto b = random_point3d();
+        const auto c = random_point3d();
+        const auto d = random_point3d();
+        geode::OpenGeodeGeometryException::test(
+            box3d.intersects( geode::Segment3D{ a, b } )
+                == reference_segment_intersects< 3 >( box3d, a, b ),
+            "[Test] Wrong random 3D segment intersection" );
+        geode::OpenGeodeGeometryException::test(
+            box3d.epsilon_intersects( geode::Segment3D{ a, b } )
+                == reference_segment_intersects< 3 >( box3d, a, b ),
+            "[Test] Wrong random 3D segment epsilon intersection" );
+        const auto a2 = random_point2d();
+        const auto b2 = random_point2d();
+        const auto c2 = random_point2d();
+        geode::OpenGeodeGeometryException::test(
+            box2d.intersects( geode::Segment2D{ a2, b2 } )
+                == reference_segment_intersects< 2 >( box2d, a2, b2 ),
+            "[Test] Wrong random 2D segment intersection" );
+
+        // Triangle: a vertex in the box, a box corner in the triangle or an
+        // edge crossing the box
+        const geode::Triangle2D triangle{ a2, b2, c2 };
+        bool expected_triangle =
+            reference_segment_intersects< 2 >( box2d, a2, b2 )
+            || reference_segment_intersects< 2 >( box2d, b2, c2 )
+            || reference_segment_intersects< 2 >( box2d, c2, a2 );
+        for( const auto x : { -1., 1. } )
+        {
+            for( const auto y : { -1., 1. } )
+            {
+                expected_triangle =
+                    expected_triangle
+                    || geode::point_triangle_position(
+                           geode::Point2D{ { x, y } }, triangle )
+                           != geode::POSITION::outside;
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            box2d.intersects( triangle ) == expected_triangle,
+            "[Test] Wrong random 2D triangle intersection" );
+        geode::OpenGeodeGeometryException::test(
+            box2d.epsilon_intersects( triangle ) == expected_triangle,
+            "[Test] Wrong random 2D triangle epsilon intersection" );
+
+        const geode::Tetrahedron tetra{ a, b, c, d };
+        bool expected_tetra =
+            box3d.intersects( geode::Triangle3D{ a, b, c } )
+            || box3d.intersects( geode::Triangle3D{ a, b, d } )
+            || box3d.intersects( geode::Triangle3D{ a, c, d } )
+            || box3d.intersects( geode::Triangle3D{ b, c, d } )
+            || geode::point_tetrahedron_position( box3d.center(), tetra )
+                   == geode::POSITION::inside;
+        geode::OpenGeodeGeometryException::test(
+            box3d.intersects( tetra ) == expected_tetra,
+            "[Test] Wrong random tetrahedron intersection" );
+        geode::OpenGeodeGeometryException::test(
+            !box3d.intersects( tetra )
+                || box3d.intersects( tetra.bounding_box() ),
+            "[Test] Tetrahedron intersection without bounding box overlap" );
+    }
+}
+
 void test()
 {
     test_bbox();
@@ -384,6 +504,7 @@ void test()
     test_tetra_intersections();
     test_triangle2d_intersections();
     test_triangle3d_intersections();
+    test_random_shape_intersections();
 }
 
 OPENGEODE_TEST( "bounding-box" )
