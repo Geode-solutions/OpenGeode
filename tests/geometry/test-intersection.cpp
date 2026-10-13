@@ -995,6 +995,110 @@ void test_segment_ellipse_intersection()
     test_segment_ellipse_intersection_3D();
 }
 
+void test_degenerated_segment_intersections()
+{
+    for( const auto length : { 4e-7, 1e-7 } )
+    {
+        const geode::Point3D origin{ { 0, 0, 0 } };
+        const geode::Point3D x_axis{ { 1, 0, 0 } };
+        const geode::Sphere3D sphere{ origin, 1 };
+        const geode::Point3D on_sphere{ { 1, 0, 0 } };
+        const geode::Point3D on_sphere2{ { 1 + length, 0, 0 } };
+        const auto sphere_result = geode::segment_sphere_intersection(
+            geode::Segment3D{ on_sphere, on_sphere2 }, sphere );
+        geode::OpenGeodeGeometryException::test(
+            sphere_result && sphere_result.result->size() == 1,
+            "Wrong degenerated segment_sphere_intersection" );
+        const geode::Point3D far_sphere{ { 5, 0, 0 } };
+        const geode::Point3D far_sphere2{ { 5 + length, 0, 0 } };
+        geode::OpenGeodeGeometryException::test(
+            !geode::segment_sphere_intersection(
+                geode::Segment3D{ far_sphere, far_sphere2 }, sphere ),
+            "Wrong degenerated segment_sphere_intersection (far)" );
+
+        const geode::Plane plane{ geode::Vector3D{ { 0, 0, 1 } }, origin };
+        const geode::Point3D on_plane{ { 0.3, 0.2, 0 } };
+        const geode::Point3D on_plane2{ { 0.3, 0.2, length } };
+        const auto plane_result = geode::segment_plane_intersection(
+            geode::Segment3D{ on_plane, on_plane2 }, plane );
+        geode::OpenGeodeGeometryException::test(
+            plane_result
+                && plane_result.result->inexact_equal(
+                    geode::Point3D{ { 0.3, 0.2, 0 } } ),
+            "Wrong degenerated segment_plane_intersection" );
+        const geode::Point3D off_plane{ { 0.3, 0.2, 1 } };
+        const geode::Point3D off_plane2{ { 0.3, 0.2, 1 + length } };
+        geode::OpenGeodeGeometryException::test(
+            !geode::segment_plane_intersection(
+                geode::Segment3D{ off_plane, off_plane2 }, plane ),
+            "Wrong degenerated segment_plane_intersection (far)" );
+
+        const geode::Cylinder cylinder{ geode::Segment3D{ origin, x_axis },
+            0.2 };
+        const geode::Point3D on_cylinder{ { 0.5, 0.2, 0 } };
+        const geode::Point3D on_cylinder2{ { 0.5, 0.2 + length, 0 } };
+        const auto cylinder_result = geode::segment_cylinder_intersection(
+            geode::Segment3D{ on_cylinder, on_cylinder2 }, cylinder );
+        geode::OpenGeodeGeometryException::test(
+            cylinder_result && cylinder_result.result->size() == 1,
+            "Wrong degenerated segment_cylinder_intersection" );
+        const geode::Point3D in_cylinder{ { 0.5, 0, 0 } };
+        const geode::Point3D in_cylinder2{ { 0.5, length, 0 } };
+        geode::OpenGeodeGeometryException::test(
+            !geode::segment_cylinder_intersection(
+                geode::Segment3D{ in_cylinder, in_cylinder2 }, cylinder ),
+            "Wrong degenerated segment_cylinder_intersection (inside)" );
+
+        const geode::Frame2D frame{ { geode::Vector2D{ { 3.0, 0.0 } },
+            geode::Vector2D{ { 0.0, 2.0 } } } };
+        const geode::Point2D origin2d{ { 0, 0 } };
+        const geode::Point2D x_axis2d{ { 1, 0 } };
+        const geode::Ellipse2D ellipse{ origin2d, frame };
+        const geode::Point2D on_ellipse{ { 3, 0 } };
+        const geode::Point2D on_ellipse2{ { 3, length } };
+        const auto ellipse_result = geode::segment_ellipse_intersection(
+            geode::Segment2D{ on_ellipse, on_ellipse2 }, ellipse );
+        geode::OpenGeodeGeometryException::test(
+            ellipse_result && ellipse_result.result->size() == 1,
+            "Wrong degenerated segment_ellipse_intersection" );
+        const geode::Point2D in_ellipse{ { 1, 0 } };
+        const geode::Point2D in_ellipse2{ { 1, length } };
+        geode::OpenGeodeGeometryException::test(
+            !geode::segment_ellipse_intersection(
+                geode::Segment2D{ in_ellipse, in_ellipse2 }, ellipse ),
+            "Wrong degenerated segment_ellipse_intersection (inside)" );
+
+        const geode::Segment2D segment{ origin2d, x_axis2d };
+        const geode::Point2D on_segment{ { 0.5, 0 } };
+        const geode::Point2D on_segment2{ { 0.5, length } };
+        const geode::Segment2D small_on{ on_segment, on_segment2 };
+        const auto segment_result0 =
+            geode::segment_segment_intersection( small_on, segment );
+        const auto segment_result1 =
+            geode::segment_segment_intersection( segment, small_on );
+        geode::OpenGeodeGeometryException::test(
+            segment_result0 && segment_result1
+                && segment_result0.result->inexact_equal(
+                    segment_result1.result.value() ),
+            "Wrong degenerated segment_segment_intersection" );
+        const geode::Point2D off_segment{ { 0.5, 1 } };
+        const geode::Point2D off_segment2{ { 0.5, 1 + length } };
+        const geode::Segment2D small_off{ off_segment, off_segment2 };
+        geode::OpenGeodeGeometryException::test(
+            !geode::segment_segment_intersection( small_off, segment )
+                && !geode::segment_segment_intersection( segment, small_off ),
+            "Wrong degenerated segment_segment_intersection (far)" );
+
+        const geode::InfiniteLine2D line{ segment };
+        geode::OpenGeodeGeometryException::test(
+            geode::segment_line_intersection( small_on, line ),
+            "Wrong degenerated segment_line_intersection" );
+        geode::OpenGeodeGeometryException::test(
+            !geode::segment_line_intersection( small_off, line ),
+            "Wrong degenerated segment_line_intersection (far)" );
+    }
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -1011,6 +1115,7 @@ void test()
     test_triangle_circle_intersection();
     test_line_ellipse_intersection();
     test_segment_ellipse_intersection();
+    test_degenerated_segment_intersections();
 }
 
 OPENGEODE_TEST( "intersection" )

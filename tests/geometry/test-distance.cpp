@@ -1301,6 +1301,28 @@ void test_triangle_triangle_distance()
         "epsilon (non conformal parts only)" );
 }
 
+void test_degenerated_segment_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
+    const geode::Triangle3D triangle{ a, b, c };
+    for( const auto length : { 4e-7, 1e-7 } )
+    {
+        const geode::Point3D p0{ { 0.2, 0.2, 1.0 } };
+        const geode::Point3D p1{ { 0.2, 0.2 + length, 1.0 } };
+        const auto [distance, closest_on_segment, closest_on_triangle] =
+            geode::segment_triangle_distance(
+                geode::Segment3D{ p0, p1 }, triangle );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - 1. ) <= geode::GLOBAL_EPSILON
+                && closest_on_triangle.inexact_equal(
+                    geode::Point3D{ { 0.2, 0.2, 0.0 } } ),
+            "Wrong result for segment_triangle_distance with degenerated "
+            "segment" );
+    }
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1316,6 +1338,7 @@ void test()
     test_segment_triangle_distance();
     test_triangle_triangle_distance();
     test_point_ellipse_distance();
+    test_degenerated_segment_triangle_distance();
 }
 
 OPENGEODE_TEST( "distance" )

@@ -1139,6 +1139,13 @@ namespace geode
     std::tuple< double, Point3D, Point3D > segment_triangle_distance(
         const Segment3D& segment, const Triangle3D& triangle )
     {
+        if( segment.is_degenerated() )
+        {
+            const auto point = segment.barycenter();
+            const auto [distance, closest_on_triangle] =
+                point_triangle_distance( point, triangle );
+            return { distance, point, closest_on_triangle };
+        }
         const InfiniteLine3D line{ segment };
         const auto [_, closest_on_line, closest_on_triangle] =
             line_triangle_distance( line, triangle );
