@@ -23,7 +23,10 @@
 
 #include <geode/basic/logger.hpp>
 
+#include <algorithm>
+#include <cmath>
 #include <limits>
+#include <random>
 
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -137,6 +140,82 @@ void test_other_tetrahedron()
         "Wrong aspect ratio 4 for random tetrahedron ", quality4 );
 }
 
+// Previous angle-based implementation
+template < geode::index_t dimension >
+double reference_triangle_angle_based_quality(
+    const geode::Triangle< dimension >& triangle )
+{
+    const auto& vertices = triangle.vertices();
+    std::array< double, 3 > sinus;
+    for( const auto v : geode::LRange{ 3 } )
+    {
+        const auto& point = vertices[v].get();
+        const geode::Vector< dimension > prev{ point,
+            vertices[( v + 2 ) % 3].get() };
+        const geode::Vector< dimension > next{ point,
+            vertices[( v + 1 ) % 3].get() };
+        const auto dot = std::clamp(
+            prev.dot( next ) / ( prev.length() * next.length() ), -1.0, 1.0 );
+        sinus[v] = std::sin( std::acos( dot ) );
+    }
+    return 4 * sinus[0] * sinus[1] * sinus[2]
+           / ( sinus[0] + sinus[1] + sinus[2] );
+}
+
+template < geode::index_t dimension >
+void check_triangle_quality( const geode::Triangle< dimension >& triangle )
+{
+    const auto quality = geode::triangle_angle_based_quality( triangle );
+    const auto reference = reference_triangle_angle_based_quality( triangle );
+    // Quality is in [0, 1]
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quality - reference ) <= 1e-12,
+        "[Test] Wrong triangle quality ", quality, " vs ", reference );
+}
+
+void test_triangle_angle_based_quality()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -10, 10 };
+    for( const auto unused : geode::Range{ 10000 } )
+    {
+        geode_unused( unused );
+        const geode::Point3D p0{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        const geode::Point3D p1{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        const geode::Point3D p2{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+        check_triangle_quality< 3 >( { p0, p1, p2 } );
+        const geode::Point2D q0{ { p0.value( 0 ), p0.value( 1 ) } };
+        const geode::Point2D q1{ { p1.value( 0 ), p1.value( 1 ) } };
+        const geode::Point2D q2{ { p2.value( 0 ), p2.value( 1 ) } };
+        check_triangle_quality< 2 >( { q0, q1, q2 } );
+    }
+    const geode::Point2D a{ { 0, 0 } };
+    const geode::Point2D b{ { 1, 0 } };
+    const geode::Point2D c{ { 0.5, std::sqrt( 3. ) / 2 } };
+    geode::OpenGeodeGeometryException::test(
+        std::fabs(
+            geode::triangle_angle_based_quality( geode::Triangle2D{ a, b, c } )
+            - 1 )
+            < 1e-12,
+        "[Test] Equilateral triangle quality should be 1" );
+    const geode::Point2D d{ { 2, 0 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::triangle_angle_based_quality( geode::Triangle2D{ a, b, d } )
+            == 0,
+        "[Test] Flat triangle quality should be 0" );
+    geode::OpenGeodeGeometryException::test(
+        geode::triangle_angle_based_quality( geode::Triangle2D{ a, a, d } )
+            == 0,
+        "[Test] Degenerated triangle quality should be 0" );
+    geode::OpenGeodeGeometryException::test(
+        geode::triangle_angle_based_quality( geode::Triangle2D{ a, a, a } )
+            == 0,
+        "[Test] Point triangle quality should be 0" );
+}
+
 void test()
 {
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
@@ -144,6 +223,7 @@ void test()
     test_regular_tetrahedron();
     test_sliver_tetrahedron();
     test_other_tetrahedron();
+    test_triangle_angle_based_quality();
 }
 
 OPENGEODE_TEST( "quality" )
