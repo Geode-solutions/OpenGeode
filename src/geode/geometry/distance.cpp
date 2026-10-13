@@ -439,14 +439,12 @@ namespace
         double min_distance{ std::numeric_limits< double >::max() };
         geode::Point3D point0;
         geode::Point3D point1;
-        for( const auto vertex0 : non_colocated_points )
+        for( const auto i : geode::Indices{ non_colocated_points } )
         {
-            for( const auto vertex1 : non_colocated_points )
+            const auto vertex0 = non_colocated_points[i];
+            for( auto j = i + 1; j < non_colocated_points.size(); j++ )
             {
-                if( vertex0 == vertex1 )
-                {
-                    continue;
-                }
+                const auto vertex1 = non_colocated_points[j];
                 if( geode::point_point_distance( base_vertices[vertex0].get(),
                         base_vertices[vertex1].get() )
                     <= geode::GLOBAL_EPSILON )

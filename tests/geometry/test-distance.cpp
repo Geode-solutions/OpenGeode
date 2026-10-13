@@ -21,6 +21,8 @@
  *
  */
 
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -1345,6 +1347,60 @@ void test_degenerated_triangle_triangle_distance()
         "(reversed)" );
 }
 
+void test_random_triangle_triangle_distance()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1., 1. };
+    const auto random_point = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    for( const auto trial : geode::Range{ 500 } )
+    {
+        geode_unused( trial );
+        const auto a = random_point();
+        const auto b = random_point();
+        const auto c = random_point();
+        const geode::Vector3D shift{ { 0, 0, 1. } };
+        const auto d = random_point() + shift;
+        const auto e = random_point() + shift;
+        const auto f = random_point() + shift;
+        const geode::Triangle3D triangle0{ a, b, c };
+        const geode::Triangle3D triangle1{ d, e, f };
+        double reference{ std::numeric_limits< double >::max() };
+        for( const auto& [base, other] :
+            { std::make_pair( &triangle0, &triangle1 ),
+                std::make_pair( &triangle1, &triangle0 ) } )
+        {
+            const auto& vertices = base->vertices();
+            for( const auto v0 : geode::LRange{ 3 } )
+            {
+                for( const auto v1 : geode::LRange{ 3 } )
+                {
+                    if( v0 == v1 )
+                    {
+                        continue;
+                    }
+                    reference = std::min( reference,
+                        std::get< 0 >( geode::segment_triangle_distance(
+                            { vertices[v0], vertices[v1] }, *other ) ) );
+                }
+            }
+        }
+        const auto [distance, point0, point1] =
+            geode::triangle_triangle_distance( triangle0, triangle1 );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - reference ) <= 1e-12,
+            "Wrong triangle_triangle_distance on random triangles: ", distance,
+            " vs ", reference );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs(
+                geode::point_point_distance( point0, point1 ) - distance )
+                <= 1e-12,
+            "Wrong triangle_triangle_distance closest points" );
+    }
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1362,6 +1418,7 @@ void test()
     test_point_ellipse_distance();
     test_degenerated_segment_triangle_distance();
     test_degenerated_triangle_triangle_distance();
+    test_random_triangle_triangle_distance();
 }
 
 OPENGEODE_TEST( "distance" )
