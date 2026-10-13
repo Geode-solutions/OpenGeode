@@ -24,6 +24,7 @@
 #include <geode/basic/assert.hpp>
 
 #include <cassert>
+#include <functional>
 
 #include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
@@ -75,30 +76,45 @@ namespace geode
             what() );
     }
 
+    namespace
+    {
+        void log_current_exception()
+        {
+            try
+            {
+                throw;
+            }
+            catch( const OpenGeodeException& exception )
+            {
+                Logger::critical( exception.string() );
+                std::reference_wrapper< const OpenGeodeException > current =
+                    exception;
+                while( current.get().has_parent() )
+                {
+                    current = current.get().parent();
+                    Logger::critical( "From: ", current.get().string() );
+                }
+            }
+            catch( const std::exception& exception )
+            {
+                Logger::critical( "std::exception: ", exception.what() );
+            }
+            catch( ... )
+            {
+                Logger::critical( "Unknown exception" );
+            }
+        }
+    } // namespace
+
     int geode_lippincott()
     {
         try
         {
-            throw;
-        }
-        catch( const OpenGeodeException& exception )
-        {
-            Logger::critical( exception.string() );
-            std::reference_wrapper< const OpenGeodeException > current =
-                exception;
-            while( current.get().has_parent() )
-            {
-                current = current.get().parent();
-                Logger::critical( "From: ", current.get().string() );
-            }
-        }
-        catch( const std::exception& exception )
-        {
-            Logger::critical( "std::exception: ", exception.what() );
+            log_current_exception();
         }
         catch( ... )
         {
-            Logger::critical( "Unknown exception" );
+            // Logging failed, nothing else can be done
         }
         return 1;
     }

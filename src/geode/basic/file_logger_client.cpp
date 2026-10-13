@@ -29,6 +29,8 @@
 #include <spdlog/sinks/basic_file_sink.h>
 // clang-format on
 
+#include <absl/synchronization/mutex.h>
+
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -40,58 +42,77 @@ namespace geode
         explicit Impl( std::string_view file_path )
         {
             set_file_path( file_path );
-            spdlog::set_level( spdlog::level::level_enum::trace );
         }
 
         void always_flush()
         {
+            absl::MutexLock lock{ mutex_ };
             logger_impl_->flush_on( spdlog::level::level_enum::trace );
             always_flush_ = true;
         }
 
         void set_file_path( std::string_view file_path )
         {
-            static constexpr auto LOGGER_NAME = "geode_logger_file";
-            spdlog::drop( LOGGER_NAME );
-            logger_impl_ = spdlog::basic_logger_mt(
-                LOGGER_NAME, std::string( file_path ) );
-            if( always_flush_ )
+            std::shared_ptr< spdlog::logger > logger;
+            try
             {
-                always_flush();
+                logger = std::make_shared< spdlog::logger >( "file",
+                    std::make_shared< spdlog::sinks::basic_file_sink_mt >(
+                        std::string( file_path ) ) );
             }
+            catch( const spdlog::spdlog_ex &exception )
+            {
+                throw OpenGeodeBasicException{ nullptr,
+                    OpenGeodeException::TYPE::internal,
+                    "[FileLoggerClient] Cannot open log file ", file_path, ": ",
+                    exception.what() };
+            }
+            logger->set_level( spdlog::level::level_enum::trace );
+            absl::MutexLock lock{ mutex_ };
+            logger->flush_on( always_flush_ ? spdlog::level::level_enum::trace
+                                            : spdlog::level::level_enum::warn );
+            logger_impl_ = std::move( logger );
         }
 
         void trace( const std::string &message )
         {
-            logger_impl_->trace( message );
+            logger()->trace( message );
         }
 
         void debug( const std::string &message )
         {
-            logger_impl_->debug( message );
+            logger()->debug( message );
         }
 
         void info( const std::string &message )
         {
-            logger_impl_->info( message );
+            logger()->info( message );
         }
 
         void warning( const std::string &message )
         {
-            logger_impl_->warn( message );
+            logger()->warn( message );
         }
 
         void error( const std::string &message )
         {
-            logger_impl_->error( message );
+            logger()->error( message );
         }
 
         void critical( const std::string &message )
         {
-            logger_impl_->critical( message );
+            logger()->critical( message );
         }
 
     private:
+        std::shared_ptr< spdlog::logger > logger() const
+        {
+            absl::ReaderMutexLock lock{ mutex_ };
+            return logger_impl_;
+        }
+
+    private:
+        mutable absl::Mutex mutex_;
         std::shared_ptr< spdlog::logger > logger_impl_{ nullptr };
         bool always_flush_{ false };
     };

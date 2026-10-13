@@ -85,6 +85,6 @@ namespace geode
         }
 
     private:
-        Type value_;
+        Type value_{};
     };
 } // namespace geode

@@ -86,15 +86,15 @@ namespace geode
 
         auto erase( const Type& element )
         {
-            return container_.erase( absl::c_find( container_, element ) );
+            const auto it = absl::c_find( container_, element );
+            if( it == container_.end() )
+            {
+                return it;
+            }
+            return container_.erase( it );
         }
 
-        auto at( index_t index ) const
-        {
-            return container_.at( index );
-        }
-
-        auto at( index_t index )
+        const Type& at( index_t index ) const
         {
             return container_.at( index );
         }

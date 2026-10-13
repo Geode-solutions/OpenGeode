@@ -134,12 +134,16 @@ namespace geode
         BijectiveMapping( BijectiveMapping&& ) noexcept = default;
         BijectiveMapping& operator=( BijectiveMapping&& ) noexcept = default;
 
-        void map( const T1& in, const T2& out )
+        void map( T1 in, T2 out )
         {
             auto [in_itr, in_is_new] =
                 this->in2out_mapping().emplace( in, out );
             if( !in_is_new )
             {
+                if( in_itr->second == out )
+                {
+                    return;
+                }
                 this->out2in_mapping().erase( in_itr->second );
                 in_itr->second = out;
             }
@@ -152,7 +156,7 @@ namespace geode
             }
         }
 
-        void erase_in( const T1& in )
+        void erase_in( T1 in )
         {
             auto in_itr = this->in2out_mapping().find( in );
             if( in_itr == this->in2out_mapping().end() )
@@ -163,7 +167,7 @@ namespace geode
             this->in2out_mapping().erase( in_itr );
         }
 
-        void erase_out( const T2& out )
+        void erase_out( T2 out )
         {
             auto out_itr = this->out2in_mapping().find( out );
             if( out_itr == this->out2in_mapping().end() )
@@ -196,7 +200,7 @@ namespace geode
         GenericMapping( GenericMapping&& ) noexcept = default;
         GenericMapping& operator=( GenericMapping&& ) noexcept = default;
 
-        void map( const T1& in, const T2& out )
+        void map( T1 in, T2 out )
         {
             if( this->has_mapping_input( in ) )
             {
@@ -209,7 +213,7 @@ namespace geode
             this->out2in_mapping()[out].push_back( in );
         }
 
-        void unmap( const T1& in, const T2& out )
+        void unmap( T1 in, T2 out )
         {
             if( !this->has_mapping_input( in ) )
             {
@@ -239,7 +243,7 @@ namespace geode
             }
         }
 
-        void erase_in( const T1& in )
+        void erase_in( T1 in )
         {
             if( !this->has_mapping_input( in ) )
             {
@@ -249,7 +253,10 @@ namespace geode
             {
                 auto& out_map = this->out2in_mapping().at( out );
                 const auto itr = absl::c_find( out_map, in );
-                out_map.erase( itr );
+                if( itr != out_map.end() )
+                {
+                    out_map.erase( itr );
+                }
                 if( this->out2in( out ).empty() )
                 {
                     this->out2in_mapping().erase( out );
@@ -258,7 +265,7 @@ namespace geode
             this->in2out_mapping().erase( in );
         }
 
-        void erase_out( const T2& out )
+        void erase_out( T2 out )
         {
             if( !this->has_mapping_output( out ) )
             {
@@ -268,7 +275,10 @@ namespace geode
             {
                 auto& in_map = this->in2out_mapping().at( in );
                 const auto itr = absl::c_find( in_map, out );
-                in_map.erase( itr );
+                if( itr != in_map.end() )
+                {
+                    in_map.erase( itr );
+                }
                 if( this->in2out( in ).empty() )
                 {
                     this->in2out_mapping().erase( in );

@@ -36,13 +36,15 @@ namespace geode
     template < typename Container >
     void concatenate( Container& container, const Container& values )
     {
-        absl::c_copy( values, std::back_inserter( container ) );
+        container.insert( container.end(), values.begin(), values.end() );
     }
 
     template < typename Container >
     void concatenate( Container& container, Container&& values )
     {
-        absl::c_move( std::forward( values ), std::back_inserter( container ) );
+        container.insert( container.end(),
+            std::make_move_iterator( values.begin() ),
+            std::make_move_iterator( values.end() ) );
     }
 
     /*!
@@ -56,11 +58,15 @@ namespace geode
     index_t delete_vector_elements(
         const DeleteContainer& to_delete, ValueContainer& values )
     {
-        OpenGeodeBasicException::check_assertion(
-            to_delete.size() == values.size(),
+        OpenGeodeBasicException::check_exception(
+            to_delete.size() == values.size(), nullptr,
+            OpenGeodeException::TYPE::data,
             "[delete_vector_elements] Number of elements in the two vectors "
             "should match" );
-        const auto first_true = absl::c_find( to_delete, true );
+        const auto first_true =
+            absl::c_find_if( to_delete, []( const auto value ) {
+                return static_cast< bool >( value );
+            } );
         if( first_true == to_delete.end() )
         {
             return 0;
@@ -116,12 +122,15 @@ namespace geode
     [[nodiscard]] ValueContainer extract_vector_elements(
         const DeleteContainer& to_keep, const ValueContainer& in_values )
     {
-        OpenGeodeBasicException::check_assertion(
-            to_keep.size() == in_values.size(),
+        OpenGeodeBasicException::check_exception(
+            to_keep.size() == in_values.size(), nullptr,
+            OpenGeodeException::TYPE::data,
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
-        const auto nb_to_keep =
-            static_cast< index_t >( absl::c_count( to_keep, true ) );
+        const auto nb_to_keep = static_cast< index_t >(
+            absl::c_count_if( to_keep, []( const auto value ) {
+                return static_cast< bool >( value );
+            } ) );
         if( nb_to_keep == in_values.size() )
         {
             return in_values;
@@ -151,6 +160,10 @@ namespace geode
         container.erase( last, container.end() );
     }
 
+    /*!
+     * Sort the container with the given comparison, then remove the
+     * duplicated values using operator==.
+     */
     template < typename Container, typename Comparison >
     void sort_unique( Container& container, Comparison comp )
     {

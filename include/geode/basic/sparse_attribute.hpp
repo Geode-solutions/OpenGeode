@@ -121,14 +121,15 @@ namespace geode
             index_t to_element,
             AttributeBase::AttributeKey /*key*/ ) override
         {
-            set_value( to_element, value( from_element ) );
+            set_value_or_erase( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
             AttributeBase::AttributeKey /*key*/ ) override
         {
-            set_value( to_element, interpolation.compute_value( *this ) );
+            set_value_or_erase(
+                to_element, interpolation.compute_value( *this ) );
         }
 
     private:
@@ -191,42 +192,66 @@ namespace geode
         }
 
         void resize(
-            index_t /*unused*/, AttributeBase::AttributeKey /*key*/ ) override
+            index_t size, AttributeBase::AttributeKey /*key*/ ) override
         {
+            absl::erase_if( values_, [size]( const auto& value ) {
+                return value.first >= size;
+            } );
         }
 
         void reserve(
-            index_t capacity, AttributeBase::AttributeKey /*key*/ ) override
+            index_t /*unused*/, AttributeBase::AttributeKey /*key*/ ) override
         {
-            values_.reserve( capacity );
+            // Only non default values are stored, the number of elements
+            // does not tell how many will be needed.
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
             AttributeBase::AttributeKey /*key*/ ) override
         {
-            const auto old2new = mapping_after_deletion( to_delete );
-            auto old_values = std::move( values_ );
-            values_ = decltype( values_ )();
-            values_.reserve( old_values.size() );
-            for( auto& [index, value] : old_values )
+            std::vector< index_t > kept_elements;
+            kept_elements.reserve( values_.size() );
+            for( const auto& [element, value] : values_ )
             {
-                if( !to_delete[index]
+                if( element < to_delete.size() && !to_delete[element]
                     && value != default_values_.default_value )
                 {
-                    values_.emplace( old2new[index], std::move( value ) );
+                    kept_elements.push_back( element );
                 }
+            }
+            absl::c_sort( kept_elements );
+            auto old_values = std::move( values_ );
+            values_ = decltype( values_ )();
+            values_.reserve( kept_elements.size() );
+            index_t nb_deleted{ 0 };
+            index_t current{ 0 };
+            for( const auto element : kept_elements )
+            {
+                for( ; current < element; current++ )
+                {
+                    if( to_delete[current] )
+                    {
+                        nb_deleted++;
+                    }
+                }
+                values_.emplace( element - nb_deleted,
+                    std::move( old_values.at( element ) ) );
             }
         }
 
         void permute_elements( absl::Span< const index_t > permutation,
             AttributeBase::AttributeKey /*key*/ ) override
         {
+            const auto old2new = old2new_permutation( permutation );
             auto old_values = std::move( values_ );
             values_ = decltype( values_ )();
             values_.reserve( old_values.size() );
             for( auto& [index, value] : old_values )
             {
-                values_.emplace( permutation[index], std::move( value ) );
+                if( index < old2new.size() )
+                {
+                    values_.emplace( old2new[index], std::move( value ) );
+                }
             }
         }
 
@@ -250,15 +275,13 @@ namespace geode
             const auto& typed_attribute =
                 dynamic_cast< const SparseAttribute< T >& >( attribute );
             default_values_ = typed_attribute.default_values_;
-            if( nb_elements != 0 )
+            values_.clear();
+            for( const auto& [element, value] : typed_attribute.values_ )
             {
-                for( const auto i : Range{ nb_elements } )
+                if( element < nb_elements
+                    && value != default_values_.default_value )
                 {
-                    if( typed_attribute.value( i )
-                        != default_values_.default_value )
-                    {
-                        values_[i] = typed_attribute.value( i );
-                    }
+                    values_.emplace( element, value );
                 }
             }
         }
@@ -274,20 +297,25 @@ namespace geode
             };
             IdentifierBuilder builder{ *attribute };
             builder.set_id( this->id() );
-            for( const auto i : Indices{ old2new } )
+            for( const auto& [element, value] : values_ )
             {
-                const auto new_index = old2new[i];
-                if( value( i ) != default_values_.default_value
-                    && new_index != NO_ID )
+                if( element >= old2new.size()
+                    || value == default_values_.default_value )
                 {
-                    OpenGeodeBasicException::check_exception(
-                        new_index < nb_elements, nullptr,
-                        OpenGeodeException::TYPE::data,
-                        "[SparseAttribute::extract] The given mapping "
-                        "contains values that go beyond the given number of "
-                        "elements." );
-                    attribute->set_value( new_index, value( i ) );
+                    continue;
                 }
+                const auto new_index = old2new[element];
+                if( new_index == NO_ID )
+                {
+                    continue;
+                }
+                OpenGeodeBasicException::check_exception(
+                    new_index < nb_elements, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SparseAttribute::extract] The given mapping "
+                    "contains values that go beyond the given number of "
+                    "elements." );
+                attribute->values_.emplace( new_index, value );
             }
             return attribute;
         }
@@ -303,20 +331,22 @@ namespace geode
             };
             IdentifierBuilder builder{ *attribute };
             builder.set_id( this->id() );
-            for( const auto& [in, outs] : old2new_mapping.in2out_map() )
+            for( const auto& [element, value] : values_ )
             {
-                if( value( in ) != default_values_.default_value )
+                if( value == default_values_.default_value
+                    || !old2new_mapping.has_mapping_input( element ) )
                 {
-                    for( const auto new_index : outs )
-                    {
-                        OpenGeodeBasicException::check_exception(
-                            new_index < nb_elements, nullptr,
-                            OpenGeodeException::TYPE::data,
-                            "[SparseAttribute::extract] The given mapping "
-                            "contains values that go beyond the given number "
-                            "of elements." );
-                        attribute->set_value( new_index, value( in ) );
-                    }
+                    continue;
+                }
+                for( const auto new_index : old2new_mapping.in2out( element ) )
+                {
+                    OpenGeodeBasicException::check_exception(
+                        new_index < nb_elements, nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[SparseAttribute::extract] The given mapping "
+                        "contains values that go beyond the given number "
+                        "of elements." );
+                    attribute->values_.emplace( new_index, value );
                 }
             }
             return attribute;
@@ -335,13 +365,24 @@ namespace geode
         {
             for( const auto& [in, outs] : old2new_mapping.in2out_map() )
             {
-                if( from.value( in ) != default_values_.default_value )
+                const auto& value = from.value( in );
+                for( const auto new_index : outs )
                 {
-                    for( const auto new_index : outs )
-                    {
-                        this->set_value( new_index, from.value( in ) );
-                    }
+                    set_value_or_erase( new_index, value );
                 }
+            }
+        }
+
+    private:
+        void set_value_or_erase( index_t element, T value )
+        {
+            if( value == default_values_.default_value )
+            {
+                values_.erase( element );
+            }
+            else
+            {
+                values_[element] = std::move( value );
             }
         }
 

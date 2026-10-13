@@ -47,7 +47,7 @@ namespace geode
             return iter->second.get();
         }
 
-        std::mutex &lock()
+        std::recursive_mutex &lock()
         {
             return lock_;
         }
@@ -55,14 +55,14 @@ namespace geode
     private:
         absl::flat_hash_map< std::string, std::unique_ptr< Singleton > >
             singletons_;
-        std::mutex lock_;
+        std::recursive_mutex lock_;
     };
 
     Singleton::Singleton() = default;
 
     Singleton::~Singleton() = default;
 
-    std::mutex &Singleton::lock()
+    std::recursive_mutex &Singleton::lock()
     {
         return instance().impl_->lock();
     }

@@ -25,6 +25,8 @@
 
 #include <any>
 #include <array>
+#include <cstdint>
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -96,6 +98,12 @@ namespace geode
 
         [[nodiscard]] const OpenGeodeException& parent() const
         {
+            if( !parent_ )
+            {
+                throw std::logic_error{
+                    "[OpenGeodeException::parent] No parent exception"
+                };
+            }
             return *parent_;
         }
 

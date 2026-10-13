@@ -97,9 +97,10 @@ namespace geode
     std::vector< std::string > OpenGeodeBRepOutput::write(
         const BRep& brep ) const
     {
-        const ZipFile zip_writer{ filename(), uuid{}.string() };
+        ZipFile zip_writer{ filename(), uuid{}.string() };
         save_brep_files( brep, zip_writer.directory() );
         archive_brep_files( zip_writer );
+        zip_writer.finalize();
         return { to_string( filename() ) };
     }
 } // namespace geode

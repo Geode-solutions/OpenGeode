@@ -28,10 +28,25 @@
 #include <string_view>
 
 #include <absl/strings/match.h>
-#include <absl/strings/str_cat.h>
 
 #include <geode/basic/logger.hpp>
 #include <geode/basic/string.hpp>
+
+namespace
+{
+    bool read_line( std::ifstream& file, std::string& line )
+    {
+        if( !std::getline( file, line ) )
+        {
+            return false;
+        }
+        if( !line.empty() && line.back() == '\r' )
+        {
+            line.pop_back();
+        }
+        return true;
+    }
+} // namespace
 
 namespace geode
 {
@@ -43,22 +58,27 @@ namespace geode
     bool line_starts_with( std::ifstream& file, std::string_view check )
     {
         std::string line;
-        std::getline( file, line );
+        if( !read_line( file, line ) )
+        {
+            return false;
+        }
         return string_starts_with( line, check );
     }
 
     void check_keyword( std::ifstream& file, std::string_view keyword )
     {
+        std::string line;
+        const auto has_line = read_line( file, line );
         OpenGeodeBasicException::check_exception(
-            line_starts_with( file, keyword ), nullptr,
-            OpenGeodeException::TYPE::data,
-            absl::StrCat( "Line should starts with \"", keyword, "\"" ) );
+            has_line && string_starts_with( line, keyword ), nullptr,
+            OpenGeodeException::TYPE::data, "Line should starts with \"",
+            keyword, "\", got \"", has_line ? line : "end of file", "\"" );
     }
 
     std::string goto_keyword( std::ifstream& file, std::string_view word )
     {
         std::string line;
-        while( std::getline( file, line ) )
+        while( read_line( file, line ) )
         {
             if( string_starts_with( line, word ) )
             {
@@ -68,14 +88,13 @@ namespace geode
         throw geode::OpenGeodeBasicException{ nullptr,
             OpenGeodeException::TYPE::data,
             "[goto_keyword] Cannot find the requested keyword: ", word };
-        return "";
     }
 
     std::string goto_keywords(
         std::ifstream& file, absl::Span< const std::string_view > words )
     {
         std::string line;
-        while( std::getline( file, line ) )
+        while( read_line( file, line ) )
         {
             for( const auto word : words )
             {
@@ -88,14 +107,13 @@ namespace geode
         throw geode::OpenGeodeBasicException{ nullptr,
             OpenGeodeException::TYPE::data,
             "[goto_keywords] Cannot find one of the requested keywords" };
-        return "";
     }
 
     std::optional< std::string > goto_keyword_if_it_exists(
         std::ifstream& file, std::string_view word )
     {
         std::optional< std::string > line{ std::in_place };
-        while( std::getline( file, line.value() ) )
+        while( read_line( file, line.value() ) )
         {
             if( string_starts_with( line.value(), word ) )
             {
@@ -105,7 +123,7 @@ namespace geode
         geode::Logger::debug( "[goto_keyword_if_it_exists] Couldn't find word ",
             word, " in the file, returning to file begin." );
         file.clear();
-        file.seekg( std::ios::beg );
+        file.seekg( 0, std::ios::beg );
         return std::nullopt;
     }
 
@@ -114,11 +132,12 @@ namespace geode
     {
         std::optional< std::string > line{ std::in_place };
         const auto previous_position = file.tellg();
-        std::getline( file, line.value() );
-        if( string_starts_with( line.value(), word ) )
+        if( read_line( file, line.value() )
+            && string_starts_with( line.value(), word ) )
         {
             return line;
         }
+        file.clear();
         file.seekg( previous_position );
         return std::nullopt;
     }

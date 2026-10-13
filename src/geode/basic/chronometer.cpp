@@ -23,7 +23,9 @@
 
 #include <geode/basic/chronometer.hpp>
 
-#include <absl/time/clock.h>
+#include <chrono>
+
+#include <absl/time/time.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -31,19 +33,36 @@ namespace geode
 {
     class Chronometer::Impl
     {
+        using Clock = std::chrono::steady_clock;
+
     public:
         void start()
         {
-            start_time_ = absl::Now();
+            if( running_ )
+            {
+                return;
+            }
+            start_time_ = Clock::now();
+            running_ = true;
         }
 
         void stop()
         {
-            duration_ += absl::Now() - start_time_;
+            if( !running_ )
+            {
+                return;
+            }
+            duration_ += absl::FromChrono( Clock::now() - start_time_ );
+            running_ = false;
         }
 
         [[nodiscard]] absl::Duration raw_duration() const
         {
+            if( running_ )
+            {
+                return duration_
+                       + absl::FromChrono( Clock::now() - start_time_ );
+            }
             return duration_;
         }
 
@@ -55,11 +74,13 @@ namespace geode
         void reset()
         {
             duration_ = absl::ZeroDuration();
+            running_ = false;
         }
 
     private:
-        absl::Time start_time_;
+        Clock::time_point start_time_;
         absl::Duration duration_;
+        bool running_{ false };
     };
 
     Chronometer::Chronometer() = default;

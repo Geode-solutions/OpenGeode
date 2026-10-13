@@ -128,20 +128,9 @@ namespace geode
             AttributeProperties properties )
         {
             absl::MutexLock lock{ mutex() };
-            auto attribute = find_attribute_base( attribute_id );
-            auto typed_attribute =
-                std::dynamic_pointer_cast< Attribute< T > >( attribute );
-            OpenGeodeBasicException::check_exception(
-                typed_attribute.get() == nullptr, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[AttributeManager::create_attribute] Attribute with id '",
-                attribute_id.string(), "' already exists." );
-            typed_attribute = std::make_unique< Attribute< T > >(
-                std::move( default_values ), attribute_name,
-                std::move( properties ), AttributeBase::AttributeKey{} );
-            IdentifierBuilder builder{ *typed_attribute };
-            builder.set_id( attribute_id );
-            register_attribute( typed_attribute, attribute_id );
+            create_attribute_unlocked< Attribute, T >( attribute_name,
+                attribute_id, std::move( default_values ),
+                std::move( properties ) );
         }
 
         template < template < typename > class Attribute, typename T >
@@ -173,10 +162,14 @@ namespace geode
             AttributeValues< T > default_values,
             AttributeProperties properties )
         {
+            geode::uuid attribute_id;
+            absl::MutexLock lock{ mutex() };
             check_new_time_step( attribute_name, time, typeid( T ).name() );
             properties.time = time;
-            return create_attribute< Attribute, T >( attribute_name,
-                std::move( default_values ), std::move( properties ) );
+            create_attribute_unlocked< Attribute, T >( attribute_name,
+                attribute_id, std::move( default_values ),
+                std::move( properties ) );
+            return attribute_id;
         }
 
         /*!
@@ -257,6 +250,7 @@ namespace geode
          * of an existing attribute of this manager.
          * @param[in] attribute_id The id of the attribute to copy.
          * @param[in] new_attribute_id The id to give to the new attribute.
+         * @exception OpenGeodeException if the attribute is a time series step.
          */
         void copy_attribute( const geode::uuid& attribute_id,
             const geode::uuid& new_attribute_id );
@@ -297,7 +291,8 @@ namespace geode
         /*!
          * Permute attribute elements.
          * @param[in] permutation Vector of size @function nb_elements().
-         * Each value correponds to the destination index.
+         * permutation[new_index] is the old index of the element moved to
+         * new_index.
          */
         void permute_elements( absl::Span< const index_t > permutation );
 
@@ -319,6 +314,26 @@ namespace geode
             const uuid& attribute_id );
 
     private:
+        template < template < typename > class Attribute, typename T >
+        void create_attribute_unlocked( std::string_view attribute_name,
+            const geode::uuid& attribute_id,
+            AttributeValues< T > default_values,
+            AttributeProperties properties )
+        {
+            OpenGeodeBasicException::check_exception(
+                find_attribute_base( attribute_id ) == nullptr, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[AttributeManager::create_attribute] Attribute with id '",
+                attribute_id.string(), "' already exists." );
+            std::shared_ptr< Attribute< T > > typed_attribute =
+                std::make_unique< Attribute< T > >( std::move( default_values ),
+                    attribute_name, std::move( properties ),
+                    AttributeBase::AttributeKey{} );
+            IdentifierBuilder builder{ *typed_attribute };
+            builder.set_id( attribute_id );
+            register_attribute( typed_attribute, attribute_id );
+        }
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& serializer );
@@ -337,8 +352,7 @@ namespace geode
 
         /*!
          * Register an Attribute to the given id.
-         * If the given id already exists in the manager, the new attribute
-         * will override the old one.
+         * The given id should not already exist in the manager.
          * @param[in] attribute The attribute to register
          * @param[in] id The associated id to the store
          */

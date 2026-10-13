@@ -35,6 +35,7 @@ namespace geode
     public:
         void register_client( std::unique_ptr< ProgressLoggerClient >&& client )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             loggers_.emplace_back( std::move( client ) );
         }
 

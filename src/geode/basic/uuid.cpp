@@ -25,8 +25,13 @@
 
 #include <atomic>
 #include <iomanip>
+#include <random>
 #include <sstream>
 #include <thread>
+
+#ifndef _WIN32
+#    include <pthread.h>
+#endif
 
 #include <absl/hash/hash.h>
 #include <absl/random/random.h>
@@ -89,16 +94,26 @@ namespace
 
             uint16_t gen_uint16_t()
             {
-                return absl::Uniform< uint16_t >( gen, 0, kSeqMask );
+                return absl::Uniform< uint16_t >(
+                    absl::IntervalClosed, gen, 0, kSeqMask );
             }
 
-            uint8_t gen_uint8_t()
+            uint64_t gen_uint64_t()
             {
-                return absl::Uniform< uint8_t >( gen, 0, 0xFF );
+                return absl::Uniform< uint64_t >( gen );
             }
         };
         static thread_local TLS tls;
 
+    public:
+        // Called in a forked child process so that it does not replay the
+        // random sequence of its parent
+        static void reseed()
+        {
+            tls.gen = absl::BitGen{};
+        }
+
+    private:
         // Generate non-zero random sequence (preserves lexicographic ordering)
         static std::uint16_t fresh_sequence()
         {
@@ -131,9 +146,11 @@ namespace
             std::uint16_t old_seq =
                 static_cast< std::uint16_t >( old & 0xFFFF );
 
-            // Enforce drift cap: limit how fast we can catch up to real time
-            if( real_ms > old_ts + kMaxDriftMs )
-                real_ms = old_ts + kMaxDriftMs;
+            // Clock moved backward beyond the drift window (NTP step, VM
+            // resume...): keep counting from the last timestamp to stay
+            // monotonic instead of failing until real time catches up
+            if( real_ms + kMaxDriftMs < old_ts )
+                real_ms = old_ts;
 
             std::uint64_t ts = old_ts;
             std::uint16_t seq = old_seq;
@@ -205,12 +222,14 @@ namespace
         // sequence low byte (byte 7)
         d[7] = static_cast< std::uint8_t >( seq & 0xFF );
 
-        // variant (10xx) + 6 random bits (byte 8)
-        d[8] =
-            static_cast< std::uint8_t >( 0x80 | ( tls.gen_uint8_t() & 0x3F ) );
-        // remaining 56 random bits (bytes 9‑15)
-        for( int i = 9; i < 16; ++i )
-            d[i] = tls.gen_uint8_t();
+        // variant (10xx) + 62 random bits (bytes 8-15)
+        auto random = tls.gen_uint64_t();
+        for( int i = 15; i >= 8; --i )
+        {
+            d[i] = static_cast< std::uint8_t >( random & 0xFF );
+            random >>= 8;
+        }
+        d[8] = static_cast< std::uint8_t >( 0x80 | ( d[8] & 0x3F ) );
 
         return bytes;
     }
@@ -218,10 +237,19 @@ namespace
     // Generate non-zero initial sequence for process startup
     inline std::uint16_t initial_seq()
     {
-        std::random_device rd;
-        const auto mono = absl::GetCurrentTimeNanos();
-        std::uint16_t s = static_cast< std::uint16_t >(
-            ( rd() ^ mono ) & UUIDv7Generator::kSeqMask );
+        std::uint64_t entropy =
+            static_cast< std::uint64_t >( absl::GetCurrentTimeNanos() );
+        try
+        {
+            std::random_device rd;
+            entropy ^= rd();
+        }
+        catch( ... )
+        {
+            // Time only seed
+        }
+        std::uint16_t s =
+            static_cast< std::uint16_t >( entropy & UUIDv7Generator::kSeqMask );
         return s ? s : 1;
     }
 
@@ -233,6 +261,13 @@ namespace
     };
 
     inline thread_local UUIDv7Generator::TLS UUIDv7Generator::tls{};
+
+#ifndef _WIN32
+    [[maybe_unused]] const auto FORK_HANDLER =
+        pthread_atfork( nullptr, nullptr, [] {
+            UUIDv7Generator::reseed();
+        } );
+#endif
 } // namespace
 
 namespace geode
@@ -272,16 +307,35 @@ namespace geode
                 && string[23] == '-',
             nullptr, OpenGeodeException::TYPE::internal,
             "[uuid] unknown string format" );
-        std::sscanf( to_string( string ).c_str(),
-            "%2hhx%2hhx%2hhx%2hhx-"
-            "%2hhx%2hhx-"
-            "%2hhx%2hhx-"
-            "%2hhx%2hhx-"
-            "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
-            &bytes_[0], &bytes_[1], &bytes_[2], &bytes_[3], &bytes_[4],
-            &bytes_[5], &bytes_[6], &bytes_[7], &bytes_[8], &bytes_[9],
-            &bytes_[10], &bytes_[11], &bytes_[12], &bytes_[13], &bytes_[14],
-            &bytes_[15] );
+        const auto hex_value = [&string]( char character ) {
+            if( character >= '0' && character <= '9' )
+            {
+                return static_cast< std::uint8_t >( character - '0' );
+            }
+            if( character >= 'a' && character <= 'f' )
+            {
+                return static_cast< std::uint8_t >( character - 'a' + 10 );
+            }
+            if( character >= 'A' && character <= 'F' )
+            {
+                return static_cast< std::uint8_t >( character - 'A' + 10 );
+            }
+            throw OpenGeodeBasicException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[uuid] invalid hexadecimal character in ", string };
+        };
+        index_t position{ 0 };
+        for( const auto byte : Indices{ bytes_ } )
+        {
+            if( byte == 4 || byte == 6 || byte == 8 || byte == 10 )
+            {
+                position++;
+            }
+            const auto high = hex_value( string[position] );
+            const auto low = hex_value( string[position + 1] );
+            bytes_[byte] = static_cast< std::uint8_t >( ( high << 4 ) | low );
+            position += 2;
+        }
     }
 
     bool uuid::operator==( const uuid &other ) const

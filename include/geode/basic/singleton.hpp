@@ -59,8 +59,19 @@ namespace geode
         template < class SingletonType >
         [[nodiscard]] static SingletonType& instance()
         {
+            // The global registry guarantees a unique instance across
+            // shared libraries, the local static avoids looking it up at
+            // each call.
+            static auto& singleton = find_or_create_instance< SingletonType >();
+            return singleton;
+        }
+
+    private:
+        template < class SingletonType >
+        [[nodiscard]] static SingletonType& find_or_create_instance()
+        {
             const auto& type = typeid( SingletonType );
-            const std::lock_guard< std::mutex > locking{ lock() };
+            const std::lock_guard< std::recursive_mutex > locking{ lock() };
             auto* singleton = instance( type );
             if( singleton == nullptr )
             {
@@ -70,12 +81,11 @@ namespace geode
             return *static_cast< SingletonType* >( singleton );
         }
 
-    private:
         [[nodiscard]] static Singleton& instance();
         static void set_instance(
             const std::type_info& type, Singleton* singleton );
         [[nodiscard]] static Singleton* instance( const std::type_info& type );
-        [[nodiscard]] static std::mutex& lock();
+        [[nodiscard]] static std::recursive_mutex& lock();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
