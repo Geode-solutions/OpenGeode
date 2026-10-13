@@ -69,6 +69,7 @@ namespace geode
     {
         const auto added_vertex = vertex_set_.nb_vertices();
         vertex_set_.vertex_attribute_manager().resize( added_vertex + 1 );
+        do_resize_vertex_storage( added_vertex + 1 );
         do_create_vertex();
         return added_vertex;
     }
@@ -78,6 +79,7 @@ namespace geode
         const auto first_added_vertex = vertex_set_.nb_vertices();
         vertex_set_.vertex_attribute_manager().resize(
             first_added_vertex + nb );
+        do_resize_vertex_storage( first_added_vertex + nb );
         do_create_vertices( nb );
         return first_added_vertex;
     }

@@ -267,6 +267,16 @@ void test_backward_io( const std::string& filename )
             "Backward TriangulatedSurface should not have legacy attribute ",
             name );
     }
+    for( const auto* name :
+        { "polygon_around_vertex", "polygons_around_vertex" } )
+    {
+        geode::OpenGeodeMeshException::test(
+            !surface->vertex_attribute_manager()
+                 .attribute_ids_matching_name( name )
+                 .has_value(),
+            "Backward TriangulatedSurface should not have legacy attribute ",
+            name );
+    }
     geode::OpenGeodeMeshException::test(
         surface->polygon_around_vertex( 0 ).value().polygon_id == 0,
         "Wrong polygon_around_vertex for backward triangulated surface" );
