@@ -192,6 +192,13 @@ void test_line_line_intersection()
         "Wrong result for line_line_intersection "
         "with query lines 1 and 4" );
 
+    geode::OpenGeodeGeometryException::test(
+        intersection_point.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for line_line_intersection with query lines 1 and 2" );
+    geode::OpenGeodeGeometryException::test(
+        intersection_point2.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for line_line_intersection with query lines 1 and 4" );
+
     const auto intersection_point3 =
         geode::line_line_intersection( line1, line5 );
     geode::OpenGeodeGeometryException::test(
@@ -213,6 +220,7 @@ void test_segment_segment_intersection()
     const geode::Segment2D segment_ab2{ a, b };
     const geode::Segment2D segment_af{ a, f };
     const geode::Segment2D segment_bc{ b, c };
+    const geode::Segment2D segment_bf{ b, f };
     const geode::Segment2D segment_cd{ c, d };
     const geode::Segment2D segment_cf{ c, f };
     const geode::Segment2D segment_de{ d, e };
@@ -258,6 +266,18 @@ void test_segment_segment_intersection()
     geode::OpenGeodeGeometryException::test( !intersection_point5,
         "Wrong result for segment_segment_intersection with query "
         "segment_ab and segment_ef" );
+
+    geode::OpenGeodeGeometryException::test(
+        intersection_point3.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for segment_segment_intersection with query "
+        "segment_ab and segment_cd" );
+    const geode::Segment2D segment_ae{ a, e };
+    const auto collinear_overlap =
+        geode::segment_segment_intersection( segment_ae, segment_bf );
+    geode::OpenGeodeGeometryException::test(
+        collinear_overlap.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for segment_segment_intersection with collinear "
+        "overlapping segments" );
 
     const auto intersection_point6 =
         geode::segment_segment_intersection( segment_bc, segment_df );

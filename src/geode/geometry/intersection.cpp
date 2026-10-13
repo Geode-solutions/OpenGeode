@@ -428,7 +428,7 @@ namespace geode
         const Vector2D diff{ line0.origin(), line1.origin() };
         const auto D0DotPerpD1 =
             dot_perpendicular( line0.direction(), line1.direction() );
-        if( std::fabs( D0DotPerpD1 ) < 0. )
+        if( D0DotPerpD1 == 0. )
         {
             // The lines are parallel.
             return { INTERSECTION_TYPE::parallel };
