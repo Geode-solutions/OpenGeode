@@ -35,98 +35,125 @@ namespace geode
 {
     namespace
     {
-        double cross_product_length( const Vector3D& cross )
+        struct TriangleCross3D
         {
-            return cross.length();
-        }
+            std::array< double, 3 > cross;
+            double length2;
+        };
 
-        double cross_product_length( double cross )
+        struct TriangleCross2D
         {
-            return std::fabs( cross );
-        }
-
-        double cross_product_length2( const Vector3D& cross )
-        {
-            return cross.length2();
-        }
-
-        double cross_product_length2( double cross )
-        {
-            return cross * cross;
-        }
-
-        Vector3D cross_product( const Vector3D& lhs, const Vector3D& rhs )
-        {
-            return lhs.cross( rhs );
-        }
-
-        double cross_product( const Vector2D& lhs, const Vector2D& rhs )
-        {
-            return dot_perpendicular( lhs, rhs );
-        }
+            double cross;
+            double length2;
+        };
 
         // Cross product of the two edges adjacent to the vertex opposite to
-        // the longest edge (same orientation as the triangle), or nullopt if
-        // the triangle height is below GLOBAL_EPSILON.
-        template < index_t dimension >
-        auto triangle_cross_product( const Triangle< dimension >& triangle )
-            -> std::optional< decltype( cross_product(
-                std::declval< Vector< dimension > >(),
-                std::declval< Vector< dimension > >() ) ) >
+        // the longest edge (all three edge pairs give the same result in exact
+        // arithmetic, this one is the most accurate), with the orientation of
+        // the triangle, or nullopt if the triangle height is below
+        // GLOBAL_EPSILON. Selections are branchless.
+        std::optional< TriangleCross3D > triangle_cross_product(
+            const Triangle3D& triangle )
         {
             const auto& vertices = triangle.vertices();
-            std::array< double, 3 > lengths2;
-            for( const auto e : LRange{ 3 } )
-            {
-                lengths2[e] = Vector< dimension >{ vertices[e],
-                    vertices[e == 2 ? 0 : e + 1] }
-                                  .length2();
-            }
-            local_index_t longest{ 0 };
-            if( lengths2[1] > lengths2[longest] )
-            {
-                longest = 1;
-            }
-            if( lengths2[2] > lengths2[longest] )
-            {
-                longest = 2;
-            }
-            const auto next = longest == 2 ? 0 : longest + 1;
-            const auto opposite = next == 2 ? 0 : next + 1;
-            const auto cross = cross_product(
-                Vector< dimension >{ vertices[opposite], vertices[longest] },
-                Vector< dimension >{ vertices[opposite], vertices[next] } );
+            const Point3D& v0 = vertices[0];
+            const Point3D& v1 = vertices[1];
+            const Point3D& v2 = vertices[2];
+            const auto e0x = v1.value( 0 ) - v0.value( 0 );
+            const auto e0y = v1.value( 1 ) - v0.value( 1 );
+            const auto e0z = v1.value( 2 ) - v0.value( 2 );
+            const auto e1x = v2.value( 0 ) - v1.value( 0 );
+            const auto e1y = v2.value( 1 ) - v1.value( 1 );
+            const auto e1z = v2.value( 2 ) - v1.value( 2 );
+            const auto e2x = v0.value( 0 ) - v2.value( 0 );
+            const auto e2y = v0.value( 1 ) - v2.value( 1 );
+            const auto e2z = v0.value( 2 ) - v2.value( 2 );
+            const auto length2_0 = e0x * e0x + e0y * e0y + e0z * e0z;
+            const auto length2_1 = e1x * e1x + e1y * e1y + e1z * e1z;
+            const auto length2_2 = e2x * e2x + e2y * e2y + e2z * e2z;
+            const auto longest0 =
+                length2_0 >= length2_1 && length2_0 >= length2_2;
+            const auto longest1 = !longest0 && length2_1 >= length2_2;
+            // Pick the two edges following the longest one
+            const auto ax = longest0 ? e1x : ( longest1 ? e2x : e0x );
+            const auto ay = longest0 ? e1y : ( longest1 ? e2y : e0y );
+            const auto az = longest0 ? e1z : ( longest1 ? e2z : e0z );
+            const auto bx = longest0 ? e2x : ( longest1 ? e0x : e1x );
+            const auto by = longest0 ? e2y : ( longest1 ? e0y : e1y );
+            const auto bz = longest0 ? e2z : ( longest1 ? e0z : e1z );
+            const auto max_length2 =
+                std::max( { length2_0, length2_1, length2_2 } );
+            const auto cx = ay * bz - az * by;
+            const auto cy = az * bx - ax * bz;
+            const auto cz = ax * by - ay * bx;
+            const auto length2 = cx * cx + cy * cy + cz * cz;
             // height = |cross| / longest length
-            if( cross_product_length2( cross )
-                <= GLOBAL_EPSILON * GLOBAL_EPSILON * lengths2[longest] )
+            if( length2 <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_length2 )
             {
                 return std::nullopt;
             }
-            return cross;
+            return TriangleCross3D{ { cx, cy, cz }, length2 };
+        }
+
+        std::optional< TriangleCross2D > triangle_cross_product(
+            const Triangle2D& triangle )
+        {
+            const auto& vertices = triangle.vertices();
+            const Point2D& v0 = vertices[0];
+            const Point2D& v1 = vertices[1];
+            const Point2D& v2 = vertices[2];
+            const auto e0x = v1.value( 0 ) - v0.value( 0 );
+            const auto e0y = v1.value( 1 ) - v0.value( 1 );
+            const auto e1x = v2.value( 0 ) - v1.value( 0 );
+            const auto e1y = v2.value( 1 ) - v1.value( 1 );
+            const auto e2x = v0.value( 0 ) - v2.value( 0 );
+            const auto e2y = v0.value( 1 ) - v2.value( 1 );
+            const auto length2_0 = e0x * e0x + e0y * e0y;
+            const auto length2_1 = e1x * e1x + e1y * e1y;
+            const auto length2_2 = e2x * e2x + e2y * e2y;
+            const auto longest0 =
+                length2_0 >= length2_1 && length2_0 >= length2_2;
+            const auto longest1 = !longest0 && length2_1 >= length2_2;
+            const auto ax = longest0 ? e1x : ( longest1 ? e2x : e0x );
+            const auto ay = longest0 ? e1y : ( longest1 ? e2y : e0y );
+            const auto bx = longest0 ? e2x : ( longest1 ? e0x : e1x );
+            const auto by = longest0 ? e2y : ( longest1 ? e0y : e1y );
+            const auto max_length2 =
+                std::max( { length2_0, length2_1, length2_2 } );
+            const auto cross = ax * by - ay * bx;
+            const auto length2 = cross * cross;
+            if( length2 <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_length2 )
+            {
+                return std::nullopt;
+            }
+            return TriangleCross2D{ cross, length2 };
         }
     } // namespace
 
     template < index_t dimension >
     double triangle_area( const Triangle< dimension >& triangle )
     {
-        const auto cross = triangle_cross_product< dimension >( triangle );
+        const auto cross = triangle_cross_product( triangle );
         if( !cross )
         {
             return 0;
         }
-        return cross_product_length( cross.value() ) / 2.;
+        return std::sqrt( cross->length2 ) / 2.;
     }
 
     double triangle_signed_area(
         const Triangle3D& triangle, const Vector3D& direction )
     {
-        const auto cross = triangle_cross_product< 3 >( triangle );
+        const auto cross = triangle_cross_product( triangle );
         if( !cross )
         {
             return 0;
         }
-        const auto area = cross->length() / 2.;
-        return direction.dot( cross.value() ) > 0 ? area : -area;
+        const auto area = std::sqrt( cross->length2 ) / 2.;
+        const auto dot = direction.value( 0 ) * cross->cross[0]
+                         + direction.value( 1 ) * cross->cross[1]
+                         + direction.value( 2 ) * cross->cross[2];
+        return dot > 0 ? area : -area;
     }
 
     double triangle_signed_area( const Triangle2D& triangle )
