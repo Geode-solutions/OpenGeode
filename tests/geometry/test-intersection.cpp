@@ -1218,6 +1218,40 @@ void test_segment_intersections_correctness()
         "Wrong correctness for plane_circle_intersection" );
 }
 
+void test_line_sphere_intersection_robustness()
+{
+    const geode::Point3D origin{ { 0, 0, 0 } };
+    const geode::Sphere3D sphere{ origin, 1 };
+    const geode::OwnerInfiniteLine3D far_line{ geode::Vector3D{ { -1, 0, 0 } },
+        geode::Point3D{ { 1e8, 0.5, 0 } } };
+    const auto far_result = geode::line_sphere_intersection(
+        geode::InfiniteLine3D{ far_line }, sphere );
+    const auto x = std::sqrt( 0.75 );
+    geode::OpenGeodeGeometryException::test(
+        far_result && far_result.result->size() == 2
+            && far_result.result->front().inexact_equal(
+                geode::Point3D{ { x, 0.5, 0 } } )
+            && far_result.result->back().inexact_equal(
+                geode::Point3D{ { -x, 0.5, 0 } } ),
+        "Wrong line_sphere_intersection with far line origin" );
+
+    const geode::Sphere3D small_sphere{ origin, 1e-4 };
+    const geode::OwnerInfiniteLine3D close_line{ geode::Vector3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0, 1.4e-4, 0 } } };
+    geode::OpenGeodeGeometryException::test(
+        !geode::line_sphere_intersection(
+            geode::InfiniteLine3D{ close_line }, small_sphere ),
+        "Wrong line_sphere_intersection with small sphere" );
+    const geode::OwnerInfiniteLine3D tangent_line{
+        geode::Vector3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1e-4, 0 } }
+    };
+    const auto tangent_result = geode::line_sphere_intersection(
+        geode::InfiniteLine3D{ tangent_line }, small_sphere );
+    geode::OpenGeodeGeometryException::test(
+        tangent_result && tangent_result.result->size() == 1,
+        "Wrong line_sphere_intersection with tangent line" );
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -1237,6 +1271,7 @@ void test()
     test_degenerated_segment_intersections();
     test_line_cylinder_perpendicular();
     test_segment_intersections_correctness();
+    test_line_sphere_intersection_robustness();
 }
 
 OPENGEODE_TEST( "intersection" )

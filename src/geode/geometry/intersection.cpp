@@ -219,26 +219,28 @@ namespace geode
         line_sphere_intersection( const InfiniteLine< dimension >& line,
             const Sphere< dimension >& sphere )
     {
-        // The sphere is (X-C)^T*(X-C)-1 = 0 and the line is X = P+t*D.
-        // Substitute the line equation into the sphere equation to obtain a
-        // quadratic equation Q(t) = t^2 + 2*a1*t + a0 = 0, where a1 =
-        // D^T*(P-C),
-        // and a0 = (P-C)^T*(P-C)-1.
+        // The sphere is |X-C| = r and the line is X = P+t*D, with D unit.
+        // Let H = P+t_c*D be the projection of C on the line, with
+        // t_c = -D^T*(P-C), and h = |H-C| the distance from C to the line.
+        // The intersections are at t = t_c +- sqrt( (r-h)*(r+h) ). Computing
+        // h directly avoids the cancellation of |P-C|^2 - (D^T*(P-C))^2 when
+        // P is far from C.
         const Vector< dimension > diff{ sphere.origin(), line.origin() };
-        const auto a0 = diff.dot( diff ) - sphere.radius() * sphere.radius();
-        const auto a1 = line.direction().dot( diff );
-
-        // Intersection occurs when Q(t) has real roots.
-        const auto discr = a1 * a1 - a0;
-        if( discr > GLOBAL_EPSILON ) // positive
+        const auto closest_parameter = -line.direction().dot( diff );
+        const auto closest_point =
+            line.origin() + line.direction() * closest_parameter;
+        const auto distance_to_center =
+            point_point_distance( closest_point, sphere.origin() );
+        const auto radius_minus_distance = sphere.radius() - distance_to_center;
+        if( radius_minus_distance > GLOBAL_EPSILON ) // two intersections
         {
             absl::InlinedVector< Point< dimension >, 2 > results;
-            const auto root = std::sqrt( discr );
+            const auto root =
+                std::sqrt( radius_minus_distance
+                           * ( sphere.radius() + distance_to_center ) );
             results.reserve( 2 );
-            results.emplace_back(
-                line.origin() + line.direction() * ( -a1 - root ) );
-            results.emplace_back(
-                line.origin() + line.direction() * ( -a1 + root ) );
+            results.emplace_back( closest_point - line.direction() * root );
+            results.emplace_back( closest_point + line.direction() * root );
             typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
                 2 > >::Correctness first_correctness;
             first_correctness.first =
@@ -268,11 +270,11 @@ namespace geode
             return { std::move( results ),
                 { first_correctness, second_correctness } };
         }
-        else if( discr > -GLOBAL_EPSILON ) // zero
+        else if( radius_minus_distance >= -GLOBAL_EPSILON ) // tangent
         {
             absl::InlinedVector< Point< dimension >, 2 > results;
             results.reserve( 1 );
-            results.emplace_back( line.origin() - line.direction() * a1 );
+            results.emplace_back( closest_point );
             typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
                 2 > >::Correctness first_correctness;
             first_correctness.first =
