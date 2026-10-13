@@ -359,9 +359,65 @@ void test_texture( const geode::EdgedCurve3D& edged_curve )
     manager.find_or_create_texture( "texture" );
 }
 
+void check_no_legacy_attributes( const geode::AttributeManager& manager,
+    std::initializer_list< const char* > names )
+{
+    for( const auto* name : names )
+    {
+        geode::OpenGeodeMeshException::test(
+            !manager.attribute_ids_matching_name( name ).has_value(),
+            "Legacy attribute ", name, " should have been removed" );
+    }
+}
+
+void check_user_value(
+    const geode::AttributeManager& manager, geode::index_t element )
+{
+    const auto ids = manager.attribute_ids_matching_name( "user_value" );
+    geode::OpenGeodeMeshException::test(
+        ids.has_value() && ids->size() == 1, "user_value should be kept" );
+    const auto attribute =
+        manager.find_read_only_attribute< double >( ids->at( 0 ) );
+    geode::OpenGeodeMeshException::test(
+        attribute->value( element ) == 1.5 * element,
+        "Wrong user_value at element ", element );
+}
+
+void check_v18_5( const geode::EdgedCurve3D& curve )
+{
+    geode::OpenGeodeMeshException::test(
+        curve.nb_vertices() == 4 && curve.nb_edges() == 3,
+        "v18_5 EdgedCurve has wrong number of elements" );
+    geode::OpenGeodeMeshException::test( curve.edge_vertex( { 2, 1 } ) == 3,
+        "v18_5 EdgedCurve has wrong edge vertex" );
+    geode::OpenGeodeMeshException::test(
+        curve.point( 3 ) == geode::Point3D{ { 1, 1, 0 } },
+        "v18_5 EdgedCurve has wrong point" );
+    geode::OpenGeodeMeshException::test(
+        curve.edges_around_vertex( 1 ).size() == 2,
+        "v18_5 EdgedCurve has wrong edges around vertex" );
+    check_user_value( curve.vertex_attribute_manager(), 2 );
+    check_user_value( curve.edge_attribute_manager(), 2 );
+    check_no_legacy_attributes(
+        curve.vertex_attribute_manager(), { "edges_around_vertex" } );
+    check_no_legacy_attributes( curve.edge_attribute_manager(), { "edges" } );
+}
+
+void test_backward_v18_5()
+{
+    const auto curve = geode::load_edged_curve< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_edc3d" ) );
+    check_v18_5( *curve );
+    const auto filename =
+        absl::StrCat( "v18_5_reload.", curve->native_extension() );
+    geode::save_edged_curve( *curve, filename );
+    check_v18_5( *geode::load_edged_curve< 3 >( filename ) );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_backward_v18_5();
     auto edged_curve = geode::EdgedCurve3D::create(
         geode::OpenGeodeEdgedCurve3D::impl_name_static() );
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );

@@ -494,9 +494,88 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
         solid.nb_vertices() == 0, "TetrahedralSolid should have 0 vertex" );
 }
 
+void check_no_legacy_attributes( const geode::AttributeManager& manager,
+    std::initializer_list< const char* > names )
+{
+    for( const auto* name : names )
+    {
+        geode::OpenGeodeMeshException::test(
+            !manager.attribute_ids_matching_name( name ).has_value(),
+            "Legacy attribute ", name, " should have been removed" );
+    }
+}
+
+void check_user_value(
+    const geode::AttributeManager& manager, geode::index_t element )
+{
+    const auto ids = manager.attribute_ids_matching_name( "user_value" );
+    geode::OpenGeodeMeshException::test(
+        ids.has_value() && ids->size() == 1, "user_value should be kept" );
+    const auto attribute =
+        manager.find_read_only_attribute< double >( ids->at( 0 ) );
+    geode::OpenGeodeMeshException::test(
+        attribute->value( element ) == 1.5 * element,
+        "Wrong user_value at element ", element );
+}
+
+void check_v18_5( const geode::TetrahedralSolid3D& solid )
+{
+    geode::OpenGeodeMeshException::test(
+        solid.nb_vertices() == 6 && solid.nb_polyhedra() == 3,
+        "v18_5 TetrahedralSolid has wrong number of elements" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( { 2, 2 } ) == 4,
+        "v18_5 TetrahedralSolid has wrong polyhedron vertex" );
+    geode::index_t nb_adjacents{ 0 };
+    for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+    {
+        for( const auto f : geode::LRange{ 4 } )
+        {
+            if( solid.polyhedron_adjacent( { p, f } ) )
+            {
+                nb_adjacents++;
+            }
+        }
+    }
+    geode::OpenGeodeMeshException::test(
+        nb_adjacents == 4, "v18_5 TetrahedralSolid has wrong adjacencies" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedra_around_vertex( 5 ).size() == 3
+            && solid.polyhedra_around_vertex( 0 ).size() == 1,
+        "v18_5 TetrahedralSolid has wrong polyhedra around vertex" );
+    geode::OpenGeodeMeshException::test( solid.edges().nb_edges() == 12,
+        "v18_5 TetrahedralSolid has wrong number of edges" );
+    geode::OpenGeodeMeshException::test( solid.facets().nb_facets() == 10,
+        "v18_5 TetrahedralSolid has wrong number of facets" );
+    check_user_value( solid.vertex_attribute_manager(), 5 );
+    check_user_value( solid.polyhedron_attribute_manager(), 2 );
+    check_user_value( solid.edges().edge_attribute_manager(), 11 );
+    check_user_value( solid.facets().facet_attribute_manager(), 9 );
+    check_no_legacy_attributes( solid.vertex_attribute_manager(),
+        { "polyhedron_around_vertex", "polyhedra_around_vertex" } );
+    check_no_legacy_attributes( solid.polyhedron_attribute_manager(),
+        { "tetrahedron_vertices", "tetrahedron_adjacents" } );
+    check_no_legacy_attributes(
+        solid.edges().edge_attribute_manager(), { "counter", "facet_vertices" } );
+    check_no_legacy_attributes( solid.facets().facet_attribute_manager(),
+        { "counter", "facet_vertices" } );
+}
+
+void test_backward_v18_5()
+{
+    const auto solid = geode::load_tetrahedral_solid< 3 >( absl::StrCat(
+        geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tso3d" ) );
+    check_v18_5( *solid );
+    const auto filename =
+        absl::StrCat( "v18_5_reload.", solid->native_extension() );
+    geode::save_tetrahedral_solid( *solid, filename );
+    check_v18_5( *geode::load_tetrahedral_solid< 3 >( filename ) );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_backward_v18_5();
     auto solid = geode::TetrahedralSolid3D::create(
         geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
     auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );

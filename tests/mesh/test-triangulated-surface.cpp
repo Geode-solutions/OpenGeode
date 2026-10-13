@@ -391,9 +391,72 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
         "[Test]TriangulatedSurface should have 0 vertex" );
 }
 
+void check_no_legacy_attributes( const geode::AttributeManager& manager,
+    std::initializer_list< const char* > names )
+{
+    for( const auto* name : names )
+    {
+        geode::OpenGeodeMeshException::test(
+            !manager.attribute_ids_matching_name( name ).has_value(),
+            "Legacy attribute ", name, " should have been removed" );
+    }
+}
+
+void check_user_value(
+    const geode::AttributeManager& manager, geode::index_t element )
+{
+    const auto ids = manager.attribute_ids_matching_name( "user_value" );
+    geode::OpenGeodeMeshException::test(
+        ids.has_value() && ids->size() == 1, "user_value should be kept" );
+    const auto attribute =
+        manager.find_read_only_attribute< double >( ids->at( 0 ) );
+    geode::OpenGeodeMeshException::test(
+        attribute->value( element ) == 1.5 * element,
+        "Wrong user_value at element ", element );
+}
+
+void check_v18_5( const geode::TriangulatedSurface3D& surface )
+{
+    geode::OpenGeodeMeshException::test(
+        surface.nb_vertices() == 5 && surface.nb_polygons() == 3,
+        "v18_5 TriangulatedSurface has wrong number of elements" );
+    geode::OpenGeodeMeshException::test(
+        surface.polygon_vertex( { 1, 1 } ) == 3,
+        "v18_5 TriangulatedSurface has wrong polygon vertex" );
+    geode::OpenGeodeMeshException::test(
+        surface.polygon_adjacent( { 0, 1 } ) == 1,
+        "v18_5 TriangulatedSurface has wrong polygon adjacent" );
+    geode::OpenGeodeMeshException::test(
+        surface.polygons_around_vertex( 1 ).size() == 3,
+        "v18_5 TriangulatedSurface has wrong polygons around vertex" );
+    geode::OpenGeodeMeshException::test( surface.edges().nb_edges() == 7,
+        "v18_5 TriangulatedSurface has wrong number of edges" );
+    check_user_value( surface.vertex_attribute_manager(), 4 );
+    check_user_value( surface.polygon_attribute_manager(), 2 );
+    check_user_value( surface.edges().edge_attribute_manager(), 6 );
+    check_no_legacy_attributes( surface.vertex_attribute_manager(),
+        { "polygon_around_vertex", "polygons_around_vertex" } );
+    check_no_legacy_attributes( surface.polygon_attribute_manager(),
+        { "triangle_vertices", "triangle_adjacents" } );
+    check_no_legacy_attributes( surface.edges().edge_attribute_manager(),
+        { "counter", "facet_vertices" } );
+}
+
+void test_backward_v18_5()
+{
+    const auto surface = geode::load_triangulated_surface< 3 >( absl::StrCat(
+        geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tsf3d" ) );
+    check_v18_5( *surface );
+    const auto filename =
+        absl::StrCat( "v18_5_reload.", surface->native_extension() );
+    geode::save_triangulated_surface( *surface, filename );
+    check_v18_5( *geode::load_triangulated_surface< 3 >( filename ) );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_backward_v18_5();
     auto surface = geode::TriangulatedSurface3D::create(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
