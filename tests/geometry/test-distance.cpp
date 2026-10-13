@@ -1418,6 +1418,35 @@ void test_nan_point_triangle_distance()
         "Wrong point_triangle_signed_distance with NaN point" );
 }
 
+void test_degenerated_point_triangle_distance_2d()
+{
+    const geode::Point2D a{ { 0.0, 0.0 } };
+    const geode::Point2D b{ { 1.0, 0.0 } };
+    const geode::Point2D c{ { 2.0, 0.0 } };
+    const geode::Triangle2D flat{ a, b, c };
+    const geode::Point2D q{ { 5.0, 0.0 } };
+    const auto [distance, closest] = geode::point_triangle_distance( q, flat );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - 3. ) <= geode::GLOBAL_EPSILON
+            && closest.inexact_equal( c ),
+        "Wrong point_triangle_distance 2D with flat triangle: ", distance );
+    const geode::Point2D on{ { 1.5, 0.0 } };
+    geode::OpenGeodeGeometryException::test(
+        std::get< 0 >( geode::point_triangle_distance( on, flat ) )
+            <= geode::GLOBAL_EPSILON,
+        "Wrong point_triangle_distance 2D with flat triangle (on)" );
+
+    const geode::Point2D p{ { 1.0, 1.0 } };
+    const geode::Triangle2D point_triangle{ p, p, p };
+    const geode::Point2D r{ { 7.0, 3.0 } };
+    const auto [distance2, closest2] =
+        geode::point_triangle_distance( r, point_triangle );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance2 - std::sqrt( 40. ) ) <= geode::GLOBAL_EPSILON
+            && closest2.inexact_equal( p ),
+        "Wrong point_triangle_distance 2D with point triangle: ", distance2 );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1437,6 +1466,7 @@ void test()
     test_degenerated_triangle_triangle_distance();
     test_random_triangle_triangle_distance();
     test_nan_point_triangle_distance();
+    test_degenerated_point_triangle_distance_2d();
 }
 
 OPENGEODE_TEST( "distance" )
