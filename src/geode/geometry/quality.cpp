@@ -160,12 +160,12 @@ namespace geode
         const Vector3D edge01{ vertices[0], vertices[1] };
         const Vector3D edge02{ vertices[0], vertices[2] };
         const Vector3D edge03{ vertices[0], vertices[3] };
-        const auto absolute_det =
-            std::fabs( edge01.dot( edge02.cross( edge03 ) ) );
-        if( absolute_det < GLOBAL_EPSILON )
+        if( tetra.is_degenerated() )
         {
             return std::numeric_limits< double >::max();
         }
+        const auto absolute_det =
+            std::fabs( edge01.dot( edge02.cross( edge03 ) ) );
         const Vector3D edge12{ vertices[1], vertices[2] };
         const Vector3D edge13{ vertices[1], vertices[3] };
         const Vector3D edge23{ vertices[2], vertices[3] };
@@ -184,7 +184,7 @@ namespace geode
     double tetrahedron_volume_to_facet_ratio( const Tetrahedron& tetra )
     {
         const auto signed_volume = tetrahedron_signed_volume( tetra );
-        if( signed_volume < 0. )
+        if( signed_volume < 0. || tetra.is_degenerated() )
         {
             return 0.;
         }
@@ -211,7 +211,7 @@ namespace geode
     double tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra )
     {
         const auto signed_volume = tetrahedron_signed_volume( tetra );
-        if( signed_volume < 0. )
+        if( signed_volume < 0. || tetra.is_degenerated() )
         {
             return 0.;
         }
@@ -231,7 +231,7 @@ namespace geode
 
     double tetrahedron_collapse_aspect_ratio( const Tetrahedron& tetra )
     {
-        if( tetrahedron_volume( tetra ) < GLOBAL_EPSILON )
+        if( tetra.is_degenerated() )
         {
             return std::numeric_limits< double >::max();
         }
