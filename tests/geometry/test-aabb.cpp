@@ -497,6 +497,33 @@ void test_aabb_with_empty_box()
         "AABB with empty box - Wrong bounding box ", box.string() );
 }
 
+void test_closest_element_box_with_nan_hint()
+{
+    geode::Logger::info( "TEST", "Closest element box with NaN hint" );
+    std::vector< geode::BoundingBox3D > boxes( 8 );
+    for( const auto i : geode::Range{ 8 } )
+    {
+        boxes[i].add_point(
+            geode::Point3D{ { static_cast< double >( i ), 0, 0 } } );
+        boxes[i].add_point( geode::Point3D{ { i + 1., 1, 1 } } );
+    }
+    const geode::AABBTree3D aabb{ boxes };
+    const auto action = [&boxes]( const geode::Point3D& query,
+                            geode::index_t element ) {
+        if( element == 0 )
+        {
+            return std::numeric_limits< double >::quiet_NaN();
+        }
+        return geode::point_point_distance( boxes[element].center(), query );
+    };
+    const auto [box_id, distance] =
+        aabb.closest_element_box( boxes[0].center(), action );
+    geode::OpenGeodeGeometryException::test(
+        box_id == 1, "Closest element box with NaN hint - Wrong box ", box_id );
+    geode::OpenGeodeGeometryException::test( std::isfinite( distance ),
+        "Closest element box with NaN hint - Distance should be finite" );
+}
+
 template < geode::index_t dimension >
 void do_test()
 {
@@ -513,6 +540,7 @@ void test()
     do_test< 2 >();
     do_test< 3 >();
     test_aabb_with_empty_box();
+    test_closest_element_box_with_nan_hint();
 }
 
 OPENGEODE_TEST( "aabb" )
