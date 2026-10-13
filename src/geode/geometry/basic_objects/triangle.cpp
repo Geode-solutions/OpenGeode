@@ -168,7 +168,7 @@ namespace geode
         std::optional< std::pair< local_index_t, Vector3D > > >
         GenericTriangle< PointType, dimension >::pivot_and_normal() const
     {
-        const auto result = pivot_and_normal_(
+        const auto result = this->pivot_and_normal_(
             simple_pivot_and_normal, std::array< RefPoint3D, 3 >{ vertices_[0],
                                          vertices_[1], vertices_[2] } );
         if( !result )
@@ -214,7 +214,10 @@ namespace geode
         local_index_t vertex, PointType point )
     {
         vertices_[vertex] = point;
-        pivot_and_normal_.reset();
+        if constexpr( dimension == 3 )
+        {
+            this->pivot_and_normal_.reset();
+        }
     }
 
     template < typename PointType, index_t dimension >
