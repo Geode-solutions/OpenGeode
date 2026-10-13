@@ -23,6 +23,8 @@
 
 #include <geode/geometry/frame_transform.hpp>
 
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -37,22 +39,38 @@ namespace geode
     public:
         Impl( const Frame< dimension >& from, const Frame< dimension >& to )
         {
+            std::array< std::array< double, dimension >, dimension > cosines;
             for( const auto d_from : LRange{ dimension } )
             {
                 const auto from_vector = from.direction( d_from ).normalize();
-                double max_dot{ 0 };
                 for( const auto d_to : LRange{ dimension } )
                 {
-                    const auto to_vector = to.direction( d_to ).normalize();
-                    const auto dot = from_vector.dot( to_vector );
-                    const auto abs_dot = std::fabs( dot );
-                    if( abs_dot > max_dot )
-                    {
-                        directions_[d_from] = d_to;
-                        max_dot = abs_dot;
-                        orientations_[d_from] = dot > 0 ? 1 : -1;
-                    }
+                    cosines[d_from][d_to] =
+                        from_vector.dot( to.direction( d_to ).normalize() );
                 }
+            }
+            // Choose the permutation maximizing the sum of |cos|, the first
+            // one in lexicographic order on ties
+            std::array< local_index_t, dimension > permutation;
+            absl::c_iota( permutation, 0 );
+            double max_sum{ -1 };
+            do
+            {
+                double sum{ 0 };
+                for( const auto d_from : LRange{ dimension } )
+                {
+                    sum += std::fabs( cosines[d_from][permutation[d_from]] );
+                }
+                if( sum > max_sum )
+                {
+                    max_sum = sum;
+                    directions_ = permutation;
+                }
+            } while( absl::c_next_permutation( permutation ) );
+            for( const auto d_from : LRange{ dimension } )
+            {
+                orientations_[d_from] =
+                    cosines[d_from][directions_[d_from]] > 0 ? 1 : -1;
             }
         }
 

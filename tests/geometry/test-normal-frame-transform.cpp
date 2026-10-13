@@ -45,9 +45,34 @@ void test_normal_frame_transform()
     geode::Logger::info( "TEST SUCCESS" );
 }
 
+void test_normal_frame_transform_cycle()
+{
+    const geode::Frame3D from;
+    const geode::Frame3D to{ { geode::Vector3D{ { 0, 0, 1 } },
+        geode::Vector3D{ { 2, 0, 0 } }, geode::Vector3D{ { 0, 3, 0 } } } };
+    const geode::NormalFrameTransform3D frame_transform{ from, to };
+    // (1, 1, 1) in the "to" frame is (2, 3, 1) in the "from" frame
+    const auto result = frame_transform.apply( geode::Vector3D{ { 1, 1, 1 } } );
+    geode::OpenGeodeGeometryException::test(
+        result == geode::Vector3D{ { 2, 3, 1 } },
+        "Wrong result for normal frame transform with a 3-cycle: ",
+        result.string() );
+    const auto frame = frame_transform.apply( from );
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        const auto& direction =
+            frame.direction( frame_transform.direction( d ) );
+        geode::OpenGeodeGeometryException::test(
+            direction == to.direction( frame_transform.direction( d ) ),
+            "Wrong result for normal frame transform on frame with a "
+            "3-cycle" );
+    }
+}
+
 void test()
 {
     test_normal_frame_transform();
+    test_normal_frame_transform_cycle();
 }
 
 OPENGEODE_TEST( "normal-frame-transform" )
