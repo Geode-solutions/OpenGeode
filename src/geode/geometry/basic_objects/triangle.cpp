@@ -214,6 +214,7 @@ namespace geode
         local_index_t vertex, PointType point )
     {
         vertices_[vertex] = point;
+        pivot_and_normal_.reset();
     }
 
     template < typename PointType, index_t dimension >
