@@ -403,11 +403,48 @@ void test_point_triangle_position_3d()
         "qdeg (degenerate case)" );
 }
 
+void test_point_triangle_position_3d_in_plane_of_projection_vector()
+{
+    // The triangle plane contains the (1, 1, 1) direction
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 1.0, 1.0 } };
+    const geode::Point3D c{ { 0.0, 0.0, 1.0 } };
+    const geode::Triangle3D triangle{ a, b, c };
+
+    const geode::Point3D q_inside{ { 0.2, 0.2, 0.5 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_triangle_position( q_inside, triangle )
+            == geode::POSITION::inside,
+        "Wrong result for point_triangle_position_3d with point inside a "
+        "triangle containing the (1,1,1) direction" );
+
+    const geode::Point3D q_edge{ { 0.5, 0.5, 0.5 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_triangle_position( q_edge, triangle )
+            == geode::POSITION::edge0,
+        "Wrong result for point_triangle_position_3d with point on edge of "
+        "a triangle containing the (1,1,1) direction" );
+
+    geode::OpenGeodeGeometryException::test(
+        geode::point_triangle_position( b, triangle )
+            == geode::POSITION::vertex1,
+        "Wrong result for point_triangle_position_3d with vertex of a "
+        "triangle containing the (1,1,1) direction" );
+
+    const geode::Point3D q_outside{ { 1e-7, 1e-7, -1e-7 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_triangle_position( q_outside, triangle )
+            == geode::POSITION::outside,
+        "Wrong result for point_triangle_position_3d with point outside a "
+        "triangle containing the (1,1,1) direction" );
+}
+
 void test_point_triangle_position()
 {
     test_point_triangle_position_2d();
     test_point_triangle_degenerated_position_2d();
     test_point_triangle_position_3d();
+    test_point_triangle_position_3d_in_plane_of_projection_vector();
 }
 
 void test_point_tetrahedron_position()

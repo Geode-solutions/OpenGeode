@@ -23,6 +23,8 @@
 
 #include <geode/geometry/position.hpp>
 
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/infinite_line.hpp>
@@ -137,28 +139,26 @@ namespace
         return geode::internal::point_triangle_position( s0, s1, s2 );
     }
 
-    geode::POSITION compute_determinants( const geode::Point3D& point,
-        const geode::Triangle3D& triangle,
-        const geode::Vector3D& third_vector )
+    geode::POSITION point_degenerated_triangle_position_exact(
+        const geode::Point3D& point, const geode::Triangle3D& triangle )
     {
         const auto& vertices = triangle.vertices();
-        const geode::Vector3D v0_to_point{ vertices[0], point };
-        const geode::Vector3D v1_to_point{ vertices[1], point };
-        const geode::Vector3D v2_to_point{ vertices[2], point };
-        const auto det0 =
-            GEO::PCK::det_3d( v0_to_point, v1_to_point, third_vector );
-        const auto det1 =
-            GEO::PCK::det_3d( v1_to_point, v2_to_point, third_vector );
-        const auto det2 =
-            GEO::PCK::det_3d( v2_to_point, v0_to_point, third_vector );
-
-        if( det0 == GEO::zero && det1 == GEO::zero && det2 == GEO::zero )
+        for( const auto e : geode::LRange{ 3 } )
         {
-            return point_triangle_position_all_zero( point, triangle );
+            const geode::Point3D& vertex0 = vertices[e];
+            const geode::Point3D& vertex1 = vertices[e == 2 ? 0 : e + 1];
+            if( point == vertex0 )
+            {
+                return geode::POSITION::parallel;
+            }
+            if( vertex0 != vertex1
+                && point_segment_position_exact( point, { vertex0, vertex1 } )
+                       != geode::POSITION::outside )
+            {
+                return geode::POSITION::parallel;
+            }
         }
-        return geode::internal::point_triangle_position(
-            geode::internal::side( det0 ), geode::internal::side( det1 ),
-            geode::internal::side( det2 ) );
+        return geode::POSITION::outside;
     }
 
     geode::POSITION point_triangle_position_exact(
@@ -170,9 +170,30 @@ namespace
         {
             return geode::POSITION::outside;
         }
-
-        return compute_determinants(
-            point, triangle, geode::Vector3D{ { 1.0, 1.0, 1.0 } } );
+        // The point is exactly on the triangle plane: project along the axis
+        // where the triangle is the largest (dropping a coordinate is exact)
+        const auto normal = geode::Vector3D{ vertices[0], vertices[1] }.cross(
+            geode::Vector3D{ vertices[0], vertices[2] } );
+        std::array< geode::local_index_t, 3 > axes{ 0, 1, 2 };
+        absl::c_stable_sort( axes,
+            [&normal]( geode::local_index_t lhs, geode::local_index_t rhs ) {
+                return std::fabs( normal.value( lhs ) )
+                       > std::fabs( normal.value( rhs ) );
+            } );
+        for( const auto axis : axes )
+        {
+            const auto projected0 = vertices[0].get().project_point( axis );
+            const auto projected1 = vertices[1].get().project_point( axis );
+            const auto projected2 = vertices[2].get().project_point( axis );
+            if( GEO::PCK::orient_2d( projected0, projected1, projected2 )
+                == GEO::zero )
+            {
+                continue;
+            }
+            return point_triangle_position_exact( point.project_point( axis ),
+                { projected0, projected1, projected2 } );
+        }
+        return point_degenerated_triangle_position_exact( point, triangle );
     }
 
     geode::POSITION point_tetrahedron_position_exact(
