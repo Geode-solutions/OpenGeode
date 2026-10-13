@@ -107,8 +107,9 @@ namespace geode
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_triangles(
         index_t nb )
     {
-        geode_triangulated_surface_.add_triangles( nb, typename OpenGeodeTriangulatedSurface<
-                dimension >::OGTriangulatedSurfaceKey{} );
+        geode_triangulated_surface_.add_triangles(
+            nb, typename OpenGeodeTriangulatedSurface<
+                    dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template < index_t dimension >
@@ -136,8 +137,9 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_triangulated_surface_.remove_polygons( to_delete, typename OpenGeodeTriangulatedSurface<
-                dimension >::OGTriangulatedSurfaceKey{} );
+        geode_triangulated_surface_.remove_polygons(
+            to_delete, typename OpenGeodeTriangulatedSurface<
+                           dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template < index_t dimension >
@@ -145,8 +147,9 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_triangulated_surface_.permute_polygons( permutation, typename OpenGeodeTriangulatedSurface<
-                dimension >::OGTriangulatedSurfaceKey{} );
+        geode_triangulated_surface_.permute_polygons(
+            permutation, typename OpenGeodeTriangulatedSurface<
+                             dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template < index_t dimension >

@@ -108,8 +108,9 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedra(
         index_t nb )
     {
-        geode_tetrahedral_solid_.add_tetrahedra( nb, typename OpenGeodeTetrahedralSolid<
-                dimension >::OGTetrahedralSolidKey{} );
+        geode_tetrahedral_solid_.add_tetrahedra(
+            nb, typename OpenGeodeTetrahedralSolid<
+                    dimension >::OGTetrahedralSolidKey{} );
     }
 
     template < index_t dimension >
@@ -138,8 +139,9 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_tetrahedral_solid_.remove_polyhedra( to_delete, typename OpenGeodeTetrahedralSolid<
-                dimension >::OGTetrahedralSolidKey{} );
+        geode_tetrahedral_solid_.remove_polyhedra(
+            to_delete, typename OpenGeodeTetrahedralSolid<
+                           dimension >::OGTetrahedralSolidKey{} );
     }
 
     template < index_t dimension >
@@ -147,8 +149,9 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_tetrahedral_solid_.permute_polyhedra( permutation, typename OpenGeodeTetrahedralSolid<
-                dimension >::OGTetrahedralSolidKey{} );
+        geode_tetrahedral_solid_.permute_polyhedra(
+            permutation, typename OpenGeodeTetrahedralSolid<
+                             dimension >::OGTetrahedralSolidKey{} );
     }
 
     template < index_t dimension >

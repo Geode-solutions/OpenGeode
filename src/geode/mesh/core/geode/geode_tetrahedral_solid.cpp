@@ -340,8 +340,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::permute_polyhedra(
-        absl::Span< const index_t > permutation,
-        OGTetrahedralSolidKey /*key*/ )
+        absl::Span< const index_t > permutation, OGTetrahedralSolidKey /*key*/ )
     {
         impl_->permute_polyhedra( permutation );
     }

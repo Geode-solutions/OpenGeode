@@ -271,8 +271,7 @@ namespace geode
         return std::nullopt;
     }
 
-    void Graph::resize_vertex_storage(
-        index_t nb_vertices, GraphKey /*key*/ )
+    void Graph::resize_vertex_storage( index_t nb_vertices, GraphKey /*key*/ )
     {
         impl_->resize_vertex_storage( nb_vertices );
     }

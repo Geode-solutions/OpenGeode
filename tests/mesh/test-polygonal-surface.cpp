@@ -736,8 +736,8 @@ void check_v18_5( const geode::PolygonalSurface3D& surface )
 
 void test_backward_v18_5()
 {
-    const auto surface = geode::load_polygonal_surface< 3 >( absl::StrCat(
-        geode::DATA_PATH, "backward_io/v18_5/v18_5.og_psf3d" ) );
+    const auto surface = geode::load_polygonal_surface< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_psf3d" ) );
     check_v18_5( *surface );
     const auto filename =
         absl::StrCat( "v18_5_reload.", surface->native_extension() );

@@ -139,14 +139,14 @@ void test_backward_io( const std::string& filename )
         "Backward edges_around should have 3 edges" );
     geode::OpenGeodeMeshException::test(
         !graph->vertex_attribute_manager()
-             .attribute_ids_matching_name( "edges_around_vertex" )
-             .has_value(),
+            .attribute_ids_matching_name( "edges_around_vertex" )
+            .has_value(),
         "Backward mesh should not have legacy attribute "
         "edges_around_vertex" );
     geode::OpenGeodeMeshException::test(
         !graph->edge_attribute_manager()
-             .attribute_ids_matching_name( "edges" )
-             .has_value(),
+            .attribute_ids_matching_name( "edges" )
+            .has_value(),
         "Backward Graph should not have legacy attribute edges" );
 }
 

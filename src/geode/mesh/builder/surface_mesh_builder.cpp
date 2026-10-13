@@ -579,8 +579,8 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > old2new )
     {
-        surface_mesh_.delete_vertex_storage( to_delete,
-            typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
+        surface_mesh_.delete_vertex_storage(
+            to_delete, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
         update_polygon_vertices( old2new );
         if( surface_mesh_.are_edges_enabled() )
         {
@@ -594,8 +594,8 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > old2new )
     {
-        surface_mesh_.permute_vertex_storage( permutation,
-            typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
+        surface_mesh_.permute_vertex_storage(
+            permutation, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
         update_polygon_vertices( old2new );
         if( surface_mesh_.are_edges_enabled() )
         {
@@ -608,8 +608,8 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::do_resize_vertex_storage(
         index_t nb_vertices )
     {
-        surface_mesh_.resize_vertex_storage( nb_vertices,
-            typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
+        surface_mesh_.resize_vertex_storage(
+            nb_vertices, typename SurfaceMesh< dimension >::SurfaceMeshKey{} );
     }
 
     template < index_t dimension >

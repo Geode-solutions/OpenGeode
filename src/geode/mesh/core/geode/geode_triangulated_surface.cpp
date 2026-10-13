@@ -67,8 +67,8 @@ namespace geode
         std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
         {
-            const auto adj =
-                triangle_adjacents_[polygon_edge.polygon_id][polygon_edge.edge_id];
+            const auto adj = triangle_adjacents_[polygon_edge.polygon_id]
+                                                [polygon_edge.edge_id];
             if( adj == NO_ID )
             {
                 return std::nullopt;
@@ -256,8 +256,8 @@ namespace geode
                         archive.object( surface.impl_ );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
-                     surface.impl_->remove_legacy_attributes(
-                         surface.polygon_attribute_manager() );
+                        surface.impl_->remove_legacy_attributes(
+                            surface.polygon_attribute_manager() );
                         const auto new_point_attribute_id =
                             surface.vertex_attribute_manager()
                                 .attribute_ids_matching_name(
@@ -277,8 +277,8 @@ namespace geode
                         archive.object( surface.impl_ );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
-                     surface.impl_->remove_legacy_attributes(
-                         surface.polygon_attribute_manager() );
+                        surface.impl_->remove_legacy_attributes(
+                            surface.polygon_attribute_manager() );
                     } } } );
     }
 
@@ -317,8 +317,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::remove_polygons(
-        const std::vector< bool >& to_delete,
-        OGTriangulatedSurfaceKey /*key*/ )
+        const std::vector< bool >& to_delete, OGTriangulatedSurfaceKey /*key*/ )
     {
         impl_->remove_polygons( to_delete );
     }

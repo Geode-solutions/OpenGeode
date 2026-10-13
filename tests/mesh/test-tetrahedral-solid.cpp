@@ -339,17 +339,18 @@ void test_backward_io( const std::string& filename )
     {
         geode::OpenGeodeMeshException::test(
             !solid->vertex_attribute_manager()
-                 .attribute_ids_matching_name( name )
-                 .has_value(),
+                .attribute_ids_matching_name( name )
+                .has_value(),
             "Backward TetrahedralSolid should not have legacy attribute ",
             name );
     }
-    for( const auto* name : { "tetrahedron_vertices", "tetrahedron_adjacents" } )
+    for( const auto* name :
+        { "tetrahedron_vertices", "tetrahedron_adjacents" } )
     {
         geode::OpenGeodeMeshException::test(
             !solid->polyhedron_attribute_manager()
-                 .attribute_ids_matching_name( name )
-                 .has_value(),
+                .attribute_ids_matching_name( name )
+                .has_value(),
             "Backward TetrahedralSolid should not have legacy attribute ",
             name );
     }
@@ -555,16 +556,16 @@ void check_v18_5( const geode::TetrahedralSolid3D& solid )
         { "polyhedron_around_vertex", "polyhedra_around_vertex" } );
     check_no_legacy_attributes( solid.polyhedron_attribute_manager(),
         { "tetrahedron_vertices", "tetrahedron_adjacents" } );
-    check_no_legacy_attributes(
-        solid.edges().edge_attribute_manager(), { "counter", "facet_vertices" } );
+    check_no_legacy_attributes( solid.edges().edge_attribute_manager(),
+        { "counter", "facet_vertices" } );
     check_no_legacy_attributes( solid.facets().facet_attribute_manager(),
         { "counter", "facet_vertices" } );
 }
 
 void test_backward_v18_5()
 {
-    const auto solid = geode::load_tetrahedral_solid< 3 >( absl::StrCat(
-        geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tso3d" ) );
+    const auto solid = geode::load_tetrahedral_solid< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tso3d" ) );
     check_v18_5( *solid );
     const auto filename =
         absl::StrCat( "v18_5_reload.", solid->native_extension() );

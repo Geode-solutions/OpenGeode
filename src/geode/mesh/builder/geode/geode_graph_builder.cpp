@@ -78,8 +78,7 @@ namespace geode
         geode_graph_.add_edge( OpenGeodeGraph::OGGraphKey{} );
     }
 
-    void OpenGeodeGraphBuilder::do_create_edges(
-        index_t nb )
+    void OpenGeodeGraphBuilder::do_create_edges( index_t nb )
     {
         geode_graph_.add_edges( nb, OpenGeodeGraph::OGGraphKey{} );
     }
@@ -98,10 +97,9 @@ namespace geode
         geode_graph_.permute_edges( permutation, OpenGeodeGraph::OGGraphKey{} );
     }
 
-    void OpenGeodeGraphBuilder::do_copy_edges(
-        const Graph& mesh )
+    void OpenGeodeGraphBuilder::do_copy_edges( const Graph& mesh )
     {
-        geode_graph_.copy_edges(
-            dynamic_cast< const OpenGeodeGraph& >( mesh ), OpenGeodeGraph::OGGraphKey{} );
+        geode_graph_.copy_edges( dynamic_cast< const OpenGeodeGraph& >( mesh ),
+            OpenGeodeGraph::OGGraphKey{} );
     }
 } // namespace geode

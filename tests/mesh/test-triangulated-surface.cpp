@@ -262,8 +262,8 @@ void test_backward_io( const std::string& filename )
     {
         geode::OpenGeodeMeshException::test(
             !surface->polygon_attribute_manager()
-                 .attribute_ids_matching_name( name )
-                 .has_value(),
+                .attribute_ids_matching_name( name )
+                .has_value(),
             "Backward TriangulatedSurface should not have legacy attribute ",
             name );
     }
@@ -272,8 +272,8 @@ void test_backward_io( const std::string& filename )
     {
         geode::OpenGeodeMeshException::test(
             !surface->vertex_attribute_manager()
-                 .attribute_ids_matching_name( name )
-                 .has_value(),
+                .attribute_ids_matching_name( name )
+                .has_value(),
             "Backward TriangulatedSurface should not have legacy attribute ",
             name );
     }
@@ -444,8 +444,8 @@ void check_v18_5( const geode::TriangulatedSurface3D& surface )
 
 void test_backward_v18_5()
 {
-    const auto surface = geode::load_triangulated_surface< 3 >( absl::StrCat(
-        geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tsf3d" ) );
+    const auto surface = geode::load_triangulated_surface< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tsf3d" ) );
     check_v18_5( *surface );
     const auto filename =
         absl::StrCat( "v18_5_reload.", surface->native_extension() );
