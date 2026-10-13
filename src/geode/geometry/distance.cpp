@@ -968,12 +968,38 @@ namespace geode
         opengeode_geometry_api point_triangle_distance(
             const Point3D& point, const Triangle3D& triangle )
     {
-        if( const auto pivot = triangle.pivot() )
+        // Pivot on the vertex opposite to the longest edge: this is cheaper
+        // than Triangle::pivot() and its height over the longest edge tells
+        // if the triangle is degenerated
+        const auto& vertices = triangle.vertices();
+        std::array< double, 3 > squared_lengths;
+        for( const auto e : LRange{ 3 } )
         {
-            return pivot_point_triangle_distance(
-                point, triangle, pivot.value() );
+            squared_lengths[e] =
+                Vector3D{ vertices[e], vertices[e == 2 ? 0 : e + 1] }.length2();
         }
-        return no_pivot_point_triangle_distance( point, triangle );
+        local_index_t longest_edge{ 0 };
+        for( const auto e : LRange{ 1, 3 } )
+        {
+            if( squared_lengths[e] > squared_lengths[longest_edge] )
+            {
+                longest_edge = e;
+            }
+        }
+        const local_index_t pivot = longest_edge == 0 ? 2 : longest_edge - 1;
+        const auto next = pivot == 2 ? 0 : pivot + 1;
+        const auto previous = next == 2 ? 0 : next + 1;
+        const auto squared_double_area =
+            Vector3D{ vertices[pivot], vertices[next] }
+                .cross( Vector3D{ vertices[pivot], vertices[previous] } )
+                .length2();
+        // height over longest edge <= epsilon
+        if( !( squared_double_area > GLOBAL_EPSILON * GLOBAL_EPSILON
+                                         * squared_lengths[longest_edge] ) )
+        {
+            return no_pivot_point_triangle_distance( point, triangle );
+        }
+        return pivot_point_triangle_distance( point, triangle, pivot );
     }
 
     template <>

@@ -845,6 +845,62 @@ void test_point_line_distance()
     test_point_line_distance_3d();
 }
 
+void test_random_point_triangle_distance()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -10, 10 };
+    std::uniform_real_distribution< double > small{ -1e-3, 1e-3 };
+    std::uniform_int_distribution< int > choice{ 0, 3 };
+    const auto random_point = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    for( const auto unused : geode::Range{ 100000 } )
+    {
+        geode_unused( unused );
+        const auto p0 = random_point();
+        const auto p1 = random_point();
+        auto p2 = random_point();
+        const auto type = choice( generator );
+        if( type == 1 )
+        {
+            // Needle/sliver: third vertex close to the first edge
+            p2 = p0 + ( p1 - p0 ) * ( distribution( generator ) / 10 )
+                 + geode::Point3D{ { small( generator ), small( generator ),
+                     small( generator ) } };
+        }
+        else if( type == 2 )
+        {
+            // Degenerated: aligned vertices
+            p2 = p0 + ( p1 - p0 ) * ( distribution( generator ) / 10 );
+        }
+        const geode::Triangle3D triangle{ p0, p1, p2 };
+        const auto query = random_point();
+        const auto [distance, closest] =
+            geode::point_triangle_distance( query, triangle );
+        // Reference: pivot-based signed distance from Triangle::pivot()
+        const auto [signed_distance, signed_closest] =
+            geode::point_triangle_signed_distance( query, triangle );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - std::fabs( signed_distance ) ) < 1e-12,
+            "[Test] Wrong random point_triangle_distance: ", distance, " vs ",
+            signed_distance );
+        geode::OpenGeodeGeometryException::test(
+            geode::point_point_distance( closest, signed_closest ) < 1e-11,
+            "[Test] Wrong random point_triangle_distance closest point" );
+        // Brute force upper bound: no edge is closer
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            const auto& vertices = triangle.vertices();
+            geode::OpenGeodeGeometryException::test(
+                distance <= geode::point_segment_distance( query,
+                                { vertices[e], vertices[e == 2 ? 0 : e + 1] } )
+                                + 1e-12,
+                "[Test] point_triangle_distance farther than an edge" );
+        }
+    }
+}
+
 void test_point_tetrahedron_distance()
 {
     const auto check_tetra_distance = []( const geode::Tetrahedron& tetra ) {
@@ -1605,6 +1661,7 @@ void test()
     test_segment_line_distance();
     test_point_line_distance();
     test_point_triangle_distance();
+    test_random_point_triangle_distance();
     test_point_tetrahedron_distance();
     test_point_skewed_tetrahedron_distance();
     test_point_plane_distance();
