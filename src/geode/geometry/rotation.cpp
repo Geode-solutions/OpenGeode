@@ -88,38 +88,27 @@ namespace geode
     Point3D opengeode_geometry_api rotate(
         const Point3D& point, const Vector3D& axis, double angle )
     {
+        const auto axis_length = axis.length();
         OpenGeodeGeometryException::check_exception(
-            axis.length2() > geode::GLOBAL_EPSILON, point,
+            axis_length > 0 && std::isfinite( axis_length ), point,
             OpenGeodeBasicException::TYPE::data,
-            "[rotate] Given axis is almost null" );
-        while( angle < 0 )
-        {
-            angle += 2 * M_PI;
-        }
-        while( angle >= 2 * M_PI )
-        {
-            angle -= 2 * M_PI;
-        }
-
-        const auto base = axis.normalize() * std::sin( 0.5 * angle );
+            "[rotate] Given axis is null or not finite" );
+        // No angle normalization needed: the rotation matrix is quadratic in
+        // the quaternion, so q and -q (angle + 2*PI) give the same rotation.
+        const auto base = axis / axis_length * std::sin( 0.5 * angle );
         const geode::Vector< 4 > quaternion( { base.value( 0 ), base.value( 1 ),
             base.value( 2 ), std::cos( 0.5 * angle ) } );
 
         const auto matrix = rotation_matrix( quaternion );
         const Vector< 4 > quat_point(
             { point.value( 0 ), point.value( 1 ), point.value( 2 ), 1.0 } );
-        Vector< 4 > result;
-        for( const auto i : geode::Range{ 4 } )
+        // The last matrix row is (0, 0, 0, 1): the homogeneous coordinate
+        // stays 1 and no division is needed.
+        Point3D result;
+        for( const auto i : geode::LRange{ 3 } )
         {
             result.set_value( i, matrix[i].dot( quat_point ) );
         }
-
-        OpenGeodeGeometryException::check_exception(
-            std::fabs( result.value( 3 ) ) > GLOBAL_EPSILON, point,
-            OpenGeodeBasicException::TYPE::internal,
-            "[rotate] Error in computation" );
-        const auto inverse = 1.0 / result.value( 3 );
-        return Point3D{ { result.value( 0 ) * inverse,
-            result.value( 1 ) * inverse, result.value( 2 ) * inverse } };
+        return result;
     }
 } // namespace geode
