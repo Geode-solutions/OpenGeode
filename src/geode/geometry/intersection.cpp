@@ -86,6 +86,51 @@ namespace
         return basis;
     }
 
+    // Squared distance to an edge, in barycentric units, is
+    // lambda^2 * |normal|^2 / |edge|^2: the point is farther than
+    // GLOBAL_EPSILON from the edge when this exceeds GLOBAL_EPSILON^2
+    bool is_clearly_inside_triangle( double lambda,
+        double squared_normal_length,
+        double squared_opposite_edge_length )
+    {
+        return lambda > 0
+               && lambda * lambda * squared_normal_length
+                      > geode::GLOBAL_EPSILON * geode::GLOBAL_EPSILON
+                            * squared_opposite_edge_length;
+    }
+
+    bool is_clearly_inside_triangle( double lambda1,
+        double lambda2,
+        const geode::Vector3D& edge1,
+        const geode::Vector3D& edge2,
+        const geode::Vector3D& normal )
+    {
+        const auto squared_normal_length = normal.length2();
+        return is_clearly_inside_triangle(
+                   lambda1, squared_normal_length, edge2.length2() )
+               && is_clearly_inside_triangle(
+                   lambda2, squared_normal_length, edge1.length2() )
+               && is_clearly_inside_triangle( 1. - lambda1 - lambda2,
+                   squared_normal_length, ( edge2 - edge1 ).length2() );
+    }
+
+    // Rounding errors on points with coordinates below this bound stay far
+    // below GLOBAL_EPSILON
+    constexpr double ROUNDING_SAFE_COORDINATE{ 1e6 };
+
+    template < geode::index_t dimension >
+    bool has_rounding_safe_coordinates( const geode::Point< dimension >& point )
+    {
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            if( !( std::fabs( point.value( d ) ) < ROUNDING_SAFE_COORDINATE ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     struct CylinderLineResult
     {
         CylinderLineResult()
@@ -115,6 +160,14 @@ namespace geode
             + plane.plane_constant();
         auto result =
             line.origin() - line.direction() * signed_distance / dot_directions;
+        if( has_rounding_safe_coordinates( result )
+            && has_rounding_safe_coordinates( line.origin() )
+            && has_rounding_safe_coordinates( plane.origin() ) )
+        {
+            // The result is on both the line and the plane up to rounding
+            CorrectnessInfo< Point3D >::Correctness correctness{ true, result };
+            return { std::move( result ), { correctness, correctness } };
+        }
         CorrectnessInfo< Point3D >::Correctness first_correctness{
             point_line_distance( result, line ) <= GLOBAL_EPSILON,
             point_line_projection( result, line )
@@ -330,6 +383,14 @@ namespace geode
             std::clamp( q_dot_n * inv, -half_length, half_length );
 
         auto result = seg_center + segment_normalized_direction * seg_parameter;
+        if( std::fabs( q_dot_n * inv ) < half_length
+            && is_clearly_inside_triangle( d_dot_q_cross_e2 * inv,
+                d_dot_e1_cross_q * inv, edge1, edge2, normal ) )
+        {
+            // The result is strictly on the segment and inside the triangle
+            CorrectnessInfo< Point3D >::Correctness correctness{ true, result };
+            return { std::move( result ), { correctness, correctness } };
+        }
         CorrectnessInfo< Point3D >::Correctness first_correctness{
             point_segment_distance( result, segment ) <= GLOBAL_EPSILON,
             point_segment_projection( result, segment )
@@ -392,6 +453,15 @@ namespace geode
                 const auto seg_parameter = q_dot_n * inv;
 
                 auto result = line.origin() + line.direction() * seg_parameter;
+                if( is_clearly_inside_triangle( d_dot_q_cross_e2 * inv,
+                        d_dot_e1_cross_q * inv, edge1, edge2, normal ) )
+                {
+                    // The result is on the line and inside the triangle
+                    CorrectnessInfo< Point3D >::Correctness correctness{ true,
+                        result };
+                    return { std::move( result ),
+                        { correctness, correctness } };
+                }
                 CorrectnessInfo< Point3D >::Correctness first_correctness{
                     point_line_distance( result, line ) <= GLOBAL_EPSILON,
                     point_line_projection( result, line )
@@ -442,6 +512,14 @@ namespace geode
         const auto diffDotPerpD1 = dot_perpendicular( diff, line1.direction() );
         const auto s0 = diffDotPerpD1 * invD0DotPerpD1;
         auto result = line0.origin() + line0.direction() * s0;
+        if( has_rounding_safe_coordinates( result )
+            && has_rounding_safe_coordinates( line0.origin() )
+            && has_rounding_safe_coordinates( line1.origin() ) )
+        {
+            // The result is on both lines up to rounding
+            CorrectnessInfo< Point2D >::Correctness correctness{ true, result };
+            return { std::move( result ), { correctness, correctness } };
+        }
         CorrectnessInfo< Point2D >::Correctness first_correctness{
             point_line_distance( result, line0 ) <= GLOBAL_EPSILON,
             point_line_projection( result, line0 )
