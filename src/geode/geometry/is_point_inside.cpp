@@ -24,19 +24,24 @@
 #include <geode/geometry/is_point_inside.hpp>
 
 #include <geode/geometry/basic_objects/polygon.hpp>
+#include <geode/geometry/internal/predicates.hpp>
 #include <geode/geometry/point.hpp>
 
 namespace
 {
-    bool is_left( const geode::Point2D& p0,
-        const geode::Point2D& p1,
-        const geode::Point2D& p2 )
+    bool is_point_on_edge( const geode::Point2D& point,
+        const geode::Point2D& v0,
+        const geode::Point2D& v1 )
     {
-        return ( p1.value( 0 ) - p0.value( 0 ) )
-                       * ( p2.value( 1 ) - p0.value( 1 ) )
-                   - ( p2.value( 0 ) - p0.value( 0 ) )
-                         * ( p1.value( 1 ) - p0.value( 1 ) )
-               > 0;
+        for( const auto d : geode::LRange{ 2 } )
+        {
+            if( point.value( d ) < std::min( v0.value( d ), v1.value( d ) )
+                || point.value( d ) > std::max( v0.value( d ), v1.value( d ) ) )
+            {
+                return false;
+            }
+        }
+        return true;
     }
 } // namespace
 
@@ -45,33 +50,35 @@ namespace geode
     bool is_point_inside_polygon(
         const Point2D& point, const Polygon2D& polygon )
     {
-        double winding_number{ 0 };
+        // Winding number using exact orientation predicates. Points on the
+        // polygon boundary are considered inside, whatever the polygon
+        // orientation.
+        int winding_number{ 0 };
         const auto& vertices = polygon.vertices();
-        for( const auto polygon_vertex : geode::Range{ polygon.nb_vertices() } )
+        const auto nb_vertices = polygon.nb_vertices();
+        for( const auto polygon_vertex : geode::Range{ nb_vertices } )
         {
-            const auto& v0 = vertices[polygon_vertex];
-            const auto& next_polygon_vertex =
-                ( polygon_vertex + 1 ) % vertices.size();
-            const auto& v1 = vertices[next_polygon_vertex];
-            if( v0.get().value( 1 ) <= point.value( 1 ) )
+            const Point2D& v0 = vertices[polygon_vertex];
+            const Point2D& v1 = vertices[polygon_vertex + 1 == nb_vertices
+                                             ? 0
+                                             : polygon_vertex + 1];
+            const auto side = GEO::PCK::orient_2d( v0, v1, point );
+            if( side == GEO::SIGN::zero && is_point_on_edge( point, v0, v1 ) )
             {
-                if( v1.get().value( 1 ) > point.value( 1 ) )
+                return true;
+            }
+            if( v0.value( 1 ) <= point.value( 1 ) )
+            {
+                if( v1.value( 1 ) > point.value( 1 )
+                    && side == GEO::SIGN::positive )
                 {
-                    if( is_left( v0, v1, point ) )
-                    {
-                        winding_number++;
-                    }
+                    winding_number++;
                 }
             }
-            else
+            else if( v1.value( 1 ) <= point.value( 1 )
+                     && side == GEO::SIGN::negative )
             {
-                if( v1.get().value( 1 ) <= point.value( 1 ) )
-                {
-                    if( !is_left( v0, v1, point ) )
-                    {
-                        winding_number--;
-                    }
-                }
+                winding_number--;
             }
         }
         return winding_number != 0;

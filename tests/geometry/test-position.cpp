@@ -25,10 +25,12 @@
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
+#include <geode/geometry/is_point_inside.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/position.hpp>
 
@@ -532,6 +534,40 @@ void test_point_side_to_triangle()
         "q3" );
 }
 
+void test_point_inside_polygon()
+{
+    const geode::Point2D a{ { 0, 0 } };
+    const geode::Point2D b{ { 1, 0 } };
+    const geode::Point2D c{ { 1, 1 } };
+    const geode::Point2D d{ { 0, 1 } };
+    const geode::Polygon2D ccw{ { a, b, c, d } };
+    const geode::Polygon2D cw{ { a, d, c, b } };
+    const std::array< geode::Point2D, 9 > inside_points{
+        geode::Point2D{ { 0.5, 0.5 } }, geode::Point2D{ { 0.5, 0 } },
+        geode::Point2D{ { 1, 0.5 } }, geode::Point2D{ { 0.5, 1 } },
+        geode::Point2D{ { 0, 0.5 } }, a, b, c, d
+    };
+    for( const auto& point : inside_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            geode::is_point_inside_polygon( point, ccw )
+                && geode::is_point_inside_polygon( point, cw ),
+            "Point ", point.string(), " should be inside the polygon" );
+    }
+    const std::array< geode::Point2D, 6 > outside_points{
+        geode::Point2D{ { 1.5, 0.5 } }, geode::Point2D{ { -0.5, 0.5 } },
+        geode::Point2D{ { 0.5, 1.5 } }, geode::Point2D{ { 0.5, -0.5 } },
+        geode::Point2D{ { 2, 0 } }, geode::Point2D{ { -1, 1 } }
+    };
+    for( const auto& point : outside_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            !geode::is_point_inside_polygon( point, ccw )
+                && !geode::is_point_inside_polygon( point, cw ),
+            "Point ", point.string(), " should be outside the polygon" );
+    }
+}
+
 void test()
 {
     test_point_side_to_segment();
@@ -540,6 +576,7 @@ void test()
     test_point_segment_position();
     test_point_triangle_position();
     test_point_tetrahedron_position();
+    test_point_inside_polygon();
 }
 
 OPENGEODE_TEST( "position" )
