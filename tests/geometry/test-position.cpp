@@ -21,6 +21,12 @@
  *
  */
 
+#include <cmath>
+#include <limits>
+#include <random>
+
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -543,6 +549,112 @@ void test_point_tetrahedron_position()
         "q9" );
 }
 
+void test_nan_point_position()
+{
+    const auto nan = std::numeric_limits< double >::quiet_NaN();
+    const geode::Point2D a2{ { 0, 0 } };
+    const geode::Point2D b2{ { 1, 0 } };
+    const geode::Point2D c2{ { 0, 1 } };
+    const geode::Point2D nan2{ { nan, nan } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_triangle_position( nan2, geode::Triangle2D{ a2, b2, c2 } )
+            == geode::POSITION::outside,
+        "[Test] NaN point should be outside the 2D triangle" );
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 1, 0, 0 } };
+    const geode::Point3D c{ { 0, 1, 0 } };
+    const geode::Point3D d{ { 0, 0, 1 } };
+    const geode::Point3D nan3{ { nan, nan, nan } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_triangle_position( nan3, geode::Triangle3D{ a, b, c } )
+            == geode::POSITION::outside,
+        "[Test] NaN point should be outside the 3D triangle" );
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position(
+            nan3, geode::Tetrahedron{ a, b, c, d } )
+            == geode::POSITION::outside,
+        "[Test] NaN point should be outside the tetrahedron" );
+}
+
+void test_random_positions_against_exact_sides()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_int_distribution< int > distribution{ -20, 20 };
+    const auto random_point = [&generator, &distribution] {
+        return geode::Point3D{ { static_cast< double >(
+                                     distribution( generator ) ),
+            static_cast< double >( distribution( generator ) ),
+            static_cast< double >( distribution( generator ) ) } };
+    };
+    for( const auto unused : geode::Range{ 5000 } )
+    {
+        geode_unused( unused );
+        const std::array< geode::Point3D, 4 > vertices{ random_point(),
+            random_point(), random_point(), random_point() };
+        const geode::Tetrahedron tetra{ vertices[0], vertices[1], vertices[2],
+            vertices[3] };
+        const auto query = random_point();
+        std::array< geode::SIDE, 4 > sides;
+        for( const auto f : geode::LRange{ 4 } )
+        {
+            const auto& facet = geode::Tetrahedron::tetrahedron_facet_vertex[f];
+            sides[f] = geode::point_side_to_triangle(
+                query, { vertices[facet[0]], vertices[facet[1]],
+                           vertices[facet[2]] } );
+        }
+        const auto position = geode::point_tetrahedron_position( query, tetra );
+        const auto all_positive =
+            absl::c_all_of( sides, []( geode::SIDE side ) {
+                return side == geode::SIDE::positive;
+            } );
+        const auto any_negative =
+            absl::c_any_of( sides, []( geode::SIDE side ) {
+                return side == geode::SIDE::negative;
+            } );
+        if( all_positive )
+        {
+            geode::OpenGeodeGeometryException::test(
+                position == geode::POSITION::inside,
+                "[Test] Wrong inside tetrahedron position" );
+        }
+        else if( any_negative )
+        {
+            geode::OpenGeodeGeometryException::test(
+                position == geode::POSITION::outside,
+                "[Test] Wrong outside tetrahedron position" );
+        }
+        else
+        {
+            geode::OpenGeodeGeometryException::test(
+                position != geode::POSITION::inside
+                    && position != geode::POSITION::outside,
+                "[Test] Wrong boundary tetrahedron position" );
+        }
+
+        const geode::Triangle3D triangle{ vertices[0], vertices[1],
+            vertices[2] };
+        const auto triangle_position =
+            geode::point_triangle_position( query, triangle );
+        if( geode::point_side_to_triangle( query, triangle )
+            != geode::SIDE::zero )
+        {
+            geode::OpenGeodeGeometryException::test(
+                triangle_position == geode::POSITION::outside,
+                "[Test] Point off the triangle plane should be outside" );
+        }
+        const auto edge_middle = ( vertices[0] + vertices[1] ) / 2.;
+        if( vertices[0] != vertices[1]
+            && !geode::are_points_aligned(
+                vertices[0], vertices[1], vertices[2] ) )
+        {
+            geode::OpenGeodeGeometryException::test(
+                geode::point_triangle_position( edge_middle, triangle )
+                    == geode::POSITION::edge0,
+                "[Test] Edge middle should be on triangle edge0" );
+        }
+    }
+}
+
 void test_point_side_to_triangle()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -577,6 +689,8 @@ void test()
     test_point_segment_position();
     test_point_triangle_position();
     test_point_tetrahedron_position();
+    test_nan_point_position();
+    test_random_positions_against_exact_sides();
 }
 
 OPENGEODE_TEST( "position" )
