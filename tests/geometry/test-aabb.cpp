@@ -30,8 +30,13 @@
 
 #include <geode/tests/common.hpp>
 
+#include <absl/algorithm/container.h>
+
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
+
+#include <algorithm>
+#include <random>
 
 template < geode::index_t dimension >
 geode::BoundingBox< dimension > create_bounding_box(
@@ -524,6 +529,74 @@ void test_closest_element_box_with_nan_hint()
         "Closest element box with NaN hint - Distance should be finite" );
 }
 
+void test_thin_strips()
+{
+    geode::Logger::info( "TEST", "AABB with long thin strips" );
+    std::mt19937 generator{ 42 };
+    constexpr geode::index_t NB_STRIPS{ 20000 };
+    std::vector< geode::BoundingBox2D > strips( NB_STRIPS );
+    for( const auto i : geode::Range{ NB_STRIPS } )
+    {
+        const auto y = 10. * i / NB_STRIPS;
+        strips[i].add_point( geode::Point2D{ { 0, y } } );
+        strips[i].add_point( geode::Point2D{ { 100, y + 0.0005 } } );
+    }
+    std::shuffle( strips.begin(), strips.end(), generator );
+    const geode::AABBTree2D aabb{ strips };
+    std::uniform_real_distribution< double > distribution{ -1, 101 };
+    std::uniform_real_distribution< double > y_distribution{ -1, 11 };
+    geode::index_t nb_visited_elements{ 0 };
+    for( const auto unused : geode::Range{ 50 } )
+    {
+        geode_unused( unused );
+        const geode::Point2D query{ { distribution( generator ),
+            y_distribution( generator ) } };
+        geode::BoundingBox2D query_box;
+        query_box.add_point( query );
+        query_box.add_point( query + geode::Point2D{ { 0.01, 0.01 } } );
+        std::vector< geode::index_t > found;
+        auto action = [&found]( geode::index_t box ) {
+            found.push_back( box );
+            return false;
+        };
+        aabb.compute_bbox_element_bbox_intersections( query_box, action );
+        std::vector< geode::index_t > expected;
+        for( const auto s : geode::Range{ NB_STRIPS } )
+        {
+            if( strips[s].epsilon_intersects( query_box ) )
+            {
+                expected.push_back( s );
+            }
+        }
+        absl::c_sort( found );
+        geode::OpenGeodeGeometryException::test(
+            found == expected, "AABB with thin strips - Wrong box query" );
+
+        const auto [closest, distance] = aabb.closest_element_box(
+            query, [&strips, &nb_visited_elements](
+                       const geode::Point2D& point, geode::index_t box ) {
+                nb_visited_elements++;
+                return strips[box].signed_distance( point );
+            } );
+        auto expected_distance = std::numeric_limits< double >::max();
+        for( const auto& strip : strips )
+        {
+            expected_distance =
+                std::min( expected_distance, strip.signed_distance( query ) );
+        }
+        geode::OpenGeodeGeometryException::test(
+            distance == expected_distance
+                && strips[closest].signed_distance( query ) == distance,
+            "AABB with thin strips - Wrong closest box" );
+    }
+    // Splitting along strip extents (x) would evaluate most strips
+    geode::Logger::info(
+        "Thin strips closest element evaluations: ", nb_visited_elements );
+    geode::OpenGeodeGeometryException::test( nb_visited_elements < 150,
+        "AABB with thin strips - Too many visited elements: ",
+        nb_visited_elements );
+}
+
 template < geode::index_t dimension >
 void do_test()
 {
@@ -541,6 +614,7 @@ void test()
     do_test< 3 >();
     test_aabb_with_empty_box();
     test_closest_element_box_with_nan_hint();
+    test_thin_strips();
 }
 
 OPENGEODE_TEST( "aabb" )

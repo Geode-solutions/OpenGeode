@@ -66,8 +66,8 @@ namespace geode
      *  where B* are the input bboxes
      *  Storage: |ROOT|A1|B1|B2|A2|B3|B4|
      *
-     * Each internal node splits its element range along the longest axis
-     * of that range's actual bounding box, at the centroid median (rather
+     * Each internal node splits its element range along the axis where
+     * its element centroids are the most spread, at the centroid median (rather
      * than a fixed pre-computed order such as a Morton curve). This keeps
      * sibling boxes tight and minimally overlapping, which is what lets
      * queries prune branches instead of having to visit both children.
@@ -105,9 +105,15 @@ namespace geode
             {
                 absl::c_iota( element_order_, index_t{ 0 } );
                 tree_.resize( 2 * bboxes.size() - 1 );
+                std::vector< Point< dimension > > centers;
+                centers.reserve( bboxes.size() );
+                for( const auto& bbox : bboxes )
+                {
+                    centers.emplace_back( bbox.center() );
+                }
                 index_t next_free_index{ 0 };
                 initialize_tree_recursive(
-                    bboxes, next_free_index, 0, bboxes.size() );
+                    bboxes, centers, next_free_index, 0, bboxes.size() );
             }
         }
 
@@ -149,6 +155,7 @@ namespace geode
 
         index_t initialize_tree_recursive(
             absl::Span< const BoundingBox< dimension > > bboxes,
+            absl::Span< const Point< dimension > > centers,
             index_t& next_free_index,
             index_t element_begin,
             index_t element_end )
@@ -164,25 +171,28 @@ namespace geode
                 tree_[node_index].box = bboxes[element_order_[element_begin]];
                 return node_index;
             }
-            BoundingBox< dimension > range_box;
+            // Split along the axis where the element centers are the most
+            // spread: the element extents may all overlap along an axis
+            // (e.g. long thin strips) where centers do not
+            BoundingBox< dimension > centers_box;
             for( const auto i : Range{ element_begin, element_end } )
             {
-                range_box.add_box( bboxes[element_order_[i]] );
+                centers_box.add_point( centers[element_order_[i]] );
             }
-            const auto axis = std::get< 0 >( range_box.largest_length() );
+            const auto axis = std::get< 0 >( centers_box.largest_length() );
             const auto element_middle =
                 element_begin + ( element_end - element_begin ) / 2;
             std::nth_element( element_order_.begin() + element_begin,
                 element_order_.begin() + element_middle,
                 element_order_.begin() + element_end,
-                [&bboxes, axis]( index_t index1, index_t index2 ) {
-                    return bboxes[index1].center().value( axis )
-                           < bboxes[index2].center().value( axis );
+                [&centers, axis]( index_t index1, index_t index2 ) {
+                    return centers[index1].value( axis )
+                           < centers[index2].value( axis );
                 } );
-            const auto left_index = initialize_tree_recursive(
-                bboxes, next_free_index, element_begin, element_middle );
+            const auto left_index = initialize_tree_recursive( bboxes, centers,
+                next_free_index, element_begin, element_middle );
             const auto right_index = initialize_tree_recursive(
-                bboxes, next_free_index, element_middle, element_end );
+                bboxes, centers, next_free_index, element_middle, element_end );
             tree_[node_index].right_child = right_index;
             // before box_union
             tree_[node_index].box.add_box( node( left_index ) );
