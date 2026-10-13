@@ -132,8 +132,7 @@ namespace geode
                      },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.edge_attribute_manager_ );
-                            impl.deserialize_legacy_storage(
-                                archive );
+                            impl.deserialize_legacy_storage( archive );
                         },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.edge_attribute_manager_ );
@@ -339,4 +338,4 @@ namespace std
         return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
                ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
     }
-} // namespace std
+} // namespace std

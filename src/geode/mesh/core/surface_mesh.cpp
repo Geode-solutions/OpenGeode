@@ -1292,4 +1292,4 @@ namespace std
         return absl::Hash< geode::index_t >()( polygon_edge.polygon_id )
                ^ absl::Hash< geode::index_t >()( polygon_edge.edge_id );
     }
-} // namespace std
+} // namespace std

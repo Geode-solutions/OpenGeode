@@ -712,7 +712,8 @@ namespace geode
         template < typename Archive >
         void deserialize_legacy_polyhedron_around_vertex( Archive& archive )
         {
-            legacy_attributes_.deserialize( archive, polyhedron_around_vertex_ );
+            legacy_attributes_.deserialize(
+                archive, polyhedron_around_vertex_ );
             polyhedra_around_vertex_.resize( polyhedron_around_vertex_.size() );
         }
 
@@ -1839,4 +1840,4 @@ namespace std
                ^ absl::Hash< geode::index_t >()(
                    polyhedron_facet_edge.edge_id );
     }
-} // namespace std
+} // namespace std
