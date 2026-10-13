@@ -30,6 +30,7 @@
 #include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -293,6 +294,23 @@ void test_circle()
         "Wrong result for circle5" );
 }
 
+void test_polygon_minimum_height()
+{
+    const geode::OwnerPolygon2D quad{ { geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 10, 0 } }, geode::Point2D{ { 5, 5 } },
+        geode::Point2D{ { -1, 0 } } } };
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( quad.minimum_height() - 5 ) <= geode::GLOBAL_EPSILON,
+        "Wrong polygon minimum height: ", quad.minimum_height() );
+    geode::OpenGeodeGeometryException::test(
+        !quad.is_degenerated(), "Polygon should not be degenerated" );
+    const geode::OwnerPolygon2D flat{ { geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 10, 0 } }, geode::Point2D{ { 5, 0 } },
+        geode::Point2D{ { -1, 0 } } } };
+    geode::OpenGeodeGeometryException::test(
+        flat.is_degenerated(), "Flat polygon should be degenerated" );
+}
+
 void test()
 {
     test_segment();
@@ -302,6 +320,7 @@ void test()
     test_tetrahedron();
     test_sphere();
     test_circle();
+    test_polygon_minimum_height();
 }
 
 OPENGEODE_TEST( "basic-object" )

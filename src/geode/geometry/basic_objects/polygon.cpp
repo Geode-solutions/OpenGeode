@@ -299,17 +299,18 @@ namespace geode
             geode::Segment< dimension >{
                 vertices_[max_length_edge], vertices_[next] }
         };
-        index_t opposite_vertex{ 0 };
+        double max_distance{ 0. };
         for( const auto vertex : geode::Range{ nb_vertices } )
         {
             if( vertex == max_length_edge || vertex == next )
             {
                 continue;
             }
-            opposite_vertex = vertex;
+            const geode::Point< dimension >& point = vertices_[vertex];
+            max_distance = std::max(
+                max_distance, geode::point_line_distance( point, line ) );
         }
-        const geode::Point< dimension >& point = vertices_[opposite_vertex];
-        return geode::point_line_distance( point, line );
+        return max_distance;
     }
 
     template < typename PointType, index_t dimension >
