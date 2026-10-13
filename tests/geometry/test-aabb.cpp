@@ -529,6 +529,70 @@ void test_closest_element_box_with_nan_hint()
         "Closest element box with NaN hint - Distance should be finite" );
 }
 
+void test_small_other_big_intersections()
+{
+    geode::Logger::info(
+        "TEST", "Small AABB other intersection with big AABB" );
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 10 };
+    const auto random_boxes = [&generator, &distribution](
+                                  geode::index_t nb, double size ) {
+        std::vector< geode::BoundingBox3D > boxes( nb );
+        for( auto& box : boxes )
+        {
+            const geode::Point3D point{ { distribution( generator ),
+                distribution( generator ), distribution( generator ) } };
+            box.add_point( point );
+            box.add_point( point + geode::Point3D{ { size, size, size } } );
+        }
+        return boxes;
+    };
+    const auto small_boxes = random_boxes( 20, 2 );
+    const auto big_boxes = random_boxes( 5000, 0.2 );
+    const geode::AABBTree3D small{ small_boxes };
+    const geode::AABBTree3D big{ big_boxes };
+    const auto action = []( geode::index_t, geode::index_t ) {
+        return true;
+    };
+    const auto result =
+        small.compute_other_element_bbox_intersections( big, action );
+    std::vector< std::pair< geode::index_t, geode::index_t > > expected;
+    for( const auto s : geode::Indices{ small_boxes } )
+    {
+        for( const auto b : geode::Indices{ big_boxes } )
+        {
+            if( small_boxes[s].epsilon_intersects( big_boxes[b] ) )
+            {
+                expected.emplace_back( s, b );
+            }
+        }
+    }
+    auto sorted_result = result;
+    absl::c_sort( sorted_result );
+    geode::OpenGeodeGeometryException::test( sorted_result == expected,
+        "Small other big intersection - Wrong pairs" );
+    for( const auto unused : geode::Range{ 3 } )
+    {
+        geode_unused( unused );
+        geode::OpenGeodeGeometryException::test(
+            small.compute_other_element_bbox_intersections( big, action )
+                == result,
+            "Small other big intersection - Order should be deterministic" );
+    }
+    // Pairs are grouped by element of the queried tree
+    absl::flat_hash_set< geode::index_t > closed_elements;
+    for( const auto p : geode::Indices{ result } )
+    {
+        if( p > 0 && result[p].first != result[p - 1].first )
+        {
+            closed_elements.insert( result[p - 1].first );
+        }
+        geode::OpenGeodeGeometryException::test(
+            !closed_elements.contains( result[p].first ),
+            "Small other big intersection - Pairs should be grouped" );
+    }
+}
+
 void test_thin_strips()
 {
     geode::Logger::info( "TEST", "AABB with long thin strips" );
@@ -615,6 +679,7 @@ void test()
     test_aabb_with_empty_box();
     test_closest_element_box_with_nan_hint();
     test_thin_strips();
+    test_small_other_big_intersections();
 }
 
 OPENGEODE_TEST( "aabb" )

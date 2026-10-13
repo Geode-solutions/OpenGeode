@@ -78,6 +78,9 @@ namespace geode
     public:
         static constexpr index_t ROOT_INDEX{ 0 };
         static constexpr index_t LEAF_QUERY_CHUNK_SIZE{ 128 };
+        static constexpr index_t MIN_PARALLEL_CHUNKS{ 16 };
+        // 2^SUBTREE_DEPTH subtrees of the other tree at most
+        static constexpr index_t SUBTREE_DEPTH{ 6 };
 
         struct Iterator
         {
@@ -288,6 +291,15 @@ namespace geode
                 const ACTION& action ) const
         {
             const auto& other = *other_tree.impl_;
+            const auto nb_chunks = ( nb_bboxes() + LEAF_QUERY_CHUNK_SIZE - 1 )
+                                   / LEAF_QUERY_CHUNK_SIZE;
+            if( nb_chunks < MIN_PARALLEL_CHUNKS
+                && other.nb_bboxes() > nb_bboxes() )
+            {
+                // Too few leaves in this tree to keep the threads busy:
+                // also split the queries along the other tree subtrees
+                return subtree_other_intersect( other, action );
+            }
             return parallel_leaf_queries(
                 [this, &other, &action]( index_t position,
                     std::vector< std::pair< index_t, index_t > >& pairs ) {
@@ -295,6 +307,94 @@ namespace geode
                         position, other, ROOT_INDEX, 0, other.nb_bboxes(),
                         action, pairs );
                 } );
+        }
+
+        struct Subtree
+        {
+            index_t node_index;
+            index_t element_begin;
+            index_t element_end;
+        };
+
+        void collect_subtrees( index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            index_t depth,
+            std::vector< Subtree >& subtrees ) const
+        {
+            if( depth == 0 || is_leaf( element_begin, element_end ) )
+            {
+                subtrees.push_back(
+                    { node_index, element_begin, element_end } );
+                return;
+            }
+            const auto it = get_recursive_iterators(
+                node_index, element_begin, element_end );
+            collect_subtrees( it.child_left, element_begin, it.element_middle,
+                depth - 1, subtrees );
+            collect_subtrees( it.child_right, it.element_middle, element_end,
+                depth - 1, subtrees );
+        }
+
+        // Same result, in the same order, as parallel_leaf_queries with
+        // leaf_other_intersect_recursive: for each leaf of this tree, the
+        // other tree subtrees are visited from left to right, which is the
+        // depth-first order of a query starting at the other tree root.
+        template < typename ACTION >
+        [[nodiscard]] std::vector< std::pair< index_t, index_t > >
+            subtree_other_intersect(
+                const Impl& other, const ACTION& action ) const
+        {
+            std::vector< Subtree > subtrees;
+            other.collect_subtrees(
+                ROOT_INDEX, 0, other.nb_bboxes(), SUBTREE_DEPTH, subtrees );
+            std::vector< index_t > leaf_nodes( nb_bboxes() );
+            for( const auto position : Range{ nb_bboxes() } )
+            {
+                leaf_nodes[position] = leaf_node( position );
+            }
+            absl::FixedArray< std::vector< std::pair< index_t, index_t > > >
+                subtree_pairs( subtrees.size() );
+            // subtree_offsets[s][p] = first pair of leaf position p
+            absl::FixedArray< std::vector< index_t > > subtree_offsets(
+                subtrees.size() );
+            async::parallel_for(
+                async::irange(
+                    index_t{ 0 }, static_cast< index_t >( subtrees.size() ) ),
+                [&]( index_t s ) {
+                    const auto& subtree = subtrees[s];
+                    auto& pairs = subtree_pairs[s];
+                    auto& offsets = subtree_offsets[s];
+                    offsets.resize( nb_bboxes() + 1 );
+                    for( const auto position : Range{ nb_bboxes() } )
+                    {
+                        offsets[position] = pairs.size();
+                        leaf_other_intersect_recursive( leaf_nodes[position],
+                            position, other, subtree.node_index,
+                            subtree.element_begin, subtree.element_end, action,
+                            pairs );
+                    }
+                    offsets[nb_bboxes()] = pairs.size();
+                } );
+            std::size_t nb_pairs{ 0 };
+            for( const auto& pairs : subtree_pairs )
+            {
+                nb_pairs += pairs.size();
+            }
+            std::vector< std::pair< index_t, index_t > > result;
+            result.reserve( nb_pairs );
+            for( const auto position : Range{ nb_bboxes() } )
+            {
+                for( const auto s : Indices{ subtrees } )
+                {
+                    const auto& pairs = subtree_pairs[s];
+                    const auto& offsets = subtree_offsets[s];
+                    result.insert( result.end(),
+                        pairs.begin() + offsets[position],
+                        pairs.begin() + offsets[position + 1] );
+                }
+            }
+            return result;
         }
 
         template < typename LeafQuery >
