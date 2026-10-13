@@ -210,7 +210,8 @@ namespace geode
             index_t node_index,
             index_t element_begin,
             index_t element_end,
-            const ACTION& action ) const
+            const ACTION& action,
+            index_t evaluated_element ) const
         {
             OpenGeodeGeometryException::check_assertion(
                 node_index < tree_.size(), "node out of tree" );
@@ -223,6 +224,10 @@ namespace geode
             if( is_leaf( element_begin, element_end ) )
             {
                 const auto cur_box = element_order( element_begin );
+                if( cur_box == evaluated_element )
+                {
+                    return;
+                }
                 const auto cur_distance = action( query, cur_box );
                 const auto cur_squared_distance = cur_distance * cur_distance;
                 if( cur_squared_distance < squared_distance )
@@ -247,13 +252,13 @@ namespace geode
                 {
                     closest_element_box_recursive( query, nearest_box,
                         squared_distance, it.child_left, element_begin,
-                        it.element_middle, action );
+                        it.element_middle, action, evaluated_element );
                 }
                 if( squared_distance_right < squared_distance )
                 {
                     closest_element_box_recursive( query, nearest_box,
                         squared_distance, it.child_right, it.element_middle,
-                        element_end, action );
+                        element_end, action, evaluated_element );
                 }
             }
             else
@@ -262,13 +267,13 @@ namespace geode
                 {
                     closest_element_box_recursive( query, nearest_box,
                         squared_distance, it.child_right, it.element_middle,
-                        element_end, action );
+                        element_end, action, evaluated_element );
                 }
                 if( squared_distance_left < squared_distance )
                 {
                     closest_element_box_recursive( query, nearest_box,
                         squared_distance, it.child_left, element_begin,
-                        it.element_middle, action );
+                        it.element_middle, action, evaluated_element );
                 }
             }
         }
@@ -627,7 +632,8 @@ namespace geode
         {
             return { NO_ID, 0 };
         }
-        auto nearest_box = impl_->closest_element_box_hint( query );
+        const auto hint = impl_->closest_element_box_hint( query );
+        auto nearest_box = hint;
         auto distance = action( query, nearest_box );
         distance *= distance;
         if( !std::isfinite( distance ) )
@@ -635,8 +641,9 @@ namespace geode
             nearest_box = NO_ID;
             distance = std::numeric_limits< double >::max();
         }
+        // The hint element has already been evaluated
         impl_->closest_element_box_recursive( query, nearest_box, distance,
-            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            Impl::ROOT_INDEX, 0, nb_bboxes(), action, hint );
         OpenGeodeGeometryException::check_assertion(
             nearest_box != NO_ID, "No box found" );
         return { nearest_box, std::sqrt( distance ) };
@@ -654,7 +661,7 @@ namespace geode
         auto nearest_box = NO_ID;
         auto distance = std::numeric_limits< double >::max();
         impl_->closest_element_box_recursive( query, nearest_box, distance,
-            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+            Impl::ROOT_INDEX, 0, nb_bboxes(), action, NO_ID );
     }
 
     template < index_t dimension >

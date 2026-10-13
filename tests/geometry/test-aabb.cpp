@@ -593,6 +593,52 @@ void test_small_other_big_intersections()
     }
 }
 
+void test_closest_element_box_evaluations()
+{
+    geode::Logger::info( "TEST", "Closest element box evaluations" );
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 10 };
+    const auto random_point = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    std::vector< geode::BoundingBox3D > boxes( 2000 );
+    for( auto& box : boxes )
+    {
+        const auto point = random_point();
+        box.add_point( point );
+        box.add_point( point + geode::Point3D{ { 0.2, 0.3, 0.1 } } );
+    }
+    const geode::AABBTree3D aabb{ boxes };
+    for( const auto unused : geode::Range{ 200 } )
+    {
+        geode_unused( unused );
+        const auto query = random_point();
+        absl::flat_hash_map< geode::index_t, geode::index_t > nb_evaluations;
+        const auto [box_id, distance] = aabb.closest_element_box(
+            query, [&boxes, &nb_evaluations](
+                       const geode::Point3D& point, geode::index_t element ) {
+                nb_evaluations[element]++;
+                return geode::point_point_distance(
+                    point, boxes[element].center() );
+            } );
+        for( const auto& [element, count] : nb_evaluations )
+        {
+            geode::OpenGeodeGeometryException::test( count == 1,
+                "Closest element box evaluations - Element ", element,
+                " evaluated ", count, " times" );
+        }
+        auto expected = std::numeric_limits< double >::max();
+        for( const auto& box : boxes )
+        {
+            expected = std::min(
+                expected, geode::point_point_distance( query, box.center() ) );
+        }
+        geode::OpenGeodeGeometryException::test( distance == expected,
+            "Closest element box evaluations - Wrong distance" );
+    }
+}
+
 void test_thin_strips()
 {
     geode::Logger::info( "TEST", "AABB with long thin strips" );
@@ -679,6 +725,7 @@ void test()
     test_aabb_with_empty_box();
     test_closest_element_box_with_nan_hint();
     test_thin_strips();
+    test_closest_element_box_evaluations();
     test_small_other_big_intersections();
 }
 
