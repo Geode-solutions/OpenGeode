@@ -1099,6 +1099,67 @@ void test_degenerated_segment_intersections()
     }
 }
 
+void test_line_cylinder_perpendicular()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Cylinder cylinder{ geode::Segment3D{ a, b }, 0.2 };
+    const auto check_correctness = []( const auto& result ) {
+        return result.correctness->first.second.size() == result.result->size()
+               && result.correctness->second.second.size()
+                      == result.result->size();
+    };
+
+    for( const auto offset : { 0., 1e-7, -1e-7 } )
+    {
+        const geode::Point3D c{ { 0.5, 0.2 + offset, -1.0 } };
+        const geode::Point3D d{ { 0.5, 0.2 + offset, 1.0 } };
+        const geode::InfiniteLine3D tangent{ geode::Segment3D{ c, d } };
+        const auto tangent_result =
+            geode::line_cylinder_intersection( tangent, cylinder );
+        geode::OpenGeodeGeometryException::test(
+            tangent_result && tangent_result.result->size() == 1
+                && tangent_result.result->front().inexact_equal(
+                    geode::Point3D{ { 0.5, 0.2, 0.0 } } )
+                && check_correctness( tangent_result ),
+            "Wrong result for line_cylinder_intersection with perpendicular "
+            "tangent line" );
+    }
+
+    const geode::Point3D e{ { 0.5, 0.1, -1.0 } };
+    const geode::Point3D f{ { 0.5, 0.1, 1.0 } };
+    const geode::InfiniteLine3D crossing{ geode::Segment3D{ e, f } };
+    const auto crossing_result =
+        geode::line_cylinder_intersection( crossing, cylinder );
+    const auto z = std::sqrt( 0.2 * 0.2 - 0.1 * 0.1 );
+    geode::OpenGeodeGeometryException::test(
+        crossing_result && crossing_result.result->size() == 2
+            && crossing_result.result->front().inexact_equal(
+                geode::Point3D{ { 0.5, 0.1, -z } } )
+            && crossing_result.result->back().inexact_equal(
+                geode::Point3D{ { 0.5, 0.1, z } } )
+            && check_correctness( crossing_result ),
+        "Wrong result for line_cylinder_intersection with perpendicular "
+        "crossing line" );
+
+    const geode::Point3D g{ { 0.5, 0.3, -1.0 } };
+    const geode::Point3D h{ { 0.5, 0.3, 1.0 } };
+    geode::OpenGeodeGeometryException::test(
+        !geode::line_cylinder_intersection(
+            geode::InfiniteLine3D{ geode::Segment3D{ g, h } }, cylinder ),
+        "Wrong result for line_cylinder_intersection with perpendicular "
+        "outside line" );
+
+    const geode::Point3D i{ { 0.0, -1.0, 0.0 } };
+    const geode::Point3D j{ { 1.0, 1.0, 0.0 } };
+    const auto oblique_result = geode::line_cylinder_intersection(
+        geode::InfiniteLine3D{ geode::Segment3D{ i, j } }, cylinder );
+    geode::OpenGeodeGeometryException::test(
+        oblique_result && oblique_result.result->size() == 2
+            && check_correctness( oblique_result ),
+        "Wrong result for line_cylinder_intersection with oblique line" );
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -1116,6 +1177,7 @@ void test()
     test_line_ellipse_intersection();
     test_segment_ellipse_intersection();
     test_degenerated_segment_intersections();
+    test_line_cylinder_perpendicular();
 }
 
 OPENGEODE_TEST( "intersection" )
