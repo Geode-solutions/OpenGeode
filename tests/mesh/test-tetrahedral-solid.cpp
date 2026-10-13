@@ -334,6 +334,16 @@ void test_backward_io( const std::string& filename )
         "Backward TetrahedralSolid should have 12 edges" );
     geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 10,
         "Backward TetrahedralSolid should have 10 facets" );
+    for( const auto* name :
+        { "polyhedron_around_vertex", "polyhedra_around_vertex" } )
+    {
+        geode::OpenGeodeMeshException::test(
+            !solid->vertex_attribute_manager()
+                 .attribute_ids_matching_name( name )
+                 .has_value(),
+            "Backward TetrahedralSolid should not have legacy attribute ",
+            name );
+    }
     for( const auto* name : { "tetrahedron_vertices", "tetrahedron_adjacents" } )
     {
         geode::OpenGeodeMeshException::test(

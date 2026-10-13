@@ -57,6 +57,7 @@ namespace geode
         const auto nb_w = grid_.nb_cells_in_direction( 2 );
         grid_.vertex_attribute_manager().resize(
             ( nb_u + 1 ) * ( nb_v + 1 ) * ( nb_w + 1 ) );
+        do_resize_vertex_storage( ( nb_u + 1 ) * ( nb_v + 1 ) * ( nb_w + 1 ) );
         grid_.polyhedron_attribute_manager().resize( grid_.nb_cells() );
         async::parallel_invoke(
             [this, nb_u, nb_v, nb_w] {

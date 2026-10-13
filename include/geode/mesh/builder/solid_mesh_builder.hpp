@@ -203,6 +203,8 @@ namespace geode
 
         using VertexSetBuilder::delete_vertices;
 
+        void do_resize_vertex_storage( index_t nb_vertices ) final;
+
     private:
         void update_polyhedron_adjacencies(
             absl::Span< const index_t > old2new );
