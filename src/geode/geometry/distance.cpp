@@ -85,33 +85,6 @@ namespace
                <= geode::GLOBAL_EPSILON * geode::GLOBAL_EPSILON * max_length2;
     }
 
-    std::optional< double > compute_point_line_distance( double segment_length,
-        double point_to_v0_length,
-        double point_to_v1_length )
-    {
-        const auto p =
-            ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
-        if( p - point_to_v0_length <= geode::GLOBAL_EPSILON )
-        {
-            return std::nullopt;
-        }
-        if( p - point_to_v1_length <= geode::GLOBAL_EPSILON )
-        {
-            return std::nullopt;
-        }
-        if( p - segment_length <= geode::GLOBAL_EPSILON )
-        {
-            return std::nullopt;
-        }
-        auto area2 = p * ( p - point_to_v0_length ) * ( p - point_to_v1_length )
-                     * ( p - segment_length );
-        if( area2 <= 0 )
-        {
-            area2 = 0;
-        }
-        return 2 * std::sqrt( area2 ) / segment_length;
-    }
-
     void get_min_edge02( double a11, double b1, std::array< double, 2 >& p )
     {
         p[0] = 0;
@@ -860,36 +833,8 @@ namespace geode
     double point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
-        const auto length = segment.length();
-        const auto length0 =
-            point_point_distance( segment.vertices()[0].get(), point );
-        if( length <= GLOBAL_EPSILON )
-        {
-            return length0;
-        }
-        const auto length1 =
-            point_point_distance( segment.vertices()[1].get(), point );
-        const auto sqr_length = length * length;
-        const auto sqr_length0 = length0 * length0;
-        const auto sqr_length1 = length1 * length1;
-        if( length0 >= length && length0 >= length1
-            && sqr_length + sqr_length1 <= sqr_length0 )
-        { // obtuse by vertex 1
-            return length1;
-        }
-        if( length1 >= length && length1 >= length0
-            && sqr_length + sqr_length0 <= sqr_length1 )
-        { // obtuse by vertex 0
-            return length0;
-        }
-        // acute angles
-        if( const auto distance =
-                compute_point_line_distance( length, length0, length1 ) )
-        {
-            return distance.value();
-        }
-        return std::get< 0 >(
-            point_segment_distance_using_projection( point, segment ) );
+        return point_point_distance(
+            point, point_segment_projection( point, segment ) );
     }
 
     template < index_t dimension >
@@ -973,16 +918,8 @@ namespace geode
     double point_line_distance(
         const Point< dimension >& point, const InfiniteLine< dimension >& line )
     {
-        const auto length0 = point_point_distance( line.origin(), point );
-        const auto length1 =
-            point_point_distance( line.origin() + line.direction(), point );
-        if( const auto distance =
-                compute_point_line_distance( 1, length0, length1 ) )
-        {
-            return distance.value();
-        }
-        return std::get< 0 >(
-            point_line_distance_using_projection( point, line ) );
+        return point_point_distance(
+            point, point_line_projection( point, line ) );
     }
 
     double point_line_signed_distance(

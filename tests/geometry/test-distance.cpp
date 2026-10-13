@@ -1447,6 +1447,107 @@ void test_degenerated_point_triangle_distance_2d()
         "Wrong point_triangle_distance 2D with point triangle: ", distance2 );
 }
 
+long double reference_distance( const geode::Point3D& point,
+    const geode::Point3D& origin,
+    const geode::Vector3D& direction,
+    bool clamp )
+{
+    std::array< long double, 3 > diff;
+    long double dot{ 0 };
+    long double length2{ 0 };
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        diff[d] = static_cast< long double >( point.value( d ) )
+                  - static_cast< long double >( origin.value( d ) );
+        const auto dir = static_cast< long double >( direction.value( d ) );
+        dot += diff[d] * dir;
+        length2 += dir * dir;
+    }
+    auto t = dot / length2;
+    if( clamp )
+    {
+        t = std::clamp( t, 0.0L, 1.0L );
+    }
+    long double distance2{ 0 };
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        const auto perp =
+            diff[d] - t * static_cast< long double >( direction.value( d ) );
+        distance2 += perp * perp;
+    }
+    return std::sqrt( distance2 );
+}
+
+void test_point_segment_line_distance_accuracy()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1., 1. };
+    std::uniform_real_distribution< double > far_distribution{ -1e4, 1e4 };
+    std::uniform_real_distribution< double > height_distribution{ 0, 1e-3 };
+    const auto random_vector = [&generator, &distribution] {
+        return geode::Vector3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        const geode::Point3D v0{ random_vector() };
+        const auto edge = random_vector();
+        const geode::Point3D v1 = v0 + edge;
+        const geode::Segment3D segment{ v0, v1 };
+        const geode::InfiniteLine3D line{ segment };
+        const auto perpendicular = edge.cross( random_vector() ).normalize()
+                                   * height_distribution( generator );
+
+        const geode::Point3D far_point =
+            v0 + edge * far_distribution( generator ) + perpendicular;
+        const auto line_distance =
+            geode::point_line_distance( far_point, line );
+        const auto line_projection =
+            geode::point_line_projection( far_point, line );
+        const auto line_reference = reference_distance(
+            far_point, line.origin(), line.direction(), false );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( geode::point_point_distance( far_point, line_projection )
+                       - line_distance )
+                <= 1e-12,
+            "Inconsistent point_line_distance and point_line_projection" );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( line_distance - line_reference ) < 1e-9,
+            "Inaccurate point_line_distance: ", line_distance, " vs ",
+            static_cast< double >( line_reference ) );
+
+        const geode::Point3D point =
+            v0 + edge * ( 2 * distribution( generator ) + 0.5 ) + perpendicular;
+        const auto segment_distance =
+            geode::point_segment_distance( point, segment );
+        const auto segment_projection =
+            geode::point_segment_projection( point, segment );
+        const auto segment_reference =
+            reference_distance( point, v0, edge, true );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( geode::point_point_distance( point, segment_projection )
+                       - segment_distance )
+                <= 1e-12,
+            "Inconsistent point_segment_distance and "
+            "point_segment_projection" );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( segment_distance - segment_reference ) < 1e-9,
+            "Inaccurate point_segment_distance: ", segment_distance, " vs ",
+            static_cast< double >( segment_reference ) );
+    }
+
+    const geode::Point3D a{ { 1, 1, 1 } };
+    const geode::Point3D b{ { 1, 1, 1 + 5e-7 } };
+    const geode::Segment3D degenerated{ a, b };
+    const geode::Point3D q{ { 2, 1, 1 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_segment_distance( q, degenerated )
+            == geode::point_point_distance(
+                q, geode::point_segment_projection( q, degenerated ) ),
+        "Inconsistent distance and projection for degenerated segment" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1467,6 +1568,7 @@ void test()
     test_random_triangle_triangle_distance();
     test_nan_point_triangle_distance();
     test_degenerated_point_triangle_distance_2d();
+    test_point_segment_line_distance_accuracy();
 }
 
 OPENGEODE_TEST( "distance" )
