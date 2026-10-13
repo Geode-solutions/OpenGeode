@@ -258,6 +258,15 @@ void test_backward_io( const std::string& filename )
         "TriangulatedSurface adjacent index is not correct" );
     geode::OpenGeodeMeshException::test( surface->edges().nb_edges() == 7,
         "Backward TriangulatedSurface should have 7 edges" );
+    for( const auto* name : { "triangle_vertices", "triangle_adjacents" } )
+    {
+        geode::OpenGeodeMeshException::test(
+            !surface->polygon_attribute_manager()
+                 .attribute_ids_matching_name( name )
+                 .has_value(),
+            "Backward TriangulatedSurface should not have legacy attribute ",
+            name );
+    }
     geode::OpenGeodeMeshException::test(
         surface->polygon_around_vertex( 0 ).value().polygon_id == 0,
         "Wrong polygon_around_vertex for backward triangulated surface" );

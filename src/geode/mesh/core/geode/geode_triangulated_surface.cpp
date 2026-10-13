@@ -28,9 +28,12 @@
 
 #include <bitsery/brief_syntax/array.h>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/permutation.hpp>
 #include <geode/basic/pimpl_impl.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
 
@@ -43,53 +46,29 @@ namespace geode
     class OpenGeodeTriangulatedSurface< dimension >::Impl
     {
         friend class bitsery::Access;
+        using Triangle = std::array< index_t, 3 >;
+        static constexpr Triangle NO_TRIANGLE{ NO_ID, NO_ID, NO_ID };
 
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
         {
             detail::template initialize_crs<
                 OpenGeodeTriangulatedSurface< dimension > >( mesh );
-            AttributeProperties attribute_properties;
-            attribute_properties.assignable = false;
-            attribute_properties.interpolable = false;
-            attribute_properties.transferable = false;
-            AttributeValues< std::array< index_t, 3 > > attribute_values;
-            attribute_values.default_value = { NO_ID, NO_ID, NO_ID };
-            attribute_values.no_value = { NO_ID, NO_ID, NO_ID };
-            const auto triangle_vertices_id =
-                mesh.polygon_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        std::array< index_t, 3 > >( "triangle_vertices",
-                        attribute_values, attribute_properties );
-            triangle_vertices_ =
-                mesh.polygon_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        std::array< index_t, 3 > >( triangle_vertices_id );
-            const auto triangle_adjacents_id =
-                mesh.polygon_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        std::array< index_t, 3 > >( "triangle_adjacents",
-                        attribute_values, attribute_properties );
-            triangle_adjacents_ =
-                mesh.polygon_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        std::array< index_t, 3 > >( triangle_adjacents_id );
         }
 
         Impl() = default;
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
         {
-            return triangle_vertices_->value( polygon_vertex.polygon_id )
-                .at( polygon_vertex.vertex_id );
+            return triangle_vertices_[polygon_vertex.polygon_id]
+                                     [polygon_vertex.vertex_id];
         }
 
         std::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
         {
             const auto adj =
-                triangle_adjacents_->value( polygon_edge.polygon_id )
-                    .at( polygon_edge.edge_id );
+                triangle_adjacents_[polygon_edge.polygon_id][polygon_edge.edge_id];
             if( adj == NO_ID )
             {
                 return std::nullopt;
@@ -100,72 +79,107 @@ namespace geode
         void set_polygon_vertex(
             const PolygonVertex& polygon_vertex, const index_t vertex_id )
         {
-            triangle_vertices_->modify_value( polygon_vertex.polygon_id,
-                [&polygon_vertex, vertex_id](
-                    std::array< index_t, 3 >& array ) {
-                    array.at( polygon_vertex.vertex_id ) = vertex_id;
-                } );
+            triangle_vertices_[polygon_vertex.polygon_id]
+                              [polygon_vertex.vertex_id] = vertex_id;
         }
 
         void set_polygon_adjacent(
             const PolygonEdge& polygon_edge, const index_t adjacent_id )
         {
-            triangle_adjacents_->modify_value(
-                polygon_edge.polygon_id, [&polygon_edge, adjacent_id](
-                                             std::array< index_t, 3 >& array ) {
-                    array.at( polygon_edge.edge_id ) = adjacent_id;
-                } );
+            triangle_adjacents_[polygon_edge.polygon_id][polygon_edge.edge_id] =
+                adjacent_id;
         }
 
-        void add_triangle(
-            const OpenGeodeTriangulatedSurface< dimension >& surface,
-            const std::array< index_t, 3 >& vertices )
+        void add_triangle( const Triangle& vertices )
         {
-            triangle_vertices_->set_value(
-                surface.nb_polygons() - 1, vertices );
+            triangle_vertices_.push_back( vertices );
+            triangle_adjacents_.push_back( NO_TRIANGLE );
+        }
+
+        void add_triangles( const index_t nb )
+        {
+            const auto new_size = triangle_vertices_.size() + nb;
+            triangle_vertices_.resize( new_size, NO_TRIANGLE );
+            triangle_adjacents_.resize( new_size, NO_TRIANGLE );
+        }
+
+        void remove_polygons( const std::vector< bool >& to_delete )
+        {
+            delete_vector_elements( to_delete, triangle_vertices_ );
+            delete_vector_elements( to_delete, triangle_adjacents_ );
+        }
+
+        void permute_polygons( absl::Span< const index_t > permutation )
+        {
+            permute( triangle_vertices_, permutation );
+            permute( triangle_adjacents_, permutation );
+        }
+
+        void copy_polygons(
+            const OpenGeodeTriangulatedSurface< dimension >::Impl& impl )
+        {
+            triangle_vertices_ = impl.triangle_vertices_;
+            triangle_adjacents_ = impl.triangle_adjacents_;
+        }
+
+        void remove_legacy_attributes( AttributeManager& manager )
+        {
+            for( const auto& attribute_id : legacy_attributes_ )
+            {
+                manager.delete_attribute( attribute_id );
+            }
+            legacy_attributes_.clear();
         }
 
     private:
+        template < typename Archive >
+        void deserialize_legacy_storage( Archive& archive )
+        {
+            internal::PointsImpl< dimension > temp;
+            archive.object( temp );
+            std::shared_ptr< VariableAttribute< Triangle > > vertices;
+            std::shared_ptr< VariableAttribute< Triangle > > adjacents;
+            archive.ext( vertices, bitsery::ext::StdSmartPtr{} );
+            archive.ext( adjacents, bitsery::ext::StdSmartPtr{} );
+            triangle_vertices_.resize( vertices->size() );
+            triangle_adjacents_.resize( adjacents->size() );
+            for( const auto p : Indices{ triangle_vertices_ } )
+            {
+                triangle_vertices_[p] = vertices->value( p );
+                triangle_adjacents_[p] = adjacents->value( p );
+            }
+            legacy_attributes_ = { vertices->id(), adjacents->id() };
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         internal::PointsImpl< dimension > temp;
-                         archive.object( temp );
-                         archive.ext( impl.triangle_vertices_,
-                             bitsery::ext::StdSmartPtr{} );
-                         archive.ext( impl.triangle_adjacents_,
-                             bitsery::ext::StdSmartPtr{} );
-                         const auto& old_triangle_vertices_properties =
-                             impl.triangle_vertices_->properties();
-                         impl.triangle_vertices_->set_properties(
-                             { old_triangle_vertices_properties.assignable,
-                                 old_triangle_vertices_properties.interpolable,
-                                 false } );
-                         const auto& old_triangle_adjacents_properties =
-                             impl.triangle_adjacents_->properties();
-                         impl.triangle_adjacents_->set_properties(
-                             { old_triangle_adjacents_properties.assignable,
-                                 old_triangle_adjacents_properties.interpolable,
-                                 false } );
+                         impl.deserialize_legacy_storage( archive );
                      },
                         []( Archive& archive, Impl& impl ) {
-                            internal::PointsImpl< dimension > temp;
-                            archive.object( temp );
-                            archive.ext( impl.triangle_vertices_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl.triangle_adjacents_,
-                                bitsery::ext::StdSmartPtr{} );
+                            impl.deserialize_legacy_storage( archive );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            const auto serialize_triangle =
+                                []( Archive& archive2, Triangle& triangle ) {
+                                    archive2.container4b( triangle );
+                                };
+                            archive.container( impl.triangle_vertices_,
+                                impl.triangle_vertices_.max_size(),
+                                serialize_triangle );
+                            archive.container( impl.triangle_adjacents_,
+                                impl.triangle_adjacents_.max_size(),
+                                serialize_triangle );
                         } } } );
         }
 
     private:
-        std::shared_ptr< VariableAttribute< std::array< index_t, 3 > > >
-            triangle_vertices_;
-        std::shared_ptr< VariableAttribute< std::array< index_t, 3 > > >
-            triangle_adjacents_;
+        std::vector< Triangle > triangle_vertices_;
+        std::vector< Triangle > triangle_adjacents_;
+        std::vector< uuid > legacy_attributes_;
     };
 
     template < index_t dimension >
@@ -222,6 +236,8 @@ namespace geode
                          surface, bitsery::ext::BaseClass<
                                       TriangulatedSurface< dimension > >{} );
                      archive.object( surface.impl_ );
+                     surface.impl_->remove_legacy_attributes(
+                         surface.polygon_attribute_manager() );
                      const auto new_point_attribute_id =
                          surface.vertex_attribute_manager()
                              .attribute_ids_matching_name( internal::PointsImpl<
@@ -238,6 +254,10 @@ namespace geode
                             surface, bitsery::ext::BaseClass<
                                          TriangulatedSurface< dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->remove_legacy_attributes(
+                            surface.polygon_attribute_manager() );
+                     surface.impl_->remove_legacy_attributes(
+                         surface.polygon_attribute_manager() );
                         const auto new_point_attribute_id =
                             surface.vertex_attribute_manager()
                                 .attribute_ids_matching_name(
@@ -255,6 +275,10 @@ namespace geode
                             surface, bitsery::ext::BaseClass<
                                          TriangulatedSurface< dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->remove_legacy_attributes(
+                            surface.polygon_attribute_manager() );
+                     surface.impl_->remove_legacy_attributes(
+                         surface.polygon_attribute_manager() );
                     } } } );
     }
 
@@ -272,7 +296,7 @@ namespace geode
         const std::array< index_t, 3 >& vertices,
         OGTriangulatedSurfaceKey /*key*/ )
     {
-        impl_->add_triangle( *this, vertices );
+        impl_->add_triangle( vertices );
     }
 
     template < index_t dimension >
@@ -282,6 +306,37 @@ namespace geode
         OGTriangulatedSurfaceKey /*key*/ )
     {
         impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::add_triangles(
+        index_t nb, OGTriangulatedSurfaceKey /*key*/ )
+    {
+        impl_->add_triangles( nb );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::remove_polygons(
+        const std::vector< bool >& to_delete,
+        OGTriangulatedSurfaceKey /*key*/ )
+    {
+        impl_->remove_polygons( to_delete );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::permute_polygons(
+        absl::Span< const index_t > permutation,
+        OGTriangulatedSurfaceKey /*key*/ )
+    {
+        impl_->permute_polygons( permutation );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::copy_polygons(
+        const OpenGeodeTriangulatedSurface< dimension >& surface_mesh,
+        OGTriangulatedSurfaceKey /*key*/ )
+    {
+        impl_->copy_polygons( *surface_mesh.impl_ );
     }
 
     template class opengeode_mesh_api OpenGeodeTriangulatedSurface< 2 >;
