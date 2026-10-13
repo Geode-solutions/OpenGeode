@@ -106,7 +106,7 @@ namespace geode
         /*!
          * Get the closest neighbor from the given point
          * @param[in] point The requested point
-         * @return the index of the closest point
+         * @return the index of the closest point, NO_ID if there is no point
          */
         [[nodiscard]] index_t closest_neighbor(
             const Point< dimension >& point ) const;
