@@ -246,11 +246,32 @@ void test_tetrahedron_signed_volume2()
         "with query tetra tetra2" );
 }
 
+void test_flat_tetrahedron_signed_volume()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { -1000.0, -0.1, 0.1 } };
+    const geode::Point3D c{ { 1000.0, 0.1, 0.0 } };
+    const geode::Point3D d{ { 2000.0, 0.0, 0.0 } };
+    const auto volume =
+        geode::tetrahedron_signed_volume( geode::Tetrahedron{ a, b, c, d } );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( volume + 10. / 3. ) < 1e-9,
+        "Wrong result for tetrahedron_signed_volume with flat tetrahedron: ",
+        volume, " | expected: ", -10. / 3. );
+
+    const auto degenerated =
+        geode::tetrahedron_signed_volume( geode::Tetrahedron{ a, b, c, b } );
+    geode::OpenGeodeGeometryException::test( degenerated == 0,
+        "Wrong result for tetrahedron_signed_volume with two equal "
+        "vertices" );
+}
+
 void test()
 {
+    test_flat_tetrahedron_signed_volume();
     test_triangle_area();
     test_triangle_signed_area();
-    // test_tetrahedron_signed_volume();
+    test_tetrahedron_signed_volume();
     test_tetrahedron_signed_volume2();
 }
 

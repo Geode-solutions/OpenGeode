@@ -23,6 +23,7 @@
 
 #include <geode/geometry/mensuration.hpp>
 
+#include <algorithm>
 #include <optional>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -105,10 +106,6 @@ namespace geode
         }
     } // namespace
 
-    static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
-        SIGNED_VOLUME_VERTICES_ORDER{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
-            { 1, 0, 2 } } };
-
     template < index_t dimension >
     double triangle_area( const Triangle< dimension >& triangle )
     {
@@ -143,35 +140,24 @@ namespace geode
     double tetrahedron_signed_volume( const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
-        for( const auto v0 : LRange{ 3 } )
+        const Vector3D edge01{ vertices[0], vertices[1] };
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
+        const Vector3D edge12{ vertices[1], vertices[2] };
+        const Vector3D edge13{ vertices[1], vertices[3] };
+        const auto cross02_03 = edge02.cross( edge03 );
+        const auto volume6 = edge01.dot( cross02_03 );
+        // height = |6 * volume| / (2 * largest facet area), compared on
+        // squared values
+        const auto max_facet_double_area2 = std::max( { cross02_03.length2(),
+            edge01.cross( edge02 ).length2(), edge01.cross( edge03 ).length2(),
+            edge12.cross( edge13 ).length2() } );
+        if( volume6 * volume6
+            <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_facet_double_area2 )
         {
-            for( const auto v1 : LRange{ v0 + 1, 4 } )
-            {
-                const Vector3D edge{ vertices[v0], vertices[v1] };
-                if( edge.length() == 0 )
-                {
-                    return 0;
-                }
-            }
+            return 0.;
         }
-        for( const auto v : LRange{ 4 } )
-        {
-            const auto v1 = SIGNED_VOLUME_VERTICES_ORDER[v][0];
-            const auto v2 = SIGNED_VOLUME_VERTICES_ORDER[v][1];
-            const auto v3 = SIGNED_VOLUME_VERTICES_ORDER[v][2];
-            const Vector3D edge02{ vertices[v], vertices[v2] };
-            const auto edge02_length = edge02.length();
-            const Vector3D edge03{ vertices[v], vertices[v3] };
-            const auto edge03_length = edge03.length();
-            const auto cross02_03 = edge02.cross( edge03 );
-            if( cross02_03.length()
-                > GLOBAL_ANGULAR_EPSILON * edge02_length * edge03_length )
-            {
-                const Vector3D edge01{ vertices[v], vertices[v1] };
-                return edge01.dot( cross02_03 ) / 6.;
-            }
-        }
-        return 0.;
+        return volume6 / 6.;
     }
 
     double tetrahedron_volume( const Tetrahedron& tetra )
