@@ -527,6 +527,55 @@ void test_segment_triangle_intersection()
         "query segment_mn" );
 }
 
+void test_segment_triangle_intersection_touching_endpoint()
+{
+    const geode::Point3D v0{ { 0.1, 0.2, 0.3 } };
+    const geode::Point3D v1{ { 1.7, 0.4, 0.9 } };
+    const geode::Point3D v2{ { 0.3, 1.9, 1.1 } };
+    const geode::Triangle3D triangle{ v0, v1, v2 };
+    const std::array< std::array< double, 3 >, 8 > barycentrics{ {
+        { 1, 0, 0 },
+        { 0, 1, 0 },
+        { 0, 0, 1 },
+        { 0.5, 0.25, 0.25 },
+        { 0.25, 0.5, 0.25 },
+        { 0.25, 0.25, 0.5 },
+        { 0.125, 0.375, 0.5 },
+        { 0.5, 0.5, 0 },
+    } };
+    const std::array< geode::Vector3D, 4 > offsets{ {
+        geode::Vector3D{ { 0.3, -0.2, 1.0 } },
+        geode::Vector3D{ { -0.7, 0.4, -0.5 } },
+        geode::Vector3D{ { 1.3, 2.1, 0.1 } },
+        geode::Vector3D{ { -0.05, -0.6, 0.9 } },
+    } };
+    for( const auto& lambdas : barycentrics )
+    {
+        const auto endpoint =
+            v0 * lambdas[0] + v1 * lambdas[1] + v2 * lambdas[2];
+        for( const auto& offset : offsets )
+        {
+            const auto other = endpoint + offset;
+            for( const auto reversed : { false, true } )
+            {
+                const auto segment = reversed
+                                         ? geode::Segment3D{ other, endpoint }
+                                         : geode::Segment3D{ endpoint, other };
+                const auto result =
+                    geode::segment_triangle_intersection( segment, triangle );
+                geode::OpenGeodeGeometryException::test(
+                    result.result.has_value()
+                        && geode::point_point_distance(
+                               result.result.value(), endpoint )
+                               < 1e-9,
+                    "Wrong result for segment_triangle_intersection with "
+                    "segment touching the triangle at ",
+                    endpoint.string(), " from ", other.string() );
+            }
+        }
+    }
+}
+
 void test_line_cylinder_intersection()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -1024,6 +1073,7 @@ void test()
     test_segment_line_intersection();
     test_segment_plane_intersection();
     test_segment_triangle_intersection();
+    test_segment_triangle_intersection_touching_endpoint();
     test_line_cylinder_intersection();
     test_segment_cylinder_intersection();
     test_plane_plane_intersection();

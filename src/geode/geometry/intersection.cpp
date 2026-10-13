@@ -23,6 +23,8 @@
 
 #include <geode/geometry/intersection.hpp>
 
+#include <algorithm>
+
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
 #include <geode/geometry/basic_objects/cylinder.hpp>
@@ -314,16 +316,18 @@ namespace geode
 
         // InfiniteLine intersects triangle, check if segment does.
         const auto q_dot_n = -sign * diff.dot( normal );
-        const auto extd_dot_n = segment.length() * d_dot_n / 2.;
+        const auto half_length = segment.length() / 2.;
+        const auto extd_dot_n = half_length * d_dot_n;
 
-        if( -extd_dot_n > q_dot_n || q_dot_n > extd_dot_n )
+        if( std::fabs( q_dot_n ) > extd_dot_n + GLOBAL_EPSILON * d_dot_n )
         {
-            // else: |t| > extent, no intersection
+            // else: |t| > extent + epsilon, no intersection
             return { INTERSECTION_TYPE::none };
         }
         // Segment intersects triangle.
         const auto inv = 1. / d_dot_n;
-        const auto seg_parameter = q_dot_n * inv;
+        const auto seg_parameter =
+            std::clamp( q_dot_n * inv, -half_length, half_length );
 
         auto result = seg_center + segment_normalized_direction * seg_parameter;
         CorrectnessInfo< Point3D >::Correctness first_correctness{
