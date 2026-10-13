@@ -35,6 +35,7 @@
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -311,6 +312,24 @@ void test_polygon_minimum_height()
         flat.is_degenerated(), "Flat polygon should be degenerated" );
 }
 
+void test_circle_bounding_box()
+{
+    const geode::Point3D origin{ { 0, 0, 0 } };
+    for( const auto sign : { -1., 1. } )
+    {
+        const geode::Plane plane{ geode::Vector3D{ { sign, 0, 0 } }, origin };
+        const geode::Circle circle{ plane, 1 };
+        const auto bbox = circle.bounding_box();
+        geode::OpenGeodeGeometryException::test(
+            bbox.min().value( 0 ) == 0 && bbox.max().value( 0 ) == 0
+                && std::fabs( bbox.min().value( 1 ) + 1 )
+                       <= geode::GLOBAL_EPSILON
+                && std::fabs( bbox.max().value( 2 ) - 1 )
+                       <= geode::GLOBAL_EPSILON,
+            "Wrong circle bounding box for normal ", sign, " x" );
+    }
+}
+
 void test()
 {
     test_segment();
@@ -321,6 +340,7 @@ void test()
     test_sphere();
     test_circle();
     test_polygon_minimum_height();
+    test_circle_bounding_box();
 }
 
 OPENGEODE_TEST( "basic-object" )
