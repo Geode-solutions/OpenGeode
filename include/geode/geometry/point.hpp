@@ -31,6 +31,7 @@
 #include <geode/basic/range.hpp>
 
 #include <geode/geometry/common.hpp>
+#include <geode/geometry/detail/point_operators.hpp>
 
 namespace geode
 {
@@ -43,39 +44,119 @@ namespace geode
     public:
         static constexpr auto dim = dimension;
 
-        Point();
+        Point()
+        {
+            values_.fill( 0 );
+        }
 
-        explicit Point( std::array< double, dimension > values );
+        explicit Point( std::array< double, dimension > values )
+            : values_( std::move( values ) )
+        {
+        }
 
-        [[nodiscard]] double value( local_index_t index ) const;
+        [[nodiscard]] double value( local_index_t index ) const
+        {
+            return values_[index];
+        }
 
-        void set_value( local_index_t index, double coordinate );
+        void set_value( local_index_t index, double coordinate )
+        {
+            values_[index] = coordinate;
+        }
 
-        [[nodiscard]] bool operator==( const Point &other ) const;
+        [[nodiscard]] bool operator==( const Point &other ) const
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                if( values_[i] != other.values_[i] )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-        [[nodiscard]] bool operator!=( const Point &other ) const;
+        [[nodiscard]] bool operator!=( const Point &other ) const
+        {
+            return !( *this == other );
+        }
 
-        [[nodiscard]] bool operator<( const Point &other ) const;
+        [[nodiscard]] bool operator<( const Point &other ) const
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                if( values_[i] < other.values_[i] )
+                {
+                    return true;
+                }
+                if( values_[i] > other.values_[i] )
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
 
-        [[nodiscard]] bool operator<=( const Point &other ) const;
+        [[nodiscard]] bool operator<=( const Point &other ) const
+        {
+            return operator<( other ) || operator==( other );
+        }
 
-        [[nodiscard]] Point operator*( double multiplier ) const;
+        [[nodiscard]] Point operator*( double multiplier ) const
+        {
+            return detail::coords_multiply( *this, multiplier );
+        }
 
-        [[nodiscard]] Point operator/( double divider ) const;
+        [[nodiscard]] Point operator/( double divider ) const
+        {
+            return detail::coords_divide( *this, divider );
+        }
 
-        [[nodiscard]] Point operator+( const Point &other ) const;
+        [[nodiscard]] Point operator+( const Point &other ) const
+        {
+            return detail::coords_add( *this, other );
+        }
 
-        [[nodiscard]] Point operator-( const Point &other ) const;
+        [[nodiscard]] Point operator-( const Point &other ) const
+        {
+            return detail::coords_substract( *this, other );
+        }
 
-        void operator*=( double multiplier );
+        void operator*=( double multiplier )
+        {
+            detail::coords_multiply_equal( *this, multiplier );
+        }
 
-        void operator/=( double divider );
+        void operator/=( double divider )
+        {
+            detail::coords_divide_equal( *this, divider );
+        }
 
-        void operator+=( const Point &other );
+        void operator+=( const Point &other )
+        {
+            detail::coords_add_equal( *this, other );
+        }
 
-        void operator-=( const Point &other );
+        void operator-=( const Point &other )
+        {
+            detail::coords_substract_equal( *this, other );
+        }
 
-        [[nodiscard]] bool inexact_equal( const Point &other ) const;
+        [[nodiscard]] bool inexact_equal( const Point &other ) const
+        {
+            double square_length{ 0 };
+            static constexpr auto SQR_EPSILON = GLOBAL_EPSILON * GLOBAL_EPSILON;
+            for( const auto i : LRange{ dimension } )
+            {
+                const double diff{ other.values_[i] - values_[i] };
+                square_length += diff * diff;
+                if( square_length > SQR_EPSILON )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         [[nodiscard]] std::string string() const;
 
