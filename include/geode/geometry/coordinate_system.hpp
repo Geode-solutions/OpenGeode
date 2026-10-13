@@ -50,6 +50,9 @@ namespace geode
         void set_directions(
             std::array< Vector< dimension >, dimension > directions );
 
+        void set_direction(
+            local_index_t index, Vector< dimension > direction );
+
         [[nodiscard]] Point< dimension > coordinates(
             const Point< dimension >& global_coordinates ) const;
 
