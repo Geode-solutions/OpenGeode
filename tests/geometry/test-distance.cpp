@@ -1481,17 +1481,19 @@ void check_point_ellipse_distance( const geode::Ellipse< dimension >& ellipse,
     const auto [distance, closest_point] =
         geode::point_ellipse_distance( point, ellipse );
     geode::OpenGeodeGeometryException::test(
-        std::fabs( ellipse_level( ellipse, closest_point ) - 1 ) < 1e-9,
+        std::fabs( ellipse_level( ellipse, closest_point ) - 1 )
+            < geode::GLOBAL_EPSILON,
         "Wrong result for point_ellipse_distance with query ", point.string(),
         ": closest point ", closest_point.string(), " not on ellipse" );
     geode::OpenGeodeGeometryException::test(
         std::fabs(
             geode::point_point_distance( point, closest_point ) - distance )
-            < 1e-9,
+            < geode::GLOBAL_EPSILON,
         "Wrong result for point_ellipse_distance with query ", point.string(),
         ": distance does not match closest point" );
     const auto brute_force = brute_force_ellipse_distance( ellipse, point );
-    geode::OpenGeodeGeometryException::test( distance <= brute_force + 1e-9,
+    geode::OpenGeodeGeometryException::test(
+        distance <= brute_force + geode::GLOBAL_EPSILON,
         "Wrong result for point_ellipse_distance with query ", point.string(),
         ": ", distance, " | brute force: ", brute_force );
 }
@@ -1602,13 +1604,13 @@ void test_point_skewed_tetrahedron_distance()
                                vertices[facet[1]], vertices[facet[2]] } ) ) );
         }
         geode::OpenGeodeGeometryException::test(
-            std::fabs( distance - brute_force ) < 1e-12,
+            std::fabs( distance - brute_force ) < geode::GLOBAL_EPSILON,
             "Wrong result for point_tetrahedron_distance with query ",
             query.string(), ": ", distance, " | expected: ", brute_force );
         geode::OpenGeodeGeometryException::test(
             std::fabs(
                 geode::point_point_distance( query, closest_point ) - distance )
-                < 1e-12,
+                < geode::GLOBAL_EPSILON,
             "Wrong closest point for point_tetrahedron_distance with query ",
             query.string() );
     }

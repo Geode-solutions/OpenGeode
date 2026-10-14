@@ -21,6 +21,7 @@
  *
  */
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <random>
@@ -33,6 +34,7 @@
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
 #include <geode/geometry/mensuration.hpp>
 
 #include <geode/tests/common.hpp>
@@ -101,7 +103,11 @@ void check_needle_area( const geode::Point3D& a,
     const geode::Point2D c2d{ { c.value( 0 ), c.value( 1 ) } };
     const auto area2d =
         geode::triangle_area( geode::Triangle2D{ a2d, b2d, c2d } );
-    const auto tolerance = expected == 0 ? 0 : 1e-12 * expected;
+    // Area error of a GLOBAL_EPSILON height error on the longest edge
+    const auto tolerance = geode::GLOBAL_EPSILON
+                           * std::max( { geode::point_point_distance( a, b ),
+                               geode::point_point_distance( b, c ),
+                               geode::point_point_distance( c, a ) } );
     geode::OpenGeodeGeometryException::test(
         std::fabs( area3d - expected ) <= tolerance,
         "Wrong result for 3D needle triangle_area: ", area3d,
@@ -177,10 +183,10 @@ void test_random_triangle_area()
         const auto cz = e0[0] * e1[1] - e0[1] * e1[0];
         const auto expected = static_cast< double >(
             std::sqrt( cx * cx + cy * cy + cz * cz ) / 2 );
-        // Precision is only required above GLOBAL_EPSILON (height error)
+        // Area error of a GLOBAL_EPSILON height error on the longest edge
         const auto tolerance =
             geode::GLOBAL_EPSILON
-            * static_cast< double >( std::sqrt( max_length2 ) ) * 1e-3;
+            * static_cast< double >( std::sqrt( max_length2 ) );
         for( const auto rotation : geode::LRange{ 3 } )
         {
             const auto area = geode::triangle_area( geode::Triangle3D{
@@ -323,7 +329,7 @@ void test_flat_tetrahedron_signed_volume()
     const auto volume =
         geode::tetrahedron_signed_volume( geode::Tetrahedron{ a, b, c, d } );
     geode::OpenGeodeGeometryException::test(
-        std::fabs( volume + 10. / 3. ) < 1e-9,
+        std::fabs( volume + 10. / 3. ) < geode::GLOBAL_EPSILON,
         "Wrong result for tetrahedron_signed_volume with flat tetrahedron: ",
         volume, " | expected: ", -10. / 3. );
 

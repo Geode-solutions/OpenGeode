@@ -567,7 +567,7 @@ void test_segment_triangle_intersection_touching_endpoint()
                     result.result.has_value()
                         && geode::point_point_distance(
                                result.result.value(), endpoint )
-                               < 1e-9,
+                               < geode::GLOBAL_EPSILON,
                     "Wrong result for segment_triangle_intersection with "
                     "segment touching the triangle at ",
                     endpoint.string(), " from ", other.string() );
