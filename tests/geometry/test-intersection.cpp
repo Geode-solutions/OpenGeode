@@ -1115,6 +1115,20 @@ void test_small_sphere_intersection()
     geode::OpenGeodeGeometryException::test(
         tiny.has_intersection() && tiny.result->size() == 1,
         "Wrong result for segment_sphere_intersection with tiny segment" );
+
+    // Line passing close to the center of a sphere of radius GLOBAL_EPSILON
+    const geode::Point2D center{ { -0x1.2f27bf7ab2068p+0,
+        -0x1.19ed33959c664p+2 } };
+    const geode::Sphere2D tiny_sphere{ center, 0x1.39cbe52173991p-20 };
+    const geode::Point2D line0{ { -0x1.2f27aa494ab6cp+0,
+        -0x1.19ed32bc45ep+2 } };
+    const geode::Point2D line1{ { 0x1.10adc34e01184p+2, 0x1.9d613ed64784p-3 } };
+    const auto tangent = geode::line_sphere_intersection(
+        geode::InfiniteLine2D{ geode::Segment2D{ line0, line1 } },
+        tiny_sphere );
+    geode::OpenGeodeGeometryException::test( tangent.has_intersection(),
+        "Wrong result for line_sphere_intersection with sphere of radius "
+        "GLOBAL_EPSILON" );
 }
 
 void test()

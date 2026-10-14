@@ -1323,8 +1323,9 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < GLOBAL_EPSILON )
+        if( center_to_point.length() == 0 )
         {
+            // No direction: any sphere point is the closest one
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
             return { sphere.radius(),
@@ -1339,8 +1340,9 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < GLOBAL_EPSILON )
+        if( center_to_point.length() == 0 )
         {
+            // No direction: any sphere point is the closest one
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
             return { -sphere.radius(),
