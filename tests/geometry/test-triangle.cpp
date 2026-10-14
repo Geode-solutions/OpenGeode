@@ -197,10 +197,32 @@ void test_degenerated_tetrahedron_vertex_order()
             }
         }
     }
+void test_set_point()
+{
+    geode::OwnerTriangle3D triangle{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1, 0 } } };
+    const auto normal = triangle.normal();
+    geode::OpenGeodeGeometryException::test(
+        normal && normal->inexact_equal( geode::Vector3D{ { 0, 0, 1 } } ),
+        "Wrong normal before set_point" );
+    auto copy = triangle;
+    triangle.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
+    const auto new_normal = triangle.normal();
+    geode::OpenGeodeGeometryException::test(
+        new_normal
+            && new_normal->inexact_equal( geode::Vector3D{ { 0, -1, 0 } } ),
+        "Wrong normal after set_point" );
+    copy.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
+    const auto copy_normal = copy.normal();
+    geode::OpenGeodeGeometryException::test(
+        copy_normal
+            && copy_normal->inexact_equal( geode::Vector3D{ { 0, -1, 0 } } ),
+        "Wrong normal after set_point on copy" );
 }
 
 void test()
 {
+    test_set_point();
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b_ref{ { 0.5, 0.1, 0.0 } };
     const geode::Point3D b{ { 0.6, 0.3 * geode::GLOBAL_EPSILON, 0.0 } };

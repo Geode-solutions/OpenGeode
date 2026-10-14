@@ -180,13 +180,21 @@ namespace geode
     template < index_t dimension >
     local_index_t Frame< dimension >::max_elongation_direction() const
     {
-        return std::distance( frame_.begin(), absl::c_max_element( frame_ ) );
+        return std::distance( frame_.begin(),
+            absl::c_max_element( frame_, []( const Vector< dimension >& lhs,
+                                             const Vector< dimension >& rhs ) {
+                return lhs.length2() < rhs.length2();
+            } ) );
     }
 
     template < index_t dimension >
     local_index_t Frame< dimension >::min_elongation_direction() const
     {
-        return std::distance( frame_.begin(), absl::c_min_element( frame_ ) );
+        return std::distance( frame_.begin(),
+            absl::c_min_element( frame_, []( const Vector< dimension >& lhs,
+                                             const Vector< dimension >& rhs ) {
+                return lhs.length2() < rhs.length2();
+            } ) );
     }
 
     template < index_t dimension >

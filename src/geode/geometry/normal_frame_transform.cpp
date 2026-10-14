@@ -92,8 +92,6 @@ namespace geode
         }
 
     private:
-        std::array< local_index_t, dimension > directions_;
-        std::array< signed_index_t, dimension > orientations_;
         std::array< double, dimension > magnitudes_;
     };
 

@@ -520,6 +520,11 @@ namespace geode
         auto nearest_box = impl_->closest_element_box_hint( query );
         auto distance = action( query, nearest_box );
         distance *= distance;
+        if( !std::isfinite( distance ) )
+        {
+            nearest_box = NO_ID;
+            distance = std::numeric_limits< double >::max();
+        }
         impl_->closest_element_box_recursive( query, nearest_box, distance,
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
         OpenGeodeGeometryException::check_assertion(

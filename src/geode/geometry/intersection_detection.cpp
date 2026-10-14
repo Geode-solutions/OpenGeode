@@ -42,34 +42,86 @@ namespace
         geode::POSITION::vertex2, geode::POSITION::vertex0
     };
 
+    geode::local_index_t max_abs_axis( const geode::Vector3D& vector )
+    {
+        geode::local_index_t axis{ 2 };
+        for( const auto other_axis : geode::LRange{ 2 } )
+        {
+            if( std::fabs( vector.value( other_axis ) )
+                > std::fabs( vector.value( axis ) ) )
+            {
+                axis = other_axis;
+            }
+        }
+        return axis;
+    }
+
+    geode::local_index_t min_abs_axis( const geode::Vector3D& vector )
+    {
+        geode::local_index_t axis{ 0 };
+        for( const auto other_axis : geode::LRange{ 1, 3 } )
+        {
+            if( std::fabs( vector.value( other_axis ) )
+                < std::fabs( vector.value( axis ) ) )
+            {
+                axis = other_axis;
+            }
+        }
+        return axis;
+    }
+
+    // Axis to drop to project coplanar points without collapsing their
+    // plane: the largest component of the plane normal, computed from the
+    // given direction and the other points. If all points are aligned with
+    // the direction, drop the smallest component of the direction.
+    geode::local_index_t coplanar_projection_axis( const geode::Point3D& origin,
+        const geode::Vector3D& direction,
+        std::initializer_list< geode::RefPoint3D > points )
+    {
+        geode::Vector3D normal;
+        double max_length2{ 0 };
+        for( const auto& point : points )
+        {
+            auto candidate =
+                direction.cross( geode::Vector3D{ origin, point.get() } );
+            const auto length2 = candidate.length2();
+            if( length2 > max_length2 )
+            {
+                max_length2 = length2;
+                normal = std::move( candidate );
+            }
+        }
+        if( max_length2 > 0 )
+        {
+            return max_abs_axis( normal );
+        }
+        return min_abs_axis( direction );
+    }
+
     geode::local_index_t best_projection_axis(
         const geode::Triangle3D& triangle, const geode::Segment3D& segment )
     {
-        geode::local_index_t largest_axis{ 2 };
         if( const auto normal = triangle.normal() )
         {
-            for( const auto other_axis : geode::LRange{ 2 } )
-            {
-                if( std::fabs( normal->value( other_axis ) )
-                    > std::fabs( normal->value( largest_axis ) ) )
-                {
-                    largest_axis = other_axis;
-                }
-            }
-            return largest_axis;
+            return max_abs_axis( normal.value() );
         }
-        auto bbox = triangle.bounding_box();
-        bbox.add_box( segment.bounding_box() );
-        const auto diagonal = bbox.diagonal();
-        for( const auto other_axis : geode::LRange{ 2 } )
+        const auto& vertices = triangle.vertices();
+        const auto longest_edge = triangle.longest_edge_index();
+        const geode::Point3D& origin = vertices[longest_edge];
+        const geode::Point3D& next =
+            vertices[longest_edge == 2 ? 0 : longest_edge + 1];
+        const geode::Vector3D direction{ origin, next };
+        const auto& segment_vertices = segment.vertices();
+        const geode::Vector3D segment_direction{ segment_vertices[0],
+            segment_vertices[1] };
+        if( segment_direction.length2() > direction.length2() )
         {
-            if( std::fabs( diagonal.value( other_axis ) )
-                < std::fabs( diagonal.value( largest_axis ) ) )
-            {
-                largest_axis = other_axis;
-            }
+            return coplanar_projection_axis( segment_vertices[0],
+                segment_direction, { vertices[0], vertices[1], vertices[2] } );
         }
-        return largest_axis;
+        return coplanar_projection_axis( origin, direction,
+            { vertices[0], vertices[1], vertices[2], segment_vertices[0],
+                segment_vertices[1] } );
     }
 
     geode::SegmentSegmentIntersection segment_segment_intersection_detection2D(
@@ -201,18 +253,16 @@ namespace
         {
             return { geode::POSITION::outside, geode::POSITION::outside };
         }
-        geode::local_index_t largest_axis{ 2 };
-        auto bbox = segment0.bounding_box();
-        bbox.add_box( segment1.bounding_box() );
-        const auto diagonal = bbox.diagonal();
-        for( const auto other_axis : geode::LRange{ 2 } )
-        {
-            if( std::fabs( diagonal.value( other_axis ) )
-                < std::fabs( diagonal.value( largest_axis ) ) )
-            {
-                largest_axis = other_axis;
-            }
-        }
+        const auto& vertices0 = segment0.vertices();
+        const auto& vertices1 = segment1.vertices();
+        const geode::Vector3D direction0{ vertices0[0], vertices0[1] };
+        const geode::Vector3D direction1{ vertices1[0], vertices1[1] };
+        const auto largest_axis =
+            direction0.length2() >= direction1.length2()
+                ? coplanar_projection_axis(
+                      vertices0[0], direction0, { vertices1[0], vertices1[1] } )
+                : coplanar_projection_axis( vertices1[0], direction1,
+                      { vertices0[0], vertices0[1] } );
         const auto segment0_proj_p0 =
             segment0.vertices()[0].get().project_point( largest_axis );
         const auto segment0_proj_p1 =

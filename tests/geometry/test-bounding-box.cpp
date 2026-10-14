@@ -423,9 +423,30 @@ void test_1d_line_intersections()
     check_ray( negative, 2, true );
 }
 
+void test_add_empty_box()
+{
+    geode::BoundingBox3D box;
+    box.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    box.add_point( geode::Point3D{ { 1, 1, 1 } } );
+    const geode::BoundingBox3D empty;
+
+    auto box_plus_empty = box;
+    box_plus_empty.add_box( empty );
+    geode::OpenGeodeGeometryException::test(
+        box_plus_empty.min() == box.min() && box_plus_empty.max() == box.max(),
+        "Adding an empty box should not change the box" );
+
+    auto empty_plus_box = empty;
+    empty_plus_box.add_box( box );
+    geode::OpenGeodeGeometryException::test(
+        empty_plus_box.min() == box.min() && empty_plus_box.max() == box.max(),
+        "Adding a box to an empty box should give the box" );
+}
+
 void test()
 {
     test_bbox();
+    test_add_empty_box();
     test_ray_intersections();
     test_line_intersections();
     test_segment_intersections();

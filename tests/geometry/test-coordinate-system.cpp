@@ -142,6 +142,23 @@ void test_system1D()
         coord_system, geode::Point1D{ { 5 } }, geode::Point1D{ { 2 } } );
 }
 
+void modified_system2D()
+{
+    geode::Logger::info( "Modified system 2D" );
+    geode::CoordinateSystem2D coord_system{ { geode::Vector2D{ { 1, 0 } },
+                                                geode::Vector2D{ { 0, 1 } } },
+        geode::Point2D{ { 0, 0 } } };
+    check_point(
+        coord_system, geode::Point2D{ { 2, 4 } }, geode::Point2D{ { 2, 4 } } );
+    coord_system.set_directions(
+        { geode::Vector2D{ { 2, 0 } }, geode::Vector2D{ { 0, 2 } } } );
+    check_point(
+        coord_system, geode::Point2D{ { 2, 4 } }, geode::Point2D{ { 1, 2 } } );
+    coord_system.set_direction( 0, geode::Vector2D{ { 4, 0 } } );
+    check_point( coord_system, geode::Point2D{ { 2, 4 } },
+        geode::Point2D{ { 0.5, 2 } } );
+}
+
 void test()
 {
     acute_system2D();
@@ -150,6 +167,7 @@ void test()
     acute_system3D();
     optuse_system3D();
     test_system1D();
+    modified_system2D();
 }
 
 OPENGEODE_TEST( "coordinate-system" )

@@ -295,39 +295,53 @@ void test_circle()
         "Wrong result for circle5" );
 }
 
-void test_polygon_minimum_height()
+void check_polygon_normal( const geode::OwnerPolygon3D& polygon,
+    const geode::Vector3D& expected_normal )
 {
-    const geode::OwnerPolygon2D quad{ { geode::Point2D{ { 0, 0 } },
-        geode::Point2D{ { 10, 0 } }, geode::Point2D{ { 5, 5 } },
-        geode::Point2D{ { -1, 0 } } } };
+    const auto normal = polygon.normal();
     geode::OpenGeodeGeometryException::test(
-        std::fabs( quad.minimum_height() - 5 ) <= geode::GLOBAL_EPSILON,
-        "Wrong polygon minimum height: ", quad.minimum_height() );
+        normal && normal->inexact_equal( expected_normal ),
+        "Wrong polygon normal" );
+    const auto triangles = polygon.triangulate();
     geode::OpenGeodeGeometryException::test(
-        !quad.is_degenerated(), "Polygon should not be degenerated" );
-    const geode::OwnerPolygon2D flat{ { geode::Point2D{ { 0, 0 } },
-        geode::Point2D{ { 10, 0 } }, geode::Point2D{ { 5, 0 } },
-        geode::Point2D{ { -1, 0 } } } };
-    geode::OpenGeodeGeometryException::test(
-        flat.is_degenerated(), "Flat polygon should be degenerated" );
+        triangles.size() == polygon.nb_vertices() - 2,
+        "Wrong number of triangles in polygon triangulation" );
+    const auto& vertices = polygon.vertices();
+    for( const auto& triangle : triangles )
+    {
+        const auto triangle_normal = geode::Triangle3D{ vertices[triangle[0]],
+            vertices[triangle[1]], vertices[triangle[2]] }
+                                         .normal();
+        geode::OpenGeodeGeometryException::test(
+            triangle_normal && triangle_normal->dot( expected_normal ) > 0,
+            "Wrong triangle orientation in polygon triangulation" );
+    }
 }
 
-void test_circle_bounding_box()
+void test_polygon()
 {
-    const geode::Point3D origin{ { 0, 0, 0 } };
-    for( const auto sign : { -1., 1. } )
-    {
-        const geode::Plane plane{ geode::Vector3D{ { sign, 0, 0 } }, origin };
-        const geode::Circle circle{ plane, 1 };
-        const auto bbox = circle.bounding_box();
-        geode::OpenGeodeGeometryException::test(
-            bbox.min().value( 0 ) == 0 && bbox.max().value( 0 ) == 0
-                && std::fabs( bbox.min().value( 1 ) + 1 )
-                       <= geode::GLOBAL_EPSILON
-                && std::fabs( bbox.max().value( 2 ) - 1 )
-                       <= geode::GLOBAL_EPSILON,
-            "Wrong circle bounding box for normal ", sign, " x" );
-    }
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 1, 1, 0 } };
+    const geode::Point3D c{ { 2, 0, 0 } };
+    const geode::Point3D d{ { 1, 3, 0 } };
+    check_polygon_normal( geode::OwnerPolygon3D{ { a, b, c, d } },
+        geode::Vector3D{ { 0, 0, 1 } } );
+    check_polygon_normal( geode::OwnerPolygon3D{ { d, c, b, a } },
+        geode::Vector3D{ { 0, 0, -1 } } );
+
+    // Same polygon in the plane of normal (1,1,1) through (1,2,3), with
+    // (1,-1,0) and (1,1,-2) as local axes
+    const geode::Point3D a_tilted{ { 1, 2, 3 } };
+    const geode::Point3D b_tilted{ { 3, 2, 1 } };
+    const geode::Point3D c_tilted{ { 3, 0, 3 } };
+    const geode::Point3D d_tilted{ { 5, 4, -3 } };
+    const auto tilted_normal = geode::Vector3D{ { 1, 1, 1 } }.normalize();
+    check_polygon_normal(
+        geode::OwnerPolygon3D{ { a_tilted, b_tilted, c_tilted, d_tilted } },
+        tilted_normal );
+    check_polygon_normal(
+        geode::OwnerPolygon3D{ { d_tilted, c_tilted, b_tilted, a_tilted } },
+        tilted_normal * -1 );
 }
 
 void test()
@@ -341,6 +355,7 @@ void test()
     test_circle();
     test_polygon_minimum_height();
     test_circle_bounding_box();
+    test_polygon();
 }
 
 OPENGEODE_TEST( "basic-object" )

@@ -24,6 +24,7 @@
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
 #include <geode/geometry/point.hpp>
@@ -69,9 +70,65 @@ void test_triangle_sign()
     test_triangle_sign_2d();
     test_triangle_sign_3d();
 }
+void test_polygon_sign()
+{
+    const geode::Point2D a{ { 0.0, 0.0 } };
+    const geode::Point2D b{ { 1.0, 1.0 } };
+    const geode::Point2D c{ { 2.0, 0.0 } };
+    const geode::Point2D d{ { 1.0, 3.0 } };
+    const geode::Polygon2D dart{ { a, b, c, d } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( dart ) == geode::SIGN::positive,
+        "Wrong result for polygon_area_sign with dart" );
+
+    const geode::Polygon2D reversed_dart{ { d, c, b, a } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( reversed_dart ) == geode::SIGN::negative,
+        "Wrong result for polygon_area_sign with reversed dart" );
+
+    const geode::Polygon2D duplicated_dart{ { b, c, d, a, a } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( duplicated_dart ) == geode::SIGN::positive,
+        "Wrong result for polygon_area_sign with duplicated vertex" );
+
+    const geode::Polygon2D duplicated_reversed_dart{ { a, d, c, b, a } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( duplicated_reversed_dart )
+            == geode::SIGN::negative,
+        "Wrong result for polygon_area_sign with duplicated vertex at both "
+        "ends" );
+
+    const geode::Point2D e{ { 2.0, 2.0 } };
+    const geode::Polygon2D flat{ { a, b, e } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( flat ) == geode::SIGN::zero,
+        "Wrong result for polygon_area_sign with flat polygon" );
+
+    // Counter-clockwise concave polygon with a flat spike at its
+    // lexicographically smallest vertex (0,0) and a reflex first fan corner
+    const geode::Point2D s0{ { 4.0, 4.0 } };
+    const geode::Point2D s1{ { 2.0, 1.0 } };
+    const geode::Point2D s2{ { 0.0, 4.0 } };
+    const geode::Point2D s3{ { 1.0, 0.0 } };
+    const geode::Point2D s4{ { 4.0, 0.0 } };
+    const geode::Polygon2D spike{ { s0, s1, s2, s3, a, s4 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( spike ) == geode::SIGN::positive,
+        "Wrong result for polygon_area_sign with spike at hull vertex" );
+
+    // Self-intersecting polygon: the orientation is the one around the
+    // lexicographically smallest vertex
+    const geode::Point2D f{ { 3.0, 1.0 } };
+    const geode::Polygon2D crossed{ { a, b, c, f } };
+    geode::OpenGeodeGeometryException::test(
+        geode::polygon_area_sign( crossed ) == geode::SIGN::negative,
+        "Wrong result for polygon_area_sign with crossed polygon" );
+}
+
 void test()
 {
     test_triangle_sign();
+    test_polygon_sign();
 
     geode::Logger::info( "TEST SUCCESS" );
 }

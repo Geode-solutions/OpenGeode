@@ -21,13 +21,20 @@
  *
  */
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/geometry/point.hpp>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/distance.hpp>
 #include <geode/geometry/mensuration.hpp>
 
 #include <geode/tests/common.hpp>
@@ -85,10 +92,120 @@ void test_triangle_area_3d()
         "with query triangle triangle3D_3" );
 }
 
+void check_needle_area( const geode::Point3D& a,
+    const geode::Point3D& b,
+    const geode::Point3D& c,
+    double expected )
+{
+    const auto area3d = geode::triangle_area( geode::Triangle3D{ a, b, c } );
+    const geode::Point2D a2d{ { a.value( 0 ), a.value( 1 ) } };
+    const geode::Point2D b2d{ { b.value( 0 ), b.value( 1 ) } };
+    const geode::Point2D c2d{ { c.value( 0 ), c.value( 1 ) } };
+    const auto area2d =
+        geode::triangle_area( geode::Triangle2D{ a2d, b2d, c2d } );
+    // Area error of a GLOBAL_EPSILON height error on the longest edge
+    const auto tolerance = geode::GLOBAL_EPSILON
+                           * std::max( { geode::point_point_distance( a, b ),
+                               geode::point_point_distance( b, c ),
+                               geode::point_point_distance( c, a ) } );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( area3d - expected ) <= tolerance,
+        "Wrong result for 3D needle triangle_area: ", area3d,
+        " | expected: ", expected );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( area2d - expected ) <= tolerance,
+        "Wrong result for 2D needle triangle_area: ", area2d,
+        " | expected: ", expected );
+    const geode::Vector3D upward{ { 0.0, 0.0, 1.0 } };
+    const auto signed_area =
+        geode::triangle_signed_area( geode::Triangle3D{ a, b, c }, upward );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( signed_area - expected ) <= tolerance,
+        "Wrong result for 3D needle triangle_signed_area: ", signed_area,
+        " | expected: ", expected );
+}
+
+void test_needle_triangle_area()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    check_needle_area( a, geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0.5, 1e-3, 0 } }, 5e-4 );
+    check_needle_area( a, geode::Point3D{ { 100, 0, 0 } },
+        geode::Point3D{ { 50, 0.005, 0 } }, 0.25 );
+    check_needle_area(
+        a, geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0.5, 0, 0 } }, 0 );
+    check_needle_area( a, geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 0.5, 1e-7, 0 } }, 0 );
+}
+
+void test_random_triangle_area()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > coordinate{ -100, 100 };
+    std::uniform_real_distribution< double > height{ 1e-3, 1 };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        std::array< geode::Point3D, 3 > points;
+        for( auto& point : points )
+        {
+            point = geode::Point3D{ { coordinate( generator ),
+                coordinate( generator ), coordinate( generator ) } };
+        }
+        if( trial % 2 == 0 )
+        {
+            // Needle: third point close to the middle of the first edge
+            points[2] = ( points[0] + points[1] ) / 2.
+                        + geode::Point3D{ { 0, 0, height( generator ) } };
+        }
+        std::array< long double, 3 > e0, e1;
+        long double max_length2{ 0 };
+        for( const auto v : geode::LRange{ 3 } )
+        {
+            long double length2{ 0 };
+            for( const auto d : geode::LRange{ 3 } )
+            {
+                const auto diff = static_cast< long double >(
+                                      points[( v + 1 ) % 3].value( d ) )
+                                  - points[v].value( d );
+                length2 += diff * diff;
+            }
+            max_length2 = std::max( max_length2, length2 );
+        }
+        for( const auto d : geode::LRange{ 3 } )
+        {
+            e0[d] = static_cast< long double >( points[1].value( d ) )
+                    - points[0].value( d );
+            e1[d] = static_cast< long double >( points[2].value( d ) )
+                    - points[0].value( d );
+        }
+        const auto cx = e0[1] * e1[2] - e0[2] * e1[1];
+        const auto cy = e0[2] * e1[0] - e0[0] * e1[2];
+        const auto cz = e0[0] * e1[1] - e0[1] * e1[0];
+        const auto expected = static_cast< double >(
+            std::sqrt( cx * cx + cy * cy + cz * cz ) / 2 );
+        // Area error of a GLOBAL_EPSILON height error on the longest edge
+        const auto tolerance =
+            geode::GLOBAL_EPSILON
+            * static_cast< double >( std::sqrt( max_length2 ) );
+        for( const auto rotation : geode::LRange{ 3 } )
+        {
+            const auto area = geode::triangle_area( geode::Triangle3D{
+                points[rotation], points[( rotation + 1 ) % 3],
+                points[( rotation + 2 ) % 3] } );
+            geode::OpenGeodeGeometryException::test(
+                std::fabs( area - expected ) <= tolerance,
+                "Wrong result for random triangle_area: ", area,
+                " | expected: ", expected );
+        }
+    }
+}
+
 void test_triangle_area()
 {
     test_triangle_area_2d();
     test_triangle_area_3d();
+    test_needle_triangle_area();
+    test_random_triangle_area();
 }
 
 void test_triangle_signed_area_2d()
@@ -203,11 +320,32 @@ void test_tetrahedron_signed_volume2()
         "with query tetra tetra2" );
 }
 
+void test_flat_tetrahedron_signed_volume()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { -1000.0, -0.1, 0.1 } };
+    const geode::Point3D c{ { 1000.0, 0.1, 0.0 } };
+    const geode::Point3D d{ { 2000.0, 0.0, 0.0 } };
+    const auto volume =
+        geode::tetrahedron_signed_volume( geode::Tetrahedron{ a, b, c, d } );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( volume + 10. / 3. ) < geode::GLOBAL_EPSILON,
+        "Wrong result for tetrahedron_signed_volume with flat tetrahedron: ",
+        volume, " | expected: ", -10. / 3. );
+
+    const auto degenerated =
+        geode::tetrahedron_signed_volume( geode::Tetrahedron{ a, b, c, b } );
+    geode::OpenGeodeGeometryException::test( degenerated == 0,
+        "Wrong result for tetrahedron_signed_volume with two equal "
+        "vertices" );
+}
+
 void test()
 {
-    // test_triangle_area();
-    // test_triangle_signed_area();
-    // test_tetrahedron_signed_volume();
+    test_flat_tetrahedron_signed_volume();
+    test_triangle_area();
+    test_triangle_signed_area();
+    test_tetrahedron_signed_volume();
     test_tetrahedron_signed_volume2();
 }
 

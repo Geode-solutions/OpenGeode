@@ -192,6 +192,13 @@ void test_line_line_intersection()
         "Wrong result for line_line_intersection "
         "with query lines 1 and 4" );
 
+    geode::OpenGeodeGeometryException::test(
+        intersection_point.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for line_line_intersection with query lines 1 and 2" );
+    geode::OpenGeodeGeometryException::test(
+        intersection_point2.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for line_line_intersection with query lines 1 and 4" );
+
     const auto intersection_point3 =
         geode::line_line_intersection( line1, line5 );
     geode::OpenGeodeGeometryException::test(
@@ -213,6 +220,7 @@ void test_segment_segment_intersection()
     const geode::Segment2D segment_ab2{ a, b };
     const geode::Segment2D segment_af{ a, f };
     const geode::Segment2D segment_bc{ b, c };
+    const geode::Segment2D segment_bf{ b, f };
     const geode::Segment2D segment_cd{ c, d };
     const geode::Segment2D segment_cf{ c, f };
     const geode::Segment2D segment_de{ d, e };
@@ -258,6 +266,18 @@ void test_segment_segment_intersection()
     geode::OpenGeodeGeometryException::test( !intersection_point5,
         "Wrong result for segment_segment_intersection with query "
         "segment_ab and segment_ef" );
+
+    geode::OpenGeodeGeometryException::test(
+        intersection_point3.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for segment_segment_intersection with query "
+        "segment_ab and segment_cd" );
+    const geode::Segment2D segment_ae{ a, e };
+    const auto collinear_overlap =
+        geode::segment_segment_intersection( segment_ae, segment_bf );
+    geode::OpenGeodeGeometryException::test(
+        collinear_overlap.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong type for segment_segment_intersection with collinear "
+        "overlapping segments" );
 
     const auto intersection_point6 =
         geode::segment_segment_intersection( segment_bc, segment_df );
@@ -505,6 +525,70 @@ void test_segment_triangle_intersection()
     geode::OpenGeodeGeometryException::test( !intersection8,
         "Wrong result for segment_triangle_intersection with "
         "query segment_mn" );
+}
+
+void test_segment_triangle_intersection_touching_endpoint()
+{
+    const geode::Point3D v0{ { 0.1, 0.2, 0.3 } };
+    const geode::Point3D v1{ { 1.7, 0.4, 0.9 } };
+    const geode::Point3D v2{ { 0.3, 1.9, 1.1 } };
+    const geode::Triangle3D triangle{ v0, v1, v2 };
+    const std::array< std::array< double, 3 >, 8 > barycentrics{ {
+        { 1, 0, 0 },
+        { 0, 1, 0 },
+        { 0, 0, 1 },
+        { 0.5, 0.25, 0.25 },
+        { 0.25, 0.5, 0.25 },
+        { 0.25, 0.25, 0.5 },
+        { 0.125, 0.375, 0.5 },
+        { 0.5, 0.5, 0 },
+    } };
+    const std::array< geode::Vector3D, 4 > offsets{ {
+        geode::Vector3D{ { 0.3, -0.2, 1.0 } },
+        geode::Vector3D{ { -0.7, 0.4, -0.5 } },
+        geode::Vector3D{ { 1.3, 2.1, 0.1 } },
+        geode::Vector3D{ { -0.05, -0.6, 0.9 } },
+    } };
+    for( const auto& lambdas : barycentrics )
+    {
+        const auto endpoint =
+            v0 * lambdas[0] + v1 * lambdas[1] + v2 * lambdas[2];
+        for( const auto& offset : offsets )
+        {
+            const auto other = endpoint + offset;
+            for( const auto reversed : { false, true } )
+            {
+                const auto segment = reversed
+                                         ? geode::Segment3D{ other, endpoint }
+                                         : geode::Segment3D{ endpoint, other };
+                const auto result =
+                    geode::segment_triangle_intersection( segment, triangle );
+                geode::OpenGeodeGeometryException::test(
+                    result.result.has_value()
+                        && geode::point_point_distance(
+                               result.result.value(), endpoint )
+                               < geode::GLOBAL_EPSILON,
+                    "Wrong result for segment_triangle_intersection with "
+                    "segment touching the triangle at ",
+                    endpoint.string(), " from ", other.string() );
+            }
+            // Segment crossing the triangle close to its first vertex
+            for( const auto ratio : { 1e-9, 1e-6, 1e-3 } )
+            {
+                const auto start = endpoint - offset * ratio;
+                const auto result = geode::segment_triangle_intersection(
+                    geode::Segment3D{ start, other }, triangle );
+                geode::OpenGeodeGeometryException::test(
+                    result.result.has_value()
+                        && geode::point_point_distance(
+                               result.result.value(), endpoint )
+                               < geode::GLOBAL_EPSILON,
+                    "Wrong result for segment_triangle_intersection with "
+                    "segment crossing the triangle at ",
+                    endpoint.string(), " from ", start.string() );
+            }
+        }
+    }
 }
 
 void test_line_cylinder_intersection()
@@ -1342,6 +1426,7 @@ void test()
     test_segment_line_intersection();
     test_segment_plane_intersection();
     test_segment_triangle_intersection();
+    test_segment_triangle_intersection_touching_endpoint();
     test_line_cylinder_intersection();
     test_segment_cylinder_intersection();
     test_plane_plane_intersection();
