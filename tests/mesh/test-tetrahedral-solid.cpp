@@ -573,6 +573,46 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_tetrahedral_solid< 3 >( filename ) );
 }
 
+void test_broken_adjacencies_around_edge()
+{
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 1 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0.5 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0.5 } } );
+    builder->create_point( geode::Point3D{ { -1, 0, 0.5 } } );
+    builder->create_point( geode::Point3D{ { 0, -1, 0.5 } } );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 1, 3, 4 } );
+    builder->create_tetrahedron( { 0, 1, 4, 5 } );
+    builder->create_tetrahedron( { 0, 1, 5, 2 } );
+    builder->compute_polyhedron_adjacencies();
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedra_around_edge( { 0, 1 }, 0 ).size() == 4,
+        "[Test] Wrong number of polyhedra around edge" );
+    // Break the cycle: polyhedron 3 points to polyhedron 1 instead of 0,
+    // the propagation never comes back to polyhedron 0
+    for( const auto f : geode::LRange{ 4 } )
+    {
+        if( solid->polyhedron_adjacent( { 3, f } ) == 0 )
+        {
+            builder->set_polyhedron_adjacent( { 3, f }, 1 );
+        }
+    }
+    try
+    {
+        const auto polyhedra = solid->polyhedra_around_edge( { 0, 1 }, 0 );
+        geode::OpenGeodeMeshException::test( polyhedra.size() < 1000,
+            "[Test] Propagation around edge should stop" );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        // Expected: broken adjacencies are reported
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -594,6 +634,7 @@ void test()
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );
     test_delete_all( *solid, *builder );
+    test_broken_adjacencies_around_edge();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

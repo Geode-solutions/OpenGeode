@@ -173,9 +173,12 @@ namespace
         auto& [polyhedra_around_edge, found] = result;
         const auto first_polyhedron = facet.polyhedron_id;
         geode::index_t safety_count{ 0 };
-        constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
+        // A valid edge cannot have more polyhedra around than the mesh
+        const auto MAX_SAFETY_COUNT =
+            std::max( geode::index_t{ 1000 }, solid.nb_polyhedra() + 1 );
         do
         {
+            safety_count++;
             if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
             {
                 const auto adj_facet = adj.value();
