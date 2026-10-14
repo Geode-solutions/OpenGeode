@@ -38,6 +38,7 @@
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
+#include <geode/geometry/internal/position_from_sides.hpp>
 #include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/perpendicular.hpp>
 #include <geode/geometry/projection.hpp>
@@ -1010,18 +1011,17 @@ namespace geode
         const auto& vertices = triangle.vertices();
         const auto& origin = line.origin();
         const Point3D destination = origin + line.direction();
-        std::array< SIGN, 3 > signs;
+        local_index_t nb_positive{ 0 };
+        local_index_t nb_negative{ 0 };
         for( const auto v : LRange{ 3 } )
         {
             const auto next = v == 2 ? 0 : v + 1;
-            signs[v] = tetrahedron_volume_sign( Tetrahedron{
+            const auto sign = tetrahedron_volume_sign( Tetrahedron{
                 origin, destination, vertices[v], vertices[next] } );
+            nb_positive += sign == SIGN::positive ? 1 : 0;
+            nb_negative += sign == SIGN::negative ? 1 : 0;
         }
-        const auto has_sign = [&signs]( SIGN sign ) {
-            return absl::c_linear_search( signs, sign );
-        };
-        if( !( has_sign( SIGN::positive ) && has_sign( SIGN::negative ) )
-            && ( has_sign( SIGN::positive ) || has_sign( SIGN::negative ) ) )
+        if( ( nb_positive == 0 ) != ( nb_negative == 0 ) )
         {
             const Vector3D E1{ vertices[0], vertices[1] };
             const Vector3D E2{ vertices[0], vertices[2] };
@@ -1032,6 +1032,8 @@ namespace geode
                 const Vector3D PmV0{ vertices[0], origin };
                 const auto Y =
                     origin + line.direction() * ( -N.dot( PmV0 ) / NdD );
+                // Y is approximated: far from the triangle for nearly
+                // parallel lines, then decided by the edge distances
                 auto [distance, closest] =
                     point_triangle_distance( Y, triangle );
                 if( distance <= GLOBAL_EPSILON )
@@ -1239,24 +1241,14 @@ namespace geode
         // Facets seen from the point (with exact predicates): the closest
         // point is on one of them, and there is none for an inside point. A
         // flat tetrahedron is the union of its facets.
-        const auto& vertices = tetra.vertices();
-        const auto facet_sign = [&vertices]( local_index_t facet,
-                                    const Point3D& query ) {
-            const auto& facet_vertices =
-                Tetrahedron::tetrahedron_facet_vertex[facet];
-            return tetrahedron_volume_sign( Tetrahedron{
-                vertices[facet_vertices[0]], vertices[facet_vertices[1]],
-                vertices[facet_vertices[2]], query } );
-        };
-        // Facets are oriented towards the inside of positive tetrahedra
-        const auto orientation = facet_sign( 0, vertices[0] );
-        const auto outside_sign =
-            orientation == SIGN::negative ? SIGN::positive : SIGN::negative;
+        const auto orientation = internal::tetrahedron_orientation( tetra );
         std::array< bool, 4 > visible;
         for( const auto facet : LRange{ 4 } )
         {
-            visible[facet] = orientation == SIGN::zero
-                             || facet_sign( facet, point ) == outside_sign;
+            visible[facet] = orientation == GEO::zero
+                             || internal::point_tetrahedron_facet_inner_sign(
+                                    point, tetra, facet, orientation )
+                                    == GEO::negative;
         }
         if( absl::c_none_of( visible, []( bool seen ) {
                 return seen;
@@ -1264,6 +1256,7 @@ namespace geode
         {
             return { 0.0, point };
         }
+        const auto& vertices = tetra.vertices();
         std::tuple< double, Point3D > result{
             std::numeric_limits< double >::max(), point
         };
@@ -1329,7 +1322,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() == 0 )
+        if( center_to_point.length2() == 0 )
         {
             // No direction: any sphere point is the closest one
             Vector< dimension > dummy_direction;
@@ -1346,7 +1339,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() == 0 )
+        if( center_to_point.length2() == 0 )
         {
             // No direction: any sphere point is the closest one
             Vector< dimension > dummy_direction;

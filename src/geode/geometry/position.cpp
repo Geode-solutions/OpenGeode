@@ -195,33 +195,6 @@ namespace
         }
         return point_degenerated_triangle_position_exact( point, triangle );
     }
-
-    geode::POSITION point_tetrahedron_position_exact(
-        const geode::Point3D& point,
-        const geode::Tetrahedron& tetra,
-        bool negative_orientation )
-    {
-        std::array< GEO::SIGN, 4 > signs;
-        const auto& vertices = tetra.vertices();
-        for( const auto f : geode::Range{ 4 } )
-        {
-            const auto& facet_vertices =
-                geode::Tetrahedron::tetrahedron_facet_vertex[f];
-            signs[f] = GEO::PCK::orient_3d( vertices[facet_vertices[0]],
-                vertices[facet_vertices[1]], vertices[facet_vertices[2]],
-                point );
-            if( negative_orientation )
-            {
-                signs[f] = static_cast< GEO::SIGN >( -signs[f] );
-            }
-            if( signs[f] == GEO::SIGN::negative )
-            {
-                return geode::POSITION::outside;
-            }
-        }
-        return geode::internal::point_tetrahedron_position( signs );
-    }
-
 } // namespace
 
 namespace geode
@@ -229,18 +202,20 @@ namespace geode
     POSITION point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        // Facets are oriented towards the inside of positive tetrahedra, i.e.
-        // with vertex 0 on the positive side of facet 0. Approximated facet
-        // normals are unreliable for nearly flat tetrahedra: only exact
-        // predicates are used.
-        const auto& vertices = tetra.vertices();
-        const auto& facet0 = Tetrahedron::tetrahedron_facet_vertex[0];
-        const auto negative_orientation =
-            GEO::PCK::orient_3d( vertices[facet0[0]], vertices[facet0[1]],
-                vertices[facet0[2]], vertices[0] )
-            == GEO::SIGN::negative;
-        return point_tetrahedron_position_exact(
-            point, tetra, negative_orientation );
+        // Approximated facet normals are unreliable for nearly flat
+        // tetrahedra: only exact predicates are used.
+        const auto orientation = internal::tetrahedron_orientation( tetra );
+        std::array< GEO::SIGN, 4 > signs;
+        for( const auto f : LRange{ 4 } )
+        {
+            signs[f] = internal::point_tetrahedron_facet_inner_sign(
+                point, tetra, f, orientation );
+            if( signs[f] == GEO::negative )
+            {
+                return POSITION::outside;
+            }
+        }
+        return internal::point_tetrahedron_position( signs );
     }
 
     template <>
