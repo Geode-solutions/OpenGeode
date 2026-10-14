@@ -201,10 +201,10 @@ void random_colocation_test()
     }
     std::shuffle( points.begin(), points.end(), generator );
     const geode::NNSearch3D search{ points };
-    constexpr double epsilon{ 1e-3 };
+    const double epsilon{ 1e-3 };
     const auto info = search.colocated_index_mapping( epsilon );
     const auto expected = reference_mapping(
-        search.nb_points(), [&search]( geode::index_t point_id ) {
+        search.nb_points(), [&search, epsilon]( geode::index_t point_id ) {
             return search.radius_neighbors( search.point( point_id ), epsilon );
         } );
     geode::OpenGeodeGeometryException::test(
