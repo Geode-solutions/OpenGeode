@@ -166,6 +166,25 @@ namespace
     }
 
     template < typename Mesh >
+    bool non_common_vertex_inside( const Mesh& mesh,
+        const geode::PolygonVertices& triangle_vertices,
+        const geode::PolygonVertices& other_triangle_vertices,
+        const geode::PolygonVertices& common_points )
+    {
+        for( const auto vertex : triangle_vertices )
+        {
+            if( absl::c_contains( common_points, vertex ) )
+            {
+                continue;
+            }
+            return geode::point_triangle_position( mesh.point( vertex ),
+                       mesh_triangle( mesh, other_triangle_vertices ) )
+                   != geode::POSITION::outside;
+        }
+        return false;
+    }
+
+    template < typename Mesh >
     std::enable_if_t< Mesh::dim == 2, bool > triangles_intersect(
         const Mesh& mesh,
         const geode::PolygonVertices& triangle_vertices,
@@ -250,7 +269,12 @@ namespace
                 }
             }
         }
-        return false;
+        // No edge crossing: the triangles still intersect if one lies inside
+        // the other (possibly nested in its corner at the common vertex)
+        return non_common_vertex_inside( mesh, triangle_vertices,
+                   other_triangle_vertices, common_points )
+               || non_common_vertex_inside( mesh, other_triangle_vertices,
+                   triangle_vertices, common_points );
     }
 
     template < typename Mesh >
