@@ -165,7 +165,9 @@ namespace
             "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
             "around vertex" );
         geode::index_t safety_count{ 0 };
-        constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
+        // A valid vertex cannot have more polygons around than the mesh
+        const auto MAX_SAFETY_COUNT =
+            std::max( geode::index_t{ 1000 }, mesh.nb_polygons() + 1 );
         geode::internal::PolygonsAroundVertexImpl result;
         auto cur_polygon_vertex = first_polygon;
         bool vertex_is_next{ false };

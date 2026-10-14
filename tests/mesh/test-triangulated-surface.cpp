@@ -559,6 +559,16 @@ void test_concurrent_polygons_around_vertex()
     }
 }
 
+void test_high_valence_vertex()
+{
+    constexpr geode::index_t FAN_SIZE{ 1500 };
+    const auto surface = create_fans( 1, FAN_SIZE );
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 0 ).size() == FAN_SIZE
+            && !surface->is_vertex_on_border( 0 ),
+        "[Test] Wrong polygons around a vertex with ", FAN_SIZE, " polygons" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -577,6 +587,7 @@ void test()
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );
     test_concurrent_polygons_around_vertex();
+    test_high_valence_vertex();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )
