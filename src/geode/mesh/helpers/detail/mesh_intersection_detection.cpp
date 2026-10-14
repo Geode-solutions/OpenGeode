@@ -67,6 +67,21 @@ namespace
         return triangles;
     }
 
+    std::vector< geode::PolygonVertices > all_fan_triangles(
+        const geode::PolygonVertices& polygon )
+    {
+        std::vector< geode::PolygonVertices > triangles;
+        triangles.reserve( ( polygon.size() - 2 ) * ( polygon.size() - 2 ) );
+        for( const auto v : geode::LRange{ polygon.size() - 2 } )
+        {
+            for( auto& triangle : fan_triangles( polygon, v ) )
+            {
+                triangles.emplace_back( std::move( triangle ) );
+            }
+        }
+        return triangles;
+    }
+
     geode::index_t third_point_index( const geode::PolygonVertices& vertices,
         const geode::PolygonVertices& vertices_to_avoid )
     {
@@ -311,22 +326,16 @@ namespace geode
                 return triangles_intersection_detection(
                     mesh, polygon, other_polygon );
             }
-            for( const auto v : geode::LRange{ polygon.size() - 2 } )
+            const auto triangles = all_fan_triangles( polygon );
+            const auto other_triangles = all_fan_triangles( other_polygon );
+            for( const auto& triangle : triangles )
             {
-                for( const auto& triangle : fan_triangles( polygon, v ) )
+                for( const auto& other_triangle : other_triangles )
                 {
-                    for( const auto other_v :
-                        geode::LRange{ other_polygon.size() - 2 } )
+                    if( triangles_intersection_detection(
+                            mesh, triangle, other_triangle ) )
                     {
-                        for( const auto& other_triangle :
-                            fan_triangles( other_polygon, other_v ) )
-                        {
-                            if( triangles_intersection_detection(
-                                    mesh, triangle, other_triangle ) )
-                            {
-                                return true;
-                            }
-                        }
+                        return true;
                     }
                 }
             }
