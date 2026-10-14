@@ -93,6 +93,9 @@ namespace geode
             axis_length > 0 && std::isfinite( axis_length ), point,
             OpenGeodeBasicException::TYPE::data,
             "[rotate] Given axis is null or not finite" );
+        OpenGeodeGeometryException::check_exception( std::isfinite( angle ),
+            point, OpenGeodeBasicException::TYPE::data,
+            "[rotate] Given angle is not finite" );
         // No angle normalization needed: the rotation matrix is quadratic in
         // the quaternion, so q and -q (angle + 2*PI) give the same rotation.
         const auto base = axis / axis_length * std::sin( 0.5 * angle );

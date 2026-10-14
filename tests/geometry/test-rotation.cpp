@@ -43,10 +43,16 @@ void test_rotation_robustness()
                           - geode::Vector3D{ input }.dot( axis ) )
                    <= geode::GLOBAL_EPSILON,
         "Wrong result for huge angle rotation" );
-    const auto infinite =
-        geode::rotate( input, axis, std::numeric_limits< double >::infinity() );
-    geode::OpenGeodeGeometryException::test( std::isnan( infinite.value( 0 ) ),
-        "Infinite angle rotation should give NaN" );
+    try
+    {
+        [[maybe_unused]] const auto infinite = geode::rotate(
+            input, axis, std::numeric_limits< double >::infinity() );
+        geode::OpenGeodeGeometryException::test(
+            false, "Infinite angle rotation should throw" );
+    }
+    catch( const geode::OpenGeodeGeometryException& )
+    {
+    }
 
     const geode::Vector3D small_axis{ { 1e-4, 0., 0. } };
     const geode::Vector3D z_axis{ { 0., 0., 3. } };
