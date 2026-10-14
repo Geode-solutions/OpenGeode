@@ -244,7 +244,8 @@ namespace geode
      * @return a tuple containing:
      * - the smallest signed distance.
      * - the closest point on the circle.
-     * @details the sign is positive outside the circle, negative inside.
+     * @details the sign is given by the side of the circle plane: positive
+     * in the direction of the plane normal, negative otherwise.
      */
     [[nodiscard]] std::tuple< double, Point3D >
         opengeode_geometry_api point_circle_signed_distance(
