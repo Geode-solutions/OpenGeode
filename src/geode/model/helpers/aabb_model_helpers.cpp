@@ -43,14 +43,52 @@
 
 namespace
 {
-    template < typename Range >
-    geode::index_t count_non_empty_elements(
-        const Range& range, geode::index_t nb_elements )
+    template < geode::index_t dimension >
+    geode::index_t nb_mesh_elements(
+        const geode::EdgedCurve< dimension >& mesh )
+    {
+        return mesh.nb_edges();
+    }
+
+    template < geode::index_t dimension >
+    geode::index_t nb_mesh_elements(
+        const geode::SurfaceMesh< dimension >& mesh )
+    {
+        return mesh.nb_polygons();
+    }
+
+    geode::index_t nb_mesh_elements( const geode::SolidMesh3D& mesh )
+    {
+        return mesh.nb_polyhedra();
+    }
+
+    struct HasVertices
+    {
+        template < typename Mesh >
+        bool operator()( const Mesh& mesh ) const
+        {
+            return mesh.nb_vertices() > 0;
+        }
+    };
+
+    struct HasElements
+    {
+        template < typename Mesh >
+        bool operator()( const Mesh& mesh ) const
+        {
+            return nb_mesh_elements( mesh ) > 0;
+        }
+    };
+
+    template < typename Range, typename IsNotEmpty >
+    geode::index_t count_non_empty_elements( const Range& range,
+        geode::index_t nb_elements,
+        const IsNotEmpty& is_not_empty )
     {
         geode::index_t nb_non_empty_elements{ 0 };
         for( const auto& element : range )
         {
-            if( element.mesh().nb_vertices() > 0 )
+            if( is_not_empty( element.mesh() ) )
             {
                 nb_non_empty_elements++;
             }
@@ -70,7 +108,7 @@ namespace
         create_aabb( const Range& range, geode::index_t nb_elements )
     {
         const auto nb_non_empty_elements =
-            count_non_empty_elements( range, nb_elements );
+            count_non_empty_elements( range, nb_elements, HasVertices{} );
         std::tuple< geode::AABBTree< dimension >,
             absl::FixedArray< geode::uuid > >
             result( geode::AABBTree< dimension >{},
@@ -106,7 +144,7 @@ namespace
         const Range& range, geode::index_t nb_elements )
     {
         const auto nb_non_empty_elements =
-            count_non_empty_elements( range, nb_elements );
+            count_non_empty_elements( range, nb_elements, HasElements{} );
         geode::ModelMeshesAABBTree< dimension > result{ nb_non_empty_elements };
         absl::FixedArray< geode::BoundingBox< dimension > > boxes(
             nb_non_empty_elements );
@@ -114,7 +152,7 @@ namespace
         geode::index_t id{ 0 };
         for( const auto& element : range )
         {
-            if( element.mesh().nb_vertices() == 0 )
+            if( !HasElements{}( element.mesh() ) )
             {
                 continue;
             }

@@ -19,6 +19,14 @@
 # SOFTWARE.
 
 add_geode_test(
+    SOURCE "test-aabb-model-helpers.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-brep.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
