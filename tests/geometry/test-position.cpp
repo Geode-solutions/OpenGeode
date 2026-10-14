@@ -21,6 +21,8 @@
  *
  */
 
+#include <cmath>
+#include <limits>
 #include <random>
 
 #include <geode/basic/assert.hpp>
@@ -536,6 +538,18 @@ void test_point_side_to_triangle()
         "q3" );
 }
 
+// Smallest double strictly greater than value, i.e. value + 1 ulp
+double next_double_above( double value )
+{
+    return std::nextafter( value, std::numeric_limits< double >::infinity() );
+}
+
+// Largest double strictly lower than value, i.e. value - 1 ulp
+double next_double_below( double value )
+{
+    return std::nextafter( value, -std::numeric_limits< double >::infinity() );
+}
+
 void test_point_inside_polygon()
 {
     const geode::Point2D a{ { 0, 0 } };
@@ -568,6 +582,28 @@ void test_point_inside_polygon()
                 && !geode::is_point_inside_polygon( point, cw ),
             "Point ", point.string(), " should be outside the polygon" );
     }
+
+    // Points inside the bounding box of the diagonal edge but not on it
+    const geode::Polygon2D triangle{ { a, b, c } };
+    const std::array< geode::Point2D, 2 > off_diagonal_points{
+        geode::Point2D{ { 0.2, 0.8 } },
+        geode::Point2D{ { 0.5, next_double_above( 0.5 ) } }
+    };
+    for( const auto& point : off_diagonal_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            !geode::is_point_inside_polygon( point, triangle ), "Point ",
+            point.string(), " should be outside the triangle" );
+    }
+    const std::array< geode::Point2D, 2 > on_diagonal_points{
+        geode::Point2D{ { 0.2, 0.2 } }, geode::Point2D{ { 0.5, 0.5 } }
+    };
+    for( const auto& point : on_diagonal_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            geode::is_point_inside_polygon( point, triangle ), "Point ",
+            point.string(), " should be on the triangle boundary" );
+    }
 }
 
 void test_exact_predicates_near_degenerate()
@@ -598,9 +634,9 @@ void test_exact_predicates_near_degenerate()
                 == geode::SIDE::zero,
             "Wrong side for collinear point" );
         const auto side_up = geode::point_side_to_segment(
-            geode::Point2D{ { x2, std::nextafter( x2, 1e300 ) } }, segment );
+            geode::Point2D{ { x2, next_double_above( x2 ) } }, segment );
         const auto side_down = geode::point_side_to_segment(
-            geode::Point2D{ { x2, std::nextafter( x2, -1e300 ) } }, segment );
+            geode::Point2D{ { x2, next_double_below( x2 ) } }, segment );
         geode::OpenGeodeGeometryException::test(
             side_up != geode::SIDE::zero && side_down != geode::SIDE::zero
                 && side_up != side_down,
@@ -621,11 +657,9 @@ void test_exact_predicates_near_degenerate()
                 == geode::SIDE::zero,
             "Wrong side for coplanar point" );
         const auto side_above = geode::point_side_to_triangle(
-            geode::Point3D{ { x3, std::nextafter( x3, 1e300 ), z3 } },
-            triangle );
+            geode::Point3D{ { x3, next_double_above( x3 ), z3 } }, triangle );
         const auto side_below = geode::point_side_to_triangle(
-            geode::Point3D{ { x3, std::nextafter( x3, -1e300 ), z3 } },
-            triangle );
+            geode::Point3D{ { x3, next_double_below( x3 ), z3 } }, triangle );
         geode::OpenGeodeGeometryException::test(
             side_above != geode::SIDE::zero && side_below != geode::SIDE::zero
                 && side_above != side_below,
@@ -649,10 +683,10 @@ void test_exact_orientation_large_coordinates()
         const geode::Point2D p1{ { x1, 3 * x1 } };
         const auto y2 = 3 * x2;
         const auto side_up = geode::point_side_to_segment(
-            geode::Point2D{ { x2, std::nextafter( y2, 1e300 ) } },
+            geode::Point2D{ { x2, next_double_above( y2 ) } },
             geode::Segment2D{ p0, p1 } );
         const auto side_down = geode::point_side_to_segment(
-            geode::Point2D{ { x2, std::nextafter( y2, -1e300 ) } },
+            geode::Point2D{ { x2, next_double_below( y2 ) } },
             geode::Segment2D{ p0, p1 } );
         geode::OpenGeodeGeometryException::test(
             x0 == x1
