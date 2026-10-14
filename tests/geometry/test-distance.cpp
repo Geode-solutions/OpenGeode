@@ -35,6 +35,7 @@
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/common.hpp>
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/information.hpp>
 #include <geode/geometry/position.hpp>
@@ -225,6 +226,17 @@ void test_point_triangle_distance_2d()
         distance == 0 && closest_point == q4,
         "Wrong result for point_triangle_distance with query point "
         "q4" );
+
+    const geode::Point2D d{ { 2.0, 0.0 } };
+    const geode::Triangle2D flat{ a, b, d };
+    const geode::Point2D q5{ { -1.0, 0.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_triangle_distance( q5, flat );
+    geode::OpenGeodeGeometryException::test(
+        distance == 1 && closest_point == a,
+        "Wrong result for point_triangle_distance with flat triangle and "
+        "aligned query point q5: ",
+        distance );
 }
 
 void test_point_triangle_distance_3d()
@@ -1618,6 +1630,8 @@ void test_point_skewed_tetrahedron_distance()
 
 void test()
 {
+    // Exact predicates need the library initialization
+    geode::OpenGeodeGeometryLibrary::initialize();
     test_point_segment_distance();
     test_segment_segment_distance();
     test_segment_line_distance();

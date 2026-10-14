@@ -47,25 +47,31 @@
 namespace
 {
     /*
-     * This function tests if the point is in the triangle by computing signed
-     * areas
-     * @warning This is not robust in edge cases!
+     * This function tests if the point is in the triangle using exact
+     * orientation predicates
      */
     bool may_point_be_in_triangle(
         const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
         const auto& vertices = triangle.vertices();
-        const auto signed_area_1 = geode::triangle_signed_area(
+        const auto sign_1 = geode::triangle_area_sign(
             geode::Triangle2D{ vertices[0], vertices[1], point } );
-        const auto signed_area_2 = geode::triangle_signed_area(
+        const auto sign_2 = geode::triangle_area_sign(
             geode::Triangle2D{ vertices[1], vertices[2], point } );
-        const auto signed_area_3 = geode::triangle_signed_area(
+        const auto sign_3 = geode::triangle_area_sign(
             geode::Triangle2D{ vertices[2], vertices[0], point } );
-
-        return ( signed_area_1 <= 0. && signed_area_2 <= 0.
-                   && signed_area_3 <= 0 )
-               || ( signed_area_1 >= 0. && signed_area_2 >= 0.
-                    && signed_area_3 >= 0 );
+        if( sign_1 == geode::SIGN::zero && sign_2 == geode::SIGN::zero
+            && sign_3 == geode::SIGN::zero )
+        {
+            // Flat triangle and aligned point: decided by the edge distances
+            return false;
+        }
+        return ( sign_1 != geode::SIGN::positive
+                   && sign_2 != geode::SIGN::positive
+                   && sign_3 != geode::SIGN::positive )
+               || ( sign_1 != geode::SIGN::negative
+                    && sign_2 != geode::SIGN::negative
+                    && sign_3 != geode::SIGN::negative );
     }
 
     std::optional< double > compute_point_line_distance( double segment_length,
