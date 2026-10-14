@@ -1596,6 +1596,380 @@ namespace GEO
                && is_product_zero( p1.value( 1 ) - p0.value( 1 ),
                    p2.value( 1 ) - p0.value( 1 ) );
     }
+
+    /******* adaptive stages *******/
+
+    // Stages B and C of the adaptive predicates of J. R. Shewchuk, "Adaptive
+    // Precision Floating-Point Arithmetic and Fast Robust Geometric
+    // Predicates", 1997 (predicates.c, public domain). They are evaluated
+    // when the floating-point filter fails: stage B computes exactly the
+    // determinant of the rounded coordinate differences, with short
+    // expansions. Stage C checks whether these differences were exact, or
+    // adds the first order corrections of their roundoff errors. If still
+    // uncertain, the full exact evaluation is required.
+    namespace adaptive
+    {
+        constexpr double EPSILON = 1.1102230246251565404e-16; // 2^-53
+        constexpr double RESULT_ERRBOUND = ( 3.0 + 8.0 * EPSILON ) * EPSILON;
+        constexpr double CCW_ERRBOUND_B = ( 2.0 + 12.0 * EPSILON ) * EPSILON;
+        constexpr double CCW_ERRBOUND_C =
+            ( 9.0 + 64.0 * EPSILON ) * EPSILON * EPSILON;
+        constexpr double O3D_ERRBOUND_B = ( 3.0 + 28.0 * EPSILON ) * EPSILON;
+        constexpr double O3D_ERRBOUND_C =
+            ( 26.0 + 288.0 * EPSILON ) * EPSILON * EPSILON;
+
+        inline void fast_two_sum( double a, double b, double& x, double& y )
+        {
+            x = a + b;
+            const double bvirt = x - a;
+            y = b - bvirt;
+        }
+
+        inline double two_diff_tail( double a, double b )
+        {
+            double x;
+            double y;
+            two_diff( a, b, x, y );
+            return y;
+        }
+
+        // Exact a1 + a0 - b, as x2 + x1 + x0
+        inline void two_one_diff(
+            double a1, double a0, double b, double& x2, double& x1, double& x0 )
+        {
+            double i;
+            two_diff( a0, b, i, x0 );
+            two_sum( a1, i, x2, x1 );
+        }
+
+        // Exact a*b - c*d as a 4 components expansion
+        inline void two_two_product_diff(
+            double a, double b, double c, double d, double x[4] )
+        {
+            double ab1;
+            double ab0;
+            two_product( a, b, ab1, ab0 );
+            double cd1;
+            double cd0;
+            two_product( c, d, cd1, cd0 );
+            double j;
+            double r0;
+            two_one_diff( ab1, ab0, cd0, j, r0, x[0] );
+            two_one_diff( j, r0, cd1, x[3], x[2], x[1] );
+        }
+
+        // h cannot be e or f.
+        inline int fast_expansion_sum_zeroelim(
+            int elen, const double* e, int flen, const double* f, double* h )
+        {
+            int eindex = 0;
+            int findex = 0;
+            int hindex = 0;
+            double enow = e[0];
+            double fnow = f[0];
+            const auto next_e = [&] {
+                eindex++;
+                enow = eindex < elen ? e[eindex] : 0.;
+            };
+            const auto next_f = [&] {
+                findex++;
+                fnow = findex < flen ? f[findex] : 0.;
+            };
+            double Q;
+            double Qnew;
+            double hh;
+            if( ( fnow > enow ) == ( fnow > -enow ) )
+            {
+                Q = enow;
+                next_e();
+            }
+            else
+            {
+                Q = fnow;
+                next_f();
+            }
+            if( eindex < elen && findex < flen )
+            {
+                if( ( fnow > enow ) == ( fnow > -enow ) )
+                {
+                    fast_two_sum( enow, Q, Qnew, hh );
+                    next_e();
+                }
+                else
+                {
+                    fast_two_sum( fnow, Q, Qnew, hh );
+                    next_f();
+                }
+                Q = Qnew;
+                if( hh != 0. )
+                {
+                    h[hindex++] = hh;
+                }
+                while( eindex < elen && findex < flen )
+                {
+                    if( ( fnow > enow ) == ( fnow > -enow ) )
+                    {
+                        two_sum( Q, enow, Qnew, hh );
+                        next_e();
+                    }
+                    else
+                    {
+                        two_sum( Q, fnow, Qnew, hh );
+                        next_f();
+                    }
+                    Q = Qnew;
+                    if( hh != 0. )
+                    {
+                        h[hindex++] = hh;
+                    }
+                }
+            }
+            while( eindex < elen )
+            {
+                two_sum( Q, enow, Qnew, hh );
+                next_e();
+                Q = Qnew;
+                if( hh != 0. )
+                {
+                    h[hindex++] = hh;
+                }
+            }
+            while( findex < flen )
+            {
+                two_sum( Q, fnow, Qnew, hh );
+                next_f();
+                Q = Qnew;
+                if( hh != 0. )
+                {
+                    h[hindex++] = hh;
+                }
+            }
+            if( Q != 0. || hindex == 0 )
+            {
+                h[hindex++] = Q;
+            }
+            return hindex;
+        }
+
+        // e and h cannot be the same.
+        inline int scale_expansion_zeroelim(
+            int elen, const double* e, double b, double* h )
+        {
+            int hindex = 0;
+            double Q;
+            double hh;
+            two_product( e[0], b, Q, hh );
+            if( hh != 0. )
+            {
+                h[hindex++] = hh;
+            }
+            for( int eindex = 1; eindex < elen; eindex++ )
+            {
+                double product1;
+                double product0;
+                two_product( e[eindex], b, product1, product0 );
+                double sum;
+                two_sum( Q, product0, sum, hh );
+                if( hh != 0. )
+                {
+                    h[hindex++] = hh;
+                }
+                fast_two_sum( product1, sum, Q, hh );
+                if( hh != 0. )
+                {
+                    h[hindex++] = hh;
+                }
+            }
+            if( Q != 0. || hindex == 0 )
+            {
+                h[hindex++] = Q;
+            }
+            return hindex;
+        }
+
+        inline double estimate( int elen, const double* e )
+        {
+            double Q = e[0];
+            for( int eindex = 1; eindex < elen; eindex++ )
+            {
+                Q += e[eindex];
+            }
+            return Q;
+        }
+
+        // Components are non-overlapping and sorted by increasing magnitude:
+        // the sign is the one of the largest non-zero component.
+        inline SIGN expansion_sign( int elen, const double* e )
+        {
+            for( int eindex = elen - 1; eindex >= 0; eindex-- )
+            {
+                if( e[eindex] > 0. )
+                {
+                    return positive;
+                }
+                if( e[eindex] < 0. )
+                {
+                    return negative;
+                }
+            }
+            return zero;
+        }
+
+        inline SIGN sign_of( double value )
+        {
+            return value > 0. ? positive : negative;
+        }
+
+        // Returns true if the sign of (p1-p0)x(p2-p0) has been determined
+        inline bool orient_2d( const geode::Point2D& p0,
+            const geode::Point2D& p1,
+            const geode::Point2D& p2,
+            SIGN& result )
+        {
+            const double acx = p1.value( 0 ) - p0.value( 0 );
+            const double bcx = p2.value( 0 ) - p0.value( 0 );
+            const double acy = p1.value( 1 ) - p0.value( 1 );
+            const double bcy = p2.value( 1 ) - p0.value( 1 );
+            const double detsum =
+                std::fabs( acx * bcy ) + std::fabs( acy * bcx );
+
+            double B[4];
+            two_two_product_diff( acx, bcy, acy, bcx, B );
+            double det = estimate( 4, B );
+            double errbound = CCW_ERRBOUND_B * detsum;
+            if( det >= errbound || -det >= errbound )
+            {
+                result = sign_of( det );
+                return true;
+            }
+
+            const double acxtail =
+                two_diff_tail( p1.value( 0 ), p0.value( 0 ) );
+            const double bcxtail =
+                two_diff_tail( p2.value( 0 ), p0.value( 0 ) );
+            const double acytail =
+                two_diff_tail( p1.value( 1 ), p0.value( 1 ) );
+            const double bcytail =
+                two_diff_tail( p2.value( 1 ), p0.value( 1 ) );
+            if( acxtail == 0. && acytail == 0. && bcxtail == 0.
+                && bcytail == 0. )
+            {
+                result = expansion_sign( 4, B );
+                return true;
+            }
+
+            errbound =
+                CCW_ERRBOUND_C * detsum + RESULT_ERRBOUND * std::fabs( det );
+            det += ( acx * bcytail + bcy * acxtail )
+                   - ( acy * bcxtail + bcx * acytail );
+            if( det >= errbound || -det >= errbound )
+            {
+                result = sign_of( det );
+                return true;
+            }
+            return false;
+        }
+
+        // Returns true if the sign of det(p1-p0, p2-p0, p3-p0) has been
+        // determined
+        inline bool orient_3d( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3,
+            SIGN& result )
+        {
+            const double adx = p1.value( 0 ) - p0.value( 0 );
+            const double bdx = p2.value( 0 ) - p0.value( 0 );
+            const double cdx = p3.value( 0 ) - p0.value( 0 );
+            const double ady = p1.value( 1 ) - p0.value( 1 );
+            const double bdy = p2.value( 1 ) - p0.value( 1 );
+            const double cdy = p3.value( 1 ) - p0.value( 1 );
+            const double adz = p1.value( 2 ) - p0.value( 2 );
+            const double bdz = p2.value( 2 ) - p0.value( 2 );
+            const double cdz = p3.value( 2 ) - p0.value( 2 );
+            const double permanent =
+                ( std::fabs( bdx * cdy ) + std::fabs( cdx * bdy ) )
+                    * std::fabs( adz )
+                + ( std::fabs( cdx * ady ) + std::fabs( adx * cdy ) )
+                      * std::fabs( bdz )
+                + ( std::fabs( adx * bdy ) + std::fabs( bdx * ady ) )
+                      * std::fabs( cdz );
+
+            double bc[4];
+            two_two_product_diff( bdx, cdy, cdx, bdy, bc );
+            double adet[8];
+            const auto alen = scale_expansion_zeroelim( 4, bc, adz, adet );
+            double ca[4];
+            two_two_product_diff( cdx, ady, adx, cdy, ca );
+            double bdet[8];
+            const auto blen = scale_expansion_zeroelim( 4, ca, bdz, bdet );
+            double ab[4];
+            two_two_product_diff( adx, bdy, bdx, ady, ab );
+            double cdet[8];
+            const auto clen = scale_expansion_zeroelim( 4, ab, cdz, cdet );
+            double abdet[16];
+            const auto ablen =
+                fast_expansion_sum_zeroelim( alen, adet, blen, bdet, abdet );
+            double fin[24];
+            const auto finlength =
+                fast_expansion_sum_zeroelim( ablen, abdet, clen, cdet, fin );
+
+            double det = estimate( finlength, fin );
+            double errbound = O3D_ERRBOUND_B * permanent;
+            if( det >= errbound || -det >= errbound )
+            {
+                result = sign_of( det );
+                return true;
+            }
+
+            const double adxtail =
+                two_diff_tail( p1.value( 0 ), p0.value( 0 ) );
+            const double bdxtail =
+                two_diff_tail( p2.value( 0 ), p0.value( 0 ) );
+            const double cdxtail =
+                two_diff_tail( p3.value( 0 ), p0.value( 0 ) );
+            const double adytail =
+                two_diff_tail( p1.value( 1 ), p0.value( 1 ) );
+            const double bdytail =
+                two_diff_tail( p2.value( 1 ), p0.value( 1 ) );
+            const double cdytail =
+                two_diff_tail( p3.value( 1 ), p0.value( 1 ) );
+            const double adztail =
+                two_diff_tail( p1.value( 2 ), p0.value( 2 ) );
+            const double bdztail =
+                two_diff_tail( p2.value( 2 ), p0.value( 2 ) );
+            const double cdztail =
+                two_diff_tail( p3.value( 2 ), p0.value( 2 ) );
+            if( adxtail == 0. && bdxtail == 0. && cdxtail == 0. && adytail == 0.
+                && bdytail == 0. && cdytail == 0. && adztail == 0.
+                && bdztail == 0. && cdztail == 0. )
+            {
+                result = expansion_sign( finlength, fin );
+                return true;
+            }
+
+            errbound =
+                O3D_ERRBOUND_C * permanent + RESULT_ERRBOUND * std::fabs( det );
+            det += ( adz
+                           * ( ( bdx * cdytail + cdy * bdxtail )
+                               - ( bdy * cdxtail + cdx * bdytail ) )
+                       + adztail * ( bdx * cdy - bdy * cdx ) )
+                   + ( bdz
+                           * ( ( cdx * adytail + ady * cdxtail )
+                               - ( cdy * adxtail + adx * cdytail ) )
+                       + bdztail * ( cdx * ady - cdy * adx ) )
+                   + ( cdz
+                           * ( ( adx * bdytail + bdy * adxtail )
+                               - ( ady * bdxtail + bdx * adytail ) )
+                       + cdztail * ( adx * bdy - ady * bdx ) );
+            if( det >= errbound || -det >= errbound )
+            {
+                result = sign_of( det );
+                return true;
+            }
+            return false;
+        }
+    } // namespace adaptive
 } // namespace GEO
 
 /******* extracted from predicates.cpp *******/
@@ -1762,6 +2136,11 @@ namespace GEO
             {
                 return zero;
             }
+            SIGN adaptive_result;
+            if( adaptive::orient_2d( p0, p1, p2, adaptive_result ) )
+            {
+                return adaptive_result;
+            }
             return orient_2d_exact( p0, p1, p2 );
         }
 
@@ -1778,6 +2157,11 @@ namespace GEO
             if( is_orient_3d_zero( p0, p1, p2, p3 ) )
             {
                 return zero;
+            }
+            SIGN adaptive_result;
+            if( adaptive::orient_3d( p0, p1, p2, p3, adaptive_result ) )
+            {
+                return adaptive_result;
             }
             return orient_3d_exact( p0, p1, p2, p3 );
         }

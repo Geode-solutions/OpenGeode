@@ -277,6 +277,26 @@ namespace
         geode::OpenGeodeGeometryException::test(
             GEO::PCK::orient_2d( e, f, g ) == GEO::zero,
             "[Test] Wrong orient_2d on points of line y = 3x" );
+
+        // Same configurations, but the coordinate differences with the tiny
+        // first point are not representable: rounded differences give a non
+        // zero determinant.
+        const auto tiny = std::ldexp( 1., -60 );
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_3d( geode::Point3D{ { 3 * tiny, tiny, 5 * tiny } },
+                geode::Point3D{ { 1000.5, 3.25, 1007 } },
+                geode::Point3D{ { -20.75, 100.5, 180.25 } },
+                geode::Point3D{ { 7, 9, 25 } } )
+                == GEO::zero,
+            "[Test] Wrong orient_3d on points of plane z = x + 2y with "
+            "inexact differences" );
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_2d( geode::Point2D{ { tiny, 3 * tiny } },
+                geode::Point2D{ { 1000.5, 3001.5 } },
+                geode::Point2D{ { -20.25, -60.75 } } )
+                == GEO::zero,
+            "[Test] Wrong orient_2d on points of line y = 3x with inexact "
+            "differences" );
     }
 
     // Nearly degenerate configurations, decided by different evaluation
