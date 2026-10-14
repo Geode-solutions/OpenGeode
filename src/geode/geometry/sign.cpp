@@ -62,43 +62,55 @@ namespace geode
         {
             return SIGN::zero;
         }
-        // The lexicographically smallest vertex is on the convex hull: the
-        // polygon orientation is the orientation of its corner
-        index_t min_vertex{ 0 };
-        for( const auto v : Range{ 1, nb_vertices } )
+        // Doubly linked list of the remaining vertices
+        std::vector< index_t > prev( nb_vertices );
+        std::vector< index_t > next( nb_vertices );
+        for( const auto v : Range{ nb_vertices } )
         {
-            if( polygon_vertices[v].get() < polygon_vertices[min_vertex].get() )
-            {
-                min_vertex = v;
-            }
+            prev[v] = v == 0 ? nb_vertices - 1 : v - 1;
+            next[v] = v + 1 == nb_vertices ? 0 : v + 1;
         }
-        const Point2D& corner = polygon_vertices[min_vertex];
-        auto prev = min_vertex;
-        auto next = min_vertex;
-        do
+        index_t start{ 0 };
+        for( auto nb_remaining = nb_vertices; nb_remaining >= 3;
+            nb_remaining-- )
         {
-            prev = prev == 0 ? nb_vertices - 1 : prev - 1;
-        } while( prev != min_vertex && polygon_vertices[prev].get() == corner );
-        do
-        {
-            next = next + 1 == nb_vertices ? 0 : next + 1;
-        } while( next != min_vertex && polygon_vertices[next].get() == corner );
-        const auto corner_sign = triangle_area_sign(
-            { polygon_vertices[prev], corner, polygon_vertices[next] } );
-        if( corner_sign != SIGN::zero )
-        {
-            return corner_sign;
-        }
-        const auto& p1 = polygon_vertices[0];
-        for( const auto other_index : Range{ 1, nb_vertices - 1 } )
-        {
-            const auto& p2 = polygon_vertices[other_index];
-            const auto& p3 = polygon_vertices[other_index + 1];
-            const auto sign = triangle_area_sign( { p1, p2, p3 } );
-            if( sign != SIGN::zero )
+            // The lexicographically smallest vertex is on the convex hull:
+            // the polygon orientation is the orientation of its corner
+            auto min_vertex = start;
+            for( auto v = next[start]; v != start; v = next[v] )
             {
-                return sign;
+                if( polygon_vertices[v].get()
+                    < polygon_vertices[min_vertex].get() )
+                {
+                    min_vertex = v;
+                }
             }
+            const Point2D& corner = polygon_vertices[min_vertex];
+            auto before = prev[min_vertex];
+            while( before != min_vertex
+                   && polygon_vertices[before].get() == corner )
+            {
+                before = prev[before];
+            }
+            if( before == min_vertex )
+            {
+                return SIGN::zero;
+            }
+            auto after = next[min_vertex];
+            while( polygon_vertices[after].get() == corner )
+            {
+                after = next[after];
+            }
+            const auto corner_sign = triangle_area_sign(
+                { polygon_vertices[before], corner, polygon_vertices[after] } );
+            if( corner_sign != SIGN::zero )
+            {
+                return corner_sign;
+            }
+            // Flat corner (spike): removing it keeps the polygon signed area
+            next[prev[min_vertex]] = next[min_vertex];
+            prev[next[min_vertex]] = prev[min_vertex];
+            start = next[min_vertex];
         }
         return SIGN::zero;
     }
