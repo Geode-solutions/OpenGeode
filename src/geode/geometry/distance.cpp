@@ -30,6 +30,7 @@
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
@@ -66,33 +67,6 @@ namespace
                    && signed_area_3 <= 0 )
                || ( signed_area_1 >= 0. && signed_area_2 >= 0.
                     && signed_area_3 >= 0 );
-    }
-
-    std::optional< double > compute_point_line_distance( double segment_length,
-        double point_to_v0_length,
-        double point_to_v1_length )
-    {
-        const auto p =
-            ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
-        if( p - point_to_v0_length <= geode::GLOBAL_EPSILON )
-        {
-            return std::nullopt;
-        }
-        if( p - point_to_v1_length <= geode::GLOBAL_EPSILON )
-        {
-            return std::nullopt;
-        }
-        if( p - segment_length <= geode::GLOBAL_EPSILON )
-        {
-            return std::nullopt;
-        }
-        auto area2 = p * ( p - point_to_v0_length ) * ( p - point_to_v1_length )
-                     * ( p - segment_length );
-        if( area2 <= 0 )
-        {
-            area2 = 0;
-        }
-        return 2 * std::sqrt( area2 ) / segment_length;
     }
 
     void get_min_edge02( double a11, double b1, std::array< double, 2 >& p )
@@ -176,7 +150,7 @@ namespace
     {
         std::array< std::tuple< double, geode::Point3D >, 3 > edge_distances;
         auto min_distance = std::numeric_limits< double >::max();
-        geode::local_index_t selected_edge{ geode::NO_LID };
+        geode::local_index_t selected_edge{ 0 };
         const auto& vertices = triangle.vertices();
         for( const auto e : geode::LRange{ 3 } )
         {
@@ -439,26 +413,20 @@ namespace
         double min_distance{ std::numeric_limits< double >::max() };
         geode::Point3D point0;
         geode::Point3D point1;
-        for( const auto vertex0 : non_colocated_points )
+        for( const auto i : geode::Indices{ non_colocated_points } )
         {
-            for( const auto vertex1 : non_colocated_points )
+            const auto vertex0 = non_colocated_points[i];
+            for( const auto j :
+                geode::Range{ i + 1, non_colocated_points.size() } )
             {
-                if( vertex0 == vertex1 )
-                {
-                    continue;
-                }
+                const auto vertex1 = non_colocated_points[j];
                 if( geode::point_point_distance( base_vertices[vertex0].get(),
                         base_vertices[vertex1].get() )
                     <= geode::GLOBAL_EPSILON )
                 {
-                    DEBUG( vertex0 );
-                    DEBUG( vertex1 );
-                    SDEBUG( base_vertices[0].get() );
-                    SDEBUG( base_vertices[1].get() );
-                    SDEBUG( base_vertices[2].get() );
-                    SDEBUG( other_triangle.vertices()[0].get() );
-                    SDEBUG( other_triangle.vertices()[1].get() );
-                    SDEBUG( other_triangle.vertices()[2].get() );
+                    // Colocated vertices: the edge is degenerated, its
+                    // vertices are tested through the other edges
+                    continue;
                 }
                 const geode::Segment3D edge{ base_vertices[vertex0],
                     base_vertices[vertex1] };
@@ -794,36 +762,8 @@ namespace geode
     double point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
-        const auto length = segment.length();
-        const auto length0 =
-            point_point_distance( segment.vertices()[0].get(), point );
-        if( length <= GLOBAL_EPSILON )
-        {
-            return length0;
-        }
-        const auto length1 =
-            point_point_distance( segment.vertices()[1].get(), point );
-        const auto sqr_length = length * length;
-        const auto sqr_length0 = length0 * length0;
-        const auto sqr_length1 = length1 * length1;
-        if( length0 >= length && length0 >= length1
-            && sqr_length + sqr_length1 <= sqr_length0 )
-        { // obtuse by vertex 1
-            return length1;
-        }
-        if( length1 >= length && length1 >= length0
-            && sqr_length + sqr_length0 <= sqr_length1 )
-        { // obtuse by vertex 0
-            return length0;
-        }
-        // acute angles
-        if( const auto distance =
-                compute_point_line_distance( length, length0, length1 ) )
-        {
-            return distance.value();
-        }
-        return std::get< 0 >(
-            point_segment_distance_using_projection( point, segment ) );
+        return point_point_distance(
+            point, point_segment_projection( point, segment ) );
     }
 
     template < index_t dimension >
@@ -942,16 +882,8 @@ namespace geode
     double point_line_distance(
         const Point< dimension >& point, const InfiniteLine< dimension >& line )
     {
-        const auto length0 = point_point_distance( line.origin(), point );
-        const auto length1 =
-            point_point_distance( line.origin() + line.direction(), point );
-        if( const auto distance =
-                compute_point_line_distance( 1, length0, length1 ) )
-        {
-            return distance.value();
-        }
-        return std::get< 0 >(
-            point_line_distance_using_projection( point, line ) );
+        return point_point_distance(
+            point, point_line_projection( point, line ) );
     }
 
     double point_line_signed_distance(
@@ -982,7 +914,8 @@ namespace geode
         opengeode_geometry_api point_triangle_distance(
             const Point2D& point, const Triangle2D& triangle )
     {
-        if( may_point_be_in_triangle( point, triangle ) )
+        if( !triangle.is_degenerated()
+            && may_point_be_in_triangle( point, triangle ) )
         {
             return { 0.0, point };
         }
@@ -1118,6 +1051,13 @@ namespace geode
     std::tuple< double, Point3D, Point3D > segment_triangle_distance(
         const Segment3D& segment, const Triangle3D& triangle )
     {
+        if( segment.is_degenerated() )
+        {
+            const auto point = segment.barycenter();
+            const auto [distance, closest_on_triangle] =
+                point_triangle_distance( point, triangle );
+            return { distance, point, closest_on_triangle };
+        }
         const InfiniteLine3D line{ segment };
         const auto [_, closest_on_line, closest_on_triangle] =
             line_triangle_distance( line, triangle );
@@ -1468,6 +1408,58 @@ namespace geode
             return { std::fabs( distance_to_plane ), projected_on_plane };
         }
         return point_circle_distance( point, disk );
+    }
+
+    std::tuple< double, Point3D > point_cylinder_distance(
+        const Point3D& point, const Cylinder& cylinder )
+    {
+        // Cylinder frame: axial coordinate along the unit axis direction,
+        // radial vector orthogonal to it, both from the axis center.
+        const auto& axis = cylinder.axis();
+        const auto axis_direction = axis.direction();
+        const auto half_height = 0.5 * axis.length();
+        const auto radius = cylinder.radius();
+        const auto center = axis.barycenter();
+        const Vector3D center_to_point{ center, point };
+        const auto axial = center_to_point.dot( axis_direction );
+        const auto radial_vector = center_to_point - axis_direction * axial;
+        const auto radial = radial_vector.length();
+        const auto axial_distance = std::fabs( axial ) - half_height;
+        const auto radial_distance = radial - radius;
+        const auto disk_center =
+            center + axis_direction * std::copysign( half_height, axial );
+        const auto to_wall = [&]( const Point3D& origin ) {
+            if( radial > 0 )
+            {
+                return origin + radial_vector * ( radius / radial );
+            }
+            // Point on the axis: any radial direction is the closest one
+            Vector3D other;
+            other.set_value(
+                std::fabs( axis_direction.value( 0 ) ) < 0.9 ? 0 : 1, 1. );
+            return origin + axis_direction.cross( other ).normalize() * radius;
+        };
+        if( axial_distance > 0 )
+        {
+            if( radial_distance <= 0 )
+            {
+                return { axial_distance, disk_center + radial_vector };
+            }
+            return { std::sqrt( axial_distance * axial_distance
+                                + radial_distance * radial_distance ),
+                to_wall( disk_center ) };
+        }
+        if( radial_distance >= 0 )
+        {
+            return { radial_distance,
+                to_wall( center + axis_direction * axial ) };
+        }
+        if( -radial_distance <= -axial_distance )
+        {
+            return { -radial_distance,
+                to_wall( center + axis_direction * axial ) };
+        }
+        return { -axial_distance, disk_center + radial_vector };
     }
 
     template < index_t dimension >

@@ -21,6 +21,8 @@
  *
  */
 
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -28,6 +30,7 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
@@ -1568,6 +1571,294 @@ void test_triangle_triangle_distance()
         "epsilon (non conformal parts only)" );
 }
 
+void test_degenerated_segment_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
+    const geode::Triangle3D triangle{ a, b, c };
+    for( const auto length :
+        { 0.4 * geode::GLOBAL_EPSILON, 0.1 * geode::GLOBAL_EPSILON } )
+    {
+        const geode::Point3D p0{ { 0.2, 0.2, 1.0 } };
+        const geode::Point3D p1{ { 0.2, 0.2 + length, 1.0 } };
+        const auto [distance, closest_on_segment, closest_on_triangle] =
+            geode::segment_triangle_distance(
+                geode::Segment3D{ p0, p1 }, triangle );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - 1. ) <= geode::GLOBAL_EPSILON
+                && closest_on_triangle.inexact_equal(
+                    geode::Point3D{ { 0.2, 0.2, 0.0 } } ),
+            "Wrong result for segment_triangle_distance with degenerated "
+            "segment" );
+    }
+}
+
+void test_degenerated_triangle_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D d{ { 1.0, 0.0, 1.0 } };
+    const geode::Point3D e{ { 0.0, 1.0, 1.0 } };
+    const geode::Triangle3D degenerated{ a, b, b };
+    const geode::Triangle3D triangle{ c, d, e };
+    const auto result0 =
+        geode::triangle_triangle_distance( degenerated, triangle );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( std::get< 0 >( result0 ) - 1. ) <= geode::GLOBAL_EPSILON,
+        "Wrong triangle_triangle_distance with degenerated triangle" );
+    const auto result1 =
+        geode::triangle_triangle_distance( triangle, degenerated );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( std::get< 0 >( result1 ) - 1. ) <= geode::GLOBAL_EPSILON,
+        "Wrong triangle_triangle_distance with degenerated triangle "
+        "(reversed)" );
+}
+
+void test_random_triangle_triangle_distance()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1., 1. };
+    const auto random_point = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    for( const auto trial : geode::Range{ 500 } )
+    {
+        geode_unused( trial );
+        const auto a = random_point();
+        const auto b = random_point();
+        const auto c = random_point();
+        const geode::Vector3D shift{ { 0, 0, 1. } };
+        const auto d = random_point() + shift;
+        const auto e = random_point() + shift;
+        const auto f = random_point() + shift;
+        const geode::Triangle3D triangle0{ a, b, c };
+        const geode::Triangle3D triangle1{ d, e, f };
+        double reference{ std::numeric_limits< double >::max() };
+        for( const auto& [base, other] :
+            { std::make_pair( &triangle0, &triangle1 ),
+                std::make_pair( &triangle1, &triangle0 ) } )
+        {
+            const auto& vertices = base->vertices();
+            for( const auto v0 : geode::LRange{ 3 } )
+            {
+                for( const auto v1 : geode::LRange{ 3 } )
+                {
+                    if( v0 == v1 )
+                    {
+                        continue;
+                    }
+                    reference = std::min( reference,
+                        std::get< 0 >( geode::segment_triangle_distance(
+                            { vertices[v0], vertices[v1] }, *other ) ) );
+                }
+            }
+        }
+        const auto [distance, point0, point1] =
+            geode::triangle_triangle_distance( triangle0, triangle1 );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - reference ) <= geode::GLOBAL_EPSILON,
+            "Wrong triangle_triangle_distance on random triangles: ", distance,
+            " vs ", reference );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs(
+                geode::point_point_distance( point0, point1 ) - distance )
+                <= geode::GLOBAL_EPSILON,
+            "Wrong triangle_triangle_distance closest points" );
+    }
+}
+
+void test_nan_point_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Triangle3D degenerated{ a, b, b };
+    const auto nan = std::numeric_limits< double >::quiet_NaN();
+    const geode::Point3D point{ { nan, nan, nan } };
+    const auto [distance, closest] =
+        geode::point_triangle_distance( point, degenerated );
+    geode::OpenGeodeGeometryException::test( std::isnan( distance ),
+        "Wrong point_triangle_distance with NaN point" );
+    const auto [signed_distance, signed_closest] =
+        geode::point_triangle_signed_distance( point, degenerated );
+    geode::OpenGeodeGeometryException::test( std::isnan( signed_distance ),
+        "Wrong point_triangle_signed_distance with NaN point" );
+}
+
+void test_degenerated_point_triangle_distance_2d()
+{
+    const geode::Point2D a{ { 0.0, 0.0 } };
+    const geode::Point2D b{ { 1.0, 0.0 } };
+    const geode::Point2D c{ { 2.0, 0.0 } };
+    const geode::Triangle2D flat{ a, b, c };
+    const geode::Point2D q{ { 5.0, 0.0 } };
+    const auto [distance, closest] = geode::point_triangle_distance( q, flat );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - 3. ) <= geode::GLOBAL_EPSILON
+            && closest.inexact_equal( c ),
+        "Wrong point_triangle_distance 2D with flat triangle: ", distance );
+    const geode::Point2D on{ { 1.5, 0.0 } };
+    geode::OpenGeodeGeometryException::test(
+        std::get< 0 >( geode::point_triangle_distance( on, flat ) )
+            <= geode::GLOBAL_EPSILON,
+        "Wrong point_triangle_distance 2D with flat triangle (on)" );
+
+    const geode::Point2D p{ { 1.0, 1.0 } };
+    const geode::Triangle2D point_triangle{ p, p, p };
+    const geode::Point2D r{ { 7.0, 3.0 } };
+    const auto [distance2, closest2] =
+        geode::point_triangle_distance( r, point_triangle );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance2 - std::sqrt( 40. ) ) <= geode::GLOBAL_EPSILON
+            && closest2.inexact_equal( p ),
+        "Wrong point_triangle_distance 2D with point triangle: ", distance2 );
+}
+
+long double reference_distance( const geode::Point3D& point,
+    const geode::Point3D& origin,
+    const geode::Vector3D& direction,
+    bool clamp )
+{
+    std::array< long double, 3 > diff;
+    long double dot{ 0 };
+    long double length2{ 0 };
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        diff[d] = static_cast< long double >( point.value( d ) )
+                  - static_cast< long double >( origin.value( d ) );
+        const auto dir = static_cast< long double >( direction.value( d ) );
+        dot += diff[d] * dir;
+        length2 += dir * dir;
+    }
+    auto t = dot / length2;
+    if( clamp )
+    {
+        t = std::clamp( t, 0.0L, 1.0L );
+    }
+    long double distance2{ 0 };
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        const auto perp =
+            diff[d] - t * static_cast< long double >( direction.value( d ) );
+        distance2 += perp * perp;
+    }
+    return std::sqrt( distance2 );
+}
+
+void test_point_segment_line_distance_accuracy()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1., 1. };
+    std::uniform_real_distribution< double > far_distribution{ -1e4, 1e4 };
+    std::uniform_real_distribution< double > height_distribution{ 0, 1e-3 };
+    const auto random_vector = [&generator, &distribution] {
+        return geode::Vector3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        const geode::Point3D v0{ random_vector() };
+        const auto edge = random_vector();
+        const geode::Point3D v1 = v0 + edge;
+        const geode::Segment3D segment{ v0, v1 };
+        const geode::InfiniteLine3D line{ segment };
+        const auto perpendicular = edge.cross( random_vector() ).normalize()
+                                   * height_distribution( generator );
+
+        const geode::Point3D far_point =
+            v0 + edge * far_distribution( generator ) + perpendicular;
+        const auto line_distance =
+            geode::point_line_distance( far_point, line );
+        const auto line_projection =
+            geode::point_line_projection( far_point, line );
+        const auto line_reference = reference_distance(
+            far_point, line.origin(), line.direction(), false );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( geode::point_point_distance( far_point, line_projection )
+                       - line_distance )
+                <= geode::GLOBAL_EPSILON,
+            "Inconsistent point_line_distance and point_line_projection" );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( line_distance - line_reference ) < geode::GLOBAL_EPSILON,
+            "Inaccurate point_line_distance: ", line_distance, " vs ",
+            static_cast< double >( line_reference ) );
+
+        const geode::Point3D point =
+            v0 + edge * ( 2 * distribution( generator ) + 0.5 ) + perpendicular;
+        const auto segment_distance =
+            geode::point_segment_distance( point, segment );
+        const auto segment_projection =
+            geode::point_segment_projection( point, segment );
+        const auto segment_reference =
+            reference_distance( point, v0, edge, true );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( geode::point_point_distance( point, segment_projection )
+                       - segment_distance )
+                <= geode::GLOBAL_EPSILON,
+            "Inconsistent point_segment_distance and "
+            "point_segment_projection" );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( segment_distance - segment_reference )
+                < geode::GLOBAL_EPSILON,
+            "Inaccurate point_segment_distance: ", segment_distance, " vs ",
+            static_cast< double >( segment_reference ) );
+    }
+
+    const geode::Point3D a{ { 1, 1, 1 } };
+    const geode::Point3D b{ { 1, 1, 1 + 0.5 * geode::GLOBAL_EPSILON } };
+    const geode::Segment3D degenerated{ a, b };
+    const geode::Point3D q{ { 2, 1, 1 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_segment_distance( q, degenerated )
+            == geode::point_point_distance(
+                q, geode::point_segment_projection( q, degenerated ) ),
+        "Inconsistent distance and projection for degenerated segment" );
+}
+
+void test_point_cylinder_distance()
+{
+    // Cylinder along x, from x=0 to x=4, radius 1
+    const geode::Point3D axis_start{ { 0, 0, 0 } };
+    const geode::Point3D axis_end{ { 4, 0, 0 } };
+    const geode::Cylinder cylinder{ geode::Segment3D{ axis_start, axis_end },
+        1 };
+    const auto check = [&cylinder]( const geode::Point3D& point,
+                           double expected_distance,
+                           const geode::Point3D& expected_closest,
+                           std::string_view label ) {
+        const auto [distance, closest] =
+            geode::point_cylinder_distance( point, cylinder );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - expected_distance ) <= geode::GLOBAL_EPSILON
+                && closest.inexact_equal( expected_closest ),
+            "Wrong point_cylinder_distance: ", label );
+    };
+    check( geode::Point3D{ { 2, 3, 0 } }, 2, geode::Point3D{ { 2, 1, 0 } },
+        "outside the wall" );
+    check( geode::Point3D{ { 6, 0, 0.5 } }, 2, geode::Point3D{ { 4, 0, 0.5 } },
+        "outside an end disk" );
+    check( geode::Point3D{ { -3, 0, 5 } }, 5, geode::Point3D{ { 0, 0, 1 } },
+        "outside the rim" );
+    check( geode::Point3D{ { 2, 0, 0.75 } }, 0.25,
+        geode::Point3D{ { 2, 0, 1 } }, "inside, close to the wall" );
+    check( geode::Point3D{ { 3.75, 0.5, 0 } }, 0.25,
+        geode::Point3D{ { 4, 0.5, 0 } }, "inside, close to an end disk" );
+    check( geode::Point3D{ { 2, 1, 0 } }, 0, geode::Point3D{ { 2, 1, 0 } },
+        "on the wall" );
+    const auto [axis_distance, axis_closest] = geode::point_cylinder_distance(
+        geode::Point3D{ { 2, 0, 0 } }, cylinder );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( axis_distance - 1 ) <= geode::GLOBAL_EPSILON
+            && std::fabs( axis_closest.value( 0 ) - 2 ) <= geode::GLOBAL_EPSILON
+            && std::get< 0 >(
+                   geode::point_cylinder_distance( axis_closest, cylinder ) )
+                   <= geode::GLOBAL_EPSILON,
+        "Wrong point_cylinder_distance: on the axis" );
+}
+
 void test_point_skewed_tetrahedron_distance()
 {
     const geode::Point3D a{ { 0, 0, 0 } };
@@ -1611,7 +1902,8 @@ void test_point_skewed_tetrahedron_distance()
             std::fabs(
                 geode::point_point_distance( query, closest_point ) - distance )
                 < geode::GLOBAL_EPSILON,
-            "Wrong closest point for point_tetrahedron_distance with query ",
+            "Wrong closest point for point_tetrahedron_distance with "
+            "query ",
             query.string() );
     }
 }
@@ -1633,6 +1925,13 @@ void test()
     test_segment_triangle_distance();
     test_triangle_triangle_distance();
     test_point_ellipse_distance();
+    test_point_cylinder_distance();
+    test_degenerated_segment_triangle_distance();
+    test_degenerated_triangle_triangle_distance();
+    test_random_triangle_triangle_distance();
+    test_nan_point_triangle_distance();
+    test_degenerated_point_triangle_distance_2d();
+    test_point_segment_line_distance_accuracy();
 }
 
 OPENGEODE_TEST( "distance" )

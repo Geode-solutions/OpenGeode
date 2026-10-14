@@ -189,10 +189,20 @@ void test_matrix_3x3()
         "[TEST] Wrong value for inverse matrix coeff [2,2]" );
 }
 
+void test_matrix_1x1()
+{
+    const geode::SquareMatrix1D matrix{ { geode::Vector1D{ { 4. } } } };
+    geode::OpenGeodeGeometryException::test(
+        matrix.determinant() == 4., "Wrong 1x1 determinant" );
+    geode::OpenGeodeGeometryException::test(
+        matrix.inverse().value( 0, 0 ) == 0.25, "Wrong 1x1 inverse" );
+}
+
 void test()
 {
     test_matrix_2x2();
     test_matrix_3x3();
+    test_matrix_1x1();
 }
 
 OPENGEODE_TEST( "vector" )

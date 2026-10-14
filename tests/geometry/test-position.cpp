@@ -21,14 +21,20 @@
  *
  */
 
+#include <cmath>
+#include <limits>
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
+#include <geode/geometry/is_point_inside.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/position.hpp>
 
@@ -569,6 +575,168 @@ void test_point_side_to_triangle()
         "q3" );
 }
 
+// Smallest double strictly greater than value, i.e. value + 1 ulp
+double next_double_above( double value )
+{
+    return std::nextafter( value, std::numeric_limits< double >::infinity() );
+}
+
+// Largest double strictly lower than value, i.e. value - 1 ulp
+double next_double_below( double value )
+{
+    return std::nextafter( value, -std::numeric_limits< double >::infinity() );
+}
+
+void test_point_inside_polygon()
+{
+    const geode::Point2D a{ { 0, 0 } };
+    const geode::Point2D b{ { 1, 0 } };
+    const geode::Point2D c{ { 1, 1 } };
+    const geode::Point2D d{ { 0, 1 } };
+    const geode::Polygon2D ccw{ { a, b, c, d } };
+    const geode::Polygon2D cw{ { a, d, c, b } };
+    const std::array< geode::Point2D, 9 > inside_points{
+        geode::Point2D{ { 0.5, 0.5 } }, geode::Point2D{ { 0.5, 0 } },
+        geode::Point2D{ { 1, 0.5 } }, geode::Point2D{ { 0.5, 1 } },
+        geode::Point2D{ { 0, 0.5 } }, a, b, c, d
+    };
+    for( const auto& point : inside_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            geode::is_point_inside_polygon( point, ccw )
+                && geode::is_point_inside_polygon( point, cw ),
+            "Point ", point.string(), " should be inside the polygon" );
+    }
+    const std::array< geode::Point2D, 6 > outside_points{
+        geode::Point2D{ { 1.5, 0.5 } }, geode::Point2D{ { -0.5, 0.5 } },
+        geode::Point2D{ { 0.5, 1.5 } }, geode::Point2D{ { 0.5, -0.5 } },
+        geode::Point2D{ { 2, 0 } }, geode::Point2D{ { -1, 1 } }
+    };
+    for( const auto& point : outside_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            !geode::is_point_inside_polygon( point, ccw )
+                && !geode::is_point_inside_polygon( point, cw ),
+            "Point ", point.string(), " should be outside the polygon" );
+    }
+
+    // Points inside the bounding box of the diagonal edge but not on it
+    const geode::Polygon2D triangle{ { a, b, c } };
+    const std::array< geode::Point2D, 2 > off_diagonal_points{
+        geode::Point2D{ { 0.2, 0.8 } },
+        geode::Point2D{ { 0.5, next_double_above( 0.5 ) } }
+    };
+    for( const auto& point : off_diagonal_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            !geode::is_point_inside_polygon( point, triangle ), "Point ",
+            point.string(), " should be outside the triangle" );
+    }
+    const std::array< geode::Point2D, 2 > on_diagonal_points{
+        geode::Point2D{ { 0.2, 0.2 } }, geode::Point2D{ { 0.5, 0.5 } }
+    };
+    for( const auto& point : on_diagonal_points )
+    {
+        geode::OpenGeodeGeometryException::test(
+            geode::is_point_inside_polygon( point, triangle ), "Point ",
+            point.string(), " should be on the triangle boundary" );
+    }
+}
+
+void test_exact_predicates_near_degenerate()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -1e3, 1e3 };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        auto x0 = distribution( generator );
+        auto x1 = distribution( generator );
+        if( x0 == x1 )
+        {
+            continue;
+        }
+        if( x0 > x1 )
+        {
+            std::swap( x0, x1 );
+        }
+        const auto x2 = distribution( generator );
+        // Points on the line y = x are exactly collinear
+        const geode::Point2D p0{ { x0, x0 } };
+        const geode::Point2D p1{ { x1, x1 } };
+        const geode::Segment2D segment{ p0, p1 };
+        geode::OpenGeodeGeometryException::test(
+            geode::point_side_to_segment(
+                geode::Point2D{ { x2, x2 } }, segment )
+                == geode::SIDE::zero,
+            "Wrong side for collinear point" );
+        const auto side_up = geode::point_side_to_segment(
+            geode::Point2D{ { x2, next_double_above( x2 ) } }, segment );
+        const auto side_down = geode::point_side_to_segment(
+            geode::Point2D{ { x2, next_double_below( x2 ) } }, segment );
+        geode::OpenGeodeGeometryException::test(
+            side_up != geode::SIDE::zero && side_down != geode::SIDE::zero
+                && side_up != side_down,
+            "Wrong side for points one ulp away from the line" );
+
+        // Points on the plane x = y are exactly coplanar
+        const auto z0 = distribution( generator );
+        const auto z1 = distribution( generator );
+        const geode::Point3D q0{ { x0, x0, z0 } };
+        const geode::Point3D q1{ { x1, x1, z0 } };
+        const geode::Point3D q2{ { x2, x2, z1 } };
+        const geode::Triangle3D triangle{ q0, q1, q2 };
+        const auto x3 = distribution( generator );
+        const auto z3 = distribution( generator );
+        geode::OpenGeodeGeometryException::test(
+            geode::point_side_to_triangle(
+                geode::Point3D{ { x3, x3, z3 } }, triangle )
+                == geode::SIDE::zero,
+            "Wrong side for coplanar point" );
+        const auto side_above = geode::point_side_to_triangle(
+            geode::Point3D{ { x3, next_double_above( x3 ), z3 } }, triangle );
+        const auto side_below = geode::point_side_to_triangle(
+            geode::Point3D{ { x3, next_double_below( x3 ), z3 } }, triangle );
+        geode::OpenGeodeGeometryException::test(
+            side_above != geode::SIDE::zero && side_below != geode::SIDE::zero
+                && side_above != side_below,
+            "Wrong side for points one ulp away from the plane" );
+    }
+}
+
+void test_exact_orientation_large_coordinates()
+{
+    // Products of large coordinates where an FMA contraction in the exact
+    // arithmetic would lose the error terms.
+    std::mt19937 generator{ 7 };
+    std::uniform_real_distribution< double > distribution{ -1e8, 1e8 };
+    for( const auto trial : geode::Range{ 1000 } )
+    {
+        geode_unused( trial );
+        const auto x0 = distribution( generator );
+        const auto x1 = distribution( generator );
+        const auto x2 = distribution( generator );
+        const geode::Point2D p0{ { x0, 3 * x0 } };
+        const geode::Point2D p1{ { x1, 3 * x1 } };
+        const auto y2 = 3 * x2;
+        const auto side_up = geode::point_side_to_segment(
+            geode::Point2D{ { x2, next_double_above( y2 ) } },
+            geode::Segment2D{ p0, p1 } );
+        const auto side_down = geode::point_side_to_segment(
+            geode::Point2D{ { x2, next_double_below( y2 ) } },
+            geode::Segment2D{ p0, p1 } );
+        geode::OpenGeodeGeometryException::test(
+            x0 == x1
+                || ( side_up != side_down && side_up != geode::SIDE::zero
+                     && side_down != geode::SIDE::zero )
+                || ( geode::point_side_to_segment(
+                         geode::Point2D{ { x2, y2 } }, { p0, p1 } )
+                     != geode::SIDE::zero ),
+            "Wrong side for points one ulp away from a line with large "
+            "coordinates" );
+    }
+}
+
 void test()
 {
     test_point_side_to_segment();
@@ -577,6 +745,9 @@ void test()
     test_point_segment_position();
     test_point_triangle_position();
     test_point_tetrahedron_position();
+    test_point_inside_polygon();
+    test_exact_predicates_near_degenerate();
+    test_exact_orientation_large_coordinates();
 }
 
 OPENGEODE_TEST( "position" )

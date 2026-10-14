@@ -561,32 +561,32 @@ namespace GEO
 {
     namespace PCK
     {
-        SIGN orient_2d( const geode::Point2D& p0,
+        opengeode_geometry_api SIGN orient_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 );
 
-        SIGN orient_3d( const geode::Point3D& p0,
+        opengeode_geometry_api SIGN orient_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2,
             const geode::Point3D& p3 );
 
-        SIGN det_3d( const geode::Vector3D& p0,
+        opengeode_geometry_api SIGN det_3d( const geode::Vector3D& p0,
             const geode::Vector3D& p1,
             const geode::Vector3D& p2 );
 
-        bool aligned_3d( const geode::Point3D& p0,
+        opengeode_geometry_api bool aligned_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2 );
 
-        SIGN dot_3d( const geode::Point3D& p0,
+        opengeode_geometry_api SIGN dot_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2 );
 
-        SIGN dot_2d( const geode::Point2D& p0,
+        opengeode_geometry_api SIGN dot_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 );
 
-        void initialize();
+        opengeode_geometry_api void initialize();
     } // namespace PCK
 } // namespace GEO
 

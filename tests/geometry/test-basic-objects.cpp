@@ -35,6 +35,7 @@
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
 
 #include <geode/tests/common.hpp>
 

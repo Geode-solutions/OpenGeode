@@ -60,11 +60,7 @@ namespace geode
     {
         const auto sin_angle = [this]( Vector3D direction ) {
             const auto dP = plane_.normal().dot( direction );
-            if( dP <= -1.0 )
-            {
-                return M_PI;
-            }
-            if( dP >= 1.0 )
+            if( std::fabs( dP ) >= 1.0 )
             {
                 return 0.;
             }

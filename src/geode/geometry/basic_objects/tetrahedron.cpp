@@ -27,6 +27,7 @@
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace geode
 {
@@ -85,18 +86,30 @@ namespace geode
     template < typename PointType >
     bool GenericTetrahedron< PointType >::is_degenerated() const
     {
-        const Point3D& point0 = vertices_.at( 0 );
-        const Point3D& point1 = vertices_.at( 1 );
-        const Point3D& point2 = vertices_.at( 2 );
-        const Triangle3D triangle{ point0, point1, point2 };
-        if( triangle.is_degenerated() )
-        {
-            return true;
-        }
-        const Point3D& point3 = vertices_.at( 3 );
-        return std::get< 0 >(
-                   point_plane_distance( point3, Plane{ triangle } ) )
-               <= GLOBAL_EPSILON;
+        // The tetrahedron is degenerated if all its vertices lie in a slab of
+        // thickness GLOBAL_EPSILON. The thinnest slab is either bounded by a
+        // facet plane (width = 6 * volume / facet double area) or by two
+        // parallel planes containing opposite edges (width = 6 * volume /
+        // |edge cross product|): the largest of these denominators gives the
+        // minimum width.
+        const Point3D& point0 = vertices_[0];
+        const Point3D& point1 = vertices_[1];
+        const Point3D& point2 = vertices_[2];
+        const Point3D& point3 = vertices_[3];
+        const Vector3D edge01{ point0, point1 };
+        const Vector3D edge02{ point0, point2 };
+        const Vector3D edge03{ point0, point3 };
+        const Vector3D edge12{ point1, point2 };
+        const Vector3D edge13{ point1, point3 };
+        const Vector3D edge23{ point2, point3 };
+        const auto six_volume = edge01.dot( edge02.cross( edge03 ) );
+        const auto max_cross2 = std::max( { edge01.cross( edge02 ).length2(),
+            edge01.cross( edge03 ).length2(), edge02.cross( edge03 ).length2(),
+            edge12.cross( edge13 ).length2(), edge01.cross( edge23 ).length2(),
+            edge02.cross( edge13 ).length2(),
+            edge03.cross( edge12 ).length2() } );
+        return six_volume * six_volume
+               <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_cross2;
     }
 
     template < typename PointType >

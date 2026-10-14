@@ -28,8 +28,8 @@
 #include <geode/geometry/basic_objects/plane.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 #include <geode/geometry/internal/position_from_sides.hpp>
-#include <geode/geometry/internal/predicates.hpp>
 #include <geode/geometry/position.hpp>
 #include <geode/geometry/projection.hpp>
 
