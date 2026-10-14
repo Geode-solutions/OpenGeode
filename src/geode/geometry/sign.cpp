@@ -26,8 +26,8 @@
 #include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 #include <geode/geometry/internal/position_from_sides.hpp>
-#include <geode/geometry/internal/predicates.hpp>
 
 namespace
 {

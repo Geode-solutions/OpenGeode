@@ -54,7 +54,7 @@ add_geode_library(
         "perpendicular.cpp"
         "points_sort.cpp"
         "position.cpp"
-        "internal/predicates.cpp"
+        "detail/predicates.cpp"
         "point.cpp"
         "projection.cpp"
         "quality.cpp"
@@ -105,10 +105,10 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/aabb_impl.hpp"
         "detail/bitsery_archive.hpp"
+        "detail/predicates.hpp"
     INTERNAL_HEADERS
         "internal/intersection_from_sides.hpp"
         "internal/position_from_sides.hpp"
-        "internal/predicates.hpp"
     SKIP_UNITY
         "position.cpp"
     PUBLIC_DEPENDENCIES

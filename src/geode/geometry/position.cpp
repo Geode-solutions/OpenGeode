@@ -31,9 +31,9 @@
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/internal/position_from_sides.hpp>
-#include <geode/geometry/internal/predicates.hpp>
 #include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/perpendicular.hpp>
 
