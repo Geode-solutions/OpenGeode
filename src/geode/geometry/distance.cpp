@@ -416,7 +416,8 @@ namespace
         for( const auto i : geode::Indices{ non_colocated_points } )
         {
             const auto vertex0 = non_colocated_points[i];
-            for( auto j = i + 1; j < non_colocated_points.size(); j++ )
+            for( const auto j :
+                geode::Range{ i + 1, non_colocated_points.size() } )
             {
                 const auto vertex1 = non_colocated_points[j];
                 if( geode::point_point_distance( base_vertices[vertex0].get(),

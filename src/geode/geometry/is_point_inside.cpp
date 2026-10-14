@@ -29,14 +29,26 @@
 
 namespace
 {
+    // Returns true if the point lies exactly on the edge, given the exact
+    // orientation of the point relative to the edge line.
     bool is_point_on_edge( const geode::Point2D& point,
-        const geode::Point2D& v0,
-        const geode::Point2D& v1 )
+        const geode::Point2D& edge_vertex0,
+        const geode::Point2D& edge_vertex1,
+        GEO::SIGN point_side )
     {
+        if( point_side != GEO::SIGN::zero )
+        {
+            return false;
+        }
+        // The point is on the edge line: it is on the edge if and only if it
+        // is inside the edge bounding box
         for( const auto d : geode::LRange{ 2 } )
         {
-            if( point.value( d ) < std::min( v0.value( d ), v1.value( d ) )
-                || point.value( d ) > std::max( v0.value( d ), v1.value( d ) ) )
+            const auto value = point.value( d );
+            const auto value0 = edge_vertex0.value( d );
+            const auto value1 = edge_vertex1.value( d );
+            if( value < std::min( value0, value1 )
+                || value > std::max( value0, value1 ) )
             {
                 return false;
             }
@@ -71,7 +83,7 @@ namespace geode
                 continue;
             }
             const auto side = GEO::PCK::orient_2d( v0, v1, point );
-            if( side == GEO::SIGN::zero && is_point_on_edge( point, v0, v1 ) )
+            if( is_point_on_edge( point, v0, v1, side ) )
             {
                 return true;
             }
