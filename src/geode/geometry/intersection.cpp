@@ -25,6 +25,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <optional>
+#include <tuple>
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
@@ -99,83 +101,171 @@ namespace
         std::array< double, 2 > parameter;
     };
     /*
-     * Intersection between a triangle and the part of the line
-     * X = point0 + alpha * (point1 - point0) with alpha in
-     * [alpha_min, alpha_max]. Objects closer than GLOBAL_EPSILON are considered
-     * intersecting. The line part is parallel when its direction is parallel
-     * to the triangle plane over the triangle extent, or when it is within
-     * GLOBAL_EPSILON of the plane near the triangle (and of the triangle).
+     * Triangle target of line_part_intersection
      */
-    template < typename DistanceFallback >
-    geode::IntersectionResult< geode::Point3D > line_part_triangle_intersection(
-        const geode::Point3D& point0,
-        const geode::Point3D& point1,
-        double alpha_min,
-        double alpha_max,
-        const geode::Triangle3D& triangle,
-        const DistanceFallback& distance_fallback )
+    class TriangleTarget
     {
-        const auto& vertices = triangle.vertices();
-        const auto build_result = [&]( geode::Point3D point,
-                                      double line_distance,
-                                      geode::Point3D line_projection ) {
-            geode::CorrectnessInfo< geode::Point3D >::Correctness
-                first_correctness{ line_distance <= geode::GLOBAL_EPSILON,
-                    std::move( line_projection ) };
-            auto [triangle_distance, triangle_projection] =
-                geode::point_triangle_distance( point, triangle );
-            geode::CorrectnessInfo< geode::Point3D >::Correctness
-                second_correctness{ triangle_distance <= geode::GLOBAL_EPSILON,
-                    std::move( triangle_projection ) };
-            return geode::IntersectionResult< geode::Point3D >{
-                std::move( point ), { first_correctness, second_correctness }
-            };
+    public:
+        explicit TriangleTarget( const geode::Triangle3D& triangle )
+            : triangle_( triangle ), normal_( triangle.normal() )
+        {
+        }
+
+        const geode::Point3D& origin() const
+        {
+            return triangle_.vertices()[0];
+        }
+
+        // Unit normal, none for a degenerated triangle
+        const std::optional< geode::Vector3D >& normal() const
+        {
+            return normal_;
+        }
+
+        double extent() const
+        {
+            const auto& vertices = triangle_.vertices();
+            return std::max( { geode::point_point_distance(
+                                   vertices[0].get(), vertices[1].get() ),
+                geode::point_point_distance(
+                    vertices[1].get(), vertices[2].get() ),
+                geode::point_point_distance(
+                    vertices[2].get(), vertices[0].get() ) } );
+        }
+
+        std::tuple< double, geode::Point3D > closest(
+            const geode::Point3D& point ) const
+        {
+            return geode::point_triangle_distance( point, triangle_ );
+        }
+
+    private:
+        const geode::Triangle3D& triangle_;
+        std::optional< geode::Vector3D > normal_;
+    };
+
+    /*
+     * 2D segment target of line_part_intersection
+     */
+    class SegmentTarget
+    {
+    public:
+        explicit SegmentTarget( const geode::Segment2D& segment )
+            : segment_( segment ), length_( segment.length() )
+        {
+            if( length_ > geode::GLOBAL_EPSILON )
+            {
+                const geode::Vector2D direction{ segment.vertices()[0],
+                    segment.vertices()[1] };
+                normal_ = geode::Vector2D{ { -direction.value( 1 ) / length_,
+                    direction.value( 0 ) / length_ } };
+            }
+        }
+
+        const geode::Point2D& origin() const
+        {
+            return segment_.vertices()[0];
+        }
+
+        // Unit normal, none for a segment shorter than GLOBAL_EPSILON
+        const std::optional< geode::Vector2D >& normal() const
+        {
+            return normal_;
+        }
+
+        double extent() const
+        {
+            return length_;
+        }
+
+        std::tuple< double, geode::Point2D > closest(
+            const geode::Point2D& point ) const
+        {
+            auto projection =
+                geode::point_segment_projection( point, segment_ );
+            const auto distance =
+                geode::point_point_distance( point, projection );
+            return { distance, std::move( projection ) };
+        }
+
+    private:
+        const geode::Segment2D& segment_;
+        double length_;
+        std::optional< geode::Vector2D > normal_;
+    };
+
+    /*
+     * Intersection between a target (triangle in 3D, segment in 2D) and the
+     * part of the line X = point0 + alpha * (point1 - point0) with alpha in
+     * [alpha_min, alpha_max]. Objects closer than GLOBAL_EPSILON are
+     * considered intersecting. The line part is parallel when its direction is
+     * parallel to the target over the target extent (whatever their
+     * distance), or when it is within GLOBAL_EPSILON of the target support
+     * near the target (and of the target). The distance fallback returns the
+     * distance between the line part and the target, and their closest
+     * points.
+     */
+    template < geode::index_t dimension,
+        typename Target,
+        typename DistanceFallback >
+    geode::IntersectionResult< geode::Point< dimension > >
+        line_part_intersection( const geode::Point< dimension >& point0,
+            const geode::Point< dimension >& point1,
+            double alpha_min,
+            double alpha_max,
+            const Target& target,
+            const DistanceFallback& distance_fallback )
+    {
+        using Result = geode::IntersectionResult< geode::Point< dimension > >;
+        using Correctness = typename geode::CorrectnessInfo<
+            geode::Point< dimension > >::Correctness;
+        // The point is on the line part, within GLOBAL_EPSILON of its closest
+        // point on the target
+        const auto build_result = []( geode::Point< dimension > point,
+                                      geode::Point< dimension > on_target ) {
+            Correctness first_correctness{ true, point };
+            Correctness second_correctness{ true, std::move( on_target ) };
+            return Result{ std::move( point ),
+                { first_correctness, second_correctness } };
         };
         const auto from_fallback = [&]() {
-            auto [distance, on_line, on_triangle] = distance_fallback();
+            auto [distance, on_line, on_target] = distance_fallback();
             if( distance > geode::GLOBAL_EPSILON )
             {
-                return geode::IntersectionResult< geode::Point3D >{
-                    geode::INTERSECTION_TYPE::none
-                };
+                return Result{ geode::INTERSECTION_TYPE::none };
             }
-            return build_result( on_line, 0., on_line );
+            return build_result( std::move( on_line ), std::move( on_target ) );
         };
-        const auto normal = triangle.normal();
+        const auto& normal = target.normal();
         if( !normal )
         {
             return from_fallback();
         }
-        const geode::Vector3D direction{ point0, point1 };
+        const auto& origin = target.origin();
+        const geode::Vector< dimension > direction{ point0, point1 };
         const auto length = direction.length();
         const auto height0 =
-            normal->dot( geode::Vector3D{ vertices[0], point0 } );
+            normal->dot( geode::Vector< dimension >{ origin, point0 } );
         const auto height1 =
-            normal->dot( geode::Vector3D{ vertices[0], point1 } );
+            normal->dot( geode::Vector< dimension >{ origin, point1 } );
         const auto height_slope = height1 - height0;
-        const auto triangle_extent = std::max( { geode::point_point_distance(
-                                                     vertices[0].get(),
-                                                     vertices[1].get() ),
-            geode::point_point_distance( vertices[1].get(), vertices[2].get() ),
-            geode::point_point_distance(
-                vertices[2].get(), vertices[0].get() ) } );
-        if( std::fabs( height_slope ) * triangle_extent
+        const auto target_extent = target.extent();
+        if( std::fabs( height_slope ) * target_extent
             <= geode::GLOBAL_EPSILON * length )
         {
-            // Parallel to the triangle plane over the triangle extent
-            return { geode::INTERSECTION_TYPE::parallel };
+            // Parallel to the target support over the target extent
+            return Result{ geode::INTERSECTION_TYPE::parallel };
         }
-        // Restrict the line part to the neighborhood of the triangle
-        const auto extent =
-            ( triangle_extent + geode::GLOBAL_EPSILON ) / length;
+        // Restrict the line part to the neighborhood of the target
+        const auto extent = ( target_extent + geode::GLOBAL_EPSILON ) / length;
         const auto alpha_center =
-            direction.dot( geode::Vector3D{ point0, vertices[0] } )
+            direction.dot( geode::Vector< dimension >{ point0, origin } )
             / ( length * length );
         const auto alpha_begin = std::max( alpha_min, alpha_center - extent );
         const auto alpha_end = std::min( alpha_max, alpha_center + extent );
         if( alpha_begin > alpha_end )
         {
-            return { geode::INTERSECTION_TYPE::none };
+            return Result{ geode::INTERSECTION_TYPE::none };
         }
         const auto height_begin = height0 + height_slope * alpha_begin;
         const auto height_end = height0 + height_slope * alpha_end;
@@ -184,147 +274,35 @@ namespace
         {
             if( std::get< 0 >( distance_fallback() ) > geode::GLOBAL_EPSILON )
             {
-                return { geode::INTERSECTION_TYPE::none };
+                return Result{ geode::INTERSECTION_TYPE::none };
             }
-            return { geode::INTERSECTION_TYPE::parallel };
+            return Result{ geode::INTERSECTION_TYPE::parallel };
         }
         if( ( height_begin > geode::GLOBAL_EPSILON
                 && height_end > geode::GLOBAL_EPSILON )
             || ( height_begin < -geode::GLOBAL_EPSILON
                  && height_end < -geode::GLOBAL_EPSILON ) )
         {
-            return { geode::INTERSECTION_TYPE::none };
+            return Result{ geode::INTERSECTION_TYPE::none };
         }
-        // Crossing of the triangle plane
-        const auto alpha_plane = -height0 / height_slope;
+        // Crossing of the target support
+        const auto alpha_support = -height0 / height_slope;
         const auto alpha_crossing =
-            std::clamp( alpha_plane, alpha_begin, alpha_end );
+            std::clamp( alpha_support, alpha_begin, alpha_end );
         auto crossing = point0 + direction * alpha_crossing;
-        const auto crossing_distance = std::get< 0 >(
-            geode::point_triangle_distance( crossing, triangle ) );
+        auto [crossing_distance, on_target] = target.closest( crossing );
         if( crossing_distance <= geode::GLOBAL_EPSILON )
         {
-            return build_result( std::move( crossing ), 0., crossing );
+            return build_result(
+                std::move( crossing ), std::move( on_target ) );
         }
-        // The line part distance to the triangle is at least
+        // The line part distance to the target is at least
         // crossing_distance * |sin(angle)| / sqrt(2)
-        if( alpha_crossing == alpha_plane
+        if( alpha_crossing == alpha_support
             && crossing_distance * std::fabs( height_slope )
                    > 2 * geode::GLOBAL_EPSILON * length )
         {
-            return { geode::INTERSECTION_TYPE::none };
-        }
-        return from_fallback();
-    }
-    /*
-     * Intersection between a 2D segment and the part of the line
-     * X = point0 + alpha * (point1 - point0) with alpha in
-     * [alpha_min, alpha_max]. Objects closer than GLOBAL_EPSILON are considered
-     * intersecting. The line part is parallel when its direction is parallel
-     * to the segment over the segment extent, or when it is within
-     * GLOBAL_EPSILON of the segment line near the segment (and of the
-     * segment).
-     */
-    template < typename DistanceFallback >
-    geode::IntersectionResult< geode::Point2D > line_part_segment_intersection(
-        const geode::Point2D& point0,
-        const geode::Point2D& point1,
-        double alpha_min,
-        double alpha_max,
-        const geode::Segment2D& segment,
-        const DistanceFallback& distance_fallback )
-    {
-        const auto build_result = [&]( geode::Point2D point ) {
-            geode::CorrectnessInfo< geode::Point2D >::Correctness
-                first_correctness{ true, point };
-            geode::CorrectnessInfo< geode::Point2D >::Correctness
-                second_correctness{ geode::point_segment_distance(
-                                        point, segment )
-                                        <= geode::GLOBAL_EPSILON,
-                    geode::point_segment_projection( point, segment ) };
-            return geode::IntersectionResult< geode::Point2D >{
-                std::move( point ), { first_correctness, second_correctness }
-            };
-        };
-        const auto from_fallback = [&]() {
-            auto [distance, on_line, on_segment] = distance_fallback();
-            if( distance > geode::GLOBAL_EPSILON )
-            {
-                return geode::IntersectionResult< geode::Point2D >{
-                    geode::INTERSECTION_TYPE::none
-                };
-            }
-            return build_result( on_line );
-        };
-        const auto& vertex0 = segment.vertices()[0].get();
-        const auto segment_length = segment.length();
-        if( segment_length <= geode::GLOBAL_EPSILON )
-        {
-            return from_fallback();
-        }
-        const geode::Vector2D segment_direction{ vertex0,
-            segment.vertices()[1] };
-        const geode::Vector2D normal{ { -segment_direction.value( 1 )
-                                            / segment_length,
-            segment_direction.value( 0 ) / segment_length } };
-        const geode::Vector2D direction{ point0, point1 };
-        const auto length = direction.length();
-        const auto height0 = normal.dot( geode::Vector2D{ vertex0, point0 } );
-        const auto height1 = normal.dot( geode::Vector2D{ vertex0, point1 } );
-        const auto height_slope = height1 - height0;
-        if( std::fabs( height_slope ) * segment_length
-            <= geode::GLOBAL_EPSILON * length )
-        {
-            // Parallel to the segment over the segment extent
-            return { geode::INTERSECTION_TYPE::parallel };
-        }
-        // Restrict the line part to the neighborhood of the segment
-        const auto extent = ( segment_length + geode::GLOBAL_EPSILON ) / length;
-        const auto alpha_center =
-            direction.dot( geode::Vector2D{ point0, vertex0 } )
-            / ( length * length );
-        const auto alpha_begin = std::max( alpha_min, alpha_center - extent );
-        const auto alpha_end = std::min( alpha_max, alpha_center + extent );
-        if( alpha_begin > alpha_end )
-        {
-            return { geode::INTERSECTION_TYPE::none };
-        }
-        const auto height_begin = height0 + height_slope * alpha_begin;
-        const auto height_end = height0 + height_slope * alpha_end;
-        if( std::fabs( height_begin ) <= geode::GLOBAL_EPSILON
-            && std::fabs( height_end ) <= geode::GLOBAL_EPSILON )
-        {
-            if( std::get< 0 >( distance_fallback() ) > geode::GLOBAL_EPSILON )
-            {
-                return { geode::INTERSECTION_TYPE::none };
-            }
-            return { geode::INTERSECTION_TYPE::parallel };
-        }
-        if( ( height_begin > geode::GLOBAL_EPSILON
-                && height_end > geode::GLOBAL_EPSILON )
-            || ( height_begin < -geode::GLOBAL_EPSILON
-                 && height_end < -geode::GLOBAL_EPSILON ) )
-        {
-            return { geode::INTERSECTION_TYPE::none };
-        }
-        // Crossing of the segment line
-        const auto alpha_line = -height0 / height_slope;
-        const auto alpha_crossing =
-            std::clamp( alpha_line, alpha_begin, alpha_end );
-        auto crossing = point0 + direction * alpha_crossing;
-        const auto crossing_distance =
-            geode::point_segment_distance( crossing, segment );
-        if( crossing_distance <= geode::GLOBAL_EPSILON )
-        {
-            return build_result( std::move( crossing ) );
-        }
-        // The line part distance to the segment is at least
-        // crossing_distance * |sin(angle)| / sqrt(2)
-        if( alpha_crossing == alpha_line
-            && crossing_distance * std::fabs( height_slope )
-                   > 2 * geode::GLOBAL_EPSILON * length )
-        {
-            return { geode::INTERSECTION_TYPE::none };
+            return Result{ geode::INTERSECTION_TYPE::none };
         }
         return from_fallback();
     }
@@ -489,19 +467,20 @@ namespace geode
         if( length <= GLOBAL_EPSILON )
         {
             // Segment considered as a point
-            if( std::get< 0 >( point_triangle_distance( origin, triangle ) )
-                > GLOBAL_EPSILON )
+            auto [distance, on_triangle] =
+                point_triangle_distance( origin, triangle );
+            if( distance > GLOBAL_EPSILON )
             {
                 return { INTERSECTION_TYPE::none };
             }
             CorrectnessInfo< Point3D >::Correctness first_correctness{ true,
                 origin };
             CorrectnessInfo< Point3D >::Correctness second_correctness{ true,
-                std::get< 1 >( point_triangle_distance( origin, triangle ) ) };
+                std::move( on_triangle ) };
             return { origin, { first_correctness, second_correctness } };
         }
-        return line_part_triangle_intersection( origin, segment.vertices()[1],
-            0., 1., triangle, [&segment, &triangle] {
+        return line_part_intersection( origin, segment.vertices()[1].get(), 0.,
+            1., TriangleTarget{ triangle }, [&segment, &triangle] {
                 return segment_triangle_distance( segment, triangle );
             } );
     }
@@ -510,9 +489,9 @@ namespace geode
         const InfiniteLine3D& line, const Triangle3D& triangle )
     {
         constexpr auto infinity = std::numeric_limits< double >::infinity();
-        return line_part_triangle_intersection( line.origin(),
-            line.origin() + line.direction(), -infinity, infinity, triangle,
-            [&line, &triangle] {
+        return line_part_intersection( line.origin(),
+            line.origin() + line.direction(), -infinity, infinity,
+            TriangleTarget{ triangle }, [&line, &triangle] {
                 return line_triangle_distance( line, triangle );
             } );
     }
@@ -577,14 +556,17 @@ namespace geode
                 closest1 };
             return { origin, { first_correctness, second_correctness } };
         }
-        return line_part_segment_intersection( origin, segment0.vertices()[1],
-            0., 1., segment1, distance_fallback );
+        return line_part_intersection( origin, segment0.vertices()[1].get(), 0.,
+            1., SegmentTarget{ segment1 }, distance_fallback );
     }
 
     IntersectionResult< Point2D > segment_line_intersection(
         const Segment2D& segment, const InfiniteLine2D& line )
     {
-        // Heights of the segment vertices relative to the line
+        // Heights of the segment vertices relative to the line. Same criteria
+        // as line_part_intersection with the segment as line part and the
+        // line as target: |height1 - height0| is the segment deviation from
+        // the line direction over the segment extent.
         const auto& vertex0 = segment.vertices()[0].get();
         const auto& vertex1 = segment.vertices()[1].get();
         const Vector2D normal{ { -line.direction().value( 1 ),
