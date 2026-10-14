@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 
 namespace geode
 {

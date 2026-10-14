@@ -28,14 +28,16 @@
 
 #include <bitsery/brief_syntax/array.h>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/permutation.hpp>
 #include <geode/basic/pimpl_impl.hpp>
-#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/detail/geode_elements.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/internal/points_impl.hpp>
 #include <geode/mesh/helpers/detail/initialize_crs.hpp>
 
@@ -45,37 +47,15 @@ namespace geode
     class OpenGeodeTetrahedralSolid< dimension >::Impl
     {
         friend class bitsery::Access;
+        using Tetrahedron = std::array< index_t, 4 >;
+        static constexpr Tetrahedron NO_TETRAHEDRON{ NO_ID, NO_ID, NO_ID,
+            NO_ID };
 
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
         {
             detail::template initialize_crs<
                 OpenGeodeTetrahedralSolid< dimension > >( mesh );
-            AttributeProperties attribute_properties;
-            attribute_properties.assignable = false;
-            attribute_properties.interpolable = false;
-            attribute_properties.transferable = false;
-            AttributeValues< std::array< index_t, 4 > > attribute_values;
-            attribute_values.default_value = { NO_ID, NO_ID, NO_ID, NO_ID };
-            attribute_values.no_value = { NO_ID, NO_ID, NO_ID, NO_ID };
-            const auto tetrahedron_vertices_id =
-                mesh.polyhedron_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        std::array< index_t, 4 > >( "tetrahedron_vertices",
-                        attribute_values, attribute_properties );
-            tetrahedron_vertices_ =
-                mesh.polyhedron_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        std::array< index_t, 4 > >( tetrahedron_vertices_id );
-            const auto tetrahedron_adjacents_id =
-                mesh.polyhedron_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        std::array< index_t, 4 > >( "tetrahedron_adjacents",
-                        attribute_values, attribute_properties );
-            tetrahedron_adjacents_ =
-                mesh.polyhedron_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        std::array< index_t, 4 > >( tetrahedron_adjacents_id );
         }
 
         Impl() = default;
@@ -83,8 +63,8 @@ namespace geode
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const
         {
-            return tetrahedron_vertices_->value(
-                polyhedron_vertex.polyhedron_id )[polyhedron_vertex.vertex_id];
+            return tetrahedron_vertices_[polyhedron_vertex.polyhedron_id]
+                                        [polyhedron_vertex.vertex_id];
         }
 
         PolyhedronVertex get_polyhedron_facet_vertex_id(
@@ -100,8 +80,9 @@ namespace geode
         std::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
-            const auto adj = tetrahedron_adjacents_->value(
-                polyhedron_facet.polyhedron_id )[polyhedron_facet.facet_id];
+            const auto adj =
+                tetrahedron_adjacents_[polyhedron_facet.polyhedron_id]
+                                      [polyhedron_facet.facet_id];
             if( adj == NO_ID )
             {
                 return std::nullopt;
@@ -112,75 +93,94 @@ namespace geode
         void set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, const index_t vertex_id )
         {
-            tetrahedron_vertices_->modify_value(
-                polyhedron_vertex.polyhedron_id,
-                [&polyhedron_vertex, vertex_id](
-                    std::array< index_t, 4 >& array ) {
-                    array[polyhedron_vertex.vertex_id] = vertex_id;
-                } );
+            tetrahedron_vertices_[polyhedron_vertex.polyhedron_id]
+                                 [polyhedron_vertex.vertex_id] = vertex_id;
         }
 
         void set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, const index_t adjacent_id )
         {
-            tetrahedron_adjacents_->modify_value(
-                polyhedron_facet.polyhedron_id,
-                [&polyhedron_facet, adjacent_id](
-                    std::array< index_t, 4 >& array ) {
-                    array[polyhedron_facet.facet_id] = adjacent_id;
-                } );
+            tetrahedron_adjacents_[polyhedron_facet.polyhedron_id]
+                                  [polyhedron_facet.facet_id] = adjacent_id;
         }
 
-        void add_tetrahedron( const TetrahedralSolid< dimension >& solid,
-            const std::array< index_t, 4 >& vertices )
+        void add_tetrahedron( const Tetrahedron& vertices )
         {
-            tetrahedron_vertices_->set_value(
-                solid.nb_polyhedra() - 1, vertices );
+            tetrahedron_vertices_.push_back( vertices );
+            tetrahedron_adjacents_.push_back( NO_TETRAHEDRON );
+        }
+
+        void add_tetrahedra( const index_t nb )
+        {
+            const auto new_size = tetrahedron_vertices_.size() + nb;
+            tetrahedron_vertices_.resize( new_size, NO_TETRAHEDRON );
+            tetrahedron_adjacents_.resize( new_size, NO_TETRAHEDRON );
+        }
+
+        void remove_polyhedra( const std::vector< bool >& to_delete )
+        {
+            delete_vector_elements( to_delete, tetrahedron_vertices_ );
+            delete_vector_elements( to_delete, tetrahedron_adjacents_ );
+        }
+
+        void permute_polyhedra( absl::Span< const index_t > permutation )
+        {
+            permute( tetrahedron_vertices_, permutation );
+            permute( tetrahedron_adjacents_, permutation );
+        }
+
+        void copy_polyhedra(
+            const OpenGeodeTetrahedralSolid< dimension >::Impl& impl )
+        {
+            tetrahedron_vertices_ = impl.tetrahedron_vertices_;
+            tetrahedron_adjacents_ = impl.tetrahedron_adjacents_;
+        }
+
+        void remove_legacy_attributes( AttributeManager& manager )
+        {
+            legacy_attributes_.remove_from( manager );
         }
 
     private:
+        template < typename Archive >
+        void deserialize_legacy_storage( Archive& archive )
+        {
+            internal::PointsImpl< dimension > temp;
+            archive.object( temp );
+            legacy_attributes_.deserialize( archive, tetrahedron_vertices_ );
+            legacy_attributes_.deserialize( archive, tetrahedron_adjacents_ );
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
-                         internal::PointsImpl< dimension > temp;
-                         archive.object( temp );
-                         archive.ext( impl.tetrahedron_vertices_,
-                             bitsery::ext::StdSmartPtr{} );
-                         archive.ext( impl.tetrahedron_adjacents_,
-                             bitsery::ext::StdSmartPtr{} );
-                         const auto& old_tetrahedron_vertices_properties =
-                             impl.tetrahedron_vertices_->properties();
-                         impl.tetrahedron_vertices_->set_properties(
-                             { old_tetrahedron_vertices_properties.assignable,
-                                 old_tetrahedron_vertices_properties
-                                     .interpolable,
-                                 false } );
-                         const auto& old_tetrahedron_adjacents_properties =
-                             impl.tetrahedron_adjacents_->properties();
-                         impl.tetrahedron_adjacents_->set_properties(
-                             { old_tetrahedron_adjacents_properties.assignable,
-                                 old_tetrahedron_adjacents_properties
-                                     .interpolable,
-                                 false } );
+                         impl.deserialize_legacy_storage( archive );
                      },
                         []( Archive& archive, Impl& impl ) {
-                            internal::PointsImpl< dimension > temp;
-                            archive.object( temp );
-                            archive.ext( impl.tetrahedron_vertices_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl.tetrahedron_adjacents_,
-                                bitsery::ext::StdSmartPtr{} );
+                            impl.deserialize_legacy_storage( archive );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            const auto serialize_tetrahedron =
+                                []( Archive& archive2,
+                                    Tetrahedron& tetrahedron ) {
+                                    archive2.container4b( tetrahedron );
+                                };
+                            archive.container( impl.tetrahedron_vertices_,
+                                impl.tetrahedron_vertices_.max_size(),
+                                serialize_tetrahedron );
+                            archive.container( impl.tetrahedron_adjacents_,
+                                impl.tetrahedron_adjacents_.max_size(),
+                                serialize_tetrahedron );
                         } } } );
         }
 
     private:
-        std::shared_ptr< VariableAttribute< std::array< index_t, 4 > > >
-            tetrahedron_vertices_;
-        std::shared_ptr< VariableAttribute< std::array< index_t, 4 > > >
-            tetrahedron_adjacents_;
+        std::vector< Tetrahedron > tetrahedron_vertices_;
+        std::vector< Tetrahedron > tetrahedron_adjacents_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < index_t dimension >
@@ -244,6 +244,8 @@ namespace geode
                          solid, bitsery::ext::BaseClass<
                                     TetrahedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->remove_legacy_attributes(
+                         solid.polyhedron_attribute_manager() );
                      const auto new_point_attribute_id =
                          solid.vertex_attribute_manager()
                              .attribute_ids_matching_name( internal::PointsImpl<
@@ -259,6 +261,8 @@ namespace geode
                             solid, bitsery::ext::BaseClass<
                                        TetrahedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->remove_legacy_attributes(
+                            solid.polyhedron_attribute_manager() );
                         const auto new_point_attribute_id =
                             solid.vertex_attribute_manager()
                                 .attribute_ids_matching_name(
@@ -275,6 +279,8 @@ namespace geode
                             solid, bitsery::ext::BaseClass<
                                        TetrahedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->remove_legacy_attributes(
+                            solid.polyhedron_attribute_manager() );
                     } } } );
     }
 
@@ -292,7 +298,7 @@ namespace geode
         const std::array< index_t, 4 >& vertices,
         OGTetrahedralSolidKey /*key*/ )
     {
-        impl_->add_tetrahedron( *this, vertices );
+        impl_->add_tetrahedron( vertices );
     }
 
     template < index_t dimension >
@@ -302,6 +308,35 @@ namespace geode
         OGTetrahedralSolidKey /*key*/ )
     {
         impl_->set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTetrahedralSolid< dimension >::add_tetrahedra(
+        index_t nb, OGTetrahedralSolidKey /*key*/ )
+    {
+        impl_->add_tetrahedra( nb );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTetrahedralSolid< dimension >::remove_polyhedra(
+        const std::vector< bool >& to_delete, OGTetrahedralSolidKey /*key*/ )
+    {
+        impl_->remove_polyhedra( to_delete );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTetrahedralSolid< dimension >::permute_polyhedra(
+        absl::Span< const index_t > permutation, OGTetrahedralSolidKey /*key*/ )
+    {
+        impl_->permute_polyhedra( permutation );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTetrahedralSolid< dimension >::copy_polyhedra(
+        const OpenGeodeTetrahedralSolid< dimension >& solid_mesh,
+        OGTetrahedralSolidKey /*key*/ )
+    {
+        impl_->copy_polyhedra( *solid_mesh.impl_ );
     }
 
     template class opengeode_mesh_api OpenGeodeTetrahedralSolid< 3 >;

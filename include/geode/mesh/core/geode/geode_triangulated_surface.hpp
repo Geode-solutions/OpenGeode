@@ -99,6 +99,18 @@ namespace geode
         void add_triangle( const std::array< index_t, 3 >& vertices,
             OGTriangulatedSurfaceKey /*key*/ );
 
+        void add_triangles( index_t nb, OGTriangulatedSurfaceKey /*key*/ );
+
+        void remove_polygons( const std::vector< bool >& to_delete,
+            OGTriangulatedSurfaceKey /*key*/ );
+
+        void permute_polygons( absl::Span< const index_t > permutation,
+            OGTriangulatedSurfaceKey /*key*/ );
+
+        void copy_polygons(
+            const OpenGeodeTriangulatedSurface< dimension >& surface_mesh,
+            OGTriangulatedSurfaceKey /*key*/ );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >

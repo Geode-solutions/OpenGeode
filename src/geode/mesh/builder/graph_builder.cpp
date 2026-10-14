@@ -153,6 +153,7 @@ namespace geode
     void GraphBuilder::do_delete_vertices( const std::vector< bool >& to_delete,
         absl::Span< const index_t > old2new )
     {
+        graph_.delete_vertex_storage( to_delete, Graph::GraphKey{} );
         update_edge_vertices( graph_, *this, old2new );
         do_delete_graph_vertices( to_delete, old2new );
     }
@@ -161,8 +162,14 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > old2new )
     {
+        graph_.permute_vertex_storage( permutation, Graph::GraphKey{} );
         update_edge_vertices( graph_, *this, old2new );
         do_permute_graph_vertices( permutation, old2new );
+    }
+
+    void GraphBuilder::do_resize_vertex_storage( index_t nb_vertices )
+    {
+        graph_.resize_vertex_storage( nb_vertices, Graph::GraphKey{} );
     }
 
     void GraphBuilder::set_edges_around_vertex(

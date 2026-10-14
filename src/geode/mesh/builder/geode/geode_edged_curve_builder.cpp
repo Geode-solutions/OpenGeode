@@ -89,30 +89,33 @@ namespace geode
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_create_edge()
     {
-        // Operation is directly handled by the AttributeManager
+        geode_edged_curve_.add_edge(
+            typename OpenGeodeEdgedCurve< dimension >::OGEdgedCurveKey{} );
     }
 
     template < index_t dimension >
-    void OpenGeodeEdgedCurveBuilder< dimension >::do_create_edges(
-        index_t /*unused*/ )
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_create_edges( index_t nb )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_edged_curve_.add_edges(
+            nb, typename OpenGeodeEdgedCurve< dimension >::OGEdgedCurveKey{} );
     }
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_delete_edges(
-        const std::vector< bool >& /*unused*/,
+        const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_edged_curve_.remove_edges( to_delete,
+            typename OpenGeodeEdgedCurve< dimension >::OGEdgedCurveKey{} );
     }
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_permute_edges(
-        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_edged_curve_.permute_edges( permutation,
+            typename OpenGeodeEdgedCurve< dimension >::OGEdgedCurveKey{} );
     }
 
     template < index_t dimension >
@@ -124,9 +127,11 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_copy_edges(
-        const Graph& /*unused*/ )
+        const Graph& mesh )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_edged_curve_.copy_edges(
+            dynamic_cast< const OpenGeodeEdgedCurve< dimension >& >( mesh ),
+            typename OpenGeodeEdgedCurve< dimension >::OGEdgedCurveKey{} );
     }
 
     template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 1 >;

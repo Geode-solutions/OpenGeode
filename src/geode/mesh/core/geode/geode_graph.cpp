@@ -37,8 +37,6 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        explicit Impl( OpenGeodeGraph& mesh ) : internal::EdgesImpl( mesh ) {}
-
         Impl() = default;
 
     private:
@@ -54,7 +52,7 @@ namespace geode
         }
     };
 
-    OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
+    OpenGeodeGraph::OpenGeodeGraph() = default;
 
     OpenGeodeGraph::OpenGeodeGraph( BITSERY bitsery ) : Graph{ bitsery } {}
 
@@ -77,6 +75,34 @@ namespace geode
         impl_->set_edge_vertex( edge_vertex, vertex_id );
     }
 
+    void OpenGeodeGraph::add_edge( OGGraphKey /*key*/ )
+    {
+        impl_->add_edge();
+    }
+
+    void OpenGeodeGraph::add_edges( index_t nb, OGGraphKey /*key*/ )
+    {
+        impl_->add_edges( nb );
+    }
+
+    void OpenGeodeGraph::remove_edges(
+        const std::vector< bool >& to_delete, OGGraphKey /*key*/ )
+    {
+        impl_->remove_edges( to_delete );
+    }
+
+    void OpenGeodeGraph::permute_edges(
+        absl::Span< const index_t > permutation, OGGraphKey /*key*/ )
+    {
+        impl_->permute_edges( permutation );
+    }
+
+    void OpenGeodeGraph::copy_edges(
+        const OpenGeodeGraph& graph, OGGraphKey /*key*/ )
+    {
+        impl_->copy_edges( *graph.impl_ );
+    }
+
     template < typename Archive >
     void OpenGeodeGraph::serialize( Archive& serializer )
     {
@@ -85,6 +111,8 @@ namespace geode
                 { []( Archive& archive, OpenGeodeGraph& graph ) {
                     archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
                     archive.object( graph.impl_ );
+                    graph.impl_->remove_legacy_attributes(
+                        graph.edge_attribute_manager() );
                 } } } );
     }
 

@@ -44,7 +44,6 @@ namespace geode
 
     public:
         explicit Impl( OpenGeodeEdgedCurve< dimension >& mesh )
-            : internal::EdgesImpl( mesh )
         {
             detail::template initialize_crs< OpenGeodeEdgedCurve< dimension > >(
                 mesh );
@@ -107,6 +106,41 @@ namespace geode
     }
 
     template < index_t dimension >
+    void OpenGeodeEdgedCurve< dimension >::add_edge( OGEdgedCurveKey /*key*/ )
+    {
+        impl_->add_edge();
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurve< dimension >::add_edges(
+        index_t nb, OGEdgedCurveKey /*key*/ )
+    {
+        impl_->add_edges( nb );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurve< dimension >::remove_edges(
+        const std::vector< bool >& to_delete, OGEdgedCurveKey /*key*/ )
+    {
+        impl_->remove_edges( to_delete );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurve< dimension >::permute_edges(
+        absl::Span< const index_t > permutation, OGEdgedCurveKey /*key*/ )
+    {
+        impl_->permute_edges( permutation );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurve< dimension >::copy_edges(
+        const OpenGeodeEdgedCurve< dimension >& edged_curve,
+        OGEdgedCurveKey /*key*/ )
+    {
+        impl_->copy_edges( *edged_curve.impl_ );
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void OpenGeodeEdgedCurve< dimension >::serialize( Archive& serializer )
     {
@@ -116,6 +150,8 @@ namespace geode
                      archive.ext( edged_curve,
                          bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
                      archive.object( edged_curve.impl_ );
+                     edged_curve.impl_->remove_legacy_attributes(
+                         edged_curve.edge_attribute_manager() );
                      const auto new_point_attribute_id =
                          edged_curve.vertex_attribute_manager()
                              .attribute_ids_matching_name( internal::PointsImpl<
@@ -131,6 +167,8 @@ namespace geode
                             edged_curve, bitsery::ext::BaseClass<
                                              EdgedCurve< dimension > >{} );
                         archive.object( edged_curve.impl_ );
+                        edged_curve.impl_->remove_legacy_attributes(
+                            edged_curve.edge_attribute_manager() );
                         const auto new_point_attribute_id =
                             edged_curve.vertex_attribute_manager()
                                 .attribute_ids_matching_name(
@@ -147,6 +185,8 @@ namespace geode
                             edged_curve, bitsery::ext::BaseClass<
                                              EdgedCurve< dimension > >{} );
                         archive.object( edged_curve.impl_ );
+                        edged_curve.impl_->remove_legacy_attributes(
+                            edged_curve.edge_attribute_manager() );
                     } } } );
     }
 

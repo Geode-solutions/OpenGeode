@@ -471,6 +471,15 @@ namespace geode
         void reset_polygons_around_vertex(
             index_t vertex_id, SurfaceMeshKey /*key*/ );
 
+        void resize_vertex_storage(
+            index_t nb_vertices, SurfaceMeshKey /*key*/ );
+
+        void delete_vertex_storage(
+            const std::vector< bool >& to_delete, SurfaceMeshKey /*key*/ );
+
+        void permute_vertex_storage(
+            absl::Span< const index_t > permutation, SurfaceMeshKey /*key*/ );
+
         [[nodiscard]] SurfaceEdges< dimension >& edges(
             SurfaceMeshKey /*key*/ );
 
