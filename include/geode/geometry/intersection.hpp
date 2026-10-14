@@ -53,6 +53,17 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * Objects closer than GLOBAL_EPSILON are considered intersecting.
+     * - none: the objects are farther than GLOBAL_EPSILON.
+     * - intersect: the result points are within GLOBAL_EPSILON of both objects.
+     * - parallel: no point is returned. Depending on the function, the
+     *   objects have parallel directions (up to GLOBAL_EPSILON over their
+     *   extent), whatever their distance, or overlap in a common support
+     *   (line or plane). Check the distance between the objects when needed.
+     * - incorrect: the computed points are not within GLOBAL_EPSILON of both
+     *   objects.
+     */
     enum struct INTERSECTION_TYPE
     {
         none,
@@ -152,8 +163,11 @@ namespace geode
     /*!
      * Compute the intersection of a segment and a triangle
      * @return an optional of the intersection point.
-     * @warning if the segment is included in the triangle plane nothing is
-     * returned
+     * @details parallel when the segment direction deviates from the triangle
+     * plane by less than GLOBAL_EPSILON over the triangle extent (whatever
+     * their distance), or when the segment lies within GLOBAL_EPSILON of the
+     * triangle plane near the triangle and of the triangle. A segment shorter
+     * than GLOBAL_EPSILON is considered as a point.
      */
     [[nodiscard]] IntersectionResult< Point3D >
         opengeode_geometry_api segment_triangle_intersection(
@@ -162,8 +176,10 @@ namespace geode
     /*!
      * Compute the intersection of a line and a triangle
      * @return an optional of the intersection point.
-     * @warning if the segment is included in the triangle plane nothing is
-     * returned
+     * @details parallel when the line direction deviates from the triangle
+     * plane by less than GLOBAL_EPSILON over the triangle extent (whatever
+     * their distance), or when the line lies within GLOBAL_EPSILON of the
+     * triangle plane near the triangle and of the triangle.
      */
     [[nodiscard]] IntersectionResult< Point3D >
         opengeode_geometry_api line_triangle_intersection(
@@ -180,6 +196,10 @@ namespace geode
     /*!
      * Compute the intersection between two segments
      * @return an optional of the intersection point.
+     * @details parallel when the segment0 direction deviates from segment1 by
+     * less than GLOBAL_EPSILON over the segment1 extent (whatever their
+     * distance), or when the segments overlap within GLOBAL_EPSILON. A segment
+     * shorter than GLOBAL_EPSILON is considered as a point.
      */
     [[nodiscard]] IntersectionResult< Point2D >
         opengeode_geometry_api segment_segment_intersection(
@@ -188,6 +208,9 @@ namespace geode
     /*!
      * Compute the intersection between a segment and an infinite line
      * @return an optional of the intersection point.
+     * @details parallel when the segment deviates from the line direction by
+     * less than GLOBAL_EPSILON over the segment extent (whatever their
+     * distance), or when the segment lies within GLOBAL_EPSILON of the line.
      */
     [[nodiscard]] IntersectionResult< Point2D >
         opengeode_geometry_api segment_line_intersection(
@@ -220,6 +243,9 @@ namespace geode
     /*!
      * Compute the intersection between a plane and a circle
      * @return an optional of the intersection points.
+     * @details parallel when the circle lies within GLOBAL_EPSILON of the
+     * plane, none when it is parallel to the plane over its extent and
+     * farther than GLOBAL_EPSILON.
      */
     [[nodiscard]] IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api plane_circle_intersection(
@@ -228,6 +254,9 @@ namespace geode
     /*!
      * Compute the intersection between two planes
      * @return an optional of the intersection line.
+     * @details the planes are parallel when the sine of their angle is below
+     * GLOBAL_EPSILON: parallel when the plane0 origin is within GLOBAL_EPSILON
+     * of plane1, none otherwise.
      */
     [[nodiscard]] IntersectionResult< OwnerInfiniteLine3D >
         opengeode_geometry_api plane_plane_intersection(
