@@ -572,6 +572,21 @@ void test_segment_triangle_intersection_touching_endpoint()
                     "segment touching the triangle at ",
                     endpoint.string(), " from ", other.string() );
             }
+            // Segment crossing the triangle close to its first vertex
+            for( const auto ratio : { 1e-9, 1e-6, 1e-3 } )
+            {
+                const auto start = endpoint - offset * ratio;
+                const auto result = geode::segment_triangle_intersection(
+                    geode::Segment3D{ start, other }, triangle );
+                geode::OpenGeodeGeometryException::test(
+                    result.result.has_value()
+                        && geode::point_point_distance(
+                               result.result.value(), endpoint )
+                               < geode::GLOBAL_EPSILON,
+                    "Wrong result for segment_triangle_intersection with "
+                    "segment crossing the triangle at ",
+                    endpoint.string(), " from ", start.string() );
+            }
         }
     }
 }

@@ -327,6 +327,20 @@ void test_polygon()
         geode::Vector3D{ { 0, 0, 1 } } );
     check_polygon_normal( geode::OwnerPolygon3D{ { d, c, b, a } },
         geode::Vector3D{ { 0, 0, -1 } } );
+
+    // Same polygon in the plane of normal (1,1,1) through (1,2,3), with
+    // (1,-1,0) and (1,1,-2) as local axes
+    const geode::Point3D a_tilted{ { 1, 2, 3 } };
+    const geode::Point3D b_tilted{ { 3, 2, 1 } };
+    const geode::Point3D c_tilted{ { 3, 0, 3 } };
+    const geode::Point3D d_tilted{ { 5, 4, -3 } };
+    const auto tilted_normal = geode::Vector3D{ { 1, 1, 1 } }.normalize();
+    check_polygon_normal(
+        geode::OwnerPolygon3D{ { a_tilted, b_tilted, c_tilted, d_tilted } },
+        tilted_normal );
+    check_polygon_normal(
+        geode::OwnerPolygon3D{ { d_tilted, c_tilted, b_tilted, a_tilted } },
+        tilted_normal * -1 );
 }
 
 void test()
