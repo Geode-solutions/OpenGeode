@@ -988,68 +988,76 @@ namespace geode
     IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         plane_circle_intersection( const Plane& plane, const Circle& circle )
     {
-        const auto& circle_plane = circle.plane();
-        const auto planes_intersection =
-            plane_plane_intersection( plane, circle_plane );
-        if( !planes_intersection.has_intersection() )
+        // Heights of the circle points relative to the plane:
+        // h(theta) = h_c + radius * ( a * cos(theta) + b * sin(theta) )
+        //          = h_c + amplitude * cos(theta - phi)
+        const auto& center = circle.plane().origin();
+        const auto radius = circle.radius();
+        const auto basis = compute_orthogonal_basis( circle.plane().normal() );
+        const auto& axis0 = basis[1];
+        const auto& axis1 = basis[2];
+        const auto center_height =
+            plane.normal().dot( Vector3D{ plane.origin(), center } );
+        const auto a = plane.normal().dot( axis0 );
+        const auto b = plane.normal().dot( axis1 );
+        const auto amplitude = radius * std::sqrt( a * a + b * b );
+        if( amplitude <= GLOBAL_EPSILON )
         {
-            // The planes are parallel or nonintersecting.
-            return { planes_intersection.type };
-        }
-        // The planes intersect in a line. Locate one or two points that
-        // are on the circle and line. If the line is t*D+P, the circle
-        // center is C, and the circle radius is r, then
-        //   r^2 = |t*D+P-C|^2 = |D|^2*t^2 + 2*Dot(D,P-C)*t + |P-C|^2
-        // This is a quadratic equation of the form
-        // a2*t^2 + 2*a1*t + a0 = 0.
-        const auto& line = planes_intersection.result.value();
-        const Vector3D diff{ circle_plane.origin(), line.origin() };
-        const auto a2 = line.direction().dot( line.direction() );
-        const auto a1 = diff.dot( line.direction() );
-        const auto a0 = diff.dot( diff ) - circle.radius() * circle.radius();
-
-        const auto discr = a1 * a1 - a0 * a2;
-        if( discr < 0. )
-        {
-            // No real roots, the circle does not intersect the plane.
+            // The circle is parallel to the plane over its extent
+            if( std::fabs( center_height ) <= GLOBAL_EPSILON )
+            {
+                return { INTERSECTION_TYPE::parallel };
+            }
             return { INTERSECTION_TYPE::none };
         }
+        if( std::fabs( center_height ) > amplitude + GLOBAL_EPSILON )
+        {
+            return { INTERSECTION_TYPE::none };
+        }
+        const auto phi = std::atan2( b, a );
+        const auto delta =
+            std::acos( std::clamp( -center_height / amplitude, -1., 1. ) );
+        const auto circle_point = [&]( double theta ) {
+            return center
+                   + ( axis0 * std::cos( theta ) + axis1 * std::sin( theta ) )
+                         * radius;
+        };
         absl::InlinedVector< Point3D, 2 > result;
+        if( radius * std::sin( delta ) <= GLOBAL_EPSILON )
+        {
+            // The circle touches the plane
+            result.emplace_back( circle_point( phi + delta ) );
+        }
+        else
+        {
+            // Ordered along the planes intersection direction
+            result.emplace_back( circle_point( phi - delta ) );
+            result.emplace_back( circle_point( phi + delta ) );
+            const auto direction =
+                plane.normal().cross( circle.plane().normal() );
+            if( Vector3D{ result[0], result[1] }.dot( direction ) < 0 )
+            {
+                std::swap( result[0], result[1] );
+            }
+        }
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
-            first_correctness;
+            first_correctness{ true, {} };
         CorrectnessInfo< absl::InlinedVector< Point3D, 2 > >::Correctness
-            second_correctness;
-        const auto compute_correctness = [&first_correctness,
-                                             &second_correctness, &plane,
-                                             &circle](
-                                             const Point3D& intersection ) {
+            second_correctness{ true, {} };
+        for( const auto& intersection : result )
+        {
             auto plane_output = point_plane_distance( intersection, plane );
             first_correctness.first =
-                std::get< 0 >( plane_output ) <= GLOBAL_EPSILON;
+                first_correctness.first
+                && std::get< 0 >( plane_output ) <= GLOBAL_EPSILON;
             first_correctness.second.emplace_back(
                 std::move( std::get< 1 >( plane_output ) ) );
             auto circle_output = point_circle_distance( intersection, circle );
             second_correctness.first =
-                std::get< 0 >( circle_output ) <= GLOBAL_EPSILON;
+                second_correctness.first
+                && std::get< 0 >( circle_output ) <= GLOBAL_EPSILON;
             second_correctness.second.emplace_back(
                 std::move( std::get< 1 >( circle_output ) ) );
-        };
-        if( discr == 0. )
-        {
-            // The quadratic polynomial has 1 real-valued repeated root.
-            // The circle just touches the plane.
-            compute_correctness( result.emplace_back(
-                line.origin() - line.direction() * ( a1 / a2 ) ) );
-        }
-        else
-        {
-            // The quadratic polynomial has 2 distinct, real-valued roots.
-            // The circle intersects the plane in two points.
-            const auto root = std::sqrt( discr );
-            compute_correctness( result.emplace_back(
-                line.origin() - line.direction() * ( ( a1 + root ) / a2 ) ) );
-            compute_correctness( result.emplace_back(
-                line.origin() - line.direction() * ( ( a1 - root ) / a2 ) ) );
         }
         return { std::move( result ),
             { first_correctness, second_correctness } };
@@ -1058,28 +1066,17 @@ namespace geode
     IntersectionResult< OwnerInfiniteLine3D > plane_plane_intersection(
         const Plane& plane0, const Plane& plane1 )
     {
-        // If N0 and N1 are parallel, either the planes are parallel and
-        // separated or the same plane.
-        //  Otherwise, the intersection line is
-        //   L(t) = t*Cross(N0,N1)/|Cross(N0,N1)| + c0*N0 + c1*N1
-        // for some coefficients c0 and c1 and for t any real number (the
-        // line parameter).  Taking dot products with the normals,
-        //   d0 = Dot(N0,L) = c0*Dot(N0,N0) + c1*Dot(N0,N1) = c0 + c1*d
-        //   d1 = Dot(N1,L) = c0*Dot(N0,N1) + c1*Dot(N1,N1) = c0*d + c1
-        // where d = Dot(N0,N1).  These are two equations in two unknowns.
-        // The solution is
-        //   c0 = (d0 - d*d1)/det
-        //   c1 = (d1 - d*d0)/det
-        // where det = 1 - d^2.
-        const auto dot = plane0.normal().dot( plane1.normal() );
-        const auto constant0 = -plane0.plane_constant();
-        const auto constant1 = -plane1.plane_constant();
-        if( std::fabs( dot ) >= 1. )
+        const auto& normal0 = plane0.normal();
+        const auto& normal1 = plane1.normal();
+        const auto direction = normal0.cross( normal1 );
+        const auto sine = direction.length();
+        // Height of the plane0 origin relative to plane1
+        const auto height =
+            normal1.dot( Vector3D{ plane1.origin(), plane0.origin() } );
+        if( sine <= GLOBAL_EPSILON )
         {
-            // The planes are parallel.  Check if they are coplanar.
-            const auto constant_diff =
-                dot >= 0. ? constant0 - constant1 : constant0 + constant1;
-            if( std::fabs( constant_diff ) == 0. )
+            // Parallel planes (as in line_plane_intersection)
+            if( std::fabs( height ) <= GLOBAL_EPSILON )
             {
                 // The planes are coplanar.
                 return { INTERSECTION_TYPE::parallel };
@@ -1087,11 +1084,12 @@ namespace geode
             // The planes are parallel but distinct.
             return { INTERSECTION_TYPE::none };
         }
-        const auto invDet = 1. / ( 1. - dot * dot );
-        const auto c0 = ( constant0 - dot * constant1 ) * invDet;
-        const auto c1 = ( constant1 - dot * constant0 ) * invDet;
-        OwnerInfiniteLine3D line{ plane0.normal().cross( plane1.normal() ),
-            plane0.normal() * c0 + plane1.normal() * c1 };
+        // Move the plane0 origin in plane0, orthogonally to the line, up to
+        // plane1: its height decreases by sine per unit length
+        const auto unit_direction = direction / sine;
+        const auto in_plane0 = normal0.cross( unit_direction );
+        OwnerInfiniteLine3D line{ unit_direction,
+            plane0.origin() + in_plane0 * ( height / sine ) };
         const auto compute_corectness = [&line]( const Plane& plane )
             -> CorrectnessInfo< OwnerInfiniteLine3D >::Correctness {
             auto output = point_plane_distance( line.origin(), plane );

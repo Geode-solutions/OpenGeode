@@ -1236,8 +1236,70 @@ void test_segment_intersection_2d_near_parallel()
         "Wrong result for segment_line_intersection with small angle" );
 }
 
+void test_near_parallel_planes_intersection()
+{
+    // Planes with an angle of 1e-5
+    const geode::Point3D origin0{ { 3, 4, 5 } };
+    const geode::Vector3D normal0{ { 0, 0, 1 } };
+    const geode::Point3D origin1{ { -2, 1, -3 } };
+    const geode::Vector3D normal1{ { 0, 1e-5, 1 } };
+    const geode::Plane plane0{ normal0, origin0 };
+    const geode::Plane plane1{ normal1, origin1 };
+    const auto planes = geode::plane_plane_intersection( plane0, plane1 );
+    geode::OpenGeodeGeometryException::test( planes.has_intersection(),
+        "Wrong result for plane_plane_intersection with nearly parallel "
+        "planes" );
+    const auto& line = planes.result.value();
+    for( const auto t : { 0., 1., -10. } )
+    {
+        const auto point = line.origin() + line.direction() * t;
+        geode::OpenGeodeGeometryException::test(
+            std::get< 0 >( geode::point_plane_distance( point, plane0 ) )
+                    < geode::GLOBAL_EPSILON
+                && std::get< 0 >( geode::point_plane_distance( point, plane1 ) )
+                       < geode::GLOBAL_EPSILON,
+            "Wrong line for plane_plane_intersection with nearly parallel "
+            "planes" );
+    }
+
+    // Planes with an angle below GLOBAL_EPSILON: parallel
+    const geode::Point3D origin2{ { -0x1.1afe28d3d8774p+0,
+        -0x1.8b34a1799de93p+1, -0x1.9f276e61666fcp+0 } };
+    const geode::Vector3D normal2{ { -0x1.4f9f1b072e83bp-1,
+        0x1.42e543054b722p-1, -0x1.a965a61857dccp-2 } };
+    const geode::Point3D origin3{ { -0x1.fa1659e5b6684p+0,
+        -0x1.770e0cff20488p+0, 0x1.02ed32a70e25cp+1 } };
+    const geode::Vector3D normal3{ { -0x1.4f9f252f05046p-1,
+        0x1.42e52d84f60b6p-1, -0x1.a965c753cc90dp-2 } };
+    const auto parallel_planes = geode::plane_plane_intersection(
+        geode::Plane{ normal2, origin2 }, geode::Plane{ normal3, origin3 } );
+    geode::OpenGeodeGeometryException::test(
+        parallel_planes.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for plane_plane_intersection with planes parallel up "
+        "to GLOBAL_EPSILON" );
+
+    // Circle in the plane (up to GLOBAL_EPSILON)
+    const geode::Point3D origin{ { -0x1.94d1db9854a7p+0, 0x1.68e1433c9226ep+1,
+        -0x1.eeedf6fe2fed8p-1 } };
+    const geode::Vector3D normal{ { -0x1.f86da7c7ff3bp-3, 0x1.2044a2b12fc87p-2,
+        -0x1.dad53f776a8e3p-1 } };
+    const geode::Point3D center{ { -0x1.2537df0082acdp+0, 0x1.5151b3ba60958p+0,
+        -0x1.89ccc55b8a3d2p+0 } };
+    const geode::Vector3D circle_normal{ { -0x1.f86da7d8c3964p-3,
+        0x1.2044a28e94a6ep-2, -0x1.dad53f7b8e24bp-1 } };
+    const geode::Plane plane{ normal, origin };
+    const geode::Plane circle_plane{ circle_normal, center };
+    const geode::Circle circle{ circle_plane, 0x1.224e1deef52adp-4 };
+    const auto coplanar = geode::plane_circle_intersection( plane, circle );
+    geode::OpenGeodeGeometryException::test(
+        coplanar.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong result for plane_circle_intersection with circle in the "
+        "plane" );
+}
+
 void test()
 {
+    test_near_parallel_planes_intersection();
     test_segment_intersection_2d_near_parallel();
     test_triangle_intersection_near_parallel();
     test_small_sphere_intersection();
