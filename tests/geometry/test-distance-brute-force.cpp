@@ -168,8 +168,10 @@ namespace
             const geode::Triangle< dimension > triangle{ vertices[0],
                 vertices[1], vertices[2] };
             const auto query = random_query( vertices, trial / 4 );
-            const auto [distance, closest] =
+            const auto output =
                 geode::point_triangle_distance( query, triangle );
+            const auto distance = std::get< 0 >( output );
+            const auto& closest = std::get< 1 >( output );
             check_closest_points( distance, query, closest,
                 "Wrong result for point_triangle_distance ", dimension,
                 "D with query ", query.string() );
@@ -685,6 +687,121 @@ namespace
                 normal.string(), " radius ", radius );
         }
     }
+    void test_non_conformal_distance()
+    {
+        for( const auto trial : geode::Range{ 2000 } )
+        {
+            const auto vertices0 = random_triangle< 3 >( trial );
+            auto vertices1 = random_other_triangle( vertices0, trial / 4 );
+            // 0: no shared vertex, 1: shared vertex, 2: shared edge
+            const auto shared = trial % 3;
+            for( const auto v : geode::LRange{ shared } )
+            {
+                vertices1[v] = vertices0[v];
+            }
+            const geode::Triangle3D triangle0{ vertices0[0], vertices0[1],
+                vertices0[2] };
+            const geode::Triangle3D triangle1{ vertices1[0], vertices1[1],
+                vertices1[2] };
+            const auto context =
+                "triangles " + vertices0[0].string() + " - "
+                + vertices0[1].string() + " - " + vertices0[2].string()
+                + " and " + vertices1[0].string() + " - "
+                + vertices1[1].string() + " - " + vertices1[2].string();
+            const auto result =
+                geode::triangle_triangle_distance_between_non_conformal_parts(
+                    triangle0, triangle1 );
+            const auto reference = std::get< 0 >(
+                geode::triangle_triangle_distance( triangle0, triangle1 ) );
+            if( !result )
+            {
+                continue;
+            }
+            const auto& [distance, closest0, closest1] = result.value();
+            check_closest_points( distance, closest0, closest1,
+                "Wrong result for "
+                "triangle_triangle_distance_between_non_conformal_parts with ",
+                context );
+            geode::OpenGeodeGeometryException::test(
+                std::get< 0 >(
+                    geode::point_triangle_distance( closest0, triangle0 ) )
+                        < geode::GLOBAL_EPSILON
+                    && std::get< 0 >( geode::point_triangle_distance(
+                           closest1, triangle1 ) )
+                           < geode::GLOBAL_EPSILON
+                    && distance >= reference - geode::GLOBAL_EPSILON,
+                "Wrong result for "
+                "triangle_triangle_distance_between_non_conformal_parts with ",
+                context, ": ", distance, " | distance ", reference );
+            if( shared == 0 && trial % 4 != 1 )
+            {
+                // No shared vertex (and no colocated vertices)
+                geode::OpenGeodeGeometryException::test(
+                    std::fabs( distance - reference ) < geode::GLOBAL_EPSILON,
+                    "Wrong result for "
+                    "triangle_triangle_distance_between_non_conformal_parts "
+                    "without common vertex with ",
+                    context, ": ", distance, " | distance ", reference );
+            }
+        }
+
+        // Constructed configurations in a plane
+        for( const auto trial : geode::Range{ 500 } )
+        {
+            const auto origin = random_point< 3 >( 5 );
+            const auto axes = plane_axes( random_direction< 3 >() );
+            const auto in_plane = [&]( double u, double v ) {
+                return origin + axes[0] * u + axes[1] * v;
+            };
+            const auto a = in_plane( 0, 0 );
+            const auto b = in_plane( uniform( 0.5, 2 ), 0 );
+            const auto c = in_plane( uniform( 0.2, 1 ), uniform( 0.5, 2 ) );
+            // Shared edge ab, other vertex on the same side, inside abc
+            const auto inner = a + ( ( b - a ) * 0.3 + ( c - a ) * 0.3 );
+            const geode::Triangle3D abc{ a, b, c };
+            const geode::Triangle3D abd{ a, b, inner };
+            const auto folded =
+                geode::triangle_triangle_distance_between_non_conformal_parts(
+                    abc, abd );
+            geode::OpenGeodeGeometryException::test(
+                folded
+                    && std::get< 0 >( folded.value() ) < geode::GLOBAL_EPSILON,
+                "Wrong result for "
+                "triangle_triangle_distance_between_non_conformal_parts with "
+                "overlapping triangles sharing an edge, trial ",
+                trial );
+            // Shared edge ab, other vertex on the other side
+            const auto opposite =
+                in_plane( uniform( 0.2, 1 ), -uniform( 0.5, 2 ) );
+            const geode::Triangle3D abe{ a, b, opposite };
+            const auto conformal =
+                geode::triangle_triangle_distance_between_non_conformal_parts(
+                    abc, abe );
+            geode::OpenGeodeGeometryException::test(
+                !conformal
+                    || std::get< 0 >( conformal.value() )
+                           > geode::GLOBAL_EPSILON,
+                "Wrong result for "
+                "triangle_triangle_distance_between_non_conformal_parts with "
+                "conformal triangles sharing an edge, trial ",
+                trial );
+            // Shared vertex a, other edge crossing abc
+            const auto f = in_plane( uniform( 0.6, 1.2 ), uniform( -1, -0.2 ) );
+            const auto g = b + ( c - b ) * 0.5 + ( c - a ) * uniform( 0.2, 1 );
+            const geode::Triangle3D afg{ a, f, g };
+            const auto crossing =
+                geode::triangle_triangle_distance_between_non_conformal_parts(
+                    abc, afg );
+            geode::OpenGeodeGeometryException::test(
+                crossing
+                    && std::get< 0 >( crossing.value() )
+                           < geode::GLOBAL_EPSILON,
+                "Wrong result for "
+                "triangle_triangle_distance_between_non_conformal_parts with "
+                "overlapping triangles sharing a vertex, trial ",
+                trial );
+        }
+    }
 } // namespace
 
 void test()
@@ -706,6 +823,7 @@ void test()
     test_segment_triangle_distance();
     test_line_triangle_distance();
     test_triangle_triangle_distance();
+    test_non_conformal_distance();
 
     geode::Logger::info( "TEST SUCCESS" );
 }
