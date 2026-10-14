@@ -519,9 +519,39 @@ void test_segment_plane_intersection_detection()
         "query segment_op" );
 }
 
+void test_segment_segment_intersection_detection_3d()
+{
+    // Crossing at (0.5, 0.5, 0.1): the thinnest bounding box axis (z) lies in
+    // the plane of the segments
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 1, 1, 0.2 } };
+    const geode::Point3D c{ { 1, 1, 0 } };
+    const geode::Point3D d{ { 0, 0, 0.2 } };
+    const geode::Segment3D segment_ab{ a, b };
+    const geode::Segment3D segment_cd{ c, d };
+    const auto crossing =
+        geode::segment_segment_intersection_detection( segment_ab, segment_cd );
+    geode::OpenGeodeGeometryException::test(
+        crossing.first == geode::POSITION::inside
+            && crossing.second == geode::POSITION::inside,
+        "[Test] Wrong result for crossing 3D segments in a plane containing "
+        "the thinnest axis" );
+
+    // Same plane, disjoint segments
+    const geode::Point3D e{ { 0.8, 0.8, 0 } };
+    const geode::Point3D f{ { 1, 1, 0.05 } };
+    const geode::Segment3D segment_ef{ e, f };
+    const auto disjoint =
+        geode::segment_segment_intersection_detection( segment_ab, segment_ef );
+    geode::OpenGeodeGeometryException::test(
+        disjoint.first == geode::POSITION::outside,
+        "[Test] Wrong result for disjoint coplanar 3D segments" );
+}
+
 void test()
 {
     test_segment_segment_intersection_detection();
+    test_segment_segment_intersection_detection_3d();
     test_segment_line_intersection_detection();
     test_segment_triangle_intersection_detection();
     test_line_triangle_intersection_detection();

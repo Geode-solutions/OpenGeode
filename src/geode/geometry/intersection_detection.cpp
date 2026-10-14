@@ -191,6 +191,54 @@ namespace
         return result;
     }
 
+    geode::local_index_t largest_component_axis( const geode::Vector3D& vector )
+    {
+        geode::local_index_t largest_axis{ 2 };
+        for( const auto other_axis : geode::LRange{ 2 } )
+        {
+            if( std::fabs( vector.value( other_axis ) )
+                > std::fabs( vector.value( largest_axis ) ) )
+            {
+                largest_axis = other_axis;
+            }
+        }
+        return largest_axis;
+    }
+
+    // Axis to drop to project two coplanar segments without collapsing their
+    // common plane: the largest component of the plane normal.
+    geode::local_index_t coplanar_segments_projection_axis(
+        const geode::Segment3D& segment0, const geode::Segment3D& segment1 )
+    {
+        const auto direction0 = segment0.direction();
+        const auto direction1 = segment1.direction();
+        const auto normal = direction0.cross( direction1 );
+        if( normal.length2() > 0 )
+        {
+            return largest_component_axis( normal );
+        }
+        const geode::Vector3D between{ segment0.vertices()[0].get(),
+            segment1.vertices()[0].get() };
+        const auto direction =
+            direction0.length2() > 0 ? direction0 : direction1;
+        const auto parallel_normal = direction.cross( between );
+        if( parallel_normal.length2() > 0 )
+        {
+            return largest_component_axis( parallel_normal );
+        }
+        // Collinear segments: keep the axes where the line spreads most
+        geode::local_index_t smallest_axis{ 2 };
+        for( const auto other_axis : geode::LRange{ 2 } )
+        {
+            if( std::fabs( direction.value( other_axis ) )
+                < std::fabs( direction.value( smallest_axis ) ) )
+            {
+                smallest_axis = other_axis;
+            }
+        }
+        return smallest_axis;
+    }
+
     geode::SegmentSegmentIntersection segment_segment_intersection_detection3D(
         const geode::Segment3D& segment0, const geode::Segment3D& segment1 )
     {
@@ -201,18 +249,8 @@ namespace
         {
             return { geode::POSITION::outside, geode::POSITION::outside };
         }
-        geode::local_index_t largest_axis{ 2 };
-        auto bbox = segment0.bounding_box();
-        bbox.add_box( segment1.bounding_box() );
-        const auto diagonal = bbox.diagonal();
-        for( const auto other_axis : geode::LRange{ 2 } )
-        {
-            if( std::fabs( diagonal.value( other_axis ) )
-                < std::fabs( diagonal.value( largest_axis ) ) )
-            {
-                largest_axis = other_axis;
-            }
-        }
+        const auto largest_axis =
+            coplanar_segments_projection_axis( segment0, segment1 );
         const auto segment0_proj_p0 =
             segment0.vertices()[0].get().project_point( largest_axis );
         const auto segment0_proj_p1 =
