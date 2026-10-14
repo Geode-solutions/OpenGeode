@@ -21,6 +21,8 @@
  *
  */
 
+#include <algorithm>
+#include <array>
 #include <random>
 
 #include <geode/basic/assert.hpp>
@@ -39,7 +41,7 @@ void test_degenerated_consistency()
 {
     const geode::Point3D p0{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D p1{ { 1.0, 0.0, 0.0 } };
-    const geode::Point3D p2{ { 3.0, 2.5e-6, 0.0 } };
+    const geode::Point3D p2{ { 3.0, 2.5 * geode::GLOBAL_EPSILON, 0.0 } };
     const geode::Point3D p3{ { 0.0, 0.0, 1.0 } };
     const geode::Triangle3D triangle{ p0, p1, p2 };
     geode::OpenGeodeGeometryException::test( triangle.is_degenerated(),
@@ -55,7 +57,7 @@ void test_degenerated_consistency()
     const geode::Triangle3D triangle2{ p0, p1, q2 };
     geode::OpenGeodeGeometryException::test( !triangle2.is_degenerated(),
         "Flat but valid triangle should not be degenerated" );
-    const geode::Point3D q3{ { 1.0, 1.0, 5e-7 } };
+    const geode::Point3D q3{ { 1.0, 1.0, 0.5 * geode::GLOBAL_EPSILON } };
     const geode::Point3D q4{ { 0.0, 1.0, 0.0 } };
     const geode::Tetrahedron flat_tetra{ p0, p1, q3, q4 };
     geode::OpenGeodeGeometryException::test(
@@ -106,6 +108,97 @@ void test_degenerated_consistency()
     }
 }
 
+// Maps local coordinates into a frame which is neither aligned with the axes
+// nor at the origin
+geode::Point3D to_global( const std::array< double, 3 >& local, double offset )
+{
+    const geode::Vector3D u{ { 2. / 3., 1. / 3., 2. / 3. } };
+    const geode::Vector3D v{ { 1. / 3., 2. / 3., -2. / 3. } };
+    const geode::Vector3D w{ { 2. / 3., -2. / 3., -1. / 3. } };
+    const geode::Point3D origin{ { offset, -offset, offset } };
+    return origin + u * local[0] + v * local[1] + w * local[2];
+}
+
+void test_degenerated_triangle_vertex_order()
+{
+    // Each triangle has a minimum height of factor * GLOBAL_EPSILON
+    for( const auto factor : { 0.5, 0.9, 1.1, 2. } )
+    {
+        const auto height = factor * geode::GLOBAL_EPSILON;
+        const std::array< std::array< std::array< double, 3 >, 3 >, 3 >
+            configurations{ {
+                // Cap: the apex projects inside the longest edge
+                { { { 0, 0, 0 }, { 1, 0, 0 }, { 0.5, height, 0 } } },
+                // Obtuse: the apex projects outside the opposite edge
+                { { { 0, 0, 0 }, { 1, 0, 0 }, { 1.5, 1.5 * height, 0 } } },
+                // Needle: one edge is shorter than GLOBAL_EPSILON
+                { { { 0, 0, 0 }, { 1, 0, 0 }, { 1, height, 0 } } },
+            } };
+        for( const auto offset : { 0., 1e3, 1e6 } )
+        {
+            for( const auto& configuration : configurations )
+            {
+                std::array< geode::local_index_t, 3 > order{ 0, 1, 2 };
+                do
+                {
+                    const geode::Triangle3D triangle{
+                        to_global( configuration[order[0]], offset ),
+                        to_global( configuration[order[1]], offset ),
+                        to_global( configuration[order[2]], offset )
+                    };
+                    geode::OpenGeodeGeometryException::test(
+                        triangle.is_degenerated() == ( factor < 1 ),
+                        "Wrong degeneracy for triangle ", triangle.string(),
+                        " of minimum height ", factor, " * GLOBAL_EPSILON" );
+                } while( std::next_permutation( order.begin(), order.end() ) );
+            }
+        }
+    }
+}
+
+void test_degenerated_tetrahedron_vertex_order()
+{
+    // Each tetrahedron lies in a slab of minimum thickness
+    // factor * GLOBAL_EPSILON
+    for( const auto factor : { 0.5, 0.9, 1.1, 2. } )
+    {
+        const auto width = factor * geode::GLOBAL_EPSILON;
+        const std::array< std::array< std::array< double, 3 >, 4 >, 3 >
+            configurations{ {
+                // Cap: the apex projects inside the opposite facet
+                { { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 },
+                    { 0.3, 0.3, width } } },
+                // Wedge: the apex projects outside the opposite facet, the
+                // thinnest slab is between edges 03 and 12
+                { { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 },
+                    { 1, 1, 2 * width } } },
+                // Sliver: thinnest between two opposite edges
+                { { { 0, 0, 0 }, { 1, 1, 0 }, { 1, 0, width },
+                    { 0, 1, width } } },
+            } };
+        for( const auto offset : { 0., 1e3, 1e6 } )
+        {
+            for( const auto& configuration : configurations )
+            {
+                std::array< geode::local_index_t, 4 > order{ 0, 1, 2, 3 };
+                do
+                {
+                    const geode::Tetrahedron tetra{
+                        to_global( configuration[order[0]], offset ),
+                        to_global( configuration[order[1]], offset ),
+                        to_global( configuration[order[2]], offset ),
+                        to_global( configuration[order[3]], offset )
+                    };
+                    geode::OpenGeodeGeometryException::test(
+                        tetra.is_degenerated() == ( factor < 1 ),
+                        "Wrong degeneracy for tetrahedron ", tetra.string(),
+                        " of thickness ", factor, " * GLOBAL_EPSILON" );
+                } while( std::next_permutation( order.begin(), order.end() ) );
+            }
+        }
+    }
+}
+
 void test()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -135,6 +228,8 @@ void test()
     geode::OpenGeodeGeometryException::test(
         !pivot2, "Pivot of triangle2 should not be calculated" );
     test_degenerated_consistency();
+    test_degenerated_triangle_vertex_order();
+    test_degenerated_tetrahedron_vertex_order();
 }
 
 OPENGEODE_TEST( "distance" )
