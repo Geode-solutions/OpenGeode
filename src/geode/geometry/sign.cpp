@@ -57,16 +57,39 @@ namespace geode
     SIGN polygon_area_sign( const Polygon2D& polygon )
     {
         const auto& polygon_vertices = polygon.vertices();
+        const auto nb_vertices = polygon_vertices.size();
+        // The lexicographically smallest vertex of a simple polygon is
+        // convex: its corner orientation is the polygon orientation, even
+        // when the polygon is concave.
+        index_t lowest{ 0 };
+        for( const auto v : Range{ 1, nb_vertices } )
+        {
+            const Point2D& point = polygon_vertices[v];
+            if( point < polygon_vertices[lowest] )
+            {
+                lowest = v;
+            }
+        }
+        const auto sign = triangle_area_sign(
+            { polygon_vertices[( lowest + nb_vertices - 1 ) % nb_vertices],
+                polygon_vertices[lowest],
+                polygon_vertices[( lowest + 1 ) % nb_vertices] } );
+        if( sign != SIGN::zero )
+        {
+            return sign;
+        }
+        // Degenerate corner (duplicated or collinear points): fallback on
+        // the first non-degenerate fan triangle
         const auto& p1 = polygon_vertices[0];
-        for( const auto other_index : LRange{ 1, polygon_vertices.size() - 1 } )
+        for( const auto other_index : LRange{ 1, nb_vertices - 1 } )
         {
             const auto& p2 = polygon_vertices[other_index];
             const auto& p3 = polygon_vertices[static_cast< local_index_t >(
                 other_index + 1 )];
-            const auto sign = triangle_area_sign( { p1, p2, p3 } );
-            if( sign != SIGN::zero )
+            const auto fan_sign = triangle_area_sign( { p1, p2, p3 } );
+            if( fan_sign != SIGN::zero )
             {
-                return sign;
+                return fan_sign;
             }
         }
         return geode::SIGN::zero;
