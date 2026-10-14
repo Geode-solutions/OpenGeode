@@ -885,63 +885,29 @@ namespace geode
         segment_line_distance( const Segment< dimension >& segment,
             const InfiniteLine< dimension >& line )
     {
-        const Vector< dimension > segDirection{ segment.vertices()[0],
+        const Vector< dimension > segment_direction{ segment.vertices()[0],
             segment.vertices()[1] };
-        const Vector< dimension > diff{ segment.vertices()[0], line.origin() };
-        const auto a00 = line.direction().dot( line.direction() );
-        const auto a01 = -line.direction().dot( segDirection );
-        const auto a11 = segDirection.dot( segDirection );
-        const auto b0 = line.direction().dot( diff );
-        const auto det = std::max( a00 * a11 - a01 * a01, 0. );
-        double s0, s1;
-
-        if( det > 0 )
-        {
-            // The line and segment are not parallel.
-            const auto b1 = -segDirection.dot( diff );
-            s1 = a01 * b0 - a00 * b1;
-
-            if( s1 >= 0 )
-            {
-                if( s1 <= det )
-                {
-                    // Two interior points are closest, one on the line
-                    // and one on the segment.
-                    s0 = ( a01 * b1 - a11 * b0 ) / det;
-                    s1 /= det;
-                }
-                else
-                {
-                    // The endpoint Q1 of the segment and an interior
-                    // point of the line are closest.
-                    s0 = -( a01 + b0 ) / a00;
-                    s1 = 1;
-                }
-            }
-            else
-            {
-                // The endpoint Q0 of the segment and an interior point
-                // of the line are closest.
-                s0 = -b0 / a00;
-                s1 = 0;
-            }
-        }
-        else
-        {
-            // The line and segment are parallel. Select the pair of
-            // closest points where the closest segment point is the
-            // endpoint Q0.
-            s0 = -b0 / a00;
-            s1 = 0;
-        }
-        std::tuple< double, geode::Point< dimension >,
-            geode::Point< dimension > >
-            result;
-        auto& [distance, closest_on_segment, closest_on_line] = result;
-        closest_on_line = line.origin() + line.direction() * s0;
-        closest_on_segment = segment.vertices()[0].get() + segDirection * s1;
-        distance = point_point_distance( closest_on_line, closest_on_segment );
-        return result;
+        const auto& line_direction = line.direction();
+        const auto terms =
+            segment_segment_terms( line_direction, segment_direction,
+                Vector< dimension >{ segment.vertices()[0], line.origin() } );
+        // det = a*c*sin^2(angle): the segment is parallel to the line when it
+        // deviates from the line direction by less than GLOBAL_EPSILON, i.e.
+        // c*sin^2(angle) < GLOBAL_EPSILON^2. The squared distance to the line
+        // is convex along the segment: clamp its minimum on the segment.
+        const auto parameter =
+            terms.det
+                    > GLOBAL_EPSILON * GLOBAL_EPSILON * line_direction.length2()
+                ? clamp_parameter( terms.t_numerator, terms.det )
+                : 0.;
+        auto closest_on_segment =
+            segment_point( segment, segment_direction, parameter );
+        auto closest_on_line =
+            point_line_projection( closest_on_segment, line );
+        const auto distance =
+            point_point_distance( closest_on_line, closest_on_segment );
+        return { distance, std::move( closest_on_segment ),
+            std::move( closest_on_line ) };
     }
 
     template < index_t dimension >

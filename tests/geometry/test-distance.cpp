@@ -670,6 +670,22 @@ void test_segment_line_distance()
             && closest_point1.inexact_equal( result_t21 ),
         "Wrong result for segment_line_distance with segment_cd and "
         "line_gh" );
+
+    // Segment crossing the line with a small angle
+    const geode::Point3D crossing0{ { -0x1.d217e6a2b9835p-2,
+        0x1.2d7a3e4d36a0dp+0, 0x1.f95b042ceb769p+1 } };
+    const geode::Point3D crossing1{ { 0x1.c368600c0a464p+1,
+        -0x1.f773fba948789p+1, -0x1.c91c9b10917e6p+0 } };
+    const geode::Point3D line0{ { 0x1.0b43bdbc176a1p+0, -0x1.7e46c373d79acp-1,
+        0x1.ca108c904092p+0 } };
+    const geode::Point3D line1{ { 0x1.5da7ed7f00da8p+1, -0x1.74d936f7869a6p+1,
+        -0x1.4824c8f17df74p-1 } };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_line_distance( geode::Segment3D{ crossing0, crossing1 },
+            geode::InfiniteLine3D{ geode::Segment3D{ line0, line1 } } );
+    geode::OpenGeodeGeometryException::test( distance < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_line_distance with small angle crossing: ",
+        distance );
 }
 
 void test_point_triangle_distance()
@@ -1221,7 +1237,8 @@ void test_line_triangle_distance()
     const geode::Point3D result_t10{ { 1.0, 1.0, 1.0 } };
     const geode::Point3D result_t11{ { 1.0, 1.0, 1.0 } };
     geode::OpenGeodeGeometryException::test(
-        distance == 0. && closest_point0.inexact_equal( result_t10 )
+        distance < geode::GLOBAL_EPSILON
+            && closest_point0.inexact_equal( result_t10 )
             && closest_point1.inexact_equal( result_t11 ),
         "Wrong result for line_triangle_distance with line_ef" );
 
@@ -1289,7 +1306,8 @@ void test_segment_triangle_distance()
     const geode::Point3D result_t10{ { 1.0, 1.0, 1.0 } };
     const geode::Point3D result_t11{ { 1.0, 1.0, 1.0 } };
     geode::OpenGeodeGeometryException::test(
-        distance == 0. && closest_point0.inexact_equal( result_t10 )
+        distance < geode::GLOBAL_EPSILON
+            && closest_point0.inexact_equal( result_t10 )
             && closest_point1.inexact_equal( result_t11 ),
         "Wrong result for segment_triangle_distance with seg_ef" );
 
