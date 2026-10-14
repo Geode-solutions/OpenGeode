@@ -514,17 +514,18 @@ namespace geode
                 const index_t vertex_id,
                 const std::optional< PolygonVertex >& first_polygon ) const
         {
-            const auto& cached = polygons_around_vertex_[vertex_id];
-            if( cached.computed() && first_polygon
-                && absl::c_contains(
-                    cached.value().polygons, first_polygon.value() ) )
-            {
-                return cached.value();
-            }
-            cached.reset();
-            cached( compute_polygons_around_vertex, mesh, vertex_id,
+            return polygons_around_vertex_[vertex_id].recompute_if_invalid(
+                [&first_polygon](
+                    const internal::PolygonsAroundVertexImpl& value ) {
+                    if( !first_polygon )
+                    {
+                        return value.polygons.empty();
+                    }
+                    return absl::c_contains(
+                        value.polygons, first_polygon.value() );
+                },
+                compute_polygons_around_vertex, mesh, vertex_id,
                 first_polygon );
-            return cached.value();
         }
 
     private:

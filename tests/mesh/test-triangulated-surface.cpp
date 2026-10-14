@@ -21,6 +21,13 @@
  *
  */
 
+#include <atomic>
+#include <cmath>
+
+#include <absl/algorithm/container.h>
+
+#include <async++.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -453,6 +460,105 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_triangulated_surface< 3 >( filename ) );
 }
 
+std::unique_ptr< geode::TriangulatedSurface2D > create_fans(
+    geode::index_t nb_fans, geode::index_t fan_size )
+{
+    auto surface = geode::TriangulatedSurface2D::create(
+        geode::OpenGeodeTriangulatedSurface2D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
+    for( const auto fan : geode::Range{ nb_fans } )
+    {
+        const auto offset = 10. * fan;
+        const auto center =
+            builder->create_point( geode::Point2D{ { offset, 0 } } );
+        const auto first_ring = surface->nb_vertices();
+        for( const auto v : geode::Range{ fan_size } )
+        {
+            const auto angle = 2. * M_PI * v / fan_size;
+            builder->create_point( geode::Point2D{
+                { offset + std::cos( angle ), std::sin( angle ) } } );
+        }
+        // Even fans are closed (interior center), odd fans are open
+        // (center on border)
+        const auto nb_triangles = fan % 2 == 0 ? fan_size : fan_size - 1;
+        for( const auto t : geode::Range{ nb_triangles } )
+        {
+            builder->create_triangle(
+                { center, first_ring + t, first_ring + ( t + 1 ) % fan_size } );
+        }
+    }
+    // Isolated vertex
+    builder->create_point( geode::Point2D{ { -10, -10 } } );
+    builder->compute_polygon_adjacencies();
+    return surface;
+}
+
+void test_concurrent_polygons_around_vertex()
+{
+    constexpr geode::index_t NB_FANS{ 40 };
+    constexpr geode::index_t FAN_SIZE{ 24 };
+    constexpr geode::index_t NB_ROUNDS{ 20 };
+    constexpr geode::index_t NB_REPEATS{ 16 };
+    const auto reference = create_fans( NB_FANS, FAN_SIZE );
+    const auto nb_vertices = reference->nb_vertices();
+    std::vector< std::vector< geode::PolygonVertex > > expected_polygons(
+        nb_vertices );
+    std::vector< bool > expected_borders( nb_vertices );
+    for( const auto v : geode::Range{ nb_vertices } )
+    {
+        const auto& polygons = reference->polygons_around_vertex( v );
+        expected_polygons[v].assign( polygons.begin(), polygons.end() );
+        absl::c_sort( expected_polygons[v] );
+        expected_borders[v] = reference->is_vertex_on_border( v );
+    }
+    const auto isolated_vertex = nb_vertices - 1;
+    geode::OpenGeodeMeshException::test(
+        expected_polygons[isolated_vertex].empty()
+            && expected_borders[isolated_vertex],
+        "[Test] Wrong polygons around isolated vertex" );
+    geode::OpenGeodeMeshException::test(
+        expected_polygons[0].size() == FAN_SIZE && !expected_borders[0],
+        "[Test] Wrong polygons around closed fan center" );
+    geode::OpenGeodeMeshException::test(
+        expected_polygons[FAN_SIZE + 1].size() == FAN_SIZE - 1
+            && expected_borders[FAN_SIZE + 1],
+        "[Test] Wrong polygons around open fan center" );
+    for( const auto round : geode::Range{ NB_ROUNDS } )
+    {
+        geode_unused( round );
+        const auto surface = create_fans( NB_FANS, FAN_SIZE );
+        std::atomic< geode::index_t > nb_errors{ 0 };
+        async::parallel_for(
+            async::irange( geode::index_t{ 0 }, nb_vertices * NB_REPEATS ),
+            [&]( geode::index_t i ) {
+                const auto v = i % nb_vertices;
+                bool on_border;
+                std::vector< geode::PolygonVertex > polygons;
+                if( i % 2 == 0 )
+                {
+                    on_border = surface->is_vertex_on_border( v );
+                    const auto& around = surface->polygons_around_vertex( v );
+                    polygons.assign( around.begin(), around.end() );
+                }
+                else
+                {
+                    const auto& around = surface->polygons_around_vertex( v );
+                    polygons.assign( around.begin(), around.end() );
+                    on_border = surface->is_vertex_on_border( v );
+                }
+                absl::c_sort( polygons );
+                if( polygons != expected_polygons[v]
+                    || on_border != expected_borders[v] )
+                {
+                    nb_errors++;
+                }
+            } );
+        geode::OpenGeodeMeshException::test( nb_errors == 0,
+            "[Test] Wrong concurrent polygons around vertex (",
+            nb_errors.load(), " errors)" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -470,6 +576,7 @@ void test()
     test_permutation( *surface, *builder );
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );
+    test_concurrent_polygons_around_vertex();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

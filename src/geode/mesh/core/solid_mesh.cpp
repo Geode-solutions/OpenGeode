@@ -692,18 +692,18 @@ namespace geode
                 const std::optional< PolyhedronVertex >& first_polyhedron )
                 const
         {
-            const auto& cached = polyhedra_around_vertex_[vertex_id];
-            if( cached.computed()
-                && ( first_polyhedron
-                     && absl::c_contains( cached.value().polyhedra,
-                         first_polyhedron.value() ) ) )
-            {
-                return cached.value();
-            }
-            cached.reset();
-            cached( compute_polyhedra_around_vertex, mesh, vertex_id,
+            return polyhedra_around_vertex_[vertex_id].recompute_if_invalid(
+                [&first_polyhedron](
+                    const internal::PolyhedraAroundVertexImpl& value ) {
+                    if( !first_polyhedron )
+                    {
+                        return value.polyhedra.empty();
+                    }
+                    return absl::c_contains(
+                        value.polyhedra, first_polyhedron.value() );
+                },
+                compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
-            return cached.value();
         }
 
         Impl() = default;

@@ -84,6 +84,34 @@ namespace geode
             return value_;
         }
 
+        /*!
+         * Return the cached value if it is computed and accepted by the
+         * validator, otherwise (re)compute it.
+         * The decision to recompute is checked again under the lock, so
+         * concurrent const callers never overwrite a valid cached value.
+         * @param[in] is_valid Callable taking the cached value and returning
+         * true if it can still be used.
+         */
+        template < typename Validator, typename... Args >
+        const ReturnType& recompute_if_invalid( const Validator& is_valid,
+            CachedFunction< Args... > computer,
+            Args&&... args ) const
+        {
+            if( computed_ && is_valid( value_ ) )
+            {
+                return value_;
+            }
+            absl::MutexLock lock{ mutex_ };
+            if( !computed_ || !is_valid( value_ ) )
+            {
+                auto new_value = computer( std::forward< Args >( args )... );
+                computed_ = false;
+                value_ = std::move( new_value );
+                computed_ = true;
+            }
+            return value_;
+        }
+
         bool operator==( const CachedValue& other ) const
         {
             if( computed() && other.computed() )
