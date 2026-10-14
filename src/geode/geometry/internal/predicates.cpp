@@ -881,8 +881,9 @@ namespace GEO
     // Values for IEEE 754 doubles, as computed by PCK::initialize(): set at
     // compile time for the predicates to be exact even if the library has
     // not been initialized.
+    constexpr double DOUBLE_EPSILON = 1.1102230246251565404e-16; // 2^-53
     double expansion_splitter_ = 134217729.0; // 2^27 + 1
-    double expansion_epsilon_ = 1.1102230246251565404e-16; // 2^-53
+    double expansion_epsilon_ = DOUBLE_EPSILON;
 
     // =============  expansion sum and difference =========================
 
@@ -1465,11 +1466,11 @@ namespace GEO
                > 8.88720573725927976811e-16 * ( max1 * max2 );
     }
 
-    // Returns 1 if the points are certainly not aligned, FPG_UNCERTAIN_VALUE
-    // otherwise. The points are aligned if and only if the three components
+    // Returns true if the points are certainly not aligned, false if
+    // uncertain. The points are aligned if and only if the three components
     // of (p1-p0)x(p2-p0) are zero: one component certified non-zero is
     // enough to conclude.
-    inline int aligned_3d_filter( const geode::Point3D& p0,
+    inline bool is_certainly_not_aligned_3d( const geode::Point3D& p0,
         const geode::Point3D& p1,
         const geode::Point3D& p2 )
     {
@@ -1482,16 +1483,12 @@ namespace GEO
         const double max_x = std::max( std::fabs( a11 ), std::fabs( a21 ) );
         const double max_y = std::max( std::fabs( a12 ), std::fabs( a22 ) );
         const double max_z = std::max( std::fabs( a13 ), std::fabs( a23 ) );
-        if( is_det_2d_certainly_non_zero(
-                ( a12 * a23 ) - ( a22 * a13 ), max_y, max_z )
-            || is_det_2d_certainly_non_zero(
-                ( a13 * a21 ) - ( a23 * a11 ), max_z, max_x )
-            || is_det_2d_certainly_non_zero(
-                ( a11 * a22 ) - ( a21 * a12 ), max_x, max_y ) )
-        {
-            return 1;
-        }
-        return FPG_UNCERTAIN_VALUE;
+        return is_det_2d_certainly_non_zero(
+                   ( a12 * a23 ) - ( a22 * a13 ), max_y, max_z )
+               || is_det_2d_certainly_non_zero(
+                   ( a13 * a21 ) - ( a23 * a11 ), max_z, max_x )
+               || is_det_2d_certainly_non_zero(
+                   ( a11 * a22 ) - ( a21 * a12 ), max_x, max_y );
     }
 
     /******* zero-filters *******/
@@ -1610,7 +1607,7 @@ namespace GEO
     // result.
     namespace adaptive
     {
-        constexpr double EPSILON = 1.1102230246251565404e-16; // 2^-53
+        constexpr double EPSILON = DOUBLE_EPSILON;
         constexpr double RESULT_ERRBOUND = ( 3.0 + 8.0 * EPSILON ) * EPSILON;
         constexpr double CCW_ERRBOUND_B = ( 2.0 + 12.0 * EPSILON ) * EPSILON;
         constexpr double CCW_ERRBOUND_C =
@@ -1658,6 +1655,10 @@ namespace GEO
             two_one_diff( ab1, ab0, cd0, j, r0, x[0] );
             two_one_diff( j, r0, cd1, x[3], x[2], x[1] );
         }
+
+        // Array versions of the GEO::expansion functions above: the adaptive
+        // stages work on fixed size stack arrays instead of allocated
+        // expansions, which is where their speed comes from.
 
         // h cannot be e or f.
         inline int fast_expansion_sum_zeroelim(
@@ -1818,7 +1819,11 @@ namespace GEO
 
         inline SIGN sign_of( double value )
         {
-            return value > 0. ? positive : negative;
+            if( value > 0. )
+            {
+                return positive;
+            }
+            return value < 0. ? negative : zero;
         }
 
         // Exact (a1 + a0) * b as a 4 components expansion
@@ -2301,7 +2306,7 @@ namespace GEO
             const geode::Point3D& p1,
             const geode::Point3D& p2 )
         {
-            if( aligned_3d_filter( p0, p1, p2 ) != FPG_UNCERTAIN_VALUE )
+            if( is_certainly_not_aligned_3d( p0, p1, p2 ) )
             {
                 return false;
             }

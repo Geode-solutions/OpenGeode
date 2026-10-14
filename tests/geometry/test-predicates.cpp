@@ -334,6 +334,28 @@ namespace
             "[Test] Wrong orient_3d on nearly collinear coplanar points" );
     }
 
+    // Positive determinants whose products all underflow to zero, while no
+    // coordinate difference is zero: out of the exact range of the adaptive
+    // stages, the result may be zero but must never be the opposite sign.
+    void test_underflow()
+    {
+        const auto tiny = 1e-170;
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_2d( geode::Point2D{ { 0, 0 } },
+                geode::Point2D{ { tiny, tiny } },
+                geode::Point2D{ { tiny, 3 * tiny } } )
+                != GEO::negative,
+            "[Test] Wrong orient_2d on underflowing products" );
+        const auto small = 1e-110;
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_3d( geode::Point3D{ { 0, 0, 0 } },
+                geode::Point3D{ { small, 0, 0 } },
+                geode::Point3D{ { 0, small, 0 } },
+                geode::Point3D{ { 0, 0, small } } )
+                != GEO::negative,
+            "[Test] Wrong orient_3d on underflowing products" );
+    }
+
     // Nearly degenerate configurations, decided by different evaluation
     // stages: the sign must not depend on the order of the points.
     void test_nearly_degenerate_consistency()
@@ -2147,6 +2169,7 @@ void test()
     test_dot_3d();
     test_dot_2d();
     test_exact_degenerate();
+    test_underflow();
     test_nearly_degenerate_consistency();
     test_integer_configurations();
     test_regression_cases();
