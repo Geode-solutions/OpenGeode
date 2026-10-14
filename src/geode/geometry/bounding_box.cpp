@@ -293,6 +293,8 @@ namespace geode
     void BoundingBox< dimension >::add_box(
         const BoundingBox< dimension >& box )
     {
+        // Not add_point( box.min_ ) and add_point( box.max_ ): an empty box
+        // (min = +DBL_MAX, max = -DBL_MAX) would then fill this box
         for( const auto i : LRange{ dimension } )
         {
             min_.set_value(
