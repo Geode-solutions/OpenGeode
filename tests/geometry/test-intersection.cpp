@@ -1079,8 +1079,47 @@ void test_segment_ellipse_intersection()
     test_segment_ellipse_intersection_3D();
 }
 
+void test_small_sphere_intersection()
+{
+    const geode::Point2D origin{ { 0.0, 0.0 } };
+    const geode::Sphere2D small{ origin, 1e-4 };
+    const geode::InfiniteLine2D far_line{ geode::Vector2D{ { 1, 0 } },
+        geode::Point2D{ { 0, 5e-4 } } };
+    const auto far = geode::line_sphere_intersection( far_line, small );
+    geode::OpenGeodeGeometryException::test(
+        far.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for line_sphere_intersection with line far from a small "
+        "sphere" );
+
+    const geode::InfiniteLine2D center_line{ geode::Vector2D{ { 1, 0 } },
+        geode::Point2D{ { -1, 0 } } };
+    const auto crossing = geode::line_sphere_intersection( center_line, small );
+    geode::OpenGeodeGeometryException::test(
+        crossing.has_intersection() && crossing.result->size() == 2,
+        "Wrong result for line_sphere_intersection with line crossing a small "
+        "sphere" );
+    for( const auto& point : crossing.result.value() )
+    {
+        geode::OpenGeodeGeometryException::test(
+            std::get< 0 >( geode::point_sphere_distance( point, small ) )
+                < geode::GLOBAL_EPSILON,
+            "Wrong point for line_sphere_intersection with line crossing a "
+            "small sphere" );
+    }
+
+    const geode::Sphere2D unit{ origin, 1 };
+    const geode::Point2D on_sphere{ { 1.0, 0.0 } };
+    const geode::Point2D close{ { 1.0 + 1e-7, 0.0 } };
+    const auto tiny = geode::segment_sphere_intersection(
+        geode::Segment2D{ on_sphere, close }, unit );
+    geode::OpenGeodeGeometryException::test(
+        tiny.has_intersection() && tiny.result->size() == 1,
+        "Wrong result for segment_sphere_intersection with tiny segment" );
+}
+
 void test()
 {
+    test_small_sphere_intersection();
     test_line_sphere_intersection();
     test_segment_sphere_intersection();
     test_line_line_intersection();

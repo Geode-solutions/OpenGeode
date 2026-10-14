@@ -133,77 +133,52 @@ namespace geode
         line_sphere_intersection( const InfiniteLine< dimension >& line,
             const Sphere< dimension >& sphere )
     {
-        // The sphere is (X-C)^T*(X-C)-1 = 0 and the line is X = P+t*D.
-        // Substitute the line equation into the sphere equation to obtain a
-        // quadratic equation Q(t) = t^2 + 2*a1*t + a0 = 0, where a1 =
-        // D^T*(P-C),
-        // and a0 = (P-C)^T*(P-C)-1.
-        const Vector< dimension > diff{ sphere.origin(), line.origin() };
-        const auto a0 = diff.dot( diff ) - sphere.radius() * sphere.radius();
-        const auto a1 = line.direction().dot( diff );
-
-        // Intersection occurs when Q(t) has real roots.
-        const auto discr = a1 * a1 - a0;
-        if( discr > GLOBAL_EPSILON ) // positive
+        // Compare the distance between the sphere center and the line with
+        // the sphere radius
+        const auto& center = sphere.origin();
+        const auto radius = sphere.radius();
+        const auto foot = point_line_projection( center, line );
+        const auto height = point_point_distance( center, foot );
+        if( height > radius + GLOBAL_EPSILON )
         {
-            absl::InlinedVector< Point< dimension >, 2 > results;
-            const auto root = std::sqrt( discr );
-            results.reserve( 2 );
-            results.emplace_back(
-                line.origin() + line.direction() * ( -a1 - root ) );
-            results.emplace_back(
-                line.origin() + line.direction() * ( -a1 + root ) );
-            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
-                2 > >::Correctness first_correctness;
-            first_correctness.first =
-                point_line_distance( results.front(), line ) <= GLOBAL_EPSILON;
-            first_correctness.second.push_back(
-                point_line_projection( results.front(), line ) );
+            return { INTERSECTION_TYPE::none };
+        }
+        const auto half_chord =
+            height < radius
+                ? std::sqrt( ( radius - height ) * ( radius + height ) )
+                : 0.;
+        absl::InlinedVector< Point< dimension >, 2 > results;
+        if( half_chord <= GLOBAL_EPSILON )
+        {
+            // Tangent line
+            results.emplace_back( foot );
+        }
+        else
+        {
+            results.emplace_back( foot - line.direction() * half_chord );
+            results.emplace_back( foot + line.direction() * half_chord );
+        }
+        typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+            2 > >::Correctness first_correctness;
+        typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+            2 > >::Correctness second_correctness;
+        first_correctness.first = true;
+        second_correctness.first = true;
+        for( const auto& point : results )
+        {
             first_correctness.first =
                 first_correctness.first
-                && point_line_distance( results.back(), line )
-                       <= GLOBAL_EPSILON;
+                && point_line_distance( point, line ) <= GLOBAL_EPSILON;
             first_correctness.second.push_back(
-                point_line_projection( results.back(), line ) );
-            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
-                2 > >::Correctness second_correctness;
-            const auto front_output =
-                point_sphere_distance( results.front(), sphere );
-            second_correctness.first =
-                std::get< 0 >( front_output ) <= GLOBAL_EPSILON;
-            second_correctness.second.push_back(
-                std::get< 1 >( front_output ) );
-            const auto back_output =
-                point_sphere_distance( results.back(), sphere );
+                point_line_projection( point, line ) );
+            const auto output = point_sphere_distance( point, sphere );
             second_correctness.first =
                 second_correctness.first
-                && std::get< 0 >( back_output ) <= GLOBAL_EPSILON;
-            second_correctness.second.push_back( std::get< 1 >( back_output ) );
-            return { std::move( results ),
-                { first_correctness, second_correctness } };
-        }
-        else if( discr > -GLOBAL_EPSILON ) // zero
-        {
-            absl::InlinedVector< Point< dimension >, 2 > results;
-            results.reserve( 1 );
-            results.emplace_back( line.origin() - line.direction() * a1 );
-            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
-                2 > >::Correctness first_correctness;
-            first_correctness.first =
-                point_line_distance( results.front(), line ) <= GLOBAL_EPSILON;
-            first_correctness.second.push_back(
-                point_line_projection( results.front(), line ) );
-            const auto output =
-                point_sphere_distance( results.front(), sphere );
-            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
-                2 > >::Correctness second_correctness;
-            second_correctness.first =
-                std::get< 0 >( output ) <= GLOBAL_EPSILON;
+                && std::get< 0 >( output ) <= GLOBAL_EPSILON;
             second_correctness.second.push_back( std::get< 1 >( output ) );
-            return { std::move( results ),
-                { first_correctness, second_correctness } };
         }
-        return { INTERSECTION_TYPE::none }; // negative
+        return { std::move( results ),
+            { first_correctness, second_correctness } };
     }
 
     template < index_t dimension >
@@ -211,9 +186,26 @@ namespace geode
         segment_sphere_intersection( const Segment< dimension >& segment,
             const Sphere< dimension >& sphere )
     {
+        if( segment.length() <= GLOBAL_EPSILON )
+        {
+            // Segment considered as a point
+            const auto& vertex = segment.vertices()[0].get();
+            const auto output = point_sphere_distance( vertex, sphere );
+            if( std::get< 0 >( output ) > GLOBAL_EPSILON )
+            {
+                return { INTERSECTION_TYPE::none };
+            }
+            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+                2 > >::Correctness first_correctness{ true, { vertex } };
+            typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+                2 > >::Correctness second_correctness{ true,
+                { std::get< 1 >( output ) } };
+            return { absl::InlinedVector< Point< dimension >, 2 >{ vertex },
+                { first_correctness, second_correctness } };
+        }
         auto line_intersections = line_sphere_intersection(
             InfiniteLine< dimension >{ segment }, sphere );
-        if( line_intersections )
+        if( line_intersections.result )
         {
             absl::InlinedVector< Point< dimension >, 2 > segment_intersections;
             segment_intersections.reserve(
