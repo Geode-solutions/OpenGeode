@@ -1435,6 +1435,24 @@ void test_point_ellipse_distance_2d_not_aligned()
         "Wrong result for point_ellipse_distance_2d_not_aligned" );
 }
 
+void test_point_elongated_ellipse_distance()
+{
+    // Query beyond the tip of the long axis: |level - 1| = 5e-7 but distance
+    // 7.75e-6
+    const geode::Point2D center{ { 0, 0 } };
+    const geode::Frame2D axes{ { geode::Vector2D{ { 31, 0 } },
+        geode::Vector2D{ { 0, 0.17 } } } };
+    const geode::Ellipse2D ellipse{ center, axes };
+    const geode::Point2D query{ { 31 * ( 1 + 2.5e-7 ), 0 } };
+    const auto [distance, closest_point] =
+        geode::point_ellipse_distance( query, ellipse );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - 7.75e-6 ) < geode::GLOBAL_EPSILON,
+        "Wrong result for point_ellipse_distance with query beyond the tip "
+        "of an elongated ellipse: ",
+        distance );
+}
+
 void test_point_ellipse_distance_3d()
 {
     const geode::Point3D center{ { 0.0, 0.0, 0.0 } };
@@ -1614,6 +1632,7 @@ void test_point_ellipse_distance()
     test_point_ellipse_distance_2d();
     test_point_ellipse_distance_3d();
     test_point_ellipse_distance_2d_not_aligned();
+    test_point_elongated_ellipse_distance();
 }
 
 void test_triangle_triangle_distance()

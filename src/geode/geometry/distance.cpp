@@ -1449,7 +1449,10 @@ namespace geode
             zPos[i] = locY[i] / locE[i];
             sum_z_squared += zPos[i] * zPos[i];
         }
-        if( std::fabs( sum_z_squared - 1 ) < geode::GLOBAL_EPSILON )
+        // The point is at most (sqrt(sum_z_squared) - 1) * emax away from the
+        // ellipse (emax = locE[0])
+        if( std::fabs( std::sqrt( sum_z_squared ) - 1 ) * locE[0]
+            < geode::GLOBAL_EPSILON )
         {
             for( const auto i : geode::LRange{ number_of_components } )
             {
