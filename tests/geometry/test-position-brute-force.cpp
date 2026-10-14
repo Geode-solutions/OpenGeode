@@ -23,10 +23,10 @@
 
 #include <array>
 #include <cstdint>
-#include <cstdio>
 #include <map>
-#include <random>
 #include <string>
+
+#include <absl/numeric/int128.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
@@ -45,6 +45,8 @@
 
 #include <geode/tests/common.hpp>
 
+#include "brute-force.hpp"
+
 /*
  * Exact predicates are checked on exact constructions: integer vertices and
  * points defined as exact barycentric combinations (weights over a power of
@@ -53,19 +55,10 @@
  */
 namespace
 {
-    using int128 = __int128;
+    // Portable 128 bits integers (no __int128 with MSVC)
+    using int128 = absl::int128;
     constexpr std::int64_t DENOMINATOR{ 1024 };
     constexpr std::int64_t RANGE{ 1 << 20 };
-
-    std::mt19937_64 generator{ 42 };
-    std::map< std::string, int > issues;
-    std::string current_mode;
-
-    std::int64_t random_int( std::int64_t min, std::int64_t max )
-    {
-        return std::uniform_int_distribution< std::int64_t >{ min, max }(
-            generator );
-    }
 
     template < std::size_t dimension >
     using IntPoint = std::array< std::int64_t, dimension >;
@@ -199,24 +192,7 @@ namespace
     template < std::size_t dimension >
     std::string hex( const IntPoint< dimension >& point )
     {
-        std::string result;
-        for( const auto d : geode::LRange{ dimension } )
-        {
-            char buffer[64];
-            std::snprintf( buffer, 64, "%a ",
-                static_cast< double >( point[d] )
-                    / static_cast< double >( DENOMINATOR ) );
-            result += buffer;
-        }
-        return result;
-    }
-
-    void record( const std::string& category, const std::string& details )
-    {
-        if( issues[category + current_mode]++ < 2 )
-        {
-            geode::Logger::warning( category, current_mode, " | ", details );
-        }
+        return hex( to_point( point ) );
     }
 
     void check_position( const std::string& name,
@@ -905,12 +881,7 @@ void test()
     test_segment_segment_detection< 3 >();
     test_segment_triangle_detection();
     test_segment_line_detection();
-    for( const auto& [category, count] : issues )
-    {
-        geode::Logger::info( category, ": ", count );
-    }
-    geode::OpenGeodeGeometryException::test(
-        issues.empty(), "Position issues found" );
+    report_issues( "Position" );
 }
 
 OPENGEODE_TEST( "position-brute-force" )

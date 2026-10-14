@@ -26,7 +26,6 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <random>
 
 #include <geode/basic/range.hpp>
 
@@ -36,6 +35,8 @@
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include "brute-force.hpp"
+
 /*
  * Random geometric configurations for brute force tests: generic and nearly
  * degenerated objects (cap, needle and flat triangles, crossing, coplanar and
@@ -43,14 +44,6 @@
  */
 namespace
 {
-    std::mt19937 generator{ 42 };
-
-    double uniform( double min, double max )
-    {
-        return std::uniform_real_distribution< double >{ min, max }(
-            generator );
-    }
-
     double log_uniform( double min_exponent, double max_exponent )
     {
         return std::pow( 10., uniform( min_exponent, max_exponent ) );
@@ -222,6 +215,7 @@ namespace
 
     /*
      * Orthonormal axes of the plane orthogonal to the given unit normal
+     * (independent of the library implementation on purpose)
      */
     std::array< geode::Vector3D, 2 > plane_axes( const geode::Vector3D& normal )
     {

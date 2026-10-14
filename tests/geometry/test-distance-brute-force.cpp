@@ -25,7 +25,6 @@
 #include <array>
 #include <cmath>
 #include <limits>
-#include <random>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
@@ -47,13 +46,15 @@
 
 #include <geode/tests/common.hpp>
 
+#include "brute-force.hpp"
 #include "random-geometry.hpp"
 
 /*
  * Each distance is checked against a brute force minimum over samples of
  * the objects. The exact distance is below the brute force minimum and above
  * it minus the sampling resolution (largest distance from a point of the
- * sampled object to its closest sample).
+ * sampled object to its closest sample). All failures are reported with the
+ * exact (hexadecimal) inputs before failing.
  */
 namespace
 {
@@ -106,7 +107,7 @@ namespace
         double resolution,
         const Args&... message )
     {
-        geode::OpenGeodeGeometryException::test(
+        check(
             distance <= brute_force + geode::GLOBAL_EPSILON
                 && distance >= brute_force - resolution - geode::GLOBAL_EPSILON,
             message..., ": ", distance, " | brute force: ", brute_force,
@@ -119,13 +120,12 @@ namespace
         const geode::Point< dimension >& closest1,
         const Args&... message )
     {
-        geode::OpenGeodeGeometryException::test(
-            std::fabs(
-                geode::point_point_distance( closest0, closest1 ) - distance )
-                < geode::GLOBAL_EPSILON,
+        check( std::fabs( geode::point_point_distance( closest0, closest1 )
+                          - distance )
+                   < geode::GLOBAL_EPSILON,
             message..., ": distance ", distance,
-            " does not match closest points ", closest0.string(), " and ",
-            closest1.string() );
+            " does not match closest points ", hex( closest0 ), " and ",
+            hex( closest1 ) );
     }
 
     template < geode::index_t dimension >
@@ -155,8 +155,8 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for point_segment_distance ", dimension,
-                "D with query ", query.string(), " and segment ", p0.string(),
-                " - ", p1.string() );
+                "D with query ", hex( query ), " and segment ", hex( p0 ),
+                " - ", hex( p1 ) );
         }
     }
 
@@ -175,7 +175,7 @@ namespace
             const auto& closest = std::get< 1 >( output );
             check_closest_points( distance, query, closest,
                 "Wrong result for point_triangle_distance ", dimension,
-                "D with query ", query.string() );
+                "D with query ", hex( query ) );
             auto brute_force = std::numeric_limits< double >::max();
             auto closest_to_samples = std::numeric_limits< double >::max();
             const auto resolution = sample_triangle(
@@ -187,14 +187,13 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for point_triangle_distance ", dimension,
-                "D with query ", query.string(), " and triangle ",
-                vertices[0].string(), " - ", vertices[1].string(), " - ",
-                vertices[2].string() );
-            geode::OpenGeodeGeometryException::test(
-                closest_to_samples <= resolution + geode::GLOBAL_EPSILON,
+                "D with query ", hex( query ), " and triangle ",
+                hex( vertices[0] ), " - ", hex( vertices[1] ), " - ",
+                hex( vertices[2] ) );
+            check( closest_to_samples <= resolution + geode::GLOBAL_EPSILON,
                 "Wrong result for point_triangle_distance ", dimension,
-                "D with query ", query.string(), ": closest point ",
-                closest.string(), " not on triangle" );
+                "D with query ", hex( query ), ": closest point ",
+                hex( closest ), " not on triangle" );
         }
     }
 
@@ -211,13 +210,12 @@ namespace
                 geode::segment_triangle_distance( segment, triangle );
             check_closest_points( distance, closest_segment, closest_triangle,
                 "Wrong result for segment_triangle_distance with segment ",
-                points[0].string(), " - ", points[1].string() );
-            geode::OpenGeodeGeometryException::test(
-                geode::point_segment_distance( closest_segment, segment )
-                        < geode::GLOBAL_EPSILON
-                    && std::get< 0 >( geode::point_triangle_distance(
-                           closest_triangle, triangle ) )
-                           < geode::GLOBAL_EPSILON,
+                hex( points[0] ), " - ", hex( points[1] ) );
+            check( geode::point_segment_distance( closest_segment, segment )
+                           < geode::GLOBAL_EPSILON
+                       && std::get< 0 >( geode::point_triangle_distance(
+                              closest_triangle, triangle ) )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for segment_triangle_distance: closest points "
                 "not on objects" );
             auto brute_force = std::numeric_limits< double >::max();
@@ -229,9 +227,9 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for segment_triangle_distance with segment ",
-                points[0].string(), " - ", points[1].string(), " and triangle ",
-                vertices[0].string(), " - ", vertices[1].string(), " - ",
-                vertices[2].string() );
+                hex( points[0] ), " - ", hex( points[1] ), " and triangle ",
+                hex( vertices[0] ), " - ", hex( vertices[1] ), " - ",
+                hex( vertices[2] ) );
         }
     }
 
@@ -255,13 +253,12 @@ namespace
                 geode::line_triangle_distance( line, triangle );
             check_closest_points( distance, closest_line, closest_triangle,
                 "Wrong result for line_triangle_distance with line through ",
-                points[0].string(), " and ", points[1].string() );
-            geode::OpenGeodeGeometryException::test(
-                geode::point_line_distance( closest_line, line )
-                        < geode::GLOBAL_EPSILON
-                    && std::get< 0 >( geode::point_triangle_distance(
-                           closest_triangle, triangle ) )
-                           < geode::GLOBAL_EPSILON,
+                hex( points[0] ), " and ", hex( points[1] ) );
+            check( geode::point_line_distance( closest_line, line )
+                           < geode::GLOBAL_EPSILON
+                       && std::get< 0 >( geode::point_triangle_distance(
+                              closest_triangle, triangle ) )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for line_triangle_distance: closest points not "
                 "on objects" );
             auto brute_force = std::numeric_limits< double >::max();
@@ -272,9 +269,9 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for line_triangle_distance with line through ",
-                points[0].string(), " and ", points[1].string(),
-                " and triangle ", vertices[0].string(), " - ",
-                vertices[1].string(), " - ", vertices[2].string() );
+                hex( points[0] ), " and ", hex( points[1] ), " and triangle ",
+                hex( vertices[0] ), " - ", hex( vertices[1] ), " - ",
+                hex( vertices[2] ) );
         }
     }
 
@@ -302,12 +299,11 @@ namespace
                 geode::segment_line_distance( segment, line );
             check_closest_points( distance, closest_segment, closest_line,
                 "Wrong result for segment_line_distance ", dimension,
-                "D with segment ", p0.string(), " - ", p1.string() );
-            geode::OpenGeodeGeometryException::test(
-                geode::point_segment_distance( closest_segment, segment )
-                        < geode::GLOBAL_EPSILON
-                    && geode::point_line_distance( closest_line, line )
-                           < geode::GLOBAL_EPSILON,
+                "D with segment ", hex( p0 ), " - ", hex( p1 ) );
+            check( geode::point_segment_distance( closest_segment, segment )
+                           < geode::GLOBAL_EPSILON
+                       && geode::point_line_distance( closest_line, line )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for segment_line_distance: closest points not "
                 "on objects" );
             auto brute_force = std::numeric_limits< double >::max();
@@ -318,9 +314,8 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for segment_line_distance ", dimension,
-                "D with segment ", p0.string(), " - ", p1.string(),
-                " and line ", origin.string(), " direction ",
-                direction.string() );
+                "D with segment ", hex( p0 ), " - ", hex( p1 ), " and line ",
+                hex( origin ), " direction ", hex( direction ) );
         }
     }
 
@@ -340,13 +335,12 @@ namespace
             check_closest_points( distance, closest0, closest1,
                 "Wrong result for triangle_triangle_distance with trial ",
                 trial );
-            geode::OpenGeodeGeometryException::test(
-                std::get< 0 >(
-                    geode::point_triangle_distance( closest0, triangle0 ) )
-                        < geode::GLOBAL_EPSILON
-                    && std::get< 0 >( geode::point_triangle_distance(
-                           closest1, triangle1 ) )
-                           < geode::GLOBAL_EPSILON,
+            check( std::get< 0 >(
+                       geode::point_triangle_distance( closest0, triangle0 ) )
+                           < geode::GLOBAL_EPSILON
+                       && std::get< 0 >( geode::point_triangle_distance(
+                              closest1, triangle1 ) )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for triangle_triangle_distance: closest points "
                 "not on triangles" );
             auto brute_force = std::numeric_limits< double >::max();
@@ -365,9 +359,9 @@ namespace
             check_bounds( distance, brute_force,
                 std::min( resolution0, resolution1 ),
                 "Wrong result for triangle_triangle_distance with triangles ",
-                vertices0[0].string(), " - ", vertices0[1].string(), " - ",
-                vertices0[2].string(), " and ", vertices1[0].string(), " - ",
-                vertices1[1].string(), " - ", vertices1[2].string() );
+                hex( vertices0[0] ), " - ", hex( vertices0[1] ), " - ",
+                hex( vertices0[2] ), " and ", hex( vertices1[0] ), " - ",
+                hex( vertices1[1] ), " - ", hex( vertices1[2] ) );
         }
     }
 
@@ -405,26 +399,24 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for point_line_distance ", dimension,
-                "D with query ", query.string(), " and line ", origin.string(),
-                " direction ", direction.string() );
+                "D with query ", hex( query ), " and line ", hex( origin ),
+                " direction ", hex( direction ) );
             if constexpr( dimension == 2 )
             {
                 const auto signed_distance =
                     geode::point_line_signed_distance( query, line );
-                geode::OpenGeodeGeometryException::test(
-                    std::fabs( std::fabs( signed_distance ) - distance )
-                        < geode::GLOBAL_EPSILON,
+                check( std::fabs( std::fabs( signed_distance ) - distance )
+                           < geode::GLOBAL_EPSILON,
                     "Wrong result for point_line_signed_distance with query ",
-                    query.string(), ": ", signed_distance, " | ", distance );
+                    hex( query ), ": ", signed_distance, " | ", distance );
                 if( distance > geode::GLOBAL_EPSILON )
                 {
                     const auto side = geode::point_side_to_line( query, line );
-                    geode::OpenGeodeGeometryException::test(
-                        ( signed_distance > 0 )
-                            == ( side == geode::SIDE::positive ),
+                    check( ( signed_distance > 0 )
+                               == ( side == geode::SIDE::positive ),
                         "Wrong sign for point_line_signed_distance with "
                         "query ",
-                        query.string(), ": ", signed_distance );
+                        hex( query ), ": ", signed_distance );
                 }
             }
         }
@@ -449,12 +441,11 @@ namespace
                 geode::point_plane_distance( query, plane );
             check_closest_points( distance, query, closest,
                 "Wrong result for point_plane_distance with query ",
-                query.string() );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( geode::Vector3D{ origin, closest }.dot( normal ) )
-                    < geode::GLOBAL_EPSILON,
+                hex( query ) );
+            check( std::fabs( geode::Vector3D{ origin, closest }.dot( normal ) )
+                       < geode::GLOBAL_EPSILON,
                 "Wrong result for point_plane_distance with query ",
-                query.string(), ": closest point not on plane" );
+                hex( query ), ": closest point not on plane" );
             const auto half_length =
                 geode::point_point_distance( query, origin ) + 1;
             constexpr geode::index_t nb_samples{ 200 };
@@ -476,22 +467,20 @@ namespace
             check_bounds( distance, brute_force,
                 std::sqrt( 2. ) * half_length / nb_samples,
                 "Wrong result for point_plane_distance with query ",
-                query.string(), " and plane ", origin.string(), " normal ",
-                normal.string() );
+                hex( query ), " and plane ", hex( origin ), " normal ",
+                hex( normal ) );
             const auto [signed_distance, signed_closest] =
                 geode::point_plane_signed_distance( query, plane );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( std::fabs( signed_distance ) - distance )
-                        < geode::GLOBAL_EPSILON
-                    && signed_closest.inexact_equal( closest ),
+            check( std::fabs( std::fabs( signed_distance ) - distance )
+                           < geode::GLOBAL_EPSILON
+                       && signed_closest.inexact_equal( closest ),
                 "Wrong result for point_plane_signed_distance with query ",
-                query.string(), ": ", signed_distance, " | ", distance );
+                hex( query ), ": ", signed_distance, " | ", distance );
             const auto height = geode::Vector3D{ origin, query }.dot( normal );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( height ) <= geode::GLOBAL_EPSILON
-                    || ( signed_distance > 0 ) == ( height > 0 ),
+            check( std::fabs( height ) <= geode::GLOBAL_EPSILON
+                       || ( signed_distance > 0 ) == ( height > 0 ),
                 "Wrong sign for point_plane_signed_distance with query ",
-                query.string(), ": ", signed_distance );
+                hex( query ), ": ", signed_distance );
         }
     }
 
@@ -543,14 +532,13 @@ namespace
                 geode::point_sphere_distance( query, sphere );
             check_closest_points( distance, query, closest,
                 "Wrong result for point_sphere_distance ", dimension,
-                "D with query ", query.string() );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs(
-                    geode::point_point_distance( center, closest ) - radius )
-                    < geode::GLOBAL_EPSILON,
+                "D with query ", hex( query ) );
+            check( std::fabs(
+                       geode::point_point_distance( center, closest ) - radius )
+                       < geode::GLOBAL_EPSILON,
                 "Wrong result for point_sphere_distance ", dimension,
-                "D with query ", query.string(), ": closest point ",
-                closest.string(), " not on sphere" );
+                "D with query ", hex( query ), ": closest point ",
+                hex( closest ), " not on sphere" );
             auto brute_force = std::numeric_limits< double >::max();
             const auto resolution = sample_sphere( center, radius, 100,
                 [&]( const geode::Point< dimension >& sample ) {
@@ -559,32 +547,30 @@ namespace
                 } );
             check_bounds( distance, brute_force, resolution,
                 "Wrong result for point_sphere_distance ", dimension,
-                "D with query ", query.string(), " and sphere ",
-                center.string(), " radius ", radius );
+                "D with query ", hex( query ), " and sphere ", hex( center ),
+                " radius ", radius );
             const auto center_distance =
                 geode::point_point_distance( center, query );
             const auto [signed_distance, signed_closest] =
                 geode::point_sphere_signed_distance( query, sphere );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( std::fabs( signed_distance ) - distance )
-                        < geode::GLOBAL_EPSILON
-                    && ( distance <= geode::GLOBAL_EPSILON
-                         || ( signed_distance > 0 )
-                                == ( center_distance > radius ) ),
+            check( std::fabs( std::fabs( signed_distance ) - distance )
+                           < geode::GLOBAL_EPSILON
+                       && ( distance <= geode::GLOBAL_EPSILON
+                            || ( signed_distance > 0 )
+                                   == ( center_distance > radius ) ),
                 "Wrong result for point_sphere_signed_distance ", dimension,
-                "D with query ", query.string(), ": ", signed_distance, " | ",
+                "D with query ", hex( query ), ": ", signed_distance, " | ",
                 distance );
             const auto [ball_distance, ball_closest] =
                 geode::point_ball_distance( query, sphere );
             const auto expected_ball_distance =
                 center_distance <= radius ? 0. : distance;
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( ball_distance - expected_ball_distance )
-                        < geode::GLOBAL_EPSILON
-                    && ball_closest.inexact_equal(
-                        ball_distance == 0 ? query : closest ),
+            check( std::fabs( ball_distance - expected_ball_distance )
+                           < geode::GLOBAL_EPSILON
+                       && ball_closest.inexact_equal(
+                           ball_distance == 0 ? query : closest ),
                 "Wrong result for point_ball_distance ", dimension,
-                "D with query ", query.string(), ": ", ball_distance, " | ",
+                "D with query ", hex( query ), ": ", ball_distance, " | ",
                 expected_ball_distance );
         }
     }
@@ -609,16 +595,15 @@ namespace
                 geode::point_circle_distance( query, circle );
             check_closest_points( distance, query, closest,
                 "Wrong result for point_circle_distance with query ",
-                query.string() );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs(
-                    geode::point_point_distance( center, closest ) - radius )
-                        < geode::GLOBAL_EPSILON
-                    && std::fabs(
-                           geode::Vector3D{ center, closest }.dot( normal ) )
-                           < geode::GLOBAL_EPSILON,
+                hex( query ) );
+            check( std::fabs(
+                       geode::point_point_distance( center, closest ) - radius )
+                           < geode::GLOBAL_EPSILON
+                       && std::fabs(
+                              geode::Vector3D{ center, closest }.dot( normal ) )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for point_circle_distance with query ",
-                query.string(), ": closest point ", closest.string(),
+                hex( query ), ": closest point ", hex( closest ),
                 " not on circle" );
             constexpr geode::index_t nb_angles{ 4000 };
             auto brute_force = std::numeric_limits< double >::max();
@@ -632,32 +617,31 @@ namespace
             }
             check_bounds( distance, brute_force, M_PI * radius / nb_angles,
                 "Wrong result for point_circle_distance with query ",
-                query.string(), " and circle ", center.string(), " normal ",
-                normal.string(), " radius ", radius );
+                hex( query ), " and circle ", hex( center ), " normal ",
+                hex( normal ), " radius ", radius );
             const auto height = geode::Vector3D{ center, query }.dot( normal );
             const auto [signed_distance, signed_closest] =
                 geode::point_circle_signed_distance( query, circle );
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( std::fabs( signed_distance ) - distance )
-                        < geode::GLOBAL_EPSILON
-                    && ( std::fabs( height ) <= geode::GLOBAL_EPSILON
-                         || ( signed_distance > 0 ) == ( height > 0 ) ),
+            check( std::fabs( std::fabs( signed_distance ) - distance )
+                           < geode::GLOBAL_EPSILON
+                       && ( std::fabs( height ) <= geode::GLOBAL_EPSILON
+                            || ( signed_distance > 0 ) == ( height > 0 ) ),
                 "Wrong result for point_circle_signed_distance with query ",
-                query.string(), ": ", signed_distance, " | ", distance );
+                hex( query ), ": ", signed_distance, " | ", distance );
 
             const auto [disk_distance, disk_closest] =
                 geode::point_disk_distance( query, circle );
             check_closest_points( disk_distance, query, disk_closest,
                 "Wrong result for point_disk_distance with query ",
-                query.string() );
-            geode::OpenGeodeGeometryException::test(
+                hex( query ) );
+            check(
                 geode::point_point_distance( center, disk_closest )
                         <= radius + geode::GLOBAL_EPSILON
                     && std::fabs( geode::Vector3D{ center, disk_closest }.dot(
                            normal ) )
                            < geode::GLOBAL_EPSILON,
                 "Wrong result for point_disk_distance with query ",
-                query.string(), ": closest point ", disk_closest.string(),
+                hex( query ), ": closest point ", hex( disk_closest ),
                 " not on disk" );
             constexpr geode::index_t nb_radii{ 100 };
             constexpr geode::index_t nb_disk_angles{ 400 };
@@ -684,8 +668,8 @@ namespace
             check_bounds( disk_distance, disk_brute_force,
                 radius / ( 2. * nb_radii ) + M_PI * radius / nb_disk_angles,
                 "Wrong result for point_disk_distance with query ",
-                query.string(), " and disk ", center.string(), " normal ",
-                normal.string(), " radius ", radius );
+                hex( query ), " and disk ", hex( center ), " normal ",
+                hex( normal ), " radius ", radius );
         }
     }
     void test_non_conformal_distance()
@@ -705,10 +689,9 @@ namespace
             const geode::Triangle3D triangle1{ vertices1[0], vertices1[1],
                 vertices1[2] };
             const auto context =
-                "triangles " + vertices0[0].string() + " - "
-                + vertices0[1].string() + " - " + vertices0[2].string()
-                + " and " + vertices1[0].string() + " - "
-                + vertices1[1].string() + " - " + vertices1[2].string();
+                "triangles " + hex( vertices0[0] ) + " - " + hex( vertices0[1] )
+                + " - " + hex( vertices0[2] ) + " and " + hex( vertices1[0] )
+                + " - " + hex( vertices1[1] ) + " - " + hex( vertices1[2] );
             const auto result =
                 geode::triangle_triangle_distance_between_non_conformal_parts(
                     triangle0, triangle1 );
@@ -723,21 +706,20 @@ namespace
                 "Wrong result for "
                 "triangle_triangle_distance_between_non_conformal_parts with ",
                 context );
-            geode::OpenGeodeGeometryException::test(
-                std::get< 0 >(
-                    geode::point_triangle_distance( closest0, triangle0 ) )
-                        < geode::GLOBAL_EPSILON
-                    && std::get< 0 >( geode::point_triangle_distance(
-                           closest1, triangle1 ) )
+            check( std::get< 0 >(
+                       geode::point_triangle_distance( closest0, triangle0 ) )
                            < geode::GLOBAL_EPSILON
-                    && distance >= reference - geode::GLOBAL_EPSILON,
+                       && std::get< 0 >( geode::point_triangle_distance(
+                              closest1, triangle1 ) )
+                              < geode::GLOBAL_EPSILON
+                       && distance >= reference - geode::GLOBAL_EPSILON,
                 "Wrong result for "
                 "triangle_triangle_distance_between_non_conformal_parts with ",
                 context, ": ", distance, " | distance ", reference );
             if( shared == 0 && trial % 4 != 1 )
             {
                 // No shared vertex (and no colocated vertices)
-                geode::OpenGeodeGeometryException::test(
+                check(
                     std::fabs( distance - reference ) < geode::GLOBAL_EPSILON,
                     "Wrong result for "
                     "triangle_triangle_distance_between_non_conformal_parts "
@@ -764,7 +746,7 @@ namespace
             const auto folded =
                 geode::triangle_triangle_distance_between_non_conformal_parts(
                     abc, abd );
-            geode::OpenGeodeGeometryException::test(
+            check(
                 folded
                     && std::get< 0 >( folded.value() ) < geode::GLOBAL_EPSILON,
                 "Wrong result for "
@@ -778,10 +760,9 @@ namespace
             const auto conformal =
                 geode::triangle_triangle_distance_between_non_conformal_parts(
                     abc, abe );
-            geode::OpenGeodeGeometryException::test(
-                !conformal
-                    || std::get< 0 >( conformal.value() )
-                           > geode::GLOBAL_EPSILON,
+            check( !conformal
+                       || std::get< 0 >( conformal.value() )
+                              > geode::GLOBAL_EPSILON,
                 "Wrong result for "
                 "triangle_triangle_distance_between_non_conformal_parts with "
                 "conformal triangles sharing an edge, trial ",
@@ -793,10 +774,9 @@ namespace
             const auto crossing =
                 geode::triangle_triangle_distance_between_non_conformal_parts(
                     abc, afg );
-            geode::OpenGeodeGeometryException::test(
-                crossing
-                    && std::get< 0 >( crossing.value() )
-                           < geode::GLOBAL_EPSILON,
+            check( crossing
+                       && std::get< 0 >( crossing.value() )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for "
                 "triangle_triangle_distance_between_non_conformal_parts with "
                 "overlapping triangles sharing a vertex, trial ",
@@ -852,18 +832,17 @@ namespace
             }
             const geode::Segment3D segment0{ p0, p1 };
             const geode::Segment3D segment1{ other[0], other[1] };
-            const auto context = "segments " + p0.string() + " - " + p1.string()
-                                 + " and " + other[0].string() + " - "
-                                 + other[1].string();
+            const auto context = "segments " + hex( p0 ) + " - " + hex( p1 )
+                                 + " and " + hex( other[0] ) + " - "
+                                 + hex( other[1] );
             const auto [distance, closest0, closest1] =
                 geode::segment_segment_distance( segment0, segment1 );
             check_closest_points( distance, closest0, closest1,
                 "Wrong result for segment_segment_distance with ", context );
-            geode::OpenGeodeGeometryException::test(
-                geode::point_segment_distance( closest0, segment0 )
-                        < geode::GLOBAL_EPSILON
-                    && geode::point_segment_distance( closest1, segment1 )
-                           < geode::GLOBAL_EPSILON,
+            check( geode::point_segment_distance( closest0, segment0 )
+                           < geode::GLOBAL_EPSILON
+                       && geode::point_segment_distance( closest1, segment1 )
+                              < geode::GLOBAL_EPSILON,
                 "Wrong result for segment_segment_distance with ", context,
                 ": closest points not on segments" );
             auto brute_force = std::numeric_limits< double >::max();
@@ -961,8 +940,8 @@ namespace
                         + random_direction< dimension >()
                               * ( min_axis * log_uniform( -8, -0.1 ) );
             }
-            std::string context = "query " + query.string() + " and ellipse "
-                                  + center.string() + " axes";
+            std::string context = "query " + hex( query ) + " and ellipse "
+                                  + hex( center ) + " axes";
             for( const auto d : geode::LRange{ dimension } )
             {
                 context += " " + axes.direction( d ).string();
@@ -983,12 +962,11 @@ namespace
                             * ( 2 * center_to_closest.dot( axis )
                                 / ( axis.length2() * axis.length2() ) );
             }
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( ellipse_level( ellipse, closest ) - 1 )
-                        / gradient.length()
-                    < geode::GLOBAL_EPSILON,
+            check( std::fabs( ellipse_level( ellipse, closest ) - 1 )
+                           / gradient.length()
+                       < geode::GLOBAL_EPSILON,
                 "Wrong result for point_ellipse_distance with ", context,
-                ": closest point ", closest.string(), " not on ellipse" );
+                ": closest point ", hex( closest ), " not on ellipse" );
             auto brute_force = std::numeric_limits< double >::max();
             const auto resolution =
                 sample_ellipse( ellipse, dimension == 2 ? 2000 : 150,
@@ -1021,10 +999,10 @@ namespace
             const geode::Tetrahedron tetra{ triangle[0], triangle[1],
                 triangle[2], apex };
             const auto query = random_query( triangle, trial / 12 );
-            const auto context = "query " + query.string() + " and tetrahedron "
-                                 + triangle[0].string() + " - "
-                                 + triangle[1].string() + " - "
-                                 + triangle[2].string() + " - " + apex.string();
+            const auto context = "query " + hex( query ) + " and tetrahedron "
+                                 + hex( triangle[0] ) + " - "
+                                 + hex( triangle[1] ) + " - "
+                                 + hex( triangle[2] ) + " - " + hex( apex );
             const auto [distance, closest] =
                 geode::point_tetrahedron_distance( query, tetra );
             check_closest_points( distance, query, closest,
@@ -1044,8 +1022,7 @@ namespace
             {
                 reference = 0;
             }
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( distance - reference ) < geode::GLOBAL_EPSILON,
+            check( std::fabs( distance - reference ) < geode::GLOBAL_EPSILON,
                 "Wrong result for point_tetrahedron_distance with ", context,
                 ": ", distance, " | expected: ", reference );
         }
@@ -1076,8 +1053,7 @@ void test()
     test_point_tetrahedron_distance();
     test_triangle_triangle_distance();
     test_non_conformal_distance();
-
-    geode::Logger::info( "TEST SUCCESS" );
+    report_issues( "Distance" );
 }
 
 OPENGEODE_TEST( "distance-brute-force" )

@@ -21,7 +21,6 @@
  *
  */
 
-#include <cstdio>
 #include <functional>
 #include <map>
 #include <optional>
@@ -62,30 +61,7 @@
  */
 namespace
 {
-    std::map< std::string, int > issues;
     std::map< std::string, std::array< int, 3 > > coverage;
-    std::string current_mode;
-
-    template < geode::index_t dimension >
-    std::string hex( const geode::Point< dimension >& point )
-    {
-        std::string result;
-        for( const auto d : geode::LRange{ dimension } )
-        {
-            char buffer[64];
-            std::snprintf( buffer, 64, "%a ", point.value( d ) );
-            result += buffer;
-        }
-        return result;
-    }
-
-    void record( const std::string& category, const std::string& details )
-    {
-        if( issues[category + current_mode]++ < 2 )
-        {
-            geode::Logger::warning( category, current_mode, " | ", details );
-        }
-    }
 
     const char* type_name( geode::INTERSECTION_TYPE type )
     {
@@ -1249,12 +1225,7 @@ void test()
         geode::Logger::info( name, ": ", counts[0], " cases, ", counts[1],
             " with known count, ", counts[2], " intersecting" );
     }
-    for( const auto& [category, count] : issues )
-    {
-        geode::Logger::info( category, ": ", count );
-    }
-    geode::OpenGeodeGeometryException::test(
-        issues.empty(), "Intersection issues found" );
+    report_issues( "Intersection" );
 }
 
 OPENGEODE_TEST( "intersection-brute-force" )
