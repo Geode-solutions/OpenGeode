@@ -85,6 +85,12 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-intersection-brute-force.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-intersection.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
