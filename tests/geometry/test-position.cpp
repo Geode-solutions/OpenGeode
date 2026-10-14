@@ -569,8 +569,42 @@ void test_point_side_to_triangle()
         "q3" );
 }
 
+void test_point_negative_tetrahedron_position()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
+    const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
+    // Negatively oriented tetrahedron
+    const geode::Tetrahedron tetra{ a, c, b, d };
+    const geode::Point3D inside{ { 0.25, 0.25, 0.25 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( inside, tetra )
+            == geode::POSITION::inside,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and inside point" );
+    const geode::Point3D on_edge{ { 0.5, 0.5, 0.0 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( on_edge, tetra )
+            == geode::POSITION::edge12,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and point on edge" );
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( d, tetra )
+            == geode::POSITION::vertex3,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and vertex" );
+    const geode::Point3D outside{ { 1.0, 1.0, 1.0 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( outside, tetra )
+            == geode::POSITION::outside,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and outside point" );
+}
+
 void test()
 {
+    test_point_negative_tetrahedron_position();
     test_point_side_to_segment();
     test_point_side_to_plane();
     test_point_side_to_triangle();
