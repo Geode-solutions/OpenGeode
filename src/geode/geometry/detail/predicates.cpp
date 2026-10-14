@@ -881,8 +881,9 @@ namespace GEO
     // Statically initialized with the IEEE-754 double values computed by
     // PCK::initialize(), so that exact predicates are correct even if the
     // library was not initialized.
-    double expansion_splitter_{ 134217729.0 }; // 2^27 + 1
-    double expansion_epsilon_{ 1.1102230246251565e-16 }; // 2^-53
+    constexpr double DOUBLE_EPSILON = 1.1102230246251565404e-16; // 2^-53
+    double expansion_splitter_ = 134217729.0; // 2^27 + 1
+    double expansion_epsilon_ = DOUBLE_EPSILON;
 
     // =============  expansion sum and difference =========================
 
