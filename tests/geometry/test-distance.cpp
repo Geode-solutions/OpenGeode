@@ -1310,7 +1310,8 @@ void test_degenerated_segment_triangle_distance()
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Triangle3D triangle{ a, b, c };
-    for( const auto length : { 4e-7, 1e-7 } )
+    for( const auto length :
+        { 0.4 * geode::GLOBAL_EPSILON, 0.1 * geode::GLOBAL_EPSILON } )
     {
         const geode::Point3D p0{ { 0.2, 0.2, 1.0 } };
         const geode::Point3D p1{ { 0.2, 0.2 + length, 1.0 } };
@@ -1391,13 +1392,13 @@ void test_random_triangle_triangle_distance()
         const auto [distance, point0, point1] =
             geode::triangle_triangle_distance( triangle0, triangle1 );
         geode::OpenGeodeGeometryException::test(
-            std::fabs( distance - reference ) <= 1e-12,
+            std::fabs( distance - reference ) <= geode::GLOBAL_EPSILON,
             "Wrong triangle_triangle_distance on random triangles: ", distance,
             " vs ", reference );
         geode::OpenGeodeGeometryException::test(
             std::fabs(
                 geode::point_point_distance( point0, point1 ) - distance )
-                <= 1e-12,
+                <= geode::GLOBAL_EPSILON,
             "Wrong triangle_triangle_distance closest points" );
     }
 }
@@ -1511,10 +1512,10 @@ void test_point_segment_line_distance_accuracy()
         geode::OpenGeodeGeometryException::test(
             std::fabs( geode::point_point_distance( far_point, line_projection )
                        - line_distance )
-                <= 1e-12,
+                <= geode::GLOBAL_EPSILON,
             "Inconsistent point_line_distance and point_line_projection" );
         geode::OpenGeodeGeometryException::test(
-            std::fabs( line_distance - line_reference ) < 1e-9,
+            std::fabs( line_distance - line_reference ) < geode::GLOBAL_EPSILON,
             "Inaccurate point_line_distance: ", line_distance, " vs ",
             static_cast< double >( line_reference ) );
 
@@ -1529,17 +1530,18 @@ void test_point_segment_line_distance_accuracy()
         geode::OpenGeodeGeometryException::test(
             std::fabs( geode::point_point_distance( point, segment_projection )
                        - segment_distance )
-                <= 1e-12,
+                <= geode::GLOBAL_EPSILON,
             "Inconsistent point_segment_distance and "
             "point_segment_projection" );
         geode::OpenGeodeGeometryException::test(
-            std::fabs( segment_distance - segment_reference ) < 1e-9,
+            std::fabs( segment_distance - segment_reference )
+                < geode::GLOBAL_EPSILON,
             "Inaccurate point_segment_distance: ", segment_distance, " vs ",
             static_cast< double >( segment_reference ) );
     }
 
     const geode::Point3D a{ { 1, 1, 1 } };
-    const geode::Point3D b{ { 1, 1, 1 + 5e-7 } };
+    const geode::Point3D b{ { 1, 1, 1 + 0.5 * geode::GLOBAL_EPSILON } };
     const geode::Segment3D degenerated{ a, b };
     const geode::Point3D q{ { 2, 1, 1 } };
     geode::OpenGeodeGeometryException::test(

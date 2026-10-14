@@ -158,8 +158,8 @@ void test_scale_invariant_quality()
     for( const auto q : geode::LRange{ 4 } )
     {
         geode::OpenGeodeGeometryException::test(
-            std::fabs( reference[q] - 1 ) < 1e-9
-                && std::fabs( small[q] - reference[q] ) < 1e-9,
+            std::fabs( reference[q] - 1 ) < geode::GLOBAL_EPSILON
+                && std::fabs( small[q] - reference[q] ) < geode::GLOBAL_EPSILON,
             "Wrong quality ", q, " for small regular tetrahedron: ", small[q],
             " vs ", reference[q] );
     }

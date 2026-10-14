@@ -361,7 +361,8 @@ void test_large_triangle3d_epsilon_intersections()
     box.add_point( geode::Point3D{ { 1, 1, 1 } } );
     const auto size = 2e4;
     for( const auto& [offset, expected] :
-        { std::make_pair( 0.5e-6, true ), std::make_pair( 1e-3, false ) } )
+        { std::make_pair( 0.5 * geode::GLOBAL_EPSILON, true ),
+            std::make_pair( 1e-3, false ) } )
     {
         const geode::Point3D a{ { -size, -size, 1 + offset } };
         const geode::Point3D b{ { size, -size, 1 + offset } };
