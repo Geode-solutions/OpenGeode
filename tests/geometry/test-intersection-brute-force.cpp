@@ -717,48 +717,6 @@ namespace
         }
     }
 
-    template < geode::index_t dimension >
-    geode::Frame< dimension > random_frame(
-        double min_exponent, double max_exponent )
-    {
-        std::array< geode::Vector< dimension >, dimension > directions;
-        const auto first = random_direction< dimension >();
-        directions[0] = first;
-        if constexpr( dimension == 2 )
-        {
-            directions[1] =
-                geode::Vector2D{ { -first.value( 1 ), first.value( 0 ) } };
-        }
-        else
-        {
-            const auto axes = plane_axes( first );
-            directions[1] = axes[0];
-            directions[2] = axes[1];
-        }
-        for( auto& direction : directions )
-        {
-            direction = direction * log_uniform( min_exponent, max_exponent );
-        }
-        return geode::Frame< dimension >{ directions };
-    }
-
-    template < geode::index_t dimension >
-    double ellipse_level( const geode::Ellipse< dimension >& ellipse,
-        const geode::Point< dimension >& point )
-    {
-        const geode::Vector< dimension > center_to_point{ ellipse.center(),
-            point };
-        double level{ 0 };
-        for( const auto d : geode::LRange{ dimension } )
-        {
-            const auto& axis = ellipse.axes().direction( d );
-            const auto coordinate =
-                center_to_point.dot( axis ) / axis.length2();
-            level += coordinate * coordinate;
-        }
-        return level;
-    }
-
     /*
      * Random line through or around an object of given center and size:
      * random, close to the center, or at a distance close to the size
