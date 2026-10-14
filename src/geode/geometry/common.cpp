@@ -24,7 +24,7 @@
 #include <geode/geometry/common.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
-#include <geode/geometry/predicates.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 
 namespace geode
 {

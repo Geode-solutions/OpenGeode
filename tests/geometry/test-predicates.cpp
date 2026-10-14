@@ -31,8 +31,8 @@
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/detail/predicates.hpp>
 #include <geode/geometry/point.hpp>
-#include <geode/geometry/predicates.hpp>
 #include <geode/geometry/vector.hpp>
 
 #include <geode/tests/common.hpp>
