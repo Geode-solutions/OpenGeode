@@ -297,6 +297,22 @@ namespace
                 == GEO::zero,
             "[Test] Wrong orient_2d on points of line y = 3x with inexact "
             "differences" );
+
+        // Nearly collinear points, exactly coplanar: requires all the
+        // roundoff error terms of the coordinate differences, including
+        // the products of three of them.
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_3d(
+                geode::Point3D{ { 0x1.47d6541ade7cdp+6, 0x1.896798203e2f6p+4,
+                    0x1.caf8dc259de1ep+5 } },
+                geode::Point3D{ { -0x1.73ff1093c559p+9, -0x1.be654717b99ep+7,
+                    -0x1.0465becdd6f18p+9 } },
+                geode::Point3D{ { 0x1.22acf2099e883p+9, 0x1.5ccf88d857d6ap+7,
+                    0x1.96f21fa711251p+8 } },
+                geode::Point3D{ { 0x1.0dfd21cd4d26ap+3, 0x1.43fc8ef65c94cp+1,
+                    0x1.79fbfc1f6c02fp+2 } } )
+                == GEO::zero,
+            "[Test] Wrong orient_3d on nearly collinear coplanar points" );
     }
 
     // Nearly degenerate configurations, decided by different evaluation

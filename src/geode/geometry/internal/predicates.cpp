@@ -1599,14 +1599,15 @@ namespace GEO
 
     /******* adaptive stages *******/
 
-    // Stages B and C of the adaptive predicates of J. R. Shewchuk, "Adaptive
+    // Stages B, C and D of the adaptive predicates of J. R. Shewchuk, "Adaptive
     // Precision Floating-Point Arithmetic and Fast Robust Geometric
     // Predicates", 1997 (predicates.c, public domain). They are evaluated
     // when the floating-point filter fails: stage B computes exactly the
     // determinant of the rounded coordinate differences, with short
     // expansions. Stage C checks whether these differences were exact, or
     // adds the first order corrections of their roundoff errors. If still
-    // uncertain, the full exact evaluation is required.
+    // uncertain, stage D adds exactly all the remaining terms to the stage B
+    // result.
     namespace adaptive
     {
         constexpr double EPSILON = 1.1102230246251565404e-16; // 2^-53
@@ -1820,11 +1821,48 @@ namespace GEO
             return value > 0. ? positive : negative;
         }
 
-        // Returns true if the sign of (p1-p0)x(p2-p0) has been determined
-        inline bool orient_2d( const geode::Point2D& p0,
+        // Exact (a1 + a0) * b as a 4 components expansion
+        inline void two_one_product(
+            double a1, double a0, double b, double x[4] )
+        {
+            double i;
+            two_product( a0, b, i, x[0] );
+            double j;
+            double r0;
+            two_product( a1, b, j, r0 );
+            double k;
+            two_sum( i, r0, k, x[1] );
+            fast_two_sum( j, k, x[3], x[2] );
+        }
+
+        // Exact xtail * y - ytail * x, skipping the zero tails. Returns the
+        // expansion length.
+        inline int tail_cross(
+            double xtail, double ytail, double x, double y, double h[4] )
+        {
+            if( xtail == 0. )
+            {
+                if( ytail == 0. )
+                {
+                    h[0] = 0.;
+                    return 1;
+                }
+                two_product( -ytail, x, h[1], h[0] );
+                return 2;
+            }
+            if( ytail == 0. )
+            {
+                two_product( xtail, y, h[1], h[0] );
+                return 2;
+            }
+            two_two_product_diff( xtail, y, ytail, x, h );
+            return 4;
+        }
+
+        // Sign of (p1-p0)x(p2-p0)
+        inline SIGN orient_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
-            const geode::Point2D& p2,
-            SIGN& result )
+            const geode::Point2D& p2 )
         {
             const double acx = p1.value( 0 ) - p0.value( 0 );
             const double bcx = p2.value( 0 ) - p0.value( 0 );
@@ -1833,16 +1871,17 @@ namespace GEO
             const double detsum =
                 std::fabs( acx * bcy ) + std::fabs( acy * bcx );
 
+            // Stage B
             double B[4];
             two_two_product_diff( acx, bcy, acy, bcx, B );
             double det = estimate( 4, B );
             double errbound = CCW_ERRBOUND_B * detsum;
             if( det >= errbound || -det >= errbound )
             {
-                result = sign_of( det );
-                return true;
+                return sign_of( det );
             }
 
+            // Stage C
             const double acxtail =
                 two_diff_tail( p1.value( 0 ), p0.value( 0 ) );
             const double bcxtail =
@@ -1854,29 +1893,38 @@ namespace GEO
             if( acxtail == 0. && acytail == 0. && bcxtail == 0.
                 && bcytail == 0. )
             {
-                result = expansion_sign( 4, B );
-                return true;
+                return expansion_sign( 4, B );
             }
-
             errbound =
                 CCW_ERRBOUND_C * detsum + RESULT_ERRBOUND * std::fabs( det );
             det += ( acx * bcytail + bcy * acxtail )
                    - ( acy * bcxtail + bcx * acytail );
             if( det >= errbound || -det >= errbound )
             {
-                result = sign_of( det );
-                return true;
+                return sign_of( det );
             }
-            return false;
+
+            // Stage D: exact sum of all the terms
+            double u[4];
+            two_two_product_diff( acxtail, bcy, acytail, bcx, u );
+            double C1[8];
+            const auto C1length = fast_expansion_sum_zeroelim( 4, B, 4, u, C1 );
+            two_two_product_diff( acx, bcytail, acy, bcxtail, u );
+            double C2[12];
+            const auto C2length =
+                fast_expansion_sum_zeroelim( C1length, C1, 4, u, C2 );
+            two_two_product_diff( acxtail, bcytail, acytail, bcxtail, u );
+            double D[16];
+            const auto Dlength =
+                fast_expansion_sum_zeroelim( C2length, C2, 4, u, D );
+            return expansion_sign( Dlength, D );
         }
 
-        // Returns true if the sign of det(p1-p0, p2-p0, p3-p0) has been
-        // determined
-        inline bool orient_3d( const geode::Point3D& p0,
+        // Sign of det(p1-p0, p2-p0, p3-p0)
+        inline SIGN orient_3d( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2,
-            const geode::Point3D& p3,
-            SIGN& result )
+            const geode::Point3D& p3 )
         {
             const double adx = p1.value( 0 ) - p0.value( 0 );
             const double bdx = p2.value( 0 ) - p0.value( 0 );
@@ -1895,6 +1943,7 @@ namespace GEO
                 + ( std::fabs( adx * bdy ) + std::fabs( bdx * ady ) )
                       * std::fabs( cdz );
 
+            // Stage B
             double bc[4];
             two_two_product_diff( bdx, cdy, cdx, bdy, bc );
             double adet[8];
@@ -1910,18 +1959,19 @@ namespace GEO
             double abdet[16];
             const auto ablen =
                 fast_expansion_sum_zeroelim( alen, adet, blen, bdet, abdet );
-            double fin[24];
-            const auto finlength =
-                fast_expansion_sum_zeroelim( ablen, abdet, clen, cdet, fin );
+            double fin1[192];
+            double fin2[192];
+            auto finlength =
+                fast_expansion_sum_zeroelim( ablen, abdet, clen, cdet, fin1 );
 
-            double det = estimate( finlength, fin );
+            double det = estimate( finlength, fin1 );
             double errbound = O3D_ERRBOUND_B * permanent;
             if( det >= errbound || -det >= errbound )
             {
-                result = sign_of( det );
-                return true;
+                return sign_of( det );
             }
 
+            // Stage C
             const double adxtail =
                 two_diff_tail( p1.value( 0 ), p0.value( 0 ) );
             const double bdxtail =
@@ -1944,8 +1994,7 @@ namespace GEO
                 && bdytail == 0. && cdytail == 0. && adztail == 0.
                 && bdztail == 0. && cdztail == 0. )
             {
-                result = expansion_sign( finlength, fin );
-                return true;
+                return expansion_sign( finlength, fin1 );
             }
 
             errbound =
@@ -1964,10 +2013,124 @@ namespace GEO
                        + cdztail * ( adx * bdy - ady * bdx ) );
             if( det >= errbound || -det >= errbound )
             {
-                result = sign_of( det );
-                return true;
+                return sign_of( det );
             }
-            return false;
+
+            // Stage D: stage B result plus all the terms involving tails
+            double* finnow = fin1;
+            double* finother = fin2;
+            const auto add = [&]( int length, const double* expansion ) {
+                finlength = fast_expansion_sum_zeroelim(
+                    finlength, finnow, length, expansion, finother );
+                std::swap( finnow, finother );
+            };
+
+            double at_b[4];
+            const auto at_blen = tail_cross( adxtail, adytail, bdx, bdy, at_b );
+            double at_c[4];
+            const auto at_clen =
+                tail_cross( -adxtail, -adytail, cdx, cdy, at_c );
+            double bt_c[4];
+            const auto bt_clen = tail_cross( bdxtail, bdytail, cdx, cdy, bt_c );
+            double bt_a[4];
+            const auto bt_alen =
+                tail_cross( -bdxtail, -bdytail, adx, ady, bt_a );
+            double ct_a[4];
+            const auto ct_alen = tail_cross( cdxtail, cdytail, adx, ady, ct_a );
+            double ct_b[4];
+            const auto ct_blen =
+                tail_cross( -cdxtail, -cdytail, bdx, bdy, ct_b );
+
+            double w[16];
+            double bct[8];
+            const auto bctlen = fast_expansion_sum_zeroelim(
+                bt_clen, bt_c, ct_blen, ct_b, bct );
+            add( scale_expansion_zeroelim( bctlen, bct, adz, w ), w );
+            double cat[8];
+            const auto catlen = fast_expansion_sum_zeroelim(
+                ct_alen, ct_a, at_clen, at_c, cat );
+            add( scale_expansion_zeroelim( catlen, cat, bdz, w ), w );
+            double abt[8];
+            const auto abtlen = fast_expansion_sum_zeroelim(
+                at_blen, at_b, bt_alen, bt_a, abt );
+            add( scale_expansion_zeroelim( abtlen, abt, cdz, w ), w );
+
+            double v[12];
+            if( adztail != 0. )
+            {
+                add( scale_expansion_zeroelim( 4, bc, adztail, v ), v );
+            }
+            if( bdztail != 0. )
+            {
+                add( scale_expansion_zeroelim( 4, ca, bdztail, v ), v );
+            }
+            if( cdztail != 0. )
+            {
+                add( scale_expansion_zeroelim( 4, ab, cdztail, v ), v );
+            }
+
+            // xtail * ytail * (z + ztail)
+            const auto add_tails_product = [&]( double xtail, double ytail,
+                                               double z, double ztail ) {
+                double product1;
+                double product0;
+                two_product( xtail, ytail, product1, product0 );
+                double u[4];
+                two_one_product( product1, product0, z, u );
+                add( 4, u );
+                if( ztail != 0. )
+                {
+                    two_one_product( product1, product0, ztail, u );
+                    add( 4, u );
+                }
+            };
+            if( adxtail != 0. )
+            {
+                if( bdytail != 0. )
+                {
+                    add_tails_product( adxtail, bdytail, cdz, cdztail );
+                }
+                if( cdytail != 0. )
+                {
+                    add_tails_product( -adxtail, cdytail, bdz, bdztail );
+                }
+            }
+            if( bdxtail != 0. )
+            {
+                if( cdytail != 0. )
+                {
+                    add_tails_product( bdxtail, cdytail, adz, adztail );
+                }
+                if( adytail != 0. )
+                {
+                    add_tails_product( -bdxtail, adytail, cdz, cdztail );
+                }
+            }
+            if( cdxtail != 0. )
+            {
+                if( adytail != 0. )
+                {
+                    add_tails_product( cdxtail, adytail, bdz, bdztail );
+                }
+                if( bdytail != 0. )
+                {
+                    add_tails_product( -cdxtail, bdytail, adz, adztail );
+                }
+            }
+
+            if( adztail != 0. )
+            {
+                add( scale_expansion_zeroelim( bctlen, bct, adztail, w ), w );
+            }
+            if( bdztail != 0. )
+            {
+                add( scale_expansion_zeroelim( catlen, cat, bdztail, w ), w );
+            }
+            if( cdztail != 0. )
+            {
+                add( scale_expansion_zeroelim( abtlen, abt, cdztail, w ), w );
+            }
+            return expansion_sign( finlength, finnow );
         }
     } // namespace adaptive
 } // namespace GEO
@@ -1997,45 +2160,7 @@ namespace GEO
 {
     // ============ orient2d ==============================================
 
-    SIGN orient_2d_exact( const geode::Point2D& p0,
-        const geode::Point2D& p1,
-        const geode::Point2D& p2 )
-    {
-        const expansion& a11 = expansion_diff( p1.value( 0 ), p0.value( 0 ) );
-        const expansion& a12 = expansion_diff( p1.value( 1 ), p0.value( 1 ) );
-
-        const expansion& a21 = expansion_diff( p2.value( 0 ), p0.value( 0 ) );
-        const expansion& a22 = expansion_diff( p2.value( 1 ), p0.value( 1 ) );
-
-        const expansion& Delta = expansion_det2x2( a11, a12, a21, a22 );
-
-        return Delta.sign();
-    }
-
     // ============ orient3d ==============================================
-
-    SIGN orient_3d_exact( const geode::Point3D& p0,
-        const geode::Point3D& p1,
-        const geode::Point3D& p2,
-        const geode::Point3D& p3 )
-    {
-        const expansion& a11 = expansion_diff( p1.value( 0 ), p0.value( 0 ) );
-        const expansion& a12 = expansion_diff( p1.value( 1 ), p0.value( 1 ) );
-        const expansion& a13 = expansion_diff( p1.value( 2 ), p0.value( 2 ) );
-
-        const expansion& a21 = expansion_diff( p2.value( 0 ), p0.value( 0 ) );
-        const expansion& a22 = expansion_diff( p2.value( 1 ), p0.value( 1 ) );
-        const expansion& a23 = expansion_diff( p2.value( 2 ), p0.value( 2 ) );
-
-        const expansion& a31 = expansion_diff( p3.value( 0 ), p0.value( 0 ) );
-        const expansion& a32 = expansion_diff( p3.value( 1 ), p0.value( 1 ) );
-        const expansion& a33 = expansion_diff( p3.value( 2 ), p0.value( 2 ) );
-
-        const expansion& Delta =
-            expansion_det3x3( a11, a12, a13, a21, a22, a23, a31, a32, a33 );
-
-        return Delta.sign();
-    }
 
     // ================================ det and dot =======================
 
@@ -2136,12 +2261,7 @@ namespace GEO
             {
                 return zero;
             }
-            SIGN adaptive_result;
-            if( adaptive::orient_2d( p0, p1, p2, adaptive_result ) )
-            {
-                return adaptive_result;
-            }
-            return orient_2d_exact( p0, p1, p2 );
+            return adaptive::orient_2d( p0, p1, p2 );
         }
 
         SIGN orient_3d( const geode::Point3D& p0,
@@ -2158,12 +2278,7 @@ namespace GEO
             {
                 return zero;
             }
-            SIGN adaptive_result;
-            if( adaptive::orient_3d( p0, p1, p2, p3, adaptive_result ) )
-            {
-                return adaptive_result;
-            }
-            return orient_3d_exact( p0, p1, p2, p3 );
+            return adaptive::orient_3d( p0, p1, p2, p3 );
         }
 
         SIGN det_3d( const geode::Vector3D& p0,
