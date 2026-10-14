@@ -21,6 +21,8 @@
  *
  */
 
+#include <string_view>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -1147,8 +1149,7 @@ void test_triangle_intersection_near_parallel()
     const auto far = geode::line_triangle_intersection(
         geode::InfiniteLine3D{ geode::Segment3D{ l0, l1 } },
         geode::Triangle3D{ t0, t1, t2 } );
-    geode::OpenGeodeGeometryException::test(
-        far.type == geode::INTERSECTION_TYPE::none,
+    geode::OpenGeodeGeometryException::test( !far.has_intersection(),
         "Wrong result for line_triangle_intersection with nearly parallel "
         "line far from the triangle" );
 
@@ -1165,8 +1166,7 @@ void test_triangle_intersection_near_parallel()
         -0x1.435f6a4e39e6ap+1 } };
     const auto separated = geode::segment_triangle_intersection(
         geode::Segment3D{ s0, s1 }, geode::Triangle3D{ u0, u1, u2 } );
-    geode::OpenGeodeGeometryException::test(
-        separated.type == geode::INTERSECTION_TYPE::none,
+    geode::OpenGeodeGeometryException::test( !separated.has_intersection(),
         "Wrong result for segment_triangle_intersection with nearly parallel "
         "segment far from the triangle" );
 
@@ -1192,8 +1192,53 @@ void test_triangle_intersection_near_parallel()
         "triangle plane" );
 }
 
+void check_crossing_2d(
+    const geode::IntersectionResult< geode::Point2D >& result,
+    const geode::Segment2D& segment,
+    std::string_view message )
+{
+    geode::OpenGeodeGeometryException::test(
+        result.type == geode::INTERSECTION_TYPE::parallel
+            || ( result.has_intersection()
+                 && geode::point_segment_distance(
+                        result.result.value(), segment )
+                        < geode::GLOBAL_EPSILON ),
+        message );
+}
+
+void test_segment_intersection_2d_near_parallel()
+{
+    // Overlapping collinear segments
+    const geode::Point2D a0{ { 0x1.e61fc9a188e38p-1, -0x1.bdfbf5d1ccdap-2 } };
+    const geode::Point2D a1{ { 0x1.c49cd43cb87fp-2, 0x1.26f1d4fc386p+0 } };
+    const geode::Point2D b0{ { 0x1.a360a0922c338p-2, 0x1.40f0a59bb274ep+0 } };
+    const geode::Point2D b1{ { 0x1.058b4a4de5bbep-1, 0x1.dfa46c2b6bb7cp-1 } };
+    const auto collinear = geode::segment_segment_intersection(
+        geode::Segment2D{ a0, a1 }, geode::Segment2D{ b0, b1 } );
+    geode::OpenGeodeGeometryException::test(
+        collinear.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong result for segment_segment_intersection with overlapping "
+        "collinear segments" );
+
+    // Segments crossing with a small angle
+    const geode::Point2D c0{ { 0x1.f1bbfa740ad58p+1, 0x1.606b05c300968p-1 } };
+    const geode::Point2D c1{ { -0x1.8bc65165933fp+1, -0x1.9af77575d819p-1 } };
+    const geode::Point2D d0{ { 0x1.8ea5460de60cap+2, 0x1.302cc0c7eeb69p+0 } };
+    const geode::Point2D d1{ { 0x1.d85dfda85a6bap+1, 0x1.4abec5ea95587p-1 } };
+    const geode::Segment2D segment_c{ c0, c1 };
+    const geode::Segment2D segment_d{ d0, d1 };
+    check_crossing_2d(
+        geode::segment_segment_intersection( segment_c, segment_d ), segment_c,
+        "Wrong result for segment_segment_intersection with small angle" );
+    check_crossing_2d( geode::segment_line_intersection(
+                           segment_c, geode::InfiniteLine2D{ segment_d } ),
+        segment_c,
+        "Wrong result for segment_line_intersection with small angle" );
+}
+
 void test()
 {
+    test_segment_intersection_2d_near_parallel();
     test_triangle_intersection_near_parallel();
     test_small_sphere_intersection();
     test_line_sphere_intersection();
