@@ -24,7 +24,7 @@
 #include <geode/geometry/is_point_inside.hpp>
 
 #include <geode/geometry/basic_objects/polygon.hpp>
-#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 #include <geode/geometry/point.hpp>
 
 namespace
