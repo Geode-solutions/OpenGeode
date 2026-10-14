@@ -617,7 +617,17 @@ namespace geode
             const InfiniteLine3D& line, const Cylinder& cylinder )
     {
         CylinderLineResult result;
+        // The line direction is unit: parameters are lengths along the line.
+        // Parameters closer than GLOBAL_EPSILON give the same point.
         const auto add_parameter = [&result]( double parameter ) {
+            for( const auto i : LRange{ result.numIntersections } )
+            {
+                if( std::fabs( parameter - result.parameter[i] )
+                    <= GLOBAL_EPSILON )
+                {
+                    return;
+                }
+            }
             if( result.numIntersections < 2 )
             {
                 result.parameter[result.numIntersections++] = parameter;
@@ -635,13 +645,49 @@ namespace geode
         const auto& U = basis[1];
         const auto& V = basis[2];
         const auto halfHeight = 0.5 * cylinder.axis().length();
-        const auto rSqr = cylinder.radius() * cylinder.radius();
+        const auto radius = cylinder.radius();
 
         const auto cylinder_barycenter = cylinder.axis().barycenter();
 
         // Convert incoming line origin to capsule coordinates.
         const Vector3D diff{ cylinder_barycenter, line.origin() };
         Vector3D P{ { U.dot( diff ), V.dot( diff ), W.dot( diff ) } };
+
+        const auto is_inside_radius = [radius]( double x, double y ) {
+            return std::sqrt( x * x + y * y ) - radius <= GLOBAL_EPSILON;
+        };
+        // Intersections of line P+t*D with the infinite cylinder
+        // x^2+y^2 = r^2, using the distance h from the line to the cylinder
+        // axis: the intersections are at
+        // t = t_closest +- sqrt( (r-h)*(r+h) ) / |D_xy|.
+        const auto wall_parameters = [&P, &is_inside_radius, radius](
+                                         const Vector3D& D ) {
+            absl::InlinedVector< double, 2 > parameters;
+            const auto a1 =
+                P.value( 0 ) * D.value( 0 ) + P.value( 1 ) * D.value( 1 );
+            const auto a2 =
+                D.value( 0 ) * D.value( 0 ) + D.value( 1 ) * D.value( 1 );
+            const auto closest_parameter = -a1 / a2;
+            const auto x = P.value( 0 ) + closest_parameter * D.value( 0 );
+            const auto y = P.value( 1 ) + closest_parameter * D.value( 1 );
+            if( !is_inside_radius( x, y ) )
+            {
+                return parameters;
+            }
+            const auto distance_to_axis = std::sqrt( x * x + y * y );
+            if( radius - distance_to_axis <= GLOBAL_EPSILON )
+            {
+                // The line is tangent to the cylinder.
+                parameters.push_back( closest_parameter );
+                return parameters;
+            }
+            const auto half_chord =
+                std::sqrt( ( radius - distance_to_axis )
+                           * ( radius + distance_to_axis ) / a2 );
+            parameters.push_back( closest_parameter - half_chord );
+            parameters.push_back( closest_parameter + half_chord );
+            return parameters;
+        };
 
         // Get the z-value, in cylinder coordinates, of the incoming
         // line's unit-length direction.
@@ -650,28 +696,20 @@ namespace geode
         {
             // The line is parallel to the cylinder axis. Determine
             // whether the line intersects the cylinder end disks.
-            const auto radialSqrDist = rSqr - P.value( 0 ) * P.value( 0 )
-                                       - P.value( 1 ) * P.value( 1 );
-            if( radialSqrDist >= 0 )
+            if( !is_inside_radius( P.value( 0 ), P.value( 1 ) ) )
             {
-                // The line intersects the cylinder end disks.
-                result.intersect = true;
-                result.numIntersections = 2;
-                if( dz > 0 )
-                {
-                    result.parameter[0] = -P.value( 2 ) - halfHeight;
-                    result.parameter[1] = -P.value( 2 ) + halfHeight;
-                }
-                else
-                {
-                    result.parameter[0] = P.value( 2 ) - halfHeight;
-                    result.parameter[1] = P.value( 2 ) + halfHeight;
-                }
+                // The line is outside the cylinder, no intersection.
+                return { INTERSECTION_TYPE::none };
+            }
+            if( dz > 0 )
+            {
+                add_parameter( -P.value( 2 ) - halfHeight );
+                add_parameter( -P.value( 2 ) + halfHeight );
             }
             else
             {
-                // else:  The line is outside the cylinder, no intersection.
-                return { INTERSECTION_TYPE::none };
+                add_parameter( P.value( 2 ) - halfHeight );
+                add_parameter( P.value( 2 ) + halfHeight );
             }
         }
         else
@@ -683,43 +721,15 @@ namespace geode
             if( D.value( 2 ) == 0 )
             {
                 // The line is perpendicular to the cylinder axis.
-                if( std::fabs( P.value( 2 ) ) > halfHeight )
+                if( std::fabs( P.value( 2 ) ) - halfHeight > GLOBAL_EPSILON )
                 {
                     // The line is outside the planes of the cylinder end
                     // disks.
                     return { INTERSECTION_TYPE::none };
                 }
-                // Test intersection of line P+t*D with infinite cylinder
-                // x^2+y^2 = r^2, using the distance h from the line to the
-                // cylinder axis: the intersections are at
-                // t = t_closest +- sqrt( (r-h)*(r+h) ) / |D|.
-                const auto a1 =
-                    P.value( 0 ) * D.value( 0 ) + P.value( 1 ) * D.value( 1 );
-                const auto a2 =
-                    D.value( 0 ) * D.value( 0 ) + D.value( 1 ) * D.value( 1 );
-                const auto closest_parameter = -a1 / a2;
-                const auto x = P.value( 0 ) + closest_parameter * D.value( 0 );
-                const auto y = P.value( 1 ) + closest_parameter * D.value( 1 );
-                const auto distance_to_axis = std::sqrt( x * x + y * y );
-                const auto radius = cylinder.radius();
-                if( distance_to_axis - radius > GLOBAL_EPSILON )
+                for( const auto parameter : wall_parameters( D ) )
                 {
-                    // The line does not intersect the cylinder.
-                    return { INTERSECTION_TYPE::none };
-                }
-                if( radius - distance_to_axis <= GLOBAL_EPSILON )
-                {
-                    // The line is tangent to the cylinder.
-                    add_parameter( closest_parameter );
-                }
-                else
-                {
-                    // The line intersects the cylinder in two places.
-                    const auto half_chord =
-                        std::sqrt( ( radius - distance_to_axis )
-                                   * ( radius + distance_to_axis ) / a2 );
-                    add_parameter( closest_parameter - half_chord );
-                    add_parameter( closest_parameter + half_chord );
+                    add_parameter( parameter );
                 }
             }
             else
@@ -732,18 +742,16 @@ namespace geode
 
                 // Test for intersections with the planes of the end disks.
                 const auto t0 = ( -halfHeight - P.value( 2 ) ) / D.value( 2 );
-                auto xTmp = P.value( 0 ) + t0 * D.value( 0 );
-                auto yTmp = P.value( 1 ) + t0 * D.value( 1 );
-                if( xTmp * xTmp + yTmp * yTmp <= rSqr )
+                if( is_inside_radius( P.value( 0 ) + t0 * D.value( 0 ),
+                        P.value( 1 ) + t0 * D.value( 1 ) ) )
                 {
                     // Plane intersection inside the bottom cylinder end disk.
                     add_parameter( t0 );
                 }
 
                 const auto t1 = ( halfHeight - P.value( 2 ) ) / D.value( 2 );
-                xTmp = P.value( 0 ) + t1 * D.value( 0 );
-                yTmp = P.value( 1 ) + t1 * D.value( 1 );
-                if( xTmp * xTmp + yTmp * yTmp <= rSqr )
+                if( is_inside_radius( P.value( 0 ) + t1 * D.value( 0 ),
+                        P.value( 1 ) + t1 * D.value( 1 ) ) )
                 {
                     // Plane intersection inside the top cylinder end disk.
                     add_parameter( t1 );
@@ -751,33 +759,21 @@ namespace geode
 
                 if( result.numIntersections < 2 )
                 {
-                    // Test for intersection with the cylinder wall.
-                    const auto a0 = P.value( 0 ) * P.value( 0 )
-                                    + P.value( 1 ) * P.value( 1 ) - rSqr;
-                    const auto a1 = P.value( 0 ) * D.value( 0 )
-                                    + P.value( 1 ) * D.value( 1 );
-                    const auto a2 = D.value( 0 ) * D.value( 0 )
-                                    + D.value( 1 ) * D.value( 1 );
-                    const auto discr = a1 * a1 - a0 * a2;
-                    const auto add_wall_parameter = [&add_parameter, t0, t1](
-                                                        double parameter ) {
-                        if( std::min( t0, t1 ) <= parameter
-                            && parameter <= std::max( t0, t1 ) )
+                    // Test for intersection with the cylinder wall, between
+                    // the end disk planes. A parameter shift of
+                    // GLOBAL_EPSILON / |dz| moves the point by GLOBAL_EPSILON
+                    // along the axis.
+                    const auto tolerance = GLOBAL_EPSILON / std::fabs( dz );
+                    const auto min_parameter = std::min( t0, t1 ) - tolerance;
+                    const auto max_parameter = std::max( t0, t1 ) + tolerance;
+                    for( const auto parameter : wall_parameters( D ) )
+                    {
+                        if( min_parameter <= parameter
+                            && parameter <= max_parameter )
                         {
                             add_parameter( parameter );
                         }
-                    };
-                    if( discr > 0 )
-                    {
-                        const auto root = std::sqrt( discr );
-                        add_wall_parameter( ( -a1 - root ) / a2 );
-                        add_wall_parameter( ( -a1 + root ) / a2 );
                     }
-                    else if( discr == 0 )
-                    {
-                        add_wall_parameter( -a1 / a2 );
-                    }
-                    // else: Line does not intersect cylinder wall.
                 }
                 // else: Line intersects both top and bottom cylinder end
                 // disks.

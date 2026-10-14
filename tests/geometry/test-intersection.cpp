@@ -1168,6 +1168,43 @@ void test_line_cylinder_perpendicular()
         "Wrong result for line_cylinder_intersection with oblique line" );
 }
 
+void test_line_cylinder_tolerance()
+{
+    // Oblique line tangent to the wall, within GLOBAL_EPSILON
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Cylinder cylinder{ geode::Segment3D{ a, b }, 0.2 };
+    for( const auto offset : { 0., 1e-7, -1e-7 } )
+    {
+        const geode::Point3D c{ { 0.0, 0.2 + offset, -0.5 } };
+        const geode::Point3D d{ { 1.0, 0.2 + offset, 0.5 } };
+        const auto result = geode::line_cylinder_intersection(
+            geode::InfiniteLine3D{ geode::Segment3D{ c, d } }, cylinder );
+        geode::OpenGeodeGeometryException::test(
+            result && result.result->size() == 1
+                && result.result->front().inexact_equal(
+                    geode::Point3D{ { 0.5, 0.2, 0.0 } } ),
+            "Wrong result for line_cylinder_intersection with oblique "
+            "tangent line (offset ",
+            offset, ")" );
+    }
+
+    // Line entering through the rim of an end disk and leaving through the
+    // wall: the rim point must be reported once
+    const geode::Point3D bottom{ { 0.0, 0.0, -1.0 } };
+    const geode::Point3D top{ { 0.0, 0.0, 1.0 } };
+    const geode::Cylinder z_cylinder{ geode::Segment3D{ bottom, top }, 1.0 };
+    const geode::Point3D rim{ { 1.0, 0.0, 1.0 } };
+    const geode::Point3D wall{ { -1.0, 0.0, 0.0 } };
+    const auto rim_result = geode::line_cylinder_intersection(
+        geode::InfiniteLine3D{ geode::Segment3D{ rim, wall } }, z_cylinder );
+    geode::OpenGeodeGeometryException::test(
+        rim_result && rim_result.result->size() == 2
+            && rim_result.result->at( 0 ).inexact_equal( rim )
+            && rim_result.result->at( 1 ).inexact_equal( wall ),
+        "Wrong result for line_cylinder_intersection through the rim" );
+}
+
 template < typename Result >
 bool has_consistent_correctness( const Result& result )
 {
@@ -1278,6 +1315,7 @@ void test()
     test_segment_ellipse_intersection();
     test_degenerated_segment_intersections();
     test_line_cylinder_perpendicular();
+    test_line_cylinder_tolerance();
     test_segment_intersections_correctness();
     test_line_sphere_intersection_robustness();
 }
