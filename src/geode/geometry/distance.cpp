@@ -68,23 +68,6 @@ namespace
                     && signed_area_3 >= 0 );
     }
 
-    /*
-     * A triangle is flat if its minimum height (twice its area divided by its
-     * longest edge length) is below GLOBAL_EPSILON
-     */
-    bool is_triangle_flat( const geode::Triangle2D& triangle )
-    {
-        const auto& vertices = triangle.vertices();
-        const geode::Vector2D edge01{ vertices[0], vertices[1] };
-        const geode::Vector2D edge02{ vertices[0], vertices[2] };
-        const geode::Vector2D edge12{ vertices[1], vertices[2] };
-        const auto double_area = geode::dot_perpendicular( edge01, edge02 );
-        const auto max_length2 = std::max(
-            { edge01.length2(), edge02.length2(), edge12.length2() } );
-        return double_area * double_area
-               <= geode::GLOBAL_EPSILON * geode::GLOBAL_EPSILON * max_length2;
-    }
-
     void get_min_edge02( double a11, double b1, std::array< double, 2 >& p )
     {
         p[0] = 0;
@@ -950,7 +933,7 @@ namespace geode
         opengeode_geometry_api point_triangle_distance(
             const Point2D& point, const Triangle2D& triangle )
     {
-        if( !is_triangle_flat( triangle )
+        if( !triangle.is_degenerated()
             && may_point_be_in_triangle( point, triangle ) )
         {
             return { 0.0, point };
