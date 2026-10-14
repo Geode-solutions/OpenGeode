@@ -1236,34 +1236,40 @@ namespace geode
     std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        std::array< double, 4 > lambdas;
-        bool degenerated{ false };
-        try
+        // Facets seen from the point (with exact predicates): the closest
+        // point is on one of them, and there is none for an inside point. A
+        // flat tetrahedron is the union of its facets.
+        const auto& vertices = tetra.vertices();
+        const auto facet_sign = [&vertices]( local_index_t facet,
+                                    const Point3D& query ) {
+            const auto& facet_vertices =
+                Tetrahedron::tetrahedron_facet_vertex[facet];
+            return tetrahedron_volume_sign( Tetrahedron{
+                vertices[facet_vertices[0]], vertices[facet_vertices[1]],
+                vertices[facet_vertices[2]], query } );
+        };
+        // Facets are oriented towards the inside of positive tetrahedra
+        const auto orientation = facet_sign( 0, vertices[0] );
+        const auto outside_sign =
+            orientation == SIGN::negative ? SIGN::positive : SIGN::negative;
+        std::array< bool, 4 > visible;
+        for( const auto facet : LRange{ 4 } )
         {
-            lambdas = tetrahedron_barycentric_coordinates( point, tetra );
-            degenerated = !absl::c_all_of( lambdas, []( double lambda ) {
-                return std::isfinite( lambda );
-            } );
+            visible[facet] = orientation == SIGN::zero
+                             || facet_sign( facet, point ) == outside_sign;
         }
-        catch( const OpenGeodeException& /*unused*/ )
-        {
-            degenerated = true;
-        }
-        if( !degenerated && absl::c_all_of( lambdas, []( double lambda ) {
-                return lambda >= 0;
+        if( absl::c_none_of( visible, []( bool seen ) {
+                return seen;
             } ) )
         {
             return { 0.0, point };
         }
-        // The closest point lies on a facet seen from the point (negative
-        // barycentric coordinate), not necessarily the most negative one
-        const auto& vertices = tetra.vertices();
         std::tuple< double, Point3D > result{
             std::numeric_limits< double >::max(), point
         };
         for( const auto facet : LRange{ 4 } )
         {
-            if( !degenerated && lambdas[facet] >= 0 )
+            if( !visible[facet] )
             {
                 continue;
             }

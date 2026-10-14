@@ -1706,10 +1706,33 @@ void test_point_skewed_tetrahedron_distance()
     }
 }
 
+void test_point_flat_tetrahedron_distance()
+{
+    // Nearly flat tetrahedron, query on its base facet
+    const geode::Point3D query{ { -0x1.f6aabb6771c78p+0, -0x1.e7252a76a9ac6p+0,
+        -0x1.d4038f7d5b546p+1 } };
+    const geode::Point3D a{ { -0x1.651bd172a2032p+1, -0x1.80011eb01403cp+1,
+        -0x1.1b90b3c0177bp+1 } };
+    const geode::Point3D b{ { -0x1.7413bc409a2f4p+0, -0x1.39c4b68a466c8p+0,
+        -0x1.22efdac676eb4p+2 } };
+    const geode::Point3D c{ { -0x1.d9f61d37e8494p+0, -0x1.c108d1c731963p+0,
+        -0x1.ed0abf0e6634dp+1 } };
+    const geode::Point3D d{ { -0x1.b9dd863ee936p+0, -0x1.9665c7b191538p+0,
+        -0x1.0483eaa8925cep+2 } };
+    const geode::Tetrahedron tetra{ a, b, c, d };
+    const auto [distance, closest_point] =
+        geode::point_tetrahedron_distance( query, tetra );
+    geode::OpenGeodeGeometryException::test( distance < geode::GLOBAL_EPSILON,
+        "Wrong result for point_tetrahedron_distance with nearly flat "
+        "tetrahedron: ",
+        distance );
+}
+
 void test()
 {
     // Exact predicates need the library initialization
     geode::OpenGeodeGeometryLibrary::initialize();
+    test_point_flat_tetrahedron_distance();
     test_point_segment_distance();
     test_segment_segment_distance();
     test_segment_line_distance();
