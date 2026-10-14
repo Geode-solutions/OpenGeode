@@ -1004,55 +1004,40 @@ namespace geode
     std::tuple< double, Point3D, Point3D > line_triangle_distance(
         const InfiniteLine3D& line, const Triangle3D& triangle )
     {
-        // The line points are X = P + t * D and the triangle points
-        // are Y = b[0] * V[0] + b[1] * V[1] + b[2] * V[2], where the
-        // barycentric coordinates satisfy b[i] in [0,1] and
-        // b[0] + b[1] + b[2 = 1. Define the triangle edge directions by
-        // E[1] = V[1] - V[0] and E[2] = V[2] - V[0]; then
-        // Y = V[0] + b1 * E[1] + b2 * E[2]. If Y is specified the
-        // barycentric coordinates are the solution to
-        //
-        // +-                        -+ +-    -+   +-                 -+
-        // | Dot(E1, E1)  Dot(E1, E2) | | b[1] | = | Dot(E1, Y - V[0]) |
-        // | Dot(E1, E2)  Dot(E2, E2) | | b[2] |   | Dot(E2, Y - V[0]) |
-        // +-                        -+ +-    -+   +-                 -+
-        //
-        // and b[0] = 1 - b[1] - b[2].
-
-        // Test whether the line intersects triangle. If so, the squared
-        // distance is zero. The normal of the plane of the triangle does
-        // not have to be normalized to unit length.
+        // Test whether the line intersects triangle with exact predicates: the
+        // line is on the same side of the three triangle edges. If so, the
+        // distance is zero at the intersection with the triangle plane.
         const auto& vertices = triangle.vertices();
-        const Vector3D E1{ vertices[0], vertices[1] };
-        const Vector3D E2{ vertices[0], vertices[2] };
-        const auto N = E1.cross( E2 );
-        const auto NdD = N.dot( line.direction() );
-        if( std::fabs( NdD ) > 0 )
+        const auto& origin = line.origin();
+        const Point3D destination = origin + line.direction();
+        std::array< SIGN, 3 > signs;
+        for( const auto v : LRange{ 3 } )
         {
-            // The line and triangle are not parallel, so the line
-            // intersects the plane of the triangle at a point Y.
-            // Determine whether Y is contained by the triangle.
-            const Vector3D PmV0{ vertices[0], line.origin() };
-            const auto NdDiff = N.dot( PmV0 );
-            const auto tIntersect = -NdDiff / NdD;
-            const auto Y = line.origin() + line.direction() * tIntersect;
-            const Vector3D YmV0{ vertices[0], Y };
-
-            // Compute the barycentric coordinates of the intersection.
-            const auto E1dE1 = E1.dot( E1 );
-            const auto E1dE2 = E1.dot( E2 );
-            const auto E2dE2 = E2.dot( E2 );
-            const auto E1dYmV0 = E1.dot( YmV0 );
-            const auto E2dYmV0 = E2.dot( YmV0 );
-            const auto det = E1dE1 * E2dE2 - E1dE2 * E1dE2;
-            const auto b1 = ( E2dE2 * E1dYmV0 - E1dE2 * E2dYmV0 ) / det;
-            const auto b2 = ( E1dE1 * E2dYmV0 - E1dE2 * E1dYmV0 ) / det;
-            const auto b0 = 1 - b1 - b2;
-
-            if( b0 >= 0 && b1 >= 0 && b2 >= 0 )
+            const auto next = v == 2 ? 0 : v + 1;
+            signs[v] = tetrahedron_volume_sign( Tetrahedron{
+                origin, destination, vertices[v], vertices[next] } );
+        }
+        const auto has_sign = [&signs]( SIGN sign ) {
+            return absl::c_linear_search( signs, sign );
+        };
+        if( !( has_sign( SIGN::positive ) && has_sign( SIGN::negative ) )
+            && ( has_sign( SIGN::positive ) || has_sign( SIGN::negative ) ) )
+        {
+            const Vector3D E1{ vertices[0], vertices[1] };
+            const Vector3D E2{ vertices[0], vertices[2] };
+            const auto N = E1.cross( E2 );
+            const auto NdD = N.dot( line.direction() );
+            if( NdD != 0 )
             {
-                // The point Y is contained by the triangle.
-                return { 0, Y, Y };
+                const Vector3D PmV0{ vertices[0], origin };
+                const auto Y =
+                    origin + line.direction() * ( -N.dot( PmV0 ) / NdD );
+                auto [distance, closest] =
+                    point_triangle_distance( Y, triangle );
+                if( distance <= GLOBAL_EPSILON )
+                {
+                    return { distance, Y, std::move( closest ) };
+                }
             }
         }
 

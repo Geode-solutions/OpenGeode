@@ -1256,6 +1256,38 @@ void test_line_triangle_distance()
         distance == 2. && closest_point0.inexact_equal( result_t30 )
             && closest_point1.inexact_equal( g ),
         "Wrong result for line_triangle_distance with line_hx" );
+
+    // Nearly flat triangle: barycentric coordinates are ill-conditioned
+    const geode::Point3D flat0{ { -0x1.eb51bc5881008p+1, -0x1.e053a51447b5p+1,
+        -0x1.231b76ae97538p+2 } };
+    const geode::Point3D flat1{ { -0x1.54799021abd9cp+1, -0x1.19d3183a49f05p+2,
+        0x1.86c9d8d2b4784p+1 } };
+    const geode::Point3D flat2{ { -0x1.28c5745c91c04p+1, -0x1.25e519e097dcbp+2,
+        0x1.5058ab06303cep+2 } };
+    const geode::Triangle3D flat{ flat0, flat1, flat2 };
+    const geode::Point3D origin{ { -0x1.25f2845b4af21p+2, -0x1.2ef14a7c0e4e2p+2,
+        -0x1.14f057c002405p+0 } };
+    const geode::Point3D destination{ { -0x1.70be6ec52f478p+1,
+        -0x1.05436b144007cp+2, 0x1.c2dd109017872p-2 } };
+    const geode::Segment3D flat_segment{ origin, destination };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::line_triangle_distance(
+            geode::InfiniteLine3D{ flat_segment }, flat );
+    geode::OpenGeodeGeometryException::test(
+        std::get< 0 >( geode::point_triangle_distance( closest_point1, flat ) )
+                < geode::GLOBAL_EPSILON
+            && std::fabs(
+                   geode::point_point_distance( closest_point0, closest_point1 )
+                   - distance )
+                   < geode::GLOBAL_EPSILON,
+        "Wrong result for line_triangle_distance with nearly flat triangle: ",
+        distance, " ", closest_point1.string() );
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( flat_segment, flat );
+    geode::OpenGeodeGeometryException::test( distance < 0.0025,
+        "Wrong result for segment_triangle_distance with nearly flat "
+        "triangle: ",
+        distance );
 }
 
 void test_segment_triangle_distance()
