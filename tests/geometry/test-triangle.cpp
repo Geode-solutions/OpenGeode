@@ -64,6 +64,22 @@ void test_degenerated_consistency()
     geode::OpenGeodeGeometryException::test( !tetra3.is_degenerated(),
         "Valid tetrahedron should not be degenerated" );
 
+    // Sliver: opposite edges 01 and 23 lie in planes z=0 and z=width, so
+    // its thickness is width while all its heights are about 2 * width.
+    for( const auto width : { 0.5, 0.8, 1., 1.2 } )
+    {
+        const auto delta = width * geode::GLOBAL_EPSILON;
+        const geode::Point3D s0{ { 0.0, 0.0, 0.0 } };
+        const geode::Point3D s1{ { 1.0, 1.0, 0.0 } };
+        const geode::Point3D s2{ { 1.0, 0.0, delta } };
+        const geode::Point3D s3{ { 0.0, 1.0, delta } };
+        const geode::Tetrahedron sliver{ s0, s1, s2, s3 };
+        geode::OpenGeodeGeometryException::test(
+            sliver.is_degenerated() == ( width <= 1. ),
+            "Wrong degeneracy for sliver of thickness ", width,
+            " * GLOBAL_EPSILON" );
+    }
+
     std::mt19937 generator{ 42 };
     std::uniform_real_distribution< double > distribution{ -1., 1. };
     std::uniform_real_distribution< double > exponent{ -9., -4. };

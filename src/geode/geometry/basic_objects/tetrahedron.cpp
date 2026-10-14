@@ -86,9 +86,12 @@ namespace geode
     template < typename PointType >
     bool GenericTetrahedron< PointType >::is_degenerated() const
     {
-        // The tetrahedron is degenerated if its minimum height, i.e. three
-        // times its volume divided by its largest facet area, is below
-        // GLOBAL_EPSILON.
+        // The tetrahedron is degenerated if all its vertices lie in a slab of
+        // thickness GLOBAL_EPSILON. The thinnest slab is either bounded by a
+        // facet plane (width = 6 * volume / facet double area) or by two
+        // parallel planes containing opposite edges (width = 6 * volume /
+        // |edge cross product|): the largest of these denominators gives the
+        // minimum width.
         const Point3D& point0 = vertices_[0];
         const Point3D& point1 = vertices_[1];
         const Point3D& point2 = vertices_[2];
@@ -98,14 +101,15 @@ namespace geode
         const Vector3D edge03{ point0, point3 };
         const Vector3D edge12{ point1, point2 };
         const Vector3D edge13{ point1, point3 };
+        const Vector3D edge23{ point2, point3 };
         const auto six_volume = edge01.dot( edge02.cross( edge03 ) );
-        const auto max_double_area2 =
-            std::max( { edge01.cross( edge02 ).length2(),
-                edge01.cross( edge03 ).length2(),
-                edge02.cross( edge03 ).length2(),
-                edge12.cross( edge13 ).length2() } );
+        const auto max_cross2 = std::max( { edge01.cross( edge02 ).length2(),
+            edge01.cross( edge03 ).length2(), edge02.cross( edge03 ).length2(),
+            edge12.cross( edge13 ).length2(), edge01.cross( edge23 ).length2(),
+            edge02.cross( edge13 ).length2(),
+            edge03.cross( edge12 ).length2() } );
         return six_volume * six_volume
-               <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_double_area2;
+               <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_cross2;
     }
 
     template < typename PointType >
