@@ -878,8 +878,11 @@ namespace
 
 namespace GEO
 {
-    double expansion_splitter_;
-    double expansion_epsilon_;
+    // Values for IEEE 754 doubles, as computed by PCK::initialize(): set at
+    // compile time for the predicates to be exact even if the library has
+    // not been initialized.
+    double expansion_splitter_ = 134217729.0; // 2^27 + 1
+    double expansion_epsilon_ = 1.1102230246251565404e-16; // 2^-53
 
     // =============  expansion sum and difference =========================
 

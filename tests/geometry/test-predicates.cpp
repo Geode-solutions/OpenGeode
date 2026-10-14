@@ -22,6 +22,7 @@
  */
 
 #include <cmath>
+#include <random>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
@@ -258,6 +259,75 @@ namespace
                 == GEO::positive,
             "[Test] Wrong dot_2d on nearly orthogonal vectors" );
     }
+
+    // Exactly degenerate, without shared coordinates: decided once the
+    // coordinate differences are known to be exact.
+    void test_exact_degenerate()
+    {
+        const geode::Point3D a{ { 1, 2, 5 } };
+        const geode::Point3D b{ { 4, 1, 6 } };
+        const geode::Point3D c{ { 2, 7, 16 } };
+        const geode::Point3D d{ { 9, 3, 15 } };
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_3d( a, b, c, d ) == GEO::zero,
+            "[Test] Wrong orient_3d on points of plane z = x + 2y" );
+        const geode::Point2D e{ { 1, 3 } };
+        const geode::Point2D f{ { 4, 12 } };
+        const geode::Point2D g{ { -7, -21 } };
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_2d( e, f, g ) == GEO::zero,
+            "[Test] Wrong orient_2d on points of line y = 3x" );
+    }
+
+    // Nearly degenerate configurations, decided by different evaluation
+    // stages: the sign must not depend on the order of the points.
+    void test_nearly_degenerate_consistency()
+    {
+        std::mt19937 generator{ 42 };
+        std::uniform_real_distribution< double > distribution{ 0, 1000 };
+        const auto random = [&] {
+            return distribution( generator );
+        };
+        for( const auto offset : { 0., 5e5 } )
+        {
+            for( const auto trial : geode::Range{ 10000 } )
+            {
+                geode_unused( trial );
+                std::array< geode::Point3D, 4 > p3;
+                for( auto& point : p3 )
+                {
+                    const auto x = offset + random();
+                    const auto y = offset + random();
+                    point = geode::Point3D{ { x, y, 0.3 * x + 0.7 * y } };
+                }
+                const auto sign =
+                    GEO::PCK::orient_3d( p3[0], p3[1], p3[2], p3[3] );
+                geode::OpenGeodeGeometryException::test(
+                    GEO::PCK::orient_3d( p3[1], p3[0], p3[3], p3[2] ) == sign
+                        && GEO::PCK::orient_3d( p3[2], p3[3], p3[0], p3[1] )
+                               == sign
+                        && GEO::PCK::orient_3d( p3[1], p3[0], p3[2], p3[3] )
+                               == -sign
+                        && GEO::PCK::orient_3d( p3[3], p3[1], p3[2], p3[0] )
+                               == -sign,
+                    "[Test] Inconsistent orient_3d on nearly coplanar points" );
+
+                std::array< geode::Point2D, 3 > p2;
+                for( auto& point : p2 )
+                {
+                    const auto t = random();
+                    point = geode::Point2D{ { offset + t, offset + 0.3 * t } };
+                }
+                const auto sign2 = GEO::PCK::orient_2d( p2[0], p2[1], p2[2] );
+                geode::OpenGeodeGeometryException::test(
+                    GEO::PCK::orient_2d( p2[1], p2[2], p2[0] ) == sign2
+                        && GEO::PCK::orient_2d( p2[2], p2[0], p2[1] ) == sign2
+                        && GEO::PCK::orient_2d( p2[1], p2[0], p2[2] ) == -sign2,
+                    "[Test] Inconsistent orient_2d on nearly collinear "
+                    "points" );
+            }
+        }
+    }
 } // namespace
 
 void test()
@@ -268,6 +338,8 @@ void test()
     test_aligned_3d();
     test_dot_3d();
     test_dot_2d();
+    test_exact_degenerate();
+    test_nearly_degenerate_consistency();
 
     geode::Logger::info( "TEST SUCCESS" );
 }
