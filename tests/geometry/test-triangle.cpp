@@ -197,64 +197,63 @@ void test_degenerated_tetrahedron_vertex_order()
             }
         }
     }
-} 
+}
 
-    void test_set_point()
-    {
-        geode::OwnerTriangle3D triangle{ geode::Point3D{ { 0, 0, 0 } },
-            geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1, 0 } } };
-        const auto normal = triangle.normal();
-        geode::OpenGeodeGeometryException::test(
-            normal && normal->inexact_equal( geode::Vector3D{ { 0, 0, 1 } } ),
-            "Wrong normal before set_point" );
-        auto copy = triangle;
-        triangle.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
-        const auto new_normal = triangle.normal();
-        geode::OpenGeodeGeometryException::test(
-            new_normal
-                && new_normal->inexact_equal( geode::Vector3D{ { 0, -1, 0 } } ),
-            "Wrong normal after set_point" );
-        copy.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
-        const auto copy_normal = copy.normal();
-        geode::OpenGeodeGeometryException::test(
-            copy_normal
-                && copy_normal->inexact_equal(
-                    geode::Vector3D{ { 0, -1, 0 } } ),
-            "Wrong normal after set_point on copy" );
-    }
+void test_set_point()
+{
+    geode::OwnerTriangle3D triangle{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1, 0 } } };
+    const auto normal = triangle.normal();
+    geode::OpenGeodeGeometryException::test(
+        normal && normal->inexact_equal( geode::Vector3D{ { 0, 0, 1 } } ),
+        "Wrong normal before set_point" );
+    auto copy = triangle;
+    triangle.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
+    const auto new_normal = triangle.normal();
+    geode::OpenGeodeGeometryException::test(
+        new_normal
+            && new_normal->inexact_equal( geode::Vector3D{ { 0, -1, 0 } } ),
+        "Wrong normal after set_point" );
+    copy.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
+    const auto copy_normal = copy.normal();
+    geode::OpenGeodeGeometryException::test(
+        copy_normal
+            && copy_normal->inexact_equal( geode::Vector3D{ { 0, -1, 0 } } ),
+        "Wrong normal after set_point on copy" );
+}
 
-    void test()
-    {
-        test_set_point();
-        const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
-        const geode::Point3D b_ref{ { 0.5, 0.1, 0.0 } };
-        const geode::Point3D b{ { 0.6, 0.3 * geode::GLOBAL_EPSILON, 0.0 } };
-        const geode::Point3D c{ { 1.0, 0.0, 0.0 } };
+void test()
+{
+    test_set_point();
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b_ref{ { 0.5, 0.1, 0.0 } };
+    const geode::Point3D b{ { 0.6, 0.3 * geode::GLOBAL_EPSILON, 0.0 } };
+    const geode::Point3D c{ { 1.0, 0.0, 0.0 } };
 
-        const geode::Vector3D answer{ { 0, 0, -1 } };
+    const geode::Vector3D answer{ { 0, 0, -1 } };
 
-        const geode::Triangle3D triangle_ref{ a, b_ref, c };
-        const auto normal_ref = triangle_ref.normal();
-        geode::OpenGeodeGeometryException::test( normal_ref.has_value(),
-            "Normal of reference triangle should be calculated" );
-        geode::OpenGeodeGeometryException::test( normal_ref.value() == answer,
-            "Wrong normal of reference triangle" );
-        const auto pivot_ref = triangle_ref.pivot();
-        geode::OpenGeodeGeometryException::test( pivot_ref.has_value(),
-            "Pivot of reference triangle should be calculated" );
-        geode::OpenGeodeGeometryException::test(
-            pivot_ref.value() == 0, "Wrong pivot of reference triangle" );
+    const geode::Triangle3D triangle_ref{ a, b_ref, c };
+    const auto normal_ref = triangle_ref.normal();
+    geode::OpenGeodeGeometryException::test( normal_ref.has_value(),
+        "Normal of reference triangle should be calculated" );
+    geode::OpenGeodeGeometryException::test(
+        normal_ref.value() == answer, "Wrong normal of reference triangle" );
+    const auto pivot_ref = triangle_ref.pivot();
+    geode::OpenGeodeGeometryException::test( pivot_ref.has_value(),
+        "Pivot of reference triangle should be calculated" );
+    geode::OpenGeodeGeometryException::test(
+        pivot_ref.value() == 0, "Wrong pivot of reference triangle" );
 
-        const geode::Triangle3D triangle2{ a, b, c };
-        const auto normal2 = triangle2.normal();
-        geode::OpenGeodeGeometryException::test(
-            !normal2, "Normal of triangle2 should not be calculated" );
-        const auto pivot2 = triangle2.pivot();
-        geode::OpenGeodeGeometryException::test(
-            !pivot2, "Pivot of triangle2 should not be calculated" );
-        test_degenerated_consistency();
-        test_degenerated_triangle_vertex_order();
-        test_degenerated_tetrahedron_vertex_order();
-    }
+    const geode::Triangle3D triangle2{ a, b, c };
+    const auto normal2 = triangle2.normal();
+    geode::OpenGeodeGeometryException::test(
+        !normal2, "Normal of triangle2 should not be calculated" );
+    const auto pivot2 = triangle2.pivot();
+    geode::OpenGeodeGeometryException::test(
+        !pivot2, "Pivot of triangle2 should not be calculated" );
+    test_degenerated_consistency();
+    test_degenerated_triangle_vertex_order();
+    test_degenerated_tetrahedron_vertex_order();
+}
 
-    OPENGEODE_TEST( "distance" )
+OPENGEODE_TEST( "distance" )
