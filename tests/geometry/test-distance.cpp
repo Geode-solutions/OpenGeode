@@ -497,15 +497,15 @@ void test_segment_segment_distance_near_parallel_fixed()
     const auto [distance, closest0, closest1] =
         geode::segment_segment_distance( segment_ab, segment_cd );
     geode::OpenGeodeGeometryException::test(
-        std::fabs( distance - 1 ) < 1e-12 && closest0.inexact_equal( result0 )
-            && closest1.inexact_equal( c ),
+        std::fabs( distance - 1 ) < geode::GLOBAL_EPSILON
+            && closest0.inexact_equal( result0 ) && closest1.inexact_equal( c ),
         "Wrong result for segment_segment_distance with near parallel "
         "segments: ",
         distance, " ", closest0.string(), " ", closest1.string() );
     const auto [swapped_distance, swapped_closest0, swapped_closest1] =
         geode::segment_segment_distance( segment_cd, segment_ab );
     geode::OpenGeodeGeometryException::test(
-        std::fabs( swapped_distance - 1 ) < 1e-12
+        std::fabs( swapped_distance - 1 ) < geode::GLOBAL_EPSILON
             && swapped_closest0.inexact_equal( c )
             && swapped_closest1.inexact_equal( result0 ),
         "Wrong result for segment_segment_distance with swapped near "
@@ -519,10 +519,23 @@ void test_segment_segment_distance_near_parallel_fixed()
         geode::segment_segment_distance(
             geode::Segment3D{ e, f }, geode::Segment3D{ g, h } );
     geode::OpenGeodeGeometryException::test(
-        std::fabs( tiny_distance - 1e-7 ) < 1e-12,
+        std::fabs( tiny_distance - 1e-7 ) < geode::GLOBAL_EPSILON,
         "Wrong result for segment_segment_distance with tiny near parallel "
         "segments: ",
         tiny_distance );
+
+    // Deviation below GLOBAL_EPSILON: segments are considered parallel
+    const geode::Point3D i{ { 5.0, 1.0, 3e-8 } };
+    const auto [parallel_distance, parallel_closest0, parallel_closest1] =
+        geode::segment_segment_distance( segment_ab, geode::Segment3D{ c, i } );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( parallel_distance - 1 ) < geode::GLOBAL_EPSILON
+            && parallel_closest0.inexact_equal( result0 )
+            && parallel_closest1.inexact_equal( c ),
+        "Wrong result for segment_segment_distance with parallel segments "
+        "below GLOBAL_EPSILON: ",
+        parallel_distance, " ", parallel_closest0.string(), " ",
+        parallel_closest1.string() );
 }
 
 void test_segment_segment_distance_near_parallel_random()
@@ -556,12 +569,14 @@ void test_segment_segment_distance_near_parallel_random()
         geode::OpenGeodeGeometryException::test(
             std::fabs(
                 geode::point_point_distance( closest0, closest1 ) - distance )
-                < 1e-12,
+                < geode::GLOBAL_EPSILON,
             "Wrong result for segment_segment_distance: distance does not "
             "match closest points" );
         geode::OpenGeodeGeometryException::test(
-            geode::point_segment_distance( closest0, segment0 ) < 1e-12
-                && geode::point_segment_distance( closest1, segment1 ) < 1e-12,
+            geode::point_segment_distance( closest0, segment0 )
+                    < geode::GLOBAL_EPSILON
+                && geode::point_segment_distance( closest1, segment1 )
+                       < geode::GLOBAL_EPSILON,
             "Wrong result for segment_segment_distance: closest points not "
             "on segments" );
         auto brute_force = std::numeric_limits< double >::max();
@@ -576,7 +591,8 @@ void test_segment_segment_distance_near_parallel_random()
                 brute_force, geode::point_segment_distance(
                                  q0 + ( q1 - q0 ) * ratio, segment0 ) );
         }
-        geode::OpenGeodeGeometryException::test( distance <= brute_force + 1e-9,
+        geode::OpenGeodeGeometryException::test(
+            distance <= brute_force + geode::GLOBAL_EPSILON,
             "Wrong result for segment_segment_distance with near parallel "
             "segments: ",
             distance, " | brute force: ", brute_force );

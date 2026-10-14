@@ -521,9 +521,6 @@ namespace
         const geode::Vector< dimension >& Q1mQ0,
         const geode::Vector< dimension >& P0mQ0 )
     {
-        // Below this relative value of sin^2(angle), segments are considered
-        // parallel
-        static constexpr double PARALLEL_EPSILON{ 1e-20 };
         const auto a = P1mP0.dot( P1mP0 );
         const auto b = P1mP0.dot( Q1mQ0 );
         const auto c = Q1mQ0.dot( Q1mQ0 );
@@ -531,7 +528,11 @@ namespace
         const auto e = Q1mQ0.dot( P0mQ0 );
         const auto terms = segment_segment_terms( P1mP0, Q1mQ0, P0mQ0 );
         double s, t, nd, bmd, bpe;
-        if( terms.det > PARALLEL_EPSILON * a * c )
+        // det = a*c*sin^2(angle): segments are parallel when each one deviates
+        // from the direction of the other by less than GLOBAL_EPSILON, i.e.
+        // max(a,c)*sin^2(angle) < GLOBAL_EPSILON^2
+        if( terms.det
+            > geode::GLOBAL_EPSILON * geode::GLOBAL_EPSILON * std::min( a, c ) )
         {
             const auto det = terms.det;
             if( terms.s_numerator <= 0 ) // s <= 0
