@@ -602,8 +602,30 @@ void test_point_negative_tetrahedron_position()
         "tetrahedron and outside point" );
 }
 
+void test_point_flat_tetrahedron_position()
+{
+    // Nearly flat tetrahedron with a nearly degenerated facet
+    const geode::Point3D query{ { 0x1.1d92bbf44c79p-1, 0x1.34202cfc1b54p-2,
+        -0x1.431d39bb8b468p+1 } };
+    const geode::Point3D a{ { -0x1.29557ab528de9p+2, -0x1.0c7b8aefd5be1p+2,
+        -0x1.62aefebba1dp-2 } };
+    const geode::Point3D b{ { 0x1.0b154468d0664p+1, 0x1.19689c56a769cp+0,
+        -0x1.bf309ad1991ap+1 } };
+    const geode::Point3D c{ { 0x1.7754eaa12b7b2p+1, 0x1.c3a8c276219d4p+0,
+        -0x1.f1cb58c02e5ddp+1 } };
+    const geode::Point3D d{ { 0x1.d3a11c0545a79p+0, 0x1.ca2b6d456dfd5p-1,
+        -0x1.afa3287fc481ap+1 } };
+    const geode::Tetrahedron tetra{ a, b, c, d };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( query, tetra )
+            == geode::POSITION::outside,
+        "Wrong result for point_tetrahedron_position with nearly flat "
+        "tetrahedron" );
+}
+
 void test()
 {
+    test_point_flat_tetrahedron_position();
     test_point_negative_tetrahedron_position();
     test_point_side_to_segment();
     test_point_side_to_plane();

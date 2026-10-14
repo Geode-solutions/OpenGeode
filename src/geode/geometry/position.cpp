@@ -229,37 +229,18 @@ namespace geode
     POSITION point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        const auto& vertices = tetra.vertices();
         // Facets are oriented towards the inside of positive tetrahedra, i.e.
-        // with vertex 0 on the positive side of facet 0
+        // with vertex 0 on the positive side of facet 0. Approximated facet
+        // normals are unreliable for nearly flat tetrahedra: only exact
+        // predicates are used.
+        const auto& vertices = tetra.vertices();
         const auto& facet0 = Tetrahedron::tetrahedron_facet_vertex[0];
         const auto negative_orientation =
             GEO::PCK::orient_3d( vertices[facet0[0]], vertices[facet0[1]],
                 vertices[facet0[2]], vertices[0] )
             == GEO::SIGN::negative;
-        for( const auto f : Range{ 4 } )
-        {
-            const auto& facet_vertices =
-                Tetrahedron::tetrahedron_facet_vertex[f];
-            const Triangle3D facet{ vertices[facet_vertices[0]],
-                vertices[facet_vertices[1]], vertices[facet_vertices[2]] };
-            auto signed_distance =
-                std::get< 0 >( point_triangle_signed_distance( point, facet ) );
-            if( negative_orientation )
-            {
-                signed_distance = -signed_distance;
-            }
-            if( signed_distance < -GLOBAL_EPSILON )
-            {
-                return POSITION::outside;
-            }
-            if( signed_distance < GLOBAL_EPSILON )
-            {
-                return point_tetrahedron_position_exact(
-                    point, tetra, negative_orientation );
-            }
-        }
-        return POSITION::inside;
+        return point_tetrahedron_position_exact(
+            point, tetra, negative_orientation );
     }
 
     template <>
