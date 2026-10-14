@@ -105,9 +105,11 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_triangles(
-        index_t /*unused*/ )
+        index_t nb )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_triangulated_surface_.add_triangles(
+            nb, typename OpenGeodeTriangulatedSurface<
+                    dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template < index_t dimension >
@@ -132,18 +134,22 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_delete_polygons(
-        const std::vector< bool >& /*unused*/,
+        const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_triangulated_surface_.remove_polygons(
+            to_delete, typename OpenGeodeTriangulatedSurface<
+                           dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_permute_polygons(
-        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_triangulated_surface_.permute_polygons(
+            permutation, typename OpenGeodeTriangulatedSurface<
+                             dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template < index_t dimension >
@@ -155,9 +161,13 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_copy_polygons(
-        const SurfaceMesh< dimension >& /*unused*/ )
+        const SurfaceMesh< dimension >& surface_mesh )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_triangulated_surface_.copy_polygons(
+            dynamic_cast< const OpenGeodeTriangulatedSurface< dimension >& >(
+                surface_mesh ),
+            typename OpenGeodeTriangulatedSurface<
+                dimension >::OGTriangulatedSurfaceKey{} );
     }
 
     template class opengeode_mesh_api OpenGeodeTriangulatedSurfaceBuilder< 2 >;

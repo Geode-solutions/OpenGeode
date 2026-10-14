@@ -312,6 +312,7 @@ add_geode_library(
     ADVANCED_HEADERS
         "core/detail/facet_storage.hpp"
         "core/detail/geode_elements.hpp"
+        "core/detail/legacy_attributes.hpp"
         "core/detail/vertex_cycle.hpp"
         "helpers/detail/component_identifier.hpp"
         "helpers/detail/create_mesh.hpp"

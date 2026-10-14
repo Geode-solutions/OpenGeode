@@ -65,10 +65,16 @@ namespace geode
             vertex_set.vertex_attribute_manager() );
     }
 
+    void VertexSetBuilder::resize_vertices( index_t nb_vertices )
+    {
+        vertex_set_.vertex_attribute_manager().resize( nb_vertices );
+        do_resize_vertex_storage( nb_vertices );
+    }
+
     index_t VertexSetBuilder::create_vertex()
     {
         const auto added_vertex = vertex_set_.nb_vertices();
-        vertex_set_.vertex_attribute_manager().resize( added_vertex + 1 );
+        resize_vertices( added_vertex + 1 );
         do_create_vertex();
         return added_vertex;
     }
@@ -76,8 +82,7 @@ namespace geode
     index_t VertexSetBuilder::create_vertices( index_t nb )
     {
         const auto first_added_vertex = vertex_set_.nb_vertices();
-        vertex_set_.vertex_attribute_manager().resize(
-            first_added_vertex + nb );
+        resize_vertices( first_added_vertex + nb );
         do_create_vertices( nb );
         return first_added_vertex;
     }

@@ -30,10 +30,12 @@
 
 #include <bitsery/brief_syntax/array.h>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/cached_value.hpp>
+#include <geode/basic/permutation.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -50,6 +52,7 @@
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/detail/facet_storage.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/internal/surface_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
@@ -278,31 +281,8 @@ namespace geode
         friend class bitsery::Access;
         using CachedPolygons =
             CachedValue< internal::PolygonsAroundVertexImpl >;
-        static constexpr auto POLYGONS_AROUND_VERTEX_NAME =
-            "polygons_around_vertex";
 
     public:
-        Impl( SurfaceMesh& surface )
-        {
-            AttributeProperties attribute_properties;
-            attribute_properties.assignable = false;
-            attribute_properties.interpolable = false;
-            attribute_properties.transferable = false;
-            AttributeValues< PolygonVertex > polygon_around_vertex_values;
-            polygon_around_vertex_values.default_value = PolygonVertex{};
-            polygon_around_vertex_values.no_value = PolygonVertex{};
-            const auto attribute_id =
-                surface.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        PolygonVertex >( "polygon_around_vertex",
-                        polygon_around_vertex_values, attribute_properties );
-            polygon_around_vertex_ =
-                surface.vertex_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        PolygonVertex >( attribute_id );
-            initialize_polygons_around_vertex( surface );
-        }
-
         VerticesAroundVertex vertices_around_vertex(
             const SurfaceMesh< dimension >& mesh, index_t vertex_id ) const
         {
@@ -340,7 +320,7 @@ namespace geode
         std::optional< PolygonVertex > polygon_around_vertex(
             const index_t vertex_id ) const
         {
-            const auto& value = polygon_around_vertex_->value( vertex_id );
+            const auto& value = polygon_around_vertex_[vertex_id];
             if( value.polygon_id != NO_ID )
             {
                 return value;
@@ -350,10 +330,7 @@ namespace geode
 
         void reset_polygons_around_vertex( index_t vertex_id )
         {
-            polygons_around_vertex_->modify_value(
-                vertex_id, []( CachedPolygons& value ) {
-                    value.reset();
-                } );
+            polygons_around_vertex_[vertex_id].reset();
         }
 
         const PolygonsAroundVertex& polygons_around_vertex(
@@ -378,7 +355,7 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, const index_t vertex_id )
         {
-            polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
+            polygon_around_vertex_[vertex_id] = polygon_vertex;
         }
 
         bool are_edges_enabled() const
@@ -439,30 +416,45 @@ namespace geode
             return { polygon_attribute_manager_, texture_storage_ };
         }
 
-        void initialize_polygons_around_vertex(
-            const SurfaceMesh< dimension >& surface )
+        void resize_vertex_storage( index_t nb_vertices )
         {
-            AttributeProperties attribute_properties;
-            attribute_properties.assignable = false;
-            attribute_properties.interpolable = false;
-            attribute_properties.transferable = false;
-            AttributeValues< CachedPolygons > polygon_around_vertex_values;
-            polygon_around_vertex_values.default_value = CachedPolygons{};
-            polygon_around_vertex_values.no_value = CachedPolygons{};
-            const auto attribute_id =
-                surface.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        CachedPolygons >( POLYGONS_AROUND_VERTEX_NAME,
-                        polygon_around_vertex_values, attribute_properties );
-            polygons_around_vertex_ =
-                surface.vertex_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        CachedPolygons >( attribute_id );
+            polygon_around_vertex_.resize( nb_vertices );
+            polygons_around_vertex_.resize( nb_vertices );
+        }
+
+        void delete_vertex_storage( const std::vector< bool >& to_delete )
+        {
+            delete_vector_elements( to_delete, polygon_around_vertex_ );
+            delete_vector_elements( to_delete, polygons_around_vertex_ );
+        }
+
+        void permute_vertex_storage( absl::Span< const index_t > permutation )
+        {
+            permute( polygon_around_vertex_, permutation );
+            permute( polygons_around_vertex_, permutation );
+        }
+
+        void remove_legacy_attributes( AttributeManager& manager )
+        {
+            legacy_attributes_.remove_from( manager );
         }
 
         Impl() = default;
 
     private:
+        template < typename Archive >
+        void deserialize_legacy_polygon_around_vertex( Archive& archive )
+        {
+            legacy_attributes_.deserialize( archive, polygon_around_vertex_ );
+            polygons_around_vertex_.resize( polygon_around_vertex_.size() );
+        }
+
+        template < typename Archive >
+        void deserialize_legacy_polygons_around_vertex( Archive& archive )
+        {
+            legacy_attributes_.skip< CachedPolygons >( archive );
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -470,82 +462,46 @@ namespace geode
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.object( impl.polygon_attribute_manager_ );
-                         archive.ext( impl.polygon_around_vertex_,
-                             bitsery::ext::StdSmartPtr{} );
+                         impl.deserialize_legacy_polygon_around_vertex(
+                             archive );
                          archive.ext(
                              impl.edges_, bitsery::ext::StdSmartPtr{} );
-                         const auto& old_polygon_around_vertex_properties =
-                             impl.polygon_around_vertex_->properties();
-                         impl.polygon_around_vertex_->set_properties(
-                             { old_polygon_around_vertex_properties.assignable,
-                                 old_polygon_around_vertex_properties
-                                     .interpolable,
-                                 false } );
-                         const auto& old_polygons_around_vertex_properties =
-                             impl.polygons_around_vertex_->properties();
-                         impl.polygons_around_vertex_->set_properties(
-                             { old_polygons_around_vertex_properties.assignable,
-                                 old_polygons_around_vertex_properties
-                                     .interpolable,
-                                 false } );
                      },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.polygon_attribute_manager_ );
-                            archive.ext( impl.polygon_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl.polygons_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
+                            impl.deserialize_legacy_polygon_around_vertex(
+                                archive );
+                            impl.deserialize_legacy_polygons_around_vertex(
+                                archive );
                             archive.ext(
                                 impl.edges_, bitsery::ext::StdSmartPtr{} );
-                            const auto& old_polygon_around_vertex_properties =
-                                impl.polygon_around_vertex_->properties();
-                            impl.polygon_around_vertex_->set_properties(
-                                { old_polygon_around_vertex_properties
-                                        .assignable,
-                                    old_polygon_around_vertex_properties
-                                        .interpolable,
-                                    false } );
-                            const auto& old_polygons_around_vertex_properties =
-                                impl.polygons_around_vertex_->properties();
-                            impl.polygons_around_vertex_->set_properties(
-                                { old_polygons_around_vertex_properties
-                                        .assignable,
-                                    old_polygons_around_vertex_properties
-                                        .interpolable,
-                                    false } );
                         },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.polygon_attribute_manager_ );
-                            archive.ext( impl.polygon_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl.polygons_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
+                            impl.deserialize_legacy_polygon_around_vertex(
+                                archive );
+                            impl.deserialize_legacy_polygons_around_vertex(
+                                archive );
                             archive.ext(
                                 impl.edges_, bitsery::ext::StdSmartPtr{} );
                             archive.object( impl.texture_storage_ );
-                            const auto& old_polygon_around_vertex_properties =
-                                impl.polygon_around_vertex_->properties();
-                            impl.polygon_around_vertex_->set_properties(
-                                { old_polygon_around_vertex_properties
-                                        .assignable,
-                                    old_polygon_around_vertex_properties
-                                        .interpolable,
-                                    false } );
-                            const auto& old_polygons_around_vertex_properties =
-                                impl.polygons_around_vertex_->properties();
-                            impl.polygons_around_vertex_->set_properties(
-                                { old_polygons_around_vertex_properties
-                                        .assignable,
-                                    old_polygons_around_vertex_properties
-                                        .interpolable,
-                                    false } );
                         },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.polygon_attribute_manager_ );
-                            archive.ext( impl.polygon_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl.polygons_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
+                            impl.deserialize_legacy_polygon_around_vertex(
+                                archive );
+                            impl.deserialize_legacy_polygons_around_vertex(
+                                archive );
+                            archive.ext(
+                                impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            archive.object( impl.texture_storage_ );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.polygon_attribute_manager_ );
+                            archive.container( impl.polygon_around_vertex_,
+                                impl.polygon_around_vertex_.max_size() );
+                            impl.polygons_around_vertex_.resize(
+                                impl.polygon_around_vertex_.size() );
                             archive.ext(
                                 impl.edges_, bitsery::ext::StdSmartPtr{} );
                             archive.object( impl.texture_storage_ );
@@ -558,7 +514,7 @@ namespace geode
                 const index_t vertex_id,
                 const std::optional< PolygonVertex >& first_polygon ) const
         {
-            const auto& cached = polygons_around_vertex_->value( vertex_id );
+            const auto& cached = polygons_around_vertex_[vertex_id];
             if( cached.computed() && first_polygon
                 && absl::c_contains(
                     cached.value().polygons, first_polygon.value() ) )
@@ -573,18 +529,15 @@ namespace geode
 
     private:
         mutable AttributeManager polygon_attribute_manager_;
-        std::shared_ptr< VariableAttribute< PolygonVertex > >
-            polygon_around_vertex_;
-        mutable std::shared_ptr< VariableAttribute< CachedPolygons > >
-            polygons_around_vertex_;
+        std::vector< PolygonVertex > polygon_around_vertex_;
+        mutable std::vector< CachedPolygons > polygons_around_vertex_;
         mutable std::unique_ptr< SurfaceEdges< dimension > > edges_;
         mutable TextureStorage2D texture_storage_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < index_t dimension >
-    SurfaceMesh< dimension >::SurfaceMesh() : impl_( *this )
-    {
-    }
+    SurfaceMesh< dimension >::SurfaceMesh() = default;
 
     template < index_t dimension >
     SurfaceMesh< dimension >::SurfaceMesh( BITSERY )
@@ -1117,14 +1070,16 @@ namespace geode
                 { []( Archive& archive, SurfaceMesh& surface ) {
                      archive.ext(
                          surface, bitsery::ext::BaseClass< VertexSet >{} );
-                     surface.impl_->initialize_polygons_around_vertex(
-                         surface );
                      archive.object( surface.impl_ );
+                     surface.impl_->remove_legacy_attributes(
+                         surface.vertex_attribute_manager() );
                  },
                     []( Archive& archive, SurfaceMesh& surface ) {
                         archive.ext(
                             surface, bitsery::ext::BaseClass< VertexSet >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->remove_legacy_attributes(
+                            surface.vertex_attribute_manager() );
                     },
                     []( Archive& archive, SurfaceMesh& surface ) {
                         archive.ext(
@@ -1134,6 +1089,8 @@ namespace geode
                                          CoordinateReferenceSystemManagers<
                                              dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->remove_legacy_attributes(
+                            surface.vertex_attribute_manager() );
                     } } } );
     }
 
@@ -1150,6 +1107,27 @@ namespace geode
             box.add_point( this->point( p ) );
         }
         return box;
+    }
+
+    template < index_t dimension >
+    void SurfaceMesh< dimension >::resize_vertex_storage(
+        index_t nb_vertices, SurfaceMeshKey /*key*/ )
+    {
+        impl_->resize_vertex_storage( nb_vertices );
+    }
+
+    template < index_t dimension >
+    void SurfaceMesh< dimension >::delete_vertex_storage(
+        const std::vector< bool >& to_delete, SurfaceMeshKey /*key*/ )
+    {
+        impl_->delete_vertex_storage( to_delete );
+    }
+
+    template < index_t dimension >
+    void SurfaceMesh< dimension >::permute_vertex_storage(
+        absl::Span< const index_t > permutation, SurfaceMeshKey /*key*/ )
+    {
+        impl_->permute_vertex_storage( permutation );
     }
 
     template < index_t dimension >

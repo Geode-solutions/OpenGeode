@@ -79,6 +79,18 @@ namespace geode
             index_t vertex_id,
             OGGraphKey /*key*/ );
 
+        void add_edge( OGGraphKey /*key*/ );
+
+        void add_edges( index_t nb, OGGraphKey /*key*/ );
+
+        void remove_edges(
+            const std::vector< bool >& to_delete, OGGraphKey /*key*/ );
+
+        void permute_edges(
+            absl::Span< const index_t > permutation, OGGraphKey /*key*/ );
+
+        void copy_edges( const OpenGeodeGraph& graph, OGGraphKey /*key*/ );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
