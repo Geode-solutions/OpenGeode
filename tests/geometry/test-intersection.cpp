@@ -1131,8 +1131,70 @@ void test_small_sphere_intersection()
         "GLOBAL_EPSILON" );
 }
 
+void test_triangle_intersection_near_parallel()
+{
+    // Line nearly parallel to the triangle plane, 3 away from the triangle
+    const geode::Point3D t0{ { 0x1.03bffd2202968p+2, 0x1.6fd08c18b0728p+0,
+        -0x1.177a24c186d1bp+2 } };
+    const geode::Point3D t1{ { -0x1.a54aef4753099p+1, -0x1.262ea62ca4626p+0,
+        -0x1.f00e403e9344p+0 } };
+    const geode::Point3D t2{ { -0x1.a3f71ec8e0ec2p+0, 0x1.2cc398f6a1d96p+1,
+        -0x1.1a511f5e5d612p+2 } };
+    const geode::Point3D l0{ { -0x1.6ce04f0f9e572p+2, -0x1.0d39029896037p+2,
+        0x1.4632a52ff3331p-2 } };
+    const geode::Point3D l1{ { -0x1.c80fd9962edd4p+2, 0x1.0b14dfd807139p+1,
+        -0x1.d989511eb823ep+1 } };
+    const auto far = geode::line_triangle_intersection(
+        geode::InfiniteLine3D{ geode::Segment3D{ l0, l1 } },
+        geode::Triangle3D{ t0, t1, t2 } );
+    geode::OpenGeodeGeometryException::test(
+        far.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for line_triangle_intersection with nearly parallel "
+        "line far from the triangle" );
+
+    // Segment nearly parallel to the triangle plane, 0.8 away from it
+    const geode::Point3D u0{ { -0x1.197524bb976d8p+0, -0x1.091bcd8fced32p+2,
+        0x1.972f348d9a6cp-1 } };
+    const geode::Point3D u1{ { -0x1.8a8dbb5920948p+0, 0x1.c2c08a610a734p+1,
+        -0x1.974660605015ap+1 } };
+    const geode::Point3D u2{ { -0x1.199d82f8d93cbp+1, -0x1.9d1d2fa6a19aep+1,
+        0x1.46c5cbcd7fc3p-1 } };
+    const geode::Point3D s0{ { -0x1.c5dc4c87e12fbp-1, 0x1.29b68453935d4p+2,
+        -0x1.fe4a9aa583717p+1 } };
+    const geode::Point3D s1{ { -0x1.d05a434b20318p+1, 0x1.bd4a334a649d7p+1,
+        -0x1.435f6a4e39e6ap+1 } };
+    const auto separated = geode::segment_triangle_intersection(
+        geode::Segment3D{ s0, s1 }, geode::Triangle3D{ u0, u1, u2 } );
+    geode::OpenGeodeGeometryException::test(
+        separated.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for segment_triangle_intersection with nearly parallel "
+        "segment far from the triangle" );
+
+    // Segment within GLOBAL_EPSILON of the triangle plane, crossing the
+    // triangle: coplanar
+    const geode::Point3D v0{ { -0x1.34e94ffeb0b77p+2, 0x1.7f8acdaf49f1p-1,
+        -0x1.701bf0d23d0dep+1 } };
+    const geode::Point3D v1{ { -0x1.75576fd208f7dp+1, -0x1.df8314931b436p+1,
+        -0x1.8d5159c2c416cp+1 } };
+    const geode::Point3D v2{ { -0x1.2ba7aa65ac70cp+2, 0x1.be0852a8488ecp+0,
+        -0x1.f8d8c7d15f43p-1 } };
+    const geode::Point3D r0{ { -0x1.18520a425ac3p+2, -0x1.4de1d1066c5a4p-1,
+        -0x1.b6f8dd0dbbc99p+1 } };
+    const geode::Point3D r1{ { -0x1.e00dc3000ad1dp+1, 0x1.21443b30d1609p-1,
+        0x1.6b4680dfa430dp-2 } };
+    const geode::Triangle3D crossed{ v0, v1, v2 };
+    const geode::Segment3D crossing_segment{ r0, r1 };
+    const auto crossing =
+        geode::segment_triangle_intersection( crossing_segment, crossed );
+    geode::OpenGeodeGeometryException::test(
+        crossing.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong result for segment_triangle_intersection with segment in the "
+        "triangle plane" );
+}
+
 void test()
 {
+    test_triangle_intersection_near_parallel();
     test_small_sphere_intersection();
     test_line_sphere_intersection();
     test_segment_sphere_intersection();

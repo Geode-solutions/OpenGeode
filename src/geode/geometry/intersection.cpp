@@ -24,6 +24,7 @@
 #include <geode/geometry/intersection.hpp>
 
 #include <algorithm>
+#include <limits>
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
@@ -97,6 +98,119 @@ namespace
         size_t numIntersections;
         std::array< double, 2 > parameter;
     };
+    /*
+     * Intersection between a triangle and the part of the line
+     * X = point0 + alpha * (point1 - point0) with alpha in
+     * [alpha_min, alpha_max]. Objects closer than GLOBAL_EPSILON are considered
+     * intersecting. The part of the line within GLOBAL_EPSILON of the triangle
+     * plane over the triangle extent and of the triangle is considered
+     * parallel.
+     */
+    template < typename DistanceFallback >
+    geode::IntersectionResult< geode::Point3D > line_part_triangle_intersection(
+        const geode::Point3D& point0,
+        const geode::Point3D& point1,
+        double alpha_min,
+        double alpha_max,
+        const geode::Triangle3D& triangle,
+        const DistanceFallback& distance_fallback )
+    {
+        const auto& vertices = triangle.vertices();
+        const auto build_result = [&]( geode::Point3D point,
+                                      double line_distance,
+                                      geode::Point3D line_projection ) {
+            geode::CorrectnessInfo< geode::Point3D >::Correctness
+                first_correctness{ line_distance <= geode::GLOBAL_EPSILON,
+                    std::move( line_projection ) };
+            auto [triangle_distance, triangle_projection] =
+                geode::point_triangle_distance( point, triangle );
+            geode::CorrectnessInfo< geode::Point3D >::Correctness
+                second_correctness{ triangle_distance <= geode::GLOBAL_EPSILON,
+                    std::move( triangle_projection ) };
+            return geode::IntersectionResult< geode::Point3D >{
+                std::move( point ), { first_correctness, second_correctness }
+            };
+        };
+        const auto from_fallback = [&]() {
+            auto [distance, on_line, on_triangle] = distance_fallback();
+            if( distance > geode::GLOBAL_EPSILON )
+            {
+                return geode::IntersectionResult< geode::Point3D >{
+                    geode::INTERSECTION_TYPE::none
+                };
+            }
+            return build_result( on_line, 0., on_line );
+        };
+        const auto normal = triangle.normal();
+        if( !normal )
+        {
+            return from_fallback();
+        }
+        // Restrict the line part to the neighborhood of the triangle
+        const geode::Vector3D direction{ point0, point1 };
+        const auto length = direction.length();
+        const auto extent =
+            ( std::max( { geode::point_point_distance(
+                              vertices[0].get(), vertices[1].get() ),
+                  geode::point_point_distance(
+                      vertices[1].get(), vertices[2].get() ),
+                  geode::point_point_distance(
+                      vertices[2].get(), vertices[0].get() ) } )
+                + geode::GLOBAL_EPSILON )
+            / length;
+        const auto alpha_center =
+            direction.dot( geode::Vector3D{ point0, vertices[0] } )
+            / ( length * length );
+        const auto alpha_begin = std::max( alpha_min, alpha_center - extent );
+        const auto alpha_end = std::min( alpha_max, alpha_center + extent );
+        if( alpha_begin > alpha_end )
+        {
+            return { geode::INTERSECTION_TYPE::none };
+        }
+        const auto height0 =
+            normal->dot( geode::Vector3D{ vertices[0], point0 } );
+        const auto height1 =
+            normal->dot( geode::Vector3D{ vertices[0], point1 } );
+        const auto height_slope = height1 - height0;
+        const auto height_begin = height0 + height_slope * alpha_begin;
+        const auto height_end = height0 + height_slope * alpha_end;
+        if( std::fabs( height_begin ) <= geode::GLOBAL_EPSILON
+            && std::fabs( height_end ) <= geode::GLOBAL_EPSILON )
+        {
+            if( std::get< 0 >( distance_fallback() ) > geode::GLOBAL_EPSILON )
+            {
+                return { geode::INTERSECTION_TYPE::none };
+            }
+            return { geode::INTERSECTION_TYPE::parallel };
+        }
+        if( ( height_begin > geode::GLOBAL_EPSILON
+                && height_end > geode::GLOBAL_EPSILON )
+            || ( height_begin < -geode::GLOBAL_EPSILON
+                 && height_end < -geode::GLOBAL_EPSILON ) )
+        {
+            return { geode::INTERSECTION_TYPE::none };
+        }
+        // Crossing of the triangle plane
+        const auto alpha_plane = -height0 / height_slope;
+        const auto alpha_crossing =
+            std::clamp( alpha_plane, alpha_begin, alpha_end );
+        auto crossing = point0 + direction * alpha_crossing;
+        const auto crossing_distance = std::get< 0 >(
+            geode::point_triangle_distance( crossing, triangle ) );
+        if( crossing_distance <= geode::GLOBAL_EPSILON )
+        {
+            return build_result( std::move( crossing ), 0., crossing );
+        }
+        // The line part distance to the triangle is at least
+        // crossing_distance * |sin(angle)| / sqrt(2)
+        if( alpha_crossing == alpha_plane
+            && crossing_distance * std::fabs( height_slope )
+                   > 2 * geode::GLOBAL_EPSILON * length )
+        {
+            return { geode::INTERSECTION_TYPE::none };
+        }
+        return from_fallback();
+    }
 } // namespace
 
 namespace geode
@@ -253,158 +367,37 @@ namespace geode
     IntersectionResult< Point3D > segment_triangle_intersection(
         const Segment3D& segment, const Triangle3D& triangle )
     {
-        // http://www.geometrictools.com/LibMathematics/Intersection/Intersection.html
-        // Compute the offset origin, edges, and normal.
-        const auto seg_center = segment.barycenter();
-        const auto& vertices = triangle.vertices();
-        const Vector3D edge1{ vertices[0], vertices[1] };
-        const Vector3D edge2{ vertices[0], vertices[2] };
-        const auto normal = edge1.cross( edge2 );
-
-        // Solve Q + t*D = b1*E1 + b2*E2 (Q = diff, D = segment direction,
-        // E1 = edge1, E2 = edge2, N = Cross(E1,E2)) by
-        //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-        //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-        //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-        const auto segment_normalized_direction = segment.direction();
-        auto d_dot_n = segment_normalized_direction.dot( normal );
-        signed_index_t sign;
-        if( d_dot_n > 0. )
+        const auto& origin = segment.vertices()[0].get();
+        const auto length = segment.length();
+        if( length <= GLOBAL_EPSILON )
         {
-            sign = 1;
+            // Segment considered as a point
+            if( std::get< 0 >( point_triangle_distance( origin, triangle ) )
+                > GLOBAL_EPSILON )
+            {
+                return { INTERSECTION_TYPE::none };
+            }
+            CorrectnessInfo< Point3D >::Correctness first_correctness{ true,
+                origin };
+            CorrectnessInfo< Point3D >::Correctness second_correctness{ true,
+                std::get< 1 >( point_triangle_distance( origin, triangle ) ) };
+            return { origin, { first_correctness, second_correctness } };
         }
-        else if( d_dot_n < -0. )
-        {
-            sign = -1;
-            d_dot_n = -d_dot_n;
-        }
-        else
-        {
-            // Segment and triangle are parallel
-            return { INTERSECTION_TYPE::parallel };
-        }
-
-        const Vector3D diff{ vertices[0], seg_center };
-        const auto d_dot_q_cross_e2 =
-            sign * segment_normalized_direction.dot( diff.cross( edge2 ) );
-        if( d_dot_q_cross_e2 < -GLOBAL_EPSILON )
-        {
-            // b1 < 0, no intersection
-            return { INTERSECTION_TYPE::none };
-        }
-        const auto d_dot_e1_cross_q =
-            sign * segment_normalized_direction.dot( edge1.cross( diff ) );
-        if( d_dot_e1_cross_q < -GLOBAL_EPSILON )
-        {
-            // b2 < 0, no intersection
-            return { INTERSECTION_TYPE::none };
-        }
-
-        if( d_dot_q_cross_e2 + d_dot_e1_cross_q - d_dot_n > GLOBAL_EPSILON )
-        {
-            // b1+b2 > 1, no intersection
-            return { INTERSECTION_TYPE::none };
-        }
-
-        // InfiniteLine intersects triangle, check if segment does.
-        const auto q_dot_n = -sign * diff.dot( normal );
-        const auto half_length = segment.length() / 2.;
-        const auto extd_dot_n = half_length * d_dot_n;
-
-        if( std::fabs( q_dot_n ) > extd_dot_n + GLOBAL_EPSILON * d_dot_n )
-        {
-            // else: |t| > extent + epsilon, no intersection
-            return { INTERSECTION_TYPE::none };
-        }
-        // Segment intersects triangle.
-        const auto inv = 1. / d_dot_n;
-        const auto seg_parameter =
-            std::clamp( q_dot_n * inv, -half_length, half_length );
-
-        auto result = seg_center + segment_normalized_direction * seg_parameter;
-        CorrectnessInfo< Point3D >::Correctness first_correctness{
-            point_segment_distance( result, segment ) <= GLOBAL_EPSILON,
-            point_segment_projection( result, segment )
-        };
-        const auto point_to_triangle_distance =
-            point_triangle_distance( result, triangle );
-        CorrectnessInfo< Point3D >::Correctness second_correctness{
-            std::get< 0 >( point_to_triangle_distance ) <= GLOBAL_EPSILON,
-            std::get< 1 >( point_to_triangle_distance )
-        };
-        return { std::move( result ),
-            { first_correctness, second_correctness } };
+        return line_part_triangle_intersection( origin, segment.vertices()[1],
+            0., 1., triangle, [&segment, &triangle] {
+                return segment_triangle_distance( segment, triangle );
+            } );
     }
 
     IntersectionResult< Point3D > line_triangle_intersection(
         const InfiniteLine3D& line, const Triangle3D& triangle )
     {
-        // http://www.geometrictools.com/LibMathematics/Intersection/Intersection.html
-        // Compute the offset origin, edges, and normal.
-        const auto& vertices = triangle.vertices();
-        const Vector3D edge1{ vertices[0], vertices[1] };
-        const Vector3D edge2{ vertices[0], vertices[2] };
-        const auto normal = edge1.cross( edge2 );
-
-        // Solve Q + t*D = b1*E1 + b2*E2 (Q = diff, D = segment direction,
-        // E1 = edge1, E2 = edge2, N = Cross(E1,E2)) by
-        //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-        //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-        //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-        auto d_dot_n = line.direction().dot( normal );
-        signed_index_t sign;
-        if( d_dot_n > 0. )
-        {
-            sign = 1;
-        }
-        else if( d_dot_n < -0. )
-        {
-            sign = -1;
-            d_dot_n = -d_dot_n;
-        }
-        else
-        {
-            // Segment and triangle are parallel
-            return { INTERSECTION_TYPE::parallel };
-        }
-
-        const Vector3D diff{ vertices[0], line.origin() };
-        const auto d_dot_q_cross_e2 =
-            sign * line.direction().dot( diff.cross( edge2 ) );
-        if( d_dot_q_cross_e2 >= -GLOBAL_EPSILON )
-        {
-            const auto d_dot_e1_cross_q =
-                sign * line.direction().dot( edge1.cross( diff ) );
-            if( d_dot_e1_cross_q >= -GLOBAL_EPSILON
-                && d_dot_q_cross_e2 + d_dot_e1_cross_q <= d_dot_n )
-            {
-                // InfiniteLine intersects triangle.
-                const auto q_dot_n = -sign * diff.dot( normal );
-                const auto inv = 1. / d_dot_n;
-                const auto seg_parameter = q_dot_n * inv;
-
-                auto result = line.origin() + line.direction() * seg_parameter;
-                CorrectnessInfo< Point3D >::Correctness first_correctness{
-                    point_line_distance( result, line ) <= GLOBAL_EPSILON,
-                    point_line_projection( result, line )
-                };
-                const auto tri_lambdas =
-                    safe_triangle_barycentric_coordinates( result, triangle );
-                const auto correctness_point =
-                    vertices[0].get() * tri_lambdas[0]
-                    + vertices[1].get() * tri_lambdas[1]
-                    + vertices[2].get() * tri_lambdas[2];
-                CorrectnessInfo< Point3D >::Correctness second_correctness{
-                    result.inexact_equal( correctness_point ), correctness_point
-                };
-                return { std::move( result ),
-                    { first_correctness, second_correctness } };
-            }
-            // else: b1+b2 > 1, no intersection
-            // else: b2 < 0, no intersection
-        }
-        // else: b1 < 0, no intersection
-        return { INTERSECTION_TYPE::none };
+        constexpr auto infinity = std::numeric_limits< double >::infinity();
+        return line_part_triangle_intersection( line.origin(),
+            line.origin() + line.direction(), -infinity, infinity, triangle,
+            [&line, &triangle] {
+                return line_triangle_distance( line, triangle );
+            } );
     }
 
     IntersectionResult< Point2D > line_line_intersection(
