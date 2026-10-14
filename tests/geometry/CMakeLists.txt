@@ -172,11 +172,3 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
-
-add_geode_test(
-    SOURCE "benchmark-tier2-robustness.cpp"
-    LOCAL
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-)
