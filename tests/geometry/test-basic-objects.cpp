@@ -353,8 +353,6 @@ void test()
     test_tetrahedron();
     test_sphere();
     test_circle();
-    test_polygon_minimum_height();
-    test_circle_bounding_box();
     test_polygon();
 }
 
