@@ -197,6 +197,8 @@ void test_degenerated_tetrahedron_vertex_order()
             }
         }
     }
+} 
+
     void test_set_point()
     {
         geode::OwnerTriangle3D triangle{ geode::Point3D{ { 0, 0, 0 } },
