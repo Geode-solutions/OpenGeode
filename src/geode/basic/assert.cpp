@@ -29,6 +29,36 @@
 #include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
 
+namespace
+{
+    void log_current_exception()
+    {
+        try
+        {
+            throw;
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::critical( exception.string() );
+            std::reference_wrapper< const geode::OpenGeodeException > current =
+                exception;
+            while( current.get().has_parent() )
+            {
+                current = current.get().parent();
+                geode::Logger::critical( "From: ", current.get().string() );
+            }
+        }
+        catch( const std::exception& exception )
+        {
+            geode::Logger::critical( "std::exception: ", exception.what() );
+        }
+        catch( ... )
+        {
+            geode::Logger::critical( "Unknown exception" );
+        }
+    }
+} // namespace
+
 namespace geode
 {
     OpenGeodeException::OpenGeodeException( const OpenGeodeException& other )
@@ -75,36 +105,6 @@ namespace geode
             " from project ", project(), " and library ", library(), ": ",
             what() );
     }
-
-    namespace
-    {
-        void log_current_exception()
-        {
-            try
-            {
-                throw;
-            }
-            catch( const OpenGeodeException& exception )
-            {
-                Logger::critical( exception.string() );
-                std::reference_wrapper< const OpenGeodeException > current =
-                    exception;
-                while( current.get().has_parent() )
-                {
-                    current = current.get().parent();
-                    Logger::critical( "From: ", current.get().string() );
-                }
-            }
-            catch( const std::exception& exception )
-            {
-                Logger::critical( "std::exception: ", exception.what() );
-            }
-            catch( ... )
-            {
-                Logger::critical( "Unknown exception" );
-            }
-        }
-    } // namespace
 
     int geode_lippincott()
     {
