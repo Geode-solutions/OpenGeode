@@ -186,3 +186,11 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
     LOCAL
 )
+
+add_geode_test(
+    SOURCE "benchmark-tier3-performance.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+    LOCAL
+)
