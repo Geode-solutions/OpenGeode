@@ -1857,7 +1857,9 @@ void test_point_cylinder_distance()
                    geode::point_cylinder_distance( axis_closest, cylinder ) )
                    <= geode::GLOBAL_EPSILON,
         "Wrong point_cylinder_distance: on the axis" );
-    void test_point_skewed_tetrahedron_distance()
+                            }
+
+void test_point_skewed_tetrahedron_distance()
     {
         const geode::Point3D a{ { 0, 0, 0 } };
         const geode::Point3D b{ { 4, 0.2, 0.1 } };
