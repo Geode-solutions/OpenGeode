@@ -29,10 +29,10 @@
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/internal/intersection_from_sides.hpp>
-#include <geode/geometry/internal/predicates.hpp>
 #include <geode/geometry/intersection.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/position.hpp>
+#include <geode/geometry/predicates.hpp>
 #include <geode/geometry/sign.hpp>
 
 namespace

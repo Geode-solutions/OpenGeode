@@ -54,7 +54,7 @@ add_geode_library(
         "perpendicular.cpp"
         "points_sort.cpp"
         "position.cpp"
-        "internal/predicates.cpp"
+        "predicates.cpp"
         "point.cpp"
         "projection.cpp"
         "quality.cpp"
@@ -95,6 +95,7 @@ add_geode_library(
         "point.hpp"
         "points_sort.hpp"
         "position.hpp"
+        "predicates.hpp"
         "projection.hpp"
         "quality.hpp"
         "radial_sort.hpp"
@@ -108,7 +109,6 @@ add_geode_library(
     INTERNAL_HEADERS
         "internal/intersection_from_sides.hpp"
         "internal/position_from_sides.hpp"
-        "internal/predicates.hpp"
     SKIP_UNITY
         "position.cpp"
     PUBLIC_DEPENDENCIES

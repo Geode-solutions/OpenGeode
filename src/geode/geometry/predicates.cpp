@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/predicates.hpp>
 
 #include <algorithm>
 #include <cmath>
