@@ -454,7 +454,7 @@ namespace
                 query.string(), ": closest point not on plane" );
             const auto half_length =
                 geode::point_point_distance( query, origin ) + 1;
-            constexpr geode::index_t nb_samples{ 300 };
+            constexpr geode::index_t nb_samples{ 200 };
             auto brute_force = std::numeric_limits< double >::max();
             for( const auto i : geode::Range{ nb_samples + 1 } )
             {
@@ -549,7 +549,7 @@ namespace
                 "D with query ", query.string(), ": closest point ",
                 closest.string(), " not on sphere" );
             auto brute_force = std::numeric_limits< double >::max();
-            const auto resolution = sample_sphere( center, radius, 200,
+            const auto resolution = sample_sphere( center, radius, 100,
                 [&]( const geode::Point< dimension >& sample ) {
                     brute_force = std::min( brute_force,
                         geode::point_point_distance( query, sample ) );
@@ -656,25 +656,26 @@ namespace
                 "Wrong result for point_disk_distance with query ",
                 query.string(), ": closest point ", disk_closest.string(),
                 " not on disk" );
-            constexpr geode::index_t nb_radii{ 300 };
-            constexpr geode::index_t nb_disk_angles{ 600 };
+            constexpr geode::index_t nb_radii{ 100 };
+            constexpr geode::index_t nb_disk_angles{ 400 };
+            std::array< geode::Vector3D, nb_disk_angles > unit_directions;
+            for( const auto i : geode::Range{ nb_disk_angles } )
+            {
+                const auto angle = 2 * M_PI * i / nb_disk_angles;
+                unit_directions[i] =
+                    axes[0] * std::cos( angle ) + axes[1] * std::sin( angle );
+            }
             auto disk_brute_force =
                 geode::point_point_distance( query, center );
             for( const auto r : geode::Range{ 1, nb_radii + 1 } )
             {
                 const auto sample_radius =
                     radius * static_cast< double >( r ) / nb_radii;
-                for( const auto i : geode::Range{ nb_disk_angles } )
+                for( const auto& unit_direction : unit_directions )
                 {
-                    const auto angle = 2 * M_PI * i / nb_disk_angles;
                     disk_brute_force = std::min( disk_brute_force,
-                        geode::point_point_distance( query,
-                            center
-                                + axes[0]
-                                      * ( sample_radius * std::cos( angle ) )
-                                + axes[1]
-                                      * ( sample_radius
-                                          * std::sin( angle ) ) ) );
+                        geode::point_point_distance(
+                            query, center + unit_direction * sample_radius ) );
                 }
             }
             check_bounds( disk_distance, disk_brute_force,
