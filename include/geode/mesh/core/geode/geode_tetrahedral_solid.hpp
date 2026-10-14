@@ -98,6 +98,18 @@ namespace geode
         void add_tetrahedron( const std::array< index_t, 4 >& vertices,
             OGTetrahedralSolidKey /*key*/ );
 
+        void add_tetrahedra( index_t nb, OGTetrahedralSolidKey /*key*/ );
+
+        void remove_polyhedra( const std::vector< bool >& to_delete,
+            OGTetrahedralSolidKey /*key*/ );
+
+        void permute_polyhedra( absl::Span< const index_t > permutation,
+            OGTetrahedralSolidKey /*key*/ );
+
+        void copy_polyhedra(
+            const OpenGeodeTetrahedralSolid< dimension >& solid_mesh,
+            OGTetrahedralSolidKey /*key*/ );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >

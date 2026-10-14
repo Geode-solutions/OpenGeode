@@ -646,6 +646,14 @@ namespace geode
         void reset_polyhedra_around_vertex(
             index_t vertex_id, SolidMeshKey /*key*/ );
 
+        void resize_vertex_storage( index_t nb_vertices, SolidMeshKey /*key*/ );
+
+        void delete_vertex_storage(
+            const std::vector< bool >& to_delete, SolidMeshKey /*key*/ );
+
+        void permute_vertex_storage(
+            absl::Span< const index_t > permutation, SolidMeshKey /*key*/ );
+
         [[nodiscard]] SolidEdges< dimension >& edges( SolidMeshKey /*key*/ );
 
         void copy_edges(

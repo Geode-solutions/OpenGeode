@@ -27,8 +27,10 @@
 
 #include <absl/hash/hash.h>
 
+#include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/permutation.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -36,36 +38,16 @@
 
 #include <geode/mesh/builder/graph_builder.hpp>
 #include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 
 namespace geode
 {
     class Graph::Impl
     {
-        static constexpr auto ATTRIBUTE_NAME = "edges_around_vertex";
         friend class bitsery::Access;
 
     public:
-        explicit Impl( Graph& graph )
-        {
-            AttributeProperties attribute_properties;
-            attribute_properties.assignable = false;
-            attribute_properties.interpolable = false;
-            attribute_properties.transferable = false;
-            AttributeValues< EdgesAroundVertex > edges_around_vertex_values;
-            edges_around_vertex_values.default_value = EdgesAroundVertex{};
-            edges_around_vertex_values.no_value = EdgesAroundVertex{};
-            const auto attribute_id =
-                graph.vertex_attribute_manager()
-                    .template create_attribute< VariableAttribute,
-                        EdgesAroundVertex >( ATTRIBUTE_NAME,
-                        edges_around_vertex_values, attribute_properties );
-            edges_around_vertex_ =
-                graph.vertex_attribute_manager()
-                    .template find_attribute< VariableAttribute,
-                        EdgesAroundVertex >( attribute_id );
-        }
-
         Impl() = default;
 
         AttributeManager& edge_attribute_manager() const
@@ -76,13 +58,13 @@ namespace geode
         const EdgesAroundVertex& edges_around_vertex(
             const index_t vertex_id ) const
         {
-            return edges_around_vertex_->value( vertex_id );
+            return edges_around_vertex_[vertex_id];
         }
 
         void set_edges_around_vertex(
-            const index_t vertex_id, EdgesAroundVertex edges ) const
+            const index_t vertex_id, EdgesAroundVertex edges )
         {
-            edges_around_vertex_->set_value( vertex_id, std::move( edges ) );
+            edges_around_vertex_[vertex_id] = std::move( edges );
         }
 
         void associate_edge_vertex_to_vertex( const Graph& graph,
@@ -90,14 +72,10 @@ namespace geode
             const index_t vertex_id )
         {
             disassociate_edge_vertex_to_vertex( graph, edge_vertex );
-            const auto& edges = edges_around_vertex_->value( vertex_id );
-            const auto it = absl::c_find( edges, edge_vertex );
-            if( it == edges.end() )
+            auto& edges = edges_around_vertex_[vertex_id];
+            if( absl::c_find( edges, edge_vertex ) == edges.end() )
             {
-                edges_around_vertex_->modify_value(
-                    vertex_id, [&edge_vertex]( EdgesAroundVertex& value ) {
-                        value.push_back( edge_vertex );
-                    } );
+                edges.push_back( edge_vertex );
             }
         }
 
@@ -107,20 +85,42 @@ namespace geode
             const auto previous_vertex = graph.edge_vertex( edge_vertex );
             if( previous_vertex < graph.nb_vertices() )
             {
-                const auto& edges =
-                    edges_around_vertex_->value( previous_vertex );
+                auto& edges = edges_around_vertex_[previous_vertex];
                 const auto it = absl::c_find( edges, edge_vertex );
                 if( it != edges.end() )
                 {
-                    edges_around_vertex_->modify_value(
-                        previous_vertex, [&it]( EdgesAroundVertex& value ) {
-                            value.erase( it );
-                        } );
+                    edges.erase( it );
                 }
             }
         }
 
+        void resize_vertex_storage( index_t nb_vertices )
+        {
+            edges_around_vertex_.resize( nb_vertices );
+        }
+
+        void delete_vertex_storage( const std::vector< bool >& to_delete )
+        {
+            delete_vector_elements( to_delete, edges_around_vertex_ );
+        }
+
+        void permute_vertex_storage( absl::Span< const index_t > permutation )
+        {
+            permute( edges_around_vertex_, permutation );
+        }
+
+        void remove_legacy_attributes( AttributeManager& manager )
+        {
+            legacy_attributes_.remove_from( manager );
+        }
+
     private:
+        template < typename Archive >
+        void deserialize_legacy_storage( Archive& archive )
+        {
+            legacy_attributes_.deserialize( archive, edges_around_vertex_ );
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -128,27 +128,28 @@ namespace geode
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
                          archive.object( impl.edge_attribute_manager_ );
-                         archive.ext( impl.edges_around_vertex_,
-                             bitsery::ext::StdSmartPtr{} );
-                         const auto& old_edges_around_vertex_properties =
-                             impl.edges_around_vertex_->properties();
-                         impl.edges_around_vertex_->set_properties(
-                             { old_edges_around_vertex_properties.assignable,
-                                 old_edges_around_vertex_properties
-                                     .interpolable,
-                                 false } );
+                         impl.deserialize_legacy_storage( archive );
                      },
                         []( Archive& archive, Impl& impl ) {
                             archive.object( impl.edge_attribute_manager_ );
-                            archive.ext( impl.edges_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
+                            impl.deserialize_legacy_storage( archive );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.edge_attribute_manager_ );
+                            archive.container( impl.edges_around_vertex_,
+                                impl.edges_around_vertex_.max_size(),
+                                []( Archive& archive2,
+                                    EdgesAroundVertex& edges ) {
+                                    archive2.container(
+                                        edges, edges.max_size() );
+                                } );
                         } } } );
         }
 
     private:
         mutable AttributeManager edge_attribute_manager_;
-        std::shared_ptr< VariableAttribute< EdgesAroundVertex > >
-            edges_around_vertex_;
+        std::vector< EdgesAroundVertex > edges_around_vertex_;
+        detail::LegacyAttributes legacy_attributes_;
     };
 
     template < typename Archive >
@@ -168,7 +169,7 @@ namespace geode
                            } } } );
     }
 
-    Graph::Graph() : impl_( *this ) {}
+    Graph::Graph() = default;
 
     Graph::Graph( BITSERY ) {}
 
@@ -259,6 +260,23 @@ namespace geode
         return std::nullopt;
     }
 
+    void Graph::resize_vertex_storage( index_t nb_vertices, GraphKey /*key*/ )
+    {
+        impl_->resize_vertex_storage( nb_vertices );
+    }
+
+    void Graph::delete_vertex_storage(
+        const std::vector< bool >& to_delete, GraphKey /*key*/ )
+    {
+        impl_->delete_vertex_storage( to_delete );
+    }
+
+    void Graph::permute_vertex_storage(
+        absl::Span< const index_t > permutation, GraphKey /*key*/ )
+    {
+        impl_->permute_vertex_storage( permutation );
+    }
+
     void Graph::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges, GraphKey /*key*/ )
     {
@@ -293,6 +311,8 @@ namespace geode
             Growable< Archive, Graph >{ { []( Archive& archive, Graph& graph ) {
                 archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( graph.impl_ );
+                graph.impl_->remove_legacy_attributes(
+                    graph.vertex_attribute_manager() );
             } } } );
     }
 
