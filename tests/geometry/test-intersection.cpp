@@ -1131,6 +1131,22 @@ void test_small_sphere_intersection()
     geode::OpenGeodeGeometryException::test( tangent.has_intersection(),
         "Wrong result for line_sphere_intersection with sphere of radius "
         "GLOBAL_EPSILON" );
+
+    // Segment starting 1.02 * GLOBAL_EPSILON away from a small sphere: its
+    // line touches the sphere within GLOBAL_EPSILON of the segment
+    const geode::Point3D small_center{ { -0x1.e059c1d05becdp+1,
+        -0x1.abea685a05f8p-2, 0x1.23b2c3df35a8p+1 } };
+    const geode::Sphere3D small_sphere{ small_center, 0x1.8f84f79ed9dbdp-20 };
+    const geode::Point3D start{ { -0x1.e059b62766559p+1, -0x1.abe9ea07260bfp-2,
+        0x1.23b2bc340e903p+1 } };
+    const geode::Point3D end{ { -0x1.4ccf4e11f9ea4p+2, -0x1.a7318e3f7335p+0,
+        -0x1.b4f7162f931f4p+2 } };
+    const auto separated = geode::segment_sphere_intersection(
+        geode::Segment3D{ start, end }, small_sphere );
+    geode::OpenGeodeGeometryException::test(
+        separated.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for segment_sphere_intersection with segment just "
+        "farther than GLOBAL_EPSILON from a small sphere" );
 }
 
 void test_triangle_intersection_near_parallel()

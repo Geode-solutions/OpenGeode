@@ -414,26 +414,37 @@ namespace geode
         }
         auto line_intersections = line_sphere_intersection(
             InfiniteLine< dimension >{ segment }, sphere );
-        if( line_intersections.result )
+        if( !line_intersections.result )
         {
-            absl::InlinedVector< Point< dimension >, 2 > segment_intersections;
-            segment_intersections.reserve(
-                line_intersections.result.value().size() );
-            for( auto&& point : line_intersections.result.value() )
-            {
-                if( point_segment_distance( point, segment ) <= GLOBAL_EPSILON )
-                {
-                    segment_intersections.emplace_back( point );
-                }
-            }
-            if( segment_intersections.empty() )
-            {
-                return { INTERSECTION_TYPE::none };
-            }
-            return { std::move( segment_intersections ),
-                std::move( line_intersections.correctness.value() ) };
+            return line_intersections.type;
         }
-        return line_intersections.type;
+        absl::InlinedVector< Point< dimension >, 2 > segment_intersections;
+        typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+            2 > >::Correctness first_correctness{ true, {} };
+        typename CorrectnessInfo< absl::InlinedVector< Point< dimension >,
+            2 > >::Correctness second_correctness{ true, {} };
+        for( auto& point : line_intersections.result.value() )
+        {
+            // The segment (not only the point) must be within GLOBAL_EPSILON
+            // of the sphere
+            auto on_segment = point_segment_projection( point, segment );
+            if( point_point_distance( point, on_segment ) > GLOBAL_EPSILON
+                || std::get< 0 >( point_sphere_distance( on_segment, sphere ) )
+                       > GLOBAL_EPSILON )
+            {
+                continue;
+            }
+            first_correctness.second.push_back( std::move( on_segment ) );
+            second_correctness.second.push_back(
+                std::get< 1 >( point_sphere_distance( point, sphere ) ) );
+            segment_intersections.push_back( std::move( point ) );
+        }
+        if( segment_intersections.empty() )
+        {
+            return { INTERSECTION_TYPE::none };
+        }
+        return { std::move( segment_intersections ),
+            { first_correctness, second_correctness } };
     }
 
     IntersectionResult< Point3D > segment_plane_intersection(
