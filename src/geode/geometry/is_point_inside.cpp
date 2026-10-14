@@ -62,21 +62,27 @@ namespace geode
             const Point2D& v1 = vertices[polygon_vertex + 1 == nb_vertices
                                              ? 0
                                              : polygon_vertex + 1];
+            const auto y = point.value( 1 );
+            const auto y0 = v0.value( 1 );
+            const auto y1 = v1.value( 1 );
+            if( ( y0 < y && y1 < y ) || ( y0 > y && y1 > y ) )
+            {
+                // The edge neither crosses the point row nor contains it
+                continue;
+            }
             const auto side = GEO::PCK::orient_2d( v0, v1, point );
             if( side == GEO::SIGN::zero && is_point_on_edge( point, v0, v1 ) )
             {
                 return true;
             }
-            if( v0.value( 1 ) <= point.value( 1 ) )
+            if( y0 <= y )
             {
-                if( v1.value( 1 ) > point.value( 1 )
-                    && side == GEO::SIGN::positive )
+                if( y1 > y && side == GEO::SIGN::positive )
                 {
                     winding_number++;
                 }
             }
-            else if( v1.value( 1 ) <= point.value( 1 )
-                     && side == GEO::SIGN::negative )
+            else if( y1 <= y && side == GEO::SIGN::negative )
             {
                 winding_number--;
             }
