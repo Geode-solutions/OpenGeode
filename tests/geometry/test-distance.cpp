@@ -1373,6 +1373,15 @@ void test_segment_triangle_distance()
         distance <= geode::GLOBAL_EPSILON && closest_point0.inexact_equal( s0 )
             && closest_point1.inexact_equal( s0 ),
         "Wrong result for segment_triangle_distance with real_segment" );
+
+    const geode::Point3D tiny_end{ { 0.0, 0.0, 1.0 + 1e-7 } };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance(
+            geode::Segment3D{ e, tiny_end }, cdg );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - std::sqrt( 2. ) ) < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_triangle_distance with tiny segment: ",
+        distance );
 }
 
 void test_point_ellipse_distance_2d()

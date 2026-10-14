@@ -1075,6 +1075,13 @@ namespace geode
     std::tuple< double, Point3D, Point3D > segment_triangle_distance(
         const Segment3D& segment, const Triangle3D& triangle )
     {
+        if( segment.length() <= GLOBAL_EPSILON )
+        {
+            const auto& vertex = segment.vertices()[0].get();
+            auto [distance, closest] =
+                point_triangle_distance( vertex, triangle );
+            return { distance, vertex, std::move( closest ) };
+        }
         const InfiniteLine3D line{ segment };
         const auto [_, closest_on_line, closest_on_triangle] =
             line_triangle_distance( line, triangle );
