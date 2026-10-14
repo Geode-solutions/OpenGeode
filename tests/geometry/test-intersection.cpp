@@ -1042,6 +1042,14 @@ void test_degenerated_segment_intersections()
         geode::OpenGeodeGeometryException::test(
             cylinder_result && cylinder_result.result->size() == 1,
             "Wrong degenerated segment_cylinder_intersection" );
+        const auto& cylinder_projection =
+            cylinder_result.correctness->second.second.front();
+        geode::OpenGeodeGeometryException::test(
+            std::get< 0 >( geode::point_cylinder_distance(
+                cylinder_projection, cylinder ) )
+                <= 1e-15,
+            "Wrong degenerated segment_cylinder_intersection correctness: "
+            "point should be on the cylinder" );
         const geode::Point3D in_cylinder{ { 0.5, 0, 0 } };
         const geode::Point3D in_cylinder2{ { 0.5, length, 0 } };
         geode::OpenGeodeGeometryException::test(

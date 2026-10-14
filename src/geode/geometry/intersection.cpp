@@ -97,55 +97,28 @@ namespace
     };
 
     /*
-     * Intersection result of a degenerated segment (considered as a point)
-     * with an object, given the distance from the point to the object and
-     * the projection of the point on the object.
+     * Intersection result when one of the two objects is a degenerated segment
+     * (considered as a point), given the closest points between the two
+     * objects and their distance. The result is the point on the first object.
      */
     template < typename Intersection, typename PointType >
     geode::IntersectionResult< Intersection > degenerated_segment_intersection(
-        const PointType& point,
-        double distance_to_object,
-        const PointType& projection_on_object )
+        const PointType& point_on_first,
+        double distance,
+        const PointType& point_on_second )
     {
-        if( distance_to_object > geode::GLOBAL_EPSILON )
+        if( distance > geode::GLOBAL_EPSILON )
         {
             return { geode::INTERSECTION_TYPE::none };
         }
         typename geode::CorrectnessInfo< Intersection >::Correctness
-            first_correctness{ true, Intersection{ point } };
+            first_correctness{ true, Intersection{ point_on_first } };
         typename geode::CorrectnessInfo< Intersection >::Correctness
-            second_correctness{ true, Intersection{ projection_on_object } };
-        return { Intersection{ point },
+            second_correctness{ true, Intersection{ point_on_second } };
+        return { Intersection{ point_on_first },
             { first_correctness, second_correctness } };
     }
 
-    double point_cylinder_distance(
-        const geode::Point3D& point, const geode::Cylinder& cylinder )
-    {
-        const auto half_height = 0.5 * cylinder.axis().length();
-        const geode::Vector3D center_to_point{ cylinder.axis().barycenter(),
-            point };
-        const auto axial =
-            std::fabs( center_to_point.dot( cylinder.axis().direction() ) );
-        const auto radial = std::sqrt(
-            std::max( center_to_point.length2() - axial * axial, 0. ) );
-        const auto radial_distance = radial - cylinder.radius();
-        const auto axial_distance = axial - half_height;
-        if( axial_distance <= 0 )
-        {
-            if( radial_distance >= 0 )
-            {
-                return radial_distance;
-            }
-            return std::min( -radial_distance, -axial_distance );
-        }
-        if( radial_distance <= 0 )
-        {
-            return axial_distance;
-        }
-        return std::sqrt( axial_distance * axial_distance
-                          + radial_distance * radial_distance );
-    }
     /*
      * Keep the line intersections located on the segment, with their
      * correctness information.
@@ -897,9 +870,11 @@ namespace geode
         if( segment.is_degenerated() )
         {
             const auto point = segment.barycenter();
+            const auto [distance, projection] =
+                point_cylinder_distance( point, cylinder );
             return degenerated_segment_intersection<
                 absl::InlinedVector< Point3D, 2 > >(
-                point, point_cylinder_distance( point, cylinder ), point );
+                point, distance, projection );
         }
         auto line_intersections =
             line_cylinder_intersection( InfiniteLine3D{ segment }, cylinder );

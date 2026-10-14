@@ -30,6 +30,7 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
@@ -1548,6 +1549,47 @@ void test_point_segment_line_distance_accuracy()
         "Inconsistent distance and projection for degenerated segment" );
 }
 
+void test_point_cylinder_distance()
+{
+    // Cylinder along x, from x=0 to x=4, radius 1
+    const geode::Point3D axis_start{ { 0, 0, 0 } };
+    const geode::Point3D axis_end{ { 4, 0, 0 } };
+    const geode::Cylinder cylinder{ geode::Segment3D{ axis_start, axis_end },
+        1 };
+    const auto check = [&cylinder]( const geode::Point3D& point,
+                           double expected_distance,
+                           const geode::Point3D& expected_closest,
+                           std::string_view label ) {
+        const auto [distance, closest] =
+            geode::point_cylinder_distance( point, cylinder );
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( distance - expected_distance ) <= geode::GLOBAL_EPSILON
+                && closest.inexact_equal( expected_closest ),
+            "Wrong point_cylinder_distance: ", label );
+    };
+    check( geode::Point3D{ { 2, 3, 0 } }, 2, geode::Point3D{ { 2, 1, 0 } },
+        "outside the wall" );
+    check( geode::Point3D{ { 6, 0, 0.5 } }, 2, geode::Point3D{ { 4, 0, 0.5 } },
+        "outside an end disk" );
+    check( geode::Point3D{ { -3, 0, 5 } }, 5, geode::Point3D{ { 0, 0, 1 } },
+        "outside the rim" );
+    check( geode::Point3D{ { 2, 0, 0.75 } }, 0.25,
+        geode::Point3D{ { 2, 0, 1 } }, "inside, close to the wall" );
+    check( geode::Point3D{ { 3.75, 0.5, 0 } }, 0.25,
+        geode::Point3D{ { 4, 0.5, 0 } }, "inside, close to an end disk" );
+    check( geode::Point3D{ { 2, 1, 0 } }, 0, geode::Point3D{ { 2, 1, 0 } },
+        "on the wall" );
+    const auto [axis_distance, axis_closest] = geode::point_cylinder_distance(
+        geode::Point3D{ { 2, 0, 0 } }, cylinder );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( axis_distance - 1 ) <= geode::GLOBAL_EPSILON
+            && std::fabs( axis_closest.value( 0 ) - 2 ) <= geode::GLOBAL_EPSILON
+            && std::get< 0 >(
+                   geode::point_cylinder_distance( axis_closest, cylinder ) )
+                   <= geode::GLOBAL_EPSILON,
+        "Wrong point_cylinder_distance: on the axis" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -1563,6 +1605,7 @@ void test()
     test_segment_triangle_distance();
     test_triangle_triangle_distance();
     test_point_ellipse_distance();
+    test_point_cylinder_distance();
     test_degenerated_segment_triangle_distance();
     test_degenerated_triangle_triangle_distance();
     test_random_triangle_triangle_distance();

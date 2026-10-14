@@ -30,6 +30,7 @@
 
 #include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
+#include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
@@ -1397,6 +1398,58 @@ namespace geode
             return { std::fabs( distance_to_plane ), projected_on_plane };
         }
         return point_circle_distance( point, disk );
+    }
+
+    std::tuple< double, Point3D > point_cylinder_distance(
+        const Point3D& point, const Cylinder& cylinder )
+    {
+        // Cylinder frame: axial coordinate along the unit axis direction,
+        // radial vector orthogonal to it, both from the axis center.
+        const auto& axis = cylinder.axis();
+        const auto axis_direction = axis.direction();
+        const auto half_height = 0.5 * axis.length();
+        const auto radius = cylinder.radius();
+        const auto center = axis.barycenter();
+        const Vector3D center_to_point{ center, point };
+        const auto axial = center_to_point.dot( axis_direction );
+        const auto radial_vector = center_to_point - axis_direction * axial;
+        const auto radial = radial_vector.length();
+        const auto axial_distance = std::fabs( axial ) - half_height;
+        const auto radial_distance = radial - radius;
+        const auto disk_center =
+            center + axis_direction * std::copysign( half_height, axial );
+        const auto to_wall = [&]( const Point3D& origin ) {
+            if( radial > 0 )
+            {
+                return origin + radial_vector * ( radius / radial );
+            }
+            // Point on the axis: any radial direction is the closest one
+            Vector3D other;
+            other.set_value(
+                std::fabs( axis_direction.value( 0 ) ) < 0.9 ? 0 : 1, 1. );
+            return origin + axis_direction.cross( other ).normalize() * radius;
+        };
+        if( axial_distance > 0 )
+        {
+            if( radial_distance <= 0 )
+            {
+                return { axial_distance, disk_center + radial_vector };
+            }
+            return { std::sqrt( axial_distance * axial_distance
+                                + radial_distance * radial_distance ),
+                to_wall( disk_center ) };
+        }
+        if( radial_distance >= 0 )
+        {
+            return { radial_distance,
+                to_wall( center + axis_direction * axial ) };
+        }
+        if( -radial_distance <= -axial_distance )
+        {
+            return { -radial_distance,
+                to_wall( center + axis_direction * axial ) };
+        }
+        return { -axial_distance, disk_center + radial_vector };
     }
 
     template < index_t dimension >
