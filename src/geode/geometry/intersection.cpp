@@ -89,6 +89,24 @@ namespace
         return basis;
     }
 
+    // Rounding errors on points with coordinates below this bound stay far
+    // below GLOBAL_EPSILON (relative double rounding ~1e-16 times 1e6 gives
+    // ~1e-10)
+    constexpr double ROUNDING_SAFE_COORDINATE{ 1. / geode::GLOBAL_EPSILON };
+
+    template < geode::index_t dimension >
+    bool has_rounding_safe_coordinates( const geode::Point< dimension >& point )
+    {
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            if( !( std::fabs( point.value( d ) ) < ROUNDING_SAFE_COORDINATE ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     struct CylinderLineResult
     {
         CylinderLineResult()
@@ -385,6 +403,14 @@ namespace geode
             + plane.plane_constant();
         auto result =
             line.origin() - line.direction() * signed_distance / dot_directions;
+        if( has_rounding_safe_coordinates( result )
+            && has_rounding_safe_coordinates( line.origin() )
+            && has_rounding_safe_coordinates( plane.origin() ) )
+        {
+            // The result is on both the line and the plane up to rounding
+            CorrectnessInfo< Point3D >::Correctness correctness{ true, result };
+            return { std::move( result ), { correctness, correctness } };
+        }
         CorrectnessInfo< Point3D >::Correctness first_correctness{
             point_line_distance( result, line ) <= GLOBAL_EPSILON,
             point_line_projection( result, line )
@@ -603,6 +629,14 @@ namespace geode
         const auto diffDotPerpD1 = dot_perpendicular( diff, line1.direction() );
         const auto s0 = diffDotPerpD1 * invD0DotPerpD1;
         auto result = line0.origin() + line0.direction() * s0;
+        if( has_rounding_safe_coordinates( result )
+            && has_rounding_safe_coordinates( line0.origin() )
+            && has_rounding_safe_coordinates( line1.origin() ) )
+        {
+            // The result is on both lines up to rounding
+            CorrectnessInfo< Point2D >::Correctness correctness{ true, result };
+            return { std::move( result ), { correctness, correctness } };
+        }
         CorrectnessInfo< Point2D >::Correctness first_correctness{
             point_line_distance( result, line0 ) <= GLOBAL_EPSILON,
             point_line_projection( result, line0 )

@@ -230,9 +230,42 @@ void test_set_point()
         "Wrong normal after set_point on copy" );
 }
 
+void test_2d_triangle_without_cache()
+{
+    static_assert(
+        sizeof( geode::Triangle2D ) == 3 * sizeof( geode::RefPoint2D ),
+        "Triangle2D should only store its vertices" );
+    static_assert(
+        sizeof( geode::OwnerTriangle2D ) == 3 * sizeof( geode::Point2D ),
+        "OwnerTriangle2D should only store its vertices" );
+    geode::OwnerTriangle2D triangle{ geode::Point2D{ { 0, 0 } },
+        geode::Point2D{ { 1, 0 } }, geode::Point2D{ { 0, 1 } } };
+    auto copy = triangle;
+    copy.set_point( 2, geode::Point2D{ { 2, 2 } } );
+    geode::OpenGeodeGeometryException::test(
+        copy.vertices()[2] == geode::Point2D{ { 2, 2 } }
+            && triangle.vertices()[2] == geode::Point2D{ { 0, 1 } },
+        "[Test] Wrong 2D triangle set_point" );
+    geode::OpenGeodeGeometryException::test(
+        copy.barycenter().inexact_equal( geode::Point2D{ { 1, 2. / 3 } } ),
+        "[Test] Wrong 2D triangle barycenter" );
+
+    const geode::OwnerTriangle3D triangle3d{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1, 0 } } };
+    const auto normal = triangle3d.normal();
+    auto copy3d = triangle3d;
+    geode::OpenGeodeGeometryException::test(
+        copy3d.normal() == normal, "[Test] Copied triangle normal" );
+    copy3d.set_point( 2, geode::Point3D{ { 0, 0, 1 } } );
+    geode::OpenGeodeGeometryException::test(
+        copy3d.normal()->inexact_equal( geode::Vector3D{ { 0, -1, 0 } } ),
+        "[Test] Normal should be updated after set_point" );
+}
+
 void test()
 {
     test_set_point();
+    test_2d_triangle_without_cache();
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b_ref{ { 0.5, 0.1, 0.0 } };
     const geode::Point3D b{ { 0.6, 0.3 * geode::GLOBAL_EPSILON, 0.0 } };

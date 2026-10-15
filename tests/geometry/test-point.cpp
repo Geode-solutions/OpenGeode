@@ -61,6 +61,58 @@ void test_operators()
         answer / 2 == p, "Points should be equal" );
 }
 
+void test_compound_operators()
+{
+    const geode::Point3D p{ { 2, 1.0, 2.6 } };
+    auto q = p;
+    q += p;
+    geode::OpenGeodeGeometryException::test(
+        q == p + p, "Operator += should match operator +" );
+    q -= p;
+    geode::OpenGeodeGeometryException::test(
+        q == p, "Operator -= should match operator -" );
+    q *= 3;
+    geode::OpenGeodeGeometryException::test(
+        q == p * 3, "Operator *= should match operator *" );
+    q /= 3;
+    geode::OpenGeodeGeometryException::test(
+        q == p * 3 / 3, "Operator /= should match operator /" );
+    bool divide_by_zero_throws{ false };
+    try
+    {
+        const auto unused = p / 0.;
+        geode_unused( unused );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        divide_by_zero_throws = true;
+    }
+    geode::OpenGeodeGeometryException::test(
+        divide_by_zero_throws, "Dividing a Point by zero should throw" );
+
+    const geode::Point3D lower{ { 2, 1.0, 2.5 } };
+    geode::OpenGeodeGeometryException::test(
+        lower < p && !( p < lower ), "Wrong lexicographic order" );
+    geode::OpenGeodeGeometryException::test(
+        lower <= p && p <= p && !( p <= lower ), "Wrong operator <=" );
+    geode::OpenGeodeGeometryException::test(
+        !( p < p ), "A point should not be smaller than itself" );
+
+    const geode::Point3D far{ { 2 + 2 * geode::GLOBAL_EPSILON, 1, 2.6 } };
+    geode::OpenGeodeGeometryException::test(
+        !p.inexact_equal( far ), "Points should not be almost equal" );
+    geode::OpenGeodeGeometryException::test(
+        p.value( 0 ) == 2 && p.value( 1 ) == 1 && p.value( 2 ) == 2.6,
+        "Wrong point values" );
+    geode::Point2D zero;
+    geode::OpenGeodeGeometryException::test(
+        zero.value( 0 ) == 0 && zero.value( 1 ) == 0,
+        "Default point should be the origin" );
+    zero.set_value( 1, 4 );
+    geode::OpenGeodeGeometryException::test(
+        zero == geode::Point2D{ { 0, 4 } }, "Wrong set_value" );
+}
+
 void test_interpolation()
 {
     geode::AttributeManager manager;
@@ -136,6 +188,7 @@ void test()
 {
     test_comparison();
     test_operators();
+    test_compound_operators();
     test_interpolation();
     test_point_hash();
 }

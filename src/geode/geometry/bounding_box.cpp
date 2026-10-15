@@ -129,12 +129,13 @@ namespace
 
     template < geode::index_t dimension >
     bool segment_quick_skip( const geode::BoundingBox< dimension >& box,
-        const geode::Segment< dimension >& segment )
+        const geode::Segment< dimension >& segment,
+        double segment_length,
+        const geode::Vector< dimension >& segment_direction )
     {
         const auto box_extent = box.diagonal() / 2.;
         const auto segment_origin = segment.barycenter() - box.center();
-        const auto segment_extent = segment.length() / 2.;
-        const auto segment_direction = segment.direction();
+        const auto segment_extent = segment_length / 2.;
         for( const auto i : geode::LRange{ dimension } )
         {
             const auto lhs = std::fabs( segment_origin.value( i ) );
@@ -461,7 +462,11 @@ namespace geode
                 return true;
             }
         }
-        if( segment.length() < GLOBAL_EPSILON )
+        // Shape data computed once (Segment::direction and the line
+        // constructor would recompute the length several times)
+        const Vector< dimension > segment_vector{ vertices[0], vertices[1] };
+        const auto length = segment_vector.length();
+        if( length < GLOBAL_EPSILON )
         {
             return false;
         }
@@ -469,11 +474,13 @@ namespace geode
         {
             return false;
         }
-        if( segment_quick_skip( *this, segment ) )
+        const auto direction = segment_vector / length;
+        if( segment_quick_skip( *this, segment, length, direction ) )
         {
             return false;
         }
-        return this->intersects( InfiniteLine< dimension >{ segment } );
+        return this->intersects(
+            InfiniteLine< dimension >{ direction, vertices[0] } );
     }
 
     template < index_t dimension >
@@ -488,7 +495,11 @@ namespace geode
                 return true;
             }
         }
-        if( segment.length() < GLOBAL_EPSILON )
+        // Shape data computed once (Segment::direction and the line
+        // constructor would recompute the length several times)
+        const Vector< dimension > segment_vector{ vertices[0], vertices[1] };
+        const auto length = segment_vector.length();
+        if( length < GLOBAL_EPSILON )
         {
             return false;
         }
@@ -496,11 +507,13 @@ namespace geode
         {
             return false;
         }
-        if( segment_quick_skip( *this, segment ) )
+        const auto direction = segment_vector / length;
+        if( segment_quick_skip( *this, segment, length, direction ) )
         {
             return false;
         }
-        return this->epsilon_intersects( InfiniteLine< dimension >{ segment } );
+        return this->epsilon_intersects(
+            InfiniteLine< dimension >{ direction, vertices[0] } );
     }
 
     template <>
@@ -548,6 +561,10 @@ namespace geode
     bool opengeode_geometry_api BoundingBox< 2 >::intersects< 2 >(
         const Triangle< 2 >& triangle ) const
     {
+        if( !intersects( triangle.bounding_box() ) )
+        {
+            return false;
+        }
         if( point_triangle_position( center(), triangle ) == POSITION::inside )
         {
             return true;
@@ -572,6 +589,10 @@ namespace geode
     bool opengeode_geometry_api BoundingBox< 2 >::epsilon_intersects< 2 >(
         const Triangle< 2 >& triangle ) const
     {
+        if( !epsilon_intersects( triangle.bounding_box() ) )
+        {
+            return false;
+        }
         if( point_triangle_position( center(), triangle ) == POSITION::inside )
         {
             return true;
@@ -597,6 +618,10 @@ namespace geode
     std::enable_if_t< T == 3, bool > BoundingBox< dimension >::intersects(
         const Tetrahedron& tetra ) const
     {
+        if( !intersects( tetra.bounding_box() ) )
+        {
+            return false;
+        }
         if( point_tetrahedron_position( center(), tetra ) == POSITION::inside )
         {
             return true;
@@ -625,6 +650,10 @@ namespace geode
         BoundingBox< dimension >::epsilon_intersects(
             const Tetrahedron& tetra ) const
     {
+        if( !epsilon_intersects( tetra.bounding_box() ) )
+        {
+            return false;
+        }
         if( point_tetrahedron_position( center(), tetra ) == POSITION::inside )
         {
             return true;

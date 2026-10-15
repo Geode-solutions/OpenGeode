@@ -23,7 +23,13 @@
 
 #include <geode/basic/logger.hpp>
 
+#include <algorithm>
+#include <random>
+
+#include <absl/algorithm/container.h>
+
 #include <geode/geometry/distance.hpp>
+#include <geode/geometry/frame.hpp>
 #include <geode/geometry/nn_search.hpp>
 #include <geode/geometry/point.hpp>
 
@@ -152,6 +158,123 @@ void second_test()
         "[Test 2] Should be 2 unique points" );
 }
 
+template < typename Neighbors >
+std::vector< geode::index_t > reference_mapping(
+    geode::index_t nb_points, const Neighbors& neighbors )
+{
+    std::vector< geode::index_t > mapping( nb_points, geode::NO_ID );
+    for( const auto point_id : geode::Range{ nb_points } )
+    {
+        if( mapping[point_id] != geode::NO_ID )
+        {
+            continue;
+        }
+        for( const auto vertex_id : neighbors( point_id ) )
+        {
+            if( mapping[vertex_id] == geode::NO_ID )
+            {
+                mapping[vertex_id] = point_id;
+            }
+        }
+    }
+    return mapping;
+}
+
+void random_colocation_test()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 1 };
+    std::uniform_real_distribution< double > noise{ -1e-3, 1e-3 };
+    std::vector< geode::Point3D > points;
+    for( const auto unused : geode::Range{ 3000 } )
+    {
+        geode_unused( unused );
+        points.emplace_back( geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } } );
+    }
+    for( const auto p : geode::Range{ 1500 } )
+    {
+        points.push_back( points[2 * p] );
+        points.push_back( points[2 * p]
+                          + geode::Point3D{ { noise( generator ),
+                              noise( generator ), noise( generator ) } } );
+    }
+    std::shuffle( points.begin(), points.end(), generator );
+    const geode::NNSearch3D search{ points };
+    const double epsilon{ 1e-3 };
+    const auto info = search.colocated_index_mapping( epsilon );
+    const auto expected = reference_mapping(
+        search.nb_points(), [&search, epsilon]( geode::index_t point_id ) {
+            return search.radius_neighbors( search.point( point_id ), epsilon );
+        } );
+    geode::OpenGeodeGeometryException::test(
+        info.colocated_input_points == expected,
+        "[Test] Wrong random colocated mapping" );
+
+    geode::Frame3D frame;
+    frame.set_direction( 0, geode::Vector3D{ { 1e-3, 0, 0 } } );
+    frame.set_direction( 1, geode::Vector3D{ { 0, 2e-3, 0 } } );
+    frame.set_direction( 2, geode::Vector3D{ { 0, 0, 5e-4 } } );
+    const auto frame_info = search.colocated_index_mapping( frame );
+    const auto frame_expected = reference_mapping(
+        search.nb_points(), [&search, &frame]( geode::index_t point_id ) {
+            return search.frame_neighbors( search.point( point_id ), frame );
+        } );
+    geode::OpenGeodeGeometryException::test(
+        frame_info.colocated_input_points == frame_expected,
+        "[Test] Wrong random frame colocated mapping" );
+    geode::OpenGeodeGeometryException::test(
+        info.nb_unique_points() < points.size()
+            && frame_info.nb_unique_points() < points.size(),
+        "[Test] Random points should have colocated points" );
+}
+
+void large_search_test()
+{
+    // Large point sets build their tree with several threads
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 1 };
+    std::vector< geode::Point2D > points;
+    for( const auto unused : geode::Range{ 150000 } )
+    {
+        geode_unused( unused );
+        points.emplace_back( geode::Point2D{
+            { distribution( generator ), distribution( generator ) } } );
+    }
+    const geode::NNSearch2D search{ points };
+    for( const auto unused : geode::Range{ 100 } )
+    {
+        geode_unused( unused );
+        const geode::Point2D query{ { distribution( generator ),
+            distribution( generator ) } };
+        geode::index_t expected{ 0 };
+        for( const auto p : geode::Indices{ points } )
+        {
+            if( geode::point_point_distance( query, points[p] )
+                < geode::point_point_distance( query, points[expected] ) )
+            {
+                expected = p;
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            search.closest_neighbor( query ) == expected,
+            "[Test] Wrong closest neighbor in large point set" );
+        auto neighbors = search.radius_neighbors( query, 0.01 );
+        absl::c_sort( neighbors );
+        std::vector< geode::index_t > expected_neighbors;
+        for( const auto p : geode::Indices{ points } )
+        {
+            if( geode::point_point_distance( query, points[p] ) < 0.01 )
+            {
+                expected_neighbors.push_back( p );
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            neighbors == expected_neighbors,
+            "[Test] Wrong radius neighbors in large point set" );
+    }
+}
+
 void test_empty_search()
 {
     const geode::NNSearch3D empty_search{ std::vector< geode::Point3D >{} };
@@ -180,6 +303,8 @@ void test()
 {
     first_test();
     second_test();
+    random_colocation_test();
+    large_search_test();
     test_empty_search();
 }
 
