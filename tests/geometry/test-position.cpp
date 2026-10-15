@@ -601,11 +601,10 @@ void test_random_positions_against_exact_sides()
         // Sides are oriented towards the inside of the tetrahedron, whatever
         // its orientation
         const auto& facet0 = geode::Tetrahedron::tetrahedron_facet_vertex[0];
-        const auto is_inverted =
-            geode::point_side_to_triangle(
-                vertices[0], { vertices[facet0[0]], vertices[facet0[1]],
-                                 vertices[facet0[2]] } )
-            == geode::SIDE::negative;
+        const auto is_inverted = geode::point_side_to_triangle( vertices[0],
+                                     { vertices[facet0[0]], vertices[facet0[1]],
+                                         vertices[facet0[2]] } )
+                                 == geode::SIDE::negative;
         std::array< geode::SIDE, 4 > sides;
         for( const auto f : geode::LRange{ 4 } )
         {
