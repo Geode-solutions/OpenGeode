@@ -43,6 +43,7 @@ namespace geode
     class Plane;
     class Tetrahedron;
     class Circle;
+    class Cylinder;
     template < index_t dimension >
     using Ball = Sphere< dimension >;
     using Disk = Circle;
@@ -261,6 +262,19 @@ namespace geode
      */
     [[nodiscard]] std::tuple< double, Point3D > opengeode_geometry_api
         point_disk_distance( const Point3D& point, const Disk& disk );
+
+    /*!
+     * Compute the smallest distance between a point and a cylinder surface,
+     * i.e. its wall and its two end disks
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the cylinder surface.
+     * @details Result is always positive or null, even if the point is inside
+     * the cylinder.
+     */
+    [[nodiscard]] std::tuple< double, Point3D >
+        opengeode_geometry_api point_cylinder_distance(
+            const Point3D& point, const Cylinder& cylinder );
 
     /*!
      * Compute the smallest distance between a point and an ellipse

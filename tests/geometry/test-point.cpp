@@ -110,11 +110,34 @@ void test_interpolation()
         attribute->value( 7 ).string() );
 }
 
+void test_point_hash()
+{
+    const std::hash< geode::Point2D > hash2d;
+    geode::OpenGeodeGeometryException::test(
+        hash2d( geode::Point2D{ { 1, 1 } } )
+            != hash2d( geode::Point2D{ { 7, 7 } } ),
+        "Hash of (1,1) and (7,7) should differ" );
+    geode::OpenGeodeGeometryException::test(
+        hash2d( geode::Point2D{ { 1, 2 } } )
+            != hash2d( geode::Point2D{ { 2, 1 } } ),
+        "Hash of (1,2) and (2,1) should differ" );
+    const std::hash< geode::Point3D > hash3d;
+    geode::OpenGeodeGeometryException::test(
+        hash3d( geode::Point3D{ { 1, 2, 3 } } )
+            != hash3d( geode::Point3D{ { 3, 2, 1 } } ),
+        "Hash of (1,2,3) and (3,2,1) should differ" );
+    geode::OpenGeodeGeometryException::test(
+        hash3d( geode::Point3D{ { 5, 5, 0 } } )
+            != hash3d( geode::Point3D{ { 0, 0, 0 } } ),
+        "Hash of (5,5,0) and (0,0,0) should differ" );
+}
+
 void test()
 {
     test_comparison();
     test_operators();
     test_interpolation();
+    test_point_hash();
 }
 
 OPENGEODE_TEST( "point" )

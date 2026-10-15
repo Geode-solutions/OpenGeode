@@ -152,10 +152,35 @@ void second_test()
         "[Test 2] Should be 2 unique points" );
 }
 
+void test_empty_search()
+{
+    const geode::NNSearch3D empty_search{ std::vector< geode::Point3D >{} };
+    const geode::Point3D query{ { 1, 2, 3 } };
+    geode::OpenGeodeGeometryException::test(
+        empty_search.closest_neighbor( query ) == geode::NO_ID,
+        "Closest neighbor in empty search should be NO_ID" );
+    geode::OpenGeodeGeometryException::test(
+        empty_search.neighbors( query, 3 ).empty(),
+        "Neighbors in empty search should be empty" );
+    geode::OpenGeodeGeometryException::test(
+        empty_search.radius_neighbors( query, 10 ).empty(),
+        "Radius neighbors in empty search should be empty" );
+
+    const geode::NNSearch3D search{ { geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } } } };
+    geode::OpenGeodeGeometryException::test(
+        search.neighbors( query, 0 ).empty(),
+        "Zero neighbors request should be empty" );
+    geode::OpenGeodeGeometryException::test(
+        search.neighbors( query, 5 ).size() == 2,
+        "Too many neighbors request should return all points" );
+}
+
 void test()
 {
     first_test();
     second_test();
+    test_empty_search();
 }
 
 OPENGEODE_TEST( "nnsearch" )

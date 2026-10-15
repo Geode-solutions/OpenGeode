@@ -24,7 +24,7 @@
 #pragma once
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
-#include <geode/geometry/internal/predicates.hpp>
+#include <geode/geometry/detail/predicates.hpp>
 
 namespace geode
 {

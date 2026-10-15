@@ -98,6 +98,11 @@ namespace geode
         [[nodiscard]] local_index_t longest_edge_index() const;
         [[nodiscard]] local_index_t smallest_edge_index() const;
         [[nodiscard]] double minimum_height() const;
+        /*!
+         * A triangle is degenerated if all its vertices lie in a strip
+         * (thick line) of thickness GLOBAL_EPSILON, i.e. if its minimum
+         * height is below GLOBAL_EPSILON.
+         */
         [[nodiscard]] bool is_degenerated() const;
         [[nodiscard]] std::string string() const;
 
