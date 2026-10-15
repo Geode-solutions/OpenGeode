@@ -115,8 +115,9 @@ namespace
     }
 
     // Rounding errors on points with coordinates below this bound stay far
-    // below GLOBAL_EPSILON
-    constexpr double ROUNDING_SAFE_COORDINATE{ 1e6 };
+    // below GLOBAL_EPSILON (relative double rounding ~1e-16 times 1e6 gives
+    // ~1e-10)
+    constexpr double ROUNDING_SAFE_COORDINATE{ 1. / geode::GLOBAL_EPSILON };
 
     template < geode::index_t dimension >
     bool has_rounding_safe_coordinates( const geode::Point< dimension >& point )

@@ -167,6 +167,46 @@ namespace
         return edge_distances[selected_edge];
     }
 
+    // Pivot on the vertex opposite to the longest edge: this is cheaper than
+    // Triangle::pivot() and its height over the longest edge tells if the
+    // triangle is degenerated
+    std::optional< geode::local_index_t > longest_edge_opposite_pivot(
+        const geode::Triangle3D& triangle )
+    {
+        const auto& vertices = triangle.vertices();
+        std::array< double, 3 > squared_lengths;
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            squared_lengths[e] =
+                geode::Vector3D{ vertices[e], vertices[e == 2 ? 0 : e + 1] }
+                    .length2();
+        }
+        geode::local_index_t longest_edge{ 0 };
+        for( const auto e : geode::LRange{ 1, 3 } )
+        {
+            if( squared_lengths[e] > squared_lengths[longest_edge] )
+            {
+                longest_edge = e;
+            }
+        }
+        const geode::local_index_t pivot =
+            longest_edge == 0 ? 2 : longest_edge - 1;
+        const auto next = pivot == 2 ? 0 : pivot + 1;
+        const auto previous = next == 2 ? 0 : next + 1;
+        const auto squared_double_area =
+            geode::Vector3D{ vertices[pivot], vertices[next] }
+                .cross( geode::Vector3D{ vertices[pivot], vertices[previous] } )
+                .length2();
+        // height over longest edge <= epsilon
+        if( !( squared_double_area > geode::GLOBAL_EPSILON
+                                         * geode::GLOBAL_EPSILON
+                                         * squared_lengths[longest_edge] ) )
+        {
+            return std::nullopt;
+        }
+        return pivot;
+    }
+
     std::tuple< double, geode::Point3D > pivot_point_triangle_distance(
         const geode::Point3D& point,
         const geode::Triangle3D& triangle,
@@ -901,38 +941,12 @@ namespace geode
         opengeode_geometry_api point_triangle_distance(
             const Point3D& point, const Triangle3D& triangle )
     {
-        // Pivot on the vertex opposite to the longest edge: this is cheaper
-        // than Triangle::pivot() and its height over the longest edge tells
-        // if the triangle is degenerated
-        const auto& vertices = triangle.vertices();
-        std::array< double, 3 > squared_lengths;
-        for( const auto e : LRange{ 3 } )
-        {
-            squared_lengths[e] =
-                Vector3D{ vertices[e], vertices[e == 2 ? 0 : e + 1] }.length2();
-        }
-        local_index_t longest_edge{ 0 };
-        for( const auto e : LRange{ 1, 3 } )
-        {
-            if( squared_lengths[e] > squared_lengths[longest_edge] )
-            {
-                longest_edge = e;
-            }
-        }
-        const local_index_t pivot = longest_edge == 0 ? 2 : longest_edge - 1;
-        const auto next = pivot == 2 ? 0 : pivot + 1;
-        const auto previous = next == 2 ? 0 : next + 1;
-        const auto squared_double_area =
-            Vector3D{ vertices[pivot], vertices[next] }
-                .cross( Vector3D{ vertices[pivot], vertices[previous] } )
-                .length2();
-        // height over longest edge <= epsilon
-        if( !( squared_double_area > GLOBAL_EPSILON * GLOBAL_EPSILON
-                                         * squared_lengths[longest_edge] ) )
+        const auto pivot = longest_edge_opposite_pivot( triangle );
+        if( !pivot )
         {
             return no_pivot_point_triangle_distance( point, triangle );
         }
-        return pivot_point_triangle_distance( point, triangle, pivot );
+        return pivot_point_triangle_distance( point, triangle, pivot.value() );
     }
 
     template <>

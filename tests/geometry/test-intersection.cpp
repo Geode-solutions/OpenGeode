@@ -543,9 +543,7 @@ void check_correctness(
         "[Test] Wrong ", name, " correctness flag" );
     geode::OpenGeodeGeometryException::test(
         geode::point_point_distance( correctness.second, expected_point )
-            < 1e-12
-                  * ( 1
-                      + geode::Vector< dimension >{ expected_point }.length() ),
+            < geode::GLOBAL_EPSILON,
         "[Test] Wrong ", name, " correctness point ",
         correctness.second.string(), " vs ", expected_point.string() );
 }
