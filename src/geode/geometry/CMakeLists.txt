@@ -110,7 +110,7 @@ add_geode_library(
         "internal/intersection_from_sides.hpp"
         "internal/position_from_sides.hpp"
     SKIP_UNITY
-        "internal/predicates.cpp"
+        "detail/predicates.cpp"
         "position.cpp"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
@@ -126,7 +126,7 @@ add_geode_library(
 # forbid contraction of a*b+c into fused multiply-add instructions.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set_source_files_properties(
-        "${PROJECT_SOURCE_DIR}/src/geode/geometry/internal/predicates.cpp"
+        "${PROJECT_SOURCE_DIR}/src/geode/geometry/detail/predicates.cpp"
         PROPERTIES
             COMPILE_OPTIONS "-ffp-contract=off"
     )
