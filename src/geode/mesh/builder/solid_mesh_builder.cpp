@@ -681,6 +681,8 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > old2new )
     {
+        solid_mesh_.delete_vertex_storage(
+            to_delete, typename SolidMesh< dimension >::SolidMeshKey{} );
         update_polyhedron_vertices( old2new );
         if( solid_mesh_.are_facets_enabled() )
         {
@@ -694,10 +696,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidMeshBuilder< dimension >::do_resize_vertex_storage(
+        index_t nb_vertices )
+    {
+        solid_mesh_.resize_vertex_storage(
+            nb_vertices, typename SolidMesh< dimension >::SolidMeshKey{} );
+    }
+
+    template < index_t dimension >
     void SolidMeshBuilder< dimension >::do_permute_vertices(
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > old2new )
     {
+        solid_mesh_.permute_vertex_storage(
+            permutation, typename SolidMesh< dimension >::SolidMeshKey{} );
         update_polyhedron_vertices( old2new );
         if( solid_mesh_.are_facets_enabled() )
         {

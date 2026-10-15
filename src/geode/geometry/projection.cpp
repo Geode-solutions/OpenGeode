@@ -35,19 +35,23 @@ namespace geode
     Point< dimension > point_segment_projection(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
-        const auto barycenter = segment.barycenter();
-        const auto length = segment.length();
-        if( length <= GLOBAL_EPSILON )
+        const auto& vertices = segment.vertices();
+        const Vector< dimension > edge{ vertices[0], vertices[1] };
+        const auto length2 = edge.length2();
+        if( length2 <= GLOBAL_EPSILON * GLOBAL_EPSILON )
         {
-            return barycenter;
+            return segment.barycenter();
         }
-        const auto norm_dir = segment.direction();
-        const auto d = norm_dir.dot( { barycenter, point } );
-        if( std::fabs( d ) <= length / 2. )
+        const auto dot = edge.dot( { vertices[0], point } );
+        if( dot <= 0 )
         {
-            return { barycenter + norm_dir * d };
+            return vertices[0];
         }
-        return d > 0 ? segment.vertices()[1] : segment.vertices()[0];
+        if( dot >= length2 )
+        {
+            return vertices[1];
+        }
+        return vertices[0].get() + edge * ( dot / length2 );
     }
 
     template < index_t dimension >

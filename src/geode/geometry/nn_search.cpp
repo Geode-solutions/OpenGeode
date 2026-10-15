@@ -69,7 +69,7 @@ namespace geode
             std::vector< nanoflann::ResultItem< index_t, double > > results;
             nanoflann::SearchParameters params;
             params.sorted = true;
-            const auto nb_results = nn_tree_.radiusSearch( &copy( point )[0],
+            const auto nb_results = nn_tree_.radiusSearch( copy( point ).data(),
                 threshold_distance * threshold_distance, results, params );
             std::vector< index_t > indices;
             indices.reserve( nb_results );
@@ -92,7 +92,7 @@ namespace geode
                 epsilons_frame.direction( max_elongation_direction ).length();
             const auto radius = max_elongation * max_elongation;
             const auto nb_results = nn_tree_.radiusSearch(
-                &copy( point )[0], radius, results, params );
+                copy( point ).data(), radius, results, params );
             std::vector< index_t > indices;
             indices.reserve( nb_results );
             for( auto&& result : results )
@@ -119,10 +119,15 @@ namespace geode
         std::vector< index_t > nearest_vertices(
             const Point< dimension >& point, const index_t nb_neighbors ) const
         {
+            if( nb_neighbors == 0 || nb_points() == 0 )
+            {
+                return {};
+            }
             std::vector< index_t > results( nb_neighbors );
             std::vector< double > distances( nb_neighbors );
-            const auto new_nb_neighbors = nn_tree_.knnSearch(
-                &copy( point )[0], nb_neighbors, &results[0], &distances[0] );
+            const auto new_nb_neighbors =
+                nn_tree_.knnSearch( copy( point ).data(), nb_neighbors,
+                    results.data(), distances.data() );
             results.resize( new_nb_neighbors );
             return results;
         }
@@ -355,7 +360,12 @@ namespace geode
     index_t NNSearch< dimension >::closest_neighbor(
         const Point< dimension >& point ) const
     {
-        return impl_->nearest_vertices( point, 1 ).front();
+        const auto closest = impl_->nearest_vertices( point, 1 );
+        if( closest.empty() )
+        {
+            return NO_ID;
+        }
+        return closest.front();
     }
 
     template < index_t dimension >

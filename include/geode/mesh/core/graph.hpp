@@ -182,6 +182,14 @@ namespace geode
         void disassociate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex, GraphKey /*key*/ );
 
+        void resize_vertex_storage( index_t nb_vertices, GraphKey /*key*/ );
+
+        void delete_vertex_storage(
+            const std::vector< bool >& to_delete, GraphKey /*key*/ );
+
+        void permute_vertex_storage(
+            absl::Span< const index_t > permutation, GraphKey /*key*/ );
+
     protected:
         Graph();
         Graph( Graph&& other ) noexcept;

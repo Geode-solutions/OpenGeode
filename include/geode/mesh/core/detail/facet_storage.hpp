@@ -34,6 +34,7 @@
 #include <geode/basic/range.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/mesh/core/detail/legacy_attributes.hpp>
 #include <geode/mesh/core/detail/vertex_cycle.hpp>
 
 namespace geode
@@ -51,43 +52,14 @@ namespace geode
                 index_t facet_id, const VertexContainer& vertices ) const
             {
                 const OrientedVertexCycle other_oriented_cycle{ vertices };
-                const OrientedVertexCycle oriented_cycle{ vertices_->value(
-                    facet_id ) };
+                const OrientedVertexCycle oriented_cycle{ vertices_[facet_id] };
                 return oriented_cycle.is_opposite( other_oriented_cycle );
             }
 
         protected:
             FacetStorage( BITSERY ) {}
 
-            FacetStorage()
-            {
-                AttributeProperties attribute_properties;
-                attribute_properties.assignable = false;
-                attribute_properties.interpolable = false;
-                attribute_properties.transferable = false;
-                AttributeValues< index_t > counter_values;
-                counter_values.default_value = 1u;
-                counter_values.no_value = NO_ID;
-                const auto counter_attribute_id =
-                    facet_attribute_manager_
-                        .create_attribute< VariableAttribute, index_t >(
-                            "counter", counter_values, attribute_properties );
-                counter_ = facet_attribute_manager_
-                               .find_attribute< VariableAttribute, index_t >(
-                                   counter_attribute_id );
-                AttributeValues< VertexContainer > vertices_values;
-                vertices_values.default_value = VertexContainer{};
-                vertices_values.no_value = VertexContainer{};
-                const auto vertices_attribute_id =
-                    facet_attribute_manager_
-                        .create_attribute< VariableAttribute, VertexContainer >(
-                            "facet_vertices", vertices_values,
-                            attribute_properties );
-                vertices_ =
-                    facet_attribute_manager_
-                        .find_attribute< VariableAttribute, VertexContainer >(
-                            vertices_attribute_id );
-            }
+            FacetStorage() = default;
 
             [[nodiscard]] AttributeManager& facet_attribute_manager() const
             {
@@ -114,12 +86,12 @@ namespace geode
                 if( !std::get< 1 >( output ) )
                 {
                     const auto old_id = it->second;
-                    counter_->set_value(
-                        old_id, counter_->value( old_id ) + 1 );
+                    counters_[old_id]++;
                     return old_id;
                 }
                 facet_attribute_manager_.resize( id + 1 );
-                vertices_->set_value( id, it->first.vertices() );
+                counters_.push_back( 1 );
+                vertices_.push_back( it->first.vertices() );
                 return id;
             }
 
@@ -134,20 +106,16 @@ namespace geode
                 OpenGeodeMeshException::check_assertion( id != NO_ID,
                     "[FacetStorage::remove_facet] Cannot find "
                     "facet from given vertices" );
-                const auto old_count = counter_->value( id );
-                const auto new_count = std::max( 1u, old_count ) - 1;
-                counter_->set_value( id, new_count );
+                counters_[id] = std::max( 1u, counters_[id] ) - 1;
                 return id;
             }
 
             std::vector< index_t > clean_facets()
             {
-                std::vector< bool > to_delete(
-                    facet_attribute_manager_.nb_elements(), false );
-                for( const auto e :
-                    Range{ facet_attribute_manager_.nb_elements() } )
+                std::vector< bool > to_delete( counters_.size(), false );
+                for( const auto e : Indices{ counters_ } )
                 {
-                    to_delete[e] = counter_->value( e ) == 0;
+                    to_delete[e] = counters_[e] == 0;
                 }
                 return delete_facets( to_delete );
             }
@@ -170,7 +138,7 @@ namespace geode
                 {
                     facet_indices_.erase( key );
                 }
-                facet_attribute_manager_.delete_elements( to_delete );
+                delete_elements( to_delete );
                 return old2new;
             }
 
@@ -217,11 +185,10 @@ namespace geode
                                 TypedVertexCycle{
                                     std::move( updated_vertices ) },
                                 cycle.second ) );
-                        vertices_->set_value(
-                            cycle.second, it->first.vertices() );
+                        vertices_[cycle.second] = it->first.vertices();
                     }
                 }
-                facet_attribute_manager_.delete_elements( to_delete );
+                delete_elements( to_delete );
                 const auto cycle_old2new = mapping_after_deletion( to_delete );
                 for( auto& cycle : facet_indices_ )
                 {
@@ -233,71 +200,62 @@ namespace geode
             [[nodiscard]] const VertexContainer& get_facet_vertices(
                 index_t facet_id ) const
             {
-                return vertices_->value( facet_id );
+                return vertices_[facet_id];
             }
 
         protected:
-            void update_attribute()
-            {
-                vertices_ = facet_attribute_manager_.template find_attribute<
-                    VariableAttribute, VertexContainer >( vertices_->id() );
-            }
-
             [[nodiscard]] index_t get_counter( index_t facet_id ) const
             {
-                return counter_->value( facet_id );
+                return counters_[facet_id];
             }
 
             void overwrite( const FacetStorage< VertexContainer >& from )
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
                 facet_indices_ = from.facet_indices_;
-                AttributeProperties attribute_properties;
-                attribute_properties.assignable = false;
-                attribute_properties.interpolable = false;
-                attribute_properties.transferable = false;
-                AttributeValues< index_t > counter_values;
-                counter_values.default_value = 1u;
-                counter_values.no_value = NO_ID;
-                const auto counter_id =
-                    facet_attribute_manager_
-                        .create_attribute< VariableAttribute, index_t >(
-                            "counter", counter_values, attribute_properties );
-                counter_ = facet_attribute_manager_
-                               .find_attribute< VariableAttribute, index_t >(
-                                   counter_id );
-                const auto old_counter_attribute =
-                    from.facet_attribute_manager()
-                        .template find_read_only_attribute< index_t >(
-                            from.counter_->id() );
-                AttributeValues< VertexContainer > vertices_values;
-                vertices_values.default_value = VertexContainer{};
-                vertices_values.no_value = VertexContainer{};
-                const auto vertices_id =
-                    facet_attribute_manager_
-                        .create_attribute< VariableAttribute, VertexContainer >(
-                            "facet_vertices", vertices_values,
-                            attribute_properties );
-                vertices_ =
-                    facet_attribute_manager_
-                        .find_attribute< VariableAttribute, VertexContainer >(
-                            vertices_id );
-                const auto old_vertices_attribute =
-                    from.facet_attribute_manager()
-                        .template find_read_only_attribute< VertexContainer >(
-                            from.vertices_->id() );
-                for( const auto& [_, facet_id] : facet_indices_ )
-                {
-                    const auto old_counter_value =
-                        old_counter_attribute->value( facet_id );
-                    counter_->set_value( facet_id, old_counter_value );
-                    const auto old_vertices_value =
-                        old_vertices_attribute->value( facet_id );
-                    vertices_->set_value( facet_id, old_vertices_value );
-                }
+                counters_ = from.counters_;
+                vertices_ = from.vertices_;
             }
 
         private:
+            void delete_elements( const std::vector< bool >& to_delete )
+            {
+                facet_attribute_manager_.delete_elements( to_delete );
+                delete_vector_elements( to_delete, counters_ );
+                delete_vector_elements( to_delete, vertices_ );
+            }
+
+            template < typename Archive >
+            void serialize_facet_indices( Archive& archive )
+            {
+                archive.ext( facet_indices_,
+                    bitsery::ext::StdMap{ facet_indices_.max_size() },
+                    []( Archive& archive2, TypedVertexCycle& cycle,
+                        index_t& attribute ) {
+                        archive2.object( cycle );
+                        archive2.value4b( attribute );
+                    } );
+            }
+
+            template < typename Archive >
+            void deserialize_legacy_storage( Archive& archive )
+            {
+                LegacyAttributes legacy_attributes;
+                legacy_attributes.deserialize( archive, counters_ );
+                legacy_attributes.skip< VertexContainer >( archive );
+                legacy_attributes.remove_from( facet_attribute_manager_ );
+                initialize_vertices();
+            }
+
+            void initialize_vertices()
+            {
+                vertices_.resize( counters_.size() );
+                for( const auto& [cycle, facet_id] : facet_indices_ )
+                {
+                    vertices_[facet_id] = cycle.vertices();
+                }
+            }
+
             template < typename Archive >
             void serialize( Archive& serializer )
             {
@@ -306,56 +264,32 @@ namespace geode
                         { []( Archive& archive,
                               FacetStorage< VertexContainer >& storage ) {
                              archive.object( storage.facet_attribute_manager_ );
-                             archive.ext( storage.facet_indices_,
-                                 bitsery::ext::StdMap{
-                                     storage.facet_indices_.max_size() },
-                                 []( Archive& archive2, TypedVertexCycle& cycle,
-                                     index_t& attribute ) {
-                                     archive2.object( cycle );
-                                     archive2.value4b( attribute );
-                                 } );
-                             archive.ext( storage.counter_,
-                                 bitsery::ext::StdSmartPtr{} );
-                             archive.ext( storage.vertices_,
-                                 bitsery::ext::StdSmartPtr{} );
-                             const auto& old_counter_properties =
-                                 storage.counter_->properties();
-                             storage.counter_->set_properties(
-                                 { old_counter_properties.assignable,
-                                     old_counter_properties.interpolable,
-                                     false } );
-                             const auto& old_vertices_properties =
-                                 storage.vertices_->properties();
-                             storage.vertices_->set_properties(
-                                 { old_vertices_properties.assignable,
-                                     old_vertices_properties.interpolable,
-                                     false } );
+                             storage.serialize_facet_indices( archive );
+                             storage.deserialize_legacy_storage( archive );
                          },
                             []( Archive& archive,
                                 FacetStorage< VertexContainer >& storage ) {
                                 archive.object(
                                     storage.facet_attribute_manager_ );
-                                archive.ext( storage.facet_indices_,
-                                    bitsery::ext::StdMap{
-                                        storage.facet_indices_.max_size() },
-                                    []( Archive& archive2,
-                                        TypedVertexCycle& cycle,
-                                        index_t& attribute ) {
-                                        archive2.object( cycle );
-                                        archive2.value4b( attribute );
-                                    } );
-                                archive.ext( storage.counter_,
-                                    bitsery::ext::StdSmartPtr{} );
-                                archive.ext( storage.vertices_,
-                                    bitsery::ext::StdSmartPtr{} );
+                                storage.serialize_facet_indices( archive );
+                                storage.deserialize_legacy_storage( archive );
+                            },
+                            []( Archive& archive,
+                                FacetStorage< VertexContainer >& storage ) {
+                                archive.object(
+                                    storage.facet_attribute_manager_ );
+                                storage.serialize_facet_indices( archive );
+                                archive.container4b( storage.counters_,
+                                    storage.counters_.max_size() );
+                                storage.initialize_vertices();
                             } } } );
             }
 
         private:
             mutable AttributeManager facet_attribute_manager_;
             absl::flat_hash_map< TypedVertexCycle, index_t > facet_indices_;
-            std::shared_ptr< VariableAttribute< index_t > > counter_;
-            std::shared_ptr< VariableAttribute< VertexContainer > > vertices_;
+            std::vector< index_t > counters_;
+            std::vector< VertexContainer > vertices_;
         };
     } // namespace detail
 } // namespace geode

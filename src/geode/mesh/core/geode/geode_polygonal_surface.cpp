@@ -217,7 +217,7 @@ namespace geode
         std::vector< index_t > polygon_vertices_;
         std::vector< index_t > polygon_adjacents_;
         std::vector< index_t > polygon_ptr_;
-    }; // namespace geode
+    };
 
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface()

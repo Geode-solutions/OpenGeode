@@ -106,9 +106,11 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedra(
-        index_t /*unused*/ )
+        index_t nb )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_tetrahedral_solid_.add_tetrahedra(
+            nb, typename OpenGeodeTetrahedralSolid<
+                    dimension >::OGTetrahedralSolidKey{} );
     }
 
     template < index_t dimension >
@@ -134,18 +136,22 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_delete_polyhedra(
-        const std::vector< bool >& /*unused*/,
+        const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_tetrahedral_solid_.remove_polyhedra(
+            to_delete, typename OpenGeodeTetrahedralSolid<
+                           dimension >::OGTetrahedralSolidKey{} );
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_permute_polyhedra(
-        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_tetrahedral_solid_.permute_polyhedra(
+            permutation, typename OpenGeodeTetrahedralSolid<
+                             dimension >::OGTetrahedralSolidKey{} );
     }
 
     template < index_t dimension >
@@ -157,9 +163,13 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_copy_polyhedra(
-        const SolidMesh< dimension >& /*unused*/ )
+        const SolidMesh< dimension >& solid_mesh )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_tetrahedral_solid_.copy_polyhedra(
+            dynamic_cast< const OpenGeodeTetrahedralSolid< dimension >& >(
+                solid_mesh ),
+            typename OpenGeodeTetrahedralSolid<
+                dimension >::OGTetrahedralSolidKey{} );
     }
 
     template class opengeode_mesh_api OpenGeodeTetrahedralSolidBuilder< 3 >;

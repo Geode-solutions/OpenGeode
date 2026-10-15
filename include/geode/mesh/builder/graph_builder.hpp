@@ -142,6 +142,8 @@ namespace geode
         using VertexSetBuilder::delete_vertices;
 
     private:
+        void do_resize_vertex_storage( index_t nb_vertices ) final;
+
         void do_delete_vertices( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) final;
 

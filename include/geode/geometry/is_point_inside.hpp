@@ -37,7 +37,8 @@ namespace geode
 {
     /*!
      * Find if point is inside a polygon.
-     * @param[in] point The point to rotate.
+     * Points on the polygon boundary are considered inside.
+     * @param[in] point The point to test.
      */
     [[nodiscard]] bool opengeode_geometry_api is_point_inside_polygon(
         const Point2D& point, const Polygon2D& polygon );

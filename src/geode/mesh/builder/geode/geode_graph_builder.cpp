@@ -75,30 +75,31 @@ namespace geode
 
     void OpenGeodeGraphBuilder::do_create_edge()
     {
-        // Operation is directly handled by the AttributeManager
+        geode_graph_.add_edge( OpenGeodeGraph::OGGraphKey{} );
     }
 
-    void OpenGeodeGraphBuilder::do_create_edges( index_t /*unused*/ )
+    void OpenGeodeGraphBuilder::do_create_edges( index_t nb )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_graph_.add_edges( nb, OpenGeodeGraph::OGGraphKey{} );
     }
 
     void OpenGeodeGraphBuilder::do_delete_edges(
-        const std::vector< bool >& /*unused*/,
+        const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_graph_.remove_edges( to_delete, OpenGeodeGraph::OGGraphKey{} );
     }
 
     void OpenGeodeGraphBuilder::do_permute_edges(
-        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_graph_.permute_edges( permutation, OpenGeodeGraph::OGGraphKey{} );
     }
 
-    void OpenGeodeGraphBuilder::do_copy_edges( const Graph& /*unused*/ )
+    void OpenGeodeGraphBuilder::do_copy_edges( const Graph& mesh )
     {
-        // Operation is directly handled by the AttributeManager
+        geode_graph_.copy_edges( dynamic_cast< const OpenGeodeGraph& >( mesh ),
+            OpenGeodeGraph::OGGraphKey{} );
     }
 } // namespace geode

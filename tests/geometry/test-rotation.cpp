@@ -30,6 +30,43 @@
 
 #include <geode/tests/common.hpp>
 
+void test_rotation_robustness()
+{
+    const geode::Point3D input{ { 1., 2., 3. } };
+    const geode::Vector3D axis{ { 1., 1., 0. } };
+    const auto huge = geode::rotate( input, axis, 1e17 );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( geode::Vector3D{ huge }.length()
+                   - geode::Vector3D{ input }.length() )
+                <= geode::GLOBAL_EPSILON
+            && std::fabs( geode::Vector3D{ huge }.dot( axis )
+                          - geode::Vector3D{ input }.dot( axis ) )
+                   <= geode::GLOBAL_EPSILON,
+        "Wrong result for huge angle rotation" );
+    try
+    {
+        [[maybe_unused]] const auto infinite = geode::rotate(
+            input, axis, std::numeric_limits< double >::infinity() );
+        geode::OpenGeodeGeometryException::test(
+            false, "Infinite angle rotation should throw" );
+    }
+    catch( const geode::OpenGeodeGeometryException& )
+    {
+    }
+
+    const geode::Vector3D small_axis{ { 1e-4, 0., 0. } };
+    const geode::Vector3D z_axis{ { 0., 0., 3. } };
+    const auto small_result = geode::rotate( z_axis, small_axis, M_PI / 2.0 );
+    geode::OpenGeodeGeometryException::test(
+        small_result.inexact_equal( geode::Point3D{ { 0., -3., 0. } } ),
+        "Wrong result for rotation around a short axis" );
+
+    const auto result = geode::rotate( input, axis, -7 * M_PI / 3.0 );
+    const auto reference = geode::rotate( input, axis, 5 * M_PI / 3.0 );
+    geode::OpenGeodeGeometryException::test( result.inexact_equal( reference ),
+        "Wrong result for negative angle rotation" );
+}
+
 void test()
 {
     const geode::Vector3D input( { 0., 0., 3. } );
@@ -48,6 +85,7 @@ void test()
     const geode::Vector3D answer3( { 0., -3., 0. } );
     geode::OpenGeodeGeometryException::test(
         result3.inexact_equal( answer3 ), "Wrong result for configuration 2" );
+    test_rotation_robustness();
 }
 
 OPENGEODE_TEST( "rotation" )

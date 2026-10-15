@@ -88,6 +88,19 @@ namespace geode
             index_t vertex_id,
             OGEdgedCurveKey /*key*/ );
 
+        void add_edge( OGEdgedCurveKey /*key*/ );
+
+        void add_edges( index_t nb, OGEdgedCurveKey /*key*/ );
+
+        void remove_edges(
+            const std::vector< bool >& to_delete, OGEdgedCurveKey /*key*/ );
+
+        void permute_edges(
+            absl::Span< const index_t > permutation, OGEdgedCurveKey /*key*/ );
+
+        void copy_edges( const OpenGeodeEdgedCurve< dimension >& edged_curve,
+            OGEdgedCurveKey /*key*/ );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >

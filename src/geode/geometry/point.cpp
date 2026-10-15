@@ -104,15 +104,12 @@ namespace std
     size_t hash< geode::Point2D >::operator()(
         const geode::Point2D &point ) const
     {
-        return absl::Hash< double >()( point.value( 0 ) )
-               ^ absl::Hash< double >()( point.value( 1 ) );
+        return absl::Hash< geode::Point2D >()( point );
     }
 
     size_t hash< geode::Point3D >::operator()(
         const geode::Point3D &point ) const
     {
-        return absl::Hash< double >()( point.value( 0 ) )
-               ^ absl::Hash< double >()( point.value( 1 ) )
-               ^ absl::Hash< double >()( point.value( 2 ) );
+        return absl::Hash< geode::Point3D >()( point );
     }
 } // namespace std

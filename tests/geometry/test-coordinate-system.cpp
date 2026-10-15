@@ -133,6 +133,15 @@ void optuse_system3D()
         geode::Point3D{ { 0.25, 4, -0.5 } } );
 }
 
+void test_system1D()
+{
+    geode::Logger::info( "System 1D" );
+    const geode::CoordinateSystem1D coord_system{ { geode::Vector1D{ { 2 } } },
+        geode::Point1D{ { 1 } } };
+    check_point(
+        coord_system, geode::Point1D{ { 5 } }, geode::Point1D{ { 2 } } );
+}
+
 void modified_system2D()
 {
     geode::Logger::info( "Modified system 2D" );
@@ -157,6 +166,7 @@ void test()
     orthonormal_system3D();
     acute_system3D();
     optuse_system3D();
+    test_system1D();
     modified_system2D();
 }
 

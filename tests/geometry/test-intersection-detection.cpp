@@ -202,17 +202,28 @@ void test_segment_degenerated_triangle_intersection_detection()
     const geode::Point3D a{ { 0, 0, 0 } };
     const geode::Point3D b{ { 2, 2, 0 } };
     const geode::Point3D c{ { 1, 1, 1e-8 } };
-    const geode::Triangle3D needle{ a, b, c };
+    const geode::Triangle3D cap{ a, b, c };
     const geode::Point3D d{ { 1, 1, 0.5 } };
     const geode::Point3D e{ { 1.5, 1.5, 1 } };
     const auto result = geode::segment_triangle_intersection_detection(
-        geode::Segment3D{ d, e }, needle );
+        geode::Segment3D{ d, e }, cap );
     geode::OpenGeodeGeometryException::test(
         result
             == std::make_pair(
                 geode::POSITION::outside, geode::POSITION::outside ),
         "Wrong result for segment_triangle_intersection_detection with "
-        "needle triangle in a vertical plane" );
+        "cap triangle in a vertical plane" );
+
+    // Segment in the plane of the cap, crossing it
+    const geode::Point3D f{ { 1, 1, -0.5 } };
+    const auto crossing = geode::segment_triangle_intersection_detection(
+        geode::Segment3D{ f, d }, cap );
+    geode::OpenGeodeGeometryException::test(
+        crossing
+            == std::make_pair(
+                geode::POSITION::parallel, geode::POSITION::parallel ),
+        "Wrong result for segment_triangle_intersection_detection with "
+        "segment crossing a cap triangle in its plane" );
 }
 
 void test_segment_line_intersection_detection()

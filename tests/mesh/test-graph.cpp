@@ -20,7 +20,9 @@
  * SOFTWARE.
  *
  */
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/variable_attribute.hpp>
 #include <iostream>
 
 #include <geode/mesh/builder/geode/geode_graph_builder.hpp>
@@ -135,6 +137,17 @@ void test_backward_io( const std::string& filename )
     geode::OpenGeodeMeshException::test(
         graph->edges_around_vertex( 2 ).size() == 3,
         "Backward edges_around should have 3 edges" );
+    geode::OpenGeodeMeshException::test(
+        !graph->vertex_attribute_manager()
+            .attribute_ids_matching_name( "edges_around_vertex" )
+            .has_value(),
+        "Backward mesh should not have legacy attribute "
+        "edges_around_vertex" );
+    geode::OpenGeodeMeshException::test(
+        !graph->edge_attribute_manager()
+            .attribute_ids_matching_name( "edges" )
+            .has_value(),
+        "Backward Graph should not have legacy attribute edges" );
 }
 
 void test_clone( const geode::Graph& graph )
@@ -158,9 +171,62 @@ void test_delete_isolated_vertices(
         graph.nb_edges() == 2, "Graph should have 2 edges" );
 }
 
+void check_no_legacy_attributes( const geode::AttributeManager& manager,
+    std::initializer_list< const char* > names )
+{
+    for( const auto* name : names )
+    {
+        geode::OpenGeodeMeshException::test(
+            !manager.attribute_ids_matching_name( name ).has_value(),
+            "Legacy attribute ", name, " should have been removed" );
+    }
+}
+
+void check_user_value(
+    const geode::AttributeManager& manager, geode::index_t element )
+{
+    const auto ids = manager.attribute_ids_matching_name( "user_value" );
+    geode::OpenGeodeMeshException::test(
+        ids.has_value() && ids->size() == 1, "user_value should be kept" );
+    const auto attribute =
+        manager.find_read_only_attribute< double >( ids->at( 0 ) );
+    geode::OpenGeodeMeshException::test(
+        attribute->value( element ) == 1.5 * element,
+        "Wrong user_value at element ", element );
+}
+
+void check_v18_5( const geode::Graph& graph )
+{
+    geode::OpenGeodeMeshException::test(
+        graph.nb_vertices() == 4 && graph.nb_edges() == 4,
+        "v18_5 Graph has wrong number of elements" );
+    geode::OpenGeodeMeshException::test( graph.edge_vertex( { 3, 1 } ) == 3,
+        "v18_5 Graph has wrong edge vertex" );
+    geode::OpenGeodeMeshException::test(
+        graph.edges_around_vertex( 2 ).size() == 3,
+        "v18_5 Graph has wrong edges around vertex" );
+    check_user_value( graph.vertex_attribute_manager(), 3 );
+    check_user_value( graph.edge_attribute_manager(), 3 );
+    check_no_legacy_attributes(
+        graph.vertex_attribute_manager(), { "edges_around_vertex" } );
+    check_no_legacy_attributes( graph.edge_attribute_manager(), { "edges" } );
+}
+
+void test_backward_v18_5()
+{
+    const auto graph = geode::load_graph(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_grp" ) );
+    check_v18_5( *graph );
+    const auto filename =
+        absl::StrCat( "v18_5_reload.", graph->native_extension() );
+    geode::save_graph( *graph, filename );
+    check_v18_5( *geode::load_graph( filename ) );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_backward_v18_5();
     auto graph =
         geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
     auto builder = geode::GraphBuilder::create( *graph );

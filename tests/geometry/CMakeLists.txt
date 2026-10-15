@@ -137,6 +137,12 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-predicates.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-projection.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -177,12 +183,4 @@ add_geode_test(
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
-)
-
-add_geode_test(
-    SOURCE "benchmark-tier1-robustness.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-    LOCAL
 )

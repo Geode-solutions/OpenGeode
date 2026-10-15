@@ -216,6 +216,47 @@ void test_triangle_angle_based_quality()
         "[Test] Point triangle quality should be 0" );
 }
 
+void test_scale_invariant_quality()
+{
+    const auto qualities = []( double scale ) {
+        const geode::Point3D point0{ { 0, 0, 0 } };
+        const geode::Point3D point1{ { scale, 0, 0 } };
+        const geode::Point3D point2{ { 0.5 * scale, std::sqrt( 3 ) / 2 * scale,
+            0 } };
+        const geode::Point3D point3{ { 0.5 * scale, std::sqrt( 3 ) / 6 * scale,
+            std::sqrt( 2. / 3. ) * scale } };
+        const geode::Tetrahedron tetra{ point0, point1, point2, point3 };
+        return std::array< double, 4 >{ geode::tetrahedron_aspect_ratio(
+                                            tetra ),
+            geode::tetrahedron_volume_to_edge_ratio( tetra ),
+            geode::tetrahedron_collapse_aspect_ratio( tetra ),
+            geode::tetrahedron_volume_to_facet_ratio( tetra ) };
+    };
+    const auto reference = qualities( 1 );
+    const auto small = qualities( 0.01 );
+    for( const auto q : geode::LRange{ 4 } )
+    {
+        geode::OpenGeodeGeometryException::test(
+            std::fabs( reference[q] - 1 ) < geode::GLOBAL_EPSILON
+                && std::fabs( small[q] - reference[q] ) < geode::GLOBAL_EPSILON,
+            "Wrong quality ", q, " for small regular tetrahedron: ", small[q],
+            " vs ", reference[q] );
+    }
+
+    const geode::Point3D point{ { 1, 2, 3 } };
+    const geode::Tetrahedron coincident{ point, point, point, point };
+    geode::OpenGeodeGeometryException::test(
+        geode::tetrahedron_volume_to_edge_ratio( coincident ) == 0
+            && geode::tetrahedron_volume_to_facet_ratio( coincident ) == 0,
+        "Wrong quality for tetrahedron with coincident vertices" );
+    geode::OpenGeodeGeometryException::test(
+        geode::tetrahedron_aspect_ratio( coincident )
+                == std::numeric_limits< double >::max()
+            && geode::tetrahedron_collapse_aspect_ratio( coincident )
+                   == std::numeric_limits< double >::max(),
+        "Wrong aspect ratio for tetrahedron with coincident vertices" );
+}
+
 void test()
 {
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
@@ -224,6 +265,7 @@ void test()
     test_sliver_tetrahedron();
     test_other_tetrahedron();
     test_triangle_angle_based_quality();
+    test_scale_invariant_quality();
 }
 
 OPENGEODE_TEST( "quality" )

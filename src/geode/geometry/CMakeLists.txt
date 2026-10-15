@@ -54,7 +54,7 @@ add_geode_library(
         "perpendicular.cpp"
         "points_sort.cpp"
         "position.cpp"
-        "internal/predicates.cpp"
+        "detail/predicates.cpp"
         "point.cpp"
         "projection.cpp"
         "quality.cpp"
@@ -105,11 +105,12 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/aabb_impl.hpp"
         "detail/bitsery_archive.hpp"
+        "detail/predicates.hpp"
     INTERNAL_HEADERS
         "internal/intersection_from_sides.hpp"
         "internal/position_from_sides.hpp"
-        "internal/predicates.hpp"
     SKIP_UNITY
+        "detail/predicates.cpp"
         "position.cpp"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
@@ -120,3 +121,13 @@ add_geode_library(
         earcut_hpp::earcut_hpp
         nanoflann::nanoflann
 )
+
+# Exact predicates rely on exact floating-point rounding of each operation:
+# forbid contraction of a*b+c into fused multiply-add instructions.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set_source_files_properties(
+        "${PROJECT_SOURCE_DIR}/src/geode/geometry/detail/predicates.cpp"
+        PROPERTIES
+            COMPILE_OPTIONS "-ffp-contract=off"
+    )
+endif()

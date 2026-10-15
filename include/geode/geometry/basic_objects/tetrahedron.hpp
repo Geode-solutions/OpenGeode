@@ -66,6 +66,10 @@ namespace geode
         void set_point( local_index_t vertex, PointType point );
         [[nodiscard]] const std::array< PointType, 4 >& vertices() const;
         [[nodiscard]] BoundingBox3D bounding_box() const;
+        /*!
+         * A tetrahedron is degenerated if all its vertices lie in a slab
+         * (thick plane) of thickness GLOBAL_EPSILON.
+         */
         [[nodiscard]] bool is_degenerated() const;
         [[nodiscard]] std::string string() const;
 

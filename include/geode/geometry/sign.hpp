@@ -50,6 +50,12 @@ namespace geode
     [[nodiscard]] SIGN opengeode_geometry_api triangle_area_sign(
         const Triangle2D& triangle );
 
+    /*!
+     * Return the sign of a 2D polygon area.
+     * The polygon is expected to be simple. For a self-intersecting polygon,
+     * the returned sign is the orientation around its lexicographically
+     * smallest vertex.
+     */
     [[nodiscard]] SIGN opengeode_geometry_api polygon_area_sign(
         const Polygon2D& polygon );
 
