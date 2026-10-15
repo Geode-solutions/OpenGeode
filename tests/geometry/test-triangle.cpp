@@ -141,11 +141,14 @@ void test_degenerated_triangle_vertex_order()
                 std::array< geode::local_index_t, 3 > order{ 0, 1, 2 };
                 do
                 {
-                    const geode::Triangle3D triangle{
-                        to_global( configuration[order[0]], offset ),
-                        to_global( configuration[order[1]], offset ),
-                        to_global( configuration[order[2]], offset )
-                    };
+                    // Triangle3D stores references: keep the points alive
+                    const auto point0 =
+                        to_global( configuration[order[0]], offset );
+                    const auto point1 =
+                        to_global( configuration[order[1]], offset );
+                    const auto point2 =
+                        to_global( configuration[order[2]], offset );
+                    const geode::Triangle3D triangle{ point0, point1, point2 };
                     geode::OpenGeodeGeometryException::test(
                         triangle.is_degenerated() == ( factor < 1 ),
                         "Wrong degeneracy for triangle ", triangle.string(),
@@ -183,12 +186,17 @@ void test_degenerated_tetrahedron_vertex_order()
                 std::array< geode::local_index_t, 4 > order{ 0, 1, 2, 3 };
                 do
                 {
-                    const geode::Tetrahedron tetra{
-                        to_global( configuration[order[0]], offset ),
-                        to_global( configuration[order[1]], offset ),
-                        to_global( configuration[order[2]], offset ),
-                        to_global( configuration[order[3]], offset )
-                    };
+                    // Tetrahedron stores references: keep the points alive
+                    const auto point0 =
+                        to_global( configuration[order[0]], offset );
+                    const auto point1 =
+                        to_global( configuration[order[1]], offset );
+                    const auto point2 =
+                        to_global( configuration[order[2]], offset );
+                    const auto point3 =
+                        to_global( configuration[order[3]], offset );
+                    const geode::Tetrahedron tetra{ point0, point1, point2,
+                        point3 };
                     geode::OpenGeodeGeometryException::test(
                         tetra.is_degenerated() == ( factor < 1 ),
                         "Wrong degeneracy for tetrahedron ", tetra.string(),

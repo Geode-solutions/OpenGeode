@@ -1197,15 +1197,18 @@ void test_degenerated_segment_segment_intersection( double length )
 
 void test_degenerated_segment_line_intersection( double length )
 {
-    const geode::InfiniteLine2D line{ geode::Vector2D{ { 1, 0 } },
-        geode::Point2D{ { 0, 0 } } };
-    const geode::Segment2D small_on{ geode::Point2D{ { 0.5, 0 } },
-        geode::Point2D{ { 0.5, length } } };
+    // InfiniteLine2D and Segment2D store references: keep the points alive
+    const geode::Point2D origin{ { 0, 0 } };
+    const geode::InfiniteLine2D line{ geode::Vector2D{ { 1, 0 } }, origin };
+    const geode::Point2D on0{ { 0.5, 0 } };
+    const geode::Point2D on1{ { 0.5, length } };
+    const geode::Segment2D small_on{ on0, on1 };
     geode::OpenGeodeGeometryException::test(
         geode::segment_line_intersection( small_on, line ),
         "Wrong degenerated segment_line_intersection" );
-    const geode::Segment2D small_off{ geode::Point2D{ { 0.5, 1 } },
-        geode::Point2D{ { 0.5, 1 + length } } };
+    const geode::Point2D off0{ { 0.5, 1 } };
+    const geode::Point2D off1{ { 0.5, 1 + length } };
+    const geode::Segment2D small_off{ off0, off1 };
     geode::OpenGeodeGeometryException::test(
         !geode::segment_line_intersection( small_off, line ),
         "Wrong degenerated segment_line_intersection (far)" );
