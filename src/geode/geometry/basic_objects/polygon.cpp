@@ -171,26 +171,31 @@ namespace geode
     std::enable_if_t< T == 3, std::optional< Vector3D > >
         GenericPolygon< PointType, dimension >::normal() const
     {
-        Vector3D normal;
-        const auto& point0 = vertices_[0];
-        for( const auto v : Range{ 2, nb_vertices() } )
-        {
-            const auto& point1 = vertices_[v - 1];
-            const auto& point2 = vertices_[v];
-            if( const auto triangle_normal =
-                    Triangle< T >{ point0, point1, point2 }.normal() )
-            {
-                normal += triangle_normal.value();
-            }
-        }
-        try
-        {
-            return normal.normalize();
-        }
-        catch( const OpenGeodeException& /*unused*/ )
+        if( nb_vertices() < 3 )
         {
             return std::nullopt;
         }
+        // Area-weighted sum of the fan triangle normals (twice the polygon
+        // vector area), robust to concave polygons.
+        const Point3D& point0 = vertices_[0];
+        Vector3D previous{ point0, vertices_[1] };
+        auto max_length2 = previous.length2();
+        Vector3D normal;
+        for( const auto v : Range{ 2, nb_vertices() } )
+        {
+            const Vector3D current{ point0, vertices_[v] };
+            max_length2 = std::max( max_length2, current.length2() );
+            normal += previous.cross( current );
+            previous = current;
+        }
+        // |normal| is twice the area: compare the corresponding height
+        // against GLOBAL_EPSILON
+        const auto length2 = normal.length2();
+        if( length2 <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_length2 )
+        {
+            return std::nullopt;
+        }
+        return normal / std::sqrt( length2 );
     }
 
     template < typename PointType, index_t dimension >
@@ -299,17 +304,18 @@ namespace geode
             geode::Segment< dimension >{
                 vertices_[max_length_edge], vertices_[next] }
         };
-        index_t opposite_vertex{ 0 };
+        double max_distance{ 0. };
         for( const auto vertex : geode::Range{ nb_vertices } )
         {
             if( vertex == max_length_edge || vertex == next )
             {
                 continue;
             }
-            opposite_vertex = vertex;
+            const geode::Point< dimension >& point = vertices_[vertex];
+            max_distance = std::max(
+                max_distance, geode::point_line_distance( point, line ) );
         }
-        const geode::Point< dimension >& point = vertices_[opposite_vertex];
-        return geode::point_line_distance( point, line );
+        return max_distance;
     }
 
     template < typename PointType, index_t dimension >

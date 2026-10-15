@@ -354,15 +354,107 @@ void test_segment_intersections()
         bbox.intersects( crossing2 ), "Wrong result with crossing2" );
 }
 
+void test_large_triangle3d_epsilon_intersections()
+{
+    geode::BoundingBox3D box;
+    box.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    box.add_point( geode::Point3D{ { 1, 1, 1 } } );
+    const auto size = 2e4;
+    for( const auto& [offset, expected] :
+        { std::make_pair( 0.5 * geode::GLOBAL_EPSILON, true ),
+            std::make_pair( 1e-3, false ) } )
+    {
+        const geode::Point3D a{ { -size, -size, 1 + offset } };
+        const geode::Point3D b{ { size, -size, 1 + offset } };
+        const geode::Point3D c{ { 0, size, 1 + offset } };
+        geode::OpenGeodeGeometryException::test(
+            box.epsilon_intersects( geode::Triangle3D{ a, b, c } ) == expected,
+            "Wrong epsilon_intersects with large horizontal triangle at "
+            "offset ",
+            offset );
+
+        // Triangle on a tilted plane, beyond the (1,1,1) box corner
+        const auto normal = geode::Vector3D{ { 1, 1, 1 } }.normalize();
+        const auto u = geode::Vector3D{ { 1, -1, 0 } }.normalize();
+        const auto v = normal.cross( u );
+        const auto center = geode::Point3D{ { 1, 1, 1 } } + normal * offset;
+        const geode::Point3D d{ center + u * size };
+        const geode::Point3D e{ center
+                                + ( u * -0.5 + v * std::sqrt( 0.75 ) ) * size };
+        const geode::Point3D f{ center
+                                + ( u * -0.5 - v * std::sqrt( 0.75 ) ) * size };
+        const geode::Triangle3D tilted{ d, e, f };
+        geode::OpenGeodeGeometryException::test(
+            box.epsilon_intersects( tilted ) == expected,
+            "Wrong epsilon_intersects with large tilted triangle at offset ",
+            offset );
+        geode::OpenGeodeGeometryException::test( !box.intersects( tilted ),
+            "Wrong intersects with large tilted triangle at offset ", offset );
+    }
+}
+
+void test_1d_line_intersections()
+{
+    geode::BoundingBox1D bbox;
+    bbox.add_point( geode::Point1D{ { 0 } } );
+    bbox.add_point( geode::Point1D{ { 1 } } );
+    const geode::Vector1D positive{ { 1 } };
+    const geode::Vector1D negative{ { -1 } };
+    const auto check_ray = [&bbox]( const geode::Vector1D& direction,
+                               double origin, bool expected ) {
+        const geode::OwnerRay1D ray{ direction, geode::Point1D{ { origin } } };
+        geode::OpenGeodeGeometryException::test(
+            bbox.intersects( ray ) == expected
+                && bbox.epsilon_intersects( ray ) == expected,
+            "Wrong 1D ray intersection with origin ", origin, " and direction ",
+            direction.value( 0 ) );
+        const geode::OwnerInfiniteLine1D line{ direction,
+            geode::Point1D{ { origin } } };
+        geode::OpenGeodeGeometryException::test(
+            bbox.intersects( line ) && bbox.epsilon_intersects( line ),
+            "Wrong 1D line intersection with origin ", origin,
+            " and direction ", direction.value( 0 ) );
+    };
+    check_ray( positive, 0.5, true );
+    check_ray( negative, 0.5, true );
+    check_ray( positive, -1, true );
+    check_ray( negative, -1, false );
+    check_ray( positive, 2, false );
+    check_ray( negative, 2, true );
+}
+
+void test_add_empty_box()
+{
+    geode::BoundingBox3D box;
+    box.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    box.add_point( geode::Point3D{ { 1, 1, 1 } } );
+    const geode::BoundingBox3D empty;
+
+    auto box_plus_empty = box;
+    box_plus_empty.add_box( empty );
+    geode::OpenGeodeGeometryException::test(
+        box_plus_empty.min() == box.min() && box_plus_empty.max() == box.max(),
+        "Adding an empty box should not change the box" );
+
+    auto empty_plus_box = empty;
+    empty_plus_box.add_box( box );
+    geode::OpenGeodeGeometryException::test(
+        empty_plus_box.min() == box.min() && empty_plus_box.max() == box.max(),
+        "Adding a box to an empty box should give the box" );
+}
+
 void test()
 {
     test_bbox();
+    test_add_empty_box();
     test_ray_intersections();
     test_line_intersections();
     test_segment_intersections();
     test_tetra_intersections();
     test_triangle2d_intersections();
     test_triangle3d_intersections();
+    test_large_triangle3d_epsilon_intersections();
+    test_1d_line_intersections();
 }
 
 OPENGEODE_TEST( "bounding-box" )

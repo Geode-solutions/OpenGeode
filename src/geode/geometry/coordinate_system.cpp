@@ -30,14 +30,13 @@
 
 namespace
 {
-    void check_frame( const std::array< geode::Vector1D, 1 >& /*directions*/ )
-    {
-    }
+    void check_frame( const geode::Frame1D& /*frame*/ ) {}
 
-    void check_frame( const std::array< geode::Vector2D, 2 >& directions )
+    void check_frame( const geode::Frame2D& frame )
     {
-        const auto dot = geode::dot_perpendicular(
-            directions[0].normalize(), directions[1].normalize() );
+        const auto dot =
+            geode::dot_perpendicular( frame.direction( 0 ).normalize(),
+                frame.direction( 1 ).normalize() );
         geode::OpenGeodeGeometryException::check_exception(
             std::fabs( dot ) > geode::GLOBAL_ANGULAR_EPSILON, nullptr,
             geode::OpenGeodeException::TYPE::data,
@@ -45,14 +44,14 @@ namespace
             "CoordinateSystem with given directions" );
     }
 
-    void check_frame( const std::array< geode::Vector3D, 3 >& directions )
+    void check_frame( const geode::Frame3D& frame )
     {
         for( const auto d0 : geode::LRange{ 2 } )
         {
             for( const auto d1 : geode::LRange{ d0 + 1, 3 } )
             {
-                const auto vector0 = directions[d0].normalize();
-                const auto vector1 = directions[d1].normalize();
+                const auto vector0 = frame.direction( d0 ).normalize();
+                const auto vector1 = frame.direction( d1 ).normalize();
 
                 const auto normal = vector0.cross( vector1 );
                 const auto length = normal.length();
@@ -115,7 +114,7 @@ namespace geode
         : Frame< dimension >( std::move( directions ) ),
           origin_( std::move( origin ) )
     {
-        check_frame( directions );
+        check_frame( *this );
     }
 
     template < index_t dimension >
@@ -131,6 +130,7 @@ namespace geode
           }() ),
           origin_( std::move( origin ) )
     {
+        check_frame( *this );
     }
 
     template < index_t dimension >
@@ -149,10 +149,21 @@ namespace geode
     void CoordinateSystem< dimension >::set_directions(
         std::array< Vector< dimension >, dimension > directions )
     {
+        const Frame< dimension > new_frame{ std::move( directions ) };
+        check_frame( new_frame );
         for( const auto d : LRange{ dimension } )
         {
-            this->set_direction( d, directions[d] );
+            Frame< dimension >::set_direction( d, new_frame.direction( d ) );
         }
+        global_to_local_matrix_.reset();
+    }
+
+    template < index_t dimension >
+    void CoordinateSystem< dimension >::set_direction(
+        local_index_t index, Vector< dimension > direction )
+    {
+        Frame< dimension >::set_direction( index, std::move( direction ) );
+        global_to_local_matrix_.reset();
     }
 
     template < index_t dimension >
@@ -192,6 +203,7 @@ namespace geode
                     archive.ext( coord_system,
                         bitsery::ext::BaseClass< Frame< dimension > >{} );
                     archive.object( coord_system.origin_ );
+                    coord_system.global_to_local_matrix_.reset();
                 } } } );
     }
 

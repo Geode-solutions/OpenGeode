@@ -158,6 +158,74 @@ void test_segment_segment_intersection_detection()
         "query segment_bc and segment_df" );
 }
 
+void test_segment_segment_intersection_detection_3d()
+{
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 2, 2, 0 } };
+    const geode::Segment3D segment0{ a, b };
+
+    const geode::Point3D c{ { 1, 1, -0.1 } };
+    const geode::Point3D d{ { 1.2, 1.2, 0.1 } };
+    const auto crossing = geode::segment_segment_intersection_detection(
+        segment0, geode::Segment3D{ c, d } );
+    geode::OpenGeodeGeometryException::test(
+        crossing
+            == std::make_pair(
+                geode::POSITION::inside, geode::POSITION::inside ),
+        "Wrong result for segment_segment_intersection_detection 3D with "
+        "crossing segments in a vertical plane" );
+
+    const geode::Point3D e{ { 1, 1, 0.05 } };
+    const auto disjoint = geode::segment_segment_intersection_detection(
+        segment0, geode::Segment3D{ e, d } );
+    geode::OpenGeodeGeometryException::test(
+        disjoint
+            == std::make_pair(
+                geode::POSITION::outside, geode::POSITION::outside ),
+        "Wrong result for segment_segment_intersection_detection 3D with "
+        "disjoint segments in a vertical plane" );
+
+    const geode::Point3D f{ { 1, 1, 0 } };
+    const geode::Point3D g{ { 3, 3, 0 } };
+    const auto collinear = geode::segment_segment_intersection_detection(
+        segment0, geode::Segment3D{ f, g } );
+    geode::OpenGeodeGeometryException::test(
+        collinear
+            == std::make_pair(
+                geode::POSITION::parallel, geode::POSITION::parallel ),
+        "Wrong result for segment_segment_intersection_detection 3D with "
+        "collinear segments" );
+}
+
+void test_segment_degenerated_triangle_intersection_detection()
+{
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 2, 2, 0 } };
+    const geode::Point3D c{ { 1, 1, 1e-8 } };
+    const geode::Triangle3D cap{ a, b, c };
+    const geode::Point3D d{ { 1, 1, 0.5 } };
+    const geode::Point3D e{ { 1.5, 1.5, 1 } };
+    const auto result = geode::segment_triangle_intersection_detection(
+        geode::Segment3D{ d, e }, cap );
+    geode::OpenGeodeGeometryException::test(
+        result
+            == std::make_pair(
+                geode::POSITION::outside, geode::POSITION::outside ),
+        "Wrong result for segment_triangle_intersection_detection with "
+        "cap triangle in a vertical plane" );
+
+    // Segment in the plane of the cap, crossing it
+    const geode::Point3D f{ { 1, 1, -0.5 } };
+    const auto crossing = geode::segment_triangle_intersection_detection(
+        geode::Segment3D{ f, d }, cap );
+    geode::OpenGeodeGeometryException::test(
+        crossing
+            == std::make_pair(
+                geode::POSITION::parallel, geode::POSITION::parallel ),
+        "Wrong result for segment_triangle_intersection_detection with "
+        "segment crossing a cap triangle in its plane" );
+}
+
 void test_segment_line_intersection_detection()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
@@ -522,6 +590,8 @@ void test_segment_plane_intersection_detection()
 void test()
 {
     test_segment_segment_intersection_detection();
+    test_segment_segment_intersection_detection_3d();
+    test_segment_degenerated_triangle_intersection_detection();
     test_segment_line_intersection_detection();
     test_segment_triangle_intersection_detection();
     test_line_triangle_intersection_detection();

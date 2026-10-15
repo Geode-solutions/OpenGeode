@@ -30,10 +30,12 @@
 #include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/basic_objects/plane.hpp>
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/bounding_box.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -293,6 +295,55 @@ void test_circle()
         "Wrong result for circle5" );
 }
 
+void check_polygon_normal( const geode::OwnerPolygon3D& polygon,
+    const geode::Vector3D& expected_normal )
+{
+    const auto normal = polygon.normal();
+    geode::OpenGeodeGeometryException::test(
+        normal && normal->inexact_equal( expected_normal ),
+        "Wrong polygon normal" );
+    const auto triangles = polygon.triangulate();
+    geode::OpenGeodeGeometryException::test(
+        triangles.size() == polygon.nb_vertices() - 2,
+        "Wrong number of triangles in polygon triangulation" );
+    const auto& vertices = polygon.vertices();
+    for( const auto& triangle : triangles )
+    {
+        const auto triangle_normal = geode::Triangle3D{ vertices[triangle[0]],
+            vertices[triangle[1]], vertices[triangle[2]] }
+                                         .normal();
+        geode::OpenGeodeGeometryException::test(
+            triangle_normal && triangle_normal->dot( expected_normal ) > 0,
+            "Wrong triangle orientation in polygon triangulation" );
+    }
+}
+
+void test_polygon()
+{
+    const geode::Point3D a{ { 0, 0, 0 } };
+    const geode::Point3D b{ { 1, 1, 0 } };
+    const geode::Point3D c{ { 2, 0, 0 } };
+    const geode::Point3D d{ { 1, 3, 0 } };
+    check_polygon_normal( geode::OwnerPolygon3D{ { a, b, c, d } },
+        geode::Vector3D{ { 0, 0, 1 } } );
+    check_polygon_normal( geode::OwnerPolygon3D{ { d, c, b, a } },
+        geode::Vector3D{ { 0, 0, -1 } } );
+
+    // Same polygon in the plane of normal (1,1,1) through (1,2,3), with
+    // (1,-1,0) and (1,1,-2) as local axes
+    const geode::Point3D a_tilted{ { 1, 2, 3 } };
+    const geode::Point3D b_tilted{ { 3, 2, 1 } };
+    const geode::Point3D c_tilted{ { 3, 0, 3 } };
+    const geode::Point3D d_tilted{ { 5, 4, -3 } };
+    const auto tilted_normal = geode::Vector3D{ { 1, 1, 1 } }.normalize();
+    check_polygon_normal(
+        geode::OwnerPolygon3D{ { a_tilted, b_tilted, c_tilted, d_tilted } },
+        tilted_normal );
+    check_polygon_normal(
+        geode::OwnerPolygon3D{ { d_tilted, c_tilted, b_tilted, a_tilted } },
+        tilted_normal * -1 );
+}
+
 void test()
 {
     test_segment();
@@ -302,6 +353,7 @@ void test()
     test_tetrahedron();
     test_sphere();
     test_circle();
+    test_polygon();
 }
 
 OPENGEODE_TEST( "basic-object" )

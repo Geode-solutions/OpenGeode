@@ -57,19 +57,62 @@ namespace geode
     SIGN polygon_area_sign( const Polygon2D& polygon )
     {
         const auto& polygon_vertices = polygon.vertices();
-        const auto& p1 = polygon_vertices[0];
-        for( const auto other_index : LRange{ 1, polygon_vertices.size() - 1 } )
+        const auto nb_vertices = polygon.nb_vertices();
+        if( nb_vertices < 3 )
         {
-            const auto& p2 = polygon_vertices[other_index];
-            const auto& p3 = polygon_vertices[static_cast< local_index_t >(
-                other_index + 1 )];
-            const auto sign = triangle_area_sign( { p1, p2, p3 } );
-            if( sign != SIGN::zero )
-            {
-                return sign;
-            }
+            return SIGN::zero;
         }
-        return geode::SIGN::zero;
+        // Doubly linked list of the remaining vertices
+        std::vector< index_t > prev( nb_vertices );
+        std::vector< index_t > next( nb_vertices );
+        for( const auto v : Range{ nb_vertices } )
+        {
+            prev[v] = v == 0 ? nb_vertices - 1 : v - 1;
+            next[v] = v + 1 == nb_vertices ? 0 : v + 1;
+        }
+        index_t start{ 0 };
+        for( auto nb_remaining = nb_vertices; nb_remaining >= 3;
+            nb_remaining-- )
+        {
+            // The lexicographically smallest vertex is on the convex hull:
+            // the polygon orientation is the orientation of its corner
+            auto min_vertex = start;
+            for( auto v = next[start]; v != start; v = next[v] )
+            {
+                if( polygon_vertices[v].get()
+                    < polygon_vertices[min_vertex].get() )
+                {
+                    min_vertex = v;
+                }
+            }
+            const Point2D& corner = polygon_vertices[min_vertex];
+            auto before = prev[min_vertex];
+            while( before != min_vertex
+                   && polygon_vertices[before].get() == corner )
+            {
+                before = prev[before];
+            }
+            if( before == min_vertex )
+            {
+                return SIGN::zero;
+            }
+            auto after = next[min_vertex];
+            while( polygon_vertices[after].get() == corner )
+            {
+                after = next[after];
+            }
+            const auto corner_sign = triangle_area_sign(
+                { polygon_vertices[before], corner, polygon_vertices[after] } );
+            if( corner_sign != SIGN::zero )
+            {
+                return corner_sign;
+            }
+            // Flat corner (spike): removing it keeps the polygon signed area
+            next[prev[min_vertex]] = next[min_vertex];
+            prev[next[min_vertex]] = prev[min_vertex];
+            start = next[min_vertex];
+        }
+        return SIGN::zero;
     }
 
     SIGN triangle_area_sign( const Triangle3D& triangle, local_index_t axis )
