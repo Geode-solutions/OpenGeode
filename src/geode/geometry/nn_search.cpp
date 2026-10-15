@@ -23,6 +23,7 @@
 
 #include <geode/geometry/nn_search.hpp>
 
+#include <geode/geometry/basic_objects/ellipse.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/frame.hpp>
 #include <geode/geometry/intersection.hpp>
@@ -30,6 +31,7 @@
 #include <numeric>
 
 #include <absl/algorithm/container.h>
+#include <absl/container/fixed_array.h>
 
 #include <async++.h>
 
@@ -45,7 +47,8 @@ namespace geode
     {
     public:
         explicit Impl( std::vector< Point< dimension > > points )
-            : cloud_{ std::move( points ) }, nn_tree_{ dimension, cloud_ }
+            : cloud_{ std::move( points ) },
+              nn_tree_{ dimension, cloud_, build_parameters( cloud_ ) }
         {
             nn_tree_.buildIndex();
         }
@@ -129,20 +132,89 @@ namespace geode
             return results;
         }
 
-        template < typename EpsilonType >
+        typename geode::NNSearch< dimension >::ColocatedInfo
+            colocated_index_mapping( double epsilon ) const
+        {
+            return colocated_index_mapping(
+                epsilon * epsilon, []( index_t /*point_id*/ ) {
+                    return []( index_t /*neighbor_id*/ ) {
+                        return true;
+                    };
+                } );
+        }
+
         typename geode::NNSearch< dimension >::ColocatedInfo
             colocated_index_mapping(
-                const geode::NNSearch< dimension >& nn_search,
-                const EpsilonType& epsilon ) const
+                const Frame< dimension >& epsilons_frame ) const
         {
+            const auto max_elongation =
+                epsilons_frame
+                    .direction( epsilons_frame.max_elongation_direction() )
+                    .length();
+            return colocated_index_mapping( max_elongation * max_elongation,
+                [this, &epsilons_frame]( index_t point_id ) {
+                    const auto& query = point( point_id );
+                    return [this, &query,
+                               ellipse = Ellipse< dimension >{ query,
+                                   epsilons_frame }]( index_t neighbor_id ) {
+                        const auto& neighbor = point( neighbor_id );
+                        if( query.inexact_equal( neighbor ) )
+                        {
+                            return true;
+                        }
+                        return segment_ellipse_intersection(
+                                   Segment< dimension >{ query, neighbor },
+                                   ellipse )
+                                   .type
+                               == INTERSECTION_TYPE::none;
+                    };
+                } );
+        }
+
+        // Colocated points are searched by chunks of points: each chunk
+        // stores its neighbors in a flat array (with offsets per point), and
+        // neighbors are not sorted since the mapping does not depend on
+        // their order.
+        template < typename NeighborFilterFactory >
+        typename geode::NNSearch< dimension >::ColocatedInfo
+            colocated_index_mapping( double squared_radius,
+                const NeighborFilterFactory& filter_factory ) const
+        {
+            static constexpr index_t CHUNK_SIZE{ 1024 };
             typename NNSearch< dimension >::ColocatedInfo result;
-            const auto nb_points = nn_search.nb_points();
-            std::vector< std::vector< index_t > > neighbor_vertices(
-                nb_points );
-            async::parallel_for( async::irange( index_t{ 0 }, nb_points ),
-                [&epsilon, &neighbor_vertices, this]( index_t point_id ) {
-                    neighbor_vertices[point_id] =
-                        neighbors( point( point_id ), epsilon );
+            const auto nb_points = this->nb_points();
+            const auto nb_chunks = ( nb_points + CHUNK_SIZE - 1 ) / CHUNK_SIZE;
+            absl::FixedArray< std::vector< index_t > > chunk_neighbors(
+                nb_chunks );
+            absl::FixedArray< std::vector< index_t > > chunk_offsets(
+                nb_chunks );
+            async::parallel_for(
+                async::irange( index_t{ 0 }, nb_chunks ), [&]( index_t chunk ) {
+                    const auto chunk_begin = chunk * CHUNK_SIZE;
+                    const auto chunk_end =
+                        std::min( chunk_begin + CHUNK_SIZE, nb_points );
+                    auto& neighbors = chunk_neighbors[chunk];
+                    auto& offsets = chunk_offsets[chunk];
+                    offsets.reserve( chunk_end - chunk_begin + 1 );
+                    std::vector< nanoflann::ResultItem< index_t, double > >
+                        results;
+                    nanoflann::SearchParameters params;
+                    params.sorted = false;
+                    for( const auto point_id : Range{ chunk_begin, chunk_end } )
+                    {
+                        offsets.push_back( neighbors.size() );
+                        nn_tree_.radiusSearch( &copy( point( point_id ) )[0],
+                            squared_radius, results, params );
+                        const auto filter = filter_factory( point_id );
+                        for( const auto& neighbor : results )
+                        {
+                            if( filter( neighbor.first ) )
+                            {
+                                neighbors.push_back( neighbor.first );
+                            }
+                        }
+                    }
+                    offsets.push_back( neighbors.size() );
                 } );
             std::vector< index_t > mapping( nb_points, NO_ID );
             for( const auto point_id : Range{ nb_points } )
@@ -151,8 +223,14 @@ namespace geode
                 {
                     continue;
                 }
-                for( const auto vertex_id : neighbor_vertices[point_id] )
+                const auto chunk = point_id / CHUNK_SIZE;
+                const auto local_id = point_id % CHUNK_SIZE;
+                const auto& neighbors = chunk_neighbors[chunk];
+                const auto& offsets = chunk_offsets[chunk];
+                for( const auto n :
+                    Range{ offsets[local_id], offsets[local_id + 1] } )
                 {
+                    const auto vertex_id = neighbors[n];
                     if( mapping[vertex_id] == NO_ID )
                     {
                         mapping[vertex_id] = point_id;
@@ -195,6 +273,17 @@ namespace geode
         }
 
     private:
+        struct PointCloud;
+
+        // Build large trees with several threads (0 = all available)
+        static nanoflann::KDTreeSingleIndexAdaptorParams build_parameters(
+            const PointCloud& cloud )
+        {
+            static constexpr index_t PARALLEL_BUILD_MIN_SIZE{ 100000 };
+            return { 10, nanoflann::KDTreeSingleIndexAdaptorFlags::None,
+                cloud.points.size() < PARALLEL_BUILD_MIN_SIZE ? 1u : 0u };
+        }
+
         std::array< double, dimension > copy(
             const Point< dimension >& point ) const
         {
@@ -311,7 +400,7 @@ namespace geode
             "[NNSearch::colocated_index_mapping] Given epsilon too small, "
             "should be bigger than GLOBAL_EPSILON (i.e. ",
             GLOBAL_EPSILON, ")" );
-        return impl_->colocated_index_mapping( *this, epsilon );
+        return impl_->colocated_index_mapping( epsilon );
     }
 
     template < geode::index_t dimension >
@@ -328,7 +417,7 @@ namespace geode
                 "small, should be bigger than GLOBAL_EPSILON (i.e. ",
                 GLOBAL_EPSILON, ")" );
         }
-        return impl_->colocated_index_mapping( *this, epsilons_frame );
+        return impl_->colocated_index_mapping( epsilons_frame );
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;

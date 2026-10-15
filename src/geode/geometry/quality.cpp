@@ -279,35 +279,40 @@ namespace geode
     template < index_t dimension >
     double triangle_angle_based_quality( const Triangle< dimension >& triangle )
     {
-        try
-        {
-            const auto& vertices = triangle.vertices();
-            std::array< double, 3 > sinus;
-            for( const auto v : LRange{ 3 } )
-            {
-                const auto point = vertices[v].get();
-                const auto point_prev = vertices[( v + 2 ) % 3].get();
-                const auto point_next = vertices[( v + 1 ) % 3].get();
-                const auto angle =
-                    compute_angle( point, point_prev, point_next );
-                DEBUG( angle );
-                sinus[v] = std::sin( angle );
-                DEBUG( sinus[v] );
-            }
-            const auto denominator = sinus[0] + sinus[1] + sinus[2];
-            if( denominator == 0 )
-            {
-                return 0;
-            }
-            const auto quality =
-                4 * sinus[0] * sinus[1] * sinus[2] / ( denominator );
-            DEBUG( quality );
-            return quality;
-        }
-        catch( ... )
+        // 4 * sin0 * sin1 * sin2 / ( sin0 + sin1 + sin2 ) with the law of
+        // sines sin_i = 2 * area / ( product of the edges adjacent to i ):
+        // 16 * area^2 / ( l0 * l1 * l2 * ( l0 + l1 + l2 ) )
+        const auto& vertices = triangle.vertices();
+        const Vector< dimension > edge0{ vertices[0], vertices[1] };
+        const Vector< dimension > edge1{ vertices[1], vertices[2] };
+        const Vector< dimension > edge2{ vertices[0], vertices[2] };
+        const auto length0 = edge0.length();
+        const auto length1 = edge1.length();
+        const auto length2 = edge2.length();
+        const auto denominator =
+            length0 * length1 * length2 * ( length0 + length1 + length2 );
+        if( !( denominator > 0 ) )
         {
             return 0;
         }
+        double squared_double_area;
+        if constexpr( dimension == 3 )
+        {
+            squared_double_area = edge0.cross( edge2 ).length2();
+        }
+        else
+        {
+            const auto double_area = edge0.value( 0 ) * edge2.value( 1 )
+                                     - edge0.value( 1 ) * edge2.value( 0 );
+            squared_double_area = double_area * double_area;
+        }
+        // 16 * area^2 = 4 * ( 2 * area )^2
+        const auto quality = 4 * squared_double_area / denominator;
+        if( !std::isfinite( quality ) )
+        {
+            return 0;
+        }
+        return quality;
     }
 
     template opengeode_geometry_api double triangle_angle_based_quality< 2 >(

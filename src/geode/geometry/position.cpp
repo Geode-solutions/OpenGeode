@@ -23,6 +23,8 @@
 
 #include <geode/geometry/position.hpp>
 
+#include <cmath>
+
 #include <absl/algorithm/container.h>
 
 #include <geode/basic/logger.hpp>
@@ -41,6 +43,19 @@
 
 namespace
 {
+    template < geode::index_t dimension >
+    bool is_finite( const geode::Point< dimension >& point )
+    {
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            if( !std::isfinite( point.value( d ) ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     geode::POSITION point_segment_position_exact(
         const geode::Point3D& point, const geode::Segment3D& segment )
     {
@@ -126,12 +141,16 @@ namespace
         const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
         const auto& vertices = triangle.vertices();
-        const auto s0 =
-            point_side_to_segment( point, { vertices[0], vertices[1] } );
-        const auto s1 =
-            point_side_to_segment( point, { vertices[1], vertices[2] } );
-        const auto s2 =
-            point_side_to_segment( point, { vertices[2], vertices[0] } );
+        const auto s0 = geode::internal::side(
+            GEO::PCK::orient_2d( point, vertices[0], vertices[1] ) );
+        const auto s1 = geode::internal::side(
+            GEO::PCK::orient_2d( point, vertices[1], vertices[2] ) );
+        if( s0 != s1 && s0 != geode::SIDE::zero && s1 != geode::SIDE::zero )
+        {
+            return geode::POSITION::outside;
+        }
+        const auto s2 = geode::internal::side(
+            GEO::PCK::orient_2d( point, vertices[2], vertices[0] ) );
         if( s0 == s1 && s1 == s2 && s2 == geode::SIDE::zero )
         {
             return point_triangle_position_all_zero( point, triangle );
@@ -223,25 +242,11 @@ namespace geode
     POSITION point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        const auto& vertices = tetra.vertices();
-        for( const auto f : Range{ 4 } )
+        if( !is_finite( point ) )
         {
-            const auto& facet_vertices =
-                Tetrahedron::tetrahedron_facet_vertex[f];
-            const Triangle3D facet{ vertices[facet_vertices[0]],
-                vertices[facet_vertices[1]], vertices[facet_vertices[2]] };
-            const auto signed_distance =
-                std::get< 0 >( point_triangle_signed_distance( point, facet ) );
-            if( signed_distance < -GLOBAL_EPSILON )
-            {
-                return POSITION::outside;
-            }
-            if( signed_distance < GLOBAL_EPSILON )
-            {
-                return point_tetrahedron_position_exact( point, tetra );
-            }
+            return POSITION::outside;
         }
-        return POSITION::inside;
+        return point_tetrahedron_position_exact( point, tetra );
     }
 
     template <>
@@ -263,14 +268,18 @@ namespace geode
             return point_triangle_position_exact( point, triangle );
         }
         const auto s2 = GEO::geo_sgn( area2 );
+        // A zero sign here comes from a NaN area (non finite input)
+        if( s1 != s2 || s1 == GEO::zero )
+        {
+            return POSITION::outside;
+        }
         const auto area3 =
             triangle_signed_area( { point, vertices[2], vertices[0] } );
         if( std::fabs( area3 ) < GLOBAL_EPSILON )
         {
             return point_triangle_position_exact( point, triangle );
         }
-        const auto s3 = GEO::geo_sgn( area3 );
-        if( s1 == s2 && s2 == s3 )
+        if( s2 == GEO::geo_sgn( area3 ) )
         {
             return POSITION::inside;
         }
@@ -281,14 +290,11 @@ namespace geode
     POSITION opengeode_geometry_api point_triangle_position(
         const Point3D& point, const Triangle3D& triangle )
     {
-        double distance;
-        std::tie( distance, std::ignore ) =
-            point_triangle_distance( point, triangle );
-        if( distance < GLOBAL_EPSILON )
+        if( !is_finite( point ) )
         {
-            return point_triangle_position_exact( point, triangle );
+            return POSITION::outside;
         }
-        return POSITION::outside;
+        return point_triangle_position_exact( point, triangle );
     }
 
     template < index_t dimension >

@@ -21,9 +21,12 @@
  *
  */
 
+#include <random>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/barycentric_coordinates.hpp>
 #include <geode/geometry/basic_objects/circle.hpp>
 #include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/ellipse.hpp>
@@ -36,6 +39,7 @@
 #include <geode/geometry/frame.hpp>
 #include <geode/geometry/intersection.hpp>
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/projection.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -525,6 +529,129 @@ void test_segment_triangle_intersection()
     geode::OpenGeodeGeometryException::test( !intersection8,
         "Wrong result for segment_triangle_intersection with "
         "query segment_mn" );
+}
+
+template < geode::index_t dimension >
+void check_correctness(
+    const typename geode::CorrectnessInfo<
+        geode::Point< dimension > >::Correctness& correctness,
+    bool expected_flag,
+    const geode::Point< dimension >& expected_point,
+    std::string_view name )
+{
+    geode::OpenGeodeGeometryException::test( correctness.first == expected_flag,
+        "[Test] Wrong ", name, " correctness flag" );
+    geode::OpenGeodeGeometryException::test(
+        geode::point_point_distance( correctness.second, expected_point )
+            < geode::GLOBAL_EPSILON,
+        "[Test] Wrong ", name, " correctness point ",
+        correctness.second.string(), " vs ", expected_point.string() );
+}
+
+void test_random_intersection_correctness()
+{
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -10, 10 };
+    const auto random_point3d = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    const auto random_point2d = [&generator, &distribution] {
+        return geode::Point2D{ { distribution( generator ),
+            distribution( generator ) } };
+    };
+    for( const auto unused : geode::Range{ 20000 } )
+    {
+        geode_unused( unused );
+        const auto t0 = random_point3d();
+        const auto t1 = random_point3d();
+        const auto t2 = random_point3d();
+        const geode::Triangle3D triangle{ t0, t1, t2 };
+        const auto s0 = random_point3d();
+        const auto s1 = random_point3d();
+        const geode::Segment3D segment{ s0, s1 };
+        const auto segment_result =
+            geode::segment_triangle_intersection( segment, triangle );
+        if( segment_result.has_intersection() )
+        {
+            const auto& result = segment_result.result.value();
+            check_correctness< 3 >( segment_result.correctness->first,
+                geode::point_segment_distance( result, segment )
+                    <= geode::GLOBAL_EPSILON,
+                geode::point_segment_projection( result, segment ),
+                "segment_triangle segment" );
+            const auto [distance, closest] =
+                geode::point_triangle_distance( result, triangle );
+            check_correctness< 3 >( segment_result.correctness->second,
+                distance <= geode::GLOBAL_EPSILON, closest,
+                "segment_triangle triangle" );
+        }
+
+        const geode::InfiniteLine3D line{ segment };
+        const auto line_result =
+            geode::line_triangle_intersection( line, triangle );
+        if( line_result.has_intersection() )
+        {
+            const auto& result = line_result.result.value();
+            check_correctness< 3 >( line_result.correctness->first,
+                geode::point_line_distance( result, line )
+                    <= geode::GLOBAL_EPSILON,
+                geode::point_line_projection( result, line ),
+                "line_triangle line" );
+            const auto lambdas = geode::safe_triangle_barycentric_coordinates(
+                result, triangle );
+            const auto& vertices = triangle.vertices();
+            const auto point = vertices[0].get() * lambdas[0]
+                               + vertices[1].get() * lambdas[1]
+                               + vertices[2].get() * lambdas[2];
+            check_correctness< 3 >( line_result.correctness->second,
+                result.inexact_equal( point ), point,
+                "line_triangle triangle" );
+        }
+
+        const auto plane_origin = random_point3d();
+        const auto n0 = random_point3d();
+        const auto n1 = random_point3d();
+        const geode::Plane plane{ geode::Vector3D{ n0, n1 }.normalize(),
+            plane_origin };
+        const auto plane_result = geode::line_plane_intersection( line, plane );
+        if( plane_result.has_intersection() )
+        {
+            const auto& result = plane_result.result.value();
+            check_correctness< 3 >( plane_result.correctness->first,
+                geode::point_line_distance( result, line )
+                    <= geode::GLOBAL_EPSILON,
+                geode::point_line_projection( result, line ),
+                "line_plane line" );
+            const auto [distance, projection] =
+                geode::point_plane_distance( result, plane );
+            check_correctness< 3 >( plane_result.correctness->second,
+                distance <= geode::GLOBAL_EPSILON, projection,
+                "line_plane plane" );
+        }
+
+        const auto a0 = random_point2d();
+        const auto a1 = random_point2d();
+        const auto b0 = random_point2d();
+        const auto b1 = random_point2d();
+        const geode::InfiniteLine2D line0{ geode::Segment2D{ a0, a1 } };
+        const geode::InfiniteLine2D line1{ geode::Segment2D{ b0, b1 } };
+        const auto lines_result = geode::line_line_intersection( line0, line1 );
+        if( lines_result.has_intersection() )
+        {
+            const auto& result = lines_result.result.value();
+            check_correctness< 2 >( lines_result.correctness->first,
+                geode::point_line_distance( result, line0 )
+                    <= geode::GLOBAL_EPSILON,
+                geode::point_line_projection( result, line0 ),
+                "line_line first" );
+            check_correctness< 2 >( lines_result.correctness->second,
+                geode::point_line_distance( result, line1 )
+                    <= geode::GLOBAL_EPSILON,
+                geode::point_line_projection( result, line1 ),
+                "line_line second" );
+        }
+    }
 }
 
 void test_segment_triangle_intersection_touching_endpoint()
@@ -1430,6 +1557,7 @@ void test()
     test_segment_plane_intersection();
     test_segment_triangle_intersection();
     test_segment_triangle_intersection_touching_endpoint();
+    test_random_intersection_correctness();
     test_line_cylinder_intersection();
     test_segment_cylinder_intersection();
     test_plane_plane_intersection();

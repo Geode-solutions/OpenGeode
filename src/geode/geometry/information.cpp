@@ -23,7 +23,7 @@
 
 #include <geode/geometry/information.hpp>
 
-#include <absl/container/flat_hash_map.h>
+#include <string>
 
 namespace geode
 {
@@ -31,60 +31,77 @@ namespace geode
     {
         local_index_t position_to_index( POSITION position )
         {
-            static const absl::flat_hash_map< POSITION, local_index_t > map = {
-                { POSITION::vertex0, 0 },
-                { POSITION::vertex1, 1 },
-                { POSITION::vertex2, 2 },
-                { POSITION::vertex3, 3 },
-                { POSITION::edge0, 0 },
-                { POSITION::edge1, 1 },
-                { POSITION::edge2, 2 },
-                { POSITION::facet0, 0 },
-                { POSITION::facet1, 1 },
-                { POSITION::facet2, 2 },
-                { POSITION::facet3, 3 },
-                { POSITION::edge01, 0 },
-                { POSITION::edge02, 1 },
-                { POSITION::edge03, 2 },
-                { POSITION::edge12, 3 },
-                { POSITION::edge13, 4 },
-                { POSITION::edge23, 5 },
-            };
-            const auto index_it = map.find( position );
-            if( index_it == map.end() )
+            switch( position )
             {
-                return NO_LID;
+                case POSITION::vertex0:
+                case POSITION::edge0:
+                case POSITION::facet0:
+                case POSITION::edge01:
+                    return 0;
+                case POSITION::vertex1:
+                case POSITION::edge1:
+                case POSITION::facet1:
+                case POSITION::edge02:
+                    return 1;
+                case POSITION::vertex2:
+                case POSITION::edge2:
+                case POSITION::facet2:
+                case POSITION::edge03:
+                    return 2;
+                case POSITION::vertex3:
+                case POSITION::facet3:
+                case POSITION::edge12:
+                    return 3;
+                case POSITION::edge13:
+                    return 4;
+                case POSITION::edge23:
+                    return 5;
+                default:
+                    return NO_LID;
             }
-            return index_it->second;
         }
 
         std::string position_to_string( POSITION position )
         {
-            static const absl::flat_hash_map< POSITION, std::string > map = {
-                { POSITION::vertex0, "vertex0" },
-                { POSITION::vertex1, "vertex1" },
-                { POSITION::vertex2, "vertex2" },
-                { POSITION::vertex3, "vertex3" },
-                { POSITION::edge0, "edge0" },
-                { POSITION::edge1, "edge1" },
-                { POSITION::edge2, "edge2" },
-                { POSITION::facet0, "facet0" },
-                { POSITION::facet1, "facet1" },
-                { POSITION::facet2, "facet2" },
-                { POSITION::facet3, "facet3" },
-                { POSITION::edge01, "edge01" },
-                { POSITION::edge02, "edge02" },
-                { POSITION::edge03, "edge03" },
-                { POSITION::edge12, "edge12" },
-                { POSITION::edge13, "edge13" },
-                { POSITION::edge23, "edge23" },
-            };
-            const auto index_it = map.find( position );
-            if( index_it == map.end() )
+            switch( position )
             {
-                return "NO_LID";
+                case POSITION::vertex0:
+                    return "vertex0";
+                case POSITION::vertex1:
+                    return "vertex1";
+                case POSITION::vertex2:
+                    return "vertex2";
+                case POSITION::vertex3:
+                    return "vertex3";
+                case POSITION::edge0:
+                    return "edge0";
+                case POSITION::edge1:
+                    return "edge1";
+                case POSITION::edge2:
+                    return "edge2";
+                case POSITION::facet0:
+                    return "facet0";
+                case POSITION::facet1:
+                    return "facet1";
+                case POSITION::facet2:
+                    return "facet2";
+                case POSITION::facet3:
+                    return "facet3";
+                case POSITION::edge01:
+                    return "edge01";
+                case POSITION::edge02:
+                    return "edge02";
+                case POSITION::edge03:
+                    return "edge03";
+                case POSITION::edge12:
+                    return "edge12";
+                case POSITION::edge13:
+                    return "edge13";
+                case POSITION::edge23:
+                    return "edge23";
+                default:
+                    return "NO_LID";
             }
-            return index_it->second;
         }
     } // namespace detail
 } // namespace geode

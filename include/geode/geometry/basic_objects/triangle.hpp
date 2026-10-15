@@ -53,10 +53,23 @@ namespace geode
             geode::Vector3D normal{ { 0, 0, 0 } };
             std::array< double, 3 > lengths;
         };
+
+        // Pivot and normal cache, only meaningful (and stored) in 3D
+        template < index_t dimension >
+        class TrianglePivotCache
+        {
+        };
+
+        template <>
+        class TrianglePivotCache< 3 >
+        {
+        protected:
+            CachedValue< std::optional< PivotNormalResult > > pivot_and_normal_;
+        };
     } // namespace internal
 
     template < typename PointType, index_t dimension >
-    class GenericTriangle
+    class GenericTriangle : private internal::TrianglePivotCache< dimension >
     {
     public:
         static constexpr auto dim = dimension;
@@ -108,8 +121,6 @@ namespace geode
 
     private:
         std::array< PointType, 3 > vertices_;
-        CachedValue< std::optional< internal::PivotNormalResult > >
-            pivot_and_normal_;
     };
 
     template < index_t dimension >

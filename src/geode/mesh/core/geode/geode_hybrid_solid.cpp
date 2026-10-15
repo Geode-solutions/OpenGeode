@@ -26,8 +26,6 @@
 #include <array>
 #include <fstream>
 
-#include <absl/container/flat_hash_map.h>
-
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
@@ -41,15 +39,6 @@
 
 namespace
 {
-    static const absl::flat_hash_map< geode::index_t,
-        geode::HybridSolid3D::TYPE >
-        TYPES = {
-            { 4, geode::HybridSolid3D::TYPE::tetrahedron },
-            { 5, geode::HybridSolid3D::TYPE::pyramid },
-            { 6, geode::HybridSolid3D::TYPE::prism },
-            { 8, geode::HybridSolid3D::TYPE::hexahedron },
-        };
-
     template < typename Data >
     geode::PolyhedronEdgesVertices polyhedron_edges_vertices(
         const geode::HybridSolid3D& mesh,
@@ -343,7 +332,21 @@ namespace geode
 
         TYPE polyhedron_type( index_t polyhedron_id ) const
         {
-            return TYPES.at( get_nb_polyhedron_vertices( polyhedron_id ) );
+            switch( get_nb_polyhedron_vertices( polyhedron_id ) )
+            {
+                case 4:
+                    return TYPE::tetrahedron;
+                case 5:
+                    return TYPE::pyramid;
+                case 6:
+                    return TYPE::prism;
+                case 8:
+                    return TYPE::hexahedron;
+                default:
+                    throw OpenGeodeMeshException{ nullptr,
+                        OpenGeodeException::TYPE::internal,
+                        "[HybridSolid] Unknown polyhedron type" };
+            }
         }
 
         void permute_polyhedra( absl::Span< const index_t > permutation )

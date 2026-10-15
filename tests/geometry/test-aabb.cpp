@@ -30,8 +30,13 @@
 
 #include <geode/tests/common.hpp>
 
+#include <absl/algorithm/container.h>
+
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
+
+#include <algorithm>
+#include <random>
 
 template < geode::index_t dimension >
 geode::BoundingBox< dimension > create_bounding_box(
@@ -524,6 +529,184 @@ void test_closest_element_box_with_nan_hint()
         "Closest element box with NaN hint - Distance should be finite" );
 }
 
+void test_small_other_big_intersections()
+{
+    geode::Logger::info(
+        "TEST", "Small AABB other intersection with big AABB" );
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 10 };
+    const auto random_boxes = [&generator, &distribution](
+                                  geode::index_t nb, double size ) {
+        std::vector< geode::BoundingBox3D > boxes( nb );
+        for( auto& box : boxes )
+        {
+            const geode::Point3D point{ { distribution( generator ),
+                distribution( generator ), distribution( generator ) } };
+            box.add_point( point );
+            box.add_point( point + geode::Point3D{ { size, size, size } } );
+        }
+        return boxes;
+    };
+    const auto small_boxes = random_boxes( 20, 2 );
+    const auto big_boxes = random_boxes( 5000, 0.2 );
+    const geode::AABBTree3D small{ small_boxes };
+    const geode::AABBTree3D big{ big_boxes };
+    const auto action = []( geode::index_t, geode::index_t ) {
+        return true;
+    };
+    const auto result =
+        small.compute_other_element_bbox_intersections( big, action );
+    std::vector< std::pair< geode::index_t, geode::index_t > > expected;
+    for( const auto s : geode::Indices{ small_boxes } )
+    {
+        for( const auto b : geode::Indices{ big_boxes } )
+        {
+            if( small_boxes[s].epsilon_intersects( big_boxes[b] ) )
+            {
+                expected.emplace_back( s, b );
+            }
+        }
+    }
+    auto sorted_result = result;
+    absl::c_sort( sorted_result );
+    geode::OpenGeodeGeometryException::test( sorted_result == expected,
+        "Small other big intersection - Wrong pairs" );
+    for( const auto unused : geode::Range{ 3 } )
+    {
+        geode_unused( unused );
+        geode::OpenGeodeGeometryException::test(
+            small.compute_other_element_bbox_intersections( big, action )
+                == result,
+            "Small other big intersection - Order should be deterministic" );
+    }
+    // Pairs are grouped by element of the queried tree
+    absl::flat_hash_set< geode::index_t > closed_elements;
+    for( const auto p : geode::Indices{ result } )
+    {
+        if( p > 0 && result[p].first != result[p - 1].first )
+        {
+            closed_elements.insert( result[p - 1].first );
+        }
+        geode::OpenGeodeGeometryException::test(
+            !closed_elements.contains( result[p].first ),
+            "Small other big intersection - Pairs should be grouped" );
+    }
+}
+
+void test_closest_element_box_evaluations()
+{
+    geode::Logger::info( "TEST", "Closest element box evaluations" );
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ 0, 10 };
+    const auto random_point = [&generator, &distribution] {
+        return geode::Point3D{ { distribution( generator ),
+            distribution( generator ), distribution( generator ) } };
+    };
+    std::vector< geode::BoundingBox3D > boxes( 2000 );
+    for( auto& box : boxes )
+    {
+        const auto point = random_point();
+        box.add_point( point );
+        box.add_point( point + geode::Point3D{ { 0.2, 0.3, 0.1 } } );
+    }
+    const geode::AABBTree3D aabb{ boxes };
+    for( const auto unused : geode::Range{ 200 } )
+    {
+        geode_unused( unused );
+        const auto query = random_point();
+        absl::flat_hash_map< geode::index_t, geode::index_t > nb_evaluations;
+        const auto [box_id, distance] = aabb.closest_element_box(
+            query, [&boxes, &nb_evaluations](
+                       const geode::Point3D& point, geode::index_t element ) {
+                nb_evaluations[element]++;
+                return geode::point_point_distance(
+                    point, boxes[element].center() );
+            } );
+        for( const auto& [element, count] : nb_evaluations )
+        {
+            geode::OpenGeodeGeometryException::test( count == 1,
+                "Closest element box evaluations - Element ", element,
+                " evaluated ", count, " times" );
+        }
+        auto expected = std::numeric_limits< double >::max();
+        for( const auto& box : boxes )
+        {
+            expected = std::min(
+                expected, geode::point_point_distance( query, box.center() ) );
+        }
+        geode::OpenGeodeGeometryException::test( distance == expected,
+            "Closest element box evaluations - Wrong distance" );
+    }
+}
+
+void test_thin_strips()
+{
+    geode::Logger::info( "TEST", "AABB with long thin strips" );
+    std::mt19937 generator{ 42 };
+    constexpr geode::index_t NB_STRIPS{ 20000 };
+    std::vector< geode::BoundingBox2D > strips( NB_STRIPS );
+    for( const auto i : geode::Range{ NB_STRIPS } )
+    {
+        const auto y = 10. * i / NB_STRIPS;
+        strips[i].add_point( geode::Point2D{ { 0, y } } );
+        strips[i].add_point( geode::Point2D{ { 100, y + 0.0005 } } );
+    }
+    std::shuffle( strips.begin(), strips.end(), generator );
+    const geode::AABBTree2D aabb{ strips };
+    std::uniform_real_distribution< double > distribution{ -1, 101 };
+    std::uniform_real_distribution< double > y_distribution{ -1, 11 };
+    geode::index_t nb_visited_elements{ 0 };
+    for( const auto unused : geode::Range{ 50 } )
+    {
+        geode_unused( unused );
+        const geode::Point2D query{ { distribution( generator ),
+            y_distribution( generator ) } };
+        geode::BoundingBox2D query_box;
+        query_box.add_point( query );
+        query_box.add_point( query + geode::Point2D{ { 0.01, 0.01 } } );
+        std::vector< geode::index_t > found;
+        auto action = [&found]( geode::index_t box ) {
+            found.push_back( box );
+            return false;
+        };
+        aabb.compute_bbox_element_bbox_intersections( query_box, action );
+        std::vector< geode::index_t > expected;
+        for( const auto s : geode::Range{ NB_STRIPS } )
+        {
+            if( strips[s].epsilon_intersects( query_box ) )
+            {
+                expected.push_back( s );
+            }
+        }
+        absl::c_sort( found );
+        geode::OpenGeodeGeometryException::test(
+            found == expected, "AABB with thin strips - Wrong box query" );
+
+        const auto [closest, distance] = aabb.closest_element_box(
+            query, [&strips, &nb_visited_elements](
+                       const geode::Point2D& point, geode::index_t box ) {
+                nb_visited_elements++;
+                return strips[box].signed_distance( point );
+            } );
+        auto expected_distance = std::numeric_limits< double >::max();
+        for( const auto& strip : strips )
+        {
+            expected_distance =
+                std::min( expected_distance, strip.signed_distance( query ) );
+        }
+        geode::OpenGeodeGeometryException::test(
+            distance == expected_distance
+                && strips[closest].signed_distance( query ) == distance,
+            "AABB with thin strips - Wrong closest box" );
+    }
+    // Splitting along strip extents (x) would evaluate most strips
+    geode::Logger::info(
+        "Thin strips closest element evaluations: ", nb_visited_elements );
+    geode::OpenGeodeGeometryException::test( nb_visited_elements < 150,
+        "AABB with thin strips - Too many visited elements: ",
+        nb_visited_elements );
+}
+
 template < geode::index_t dimension >
 void do_test()
 {
@@ -541,6 +724,9 @@ void test()
     do_test< 3 >();
     test_aabb_with_empty_box();
     test_closest_element_box_with_nan_hint();
+    test_thin_strips();
+    test_closest_element_box_evaluations();
+    test_small_other_big_intersections();
 }
 
 OPENGEODE_TEST( "aabb" )
