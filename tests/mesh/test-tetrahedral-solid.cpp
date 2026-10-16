@@ -734,6 +734,31 @@ void test_create_invalid_polyhedron()
         "an invalid vertex index" );
 }
 
+void test_degenerated_tetrahedron_with_repeated_vertex()
+{
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_point( geode::Point3D{ { 0, 0, 10 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    builder->create_tetrahedron( { 1, 2, 3, 1 } );
+    builder->create_tetrahedron( { 1, 2, 3, 0 } );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedron_minimum_height( 0 ) == 0.,
+        "Tetrahedron with repeated vertex should have a null height" );
+    geode::OpenGeodeMeshException::test( solid->is_polyhedron_degenerated( 0 ),
+        "Tetrahedron with repeated vertex should be degenerated" );
+    geode::OpenGeodeMeshException::test(
+        std::fabs(
+            solid->polyhedron_minimum_height( 1 ) - 1. / std::sqrt( 2.01 ) )
+            < geode::GLOBAL_EPSILON,
+        "Wrong minimum height of tetrahedron 1" );
+    geode::OpenGeodeMeshException::test( !solid->is_polyhedron_degenerated( 1 ),
+        "Tetrahedron 1 should not be degenerated" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -761,6 +786,7 @@ void test()
     test_permute_vertices_with_isolated_vertex();
     test_replace_vertices_chained();
     test_create_invalid_polyhedron();
+    test_degenerated_tetrahedron_with_repeated_vertex();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

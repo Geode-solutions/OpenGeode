@@ -518,17 +518,22 @@ namespace geode
             const auto facet_vertices = mesh.polyhedron_facet_vertices(
                 { polyhedron_id, max_area_facet } );
             Plane plane{ normal.value(), mesh.point( facet_vertices[0] ) };
-            auto opposite_vertex{ 0 };
+            std::optional< double > min_height;
             for( const auto vertex_id : vertices )
             {
                 if( absl::c_contains( facet_vertices, vertex_id ) )
                 {
                     continue;
                 }
-                opposite_vertex = vertex_id;
+                const auto height = std::get< 0 >(
+                    point_plane_distance( mesh.point( vertex_id ), plane ) );
+                if( !min_height || height < min_height.value() )
+                {
+                    min_height = height;
+                }
             }
-            return std::get< 0 >(
-                point_plane_distance( mesh.point( opposite_vertex ), plane ) );
+            // All the polyhedron vertices are on its largest facet
+            return min_height.value_or( 0. );
         }
 
         void reset_polyhedra_around_vertex( index_t vertex_id )
