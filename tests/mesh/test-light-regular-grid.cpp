@@ -381,6 +381,55 @@ void test_vertices_around_vertex( const geode::LightRegularGrid3D& grid )
         "Wrong number of vertices around a corner vertex" );
 }
 
+void test_set_grid_dimensions_failure()
+{
+    geode::LightRegularGrid3D grid{ geode::Point3D{ { 1.5, 0, 1 } },
+        { 5, 10, 15 }, { 1, 2, 3 } };
+    geode::GridBuilder3D builder{ grid };
+    const auto check_unchanged = [&grid]( std::string_view context ) {
+        geode::OpenGeodeMeshException::test(
+            grid.nb_cells_in_direction( 0 ) == 5
+                && grid.nb_cells_in_direction( 1 ) == 10
+                && grid.nb_cells_in_direction( 2 ) == 15,
+            "[Test] Cells number should be unchanged after a failed ",
+            context );
+        geode::OpenGeodeMeshException::test(
+            grid.cell_length_in_direction( 0 ) == 1
+                && grid.cell_length_in_direction( 1 ) == 2
+                && grid.cell_length_in_direction( 2 ) == 3,
+            "[Test] Cells length should be unchanged after a failed ",
+            context );
+        geode::OpenGeodeMeshException::test(
+            grid.grid_point( { 1, 1, 1 } ) == geode::Point3D{ { 2.5, 2, 4 } },
+            "[Test] Grid geometry should be unchanged after a failed ",
+            context );
+    };
+    bool thrown{ false };
+    try
+    {
+        builder.set_grid_dimensions( { 65535, 65535, 1 }, { 1, 1, 1 } );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] Too many vertices should throw" );
+    check_unchanged( "vertex overflow" );
+    thrown = false;
+    try
+    {
+        builder.set_grid_dimensions( { 6, 7, 8 }, { 1, 0, 3 } );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] Null cell length should throw" );
+    check_unchanged( "null length" );
+}
+
 void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
@@ -412,6 +461,7 @@ void test()
     test_closest_vertex( grid );
     test_attribute( grid );
     test_vertices_around_vertex( grid );
+    test_set_grid_dimensions_failure();
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 

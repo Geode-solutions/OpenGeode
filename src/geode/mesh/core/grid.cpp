@@ -368,14 +368,14 @@ namespace geode
             grid_coordinate_system_.set_origin( std::move( origin ) );
         }
 
-        void set_grid_dimensions( Grid< dimension >& grid,
-            std::array< double, dimension > cells_length )
+        static void check_grid_dimensions(
+            const std::array< index_t, dimension >& cells_number,
+            const std::array< double, dimension >& cells_length )
         {
-            cells_length_ = std::move( cells_length );
             for( const auto direction : LRange{ dimension } )
             {
                 OpenGeodeMeshException::check_exception(
-                    cells_length_[direction] > GLOBAL_EPSILON, nullptr,
+                    cells_length[direction] > GLOBAL_EPSILON, nullptr,
                     OpenGeodeException::TYPE::data,
                     "[Grid] Creation of a grid with a cell length smaller than "
                     "epsilon in direction ",
@@ -384,8 +384,8 @@ namespace geode
             double nb_vertices_double{ 1 };
             for( const auto d : LRange{ dimension } )
             {
-                nb_vertices_double *= static_cast< double >(
-                    grid.nb_cells_in_direction( d ) + 1 );
+                nb_vertices_double *=
+                    static_cast< double >( cells_number[d] ) + 1.;
             }
             OpenGeodeMeshException::check_exception(
                 nb_vertices_double < static_cast< double >(
@@ -393,6 +393,11 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::data,
                 "[Grid] Creation of a grid for which the number of cell "
                 "vertices exceeds the unsigned int limit." );
+        }
+
+        void set_grid_dimensions( std::array< double, dimension > cells_length )
+        {
+            cells_length_ = std::move( cells_length );
             for( const auto d : LRange{ dimension } )
             {
                 const auto& direction = grid_coordinate_system_.direction( d );
@@ -627,8 +632,9 @@ namespace geode
         std::array< double, dimension > cells_length,
         GridKey /*key*/ )
     {
+        Impl::check_grid_dimensions( cells_number, cells_length );
         set_array_dimensions( std::move( cells_number ) );
-        impl_->set_grid_dimensions( *this, std::move( cells_length ) );
+        impl_->set_grid_dimensions( std::move( cells_length ) );
     }
 
     template < index_t dimension >
