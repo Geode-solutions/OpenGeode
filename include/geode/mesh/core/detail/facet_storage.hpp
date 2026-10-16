@@ -31,6 +31,7 @@
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -146,18 +147,9 @@ namespace geode
             std::vector< index_t > clean_facets()
             {
                 std::vector< bool > to_delete( counters_.size(), false );
-                bool has_isolated_facet{ false };
                 for( const auto e : Indices{ counters_ } )
                 {
-                    if( counters_[e] == 0 )
-                    {
-                        to_delete[e] = true;
-                        has_isolated_facet = true;
-                    }
-                }
-                if( !has_isolated_facet )
-                {
-                    return identity_mapping();
+                    to_delete[e] = counters_[e] == 0;
                 }
                 return delete_facets( to_delete );
             }
@@ -327,28 +319,83 @@ namespace geode
 
             void initialize_vertices()
             {
-                const auto nb_facets = counters_.size();
-                OpenGeodeMeshException::check_exception(
-                    facet_indices_.size() == nb_facets, nullptr,
-                    OpenGeodeException::TYPE::data,
-                    "[FacetStorage::initialize_vertices] Inconsistent number "
-                    "of facets: ",
-                    facet_indices_.size(), " indexed facets for ", nb_facets,
-                    " facet counters, file may be corrupted" );
-                vertices_.resize( nb_facets );
-                std::vector< bool > is_indexed( nb_facets, false );
-                for( const auto& cycle : facet_indices_ )
+                std::vector< bool > is_indexed( counters_.size(), false );
+                std::vector< index_t* > misindexed_facets;
+                for( auto& [cycle, facet_id] : facet_indices_ )
                 {
-                    const auto facet_id = cycle.second;
-                    OpenGeodeMeshException::check_exception(
-                        facet_id < nb_facets && !is_indexed[facet_id], nullptr,
-                        OpenGeodeException::TYPE::data,
-                        "[FacetStorage::initialize_vertices] Invalid or "
-                        "duplicated facet index ",
-                        facet_id, ", file may be corrupted" );
-                    is_indexed[facet_id] = true;
-                    vertices_[facet_id] = cycle.first.vertices();
+                    if( facet_id < counters_.size() && !is_indexed[facet_id] )
+                    {
+                        is_indexed[facet_id] = true;
+                    }
+                    else
+                    {
+                        misindexed_facets.push_back( &facet_id );
+                    }
                 }
+                if( !misindexed_facets.empty()
+                    || absl::c_find( is_indexed, false ) != is_indexed.end() )
+                {
+                    repair_facet_indices( is_indexed, misindexed_facets );
+                }
+                vertices_.resize( counters_.size() );
+                for( const auto& [cycle, facet_id] : facet_indices_ )
+                {
+                    vertices_[facet_id] = cycle.vertices();
+                }
+            }
+
+            /*!
+             * Repair storages written by versions merging facets in
+             * update_facet_vertices without updating ids: facets sharing an
+             * id or with an invalid id get a new id, counters without facet
+             * are deleted. Counters that cannot be attributed to a facet are
+             * added to every facet, so that no facet in use becomes isolated.
+             */
+            void repair_facet_indices( const std::vector< bool >& is_indexed,
+                absl::Span< index_t* const > misindexed_facets )
+            {
+                const auto nb_counters = counters_.size();
+                index_t nb_unindexed{ 0 };
+                index_t unattributed_counter{ 0 };
+                for( const auto f : Range{ nb_counters } )
+                {
+                    if( !is_indexed[f] )
+                    {
+                        nb_unindexed++;
+                        unattributed_counter += counters_[f];
+                    }
+                }
+                for( auto* facet_id : misindexed_facets )
+                {
+                    const auto shared_counter =
+                        *facet_id < nb_counters ? counters_[*facet_id] : 0;
+                    *facet_id = static_cast< index_t >( counters_.size() );
+                    counters_.push_back( std::max( 1u, shared_counter ) );
+                }
+                for( auto& counter : counters_ )
+                {
+                    counter += unattributed_counter;
+                }
+                std::vector< bool > to_delete( counters_.size(), false );
+                for( const auto f : Range{ nb_counters } )
+                {
+                    to_delete[f] = !is_indexed[f];
+                }
+                const auto old2new = mapping_after_deletion( to_delete );
+                for( auto& [cycle, facet_id] : facet_indices_ )
+                {
+                    facet_id = old2new[facet_id];
+                }
+                facet_attribute_manager_.resize( counters_.size() );
+                facet_attribute_manager_.delete_elements( to_delete );
+                delete_vector_elements( to_delete, counters_ );
+                Logger::warning( "[FacetStorage] Inconsistent facet storage "
+                                 "repaired: ",
+                    misindexed_facets.size(), " facet(s) re-indexed, ",
+                    nb_unindexed,
+                    " unindexed counter(s) removed. Attributes on these "
+                    "facets may be wrong, disable and enable facets to "
+                    "recompute them exactly." );
             }
 
             template < typename Archive >

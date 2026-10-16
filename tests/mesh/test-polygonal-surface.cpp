@@ -21,6 +21,7 @@
  *
  */
 
+#include <cstring>
 #include <sstream>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -758,33 +759,70 @@ std::string serialize_edges( const FacetEdges& edges )
     return output.str();
 }
 
-bool is_deserialization_rejected( const std::string& buffer )
+void deserialize_edges( const std::string& buffer, FacetEdges& edges )
 {
     std::istringstream input{ buffer, std::ios::binary };
     geode::TContext context{};
     geode::BitseryExtensions::register_deserialize_pcontext(
         std::get< 0 >( context ) );
     geode::Deserializer archive{ context, input };
+    archive.object( edges );
+}
+
+constexpr std::array< geode::index_t, 2 > EDGE_A{ 1000001, 1000002 };
+constexpr std::array< geode::index_t, 2 > EDGE_B{ 1000003, 1000004 };
+
+void check_repaired_edges( const std::string& buffer,
+    geode::index_t expected_counter,
+    std::string_view case_name )
+{
     FacetEdges edges{ geode::BITSERY::constructor };
-    try
+    deserialize_edges( buffer, edges );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_attribute_manager().nb_elements() == 2, "[corrupted edges] ",
+        case_name, ": should have 2 edges, not ",
+        edges.edge_attribute_manager().nb_elements() );
+    const auto edge_a = edges.find_edge( EDGE_A );
+    const auto edge_b = edges.find_edge( EDGE_B );
+    geode::OpenGeodeMeshException::test(
+        edge_a && edge_b && edge_a.value() != edge_b.value()
+            && edge_a.value() < 2 && edge_b.value() < 2,
+        "[corrupted edges] ", case_name, ": wrong edge ids" );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_vertices( edge_a.value() ) == EDGE_A
+            && edges.edge_vertices( edge_b.value() ) == EDGE_B,
+        "[corrupted edges] ", case_name, ": wrong edge vertices" );
+    for( const auto& [edge, vertices] :
+        { std::pair{ edge_a.value(), EDGE_A }, { edge_b.value(), EDGE_B } } )
     {
-        archive.object( edges );
+        for( const auto i : geode::Range{ expected_counter } )
+        {
+            geode::OpenGeodeMeshException::test(
+                !edges.is_edge_isolated( edge ), "[corrupted edges] ",
+                case_name, ": edge ", edge, " isolated after ", i,
+                " removals" );
+            edges.remove_edge( vertices );
+        }
+        geode::OpenGeodeMeshException::test( edges.is_edge_isolated( edge ),
+            "[corrupted edges] ", case_name, ": edge ", edge,
+            " should be isolated" );
     }
-    catch( const geode::OpenGeodeException& exception )
-    {
-        return exception.type() == geode::OpenGeodeException::TYPE::data;
-    }
-    return false;
+}
+
+std::string as_bytes( geode::index_t value )
+{
+    std::string bytes( sizeof( geode::index_t ), 0 );
+    std::memcpy( bytes.data(), &value, sizeof( geode::index_t ) );
+    return bytes;
 }
 
 void test_corrupted_edges_deserialization()
 {
     FacetEdges edges;
-    edges.find_or_create_edge( { 0, 1 } );
-    edges.find_or_create_edge( { 1, 2 } );
+    edges.find_or_create_edge( EDGE_A );
+    edges.find_or_create_edge( EDGE_B );
     const auto buffer = serialize_edges( edges );
-    geode::OpenGeodeMeshException::test( !is_deserialization_rejected( buffer ),
-        "[corrupted edges] Valid edges should be loaded" );
+    check_repaired_edges( buffer, 1, "valid" );
 
     // Edge counters are serialized last: [size = 2][counter 0][counter 1]
     constexpr auto COUNTERS_SIZE = 1 + 2 * sizeof( geode::index_t );
@@ -793,24 +831,30 @@ void test_corrupted_edges_deserialization()
             && buffer[buffer.size() - COUNTERS_SIZE] == 2,
         "[corrupted edges] Unexpected serialized layout" );
     const auto prefix = buffer.substr( 0, buffer.size() - COUNTERS_SIZE );
-    const auto first_counter = buffer.substr(
-        buffer.size() - COUNTERS_SIZE + 1, sizeof( geode::index_t ) );
-    const auto all_counters =
-        buffer.substr( buffer.size() - COUNTERS_SIZE + 1 );
+    const auto one_counter = as_bytes( 1 );
 
-    // Only one counter: edge index 1 is out of bounds
-    const auto missing_counter =
-        absl::StrCat( prefix, std::string( 1, 1 ), first_counter );
-    geode::OpenGeodeMeshException::test(
-        is_deserialization_rejected( missing_counter ),
-        "[corrupted edges] Out of bounds edge index should be rejected" );
+    // Only one counter: one edge index is out of bounds
+    check_repaired_edges(
+        absl::StrCat( prefix, std::string( 1, 1 ), one_counter ), 1,
+        "missing counter" );
 
-    // Three counters for two edges
-    const auto extra_counter = absl::StrCat(
-        prefix, std::string( 1, 3 ), all_counters, first_counter );
-    geode::OpenGeodeMeshException::test(
-        is_deserialization_rejected( extra_counter ),
-        "[corrupted edges] Inconsistent edge number should be rejected" );
+    // Three counters for two edges: the unindexed counter is added to every
+    // edge
+    check_repaired_edges( absl::StrCat( prefix, std::string( 1, 3 ),
+                              one_counter, one_counter, one_counter ),
+        2, "extra counter" );
+
+    // Both edges share the same index: each map entry is serialized as
+    // [vertices][edge index]
+    const auto edge_b_entry = absl::StrCat(
+        as_bytes( EDGE_B[0] ), as_bytes( EDGE_B[1] ), as_bytes( 1 ) );
+    auto shared_index = buffer;
+    const auto edge_b_position = shared_index.find( edge_b_entry );
+    geode::OpenGeodeMeshException::test( edge_b_position != std::string::npos,
+        "[corrupted edges] Unexpected serialized edge layout" );
+    shared_index.replace( edge_b_position + 2 * sizeof( geode::index_t ),
+        sizeof( geode::index_t ), as_bytes( 0 ) );
+    check_repaired_edges( shared_index, 2, "shared index" );
 }
 
 void test_texture( const geode::PolygonalSurface3D& polygonal_surface )
