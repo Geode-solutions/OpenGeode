@@ -1172,6 +1172,39 @@ void test_time_series()
     test_time_series_copy_step( manager );
 }
 
+void test_nan_compound_no_value()
+{
+    geode::AttributeManager manager;
+    manager.resize( 3 );
+    constexpr auto nan = std::numeric_limits< double >::quiet_NaN();
+    geode::AttributeValues< std::array< double, 2 > > values;
+    values.default_value = { nan, nan };
+    values.no_value = { nan, nan };
+    const auto variable_id = manager.create_attribute< geode::VariableAttribute,
+        std::array< double, 2 > >( "nan_variable", values, {} );
+    const auto sparse_id = manager.create_attribute< geode::SparseAttribute,
+        std::array< double, 2 > >( "nan_sparse", values, {} );
+    auto variable_attribute = manager.find_attribute< geode::VariableAttribute,
+        std::array< double, 2 > >( variable_id );
+    auto sparse_attribute = manager.find_attribute< geode::SparseAttribute,
+        std::array< double, 2 > >( sparse_id );
+    variable_attribute->set_value( 1, { 1., 2. } );
+    sparse_attribute->set_value( 1, { 1., 2. } );
+    variable_attribute->set_value( 2, { 0., nan } );
+    sparse_attribute->set_value( 2, { 0., nan } );
+    for( const auto element : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeBasicException::test(
+            variable_attribute->has_value( element ) == ( element == 1 ),
+            "Wrong has_value for NaN compound variable attribute element ",
+            element );
+        geode::OpenGeodeBasicException::test(
+            sparse_attribute->has_value( element ) == ( element == 1 ),
+            "Wrong has_value for NaN compound sparse attribute element ",
+            element );
+    }
+}
+
 void test()
 {
     geode::AttributeManager manager;
@@ -1213,6 +1246,7 @@ void test()
         array_double_attribute_id, double_sparse_attribute_id );
     test_multi_import_manager();
     test_no_value();
+    test_nan_compound_no_value();
     test_attribute_types( manager, bool_variable_attribute_id );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( bool_variable_attribute_id );

@@ -95,6 +95,16 @@ namespace geode
                     return !std::isnan( value( element ) );
                 }
             }
+            else if constexpr( std::is_class_v< T > )
+            {
+                // A no_value which is not equal to itself (e.g. a vector of
+                // NaN) matches any element not equal to itself
+                if( no_value.value() != no_value.value() )
+                {
+                    const auto& element_value = value( element );
+                    return !( element_value != element_value );
+                }
+            }
             return value( element ) != no_value.value();
         }
 
