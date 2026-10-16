@@ -180,11 +180,13 @@ namespace geode
         std::array< index_t, 3 > cells_number,
         std::array< Vector3D, 3 > directions )
     {
+        // Directions are set first: initialize_grid keeps them (cell lengths
+        // match) and update_origin places the points along them, so the
+        // points are computed only once.
+        set_grid_directions( directions );
         initialize_grid( origin, std::move( cells_number ),
             { directions[0].length(), directions[1].length(),
                 directions[2].length() } );
-        update_origin_and_directions(
-            std::move( origin ), std::move( directions ) );
     }
 
     void RegularGridBuilder< 3 >::copy( const RegularGrid3D& grid )

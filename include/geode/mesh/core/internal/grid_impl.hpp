@@ -105,8 +105,55 @@ namespace geode
             void do_update_origin_and_directions(
                 RegularGrid< dimension >& grid,
                 const Point< dimension >& origin,
-                const std::array< Vector< dimension >, dimension >&
-                    directions );
+                const std::array< Vector< dimension >, dimension >& directions )
+            {
+                static constexpr index_t MIN_VERTICES_PER_TASK{ 16384 };
+                const auto nu = grid.nb_vertices_in_direction( 0 );
+                const auto nb_rows = grid.nb_grid_vertices() / nu;
+                const auto rows_per_task =
+                    std::max( index_t{ 1 }, MIN_VERTICES_PER_TASK / nu );
+                const auto nb_tasks =
+                    ( nb_rows + rows_per_task - 1 ) / rows_per_task;
+                CoordinateReferenceSystemManagersBuilder< dimension > builder{
+                    grid
+                };
+                absl::FixedArray< async::task< void > > tasks( nb_tasks );
+                for( const auto task_id : Range{ nb_tasks } )
+                {
+                    const auto first_row = task_id * rows_per_task;
+                    const auto last_row =
+                        std::min( first_row + rows_per_task, nb_rows );
+                    tasks[task_id] = async::spawn( [&builder, &grid, &origin,
+                                                       &directions, first_row,
+                                                       last_row, nu] {
+                        for( const auto row : Range{ first_row, last_row } )
+                        {
+                            VertexIndices indices;
+                            auto remaining_row = row;
+                            for( const auto d : LRange{ 1, dimension } )
+                            {
+                                const auto nb_vertices =
+                                    grid.nb_vertices_in_direction( d );
+                                indices[d] = remaining_row % nb_vertices;
+                                remaining_row /= nb_vertices;
+                            }
+                            for( const auto u : Range{ nu } )
+                            {
+                                auto point = origin + directions[0] * u;
+                                for( const auto d : LRange{ 1, dimension } )
+                                {
+                                    point = point + directions[d] * indices[d];
+                                }
+                                builder.set_point( u + row * nu, point );
+                            }
+                        }
+                    } );
+                }
+                for( auto& task : async::when_all( tasks ).get() )
+                {
+                    task.get();
+                }
+            }
 
         private:
             template < typename Archive >
@@ -123,73 +170,5 @@ namespace geode
             }
         };
 
-        template <>
-        inline void GridImpl< 2 >::do_update_origin_and_directions(
-            RegularGrid< 2 >& grid,
-            const Point< 2 >& origin,
-            const std::array< Vector2D, 2 >& directions )
-        {
-            const auto nu = grid.nb_vertices_in_direction( 0 );
-            const auto nv = grid.nb_vertices_in_direction( 1 );
-            const auto& vector_u = directions[0];
-            const auto& vector_v = directions[1];
-            index_t task_id{ 0 };
-            CoordinateReferenceSystemManagersBuilder2D builder{ grid };
-            absl::FixedArray< async::task< void > > tasks( nv );
-            for( const auto v : Range{ nv } )
-            {
-                tasks[task_id++] = async::spawn(
-                    [&builder, &origin, v, &vector_u, &vector_v, nu] {
-                        for( const auto u : Range{ nu } )
-                        {
-                            const auto vertex = u + v * nu;
-                            builder.set_point(
-                                vertex, origin + vector_u * u + vector_v * v );
-                        }
-                    } );
-            }
-            for( auto& task : async::when_all( tasks ).get() )
-            {
-                task.get();
-            }
-        }
-
-        template <>
-        inline void GridImpl< 3 >::do_update_origin_and_directions(
-            RegularGrid< 3 >& grid,
-            const Point< 3 >& origin,
-            const std::array< Vector3D, 3 >& directions )
-        {
-            const auto nu = grid.nb_vertices_in_direction( 0 );
-            const auto nv = grid.nb_vertices_in_direction( 1 );
-            const auto nw = grid.nb_vertices_in_direction( 2 );
-            const auto& vector_u = directions[0];
-            const auto& vector_v = directions[1];
-            const auto& vector_w = directions[2];
-            index_t task_id{ 0 };
-            CoordinateReferenceSystemManagersBuilder3D builder{ grid };
-            absl::FixedArray< async::task< void > > tasks( nw * nv );
-            for( const auto w : Range{ nw } )
-            {
-                for( const auto v : Range{ nv } )
-                {
-                    tasks[task_id++] =
-                        async::spawn( [&builder, &origin, v, w, &vector_u,
-                                          &vector_v, &vector_w, nu, nv] {
-                            for( const auto u : Range{ nu } )
-                            {
-                                const auto vertex = u + v * nu + w * nu * nv;
-                                builder.set_point( vertex, origin + vector_u * u
-                                                               + vector_v * v
-                                                               + vector_w * w );
-                            }
-                        } );
-                }
-            }
-            for( auto& task : async::when_all( tasks ).get() )
-            {
-                task.get();
-            }
-        }
     } // namespace internal
 } // namespace geode
