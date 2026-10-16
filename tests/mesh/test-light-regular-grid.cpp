@@ -447,6 +447,42 @@ void test_nan_query( const geode::LightRegularGrid3D& grid )
     }
 }
 
+void test_epsilon_in_world_units()
+{
+    const auto eps = geode::GLOBAL_EPSILON;
+    const geode::LightRegularGrid3D big{ geode::Point3D{ { 0, 0, 0 } },
+        { 2, 2, 2 }, { 1e4, 1e4, 1e4 } };
+    const geode::Point3D big_outside{ { -100 * eps, 1e4, 1e4 } };
+    geode::OpenGeodeMeshException::test( !big.contains( big_outside ),
+        "[Test] Point 100 epsilons outside a big grid should not be "
+        "contained" );
+    geode::OpenGeodeMeshException::test( big.cells( big_outside ).empty(),
+        "[Test] Point 100 epsilons outside a big grid should be in no cell" );
+    const geode::Point3D big_near_face{ { 1e4 + 100 * eps, 5e3, 5e3 } };
+    geode::OpenGeodeMeshException::test( big.cells( big_near_face ).size() == 1,
+        "[Test] Point 100 epsilons away from a big cell face should be in "
+        "one cell" );
+    const geode::Point3D big_on_face{ { 1e4 + eps / 2, 5e3, 5e3 } };
+    geode::OpenGeodeMeshException::test( big.cells( big_on_face ).size() == 2,
+        "[Test] Point half an epsilon away from a big cell face should be in "
+        "two cells" );
+
+    const geode::LightRegularGrid3D small{ geode::Point3D{ { 0, 0, 0 } },
+        { 2, 2, 2 }, { 1e-3, 1e-3, 1e-3 } };
+    const geode::Point3D small_near{ { -eps / 2, 1e-3, 1e-3 } };
+    geode::OpenGeodeMeshException::test( small.contains( small_near ),
+        "[Test] Point half an epsilon outside a small grid should be "
+        "contained" );
+    geode::OpenGeodeMeshException::test( !small.cells( small_near ).empty(),
+        "[Test] Point half an epsilon outside a small grid should be in a "
+        "cell" );
+    const geode::Point3D small_on_face{ { 1e-3 + eps / 2, 5e-4, 5e-4 } };
+    geode::OpenGeodeMeshException::test(
+        small.cells( small_on_face ).size() == 2,
+        "[Test] Point half an epsilon away from a small cell face should be "
+        "in two cells" );
+}
+
 void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
@@ -480,6 +516,7 @@ void test()
     test_vertices_around_vertex( grid );
     test_set_grid_dimensions_failure();
     test_nan_query( grid );
+    test_epsilon_in_world_units();
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
