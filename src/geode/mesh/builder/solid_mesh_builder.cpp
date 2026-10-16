@@ -568,12 +568,16 @@ namespace geode
                 LRange{ solid_mesh_.nb_polyhedron_vertices( p ) } )
             {
                 const PolyhedronVertex id{ p, v };
-                const auto new_vertex =
-                    old2new[solid_mesh_.polyhedron_vertex( id )];
+                const auto old_vertex = solid_mesh_.polyhedron_vertex( id );
+                const auto new_vertex = old2new[old_vertex];
                 OpenGeodeMeshException::check_assertion( new_vertex != NO_ID,
                     "[SolidMeshBuilder::update_polyhedron_vertices] No "
                     "more polyhedra with vertices to delete should remain at "
                     "this point" );
+                if( new_vertex == old_vertex )
+                {
+                    continue;
+                }
                 update_polyhedron_vertex( id, new_vertex );
             }
         }
