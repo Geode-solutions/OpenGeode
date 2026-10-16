@@ -148,36 +148,6 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::tuple< geode::index_t, geode::index_t > get_major_plane(
-        const std::array< typename geode::Grid< dimension >::Indices, 3 >&
-            vertex_cells )
-    {
-        geode::index_t max_delta{ 0 };
-        geode::index_t major_edge{ geode::NO_ID };
-        geode::index_t major_axis{ geode::NO_ID };
-        for( const auto e : geode::LRange{ 3 } )
-        {
-            for( const auto& e0 : vertex_cells[e] )
-            {
-                for( const auto& e1 : vertex_cells[( e + 1 ) % 3] )
-                {
-                    std::array< double, dimension > deltas;
-                    std::array< int, dimension > increments;
-                    std::tie( deltas, increments ) =
-                        compute_deltas< dimension >( e0, e1 );
-                    const auto i = get_major_axis< dimension >( deltas );
-                    if( deltas[i] > max_delta )
-                    {
-                        major_edge = e;
-                        major_axis = i;
-                    }
-                }
-            }
-        }
-        return { major_edge, major_axis };
-    }
-
-    template < geode::index_t dimension >
     std::vector< CellIndices< dimension > > paint_segment(
         const CellIndices< dimension >& start,
         const CellIndices< dimension >& end )
@@ -280,18 +250,6 @@ namespace
             geode::Segment< dimension >{ vertices[2], vertices[0] } };
     }
 
-    void add_cells( std::vector< CellIndices< 3 > >& cells,
-        std::vector< CellIndices< 3 > > new_cells )
-    {
-        for( auto&& new_cell : new_cells )
-        {
-            if( absl::c_find( cells, new_cell ) == cells.end() )
-            {
-                cells.emplace_back( new_cell );
-            }
-        }
-    }
-
     std::vector< CellIndices< 3 > > conservative_voxelization_triangle(
         const geode::Grid3D& grid,
         const geode::Triangle3D& triangle,
@@ -334,9 +292,12 @@ namespace
         {
             for( const auto e : geode::LRange{ 3 } )
             {
-                add_cells( cells,
-                    geode::rasterize_segment( grid, triangle_edges[e] ) );
+                const auto edge_cells =
+                    geode::rasterize_segment( grid, triangle_edges[e] );
+                cells.insert(
+                    cells.end(), edge_cells.begin(), edge_cells.end() );
             }
+            geode::sort_unique( cells );
             return cells;
         }
         const auto critical_point =
