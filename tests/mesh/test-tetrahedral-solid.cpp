@@ -21,6 +21,9 @@
  *
  */
 
+#include <atomic>
+#include <thread>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/mapping.hpp>
@@ -784,6 +787,43 @@ void test_polyhedra_around_non_manifold_vertex()
         "not change" );
 }
 
+void test_concurrent_polyhedra_around_vertex()
+{
+    constexpr geode::index_t nb_tetrahedra{ 1000 };
+    auto solid = create_solid_with_points( nb_tetrahedra + 3 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    for( const auto t : geode::Range{ nb_tetrahedra } )
+    {
+        builder->create_tetrahedron( { t, t + 1, t + 2, t + 3 } );
+    }
+    builder->compute_polyhedron_adjacencies();
+    std::vector< std::thread > threads;
+    std::atomic< bool > success{ true };
+    for( const auto thread_id : geode::Range{ 4 } )
+    {
+        threads.emplace_back( [&solid, &success, thread_id] {
+            for( const auto v : geode::Range{ solid->nb_vertices() } )
+            {
+                const auto vertex =
+                    thread_id % 2 == 0 ? v : solid->nb_vertices() - 1 - v;
+                const auto expected = std::min< geode::index_t >(
+                    { vertex + 1, 4, solid->nb_vertices() - vertex } );
+                if( solid->polyhedra_around_vertex( vertex ).size()
+                    != expected )
+                {
+                    success = false;
+                }
+            }
+        } );
+    }
+    for( auto& thread : threads )
+    {
+        thread.join();
+    }
+    geode::OpenGeodeMeshException::test( success.load(),
+        "Wrong concurrent polyhedra around vertex computation" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -813,6 +853,7 @@ void test()
     test_create_invalid_polyhedron();
     test_degenerated_tetrahedron_with_repeated_vertex();
     test_polyhedra_around_non_manifold_vertex();
+    test_concurrent_polyhedra_around_vertex();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

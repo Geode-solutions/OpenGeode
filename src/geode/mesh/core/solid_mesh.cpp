@@ -20,6 +20,8 @@
  * SOFTWARE.
  *
  */
+#include <atomic>
+#include <memory>
 #include <stack>
 
 #include <geode/mesh/core/solid_mesh.hpp>
@@ -353,6 +355,106 @@ namespace
         }
         return std::nullopt;
     }
+
+    /*!
+     * Per-vertex storage of the polyhedra around vertex cache. The cached
+     * values (~190 bytes each) are only allocated the first time a vertex
+     * is queried: an unqueried vertex costs one pointer. Allocation is
+     * lock-free (atomic compare-exchange), and each allocated value keeps
+     * the CachedValue semantics for concurrent const reads.
+     */
+    class LazyPolyhedraAroundVertexCache
+    {
+        using Cached =
+            geode::CachedValue< geode::internal::PolyhedraAroundVertexImpl >;
+
+        class Slot
+        {
+        public:
+            Slot() = default;
+            Slot( const Slot& ) = delete;
+            Slot& operator=( const Slot& ) = delete;
+            // Moves only happen while the mesh is modified (no concurrent
+            // reads): relaxed accesses are enough.
+            Slot( Slot&& other ) noexcept
+                : value_{ other.value_.load( std::memory_order_relaxed ) }
+            {
+                other.value_.store( nullptr, std::memory_order_relaxed );
+            }
+            Slot& operator=( Slot&& other ) noexcept
+            {
+                if( this != &other )
+                {
+                    delete value_.load( std::memory_order_relaxed );
+                    value_.store(
+                        other.value_.load( std::memory_order_relaxed ),
+                        std::memory_order_relaxed );
+                    other.value_.store( nullptr, std::memory_order_relaxed );
+                }
+                return *this;
+            }
+            ~Slot()
+            {
+                delete value_.load( std::memory_order_relaxed );
+            }
+
+            const Cached& get() const
+            {
+                auto* value = value_.load( std::memory_order_acquire );
+                if( value != nullptr )
+                {
+                    return *value;
+                }
+                auto created = std::make_unique< Cached >();
+                if( value_.compare_exchange_strong( value, created.get(),
+                        std::memory_order_acq_rel, std::memory_order_acquire ) )
+                {
+                    return *created.release();
+                }
+                return *value;
+            }
+
+            void reset()
+            {
+                if( auto* value = value_.load( std::memory_order_acquire ) )
+                {
+                    value->reset();
+                }
+            }
+
+        private:
+            mutable std::atomic< Cached* > value_{ nullptr };
+        };
+
+    public:
+        void resize( geode::index_t nb_vertices )
+        {
+            slots_.resize( nb_vertices );
+        }
+
+        const Cached& operator[]( geode::index_t vertex_id ) const
+        {
+            return slots_[vertex_id].get();
+        }
+
+        void reset( geode::index_t vertex_id )
+        {
+            slots_[vertex_id].reset();
+        }
+
+        void delete_elements( const std::vector< bool >& to_delete )
+        {
+            geode::delete_vector_elements( to_delete, slots_ );
+        }
+
+        void permute_elements( absl::Span< const geode::index_t > permutation )
+        {
+            geode::permute( slots_, permutation );
+        }
+
+    private:
+        std::vector< Slot > slots_;
+    };
 } // namespace
 
 namespace geode
@@ -539,7 +641,7 @@ namespace geode
 
         void reset_polyhedra_around_vertex( index_t vertex_id )
         {
-            polyhedra_around_vertex_[vertex_id].reset();
+            polyhedra_around_vertex_.reset( vertex_id );
             if( !other_polyhedra_around_vertex_.empty() )
             {
                 other_polyhedra_around_vertex_.erase( vertex_id );
@@ -694,14 +796,14 @@ namespace geode
         void delete_vertex_storage( const std::vector< bool >& to_delete )
         {
             delete_vector_elements( to_delete, polyhedron_around_vertex_ );
-            delete_vector_elements( to_delete, polyhedra_around_vertex_ );
+            polyhedra_around_vertex_.delete_elements( to_delete );
             other_polyhedra_around_vertex_.clear();
         }
 
         void permute_vertex_storage( absl::Span< const index_t > permutation )
         {
             permute( polyhedron_around_vertex_, permutation );
-            permute( polyhedra_around_vertex_, permutation );
+            polyhedra_around_vertex_.permute_elements( permutation );
             other_polyhedra_around_vertex_.clear();
         }
 
@@ -850,7 +952,7 @@ namespace geode
     private:
         mutable AttributeManager polyhedron_attribute_manager_;
         std::vector< PolyhedronVertex > polyhedron_around_vertex_;
-        mutable std::vector< CachedPolyhedra > polyhedra_around_vertex_;
+        LazyPolyhedraAroundVertexCache polyhedra_around_vertex_;
         mutable absl::flat_hash_map< index_t,
             std::vector< std::unique_ptr< PolyhedraAroundVertex > > >
             other_polyhedra_around_vertex_;
