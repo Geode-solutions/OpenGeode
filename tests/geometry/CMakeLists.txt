@@ -61,7 +61,25 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
-    SOURCE "test-distance-brute-force.cpp"
+    SOURCE "test-distance-curve-brute-force.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-distance-point-brute-force.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-distance-segment-brute-force.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-distance-triangle-brute-force.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
@@ -86,6 +104,18 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-intersection-brute-force.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-intersection-circle-brute-force.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-intersection-cylinder-brute-force.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
