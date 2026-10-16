@@ -66,6 +66,17 @@ namespace geode
                 return facet_attribute_manager_;
             }
 
+            /*!
+             * Reserve memory for the given total number of facets
+             */
+            void reserve( index_t capacity )
+            {
+                facet_indices_.reserve( capacity );
+                counters_.reserve( capacity );
+                vertices_.reserve( capacity );
+                facet_attribute_manager_.reserve( capacity );
+            }
+
             [[nodiscard]] std::optional< index_t > find_facet(
                 TypedVertexCycle vertices ) const
             {

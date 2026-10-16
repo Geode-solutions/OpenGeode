@@ -53,6 +53,19 @@ namespace
             facet_id < solid.nb_facets(),
             "[check_facet_id] Trying to access an invalid facet" );
     }
+
+    template < geode::index_t dimension >
+    geode::index_t estimate_nb_facets(
+        const geode::SolidMesh< dimension >& solid )
+    {
+        // Each inner facet is shared by 2 polyhedra, margin for border facets
+        geode::index_t nb_polyhedron_facets{ 0 };
+        for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+        {
+            nb_polyhedron_facets += solid.nb_polyhedron_facets( p );
+        }
+        return ( nb_polyhedron_facets + nb_polyhedron_facets / 16 ) / 2;
+    }
 } // namespace
 
 namespace geode
@@ -76,6 +89,7 @@ namespace geode
 
         Impl( const SolidMesh< dimension >& solid )
         {
+            this->reserve( estimate_nb_facets( solid ) );
             for( const auto p : Range{ solid.nb_polyhedra() } )
             {
                 for( auto&& f : solid.polyhedron_facets_vertices( p ) )

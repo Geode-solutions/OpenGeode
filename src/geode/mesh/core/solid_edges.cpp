@@ -53,6 +53,34 @@ namespace
             "[check_edge_id] Trying to access an invalid edge" );
     }
 
+    template < geode::index_t dimension >
+    geode::index_t estimate_nb_edges(
+        const geode::SolidMesh< dimension >& solid )
+    {
+        // Euler characteristic of a ball: V - E + F - P = 1
+        // Each inner facet is shared by 2 polyhedra, margin for border facets
+        geode::index_t nb_facets{ 0 };
+        if( solid.are_facets_enabled() )
+        {
+            nb_facets = solid.facets().nb_facets();
+        }
+        else
+        {
+            geode::index_t nb_polyhedron_facets{ 0 };
+            for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+            {
+                nb_polyhedron_facets += solid.nb_polyhedron_facets( p );
+            }
+            nb_facets =
+                ( nb_polyhedron_facets + nb_polyhedron_facets / 16 ) / 2;
+        }
+        const auto nb_vertices_and_facets = solid.nb_vertices() + nb_facets;
+        if( nb_vertices_and_facets <= solid.nb_polyhedra() )
+        {
+            return 0;
+        }
+        return nb_vertices_and_facets - solid.nb_polyhedra();
+    }
 } // namespace
 
 namespace geode
@@ -70,6 +98,7 @@ namespace geode
 
         Impl( const SolidMesh< dimension >& solid )
         {
+            this->reserve( estimate_nb_edges( solid ) );
             for( const auto p : Range{ solid.nb_polyhedra() } )
             {
                 for( auto&& e : solid.polyhedron_edges_vertices( p ) )
