@@ -68,6 +68,33 @@ void test_names_stability()
         found, "[Test] CRS a should be listed" );
 }
 
+void test_deleted_active_crs()
+{
+    geode::CoordinateReferenceSystemManager3D crs_manager;
+    geode::CoordinateReferenceSystemManagerBuilder3D crs_manager_builder{
+        crs_manager
+    };
+    geode::AttributeManager att_manager;
+    att_manager.resize( 1 );
+    crs_manager_builder.register_coordinate_reference_system( "active",
+        std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
+            att_manager, "active" ) );
+    crs_manager_builder.set_active_coordinate_reference_system( "active" );
+    crs_manager_builder.delete_coordinate_reference_system( "active" );
+    bool thrown{ false };
+    try
+    {
+        const auto& crs = crs_manager.active_coordinate_reference_system();
+        geode_unused( crs );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] Accessing a deleted active CRS should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -109,6 +136,7 @@ void test()
         "Wrong number of CRS" );
 
     test_names_stability();
+    test_deleted_active_crs();
 }
 
 OPENGEODE_TEST( "coordinate-reference-manager" )
