@@ -118,6 +118,11 @@ namespace geode
                                    archive.object( impl.image_ );
                                    archive.ext( impl.coordinates_,
                                        bitsery::ext::StdSmartPtr{} );
+                                   OpenGeodeMeshException::check_exception(
+                                       impl.coordinates_ != nullptr, nullptr,
+                                       OpenGeodeException::TYPE::data,
+                                       "[Texture] Cannot deserialize texture "
+                                       "coordinates: file may be corrupted" );
                                } } } );
             }
 

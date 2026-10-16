@@ -47,7 +47,21 @@
         Deserializer archive{ context, file };                                 \
         std::unique_ptr< Mesh > mesh{ new OpenGeode##Mesh{                     \
             BITSERY::constructor } };                                          \
-        archive.object( dynamic_cast< OpenGeode##Mesh& >( *mesh ) );           \
+        try                                                                    \
+        {                                                                      \
+            archive.object( dynamic_cast< OpenGeode##Mesh& >( *mesh ) );       \
+        }                                                                      \
+        catch( const geode::OpenGeodeException& )                              \
+        {                                                                      \
+            throw;                                                             \
+        }                                                                      \
+        catch( const std::exception& exception )                               \
+        {                                                                      \
+            throw geode::OpenGeodeMeshException{ nullptr,                      \
+                geode::OpenGeodeException::TYPE::data,                         \
+                "[Bitsery::read] Error while reading file: ",                  \
+                this->filename(), " (", exception.what(), ")" };               \
+        }                                                                      \
         const auto& adapter = archive.adapter();                               \
         geode::OpenGeodeMeshException::check_exception(                        \
             adapter.error() == bitsery::ReaderError::NoError                   \
