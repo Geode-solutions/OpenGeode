@@ -555,6 +555,30 @@ void test_next_on_border_with_flipped_orientation()
         "orientation" );
 }
 
+void test_incremental_adjacencies_with_edges()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 5 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 0, 3 } );
+    builder->create_triangle( { 0, 1, 4 } );
+    const std::array< geode::index_t, 2 > first{ 0, 1 };
+    builder->compute_polygon_adjacencies( first );
+    const std::array< geode::index_t, 2 > second{ 1, 2 };
+    builder->compute_polygon_adjacencies( second );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_adjacent( { 0, 0 } ) == 1,
+        "[compute_polygon_adjacencies] Wrong adjacency for polygon 0" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_adjacent( { 1, 0 } ) == 0,
+        "[compute_polygon_adjacencies] Existing adjacency should be kept" );
+    geode::OpenGeodeMeshException::test( !surface->polygon_adjacent( { 2, 0 } ),
+        "[compute_polygon_adjacencies] Polygon 2 should stay on border" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -577,6 +601,7 @@ void test()
     test_large_fan_around_vertex();
     test_polygons_around_vertex_after_adjacencies();
     test_next_on_border_with_flipped_orientation();
+    test_incremental_adjacencies_with_edges();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )
