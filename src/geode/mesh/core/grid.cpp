@@ -425,6 +425,14 @@ namespace geode
 
         std::array< index_t, dimension >&& deprecated_cells_number()
         {
+            for( const auto d : LRange{ dimension } )
+            {
+                OpenGeodeMeshException::check_exception(
+                    deprecated_cells_number_[d] != 0, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[Grid] Missing cells number in legacy file: file may "
+                    "be corrupted" );
+            }
             return std::move( deprecated_cells_number_ );
         }
 
@@ -468,7 +476,7 @@ namespace geode
         }
 
     private:
-        std::array< index_t, dimension > deprecated_cells_number_;
+        std::array< index_t, dimension > deprecated_cells_number_{};
         std::array< double, dimension > cells_length_;
         CoordinateSystem< dimension > grid_coordinate_system_;
     };

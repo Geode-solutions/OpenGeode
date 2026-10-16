@@ -43,6 +43,7 @@
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/io/graph_input.hpp>
@@ -55,6 +56,7 @@
 #include <geode/mesh/io/polygonal_surface_output.hpp>
 #include <geode/mesh/io/polyhedral_solid_input.hpp>
 #include <geode/mesh/io/polyhedral_solid_output.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
 #include <geode/mesh/io/tetrahedral_solid_input.hpp>
 #include <geode/mesh/io/tetrahedral_solid_output.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
@@ -382,6 +384,42 @@ namespace
         test_corrupted_file( filename, Bytes{}.u32s( { 2, 3, 4 } ),
             Bytes{}.u32s( { 65535, 65535, 1 } ), loader );
     }
+
+    void test_legacy_grid_without_cells_number()
+    {
+        // In v12 files, Grid version 1 relies on the cells number stored by
+        // Grid::Impl version 1: a Grid::Impl version 2 does not provide it
+        const auto filename = absl::StrCat(
+            geode::DATA_PATH, "backward_io/v12/test_v12.og_rgd3d" );
+        auto content = read_file( filename );
+        const auto from = Bytes{}.u8( 1 ).u32s( { 5, 10, 15 } ).string();
+        const auto position = content.find( from );
+        geode::OpenGeodeMeshException::test(
+            position != std::string::npos, "[Test] Cells number not found" );
+        content.replace( position, from.size(), Bytes{}.u8( 2 ).string() );
+        const std::string corrupted{ "corrupted_v12.og_rgd3d" };
+        {
+            std::ofstream file{ corrupted, std::ofstream::binary };
+            file << content;
+        }
+        try
+        {
+            const auto grid = geode::load_regular_grid< 3 >( corrupted );
+            geode::Logger::error( "Grid loaded with cells ",
+                grid->nb_cells_in_direction( 0 ), " ",
+                grid->nb_cells_in_direction( 1 ), " ",
+                grid->nb_cells_in_direction( 2 ) );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::info(
+                corrupted, " throws as expected: ", exception.what() );
+            return;
+        }
+        throw geode::OpenGeodeMeshException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] ", corrupted,
+            " should not be loaded" };
+    }
 } // namespace
 
 void test()
@@ -394,6 +432,7 @@ void test()
     test_hybrid_solid();
     test_graph();
     test_light_regular_grid();
+    test_legacy_grid_without_cells_number();
 }
 
 OPENGEODE_TEST( "mesh-corrupted-files" )
