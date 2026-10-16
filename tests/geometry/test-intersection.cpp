@@ -22,6 +22,7 @@
  */
 
 #include <random>
+#include <string_view>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
@@ -1206,6 +1207,238 @@ void test_segment_ellipse_intersection()
     test_segment_ellipse_intersection_3D();
 }
 
+void test_small_sphere_intersection()
+{
+    const geode::Point2D origin{ { 0.0, 0.0 } };
+    const geode::Sphere2D small{ origin, 1e-4 };
+    const geode::InfiniteLine2D far_line{ geode::Vector2D{ { 1, 0 } },
+        geode::Point2D{ { 0, 5e-4 } } };
+    const auto far = geode::line_sphere_intersection( far_line, small );
+    geode::OpenGeodeGeometryException::test(
+        far.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for line_sphere_intersection with line far from a small "
+        "sphere" );
+
+    const geode::InfiniteLine2D center_line{ geode::Vector2D{ { 1, 0 } },
+        geode::Point2D{ { -1, 0 } } };
+    const auto crossing = geode::line_sphere_intersection( center_line, small );
+    geode::OpenGeodeGeometryException::test(
+        crossing.has_intersection() && crossing.result->size() == 2,
+        "Wrong result for line_sphere_intersection with line crossing a small "
+        "sphere" );
+    for( const auto& point : crossing.result.value() )
+    {
+        geode::OpenGeodeGeometryException::test(
+            std::get< 0 >( geode::point_sphere_distance( point, small ) )
+                < geode::GLOBAL_EPSILON,
+            "Wrong point for line_sphere_intersection with line crossing a "
+            "small sphere" );
+    }
+
+    const geode::Sphere2D unit{ origin, 1 };
+    const geode::Point2D on_sphere{ { 1.0, 0.0 } };
+    const geode::Point2D close{ { 1.0 + 1e-7, 0.0 } };
+    const auto tiny = geode::segment_sphere_intersection(
+        geode::Segment2D{ on_sphere, close }, unit );
+    geode::OpenGeodeGeometryException::test(
+        tiny.has_intersection() && tiny.result->size() == 1,
+        "Wrong result for segment_sphere_intersection with tiny segment" );
+
+    // Line passing close to the center of a sphere of radius GLOBAL_EPSILON
+    const geode::Point2D center{ { -0x1.2f27bf7ab2068p+0,
+        -0x1.19ed33959c664p+2 } };
+    const geode::Sphere2D tiny_sphere{ center, 0x1.39cbe52173991p-20 };
+    const geode::Point2D line0{ { -0x1.2f27aa494ab6cp+0,
+        -0x1.19ed32bc45ep+2 } };
+    const geode::Point2D line1{ { 0x1.10adc34e01184p+2, 0x1.9d613ed64784p-3 } };
+    const auto tangent = geode::line_sphere_intersection(
+        geode::InfiniteLine2D{ geode::Segment2D{ line0, line1 } },
+        tiny_sphere );
+    geode::OpenGeodeGeometryException::test( tangent.has_intersection(),
+        "Wrong result for line_sphere_intersection with sphere of radius "
+        "GLOBAL_EPSILON" );
+
+    // Segment starting 1.02 * GLOBAL_EPSILON away from a small sphere: its
+    // line touches the sphere within GLOBAL_EPSILON of the segment
+    const geode::Point3D small_center{ { -0x1.e059c1d05becdp+1,
+        -0x1.abea685a05f8p-2, 0x1.23b2c3df35a8p+1 } };
+    const geode::Sphere3D small_sphere{ small_center, 0x1.8f84f79ed9dbdp-20 };
+    const geode::Point3D start{ { -0x1.e059b62766559p+1, -0x1.abe9ea07260bfp-2,
+        0x1.23b2bc340e903p+1 } };
+    const geode::Point3D end{ { -0x1.4ccf4e11f9ea4p+2, -0x1.a7318e3f7335p+0,
+        -0x1.b4f7162f931f4p+2 } };
+    const auto separated = geode::segment_sphere_intersection(
+        geode::Segment3D{ start, end }, small_sphere );
+    geode::OpenGeodeGeometryException::test(
+        separated.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for segment_sphere_intersection with segment just "
+        "farther than GLOBAL_EPSILON from a small sphere" );
+}
+
+void test_triangle_intersection_near_parallel()
+{
+    // Line nearly parallel to the triangle plane, 3 away from the triangle
+    const geode::Point3D t0{ { 0x1.03bffd2202968p+2, 0x1.6fd08c18b0728p+0,
+        -0x1.177a24c186d1bp+2 } };
+    const geode::Point3D t1{ { -0x1.a54aef4753099p+1, -0x1.262ea62ca4626p+0,
+        -0x1.f00e403e9344p+0 } };
+    const geode::Point3D t2{ { -0x1.a3f71ec8e0ec2p+0, 0x1.2cc398f6a1d96p+1,
+        -0x1.1a511f5e5d612p+2 } };
+    const geode::Point3D l0{ { -0x1.6ce04f0f9e572p+2, -0x1.0d39029896037p+2,
+        0x1.4632a52ff3331p-2 } };
+    const geode::Point3D l1{ { -0x1.c80fd9962edd4p+2, 0x1.0b14dfd807139p+1,
+        -0x1.d989511eb823ep+1 } };
+    const auto far = geode::line_triangle_intersection(
+        geode::InfiniteLine3D{ geode::Segment3D{ l0, l1 } },
+        geode::Triangle3D{ t0, t1, t2 } );
+    geode::OpenGeodeGeometryException::test( !far.has_intersection(),
+        "Wrong result for line_triangle_intersection with nearly parallel "
+        "line far from the triangle" );
+
+    // Segment nearly parallel to the triangle plane, 0.8 away from it
+    const geode::Point3D u0{ { -0x1.197524bb976d8p+0, -0x1.091bcd8fced32p+2,
+        0x1.972f348d9a6cp-1 } };
+    const geode::Point3D u1{ { -0x1.8a8dbb5920948p+0, 0x1.c2c08a610a734p+1,
+        -0x1.974660605015ap+1 } };
+    const geode::Point3D u2{ { -0x1.199d82f8d93cbp+1, -0x1.9d1d2fa6a19aep+1,
+        0x1.46c5cbcd7fc3p-1 } };
+    const geode::Point3D s0{ { -0x1.c5dc4c87e12fbp-1, 0x1.29b68453935d4p+2,
+        -0x1.fe4a9aa583717p+1 } };
+    const geode::Point3D s1{ { -0x1.d05a434b20318p+1, 0x1.bd4a334a649d7p+1,
+        -0x1.435f6a4e39e6ap+1 } };
+    const auto separated = geode::segment_triangle_intersection(
+        geode::Segment3D{ s0, s1 }, geode::Triangle3D{ u0, u1, u2 } );
+    geode::OpenGeodeGeometryException::test( !separated.has_intersection(),
+        "Wrong result for segment_triangle_intersection with nearly parallel "
+        "segment far from the triangle" );
+
+    // Segment within GLOBAL_EPSILON of the triangle plane, crossing the
+    // triangle: coplanar
+    const geode::Point3D v0{ { -0x1.34e94ffeb0b77p+2, 0x1.7f8acdaf49f1p-1,
+        -0x1.701bf0d23d0dep+1 } };
+    const geode::Point3D v1{ { -0x1.75576fd208f7dp+1, -0x1.df8314931b436p+1,
+        -0x1.8d5159c2c416cp+1 } };
+    const geode::Point3D v2{ { -0x1.2ba7aa65ac70cp+2, 0x1.be0852a8488ecp+0,
+        -0x1.f8d8c7d15f43p-1 } };
+    const geode::Point3D r0{ { -0x1.18520a425ac3p+2, -0x1.4de1d1066c5a4p-1,
+        -0x1.b6f8dd0dbbc99p+1 } };
+    const geode::Point3D r1{ { -0x1.e00dc3000ad1dp+1, 0x1.21443b30d1609p-1,
+        0x1.6b4680dfa430dp-2 } };
+    const geode::Triangle3D crossed{ v0, v1, v2 };
+    const geode::Segment3D crossing_segment{ r0, r1 };
+    const auto crossing =
+        geode::segment_triangle_intersection( crossing_segment, crossed );
+    geode::OpenGeodeGeometryException::test(
+        crossing.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong result for segment_triangle_intersection with segment in the "
+        "triangle plane" );
+}
+
+void check_crossing_2d(
+    const geode::IntersectionResult< geode::Point2D >& result,
+    const geode::Segment2D& segment,
+    std::string_view message )
+{
+    geode::OpenGeodeGeometryException::test(
+        result.type == geode::INTERSECTION_TYPE::parallel
+            || ( result.has_intersection()
+                 && geode::point_segment_distance(
+                        result.result.value(), segment )
+                        < geode::GLOBAL_EPSILON ),
+        message );
+}
+
+void test_segment_intersection_2d_near_parallel()
+{
+    // Overlapping collinear segments
+    const geode::Point2D a0{ { 0x1.e61fc9a188e38p-1, -0x1.bdfbf5d1ccdap-2 } };
+    const geode::Point2D a1{ { 0x1.c49cd43cb87fp-2, 0x1.26f1d4fc386p+0 } };
+    const geode::Point2D b0{ { 0x1.a360a0922c338p-2, 0x1.40f0a59bb274ep+0 } };
+    const geode::Point2D b1{ { 0x1.058b4a4de5bbep-1, 0x1.dfa46c2b6bb7cp-1 } };
+    const auto collinear = geode::segment_segment_intersection(
+        geode::Segment2D{ a0, a1 }, geode::Segment2D{ b0, b1 } );
+    geode::OpenGeodeGeometryException::test(
+        collinear.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong result for segment_segment_intersection with overlapping "
+        "collinear segments" );
+
+    // Segments crossing with a small angle
+    const geode::Point2D c0{ { 0x1.f1bbfa740ad58p+1, 0x1.606b05c300968p-1 } };
+    const geode::Point2D c1{ { -0x1.8bc65165933fp+1, -0x1.9af77575d819p-1 } };
+    const geode::Point2D d0{ { 0x1.8ea5460de60cap+2, 0x1.302cc0c7eeb69p+0 } };
+    const geode::Point2D d1{ { 0x1.d85dfda85a6bap+1, 0x1.4abec5ea95587p-1 } };
+    const geode::Segment2D segment_c{ c0, c1 };
+    const geode::Segment2D segment_d{ d0, d1 };
+    check_crossing_2d(
+        geode::segment_segment_intersection( segment_c, segment_d ), segment_c,
+        "Wrong result for segment_segment_intersection with small angle" );
+    check_crossing_2d( geode::segment_line_intersection(
+                           segment_c, geode::InfiniteLine2D{ segment_d } ),
+        segment_c,
+        "Wrong result for segment_line_intersection with small angle" );
+}
+
+void test_near_parallel_planes_intersection()
+{
+    // Planes with an angle of 1e-5
+    const geode::Point3D origin0{ { 3, 4, 5 } };
+    const geode::Vector3D normal0{ { 0, 0, 1 } };
+    const geode::Point3D origin1{ { -2, 1, -3 } };
+    const geode::Vector3D normal1{ { 0, 1e-5, 1 } };
+    const geode::Plane plane0{ normal0, origin0 };
+    const geode::Plane plane1{ normal1, origin1 };
+    const auto planes = geode::plane_plane_intersection( plane0, plane1 );
+    geode::OpenGeodeGeometryException::test( planes.has_intersection(),
+        "Wrong result for plane_plane_intersection with nearly parallel "
+        "planes" );
+    const auto& line = planes.result.value();
+    for( const auto t : { 0., 1., -10. } )
+    {
+        const auto point = line.origin() + line.direction() * t;
+        geode::OpenGeodeGeometryException::test(
+            std::get< 0 >( geode::point_plane_distance( point, plane0 ) )
+                    < geode::GLOBAL_EPSILON
+                && std::get< 0 >( geode::point_plane_distance( point, plane1 ) )
+                       < geode::GLOBAL_EPSILON,
+            "Wrong line for plane_plane_intersection with nearly parallel "
+            "planes" );
+    }
+
+    // Planes with an angle below GLOBAL_EPSILON: parallel
+    const geode::Point3D origin2{ { -0x1.1afe28d3d8774p+0,
+        -0x1.8b34a1799de93p+1, -0x1.9f276e61666fcp+0 } };
+    const geode::Vector3D normal2{ { -0x1.4f9f1b072e83bp-1,
+        0x1.42e543054b722p-1, -0x1.a965a61857dccp-2 } };
+    const geode::Point3D origin3{ { -0x1.fa1659e5b6684p+0,
+        -0x1.770e0cff20488p+0, 0x1.02ed32a70e25cp+1 } };
+    const geode::Vector3D normal3{ { -0x1.4f9f252f05046p-1,
+        0x1.42e52d84f60b6p-1, -0x1.a965c753cc90dp-2 } };
+    const auto parallel_planes = geode::plane_plane_intersection(
+        geode::Plane{ normal2, origin2 }, geode::Plane{ normal3, origin3 } );
+    geode::OpenGeodeGeometryException::test(
+        parallel_planes.type == geode::INTERSECTION_TYPE::none,
+        "Wrong result for plane_plane_intersection with planes parallel up "
+        "to GLOBAL_EPSILON" );
+
+    // Circle in the plane (up to GLOBAL_EPSILON)
+    const geode::Point3D origin{ { -0x1.94d1db9854a7p+0, 0x1.68e1433c9226ep+1,
+        -0x1.eeedf6fe2fed8p-1 } };
+    const geode::Vector3D normal{ { -0x1.f86da7c7ff3bp-3, 0x1.2044a2b12fc87p-2,
+        -0x1.dad53f776a8e3p-1 } };
+    const geode::Point3D center{ { -0x1.2537df0082acdp+0, 0x1.5151b3ba60958p+0,
+        -0x1.89ccc55b8a3d2p+0 } };
+    const geode::Vector3D circle_normal{ { -0x1.f86da7d8c3964p-3,
+        0x1.2044a28e94a6ep-2, -0x1.dad53f7b8e24bp-1 } };
+    const geode::Plane plane{ normal, origin };
+    const geode::Plane circle_plane{ circle_normal, center };
+    const geode::Circle circle{ circle_plane, 0x1.224e1deef52adp-4 };
+    const auto coplanar = geode::plane_circle_intersection( plane, circle );
+    geode::OpenGeodeGeometryException::test(
+        coplanar.type == geode::INTERSECTION_TYPE::parallel,
+        "Wrong result for plane_circle_intersection with circle in the "
+        "plane" );
+}
+
 void test_degenerated_segment_sphere_intersection( double length )
 {
     const geode::Point3D origin{ { 0, 0, 0 } };
@@ -1549,6 +1782,10 @@ void test_line_sphere_intersection_robustness()
 
 void test()
 {
+    test_near_parallel_planes_intersection();
+    test_segment_intersection_2d_near_parallel();
+    test_triangle_intersection_near_parallel();
+    test_small_sphere_intersection();
     test_line_sphere_intersection();
     test_segment_sphere_intersection();
     test_line_line_intersection();

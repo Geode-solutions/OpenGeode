@@ -39,6 +39,7 @@
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
+#include <geode/geometry/internal/position_from_sides.hpp>
 #include <geode/geometry/mensuration.hpp>
 #include <geode/geometry/perpendicular.hpp>
 #include <geode/geometry/projection.hpp>
@@ -48,25 +49,31 @@
 namespace
 {
     /*
-     * This function tests if the point is in the triangle by computing signed
-     * areas
-     * @warning This is not robust in edge cases!
+     * This function tests if the point is in the triangle using exact
+     * orientation predicates
      */
     bool may_point_be_in_triangle(
         const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
         const auto& vertices = triangle.vertices();
-        const auto signed_area_1 = geode::triangle_signed_area(
+        const auto sign_1 = geode::triangle_area_sign(
             geode::Triangle2D{ vertices[0], vertices[1], point } );
-        const auto signed_area_2 = geode::triangle_signed_area(
+        const auto sign_2 = geode::triangle_area_sign(
             geode::Triangle2D{ vertices[1], vertices[2], point } );
-        const auto signed_area_3 = geode::triangle_signed_area(
+        const auto sign_3 = geode::triangle_area_sign(
             geode::Triangle2D{ vertices[2], vertices[0], point } );
-
-        return ( signed_area_1 <= 0. && signed_area_2 <= 0.
-                   && signed_area_3 <= 0 )
-               || ( signed_area_1 >= 0. && signed_area_2 >= 0.
-                    && signed_area_3 >= 0 );
+        if( sign_1 == geode::SIGN::zero && sign_2 == geode::SIGN::zero
+            && sign_3 == geode::SIGN::zero )
+        {
+            // Flat triangle and aligned point: decided by the edge distances
+            return false;
+        }
+        return ( sign_1 != geode::SIGN::positive
+                   && sign_2 != geode::SIGN::positive
+                   && sign_3 != geode::SIGN::positive )
+               || ( sign_1 != geode::SIGN::negative
+                    && sign_2 != geode::SIGN::negative
+                    && sign_3 != geode::SIGN::negative );
     }
 
     void get_min_edge02( double a11, double b1, std::array< double, 2 >& p )
@@ -859,63 +866,29 @@ namespace geode
         segment_line_distance( const Segment< dimension >& segment,
             const InfiniteLine< dimension >& line )
     {
-        const Vector< dimension > segDirection{ segment.vertices()[0],
+        const Vector< dimension > segment_direction{ segment.vertices()[0],
             segment.vertices()[1] };
-        const Vector< dimension > diff{ segment.vertices()[0], line.origin() };
-        const auto a00 = line.direction().dot( line.direction() );
-        const auto a01 = -line.direction().dot( segDirection );
-        const auto a11 = segDirection.dot( segDirection );
-        const auto b0 = line.direction().dot( diff );
-        const auto det = std::max( a00 * a11 - a01 * a01, 0. );
-        double s0, s1;
-
-        if( det > 0 )
-        {
-            // The line and segment are not parallel.
-            const auto b1 = -segDirection.dot( diff );
-            s1 = a01 * b0 - a00 * b1;
-
-            if( s1 >= 0 )
-            {
-                if( s1 <= det )
-                {
-                    // Two interior points are closest, one on the line
-                    // and one on the segment.
-                    s0 = ( a01 * b1 - a11 * b0 ) / det;
-                    s1 /= det;
-                }
-                else
-                {
-                    // The endpoint Q1 of the segment and an interior
-                    // point of the line are closest.
-                    s0 = -( a01 + b0 ) / a00;
-                    s1 = 1;
-                }
-            }
-            else
-            {
-                // The endpoint Q0 of the segment and an interior point
-                // of the line are closest.
-                s0 = -b0 / a00;
-                s1 = 0;
-            }
-        }
-        else
-        {
-            // The line and segment are parallel. Select the pair of
-            // closest points where the closest segment point is the
-            // endpoint Q0.
-            s0 = -b0 / a00;
-            s1 = 0;
-        }
-        std::tuple< double, geode::Point< dimension >,
-            geode::Point< dimension > >
-            result;
-        auto& [distance, closest_on_segment, closest_on_line] = result;
-        closest_on_line = line.origin() + line.direction() * s0;
-        closest_on_segment = segment.vertices()[0].get() + segDirection * s1;
-        distance = point_point_distance( closest_on_line, closest_on_segment );
-        return result;
+        const auto& line_direction = line.direction();
+        const auto terms =
+            segment_segment_terms( line_direction, segment_direction,
+                Vector< dimension >{ segment.vertices()[0], line.origin() } );
+        // det = a*c*sin^2(angle): the segment is parallel to the line when it
+        // deviates from the line direction by less than GLOBAL_EPSILON, i.e.
+        // c*sin^2(angle) < GLOBAL_EPSILON^2. The squared distance to the line
+        // is convex along the segment: clamp its minimum on the segment.
+        const auto parameter =
+            terms.det
+                    > GLOBAL_EPSILON * GLOBAL_EPSILON * line_direction.length2()
+                ? clamp_parameter( terms.t_numerator, terms.det )
+                : 0.;
+        auto closest_on_segment =
+            segment_point( segment, segment_direction, parameter );
+        auto closest_on_line =
+            point_line_projection( closest_on_segment, line );
+        const auto distance =
+            point_point_distance( closest_on_line, closest_on_segment );
+        return { distance, std::move( closest_on_segment ),
+            std::move( closest_on_line ) };
     }
 
     template < index_t dimension >
@@ -1005,55 +978,41 @@ namespace geode
     std::tuple< double, Point3D, Point3D > line_triangle_distance(
         const InfiniteLine3D& line, const Triangle3D& triangle )
     {
-        // The line points are X = P + t * D and the triangle points
-        // are Y = b[0] * V[0] + b[1] * V[1] + b[2] * V[2], where the
-        // barycentric coordinates satisfy b[i] in [0,1] and
-        // b[0] + b[1] + b[2 = 1. Define the triangle edge directions by
-        // E[1] = V[1] - V[0] and E[2] = V[2] - V[0]; then
-        // Y = V[0] + b1 * E[1] + b2 * E[2]. If Y is specified the
-        // barycentric coordinates are the solution to
-        //
-        // +-                        -+ +-    -+   +-                 -+
-        // | Dot(E1, E1)  Dot(E1, E2) | | b[1] | = | Dot(E1, Y - V[0]) |
-        // | Dot(E1, E2)  Dot(E2, E2) | | b[2] |   | Dot(E2, Y - V[0]) |
-        // +-                        -+ +-    -+   +-                 -+
-        //
-        // and b[0] = 1 - b[1] - b[2].
-
-        // Test whether the line intersects triangle. If so, the squared
-        // distance is zero. The normal of the plane of the triangle does
-        // not have to be normalized to unit length.
+        // Test whether the line intersects triangle with exact predicates: the
+        // line is on the same side of the three triangle edges. If so, the
+        // distance is zero at the intersection with the triangle plane.
         const auto& vertices = triangle.vertices();
-        const Vector3D E1{ vertices[0], vertices[1] };
-        const Vector3D E2{ vertices[0], vertices[2] };
-        const auto N = E1.cross( E2 );
-        const auto NdD = N.dot( line.direction() );
-        if( std::fabs( NdD ) > 0 )
+        const auto& origin = line.origin();
+        const Point3D destination = origin + line.direction();
+        local_index_t nb_positive{ 0 };
+        local_index_t nb_negative{ 0 };
+        for( const auto v : LRange{ 3 } )
         {
-            // The line and triangle are not parallel, so the line
-            // intersects the plane of the triangle at a point Y.
-            // Determine whether Y is contained by the triangle.
-            const Vector3D PmV0{ vertices[0], line.origin() };
-            const auto NdDiff = N.dot( PmV0 );
-            const auto tIntersect = -NdDiff / NdD;
-            const auto Y = line.origin() + line.direction() * tIntersect;
-            const Vector3D YmV0{ vertices[0], Y };
-
-            // Compute the barycentric coordinates of the intersection.
-            const auto E1dE1 = E1.dot( E1 );
-            const auto E1dE2 = E1.dot( E2 );
-            const auto E2dE2 = E2.dot( E2 );
-            const auto E1dYmV0 = E1.dot( YmV0 );
-            const auto E2dYmV0 = E2.dot( YmV0 );
-            const auto det = E1dE1 * E2dE2 - E1dE2 * E1dE2;
-            const auto b1 = ( E2dE2 * E1dYmV0 - E1dE2 * E2dYmV0 ) / det;
-            const auto b2 = ( E1dE1 * E2dYmV0 - E1dE2 * E1dYmV0 ) / det;
-            const auto b0 = 1 - b1 - b2;
-
-            if( b0 >= 0 && b1 >= 0 && b2 >= 0 )
+            const auto next = v == 2 ? 0 : v + 1;
+            const auto sign = tetrahedron_volume_sign( Tetrahedron{
+                origin, destination, vertices[v], vertices[next] } );
+            nb_positive += sign == SIGN::positive ? 1 : 0;
+            nb_negative += sign == SIGN::negative ? 1 : 0;
+        }
+        if( ( nb_positive == 0 ) != ( nb_negative == 0 ) )
+        {
+            const Vector3D E1{ vertices[0], vertices[1] };
+            const Vector3D E2{ vertices[0], vertices[2] };
+            const auto N = E1.cross( E2 );
+            const auto NdD = N.dot( line.direction() );
+            if( NdD != 0 )
             {
-                // The point Y is contained by the triangle.
-                return { 0, Y, Y };
+                const Vector3D PmV0{ vertices[0], origin };
+                const auto Y =
+                    origin + line.direction() * ( -N.dot( PmV0 ) / NdD );
+                // Y is approximated: far from the triangle for nearly
+                // parallel lines, then decided by the edge distances
+                auto [distance, closest] =
+                    point_triangle_distance( Y, triangle );
+                if( distance <= GLOBAL_EPSILON )
+                {
+                    return { distance, Y, std::move( closest ) };
+                }
             }
         }
 
@@ -1252,34 +1211,31 @@ namespace geode
     std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        std::array< double, 4 > lambdas;
-        bool degenerated{ false };
-        try
+        // Facets seen from the point (with exact predicates): the closest
+        // point is on one of them, and there is none for an inside point. A
+        // flat tetrahedron is the union of its facets.
+        const auto orientation = internal::tetrahedron_orientation( tetra );
+        std::array< bool, 4 > visible;
+        for( const auto facet : LRange{ 4 } )
         {
-            lambdas = tetrahedron_barycentric_coordinates( point, tetra );
-            degenerated = !absl::c_all_of( lambdas, []( double lambda ) {
-                return std::isfinite( lambda );
-            } );
+            visible[facet] = orientation == GEO::zero
+                             || internal::point_tetrahedron_facet_inner_sign(
+                                    point, tetra, facet, orientation )
+                                    == GEO::negative;
         }
-        catch( const OpenGeodeException& /*unused*/ )
-        {
-            degenerated = true;
-        }
-        if( !degenerated && absl::c_all_of( lambdas, []( double lambda ) {
-                return lambda >= 0;
+        if( absl::c_none_of( visible, []( bool seen ) {
+                return seen;
             } ) )
         {
             return { 0.0, point };
         }
-        // The closest point lies on a facet seen from the point (negative
-        // barycentric coordinate), not necessarily the most negative one
         const auto& vertices = tetra.vertices();
         std::tuple< double, Point3D > result{
             std::numeric_limits< double >::max(), point
         };
         for( const auto facet : LRange{ 4 } )
         {
-            if( !degenerated && lambdas[facet] >= 0 )
+            if( !visible[facet] )
             {
                 continue;
             }
@@ -1339,8 +1295,9 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < GLOBAL_EPSILON )
+        if( center_to_point.length2() == 0 )
         {
+            // No direction: any sphere point is the closest one
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
             return { sphere.radius(),
@@ -1355,8 +1312,9 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
         const Vector< dimension > center_to_point{ sphere.origin(), point };
-        if( center_to_point.length() < GLOBAL_EPSILON )
+        if( center_to_point.length2() == 0 )
         {
+            // No direction: any sphere point is the closest one
             Vector< dimension > dummy_direction;
             dummy_direction.set_value( 0, 1 );
             return { -sphere.radius(),
@@ -1515,7 +1473,10 @@ namespace geode
             zPos[i] = locY[i] / locE[i];
             sum_z_squared += zPos[i] * zPos[i];
         }
-        if( std::fabs( sum_z_squared - 1 ) < geode::GLOBAL_EPSILON )
+        // The point is at most (sqrt(sum_z_squared) - 1) * emax away from the
+        // ellipse (emax = locE[0])
+        if( std::fabs( std::sqrt( sum_z_squared ) - 1 ) * locE[0]
+            < geode::GLOBAL_EPSILON )
         {
             for( const auto i : geode::LRange{ number_of_components } )
             {

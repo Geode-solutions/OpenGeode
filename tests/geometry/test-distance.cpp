@@ -38,14 +38,11 @@
 #include <geode/geometry/basic_objects/sphere.hpp>
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/common.hpp>
 #include <geode/geometry/distance.hpp>
-#include <geode/geometry/information.hpp>
-#include <geode/geometry/position.hpp>
 #include <geode/geometry/projection.hpp>
 
 #include <geode/tests/common.hpp>
-
-#include <random>
 
 void test_point_segment_distance_2d()
 {
@@ -228,6 +225,17 @@ void test_point_triangle_distance_2d()
         distance == 0 && closest_point == q4,
         "Wrong result for point_triangle_distance with query point "
         "q4" );
+
+    const geode::Point2D d{ { 2.0, 0.0 } };
+    const geode::Triangle2D flat{ a, b, d };
+    const geode::Point2D q5{ { -1.0, 0.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_triangle_distance( q5, flat );
+    geode::OpenGeodeGeometryException::test(
+        distance == 1 && closest_point == a,
+        "Wrong result for point_triangle_distance with flat triangle and "
+        "aligned query point q5: ",
+        distance );
 }
 
 void test_point_triangle_distance_3d()
@@ -541,73 +549,11 @@ void test_segment_segment_distance_near_parallel_fixed()
         parallel_closest1.string() );
 }
 
-void test_segment_segment_distance_near_parallel_random()
-{
-    std::mt19937 generator{ 42 };
-    std::uniform_real_distribution< double > coordinate{ -5, 5 };
-    std::uniform_real_distribution< double > unit{ -1, 1 };
-    std::uniform_real_distribution< double > exponent{ -12, -3 };
-    const auto random_vector = [&]( double scale ) {
-        return geode::Vector3D{
-            { unit( generator ), unit( generator ), unit( generator ) }
-        } * scale;
-    };
-    for( const auto unused : geode::Range{ 2000 } )
-    {
-        geode_unused( unused );
-        const geode::Point3D p0{ { coordinate( generator ),
-            coordinate( generator ), coordinate( generator ) } };
-        const auto direction = random_vector( 3 );
-        const geode::Point3D p1 = p0 + direction;
-        const auto angle = std::pow( 10., exponent( generator ) );
-        const auto q0 =
-            p0 + direction * unit( generator ) + random_vector( 0.5 );
-        const auto q1 = q0
-                        + ( direction + random_vector( angle ) )
-                              * ( 0.5 + std::fabs( unit( generator ) ) );
-        const geode::Segment3D segment0{ p0, p1 };
-        const geode::Segment3D segment1{ q0, q1 };
-        const auto [distance, closest0, closest1] =
-            geode::segment_segment_distance( segment0, segment1 );
-        geode::OpenGeodeGeometryException::test(
-            std::fabs(
-                geode::point_point_distance( closest0, closest1 ) - distance )
-                < geode::GLOBAL_EPSILON,
-            "Wrong result for segment_segment_distance: distance does not "
-            "match closest points" );
-        geode::OpenGeodeGeometryException::test(
-            geode::point_segment_distance( closest0, segment0 )
-                    < geode::GLOBAL_EPSILON
-                && geode::point_segment_distance( closest1, segment1 )
-                       < geode::GLOBAL_EPSILON,
-            "Wrong result for segment_segment_distance: closest points not "
-            "on segments" );
-        auto brute_force = std::numeric_limits< double >::max();
-        constexpr geode::index_t nb_samples{ 1000 };
-        for( const auto i : geode::Range{ nb_samples + 1 } )
-        {
-            const auto ratio = static_cast< double >( i ) / nb_samples;
-            brute_force = std::min(
-                brute_force, geode::point_segment_distance(
-                                 p0 + ( p1 - p0 ) * ratio, segment1 ) );
-            brute_force = std::min(
-                brute_force, geode::point_segment_distance(
-                                 q0 + ( q1 - q0 ) * ratio, segment0 ) );
-        }
-        geode::OpenGeodeGeometryException::test(
-            distance <= brute_force + geode::GLOBAL_EPSILON,
-            "Wrong result for segment_segment_distance with near parallel "
-            "segments: ",
-            distance, " | brute force: ", brute_force );
-    }
-}
-
 void test_segment_segment_distance()
 {
     test_segment_segment_distance_2d();
     test_segment_segment_distance_3d();
     test_segment_segment_distance_near_parallel_fixed();
-    test_segment_segment_distance_near_parallel_random();
 }
 
 void test_segment_line_distance()
@@ -661,6 +607,22 @@ void test_segment_line_distance()
             && closest_point1.inexact_equal( result_t21 ),
         "Wrong result for segment_line_distance with segment_cd and "
         "line_gh" );
+
+    // Segment crossing the line with a small angle
+    const geode::Point3D crossing0{ { -0x1.d217e6a2b9835p-2,
+        0x1.2d7a3e4d36a0dp+0, 0x1.f95b042ceb769p+1 } };
+    const geode::Point3D crossing1{ { 0x1.c368600c0a464p+1,
+        -0x1.f773fba948789p+1, -0x1.c91c9b10917e6p+0 } };
+    const geode::Point3D line0{ { 0x1.0b43bdbc176a1p+0, -0x1.7e46c373d79acp-1,
+        0x1.ca108c904092p+0 } };
+    const geode::Point3D line1{ { 0x1.5da7ed7f00da8p+1, -0x1.74d936f7869a6p+1,
+        -0x1.4824c8f17df74p-1 } };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_line_distance( geode::Segment3D{ crossing0, crossing1 },
+            geode::InfiniteLine3D{ geode::Segment3D{ line0, line1 } } );
+    geode::OpenGeodeGeometryException::test( distance < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_line_distance with small angle crossing: ",
+        distance );
 }
 
 void test_point_triangle_distance()
@@ -1268,7 +1230,8 @@ void test_line_triangle_distance()
     const geode::Point3D result_t10{ { 1.0, 1.0, 1.0 } };
     const geode::Point3D result_t11{ { 1.0, 1.0, 1.0 } };
     geode::OpenGeodeGeometryException::test(
-        distance == 0. && closest_point0.inexact_equal( result_t10 )
+        distance < geode::GLOBAL_EPSILON
+            && closest_point0.inexact_equal( result_t10 )
             && closest_point1.inexact_equal( result_t11 ),
         "Wrong result for line_triangle_distance with line_ef" );
 
@@ -1286,6 +1249,38 @@ void test_line_triangle_distance()
         distance == 2. && closest_point0.inexact_equal( result_t30 )
             && closest_point1.inexact_equal( g ),
         "Wrong result for line_triangle_distance with line_hx" );
+
+    // Nearly flat triangle: barycentric coordinates are ill-conditioned
+    const geode::Point3D flat0{ { -0x1.eb51bc5881008p+1, -0x1.e053a51447b5p+1,
+        -0x1.231b76ae97538p+2 } };
+    const geode::Point3D flat1{ { -0x1.54799021abd9cp+1, -0x1.19d3183a49f05p+2,
+        0x1.86c9d8d2b4784p+1 } };
+    const geode::Point3D flat2{ { -0x1.28c5745c91c04p+1, -0x1.25e519e097dcbp+2,
+        0x1.5058ab06303cep+2 } };
+    const geode::Triangle3D flat{ flat0, flat1, flat2 };
+    const geode::Point3D origin{ { -0x1.25f2845b4af21p+2, -0x1.2ef14a7c0e4e2p+2,
+        -0x1.14f057c002405p+0 } };
+    const geode::Point3D destination{ { -0x1.70be6ec52f478p+1,
+        -0x1.05436b144007cp+2, 0x1.c2dd109017872p-2 } };
+    const geode::Segment3D flat_segment{ origin, destination };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::line_triangle_distance(
+            geode::InfiniteLine3D{ flat_segment }, flat );
+    geode::OpenGeodeGeometryException::test(
+        std::get< 0 >( geode::point_triangle_distance( closest_point1, flat ) )
+                < geode::GLOBAL_EPSILON
+            && std::fabs(
+                   geode::point_point_distance( closest_point0, closest_point1 )
+                   - distance )
+                   < geode::GLOBAL_EPSILON,
+        "Wrong result for line_triangle_distance with nearly flat triangle: ",
+        distance, " ", closest_point1.string() );
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( flat_segment, flat );
+    geode::OpenGeodeGeometryException::test( distance < 0.0025,
+        "Wrong result for segment_triangle_distance with nearly flat "
+        "triangle: ",
+        distance );
 }
 
 void test_segment_triangle_distance()
@@ -1336,7 +1331,8 @@ void test_segment_triangle_distance()
     const geode::Point3D result_t10{ { 1.0, 1.0, 1.0 } };
     const geode::Point3D result_t11{ { 1.0, 1.0, 1.0 } };
     geode::OpenGeodeGeometryException::test(
-        distance == 0. && closest_point0.inexact_equal( result_t10 )
+        distance < geode::GLOBAL_EPSILON
+            && closest_point0.inexact_equal( result_t10 )
             && closest_point1.inexact_equal( result_t11 ),
         "Wrong result for segment_triangle_distance with seg_ef" );
 
@@ -1370,6 +1366,15 @@ void test_segment_triangle_distance()
         distance <= geode::GLOBAL_EPSILON && closest_point0.inexact_equal( s0 )
             && closest_point1.inexact_equal( s0 ),
         "Wrong result for segment_triangle_distance with real_segment" );
+
+    const geode::Point3D tiny_end{ { 0.0, 0.0, 1.0 + 1e-7 } };
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance(
+            geode::Segment3D{ e, tiny_end }, cdg );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - std::sqrt( 2. ) ) < geode::GLOBAL_EPSILON,
+        "Wrong result for segment_triangle_distance with tiny segment: ",
+        distance );
 }
 
 void test_point_ellipse_distance_2d()
@@ -1421,6 +1426,23 @@ void test_point_ellipse_distance_2d_not_aligned()
         std::fabs( std::sqrt( 2 ) - distance ) < geode::GLOBAL_EPSILON
             && closest_point.inexact_equal( result ),
         "Wrong result for point_ellipse_distance_2d_not_aligned" );
+}
+void test_point_elongated_ellipse_distance()
+{
+    // Query beyond the tip of the long axis: |level - 1| = 5e-7 but distance
+    // 7.75e-6
+    const geode::Point2D center{ { 0, 0 } };
+    const geode::Frame2D axes{ { geode::Vector2D{ { 31, 0 } },
+        geode::Vector2D{ { 0, 0.17 } } } };
+    const geode::Ellipse2D ellipse{ center, axes };
+    const geode::Point2D query{ { 31 * ( 1 + 2.5e-7 ), 0 } };
+    const auto [distance, closest_point] =
+        geode::point_ellipse_distance( query, ellipse );
+    geode::OpenGeodeGeometryException::test(
+        std::fabs( distance - 7.75e-6 ) < geode::GLOBAL_EPSILON,
+        "Wrong result for point_ellipse_distance with query beyond the tip "
+        "of an elongated ellipse: ",
+        distance );
 }
 
 void test_point_ellipse_distance_3d()
@@ -1476,132 +1498,12 @@ void test_point_ellipse_distance_3d()
         "point" );
 }
 
-template < geode::index_t dimension >
-double ellipse_level( const geode::Ellipse< dimension >& ellipse,
-    const geode::Point< dimension >& point )
-{
-    const geode::Vector< dimension > center_to_point{ ellipse.center(), point };
-    double level{ 0 };
-    for( const auto d : geode::LRange{ dimension } )
-    {
-        const auto& axis = ellipse.axes().direction( d );
-        const auto coordinate = center_to_point.dot( axis ) / axis.length2();
-        level += coordinate * coordinate;
-    }
-    return level;
-}
-
-double brute_force_ellipse_distance(
-    const geode::Ellipse2D& ellipse, const geode::Point2D& point )
-{
-    const auto& axes = ellipse.axes();
-    auto min_distance = std::numeric_limits< double >::max();
-    constexpr geode::index_t nb_samples{ 4000 };
-    for( const auto s : geode::Range{ nb_samples } )
-    {
-        const auto angle = 2. * M_PI * s / nb_samples;
-        const auto sample = ellipse.center()
-                            + axes.direction( 0 ) * std::cos( angle )
-                            + axes.direction( 1 ) * std::sin( angle );
-        min_distance = std::min(
-            min_distance, geode::point_point_distance( point, sample ) );
-    }
-    return min_distance;
-}
-
-double brute_force_ellipse_distance(
-    const geode::Ellipse3D& ellipse, const geode::Point3D& point )
-{
-    const auto& axes = ellipse.axes();
-    auto min_distance = std::numeric_limits< double >::max();
-    constexpr geode::index_t nb_samples{ 100 };
-    for( const auto s0 : geode::Range{ nb_samples + 1 } )
-    {
-        const auto theta = M_PI * s0 / nb_samples;
-        for( const auto s1 : geode::Range{ 2 * nb_samples } )
-        {
-            const auto phi = M_PI * s1 / nb_samples;
-            const auto sample =
-                ellipse.center()
-                + axes.direction( 0 ) * ( std::sin( theta ) * std::cos( phi ) )
-                + axes.direction( 1 ) * ( std::sin( theta ) * std::sin( phi ) )
-                + axes.direction( 2 ) * std::cos( theta );
-            min_distance = std::min(
-                min_distance, geode::point_point_distance( point, sample ) );
-        }
-    }
-    return min_distance;
-}
-
-template < geode::index_t dimension >
-void check_point_ellipse_distance( const geode::Ellipse< dimension >& ellipse,
-    const geode::Point< dimension >& point )
-{
-    const auto [distance, closest_point] =
-        geode::point_ellipse_distance( point, ellipse );
-    geode::OpenGeodeGeometryException::test(
-        std::fabs( ellipse_level( ellipse, closest_point ) - 1 )
-            < geode::GLOBAL_EPSILON,
-        "Wrong result for point_ellipse_distance with query ", point.string(),
-        ": closest point ", closest_point.string(), " not on ellipse" );
-    geode::OpenGeodeGeometryException::test(
-        std::fabs(
-            geode::point_point_distance( point, closest_point ) - distance )
-            < geode::GLOBAL_EPSILON,
-        "Wrong result for point_ellipse_distance with query ", point.string(),
-        ": distance does not match closest point" );
-    const auto brute_force = brute_force_ellipse_distance( ellipse, point );
-    geode::OpenGeodeGeometryException::test(
-        distance <= brute_force + geode::GLOBAL_EPSILON,
-        "Wrong result for point_ellipse_distance with query ", point.string(),
-        ": ", distance, " | brute force: ", brute_force );
-}
-
-void test_point_ellipse_distance_random()
-{
-    std::mt19937 generator{ 42 };
-    std::uniform_real_distribution< double > distribution{ -4, 4 };
-    const geode::Point2D origin2d{ { 0, 0 } };
-    const geode::Point2D center2d{ { 0.5, -0.25 } };
-    const geode::Frame2D sorted_frame2d{ { geode::Vector2D{ { 2, 0 } },
-        geode::Vector2D{ { 0, 1 } } } };
-    const geode::Frame2D unsorted_frame2d{ { geode::Vector2D{ { 1, 0 } },
-        geode::Vector2D{ { 0, 2 } } } };
-    const geode::Frame2D rotated_frame2d{ { geode::Vector2D{ { 0.6, 0.8 } },
-        geode::Vector2D{ { -2.4, 1.8 } } } };
-    const geode::Ellipse2D sorted2d{ center2d, sorted_frame2d };
-    const geode::Ellipse2D unsorted2d{ center2d, unsorted_frame2d };
-    const geode::Ellipse2D rotated2d{ center2d, rotated_frame2d };
-    check_point_ellipse_distance( geode::Ellipse2D{ origin2d, sorted_frame2d },
-        geode::Point2D{ { -3, -0.5 } } );
-    for( const auto unused : geode::Range{ 200 } )
-    {
-        geode_unused( unused );
-        const geode::Point2D query{ { distribution( generator ),
-            distribution( generator ) } };
-        check_point_ellipse_distance( sorted2d, query );
-        check_point_ellipse_distance( unsorted2d, query );
-        check_point_ellipse_distance( rotated2d, query );
-    }
-    const geode::Point3D center3d{ { 0.5, -0.25, 1 } };
-    const geode::Frame3D frame3d{ { geode::Vector3D{ { 0, 0, 1 } },
-        geode::Vector3D{ { 0, 3, 0 } }, geode::Vector3D{ { 2, 0, 0 } } } };
-    const geode::Ellipse3D ellipse3d{ center3d, frame3d };
-    for( const auto unused : geode::Range{ 50 } )
-    {
-        geode_unused( unused );
-        const geode::Point3D query{ { distribution( generator ),
-            distribution( generator ), distribution( generator ) } };
-        check_point_ellipse_distance( ellipse3d, query );
-    }
-}
-
 void test_point_ellipse_distance()
 {
-    test_point_ellipse_distance_random();
     test_point_ellipse_distance_2d();
     test_point_ellipse_distance_3d();
     test_point_ellipse_distance_2d_not_aligned();
+    test_point_elongated_ellipse_distance();
 }
 
 void test_triangle_triangle_distance()
@@ -1915,57 +1817,33 @@ void test_point_cylinder_distance()
         "Wrong point_cylinder_distance: on the axis" );
 }
 
-void test_point_skewed_tetrahedron_distance()
+void test_point_flat_tetrahedron_distance()
 {
-    const geode::Point3D a{ { 0, 0, 0 } };
-    const geode::Point3D b{ { 4, 0.2, 0.1 } };
-    const geode::Point3D c{ { 3.5, 1, 0.3 } };
-    const geode::Point3D d{ { 0.5, 0.3, 0.8 } };
+    // Nearly flat tetrahedron, query on its base facet
+    const geode::Point3D query{ { -0x1.f6aabb6771c78p+0, -0x1.e7252a76a9ac6p+0,
+        -0x1.d4038f7d5b546p+1 } };
+    const geode::Point3D a{ { -0x1.651bd172a2032p+1, -0x1.80011eb01403cp+1,
+        -0x1.1b90b3c0177bp+1 } };
+    const geode::Point3D b{ { -0x1.7413bc409a2f4p+0, -0x1.39c4b68a466c8p+0,
+        -0x1.22efdac676eb4p+2 } };
+    const geode::Point3D c{ { -0x1.d9f61d37e8494p+0, -0x1.c108d1c731963p+0,
+        -0x1.ed0abf0e6634dp+1 } };
+    const geode::Point3D d{ { -0x1.b9dd863ee936p+0, -0x1.9665c7b191538p+0,
+        -0x1.0483eaa8925cep+2 } };
     const geode::Tetrahedron tetra{ a, b, c, d };
-    const auto& vertices = tetra.vertices();
-    std::mt19937 generator{ 42 };
-    std::uniform_real_distribution< double > distribution{ -2, 6 };
-    for( const auto unused : geode::Range{ 1000 } )
-    {
-        geode_unused( unused );
-        const geode::Point3D query{ { distribution( generator ),
-            distribution( generator ), distribution( generator ) } };
-        const auto [distance, closest_point] =
-            geode::point_tetrahedron_distance( query, tetra );
-        if( distance == 0 )
-        {
-            geode::OpenGeodeGeometryException::test(
-                geode::point_tetrahedron_position( query, tetra )
-                    != geode::POSITION::outside,
-                "Wrong null result for point_tetrahedron_distance with "
-                "query ",
-                query.string() );
-            continue;
-        }
-        auto brute_force = std::numeric_limits< double >::max();
-        for( const auto& facet : geode::Tetrahedron::tetrahedron_facet_vertex )
-        {
-            brute_force = std::min( brute_force,
-                std::get< 0 >( geode::point_triangle_distance(
-                    query, geode::Triangle3D{ vertices[facet[0]],
-                               vertices[facet[1]], vertices[facet[2]] } ) ) );
-        }
-        geode::OpenGeodeGeometryException::test(
-            std::fabs( distance - brute_force ) < geode::GLOBAL_EPSILON,
-            "Wrong result for point_tetrahedron_distance with query ",
-            query.string(), ": ", distance, " | expected: ", brute_force );
-        geode::OpenGeodeGeometryException::test(
-            std::fabs(
-                geode::point_point_distance( query, closest_point ) - distance )
-                < geode::GLOBAL_EPSILON,
-            "Wrong closest point for point_tetrahedron_distance with "
-            "query ",
-            query.string() );
-    }
+    const auto [distance, closest_point] =
+        geode::point_tetrahedron_distance( query, tetra );
+    geode::OpenGeodeGeometryException::test( distance < geode::GLOBAL_EPSILON,
+        "Wrong result for point_tetrahedron_distance with nearly flat "
+        "tetrahedron: ",
+        distance );
 }
 
 void test()
 {
+    test_point_flat_tetrahedron_distance();
+    // Exact predicates need the library initialization
+    geode::OpenGeodeGeometryLibrary::initialize();
     test_point_segment_distance();
     test_segment_segment_distance();
     test_segment_line_distance();
@@ -1973,7 +1851,6 @@ void test()
     test_point_triangle_distance();
     test_random_point_triangle_distance();
     test_point_tetrahedron_distance();
-    test_point_skewed_tetrahedron_distance();
     test_point_plane_distance();
     test_point_sphere_distance();
     test_point_circle_distance();

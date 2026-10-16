@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/detail/predicates.hpp>
 
 namespace geode
@@ -218,6 +219,52 @@ namespace geode
                 return POSITION::inside;
             }
             return POSITION::outside;
+        }
+
+        /*
+         * Exact sign of the point relative to the tetrahedron facet. Facets
+         * are oriented towards the inside of positive tetrahedra.
+         */
+        [[nodiscard]] inline GEO::SIGN point_tetrahedron_facet_sign(
+            const Point3D& point,
+            const Tetrahedron& tetra,
+            local_index_t facet )
+        {
+            const auto& vertices = tetra.vertices();
+            const auto& facet_vertices =
+                Tetrahedron::tetrahedron_facet_vertex[facet];
+            return GEO::PCK::orient_3d( vertices[facet_vertices[0]],
+                vertices[facet_vertices[1]], vertices[facet_vertices[2]],
+                point );
+        }
+
+        /*
+         * Exact orientation of the tetrahedron: sign of vertex 0 relative to
+         * facet 0, zero for flat tetrahedra.
+         */
+        [[nodiscard]] inline GEO::SIGN tetrahedron_orientation(
+            const Tetrahedron& tetra )
+        {
+            return point_tetrahedron_facet_sign(
+                tetra.vertices()[0], tetra, 0 );
+        }
+
+        /*
+         * Exact sign of the point relative to the tetrahedron facet, positive
+         * towards the inside of the tetrahedron whatever its orientation
+         * (given by tetrahedron_orientation).
+         */
+        [[nodiscard]] inline GEO::SIGN point_tetrahedron_facet_inner_sign(
+            const Point3D& point,
+            const Tetrahedron& tetra,
+            local_index_t facet,
+            GEO::SIGN orientation )
+        {
+            const auto sign =
+                point_tetrahedron_facet_sign( point, tetra, facet );
+            return orientation == GEO::negative
+                       ? static_cast< GEO::SIGN >( -sign )
+                       : sign;
         }
     } // namespace internal
 } // namespace geode

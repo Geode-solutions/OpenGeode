@@ -598,6 +598,13 @@ void test_random_positions_against_exact_sides()
         const geode::Tetrahedron tetra{ vertices[0], vertices[1], vertices[2],
             vertices[3] };
         const auto query = random_point();
+        // Sides are oriented towards the inside of the tetrahedron, whatever
+        // its orientation
+        const auto& facet0 = geode::Tetrahedron::tetrahedron_facet_vertex[0];
+        const auto is_inverted = geode::point_side_to_triangle( vertices[0],
+                                     { vertices[facet0[0]], vertices[facet0[1]],
+                                         vertices[facet0[2]] } )
+                                 == geode::SIDE::negative;
         std::array< geode::SIDE, 4 > sides;
         for( const auto f : geode::LRange{ 4 } )
         {
@@ -605,6 +612,12 @@ void test_random_positions_against_exact_sides()
             sides[f] = geode::point_side_to_triangle(
                 query, { vertices[facet[0]], vertices[facet[1]],
                            vertices[facet[2]] } );
+            if( is_inverted && sides[f] != geode::SIDE::zero )
+            {
+                sides[f] = sides[f] == geode::SIDE::positive
+                               ? geode::SIDE::negative
+                               : geode::SIDE::positive;
+            }
         }
         const auto position = geode::point_tetrahedron_position( query, tetra );
         const auto all_positive =
@@ -720,6 +733,60 @@ void test_point_side_to_triangle()
     geode::OpenGeodeGeometryException::test( side_q3 == geode::SIDE::zero,
         "Wrong result for point_side_to_triangle with query point "
         "q3" );
+}
+
+void test_point_negative_tetrahedron_position()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
+    const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
+    // Negatively oriented tetrahedron
+    const geode::Tetrahedron tetra{ a, c, b, d };
+    const geode::Point3D inside{ { 0.25, 0.25, 0.25 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( inside, tetra )
+            == geode::POSITION::inside,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and inside point" );
+    const geode::Point3D on_edge{ { 0.5, 0.5, 0.0 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( on_edge, tetra )
+            == geode::POSITION::edge12,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and point on edge" );
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( d, tetra )
+            == geode::POSITION::vertex3,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and vertex" );
+    const geode::Point3D outside{ { 1.0, 1.0, 1.0 } };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( outside, tetra )
+            == geode::POSITION::outside,
+        "Wrong result for point_tetrahedron_position with negative "
+        "tetrahedron and outside point" );
+}
+
+void test_point_flat_tetrahedron_position()
+{
+    // Nearly flat tetrahedron with a nearly degenerated facet
+    const geode::Point3D query{ { 0x1.1d92bbf44c79p-1, 0x1.34202cfc1b54p-2,
+        -0x1.431d39bb8b468p+1 } };
+    const geode::Point3D a{ { -0x1.29557ab528de9p+2, -0x1.0c7b8aefd5be1p+2,
+        -0x1.62aefebba1dp-2 } };
+    const geode::Point3D b{ { 0x1.0b154468d0664p+1, 0x1.19689c56a769cp+0,
+        -0x1.bf309ad1991ap+1 } };
+    const geode::Point3D c{ { 0x1.7754eaa12b7b2p+1, 0x1.c3a8c276219d4p+0,
+        -0x1.f1cb58c02e5ddp+1 } };
+    const geode::Point3D d{ { 0x1.d3a11c0545a79p+0, 0x1.ca2b6d456dfd5p-1,
+        -0x1.afa3287fc481ap+1 } };
+    const geode::Tetrahedron tetra{ a, b, c, d };
+    geode::OpenGeodeGeometryException::test(
+        geode::point_tetrahedron_position( query, tetra )
+            == geode::POSITION::outside,
+        "Wrong result for point_tetrahedron_position with nearly flat "
+        "tetrahedron" );
 }
 
 // Smallest double strictly greater than value, i.e. value + 1 ulp
@@ -886,6 +953,8 @@ void test_exact_orientation_large_coordinates()
 
 void test()
 {
+    test_point_flat_tetrahedron_position();
+    test_point_negative_tetrahedron_position();
     test_point_side_to_segment();
     test_point_side_to_plane();
     test_point_side_to_triangle();
