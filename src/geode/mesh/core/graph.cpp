@@ -114,6 +114,15 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+        void check_vertex_storage( index_t nb_vertices ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                edges_around_vertex_.size() == nb_vertices, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[Graph] Wrong vertex storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
     private:
         template < typename Archive >
         void deserialize_legacy_storage( Archive& archive )
@@ -311,6 +320,7 @@ namespace geode
             Growable< Archive, Graph >{ { []( Archive& archive, Graph& graph ) {
                 archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( graph.impl_ );
+                graph.impl_->check_vertex_storage( graph.nb_vertices() );
                 graph.impl_->remove_legacy_attributes(
                     graph.vertex_attribute_manager() );
             } } } );

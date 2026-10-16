@@ -686,6 +686,15 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+        void check_vertex_storage( index_t nb_vertices ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                polyhedron_around_vertex_.size() == nb_vertices, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SolidMesh] Wrong vertex storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
         const internal::PolyhedraAroundVertexImpl&
             updated_polyhedra_around_vertex( const SolidMesh< dimension >& mesh,
                 const index_t vertex_id,
@@ -1742,6 +1751,7 @@ namespace geode
                      archive.ext(
                          solid, bitsery::ext::BaseClass< VertexSet >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->check_vertex_storage( solid.nb_vertices() );
                      solid.impl_->remove_legacy_attributes(
                          solid.vertex_attribute_manager() );
                  },
@@ -1749,6 +1759,8 @@ namespace geode
                         archive.ext(
                             solid, bitsery::ext::BaseClass< VertexSet >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_vertex_storage(
+                            solid.nb_vertices() );
                         solid.impl_->remove_legacy_attributes(
                             solid.vertex_attribute_manager() );
                     },
@@ -1760,6 +1772,8 @@ namespace geode
                                        CoordinateReferenceSystemManagers<
                                            dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_vertex_storage(
+                            solid.nb_vertices() );
                         solid.impl_->remove_legacy_attributes(
                             solid.vertex_attribute_manager() );
                     } } } );

@@ -321,6 +321,28 @@ namespace geode
             polyhedron_adjacent_ptr_ = impl.polyhedron_adjacent_ptr_;
         }
 
+    public:
+        void check_storage( index_t nb_polyhedra ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                polyhedron_vertex_ptr_.size() == nb_polyhedra + 1
+                    && polyhedron_vertex_ptr_.front() == 0
+                    && polyhedron_vertex_ptr_.back()
+                           == polyhedron_vertices_.size()
+                    && polyhedron_adjacent_ptr_.size() == nb_polyhedra + 1
+                    && polyhedron_adjacent_ptr_.front() == 0
+                    && polyhedron_adjacent_ptr_.back()
+                           == polyhedron_adjacents_.size()
+                    && polyhedron_facet_ptr_.size()
+                           == polyhedron_adjacents_.size() + 1
+                    && polyhedron_facet_ptr_.front() == 0
+                    && polyhedron_facet_ptr_.back()
+                           == polyhedron_facets_.size(),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[PolyhedralSolid] Wrong polyhedron storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
     private:
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -539,6 +561,7 @@ namespace geode
                      archive.ext( solid, bitsery::ext::BaseClass<
                                              PolyhedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->check_storage( solid.nb_polyhedra() );
                      const auto new_point_attribute_id =
                          solid.vertex_attribute_manager()
                              .attribute_ids_matching_name( internal::PointsImpl<
@@ -554,6 +577,7 @@ namespace geode
                             solid, bitsery::ext::BaseClass<
                                        PolyhedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_storage( solid.nb_polyhedra() );
                         const auto new_point_attribute_id =
                             solid.vertex_attribute_manager()
                                 .attribute_ids_matching_name(
@@ -570,6 +594,7 @@ namespace geode
                             solid, bitsery::ext::BaseClass<
                                        PolyhedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_storage( solid.nb_polyhedra() );
                     } } } );
     }
 

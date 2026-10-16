@@ -127,6 +127,17 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+    public:
+        void check_storage( index_t nb_polygons ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                triangle_vertices_.size() == nb_polygons
+                    && triangle_adjacents_.size() == nb_polygons,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[TriangulatedSurface] Wrong triangle storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
     private:
         template < typename Archive >
         void deserialize_legacy_storage( Archive& archive )
@@ -222,6 +233,7 @@ namespace geode
                          surface, bitsery::ext::BaseClass<
                                       TriangulatedSurface< dimension > >{} );
                      archive.object( surface.impl_ );
+                     surface.impl_->check_storage( surface.nb_polygons() );
                      surface.impl_->remove_legacy_attributes(
                          surface.polygon_attribute_manager() );
                      const auto new_point_attribute_id =
@@ -240,6 +252,7 @@ namespace geode
                             surface, bitsery::ext::BaseClass<
                                          TriangulatedSurface< dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->check_storage( surface.nb_polygons() );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
                         const auto new_point_attribute_id =
@@ -259,6 +272,7 @@ namespace geode
                             surface, bitsery::ext::BaseClass<
                                          TriangulatedSurface< dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->check_storage( surface.nb_polygons() );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
                     } } } );

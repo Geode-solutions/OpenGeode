@@ -136,6 +136,16 @@ namespace geode
             tetrahedron_adjacents_ = impl.tetrahedron_adjacents_;
         }
 
+        void check_storage( index_t nb_polyhedra ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                tetrahedron_vertices_.size() == nb_polyhedra
+                    && tetrahedron_adjacents_.size() == nb_polyhedra,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[TetrahedralSolid] Wrong tetrahedron storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
         void remove_legacy_attributes( AttributeManager& manager )
         {
             legacy_attributes_.remove_from( manager );
@@ -244,6 +254,7 @@ namespace geode
                          solid, bitsery::ext::BaseClass<
                                     TetrahedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->check_storage( solid.nb_polyhedra() );
                      solid.impl_->remove_legacy_attributes(
                          solid.polyhedron_attribute_manager() );
                      const auto new_point_attribute_id =
@@ -261,6 +272,7 @@ namespace geode
                             solid, bitsery::ext::BaseClass<
                                        TetrahedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_storage( solid.nb_polyhedra() );
                         solid.impl_->remove_legacy_attributes(
                             solid.polyhedron_attribute_manager() );
                         const auto new_point_attribute_id =
@@ -279,6 +291,7 @@ namespace geode
                             solid, bitsery::ext::BaseClass<
                                        TetrahedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_storage( solid.nb_polyhedra() );
                         solid.impl_->remove_legacy_attributes(
                             solid.polyhedron_attribute_manager() );
                     } } } );

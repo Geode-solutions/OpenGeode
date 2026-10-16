@@ -662,6 +662,19 @@ namespace geode
                     archive.ext( grid,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
                     archive.object( grid.impl_ );
+                    if constexpr( std::is_same_v< Archive, Deserializer > )
+                    {
+                        std::uint64_t nb_vertices{ 1 };
+                        for( const auto d : LRange{ dimension } )
+                        {
+                            nb_vertices *= grid.nb_cells_in_direction( d ) + 1;
+                        }
+                        OpenGeodeMeshException::check_exception(
+                            nb_vertices < NO_ID, nullptr,
+                            OpenGeodeException::TYPE::data,
+                            "[Grid] Too many grid vertices after "
+                            "deserialization: file may be corrupted" );
+                    }
                 } } } );
     }
 

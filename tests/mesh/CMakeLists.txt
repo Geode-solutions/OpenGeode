@@ -121,6 +121,13 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-mesh-corrupted-files.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-mesh-truncated-files.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

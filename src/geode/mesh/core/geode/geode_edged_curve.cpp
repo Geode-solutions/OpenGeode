@@ -150,6 +150,8 @@ namespace geode
                      archive.ext( edged_curve,
                          bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
                      archive.object( edged_curve.impl_ );
+                     edged_curve.impl_->check_edges_number(
+                         edged_curve.nb_edges() );
                      edged_curve.impl_->remove_legacy_attributes(
                          edged_curve.edge_attribute_manager() );
                      const auto new_point_attribute_id =
@@ -167,6 +169,8 @@ namespace geode
                             edged_curve, bitsery::ext::BaseClass<
                                              EdgedCurve< dimension > >{} );
                         archive.object( edged_curve.impl_ );
+                        edged_curve.impl_->check_edges_number(
+                            edged_curve.nb_edges() );
                         edged_curve.impl_->remove_legacy_attributes(
                             edged_curve.edge_attribute_manager() );
                         const auto new_point_attribute_id =
@@ -185,6 +189,8 @@ namespace geode
                             edged_curve, bitsery::ext::BaseClass<
                                              EdgedCurve< dimension > >{} );
                         archive.object( edged_curve.impl_ );
+                        edged_curve.impl_->check_edges_number(
+                            edged_curve.nb_edges() );
                         edged_curve.impl_->remove_legacy_attributes(
                             edged_curve.edge_attribute_manager() );
                     } } } );

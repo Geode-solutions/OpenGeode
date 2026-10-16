@@ -439,6 +439,15 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+        void check_vertex_storage( index_t nb_vertices ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                polygon_around_vertex_.size() == nb_vertices, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SurfaceMesh] Wrong vertex storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
         Impl() = default;
 
     private:
@@ -1071,6 +1080,8 @@ namespace geode
                      archive.ext(
                          surface, bitsery::ext::BaseClass< VertexSet >{} );
                      archive.object( surface.impl_ );
+                     surface.impl_->check_vertex_storage(
+                         surface.nb_vertices() );
                      surface.impl_->remove_legacy_attributes(
                          surface.vertex_attribute_manager() );
                  },
@@ -1078,6 +1089,8 @@ namespace geode
                         archive.ext(
                             surface, bitsery::ext::BaseClass< VertexSet >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->check_vertex_storage(
+                            surface.nb_vertices() );
                         surface.impl_->remove_legacy_attributes(
                             surface.vertex_attribute_manager() );
                     },
@@ -1089,6 +1102,8 @@ namespace geode
                                          CoordinateReferenceSystemManagers<
                                              dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->check_vertex_storage(
+                            surface.nb_vertices() );
                         surface.impl_->remove_legacy_attributes(
                             surface.vertex_attribute_manager() );
                     } } } );
