@@ -161,8 +161,8 @@ namespace geode
             std::vector< index_t > update_facet_vertices(
                 absl::Span< const index_t > old2new )
             {
-                const auto old_facet_indices = facet_indices_;
-                facet_indices_.clear();
+                const auto old_facet_indices = std::move( facet_indices_ );
+                facet_indices_ = {};
                 facet_indices_.reserve( old_facet_indices.size() );
                 std::vector< bool > to_delete(
                     old_facet_indices.size(), false );
