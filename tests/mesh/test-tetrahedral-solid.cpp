@@ -824,6 +824,33 @@ void test_concurrent_polyhedra_around_vertex()
         "Wrong concurrent polyhedra around vertex computation" );
 }
 
+void test_std_hash()
+{
+    const std::hash< geode::PolyhedronVertex > vertex_hash;
+    geode::OpenGeodeMeshException::test(
+        vertex_hash( { 1, 1 } ) != vertex_hash( { 2, 2 } ),
+        "std::hash of PolyhedronVertex should not collide when ids are "
+        "equal" );
+    const std::hash< geode::PolyhedronFacet > facet_hash;
+    geode::OpenGeodeMeshException::test(
+        facet_hash( { 1, 1 } ) != facet_hash( { 2, 2 } ),
+        "std::hash of PolyhedronFacet should not collide when ids are "
+        "equal" );
+    geode::OpenGeodeMeshException::test(
+        facet_hash( { 1, 2 } ) != facet_hash( { 2, 1 } ),
+        "std::hash of PolyhedronFacet should not be symmetric" );
+    const std::hash< geode::PolyhedronFacetVertex > facet_vertex_hash;
+    geode::OpenGeodeMeshException::test(
+        facet_vertex_hash( { { 3, 1 }, 2 } )
+            != facet_vertex_hash( { { 3, 2 }, 1 } ),
+        "std::hash of PolyhedronFacetVertex should not collide" );
+    const std::hash< geode::PolyhedronFacetEdge > facet_edge_hash;
+    geode::OpenGeodeMeshException::test(
+        facet_edge_hash( { { 3, 1 }, 2 } )
+            != facet_edge_hash( { { 3, 2 }, 1 } ),
+        "std::hash of PolyhedronFacetEdge should not collide" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -854,6 +881,7 @@ void test()
     test_degenerated_tetrahedron_with_repeated_vertex();
     test_polyhedra_around_non_manifold_vertex();
     test_concurrent_polyhedra_around_vertex();
+    test_std_hash();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

@@ -2010,32 +2010,28 @@ namespace std
     size_t hash< geode::PolyhedronVertex >::operator()(
         const geode::PolyhedronVertex& polyhedron_vertex ) const
     {
-        return absl::Hash< geode::index_t >()( polyhedron_vertex.polyhedron_id )
-               ^ absl::Hash< geode::index_t >()( polyhedron_vertex.vertex_id );
+        return absl::HashOf(
+            polyhedron_vertex.polyhedron_id, polyhedron_vertex.vertex_id );
     }
 
     size_t hash< geode::PolyhedronFacet >::operator()(
         const geode::PolyhedronFacet& polyhedron_facet ) const
     {
-        return absl::Hash< geode::index_t >()( polyhedron_facet.polyhedron_id )
-               ^ absl::Hash< geode::index_t >()( polyhedron_facet.facet_id );
+        return absl::HashOf(
+            polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
     }
 
     size_t hash< geode::PolyhedronFacetVertex >::operator()(
         const geode::PolyhedronFacetVertex& polyhedron_facet_vertex ) const
     {
-        return absl::Hash< geode::PolyhedronFacet >()(
-                   polyhedron_facet_vertex.polyhedron_facet )
-               ^ absl::Hash< geode::index_t >()(
-                   polyhedron_facet_vertex.vertex_id );
+        return absl::HashOf( polyhedron_facet_vertex.polyhedron_facet,
+            polyhedron_facet_vertex.vertex_id );
     }
 
     size_t hash< geode::PolyhedronFacetEdge >::operator()(
         const geode::PolyhedronFacetEdge& polyhedron_facet_edge ) const
     {
-        return absl::Hash< geode::PolyhedronFacet >()(
-                   polyhedron_facet_edge.polyhedron_facet )
-               ^ absl::Hash< geode::index_t >()(
-                   polyhedron_facet_edge.edge_id );
+        return absl::HashOf( polyhedron_facet_edge.polyhedron_facet,
+            polyhedron_facet_edge.edge_id );
     }
 } // namespace std
