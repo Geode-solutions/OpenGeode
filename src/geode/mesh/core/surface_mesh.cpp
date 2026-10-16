@@ -180,7 +180,7 @@ namespace
         }
 
     private:
-        static constexpr geode::index_t MIN_FAN_SIZE_TO_CHECK{ 32 };
+        static constexpr geode::index_t MIN_FAN_SIZE_TO_CHECK{ 64 };
         absl::flat_hash_set< geode::PolygonVertex > visited_;
     };
 
