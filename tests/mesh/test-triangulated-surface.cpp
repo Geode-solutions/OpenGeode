@@ -601,6 +601,26 @@ void test_delete_polygon_at_pinched_vertex()
         "vertices" );
 }
 
+void test_permute_vertices_with_isolated_vertex()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 1, 2, 3 } );
+    builder->compute_polygon_adjacencies();
+    builder->permute_vertices( { 2, 0, 1, 3 } );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 1 ),
+        "[permute_vertices] New vertex 1 should be isolated" );
+    for( const geode::index_t v : { 0, 2, 3 } )
+    {
+        const auto around = surface->polygon_around_vertex( v );
+        geode::OpenGeodeMeshException::test(
+            around && surface->polygon_vertex( around.value() ) == v,
+            "[permute_vertices] Wrong link for vertex ", v );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -625,6 +645,7 @@ void test()
     test_next_on_border_with_flipped_orientation();
     test_incremental_adjacencies_with_edges();
     test_delete_polygon_at_pinched_vertex();
+    test_permute_vertices_with_isolated_vertex();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

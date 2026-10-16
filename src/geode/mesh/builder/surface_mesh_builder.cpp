@@ -79,41 +79,6 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_polygon_around_vertices(
-        const geode::SurfaceMesh< dimension >& surface,
-        geode::SurfaceMeshBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > vertices_old2new )
-    {
-        for( const auto v : geode::Range{ surface.nb_vertices() } )
-        {
-            const auto new_vertex = vertices_old2new[v];
-            if( new_vertex == v )
-            {
-                continue;
-            }
-            if( new_vertex != geode::NO_ID )
-            {
-                if( const auto new_polygon_around =
-                        surface.polygon_around_vertex( new_vertex ) )
-                {
-                    builder.associate_polygon_vertex_to_vertex(
-                        new_polygon_around.value(), v );
-                }
-                else
-                {
-                    builder.disassociate_polygon_vertex_to_vertex( v );
-                    builder.reset_polygons_around_vertex( v );
-                }
-            }
-            else
-            {
-                builder.disassociate_polygon_vertex_to_vertex( v );
-                builder.reset_polygons_around_vertex( v );
-            }
-        }
-    }
-
-    template < geode::index_t dimension >
     void check_no_polygon_to_delete(
         const geode::SurfaceMesh< dimension >& surface,
         absl::Span< const geode::index_t > vertices_old2new )
@@ -575,7 +540,8 @@ namespace geode
         absl::Span< const index_t > old2new )
     {
         check_no_polygon_to_delete( surface_mesh_, old2new );
-        update_polygon_around_vertices( surface_mesh_, *this, old2new );
+        // Vertex -> polygon links have already been permuted/deleted with
+        // the vertex storage, only polygon vertices need to be updated
         for( const auto p : Range{ surface_mesh_.nb_polygons() } )
         {
             for( const auto v :
