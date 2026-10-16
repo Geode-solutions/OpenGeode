@@ -62,6 +62,13 @@ namespace geode
                 OpenGeodeException::TYPE::internal,
                 "Cannot load PolygonalSurface from file: ", filename };
         }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load PolygonalSurface from file: ", filename };
+        }
     }
 
     template < index_t dimension >

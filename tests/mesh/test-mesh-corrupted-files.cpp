@@ -25,6 +25,7 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
+#include <stdexcept>
 #include <string>
 
 #include <geode/basic/logger.hpp>
@@ -42,6 +43,7 @@
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/graph.hpp>
 #include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
@@ -53,6 +55,7 @@
 #include <geode/mesh/core/texture2d.hpp>
 #include <geode/mesh/core/texture_manager.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
+#include <geode/mesh/io/edged_curve_input.hpp>
 #include <geode/mesh/io/graph_input.hpp>
 #include <geode/mesh/io/graph_output.hpp>
 #include <geode/mesh/io/hybrid_solid_input.hpp>
@@ -70,6 +73,7 @@
 #include <geode/mesh/io/tetrahedral_solid_output.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
 #include <geode/mesh/io/triangulated_surface_output.hpp>
+#include <geode/mesh/io/vertex_set_input.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -515,6 +519,127 @@ namespace
             geode_unused( geode::load_triangulated_surface< 2 >( file ) );
         } );
     }
+
+    template < typename Base, typename... Args >
+    class ThrowingInput final : public Base
+    {
+    public:
+        explicit ThrowingInput( std::string_view filename ) : Base{ filename }
+        {
+        }
+
+        typename Base::InputData read( const Args&... /*unused*/ ) override
+        {
+            throw std::runtime_error{ "[Test] Not an OpenGeodeException" };
+        }
+
+        geode::AdditionalFiles additional_files() const override
+        {
+            return {};
+        }
+
+        geode::index_t object_priority() const override
+        {
+            return 0;
+        }
+
+        geode::Percentage is_loadable() const override
+        {
+            return geode::Percentage{ 1 };
+        }
+    };
+
+    template < typename Factory, typename Input, typename Loader >
+    void test_std_exception( const Loader& loader )
+    {
+        const std::string extension{ "throwing_input" };
+        Factory::template register_creator< Input >( extension );
+        const auto filename = absl::StrCat( "std_exception.", extension );
+        {
+            std::ofstream file{ filename };
+            file << "content";
+        }
+        expect_load_failure( filename, loader );
+    }
+
+    void test_std_exceptions()
+    {
+        using geode::MeshImpl;
+        test_std_exception< geode::VertexSetInputFactory,
+            ThrowingInput< geode::VertexSetInput, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_vertex_set( file ) );
+            } );
+        test_std_exception< geode::PointSetInputFactory3D,
+            ThrowingInput< geode::PointSetInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_point_set< 3 >( file ) );
+            } );
+        test_std_exception< geode::GraphInputFactory,
+            ThrowingInput< geode::GraphInput, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_graph( file ) );
+            } );
+        test_std_exception< geode::EdgedCurveInputFactory3D,
+            ThrowingInput< geode::EdgedCurveInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_edged_curve< 3 >( file ) );
+            } );
+        test_std_exception< geode::PolygonalSurfaceInputFactory3D,
+            ThrowingInput< geode::PolygonalSurfaceInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_polygonal_surface< 3 >( file ) );
+            } );
+        test_std_exception< geode::TriangulatedSurfaceInputFactory3D,
+            ThrowingInput< geode::TriangulatedSurfaceInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_triangulated_surface< 3 >( file ) );
+            } );
+        test_std_exception< geode::PolyhedralSolidInputFactory3D,
+            ThrowingInput< geode::PolyhedralSolidInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_polyhedral_solid< 3 >( file ) );
+            } );
+        test_std_exception< geode::TetrahedralSolidInputFactory3D,
+            ThrowingInput< geode::TetrahedralSolidInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_tetrahedral_solid< 3 >( file ) );
+            } );
+        test_std_exception< geode::HybridSolidInputFactory3D,
+            ThrowingInput< geode::HybridSolidInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_hybrid_solid< 3 >( file ) );
+            } );
+        test_std_exception< geode::RegularGridInputFactory3D,
+            ThrowingInput< geode::RegularGridInput3D, MeshImpl > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_regular_grid< 3 >( file ) );
+            } );
+        test_std_exception< geode::LightRegularGridInputFactory3D,
+            ThrowingInput< geode::LightRegularGridInput3D > >(
+            []( std::string_view file ) {
+                geode_unused( geode::load_light_regular_grid< 3 >( file ) );
+            } );
+    }
+
+    void test_legacy_file_without_points()
+    {
+        // Rename the legacy vertex coordinates attribute
+        auto content = read_file( absl::StrCat(
+            geode::DATA_PATH, "backward_io/v12/test_v12.og_edc3d" ) );
+        const auto position = content.find( "points" );
+        geode::OpenGeodeMeshException::test( position != std::string::npos,
+            "[Test] Points attribute not found" );
+        content[position + 5] = 'z';
+        const std::string corrupted{ "corrupted_v12.og_edc3d" };
+        {
+            std::ofstream file{ corrupted, std::ofstream::binary };
+            file << content;
+        }
+        expect_load_failure( corrupted, []( std::string_view file ) {
+            geode_unused( geode::load_edged_curve< 3 >( file ) );
+        } );
+    }
 } // namespace
 
 void test()
@@ -530,6 +655,8 @@ void test()
     test_legacy_grid_without_cells_number();
     test_long_names();
     test_active_crs();
+    test_legacy_file_without_points();
+    test_std_exceptions();
 }
 
 OPENGEODE_TEST( "mesh-corrupted-files" )

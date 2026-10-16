@@ -562,15 +562,8 @@ namespace geode
                                              PolyhedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
                      solid.impl_->check_storage( solid.nb_polyhedra() );
-                     const auto new_point_attribute_id =
-                         solid.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodePolyhedralSolid< dimension > >(
-                         solid, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodePolyhedralSolid< dimension > >( solid );
                  },
                     []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
                         archive.ext(
@@ -578,16 +571,8 @@ namespace geode
                                        PolyhedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
                         solid.impl_->check_storage( solid.nb_polyhedra() );
-                        const auto new_point_attribute_id =
-                            solid.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodePolyhedralSolid< dimension > >(
-                            solid, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodePolyhedralSolid< dimension > >( solid );
                     },
                     []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
                         archive.ext(

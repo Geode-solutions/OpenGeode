@@ -233,30 +233,16 @@ namespace geode
                      archive.ext(
                          grid, bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
                      archive.object( grid.impl_ );
-                     const auto new_point_attribute_id =
-                         grid.vertex_attribute_manager()
-                             .attribute_ids_matching_name(
-                                 internal::PointsImpl< 2 >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodeRegularGrid< 2 > >(
-                         grid, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodeRegularGrid< 2 > >( grid );
                      repair_grid_coordinate_system( grid );
                  },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
                         archive.object( grid.impl_ );
-                        const auto new_point_attribute_id =
-                            grid.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl< 2 >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodeRegularGrid< 2 > >(
-                            grid, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodeRegularGrid< 2 > >( grid );
                         repair_grid_coordinate_system( grid );
                     },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {

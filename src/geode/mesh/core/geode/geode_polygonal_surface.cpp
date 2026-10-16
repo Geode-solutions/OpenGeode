@@ -294,15 +294,8 @@ namespace geode
                                       PolygonalSurface< dimension > >{} );
                      archive.object( surface.impl_ );
                      surface.impl_->check_storage( surface.nb_polygons() );
-                     const auto new_point_attribute_id =
-                         surface.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodePolygonalSurface< dimension > >(
-                         surface, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodePolygonalSurface< dimension > >( surface );
                  },
                     []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                         archive.ext(
@@ -310,16 +303,8 @@ namespace geode
                                          PolygonalSurface< dimension > >{} );
                         archive.object( surface.impl_ );
                         surface.impl_->check_storage( surface.nb_polygons() );
-                        const auto new_point_attribute_id =
-                            surface.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodePolygonalSurface< dimension > >(
-                            surface, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodePolygonalSurface< dimension > >( surface );
                     },
                     []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                         archive.ext(

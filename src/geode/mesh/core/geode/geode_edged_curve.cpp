@@ -154,15 +154,8 @@ namespace geode
                          edged_curve.nb_edges() );
                      edged_curve.impl_->remove_legacy_attributes(
                          edged_curve.edge_attribute_manager() );
-                     const auto new_point_attribute_id =
-                         edged_curve.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodeEdgedCurve< dimension > >(
-                         edged_curve, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodeEdgedCurve< dimension > >( edged_curve );
                  },
                     []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
                         archive.ext(
@@ -173,16 +166,8 @@ namespace geode
                             edged_curve.nb_edges() );
                         edged_curve.impl_->remove_legacy_attributes(
                             edged_curve.edge_attribute_manager() );
-                        const auto new_point_attribute_id =
-                            edged_curve.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodeEdgedCurve< dimension > >(
-                            edged_curve, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodeEdgedCurve< dimension > >( edged_curve );
                     },
                     []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
                         archive.ext(

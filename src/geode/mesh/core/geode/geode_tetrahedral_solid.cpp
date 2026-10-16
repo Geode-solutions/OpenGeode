@@ -257,15 +257,8 @@ namespace geode
                      solid.impl_->check_storage( solid.nb_polyhedra() );
                      solid.impl_->remove_legacy_attributes(
                          solid.polyhedron_attribute_manager() );
-                     const auto new_point_attribute_id =
-                         solid.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodeTetrahedralSolid< dimension > >(
-                         solid, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodeTetrahedralSolid< dimension > >( solid );
                  },
                     []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
                         archive.ext(
@@ -275,16 +268,8 @@ namespace geode
                         solid.impl_->check_storage( solid.nb_polyhedra() );
                         solid.impl_->remove_legacy_attributes(
                             solid.polyhedron_attribute_manager() );
-                        const auto new_point_attribute_id =
-                            solid.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodeTetrahedralSolid< dimension > >(
-                            solid, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodeTetrahedralSolid< dimension > >( solid );
                     },
                     []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
                         archive.ext(

@@ -57,6 +57,13 @@ namespace geode
                 OpenGeodeException::TYPE::internal,
                 "Cannot load Graph from file: ", filename };
         }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load Graph from file: ", filename };
+        }
     }
 
     std::unique_ptr< Graph > load_graph( std::string_view filename )

@@ -236,15 +236,8 @@ namespace geode
                      surface.impl_->check_storage( surface.nb_polygons() );
                      surface.impl_->remove_legacy_attributes(
                          surface.polygon_attribute_manager() );
-                     const auto new_point_attribute_id =
-                         surface.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodeTriangulatedSurface< dimension > >(
-                         surface, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodeTriangulatedSurface< dimension > >( surface );
                  },
                     []( Archive& archive,
                         OpenGeodeTriangulatedSurface& surface ) {
@@ -255,16 +248,9 @@ namespace geode
                         surface.impl_->check_storage( surface.nb_polygons() );
                         surface.impl_->remove_legacy_attributes(
                             surface.polygon_attribute_manager() );
-                        const auto new_point_attribute_id =
-                            surface.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
+                        detail::template initialize_legacy_crs<
                             OpenGeodeTriangulatedSurface< dimension > >(
-                            surface, new_point_attribute_id );
+                            surface );
                     },
                     []( Archive& archive,
                         OpenGeodeTriangulatedSurface& surface ) {
