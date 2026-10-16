@@ -21,7 +21,10 @@
  *
  */
 
+#include <sstream>
+
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -32,6 +35,7 @@
 #include <geode/mesh/builder/geode/geode_polygonal_surface_builder.hpp>
 #include <geode/mesh/builder/surface_edges_builder.hpp>
 #include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/internal/facet_edges_impl.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/surface_edges.hpp>
 #include <geode/mesh/io/polygonal_surface_input.hpp>
@@ -720,6 +724,75 @@ void test_merge_edges_on_vertex_update()
         "[merge edges] Wrong id from vertices for edge 1" );
 }
 
+using FacetEdges = geode::internal::FacetEdgesImpl< 3 >;
+
+std::string serialize_edges( const FacetEdges& edges )
+{
+    std::ostringstream output{ std::ios::binary };
+    geode::TContext context{};
+    geode::BitseryExtensions::register_serialize_pcontext(
+        std::get< 0 >( context ) );
+    geode::Serializer archive{ context, output };
+    archive.object( edges );
+    archive.adapter().flush();
+    return output.str();
+}
+
+bool is_deserialization_rejected( const std::string& buffer )
+{
+    std::istringstream input{ buffer, std::ios::binary };
+    geode::TContext context{};
+    geode::BitseryExtensions::register_deserialize_pcontext(
+        std::get< 0 >( context ) );
+    geode::Deserializer archive{ context, input };
+    FacetEdges edges{ geode::BITSERY::constructor };
+    try
+    {
+        archive.object( edges );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        return exception.type() == geode::OpenGeodeException::TYPE::data;
+    }
+    return false;
+}
+
+void test_corrupted_edges_deserialization()
+{
+    FacetEdges edges;
+    edges.find_or_create_edge( { 0, 1 } );
+    edges.find_or_create_edge( { 1, 2 } );
+    const auto buffer = serialize_edges( edges );
+    geode::OpenGeodeMeshException::test( !is_deserialization_rejected( buffer ),
+        "[corrupted edges] Valid edges should be loaded" );
+
+    // Edge counters are serialized last: [size = 2][counter 0][counter 1]
+    constexpr auto COUNTERS_SIZE = 1 + 2 * sizeof( geode::index_t );
+    geode::OpenGeodeMeshException::test(
+        buffer.size() > COUNTERS_SIZE
+            && buffer[buffer.size() - COUNTERS_SIZE] == 2,
+        "[corrupted edges] Unexpected serialized layout" );
+    const auto prefix = buffer.substr( 0, buffer.size() - COUNTERS_SIZE );
+    const auto first_counter = buffer.substr(
+        buffer.size() - COUNTERS_SIZE + 1, sizeof( geode::index_t ) );
+    const auto all_counters =
+        buffer.substr( buffer.size() - COUNTERS_SIZE + 1 );
+
+    // Only one counter: edge index 1 is out of bounds
+    const auto missing_counter =
+        absl::StrCat( prefix, std::string( 1, 1 ), first_counter );
+    geode::OpenGeodeMeshException::test(
+        is_deserialization_rejected( missing_counter ),
+        "[corrupted edges] Out of bounds edge index should be rejected" );
+
+    // Three counters for two edges
+    const auto extra_counter = absl::StrCat(
+        prefix, std::string( 1, 3 ), all_counters, first_counter );
+    geode::OpenGeodeMeshException::test(
+        is_deserialization_rejected( extra_counter ),
+        "[corrupted edges] Inconsistent edge number should be rejected" );
+}
+
 void test_texture( const geode::PolygonalSurface3D& polygonal_surface )
 {
     auto manager = polygonal_surface.texture_manager();
@@ -831,6 +904,7 @@ void test()
 
     test_non_manifold_surface();
     test_merge_edges_on_vertex_update();
+    test_corrupted_edges_deserialization();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

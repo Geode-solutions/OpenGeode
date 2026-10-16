@@ -306,10 +306,27 @@ namespace geode
 
             void initialize_vertices()
             {
-                vertices_.resize( counters_.size() );
-                for( const auto& [cycle, facet_id] : facet_indices_ )
+                const auto nb_facets = counters_.size();
+                OpenGeodeMeshException::check_exception(
+                    facet_indices_.size() == nb_facets, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[FacetStorage::initialize_vertices] Inconsistent number "
+                    "of facets: ",
+                    facet_indices_.size(), " indexed facets for ", nb_facets,
+                    " facet counters, file may be corrupted" );
+                vertices_.resize( nb_facets );
+                std::vector< bool > is_indexed( nb_facets, false );
+                for( const auto& cycle : facet_indices_ )
                 {
-                    vertices_[facet_id] = cycle.vertices();
+                    const auto facet_id = cycle.second;
+                    OpenGeodeMeshException::check_exception(
+                        facet_id < nb_facets && !is_indexed[facet_id], nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[FacetStorage::initialize_vertices] Invalid or "
+                        "duplicated facet index ",
+                        facet_id, ", file may be corrupted" );
+                    is_indexed[facet_id] = true;
+                    vertices_[facet_id] = cycle.first.vertices();
                 }
             }
 
