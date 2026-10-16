@@ -61,6 +61,7 @@ namespace geode
             : cells_number_( std::move( cells_number ) )
         {
             check_cells_number< dimension >( cells_number_ );
+            update_strides();
         }
 
         index_t nb_cells() const
@@ -126,11 +127,24 @@ namespace geode
         {
             check_cells_number< dimension >( cells_number );
             cells_number_ = std::move( cells_number );
+            update_strides();
         }
 
         void copy( const CellArray< dimension >::Impl& impl )
         {
             cells_number_ = impl.cells_number_;
+            cell_strides_ = impl.cell_strides_;
+            vertex_strides_ = impl.vertex_strides_;
+        }
+
+        const std::array< index_t, dimension >& cell_strides() const
+        {
+            return cell_strides_;
+        }
+
+        const std::array< index_t, dimension >& vertex_strides() const
+        {
+            return vertex_strides_;
         }
 
     private:
@@ -142,11 +156,27 @@ namespace geode
                 *this, Growable< Archive, Impl >{
                            { []( Archive& local_archive, Impl& impl ) {
                                local_archive.container4b( impl.cells_number_ );
+                               impl.update_strides();
                            } } } );
         }
 
+        void update_strides()
+        {
+            index_t cell_stride{ 1 };
+            index_t vertex_stride{ 1 };
+            for( const auto d : LRange{ dimension } )
+            {
+                cell_strides_[d] = cell_stride;
+                vertex_strides_[d] = vertex_stride;
+                cell_stride *= cells_number_[d];
+                vertex_stride *= cells_number_[d] + 1;
+            }
+        }
+
     private:
-        std::array< index_t, dimension > cells_number_;
+        std::array< index_t, dimension > cells_number_{};
+        std::array< index_t, dimension > cell_strides_{};
+        std::array< index_t, dimension > vertex_strides_{};
     };
 
     template < index_t dimension >
@@ -208,6 +238,20 @@ namespace geode
         std::array< index_t, dimension > cells_number )
     {
         impl_->set_array_dimensions( std::move( cells_number ) );
+    }
+
+    template < index_t dimension >
+    auto CellArray< dimension >::cell_strides() const
+        -> const std::array< index_t, dimension >&
+    {
+        return impl_->cell_strides();
+    }
+
+    template < index_t dimension >
+    auto CellArray< dimension >::vertex_strides() const
+        -> const std::array< index_t, dimension >&
+    {
+        return impl_->vertex_strides();
     }
 
     template < index_t dimension >

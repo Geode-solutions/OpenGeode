@@ -50,21 +50,13 @@ namespace geode
             [[nodiscard]] index_t vertex_index( const Grid< dimension >& grid,
                 const VertexIndices& index ) const
             {
-                index_t vertex_id{ 0 };
                 for( const auto d : LRange{ dimension } )
                 {
                     OpenGeodeMeshException::check_assertion(
                         index[d] < grid.nb_vertices_in_direction( d ),
                         "[RegularGrid::vertex_index] Invalid index" );
-
-                    index_t offset{ 1 };
-                    for( const auto d2 : LRange{ d } )
-                    {
-                        offset *= grid.nb_vertices_in_direction( d2 );
-                    }
-                    vertex_id += offset * index[d];
                 }
-                return vertex_id;
+                return this->flat_index( this->vertex_strides( grid ), index );
             }
 
             [[nodiscard]] VertexIndices vertex_indices(
@@ -73,20 +65,7 @@ namespace geode
                 OpenGeodeMeshException::check_assertion(
                     index < grid.nb_grid_vertices(),
                     "[RegularGrid::vertex_index] Invalid index" );
-                VertexIndices vertex_id;
-                for( const auto d : LRange{ dimension } )
-                {
-                    index_t offset{ 1 };
-                    for( const auto d2 : LRange{ dimension - d - 1 } )
-                    {
-                        offset *= grid.nb_vertices_in_direction( d2 );
-                    }
-                    const auto value =
-                        static_cast< index_t >( std::floor( index / offset ) );
-                    vertex_id[dimension - d - 1] = value;
-                    index -= value * offset;
-                }
-                return vertex_id;
+                return this->multi_index( this->vertex_strides( grid ), index );
             }
 
         protected:
