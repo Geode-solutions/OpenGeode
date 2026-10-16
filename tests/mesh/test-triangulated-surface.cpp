@@ -570,14 +570,16 @@ void test_incremental_adjacencies_with_edges()
     builder->compute_polygon_adjacencies( first );
     const std::array< geode::index_t, 2 > second{ 1, 2 };
     builder->compute_polygon_adjacencies( second );
-    geode::OpenGeodeMeshException::test(
-        surface->polygon_adjacent( { 0, 0 } ) == 1,
-        "[compute_polygon_adjacencies] Wrong adjacency for polygon 0" );
-    geode::OpenGeodeMeshException::test(
-        surface->polygon_adjacent( { 1, 0 } ) == 0,
-        "[compute_polygon_adjacencies] Existing adjacency should be kept" );
-    geode::OpenGeodeMeshException::test( !surface->polygon_adjacent( { 2, 0 } ),
-        "[compute_polygon_adjacencies] Polygon 2 should stay on border" );
+    // Same result as a full computation: the non-manifold edge 0-1 is
+    // unconnected for the three triangles
+    for( const auto t : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            !surface->polygon_adjacent( { t, 0 } ),
+            "[compute_polygon_adjacencies] Non-manifold edge should be "
+            "unconnected for polygon ",
+            t );
+    }
 }
 
 void test_delete_polygon_at_pinched_vertex()

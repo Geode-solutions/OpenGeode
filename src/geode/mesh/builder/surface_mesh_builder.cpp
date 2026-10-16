@@ -669,10 +669,12 @@ namespace geode
         absl::Span< const index_t > polygons_to_connect )
     {
         // Same algorithm with or without edges: only border edges of the
-        // given polygons are connected, existing adjacencies are kept and
-        // non-manifold edges are left unconnected.
+        // given polygons are connected, existing adjacencies are kept unless
+        // the edge becomes non-manifold, and non-manifold edges are left
+        // unconnected.
         using Edge = detail::VertexCycle< std::array< index_t, 2 > >;
         absl::flat_hash_map< Edge, PolygonEdge > edges;
+        std::vector< PolygonEdge > connected_edges;
         for( const auto polygon : polygons_to_connect )
         {
             for( const auto e :
@@ -681,6 +683,7 @@ namespace geode
                 const PolygonEdge edge{ polygon, e };
                 if( !surface_mesh_.is_edge_on_border( edge ) )
                 {
+                    connected_edges.push_back( edge );
                     continue;
                 }
                 auto output = edges.emplace(
@@ -713,6 +716,27 @@ namespace geode
             {
                 do_unset_polygon_adjacent( polygon_edge );
                 do_unset_polygon_adjacent( polygon_adj.value() );
+            }
+        }
+        // An already connected edge shared with a new border edge is
+        // non-manifold: unset it as a full computation would do
+        for( const auto& connected_edge : connected_edges )
+        {
+            const auto edge_vertices =
+                surface_mesh_.polygon_edge_vertices( connected_edge );
+            const auto it = edges.find( Edge{ edge_vertices } );
+            if( it == edges.end() )
+            {
+                continue;
+            }
+            for( const auto& edge : { connected_edge, it->second } )
+            {
+                if( const auto adj_edge = find_polygon_adjacent_edge(
+                        surface_mesh_, edge, edge_vertices ) )
+                {
+                    do_unset_polygon_adjacent( adj_edge.value() );
+                }
+                do_unset_polygon_adjacent( edge );
             }
         }
         // Every modified adjacency is on an edge of polygons_to_connect
