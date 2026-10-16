@@ -248,6 +248,22 @@ void test_replace_vertex()
         "[Test] Wrong edge vertices after replace_vertex" );
 }
 
+void test_edge_vertex_hash()
+{
+    absl::flat_hash_set< size_t > hashes;
+    for( const auto e : geode::Range{ 10 } )
+    {
+        for( const auto v : geode::LRange{ 2 } )
+        {
+            hashes.insert(
+                std::hash< geode::EdgeVertex >{}( geode::EdgeVertex{ e, v } ) );
+        }
+    }
+    geode::OpenGeodeMeshException::test( hashes.size() == 20,
+        "[Test] EdgeVertex hashes should not collide, got ", hashes.size(),
+        " different hashes for 20 EdgeVertex" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -267,6 +283,7 @@ void test()
     test_clone( *graph );
     test_delete_isolated_vertices( *graph, *builder );
     test_replace_vertex();
+    test_edge_vertex_hash();
 
     const auto default_graph = geode::Graph::create();
     geode::OpenGeodeMeshException::test(

@@ -335,7 +335,6 @@ namespace std
     size_t hash< geode::EdgeVertex >::operator()(
         const geode::EdgeVertex& edge_vertex ) const
     {
-        return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
-               ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
+        return absl::HashOf( edge_vertex );
     }
 } // namespace std
