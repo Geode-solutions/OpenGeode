@@ -159,6 +159,11 @@ namespace geode
             return Facets::facet_attribute_manager();
         }
 
+        void reserve_facets( index_t capacity )
+        {
+            Facets::reserve( capacity );
+        }
+
         void overwrite_facets(
             const detail::FacetStorage< PolyhedronFacetVertices >& from )
         {
@@ -265,6 +270,13 @@ namespace geode
         const std::vector< bool >& to_delete, SolidFacetsKey /*key*/ )
     {
         return impl_->delete_facets( to_delete );
+    }
+
+    template < index_t dimension >
+    void SolidFacets< dimension >::reserve_facets(
+        index_t nb, SolidFacetsKey /*key*/ )
+    {
+        impl_->reserve_facets( nb_facets() + nb );
     }
 
     template < index_t dimension >

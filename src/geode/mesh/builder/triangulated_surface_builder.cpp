@@ -106,6 +106,12 @@ namespace geode
         const auto nb_triangles = triangulated_surface_.nb_polygons();
         triangulated_surface_.polygon_attribute_manager().reserve(
             nb_triangles + nb );
+        if( triangulated_surface_.are_edges_enabled() )
+        {
+            // In a triangulated surface, there are about 1.5 edges per
+            // triangle
+            this->edges_builder().reserve_edges( nb + nb / 2 );
+        }
     }
 
     template < index_t dimension >

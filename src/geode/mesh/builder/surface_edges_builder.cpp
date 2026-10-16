@@ -43,6 +43,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SurfaceEdgesBuilder< dimension >::reserve_edges( index_t nb )
+    {
+        edges_->reserve_edges(
+            nb, typename SurfaceEdges< dimension >::SurfaceEdgesKey() );
+    }
+
+    template < index_t dimension >
     void SurfaceEdgesBuilder< dimension >::update_edge_vertices(
         absl::Span< const index_t > old2new )
     {

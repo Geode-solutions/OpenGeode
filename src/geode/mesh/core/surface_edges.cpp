@@ -177,6 +177,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SurfaceEdges< dimension >::reserve_edges(
+        index_t nb, SurfaceEdgesKey /*key*/ )
+    {
+        impl_->reserve_edges( nb_edges() + nb );
+    }
+
+    template < index_t dimension >
     void SurfaceEdges< dimension >::overwrite_edges(
         const SurfaceEdges< dimension >& from, SurfaceEdgesKey /*key*/ )
     {
