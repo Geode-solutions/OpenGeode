@@ -700,8 +700,10 @@ namespace
     std::array< geode::index_t, 6 > order_prism_vertices(
         const geode::index_t prism_id, const geode::SolidMesh3D& solid )
     {
+        // The first triangle keeps its orientation (HybridSolid facet 0 is
+        // {0, 1, 2}), as the hexahedron reference facet does.
         std::array< geode::index_t, 6 > ordered_vertices;
-        geode::index_t already_used_facet{ 0 };
+        geode::local_index_t already_used_facet{ 0 };
         for( const auto f : geode::LRange{ 5 } )
         {
             if( solid.nb_polyhedron_facet_vertices( { prism_id, f } ) == 3 )
@@ -709,12 +711,14 @@ namespace
                 const auto vertices =
                     solid.polyhedron_facet_vertices( { prism_id, f } );
                 ordered_vertices[0] = vertices[0];
-                ordered_vertices[1] = vertices[2];
-                ordered_vertices[2] = vertices[1];
+                ordered_vertices[1] = vertices[1];
+                ordered_vertices[2] = vertices[2];
                 already_used_facet = f;
                 break;
             }
         }
+        // The quad facet sharing edge (0, 1) is oriented the other way:
+        // (1, 0, 3, 4), so 3 and 4 follow vertex 0 in this facet.
         for( const auto f : geode::LRange{ 5 } )
         {
             if( f == already_used_facet )
@@ -726,7 +730,7 @@ namespace
             const auto v_id =
                 absl::c_find( facet_vertices, ordered_vertices[0] );
             if( v_id == facet_vertices.end()
-                || absl::c_find( facet_vertices, ordered_vertices[2] )
+                || absl::c_find( facet_vertices, ordered_vertices[1] )
                        == facet_vertices.end() )
             {
                 continue;
@@ -734,17 +738,52 @@ namespace
             const auto index_v_id =
                 std::distance( facet_vertices.begin(), v_id );
             ordered_vertices[3] = facet_vertices[( index_v_id + 1 ) % 4];
-            ordered_vertices[5] = facet_vertices[( index_v_id + 2 ) % 4];
+            ordered_vertices[4] = facet_vertices[( index_v_id + 2 ) % 4];
             break;
         }
         for( const auto v : geode::LRange{ 6 } )
         {
             const auto solid_vertex =
                 solid.polyhedron_vertex( { prism_id, v } );
+            if( ordered_vertices[0] == solid_vertex
+                || ordered_vertices[1] == solid_vertex
+                || ordered_vertices[2] == solid_vertex
+                || ordered_vertices[3] == solid_vertex
+                || ordered_vertices[4] == solid_vertex )
+            {
+                continue;
+            }
+            ordered_vertices[5] = solid_vertex;
+            break;
+        }
+        return ordered_vertices;
+    }
+
+    std::array< geode::index_t, 5 > order_pyramid_vertices(
+        const geode::index_t pyramid_id, const geode::SolidMesh3D& solid )
+    {
+        // The quad keeps its orientation (HybridSolid facet 0 is {0, 1, 2, 3})
+        std::array< geode::index_t, 5 > ordered_vertices;
+        for( const auto f : geode::LRange{ 5 } )
+        {
+            if( solid.nb_polyhedron_facet_vertices( { pyramid_id, f } ) == 4 )
+            {
+                const auto vertices =
+                    solid.polyhedron_facet_vertices( { pyramid_id, f } );
+                ordered_vertices[0] = vertices[0];
+                ordered_vertices[1] = vertices[1];
+                ordered_vertices[2] = vertices[2];
+                ordered_vertices[3] = vertices[3];
+                break;
+            }
+        }
+        for( const auto v : geode::LRange{ 5 } )
+        {
+            const auto solid_vertex =
+                solid.polyhedron_vertex( { pyramid_id, v } );
             if( ordered_vertices[1] == solid_vertex
                 || ordered_vertices[2] == solid_vertex
                 || ordered_vertices[3] == solid_vertex
-                || ordered_vertices[5] == solid_vertex
                 || ordered_vertices[0] == solid_vertex )
             {
                 continue;
@@ -755,40 +794,6 @@ namespace
         return ordered_vertices;
     }
 } // namespace
-
-std::array< geode::index_t, 5 > order_pyramid_vertices(
-    const geode::index_t pyramid_id, const geode::SolidMesh3D& solid )
-{
-    std::array< geode::index_t, 5 > ordered_vertices;
-
-    for( const auto f : geode::LRange{ 5 } )
-    {
-        if( solid.nb_polyhedron_facet_vertices( { pyramid_id, f } ) == 4 )
-        {
-            const auto vertices =
-                solid.polyhedron_facet_vertices( { pyramid_id, f } );
-            ordered_vertices[0] = vertices[0];
-            ordered_vertices[1] = vertices[3];
-            ordered_vertices[2] = vertices[2];
-            ordered_vertices[3] = vertices[1];
-            break;
-        }
-    }
-    for( const auto v : geode::LRange{ 5 } )
-    {
-        const auto solid_vertex = solid.polyhedron_vertex( { pyramid_id, v } );
-        if( ordered_vertices[1] == solid_vertex
-            || ordered_vertices[2] == solid_vertex
-            || ordered_vertices[3] == solid_vertex
-            || ordered_vertices[0] == solid_vertex )
-        {
-            continue;
-        }
-        ordered_vertices[4] = solid_vertex;
-        break;
-    }
-    return ordered_vertices;
-}
 
 namespace geode
 {

@@ -42,6 +42,16 @@
 
 // NOLINTBEGIN(*-magic-numbers)
 
+void check_positive_volumes( const geode::SolidMesh3D& solid )
+{
+    for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+    {
+        const auto volume = solid.polyhedron_volume( p );
+        geode::OpenGeodeMeshException::test( volume > 0, "Polyhedron ", p,
+            " should have a positive volume, not ", volume );
+    }
+}
+
 void test_grid_to_solids()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -156,6 +166,7 @@ void test_hybrid_solid()
     auto hybrid_solid_hex = geode::convert_solid_mesh_into_hybrid_solid( *hex );
     geode::save_hybrid_solid(
         *hybrid_solid_hex.value(), "hybrid_solid_hex.og_hso3d" );
+    check_positive_volumes( *hybrid_solid_hex.value() );
     std::vector< geode::Point3D > prism_points{
         geode::Point3D{ { 0, 0, 0 } },
         geode::Point3D{ { 1, 0, 0 } },
@@ -177,6 +188,7 @@ void test_hybrid_solid()
         geode::convert_solid_mesh_into_hybrid_solid( *prism );
     geode::save_hybrid_solid(
         *hybrid_solid_prism.value(), "hybrid_solid_prism.og_hso3d" );
+    check_positive_volumes( *hybrid_solid_prism.value() );
     std::vector< geode::Point3D > pyramid_points{ geode::Point3D{ { 0, 0, 0 } },
         geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 1, 1, 0 } },
         geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0.5, 0.5, 1 } } };
@@ -193,6 +205,7 @@ void test_hybrid_solid()
         geode::convert_solid_mesh_into_hybrid_solid( *pyramid );
     geode::save_hybrid_solid(
         *hybrid_solid_pyramid.value(), "hybrid_solid_pyramid.og_hso3d" );
+    check_positive_volumes( *hybrid_solid_pyramid.value() );
 }
 
 void test()
