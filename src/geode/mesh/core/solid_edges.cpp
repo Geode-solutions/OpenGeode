@@ -37,6 +37,7 @@
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/core/bitsery_archive.hpp>
 #include <geode/mesh/core/internal/facet_edges_impl.hpp>
+#include <geode/mesh/core/internal/solid_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
 
@@ -58,22 +59,10 @@ namespace
         const geode::SolidMesh< dimension >& solid )
     {
         // Euler characteristic of a ball: V - E + F - P = 1
-        // Each inner facet is shared by 2 polyhedra, margin for border facets
-        geode::index_t nb_facets{ 0 };
-        if( solid.are_facets_enabled() )
-        {
-            nb_facets = solid.facets().nb_facets();
-        }
-        else
-        {
-            geode::index_t nb_polyhedron_facets{ 0 };
-            for( const auto p : geode::Range{ solid.nb_polyhedra() } )
-            {
-                nb_polyhedron_facets += solid.nb_polyhedron_facets( p );
-            }
-            nb_facets =
-                ( nb_polyhedron_facets + nb_polyhedron_facets / 16 ) / 2;
-        }
+        const auto nb_facets =
+            solid.are_facets_enabled()
+                ? solid.facets().nb_facets()
+                : geode::internal::estimate_nb_facets( solid );
         const auto nb_vertices_and_facets = solid.nb_vertices() + nb_facets;
         if( nb_vertices_and_facets <= solid.nb_polyhedra() )
         {
