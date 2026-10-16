@@ -32,19 +32,26 @@
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.hpp>
 #include <geode/mesh/builder/graph_builder.hpp>
 #include <geode/mesh/builder/hybrid_solid_builder.hpp>
+#include <geode/mesh/builder/point_set_builder.hpp>
 #include <geode/mesh/builder/polygonal_surface_builder.hpp>
 #include <geode/mesh/builder/polyhedral_solid_builder.hpp>
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
 #include <geode/mesh/core/graph.hpp>
 #include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
+#include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/texture2d.hpp>
+#include <geode/mesh/core/texture_manager.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/io/graph_input.hpp>
 #include <geode/mesh/io/graph_output.hpp>
@@ -52,6 +59,8 @@
 #include <geode/mesh/io/hybrid_solid_output.hpp>
 #include <geode/mesh/io/light_regular_grid_input.hpp>
 #include <geode/mesh/io/light_regular_grid_output.hpp>
+#include <geode/mesh/io/point_set_input.hpp>
+#include <geode/mesh/io/point_set_output.hpp>
 #include <geode/mesh/io/polygonal_surface_input.hpp>
 #include <geode/mesh/io/polygonal_surface_output.hpp>
 #include <geode/mesh/io/polyhedral_solid_input.hpp>
@@ -420,6 +429,92 @@ namespace
             geode::OpenGeodeException::TYPE::internal, "[Test] ", corrupted,
             " should not be loaded" };
     }
+
+    template < typename Loader >
+    void expect_load_failure( std::string_view filename, const Loader& loader )
+    {
+        try
+        {
+            loader( filename );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::info(
+                filename, " throws as expected: ", exception.what() );
+            return;
+        }
+        throw geode::OpenGeodeMeshException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] ", filename,
+            " should not be loaded" };
+    }
+
+    std::unique_ptr< geode::PointSet3D > create_point_set_with_crs(
+        std::string_view crs_name )
+    {
+        auto point_set = geode::PointSet3D::create();
+        auto builder = geode::PointSetBuilder3D::create( *point_set );
+        create_points( *builder, 3 );
+        auto crs_builder =
+            geode::CoordinateReferenceSystemManagersBuilder3D{ *point_set }
+                .main_coordinate_reference_system_manager_builder();
+        crs_builder.register_coordinate_reference_system( crs_name,
+            std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
+                point_set->vertex_attribute_manager(), "other_coordinates" ) );
+        crs_builder.set_active_coordinate_reference_system( crs_name );
+        return point_set;
+    }
+
+    void test_active_crs()
+    {
+        const std::string crs_name{ "ACTIVE_CRS_NAME" };
+        const auto point_set = create_point_set_with_crs( crs_name );
+        const auto filename =
+            absl::StrCat( "active_crs.", point_set->native_extension() );
+        geode::save_point_set( *point_set, filename );
+        const auto loader = []( std::string_view file ) {
+            geode_unused( geode::load_point_set< 3 >( file ) );
+        };
+        loader( filename );
+        // Rename the active CRS (its name is written last) to an unknown one
+        auto content = read_file( filename );
+        const auto position = content.rfind( crs_name );
+        geode::OpenGeodeMeshException::test(
+            position != std::string::npos, "[Test] Active CRS name not found" );
+        content[position + crs_name.size() - 1] = 'X';
+        const auto corrupted = absl::StrCat( "corrupted_", filename );
+        {
+            std::ofstream file{ corrupted, std::ofstream::binary };
+            file << content;
+        }
+        expect_load_failure( corrupted, loader );
+    }
+
+    void test_long_names()
+    {
+        const std::string long_name( geode::MAX_SERIALIZED_NAME_SIZE + 1, 'a' );
+        const auto point_set = create_point_set_with_crs( long_name );
+        const auto filename =
+            absl::StrCat( "long_crs_name.", point_set->native_extension() );
+        geode::save_point_set( *point_set, filename );
+        expect_load_failure( filename, []( std::string_view file ) {
+            geode_unused( geode::load_point_set< 3 >( file ) );
+        } );
+
+        auto surface = geode::TriangulatedSurface2D::create();
+        auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
+        builder->create_point( geode::Point2D{ { 0, 0 } } );
+        builder->create_point( geode::Point2D{ { 1, 0 } } );
+        builder->create_point( geode::Point2D{ { 0, 1 } } );
+        builder->create_triangle( { 0, 1, 2 } );
+        auto manager = surface->texture_manager();
+        manager.find_or_create_texture( long_name );
+        const auto surface_filename =
+            absl::StrCat( "long_texture_name.", surface->native_extension() );
+        geode::save_triangulated_surface( *surface, surface_filename );
+        expect_load_failure( surface_filename, []( std::string_view file ) {
+            geode_unused( geode::load_triangulated_surface< 2 >( file ) );
+        } );
+    }
 } // namespace
 
 void test()
@@ -433,6 +528,7 @@ void test()
     test_graph();
     test_light_regular_grid();
     test_legacy_grid_without_cells_number();
+    test_long_names();
 }
 
 OPENGEODE_TEST( "mesh-corrupted-files" )

@@ -161,12 +161,12 @@ namespace geode
                     []( Archive& archive2, std::string& name,
                         std::shared_ptr<
                             CoordinateReferenceSystem< dimension > >& crs ) {
-                        archive2.text1b( name, name.max_size() );
+                        archive2.text1b( name, MAX_SERIALIZED_NAME_SIZE );
                         archive2.ext( crs, bitsery::ext::StdSmartPtr{} );
                     } );
                 archive.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
                 archive.text1b(
-                    impl.active_crs_name_, impl.active_crs_name_.max_size() );
+                    impl.active_crs_name_, MAX_SERIALIZED_NAME_SIZE );
             } } } );
         }
 
