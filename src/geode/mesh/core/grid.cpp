@@ -335,10 +335,14 @@ namespace geode
             {
                 if( max[d] != min[d] )
                 {
-                    for( const auto& cell_indices : cells_around_point )
+                    // Index loop: push_back may reallocate the vector
+                    const auto nb_cells = cells_around_point.size();
+                    for( const auto c : Range{ nb_cells } )
                     {
-                        cells_around_point.push_back( cell_indices );
-                        cells_around_point.back()[d] = max[d];
+                        auto cell_indices = cells_around_point[c];
+                        cell_indices[d] = max[d];
+                        cells_around_point.push_back(
+                            std::move( cell_indices ) );
                     }
                 }
             }
@@ -363,10 +367,14 @@ namespace geode
             {
                 if( max[d] != min[d] )
                 {
-                    for( const auto& cell_indices : cells_around_vertex )
+                    // Index loop: push_back may reallocate the vector
+                    const auto nb_cells = cells_around_vertex.size();
+                    for( const auto c : Range{ nb_cells } )
                     {
-                        cells_around_vertex.push_back( cell_indices );
-                        cells_around_vertex.back()[d] = max[d];
+                        auto cell_indices = cells_around_vertex[c];
+                        cell_indices[d] = max[d];
+                        cells_around_vertex.push_back(
+                            std::move( cell_indices ) );
                     }
                 }
             }
