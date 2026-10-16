@@ -41,6 +41,11 @@ namespace
         const geode::TriangulatedSurface3D& mesh_A,
         const geode::TriangulatedSurface3D& mesh_B )
     {
+        geode::OpenGeodeMeshException::check_exception(
+            mesh_B.nb_polygons() > 0, nullptr,
+            geode::OpenGeodeException::TYPE::data,
+            "[hausdorff_distance] Hausdorff distance is undefined for an "
+            "empty mesh" );
         const auto mesh_B_tree = geode::create_aabb_tree( mesh_B );
         const geode::DistanceToTriangle3D distance_action{ mesh_B };
         double min_dist = 0;
