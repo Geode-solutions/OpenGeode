@@ -430,6 +430,27 @@ namespace
             "Beyond grid max" );
     }
 
+    void test_rasterize_tetrahedron_rotated()
+    {
+        geode::Logger::info( "Test rasterize tetrahedron in rotated grid" );
+        auto grid = geode::RegularGrid3D::create();
+        auto builder = geode::RegularGridBuilder3D::create( *grid );
+        const auto angle = M_PI / 6.;
+        builder->initialize_grid( geode::Point3D{ { 1., 2., 3. } },
+            { 10, 12, 8 },
+            { geode::Vector3D{
+                  { 0.8 * std::cos( angle ), 0.8 * std::sin( angle ), 0. } },
+                geode::Vector3D{
+                    { -1.1 * std::sin( angle ), 1.1 * std::cos( angle ), 0. } },
+                geode::Vector3D{ { 0., 0., 0.9 } } } );
+        std::mt19937 generator{ 7 };
+        for( const auto trial : geode::Range{ 20 } )
+        {
+            check_tetrahedron( *grid,
+                random_tetrahedron( *grid, generator, 0.1, 7.9 ),
+                absl::StrCat( "Rotated ", trial ) );
+        }
+    }
 } // namespace
 
 void test()
@@ -455,6 +476,7 @@ void test()
     test_limit();
     test_rasterize_tetrahedron_axis_aligned();
     test_rasterize_tetrahedron_boundary();
+    test_rasterize_tetrahedron_rotated();
 }
 
 OPENGEODE_TEST( "rasterize" )

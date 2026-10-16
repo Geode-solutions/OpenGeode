@@ -710,26 +710,19 @@ namespace
         void fill_values( const geode::Triangle2D& triangle )
         {
             const auto bbox = triangle.bounding_box();
-            // Range of cell centers covered by the projected triangle,
-            // clamped to the grid in floating point before any cast
-            const auto min_j_value = std::max( 0.,
-                std::ceil(
-                    bbox.min().value( 0 ) / grid_.cell_length_in_direction( 1 )
-                    - 0.5 ) );
+            // Range of cell centers covered by the projected triangle
+            // (coordinates are in cell length unit), clamped to the grid in
+            // floating point before any cast
+            const auto min_j_value =
+                std::max( 0., std::ceil( bbox.min().value( 0 ) - 0.5 ) );
             const auto max_j_value =
                 std::min( grid_.nb_cells_in_direction( 1 ) - 1.,
-                    std::floor( bbox.max().value( 0 )
-                                    / grid_.cell_length_in_direction( 1 )
-                                - 0.5 ) );
-            const auto min_k_value = std::max( 0.,
-                std::ceil(
-                    bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
-                    - 0.5 ) );
+                    std::floor( bbox.max().value( 0 ) - 0.5 ) );
+            const auto min_k_value =
+                std::max( 0., std::ceil( bbox.min().value( 1 ) - 0.5 ) );
             const auto max_k_value =
                 std::min( grid_.nb_cells_in_direction( 2 ) - 1.,
-                    std::floor( bbox.max().value( 1 )
-                                    / grid_.cell_length_in_direction( 2 )
-                                - 0.5 ) );
+                    std::floor( bbox.max().value( 1 ) - 0.5 ) );
             if( min_j_value > max_j_value || min_k_value > max_k_value )
             {
                 return;
@@ -742,10 +735,7 @@ namespace
             {
                 for( const auto k : geode::Range{ min_k, max_k + 1 } )
                 {
-                    const geode::Point2D point{
-                        { ( j + 0.5 ) * grid_.cell_length_in_direction( 1 ),
-                            ( k + 0.5 ) * grid_.cell_length_in_direction( 2 ) }
-                    };
+                    const geode::Point2D point{ { j + 0.5, k + 0.5 } };
                     const auto jk_process =
                         is_jk_to_process( triangle, point, j, k );
                     if( !jk_process.to_process )
@@ -784,38 +774,28 @@ namespace
                 order = { 0, 2, 1 };
             }
 
-            const auto decimal_fabs = [this]( double value ) {
-                return value / grid_.cell_length_in_direction( 0 );
-            };
-
             if( position == geode::POSITION::vertex0 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[0]] );
-                const auto i_value =
-                    i_index( decimal_fabs( point_3d.value( 0 ) ) );
+                const auto i_value = i_index( point_3d.value( 0 ) );
                 return { i_value, i_value };
             }
             if( position == geode::POSITION::vertex1 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[1]] );
-                const auto i_value =
-                    i_index( decimal_fabs( point_3d.value( 0 ) ) );
+                const auto i_value = i_index( point_3d.value( 0 ) );
                 return { i_value, i_value };
             }
             if( position == geode::POSITION::vertex2 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[2]] );
-                const auto i_value =
-                    i_index( decimal_fabs( point_3d.value( 0 ) ) );
+                const auto i_value = i_index( point_3d.value( 0 ) );
                 return { i_value, i_value };
             }
             std::array< double, 3 > i_values_triangle_vertices{
-                decimal_fabs(
-                    points_.at( vertices_order_[order[0]] ).value( 0 ) ),
-                decimal_fabs(
-                    points_.at( vertices_order_[order[1]] ).value( 0 ) ),
-                decimal_fabs(
-                    points_.at( vertices_order_[order[2]] ).value( 0 ) )
+                points_.at( vertices_order_[order[0]] ).value( 0 ),
+                points_.at( vertices_order_[order[1]] ).value( 0 ),
+                points_.at( vertices_order_[order[2]] ).value( 0 )
             };
             if( position == geode::POSITION::edge0 )
             {
@@ -1025,12 +1005,14 @@ namespace
         Values values;
         PaintedVertices painted_vertices;
         PaintedEdges painted_edges;
-        const auto& origin = grid.grid_coordinate_system().origin();
+        // Points in the grid coordinate system, in cell length unit
+        const auto& coordinate_system = grid.grid_coordinate_system();
         absl::FixedArray< geode::Point3D > points(
             closed_surface.nb_vertices() );
         for( const auto v : geode::Range{ closed_surface.nb_vertices() } )
         {
-            points[v] = closed_surface.point( v ) - origin;
+            points[v] =
+                coordinate_system.coordinates( closed_surface.point( v ) );
         }
         for( const auto p : geode::Range{ closed_surface.nb_polygons() } )
         {
@@ -1048,12 +1030,13 @@ namespace
         Values values;
         PaintedVertices painted_vertices;
         PaintedEdges painted_edges;
-        const auto& origin = grid.grid_coordinate_system().origin();
+        // Points in the grid coordinate system, in cell length unit
+        const auto& coordinate_system = grid.grid_coordinate_system();
         absl::FixedArray< geode::Point3D > points( 4 );
         const auto& vertices = tetrahedron.vertices();
         for( const auto v : geode::Range{ 4 } )
         {
-            points[v] = vertices[v].get() - origin;
+            points[v] = coordinate_system.coordinates( vertices[v].get() );
         }
         for( const auto f : geode::Range{ 4 } )
         {
