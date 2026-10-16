@@ -229,9 +229,11 @@ namespace geode
                 grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                if( query_in_grid.value( d ) < -GLOBAL_EPSILON
-                    || query_in_grid.value( d )
-                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
+                // Negated form: a NaN coordinate is rejected
+                const auto value = query_in_grid.value( d );
+                if( !( value >= -GLOBAL_EPSILON
+                        && value <= grid.nb_cells_in_direction( d )
+                                        + GLOBAL_EPSILON ) )
                 {
                     return false;
                 }
@@ -248,11 +250,12 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                if( value < 0. )
+                // Negated form: a NaN coordinate gives 0, not a cast of NaN
+                if( !( value > 0. ) )
                 {
                     closest[d] = 0;
                 }
-                else if( value > grid.nb_cells_in_direction( d ) )
+                else if( !( value < grid.nb_cells_in_direction( d ) ) )
                 {
                     closest[d] = grid.nb_cells_in_direction( d );
                 }
@@ -284,9 +287,10 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                if( value < -GLOBAL_EPSILON
-                    || value
-                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
+                // Negated form: a NaN coordinate is rejected
+                if( !( value >= -GLOBAL_EPSILON
+                        && value <= grid.nb_cells_in_direction( d )
+                                        + GLOBAL_EPSILON ) )
                 {
                     return {};
                 }

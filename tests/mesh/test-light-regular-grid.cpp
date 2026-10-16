@@ -430,6 +430,23 @@ void test_set_grid_dimensions_failure()
     check_unchanged( "null length" );
 }
 
+void test_nan_query( const geode::LightRegularGrid3D& grid )
+{
+    const auto nan = std::numeric_limits< double >::quiet_NaN();
+    const geode::Point3D query{ { nan, 2, 2 } };
+    geode::OpenGeodeMeshException::test(
+        !grid.contains( query ), "[Test] NaN point should not be contained" );
+    geode::OpenGeodeMeshException::test(
+        grid.cells( query ).empty(), "[Test] NaN point should be in no cell" );
+    const auto closest = grid.closest_vertex( query );
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            closest[d] < grid.nb_vertices_in_direction( d ),
+            "[Test] Closest vertex of NaN point should be a valid vertex" );
+    }
+}
+
 void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
@@ -462,6 +479,7 @@ void test()
     test_attribute( grid );
     test_vertices_around_vertex( grid );
     test_set_grid_dimensions_failure();
+    test_nan_query( grid );
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
