@@ -92,26 +92,39 @@ namespace
         return mesh.edge_vertex( edge_vertex0 )
                == mesh.edge_vertex( edge_vertex1 );
     }
+} // namespace
 
-    /*!
-     * Polygon-local vertex or edge hit by a ray, if any.
-     */
-    struct PolygonFeature
+namespace geode
+{
+    namespace internal
     {
-        geode::local_index_t vertex{ geode::NO_LID };
-        geode::local_index_t edge{ geode::NO_LID };
-    };
-
-    struct PolygonHit
-    {
-        geode::RayTracing3D::PolygonDistance distance;
-        PolygonFeature feature;
-
-        bool operator<( const PolygonHit& other ) const
+        /*!
+         * Polygon-local vertex or edge hit by a ray, if any.
+         * Not in an anonymous namespace: used as RayTracing3D::Impl member.
+         */
+        struct RayTracingPolygonFeature
         {
-            return distance < other.distance;
-        }
-    };
+            geode::local_index_t vertex{ geode::NO_LID };
+            geode::local_index_t edge{ geode::NO_LID };
+        };
+
+        struct RayTracingPolygonHit
+        {
+            geode::RayTracing3D::PolygonDistance distance;
+            RayTracingPolygonFeature feature;
+
+            bool operator<( const RayTracingPolygonHit& other ) const
+            {
+                return distance < other.distance;
+            }
+        };
+    } // namespace internal
+} // namespace geode
+
+namespace
+{
+    using PolygonFeature = geode::internal::RayTracingPolygonFeature;
+    using PolygonHit = geode::internal::RayTracingPolygonHit;
 
     geode::POSITION polygon_vertex_position( geode::local_index_t vertex )
     {
