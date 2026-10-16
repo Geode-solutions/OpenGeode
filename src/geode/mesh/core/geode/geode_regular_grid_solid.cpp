@@ -30,6 +30,7 @@
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.hpp>
 #include <geode/mesh/core/internal/grid_impl.hpp>
@@ -48,6 +49,39 @@ namespace
     static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
         SOLID_CELL_FACET_VERTICES{ { { 0, 2, 6, 4 }, { 1, 5, 7, 3 },
             { 0, 4, 5, 1 }, { 2, 3, 7, 6 }, { 0, 1, 3, 2 }, { 4, 6, 7, 5 } } };
+
+    /*!
+     * Old files do not store the grid coordinate system (it is reset to the
+     * default one on load), and files written by OpenGeode v18.0 to v18.2 may
+     * store a coordinate system that does not match the vertex coordinates.
+     * In these cases, rebuild the grid origin and directions from the vertex
+     * coordinates. A consistent stored coordinate system is kept untouched.
+     */
+    void repair_grid_coordinate_system( geode::RegularGrid3D& grid )
+    {
+        const auto& origin = grid.point( 0 );
+        bool is_consistent =
+            grid.grid_point( geode::Grid3D::VertexIndices{} ) == origin;
+        std::array< geode::Vector3D, 3 > directions;
+        for( const auto d : geode::LRange{ 3 } )
+        {
+            geode::Grid3D::VertexIndices next_vertex{};
+            next_vertex[d] = 1;
+            const auto& next_point =
+                grid.point( grid.vertex_index( next_vertex ) );
+            directions[d] = geode::Vector3D{ origin, next_point };
+            is_consistent =
+                is_consistent
+                && grid.grid_point( next_vertex ).inexact_equal( next_point );
+        }
+        if( is_consistent )
+        {
+            return;
+        }
+        geode::GridBuilder3D builder{ grid };
+        builder.set_grid_origin( origin );
+        builder.set_grid_directions( std::move( directions ) );
+    }
 } // namespace
 
 namespace geode
@@ -230,6 +264,7 @@ namespace geode
                      detail::template initialize_crs<
                          OpenGeodeRegularGrid< 3 > >(
                          grid, new_point_attribute_id );
+                     repair_grid_coordinate_system( grid );
                  },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
@@ -244,11 +279,16 @@ namespace geode
                         detail::template initialize_crs<
                             OpenGeodeRegularGrid< 3 > >(
                             grid, new_point_attribute_id );
+                        repair_grid_coordinate_system( grid );
                     },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
                         archive.object( grid.impl_ );
+                        if constexpr( std::is_same_v< Archive, Deserializer > )
+                        {
+                            repair_grid_coordinate_system( grid );
+                        }
                     } } } );
     }
 
