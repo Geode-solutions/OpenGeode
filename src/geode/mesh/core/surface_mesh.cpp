@@ -244,35 +244,37 @@ namespace geode
     template < typename Archive >
     void PolygonVertex::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolygonVertex >{
-                { []( Archive& archive, PolygonVertex& polygon_vertex ) {
-                     archive.value4b( polygon_vertex.polygon_id );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polygon_vertex.vertex_id = value;
-                 },
-                    []( Archive& archive, PolygonVertex& polygon_vertex ) {
-                        archive.value4b( polygon_vertex.polygon_id );
-                        archive.value1b( polygon_vertex.vertex_id );
-                    } } } );
+        static const Growable< Archive, PolygonVertex > growable{
+            { []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                 archive.value4b( polygon_vertex.polygon_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polygon_vertex.vertex_id = value;
+             },
+                []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                    archive.value4b( polygon_vertex.polygon_id );
+                    archive.value1b( polygon_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolygonEdge::serialize( Archive& serializer )
     {
-        serializer.ext(
-            *this, Growable< Archive, PolygonEdge >{
-                       { []( Archive& archive, PolygonEdge& polygon_edge ) {
-                            archive.value4b( polygon_edge.polygon_id );
-                            index_t value{ NO_ID };
-                            archive.value4b( value );
-                            polygon_edge.edge_id = value;
-                        },
-                           []( Archive& archive, PolygonEdge& polygon_edge ) {
-                               archive.value4b( polygon_edge.polygon_id );
-                               archive.value1b( polygon_edge.edge_id );
-                           } } } );
+        static const Growable< Archive, PolygonEdge > growable{
+            { []( Archive& archive, PolygonEdge& polygon_edge ) {
+                 archive.value4b( polygon_edge.polygon_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polygon_edge.edge_id = value;
+             },
+                []( Archive& archive, PolygonEdge& polygon_edge ) {
+                    archive.value4b( polygon_edge.polygon_id );
+                    archive.value1b( polygon_edge.edge_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < index_t dimension >

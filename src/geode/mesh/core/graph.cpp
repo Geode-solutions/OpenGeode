@@ -164,18 +164,19 @@ namespace geode
     template < typename Archive >
     void EdgeVertex::serialize( Archive& serializer )
     {
-        serializer.ext(
-            *this, Growable< Archive, EdgeVertex >{
-                       { []( Archive& archive, EdgeVertex& edge_vertex ) {
-                            archive.value4b( edge_vertex.edge_id );
-                            index_t value{ NO_ID };
-                            archive.value4b( value );
-                            edge_vertex.vertex_id = value;
-                        },
-                           []( Archive& archive, EdgeVertex& edge_vertex ) {
-                               archive.value4b( edge_vertex.edge_id );
-                               archive.value1b( edge_vertex.vertex_id );
-                           } } } );
+        static const Growable< Archive, EdgeVertex > growable{
+            { []( Archive& archive, EdgeVertex& edge_vertex ) {
+                 archive.value4b( edge_vertex.edge_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 edge_vertex.vertex_id = value;
+             },
+                []( Archive& archive, EdgeVertex& edge_vertex ) {
+                    archive.value4b( edge_vertex.edge_id );
+                    archive.value1b( edge_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     Graph::Graph() = default;
