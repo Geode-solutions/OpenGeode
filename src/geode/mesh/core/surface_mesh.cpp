@@ -115,18 +115,6 @@ namespace
             "edge" );
     }
 
-    template < geode::index_t dimension >
-    bool not_same_orientation( const geode::SurfaceMesh< dimension >& mesh,
-        const geode::PolygonEdge& current_edge,
-        const geode::PolygonEdge& adj_edge )
-    {
-        const auto cur_v0 = mesh.polygon_edge_vertex( current_edge, 0 );
-        const auto cur_v1 = mesh.polygon_edge_vertex( current_edge, 1 );
-        const auto adj_v0 = mesh.polygon_edge_vertex( adj_edge, 0 );
-        const auto adj_v1 = mesh.polygon_edge_vertex( adj_edge, 1 );
-        return cur_v0 == adj_v0 && cur_v1 == adj_v1;
-    }
-
     /*!
      * Return the other edge of the polygon sharing the given vertex with the
      * given edge. Works whatever the orientation of the polygon.
@@ -148,24 +136,24 @@ namespace
     std::optional< geode::PolygonVertex > next_polygon_vertex_around(
         const geode::SurfaceMesh< dimension >& mesh,
         const geode::PolygonVertex& cur_polygon_vertex,
+        geode::index_t vertex_id,
         bool& vertex_is_next )
     {
         const auto exit_vertex =
             vertex_is_next ? cur_polygon_vertex
                            : mesh.previous_polygon_vertex( cur_polygon_vertex );
-        const geode::PolygonEdge exit_edge{ exit_vertex };
-        const auto adj_edge = mesh.polygon_adjacent_edge( exit_edge );
+        const auto adj_edge =
+            mesh.polygon_adjacent_edge( geode::PolygonEdge{ exit_vertex } );
         if( !adj_edge )
         {
             return std::nullopt;
         }
-        if( not_same_orientation( mesh, exit_edge, adj_edge.value() ) )
-        {
-            vertex_is_next = !vertex_is_next;
-        }
-        return vertex_is_next ? geode::PolygonVertex{ mesh.next_polygon_vertex(
-                                    geode::PolygonVertex{ adj_edge.value() } ) }
-                              : geode::PolygonVertex{ adj_edge.value() };
+        // The adjacent edge contains vertex_id either as first or as second
+        // vertex, whatever the orientation of the adjacent polygon
+        const geode::PolygonVertex adj_vertex{ adj_edge.value() };
+        vertex_is_next = mesh.polygon_vertex( adj_vertex ) != vertex_id;
+        return vertex_is_next ? mesh.next_polygon_vertex( adj_vertex )
+                              : adj_vertex;
     }
 
     /*!
@@ -234,7 +222,7 @@ namespace
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
             cur_polygon_vertex = next_polygon_vertex_around(
-                mesh, cur_polygon_vertex.value(), vertex_is_next );
+                mesh, cur_polygon_vertex.value(), vertex_id, vertex_is_next );
             if( !cur_polygon_vertex )
             {
                 break;
@@ -252,7 +240,7 @@ namespace
         {
             vertex_is_next = true;
             cur_polygon_vertex = next_polygon_vertex_around(
-                mesh, first_polygon.value(), vertex_is_next );
+                mesh, first_polygon.value(), vertex_id, vertex_is_next );
         }
         else
         {
@@ -271,7 +259,7 @@ namespace
             }
             result.polygons.push_back( cur_polygon_vertex.value() );
             cur_polygon_vertex = next_polygon_vertex_around(
-                mesh, cur_polygon_vertex.value(), vertex_is_next );
+                mesh, cur_polygon_vertex.value(), vertex_id, vertex_is_next );
         }
         return result;
     }
@@ -784,52 +772,48 @@ namespace geode
         SurfaceMesh< dimension >::polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const
     {
-        const auto polygon_adj = polygon_adjacent( polygon_edge );
+        check_polygon_id( *this, polygon_edge.polygon_id );
+        check_polygon_edge_id(
+            *this, polygon_edge.polygon_id, polygon_edge.edge_id );
+        // Hot path of polygons_around_vertex: unchecked accessors only
+        const auto polygon_adj = get_polygon_adjacent( polygon_edge );
         if( !polygon_adj )
         {
             return std::nullopt;
         }
         const auto polygon_adj_id = polygon_adj.value();
-        const auto v0 = polygon_vertex( PolygonVertex{ polygon_edge } );
-        const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-        const auto adj_vertices = polygon_vertices( polygon_adj_id );
-        const auto nb_edges = adj_vertices.size();
-        std::vector< PolygonEdge > failed_edges;
-        for( const auto edge_id : LRange{ nb_edges } )
+        const auto nb_vertices =
+            get_nb_polygon_vertices( polygon_edge.polygon_id );
+        const auto v0 = get_polygon_vertex( PolygonVertex{ polygon_edge } );
+        const local_index_t next_vertex =
+            polygon_edge.edge_id + 1 == nb_vertices ? 0
+                                                    : polygon_edge.edge_id + 1;
+        const auto v1 =
+            get_polygon_vertex( { polygon_edge.polygon_id, next_vertex } );
+        const auto nb_adj_edges = get_nb_polygon_vertices( polygon_adj_id );
+        const auto adj_first_vertex =
+            get_polygon_vertex( { polygon_adj_id, 0 } );
+        auto adj_vertex = adj_first_vertex;
+        absl::InlinedVector< PolygonEdge, 1 > failed_edges;
+        for( const auto edge_id : LRange{ nb_adj_edges } )
         {
-            const PolygonEdge polygon_adj_edge{ polygon_adj_id, edge_id };
-            if( v0 == adj_vertices[edge_id] )
+            const local_index_t enext =
+                edge_id + 1 == nb_adj_edges ? 0 : edge_id + 1;
+            const auto adj_next_vertex =
+                enext == 0 ? adj_first_vertex
+                           : get_polygon_vertex( { polygon_adj_id, enext } );
+            if( ( v0 == adj_vertex && v1 == adj_next_vertex )
+                || ( v1 == adj_vertex && v0 == adj_next_vertex ) )
             {
-                const auto enext =
-                    edge_id == nb_edges - 1
-                        ? 0u
-                        : static_cast< local_index_t >( edge_id + 1 );
-                if( v1 == adj_vertices[enext] )
+                const PolygonEdge polygon_adj_edge{ polygon_adj_id, edge_id };
+                if( get_polygon_adjacent( polygon_adj_edge )
+                    == polygon_edge.polygon_id )
                 {
-                    if( polygon_adjacent( polygon_adj_edge )
-                        == polygon_edge.polygon_id )
-                    {
-                        return polygon_adj_edge;
-                    }
-                    failed_edges.emplace_back( polygon_adj_edge );
+                    return polygon_adj_edge;
                 }
+                failed_edges.emplace_back( polygon_adj_edge );
             }
-            else if( v1 == adj_vertices[edge_id] )
-            {
-                const auto enext =
-                    edge_id == nb_edges - 1
-                        ? 0u
-                        : static_cast< local_index_t >( edge_id + 1 );
-                if( v0 == adj_vertices[enext] )
-                {
-                    if( polygon_adjacent( polygon_adj_edge )
-                        == polygon_edge.polygon_id )
-                    {
-                        return polygon_adj_edge;
-                    }
-                    failed_edges.emplace_back( polygon_adj_edge );
-                }
-            }
+            adj_vertex = adj_next_vertex;
         }
         if( failed_edges.empty() )
         {
