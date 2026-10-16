@@ -54,6 +54,12 @@ namespace geode
     {
         set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
+        initialize_grid_elements( origin );
+    }
+
+    void RegularGridBuilder< 2 >::initialize_grid_elements(
+        const Point2D& origin )
+    {
         const auto nb_u = grid_.nb_cells_in_direction( 0 );
         const auto nb_v = grid_.nb_cells_in_direction( 1 );
         resize_vertices( ( nb_u + 1 ) * ( nb_v + 1 ) );
@@ -110,12 +116,13 @@ namespace geode
         std::array< index_t, 2 > cells_number,
         std::array< Vector2D, 2 > directions )
     {
-        // Directions are set first: initialize_grid keeps them (cell lengths
-        // match) and update_origin places the points along them, so the
-        // points are computed only once.
-        set_grid_directions( directions );
-        initialize_grid( origin, std::move( cells_number ),
+        // Dimensions are set first: they are checked before anything is
+        // modified. Directions are then set (cell lengths match) and the
+        // points are placed along them only once.
+        set_grid_dimensions( std::move( cells_number ),
             { directions[0].length(), directions[1].length() } );
+        set_grid_directions( std::move( directions ) );
+        initialize_grid_elements( origin );
     }
 
     void RegularGridBuilder< 2 >::copy( const RegularGrid2D& grid )

@@ -28,6 +28,7 @@
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.hpp>
@@ -618,6 +619,55 @@ void test_update_origin_on_rotated_grid()
     }
 }
 
+template < geode::index_t dimension >
+void test_initialize_grid_with_directions_failure(
+    const std::array< geode::index_t, dimension >& cells_number,
+    const std::array< geode::Vector< dimension >, dimension >& directions,
+    std::string_view context )
+{
+    auto grid = geode::RegularGrid< dimension >::create();
+    auto builder = geode::RegularGridBuilder< dimension >::create( *grid );
+    bool thrown{ false };
+    try
+    {
+        builder->initialize_grid(
+            geode::Point< dimension >{}, cells_number, directions );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] initialize_grid should throw with ", context );
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        geode::Vector< dimension > unit_direction;
+        unit_direction.set_value( d, 1 );
+        geode::OpenGeodeMeshException::test(
+            grid->cell_length_in_direction( d ) == 1
+                && grid->grid_coordinate_system().direction( d )
+                       == unit_direction,
+            "[Test] Grid directions should be unchanged after a failed "
+            "initialize_grid with ",
+            context );
+    }
+}
+
+void test_initialize_grid_with_directions_failures()
+{
+    test_initialize_grid_with_directions_failure< 3 >( { 2, 3, 4 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{},
+            geode::Vector3D{ { 0, -3, 0 } } },
+        "a null 3D direction" );
+    test_initialize_grid_with_directions_failure< 3 >( { 65535, 65535, 1 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } },
+        "a 3D vertex overflow" );
+    test_initialize_grid_with_directions_failure< 2 >( { 3, 4 },
+        { geode::Vector2D{ { 1, 1 } }, geode::Vector2D{} },
+        "a null 2D direction" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -631,6 +681,7 @@ void test()
     test_old_io();
     test_adjacencies2D();
     test_update_origin_on_rotated_grid();
+    test_initialize_grid_with_directions_failures();
 }
 
 OPENGEODE_TEST( "regular-grid" )
