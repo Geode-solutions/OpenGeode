@@ -158,6 +158,34 @@ void compare_edges(
     }
 }
 
+void test_isolated_null_area_polygon()
+{
+    auto surface = geode::SurfaceMesh2D::create();
+    auto builder = geode::SurfaceMeshBuilder2D::create( *surface );
+    builder->create_vertices( 6 );
+    builder->set_point( 0, geode::Point2D{ { 0, 0 } } );
+    builder->set_point( 1, geode::Point2D{ { 1, 0 } } );
+    builder->set_point( 2, geode::Point2D{ { 0, 1 } } );
+    builder->set_point( 3, geode::Point2D{ { 5, 5 } } );
+    builder->set_point( 4, geode::Point2D{ { 6, 6 } } );
+    builder->set_point( 5, geode::Point2D{ { 7, 7 } } );
+    builder->create_polygon( { 0, 2, 1 } );
+    builder->create_polygon( { 3, 4, 5 } );
+    builder->compute_polygon_adjacencies();
+    geode::repair_polygon_orientations( *surface, *builder );
+    check_vertices_order( *surface, 0, { 0, 1, 2 } );
+    check_vertices_order( *surface, 1, { 3, 4, 5 } );
+}
+
+void test_empty_surface()
+{
+    auto surface = geode::SurfaceMesh2D::create();
+    auto builder = geode::SurfaceMeshBuilder2D::create( *surface );
+    geode::repair_polygon_orientations( *surface, *builder );
+    geode::OpenGeodeMeshException::test(
+        surface->nb_polygons() == 0, "Empty surface should stay empty" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -169,6 +197,8 @@ void test()
     check_repaired_surface( *wrong_surface );
     const auto edges_after = get_edges( *wrong_surface );
     compare_edges( edges_before, edges_after );
+    test_isolated_null_area_polygon();
+    test_empty_surface();
 }
 
 OPENGEODE_TEST( "repair-polygon-orientations" )

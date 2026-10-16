@@ -173,6 +173,10 @@ namespace
     {
         polygons_area_sign_info area_sign_info{ 0, mesh.nb_polygons(),
             geode::SIGN::zero };
+        if( mesh.nb_polygons() == 0 )
+        {
+            return area_sign_info;
+        }
         for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
         {
             area_sign_info.area_sign[polygon_id] =
@@ -187,66 +191,74 @@ namespace
             }
         }
         geode::OpenGeodeMeshException::check_exception(
-            area_sign_info.queue.size() != mesh.nb_polygons(), mesh.point( 0 ),
+            area_sign_info.queue.size() != mesh.nb_polygons(), nullptr,
             geode::OpenGeodeException::TYPE::data,
             "[repair_polygon_bad_orientations] Cannot repair orientations of a "
             "SurfaceMesh2D where all polygons have a null area." );
         return area_sign_info;
     }
 
+    geode::SIGN propagated_area_sign( const geode::SurfaceMesh2D& mesh,
+        const polygons_area_sign_info& area_sign_info,
+        geode::index_t polygon )
+    {
+        for( const auto e : geode::LRange{ mesh.nb_polygon_edges( polygon ) } )
+        {
+            const geode::PolygonEdge edge{ polygon, e };
+            if( mesh.is_edge_on_border( edge ) )
+            {
+                continue;
+            }
+            const auto adj = mesh.polygon_adjacent_edge( edge ).value();
+            const auto adj_sign = area_sign_info.area_sign[adj.polygon_id];
+            if( adj_sign == geode::SIGN::zero )
+            {
+                continue;
+            }
+            const auto vertices = mesh.polygon_edge_vertices( edge );
+            const auto adj_vertices = mesh.polygon_edge_vertices( adj );
+            const auto same_orientation = ( vertices[0] == adj_vertices[1]
+                                            && vertices[1] == adj_vertices[0] );
+            if( same_orientation )
+            {
+                return adj_sign;
+            }
+            return adj_sign == geode::SIGN::positive ? geode::SIGN::negative
+                                                     : geode::SIGN::positive;
+        }
+        return geode::SIGN::zero;
+    }
+
     void process_null_area_polygons( const geode::SurfaceMesh2D& mesh,
         polygons_area_sign_info& area_sign_info )
     {
-        while( !area_sign_info.queue.empty() )
+        // Each pass processes every queued polygon once. A null area polygon
+        // without any oriented neighbor is requeued. If a whole pass orients
+        // no polygon, the remaining ones cannot be oriented (e.g. isolated
+        // null area polygons) and are left unchanged.
+        bool progress{ true };
+        while( progress && !area_sign_info.queue.empty() )
         {
-            const auto cur_polygon = area_sign_info.queue.front();
-            area_sign_info.queue.pop();
-            for( const auto e :
-                geode::LRange{ mesh.nb_polygon_edges( cur_polygon ) } )
+            progress = false;
+            const auto nb_queued = area_sign_info.queue.size();
+            for( [[maybe_unused]] const auto unused :
+                geode::Range{ nb_queued } )
             {
-                const geode::PolygonEdge edge{ cur_polygon, e };
-                if( mesh.is_edge_on_border( edge ) )
+                const auto polygon = area_sign_info.queue.front();
+                area_sign_info.queue.pop();
+                const auto sign =
+                    propagated_area_sign( mesh, area_sign_info, polygon );
+                if( sign == geode::SIGN::zero )
                 {
+                    area_sign_info.queue.emplace( polygon );
                     continue;
                 }
-                const auto adj = mesh.polygon_adjacent_edge( edge ).value();
-                if( area_sign_info.area_sign[adj.polygon_id]
-                    == geode::SIGN::zero )
+                progress = true;
+                area_sign_info.area_sign[polygon] = sign;
+                if( sign == geode::SIGN::negative )
                 {
-                    continue;
+                    area_sign_info.nb_bad_polygons++;
                 }
-                const auto vertices = mesh.polygon_edge_vertices( edge );
-                const auto adj_vertices = mesh.polygon_edge_vertices( adj );
-                const auto same_orientation =
-                    ( vertices[0] == adj_vertices[1]
-                        && vertices[1] == adj_vertices[0] );
-                if( same_orientation )
-                {
-                    area_sign_info.area_sign[cur_polygon] =
-                        area_sign_info.area_sign[adj.polygon_id];
-                    break;
-                }
-                if( area_sign_info.area_sign[adj.polygon_id]
-                    == geode::SIGN::positive )
-                {
-                    area_sign_info.area_sign[cur_polygon] =
-                        geode::SIGN::negative;
-                }
-                else
-                {
-                    area_sign_info.area_sign[cur_polygon] =
-                        geode::SIGN::positive;
-                }
-                break;
-            }
-            if( area_sign_info.area_sign[cur_polygon] == geode::SIGN::zero )
-            {
-                area_sign_info.queue.emplace( cur_polygon );
-            }
-            else if( area_sign_info.area_sign[cur_polygon]
-                     == geode::SIGN::negative )
-            {
-                area_sign_info.nb_bad_polygons++;
             }
         }
     }

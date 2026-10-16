@@ -25,6 +25,7 @@
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
+#include <absl/container/inlined_vector.h>
 
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/logger.hpp>
@@ -65,7 +66,7 @@ namespace geode
         template < index_t dimension >
         class SurfaceMeshMerger< dimension >::Impl
         {
-            using Polygon = absl::FixedArray< index_t >;
+            using Polygon = absl::InlinedVector< index_t, 4 >;
             using TypedVertexCycle = detail::VertexCycle< Polygon >;
             using SurfaceId = absl::flat_hash_set< index_t >;
 
@@ -147,6 +148,12 @@ namespace geode
             void create_polygons( SurfaceMeshMerger< dimension >& merger )
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > polygons;
+                index_t nb_polygons{ 0 };
+                for( const auto& surface : merger.meshes() )
+                {
+                    nb_polygons += surface.get().nb_polygons();
+                }
+                polygons.reserve( nb_polygons );
                 const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {

@@ -21,18 +21,14 @@
  *
  */
 
-#include <geode/model/helpers/detail/surface_mesh_validity_fix.hpp>
+#include <geode/mesh/helpers/detail/surface_mesh_validity_fix.hpp>
 
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/point.hpp>
 
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
-
-#include <geode/model/mixin/core/surface.hpp>
-#include <geode/model/representation/core/brep.hpp>
-#include <geode/model/representation/core/section.hpp>
 
 namespace geode
 {
