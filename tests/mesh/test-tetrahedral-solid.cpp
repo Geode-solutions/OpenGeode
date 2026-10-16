@@ -72,6 +72,29 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.set_polyhedron_vertex( { 0, 3 }, 3 );
 }
 
+void test_reserve_with_facets_and_edges()
+{
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
+    solid->enable_facets();
+    solid->enable_edges();
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_vertices( 5 );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->reserve_tetrahedra( 10 );
+    builder->facets_builder().reserve_facets( 10 );
+    builder->edges_builder().reserve_edges( 10 );
+    geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 4,
+        "[reserve] Reserving should not create facets" );
+    geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 6,
+        "[reserve] Reserving should not create edges" );
+    builder->create_tetrahedron( { 1, 2, 3, 4 } );
+    geode::OpenGeodeMeshException::test( solid->facets().nb_facets() == 7,
+        "[reserve] Wrong number of facets after reserve" );
+    geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 9,
+        "[reserve] Wrong number of edges after reserve" );
+}
+
 void test_polyhedron_volumes( const geode::TetrahedralSolid3D& solid )
 {
     for( const auto p : geode::Range{ solid.nb_polyhedra() } )
@@ -583,6 +606,7 @@ void test()
 
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
+    test_reserve_with_facets_and_edges();
     test_polyhedron_volumes( *solid );
     test_polyhedron_facet_area( *solid );
     test_polyhedron_adjacencies( *solid, *builder );

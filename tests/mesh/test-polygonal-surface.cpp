@@ -21,7 +21,11 @@
  *
  */
 
+#include <cstring>
+#include <sstream>
+
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -32,6 +36,7 @@
 #include <geode/mesh/builder/geode/geode_polygonal_surface_builder.hpp>
 #include <geode/mesh/builder/surface_edges_builder.hpp>
 #include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/internal/facet_edges_impl.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/surface_edges.hpp>
 #include <geode/mesh/io/polygonal_surface_input.hpp>
@@ -679,6 +684,179 @@ void test_non_manifold_surface()
     }
 }
 
+void test_merge_edges_on_vertex_update()
+{
+    auto surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::PolygonalSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 3 );
+    auto edges_builder = builder->edges_builder();
+    edges_builder.find_or_create_edge( { 0, 2 } );
+    edges_builder.find_or_create_edge( { 1, 2 } );
+    const std::vector< geode::index_t > old2new{ 0, 0, 2 };
+    edges_builder.update_edge_vertices( old2new );
+    const auto& edges = surface->edges();
+    geode::OpenGeodeMeshException::test( edges.nb_edges() == 1,
+        "[merge edges] Merged edges should give 1 edge, not ",
+        edges.nb_edges() );
+    const auto merged = edges.edge_from_vertices( { 0, 2 } );
+    geode::OpenGeodeMeshException::test(
+        merged && merged.value() == 0, "[merge edges] Wrong merged edge id" );
+    geode::OpenGeodeMeshException::test(
+        !edges.is_edge_isolated( 0 ), "[merge edges] Edge 0 is isolated" );
+    edges_builder.remove_edge( { 0, 2 } );
+    geode::OpenGeodeMeshException::test( !edges.is_edge_isolated( 0 ),
+        "[merge edges] Merged edge should keep both counters" );
+
+    const auto new_edge = edges_builder.find_or_create_edge( { 1, 2 } );
+    geode::OpenGeodeMeshException::test( new_edge == 1,
+        "[merge edges] New edge id should be 1, not ", new_edge );
+    geode::OpenGeodeMeshException::test( edges.nb_edges() == 2,
+        "[merge edges] Should have 2 edges, not ", edges.nb_edges() );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_vertices( 0 ) == std::array< geode::index_t, 2 >{ 0, 2 },
+        "[merge edges] Wrong vertices for edge 0" );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_vertices( 1 ) == std::array< geode::index_t, 2 >{ 1, 2 },
+        "[merge edges] Wrong vertices for edge 1" );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_from_vertices( { 1, 2 } ) == 1,
+        "[merge edges] Wrong id from vertices for edge 1" );
+}
+
+void test_edge_is_opposite()
+{
+    auto surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::PolygonalSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 3 );
+    const auto edge_id =
+        builder->edges_builder().find_or_create_edge( { 2, 1 } );
+    const auto& edges = surface->edges();
+    // Edges are stored in a canonical orientation
+    geode::OpenGeodeMeshException::test( edges.is_opposite( edge_id, { 1, 2 } ),
+        "[is_opposite] Edge should match its canonical orientation" );
+    geode::OpenGeodeMeshException::test( edges.is_opposite( edge_id, { 2, 1 } ),
+        "[is_opposite] Edge should match its canonical orientation" );
+    geode::OpenGeodeMeshException::test(
+        !edges.is_opposite( edge_id, { 0, 2 } ),
+        "[is_opposite] Different edge detected as opposite" );
+}
+
+using FacetEdges = geode::internal::FacetEdgesImpl< 3 >;
+
+std::string serialize_edges( const FacetEdges& edges )
+{
+    std::ostringstream output{ std::ios::binary };
+    geode::TContext context{};
+    geode::BitseryExtensions::register_serialize_pcontext(
+        std::get< 0 >( context ) );
+    geode::Serializer archive{ context, output };
+    archive.object( edges );
+    archive.adapter().flush();
+    return output.str();
+}
+
+void deserialize_edges( const std::string& buffer, FacetEdges& edges )
+{
+    std::istringstream input{ buffer, std::ios::binary };
+    geode::TContext context{};
+    geode::BitseryExtensions::register_deserialize_pcontext(
+        std::get< 0 >( context ) );
+    geode::Deserializer archive{ context, input };
+    archive.object( edges );
+}
+
+constexpr std::array< geode::index_t, 2 > EDGE_A{ 1000001, 1000002 };
+constexpr std::array< geode::index_t, 2 > EDGE_B{ 1000003, 1000004 };
+
+void check_repaired_edges( const std::string& buffer,
+    geode::index_t expected_counter,
+    std::string_view case_name )
+{
+    FacetEdges edges{ geode::BITSERY::constructor };
+    deserialize_edges( buffer, edges );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_attribute_manager().nb_elements() == 2, "[corrupted edges] ",
+        case_name, ": should have 2 edges, not ",
+        edges.edge_attribute_manager().nb_elements() );
+    const auto edge_a = edges.find_edge( EDGE_A );
+    const auto edge_b = edges.find_edge( EDGE_B );
+    geode::OpenGeodeMeshException::test(
+        edge_a && edge_b && edge_a.value() != edge_b.value()
+            && edge_a.value() < 2 && edge_b.value() < 2,
+        "[corrupted edges] ", case_name, ": wrong edge ids" );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_vertices( edge_a.value() ) == EDGE_A
+            && edges.edge_vertices( edge_b.value() ) == EDGE_B,
+        "[corrupted edges] ", case_name, ": wrong edge vertices" );
+    for( const auto& [edge, vertices] :
+        { std::pair{ edge_a.value(), EDGE_A }, { edge_b.value(), EDGE_B } } )
+    {
+        for( const auto i : geode::Range{ expected_counter } )
+        {
+            geode::OpenGeodeMeshException::test(
+                !edges.is_edge_isolated( edge ), "[corrupted edges] ",
+                case_name, ": edge ", edge, " isolated after ", i,
+                " removals" );
+            edges.remove_edge( vertices );
+        }
+        geode::OpenGeodeMeshException::test( edges.is_edge_isolated( edge ),
+            "[corrupted edges] ", case_name, ": edge ", edge,
+            " should be isolated" );
+    }
+}
+
+std::string as_bytes( geode::index_t value )
+{
+    std::string bytes( sizeof( geode::index_t ), 0 );
+    std::memcpy( bytes.data(), &value, sizeof( geode::index_t ) );
+    return bytes;
+}
+
+void test_corrupted_edges_deserialization()
+{
+    FacetEdges edges;
+    edges.find_or_create_edge( EDGE_A );
+    edges.find_or_create_edge( EDGE_B );
+    const auto buffer = serialize_edges( edges );
+    check_repaired_edges( buffer, 1, "valid" );
+
+    // Edge counters are serialized last: [size = 2][counter 0][counter 1]
+    constexpr auto COUNTERS_SIZE = 1 + 2 * sizeof( geode::index_t );
+    geode::OpenGeodeMeshException::test(
+        buffer.size() > COUNTERS_SIZE
+            && buffer[buffer.size() - COUNTERS_SIZE] == 2,
+        "[corrupted edges] Unexpected serialized layout" );
+    const auto prefix = buffer.substr( 0, buffer.size() - COUNTERS_SIZE );
+    const auto one_counter = as_bytes( 1 );
+
+    // Only one counter: one edge index is out of bounds
+    check_repaired_edges(
+        absl::StrCat( prefix, std::string( 1, 1 ), one_counter ), 1,
+        "missing counter" );
+
+    // Three counters for two edges: the unindexed counter is added to every
+    // edge
+    check_repaired_edges( absl::StrCat( prefix, std::string( 1, 3 ),
+                              one_counter, one_counter, one_counter ),
+        2, "extra counter" );
+
+    // Both edges share the same index: each map entry is serialized as
+    // [vertices][edge index]
+    const auto edge_b_entry = absl::StrCat(
+        as_bytes( EDGE_B[0] ), as_bytes( EDGE_B[1] ), as_bytes( 1 ) );
+    auto shared_index = buffer;
+    const auto edge_b_position = shared_index.find( edge_b_entry );
+    geode::OpenGeodeMeshException::test( edge_b_position != std::string::npos,
+        "[corrupted edges] Unexpected serialized edge layout" );
+    shared_index.replace( edge_b_position + 2 * sizeof( geode::index_t ),
+        sizeof( geode::index_t ), as_bytes( 0 ) );
+    check_repaired_edges( shared_index, 2, "shared index" );
+}
+
 void test_texture( const geode::PolygonalSurface3D& polygonal_surface )
 {
     auto manager = polygonal_surface.texture_manager();
@@ -856,6 +1034,9 @@ void test()
     test_non_manifold_surface();
     test_create_invalid_polygons();
     test_polygon_vertex_normal_with_coincident_points();
+    test_merge_edges_on_vertex_update();
+    test_corrupted_edges_deserialization();
+    test_edge_is_opposite();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

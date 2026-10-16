@@ -96,6 +96,11 @@ namespace geode
 
         std::vector< index_t > remove_isolated_facets( SolidFacetsKey /*key*/ );
 
+        /*!
+         * Reserve memory for nb additional facets
+         */
+        void reserve_facets( index_t nb, SolidFacetsKey /*key*/ );
+
         index_t find_or_create_facet(
             PolyhedronFacetVertices facet_vertices, SolidFacetsKey /*key*/ )
         {

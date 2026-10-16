@@ -37,6 +37,23 @@
 
 #include <geode/tests/common.hpp>
 
+void test_reserve_with_edges()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->reserve_triangles( 10 );
+    builder->edges_builder().reserve_edges( 10 );
+    geode::OpenGeodeMeshException::test( surface->edges().nb_edges() == 3,
+        "[reserve] Reserving should not create edges" );
+    builder->create_triangle( { 1, 3, 2 } );
+    geode::OpenGeodeMeshException::test( surface->edges().nb_edges() == 5,
+        "[reserve] Wrong number of edges after reserve" );
+}
+
 void test_create_vertices( const geode::TriangulatedSurface3D& surface,
     geode::TriangulatedSurfaceBuilder3D& builder )
 {
@@ -692,6 +709,7 @@ void test()
     test_permute_vertices_with_isolated_vertex();
     test_replace_vertices_chained_mapping();
     test_polygon_vertex_edge_hash();
+    test_reserve_with_edges();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )
