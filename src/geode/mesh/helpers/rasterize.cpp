@@ -645,9 +645,9 @@ namespace
             {
                 return ids[0] < other.ids[0];
             }
-            if( ids[1] != ids[1] )
+            if( ids[1] != other.ids[1] )
             {
-                return ids[1] > other.ids[1];
+                return ids[1] < other.ids[1];
             }
             return counter_clockwise < other.counter_clockwise;
         }
