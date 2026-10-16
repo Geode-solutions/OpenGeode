@@ -518,6 +518,25 @@ void test_large_fan_around_vertex()
         "[polygons_around_vertex] Fan center should be on border" );
 }
 
+void test_polygons_around_vertex_after_adjacencies()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 3, 2 } );
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 1 ).size() == 1,
+        "[polygons_around_vertex] Wrong number of polygons before "
+        "adjacencies" );
+    builder->compute_polygon_adjacencies();
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 1 ).size() == 2,
+        "[polygons_around_vertex] Wrong number of polygons after "
+        "adjacencies" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -538,6 +557,7 @@ void test()
     test_set_polygon_vertex_keeps_old_vertex_link();
     test_create_polygon_invalid_size();
     test_large_fan_around_vertex();
+    test_polygons_around_vertex_after_adjacencies();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

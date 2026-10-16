@@ -753,6 +753,16 @@ namespace geode
                 }
             }
         }
+        // Every modified adjacency is on an edge of polygons_to_connect
+        for( const auto polygon : polygons_to_connect )
+        {
+            for( const auto v :
+                LRange{ surface_mesh_.nb_polygon_vertices( polygon ) } )
+            {
+                reset_polygons_around_vertex(
+                    surface_mesh_.polygon_vertex( { polygon, v } ) );
+            }
+        }
     }
 
     template < index_t dimension >
