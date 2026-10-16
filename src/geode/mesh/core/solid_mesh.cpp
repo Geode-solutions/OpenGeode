@@ -176,27 +176,35 @@ namespace
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         do
         {
-            if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
+            safety_count++;
+            const auto adj = solid.polyhedron_adjacent_facet( facet );
+            if( !adj )
             {
-                const auto adj_facet = adj.value();
-                polyhedra_around_edge.push_back( adj_facet.polyhedron_id );
-                for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
-                         adj_facet.polyhedron_id ) } )
+                found = false;
+                return result;
+            }
+            const auto adj_facet = adj.value();
+            polyhedra_around_edge.push_back( adj_facet.polyhedron_id );
+            bool next_facet_found{ false };
+            for( const auto f : geode::LRange{
+                     solid.nb_polyhedron_facets( adj_facet.polyhedron_id ) } )
+            {
+                if( adj_facet.facet_id == f )
                 {
-                    if( adj_facet.facet_id == f )
-                    {
-                        continue;
-                    }
-                    if( solid.is_edge_in_polyhedron_facet(
-                            { adj_facet.polyhedron_id, f }, edge_vertices ) )
-                    {
-                        facet = { adj_facet.polyhedron_id, f };
-                        break;
-                    }
+                    continue;
+                }
+                if( solid.is_edge_in_polyhedron_facet(
+                        { adj_facet.polyhedron_id, f }, edge_vertices ) )
+                {
+                    facet = { adj_facet.polyhedron_id, f };
+                    next_facet_found = true;
+                    break;
                 }
             }
-            else
+            if( !next_facet_found )
             {
+                // The adjacent polyhedron does not contain the edge (e.g.
+                // adjacency through a facet subset): the walk cannot go on.
                 found = false;
                 return result;
             }
