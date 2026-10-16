@@ -357,6 +357,37 @@ void test_tetrahedral_solid_adjacencies()
     check_adjacencies_consistency( *tet_solid.value(), 2 );
 }
 
+void test_densify_grid_cells_validation()
+{
+    auto grid = geode::RegularGrid3D::create();
+    auto builder = geode::RegularGridBuilder3D::create( *grid );
+    builder->initialize_grid( geode::Point3D{ { 0, 0, 0 } }, { 3, 3, 3 }, 1 );
+    const std::array< geode::index_t, 1 > single{ 13 };
+    const auto reference =
+        geode::convert_grid_into_densified_tetrahedral_solid( *grid, single );
+    const std::array< geode::index_t, 2 > duplicated{ 13, 13 };
+    const auto densified = geode::convert_grid_into_densified_tetrahedral_solid(
+        *grid, duplicated );
+    geode::OpenGeodeMeshException::test(
+        densified->nb_vertices() == reference->nb_vertices()
+            && densified->nb_polyhedra() == reference->nb_polyhedra(),
+        "Duplicated cells to densify should be densified once" );
+    const std::array< geode::index_t, 1 > out_of_range{ grid->nb_cells() };
+    bool has_thrown{ false };
+    try
+    {
+        const auto result =
+            geode::convert_grid_into_densified_tetrahedral_solid(
+                *grid, out_of_range );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        has_thrown, "Out of range cell to densify should throw" );
+}
+
 void test()
 {
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
@@ -364,6 +395,7 @@ void test()
     test_hybrid_solid();
     test_hybrid_solid_adjacencies();
     test_tetrahedral_solid_adjacencies();
+    test_densify_grid_cells_validation();
 }
 
 OPENGEODE_TEST( "convert-solid" )

@@ -164,6 +164,37 @@ void triangulate_surface()
         surface->nb_polygons() );
 }
 
+void densify_grid_cells_validation()
+{
+    geode::LightRegularGrid2D grid{ geode::Point2D{ { 0, 0 } }, { 3, 3 },
+        { 1, 1 } };
+    const std::array< geode::index_t, 1 > single{ 4 };
+    const auto reference =
+        geode::convert_grid_into_densified_triangulated_surface( grid, single );
+    const std::array< geode::index_t, 2 > duplicated{ 4, 4 };
+    const auto densified =
+        geode::convert_grid_into_densified_triangulated_surface(
+            grid, duplicated );
+    geode::OpenGeodeMeshException::test(
+        densified->nb_vertices() == reference->nb_vertices()
+            && densified->nb_polygons() == reference->nb_polygons(),
+        "Duplicated cells to densify should be densified once" );
+    const std::array< geode::index_t, 1 > out_of_range{ grid.nb_cells() };
+    bool has_thrown{ false };
+    try
+    {
+        const auto result =
+            geode::convert_grid_into_densified_triangulated_surface(
+                grid, out_of_range );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        has_thrown, "Out of range cell to densify should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -171,6 +202,7 @@ void test()
     convert_surface_dimension();
     convert_grid_to_surface();
     triangulate_surface();
+    densify_grid_cells_validation();
 }
 
 OPENGEODE_TEST( "convert-surface" )

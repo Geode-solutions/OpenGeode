@@ -832,6 +832,31 @@ namespace
         }
         return ordered_vertices;
     }
+
+    std::vector< geode::index_t > checked_cells_to_densify(
+        const geode::Grid3D& grid,
+        absl::Span< const geode::index_t > cells_to_densify )
+    {
+        std::vector< bool > already_added( grid.nb_cells(), false );
+        std::vector< geode::index_t > cells;
+        cells.reserve( cells_to_densify.size() );
+        for( const auto cell_id : cells_to_densify )
+        {
+            geode::OpenGeodeMeshException::check_exception(
+                cell_id < grid.nb_cells(), nullptr,
+                geode::OpenGeodeException::TYPE::data,
+                "[convert_grid_into_densified_tetrahedral_solid] Cell ",
+                cell_id, " to densify is out of range (the grid has ",
+                grid.nb_cells(), " cells)" );
+            if( already_added[cell_id] )
+            {
+                continue;
+            }
+            already_added[cell_id] = true;
+            cells.push_back( cell_id );
+        }
+        return cells;
+    }
 } // namespace
 
 namespace geode
@@ -900,7 +925,8 @@ namespace geode
         convert_grid_into_densified_tetrahedral_solid( const Grid3D& grid,
             absl::Span< const geode::index_t > cells_to_densify )
     {
-        return create_tetrahedral_solid_from_grid( grid, cells_to_densify );
+        return create_tetrahedral_solid_from_grid(
+            grid, checked_cells_to_densify( grid, cells_to_densify ) );
     }
 
     std::optional< std::unique_ptr< HybridSolid3D > >
