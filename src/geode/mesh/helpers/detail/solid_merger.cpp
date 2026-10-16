@@ -25,6 +25,7 @@
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
+#include <absl/container/inlined_vector.h>
 
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/pimpl_impl.hpp>
@@ -64,7 +65,7 @@ namespace geode
         template < index_t dimension >
         class SolidMeshMerger< dimension >::Impl
         {
-            using Polyhedron = absl::FixedArray< index_t >;
+            using Polyhedron = absl::InlinedVector< index_t, 8 >;
             using SortedVertices = absl::InlinedVector< index_t, 8 >;
             using PolyhedronCandidates = absl::InlinedVector< index_t, 1 >;
             using FacetCycles =
@@ -204,14 +205,21 @@ namespace geode
                 // between solids by any permutation, not only a cyclic one.
                 absl::flat_hash_map< SortedVertices, PolyhedronCandidates >
                     polyhedra;
+                index_t nb_polyhedra{ 0 };
+                for( const auto& solid : merger.meshes() )
+                {
+                    nb_polyhedra += solid.get().nb_polyhedra();
+                }
+                polyhedra.reserve( nb_polyhedra );
+                std::vector< std::vector< local_index_t > > facets;
+                Polyhedron vertices;
                 const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
                     const auto& solid = meshes[s].get();
                     for( const auto p : Range{ solid.nb_polyhedra() } )
                     {
-                        Polyhedron vertices(
-                            solid.nb_polyhedron_vertices( p ) );
+                        vertices.resize( solid.nb_polyhedron_vertices( p ) );
                         for( const auto v : LIndices{ vertices } )
                         {
                             vertices[v] = merger.vertex_in_merged(
@@ -229,8 +237,8 @@ namespace geode
                             find_same_polyhedron( merger, candidates, s, p );
                         if( !same_polyhedron )
                         {
-                            absl::FixedArray< std::vector< local_index_t > >
-                                facets( solid.nb_polyhedron_facets( p ) );
+                            // Reuse the facet buffers between polyhedra
+                            facets.resize( solid.nb_polyhedron_facets( p ) );
                             for( const auto f : LIndices{ facets } )
                             {
                                 const PolyhedronFacet facet{ p, f };
