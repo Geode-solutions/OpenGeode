@@ -23,6 +23,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
@@ -621,6 +622,29 @@ void test_permute_vertices_with_isolated_vertex()
     }
 }
 
+void test_replace_vertices_chained_mapping()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 7 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 3, 4, 5 } );
+    geode::GenericMapping< geode::index_t > mapping;
+    mapping.map( 0, 3 );
+    mapping.map( 3, 6 );
+    builder->replace_vertices( mapping );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 0 ),
+        "[replace_vertices] Vertex 0 should be isolated" );
+    for( const geode::index_t v : { 3, 6 } )
+    {
+        const auto around = surface->polygon_around_vertex( v );
+        geode::OpenGeodeMeshException::test(
+            around && surface->polygon_vertex( around.value() ) == v,
+            "[replace_vertices] Wrong link for vertex ", v );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -646,6 +670,7 @@ void test()
     test_incremental_adjacencies_with_edges();
     test_delete_polygon_at_pinched_vertex();
     test_permute_vertices_with_isolated_vertex();
+    test_replace_vertices_chained_mapping();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

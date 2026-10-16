@@ -463,6 +463,19 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::replace_vertices(
         const GenericMapping< index_t >& vertices_mapping )
     {
+        // Unlink all the sources first: a vertex may be both a source and a
+        // target (e.g. a->b and b->c), it must not be unlinked after being
+        // linked as a target
+        for( const auto& [old_vertex_id, new_vertices] :
+            vertices_mapping.in2out_map() )
+        {
+            if( new_vertices.size() == 1 && new_vertices[0] == old_vertex_id )
+            {
+                continue;
+            }
+            disassociate_polygon_vertex_to_vertex( old_vertex_id );
+            reset_polygons_around_vertex( old_vertex_id );
+        }
         for( const auto p : Range{ surface_mesh_.nb_polygons() } )
         {
             for( const auto v :
@@ -484,8 +497,6 @@ namespace geode
                 {
                     continue;
                 }
-                disassociate_polygon_vertex_to_vertex( old_vertex_id );
-                reset_polygons_around_vertex( old_vertex_id );
                 if( surface_mesh_.are_edges_enabled() )
                 {
                     update_edge( surface_mesh_, *this, polygon_vertex,
