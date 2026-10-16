@@ -104,7 +104,12 @@ namespace geode
                     nb_components_ );
                 for( const auto p : Indices{ identification_ } )
                 {
-                    components[identifier( p )].push_back( p );
+                    const auto component = identifier( p );
+                    if( component == NO_ID )
+                    {
+                        continue;
+                    }
+                    components[component].push_back( p );
                 }
                 return components;
             }
