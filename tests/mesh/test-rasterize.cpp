@@ -23,17 +23,23 @@
 
 #include <geode/tests/common.hpp>
 
+#include <random>
+
 #include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/segment.hpp>
+#include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.hpp>
 #include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/regular_grid_surface.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
@@ -216,6 +222,216 @@ void test_limit()
         " instead of 27" );
 }
 
+namespace
+{
+    struct FacePlane
+    {
+        geode::Vector3D normal;
+        geode::Point3D origin;
+    };
+
+    std::array< FacePlane, 4 > tetrahedron_planes(
+        const std::array< geode::Point3D, 4 >& vertices )
+    {
+        std::array< FacePlane, 4 > planes;
+        for( const auto f : geode::LRange{ 4 } )
+        {
+            const auto& facet = geode::Tetrahedron::tetrahedron_facet_vertex[f];
+            const auto& a = vertices[facet[0]];
+            const auto& b = vertices[facet[1]];
+            const auto& c = vertices[facet[2]];
+            auto normal =
+                geode::Vector3D{ a, b }.cross( geode::Vector3D{ a, c } );
+            if( normal.dot( geode::Vector3D{ a, vertices[f] } ) < 0 )
+            {
+                normal = normal * -1.;
+            }
+            planes[f] = { normal.normalize(), a };
+        }
+        return planes;
+    }
+
+    bool is_strictly_inside(
+        const std::array< FacePlane, 4 >& planes, const geode::Point3D& point )
+    {
+        for( const auto& plane : planes )
+        {
+            if( plane.normal.dot( geode::Vector3D{ plane.origin, point } )
+                <= 1e-6 )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool column_intersects_cell( const std::array< FacePlane, 4 >& planes,
+        const geode::Grid3D::CellIndices& cell )
+    {
+        constexpr double TOLERANCE{ 1e-6 };
+        auto x_min = -std::numeric_limits< double >::max();
+        auto x_max = std::numeric_limits< double >::max();
+        const auto y = cell[1] + 0.5;
+        const auto z = cell[2] + 0.5;
+        for( const auto& plane : planes )
+        {
+            const auto& normal = plane.normal;
+            const auto rest =
+                normal.value( 1 ) * ( y - plane.origin.value( 1 ) )
+                + normal.value( 2 ) * ( z - plane.origin.value( 2 ) );
+            if( std::fabs( normal.value( 0 ) ) < 1e-12 )
+            {
+                if( rest < -TOLERANCE )
+                {
+                    return false;
+                }
+                continue;
+            }
+            const auto bound =
+                plane.origin.value( 0 ) - rest / normal.value( 0 );
+            if( normal.value( 0 ) > 0 )
+            {
+                x_min = std::max( x_min, bound );
+            }
+            else
+            {
+                x_max = std::min( x_max, bound );
+            }
+        }
+        return x_min - TOLERANCE <= cell[0] + 1.
+               && x_max + TOLERANCE >= cell[0];
+    }
+
+    void check_volume_rasterization( const geode::RegularGrid3D& grid,
+        const std::array< geode::Point3D, 4 >& vertices,
+        absl::Span< const geode::Grid3D::CellIndices > cells,
+        std::string_view name )
+    {
+        std::array< geode::Point3D, 4 > vertices_in_grid;
+        for( const auto v : geode::LRange{ 4 } )
+        {
+            vertices_in_grid[v] =
+                grid.grid_coordinate_system().coordinates( vertices[v] );
+        }
+        const auto planes = tetrahedron_planes( vertices_in_grid );
+        absl::flat_hash_set< geode::Grid3D::CellIndices > result;
+        for( const auto& cell : cells )
+        {
+            for( const auto d : geode::LRange{ 3 } )
+            {
+                geode::OpenGeodeMeshException::test(
+                    cell[d] < grid.nb_cells_in_direction( d ), name,
+                    ": cell out of the grid" );
+            }
+            geode::OpenGeodeMeshException::test(
+                result.insert( cell ).second, name, ": duplicated cell" );
+            geode::OpenGeodeMeshException::test(
+                column_intersects_cell( planes, cell ), name, ": cell ",
+                cell[0], " ", cell[1], " ", cell[2],
+                " does not intersect the tetrahedron" );
+        }
+        for( const auto c : geode::Range{ grid.nb_cells() } )
+        {
+            const auto cell = grid.cell_indices( c );
+            const geode::Point3D center{ { cell[0] + 0.5, cell[1] + 0.5,
+                cell[2] + 0.5 } };
+            if( is_strictly_inside( planes, center ) )
+            {
+                geode::OpenGeodeMeshException::test( result.contains( cell ),
+                    name, ": missing cell ", cell[0], " ", cell[1], " ",
+                    cell[2] );
+            }
+        }
+    }
+
+    void check_tetrahedron( const geode::RegularGrid3D& grid,
+        const std::array< geode::Point3D, 4 >& vertices,
+        std::string_view name )
+    {
+        const geode::Tetrahedron tetrahedron{ vertices[0], vertices[1],
+            vertices[2], vertices[3] };
+        check_volume_rasterization( grid, vertices,
+            geode::rasterize_tetrahedron( grid, tetrahedron ),
+            absl::StrCat( name, " (tetrahedron)" ) );
+
+        auto surface = geode::TriangulatedSurface3D::create();
+        auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+        for( const auto& vertex : vertices )
+        {
+            builder->create_point( vertex );
+        }
+        for( const auto& facet : geode::Tetrahedron::tetrahedron_facet_vertex )
+        {
+            builder->create_triangle( facet );
+        }
+        check_volume_rasterization( grid, vertices,
+            geode::rasterize_closed_surface( grid, *surface ),
+            absl::StrCat( name, " (closed surface)" ) );
+    }
+
+    std::array< geode::Point3D, 4 > random_tetrahedron(
+        const geode::RegularGrid3D& grid,
+        std::mt19937& generator,
+        double min_coordinate,
+        double max_coordinate )
+    {
+        std::uniform_real_distribution< double > distribution{ min_coordinate,
+            max_coordinate };
+        std::array< geode::Point3D, 4 > vertices;
+        for( auto& vertex : vertices )
+        {
+            vertex = grid.grid_coordinate_system().global_coordinates(
+                geode::Point3D{ { distribution( generator ),
+                    distribution( generator ), distribution( generator ) } } );
+        }
+        return vertices;
+    }
+
+    void test_rasterize_tetrahedron_axis_aligned()
+    {
+        geode::Logger::info( "Test rasterize tetrahedron axis aligned" );
+        auto grid = geode::RegularGrid3D::create();
+        auto builder = geode::RegularGridBuilder3D::create( *grid );
+        builder->initialize_grid(
+            geode::Point3D{ { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
+        std::mt19937 generator{ 42 };
+        for( const auto trial : geode::Range{ 20 } )
+        {
+            check_tetrahedron( *grid,
+                random_tetrahedron( *grid, generator, 0.1, 9.9 ),
+                absl::StrCat( "Axis aligned ", trial ) );
+        }
+    }
+
+    void test_rasterize_tetrahedron_boundary()
+    {
+        geode::Logger::info( "Test rasterize tetrahedron on grid boundary" );
+        auto grid = geode::RegularGrid3D::create();
+        auto builder = geode::RegularGridBuilder3D::create( *grid );
+        builder->initialize_grid(
+            geode::Point3D{ { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
+        check_tetrahedron( *grid,
+            { geode::Point3D{ { -1e-16, 2.5, 2.5 } },
+                geode::Point3D{ { 3.2, 1.1, 1.3 } },
+                geode::Point3D{ { 3.1, 4.7, 1.6 } },
+                geode::Point3D{ { 2.9, 2.6, 4.8 } } },
+            "Vertex on grid min" );
+        check_tetrahedron( *grid,
+            { geode::Point3D{ { 2.5, 2.5, -0.8 } },
+                geode::Point3D{ { 6.2, 1.1, 1.3 } },
+                geode::Point3D{ { 3.1, 7.7, 1.6 } },
+                geode::Point3D{ { 2.9, 2.6, 4.8 } } },
+            "Below grid min" );
+        check_tetrahedron( *grid,
+            { geode::Point3D{ { 2.5, 2.5, 2.5 } },
+                geode::Point3D{ { 6.2, 11.7, 1.3 } },
+                geode::Point3D{ { 3.1, 7.7, 1.6 } },
+                geode::Point3D{ { 12.9, 2.6, 4.8 } } },
+            "Beyond grid max" );
+    }
+
+} // namespace
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -237,6 +453,8 @@ void test()
         *grid, geode::Triangle3D{ pt0, pt3, pt4 } );
 
     test_limit();
+    test_rasterize_tetrahedron_axis_aligned();
+    test_rasterize_tetrahedron_boundary();
 }
 
 OPENGEODE_TEST( "rasterize" )

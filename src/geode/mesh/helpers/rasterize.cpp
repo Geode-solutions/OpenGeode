@@ -603,8 +603,7 @@ namespace
 
     struct Cell
     {
-        Cell(
-            std::array< geode::index_t, 2 > ids_in, bool counter_clockwise_in )
+        Cell( std::array< std::int64_t, 2 > ids_in, bool counter_clockwise_in )
             : ids( std::move( ids_in ) ),
               counter_clockwise( counter_clockwise_in )
         {
@@ -632,7 +631,7 @@ namespace
             }
             return counter_clockwise < other.counter_clockwise;
         }
-        std::array< geode::index_t, 2 > ids;
+        std::array< std::int64_t, 2 > ids;
         bool counter_clockwise;
     };
 
@@ -711,19 +710,34 @@ namespace
         void fill_values( const geode::Triangle2D& triangle )
         {
             const auto bbox = triangle.bounding_box();
-            const auto max_j = static_cast< geode::index_t >( std::floor(
-                bbox.max().value( 0 ) / grid_.cell_length_in_direction( 1 )
-                - 0.5 ) );
-            const auto max_k = static_cast< geode::index_t >( std::floor(
-                bbox.max().value( 1 ) / grid_.cell_length_in_direction( 2 )
-                - 0.5 ) );
-            const auto min_j = static_cast< geode::index_t >( std::ceil(
-                bbox.min().value( 0 ) / grid_.cell_length_in_direction( 1 )
-                - 0.5 ) );
-            const auto min_k = static_cast< geode::index_t >( std::ceil(
-                bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
-                - 0.5 ) );
-            const auto max_i_grid = grid_.nb_cells_in_direction( 0 ) - 1;
+            // Range of cell centers covered by the projected triangle,
+            // clamped to the grid in floating point before any cast
+            const auto min_j_value = std::max( 0.,
+                std::ceil(
+                    bbox.min().value( 0 ) / grid_.cell_length_in_direction( 1 )
+                    - 0.5 ) );
+            const auto max_j_value =
+                std::min( grid_.nb_cells_in_direction( 1 ) - 1.,
+                    std::floor( bbox.max().value( 0 )
+                                    / grid_.cell_length_in_direction( 1 )
+                                - 0.5 ) );
+            const auto min_k_value = std::max( 0.,
+                std::ceil(
+                    bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
+                    - 0.5 ) );
+            const auto max_k_value =
+                std::min( grid_.nb_cells_in_direction( 2 ) - 1.,
+                    std::floor( bbox.max().value( 1 )
+                                    / grid_.cell_length_in_direction( 2 )
+                                - 0.5 ) );
+            if( min_j_value > max_j_value || min_k_value > max_k_value )
+            {
+                return;
+            }
+            const auto min_j = static_cast< geode::index_t >( min_j_value );
+            const auto max_j = static_cast< geode::index_t >( max_j_value );
+            const auto min_k = static_cast< geode::index_t >( min_k_value );
+            const auto max_k = static_cast< geode::index_t >( max_k_value );
             for( const auto j : geode::Range{ min_j, max_j + 1 } )
             {
                 for( const auto k : geode::Range{ min_k, max_k + 1 } )
@@ -738,17 +752,28 @@ namespace
                     {
                         continue;
                     }
-                    auto i_coord = compute_i_coordinates(
-                        point, triangle, jk_process.position );
-                    i_coord[0] = std::min( i_coord[0], max_i_grid );
-                    i_coord[1] = std::min( i_coord[1], max_i_grid );
                     values_[{ j, k }].emplace_back(
-                        i_coord, counter_clockwise_ );
+                        compute_i_coordinates(
+                            point, triangle, jk_process.position ),
+                        counter_clockwise_ );
                 }
             }
         }
 
-        std::array< geode::index_t, 2 > compute_i_coordinates(
+        /*!
+         * Cell index along i of the given coordinate (in cell length unit).
+         * Values outside the grid are clamped to -1 or to the number of
+         * cells, in floating point before the cast, so that they can be
+         * clipped when painting.
+         */
+        std::int64_t i_index( double coordinate ) const
+        {
+            return static_cast< std::int64_t >( std::clamp(
+                std::floor( coordinate ), -1.,
+                static_cast< double >( grid_.nb_cells_in_direction( 0 ) ) ) );
+        }
+
+        std::array< std::int64_t, 2 > compute_i_coordinates(
             const geode::Point2D& point,
             const geode::Triangle2D& triangle,
             geode::POSITION position ) const
@@ -766,22 +791,22 @@ namespace
             if( position == geode::POSITION::vertex0 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[0]] );
-                const auto i_value = static_cast< geode::index_t >(
-                    std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
+                const auto i_value =
+                    i_index( decimal_fabs( point_3d.value( 0 ) ) );
                 return { i_value, i_value };
             }
             if( position == geode::POSITION::vertex1 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[1]] );
-                const auto i_value = static_cast< geode::index_t >(
-                    std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
+                const auto i_value =
+                    i_index( decimal_fabs( point_3d.value( 0 ) ) );
                 return { i_value, i_value };
             }
             if( position == geode::POSITION::vertex2 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[2]] );
-                const auto i_value = static_cast< geode::index_t >(
-                    std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
+                const auto i_value =
+                    i_index( decimal_fabs( point_3d.value( 0 ) ) );
                 return { i_value, i_value };
             }
             std::array< double, 3 > i_values_triangle_vertices{
@@ -798,9 +823,9 @@ namespace
                     geode::safe_segment_barycentric_coordinates(
                         point, geode::Segment2D{ triangle.vertices()[0],
                                    triangle.vertices()[1] } );
-                const auto i_value = static_cast< geode::index_t >( std::floor(
-                    i_values_triangle_vertices[0] * lambdas[0]
-                    + i_values_triangle_vertices[1] * lambdas[1] ) );
+                const auto i_value =
+                    i_index( i_values_triangle_vertices[0] * lambdas[0]
+                             + i_values_triangle_vertices[1] * lambdas[1] );
                 return { i_value, i_value };
             }
             if( position == geode::POSITION::edge1 )
@@ -809,9 +834,9 @@ namespace
                     geode::safe_segment_barycentric_coordinates(
                         point, geode::Segment2D{ triangle.vertices()[1],
                                    triangle.vertices()[2] } );
-                const auto i_value = static_cast< geode::index_t >( std::floor(
-                    i_values_triangle_vertices[1] * lambdas[0]
-                    + i_values_triangle_vertices[2] * lambdas[1] ) );
+                const auto i_value =
+                    i_index( i_values_triangle_vertices[1] * lambdas[0]
+                             + i_values_triangle_vertices[2] * lambdas[1] );
                 return { i_value, i_value };
             }
             if( position == geode::POSITION::edge2 )
@@ -820,19 +845,19 @@ namespace
                     geode::safe_segment_barycentric_coordinates(
                         point, geode::Segment2D{ triangle.vertices()[2],
                                    triangle.vertices()[0] } );
-                const auto i_value = static_cast< geode::index_t >( std::floor(
-                    i_values_triangle_vertices[2] * lambdas[0]
-                    + i_values_triangle_vertices[0] * lambdas[1] ) );
+                const auto i_value =
+                    i_index( i_values_triangle_vertices[2] * lambdas[0]
+                             + i_values_triangle_vertices[0] * lambdas[1] );
                 return { i_value, i_value };
             }
             try
             {
                 const auto lambdas =
                     geode::triangle_barycentric_coordinates( point, triangle );
-                const auto i_value = static_cast< geode::index_t >( std::floor(
-                    i_values_triangle_vertices[0] * lambdas[0]
-                    + i_values_triangle_vertices[1] * lambdas[1]
-                    + i_values_triangle_vertices[2] * lambdas[2] ) );
+                const auto i_value =
+                    i_index( i_values_triangle_vertices[0] * lambdas[0]
+                             + i_values_triangle_vertices[1] * lambdas[1]
+                             + i_values_triangle_vertices[2] * lambdas[2] );
                 return { i_value, i_value };
             }
             catch( geode::OpenGeodeException& )
@@ -851,15 +876,14 @@ namespace
                             point, edge );
                 }
                 const auto edges = closest_edges( distances_to_edges );
-                std::array< geode::index_t, 2 > i_values;
+                std::array< std::int64_t, 2 > i_values;
                 for( const auto e : geode::LRange{ 2 } )
                 {
                     const auto next = edges[e] == 2 ? 0 : edges[e] + 1;
-                    i_values[e] =
-                        std::floor( i_values_triangle_vertices[edges[e]]
-                                        * edge_lambdas[edges[e]][0]
-                                    + i_values_triangle_vertices[next]
-                                          * edge_lambdas[edges[e]][1] );
+                    i_values[e] = i_index( i_values_triangle_vertices[edges[e]]
+                                               * edge_lambdas[edges[e]][0]
+                                           + i_values_triangle_vertices[next]
+                                                 * edge_lambdas[edges[e]][1] );
                 }
                 return i_values;
             }
@@ -1043,8 +1067,10 @@ namespace
     }
 
     std::vector< typename geode::Grid3D::CellIndices > paint_interior(
-        Values& values )
+        const geode::Grid3D& grid, Values& values )
     {
+        const auto max_i =
+            static_cast< std::int64_t >( grid.nb_cells_in_direction( 0 ) ) - 1;
         std::vector< geode::Grid3D::CellIndices > cells;
         for( auto& value : values )
         {
@@ -1065,10 +1091,13 @@ namespace
                 {
                     continue;
                 }
-                for( const auto i : geode::Range{
-                         i_values[it].ids[0], i_values[it + 1].ids[1] + 1 } )
+                const auto begin =
+                    std::max( i_values[it].ids[0], std::int64_t{ 0 } );
+                const auto end = std::min( i_values[it + 1].ids[1], max_i );
+                for( auto i = begin; i <= end; i++ )
                 {
-                    cells.emplace_back( geode::Grid3D::CellIndices{ i, j, k } );
+                    cells.emplace_back( geode::Grid3D::CellIndices{
+                        static_cast< geode::index_t >( i ), j, k } );
                 }
             }
         }
@@ -1159,7 +1188,7 @@ namespace geode
         const Grid3D& grid, const Tetrahedron& tetrahedron )
     {
         auto values = paint_surface( grid, tetrahedron );
-        return paint_interior( values );
+        return paint_interior( grid, values );
     }
 
     std::vector< Grid3D::CellIndices >
@@ -1167,7 +1196,7 @@ namespace geode
             const Grid3D& grid, const TriangulatedSurface3D& closed_surface )
     {
         auto values = paint_surface( grid, closed_surface );
-        return paint_interior( values );
+        return paint_interior( grid, values );
     }
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api
