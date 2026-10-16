@@ -520,6 +520,47 @@ void test_merge_facets_on_vertex_update()
         "[merge facets] Wrong id from vertices for facet 1" );
 }
 
+void test_facet_is_opposite()
+{
+    auto solid = geode::PolyhedralSolid3D::create(
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
+    solid->enable_facets();
+    auto builder = geode::PolyhedralSolidBuilder3D::create( *solid );
+    builder->create_vertices( 6 );
+    const auto facet_id =
+        builder->facets_builder().find_or_create_facet( { 3, 1, 5, 2 } );
+    const auto& facets = solid->facets();
+    // Facets are stored in a canonical orientation
+    geode::OpenGeodeMeshException::test(
+        facets.facet_vertices( facet_id )
+            == geode::PolyhedronFacetVertices{ 1, 3, 2, 5 },
+        "[is_opposite] Wrong stored facet vertices" );
+    const std::array< geode::PolyhedronFacetVertices, 4 > same{
+        { { 1, 3, 2, 5 }, { 3, 2, 5, 1 }, { 2, 5, 1, 3 }, { 5, 1, 3, 2 } }
+    };
+    for( const auto& vertices : same )
+    {
+        geode::OpenGeodeMeshException::test(
+            !facets.is_opposite( facet_id, vertices ),
+            "[is_opposite] Same orientation detected as opposite" );
+    }
+    const std::array< geode::PolyhedronFacetVertices, 4 > opposite{
+        { { 3, 1, 5, 2 }, { 1, 5, 2, 3 }, { 5, 2, 3, 1 }, { 2, 3, 1, 5 } }
+    };
+    for( const auto& vertices : opposite )
+    {
+        geode::OpenGeodeMeshException::test(
+            facets.is_opposite( facet_id, vertices ),
+            "[is_opposite] Opposite orientation not detected" );
+    }
+    geode::OpenGeodeMeshException::test(
+        !facets.is_opposite( facet_id, { 3, 1, 2, 5 } ),
+        "[is_opposite] Different facet detected as opposite" );
+    geode::OpenGeodeMeshException::test(
+        !facets.is_opposite( facet_id, { 3, 1, 5 } ),
+        "[is_opposite] Smaller facet detected as opposite" );
+}
+
 void test_barycenters()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
@@ -748,6 +789,7 @@ void test()
     test_barycenters();
     test_normals();
     test_merge_facets_on_vertex_update();
+    test_facet_is_opposite();
 }
 
 OPENGEODE_TEST( "polyhedral-solid" )

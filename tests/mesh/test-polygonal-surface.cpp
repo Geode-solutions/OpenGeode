@@ -724,6 +724,26 @@ void test_merge_edges_on_vertex_update()
         "[merge edges] Wrong id from vertices for edge 1" );
 }
 
+void test_edge_is_opposite()
+{
+    auto surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::PolygonalSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 3 );
+    const auto edge_id =
+        builder->edges_builder().find_or_create_edge( { 2, 1 } );
+    const auto& edges = surface->edges();
+    // Edges are stored in a canonical orientation
+    geode::OpenGeodeMeshException::test( edges.is_opposite( edge_id, { 1, 2 } ),
+        "[is_opposite] Edge should match its canonical orientation" );
+    geode::OpenGeodeMeshException::test( edges.is_opposite( edge_id, { 2, 1 } ),
+        "[is_opposite] Edge should match its canonical orientation" );
+    geode::OpenGeodeMeshException::test(
+        !edges.is_opposite( edge_id, { 0, 2 } ),
+        "[is_opposite] Different edge detected as opposite" );
+}
+
 using FacetEdges = geode::internal::FacetEdgesImpl< 3 >;
 
 std::string serialize_edges( const FacetEdges& edges )
@@ -905,6 +925,7 @@ void test()
     test_non_manifold_surface();
     test_merge_edges_on_vertex_update();
     test_corrupted_edges_deserialization();
+    test_edge_is_opposite();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

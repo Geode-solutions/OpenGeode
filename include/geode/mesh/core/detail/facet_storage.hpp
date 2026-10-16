@@ -52,9 +52,30 @@ namespace geode
             [[nodiscard]] bool is_opposite(
                 index_t facet_id, const VertexContainer& vertices ) const
             {
-                const OrientedVertexCycle other_oriented_cycle{ vertices };
-                const OrientedVertexCycle oriented_cycle{ vertices_[facet_id] };
-                return oriented_cycle.is_opposite( other_oriented_cycle );
+                // Same result as comparing OrientedVertexCycles, without
+                // copying the containers: stored facet vertices are in
+                // canonical form, i.e. they start with their minimum vertex
+                const auto& facet_vertices = vertices_[facet_id];
+                const auto nb_vertices = facet_vertices.size();
+                if( vertices.size() != nb_vertices || nb_vertices == 0 )
+                {
+                    return false;
+                }
+                const auto start = static_cast< size_t >(
+                    absl::c_min_element( vertices ) - vertices.begin() );
+                if( facet_vertices[0] != vertices[start] )
+                {
+                    return false;
+                }
+                for( const auto v : Range{ 1, nb_vertices } )
+                {
+                    if( facet_vertices[v]
+                        != vertices[( start + nb_vertices - v ) % nb_vertices] )
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
 
         protected:
