@@ -759,6 +759,31 @@ void test_degenerated_tetrahedron_with_repeated_vertex()
         "Tetrahedron 1 should not be degenerated" );
 }
 
+void test_polyhedra_around_non_manifold_vertex()
+{
+    auto solid = create_solid_with_points( 7 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 4, 5, 6 } );
+    builder->compute_polyhedron_adjacencies();
+    const auto& canonical = solid->polyhedra_around_vertex( 0 );
+    const geode::PolyhedraAroundVertex canonical_answer{ { 1, 0 } };
+    geode::OpenGeodeMeshException::test(
+        canonical == canonical_answer, "Wrong polyhedra around vertex 0" );
+    const auto& other = solid->polyhedra_around_vertex( { 0, 0 } );
+    const geode::PolyhedraAroundVertex other_answer{ { 0, 0 } };
+    geode::OpenGeodeMeshException::test(
+        other == other_answer, "Wrong polyhedra around vertex 0 from tet 0" );
+    geode::OpenGeodeMeshException::test( canonical == canonical_answer,
+        "Previously returned polyhedra around vertex 0 should not change" );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedra_around_vertex( 0 ) == canonical_answer,
+        "Wrong polyhedra around vertex 0 (second query)" );
+    geode::OpenGeodeMeshException::test( other == other_answer,
+        "Previously returned polyhedra around vertex 0 from tet 0 should "
+        "not change" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -787,6 +812,7 @@ void test()
     test_replace_vertices_chained();
     test_create_invalid_polyhedron();
     test_degenerated_tetrahedron_with_repeated_vertex();
+    test_polyhedra_around_non_manifold_vertex();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

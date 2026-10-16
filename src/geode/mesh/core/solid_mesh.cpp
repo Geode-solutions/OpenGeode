@@ -26,6 +26,7 @@
 
 #include <stack>
 
+#include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 #include <absl/hash/hash.h>
 #include <absl/synchronization/mutex.h>
@@ -539,6 +540,10 @@ namespace geode
         void reset_polyhedra_around_vertex( index_t vertex_id )
         {
             polyhedra_around_vertex_[vertex_id].reset();
+            if( !other_polyhedra_around_vertex_.empty() )
+            {
+                other_polyhedra_around_vertex_.erase( vertex_id );
+            }
         }
 
         const PolyhedraAroundVertex& polyhedra_around_vertex(
@@ -546,17 +551,21 @@ namespace geode
             index_t vertex_id,
             const std::optional< PolyhedronVertex >& first_polyhedron ) const
         {
-            return updated_polyhedra_around_vertex(
-                mesh, vertex_id, first_polyhedron )
-                .polyhedra;
+            const auto& polyhedra =
+                updated_polyhedra_around_vertex( mesh, vertex_id ).polyhedra;
+            if( !first_polyhedron
+                || absl::c_contains( polyhedra, first_polyhedron.value() ) )
+            {
+                return polyhedra;
+            }
+            return other_polyhedra_around_vertex(
+                mesh, vertex_id, first_polyhedron.value() );
         }
 
-        bool is_vertex_on_border( const SolidMesh< dimension >& mesh,
-            index_t vertex_id,
-            const std::optional< PolyhedronVertex >& first_polyhedron ) const
+        bool is_vertex_on_border(
+            const SolidMesh< dimension >& mesh, index_t vertex_id ) const
         {
-            return updated_polyhedra_around_vertex(
-                mesh, vertex_id, first_polyhedron )
+            return updated_polyhedra_around_vertex( mesh, vertex_id )
                 .vertex_is_on_border;
         }
 
@@ -686,12 +695,14 @@ namespace geode
         {
             delete_vector_elements( to_delete, polyhedron_around_vertex_ );
             delete_vector_elements( to_delete, polyhedra_around_vertex_ );
+            other_polyhedra_around_vertex_.clear();
         }
 
         void permute_vertex_storage( absl::Span< const index_t > permutation )
         {
             permute( polyhedron_around_vertex_, permutation );
             permute( polyhedra_around_vertex_, permutation );
+            other_polyhedra_around_vertex_.clear();
         }
 
         void remove_legacy_attributes( AttributeManager& manager )
@@ -699,17 +710,23 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+        /*!
+         * Polyhedra around the vertex computed from its canonical polyhedron
+         * (polyhedron_around_vertex). Only this fan is stored in the
+         * per-vertex cache, so that queries from another fan of a
+         * non-manifold vertex do not overwrite it.
+         */
         const internal::PolyhedraAroundVertexImpl&
             updated_polyhedra_around_vertex( const SolidMesh< dimension >& mesh,
-                const index_t vertex_id,
-                const std::optional< PolyhedronVertex >& first_polyhedron )
-                const
+                const index_t vertex_id ) const
         {
+            const auto first_polyhedron = polyhedron_around_vertex( vertex_id );
             const auto& cached = polyhedra_around_vertex_[vertex_id];
             if( cached.computed()
                 && ( first_polyhedron
-                     && absl::c_contains( cached.value().polyhedra,
-                         first_polyhedron.value() ) ) )
+                         ? absl::c_contains( cached.value().polyhedra,
+                               first_polyhedron.value() )
+                         : cached.value().polyhedra.empty() ) )
             {
                 return cached.value();
             }
@@ -717,6 +734,33 @@ namespace geode
             cached( compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
             return cached.value();
+        }
+
+        /*!
+         * Polyhedra around a non-manifold vertex, computed from a polyhedron
+         * which is not in the canonical fan. Results are kept (with stable
+         * addresses) until the vertex is modified. This is a cold path,
+         * guarded by its own mutex.
+         */
+        const PolyhedraAroundVertex& other_polyhedra_around_vertex(
+            const SolidMesh< dimension >& mesh,
+            const index_t vertex_id,
+            const PolyhedronVertex& first_polyhedron ) const
+        {
+            absl::MutexLock lock{ &other_polyhedra_around_vertex_mutex_ };
+            auto& fans = other_polyhedra_around_vertex_[vertex_id];
+            for( const auto& fan : fans )
+            {
+                if( absl::c_contains( *fan, first_polyhedron ) )
+                {
+                    return *fan;
+                }
+            }
+            fans.emplace_back( std::make_unique< PolyhedraAroundVertex >(
+                compute_polyhedra_around_vertex(
+                    mesh, vertex_id, first_polyhedron )
+                    .polyhedra ) );
+            return *fans.back();
         }
 
         Impl() = default;
@@ -807,6 +851,10 @@ namespace geode
         mutable AttributeManager polyhedron_attribute_manager_;
         std::vector< PolyhedronVertex > polyhedron_around_vertex_;
         mutable std::vector< CachedPolyhedra > polyhedra_around_vertex_;
+        mutable absl::flat_hash_map< index_t,
+            std::vector< std::unique_ptr< PolyhedraAroundVertex > > >
+            other_polyhedra_around_vertex_;
+        mutable absl::Mutex other_polyhedra_around_vertex_mutex_;
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
         mutable TextureStorage3D texture_storage_;
@@ -1236,8 +1284,8 @@ namespace geode
     template < index_t dimension >
     bool SolidMesh< dimension >::is_vertex_on_border( index_t vertex_id ) const
     {
-        return impl_->is_vertex_on_border(
-            *this, vertex_id, polyhedron_around_vertex( vertex_id ) );
+        check_vertex_id( *this, vertex_id );
+        return impl_->is_vertex_on_border( *this, vertex_id );
     }
 
     template < index_t dimension >
