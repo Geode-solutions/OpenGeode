@@ -745,6 +745,46 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_polygonal_surface< 3 >( filename ) );
 }
 
+void test_create_invalid_polygons()
+{
+    auto surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    auto builder = geode::PolygonalSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 300 );
+    const auto expect_throw = [&builder, &surface](
+                                  absl::Span< const geode::index_t > vertices,
+                                  std::string_view message ) {
+        bool has_thrown{ false };
+        try
+        {
+            builder->create_polygon( vertices );
+        }
+        catch( const geode::OpenGeodeException& /*unused*/ )
+        {
+            has_thrown = true;
+        }
+        geode::OpenGeodeMeshException::test(
+            has_thrown, "[create_polygon] Should throw with ", message );
+        geode::OpenGeodeMeshException::test( surface->nb_polygons() == 0,
+            "[create_polygon] Failed creation should not add a polygon (",
+            message, ")" );
+        geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 0 ),
+            "[create_polygon] Failed creation should not link vertices (",
+            message, ")" );
+    };
+    expect_throw( {}, "no vertex" );
+    std::vector< geode::index_t > too_many( geode::NO_LID + 1 );
+    absl::c_iota( too_many, 0 );
+    expect_throw( too_many, "too many vertices" );
+    expect_throw( { 0, 1, 300 }, "an invalid vertex" );
+    std::vector< geode::index_t > largest( geode::NO_LID - 1 );
+    absl::c_iota( largest, 0 );
+    builder->create_polygon( largest );
+    geode::OpenGeodeMeshException::test(
+        surface->nb_polygon_vertices( 0 ) == largest.size(),
+        "[create_polygon] Wrong number of polygon vertices" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -789,6 +829,7 @@ void test()
     test_delete_all( *polygonal_surface, *builder );
 
     test_non_manifold_surface();
+    test_create_invalid_polygons();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

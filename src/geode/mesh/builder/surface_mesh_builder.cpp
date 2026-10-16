@@ -373,7 +373,27 @@ namespace geode
     index_t SurfaceMeshBuilder< dimension >::create_polygon(
         absl::Span< const index_t > vertices )
     {
+        OpenGeodeMeshException::check_exception( !vertices.empty(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SurfaceMeshBuilder::create_polygon] Cannot create a polygon "
+            "without vertex" );
+        OpenGeodeMeshException::check_exception( vertices.size() < NO_LID,
+            nullptr, OpenGeodeException::TYPE::data,
+            "[SurfaceMeshBuilder::create_polygon] Cannot create a polygon "
+            "with ",
+            vertices.size(), " vertices (maximum is ", NO_LID - 1, ")" );
+        for( const auto vertex : vertices )
+        {
+            OpenGeodeMeshException::check_exception(
+                vertex < surface_mesh_.nb_vertices(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SurfaceMeshBuilder::create_polygon] Invalid vertex ", vertex,
+                " (number of vertices: ", surface_mesh_.nb_vertices(), ")" );
+        }
         const auto added_polygon = surface_mesh_.nb_polygons();
+        // Called first so that specific checks (e.g. triangles) are done
+        // before any modification of the mesh
+        do_create_polygon( vertices );
         surface_mesh_.polygon_attribute_manager().resize( added_polygon + 1 );
         for( const auto v : LIndices{ vertices } )
         {
@@ -389,7 +409,6 @@ namespace geode
             }
             edges.find_or_create_edge( { vertices.back(), vertices.front() } );
         }
-        do_create_polygon( vertices );
         return added_polygon;
     }
 

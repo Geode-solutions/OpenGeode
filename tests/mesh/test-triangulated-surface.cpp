@@ -475,6 +475,30 @@ void test_set_polygon_vertex_keeps_old_vertex_link()
         "polygon" );
 }
 
+void test_create_polygon_invalid_size()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    bool has_thrown{ false };
+    try
+    {
+        builder->create_polygon( { 0, 1, 2, 3 } );
+    }
+    catch( const geode::OpenGeodeException& /*unused*/ )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeMeshException::test( has_thrown,
+        "[create_polygon] Creating a quad in a TriangulatedSurface should "
+        "throw" );
+    geode::OpenGeodeMeshException::test( surface->nb_polygons() == 0,
+        "[create_polygon] Failed creation should not add a polygon" );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 0 ),
+        "[create_polygon] Failed creation should not link vertices" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -493,6 +517,7 @@ void test()
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );
     test_set_polygon_vertex_keeps_old_vertex_link();
+    test_create_polygon_invalid_size();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

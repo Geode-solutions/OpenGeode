@@ -53,10 +53,11 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::do_create_polygon(
         absl::Span< const index_t > vertices )
     {
-        OpenGeodeMeshException::check_assertion( vertices.size() == 3,
-            "[TriangulatedSurfaceBuilder"
-            "::do_create_polygon] Only "
-            "triangles are handled" );
+        OpenGeodeMeshException::check_exception( vertices.size() == 3, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[TriangulatedSurfaceBuilder::do_create_polygon] Only triangles "
+            "are handled, got a polygon with ",
+            vertices.size(), " vertices" );
         std::array< index_t, 3 > triangle_vertices;
         absl::c_copy_n( vertices, 3, triangle_vertices.begin() );
         do_create_triangle( triangle_vertices );
