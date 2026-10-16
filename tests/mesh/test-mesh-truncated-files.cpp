@@ -92,11 +92,19 @@ namespace
             std::filesystem::path{ filename }.extension().string();
         const auto truncated_filename =
             ( folder / absl::StrCat( "truncated", extension ) ).string();
-        const auto step = std::max< std::size_t >( content.size() / 1000, 1 );
+        // Every size in the first bytes (headers and first pointers), then a
+        // sampling of the rest: keeps the test fast on big files
+        constexpr std::size_t NB_EXHAUSTIVE_BYTES{ 256 };
+        constexpr std::size_t NB_SAMPLES{ 128 };
+        const auto nb_exhaustive =
+            std::min( content.size(), NB_EXHAUSTIVE_BYTES );
+        const auto step = std::max< std::size_t >(
+            ( content.size() - nb_exhaustive ) / NB_SAMPLES, 1 );
         const auto level = geode::Logger::level();
         geode::Logger::set_level( geode::Logger::LEVEL::off );
         geode::index_t nb_throws{ 0 };
-        for( std::size_t size = 0; size < content.size(); size += step )
+        for( std::size_t size = 0; size < content.size();
+            size += size < nb_exhaustive ? 1 : step )
         {
             {
                 std::ofstream file{ truncated_filename, std::ofstream::binary };
