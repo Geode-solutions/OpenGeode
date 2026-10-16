@@ -635,6 +635,25 @@ void test_non_manifold_facet_adjacencies()
     }
 }
 
+void test_delete_polyhedron_at_pinched_vertex()
+{
+    auto solid = create_solid_with_points( 7 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 4, 5, 6 } );
+    builder->compute_polyhedron_adjacencies();
+    std::vector< bool > to_delete{ false, true };
+    builder->delete_polyhedra( to_delete );
+    geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 1,
+        "Solid should have 1 tetrahedron after deletion" );
+    check_vertex_link( *solid, 0 );
+    for( const auto v : geode::Range{ 4, 7 } )
+    {
+        geode::OpenGeodeMeshException::test( solid->is_vertex_isolated( v ),
+            "Vertex ", v, " should be isolated after deletion" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -658,6 +677,7 @@ void test()
     test_delete_all( *solid, *builder );
     test_set_polyhedron_vertex_relink();
     test_non_manifold_facet_adjacencies();
+    test_delete_polyhedron_at_pinched_vertex();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

@@ -136,6 +136,8 @@ namespace
         geode::SolidMeshBuilder< dimension >& builder,
         absl::Span< const geode::index_t > old2new )
     {
+        std::vector< bool > to_relink( solid.nb_vertices(), false );
+        bool relink_needed{ false };
         for( const auto v : geode::Range{ solid.nb_vertices() } )
         {
             const auto polyhedron_vertex = solid.polyhedron_around_vertex( v );
@@ -162,12 +164,38 @@ namespace
             }
             if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
             {
+                // The vertex may still be used by another polyhedron fan
+                // (non-manifold vertex): it is relinked below.
                 builder.disassociate_polyhedron_vertex_to_vertex( v );
+                to_relink[v] = true;
+                relink_needed = true;
             }
             else
             {
                 builder.associate_polyhedron_vertex_to_vertex(
                     new_polyhedron_vertex, v );
+            }
+        }
+        if( relink_needed )
+        {
+            for( const auto p : geode::Indices{ old2new } )
+            {
+                const auto new_p = old2new[p];
+                if( new_p == geode::NO_ID )
+                {
+                    continue;
+                }
+                for( const auto v :
+                    geode::LRange{ solid.nb_polyhedron_vertices( p ) } )
+                {
+                    const auto vertex = solid.polyhedron_vertex( { p, v } );
+                    if( to_relink[vertex] )
+                    {
+                        builder.associate_polyhedron_vertex_to_vertex(
+                            { new_p, v }, vertex );
+                        to_relink[vertex] = false;
+                    }
+                }
             }
         }
         for( const auto p : geode::Indices{ old2new } )
