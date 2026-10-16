@@ -579,6 +579,28 @@ void test_incremental_adjacencies_with_edges()
         "[compute_polygon_adjacencies] Polygon 2 should stay on border" );
 }
 
+void test_delete_polygon_at_pinched_vertex()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 5 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 0, 3, 4 } );
+    builder->compute_polygon_adjacencies();
+    builder->delete_polygons( { false, true } );
+    geode::OpenGeodeMeshException::test( !surface->is_vertex_isolated( 0 ),
+        "[delete_polygons] Pinched vertex should not be isolated" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_vertex( surface->polygon_around_vertex( 0 ).value() )
+            == 0,
+        "[delete_polygons] Pinched vertex wrongly linked" );
+    builder->delete_isolated_vertices();
+    geode::OpenGeodeMeshException::test( surface->nb_vertices() == 3,
+        "[delete_polygons] Wrong number of vertices after deleting isolated "
+        "vertices" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -602,6 +624,7 @@ void test()
     test_polygons_around_vertex_after_adjacencies();
     test_next_on_border_with_flipped_orientation();
     test_incremental_adjacencies_with_edges();
+    test_delete_polygon_at_pinched_vertex();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

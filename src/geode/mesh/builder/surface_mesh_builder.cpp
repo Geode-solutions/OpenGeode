@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/permutation.hpp>
 
@@ -168,6 +170,7 @@ namespace
         geode::SurfaceMeshBuilder< dimension >& builder,
         absl::Span< const geode::index_t > old2new )
     {
+        absl::flat_hash_set< geode::index_t > unlinked_vertices;
         for( const auto v : geode::Range{ surface.nb_vertices() } )
         {
             const auto polygon_vertex = surface.polygon_around_vertex( v );
@@ -192,11 +195,41 @@ namespace
             if( new_polygon_vertex.polygon_id == geode::NO_ID )
             {
                 builder.disassociate_polygon_vertex_to_vertex( v );
+                unlinked_vertices.insert( v );
             }
             else
             {
                 builder.associate_polygon_vertex_to_vertex(
                     new_polygon_vertex, v );
+            }
+        }
+        if( !unlinked_vertices.empty() )
+        {
+            // A non-manifold vertex may still be used by a remaining polygon
+            // not connected to its deleted polygons by adjacencies
+            for( const auto p : geode::Indices{ old2new } )
+            {
+                const auto new_polygon = old2new[p];
+                if( new_polygon == geode::NO_ID )
+                {
+                    continue;
+                }
+                for( const auto v :
+                    geode::LRange{ surface.nb_polygon_vertices( p ) } )
+                {
+                    if( unlinked_vertices.erase(
+                            surface.polygon_vertex( { p, v } ) )
+                        != 0 )
+                    {
+                        builder.associate_polygon_vertex_to_vertex(
+                            { new_polygon, v },
+                            surface.polygon_vertex( { p, v } ) );
+                    }
+                }
+                if( unlinked_vertices.empty() )
+                {
+                    break;
+                }
             }
         }
         for( const auto p : geode::Indices{ old2new } )
