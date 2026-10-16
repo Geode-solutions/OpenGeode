@@ -39,7 +39,7 @@ namespace geode
     {
         double min_edge_size{ std::numeric_limits< double >::max() };
         double mean_edge_size{ 0. };
-        double max_edge_size{ std::numeric_limits< double >::min() };
+        double max_edge_size{ 0. };
     };
 
     template < index_t dimension >
