@@ -469,6 +469,19 @@ namespace geode
     void SolidMeshBuilder< dimension >::replace_vertices(
         const GenericMapping< index_t >& vertices_mapping )
     {
+        // Unlink all the source vertices first: with chained mappings
+        // (e.g. 0 -> 1 and 1 -> 2), unlinking a source vertex while
+        // processing polyhedra would also unlink it as a target.
+        for( const auto& [old_vertex_id, new_vertices] :
+            vertices_mapping.in2out_map() )
+        {
+            if( new_vertices.size() == 1 && new_vertices[0] == old_vertex_id )
+            {
+                continue;
+            }
+            disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
+            reset_polyhedra_around_vertex( old_vertex_id );
+        }
         for( const auto p : Range{ solid_mesh_.nb_polyhedra() } )
         {
             for( const auto v :
@@ -490,8 +503,6 @@ namespace geode
                 {
                     continue;
                 }
-                disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
-                reset_polyhedra_around_vertex( old_vertex_id );
                 if( solid_mesh_.are_edges_enabled()
                     || solid_mesh_.are_facets_enabled() )
                 {

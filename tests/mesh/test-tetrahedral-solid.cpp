@@ -23,6 +23,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -681,6 +682,26 @@ void test_permute_vertices_with_isolated_vertex()
     } while( absl::c_next_permutation( permutation ) );
 }
 
+void test_replace_vertices_chained()
+{
+    auto solid = create_solid_with_points( 9 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 3, 4, 5 } );
+    builder->create_tetrahedron( { 1, 6, 7, 8 } );
+    geode::GenericMapping< geode::index_t > mapping;
+    mapping.map( 0, 1 );
+    mapping.map( 1, 2 );
+    builder->replace_vertices( mapping );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedron_vertex( { 0, 0 } ) == 1
+            && solid->polyhedron_vertex( { 1, 0 } ) == 2,
+        "Wrong polyhedron vertices after replace_vertices" );
+    geode::OpenGeodeMeshException::test( solid->is_vertex_isolated( 0 ),
+        "Vertex 0 should be isolated after replace_vertices" );
+    check_vertex_link( *solid, 1 );
+    check_vertex_link( *solid, 2 );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -706,6 +727,7 @@ void test()
     test_non_manifold_facet_adjacencies();
     test_delete_polyhedron_at_pinched_vertex();
     test_permute_vertices_with_isolated_vertex();
+    test_replace_vertices_chained();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )
