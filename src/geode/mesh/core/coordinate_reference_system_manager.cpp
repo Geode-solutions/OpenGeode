@@ -25,7 +25,7 @@
 
 #include <bitsery/ext/std_map.h>
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/container/node_hash_map.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -171,7 +171,9 @@ namespace geode
         }
 
     private:
-        absl::flat_hash_map< std::string,
+        // node_hash_map: coordinate_reference_system_names() returns views on
+        // the keys, they must stay valid when other CRSs are registered
+        absl::node_hash_map< std::string,
             std::shared_ptr< CoordinateReferenceSystem< dimension > > >
             crss_;
         std::shared_ptr< CoordinateReferenceSystem< dimension > > active_crs_;

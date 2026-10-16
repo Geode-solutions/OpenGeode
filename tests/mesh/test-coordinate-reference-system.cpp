@@ -33,6 +33,41 @@
 
 #include <geode/tests/common.hpp>
 
+void test_names_stability()
+{
+    geode::CoordinateReferenceSystemManager3D crs_manager;
+    geode::CoordinateReferenceSystemManagerBuilder3D crs_manager_builder{
+        crs_manager
+    };
+    geode::AttributeManager att_manager;
+    att_manager.resize( 1 );
+    crs_manager_builder.register_coordinate_reference_system(
+        "a", std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
+                 att_manager, "a" ) );
+    const auto names = crs_manager.coordinate_reference_system_names();
+    const auto* name_data = names.at( 0 ).data();
+    for( const auto i : geode::Range{ 100 } )
+    {
+        const auto name = absl::StrCat( "crs_", i );
+        crs_manager_builder.register_coordinate_reference_system( name,
+            std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
+                att_manager, name ) );
+    }
+    bool found{ false };
+    for( const auto name : crs_manager.coordinate_reference_system_names() )
+    {
+        if( name == "a" )
+        {
+            found = true;
+            geode::OpenGeodeMeshException::test( name.data() == name_data,
+                "[Test] CRS name view should stay valid after other "
+                "insertions" );
+        }
+    }
+    geode::OpenGeodeMeshException::test(
+        found, "[Test] CRS a should be listed" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -72,6 +107,8 @@ void test()
     geode::OpenGeodeMeshException::test(
         crs_manager.nb_coordinate_reference_systems() == 2,
         "Wrong number of CRS" );
+
+    test_names_stability();
 }
 
 OPENGEODE_TEST( "coordinate-reference-manager" )
