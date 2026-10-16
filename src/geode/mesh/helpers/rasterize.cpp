@@ -27,6 +27,7 @@
 #include <queue>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
@@ -488,7 +489,10 @@ namespace
         const std::array< geode::Grid3D::CellsAroundVertex, 2 > vertex_cells )
     {
         auto cells = geode::rasterize_segment( grid, segment );
-        std::vector< bool > tested_cells( grid.nb_cells(), false );
+        // Only the cells around the segment are tested: a hash set keeps the
+        // memory proportional to them instead of to the whole grid
+        absl::flat_hash_set< geode::index_t > tested_cells;
+        tested_cells.reserve( 4 * cells.size() );
         auto min = grid.cell_indices( grid.nb_cells() - 1 );
         auto max = grid.cell_indices( 0 );
         for( const auto vertex_id : geode::LRange{ 2 } )
@@ -505,7 +509,7 @@ namespace
         std::queue< CellIndices< 3 > > to_test;
         for( const auto& cell : cells )
         {
-            tested_cells[grid.cell_index( cell )] = true;
+            tested_cells.insert( grid.cell_index( cell ) );
             add_neighbors_to_queue( grid, cell, to_test, min, max );
         }
         const auto half_cell_size =
@@ -520,12 +524,10 @@ namespace
         {
             const auto cell = to_test.front();
             to_test.pop();
-            const auto cell_id = grid.cell_index( cell );
-            if( tested_cells[cell_id] )
+            if( !tested_cells.insert( grid.cell_index( cell ) ).second )
             {
                 continue;
             }
-            tested_cells[cell_id] = true;
             const auto center = grid.cell_barycenter( cell );
             if( geode::point_segment_distance( center, segment )
                 <= half_cell_size )
