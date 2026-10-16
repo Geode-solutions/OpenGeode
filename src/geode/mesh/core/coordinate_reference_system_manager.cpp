@@ -150,6 +150,25 @@ namespace geode
         }
 
     private:
+        void check_active_crs() const
+        {
+            if( !active_crs_ )
+            {
+                OpenGeodeMeshException::check_exception(
+                    active_crs_name_.empty(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[CoordinateReferenceSystemManager] Active CRS name "
+                    "without active CRS: file may be corrupted" );
+                return;
+            }
+            const auto it = crss_.find( active_crs_name_ );
+            OpenGeodeMeshException::check_exception(
+                it != crss_.end() && it->second == active_crs_, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[CoordinateReferenceSystemManager] Active CRS is not a "
+                "registered CRS: file may be corrupted" );
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -167,6 +186,7 @@ namespace geode
                 archive.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
                 archive.text1b(
                     impl.active_crs_name_, MAX_SERIALIZED_NAME_SIZE );
+                impl.check_active_crs();
             } } } );
         }
 

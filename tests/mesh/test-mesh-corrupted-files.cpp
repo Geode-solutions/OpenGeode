@@ -529,6 +529,7 @@ void test()
     test_light_regular_grid();
     test_legacy_grid_without_cells_number();
     test_long_names();
+    test_active_crs();
 }
 
 OPENGEODE_TEST( "mesh-corrupted-files" )
