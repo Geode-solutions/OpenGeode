@@ -764,7 +764,8 @@ namespace geode
         absl::Span< const index_t > polyhedra_to_connect )
     {
         using Facet = detail::VertexCycle< PolyhedronFacetVertices >;
-        absl::flat_hash_map< Facet, PolyhedronFacet > facets;
+        absl::flat_hash_map< Facet, absl::InlinedVector< PolyhedronFacet, 2 > >
+            facets;
         for( const auto polyhedron : polyhedra_to_connect )
         {
             for( const auto f :
@@ -775,17 +776,22 @@ namespace geode
                 {
                     continue;
                 }
-                const auto output = facets.emplace(
-                    solid_mesh_.polyhedron_facet_vertices( facet ), facet );
-                if( !output.second )
-                {
-                    const auto it = output.first;
-                    do_set_polyhedron_adjacent( it->second, polyhedron );
-                    do_set_polyhedron_adjacent(
-                        facet, it->second.polyhedron_id );
-                    facets.erase( it );
-                }
+                facets[Facet{ solid_mesh_.polyhedron_facet_vertices( facet ) }]
+                    .push_back( facet );
             }
+        }
+        for( const auto& [vertices, polyhedron_facets] : facets )
+        {
+            // Non-manifold facets (shared by more than 2 polyhedra) are
+            // left on border: there is no consistent way to pair them.
+            if( polyhedron_facets.size() != 2 )
+            {
+                continue;
+            }
+            do_set_polyhedron_adjacent(
+                polyhedron_facets[0], polyhedron_facets[1].polyhedron_id );
+            do_set_polyhedron_adjacent(
+                polyhedron_facets[1], polyhedron_facets[0].polyhedron_id );
         }
     }
 

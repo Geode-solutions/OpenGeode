@@ -617,6 +617,24 @@ void test_set_polyhedron_vertex_relink()
         "Vertex 1 should now be linked to tetrahedron 0" );
 }
 
+void test_non_manifold_facet_adjacencies()
+{
+    auto solid = create_solid_with_points( 6 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 1, 2, 4 } );
+    builder->create_tetrahedron( { 0, 1, 2, 5 } );
+    builder->compute_polyhedron_adjacencies();
+    for( const auto t : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            solid->polyhedron_facets_on_border( t ).size() == 4, "Tetrahedron ",
+            t,
+            " should have all its facets on border: facet (0,1,2) is "
+            "shared by 3 tetrahedra" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -639,6 +657,7 @@ void test()
     test_clone( *solid );
     test_delete_all( *solid, *builder );
     test_set_polyhedron_vertex_relink();
+    test_non_manifold_facet_adjacencies();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )
