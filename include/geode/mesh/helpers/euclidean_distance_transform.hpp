@@ -51,7 +51,9 @@ namespace geode
      * the \param grid.
      * @exception OpenGeodeException if the attribute named \param
      * distance_map_name cannot be accessed.
-     * @return the created attribute
+     * @return the created attribute. Its no_value is
+     * std::numeric_limits< double >::max(): when \param grid_cell_ids is
+     * empty, every cell keeps this value and has_value() is false.
      */
     template < index_t dimension >
     [[nodiscard]] std::shared_ptr< VariableAttribute< double > >

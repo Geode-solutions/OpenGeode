@@ -30,6 +30,11 @@
 
 #include <geode/mesh/core/grid.hpp>
 
+namespace
+{
+    constexpr auto NO_DISTANCE = std::numeric_limits< double >::max();
+} // namespace
+
 namespace geode
 {
     template < index_t dimension >
@@ -48,9 +53,8 @@ namespace geode
             attribute_properties.interpolable = false;
             attribute_properties.transferable = true;
             AttributeValues< double > distance_map_values;
-            distance_map_values.default_value =
-                std::numeric_limits< double >::max();
-            distance_map_values.no_value = std::numeric_limits< double >::max();
+            distance_map_values.default_value = NO_DISTANCE;
+            distance_map_values.no_value = NO_DISTANCE;
             const auto distance_map_id =
                 grid.cell_attribute_manager()
                     .template create_attribute< VariableAttribute, double >(
@@ -87,6 +91,12 @@ namespace geode
                         if( value <= 0. )
                         {
                             value = 0;
+                            return;
+                        }
+                        if( value >= NO_DISTANCE )
+                        {
+                            // No seed: keep the attribute no_value
+                            value = NO_DISTANCE;
                             return;
                         }
                         value = std::sqrt( value );
