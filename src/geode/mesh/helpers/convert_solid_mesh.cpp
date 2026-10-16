@@ -624,6 +624,45 @@ namespace
         return solid;
     }
 
+    /*!
+     * Copy polyhedron adjacencies from a solid to a converted one having the
+     * same polyhedra but possibly with reordered vertices and facets.
+     * Facets are matched by their vertex sets.
+     */
+    void copy_polyhedron_adjacencies( const geode::SolidMesh3D& from,
+        const geode::SolidMesh3D& to,
+        geode::SolidMeshBuilder3D& builder )
+    {
+        for( const auto p : geode::Range{ from.nb_polyhedra() } )
+        {
+            for( const auto f :
+                geode::LRange{ from.nb_polyhedron_facets( p ) } )
+            {
+                const auto adjacent = from.polyhedron_adjacent( { p, f } );
+                if( !adjacent )
+                {
+                    continue;
+                }
+                auto facet_vertices =
+                    from.polyhedron_facet_vertices( { p, f } );
+                absl::c_sort( facet_vertices );
+                for( const auto to_f :
+                    geode::LRange{ to.nb_polyhedron_facets( p ) } )
+                {
+                    auto to_facet_vertices =
+                        to.polyhedron_facet_vertices( { p, to_f } );
+                    absl::c_sort( to_facet_vertices );
+                    if( to_facet_vertices == facet_vertices )
+                    {
+                        builder.set_polyhedron_adjacent(
+                            { p, to_f }, adjacent.value() );
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     bool all_polyhedra_are_hybrid( const geode::SolidMesh3D& solid )
     {
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
@@ -837,18 +876,7 @@ namespace geode
                 solid.polyhedron_vertex( { p, 3 } ) };
             builder->create_tetrahedron( vertices );
         }
-        for( const auto p : Range{ solid.nb_polyhedra() } )
-        {
-            for( const auto f : LRange{ 4 } )
-            {
-                if( const auto adjacent =
-                        solid.polyhedron_adjacent( { p, f } ) )
-                {
-                    builder->set_polyhedron_adjacent(
-                        { p, f }, adjacent.value() );
-                }
-            }
-        }
+        copy_polyhedron_adjacencies( solid, *tet_solid->get(), *builder );
         internal::copy_attributes( solid.vertex_attribute_manager(),
             tet_solid->get()->vertex_attribute_manager() );
         internal::copy_attributes( solid.polyhedron_attribute_manager(),
@@ -914,18 +942,7 @@ namespace geode
                 builder->create_prism( { ordered_vertices } );
             }
         }
-        for( const auto p : Range{ solid.nb_polyhedra() } )
-        {
-            for( const auto f : LRange{ solid.nb_polyhedron_facets( p ) } )
-            {
-                if( const auto adjacent =
-                        solid.polyhedron_adjacent( { p, f } ) )
-                {
-                    builder->set_polyhedron_adjacent(
-                        { p, f }, adjacent.value() );
-                }
-            }
-        }
+        copy_polyhedron_adjacencies( solid, *hybrid_solid->get(), *builder );
         internal::copy_attributes( solid.vertex_attribute_manager(),
             hybrid_solid->get()->vertex_attribute_manager() );
         internal::copy_attributes( solid.polyhedron_attribute_manager(),
