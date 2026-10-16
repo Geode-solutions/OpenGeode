@@ -566,6 +566,18 @@ namespace
         const auto pt1_in_grid =
             grid.grid_coordinate_system().coordinates( seg_vertices[1] );
         const geode::Segment2D segment_in_grid{ pt0_in_grid, pt1_in_grid };
+        if( segment_in_grid.length() <= geode::GLOBAL_EPSILON )
+        {
+            // Too short in grid space to define a direction: the segment is
+            // covered by the cells around its vertices
+            for( const auto& vertex_cells_v : vertex_cells )
+            {
+                cells.insert(
+                    cells.end(), vertex_cells_v.begin(), vertex_cells_v.end() );
+            }
+            geode::sort_unique( cells );
+            return cells;
+        }
         const auto normal_in_grid = geode::perpendicular(
             segment_in_grid.direction() * segment_in_grid.length() );
         const geode::InfiniteLine2D line_in_grid{ segment_in_grid };

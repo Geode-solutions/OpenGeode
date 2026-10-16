@@ -451,6 +451,24 @@ namespace
                 absl::StrCat( "Rotated ", trial ) );
         }
     }
+    void test_conservative_rasterize_short_segment()
+    {
+        geode::Logger::info( "Test conservative rasterize short segment" );
+        auto grid = geode::RegularGrid2D::create();
+        auto builder = geode::RegularGridBuilder2D::create( *grid );
+        builder->initialize_grid( geode::Point2D{ { 0., 0. } }, { 2, 2 }, 1e5 );
+        const geode::Point2D pt0{ { 99999.89995, 50. } };
+        const geode::Point2D pt1{ { 99999.90005, 50. } };
+        const auto cells = geode::conservative_rasterize_segment(
+            *grid, geode::Segment2D{ pt0, pt1 } );
+        absl::flat_hash_set< geode::Grid2D::CellIndices > result{ cells.begin(),
+            cells.end() };
+        geode::OpenGeodeMeshException::test(
+            result.size() == 2 && cells.size() == 2
+                && result.contains( geode::Grid2D::CellIndices{ 0, 0 } )
+                && result.contains( geode::Grid2D::CellIndices{ 1, 0 } ),
+            "Wrong cells for short conservative segment" );
+    }
 } // namespace
 
 void test()
@@ -477,6 +495,7 @@ void test()
     test_rasterize_tetrahedron_axis_aligned();
     test_rasterize_tetrahedron_boundary();
     test_rasterize_tetrahedron_rotated();
+    test_conservative_rasterize_short_segment();
 }
 
 OPENGEODE_TEST( "rasterize" )
