@@ -451,6 +451,122 @@ namespace
                 absl::StrCat( "Rotated ", trial ) );
         }
     }
+    double triangle_box_separation(
+        const std::array< geode::Point3D, 3 >& triangle,
+        const geode::Grid3D::CellIndices& cell )
+    {
+        std::vector< geode::Vector3D > axes{ geode::Vector3D{ { 1, 0, 0 } },
+            geode::Vector3D{ { 0, 1, 0 } }, geode::Vector3D{ { 0, 0, 1 } } };
+        const std::array< geode::Vector3D, 3 > edges{
+            geode::Vector3D{ triangle[0], triangle[1] },
+            geode::Vector3D{ triangle[1], triangle[2] },
+            geode::Vector3D{ triangle[2], triangle[0] }
+        };
+        axes.push_back( edges[0].cross( edges[1] ) );
+        for( const auto& edge : edges )
+        {
+            for( const auto d : geode::LRange{ 3 } )
+            {
+                axes.push_back( edge.cross( axes[d] ) );
+            }
+        }
+        auto separation = -std::numeric_limits< double >::max();
+        for( const auto& axis : axes )
+        {
+            const auto length = axis.length();
+            if( length < 1e-12 )
+            {
+                continue;
+            }
+            auto triangle_min = std::numeric_limits< double >::max();
+            auto triangle_max = -std::numeric_limits< double >::max();
+            for( const auto& vertex : triangle )
+            {
+                const auto value = axis.dot( geode::Vector3D{ vertex } );
+                triangle_min = std::min( triangle_min, value );
+                triangle_max = std::max( triangle_max, value );
+            }
+            double box_center{ 0 };
+            double box_radius{ 0 };
+            for( const auto d : geode::LRange{ 3 } )
+            {
+                box_center += axis.value( d ) * ( cell[d] + 0.5 );
+                box_radius += 0.5 * std::fabs( axis.value( d ) );
+            }
+            separation = std::max( separation,
+                std::max( triangle_min - ( box_center + box_radius ),
+                    ( box_center - box_radius ) - triangle_max )
+                    / length );
+        }
+        return separation;
+    }
+
+    void test_rasterize_random_triangles()
+    {
+        geode::Logger::info( "Test rasterize random triangles" );
+        auto grid = geode::RegularGrid3D::create();
+        auto builder = geode::RegularGridBuilder3D::create( *grid );
+        builder->initialize_grid( geode::Point3D{ { 0., 0., 0. } },
+            { 16, 16, 16 }, { 1., 0.7, 1.3 } );
+        std::mt19937 generator{ 1234 };
+        std::uniform_real_distribution< double > distribution{ 0.05, 15.95 };
+        std::uniform_real_distribution< double > scale_distribution{ 0.05, 1. };
+        for( const auto trial : geode::Range{ 200 } )
+        {
+            const auto scale = scale_distribution( generator );
+            const geode::Point3D center{ { distribution( generator ),
+                distribution( generator ), distribution( generator ) } };
+            std::array< geode::Point3D, 3 > triangle_in_grid;
+            for( auto& vertex : triangle_in_grid )
+            {
+                for( const auto d : geode::LRange{ 3 } )
+                {
+                    const auto value =
+                        center.value( d )
+                        + scale * ( distribution( generator ) - 8. );
+                    vertex.set_value( d, std::clamp( value, 0.05, 15.95 ) );
+                }
+            }
+            std::array< geode::Point3D, 3 > triangle_points;
+            for( const auto v : geode::LRange{ 3 } )
+            {
+                triangle_points[v] =
+                    grid->grid_coordinate_system().global_coordinates(
+                        triangle_in_grid[v] );
+            }
+            const geode::Triangle3D triangle{ triangle_points[0],
+                triangle_points[1], triangle_points[2] };
+            const auto cells =
+                geode::conservative_rasterize_triangle( *grid, triangle );
+            absl::flat_hash_set< geode::Grid3D::CellIndices > result;
+            for( const auto& cell : cells )
+            {
+                geode::OpenGeodeMeshException::test(
+                    result.insert( cell ).second, "Random triangle ", trial,
+                    ": duplicated cell" );
+            }
+            for( const auto c : geode::Range{ grid->nb_cells() } )
+            {
+                const auto cell = grid->cell_indices( c );
+                const auto separation =
+                    triangle_box_separation( triangle_in_grid, cell );
+                if( separation < -1e-5 )
+                {
+                    geode::OpenGeodeMeshException::test(
+                        result.contains( cell ), "Random triangle ", trial,
+                        ": missing cell ", cell[0], " ", cell[1], " ",
+                        cell[2] );
+                }
+                else if( separation > 1e-5 )
+                {
+                    geode::OpenGeodeMeshException::test(
+                        !result.contains( cell ), "Random triangle ", trial,
+                        ": extra cell ", cell[0], " ", cell[1], " ", cell[2] );
+                }
+            }
+        }
+    }
+
     void test_conservative_rasterize_short_segment()
     {
         geode::Logger::info( "Test conservative rasterize short segment" );
@@ -495,6 +611,7 @@ void test()
     test_rasterize_tetrahedron_axis_aligned();
     test_rasterize_tetrahedron_boundary();
     test_rasterize_tetrahedron_rotated();
+    test_rasterize_random_triangles();
     test_conservative_rasterize_short_segment();
 }
 

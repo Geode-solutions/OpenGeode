@@ -292,17 +292,6 @@ namespace
         }
     }
 
-    geode::index_t max_number_cells(
-        const CellIndices< 3 >& min, const CellIndices< 3 >& max )
-    {
-        geode::index_t nb_cells{ 1 };
-        for( const auto d : geode::LRange{ 3 } )
-        {
-            nb_cells *= max[d] + 1 - min[d];
-        }
-        return nb_cells;
-    }
-
     std::vector< CellIndices< 3 > > conservative_voxelization_triangle(
         const geode::Grid3D& grid,
         const geode::Triangle3D& triangle,
@@ -322,7 +311,6 @@ namespace
             }
         }
         std::vector< CellIndices< 3 > > cells;
-        cells.reserve( max_number_cells( min, max ) );
         const geode::OwnerTriangle3D triangle_in_grid{
             grid.grid_coordinate_system().coordinates( triangle.vertices()[0] ),
             grid.grid_coordinate_system().coordinates( triangle.vertices()[1] ),
@@ -363,94 +351,151 @@ namespace
             get_edge_projection( triangle_in_grid, triangle_edges_in_grid,
                 { 2, 0 }, ( normal_in_grid->value( 1 ) >= 0 ? 1 : -1 ) );
         const auto plane_in_grid = triangle_in_grid.plane().value();
-        for( const auto k : geode::Range( min[2], max[2] + 1 ) )
-        {
-            for( const auto j : geode::Range( min[1], max[1] + 1 ) )
+        const auto cell_intersects_triangle = [&]( geode::index_t i,
+                                                  geode::index_t j,
+                                                  geode::index_t k ) {
+            const geode::Point3D point{ { static_cast< double >( i ),
+                static_cast< double >( j ), static_cast< double >( k ) } };
+
+            // Test triangle plane through box
+            const auto p_minus = point + critical_point;
+            double p_minus_dist;
+            std::tie( p_minus_dist, std::ignore ) =
+                geode::point_plane_signed_distance( p_minus, plane_in_grid );
+            const geode::Point3D p_plus{ { 1. + i - critical_point.value( 0 ),
+                1. + j - critical_point.value( 1 ),
+                1. + k - critical_point.value( 2 ) } };
+            double p_plus_dist;
+            std::tie( p_plus_dist, std::ignore ) =
+                geode::point_plane_signed_distance( p_plus, plane_in_grid );
+            if( std::fabs( p_minus_dist ) > 2. * geode::GLOBAL_EPSILON
+                && std::fabs( p_plus_dist ) > 2. * geode::GLOBAL_EPSILON
+                && p_minus_dist * p_plus_dist > 0. )
             {
-                for( const auto i : geode::Range( min[0], max[0] + 1 ) )
+                return false;
+            }
+
+            // Tests projection plane
+            const geode::Vector2D p_xy{ { point.value( 0 ),
+                point.value( 1 ) } };
+            if( xy_params[0].first.dot( p_xy ) + xy_params[0].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            if( xy_params[1].first.dot( p_xy ) + xy_params[1].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            if( xy_params[2].first.dot( p_xy ) + xy_params[2].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+
+            const geode::Vector2D p_yz{ { point.value( 1 ),
+                point.value( 2 ) } };
+            if( yz_params[0].first.dot( p_yz ) + yz_params[0].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            if( yz_params[1].first.dot( p_yz ) + yz_params[1].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            if( yz_params[2].first.dot( p_yz ) + yz_params[2].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+
+            const geode::Vector2D p_zx{ { point.value( 2 ),
+                point.value( 0 ) } };
+            if( zx_params[0].first.dot( p_zx ) + zx_params[0].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            if( zx_params[1].first.dot( p_zx ) + zx_params[1].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            if( zx_params[2].first.dot( p_zx ) + zx_params[2].second
+                < -2. * geode::GLOBAL_EPSILON )
+            {
+                return false;
+            }
+            return true;
+        };
+
+        // Loop on the cell columns along the dominant axis of the triangle
+        // normal, and only test the cells of each column close to the
+        // triangle plane: the cost is proportional to the output size
+        // instead of the bounding box volume.
+        const auto& normal = plane_in_grid.normal();
+        geode::local_index_t axis{ 0 };
+        for( const auto d : geode::LRange{ 1, 3 } )
+        {
+            if( std::fabs( normal.value( d ) )
+                > std::fabs( normal.value( axis ) ) )
+            {
+                axis = d;
+            }
+        }
+        const geode::local_index_t axis1 = axis == 2 ? 0 : axis + 1;
+        const geode::local_index_t axis2 = axis1 == 2 ? 0 : axis1 + 1;
+        const auto plane_value =
+            normal.dot( geode::Vector3D{ plane_in_grid.origin() } );
+        // Plane coordinate along axis at the given coordinates on the other
+        // axes
+        const auto axis_coordinate = [&]( double value1, double value2 ) {
+            return ( plane_value - normal.value( axis1 ) * value1
+                       - normal.value( axis2 ) * value2 )
+                   / normal.value( axis );
+        };
+        // Larger than the tolerance of the plane test, scaled by the
+        // dominant normal component (at least 1/sqrt(3))
+        constexpr double MARGIN{ 1e-3 };
+        for( const auto c1 : geode::Range( min[axis1], max[axis1] + 1 ) )
+        {
+            for( const auto c2 : geode::Range( min[axis2], max[axis2] + 1 ) )
+            {
+                auto axis_min = std::numeric_limits< double >::max();
+                auto axis_max = std::numeric_limits< double >::lowest();
+                for( const auto corner1 : { 0., 1. } )
                 {
-                    CellIndices< 3 > cur_cell{ { i, j, k } };
-                    const geode::Point3D point{ { static_cast< double >( i ),
-                        static_cast< double >( j ),
-                        static_cast< double >( k ) } };
-
-                    // Test triangle plane through box
-                    const auto p_minus = point + critical_point;
-                    double p_minus_dist;
-                    std::tie( p_minus_dist, std::ignore ) =
-                        geode::point_plane_signed_distance(
-                            p_minus, plane_in_grid );
-                    const geode::Point3D p_plus{
-                        { 1. + i - critical_point.value( 0 ),
-                            1. + j - critical_point.value( 1 ),
-                            1. + k - critical_point.value( 2 ) }
-                    };
-                    double p_plus_dist;
-                    std::tie( p_plus_dist, std::ignore ) =
-                        geode::point_plane_signed_distance(
-                            p_plus, plane_in_grid );
-                    if( std::fabs( p_minus_dist ) > 2. * geode::GLOBAL_EPSILON
-                        && std::fabs( p_plus_dist ) > 2. * geode::GLOBAL_EPSILON
-                        && p_minus_dist * p_plus_dist > 0. )
+                    for( const auto corner2 : { 0., 1. } )
                     {
-                        continue;
+                        const auto value =
+                            axis_coordinate( c1 + corner1, c2 + corner2 );
+                        axis_min = std::min( axis_min, value );
+                        axis_max = std::max( axis_max, value );
                     }
-
-                    // Tests projection plane
-                    const geode::Vector2D p_xy{ { point.value( 0 ),
-                        point.value( 1 ) } };
-                    if( xy_params[0].first.dot( p_xy ) + xy_params[0].second
-                        < -2. * geode::GLOBAL_EPSILON )
+                }
+                const auto begin = std::max( static_cast< double >( min[axis] ),
+                    std::floor( axis_min - MARGIN ) );
+                const auto end = std::min( static_cast< double >( max[axis] ),
+                    std::floor( axis_max + MARGIN ) );
+                if( begin > end )
+                {
+                    continue;
+                }
+                CellIndices< 3 > cell;
+                cell[axis1] = c1;
+                cell[axis2] = c2;
+                for( const auto c :
+                    geode::Range( static_cast< geode::index_t >( begin ),
+                        static_cast< geode::index_t >( end ) + 1 ) )
+                {
+                    cell[axis] = c;
+                    if( cell_intersects_triangle( cell[0], cell[1], cell[2] ) )
                     {
-                        continue;
+                        cells.push_back( cell );
                     }
-                    if( xy_params[1].first.dot( p_xy ) + xy_params[1].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-                    if( xy_params[2].first.dot( p_xy ) + xy_params[2].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-
-                    const geode::Vector2D p_yz{ { point.value( 1 ),
-                        point.value( 2 ) } };
-                    if( yz_params[0].first.dot( p_yz ) + yz_params[0].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-                    if( yz_params[1].first.dot( p_yz ) + yz_params[1].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-                    if( yz_params[2].first.dot( p_yz ) + yz_params[2].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-
-                    const geode::Vector2D p_zx{ { point.value( 2 ),
-                        point.value( 0 ) } };
-                    if( zx_params[0].first.dot( p_zx ) + zx_params[0].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-                    if( zx_params[1].first.dot( p_zx ) + zx_params[1].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-                    if( zx_params[2].first.dot( p_zx ) + zx_params[2].second
-                        < -2. * geode::GLOBAL_EPSILON )
-                    {
-                        continue;
-                    }
-                    cells.emplace_back( std::move( cur_cell ) );
                 }
             }
         }
