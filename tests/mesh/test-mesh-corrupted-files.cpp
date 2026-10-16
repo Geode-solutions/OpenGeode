@@ -493,14 +493,48 @@ namespace
         expect_load_failure( corrupted, loader );
     }
 
+    /*
+     * Saving a name longer than MAX_SERIALIZED_NAME_SIZE is not possible
+     * (bitsery asserts on write), so a short name is saved and its size
+     * prefix is patched above the limit.
+     */
+    template < typename Loader >
+    void test_too_long_name(
+        std::string_view filename, std::string_view name, const Loader& loader )
+    {
+        loader( filename );
+        auto content = read_file( filename );
+        const auto from =
+            absl::StrCat( Bytes{}.size( name.size() ).string(), name );
+        const auto position = content.find( from );
+        geode::OpenGeodeMeshException::test( position != std::string::npos,
+            "[Test] Name ", name, " not found in ", filename );
+        // bitsery 4-byte size encoding: two high bytes, then a little endian
+        // 16-bit word
+        constexpr auto TOO_LONG = geode::MAX_SERIALIZED_NAME_SIZE + 1;
+        const auto too_long_size =
+            Bytes{}
+                .u8( static_cast< std::uint8_t >( 0xC0u | ( TOO_LONG >> 24 ) ) )
+                .u8( static_cast< std::uint8_t >( TOO_LONG >> 16 ) )
+                .u8( static_cast< std::uint8_t >( TOO_LONG ) )
+                .u8( static_cast< std::uint8_t >( TOO_LONG >> 8 ) );
+        content.replace( position, 1, too_long_size.string() );
+        const auto corrupted = absl::StrCat( "corrupted_", filename );
+        {
+            std::ofstream file{ corrupted, std::ofstream::binary };
+            file << content;
+        }
+        expect_load_failure( corrupted, loader );
+    }
+
     void test_long_names()
     {
-        const std::string long_name( geode::MAX_SERIALIZED_NAME_SIZE + 1, 'a' );
-        const auto point_set = create_point_set_with_crs( long_name );
+        const std::string crs_name{ "LONG_CRS_NAME" };
+        const auto point_set = create_point_set_with_crs( crs_name );
         const auto filename =
             absl::StrCat( "long_crs_name.", point_set->native_extension() );
         geode::save_point_set( *point_set, filename );
-        expect_load_failure( filename, []( std::string_view file ) {
+        test_too_long_name( filename, crs_name, []( std::string_view file ) {
             geode_unused( geode::load_point_set< 3 >( file ) );
         } );
 
@@ -510,14 +544,16 @@ namespace
         builder->create_point( geode::Point2D{ { 1, 0 } } );
         builder->create_point( geode::Point2D{ { 0, 1 } } );
         builder->create_triangle( { 0, 1, 2 } );
+        const std::string texture_name{ "LONG_TEXTURE_NAME" };
         auto manager = surface->texture_manager();
-        manager.find_or_create_texture( long_name );
+        manager.find_or_create_texture( texture_name );
         const auto surface_filename =
             absl::StrCat( "long_texture_name.", surface->native_extension() );
         geode::save_triangulated_surface( *surface, surface_filename );
-        expect_load_failure( surface_filename, []( std::string_view file ) {
-            geode_unused( geode::load_triangulated_surface< 2 >( file ) );
-        } );
+        test_too_long_name(
+            surface_filename, texture_name, []( std::string_view file ) {
+                geode_unused( geode::load_triangulated_surface< 2 >( file ) );
+            } );
     }
 
     template < typename Base, typename... Args >
