@@ -531,7 +531,7 @@ namespace geode
                 else
                 {
                     associate_polyhedron_vertex_to_vertex(
-                        polyhedra_around[1], new_vertex_id );
+                        polyhedra_around[1], old_vertex_id );
                 }
             }
             reset_polyhedra_around_vertex( old_vertex_id );

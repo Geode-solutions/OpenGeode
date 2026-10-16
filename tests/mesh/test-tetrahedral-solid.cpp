@@ -573,6 +573,50 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_tetrahedral_solid< 3 >( filename ) );
 }
 
+std::unique_ptr< geode::TetrahedralSolid3D > create_solid_with_points(
+    geode::index_t nb_points )
+{
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    for( const auto p : geode::Range{ nb_points } )
+    {
+        builder->create_point( geode::Point3D{ { static_cast< double >( p % 3 ),
+            static_cast< double >( p % 5 ), static_cast< double >( p ) } } );
+    }
+    return solid;
+}
+
+void check_vertex_link(
+    const geode::TetrahedralSolid3D& solid, geode::index_t vertex )
+{
+    const auto polyhedron_vertex = solid.polyhedron_around_vertex( vertex );
+    geode::OpenGeodeMeshException::test( polyhedron_vertex.has_value(),
+        "Vertex ", vertex, " should not be isolated" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( polyhedron_vertex.value() ) == vertex,
+        "Vertex ", vertex, " is linked to a wrong polyhedron vertex" );
+}
+
+void test_set_polyhedron_vertex_relink()
+{
+    auto solid = create_solid_with_points( 6 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 1, 2, 3, 4 } );
+    builder->compute_polyhedron_adjacencies();
+    const auto around = solid->polyhedron_around_vertex( 1 );
+    geode::OpenGeodeMeshException::test(
+        around.has_value() && around->polyhedron_id == 1,
+        "Vertex 1 should be linked to tetrahedron 1" );
+    builder->set_polyhedron_vertex( around.value(), 5 );
+    check_vertex_link( *solid, 1 );
+    check_vertex_link( *solid, 5 );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedron_around_vertex( 1 )->polyhedron_id == 0,
+        "Vertex 1 should now be linked to tetrahedron 0" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -594,6 +638,7 @@ void test()
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );
     test_delete_all( *solid, *builder );
+    test_set_polyhedron_vertex_relink();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )
