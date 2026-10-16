@@ -679,6 +679,47 @@ void test_non_manifold_surface()
     }
 }
 
+void test_merge_edges_on_vertex_update()
+{
+    auto surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::PolygonalSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 3 );
+    auto edges_builder = builder->edges_builder();
+    edges_builder.find_or_create_edge( { 0, 2 } );
+    edges_builder.find_or_create_edge( { 1, 2 } );
+    const std::vector< geode::index_t > old2new{ 0, 0, 2 };
+    edges_builder.update_edge_vertices( old2new );
+    const auto& edges = surface->edges();
+    geode::OpenGeodeMeshException::test( edges.nb_edges() == 1,
+        "[merge edges] Merged edges should give 1 edge, not ",
+        edges.nb_edges() );
+    const auto merged = edges.edge_from_vertices( { 0, 2 } );
+    geode::OpenGeodeMeshException::test(
+        merged && merged.value() == 0, "[merge edges] Wrong merged edge id" );
+    geode::OpenGeodeMeshException::test(
+        !edges.is_edge_isolated( 0 ), "[merge edges] Edge 0 is isolated" );
+    edges_builder.remove_edge( { 0, 2 } );
+    geode::OpenGeodeMeshException::test( !edges.is_edge_isolated( 0 ),
+        "[merge edges] Merged edge should keep both counters" );
+
+    const auto new_edge = edges_builder.find_or_create_edge( { 1, 2 } );
+    geode::OpenGeodeMeshException::test( new_edge == 1,
+        "[merge edges] New edge id should be 1, not ", new_edge );
+    geode::OpenGeodeMeshException::test( edges.nb_edges() == 2,
+        "[merge edges] Should have 2 edges, not ", edges.nb_edges() );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_vertices( 0 ) == std::array< geode::index_t, 2 >{ 0, 2 },
+        "[merge edges] Wrong vertices for edge 0" );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_vertices( 1 ) == std::array< geode::index_t, 2 >{ 1, 2 },
+        "[merge edges] Wrong vertices for edge 1" );
+    geode::OpenGeodeMeshException::test(
+        edges.edge_from_vertices( { 1, 2 } ) == 1,
+        "[merge edges] Wrong id from vertices for edge 1" );
+}
+
 void test_texture( const geode::PolygonalSurface3D& polygonal_surface )
 {
     auto manager = polygonal_surface.texture_manager();
@@ -789,6 +830,7 @@ void test()
     test_delete_all( *polygonal_surface, *builder );
 
     test_non_manifold_surface();
+    test_merge_edges_on_vertex_update();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

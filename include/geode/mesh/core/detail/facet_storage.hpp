@@ -79,7 +79,7 @@ namespace geode
 
             index_t add_facet( TypedVertexCycle vertices )
             {
-                const auto id = facet_indices_.size();
+                const auto id = static_cast< index_t >( counters_.size() );
                 const auto output =
                     facet_indices_.try_emplace( std::move( vertices ), id );
                 const auto it = std::get< 0 >( output );
@@ -158,41 +158,66 @@ namespace geode
                 return mapping;
             }
 
+            /*!
+             * Update facet vertices with the given vertex mapping.
+             * Facets using a vertex mapped to NO_ID are deleted.
+             * Facets becoming identical are merged into the one with the
+             * smallest index: their counters are summed up and the other
+             * facets are deleted. In the returned mapping, a merged facet is
+             * mapped to the new index of the facet it was merged into.
+             */
             std::vector< index_t > update_facet_vertices(
                 absl::Span< const index_t > old2new )
             {
                 const auto old_facet_indices = std::move( facet_indices_ );
                 facet_indices_ = {};
                 facet_indices_.reserve( old_facet_indices.size() );
-                std::vector< bool > to_delete(
-                    old_facet_indices.size(), false );
-                for( const auto& cycle : old_facet_indices )
+                std::vector< bool > to_delete( counters_.size(), false );
+                std::vector< std::pair< index_t, index_t > > merged_facets;
+                for( const auto& [cycle, facet_id] : old_facet_indices )
                 {
-                    auto updated_vertices = cycle.first.vertices();
+                    auto updated_vertices = cycle.vertices();
+                    bool removed{ false };
                     for( auto& v : updated_vertices )
                     {
                         v = old2new[v];
                         if( v == NO_ID )
                         {
-                            to_delete[cycle.second] = true;
+                            removed = true;
                             break;
                         }
                     }
-                    if( !to_delete[cycle.second] )
+                    if( removed )
                     {
-                        const auto it =
-                            std::get< 0 >( facet_indices_.try_emplace(
-                                TypedVertexCycle{
-                                    std::move( updated_vertices ) },
-                                cycle.second ) );
-                        vertices_[cycle.second] = it->first.vertices();
+                        to_delete[facet_id] = true;
+                        continue;
                     }
+                    const auto [it, inserted] = facet_indices_.try_emplace(
+                        TypedVertexCycle{ std::move( updated_vertices ) },
+                        facet_id );
+                    if( !inserted )
+                    {
+                        const auto kept = std::min( it->second, facet_id );
+                        const auto merged = std::max( it->second, facet_id );
+                        counters_[kept] += counters_[merged];
+                        to_delete[merged] = true;
+                        merged_facets.emplace_back( merged, kept );
+                        it->second = kept;
+                    }
+                    vertices_[it->second] = it->first.vertices();
                 }
                 delete_elements( to_delete );
-                const auto cycle_old2new = mapping_after_deletion( to_delete );
+                auto cycle_old2new = mapping_after_deletion( to_delete );
                 for( auto& cycle : facet_indices_ )
                 {
                     cycle.second = cycle_old2new[cycle.second];
+                }
+                // Reverse order: a kept facet may be merged later on
+                for( auto merged_it = merged_facets.rbegin();
+                    merged_it != merged_facets.rend(); ++merged_it )
+                {
+                    cycle_old2new[merged_it->first] =
+                        cycle_old2new[merged_it->second];
                 }
                 return cycle_old2new;
             }
