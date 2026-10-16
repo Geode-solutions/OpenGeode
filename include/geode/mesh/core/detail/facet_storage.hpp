@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <absl/algorithm/container.h>
 #include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
@@ -124,9 +125,18 @@ namespace geode
             std::vector< index_t > clean_facets()
             {
                 std::vector< bool > to_delete( counters_.size(), false );
+                bool has_isolated_facet{ false };
                 for( const auto e : Indices{ counters_ } )
                 {
-                    to_delete[e] = counters_[e] == 0;
+                    if( counters_[e] == 0 )
+                    {
+                        to_delete[e] = true;
+                        has_isolated_facet = true;
+                    }
+                }
+                if( !has_isolated_facet )
+                {
+                    return identity_mapping();
                 }
                 return delete_facets( to_delete );
             }
@@ -134,20 +144,24 @@ namespace geode
             std::vector< index_t > delete_facets(
                 const std::vector< bool >& to_delete )
             {
-                const auto old2new = mapping_after_deletion( to_delete );
-                std::vector< TypedVertexCycle > key_to_erase;
-                key_to_erase.reserve( old2new.size() );
-                for( auto& cycle : facet_indices_ )
+                if( absl::c_find( to_delete, true ) == to_delete.end() )
                 {
-                    if( old2new[cycle.second] == NO_ID )
-                    {
-                        key_to_erase.emplace_back( cycle.first );
-                    }
-                    cycle.second = old2new[cycle.second];
+                    return identity_mapping();
                 }
-                for( const auto& key : key_to_erase )
+                const auto old2new = mapping_after_deletion( to_delete );
+                for( auto it = facet_indices_.begin();
+                    it != facet_indices_.end(); )
                 {
-                    facet_indices_.erase( key );
+                    const auto new_id = old2new[it->second];
+                    if( new_id == NO_ID )
+                    {
+                        facet_indices_.erase( it++ );
+                    }
+                    else
+                    {
+                        it->second = new_id;
+                        ++it;
+                    }
                 }
                 delete_elements( to_delete );
                 return old2new;
@@ -254,6 +268,13 @@ namespace geode
             }
 
         private:
+            [[nodiscard]] std::vector< index_t > identity_mapping() const
+            {
+                std::vector< index_t > old2new( counters_.size() );
+                absl::c_iota( old2new, 0 );
+                return old2new;
+            }
+
             void delete_elements( const std::vector< bool >& to_delete )
             {
                 facet_attribute_manager_.delete_elements( to_delete );
