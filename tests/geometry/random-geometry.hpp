@@ -44,7 +44,7 @@
  */
 namespace
 {
-    double log_uniform( double min_exponent, double max_exponent )
+    inline double log_uniform( double min_exponent, double max_exponent )
     {
         return std::pow( 10., uniform( min_exponent, max_exponent ) );
     }
@@ -152,7 +152,7 @@ namespace
      * Random segment around the triangle: random, crossing the triangle,
      * nearly parallel to its plane, in its plane, or with an endpoint on it
      */
-    std::array< geode::Point3D, 2 > random_segment(
+    inline std::array< geode::Point3D, 2 > random_segment(
         const std::array< geode::Point3D, 3 >& vertices, geode::index_t trial )
     {
         switch( trial % 5 )
@@ -186,7 +186,7 @@ namespace
      * Second triangle: random, translated copy of the first one (parallel),
      * in the same plane, or crossing the first one
      */
-    std::array< geode::Point3D, 3 > random_other_triangle(
+    inline std::array< geode::Point3D, 3 > random_other_triangle(
         const std::array< geode::Point3D, 3 >& vertices, geode::index_t trial )
     {
         switch( trial % 4 )
@@ -217,7 +217,8 @@ namespace
      * Orthonormal axes of the plane orthogonal to the given unit normal
      * (independent of the library implementation on purpose)
      */
-    std::array< geode::Vector3D, 2 > plane_axes( const geode::Vector3D& normal )
+    inline std::array< geode::Vector3D, 2 > plane_axes(
+        const geode::Vector3D& normal )
     {
         const auto other = std::fabs( normal.value( 0 ) ) < 0.9
                                ? geode::Vector3D{ { 1, 0, 0 } }
