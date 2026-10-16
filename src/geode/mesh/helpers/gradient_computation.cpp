@@ -78,7 +78,7 @@ namespace
             geode::AttributeValues< geode::Vector< Mesh::dim > >
                 distance_map_values;
             distance_map_values.default_value = geode::Vector< Mesh::dim >{};
-            distance_map_values.no_value = geode::Vector< Mesh::dim >{};
+            distance_map_values.no_value = no_value_gradient();
             const auto gradient_function_name =
                 absl::StrCat( scalar_function_->name().value(), "_gradient" );
             gradient_function_id =
@@ -181,19 +181,20 @@ namespace
             }
             if( !value_set )
             {
+                gradient_function.set_value( vertex_id, no_value_gradient() );
                 return false;
             }
             gradient_function.set_value( vertex_id, computed_gradient );
             return true;
         }
 
-        geode::Vector< Mesh::dim > no_value_gradient() const
+        static geode::Vector< Mesh::dim > no_value_gradient()
         {
             geode::Vector< Mesh::dim > result;
             for( const auto dim : geode::LRange{ Mesh::dim } )
             {
                 result.set_value( dim, std::nan( "" ) );
-            };
+            }
             return result;
         }
 
