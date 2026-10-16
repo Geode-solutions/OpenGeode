@@ -164,6 +164,55 @@ void triangulate_surface()
         surface->nb_polygons() );
 }
 
+void triangulate_surface_keeps_polygon_attributes()
+{
+    auto surface = geode::PolygonalSurface2D::create();
+    auto builder = geode::SurfaceMeshBuilder2D::create( *surface );
+    builder->create_point( geode::Point2D{ { 0, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 1 } } );
+    builder->create_point( geode::Point2D{ { 0, 1 } } );
+    builder->create_point( geode::Point2D{ { 2, 0 } } );
+    builder->create_polygon( { 0, 1, 2, 3 } );
+    builder->create_polygon( { 1, 4, 2 } );
+    builder->compute_polygon_adjacencies();
+    geode::AttributeValues< int > values;
+    values.default_value = -1;
+    values.no_value = -1;
+    geode::AttributeProperties properties;
+    properties.assignable = true;
+    properties.transferable = true;
+    const auto attribute_id =
+        surface->polygon_attribute_manager()
+            .create_attribute< geode::VariableAttribute, int >(
+                "id", values, properties );
+    auto attribute =
+        surface->polygon_attribute_manager()
+            .find_attribute< geode::VariableAttribute, int >( attribute_id );
+    attribute->set_value( 0, 42 );
+    attribute->set_value( 1, 7 );
+    geode::triangulate_surface_mesh( *surface, *builder );
+    geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
+        "Wrong number of polygons after triangulation" );
+    geode::index_t nb_42{ 0 };
+    geode::index_t nb_7{ 0 };
+    for( const auto p : geode::Range{ surface->nb_polygons() } )
+    {
+        const auto value = attribute->value( p );
+        if( value == 42 )
+        {
+            nb_42++;
+        }
+        else if( value == 7 )
+        {
+            nb_7++;
+        }
+    }
+    geode::OpenGeodeMeshException::test( nb_42 == 2 && nb_7 == 1,
+        "Polygon attribute not propagated to triangles: ", nb_42,
+        " triangles with 42 and ", nb_7, " with 7" );
+}
+
 void densify_grid_cells_validation()
 {
     geode::LightRegularGrid2D grid{ geode::Point2D{ { 0, 0 } }, { 3, 3 },
@@ -202,6 +251,7 @@ void test()
     convert_surface_dimension();
     convert_grid_to_surface();
     triangulate_surface();
+    triangulate_surface_keeps_polygon_attributes();
     densify_grid_cells_validation();
 }
 

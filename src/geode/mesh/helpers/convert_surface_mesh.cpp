@@ -445,6 +445,8 @@ namespace geode
                     const std::array triangle{ vertices[new_triangle[0]],
                         vertices[new_triangle[1]], vertices[new_triangle[2]] };
                     new_polygons[trgl] = builder.create_polygon( triangle );
+                    surface.polygon_attribute_manager().copy_attribute_value(
+                        p, new_polygons[trgl] );
                     for( const auto e : LRange{ 3 } )
                     {
                         const auto vertex0 = triangle[e];
