@@ -222,6 +222,15 @@ namespace geode
             return std::nullopt;
         }
 
+        /*!
+         * GLOBAL_EPSILON (world units) expressed in grid coordinates
+         * (cell units) along the given direction.
+         */
+        double epsilon_in_grid( local_index_t direction ) const
+        {
+            return GLOBAL_EPSILON / cells_length_[direction];
+        }
+
         bool contains( const Grid< dimension >& grid,
             const Point< dimension >& query ) const
         {
@@ -229,9 +238,12 @@ namespace geode
                 grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                if( query_in_grid.value( d ) < -GLOBAL_EPSILON
-                    || query_in_grid.value( d )
-                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
+                // Negated form: a NaN coordinate is rejected
+                const auto value = query_in_grid.value( d );
+                const auto epsilon = epsilon_in_grid( d );
+                if( !( value >= -epsilon
+                        && value
+                               <= grid.nb_cells_in_direction( d ) + epsilon ) )
                 {
                     return false;
                 }
@@ -248,11 +260,12 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                if( value < 0. )
+                // Negated form: a NaN coordinate gives 0, not a cast of NaN
+                if( !( value > 0. ) )
                 {
                     closest[d] = 0;
                 }
-                else if( value > grid.nb_cells_in_direction( d ) )
+                else if( !( value < grid.nb_cells_in_direction( d ) ) )
                 {
                     closest[d] = grid.nb_cells_in_direction( d );
                 }
@@ -284,9 +297,11 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                if( value < -GLOBAL_EPSILON
-                    || value
-                           > grid.nb_cells_in_direction( d ) + GLOBAL_EPSILON )
+                const auto epsilon = epsilon_in_grid( d );
+                // Negated form: a NaN coordinate is rejected
+                if( !( value >= -epsilon
+                        && value
+                               <= grid.nb_cells_in_direction( d ) + epsilon ) )
                 {
                     return {};
                 }
@@ -304,11 +319,11 @@ namespace geode
                 min[d] = integer_floor;
                 max[d] = integer_floor;
                 const auto remainder = value - floating_floor;
-                if( remainder < GLOBAL_EPSILON )
+                if( remainder < epsilon )
                 {
                     min[d] = integer_floor > 0 ? integer_floor - 1 : 0;
                 }
-                else if( remainder > 1 - GLOBAL_EPSILON )
+                else if( remainder > 1 - epsilon )
                 {
                     max[d] = std::min( integer_floor + 1,
                         grid.nb_cells_in_direction( d ) - 1 );
@@ -320,10 +335,14 @@ namespace geode
             {
                 if( max[d] != min[d] )
                 {
-                    for( const auto& cell_indices : cells_around_point )
+                    // Index loop: push_back may reallocate the vector
+                    const auto nb_cells = cells_around_point.size();
+                    for( const auto c : Range{ nb_cells } )
                     {
-                        cells_around_point.push_back( cell_indices );
-                        cells_around_point.back()[d] = max[d];
+                        auto cell_indices = cells_around_point[c];
+                        cell_indices[d] = max[d];
+                        cells_around_point.push_back(
+                            std::move( cell_indices ) );
                     }
                 }
             }
@@ -348,10 +367,14 @@ namespace geode
             {
                 if( max[d] != min[d] )
                 {
-                    for( const auto& cell_indices : cells_around_vertex )
+                    // Index loop: push_back may reallocate the vector
+                    const auto nb_cells = cells_around_vertex.size();
+                    for( const auto c : Range{ nb_cells } )
                     {
-                        cells_around_vertex.push_back( cell_indices );
-                        cells_around_vertex.back()[d] = max[d];
+                        auto cell_indices = cells_around_vertex[c];
+                        cell_indices[d] = max[d];
+                        cells_around_vertex.push_back(
+                            std::move( cell_indices ) );
                     }
                 }
             }
@@ -368,14 +391,14 @@ namespace geode
             grid_coordinate_system_.set_origin( std::move( origin ) );
         }
 
-        void set_grid_dimensions( Grid< dimension >& grid,
-            std::array< double, dimension > cells_length )
+        static void check_grid_dimensions(
+            const std::array< index_t, dimension >& cells_number,
+            const std::array< double, dimension >& cells_length )
         {
-            cells_length_ = std::move( cells_length );
             for( const auto direction : LRange{ dimension } )
             {
                 OpenGeodeMeshException::check_exception(
-                    cells_length_[direction] > GLOBAL_EPSILON, nullptr,
+                    cells_length[direction] > GLOBAL_EPSILON, nullptr,
                     OpenGeodeException::TYPE::data,
                     "[Grid] Creation of a grid with a cell length smaller than "
                     "epsilon in direction ",
@@ -384,8 +407,8 @@ namespace geode
             double nb_vertices_double{ 1 };
             for( const auto d : LRange{ dimension } )
             {
-                nb_vertices_double *= static_cast< double >(
-                    grid.nb_cells_in_direction( d ) + 1 );
+                nb_vertices_double *=
+                    static_cast< double >( cells_number[d] ) + 1.;
             }
             OpenGeodeMeshException::check_exception(
                 nb_vertices_double < static_cast< double >(
@@ -393,6 +416,11 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::data,
                 "[Grid] Creation of a grid for which the number of cell "
                 "vertices exceeds the unsigned int limit." );
+        }
+
+        void set_grid_dimensions( std::array< double, dimension > cells_length )
+        {
+            cells_length_ = std::move( cells_length );
             for( const auto d : LRange{ dimension } )
             {
                 const auto& direction = grid_coordinate_system_.direction( d );
@@ -627,8 +655,9 @@ namespace geode
         std::array< double, dimension > cells_length,
         GridKey /*key*/ )
     {
+        Impl::check_grid_dimensions( cells_number, cells_length );
         set_array_dimensions( std::move( cells_number ) );
-        impl_->set_grid_dimensions( *this, std::move( cells_length ) );
+        impl_->set_grid_dimensions( std::move( cells_length ) );
     }
 
     template < index_t dimension >

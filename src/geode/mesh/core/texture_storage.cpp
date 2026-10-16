@@ -23,7 +23,7 @@
 
 #include <geode/mesh/core/texture_storage.hpp>
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/container/node_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
@@ -110,7 +110,9 @@ namespace geode
         }
 
     private:
-        absl::flat_hash_map< std::string, Texture< dimension > > textures_;
+        // node_hash_map: references to textures and names are handed out and
+        // must stay valid when other textures are inserted
+        absl::node_hash_map< std::string, Texture< dimension > > textures_;
     };
 
     template < index_t dimension >

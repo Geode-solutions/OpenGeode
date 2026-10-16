@@ -52,6 +52,12 @@ namespace geode
     {
         set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
+        initialize_grid_elements( origin );
+    }
+
+    void RegularGridBuilder< 3 >::initialize_grid_elements(
+        const Point3D& origin )
+    {
         const auto nb_u = grid_.nb_cells_in_direction( 0 );
         const auto nb_v = grid_.nb_cells_in_direction( 1 );
         const auto nb_w = grid_.nb_cells_in_direction( 2 );
@@ -180,11 +186,14 @@ namespace geode
         std::array< index_t, 3 > cells_number,
         std::array< Vector3D, 3 > directions )
     {
-        initialize_grid( origin, std::move( cells_number ),
+        // Dimensions are set first: they are checked before anything is
+        // modified. Directions are then set (cell lengths match) and the
+        // points are placed along them only once.
+        set_grid_dimensions( std::move( cells_number ),
             { directions[0].length(), directions[1].length(),
                 directions[2].length() } );
-        update_origin_and_directions(
-            std::move( origin ), std::move( directions ) );
+        set_grid_directions( std::move( directions ) );
+        initialize_grid_elements( origin );
     }
 
     void RegularGridBuilder< 3 >::copy( const RegularGrid3D& grid )

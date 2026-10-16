@@ -25,7 +25,7 @@
 
 #include <bitsery/ext/std_map.h>
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/container/node_hash_map.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -59,8 +59,8 @@ namespace geode
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const
         {
-            geode::OpenGeodeMeshException::check_assertion(
-                active_crs_.use_count() > 1,
+            OpenGeodeMeshException::check_exception( active_crs_ != nullptr,
+                nullptr, OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::active_coordinate_"
                 "reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -171,7 +171,9 @@ namespace geode
         }
 
     private:
-        absl::flat_hash_map< std::string,
+        // node_hash_map: coordinate_reference_system_names() returns views on
+        // the keys, they must stay valid when other CRSs are registered
+        absl::node_hash_map< std::string,
             std::shared_ptr< CoordinateReferenceSystem< dimension > > >
             crss_;
         std::shared_ptr< CoordinateReferenceSystem< dimension > > active_crs_;
