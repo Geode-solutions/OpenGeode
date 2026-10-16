@@ -21,6 +21,12 @@
  *
  */
 
+#include <chrono>
+#include <cstdlib>
+#include <future>
+#include <memory>
+#include <thread>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -664,6 +670,73 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test]PolyhedralSolid should have 0 vertex" );
 }
 
+template < typename Function >
+void run_with_timeout( Function&& function, const std::string& message )
+{
+    auto promise = std::make_shared< std::promise< void > >();
+    auto future = promise->get_future();
+    std::thread{ [promise, function]() {
+        try
+        {
+            function();
+            promise->set_value();
+        }
+        catch( ... )
+        {
+            promise->set_exception( std::current_exception() );
+        }
+    } }.detach();
+    if( future.wait_for( std::chrono::seconds{ 5 } )
+        == std::future_status::timeout )
+    {
+        geode::Logger::error( "[Test] Timeout: ", message );
+        std::_Exit( EXIT_FAILURE );
+    }
+    future.get();
+}
+
+void test_propagate_around_edge_without_next_facet()
+{
+    // Pyramid P whose quad base {0,1,2,3} is adjacent to the triangle facet
+    // {1,2,3} of tetrahedron Q. Walking around edge (0,1) through the base
+    // reaches Q, which has no other facet containing the edge.
+    auto solid = geode::PolyhedralSolid3D::create(
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
+    auto builder = geode::PolyhedralSolidBuilder3D::create( *solid );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 0.5, 0.5, 1 } } );
+    builder->create_point( geode::Point3D{ { 0.7, 0.7, -1 } } );
+    builder->create_polyhedron(
+        { 0, 1, 2, 3, 4 }, { { 0, 1, 2, 3 }, { 0, 1, 4 }, { 1, 2, 4 },
+                               { 2, 3, 4 }, { 3, 0, 4 } } );
+    builder->create_polyhedron( { 1, 2, 3, 5 },
+        { { 0, 1, 2 }, { 0, 1, 3 }, { 1, 2, 3 }, { 0, 2, 3 } } );
+    // Tetrahedron R sharing facet {0,1,4} with P, created last so that the
+    // walk around edge (0,1) starts from R and gets stuck in P.
+    builder->create_point( geode::Point3D{ { 0.5, -1, 0.5 } } );
+    builder->create_polyhedron( { 0, 1, 4, 6 },
+        { { 0, 1, 2 }, { 0, 1, 3 }, { 1, 2, 3 }, { 0, 2, 3 } } );
+    builder->set_polyhedron_adjacent( { 0, 0 }, 1 );
+    builder->set_polyhedron_adjacent( { 1, 0 }, 0 );
+    builder->set_polyhedron_adjacent( { 0, 1 }, 2 );
+    builder->set_polyhedron_adjacent( { 2, 0 }, 0 );
+    const geode::PolyhedralSolid3D& mesh = *solid;
+    run_with_timeout(
+        [&mesh] {
+            geode::OpenGeodeMeshException::test(
+                mesh.is_edge_on_border( { 0, 1 } ),
+                "Edge (0,1) should be on border" );
+            const auto polyhedra = mesh.polyhedra_around_edge( { 0, 1 } );
+            geode::OpenGeodeMeshException::test(
+                !polyhedra.empty() && polyhedra.size() < 10,
+                "Wrong number of polyhedra around edge (0,1)" );
+        },
+        "propagation around edge (0,1) does not end" );
+}
+
 void test_texture( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
     auto manager = polyhedral_solid.texture_manager();
@@ -709,6 +782,7 @@ void test()
 
     test_barycenters();
     test_normals();
+    test_propagate_around_edge_without_next_facet();
 }
 
 OPENGEODE_TEST( "polyhedral-solid" )
