@@ -808,6 +808,11 @@ namespace geode
     {
         for( const auto p : geode::Range{ surface_mesh_.nb_polygons() } )
         {
+            if( old2new[p] == geode::NO_ID )
+            {
+                // Polygon to be deleted
+                continue;
+            }
             for( const auto e :
                 geode::LRange{ surface_mesh_.nb_polygon_edges( p ) } )
             {
@@ -815,6 +820,10 @@ namespace geode
                 if( const auto adj = surface_mesh_.polygon_adjacent( id ) )
                 {
                     const auto new_adjacent = old2new[adj.value()];
+                    if( new_adjacent == adj.value() )
+                    {
+                        continue;
+                    }
                     if( new_adjacent == geode::NO_ID )
                     {
                         do_unset_polygon_adjacent( id );
