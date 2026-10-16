@@ -198,18 +198,19 @@ namespace geode
     template < index_t dimension >
     LightRegularGrid< dimension > LightRegularGrid< dimension >::clone() const
     {
-        auto origin_position = this->vertex_indices( 0 );
-        auto origin = this->grid_point( origin_position );
         std::array< index_t, dimension > cells_number;
-        std::array< Vector< dimension >, dimension > directions;
+        std::array< double, dimension > cells_length;
         for( const auto axis : LRange{ dimension } )
         {
             cells_number[axis] = this->nb_cells_in_direction( axis );
-            directions[axis] = Vector< dimension >{ origin,
-                this->grid_point(
-                    this->next_vertex( origin_position, axis ).value() ) };
+            cells_length[axis] = this->cell_length_in_direction( axis );
         }
-        LightRegularGrid< dimension > clone{ origin, cells_number, directions };
+        LightRegularGrid< dimension > clone{
+            this->grid_coordinate_system().origin(), cells_number, cells_length
+        };
+        // Copy the coordinate system as is: rebuilding the directions from
+        // point differences would introduce rounding errors
+        GridBuilder< dimension >{ clone }.copy( *this );
         IdentifierBuilder builder{ clone };
         builder.copy_identifier( *this );
         clone.grid_vertex_attribute_manager().copy(

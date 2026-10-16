@@ -483,6 +483,36 @@ void test_epsilon_in_world_units()
         "in two cells" );
 }
 
+void test_clone_exact_geometry()
+{
+    const geode::LightRegularGrid3D grid{
+        geode::Point3D{ { 1e6 + 0.1, -3e5 + 0.7, 12345.678 } }, { 3, 4, 5 },
+        { geode::Vector3D{ { 0.1, 0.2, 0.3 } },
+            geode::Vector3D{ { -0.7, 0.1 / 3, 0.3 } },
+            geode::Vector3D{ { 1.1, 0.9, -0.3 / 7 } } }
+    };
+    const auto clone = grid.clone();
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            clone.grid_coordinate_system().direction( d )
+                == grid.grid_coordinate_system().direction( d ),
+            "[Test] Cloned grid direction ", d, " should be identical: ",
+            clone.grid_coordinate_system().direction( d ).string(), " vs ",
+            grid.grid_coordinate_system().direction( d ).string() );
+        geode::OpenGeodeMeshException::test(
+            clone.cell_length_in_direction( d )
+                == grid.cell_length_in_direction( d ),
+            "[Test] Cloned grid cell length should be identical" );
+    }
+    for( const auto v : geode::Range{ grid.nb_grid_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            clone.point( v ) == grid.point( v ),
+            "[Test] Cloned grid point should be identical" );
+    }
+}
+
 void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
@@ -517,6 +547,7 @@ void test()
     test_set_grid_dimensions_failure();
     test_nan_query( grid );
     test_epsilon_in_world_units();
+    test_clone_exact_geometry();
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
