@@ -233,11 +233,17 @@ namespace
         const geode::SolidMesh< dimension >& solid,
         const std::array< geode::index_t, 2 >& vertices )
     {
-        for( const auto vertex : vertices )
+        for( const auto v : geode::LRange{ 2 } )
         {
+            const auto other_vertex = vertices[1 - v];
             for( const auto& polyhedron :
-                solid.polyhedra_around_vertex( vertex ) )
+                solid.polyhedra_around_vertex( vertices[v] ) )
             {
+                if( !solid.vertex_in_polyhedron(
+                        polyhedron.polyhedron_id, other_vertex ) )
+                {
+                    continue;
+                }
                 for( const auto& edge_vertices :
                     solid.polyhedron_edges_vertices(
                         polyhedron.polyhedron_id ) )
