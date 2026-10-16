@@ -161,6 +161,28 @@ void test_texture_reference_stability()
         name_found, "[Test] Texture a should be listed" );
 }
 
+void test_texture_coordinates_out_of_range()
+{
+    geode::AttributeManager attributes;
+    attributes.resize( 42 );
+    geode::TextureStorage2D storage;
+    geode::TextureManager2D manager{ attributes, storage };
+    auto& texture = manager.find_or_create_texture( "texture" );
+    bool thrown{ false };
+    try
+    {
+        texture.set_texture_coordinates(
+            { 42, 0 }, geode::Point2D{ { 1., 1. } } );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test( thrown,
+        "[Test] Setting texture coordinates of an unknown element should "
+        "throw" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -172,6 +194,7 @@ void test()
     auto reload = load( "storage" );
     check_texture( attributes, reload );
     test_texture_reference_stability();
+    test_texture_coordinates_out_of_range();
 }
 
 OPENGEODE_TEST( "texture-manager" )
