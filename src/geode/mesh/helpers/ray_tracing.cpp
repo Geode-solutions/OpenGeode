@@ -513,6 +513,29 @@ namespace geode
         {
             const auto& point0 =
                 mesh_.point( mesh_.polygon_vertex( { polygon_id, 0 } ) );
+            // Closest contact found when the ray is coplanar to the polygon
+            // (or to a degenerate fan triangle): a single one is kept per
+            // polygon
+            std::optional<
+                std::tuple< double, POSITION, local_index_t, Point3D > >
+                coplanar_contact;
+            const auto add_coplanar_contact =
+                [this, &coplanar_contact]( const Point3D& ray_point,
+                    POSITION position, local_index_t edge ) {
+                    const Vector3D origin_target{ origin_, ray_point };
+                    auto distance = origin_target.length();
+                    if( origin_target.dot( segment_.direction() ) < 0 )
+                    {
+                        distance *= -1.;
+                    }
+                    if( !coplanar_contact
+                        || std::fabs( distance ) < std::fabs(
+                               std::get< 0 >( coplanar_contact.value() ) ) )
+                    {
+                        coplanar_contact.emplace(
+                            distance, position, edge, ray_point );
+                    }
+                };
             for( const auto edge :
                 LRange{ 1, mesh_.nb_polygon_edges( polygon_id ) - 1 } )
             {
@@ -541,7 +564,7 @@ namespace geode
                     }
                     add_result( polygon_id, distance, result.second, edge,
                         intersection_result );
-                    break;
+                    return false;
                 }
                 for( const auto edge2 : LRange{ 3 } )
                 {
@@ -549,34 +572,23 @@ namespace geode
                         _] = segment_segment_distance( Segment3D{ segment_ },
                         { triangle.vertices()[edge2].get(),
                             triangle.vertices()[( edge2 + 1 ) % 3].get() } );
-                    if( ray_edge_distance > GLOBAL_EPSILON )
+                    if( ray_edge_distance <= GLOBAL_EPSILON )
                     {
-                        continue;
+                        add_coplanar_contact( ray_point, result.second, edge );
                     }
-                    const Vector3D origin_target{ origin_, ray_point };
-                    auto distance = origin_target.length();
-                    if( origin_target.dot( segment_.direction() ) < 0 )
-                    {
-                        distance *= -1.;
-                    }
-                    add_result(
-                        polygon_id, distance, result.second, edge, ray_point );
                 }
                 const auto [triangle_distance, ray_point, _] =
                     segment_triangle_distance( segment_, triangle );
-                if( triangle_distance > GLOBAL_EPSILON )
+                if( triangle_distance <= GLOBAL_EPSILON )
                 {
-                    continue;
+                    add_coplanar_contact( ray_point, result.second, edge );
                 }
-                const Vector3D origin_target{ origin_, ray_point };
-                auto distance = origin_target.length();
-                if( origin_target.dot( segment_.direction() ) < 0 )
-                {
-                    distance *= -1.;
-                }
-                add_result(
-                    polygon_id, distance, result.second, edge, ray_point );
-                break;
+            }
+            if( coplanar_contact )
+            {
+                const auto& [distance, position, edge, point] =
+                    coplanar_contact.value();
+                add_result( polygon_id, distance, position, edge, point );
             }
             return false;
         }

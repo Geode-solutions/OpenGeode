@@ -214,6 +214,27 @@ namespace
             "Ray through quad diagonal should be inside the polygon" );
     }
 
+    void test_ray_coplanar_single_entry()
+    {
+        geode::Logger::info( "Test ray coplanar single entry" );
+        const auto mesh = create_quad_mesh();
+        const auto aabb = geode::create_aabb_tree( *mesh );
+        const geode::Vector3D direction{ { 1, 0, 0 } };
+        const geode::Point3D origin{ { -1, 0.5, 0 } };
+        const geode::Ray3D ray{ direction, origin };
+        geode::RayTracing3D tracing{ *mesh, aabb.bounding_box(), ray };
+        aabb.compute_ray_element_bbox_intersections( ray, tracing );
+        const auto results = tracing.all_intersections();
+        geode::OpenGeodeMeshException::test( results.size() == 1,
+            "Coplanar ray should give one intersection per polygon, not ",
+            results.size() );
+        geode::OpenGeodeMeshException::test(
+            results.front().polygon == 0, "Coplanar ray: wrong polygon" );
+        geode::OpenGeodeMeshException::test(
+            std::fabs( results.front().distance - 1 ) < geode::GLOBAL_EPSILON,
+            "Coplanar ray: wrong distance ", results.front().distance );
+    }
+
     geode::RayTracing3D create_tracing_from_local_ray(
         const geode::SurfaceMesh3D& mesh, const geode::BoundingBox3D& bbox )
     {
@@ -262,6 +283,7 @@ namespace
         test_ray_quad_vertex();
         test_ray_quad_edge();
         test_ray_quad_diagonal();
+        test_ray_coplanar_single_entry();
         test_ray_origin_lifetime();
     }
 } // namespace
