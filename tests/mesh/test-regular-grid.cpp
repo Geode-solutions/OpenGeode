@@ -586,6 +586,38 @@ void test_old_io()
         old_grid->native_extension() ) );
 }
 
+void test_update_origin_on_rotated_grid()
+{
+    auto grid3d = geode::RegularGrid3D::create();
+    auto builder3d = geode::RegularGridBuilder3D::create( *grid3d );
+    builder3d->initialize_grid( geode::Point3D{ { 1.5, 0, 1 } }, { 2, 3, 4 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } } );
+    builder3d->update_origin( geode::Point3D{ { -4, 7, 2 } } );
+    for( const auto v : geode::Range{ grid3d->nb_vertices() } )
+    {
+        const auto expected = grid3d->grid_point( grid3d->vertex_indices( v ) );
+        geode::OpenGeodeMeshException::test(
+            grid3d->point( v ).inexact_equal( expected ),
+            "[Test] Wrong 3D point after update_origin on a rotated grid: ",
+            grid3d->point( v ).string(), " instead of ", expected.string() );
+    }
+
+    auto grid2d = geode::RegularGrid2D::create();
+    auto builder2d = geode::RegularGridBuilder2D::create( *grid2d );
+    builder2d->initialize_grid( geode::Point2D{ { 1.5, 0 } }, { 3, 4 },
+        { geode::Vector2D{ { 1, 1 } }, geode::Vector2D{ { -2, 2 } } } );
+    builder2d->update_origin( geode::Point2D{ { -4, 7 } } );
+    for( const auto v : geode::Range{ grid2d->nb_vertices() } )
+    {
+        const auto expected = grid2d->grid_point( grid2d->vertex_indices( v ) );
+        geode::OpenGeodeMeshException::test(
+            grid2d->point( v ).inexact_equal( expected ),
+            "[Test] Wrong 2D point after update_origin on a rotated grid: ",
+            grid2d->point( v ).string(), " instead of ", expected.string() );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -598,6 +630,7 @@ void test()
     test_grid( *grid );
     test_old_io();
     test_adjacencies2D();
+    test_update_origin_on_rotated_grid();
 }
 
 OPENGEODE_TEST( "regular-grid" )

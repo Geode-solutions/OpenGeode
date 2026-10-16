@@ -29,6 +29,7 @@
 #include <geode/basic/growable.hpp>
 #include <geode/basic/internal/array_impl.hpp>
 
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/core/internal/points_impl.hpp>
@@ -90,7 +91,16 @@ namespace geode
 
         protected:
             void do_update_origin( RegularGrid< dimension >& grid,
-                const Point< dimension >& origin );
+                const Point< dimension >& origin )
+            {
+                const auto& coordinate_system = grid.grid_coordinate_system();
+                std::array< Vector< dimension >, dimension > directions;
+                for( const auto d : LRange{ dimension } )
+                {
+                    directions[d] = coordinate_system.direction( d );
+                }
+                do_update_origin_and_directions( grid, origin, directions );
+            }
 
             void do_update_origin_and_directions(
                 RegularGrid< dimension >& grid,
@@ -112,35 +122,6 @@ namespace geode
                             } } } );
             }
         };
-
-        template <>
-        inline void GridImpl< 2 >::do_update_origin(
-            RegularGrid< 2 >& grid, const Point< 2 >& origin )
-        {
-            const auto du = grid.cell_length_in_direction( 0 );
-            const auto dv = grid.cell_length_in_direction( 1 );
-            const auto nu = grid.nb_vertices_in_direction( 0 );
-            const auto nv = grid.nb_vertices_in_direction( 1 );
-            index_t task_id{ 0 };
-            CoordinateReferenceSystemManagersBuilder2D builder{ grid };
-            absl::FixedArray< async::task< void > > tasks( nv );
-            for( const auto v : Range{ nv } )
-            {
-                tasks[task_id++] =
-                    async::spawn( [&builder, &origin, v, du, dv, nu] {
-                        for( const auto u : Range{ nu } )
-                        {
-                            const auto vertex = u + v * nu;
-                            const Point2D translation{ { u * du, v * dv } };
-                            builder.set_point( vertex, origin + translation );
-                        }
-                    } );
-            }
-            for( auto& task : async::when_all( tasks ).get() )
-            {
-                task.get();
-            }
-        }
 
         template <>
         inline void GridImpl< 2 >::do_update_origin_and_directions(
@@ -166,41 +147,6 @@ namespace geode
                                 vertex, origin + vector_u * u + vector_v * v );
                         }
                     } );
-            }
-            for( auto& task : async::when_all( tasks ).get() )
-            {
-                task.get();
-            }
-        }
-
-        template <>
-        inline void GridImpl< 3 >::do_update_origin(
-            RegularGrid< 3 >& grid, const Point< 3 >& origin )
-        {
-            const auto du = grid.cell_length_in_direction( 0 );
-            const auto dv = grid.cell_length_in_direction( 1 );
-            const auto dw = grid.cell_length_in_direction( 2 );
-            const auto nu = grid.nb_vertices_in_direction( 0 );
-            const auto nv = grid.nb_vertices_in_direction( 1 );
-            const auto nw = grid.nb_vertices_in_direction( 2 );
-            index_t task_id{ 0 };
-            CoordinateReferenceSystemManagersBuilder3D builder{ grid };
-            absl::FixedArray< async::task< void > > tasks( nw * nv );
-            for( const auto w : Range{ nw } )
-            {
-                for( const auto v : Range{ nv } )
-                {
-                    tasks[task_id++] = async::spawn( [&builder, &origin, v, w,
-                                                         du, dv, dw, nu, nv] {
-                        for( const auto u : Range{ nu } )
-                        {
-                            const auto vertex = u + v * nu + w * nu * nv;
-                            const Point3D translation{ { u * du, v * dv,
-                                w * dw } };
-                            builder.set_point( vertex, origin + translation );
-                        }
-                    } );
-                }
             }
             for( auto& task : async::when_all( tasks ).get() )
             {
