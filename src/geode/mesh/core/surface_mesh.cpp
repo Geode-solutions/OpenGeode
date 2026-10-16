@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <stack>
 
+#include <absl/container/flat_hash_set.h>
 #include <absl/synchronization/mutex.h>
 
 #include <bitsery/brief_syntax/array.h>
@@ -150,6 +151,34 @@ namespace
                               : geode::PolygonVertex{ adj_edge.value() };
     }
 
+    /*!
+     * Detects when turning around a vertex visits a PolygonVertex twice,
+     * which can only happen with invalid polygon adjacencies.
+     * Small fans are not checked (no overhead for usual meshes): a loop
+     * makes the fan grow until it is checked.
+     */
+    class PolygonVertexLoopDetector
+    {
+    public:
+        [[nodiscard]] bool is_new( const geode::PolygonsAroundVertex& visited,
+            const geode::PolygonVertex& polygon_vertex )
+        {
+            if( visited.size() < MIN_FAN_SIZE_TO_CHECK )
+            {
+                return true;
+            }
+            if( visited_.empty() )
+            {
+                visited_.insert( visited.begin(), visited.end() );
+            }
+            return visited_.insert( polygon_vertex ).second;
+        }
+
+    private:
+        static constexpr geode::index_t MIN_FAN_SIZE_TO_CHECK{ 32 };
+        absl::flat_hash_set< geode::PolygonVertex > visited_;
+    };
+
     template < geode::index_t dimension >
     geode::internal::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
@@ -164,9 +193,18 @@ namespace
             mesh.polygon_vertex( first_polygon.value() ) == vertex_id,
             "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
             "around vertex" );
-        geode::index_t safety_count{ 0 };
-        constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
+        const auto throw_loop = [&mesh, vertex_id] {
+            throw geode::OpenGeodeMeshException{ mesh.point( vertex_id ),
+                geode::OpenGeodeException::TYPE::data,
+                "[SurfaceMesh::polygons_around_vertex] Surface ",
+                mesh.name().value_or( mesh.id().string() ),
+                ": Loop detected while turning around vertex ", vertex_id, " (",
+                mesh.point( vertex_id ).string(),
+                "). This is probably related to a bug in the polygon "
+                "adjacencies." };
+        };
         geode::internal::PolygonsAroundVertexImpl result;
+        PolygonVertexLoopDetector loop_detector;
         auto cur_polygon_vertex = first_polygon;
         bool vertex_is_next{ false };
         do
@@ -178,15 +216,19 @@ namespace
                 vertex_id, " / ", cur_polygon_vertex->string(), " ",
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) );
             result.polygons.push_back( cur_polygon_vertex.value() );
-            safety_count++;
             cur_polygon_vertex = next_polygon_vertex_around(
                 mesh, cur_polygon_vertex.value(), vertex_is_next );
             if( !cur_polygon_vertex )
             {
                 break;
             }
-        } while( cur_polygon_vertex != first_polygon
-                 && safety_count < MAX_SAFETY_COUNT );
+            if( cur_polygon_vertex != first_polygon
+                && !loop_detector.is_new(
+                    result.polygons, cur_polygon_vertex.value() ) )
+            {
+                throw_loop();
+            }
+        } while( cur_polygon_vertex != first_polygon );
 
         result.vertex_is_on_border = cur_polygon_vertex != first_polygon;
         if( result.vertex_is_on_border )
@@ -199,30 +241,21 @@ namespace
         {
             cur_polygon_vertex = std::nullopt;
         }
-        while( cur_polygon_vertex && safety_count < MAX_SAFETY_COUNT )
+        while( cur_polygon_vertex )
         {
             geode::OpenGeodeMeshException::check_assertion(
                 mesh.polygon_vertex( cur_polygon_vertex.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex" );
+            if( !loop_detector.is_new(
+                    result.polygons, cur_polygon_vertex.value() ) )
+            {
+                throw_loop();
+            }
             result.polygons.push_back( cur_polygon_vertex.value() );
-            safety_count++;
             cur_polygon_vertex = next_polygon_vertex_around(
                 mesh, cur_polygon_vertex.value(), vertex_is_next );
-            if( !cur_polygon_vertex )
-            {
-                break;
-            }
         }
-        geode::OpenGeodeMeshException::check_exception(
-            safety_count < MAX_SAFETY_COUNT, mesh.point( vertex_id ),
-            geode::OpenGeodeException::TYPE::data,
-            "[SurfaceMesh::polygons_around_vertex] Surface ",
-            mesh.name().value_or( mesh.id().string() ),
-            ": Too many polygons around vertex ", vertex_id, " (",
-            mesh.point( vertex_id ).string(),
-            "). This is probably related to a bug in the polygon "
-            "adjacencies." );
         return result;
     }
 } // namespace
