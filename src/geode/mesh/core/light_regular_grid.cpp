@@ -161,7 +161,7 @@ namespace geode
     {
         VerticesAroundVertex result;
         const auto indices = this->vertex_indices( vertex_id );
-        for( const auto d : LRange{ 2 } )
+        for( const auto d : LRange{ dimension } )
         {
             if( const auto next = this->next_vertex( indices, d ) )
             {

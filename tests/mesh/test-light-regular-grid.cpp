@@ -21,16 +21,22 @@
  *
  */
 
+#include <cmath>
 #include <fstream>
+#include <limits>
+
+#include <absl/algorithm/container.h>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/grid_builder.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/io/light_regular_grid_input.hpp>
 #include <geode/mesh/io/light_regular_grid_output.hpp>
@@ -356,6 +362,25 @@ void test_attribute( const geode::LightRegularGrid3D& grid )
         "Wrong attribute value" );
 }
 
+void test_vertices_around_vertex( const geode::LightRegularGrid3D& grid )
+{
+    const auto vertex = grid.vertex_index( { 1, 1, 1 } );
+    const auto around = grid.vertices_around_vertex( vertex );
+    geode::OpenGeodeMeshException::test( around.size() == 6,
+        "Wrong number of vertices around an inner vertex: ", around.size() );
+    for( const auto& neighbor : std::array< geode::Grid3D::VertexIndices, 6 >{
+             { { 0, 1, 1 }, { 2, 1, 1 }, { 1, 0, 1 }, { 1, 2, 1 }, { 1, 1, 0 },
+                 { 1, 1, 2 } } } )
+    {
+        geode::OpenGeodeMeshException::test(
+            absl::c_linear_search( around, grid.vertex_index( neighbor ) ),
+            "Missing vertex around an inner vertex" );
+    }
+    const auto corner_around = grid.vertices_around_vertex( 0 );
+    geode::OpenGeodeMeshException::test( corner_around.size() == 3,
+        "Wrong number of vertices around a corner vertex" );
+}
+
 void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
@@ -386,6 +411,7 @@ void test()
     test_boundary_box( grid );
     test_closest_vertex( grid );
     test_attribute( grid );
+    test_vertices_around_vertex( grid );
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
