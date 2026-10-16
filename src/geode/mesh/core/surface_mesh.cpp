@@ -127,6 +127,23 @@ namespace
         return cur_v0 == adj_v0 && cur_v1 == adj_v1;
     }
 
+    /*!
+     * Return the other edge of the polygon sharing the given vertex with the
+     * given edge. Works whatever the orientation of the polygon.
+     */
+    template < geode::index_t dimension >
+    geode::PolygonEdge other_polygon_edge_around_vertex(
+        const geode::SurfaceMesh< dimension >& mesh,
+        const geode::PolygonEdge& edge,
+        geode::index_t vertex_id )
+    {
+        if( mesh.polygon_vertex( geode::PolygonVertex{ edge } ) == vertex_id )
+        {
+            return mesh.previous_polygon_edge( edge );
+        }
+        return mesh.next_polygon_edge( edge );
+    }
+
     template < geode::index_t dimension >
     std::optional< geode::PolygonVertex > next_polygon_vertex_around(
         const geode::SurfaceMesh< dimension >& mesh,
@@ -875,11 +892,12 @@ namespace geode
             is_edge_on_border( polygon_edge ), edge_barycenter( polygon_edge ),
             OpenGeodeException::TYPE::data,
             "[SurfaceMesh::next_on_border] Polygon edge should be on border" );
+        const auto vertex = polygon_edge_vertex( polygon_edge, 1 );
         auto next_border = next_polygon_edge( polygon_edge );
         while( !is_edge_on_border( next_border ) )
         {
-            next_border = next_polygon_edge(
-                polygon_adjacent_edge( next_border ).value() );
+            next_border = other_polygon_edge_around_vertex(
+                *this, polygon_adjacent_edge( next_border ).value(), vertex );
         }
         return next_border;
     }
@@ -893,11 +911,12 @@ namespace geode
             OpenGeodeException::TYPE::data,
             "[SurfaceMesh::previous_on_border] Polygon edge should be on "
             "border" );
+        const auto vertex = polygon_vertex( PolygonVertex{ polygon_edge } );
         auto previous_border = previous_polygon_edge( polygon_edge );
         while( !is_edge_on_border( previous_border ) )
         {
-            previous_border = previous_polygon_edge(
-                polygon_adjacent_edge( previous_border ).value() );
+            previous_border = other_polygon_edge_around_vertex( *this,
+                polygon_adjacent_edge( previous_border ).value(), vertex );
         }
         return previous_border;
     }

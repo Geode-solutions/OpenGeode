@@ -537,6 +537,24 @@ void test_polygons_around_vertex_after_adjacencies()
         "adjacencies" );
 }
 
+void test_next_on_border_with_flipped_orientation()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 2, 3 } );
+    builder->compute_polygon_adjacencies();
+    geode::OpenGeodeMeshException::test(
+        surface->next_on_border( { 0, 0 } ) == geode::PolygonEdge{ 1, 2 },
+        "[next_on_border] Wrong next border edge with flipped orientation" );
+    geode::OpenGeodeMeshException::test(
+        surface->previous_on_border( { 0, 2 } ) == geode::PolygonEdge{ 1, 1 },
+        "[previous_on_border] Wrong previous border edge with flipped "
+        "orientation" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -558,6 +576,7 @@ void test()
     test_create_polygon_invalid_size();
     test_large_fan_around_vertex();
     test_polygons_around_vertex_after_adjacencies();
+    test_next_on_border_with_flipped_orientation();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )
