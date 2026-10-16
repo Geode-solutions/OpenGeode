@@ -785,6 +785,31 @@ void test_create_invalid_polygons()
         "[create_polygon] Wrong number of polygon vertices" );
 }
 
+void test_polygon_vertex_normal_with_coincident_points()
+{
+    auto polygonal_surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    auto builder =
+        geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
+
+    builder->create_point( geode::Point3D{ { 0.0, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 1.0, 0.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { 0.0, 1.0, 0.0 } } );
+    builder->create_point( geode::Point3D{ { -1.0, 1.0, 0.0 } } );
+
+    builder->create_polygon( { 0, 1, 2, 3 } );
+    builder->create_polygon( { 0, 3, 4 } );
+    builder->compute_polygon_adjacencies();
+
+    const geode::Vector3D answer{ { 0., 0., 1. } };
+    const auto normal = polygonal_surface->polygon_vertex_normal( 0 );
+    geode::OpenGeodeMeshException::test(
+        normal && normal->inexact_equal( answer ),
+        "PolygonalSurface polygon vertex normal with coincident points is "
+        "not correct" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -830,6 +855,7 @@ void test()
 
     test_non_manifold_surface();
     test_create_invalid_polygons();
+    test_polygon_vertex_normal_with_coincident_points();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

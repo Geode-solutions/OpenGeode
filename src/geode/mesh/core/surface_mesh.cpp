@@ -1274,6 +1274,12 @@ namespace geode
                 const Vector3D next{ this->point(
                                          this->polygon_vertex( next_vertex ) ),
                     this->point( vertex_id ) };
+                if( prev.length() <= GLOBAL_EPSILON
+                    || next.length() <= GLOBAL_EPSILON )
+                {
+                    // Coincident points: no angle defined at this polygon
+                    continue;
+                }
                 const auto angle = Angle::create_from_vectors( prev, next );
                 normal = normal + p_normal.value() * angle.radians();
             }
