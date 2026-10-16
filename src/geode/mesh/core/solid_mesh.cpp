@@ -70,6 +70,10 @@
 
 namespace
 {
+    /// Below this length, a facet normal is considered as undefined
+    /// (same threshold as Vector::normalize).
+    constexpr double MIN_NORMAL_LENGTH{ 1e-30 };
+
     template < geode::index_t dimension >
     void check_vertex_id( const geode::SolidMesh< dimension >& solid,
         const geode::index_t vertex_id )
@@ -362,6 +366,55 @@ namespace
         return std::nullopt;
     }
 
+    template < geode::index_t dimension >
+    std::optional< geode::Vector3D > facet_normal_from_vertices(
+        const geode::SolidMesh< dimension >& solid,
+        const geode::PolyhedronFacetVertices& facet_vertices )
+    {
+        if( facet_vertices.size() < 3 )
+        {
+            return std::nullopt;
+        }
+        geode::Vector3D normal{ { 0, 0, 0 } };
+        const auto& p0 = solid.point( facet_vertices[0] );
+        for( const auto v : geode::LRange{ 2, facet_vertices.size() } )
+        {
+            const auto& p1 = solid.point( facet_vertices[v - 1] );
+            const auto& p2 = solid.point( facet_vertices[v] );
+            if( const auto triangle_normal =
+                    geode::Triangle3D{ p0, p1, p2 }.normal() )
+            {
+                normal += triangle_normal.value();
+            }
+        }
+        const auto length = normal.length();
+        if( length <= MIN_NORMAL_LENGTH )
+        {
+            return std::nullopt;
+        }
+        return normal / length;
+    }
+
+    template < geode::index_t dimension >
+    double facet_area_from_vertices( const geode::SolidMesh< dimension >& solid,
+        const geode::PolyhedronFacetVertices& facet_vertices,
+        const geode::Vector3D& direction )
+    {
+        if( facet_vertices.size() < 3 )
+        {
+            return 0.;
+        }
+        double area{ 0. };
+        const auto& p1 = solid.point( facet_vertices[0] );
+        for( const auto i : geode::LRange{ 1, facet_vertices.size() - 1 } )
+        {
+            const auto& p2 = solid.point( facet_vertices[i] );
+            const auto& p3 = solid.point( facet_vertices[i + 1] );
+            area += geode::triangle_signed_area( { p1, p2, p3 }, direction );
+        }
+        return area;
+    }
+
     /*!
      * Per-vertex storage of the polyhedra around vertex cache. The cached
      * values (~190 bytes each) are only allocated the first time a vertex
@@ -605,27 +658,30 @@ namespace geode
             const index_t polyhedron_id ) const
         {
             double max_area{ 0. };
-            local_index_t max_area_facet{ 0 };
+            std::optional< Vector3D > normal;
+            PolyhedronFacetVertices facet_vertices;
             for( const auto f :
                 LRange{ mesh.nb_polyhedron_facets( polyhedron_id ) } )
             {
+                auto cur_vertices =
+                    mesh.polyhedron_facet_vertices( { polyhedron_id, f } );
+                const auto cur_normal =
+                    facet_normal_from_vertices( mesh, cur_vertices );
                 const auto cur_area =
-                    mesh.polyhedron_facet_area( { polyhedron_id, f } );
-                if( cur_area > max_area )
+                    facet_area_from_vertices( mesh, cur_vertices,
+                        cur_normal.value_or( Vector3D{ { 0, 0, 1 } } ) );
+                if( f == 0 || cur_area > max_area )
                 {
-                    max_area = cur_area;
-                    max_area_facet = f;
+                    max_area = std::max( max_area, cur_area );
+                    normal = cur_normal;
+                    facet_vertices = std::move( cur_vertices );
                 }
             }
-            const auto vertices = mesh.polyhedron_vertices( polyhedron_id );
-            const auto normal = mesh.polyhedron_facet_normal(
-                { polyhedron_id, max_area_facet } );
             if( !normal )
             {
                 return 0.;
             }
-            const auto facet_vertices = mesh.polyhedron_facet_vertices(
-                { polyhedron_id, max_area_facet } );
+            const auto vertices = mesh.polyhedron_vertices( polyhedron_id );
             Plane plane{ normal.value(), mesh.point( facet_vertices[0] ) };
             std::optional< double > min_height;
             for( const auto vertex_id : vertices )
@@ -1142,22 +1198,16 @@ namespace geode
     double SolidMesh< dimension >::polyhedron_facet_area(
         const PolyhedronFacet& polyhedron_facet ) const
     {
-        if( nb_polyhedron_facet_vertices( polyhedron_facet ) < 3 )
+        check_polyhedron_facet_id(
+            *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
+        const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
+        if( vertices.size() < 3 )
         {
             return 0.;
         }
-        double area{ 0. };
-        const auto direction = polyhedron_facet_normal( polyhedron_facet )
+        const auto direction = facet_normal_from_vertices( *this, vertices )
                                    .value_or( Vector3D{ { 0, 0, 1 } } );
-        const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p1 = this->point( vertices[0] );
-        for( const auto i : LRange{ 1, vertices.size() - 1 } )
-        {
-            const auto& p2 = this->point( vertices[i] );
-            const auto& p3 = this->point( vertices[i + 1] );
-            area += triangle_signed_area( { p1, p2, p3 }, direction );
-        }
-        return area;
+        return facet_area_from_vertices( *this, vertices, direction );
     }
 
     template < index_t dimension >
@@ -1166,28 +1216,8 @@ namespace geode
     {
         check_polyhedron_facet_id(
             *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
-        Vector3D normal{ { 0, 0, 0 } };
-        const auto facet_vertices =
-            polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p0 = this->point( facet_vertices[0] );
-        for( const auto v :
-            LRange{ 2, nb_polyhedron_facet_vertices( polyhedron_facet ) } )
-        {
-            const auto& p1 = this->point( facet_vertices[v - 1] );
-            const auto& p2 = this->point( facet_vertices[v] );
-            if( const auto triangle_normal = Triangle3D{ p0, p1, p2 }.normal() )
-            {
-                normal += triangle_normal.value();
-            }
-        }
-        try
-        {
-            return normal.normalize();
-        }
-        catch( ... )
-        {
-            return std::nullopt;
-        }
+        return facet_normal_from_vertices(
+            *this, polyhedron_facet_vertices( polyhedron_facet ) );
     }
 
     template < index_t dimension >
@@ -1463,12 +1493,11 @@ namespace geode
             {
                 continue;
             }
-            const auto propagation_result = propagate_around_edge(
+            auto [polyhedra, found] = propagate_around_edge(
                 *this, { first_polyhedron, f }, vertices );
-            auto polyhedra = std::get< 0 >( propagation_result );
-            if( std::get< 1 >( propagation_result ) )
+            if( found )
             {
-                return polyhedra;
+                return std::move( polyhedra );
             }
             result.insert( result.end(), polyhedra.begin(), polyhedra.end() );
         }
