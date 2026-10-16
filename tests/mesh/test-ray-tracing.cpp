@@ -143,6 +143,77 @@ namespace
         return mesh;
     }
 
+    std::vector< geode::RayTracing3D::PolygonDistance > trace_vertical_ray(
+        const geode::SurfaceMesh3D& mesh, const geode::Point3D& origin )
+    {
+        const auto aabb = geode::create_aabb_tree( mesh );
+        const geode::Vector3D direction{ { 0, 0, 1 } };
+        const geode::Ray3D ray{ direction, origin };
+        geode::RayTracing3D tracing{ mesh, aabb.bounding_box(), ray };
+        aabb.compute_ray_element_bbox_intersections( ray, tracing );
+        return tracing.all_intersections();
+    }
+
+    void test_ray_quad_vertex()
+    {
+        geode::Logger::info( "Test ray quad vertex" );
+        const auto mesh = create_quad_mesh();
+        const auto results =
+            trace_vertical_ray( *mesh, geode::Point3D{ { 0, 1, -1 } } );
+        geode::OpenGeodeMeshException::test( results.size() == 1,
+            "Ray through quad vertex 3 should give one intersection, not ",
+            results.size() );
+        const auto& result = results.front();
+        const auto vertex_id = result.polygon == 0 ? 3 : 0;
+        const auto expected_position = result.polygon == 0
+                                           ? geode::POSITION::vertex3
+                                           : geode::POSITION::vertex0;
+        geode::OpenGeodeMeshException::test(
+            result.position == expected_position,
+            "Ray through quad vertex: wrong position" );
+        geode::OpenGeodeMeshException::test(
+            mesh->polygon_vertex( { result.polygon,
+                static_cast< geode::local_index_t >( vertex_id ) } )
+                == 3,
+            "Ray through quad vertex: wrong vertex" );
+        geode::OpenGeodeMeshException::test(
+            result.distance == 1, "Ray through quad vertex: wrong distance" );
+    }
+
+    void test_ray_quad_edge()
+    {
+        geode::Logger::info( "Test ray quad edge" );
+        const auto mesh = create_quad_mesh();
+        const auto results =
+            trace_vertical_ray( *mesh, geode::Point3D{ { 0.5, 1, -1 } } );
+        geode::OpenGeodeMeshException::test( results.size() == 1,
+            "Ray through shared quad edge should give one intersection, not ",
+            results.size() );
+        const auto& result = results.front();
+        const auto expected_position = result.polygon == 0
+                                           ? geode::POSITION::edge2
+                                           : geode::POSITION::edge0;
+        geode::OpenGeodeMeshException::test(
+            result.position == expected_position,
+            "Ray through shared quad edge: wrong position" );
+    }
+
+    void test_ray_quad_diagonal()
+    {
+        geode::Logger::info( "Test ray quad diagonal" );
+        const auto mesh = create_quad_mesh();
+        const auto results =
+            trace_vertical_ray( *mesh, geode::Point3D{ { 0.5, 0.5, -1 } } );
+        geode::OpenGeodeMeshException::test( results.size() == 1,
+            "Ray through quad diagonal should give one intersection, not ",
+            results.size() );
+        geode::OpenGeodeMeshException::test( results.front().polygon == 0,
+            "Ray through quad diagonal: wrong polygon" );
+        geode::OpenGeodeMeshException::test(
+            results.front().position == geode::POSITION::inside,
+            "Ray through quad diagonal should be inside the polygon" );
+    }
+
     geode::RayTracing3D create_tracing_from_local_ray(
         const geode::SurfaceMesh3D& mesh, const geode::BoundingBox3D& bbox )
     {
@@ -188,6 +259,9 @@ namespace
         test_ray_inside();
         test_ray_edge();
         test_ray_parallel();
+        test_ray_quad_vertex();
+        test_ray_quad_edge();
+        test_ray_quad_diagonal();
         test_ray_origin_lifetime();
     }
 } // namespace
