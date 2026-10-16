@@ -32,9 +32,73 @@
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/helpers/detail/solid_merger.hpp>
 
+std::unique_ptr< geode::SolidMesh3D > create_hexahedron(
+    absl::Span< const geode::index_t > permutation )
+{
+    // permutation[local] is the hexahedron vertex (HybridSolid order)
+    // stored at local index
+    const std::array< geode::Point3D, 8 > points{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 1, 1, 0 } },
+        geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0, 0, 1 } },
+        geode::Point3D{ { 1, 0, 1 } }, geode::Point3D{ { 1, 1, 1 } },
+        geode::Point3D{ { 0, 1, 1 } } };
+    const std::array< std::array< geode::local_index_t, 4 >, 6 > facets{ {
+        { 0, 4, 5, 1 },
+        { 2, 6, 7, 3 },
+        { 0, 3, 7, 4 },
+        { 1, 5, 6, 2 },
+        { 0, 1, 2, 3 },
+        { 4, 7, 6, 5 },
+    } };
+    auto mesh = geode::SolidMesh3D::create();
+    auto builder = geode::SolidMeshBuilder3D::create( *mesh );
+    for( const auto& point : points )
+    {
+        builder->create_point( point );
+    }
+    std::array< geode::local_index_t, 8 > local_of_vertex;
+    for( const auto local : geode::LRange{ 8 } )
+    {
+        local_of_vertex[permutation[local]] = local;
+    }
+    std::vector< std::vector< geode::local_index_t > > local_facets;
+    for( const auto& facet : facets )
+    {
+        auto& local_facet = local_facets.emplace_back();
+        for( const auto vertex : facet )
+        {
+            local_facet.push_back( local_of_vertex[vertex] );
+        }
+    }
+    builder->create_polyhedron( permutation, local_facets );
+    return mesh;
+}
+
+void test_same_polyhedron_with_permuted_vertices()
+{
+    const auto mesh0 = create_hexahedron(
+        std::array< geode::index_t, 8 >{ 0, 1, 2, 3, 4, 5, 6, 7 } );
+    const auto mesh1 = create_hexahedron(
+        std::array< geode::index_t, 8 >{ 1, 0, 3, 2, 5, 4, 7, 6 } );
+    std::vector< std::reference_wrapper< const geode::SolidMesh3D > > meshes{
+        *mesh0, *mesh1
+    };
+    geode::detail::SolidMeshMerger3D merger{ meshes };
+    const auto merged = merger.merge( geode::GLOBAL_EPSILON );
+    geode::OpenGeodeMeshException::test(
+        merged->nb_vertices() == 8, "Wrong number of vertices" );
+    geode::OpenGeodeMeshException::test( merged->nb_polyhedra() == 1,
+        "Same hexahedron given with permuted vertices should be merged: ",
+        merged->nb_polyhedra(), " polyhedra" );
+    geode::OpenGeodeMeshException::test(
+        merger.polyhedron_origins( 0 ).size() == 2,
+        "Merged hexahedron should have two origins" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_same_polyhedron_with_permuted_vertices();
     std::vector< geode::Point3D > points{
         geode::Point3D{ { -1, 0, 0 } },
         geode::Point3D{ { -1, -1, -1 } },
