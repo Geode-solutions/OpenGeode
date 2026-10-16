@@ -645,6 +645,24 @@ void test_replace_vertices_chained_mapping()
     }
 }
 
+void test_polygon_vertex_edge_hash()
+{
+    const std::hash< geode::PolygonVertex > vertex_hash;
+    geode::OpenGeodeMeshException::test(
+        vertex_hash( { 1, 2 } ) != vertex_hash( { 2, 1 } ),
+        "[hash] Symmetric PolygonVertex should not collide" );
+    geode::OpenGeodeMeshException::test(
+        vertex_hash( { 1, 1 } ) != vertex_hash( { 2, 2 } ),
+        "[hash] Diagonal PolygonVertex should not collide" );
+    const std::hash< geode::PolygonEdge > edge_hash;
+    geode::OpenGeodeMeshException::test(
+        edge_hash( { 1, 2 } ) != edge_hash( { 2, 1 } ),
+        "[hash] Symmetric PolygonEdge should not collide" );
+    geode::OpenGeodeMeshException::test(
+        edge_hash( { 1, 1 } ) != edge_hash( { 2, 2 } ),
+        "[hash] Diagonal PolygonEdge should not collide" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -671,6 +689,7 @@ void test()
     test_delete_polygon_at_pinched_vertex();
     test_permute_vertices_with_isolated_vertex();
     test_replace_vertices_chained_mapping();
+    test_polygon_vertex_edge_hash();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )

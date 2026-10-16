@@ -1324,14 +1324,13 @@ namespace std
     size_t hash< geode::PolygonVertex >::operator()(
         const geode::PolygonVertex& polygon_vertex ) const
     {
-        return absl::Hash< geode::index_t >()( polygon_vertex.polygon_id )
-               ^ absl::Hash< geode::index_t >()( polygon_vertex.vertex_id );
+        return absl::HashOf(
+            polygon_vertex.polygon_id, polygon_vertex.vertex_id );
     }
 
     size_t hash< geode::PolygonEdge >::operator()(
         const geode::PolygonEdge& polygon_edge ) const
     {
-        return absl::Hash< geode::index_t >()( polygon_edge.polygon_id )
-               ^ absl::Hash< geode::index_t >()( polygon_edge.edge_id );
+        return absl::HashOf( polygon_edge.polygon_id, polygon_edge.edge_id );
     }
 } // namespace std
