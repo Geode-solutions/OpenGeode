@@ -654,6 +654,33 @@ void test_delete_polyhedron_at_pinched_vertex()
     }
 }
 
+void test_permute_vertices_with_isolated_vertex()
+{
+    std::vector< geode::index_t > permutation{ 0, 1, 2, 3, 4 };
+    do
+    {
+        auto solid = create_solid_with_points( 5 );
+        auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+        builder->create_tetrahedron( { 1, 2, 3, 4 } );
+        const auto old2new = builder->permute_vertices( permutation );
+        for( const auto old_v : geode::Range{ 5 } )
+        {
+            const auto new_v = old2new[old_v];
+            if( old_v == 0 )
+            {
+                geode::OpenGeodeMeshException::test(
+                    solid->is_vertex_isolated( new_v ),
+                    "Isolated vertex should stay isolated after "
+                    "permutation" );
+            }
+            else
+            {
+                check_vertex_link( *solid, new_v );
+            }
+        }
+    } while( absl::c_next_permutation( permutation ) );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -678,6 +705,7 @@ void test()
     test_set_polyhedron_vertex_relink();
     test_non_manifold_facet_adjacencies();
     test_delete_polyhedron_at_pinched_vertex();
+    test_permute_vertices_with_isolated_vertex();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

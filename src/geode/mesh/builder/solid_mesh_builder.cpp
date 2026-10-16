@@ -100,37 +100,6 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_polyhedron_around_vertices_from_vertices(
-        const geode::SolidMesh< dimension >& solid,
-        geode::SolidMeshBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > vertices_old2new )
-    {
-        for( const auto v : geode::Range{ solid.nb_vertices() } )
-        {
-            if( vertices_old2new[v] != geode::NO_ID )
-            {
-                const auto new_polyhedron_around =
-                    solid.polyhedron_around_vertex( vertices_old2new[v] );
-                if( new_polyhedron_around )
-                {
-                    builder.associate_polyhedron_vertex_to_vertex(
-                        new_polyhedron_around.value(), v );
-                }
-                else
-                {
-                    builder.disassociate_polyhedron_vertex_to_vertex( v );
-                    builder.reset_polyhedra_around_vertex( v );
-                }
-            }
-            else
-            {
-                builder.disassociate_polyhedron_vertex_to_vertex( v );
-                builder.reset_polyhedra_around_vertex( v );
-            }
-        }
-    }
-
-    template < geode::index_t dimension >
     void update_polyhedron_around_vertices_from_polyhedron(
         const geode::SolidMesh< dimension >& solid,
         geode::SolidMeshBuilder< dimension >& builder,
@@ -578,9 +547,10 @@ namespace geode
     void SolidMeshBuilder< dimension >::update_polyhedron_vertices(
         absl::Span< const index_t > old2new )
     {
+        // Vertex storage (polyhedron around vertex and polyhedra around
+        // vertex caches) has already been deleted/permuted: links are
+        // PolyhedronVertex and remain valid, isolated vertices stay isolated.
         check_no_polyhedron_to_delete( solid_mesh_, old2new );
-        update_polyhedron_around_vertices_from_vertices(
-            solid_mesh_, *this, old2new );
         for( const auto p : Range{ solid_mesh_.nb_polyhedra() } )
         {
             for( const auto v :
