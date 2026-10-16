@@ -28,7 +28,11 @@
 
 #include <geode/geometry/point.hpp>
 
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/graph_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
+#include <geode/mesh/core/graph.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 #include <geode/mesh/helpers/detail/component_identifier.hpp>
 
@@ -55,10 +59,65 @@ void test_components_before_identification()
         "Wrong components after identification" );
 }
 
+void test_star_curve()
+{
+    constexpr geode::index_t nb_branches{ 5000 };
+    auto curve = geode::EdgedCurve3D::create();
+    auto builder = geode::EdgedCurveBuilder3D::create( *curve );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    for( const auto e : geode::Range{ nb_branches } )
+    {
+        const auto vertex = builder->create_point(
+            geode::Point3D{ { static_cast< double >( e ), 1, 0 } } );
+        builder->create_edge( 0, vertex );
+    }
+    const auto v0 = builder->create_point( geode::Point3D{ { 0, 5, 0 } } );
+    const auto v1 = builder->create_point( geode::Point3D{ { 0, 6, 0 } } );
+    builder->create_edge( v0, v1 );
+    geode::detail::EdgedCurveIdentifier3D identifier{ *curve };
+    geode::OpenGeodeMeshException::test(
+        identifier.identify_edges() == 2, "Wrong number of curve components" );
+    const auto components = identifier.identified_connected_edges();
+    geode::OpenGeodeMeshException::test(
+        components.size() == 2 && components[0].size() == nb_branches
+            && components[1].size() == 1,
+        "Wrong curve components" );
+    for( const auto e : geode::Range{ nb_branches } )
+    {
+        geode::OpenGeodeMeshException::test(
+            identifier.edge_identifier( e ) == 0, "Wrong edge identifier" );
+    }
+    geode::OpenGeodeMeshException::test(
+        identifier.edge_identifier( nb_branches ) == 1,
+        "Wrong isolated edge identifier" );
+}
+
+void test_graph_max_elements()
+{
+    auto graph = geode::Graph::create();
+    auto builder = geode::GraphBuilder::create( *graph );
+    builder->create_vertices( 5 );
+    for( const auto v : geode::Range{ 4 } )
+    {
+        builder->create_edge( v, v + 1 );
+    }
+    geode::detail::GraphIdentifier identifier{ *graph };
+    geode::OpenGeodeMeshException::test( identifier.identify_vertices( 2 ) == 3,
+        "Wrong number of graph components with a size limit" );
+    const auto components = identifier.identified_connected_vertices();
+    geode::OpenGeodeMeshException::test(
+        components[0] == std::vector< geode::index_t >{ 0, 1 }
+            && components[1] == std::vector< geode::index_t >{ 2, 3 }
+            && components[2] == std::vector< geode::index_t >{ 4 },
+        "Wrong graph components with a size limit" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     test_components_before_identification();
+    test_star_curve();
+    test_graph_max_elements();
 }
 
 OPENGEODE_TEST( "component-identifier" )
