@@ -199,6 +199,55 @@ void test_gradient_grid3D()
     geode::save_regular_grid< 3 >( *grid, "grid_with_gradient.og_rgd3d" );
 }
 
+void test_gradient_no_value()
+{
+    auto surface = geode::TriangulatedSurface2D::create();
+    auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
+    builder->create_point( geode::Point2D{ { 0, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_point( geode::Point2D{ { 0, 1 } } );
+    builder->create_point( geode::Point2D{ { 1, 1 } } );
+    builder->create_point( geode::Point2D{ { 5, 5 } } );
+    builder->create_point( geode::Point2D{ { 2, 0.5 } } );
+    builder->create_polygon( { 0, 1, 2 } );
+    builder->create_polygon( { 1, 3, 2 } );
+    builder->create_polygon( { 1, 5, 3 } );
+    builder->compute_polygon_adjacencies();
+    geode::AttributeValues< double > attribute_values;
+    attribute_values.default_value = 1;
+    const auto attribute_id =
+        surface->vertex_attribute_manager()
+            .create_attribute< geode::VariableAttribute, double >(
+                "constant_function", attribute_values, {} );
+    surface->vertex_attribute_manager()
+        .find_attribute< geode::VariableAttribute, double >( attribute_id )
+        ->set_value( 5, std::nan( "" ) );
+    const auto gradient_id = geode::compute_surface_scalar_function_gradient(
+        *surface, attribute_id );
+    const auto gradient =
+        surface->vertex_attribute_manager()
+            .find_attribute< geode::VariableAttribute, geode::Vector2D >(
+                gradient_id );
+    for( const auto vertex : { 0u, 2u } )
+    {
+        geode::OpenGeodeMeshException::test( gradient->has_value( vertex ),
+            "Zero gradient of a constant function should be a value (vertex ",
+            vertex, ")" );
+        geode::OpenGeodeMeshException::test(
+            gradient->value( vertex ).length() == 0.,
+            "Gradient of a constant function should be zero (vertex ", vertex,
+            ")" );
+    }
+    for( const auto vertex : { 1u, 3u, 4u, 5u } )
+    {
+        geode::OpenGeodeMeshException::test( !gradient->has_value( vertex ),
+            "Vertex ", vertex, " should have no gradient value" );
+        geode::OpenGeodeMeshException::test(
+            std::isnan( gradient->value( vertex ).value( 0 ) ), "Vertex ",
+            vertex, " should have a NaN gradient" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -206,6 +255,7 @@ void test()
     test_gradient_grid2D();
     test_gradient_triangulated_surface2D();
     test_gradient_grid3D();
+    test_gradient_no_value();
 }
 
 OPENGEODE_TEST( "gradient-computation" )
