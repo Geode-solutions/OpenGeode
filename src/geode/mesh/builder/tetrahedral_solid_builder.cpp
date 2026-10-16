@@ -57,13 +57,22 @@ namespace geode
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< local_index_t > > facets )
     {
-        geode_unused( facets );
-        OpenGeodeMeshException::check_assertion( vertices.size() == 4,
-            "[TetrahedralSolidBuilder::do_create_"
-            "polyhedron] Only tetrahedra are handled" );
+        check_polyhedron_definition( vertices, facets );
         std::array< index_t, 4 > tetrahedron_vertices;
         absl::c_copy_n( vertices, 4, tetrahedron_vertices.begin() );
         do_create_tetrahedron( tetrahedron_vertices );
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::check_polyhedron_definition(
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< local_index_t > > /*facets*/ ) const
+    {
+        OpenGeodeMeshException::check_exception( vertices.size() == 4, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[TetrahedralSolidBuilder::create_polyhedron] Only tetrahedra are "
+            "handled (given polyhedron has ",
+            vertices.size(), " vertices)" );
     }
 
     template < index_t dimension >

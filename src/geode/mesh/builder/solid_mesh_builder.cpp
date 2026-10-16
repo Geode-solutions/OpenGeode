@@ -603,6 +603,32 @@ namespace geode
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< local_index_t > > facets )
     {
+        OpenGeodeMeshException::check_exception( vertices.size() < NO_LID,
+            nullptr, OpenGeodeException::TYPE::data,
+            "[SolidMeshBuilder::create_polyhedron] Too many vertices: ",
+            vertices.size() );
+        for( const auto vertex : vertices )
+        {
+            OpenGeodeMeshException::check_exception(
+                vertex < solid_mesh_.nb_vertices(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SolidMeshBuilder::create_polyhedron] Invalid vertex index ",
+                vertex, " (nb vertices: ", solid_mesh_.nb_vertices(), ")" );
+        }
+        for( const auto& facet : facets )
+        {
+            for( const auto vertex : facet )
+            {
+                OpenGeodeMeshException::check_exception(
+                    vertex < vertices.size(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SolidMeshBuilder::create_polyhedron] Invalid facet "
+                    "vertex index ",
+                    vertex, " (nb polyhedron vertices: ", vertices.size(),
+                    ")" );
+            }
+        }
+        check_polyhedron_definition( vertices, facets );
         const auto added_polyhedron = solid_mesh_.nb_polyhedra();
         solid_mesh_.polyhedron_attribute_manager().resize(
             added_polyhedron + 1 );
@@ -631,6 +657,13 @@ namespace geode
             }
         }
         return added_polyhedron;
+    }
+
+    template < index_t dimension >
+    void SolidMeshBuilder< dimension >::check_polyhedron_definition(
+        absl::Span< const index_t > /*vertices*/,
+        absl::Span< const std::vector< local_index_t > > /*facets*/ ) const
+    {
     }
 
     template < index_t dimension >

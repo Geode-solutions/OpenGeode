@@ -702,6 +702,38 @@ void test_replace_vertices_chained()
     check_vertex_link( *solid, 2 );
 }
 
+void test_create_invalid_polyhedron()
+{
+    auto solid = create_solid_with_points( 5 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    const auto check_invalid = [&solid, &builder](
+                                   absl::Span< const geode::index_t > vertices,
+                                   const std::string& message ) {
+        bool thrown{ false };
+        try
+        {
+            builder->create_polyhedron( vertices, {} );
+        }
+        catch( const geode::OpenGeodeException& )
+        {
+            thrown = true;
+        }
+        geode::OpenGeodeMeshException::test(
+            thrown, "Creating ", message, " should throw" );
+        geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 1,
+            "Creating ", message, " should not add a polyhedron" );
+        geode::OpenGeodeMeshException::test(
+            solid->polyhedron_around_vertex( 0 )->polyhedron_id == 0,
+            "Creating ", message, " should not change vertex links" );
+    };
+    check_invalid( std::vector< geode::index_t >{ 0, 1, 4 }, "3 vertices" );
+    check_invalid(
+        std::vector< geode::index_t >{ 0, 1, 2, 4, 3 }, "5 vertices" );
+    check_invalid( std::vector< geode::index_t >{ 0, 1, 2, 42 },
+        "an invalid vertex index" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -728,6 +760,7 @@ void test()
     test_delete_polyhedron_at_pinched_vertex();
     test_permute_vertices_with_isolated_vertex();
     test_replace_vertices_chained();
+    test_create_invalid_polyhedron();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )
