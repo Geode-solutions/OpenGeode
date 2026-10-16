@@ -518,7 +518,7 @@ namespace geode
                 else
                 {
                     associate_polygon_vertex_to_vertex(
-                        polygons_around[1], new_vertex_id );
+                        polygons_around[1], old_vertex_id );
                 }
             }
             reset_polygons_around_vertex( old_vertex_id );

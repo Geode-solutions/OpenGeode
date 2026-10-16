@@ -453,6 +453,28 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_triangulated_surface< 3 >( filename ) );
 }
 
+void test_set_polygon_vertex_keeps_old_vertex_link()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 5 );
+    builder->create_triangle( { 0, 2, 3 } );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->compute_polygon_adjacencies();
+    builder->set_polygon_vertex( { 1, 0 }, 4 );
+    const auto around_0 = surface->polygon_around_vertex( 0 );
+    geode::OpenGeodeMeshException::test(
+        around_0 && surface->polygon_vertex( around_0.value() ) == 0,
+        "[set_polygon_vertex] Old vertex should be linked to a polygon "
+        "still using it" );
+    const auto around_4 = surface->polygon_around_vertex( 4 );
+    geode::OpenGeodeMeshException::test(
+        around_4 && surface->polygon_vertex( around_4.value() ) == 4,
+        "[set_polygon_vertex] New vertex should be linked to the modified "
+        "polygon" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -470,6 +492,7 @@ void test()
     test_permutation( *surface, *builder );
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );
+    test_set_polygon_vertex_keeps_old_vertex_link();
 }
 
 OPENGEODE_TEST( "triangulated-surface" )
