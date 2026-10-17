@@ -44,12 +44,21 @@ namespace geode
     {
         std::ofstream file{ to_string( this->filename() ),
             std::ofstream::binary };
+        OpenGeodeMeshException::check_exception( !file.fail(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[LightRegularGridOutput] Failed to open file: ",
+            this->filename() );
         TContext context{};
         BitseryExtensions::register_serialize_pcontext(
             std::get< 0 >( context ) );
         Serializer archive{ context, file };
         archive.object( grid );
         archive.adapter().flush();
+        file.flush();
+        OpenGeodeMeshException::check_exception( file.good(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[LightRegularGridOutput] Failed to write file: ",
+            this->filename() );
         OpenGeodeMeshException::check_exception(
             std::get< 1 >( context ).isValid(), nullptr,
             OpenGeodeException::TYPE::internal,

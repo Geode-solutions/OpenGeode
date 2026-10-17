@@ -361,76 +361,77 @@ namespace geode
     template < typename Archive >
     void PolyhedronVertex::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronVertex >{
-                { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
-                     archive.value4b( polyhedron_vertex.polyhedron_id );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_vertex.vertex_id = value;
-                 },
-                    []( Archive& archive,
-                        PolyhedronVertex& polyhedron_vertex ) {
-                        archive.value4b( polyhedron_vertex.polyhedron_id );
-                        archive.value1b( polyhedron_vertex.vertex_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronVertex > growable{
+            { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                 archive.value4b( polyhedron_vertex.polyhedron_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_vertex.vertex_id = value;
+             },
+                []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                    archive.value4b( polyhedron_vertex.polyhedron_id );
+                    archive.value1b( polyhedron_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolyhedronFacet::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronFacet >{
-                { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                     archive.value4b( polyhedron_facet.polyhedron_id );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_facet.facet_id = value;
-                 },
-                    []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                        archive.value4b( polyhedron_facet.polyhedron_id );
-                        archive.value1b( polyhedron_facet.facet_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronFacet > growable{
+            { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                 archive.value4b( polyhedron_facet.polyhedron_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_facet.facet_id = value;
+             },
+                []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                    archive.value4b( polyhedron_facet.polyhedron_id );
+                    archive.value1b( polyhedron_facet.facet_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolyhedronFacetVertex::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronFacetVertex >{
-                { []( Archive& archive,
-                      PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                     archive.object( polyhedron_facet_vertex.polyhedron_facet );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_facet_vertex.vertex_id = value;
-                 },
-                    []( Archive& archive,
-                        PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                        archive.object(
-                            polyhedron_facet_vertex.polyhedron_facet );
-                        archive.value1b( polyhedron_facet_vertex.vertex_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronFacetVertex > growable{
+            { []( Archive& archive,
+                  PolyhedronFacetVertex& polyhedron_facet_vertex ) {
+                 archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_facet_vertex.vertex_id = value;
+             },
+                []( Archive& archive,
+                    PolyhedronFacetVertex& polyhedron_facet_vertex ) {
+                    archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                    archive.value1b( polyhedron_facet_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolyhedronFacetEdge::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronFacetEdge >{
-                { []( Archive& archive,
-                      PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                     archive.object( polyhedron_facet_edge.polyhedron_facet );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_facet_edge.edge_id = value;
-                 },
-                    []( Archive& archive,
-                        PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                        archive.object(
-                            polyhedron_facet_edge.polyhedron_facet );
-                        archive.value1b( polyhedron_facet_edge.edge_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronFacetEdge > growable{
+            { []( Archive& archive,
+                  PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                 archive.object( polyhedron_facet_edge.polyhedron_facet );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_facet_edge.edge_id = value;
+             },
+                []( Archive& archive,
+                    PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                    archive.object( polyhedron_facet_edge.polyhedron_facet );
+                    archive.value1b( polyhedron_facet_edge.edge_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < index_t dimension >
@@ -684,6 +685,15 @@ namespace geode
         void remove_legacy_attributes( AttributeManager& manager )
         {
             legacy_attributes_.remove_from( manager );
+        }
+
+        void check_vertex_storage( index_t nb_vertices ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                polyhedron_around_vertex_.size() == nb_vertices, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SolidMesh] Wrong vertex storage size "
+                "after deserialization: file may be corrupted" );
         }
 
         const internal::PolyhedraAroundVertexImpl&
@@ -1742,6 +1752,7 @@ namespace geode
                      archive.ext(
                          solid, bitsery::ext::BaseClass< VertexSet >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->check_vertex_storage( solid.nb_vertices() );
                      solid.impl_->remove_legacy_attributes(
                          solid.vertex_attribute_manager() );
                  },
@@ -1749,6 +1760,8 @@ namespace geode
                         archive.ext(
                             solid, bitsery::ext::BaseClass< VertexSet >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_vertex_storage(
+                            solid.nb_vertices() );
                         solid.impl_->remove_legacy_attributes(
                             solid.vertex_attribute_manager() );
                     },
@@ -1760,6 +1773,8 @@ namespace geode
                                        CoordinateReferenceSystemManagers<
                                            dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_vertex_storage(
+                            solid.nb_vertices() );
                         solid.impl_->remove_legacy_attributes(
                             solid.vertex_attribute_manager() );
                     } } } );

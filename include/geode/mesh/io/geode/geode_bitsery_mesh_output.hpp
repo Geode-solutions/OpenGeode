@@ -46,12 +46,19 @@
             OpenGeode##Mesh::impl_name_static().get() );                       \
         std::ofstream file{ to_string( this->filename() ),                     \
             std::ofstream::binary };                                           \
+        geode::OpenGeodeMeshException::check_exception( !file.fail(), nullptr, \
+            geode::OpenGeodeException::TYPE::data,                             \
+            "[Bitsery::write] Failed to open file: ", this->filename() );      \
         TContext context{};                                                    \
         BitseryExtensions::register_serialize_pcontext(                        \
             std::get< 0 >( context ) );                                        \
         Serializer archive{ context, file };                                   \
         archive.object( dynamic_cast< const OpenGeode##Mesh& >( mesh ) );      \
         archive.adapter().flush();                                             \
+        file.flush();                                                          \
+        geode::OpenGeodeMeshException::check_exception( file.good(), nullptr,  \
+            geode::OpenGeodeException::TYPE::data,                             \
+            "[Bitsery::write] Failed to write file: ", this->filename() );     \
         geode::OpenGeodeMeshException::check_exception(                        \
             std::get< 1 >( context ).isValid(), nullptr,                       \
             geode::OpenGeodeException::TYPE::internal,                         \

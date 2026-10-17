@@ -29,6 +29,7 @@
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/regular_grid_surface_builder.hpp>
 #include <geode/mesh/core/internal/grid_impl.hpp>
@@ -44,6 +45,39 @@ namespace
     static constexpr std::array< std::pair< bool, geode::index_t >, 4 >
         SURFACE_CELL_ADJACENT_DIRETIONS{ { { false, 1 }, { true, 0 },
             { true, 1 }, { false, 0 } } };
+
+    /*!
+     * Old files do not store the grid coordinate system (it is reset to the
+     * default one on load), and files written by OpenGeode v18.0 to v18.2 may
+     * store a coordinate system that does not match the vertex coordinates.
+     * In these cases, rebuild the grid origin and directions from the vertex
+     * coordinates. A consistent stored coordinate system is kept untouched.
+     */
+    void repair_grid_coordinate_system( geode::RegularGrid2D& grid )
+    {
+        const auto& origin = grid.point( 0 );
+        bool is_consistent =
+            grid.grid_point( geode::Grid2D::VertexIndices{} ) == origin;
+        std::array< geode::Vector2D, 2 > directions;
+        for( const auto d : geode::LRange{ 2 } )
+        {
+            geode::Grid2D::VertexIndices next_vertex{};
+            next_vertex[d] = 1;
+            const auto& next_point =
+                grid.point( grid.vertex_index( next_vertex ) );
+            directions[d] = geode::Vector2D{ origin, next_point };
+            is_consistent =
+                is_consistent
+                && grid.grid_point( next_vertex ).inexact_equal( next_point );
+        }
+        if( is_consistent )
+        {
+            return;
+        }
+        geode::GridBuilder2D builder{ grid };
+        builder.set_grid_origin( origin );
+        builder.set_grid_directions( std::move( directions ) );
+    }
 } // namespace
 
 namespace geode
@@ -199,34 +233,26 @@ namespace geode
                      archive.ext(
                          grid, bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
                      archive.object( grid.impl_ );
-                     const auto new_point_attribute_id =
-                         grid.vertex_attribute_manager()
-                             .attribute_ids_matching_name(
-                                 internal::PointsImpl< 2 >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodeRegularGrid< 2 > >(
-                         grid, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodeRegularGrid< 2 > >( grid );
+                     repair_grid_coordinate_system( grid );
                  },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
                         archive.object( grid.impl_ );
-                        const auto new_point_attribute_id =
-                            grid.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl< 2 >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodeRegularGrid< 2 > >(
-                            grid, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodeRegularGrid< 2 > >( grid );
+                        repair_grid_coordinate_system( grid );
                     },
                     []( Archive& archive, OpenGeodeRegularGrid& grid ) {
                         archive.ext( grid,
                             bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
                         archive.object( grid.impl_ );
+                        if constexpr( std::is_same_v< Archive, Deserializer > )
+                        {
+                            repair_grid_coordinate_system( grid );
+                        }
                     } } } );
     }
 

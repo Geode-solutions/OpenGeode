@@ -64,12 +64,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, MeshElement >{
-                           { []( Archive& archive, MeshElement& mesh_element ) {
-                               archive.object( mesh_element.mesh_id );
-                               archive.value4b( mesh_element.element_id );
-                           } } } );
+            static const Growable< Archive, MeshElement > growable{
+                { []( Archive& archive, MeshElement& mesh_element ) {
+                    archive.object( mesh_element.mesh_id );
+                    archive.value4b( mesh_element.element_id );
+                } }
+            };
+            serializer.ext( *this, growable );
         }
 
         [[nodiscard]] std::string string() const

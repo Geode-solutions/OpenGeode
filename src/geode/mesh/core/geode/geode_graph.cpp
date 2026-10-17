@@ -111,6 +111,7 @@ namespace geode
                 { []( Archive& archive, OpenGeodeGraph& graph ) {
                     archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
                     archive.object( graph.impl_ );
+                    graph.impl_->check_edges_number( graph.nb_edges() );
                     graph.impl_->remove_legacy_attributes(
                         graph.edge_attribute_manager() );
                 } } } );

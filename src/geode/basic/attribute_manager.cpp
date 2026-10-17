@@ -566,6 +566,12 @@ namespace geode
                                              ? attribute->type()
                                              : std::string_view{ "unknown" } };
                                  }
+                                 OpenGeodeBasicException::check_exception(
+                                     attribute != nullptr, nullptr,
+                                     OpenGeodeException::TYPE::data,
+                                     "[AttributeManager::serialize] Cannot "
+                                     "deserialize attribute ",
+                                     name, ": file may be corrupted" );
                              } );
                          for( auto &[attribute_name, attribute] : old_map )
                          {
@@ -603,6 +609,13 @@ namespace geode
                                                       : std::string_view{
                                                             "unknown" } };
                                     }
+                                    OpenGeodeBasicException::check_exception(
+                                        attribute != nullptr, nullptr,
+                                        OpenGeodeException::TYPE::data,
+                                        "[AttributeManager::serialize] Cannot "
+                                        "deserialize attribute with id ",
+                                        attribute_id.string(),
+                                        ": file may be corrupted" );
                                 } );
                         } } } );
         }
