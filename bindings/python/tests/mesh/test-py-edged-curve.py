@@ -54,7 +54,7 @@ def test_bounding_box(edged_curve):
 
 def test_create_edges(edged_curve, builder):
     builder.create_edge_with_vertices(0, 1)
-    builder.create_edge(0, 2)
+    builder.create_edge_with_vertices(0, 2)
     if edged_curve.nb_edges() != 2:
         raise ValueError("[Test] EdgedCurve should have 2 edges")
     if edged_curve.edge_vertex(mesh.EdgeVertex(0, 1)) != 1:
