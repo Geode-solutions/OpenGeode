@@ -48,7 +48,8 @@ namespace geode
                     attribute_name, std::move( values ), properties );
             },
             pybind11::arg( "name" ), pybind11::arg( "default_value" ),
-            pybind11::arg( "properties" ) = AttributeProperties{},
+            pybind11::arg_v(
+                "properties", AttributeProperties{}, "AttributeProperties()" ),
             "Create an attribute from its name and default value and return "
             "its uuid" );
     }
