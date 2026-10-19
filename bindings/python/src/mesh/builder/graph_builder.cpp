@@ -34,6 +34,10 @@ namespace geode
             .def_static( "create", &GraphBuilder::create )
             .def( "create_edge", static_cast< index_t ( GraphBuilder::* )() >(
                                      &GraphBuilder::create_edge ) )
+            .def( "create_edge",
+                static_cast< index_t ( GraphBuilder::* )( index_t, index_t ) >(
+                    &GraphBuilder::create_edge ),
+                pybind11::arg( "v0" ), pybind11::arg( "v1" ) )
             .def( "create_edge_with_vertices",
                 static_cast< index_t ( GraphBuilder::* )( index_t, index_t ) >(
                     &GraphBuilder::create_edge ) )
