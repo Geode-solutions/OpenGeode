@@ -314,6 +314,15 @@ namespace geode
             const GenericMapping< index_t >& old2new_mapping,
             const uuid& attribute_id );
 
+        /*!
+         * Import the transferable attributes of another AttributeManager
+         * using an old2new array (old2new[old_element] is the new element or
+         * NO_ID). Same behavior as the GenericMapping import, without
+         * building a GenericMapping for one-to-one mappings.
+         */
+        void import( const AttributeManager& attribute_manager,
+            absl::Span< const index_t > old2new );
+
     private:
         template < template < typename > class Attribute, typename T >
         void create_attribute_unlocked( std::string_view attribute_name,
@@ -369,15 +378,5 @@ namespace geode
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
-
-    public:
-        /*!
-         * Import the transferable attributes of another AttributeManager
-         * using an old2new array (old2new[old_element] is the new element or
-         * NO_ID). Same behavior as the GenericMapping import, without
-         * building a GenericMapping for one-to-one mappings.
-         */
-        void import( const AttributeManager& attribute_manager,
-            absl::Span< const index_t > old2new );
     };
 } // namespace geode
