@@ -21,6 +21,7 @@
  *
  */
 
+#include <filesystem>
 #include <fstream>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -370,6 +371,26 @@ void test_io(
     test_boundary_box( new_grid );
 }
 
+void test_save_unwritable( const geode::LightRegularGrid3D& grid )
+{
+    const auto filename =
+        absl::StrCat( "unwritable.", grid.native_extension() );
+    std::filesystem::create_directories( filename );
+    try
+    {
+        geode::save_light_regular_grid( grid, filename );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        std::filesystem::remove_all( filename );
+        return;
+    }
+    std::filesystem::remove_all( filename );
+    throw geode::OpenGeodeMeshException{ nullptr,
+        geode::OpenGeodeException::TYPE::internal,
+        "[Test] Saving in a non writable file should throw" };
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -387,6 +408,7 @@ void test()
     test_closest_vertex( grid );
     test_attribute( grid );
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
+    test_save_unwritable( grid );
 }
 
 OPENGEODE_TEST( "light-regular-grid" )

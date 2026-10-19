@@ -153,11 +153,12 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& serializer )
             {
-                serializer.ext( *this,
-                    Growable< Archive, OrientedVertexCycle >{
-                        { []( Archive& archive, OrientedVertexCycle& storage ) {
-                            archive( storage.vertices_ );
-                        } } } );
+                static const Growable< Archive, OrientedVertexCycle > growable{
+                    { []( Archive& archive, OrientedVertexCycle& storage ) {
+                        archive( storage.vertices_ );
+                    } }
+                };
+                serializer.ext( *this, growable );
             }
 
         private:

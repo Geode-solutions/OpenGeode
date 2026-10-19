@@ -479,6 +479,41 @@ void test_delete_all( const geode::HybridSolid3D& hybrid_solid,
         "[Test]HybridSolid should have 0 vertex" );
 }
 
+void test_create_invalid_polyhedron()
+{
+    auto solid = geode::HybridSolid3D::create(
+        geode::OpenGeodeHybridSolid3D::impl_name_static() );
+    solid->enable_edges();
+    solid->enable_facets();
+    auto builder = geode::HybridSolidBuilder3D::create( *solid );
+    builder->create_vertices( 8 );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    const auto check_invalid = [&solid, &builder](
+                                   absl::Span< const geode::index_t > vertices,
+                                   const std::string& message ) {
+        bool thrown{ false };
+        try
+        {
+            builder->create_polyhedron( vertices, {} );
+        }
+        catch( const geode::OpenGeodeException& )
+        {
+            thrown = true;
+        }
+        geode::OpenGeodeMeshException::test(
+            thrown, "Creating ", message, " should throw" );
+        geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 1,
+            "Creating ", message, " should not add a polyhedron" );
+        geode::OpenGeodeMeshException::test(
+            solid->polyhedron_around_vertex( 0 )->polyhedron_id == 0,
+            "Creating ", message, " should not change vertex links" );
+    };
+    check_invalid(
+        std::vector< geode::index_t >{ 0, 1, 2, 3, 4, 5, 6 }, "7 vertices" );
+    check_invalid( std::vector< geode::index_t >{ 0, 1, 2, 42 },
+        "an invalid vertex index" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -501,6 +536,7 @@ void test()
     test_delete_polyhedra( *hybrid_solid, *builder );
     test_clone( *hybrid_solid );
     test_delete_all( *hybrid_solid, *builder );
+    test_create_invalid_polyhedron();
 }
 
 OPENGEODE_TEST( "hybrid-solid" )

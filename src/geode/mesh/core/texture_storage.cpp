@@ -96,17 +96,17 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                        archive.ext( impl.textures_,
-                            bitsery::ext::StdMap{ impl.textures_.max_size() },
-                            []( Archive& archive2, std::string& name,
-                                Texture< dimension >& texture ) {
-                                archive2.text1b( name, name.max_size() );
-                                archive2.object( texture );
-                            } );
-                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    archive.ext( impl.textures_,
+                        bitsery::ext::StdMap{ impl.textures_.max_size() },
+                        []( Archive& archive2, std::string& name,
+                            Texture< dimension >& texture ) {
+                            archive2.text1b( name, MAX_SERIALIZED_NAME_SIZE );
+                            archive2.object( texture );
+                        } );
+                } } } );
         }
 
     private:

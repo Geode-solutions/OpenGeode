@@ -25,6 +25,7 @@
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
+#include <absl/container/inlined_vector.h>
 
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/pimpl_impl.hpp>
@@ -64,8 +65,11 @@ namespace geode
         template < index_t dimension >
         class SolidMeshMerger< dimension >::Impl
         {
-            using Polyhedron = absl::FixedArray< index_t >;
-            using TypedVertexCycle = detail::VertexCycle< Polyhedron >;
+            using Polyhedron = absl::InlinedVector< index_t, 8 >;
+            using SortedVertices = absl::InlinedVector< index_t, 8 >;
+            using PolyhedronCandidates = absl::InlinedVector< index_t, 1 >;
+            using FacetCycles =
+                std::vector< VertexCycle< PolyhedronFacetVertices > >;
             using SolidId = absl::flat_hash_set< index_t >;
 
         public:
@@ -134,17 +138,88 @@ namespace geode
                 separate_solids( merger );
             }
 
+            static FacetCycles sorted_facet_cycles(
+                const PolyhedronFacetsVertices& facets_vertices )
+            {
+                FacetCycles cycles;
+                cycles.reserve( facets_vertices.size() );
+                for( const auto& facet_vertices : facets_vertices )
+                {
+                    cycles.emplace_back( facet_vertices );
+                }
+                absl::c_sort( cycles );
+                return cycles;
+            }
+
+            static FacetCycles input_facet_cycles(
+                const SolidMeshMerger< dimension >& merger,
+                index_t solid_id,
+                index_t polyhedron )
+            {
+                const auto& solid = merger.meshes()[solid_id].get();
+                auto facets_vertices =
+                    solid.polyhedron_facets_vertices( polyhedron );
+                for( auto& facet_vertices : facets_vertices )
+                {
+                    for( auto& vertex : facet_vertices )
+                    {
+                        vertex = merger.vertex_in_merged( solid_id, vertex );
+                    }
+                }
+                return sorted_facet_cycles( facets_vertices );
+            }
+
+            /*!
+             * Find an already created polyhedron with the same vertex set and
+             * the same facets than the given input polyhedron.
+             */
+            static std::optional< index_t > find_same_polyhedron(
+                const SolidMeshMerger< dimension >& merger,
+                const PolyhedronCandidates& candidates,
+                index_t solid_id,
+                index_t polyhedron )
+            {
+                if( candidates.empty() )
+                {
+                    return std::nullopt;
+                }
+                const auto facets =
+                    input_facet_cycles( merger, solid_id, polyhedron );
+                for( const auto candidate : candidates )
+                {
+                    if( sorted_facet_cycles(
+                            merger.mesh().polyhedron_facets_vertices(
+                                candidate ) )
+                        == facets )
+                    {
+                        return candidate;
+                    }
+                }
+                return std::nullopt;
+            }
+
             void create_polyhedra( SolidMeshMerger< dimension >& merger )
             {
-                absl::flat_hash_map< TypedVertexCycle, index_t > polyhedra;
+                // Polyhedra are matched by vertex set, then confirmed by
+                // facets: the vertex order of a same polyhedron may differ
+                // between solids by any permutation, not only a cyclic one.
+                absl::flat_hash_map< SortedVertices, PolyhedronCandidates >
+                    polyhedra;
+                index_t nb_polyhedra{ 0 };
+                for( const auto& solid : merger.meshes() )
+                {
+                    nb_polyhedra += solid.get().nb_polyhedra();
+                }
+                polyhedra.reserve( nb_polyhedra );
+                std::vector< std::vector< local_index_t > > facets;
+                Polyhedron vertices;
                 const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
                 {
                     const auto& solid = meshes[s].get();
                     for( const auto p : Range{ solid.nb_polyhedra() } )
                     {
-                        Polyhedron vertices(
-                            solid.nb_polyhedron_vertices( p ) );
+                        vertices.resize( solid.nb_polyhedron_vertices( p ) );
                         for( const auto v : LIndices{ vertices } )
                         {
                             vertices[v] = merger.vertex_in_merged(
@@ -154,13 +229,16 @@ namespace geode
                         {
                             continue;
                         }
-                        const auto it =
-                            polyhedra.try_emplace( TypedVertexCycle{ vertices },
-                                merger.mesh().nb_polyhedra() );
-                        if( it.second )
+                        SortedVertices sorted_vertices(
+                            vertices.begin(), vertices.end() );
+                        absl::c_sort( sorted_vertices );
+                        auto& candidates = polyhedra[sorted_vertices];
+                        const auto same_polyhedron =
+                            find_same_polyhedron( merger, candidates, s, p );
+                        if( !same_polyhedron )
                         {
-                            absl::FixedArray< std::vector< local_index_t > >
-                                facets( solid.nb_polyhedron_facets( p ) );
+                            // Reuse the facet buffers between polyhedra
+                            facets.resize( solid.nb_polyhedron_facets( p ) );
                             for( const auto f : LIndices{ facets } )
                             {
                                 const PolyhedronFacet facet{ p, f };
@@ -180,6 +258,7 @@ namespace geode
                             const auto polyhedron_id =
                                 merger.builder().create_polyhedron(
                                     vertices, facets );
+                            candidates.push_back( polyhedron_id );
                             OpenGeodeMeshException::check_assertion(
                                 polyhedron_id == solid_id_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "
@@ -196,7 +275,7 @@ namespace geode
                         }
                         else
                         {
-                            const auto polyhedron_id = it.first->second;
+                            const auto polyhedron_id = same_polyhedron.value();
                             OpenGeodeMeshException::check_assertion(
                                 polyhedron_id < solid_id_.size(),
                                 "[SolidMerger::create_polyhedra] Issue in "

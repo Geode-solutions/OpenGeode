@@ -24,7 +24,6 @@
 #include <geode/mesh/helpers/detail/curve_merger.hpp>
 
 #include <absl/container/flat_hash_map.h>
-#include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -41,7 +40,6 @@ namespace geode
         {
             using Edge = std::array< index_t, 2 >;
             using TypedVertexCycle = detail::VertexCycle< Edge >;
-            using EdgedCurveId = absl::flat_hash_set< index_t >;
 
         public:
             Impl( absl::Span< const std::reference_wrapper<
@@ -56,7 +54,6 @@ namespace geode
                     nb_edges += curve.nb_edges();
                 }
                 edges_origins_.reserve( nb_edges );
-                curve_id_.reserve( nb_edges );
             }
 
             std::unique_ptr< EdgedCurve< dimension > > merge(
@@ -64,8 +61,6 @@ namespace geode
             {
                 merger.create_points( epsilon );
                 create_edges( merger );
-                clean_curve( merger );
-                curve_id_.clear();
                 return merger.steal_mesh();
             }
 
@@ -75,8 +70,6 @@ namespace geode
             {
                 merger.create_points( epsilons_frame );
                 create_edges( merger );
-                clean_curve( merger );
-                curve_id_.clear();
                 return merger.steal_mesh();
             }
 
@@ -101,39 +94,10 @@ namespace geode
             }
 
         private:
-            void clean_curve( EdgedCurveMerger< dimension >& merger )
-            {
-                bool delete_needed{ false };
-                std::vector< bool > to_delete(
-                    merger.mesh().nb_edges(), false );
-                for( const auto e : Range{ merger.mesh().nb_edges() } )
-                {
-                    const auto vertices = merger.mesh().edge_vertices( e );
-                    if( vertices[0] == vertices[1] )
-                    {
-                        to_delete[e] = true;
-                        delete_needed = true;
-                    }
-                }
-                if( delete_needed )
-                {
-                    const auto old2new =
-                        merger.builder().delete_edges( to_delete );
-                    const auto& meshes = merger.meshes();
-                    for( const auto curve_id : Indices{ merger.meshes() } )
-                    {
-                        const auto& curve = meshes[curve_id].get();
-                        for( const auto e : Range{ curve.nb_edges() } )
-                        {
-                            const auto old = new_id_[curve_id][e];
-                            new_id_[curve_id][e] = old2new[old];
-                        }
-                    }
-                }
-            }
-
             void create_edges( EdgedCurveMerger< dimension >& merger )
             {
+                // Edges collapsed by the vertex merge are skipped: their
+                // edge_in_merged() is NO_ID
                 absl::flat_hash_map< TypedVertexCycle, index_t > edges;
                 const auto& meshes = merger.meshes();
                 for( const auto s : Indices{ merger.meshes() } )
@@ -158,12 +122,6 @@ namespace geode
                         {
                             const auto edge_id = merger.builder().create_edge(
                                 vertices[0], vertices[1] );
-                            OpenGeodeMeshException::check_assertion(
-                                edge_id == curve_id_.size(),
-                                "[EdgedCurveMerger::create_edges] Issue in "
-                                "edge database (curve_id_)" );
-                            curve_id_.emplace_back();
-                            curve_id_.back().insert( s );
                             new_id_[s][e] = edge_id;
                             OpenGeodeMeshException::check_assertion(
                                 edge_id == edges_origins_.size(),
@@ -175,11 +133,6 @@ namespace geode
                         else
                         {
                             const auto edge_id = it.first->second;
-                            OpenGeodeMeshException::check_assertion(
-                                edge_id < curve_id_.size(),
-                                "[EdgedCurveMerger::create_edges] Issue in "
-                                "edge database (curve_id_)" );
-                            curve_id_[edge_id].insert( s );
                             new_id_[s][e] = edge_id;
                             OpenGeodeMeshException::check_assertion(
                                 edge_id < edges_origins_.size(),
@@ -192,7 +145,6 @@ namespace geode
             }
 
         private:
-            std::vector< EdgedCurveId > curve_id_;
             absl::FixedArray< std::vector< index_t > > new_id_;
             std::vector< EdgeOrigins > edges_origins_;
         };

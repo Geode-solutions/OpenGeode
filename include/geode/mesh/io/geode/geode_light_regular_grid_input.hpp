@@ -71,7 +71,21 @@ namespace geode
             cells_length.fill( 1 );
             LightRegularGrid< dimension > grid{ origin, cells_number,
                 cells_length };
-            archive.object( grid );
+            try
+            {
+                archive.object( grid );
+            }
+            catch( const OpenGeodeException& )
+            {
+                throw;
+            }
+            catch( const std::exception& exception )
+            {
+                throw OpenGeodeMeshException{ nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[Bitsery::read] Error while reading file: ",
+                    this->filename(), " (", exception.what(), ")" };
+            }
             const auto& adapter = archive.adapter();
             OpenGeodeMeshException::check_exception(
                 adapter.error() == bitsery::ReaderError::NoError

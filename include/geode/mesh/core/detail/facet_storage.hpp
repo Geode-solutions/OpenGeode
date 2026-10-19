@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <absl/algorithm/container.h>
 #include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
@@ -30,6 +31,7 @@
 #include <geode/basic/algorithm.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -51,9 +53,30 @@ namespace geode
             [[nodiscard]] bool is_opposite(
                 index_t facet_id, const VertexContainer& vertices ) const
             {
-                const OrientedVertexCycle other_oriented_cycle{ vertices };
-                const OrientedVertexCycle oriented_cycle{ vertices_[facet_id] };
-                return oriented_cycle.is_opposite( other_oriented_cycle );
+                // Same result as comparing OrientedVertexCycles, without
+                // copying the containers: stored facet vertices are in
+                // canonical form, i.e. they start with their minimum vertex
+                const auto& facet_vertices = vertices_[facet_id];
+                const auto nb_vertices = facet_vertices.size();
+                if( vertices.size() != nb_vertices || nb_vertices == 0 )
+                {
+                    return false;
+                }
+                const auto start = static_cast< size_t >(
+                    absl::c_min_element( vertices ) - vertices.begin() );
+                if( facet_vertices[0] != vertices[start] )
+                {
+                    return false;
+                }
+                for( const auto v : Range{ 1, nb_vertices } )
+                {
+                    if( facet_vertices[v]
+                        != vertices[( start + nb_vertices - v ) % nb_vertices] )
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
 
         protected:
@@ -64,6 +87,17 @@ namespace geode
             [[nodiscard]] AttributeManager& facet_attribute_manager() const
             {
                 return facet_attribute_manager_;
+            }
+
+            /*!
+             * Reserve memory for the given total number of facets
+             */
+            void reserve( index_t capacity )
+            {
+                facet_indices_.reserve( capacity );
+                counters_.reserve( capacity );
+                vertices_.reserve( capacity );
+                facet_attribute_manager_.reserve( capacity );
             }
 
             [[nodiscard]] std::optional< index_t > find_facet(
@@ -79,7 +113,7 @@ namespace geode
 
             index_t add_facet( TypedVertexCycle vertices )
             {
-                const auto id = facet_indices_.size();
+                const auto id = static_cast< index_t >( counters_.size() );
                 const auto output =
                     facet_indices_.try_emplace( std::move( vertices ), id );
                 const auto it = std::get< 0 >( output );
@@ -123,20 +157,24 @@ namespace geode
             std::vector< index_t > delete_facets(
                 const std::vector< bool >& to_delete )
             {
-                const auto old2new = mapping_after_deletion( to_delete );
-                std::vector< TypedVertexCycle > key_to_erase;
-                key_to_erase.reserve( old2new.size() );
-                for( auto& cycle : facet_indices_ )
+                if( absl::c_find( to_delete, true ) == to_delete.end() )
                 {
-                    if( old2new[cycle.second] == NO_ID )
-                    {
-                        key_to_erase.emplace_back( cycle.first );
-                    }
-                    cycle.second = old2new[cycle.second];
+                    return identity_mapping();
                 }
-                for( const auto& key : key_to_erase )
+                const auto old2new = mapping_after_deletion( to_delete );
+                for( auto it = facet_indices_.begin();
+                    it != facet_indices_.end(); )
                 {
-                    facet_indices_.erase( key );
+                    const auto new_id = old2new[it->second];
+                    if( new_id == NO_ID )
+                    {
+                        facet_indices_.erase( it++ );
+                    }
+                    else
+                    {
+                        it->second = new_id;
+                        ++it;
+                    }
                 }
                 delete_elements( to_delete );
                 return old2new;
@@ -158,41 +196,66 @@ namespace geode
                 return mapping;
             }
 
+            /*!
+             * Update facet vertices with the given vertex mapping.
+             * Facets using a vertex mapped to NO_ID are deleted.
+             * Facets becoming identical are merged into the one with the
+             * smallest index: their counters are summed up and the other
+             * facets are deleted. In the returned mapping, a merged facet is
+             * mapped to the new index of the facet it was merged into.
+             */
             std::vector< index_t > update_facet_vertices(
                 absl::Span< const index_t > old2new )
             {
-                const auto old_facet_indices = facet_indices_;
-                facet_indices_.clear();
+                const auto old_facet_indices = std::move( facet_indices_ );
+                facet_indices_ = {};
                 facet_indices_.reserve( old_facet_indices.size() );
-                std::vector< bool > to_delete(
-                    old_facet_indices.size(), false );
-                for( const auto& cycle : old_facet_indices )
+                std::vector< bool > to_delete( counters_.size(), false );
+                std::vector< std::pair< index_t, index_t > > merged_facets;
+                for( const auto& [cycle, facet_id] : old_facet_indices )
                 {
-                    auto updated_vertices = cycle.first.vertices();
+                    auto updated_vertices = cycle.vertices();
+                    bool removed{ false };
                     for( auto& v : updated_vertices )
                     {
                         v = old2new[v];
                         if( v == NO_ID )
                         {
-                            to_delete[cycle.second] = true;
+                            removed = true;
                             break;
                         }
                     }
-                    if( !to_delete[cycle.second] )
+                    if( removed )
                     {
-                        const auto it =
-                            std::get< 0 >( facet_indices_.try_emplace(
-                                TypedVertexCycle{
-                                    std::move( updated_vertices ) },
-                                cycle.second ) );
-                        vertices_[cycle.second] = it->first.vertices();
+                        to_delete[facet_id] = true;
+                        continue;
                     }
+                    const auto [it, inserted] = facet_indices_.try_emplace(
+                        TypedVertexCycle{ std::move( updated_vertices ) },
+                        facet_id );
+                    if( !inserted )
+                    {
+                        const auto kept = std::min( it->second, facet_id );
+                        const auto merged = std::max( it->second, facet_id );
+                        counters_[kept] += counters_[merged];
+                        to_delete[merged] = true;
+                        merged_facets.emplace_back( merged, kept );
+                        it->second = kept;
+                    }
+                    vertices_[it->second] = it->first.vertices();
                 }
                 delete_elements( to_delete );
-                const auto cycle_old2new = mapping_after_deletion( to_delete );
+                auto cycle_old2new = mapping_after_deletion( to_delete );
                 for( auto& cycle : facet_indices_ )
                 {
                     cycle.second = cycle_old2new[cycle.second];
+                }
+                // Reverse order: a kept facet may be merged later on
+                for( auto merged_it = merged_facets.rbegin();
+                    merged_it != merged_facets.rend(); ++merged_it )
+                {
+                    cycle_old2new[merged_it->first] =
+                        cycle_old2new[merged_it->second];
                 }
                 return cycle_old2new;
             }
@@ -218,6 +281,13 @@ namespace geode
             }
 
         private:
+            [[nodiscard]] std::vector< index_t > identity_mapping() const
+            {
+                std::vector< index_t > old2new( counters_.size() );
+                absl::c_iota( old2new, 0 );
+                return old2new;
+            }
+
             void delete_elements( const std::vector< bool >& to_delete )
             {
                 facet_attribute_manager_.delete_elements( to_delete );
@@ -249,11 +319,83 @@ namespace geode
 
             void initialize_vertices()
             {
+                std::vector< bool > is_indexed( counters_.size(), false );
+                std::vector< index_t* > misindexed_facets;
+                for( auto& [cycle, facet_id] : facet_indices_ )
+                {
+                    if( facet_id < counters_.size() && !is_indexed[facet_id] )
+                    {
+                        is_indexed[facet_id] = true;
+                    }
+                    else
+                    {
+                        misindexed_facets.push_back( &facet_id );
+                    }
+                }
+                if( !misindexed_facets.empty()
+                    || absl::c_find( is_indexed, false ) != is_indexed.end() )
+                {
+                    repair_facet_indices( is_indexed, misindexed_facets );
+                }
                 vertices_.resize( counters_.size() );
                 for( const auto& [cycle, facet_id] : facet_indices_ )
                 {
                     vertices_[facet_id] = cycle.vertices();
                 }
+            }
+
+            /*!
+             * Repair storages written by versions merging facets in
+             * update_facet_vertices without updating ids: facets sharing an
+             * id or with an invalid id get a new id, counters without facet
+             * are deleted. Counters that cannot be attributed to a facet are
+             * added to every facet, so that no facet in use becomes isolated.
+             */
+            void repair_facet_indices( const std::vector< bool >& is_indexed,
+                absl::Span< index_t* const > misindexed_facets )
+            {
+                const auto nb_counters = counters_.size();
+                index_t nb_unindexed{ 0 };
+                index_t unattributed_counter{ 0 };
+                for( const auto f : Range{ nb_counters } )
+                {
+                    if( !is_indexed[f] )
+                    {
+                        nb_unindexed++;
+                        unattributed_counter += counters_[f];
+                    }
+                }
+                for( auto* facet_id : misindexed_facets )
+                {
+                    const auto shared_counter =
+                        *facet_id < nb_counters ? counters_[*facet_id] : 0;
+                    *facet_id = static_cast< index_t >( counters_.size() );
+                    counters_.push_back( std::max( 1u, shared_counter ) );
+                }
+                for( auto& counter : counters_ )
+                {
+                    counter += unattributed_counter;
+                }
+                std::vector< bool > to_delete( counters_.size(), false );
+                for( const auto f : Range{ nb_counters } )
+                {
+                    to_delete[f] = !is_indexed[f];
+                }
+                const auto old2new = mapping_after_deletion( to_delete );
+                for( auto& [cycle, facet_id] : facet_indices_ )
+                {
+                    facet_id = old2new[facet_id];
+                }
+                facet_attribute_manager_.resize( counters_.size() );
+                facet_attribute_manager_.delete_elements( to_delete );
+                delete_vector_elements( to_delete, counters_ );
+                Logger::warning( "[FacetStorage] Inconsistent facet storage "
+                                 "repaired: ",
+                    misindexed_facets.size(), " facet(s) re-indexed, ",
+                    nb_unindexed,
+                    " unindexed counter(s) removed. Attributes on these "
+                    "facets may be wrong, disable and enable facets to "
+                    "recompute them exactly." );
             }
 
             template < typename Archive >
