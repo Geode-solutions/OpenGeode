@@ -42,7 +42,7 @@ namespace geode
         const RGBColor& color( index_t index ) const
         {
             OpenGeodeImageException::check_assertion( index < colors_.size(),
-                "[RasterImage::set_color] Accessing a "
+                "[RasterImage::color] Accessing a "
                 "cell that does not exist" );
             return colors_[index];
         }
@@ -122,6 +122,12 @@ namespace geode
     index_t RasterImage< dimension >::cell_index(
         const CellIndices& index ) const
     {
+        for( const auto d : LRange{ dimension } )
+        {
+            OpenGeodeImageException::check_assertion(
+                index[d] < this->nb_cells_in_direction( d ),
+                "[RasterImage::cell_index] Invalid index in direction ", d );
+        }
         return impl_->cell_index( *this, index );
     }
 

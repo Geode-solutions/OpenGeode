@@ -45,6 +45,21 @@ def test_raster(raster):
             raise ValueError("[Test] Wrong color for ", i)
 
 
+def expect_error(name, function, *args):
+    try:
+        function(*args)
+    except Exception:
+        return
+    raise ValueError("[Test] Out of bounds " + name + " should raise")
+
+
+def test_out_of_bounds(raster):
+    expect_error("color", raster.color, raster.nb_cells())
+    expect_error("set_color", raster.set_color, raster.nb_cells(), image.RGBColor())
+    expect_error("cell_index", raster.cell_index, [10, 0])
+    expect_error("cell_indices", raster.cell_indices, raster.nb_cells())
+
+
 if __name__ == "__main__":
     image.OpenGeodeImageLibrary.initialize()
     raster = image.RasterImage2D([10, 10])
@@ -56,3 +71,4 @@ if __name__ == "__main__":
     image.save_raster_image2D(raster, "test.og_img2d")
     reload = image.load_raster_image2D("test.og_img2d")
     test_raster(reload)
+    test_out_of_bounds(raster)
