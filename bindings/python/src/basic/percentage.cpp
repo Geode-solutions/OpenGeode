@@ -32,6 +32,8 @@ namespace geode
         pybind11::class_< Percentage >( module, "Percentage" )
             .def( pybind11::init< double >() )
             .def( "string", &Percentage::string )
+            .def( "__str__", &Percentage::string )
+            .def( "__repr__", &Percentage::string )
             .def( "value", &Percentage::value )
             .def( "set_value", &Percentage::set_value );
     }

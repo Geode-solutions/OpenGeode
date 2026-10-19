@@ -44,3 +44,5 @@ if __name__ == '__main__':
         raise ValueError("[Test] uuid should be usable as dict key")
     if not ((id < other) != (other < id)):
         raise ValueError("[Test] uuids should be ordered")
+    if str(id) != id.string() or repr(id) != id.string():
+        raise ValueError("[Test] str/repr of uuid should return its string")
