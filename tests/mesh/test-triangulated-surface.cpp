@@ -23,6 +23,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/point.hpp>
@@ -470,6 +471,217 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_triangulated_surface< 3 >( filename ) );
 }
 
+void test_set_polygon_vertex_keeps_old_vertex_link()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 5 );
+    builder->create_triangle( { 0, 2, 3 } );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->compute_polygon_adjacencies();
+    builder->set_polygon_vertex( { 1, 0 }, 4 );
+    const auto around_0 = surface->polygon_around_vertex( 0 );
+    geode::OpenGeodeMeshException::test(
+        around_0 && surface->polygon_vertex( around_0.value() ) == 0,
+        "[set_polygon_vertex] Old vertex should be linked to a polygon "
+        "still using it" );
+    const auto around_4 = surface->polygon_around_vertex( 4 );
+    geode::OpenGeodeMeshException::test(
+        around_4 && surface->polygon_vertex( around_4.value() ) == 4,
+        "[set_polygon_vertex] New vertex should be linked to the modified "
+        "polygon" );
+}
+
+void test_create_polygon_invalid_size()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    bool has_thrown{ false };
+    try
+    {
+        builder->create_polygon( { 0, 1, 2, 3 } );
+    }
+    catch( const geode::OpenGeodeException& /*unused*/ )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeMeshException::test( has_thrown,
+        "[create_polygon] Creating a quad in a TriangulatedSurface should "
+        "throw" );
+    geode::OpenGeodeMeshException::test( surface->nb_polygons() == 0,
+        "[create_polygon] Failed creation should not add a polygon" );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 0 ),
+        "[create_polygon] Failed creation should not link vertices" );
+}
+
+void test_large_fan_around_vertex()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    constexpr geode::index_t NB_TRIANGLES{ 1500 };
+    builder->create_vertices( NB_TRIANGLES + 2 );
+    for( const auto t : geode::Range{ NB_TRIANGLES } )
+    {
+        builder->create_triangle( { 0, t + 1, t + 2 } );
+    }
+    builder->compute_polygon_adjacencies();
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 0 ).size() == NB_TRIANGLES,
+        "[polygons_around_vertex] Wrong number of polygons in a large fan" );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_on_border( 0 ),
+        "[polygons_around_vertex] Fan center should be on border" );
+}
+
+void test_polygons_around_vertex_after_adjacencies()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 3, 2 } );
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 1 ).size() == 1,
+        "[polygons_around_vertex] Wrong number of polygons before "
+        "adjacencies" );
+    builder->compute_polygon_adjacencies();
+    geode::OpenGeodeMeshException::test(
+        surface->polygons_around_vertex( 1 ).size() == 2,
+        "[polygons_around_vertex] Wrong number of polygons after "
+        "adjacencies" );
+}
+
+void test_next_on_border_with_flipped_orientation()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 2, 3 } );
+    builder->compute_polygon_adjacencies();
+    geode::OpenGeodeMeshException::test(
+        surface->next_on_border( { 0, 0 } ) == geode::PolygonEdge{ 1, 2 },
+        "[next_on_border] Wrong next border edge with flipped orientation" );
+    geode::OpenGeodeMeshException::test(
+        surface->previous_on_border( { 0, 2 } ) == geode::PolygonEdge{ 1, 1 },
+        "[previous_on_border] Wrong previous border edge with flipped "
+        "orientation" );
+}
+
+void test_incremental_adjacencies_with_edges()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    surface->enable_edges();
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 5 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 0, 3 } );
+    builder->create_triangle( { 0, 1, 4 } );
+    const std::array< geode::index_t, 2 > first{ 0, 1 };
+    builder->compute_polygon_adjacencies( first );
+    const std::array< geode::index_t, 2 > second{ 1, 2 };
+    builder->compute_polygon_adjacencies( second );
+    // Same result as a full computation: the non-manifold edge 0-1 is
+    // unconnected for the three triangles
+    for( const auto t : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            !surface->polygon_adjacent( { t, 0 } ),
+            "[compute_polygon_adjacencies] Non-manifold edge should be "
+            "unconnected for polygon ",
+            t );
+    }
+}
+
+void test_delete_polygon_at_pinched_vertex()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 5 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 0, 3, 4 } );
+    builder->compute_polygon_adjacencies();
+    builder->delete_polygons( { false, true } );
+    geode::OpenGeodeMeshException::test( !surface->is_vertex_isolated( 0 ),
+        "[delete_polygons] Pinched vertex should not be isolated" );
+    geode::OpenGeodeMeshException::test(
+        surface->polygon_vertex( surface->polygon_around_vertex( 0 ).value() )
+            == 0,
+        "[delete_polygons] Pinched vertex wrongly linked" );
+    builder->delete_isolated_vertices();
+    geode::OpenGeodeMeshException::test( surface->nb_vertices() == 3,
+        "[delete_polygons] Wrong number of vertices after deleting isolated "
+        "vertices" );
+}
+
+void test_permute_vertices_with_isolated_vertex()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 1, 2, 3 } );
+    builder->compute_polygon_adjacencies();
+    builder->permute_vertices( { 2, 0, 1, 3 } );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 1 ),
+        "[permute_vertices] New vertex 1 should be isolated" );
+    for( const geode::index_t v : { 0, 2, 3 } )
+    {
+        const auto around = surface->polygon_around_vertex( v );
+        geode::OpenGeodeMeshException::test(
+            around && surface->polygon_vertex( around.value() ) == v,
+            "[permute_vertices] Wrong link for vertex ", v );
+    }
+}
+
+void test_replace_vertices_chained_mapping()
+{
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 7 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 3, 4, 5 } );
+    geode::GenericMapping< geode::index_t > mapping;
+    mapping.map( 0, 3 );
+    mapping.map( 3, 6 );
+    builder->replace_vertices( mapping );
+    geode::OpenGeodeMeshException::test( surface->is_vertex_isolated( 0 ),
+        "[replace_vertices] Vertex 0 should be isolated" );
+    for( const geode::index_t v : { 3, 6 } )
+    {
+        const auto around = surface->polygon_around_vertex( v );
+        geode::OpenGeodeMeshException::test(
+            around && surface->polygon_vertex( around.value() ) == v,
+            "[replace_vertices] Wrong link for vertex ", v );
+    }
+}
+
+void test_polygon_vertex_edge_hash()
+{
+    const std::hash< geode::PolygonVertex > vertex_hash;
+    geode::OpenGeodeMeshException::test(
+        vertex_hash( { 1, 2 } ) != vertex_hash( { 2, 1 } ),
+        "[hash] Symmetric PolygonVertex should not collide" );
+    geode::OpenGeodeMeshException::test(
+        vertex_hash( { 1, 1 } ) != vertex_hash( { 2, 2 } ),
+        "[hash] Diagonal PolygonVertex should not collide" );
+    const std::hash< geode::PolygonEdge > edge_hash;
+    geode::OpenGeodeMeshException::test(
+        edge_hash( { 1, 2 } ) != edge_hash( { 2, 1 } ),
+        "[hash] Symmetric PolygonEdge should not collide" );
+    geode::OpenGeodeMeshException::test(
+        edge_hash( { 1, 1 } ) != edge_hash( { 2, 2 } ),
+        "[hash] Diagonal PolygonEdge should not collide" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -487,6 +699,16 @@ void test()
     test_permutation( *surface, *builder );
     test_delete_polygon( *surface, *builder );
     test_clone( *surface );
+    test_set_polygon_vertex_keeps_old_vertex_link();
+    test_create_polygon_invalid_size();
+    test_large_fan_around_vertex();
+    test_polygons_around_vertex_after_adjacencies();
+    test_next_on_border_with_flipped_orientation();
+    test_incremental_adjacencies_with_edges();
+    test_delete_polygon_at_pinched_vertex();
+    test_permute_vertices_with_isolated_vertex();
+    test_replace_vertices_chained_mapping();
+    test_polygon_vertex_edge_hash();
     test_reserve_with_edges();
 }
 
