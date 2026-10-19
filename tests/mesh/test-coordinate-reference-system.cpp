@@ -52,8 +52,7 @@ void test_names_stability()
             std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
                 att_manager, name ) );
     }
-    geode::OpenGeodeMeshException::test(
-        names.size() == 1 && names[0] == "a",
+    geode::OpenGeodeMeshException::test( names.size() == 1 && names[0] == "a",
         "[Test] CRS names should stay valid after other insertions" );
     geode::OpenGeodeMeshException::test(
         crs_manager.coordinate_reference_system_names().size() == 101,

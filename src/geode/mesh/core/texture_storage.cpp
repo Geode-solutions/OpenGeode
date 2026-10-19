@@ -98,25 +98,24 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                        archive.ext( impl.textures_,
-                            bitsery::ext::StdMap{ impl.textures_.max_size() },
-                            []( Archive& archive2, std::string& name,
-                                std::unique_ptr< Texture< dimension > >&
-                                    texture ) {
-                                archive2.text1b( name, name.max_size() );
-                                if( !texture )
-                                {
-                                    texture =
-                                        std::make_unique< Texture< dimension > >(
-                                            bitsery::Access::create<
-                                                Texture< dimension > >() );
-                                }
-                                archive2.object( *texture );
-                            } );
-                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    archive.ext( impl.textures_,
+                        bitsery::ext::StdMap{ impl.textures_.max_size() },
+                        []( Archive& archive2, std::string& name,
+                            std::unique_ptr< Texture< dimension > >& texture ) {
+                            archive2.text1b( name, name.max_size() );
+                            if( !texture )
+                            {
+                                texture =
+                                    std::make_unique< Texture< dimension > >(
+                                        bitsery::Access::create<
+                                            Texture< dimension > >() );
+                            }
+                            archive2.object( *texture );
+                        } );
+                } } } );
         }
 
     private:
@@ -161,9 +160,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< std::string >
-        TextureStorage< dimension >::texture_names(
-            TextureManagerKey /*key*/ ) const
+    absl::FixedArray< std::string > TextureStorage< dimension >::texture_names(
+        TextureManagerKey /*key*/ ) const
     {
         return impl_->texture_names();
     }

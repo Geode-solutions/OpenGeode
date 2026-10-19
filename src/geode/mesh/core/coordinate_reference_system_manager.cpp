@@ -71,7 +71,8 @@ namespace geode
             return active_crs_name_;
         }
 
-        absl::FixedArray< std::string > coordinate_reference_system_names() const
+        absl::FixedArray< std::string >
+            coordinate_reference_system_names() const
         {
             absl::FixedArray< std::string > names( crss_.size() );
             index_t count{ 0 };

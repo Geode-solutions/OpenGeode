@@ -137,8 +137,7 @@ void test_texture_reference_stability()
         "[Test] Texture reference should stay valid after other insertions" );
     geode::OpenGeodeMeshException::test( texture.texture_id() == texture_id,
         "[Test] Texture reference should still refer to the same texture" );
-    geode::OpenGeodeMeshException::test(
-        names.size() == 1 && names[0] == "a",
+    geode::OpenGeodeMeshException::test( names.size() == 1 && names[0] == "a",
         "[Test] Texture names should stay valid after other insertions" );
     geode::OpenGeodeMeshException::test( manager.texture_names().size() == 101,
         "[Test] Wrong number of texture names" );
