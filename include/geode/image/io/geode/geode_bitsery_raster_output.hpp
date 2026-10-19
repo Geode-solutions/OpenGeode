@@ -65,5 +65,5 @@ namespace geode
             return { to_string( this->filename() ) };
         }
     };
-    ALIAS_2D_AND_3D( OpenGeodeRasterImageOutput );
+    ALIAS_1D_AND_2D_AND_3D( OpenGeodeRasterImageOutput );
 } // namespace geode

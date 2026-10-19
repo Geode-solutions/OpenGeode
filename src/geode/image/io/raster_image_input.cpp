@@ -75,21 +75,29 @@ namespace geode
         return input->object_priority();
     }
 
+    template RasterImage< 1 > opengeode_image_api load_raster_image(
+        std::string_view );
     template RasterImage< 2 > opengeode_image_api load_raster_image(
         std::string_view );
     template RasterImage< 3 > opengeode_image_api load_raster_image(
         std::string_view );
 
     template AdditionalFiles opengeode_image_api
+        raster_image_additional_files< 1 >( std::string_view );
+    template AdditionalFiles opengeode_image_api
         raster_image_additional_files< 2 >( std::string_view );
     template AdditionalFiles opengeode_image_api
         raster_image_additional_files< 3 >( std::string_view );
 
+    template Percentage opengeode_image_api is_raster_image_loadable< 1 >(
+        std::string_view );
     template Percentage opengeode_image_api is_raster_image_loadable< 2 >(
         std::string_view );
     template Percentage opengeode_image_api is_raster_image_loadable< 3 >(
         std::string_view );
 
+    template index_t opengeode_image_api raster_image_object_priority< 1 >(
+        std::string_view );
     template index_t opengeode_image_api raster_image_object_priority< 2 >(
         std::string_view );
     template index_t opengeode_image_api raster_image_object_priority< 3 >(

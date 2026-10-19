@@ -63,6 +63,7 @@ namespace geode
 {
     void define_raster_image_io( pybind11::module& module )
     {
+        PYTHON_RASTER_IMAGE_IO( 1 );
         PYTHON_RASTER_IMAGE_IO( 2 );
         PYTHON_RASTER_IMAGE_IO( 3 );
     }

@@ -135,6 +135,41 @@ void test_extra_colors()
         "[TEST] Loading more colors than cells should throw" );
 }
 
+template < geode::index_t dimension >
+void test_io( std::array< geode::index_t, dimension > cells_number )
+{
+    geode::RasterImage< dimension > raster{ std::move( cells_number ) };
+    for( const auto i : geode::Range{ raster.nb_cells() } )
+    {
+        raster.set_color(
+            i, { static_cast< geode::local_index_t >( i ),
+                   static_cast< geode::local_index_t >( 2 * i ),
+                   static_cast< geode::local_index_t >( 3 * i ) } );
+    }
+    const auto filename = absl::StrCat( "test.", raster.native_extension() );
+    geode::save_raster_image( raster, filename );
+    const auto reload = geode::load_raster_image< dimension >( filename );
+    geode::OpenGeodeImageException::test(
+        reload.nb_cells() == raster.nb_cells(),
+        "[TEST] Wrong number of cells "
+        "after reload in ",
+        dimension, "D" );
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        geode::OpenGeodeImageException::test(
+            reload.nb_cells_in_direction( d )
+                == raster.nb_cells_in_direction( d ),
+            "[TEST] Wrong number of cells in direction ", d, " in ", dimension,
+            "D" );
+    }
+    for( const auto i : geode::Range{ raster.nb_cells() } )
+    {
+        geode::OpenGeodeImageException::test(
+            reload.color( i ) == raster.color( i ),
+            "[TEST] Wrong reloaded color for ", i, " in ", dimension, "D" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeImageLibrary::initialize();
@@ -150,6 +185,8 @@ void test()
     const auto reload = geode::load_raster_image< 2 >( filename_with_spaces );
     test_raster( reload );
     test_save_failure( raster );
+    test_io< 1 >( { 7 } );
+    test_io< 3 >( { 2, 3, 4 } );
     test_missing_colors();
     test_too_many_cells();
     test_extra_colors();

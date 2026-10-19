@@ -79,5 +79,5 @@ namespace geode
             return Percentage{ 1 };
         }
     };
-    ALIAS_2D_AND_3D( OpenGeodeRasterImageInput );
+    ALIAS_1D_AND_2D_AND_3D( OpenGeodeRasterImageInput );
 } // namespace geode
