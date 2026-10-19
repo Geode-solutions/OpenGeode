@@ -21,8 +21,12 @@
  *
  */
 
+#include <atomic>
+#include <thread>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/mapping.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
@@ -596,6 +600,280 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_tetrahedral_solid< 3 >( filename ) );
 }
 
+std::unique_ptr< geode::TetrahedralSolid3D > create_solid_with_points(
+    geode::index_t nb_points )
+{
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    for( const auto p : geode::Range{ nb_points } )
+    {
+        builder->create_point( geode::Point3D{ { static_cast< double >( p % 3 ),
+            static_cast< double >( p % 5 ), static_cast< double >( p ) } } );
+    }
+    return solid;
+}
+
+void check_vertex_link(
+    const geode::TetrahedralSolid3D& solid, geode::index_t vertex )
+{
+    const auto polyhedron_vertex = solid.polyhedron_around_vertex( vertex );
+    geode::OpenGeodeMeshException::test( polyhedron_vertex.has_value(),
+        "Vertex ", vertex, " should not be isolated" );
+    geode::OpenGeodeMeshException::test(
+        solid.polyhedron_vertex( polyhedron_vertex.value() ) == vertex,
+        "Vertex ", vertex, " is linked to a wrong polyhedron vertex" );
+}
+
+void test_set_polyhedron_vertex_relink()
+{
+    auto solid = create_solid_with_points( 6 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 1, 2, 3, 4 } );
+    builder->compute_polyhedron_adjacencies();
+    const auto around = solid->polyhedron_around_vertex( 1 );
+    geode::OpenGeodeMeshException::test(
+        around.has_value() && around->polyhedron_id == 1,
+        "Vertex 1 should be linked to tetrahedron 1" );
+    builder->set_polyhedron_vertex( around.value(), 5 );
+    check_vertex_link( *solid, 1 );
+    check_vertex_link( *solid, 5 );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedron_around_vertex( 1 )->polyhedron_id == 0,
+        "Vertex 1 should now be linked to tetrahedron 0" );
+}
+
+void test_non_manifold_facet_adjacencies()
+{
+    auto solid = create_solid_with_points( 6 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 1, 2, 4 } );
+    builder->create_tetrahedron( { 0, 1, 2, 5 } );
+    builder->compute_polyhedron_adjacencies();
+    for( const auto t : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            solid->polyhedron_facets_on_border( t ).size() == 4, "Tetrahedron ",
+            t,
+            " should have all its facets on border: facet (0,1,2) is "
+            "shared by 3 tetrahedra" );
+    }
+}
+
+void test_delete_polyhedron_at_pinched_vertex()
+{
+    auto solid = create_solid_with_points( 7 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 4, 5, 6 } );
+    builder->compute_polyhedron_adjacencies();
+    std::vector< bool > to_delete{ false, true };
+    builder->delete_polyhedra( to_delete );
+    geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 1,
+        "Solid should have 1 tetrahedron after deletion" );
+    check_vertex_link( *solid, 0 );
+    for( const auto v : geode::Range{ 4, 7 } )
+    {
+        geode::OpenGeodeMeshException::test( solid->is_vertex_isolated( v ),
+            "Vertex ", v, " should be isolated after deletion" );
+    }
+}
+
+void test_permute_vertices_with_isolated_vertex()
+{
+    std::vector< geode::index_t > permutation{ 0, 1, 2, 3, 4 };
+    do
+    {
+        auto solid = create_solid_with_points( 5 );
+        auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+        builder->create_tetrahedron( { 1, 2, 3, 4 } );
+        const auto old2new = builder->permute_vertices( permutation );
+        for( const auto old_v : geode::Range{ 5 } )
+        {
+            const auto new_v = old2new[old_v];
+            if( old_v == 0 )
+            {
+                geode::OpenGeodeMeshException::test(
+                    solid->is_vertex_isolated( new_v ),
+                    "Isolated vertex should stay isolated after "
+                    "permutation" );
+            }
+            else
+            {
+                check_vertex_link( *solid, new_v );
+            }
+        }
+    } while( absl::c_next_permutation( permutation ) );
+}
+
+void test_replace_vertices_chained()
+{
+    auto solid = create_solid_with_points( 9 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 3, 4, 5 } );
+    builder->create_tetrahedron( { 1, 6, 7, 8 } );
+    geode::GenericMapping< geode::index_t > mapping;
+    mapping.map( 0, 1 );
+    mapping.map( 1, 2 );
+    builder->replace_vertices( mapping );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedron_vertex( { 0, 0 } ) == 1
+            && solid->polyhedron_vertex( { 1, 0 } ) == 2,
+        "Wrong polyhedron vertices after replace_vertices" );
+    geode::OpenGeodeMeshException::test( solid->is_vertex_isolated( 0 ),
+        "Vertex 0 should be isolated after replace_vertices" );
+    check_vertex_link( *solid, 1 );
+    check_vertex_link( *solid, 2 );
+}
+
+void test_create_invalid_polyhedron()
+{
+    auto solid = create_solid_with_points( 5 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    const auto check_invalid = [&solid, &builder](
+                                   absl::Span< const geode::index_t > vertices,
+                                   const std::string& message ) {
+        bool thrown{ false };
+        try
+        {
+            builder->create_polyhedron( vertices, {} );
+        }
+        catch( const geode::OpenGeodeException& )
+        {
+            thrown = true;
+        }
+        geode::OpenGeodeMeshException::test(
+            thrown, "Creating ", message, " should throw" );
+        geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 1,
+            "Creating ", message, " should not add a polyhedron" );
+        geode::OpenGeodeMeshException::test(
+            solid->polyhedron_around_vertex( 0 )->polyhedron_id == 0,
+            "Creating ", message, " should not change vertex links" );
+    };
+    check_invalid( std::vector< geode::index_t >{ 0, 1, 4 }, "3 vertices" );
+    check_invalid(
+        std::vector< geode::index_t >{ 0, 1, 2, 4, 3 }, "5 vertices" );
+    check_invalid( std::vector< geode::index_t >{ 0, 1, 2, 42 },
+        "an invalid vertex index" );
+}
+
+void test_degenerated_tetrahedron_with_repeated_vertex()
+{
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_point( geode::Point3D{ { 0, 0, 10 } } );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    builder->create_tetrahedron( { 1, 2, 3, 1 } );
+    builder->create_tetrahedron( { 1, 2, 3, 0 } );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedron_minimum_height( 0 ) == 0.,
+        "Tetrahedron with repeated vertex should have a null height" );
+    geode::OpenGeodeMeshException::test( solid->is_polyhedron_degenerated( 0 ),
+        "Tetrahedron with repeated vertex should be degenerated" );
+    geode::OpenGeodeMeshException::test(
+        std::fabs(
+            solid->polyhedron_minimum_height( 1 ) - 1. / std::sqrt( 2.01 ) )
+            < geode::GLOBAL_EPSILON,
+        "Wrong minimum height of tetrahedron 1" );
+    geode::OpenGeodeMeshException::test( !solid->is_polyhedron_degenerated( 1 ),
+        "Tetrahedron 1 should not be degenerated" );
+}
+
+void test_polyhedra_around_non_manifold_vertex()
+{
+    auto solid = create_solid_with_points( 7 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 0, 4, 5, 6 } );
+    builder->compute_polyhedron_adjacencies();
+    const auto& canonical = solid->polyhedra_around_vertex( 0 );
+    const geode::PolyhedraAroundVertex canonical_answer{ { 1, 0 } };
+    geode::OpenGeodeMeshException::test(
+        canonical == canonical_answer, "Wrong polyhedra around vertex 0" );
+    const auto& other = solid->polyhedra_around_vertex( { 0, 0 } );
+    const geode::PolyhedraAroundVertex other_answer{ { 0, 0 } };
+    geode::OpenGeodeMeshException::test(
+        other == other_answer, "Wrong polyhedra around vertex 0 from tet 0" );
+    geode::OpenGeodeMeshException::test( canonical == canonical_answer,
+        "Previously returned polyhedra around vertex 0 should not change" );
+    geode::OpenGeodeMeshException::test(
+        solid->polyhedra_around_vertex( 0 ) == canonical_answer,
+        "Wrong polyhedra around vertex 0 (second query)" );
+    geode::OpenGeodeMeshException::test( other == other_answer,
+        "Previously returned polyhedra around vertex 0 from tet 0 should "
+        "not change" );
+}
+
+void test_concurrent_polyhedra_around_vertex()
+{
+    constexpr geode::index_t nb_tetrahedra{ 1000 };
+    auto solid = create_solid_with_points( nb_tetrahedra + 3 );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    for( const auto t : geode::Range{ nb_tetrahedra } )
+    {
+        builder->create_tetrahedron( { t, t + 1, t + 2, t + 3 } );
+    }
+    builder->compute_polyhedron_adjacencies();
+    std::vector< std::thread > threads;
+    std::atomic< bool > success{ true };
+    for( const auto thread_id : geode::Range{ 4 } )
+    {
+        threads.emplace_back( [&solid, &success, thread_id] {
+            for( const auto v : geode::Range{ solid->nb_vertices() } )
+            {
+                const auto vertex =
+                    thread_id % 2 == 0 ? v : solid->nb_vertices() - 1 - v;
+                const auto expected = std::min< geode::index_t >(
+                    { vertex + 1, 4, solid->nb_vertices() - vertex } );
+                if( solid->polyhedra_around_vertex( vertex ).size()
+                    != expected )
+                {
+                    success = false;
+                }
+            }
+        } );
+    }
+    for( auto& thread : threads )
+    {
+        thread.join();
+    }
+    geode::OpenGeodeMeshException::test( success.load(),
+        "Wrong concurrent polyhedra around vertex computation" );
+}
+
+void test_std_hash()
+{
+    const std::hash< geode::PolyhedronVertex > vertex_hash;
+    geode::OpenGeodeMeshException::test(
+        vertex_hash( { 1, 1 } ) != vertex_hash( { 2, 2 } ),
+        "std::hash of PolyhedronVertex should not collide when ids are "
+        "equal" );
+    const std::hash< geode::PolyhedronFacet > facet_hash;
+    geode::OpenGeodeMeshException::test(
+        facet_hash( { 1, 1 } ) != facet_hash( { 2, 2 } ),
+        "std::hash of PolyhedronFacet should not collide when ids are "
+        "equal" );
+    geode::OpenGeodeMeshException::test(
+        facet_hash( { 1, 2 } ) != facet_hash( { 2, 1 } ),
+        "std::hash of PolyhedronFacet should not be symmetric" );
+    const std::hash< geode::PolyhedronFacetVertex > facet_vertex_hash;
+    geode::OpenGeodeMeshException::test(
+        facet_vertex_hash( { { 3, 1 }, 2 } )
+            != facet_vertex_hash( { { 3, 2 }, 1 } ),
+        "std::hash of PolyhedronFacetVertex should not collide" );
+    const std::hash< geode::PolyhedronFacetEdge > facet_edge_hash;
+    geode::OpenGeodeMeshException::test(
+        facet_edge_hash( { { 3, 1 }, 2 } )
+            != facet_edge_hash( { { 3, 2 }, 1 } ),
+        "std::hash of PolyhedronFacetEdge should not collide" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -618,6 +896,16 @@ void test()
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );
     test_delete_all( *solid, *builder );
+    test_set_polyhedron_vertex_relink();
+    test_non_manifold_facet_adjacencies();
+    test_delete_polyhedron_at_pinched_vertex();
+    test_permute_vertices_with_isolated_vertex();
+    test_replace_vertices_chained();
+    test_create_invalid_polyhedron();
+    test_degenerated_tetrahedron_with_repeated_vertex();
+    test_polyhedra_around_non_manifold_vertex();
+    test_concurrent_polyhedra_around_vertex();
+    test_std_hash();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )
