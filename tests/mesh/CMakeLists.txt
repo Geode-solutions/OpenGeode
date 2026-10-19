@@ -40,6 +40,20 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-component-identifier.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-mesh-intersection-detection.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-convert-surface.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -118,6 +132,21 @@ add_geode_test(
     SOURCE "test-light-regular-grid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-mesh-corrupted-files.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-mesh-truncated-files.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::image
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(

@@ -100,42 +100,13 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_polyhedron_around_vertices_from_vertices(
-        const geode::SolidMesh< dimension >& solid,
-        geode::SolidMeshBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > vertices_old2new )
-    {
-        for( const auto v : geode::Range{ solid.nb_vertices() } )
-        {
-            if( vertices_old2new[v] != geode::NO_ID )
-            {
-                const auto new_polyhedron_around =
-                    solid.polyhedron_around_vertex( vertices_old2new[v] );
-                if( new_polyhedron_around )
-                {
-                    builder.associate_polyhedron_vertex_to_vertex(
-                        new_polyhedron_around.value(), v );
-                }
-                else
-                {
-                    builder.disassociate_polyhedron_vertex_to_vertex( v );
-                    builder.reset_polyhedra_around_vertex( v );
-                }
-            }
-            else
-            {
-                builder.disassociate_polyhedron_vertex_to_vertex( v );
-                builder.reset_polyhedra_around_vertex( v );
-            }
-        }
-    }
-
-    template < geode::index_t dimension >
     void update_polyhedron_around_vertices_from_polyhedron(
         const geode::SolidMesh< dimension >& solid,
         geode::SolidMeshBuilder< dimension >& builder,
         absl::Span< const geode::index_t > old2new )
     {
+        std::vector< bool > to_relink( solid.nb_vertices(), false );
+        bool relink_needed{ false };
         for( const auto v : geode::Range{ solid.nb_vertices() } )
         {
             const auto polyhedron_vertex = solid.polyhedron_around_vertex( v );
@@ -162,12 +133,38 @@ namespace
             }
             if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
             {
+                // The vertex may still be used by another polyhedron fan
+                // (non-manifold vertex): it is relinked below.
                 builder.disassociate_polyhedron_vertex_to_vertex( v );
+                to_relink[v] = true;
+                relink_needed = true;
             }
             else
             {
                 builder.associate_polyhedron_vertex_to_vertex(
                     new_polyhedron_vertex, v );
+            }
+        }
+        if( relink_needed )
+        {
+            for( const auto p : geode::Indices{ old2new } )
+            {
+                const auto new_p = old2new[p];
+                if( new_p == geode::NO_ID )
+                {
+                    continue;
+                }
+                for( const auto v :
+                    geode::LRange{ solid.nb_polyhedron_vertices( p ) } )
+                {
+                    const auto vertex = solid.polyhedron_vertex( { p, v } );
+                    if( to_relink[vertex] )
+                    {
+                        builder.associate_polyhedron_vertex_to_vertex(
+                            { new_p, v }, vertex );
+                        to_relink[vertex] = false;
+                    }
+                }
             }
         }
         for( const auto p : geode::Indices{ old2new } )
@@ -472,6 +469,19 @@ namespace geode
     void SolidMeshBuilder< dimension >::replace_vertices(
         const GenericMapping< index_t >& vertices_mapping )
     {
+        // Unlink all the source vertices first: with chained mappings
+        // (e.g. 0 -> 1 and 1 -> 2), unlinking a source vertex while
+        // processing polyhedra would also unlink it as a target.
+        for( const auto& [old_vertex_id, new_vertices] :
+            vertices_mapping.in2out_map() )
+        {
+            if( new_vertices.size() == 1 && new_vertices[0] == old_vertex_id )
+            {
+                continue;
+            }
+            disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
+            reset_polyhedra_around_vertex( old_vertex_id );
+        }
         for( const auto p : Range{ solid_mesh_.nb_polyhedra() } )
         {
             for( const auto v :
@@ -493,8 +503,6 @@ namespace geode
                 {
                     continue;
                 }
-                disassociate_polyhedron_vertex_to_vertex( old_vertex_id );
-                reset_polyhedra_around_vertex( old_vertex_id );
                 if( solid_mesh_.are_edges_enabled()
                     || solid_mesh_.are_facets_enabled() )
                 {
@@ -531,7 +539,7 @@ namespace geode
                 else
                 {
                     associate_polyhedron_vertex_to_vertex(
-                        polyhedra_around[1], new_vertex_id );
+                        polyhedra_around[1], old_vertex_id );
                 }
             }
             reset_polyhedra_around_vertex( old_vertex_id );
@@ -550,21 +558,26 @@ namespace geode
     void SolidMeshBuilder< dimension >::update_polyhedron_vertices(
         absl::Span< const index_t > old2new )
     {
+        // Vertex storage (polyhedron around vertex and polyhedra around
+        // vertex caches) has already been deleted/permuted: links are
+        // PolyhedronVertex and remain valid, isolated vertices stay isolated.
         check_no_polyhedron_to_delete( solid_mesh_, old2new );
-        update_polyhedron_around_vertices_from_vertices(
-            solid_mesh_, *this, old2new );
         for( const auto p : Range{ solid_mesh_.nb_polyhedra() } )
         {
             for( const auto v :
                 LRange{ solid_mesh_.nb_polyhedron_vertices( p ) } )
             {
                 const PolyhedronVertex id{ p, v };
-                const auto new_vertex =
-                    old2new[solid_mesh_.polyhedron_vertex( id )];
+                const auto old_vertex = solid_mesh_.polyhedron_vertex( id );
+                const auto new_vertex = old2new[old_vertex];
                 OpenGeodeMeshException::check_assertion( new_vertex != NO_ID,
                     "[SolidMeshBuilder::update_polyhedron_vertices] No "
                     "more polyhedra with vertices to delete should remain at "
                     "this point" );
+                if( new_vertex == old_vertex )
+                {
+                    continue;
+                }
                 update_polyhedron_vertex( id, new_vertex );
             }
         }
@@ -590,6 +603,32 @@ namespace geode
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< local_index_t > > facets )
     {
+        OpenGeodeMeshException::check_exception( vertices.size() < NO_LID,
+            nullptr, OpenGeodeException::TYPE::data,
+            "[SolidMeshBuilder::create_polyhedron] Too many vertices: ",
+            vertices.size() );
+        for( const auto vertex : vertices )
+        {
+            OpenGeodeMeshException::check_exception(
+                vertex < solid_mesh_.nb_vertices(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SolidMeshBuilder::create_polyhedron] Invalid vertex index ",
+                vertex, " (nb vertices: ", solid_mesh_.nb_vertices(), ")" );
+        }
+        for( const auto& facet : facets )
+        {
+            for( const auto vertex : facet )
+            {
+                OpenGeodeMeshException::check_exception(
+                    vertex < vertices.size(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SolidMeshBuilder::create_polyhedron] Invalid facet "
+                    "vertex index ",
+                    vertex, " (nb polyhedron vertices: ", vertices.size(),
+                    ")" );
+            }
+        }
+        check_polyhedron_definition( vertices, facets );
         const auto added_polyhedron = solid_mesh_.nb_polyhedra();
         solid_mesh_.polyhedron_attribute_manager().resize(
             added_polyhedron + 1 );
@@ -618,6 +657,13 @@ namespace geode
             }
         }
         return added_polyhedron;
+    }
+
+    template < index_t dimension >
+    void SolidMeshBuilder< dimension >::check_polyhedron_definition(
+        absl::Span< const index_t > /*vertices*/,
+        absl::Span< const std::vector< local_index_t > > /*facets*/ ) const
+    {
     }
 
     template < index_t dimension >
@@ -764,7 +810,8 @@ namespace geode
         absl::Span< const index_t > polyhedra_to_connect )
     {
         using Facet = detail::VertexCycle< PolyhedronFacetVertices >;
-        absl::flat_hash_map< Facet, PolyhedronFacet > facets;
+        absl::flat_hash_map< Facet, absl::InlinedVector< PolyhedronFacet, 2 > >
+            facets;
         for( const auto polyhedron : polyhedra_to_connect )
         {
             for( const auto f :
@@ -775,17 +822,22 @@ namespace geode
                 {
                     continue;
                 }
-                const auto output = facets.emplace(
-                    solid_mesh_.polyhedron_facet_vertices( facet ), facet );
-                if( !output.second )
-                {
-                    const auto it = output.first;
-                    do_set_polyhedron_adjacent( it->second, polyhedron );
-                    do_set_polyhedron_adjacent(
-                        facet, it->second.polyhedron_id );
-                    facets.erase( it );
-                }
+                facets[Facet{ solid_mesh_.polyhedron_facet_vertices( facet ) }]
+                    .push_back( facet );
             }
+        }
+        for( const auto& [vertices, polyhedron_facets] : facets )
+        {
+            // Non-manifold facets (shared by more than 2 polyhedra) are
+            // left on border: there is no consistent way to pair them.
+            if( polyhedron_facets.size() != 2 )
+            {
+                continue;
+            }
+            do_set_polyhedron_adjacent(
+                polyhedron_facets[0], polyhedron_facets[1].polyhedron_id );
+            do_set_polyhedron_adjacent(
+                polyhedron_facets[1], polyhedron_facets[0].polyhedron_id );
         }
     }
 

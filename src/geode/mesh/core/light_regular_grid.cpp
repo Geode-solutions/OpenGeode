@@ -231,6 +231,16 @@ namespace geode
                            archive.ext(
                                grid, bitsery::ext::BaseClass< Identifier >{} );
                            archive.object( grid.impl_ );
+                           OpenGeodeMeshException::check_exception(
+                               grid.cell_attribute_manager().nb_elements()
+                                       == grid.nb_cells()
+                                   && grid.grid_vertex_attribute_manager()
+                                              .nb_elements()
+                                          == grid.nb_grid_vertices(),
+                               nullptr, OpenGeodeException::TYPE::data,
+                               "[LightRegularGrid] Wrong attribute manager "
+                               "sizes after deserialization: file may be "
+                               "corrupted" );
                        } } } );
     }
 

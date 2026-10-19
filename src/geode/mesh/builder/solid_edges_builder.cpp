@@ -65,6 +65,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidEdgesBuilder< dimension >::reserve_edges( index_t nb )
+    {
+        edges_->reserve_edges(
+            nb, typename SolidEdges< dimension >::SolidEdgesKey() );
+    }
+
+    template < index_t dimension >
     BijectiveMapping< index_t >
         SolidEdgesBuilder< dimension >::update_edge_vertex(
             std::array< index_t, 2 > edge_vertices,

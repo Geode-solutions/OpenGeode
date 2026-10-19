@@ -94,30 +94,15 @@ namespace geode
                      archive.ext( point_set,
                          bitsery::ext::BaseClass< PointSet< dimension > >{} );
                      archive.object( point_set.impl_ );
-                     const auto new_attribute_id =
-                         point_set.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodePointSet< dimension > >(
-                         point_set, new_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodePointSet< dimension > >( point_set );
                  },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
                         archive.ext( point_set, bitsery::ext::BaseClass<
                                                     PointSet< dimension > >{} );
                         archive.object( point_set.impl_ );
-                        const auto new_attribute_id =
-                            point_set.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodePointSet< dimension > >(
-                            point_set, new_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodePointSet< dimension > >( point_set );
                     },
                     []( Archive& archive, OpenGeodePointSet& point_set ) {
                         archive.ext( point_set, bitsery::ext::BaseClass<

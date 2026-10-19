@@ -183,6 +183,19 @@ namespace geode
             polygon_ptr_ = impl.polygon_ptr_;
         }
 
+    public:
+        void check_storage( index_t nb_polygons ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                polygon_ptr_.size() == nb_polygons + 1
+                    && polygon_ptr_.front() == 0
+                    && polygon_ptr_.back() == polygon_vertices_.size()
+                    && polygon_adjacents_.size() == polygon_vertices_.size(),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[PolygonalSurface] Wrong polygon storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
     private:
         template < typename Archive >
         void serialize( Archive& serializer )
@@ -280,37 +293,25 @@ namespace geode
                          surface, bitsery::ext::BaseClass<
                                       PolygonalSurface< dimension > >{} );
                      archive.object( surface.impl_ );
-                     const auto new_point_attribute_id =
-                         surface.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodePolygonalSurface< dimension > >(
-                         surface, new_point_attribute_id );
+                     surface.impl_->check_storage( surface.nb_polygons() );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodePolygonalSurface< dimension > >( surface );
                  },
                     []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                         archive.ext(
                             surface, bitsery::ext::BaseClass<
                                          PolygonalSurface< dimension > >{} );
                         archive.object( surface.impl_ );
-                        const auto new_point_attribute_id =
-                            surface.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodePolygonalSurface< dimension > >(
-                            surface, new_point_attribute_id );
+                        surface.impl_->check_storage( surface.nb_polygons() );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodePolygonalSurface< dimension > >( surface );
                     },
                     []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                         archive.ext(
                             surface, bitsery::ext::BaseClass<
                                          PolygonalSurface< dimension > >{} );
                         archive.object( surface.impl_ );
+                        surface.impl_->check_storage( surface.nb_polygons() );
                     } } } );
     }
 

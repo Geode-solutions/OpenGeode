@@ -264,11 +264,25 @@ namespace geode
     template < typename Archive >
     void CellArray< dimension >::serialize( Archive& serializer )
     {
-        serializer.ext(
-            *this, Growable< Archive, CellArray >{
-                       { []( Archive& local_archive, CellArray& array ) {
-                           local_archive.object( array.impl_ );
-                       } } } );
+        serializer.ext( *this,
+            Growable< Archive, CellArray >{
+                { []( Archive& local_archive, CellArray& array ) {
+                    local_archive.object( array.impl_ );
+                    if constexpr( std::is_same_v< Archive, Deserializer > )
+                    {
+                        // Empty arrays (e.g. default images) are valid
+                        std::uint64_t nb_cells{ 1 };
+                        for( const auto d : LRange{ dimension } )
+                        {
+                            nb_cells *= array.nb_cells_in_direction( d );
+                            OpenGeodeBasicException::check_exception(
+                                nb_cells < NO_ID, nullptr,
+                                OpenGeodeException::TYPE::data,
+                                "[CellArray] Too many cells after "
+                                "deserialization: file may be corrupted" );
+                        }
+                    }
+                } } } );
     }
 
     template class opengeode_basic_api CellArray< 1 >;

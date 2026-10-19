@@ -20,12 +20,15 @@
  * SOFTWARE.
  *
  */
+#include <atomic>
+#include <memory>
 #include <stack>
 
 #include <geode/mesh/core/solid_mesh.hpp>
 
 #include <stack>
 
+#include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 #include <absl/hash/hash.h>
 #include <absl/synchronization/mutex.h>
@@ -176,27 +179,35 @@ namespace
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
         do
         {
-            if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
+            safety_count++;
+            const auto adj = solid.polyhedron_adjacent_facet( facet );
+            if( !adj )
             {
-                const auto adj_facet = adj.value();
-                polyhedra_around_edge.push_back( adj_facet.polyhedron_id );
-                for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
-                         adj_facet.polyhedron_id ) } )
+                found = false;
+                return result;
+            }
+            const auto adj_facet = adj.value();
+            polyhedra_around_edge.push_back( adj_facet.polyhedron_id );
+            bool next_facet_found{ false };
+            for( const auto f : geode::LRange{
+                     solid.nb_polyhedron_facets( adj_facet.polyhedron_id ) } )
+            {
+                if( adj_facet.facet_id == f )
                 {
-                    if( adj_facet.facet_id == f )
-                    {
-                        continue;
-                    }
-                    if( solid.is_edge_in_polyhedron_facet(
-                            { adj_facet.polyhedron_id, f }, edge_vertices ) )
-                    {
-                        facet = { adj_facet.polyhedron_id, f };
-                        break;
-                    }
+                    continue;
+                }
+                if( solid.is_edge_in_polyhedron_facet(
+                        { adj_facet.polyhedron_id, f }, edge_vertices ) )
+                {
+                    facet = { adj_facet.polyhedron_id, f };
+                    next_facet_found = true;
+                    break;
                 }
             }
-            else
+            if( !next_facet_found )
             {
+                // The adjacent polyhedron does not contain the edge (e.g.
+                // adjacency through a facet subset): the walk cannot go on.
                 found = false;
                 return result;
             }
@@ -222,11 +233,17 @@ namespace
         const geode::SolidMesh< dimension >& solid,
         const std::array< geode::index_t, 2 >& vertices )
     {
-        for( const auto vertex : vertices )
+        for( const auto v : geode::LRange{ 2 } )
         {
+            const auto other_vertex = vertices[1 - v];
             for( const auto& polyhedron :
-                solid.polyhedra_around_vertex( vertex ) )
+                solid.polyhedra_around_vertex( vertices[v] ) )
             {
+                if( !solid.vertex_in_polyhedron(
+                        polyhedron.polyhedron_id, other_vertex ) )
+                {
+                    continue;
+                }
                 for( const auto& edge_vertices :
                     solid.polyhedron_edges_vertices(
                         polyhedron.polyhedron_id ) )
@@ -344,7 +361,166 @@ namespace
         }
         return std::nullopt;
     }
+
+    template < geode::index_t dimension >
+    std::optional< geode::Vector3D > facet_normal_from_vertices(
+        const geode::SolidMesh< dimension >& solid,
+        const geode::PolyhedronFacetVertices& facet_vertices )
+    {
+        if( facet_vertices.size() < 3 )
+        {
+            return std::nullopt;
+        }
+        geode::Vector3D normal{ { 0, 0, 0 } };
+        const auto& p0 = solid.point( facet_vertices[0] );
+        for( const auto v : geode::LRange{ 2, facet_vertices.size() } )
+        {
+            const auto& p1 = solid.point( facet_vertices[v - 1] );
+            const auto& p2 = solid.point( facet_vertices[v] );
+            if( const auto triangle_normal =
+                    geode::Triangle3D{ p0, p1, p2 }.normal() )
+            {
+                normal += triangle_normal.value();
+            }
+        }
+        // Sum of unit normals: its length is scale independent
+        const auto length = normal.length();
+        if( length <= geode::GLOBAL_EPSILON )
+        {
+            return std::nullopt;
+        }
+        return normal / length;
+    }
+
+    template < geode::index_t dimension >
+    double facet_area_from_vertices( const geode::SolidMesh< dimension >& solid,
+        const geode::PolyhedronFacetVertices& facet_vertices,
+        const geode::Vector3D& direction )
+    {
+        if( facet_vertices.size() < 3 )
+        {
+            return 0.;
+        }
+        double area{ 0. };
+        const auto& p1 = solid.point( facet_vertices[0] );
+        for( const auto i : geode::LRange{ 1, facet_vertices.size() - 1 } )
+        {
+            const auto& p2 = solid.point( facet_vertices[i] );
+            const auto& p3 = solid.point( facet_vertices[i + 1] );
+            area += geode::triangle_signed_area( { p1, p2, p3 }, direction );
+        }
+        return area;
+    }
+
 } // namespace
+
+namespace geode
+{
+    namespace internal
+    {
+        /*!
+         * Per-vertex storage of the polyhedra around vertex cache. The cached
+         * values (~190 bytes each) are only allocated the first time a vertex
+         * is queried: an unqueried vertex costs one pointer. Allocation is
+         * lock-free (atomic compare-exchange), and each allocated value keeps
+         * the CachedValue semantics for concurrent const reads.
+         */
+        class LazyPolyhedraAroundVertexCache
+        {
+            using Cached = geode::CachedValue< PolyhedraAroundVertexImpl >;
+
+            class Slot
+            {
+            public:
+                Slot() = default;
+                Slot( const Slot& ) = delete;
+                Slot& operator=( const Slot& ) = delete;
+                // Moves only happen while the mesh is modified (no concurrent
+                // reads): relaxed accesses are enough.
+                Slot( Slot&& other ) noexcept
+                    : value_{ other.value_.load( std::memory_order_relaxed ) }
+                {
+                    other.value_.store( nullptr, std::memory_order_relaxed );
+                }
+                Slot& operator=( Slot&& other ) noexcept
+                {
+                    if( this != &other )
+                    {
+                        delete value_.load( std::memory_order_relaxed );
+                        value_.store(
+                            other.value_.load( std::memory_order_relaxed ),
+                            std::memory_order_relaxed );
+                        other.value_.store(
+                            nullptr, std::memory_order_relaxed );
+                    }
+                    return *this;
+                }
+                ~Slot()
+                {
+                    delete value_.load( std::memory_order_relaxed );
+                }
+
+                const Cached& get() const
+                {
+                    auto* value = value_.load( std::memory_order_acquire );
+                    if( value != nullptr )
+                    {
+                        return *value;
+                    }
+                    auto created = std::make_unique< Cached >();
+                    if( value_.compare_exchange_strong( value, created.get(),
+                            std::memory_order_acq_rel,
+                            std::memory_order_acquire ) )
+                    {
+                        return *created.release();
+                    }
+                    return *value;
+                }
+
+                void reset()
+                {
+                    if( auto* value = value_.load( std::memory_order_acquire ) )
+                    {
+                        value->reset();
+                    }
+                }
+
+            private:
+                mutable std::atomic< Cached* > value_{ nullptr };
+            };
+
+        public:
+            void resize( geode::index_t nb_vertices )
+            {
+                slots_.resize( nb_vertices );
+            }
+
+            const Cached& operator[]( geode::index_t vertex_id ) const
+            {
+                return slots_[vertex_id].get();
+            }
+
+            void reset( geode::index_t vertex_id )
+            {
+                slots_[vertex_id].reset();
+            }
+
+            void delete_elements( const std::vector< bool >& to_delete )
+            {
+                geode::delete_vector_elements( to_delete, slots_ );
+            }
+
+            void permute_elements(
+                absl::Span< const geode::index_t > permutation )
+            {
+                geode::permute( slots_, permutation );
+            }
+
+        private:
+            std::vector< Slot > slots_;
+        };
+    } // namespace internal
+} // namespace geode
 
 namespace geode
 {
@@ -361,76 +537,77 @@ namespace geode
     template < typename Archive >
     void PolyhedronVertex::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronVertex >{
-                { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
-                     archive.value4b( polyhedron_vertex.polyhedron_id );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_vertex.vertex_id = value;
-                 },
-                    []( Archive& archive,
-                        PolyhedronVertex& polyhedron_vertex ) {
-                        archive.value4b( polyhedron_vertex.polyhedron_id );
-                        archive.value1b( polyhedron_vertex.vertex_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronVertex > growable{
+            { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                 archive.value4b( polyhedron_vertex.polyhedron_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_vertex.vertex_id = value;
+             },
+                []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                    archive.value4b( polyhedron_vertex.polyhedron_id );
+                    archive.value1b( polyhedron_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolyhedronFacet::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronFacet >{
-                { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                     archive.value4b( polyhedron_facet.polyhedron_id );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_facet.facet_id = value;
-                 },
-                    []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                        archive.value4b( polyhedron_facet.polyhedron_id );
-                        archive.value1b( polyhedron_facet.facet_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronFacet > growable{
+            { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                 archive.value4b( polyhedron_facet.polyhedron_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_facet.facet_id = value;
+             },
+                []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                    archive.value4b( polyhedron_facet.polyhedron_id );
+                    archive.value1b( polyhedron_facet.facet_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolyhedronFacetVertex::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronFacetVertex >{
-                { []( Archive& archive,
-                      PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                     archive.object( polyhedron_facet_vertex.polyhedron_facet );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_facet_vertex.vertex_id = value;
-                 },
-                    []( Archive& archive,
-                        PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                        archive.object(
-                            polyhedron_facet_vertex.polyhedron_facet );
-                        archive.value1b( polyhedron_facet_vertex.vertex_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronFacetVertex > growable{
+            { []( Archive& archive,
+                  PolyhedronFacetVertex& polyhedron_facet_vertex ) {
+                 archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_facet_vertex.vertex_id = value;
+             },
+                []( Archive& archive,
+                    PolyhedronFacetVertex& polyhedron_facet_vertex ) {
+                    archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                    archive.value1b( polyhedron_facet_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < typename Archive >
     void PolyhedronFacetEdge::serialize( Archive& serializer )
     {
-        serializer.ext( *this,
-            Growable< Archive, PolyhedronFacetEdge >{
-                { []( Archive& archive,
-                      PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                     archive.object( polyhedron_facet_edge.polyhedron_facet );
-                     index_t value{ NO_ID };
-                     archive.value4b( value );
-                     polyhedron_facet_edge.edge_id = value;
-                 },
-                    []( Archive& archive,
-                        PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                        archive.object(
-                            polyhedron_facet_edge.polyhedron_facet );
-                        archive.value1b( polyhedron_facet_edge.edge_id );
-                    } } } );
+        static const Growable< Archive, PolyhedronFacetEdge > growable{
+            { []( Archive& archive,
+                  PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                 archive.object( polyhedron_facet_edge.polyhedron_facet );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 polyhedron_facet_edge.edge_id = value;
+             },
+                []( Archive& archive,
+                    PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                    archive.object( polyhedron_facet_edge.polyhedron_facet );
+                    archive.value1b( polyhedron_facet_edge.edge_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     template < index_t dimension >
@@ -488,44 +665,56 @@ namespace geode
             const index_t polyhedron_id ) const
         {
             double max_area{ 0. };
-            local_index_t max_area_facet{ 0 };
+            std::optional< Vector3D > normal;
+            PolyhedronFacetVertices facet_vertices;
             for( const auto f :
                 LRange{ mesh.nb_polyhedron_facets( polyhedron_id ) } )
             {
+                auto cur_vertices =
+                    mesh.polyhedron_facet_vertices( { polyhedron_id, f } );
+                const auto cur_normal =
+                    facet_normal_from_vertices( mesh, cur_vertices );
                 const auto cur_area =
-                    mesh.polyhedron_facet_area( { polyhedron_id, f } );
-                if( cur_area > max_area )
+                    facet_area_from_vertices( mesh, cur_vertices,
+                        cur_normal.value_or( Vector3D{ { 0, 0, 1 } } ) );
+                if( f == 0 || cur_area > max_area )
                 {
-                    max_area = cur_area;
-                    max_area_facet = f;
+                    max_area = std::max( max_area, cur_area );
+                    normal = cur_normal;
+                    facet_vertices = std::move( cur_vertices );
                 }
             }
-            const auto vertices = mesh.polyhedron_vertices( polyhedron_id );
-            const auto normal = mesh.polyhedron_facet_normal(
-                { polyhedron_id, max_area_facet } );
             if( !normal )
             {
                 return 0.;
             }
-            const auto facet_vertices = mesh.polyhedron_facet_vertices(
-                { polyhedron_id, max_area_facet } );
+            const auto vertices = mesh.polyhedron_vertices( polyhedron_id );
             Plane plane{ normal.value(), mesh.point( facet_vertices[0] ) };
-            auto opposite_vertex{ 0 };
+            std::optional< double > min_height;
             for( const auto vertex_id : vertices )
             {
                 if( absl::c_contains( facet_vertices, vertex_id ) )
                 {
                     continue;
                 }
-                opposite_vertex = vertex_id;
+                const auto height = std::get< 0 >(
+                    point_plane_distance( mesh.point( vertex_id ), plane ) );
+                if( !min_height || height < min_height.value() )
+                {
+                    min_height = height;
+                }
             }
-            return std::get< 0 >(
-                point_plane_distance( mesh.point( opposite_vertex ), plane ) );
+            // All the polyhedron vertices are on its largest facet
+            return min_height.value_or( 0. );
         }
 
         void reset_polyhedra_around_vertex( index_t vertex_id )
         {
-            polyhedra_around_vertex_[vertex_id].reset();
+            polyhedra_around_vertex_.reset( vertex_id );
+            if( !other_polyhedra_around_vertex_.empty() )
+            {
+                other_polyhedra_around_vertex_.erase( vertex_id );
+            }
         }
 
         const PolyhedraAroundVertex& polyhedra_around_vertex(
@@ -533,17 +722,21 @@ namespace geode
             index_t vertex_id,
             const std::optional< PolyhedronVertex >& first_polyhedron ) const
         {
-            return updated_polyhedra_around_vertex(
-                mesh, vertex_id, first_polyhedron )
-                .polyhedra;
+            const auto& polyhedra =
+                updated_polyhedra_around_vertex( mesh, vertex_id ).polyhedra;
+            if( !first_polyhedron
+                || absl::c_contains( polyhedra, first_polyhedron.value() ) )
+            {
+                return polyhedra;
+            }
+            return other_polyhedra_around_vertex(
+                mesh, vertex_id, first_polyhedron.value() );
         }
 
-        bool is_vertex_on_border( const SolidMesh< dimension >& mesh,
-            index_t vertex_id,
-            const std::optional< PolyhedronVertex >& first_polyhedron ) const
+        bool is_vertex_on_border(
+            const SolidMesh< dimension >& mesh, index_t vertex_id ) const
         {
-            return updated_polyhedra_around_vertex(
-                mesh, vertex_id, first_polyhedron )
+            return updated_polyhedra_around_vertex( mesh, vertex_id )
                 .vertex_is_on_border;
         }
 
@@ -672,13 +865,15 @@ namespace geode
         void delete_vertex_storage( const std::vector< bool >& to_delete )
         {
             delete_vector_elements( to_delete, polyhedron_around_vertex_ );
-            delete_vector_elements( to_delete, polyhedra_around_vertex_ );
+            polyhedra_around_vertex_.delete_elements( to_delete );
+            other_polyhedra_around_vertex_.clear();
         }
 
         void permute_vertex_storage( absl::Span< const index_t > permutation )
         {
             permute( polyhedron_around_vertex_, permutation );
-            permute( polyhedra_around_vertex_, permutation );
+            polyhedra_around_vertex_.permute_elements( permutation );
+            other_polyhedra_around_vertex_.clear();
         }
 
         void remove_legacy_attributes( AttributeManager& manager )
@@ -686,17 +881,32 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+        void check_vertex_storage( index_t nb_vertices ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                polyhedron_around_vertex_.size() == nb_vertices, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[SolidMesh] Wrong vertex storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
+        /*!
+         * Polyhedra around the vertex computed from its canonical polyhedron
+         * (polyhedron_around_vertex). Only this fan is stored in the
+         * per-vertex cache, so that queries from another fan of a
+         * non-manifold vertex do not overwrite it.
+         */
         const internal::PolyhedraAroundVertexImpl&
             updated_polyhedra_around_vertex( const SolidMesh< dimension >& mesh,
-                const index_t vertex_id,
-                const std::optional< PolyhedronVertex >& first_polyhedron )
-                const
+                const index_t vertex_id ) const
         {
+            const auto first_polyhedron = polyhedron_around_vertex( vertex_id );
             const auto& cached = polyhedra_around_vertex_[vertex_id];
             if( cached.computed()
                 && ( first_polyhedron
-                     && absl::c_contains( cached.value().polyhedra,
-                         first_polyhedron.value() ) ) )
+                         ? absl::c_contains( cached.value().polyhedra,
+                               first_polyhedron.value() )
+                         : cached.value().polyhedra.empty() ) )
             {
                 return cached.value();
             }
@@ -704,6 +914,33 @@ namespace geode
             cached( compute_polyhedra_around_vertex, mesh, vertex_id,
                 first_polyhedron );
             return cached.value();
+        }
+
+        /*!
+         * Polyhedra around a non-manifold vertex, computed from a polyhedron
+         * which is not in the canonical fan. Results are kept (with stable
+         * addresses) until the vertex is modified. This is a cold path,
+         * guarded by its own mutex.
+         */
+        const PolyhedraAroundVertex& other_polyhedra_around_vertex(
+            const SolidMesh< dimension >& mesh,
+            const index_t vertex_id,
+            const PolyhedronVertex& first_polyhedron ) const
+        {
+            absl::MutexLock lock{ &other_polyhedra_around_vertex_mutex_ };
+            auto& fans = other_polyhedra_around_vertex_[vertex_id];
+            for( const auto& fan : fans )
+            {
+                if( absl::c_contains( *fan, first_polyhedron ) )
+                {
+                    return *fan;
+                }
+            }
+            fans.emplace_back( std::make_unique< PolyhedraAroundVertex >(
+                compute_polyhedra_around_vertex(
+                    mesh, vertex_id, first_polyhedron )
+                    .polyhedra ) );
+            return *fans.back();
         }
 
         Impl() = default;
@@ -793,7 +1030,11 @@ namespace geode
     private:
         mutable AttributeManager polyhedron_attribute_manager_;
         std::vector< PolyhedronVertex > polyhedron_around_vertex_;
-        mutable std::vector< CachedPolyhedra > polyhedra_around_vertex_;
+        internal::LazyPolyhedraAroundVertexCache polyhedra_around_vertex_;
+        mutable absl::flat_hash_map< index_t,
+            std::vector< std::unique_ptr< PolyhedraAroundVertex > > >
+            other_polyhedra_around_vertex_;
+        mutable absl::Mutex other_polyhedra_around_vertex_mutex_;
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
         mutable TextureStorage3D texture_storage_;
@@ -973,22 +1214,16 @@ namespace geode
     double SolidMesh< dimension >::polyhedron_facet_area(
         const PolyhedronFacet& polyhedron_facet ) const
     {
-        if( nb_polyhedron_facet_vertices( polyhedron_facet ) < 3 )
+        check_polyhedron_facet_id(
+            *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
+        const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
+        if( vertices.size() < 3 )
         {
             return 0.;
         }
-        double area{ 0. };
-        const auto direction = polyhedron_facet_normal( polyhedron_facet )
+        const auto direction = facet_normal_from_vertices( *this, vertices )
                                    .value_or( Vector3D{ { 0, 0, 1 } } );
-        const auto vertices = polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p1 = this->point( vertices[0] );
-        for( const auto i : LRange{ 1, vertices.size() - 1 } )
-        {
-            const auto& p2 = this->point( vertices[i] );
-            const auto& p3 = this->point( vertices[i + 1] );
-            area += triangle_signed_area( { p1, p2, p3 }, direction );
-        }
-        return area;
+        return facet_area_from_vertices( *this, vertices, direction );
     }
 
     template < index_t dimension >
@@ -997,28 +1232,8 @@ namespace geode
     {
         check_polyhedron_facet_id(
             *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
-        Vector3D normal{ { 0, 0, 0 } };
-        const auto facet_vertices =
-            polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p0 = this->point( facet_vertices[0] );
-        for( const auto v :
-            LRange{ 2, nb_polyhedron_facet_vertices( polyhedron_facet ) } )
-        {
-            const auto& p1 = this->point( facet_vertices[v - 1] );
-            const auto& p2 = this->point( facet_vertices[v] );
-            if( const auto triangle_normal = Triangle3D{ p0, p1, p2 }.normal() )
-            {
-                normal += triangle_normal.value();
-            }
-        }
-        try
-        {
-            return normal.normalize();
-        }
-        catch( ... )
-        {
-            return std::nullopt;
-        }
+        return facet_normal_from_vertices(
+            *this, polyhedron_facet_vertices( polyhedron_facet ) );
     }
 
     template < index_t dimension >
@@ -1223,8 +1438,8 @@ namespace geode
     template < index_t dimension >
     bool SolidMesh< dimension >::is_vertex_on_border( index_t vertex_id ) const
     {
-        return impl_->is_vertex_on_border(
-            *this, vertex_id, polyhedron_around_vertex( vertex_id ) );
+        check_vertex_id( *this, vertex_id );
+        return impl_->is_vertex_on_border( *this, vertex_id );
     }
 
     template < index_t dimension >
@@ -1294,12 +1509,11 @@ namespace geode
             {
                 continue;
             }
-            const auto propagation_result = propagate_around_edge(
+            auto [polyhedra, found] = propagate_around_edge(
                 *this, { first_polyhedron, f }, vertices );
-            auto polyhedra = std::get< 0 >( propagation_result );
-            if( std::get< 1 >( propagation_result ) )
+            if( found )
             {
-                return polyhedra;
+                return std::move( polyhedra );
             }
             result.insert( result.end(), polyhedra.begin(), polyhedra.end() );
         }
@@ -1742,6 +1956,7 @@ namespace geode
                      archive.ext(
                          solid, bitsery::ext::BaseClass< VertexSet >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->check_vertex_storage( solid.nb_vertices() );
                      solid.impl_->remove_legacy_attributes(
                          solid.vertex_attribute_manager() );
                  },
@@ -1749,6 +1964,8 @@ namespace geode
                         archive.ext(
                             solid, bitsery::ext::BaseClass< VertexSet >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_vertex_storage(
+                            solid.nb_vertices() );
                         solid.impl_->remove_legacy_attributes(
                             solid.vertex_attribute_manager() );
                     },
@@ -1760,6 +1977,8 @@ namespace geode
                                        CoordinateReferenceSystemManagers<
                                            dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_vertex_storage(
+                            solid.nb_vertices() );
                         solid.impl_->remove_legacy_attributes(
                             solid.vertex_attribute_manager() );
                     } } } );
@@ -1812,32 +2031,28 @@ namespace std
     size_t hash< geode::PolyhedronVertex >::operator()(
         const geode::PolyhedronVertex& polyhedron_vertex ) const
     {
-        return absl::Hash< geode::index_t >()( polyhedron_vertex.polyhedron_id )
-               ^ absl::Hash< geode::index_t >()( polyhedron_vertex.vertex_id );
+        return absl::HashOf(
+            polyhedron_vertex.polyhedron_id, polyhedron_vertex.vertex_id );
     }
 
     size_t hash< geode::PolyhedronFacet >::operator()(
         const geode::PolyhedronFacet& polyhedron_facet ) const
     {
-        return absl::Hash< geode::index_t >()( polyhedron_facet.polyhedron_id )
-               ^ absl::Hash< geode::index_t >()( polyhedron_facet.facet_id );
+        return absl::HashOf(
+            polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
     }
 
     size_t hash< geode::PolyhedronFacetVertex >::operator()(
         const geode::PolyhedronFacetVertex& polyhedron_facet_vertex ) const
     {
-        return absl::Hash< geode::PolyhedronFacet >()(
-                   polyhedron_facet_vertex.polyhedron_facet )
-               ^ absl::Hash< geode::index_t >()(
-                   polyhedron_facet_vertex.vertex_id );
+        return absl::HashOf( polyhedron_facet_vertex.polyhedron_facet,
+            polyhedron_facet_vertex.vertex_id );
     }
 
     size_t hash< geode::PolyhedronFacetEdge >::operator()(
         const geode::PolyhedronFacetEdge& polyhedron_facet_edge ) const
     {
-        return absl::Hash< geode::PolyhedronFacet >()(
-                   polyhedron_facet_edge.polyhedron_facet )
-               ^ absl::Hash< geode::index_t >()(
-                   polyhedron_facet_edge.edge_id );
+        return absl::HashOf( polyhedron_facet_edge.polyhedron_facet,
+            polyhedron_facet_edge.edge_id );
     }
 } // namespace std

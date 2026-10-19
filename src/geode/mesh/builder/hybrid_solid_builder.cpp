@@ -92,6 +92,21 @@ namespace geode
     }
 
     template < index_t dimension >
+    void HybridSolidBuilder< dimension >::check_polyhedron_definition(
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< local_index_t > > /*facets*/ ) const
+    {
+        const auto nb_vertices = vertices.size();
+        OpenGeodeMeshException::check_exception(
+            nb_vertices == 4 || nb_vertices == 5 || nb_vertices == 6
+                || nb_vertices == 8,
+            nullptr, OpenGeodeException::TYPE::data,
+            "[HybridSolidBuilder::create_polyhedron] Only tetrahedron, "
+            "hexahedron, prism and pyramid are handled (given polyhedron has ",
+            nb_vertices, " vertices)" );
+    }
+
+    template < index_t dimension >
     index_t HybridSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {

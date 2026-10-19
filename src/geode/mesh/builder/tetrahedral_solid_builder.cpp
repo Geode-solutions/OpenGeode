@@ -57,13 +57,22 @@ namespace geode
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< local_index_t > > facets )
     {
-        geode_unused( facets );
-        OpenGeodeMeshException::check_assertion( vertices.size() == 4,
-            "[TetrahedralSolidBuilder::do_create_"
-            "polyhedron] Only tetrahedra are handled" );
+        check_polyhedron_definition( vertices, facets );
         std::array< index_t, 4 > tetrahedron_vertices;
         absl::c_copy_n( vertices, 4, tetrahedron_vertices.begin() );
         do_create_tetrahedron( tetrahedron_vertices );
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::check_polyhedron_definition(
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< local_index_t > > /*facets*/ ) const
+    {
+        OpenGeodeMeshException::check_exception( vertices.size() == 4, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[TetrahedralSolidBuilder::create_polyhedron] Only tetrahedra are "
+            "handled (given polyhedron has ",
+            vertices.size(), " vertices)" );
     }
 
     template < index_t dimension >
@@ -84,15 +93,15 @@ namespace geode
         const auto nb_tet = tetrahedral_solid_.nb_polyhedra();
         tetrahedral_solid_.polyhedron_attribute_manager().reserve(
             nb_tet + nb );
+        // In a tetrahedral mesh, there are about 2 facets and 1.2 edges
+        // per tetrahedron
         if( tetrahedral_solid_.are_facets_enabled() )
         {
-            tetrahedral_solid_.facets().facet_attribute_manager().reserve(
-                nb_tet + 4 * nb );
+            this->facets_builder().reserve_facets( 2 * nb );
         }
         if( tetrahedral_solid_.are_edges_enabled() )
         {
-            tetrahedral_solid_.edges().edge_attribute_manager().reserve(
-                nb_tet + 6 * nb );
+            this->edges_builder().reserve_edges( nb + nb / 4 );
         }
     }
 

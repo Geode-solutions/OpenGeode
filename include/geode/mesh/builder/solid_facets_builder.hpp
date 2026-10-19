@@ -54,6 +54,11 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_facets();
 
+        /*!
+         * Reserve memory for nb additional facets
+         */
+        void reserve_facets( index_t nb );
+
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
         std::vector< index_t > delete_facets(

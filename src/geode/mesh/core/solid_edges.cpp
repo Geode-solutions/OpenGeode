@@ -37,6 +37,7 @@
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/core/bitsery_archive.hpp>
 #include <geode/mesh/core/internal/facet_edges_impl.hpp>
+#include <geode/mesh/core/internal/solid_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
 
@@ -53,6 +54,22 @@ namespace
             "[check_edge_id] Trying to access an invalid edge" );
     }
 
+    template < geode::index_t dimension >
+    geode::index_t estimate_nb_edges(
+        const geode::SolidMesh< dimension >& solid )
+    {
+        // Euler characteristic of a ball: V - E + F - P = 1
+        const auto nb_facets =
+            solid.are_facets_enabled()
+                ? solid.facets().nb_facets()
+                : geode::internal::estimate_nb_facets( solid );
+        const auto nb_vertices_and_facets = solid.nb_vertices() + nb_facets;
+        if( nb_vertices_and_facets <= solid.nb_polyhedra() )
+        {
+            return 0;
+        }
+        return nb_vertices_and_facets - solid.nb_polyhedra();
+    }
 } // namespace
 
 namespace geode
@@ -70,6 +87,7 @@ namespace geode
 
         Impl( const SolidMesh< dimension >& solid )
         {
+            this->reserve( estimate_nb_edges( solid ) );
             for( const auto p : Range{ solid.nb_polyhedra() } )
             {
                 for( auto&& e : solid.polyhedron_edges_vertices( p ) )
@@ -179,6 +197,13 @@ namespace geode
         const std::vector< bool >& to_delete, SolidEdgesKey /*key*/ )
     {
         return impl_->delete_edges( to_delete );
+    }
+
+    template < index_t dimension >
+    void SolidEdges< dimension >::reserve_edges(
+        index_t nb, SolidEdgesKey /*key*/ )
+    {
+        impl_->reserve_edges( nb_edges() + nb );
     }
 
     template < index_t dimension >

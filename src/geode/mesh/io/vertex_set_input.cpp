@@ -61,6 +61,13 @@ namespace geode
                 OpenGeodeException::TYPE::internal,
                 "Cannot load VertexSet from file: ", filename };
         }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load VertexSet from file: ", filename };
+        }
     }
 
     AdditionalFiles vertex_set_additional_files( std::string_view filename )

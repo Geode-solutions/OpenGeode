@@ -105,7 +105,7 @@ namespace geode
                         bitsery::ext::StdMap{ impl.textures_.max_size() },
                         []( Archive& archive2, std::string& name,
                             std::unique_ptr< Texture< dimension > >& texture ) {
-                            archive2.text1b( name, name.max_size() );
+                            archive2.text1b( name, MAX_SERIALIZED_NAME_SIZE );
                             if( !texture )
                             {
                                 texture =

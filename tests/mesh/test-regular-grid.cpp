@@ -31,6 +31,7 @@
 #include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/grid_builder.hpp>
 #include <geode/mesh/builder/regular_grid_solid_builder.hpp>
 #include <geode/mesh/builder/regular_grid_surface_builder.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
@@ -483,6 +484,75 @@ void test_backward_io( std::string_view filename )
         "Wrong Backward grid nb_cells_in_direction(2)" );
 }
 
+void test_legacy_grid_origin()
+{
+    const auto grid_v12 = geode::load_regular_grid< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v12/test_v12.og_rgd3d" ) );
+    const geode::Point3D origin{ { 1.5, 0, 1 } };
+    geode::OpenGeodeMeshException::test(
+        grid_v12->point( 0 ) == origin, "[v12] Wrong point 0" );
+    geode::OpenGeodeMeshException::test(
+        grid_v12->grid_point( { 0, 0, 0 } ) == grid_v12->point( 0 ),
+        "[v12] Wrong grid origin" );
+    for( const auto& vertex : { geode::Grid3D::VertexIndices{ 1, 1, 1 },
+             geode::Grid3D::VertexIndices{ 5, 10, 15 } } )
+    {
+        geode::OpenGeodeMeshException::test(
+            grid_v12->grid_point( vertex ).inexact_equal(
+                grid_v12->point( grid_v12->vertex_index( vertex ) ) ),
+            "[v12] Wrong grid point" );
+    }
+
+    const auto grid_v13 = geode::load_regular_grid< 2 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v13/v13.og_rgd2d" ) );
+    geode::OpenGeodeMeshException::test(
+        grid_v13->nb_polygons() == 12, "[v13] Wrong number of cells" );
+    geode::OpenGeodeMeshException::test(
+        grid_v13->grid_point( { 0, 0 } ) == geode::Point2D{ { 1.5, 1 } },
+        "[v13] Wrong grid origin" );
+    for( const auto& vertex : { geode::Grid2D::VertexIndices{ 1, 1 },
+             geode::Grid2D::VertexIndices{ 3, 4 } } )
+    {
+        geode::OpenGeodeMeshException::test(
+            grid_v13->grid_point( vertex ).inexact_equal(
+                grid_v13->point( grid_v13->vertex_index( vertex ) ) ),
+            "[v13] Wrong grid point" );
+    }
+}
+
+void test_io_keeps_coordinate_system()
+{
+    auto grid = geode::RegularGrid3D::create();
+    auto builder = geode::RegularGridBuilder3D::create( *grid );
+    const std::array< geode::Vector3D, 3 > directions{ geode::Vector3D{
+                                                           { 0.1, 0.2, 0.3 } },
+        geode::Vector3D{ { -0.3, 0.1, 0.7 } },
+        geode::Vector3D{ { 0.7, -0.3, 0.1 } } };
+    builder->initialize_grid( geode::Point3D{ { 12345.678, -9876.54321, 0.3 } },
+        { 3, 3, 3 }, directions );
+    // Exact directions, differing from the vertex coordinate differences
+    // by rounding errors only
+    geode::GridBuilder3D{ *grid }.set_grid_directions( directions );
+    const auto filename =
+        absl::StrCat( "test_coordinate_system.", grid->native_extension() );
+    geode::save_regular_grid( *grid, filename );
+    const auto reload = geode::load_regular_grid< 3 >( filename );
+    const auto& coordinate_system = grid->grid_coordinate_system();
+    const auto& reload_coordinate_system = reload->grid_coordinate_system();
+    geode::OpenGeodeMeshException::test(
+        coordinate_system.origin() == reload_coordinate_system.origin(),
+        "Wrong reloaded grid origin" );
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            coordinate_system.direction( d ) == directions[d],
+            "Saving should not modify grid direction ", d );
+        geode::OpenGeodeMeshException::test(
+            reload_coordinate_system.direction( d ) == directions[d],
+            "Wrong reloaded grid direction ", d );
+    }
+}
+
 void test_adjacencies2D()
 {
     auto grid = geode::RegularGrid2D::create();
@@ -679,6 +749,8 @@ void test()
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
     test_old_io();
+    test_legacy_grid_origin();
+    test_io_keeps_coordinate_system();
     test_adjacencies2D();
     test_update_origin_on_rotated_grid();
     test_initialize_grid_with_directions_failures();
