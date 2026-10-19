@@ -32,19 +32,27 @@ void test()
         "Wrong Hausdorff distance: ", hausdorff_distance );
 
     const auto empty_mesh = geode::TriangulatedSurface3D::create();
-    bool has_thrown{ false };
-    try
-    {
-        const auto distance = geode::hausdorff_distance( *mesh_A, *empty_mesh );
-        geode::Logger::error(
-            "Hausdorff distance with empty mesh: ", distance );
-    }
-    catch( const geode::OpenGeodeException& )
-    {
-        has_thrown = true;
-    }
+    const auto throws_with_empty_mesh =
+        []( const geode::TriangulatedSurface3D& lhs,
+            const geode::TriangulatedSurface3D& rhs ) {
+            try
+            {
+                const auto distance = geode::hausdorff_distance( lhs, rhs );
+                geode::Logger::error(
+                    "Hausdorff distance with empty mesh: ", distance );
+            }
+            catch( const geode::OpenGeodeException& )
+            {
+                return true;
+            }
+            return false;
+        };
     geode::OpenGeodeMeshException::test(
-        has_thrown, "Hausdorff distance to an empty mesh should throw" );
+        throws_with_empty_mesh( *mesh_A, *empty_mesh ),
+        "Hausdorff distance to an empty mesh should throw" );
+    geode::OpenGeodeMeshException::test(
+        throws_with_empty_mesh( *empty_mesh, *mesh_A ),
+        "Hausdorff distance from an empty mesh should throw" );
 }
 
 OPENGEODE_TEST( "hausdorff-distance" )
