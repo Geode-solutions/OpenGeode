@@ -87,6 +87,16 @@ namespace geode
                 legacy_attributes_.remove_from( manager );
             }
 
+        public:
+            void check_edges_number( index_t nb_edges ) const
+            {
+                OpenGeodeMeshException::check_exception(
+                    edges_.size() == nb_edges, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[Edges] Wrong edge storage size after deserialization: "
+                    "file may be corrupted" );
+            }
+
         private:
             template < typename Archive >
             void deserialize_legacy_storage( Archive& archive )

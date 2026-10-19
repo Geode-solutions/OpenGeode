@@ -136,6 +136,16 @@ namespace geode
             tetrahedron_adjacents_ = impl.tetrahedron_adjacents_;
         }
 
+        void check_storage( index_t nb_polyhedra ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                tetrahedron_vertices_.size() == nb_polyhedra
+                    && tetrahedron_adjacents_.size() == nb_polyhedra,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[TetrahedralSolid] Wrong tetrahedron storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
         void remove_legacy_attributes( AttributeManager& manager )
         {
             legacy_attributes_.remove_from( manager );
@@ -244,41 +254,29 @@ namespace geode
                          solid, bitsery::ext::BaseClass<
                                     TetrahedralSolid< dimension > >{} );
                      archive.object( solid.impl_ );
+                     solid.impl_->check_storage( solid.nb_polyhedra() );
                      solid.impl_->remove_legacy_attributes(
                          solid.polyhedron_attribute_manager() );
-                     const auto new_point_attribute_id =
-                         solid.vertex_attribute_manager()
-                             .attribute_ids_matching_name( internal::PointsImpl<
-                                 dimension >::POINTS_NAME )
-                             .value()
-                             .at( 0 );
-                     detail::template initialize_crs<
-                         OpenGeodeTetrahedralSolid< dimension > >(
-                         solid, new_point_attribute_id );
+                     detail::template initialize_legacy_crs<
+                         OpenGeodeTetrahedralSolid< dimension > >( solid );
                  },
                     []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
                         archive.ext(
                             solid, bitsery::ext::BaseClass<
                                        TetrahedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_storage( solid.nb_polyhedra() );
                         solid.impl_->remove_legacy_attributes(
                             solid.polyhedron_attribute_manager() );
-                        const auto new_point_attribute_id =
-                            solid.vertex_attribute_manager()
-                                .attribute_ids_matching_name(
-                                    internal::PointsImpl<
-                                        dimension >::POINTS_NAME )
-                                .value()
-                                .at( 0 );
-                        detail::template initialize_crs<
-                            OpenGeodeTetrahedralSolid< dimension > >(
-                            solid, new_point_attribute_id );
+                        detail::template initialize_legacy_crs<
+                            OpenGeodeTetrahedralSolid< dimension > >( solid );
                     },
                     []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
                         archive.ext(
                             solid, bitsery::ext::BaseClass<
                                        TetrahedralSolid< dimension > >{} );
                         archive.object( solid.impl_ );
+                        solid.impl_->check_storage( solid.nb_polyhedra() );
                         solid.impl_->remove_legacy_attributes(
                             solid.polyhedron_attribute_manager() );
                     } } } );
