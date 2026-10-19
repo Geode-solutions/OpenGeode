@@ -29,6 +29,7 @@
 #include <geode/basic/range.hpp>
 
 #include <geode/image/common.hpp>
+#include <geode/image/core/detail/color_channel.hpp>
 
 namespace geode
 {
@@ -78,21 +79,34 @@ namespace geode
             const AttributeLinearInterpolation &interpolator,
             const Attribute< RGBColor > &attribute )
         {
-            RGBColor result;
+            if( interpolator.indices_.empty() )
+            {
+                return attribute.default_values().default_value;
+            }
+            std::array< double, 3 > result{ 0, 0, 0 };
+            bool is_same{ true };
+            const auto first_value =
+                attribute.value( interpolator.indices_[0] );
             for( const auto i : Indices{ interpolator.indices_ } )
             {
-                const auto &att_value =
+                const auto &i_value =
                     attribute.value( interpolator.indices_[i] );
-                result.set_red(
-                    result.red() + att_value.red() * interpolator.lambdas_[i] );
-                result.set_green(
-                    result.green()
-                    + att_value.green() * interpolator.lambdas_[i] );
-                result.set_blue(
-                    result.blue()
-                    + att_value.blue() * interpolator.lambdas_[i] );
+                if( is_same )
+                {
+                    is_same = i_value == first_value;
+                }
+                const auto lambda = interpolator.lambdas_[i];
+                result[0] += i_value.red() * lambda;
+                result[1] += i_value.green() * lambda;
+                result[2] += i_value.blue() * lambda;
             }
-            return result;
+            if( is_same )
+            {
+                return first_value;
+            }
+            return RGBColor{ detail::color_channel( result[0] ),
+                detail::color_channel( result[1] ),
+                detail::color_channel( result[2] ) };
         }
     };
 

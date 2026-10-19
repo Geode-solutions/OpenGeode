@@ -27,6 +27,7 @@
 #include <geode/basic/range.hpp>
 
 #include <geode/image/common.hpp>
+#include <geode/image/core/detail/color_channel.hpp>
 
 namespace geode
 {
@@ -69,25 +70,29 @@ namespace geode
             const AttributeLinearInterpolation &interpolator,
             const Attribute< GreyscaleColor > &attribute )
         {
-            local_index_t result{ 0 };
+            if( interpolator.indices_.empty() )
+            {
+                return attribute.default_values().default_value;
+            }
+            double result{ 0 };
             bool is_same{ true };
-            const auto &first_value =
+            const auto first_value =
                 attribute.value( interpolator.indices_[0] ).value();
             for( const auto i : Indices{ interpolator.indices_ } )
             {
-                const auto &i_value =
+                const auto i_value =
                     attribute.value( interpolator.indices_[i] ).value();
                 if( is_same )
                 {
                     is_same = i_value == first_value;
                 }
-                result = result + i_value * interpolator.lambdas_[i];
+                result += i_value * interpolator.lambdas_[i];
             }
             if( is_same )
             {
                 return GreyscaleColor{ first_value };
             }
-            return GreyscaleColor{ result };
+            return GreyscaleColor{ detail::color_channel( result ) };
         }
     };
 

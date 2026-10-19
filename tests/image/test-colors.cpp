@@ -108,12 +108,79 @@ void test_color_attribute()
         "[TEST] Wrong generic value" );
 }
 
+void check_interpolation( geode::AttributeManager& manager,
+    const geode::VariableAttribute< geode::RGBColor >& rgb_attribute,
+    const geode::VariableAttribute< geode::GreyscaleColor >& grey_attribute,
+    absl::Span< const geode::index_t > indices,
+    absl::Span< const double > lambdas,
+    geode::local_index_t expected )
+{
+    static constexpr geode::index_t TARGET{ 10 };
+    manager.interpolate_attribute_value( { indices, lambdas }, TARGET );
+    const geode::RGBColor expected_rgb{ expected, expected, expected };
+    geode::OpenGeodeImageException::test(
+        rgb_attribute.value( TARGET ) == expected_rgb,
+        "[TEST] Wrong RGBColor interpolation: ",
+        rgb_attribute.value( TARGET ).string(), " instead of ",
+        expected_rgb.string() );
+    const geode::GreyscaleColor expected_grey{ expected };
+    geode::OpenGeodeImageException::test(
+        grey_attribute.value( TARGET ) == expected_grey,
+        "[TEST] Wrong GreyscaleColor interpolation: ",
+        grey_attribute.value( TARGET ).string(), " instead of ",
+        expected_grey.string() );
+}
+
+void test_interpolation()
+{
+    geode::AttributeManager manager;
+    manager.resize( 11 );
+    geode::AttributeProperties properties;
+    properties.interpolable = true;
+    static constexpr geode::local_index_t DEFAULT{ 42 };
+    geode::AttributeValues< geode::RGBColor > rgb_values;
+    rgb_values.default_value = geode::RGBColor{ DEFAULT, DEFAULT, DEFAULT };
+    auto rgb_attribute =
+        manager.find_attribute< geode::VariableAttribute, geode::RGBColor >(
+            manager
+                .create_attribute< geode::VariableAttribute, geode::RGBColor >(
+                    "rgb", rgb_values, properties ) );
+    geode::AttributeValues< geode::GreyscaleColor > grey_values;
+    grey_values.default_value = geode::GreyscaleColor{ DEFAULT };
+    auto grey_attribute = manager.find_attribute< geode::VariableAttribute,
+        geode::GreyscaleColor >(
+        manager.create_attribute< geode::VariableAttribute,
+            geode::GreyscaleColor >( "grey", grey_values, properties ) );
+    const std::array< geode::local_index_t, 4 > values{ 255, 255, 100, 101 };
+    for( const auto v : geode::LIndices{ values } )
+    {
+        rgb_attribute->set_value( v, { values[v], values[v], values[v] } );
+        grey_attribute->set_value( v, geode::GreyscaleColor{ values[v] } );
+    }
+    const auto third = 1. / 3.;
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 0, 1 }, { 0.5, 0.5 }, 255 );
+    check_interpolation( manager, *rgb_attribute, *grey_attribute, { 2, 2, 2 },
+        { third, third, third }, 100 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 2, 3 }, { 0.5, 0.5 }, 101 );
+    check_interpolation( manager, *rgb_attribute, *grey_attribute, { 0, 2 },
+        { third, 2 * third }, 152 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 0, 2 }, { 2, -1 }, 255 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 2, 0 }, { 2, -1 }, 0 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, {}, {}, DEFAULT );
+}
+
 void test()
 {
     test_comparison();
     test_rgb_addition();
     test_greyscale_addition();
     test_color_attribute();
+    test_interpolation();
 }
 
 OPENGEODE_TEST( "colors" )
