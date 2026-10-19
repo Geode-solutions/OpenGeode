@@ -90,20 +90,32 @@ void test_missing_colors()
     }
 }
 
-void test_too_many_cells()
+bool load_throws( std::string_view filename )
 {
-    bool thrown{ false };
     try
     {
-        const auto raster = geode::load_raster_image< 2 >( absl::StrCat(
-            geode::DATA_PATH, "raster_too_many_cells.og_img2d" ) );
+        const auto raster = geode::load_raster_image< 2 >(
+            absl::StrCat( geode::DATA_PATH, filename ) );
     }
     catch( const geode::OpenGeodeException& )
     {
-        thrown = true;
+        return true;
     }
+    return false;
+}
+
+void test_too_many_cells()
+{
     geode::OpenGeodeImageException::test(
-        thrown, "[TEST] Loading a raster with too many cells should throw" );
+        load_throws( "raster_too_many_cells.og_img2d" ),
+        "[TEST] Loading a raster with too many cells should throw" );
+}
+
+void test_extra_colors()
+{
+    geode::OpenGeodeImageException::test(
+        load_throws( "raster_extra_colors.og_img2d" ),
+        "[TEST] Loading more colors than cells should throw" );
 }
 
 void test()
@@ -123,6 +135,7 @@ void test()
     test_save_failure( raster );
     test_missing_colors();
     test_too_many_cells();
+    test_extra_colors();
     auto raster2 = std::move( raster );
     geode::OpenGeodeImageException::test(
         raster2.nb_cells() == 100, "Wrong number of cells after move" );

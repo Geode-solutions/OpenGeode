@@ -60,6 +60,11 @@ namespace geode
             return static_cast< index_t >( colors_.size() );
         }
 
+        void set_max_nb_colors( index_t max_nb_colors )
+        {
+            max_nb_colors_ = max_nb_colors;
+        }
+
         void resize( index_t nb_cells )
         {
             colors_.resize( nb_cells );
@@ -74,18 +79,22 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, Impl >{ { []( Archive& archive,
-                                                        Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  internal::ArrayImpl< dimension > >{} );
-                    archive.container( impl.colors_, impl.colors_.max_size() );
-                } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass<
+                                      internal::ArrayImpl< dimension > >{} );
+                        archive.container(
+                            impl.colors_, std::size_t{ impl.max_nb_colors_ } );
+                    } } } );
         }
 
     private:
         std::vector< RGBColor > colors_;
+        /// Bound of the serialized colors, prevents corrupted files from
+        /// requesting huge allocations. Not serialized.
+        index_t max_nb_colors_{ 0 };
     };
 
     template < index_t dimension >
@@ -167,6 +176,7 @@ namespace geode
                 { []( Archive& archive, RasterImage& raster ) {
                     archive.ext( raster,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
+                    raster.impl_->set_max_nb_colors( raster.nb_cells() );
                     archive.object( raster.impl_ );
                     raster.repair_colors();
                 } } } );
