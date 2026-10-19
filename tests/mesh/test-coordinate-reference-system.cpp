@@ -45,7 +45,6 @@ void test_names_stability()
         "a", std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
                  att_manager, "a" ) );
     const auto names = crs_manager.coordinate_reference_system_names();
-    const auto* name_data = names.at( 0 ).data();
     for( const auto i : geode::Range{ 100 } )
     {
         const auto name = absl::StrCat( "crs_", i );
@@ -53,19 +52,12 @@ void test_names_stability()
             std::make_shared< geode::AttributeCoordinateReferenceSystem3D >(
                 att_manager, name ) );
     }
-    bool found{ false };
-    for( const auto name : crs_manager.coordinate_reference_system_names() )
-    {
-        if( name == "a" )
-        {
-            found = true;
-            geode::OpenGeodeMeshException::test( name.data() == name_data,
-                "[Test] CRS name view should stay valid after other "
-                "insertions" );
-        }
-    }
     geode::OpenGeodeMeshException::test(
-        found, "[Test] CRS a should be listed" );
+        names.size() == 1 && names[0] == "a",
+        "[Test] CRS names should stay valid after other insertions" );
+    geode::OpenGeodeMeshException::test(
+        crs_manager.coordinate_reference_system_names().size() == 101,
+        "[Test] Wrong number of CRS names" );
 }
 
 void test_deleted_active_crs()

@@ -25,7 +25,7 @@
 
 #include <bitsery/ext/std_map.h>
 
-#include <absl/container/node_hash_map.h>
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -71,10 +71,9 @@ namespace geode
             return active_crs_name_;
         }
 
-        absl::FixedArray< std::string_view >
-            coordinate_reference_system_names() const
+        absl::FixedArray< std::string > coordinate_reference_system_names() const
         {
-            absl::FixedArray< std::string_view > names( crss_.size() );
+            absl::FixedArray< std::string > names( crss_.size() );
             index_t count{ 0 };
             for( const auto& it : crss_ )
             {
@@ -171,9 +170,7 @@ namespace geode
         }
 
     private:
-        // node_hash_map: coordinate_reference_system_names() returns views on
-        // the keys, they must stay valid when other CRSs are registered
-        absl::node_hash_map< std::string,
+        absl::flat_hash_map< std::string,
             std::shared_ptr< CoordinateReferenceSystem< dimension > > >
             crss_;
         std::shared_ptr< CoordinateReferenceSystem< dimension > > active_crs_;
@@ -224,7 +221,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< std::string_view > CoordinateReferenceSystemManager<
+    absl::FixedArray< std::string > CoordinateReferenceSystemManager<
         dimension >::coordinate_reference_system_names() const
     {
         return impl_->coordinate_reference_system_names();
