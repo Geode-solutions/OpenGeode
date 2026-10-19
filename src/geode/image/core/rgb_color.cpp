@@ -98,10 +98,8 @@ namespace geode
 
     RGBColor RGBColor::operator+( const RGBColor &other ) const
     {
-        RGBColor result;
-        result.set_red( ( result.red() + other.red() ) / 2 );
-        result.set_green( ( result.green() + other.green() ) / 2 );
-        result.set_blue( ( result.blue() + other.blue() ) / 2 );
+        RGBColor result{ *this };
+        result += other;
         return result;
     }
 

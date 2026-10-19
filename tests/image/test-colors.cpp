@@ -42,6 +42,19 @@ void test_comparison()
         color1 != color3, "Colors should be different" );
 }
 
+void test_rgb_addition()
+{
+    const geode::RGBColor color1{ 200, 100, 0 };
+    const geode::RGBColor color2{ 100, 50, 255 };
+    const geode::RGBColor average{ 150, 75, 127 };
+    geode::OpenGeodeImageException::test( color1 + color2 == average,
+        "[TEST] Wrong RGBColor addition: ", ( color1 + color2 ).string() );
+    auto color3 = color1;
+    color3 += color2;
+    geode::OpenGeodeImageException::test( color3 == average,
+        "[TEST] Wrong RGBColor addition assignment: ", color3.string() );
+}
+
 void test_color_attribute()
 {
     geode::AttributeManager manager;
@@ -84,6 +97,7 @@ void test_color_attribute()
 void test()
 {
     test_comparison();
+    test_rgb_addition();
     test_color_attribute();
 }
 
