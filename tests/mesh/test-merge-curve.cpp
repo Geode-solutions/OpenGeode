@@ -76,9 +76,32 @@ std::vector< std::unique_ptr< geode::EdgedCurve2D > > create_curves()
     return curves;
 }
 
+void test_collapsed_edge()
+{
+    auto curve = geode::EdgedCurve2D::create();
+    auto builder = geode::EdgedCurveBuilder2D::create( *curve );
+    builder->create_point( geode::Point2D{ { 0, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_edge( 0, 1 );
+    builder->create_edge( 1, 2 );
+    geode::detail::EdgedCurveMerger2D merger{ { *curve } };
+    const auto merged = merger.merge( geode::GLOBAL_EPSILON );
+    geode::OpenGeodeMeshException::test( merged->nb_vertices() == 2,
+        "Wrong number of vertices with a collapsed edge" );
+    geode::OpenGeodeMeshException::test( merged->nb_edges() == 1,
+        "Wrong number of edges with a collapsed edge" );
+    geode::OpenGeodeMeshException::test( merger.edge_in_merged( 0, 0 ) == 0,
+        "Wrong merged edge for a kept edge" );
+    geode::OpenGeodeMeshException::test(
+        merger.edge_in_merged( 0, 1 ) == geode::NO_ID,
+        "Collapsed edge should not be in the merged curve" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_collapsed_edge();
 
     const auto curves = create_curves();
     geode::detail::EdgedCurveMerger2D merger{ { *curves[0], *curves[1],

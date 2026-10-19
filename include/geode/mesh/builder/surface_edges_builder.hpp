@@ -56,6 +56,11 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_edges();
 
+        /*!
+         * Reserve memory for nb additional edges
+         */
+        void reserve_edges( index_t nb );
+
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         std::vector< index_t > delete_edges(

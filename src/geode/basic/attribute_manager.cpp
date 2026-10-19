@@ -859,4 +859,57 @@ namespace geode
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, AttributeManager );
+
+    void AttributeManager::import( const AttributeManager &attribute_manager,
+        absl::Span< const index_t > old2new )
+    {
+        absl::MutexLock lock{ impl_->mutex() };
+        std::optional< absl::ReaderMutexLock > from_lock;
+        if( &attribute_manager != this )
+        {
+            from_lock.emplace( attribute_manager.impl_->mutex() );
+        }
+        std::optional< GenericMapping< index_t > > old2new_mapping;
+        for( const auto &attribute_id :
+            attribute_manager.impl_->attribute_ids() )
+        {
+            const auto attribute_from =
+                attribute_manager.impl_->find_attribute_base( attribute_id );
+            if( !attribute_from->properties().transferable )
+            {
+                continue;
+            }
+            if( !impl_->attribute_exists( attribute_id ) )
+            {
+                auto attribute = attribute_from->extract( old2new,
+                    impl_->nb_elements(), AttributeBase::AttributeKey{} );
+                impl_->register_attribute(
+                    attribute, attribute_id, AttributeBase::AttributeKey{} );
+                continue;
+            }
+            if( attribute_from->type()
+                != impl_->attribute_type( attribute_id ) )
+            {
+                Logger::warning( "[AttributeManager::import] Attribute \"",
+                    attribute_id.string(), "\" not imported: types differ (",
+                    attribute_from->type(), " vs ",
+                    impl_->attribute_type( attribute_id ), ")" );
+                continue;
+            }
+            if( !old2new_mapping )
+            {
+                old2new_mapping.emplace();
+                for( const auto old_element : Indices{ old2new } )
+                {
+                    if( old2new[old_element] != NO_ID )
+                    {
+                        old2new_mapping->map(
+                            old_element, old2new[old_element] );
+                    }
+                }
+            }
+            impl_->import( *attribute_manager.impl_, old2new_mapping.value(),
+                attribute_id, AttributeBase::AttributeKey{} );
+        }
+    }
 } // namespace geode
