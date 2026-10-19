@@ -37,6 +37,7 @@
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/core/bitsery_archive.hpp>
 #include <geode/mesh/core/detail/facet_storage.hpp>
+#include <geode/mesh/core/internal/solid_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
 #include <geode/mesh/core/solid_edges.hpp>
@@ -53,6 +54,7 @@ namespace
             facet_id < solid.nb_facets(),
             "[check_facet_id] Trying to access an invalid facet" );
     }
+
 } // namespace
 
 namespace geode
@@ -76,6 +78,7 @@ namespace geode
 
         Impl( const SolidMesh< dimension >& solid )
         {
+            this->reserve( internal::estimate_nb_facets( solid ) );
             for( const auto p : Range{ solid.nb_polyhedra() } )
             {
                 for( auto&& f : solid.polyhedron_facets_vertices( p ) )
@@ -143,6 +146,11 @@ namespace geode
         AttributeManager& facet_attribute_manager() const
         {
             return Facets::facet_attribute_manager();
+        }
+
+        void reserve_facets( index_t capacity )
+        {
+            Facets::reserve( capacity );
         }
 
         void overwrite_facets(
@@ -251,6 +259,13 @@ namespace geode
         const std::vector< bool >& to_delete, SolidFacetsKey /*key*/ )
     {
         return impl_->delete_facets( to_delete );
+    }
+
+    template < index_t dimension >
+    void SolidFacets< dimension >::reserve_facets(
+        index_t nb, SolidFacetsKey /*key*/ )
+    {
+        impl_->reserve_facets( nb_facets() + nb );
     }
 
     template < index_t dimension >

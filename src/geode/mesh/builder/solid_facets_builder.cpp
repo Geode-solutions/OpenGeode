@@ -55,6 +55,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidFacetsBuilder< dimension >::reserve_facets( index_t nb )
+    {
+        facets_->reserve_facets(
+            nb, typename SolidFacets< dimension >::SolidFacetsKey() );
+    }
+
+    template < index_t dimension >
     std::vector< index_t >
         SolidFacetsBuilder< dimension >::update_facet_vertices(
             absl::Span< const index_t > old2new )

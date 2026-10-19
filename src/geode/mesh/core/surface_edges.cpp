@@ -52,6 +52,21 @@ namespace
             edge_id < edges.nb_edges(),
             "[check_edge_id] Trying to access an invalid edge" );
     }
+
+    template < geode::index_t dimension >
+    geode::index_t estimate_nb_edges(
+        const geode::SurfaceMesh< dimension >& surface )
+    {
+        // Euler characteristic of a disk: V - E + F = 1
+        // bounded by the number of polygon edges
+        geode::index_t nb_polygon_edges{ 0 };
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            nb_polygon_edges += surface.nb_polygon_edges( p );
+        }
+        return std::min(
+            nb_polygon_edges, surface.nb_vertices() + surface.nb_polygons() );
+    }
 } // namespace
 
 namespace geode
@@ -69,6 +84,7 @@ namespace geode
 
         Impl( const SurfaceMesh< dimension >& surface )
         {
+            this->reserve( estimate_nb_edges( surface ) );
             for( const auto p : Range{ surface.nb_polygons() } )
             {
                 for( const auto e : LRange{ surface.nb_polygon_edges( p ) } )
@@ -158,6 +174,13 @@ namespace geode
         SurfaceEdgesKey /*key*/ )
     {
         return impl_->remove_isolated_edges();
+    }
+
+    template < index_t dimension >
+    void SurfaceEdges< dimension >::reserve_edges(
+        index_t nb, SurfaceEdgesKey /*key*/ )
+    {
+        impl_->reserve_edges( nb_edges() + nb );
     }
 
     template < index_t dimension >

@@ -102,6 +102,11 @@ namespace geode
 
         std::vector< index_t > remove_isolated_edges( SurfaceEdgesKey /*key*/ );
 
+        /*!
+         * Reserve memory for nb additional edges
+         */
+        void reserve_edges( index_t nb, SurfaceEdgesKey /*key*/ );
+
         index_t find_or_create_edge(
             std::array< index_t, 2 > edge_vertices, SurfaceEdgesKey /*key*/ )
         {
