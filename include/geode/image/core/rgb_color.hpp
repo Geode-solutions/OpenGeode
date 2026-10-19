@@ -36,29 +36,69 @@ namespace geode
     class opengeode_image_api RGBColor
     {
     public:
-        RGBColor();
+        constexpr RGBColor() = default;
 
-        RGBColor( local_index_t red, local_index_t green, local_index_t blue );
+        constexpr RGBColor(
+            local_index_t red, local_index_t green, local_index_t blue )
+            : values_{ red, green, blue }
+        {
+        }
 
-        [[nodiscard]] local_index_t red() const;
+        [[nodiscard]] constexpr local_index_t red() const
+        {
+            return values_[0];
+        }
 
-        [[nodiscard]] local_index_t green() const;
+        [[nodiscard]] constexpr local_index_t green() const
+        {
+            return values_[1];
+        }
 
-        [[nodiscard]] local_index_t blue() const;
+        [[nodiscard]] constexpr local_index_t blue() const
+        {
+            return values_[2];
+        }
 
-        void set_red( local_index_t red_scale );
+        constexpr void set_red( local_index_t red_scale )
+        {
+            values_[0] = red_scale;
+        }
 
-        void set_green( local_index_t green_scale );
+        constexpr void set_green( local_index_t green_scale )
+        {
+            values_[1] = green_scale;
+        }
 
-        void set_blue( local_index_t blue_scale );
+        constexpr void set_blue( local_index_t blue_scale )
+        {
+            values_[2] = blue_scale;
+        }
 
-        [[nodiscard]] bool operator==( const RGBColor &other ) const;
+        [[nodiscard]] constexpr bool operator==( const RGBColor &other ) const
+        {
+            return red() == other.red() && green() == other.green()
+                   && blue() == other.blue();
+        }
 
-        [[nodiscard]] bool operator!=( const RGBColor &other ) const;
+        [[nodiscard]] constexpr bool operator!=( const RGBColor &other ) const
+        {
+            return !( *this == other );
+        }
 
-        [[nodiscard]] RGBColor operator+( const RGBColor &other ) const;
+        [[nodiscard]] constexpr RGBColor operator+(
+            const RGBColor &other ) const
+        {
+            RGBColor result{ *this };
+            result += other;
+            return result;
+        }
 
-        void operator+=( const RGBColor &other );
+        constexpr void operator+=( const RGBColor &other )
+        {
+            set_red( ( red() + other.red() ) / 2 );
+            set_green( ( green() + other.green() ) / 2 );
+            set_blue( ( blue() + other.blue() ) / 2 );
+        }
 
         [[nodiscard]] std::string string() const;
 
@@ -68,7 +108,7 @@ namespace geode
         void serialize( Archive &serializer );
 
     private:
-        std::array< local_index_t, 3 > values_;
+        std::array< local_index_t, 3 > values_{ 0, 0, 0 };
     };
 
     template <>

@@ -34,22 +34,47 @@ namespace geode
     class opengeode_image_api GreyscaleColor
     {
     public:
-        GreyscaleColor();
+        constexpr GreyscaleColor() = default;
 
-        explicit GreyscaleColor( local_index_t value );
+        constexpr explicit GreyscaleColor( local_index_t value )
+            : value_( value )
+        {
+        }
 
-        [[nodiscard]] local_index_t value() const;
+        [[nodiscard]] constexpr local_index_t value() const
+        {
+            return value_;
+        }
 
-        void set_value( local_index_t greyscale );
+        constexpr void set_value( local_index_t greyscale )
+        {
+            value_ = greyscale;
+        }
 
-        [[nodiscard]] bool operator==( const GreyscaleColor &other ) const;
+        [[nodiscard]] constexpr bool operator==(
+            const GreyscaleColor &other ) const
+        {
+            return value() == other.value();
+        }
 
-        [[nodiscard]] bool operator!=( const GreyscaleColor &other ) const;
+        [[nodiscard]] constexpr bool operator!=(
+            const GreyscaleColor &other ) const
+        {
+            return value() != other.value();
+        }
 
-        [[nodiscard]] GreyscaleColor operator+(
-            const GreyscaleColor &other ) const;
+        [[nodiscard]] constexpr GreyscaleColor operator+(
+            const GreyscaleColor &other ) const
+        {
+            GreyscaleColor result{ *this };
+            result += other;
+            return result;
+        }
 
-        void operator+=( const GreyscaleColor &other );
+        constexpr void operator+=( const GreyscaleColor &other )
+        {
+            set_value( ( value() + other.value() ) / 2 );
+        }
 
         [[nodiscard]] std::string string() const;
 
@@ -59,7 +84,7 @@ namespace geode
         void serialize( Archive &serializer );
 
     private:
-        local_index_t value_;
+        local_index_t value_{ 0 };
     };
 
     template <>

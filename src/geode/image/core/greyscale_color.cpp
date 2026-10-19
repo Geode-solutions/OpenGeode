@@ -30,46 +30,6 @@
 
 namespace geode
 {
-    GreyscaleColor::GreyscaleColor()
-    {
-        value_ = 0;
-    }
-
-    GreyscaleColor::GreyscaleColor( local_index_t value ) : value_( value ) {}
-
-    local_index_t GreyscaleColor::value() const
-    {
-        return value_;
-    }
-
-    void GreyscaleColor::set_value( local_index_t greyscale )
-    {
-        value_ = greyscale;
-    }
-
-    bool GreyscaleColor::operator==( const GreyscaleColor &other ) const
-    {
-        return value() == other.value();
-    }
-
-    bool GreyscaleColor::operator!=( const GreyscaleColor &other ) const
-    {
-        return value() != other.value();
-    }
-
-    GreyscaleColor GreyscaleColor::operator+(
-        const GreyscaleColor &other ) const
-    {
-        GreyscaleColor result{ *this };
-        result += other;
-        return result;
-    }
-
-    void GreyscaleColor::operator+=( const GreyscaleColor &other )
-    {
-        set_value( ( value() + other.value() ) / 2 );
-    }
-
     std::string GreyscaleColor::string() const
     {
         return absl::StrCat( value_ );

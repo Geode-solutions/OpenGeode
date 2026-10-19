@@ -21,6 +21,8 @@
  *
  */
 
+#include <type_traits>
+
 #include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -31,6 +33,24 @@
 #include <geode/image/core/rgb_color.hpp>
 
 #include <geode/tests/common.hpp>
+
+void test_constexpr()
+{
+    static_assert( std::is_trivially_copyable_v< geode::RGBColor > );
+    static_assert( std::is_trivially_copyable_v< geode::GreyscaleColor > );
+    constexpr geode::RGBColor rgb{ 1, 2, 3 };
+    static_assert( rgb.red() == 1 && rgb.green() == 2 && rgb.blue() == 3 );
+    static_assert( rgb == geode::RGBColor{ 1, 2, 3 } );
+    static_assert( rgb != geode::RGBColor{} );
+    static_assert(
+        rgb + geode::RGBColor{ 3, 4, 5 } == geode::RGBColor{ 2, 3, 4 } );
+    constexpr geode::GreyscaleColor grey{ 4 };
+    static_assert( grey.value() == 4 );
+    static_assert( grey == geode::GreyscaleColor{ 4 } );
+    static_assert( grey != geode::GreyscaleColor{} );
+    static_assert(
+        grey + geode::GreyscaleColor{ 6 } == geode::GreyscaleColor{ 5 } );
+}
 
 void test_comparison()
 {
@@ -197,6 +217,7 @@ void test_rgb_hash()
 
 void test()
 {
+    test_constexpr();
     test_comparison();
     test_rgb_addition();
     test_greyscale_addition();
