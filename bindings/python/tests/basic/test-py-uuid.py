@@ -31,3 +31,16 @@ import opengeode_py_basic as basic
 if __name__ == '__main__':
     id = basic.uuid()
     print(id.string())
+
+    same = basic.uuid(id.string())
+    other = basic.uuid()
+    if not (id == same) or id != same:
+        raise ValueError("[Test] uuids built from the same string should be equal")
+    if id == other:
+        raise ValueError("[Test] Different uuids should not be equal")
+    if hash(id) != hash(same):
+        raise ValueError("[Test] Equal uuids should have the same hash")
+    if len({id: 0, same: 1, other: 2}) != 2:
+        raise ValueError("[Test] uuid should be usable as dict key")
+    if not ((id < other) != (other < id)):
+        raise ValueError("[Test] uuids should be ordered")

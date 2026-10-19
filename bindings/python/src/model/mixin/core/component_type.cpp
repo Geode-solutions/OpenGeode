@@ -33,7 +33,12 @@ namespace geode
             .def( pybind11::init<>() )
             .def( pybind11::init< std::string >() )
             .def( "get", &ComponentType::get )
-            .def( "matches", &ComponentType::operator== );
+            .def( "matches", &ComponentType::operator== )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def( "__hash__", []( const ComponentType& type ) {
+                return std::hash< ComponentType >{}( type );
+            } );
 
         pybind11::class_< ComponentID >( module, "ComponentID" )
             .def( pybind11::init<>() )
@@ -42,6 +47,10 @@ namespace geode
             .def_readwrite( "type", &ComponentID::type )
             .def_readwrite( "id", &ComponentID::id )
             .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self );
+            .def( pybind11::self != pybind11::self )
+            .def( pybind11::self < pybind11::self )
+            .def( "__hash__", []( const ComponentID& id ) {
+                return std::hash< ComponentID >{}( id );
+            } );
     }
 } // namespace geode
