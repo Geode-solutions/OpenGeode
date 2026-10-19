@@ -36,6 +36,14 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * Compute the gradient of a scalar vertex attribute and store it in a new
+     * vertex attribute named "<scalar attribute name>_gradient", whose id is
+     * returned. Vertices where the gradient cannot be computed (no scalar
+     * value on the vertex or on one of its neighbors, or no usable neighbor)
+     * are set to the attribute no_value, a vector of NaN: has_value() is
+     * false for them.
+     */
     template < index_t dimension >
     [[nodiscard]] uuid compute_surface_scalar_function_gradient(
         const SurfaceMesh< dimension >& mesh, const uuid& scalar_function_id );

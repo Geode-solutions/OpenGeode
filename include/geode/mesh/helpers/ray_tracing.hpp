@@ -131,6 +131,12 @@ namespace geode
 
             index_t polygon{ NO_ID };
             double distance{ 0 };
+            /*!
+             * Position relative to the polygon: vertexN/edgeN refer to the
+             * polygon local vertex/edge N, inside means the polygon interior.
+             * Vertices after vertex3 and edges after edge2, which POSITION
+             * cannot express, are reported as parallel (ambiguous).
+             */
             POSITION position{ POSITION::outside };
             Point3D point;
         };

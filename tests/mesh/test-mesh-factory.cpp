@@ -60,6 +60,33 @@ void test()
 
     const auto mesh = geode::MeshFactory::create_mesh< MeshTest >( impl );
     geode_unused( mesh );
+
+    bool thrown{ false };
+    try
+    {
+        const auto& unknown_type =
+            geode::MeshFactory::type( geode::MeshImpl{ "unknown_impl" } );
+        geode_unused( unknown_type );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] Unknown mesh impl should throw an OpenGeodeException" );
+    thrown = false;
+    try
+    {
+        const auto& unknown_impl = geode::MeshFactory::default_impl(
+            geode::MeshType{ "unknown_type" } );
+        geode_unused( unknown_impl );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test( thrown,
+        "[Test] Unknown mesh type default should throw an OpenGeodeException" );
 }
 
 OPENGEODE_TEST( "mesh-factory" )

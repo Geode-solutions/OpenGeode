@@ -30,8 +30,7 @@ namespace std
     size_t hash< geode::MeshElement >::operator()(
         const geode::MeshElement& mesh_element ) const
     {
-        return absl::Hash< geode::uuid >()( mesh_element.mesh_id )
-               ^ absl::Hash< geode::index_t >()( mesh_element.element_id );
+        return absl::HashOf( mesh_element );
     }
 
     size_t hash< geode::MeshVertex >::operator()(

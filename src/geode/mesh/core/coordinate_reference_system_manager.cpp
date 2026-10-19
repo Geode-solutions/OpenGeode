@@ -59,8 +59,8 @@ namespace geode
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const
         {
-            geode::OpenGeodeMeshException::check_assertion(
-                active_crs_.use_count() > 1,
+            OpenGeodeMeshException::check_exception( active_crs_ != nullptr,
+                nullptr, OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::active_coordinate_"
                 "reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -71,10 +71,10 @@ namespace geode
             return active_crs_name_;
         }
 
-        absl::FixedArray< std::string_view >
+        absl::FixedArray< std::string >
             coordinate_reference_system_names() const
         {
-            absl::FixedArray< std::string_view > names( crss_.size() );
+            absl::FixedArray< std::string > names( crss_.size() );
             index_t count{ 0 };
             for( const auto& it : crss_ )
             {
@@ -242,7 +242,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< std::string_view > CoordinateReferenceSystemManager<
+    absl::FixedArray< std::string > CoordinateReferenceSystemManager<
         dimension >::coordinate_reference_system_names() const
     {
         return impl_->coordinate_reference_system_names();

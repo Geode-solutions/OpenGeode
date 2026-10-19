@@ -30,6 +30,11 @@
 
 #include <geode/mesh/core/grid.hpp>
 
+namespace
+{
+    constexpr auto NO_DISTANCE = std::numeric_limits< double >::max();
+} // namespace
+
 namespace geode
 {
     template < index_t dimension >
@@ -48,9 +53,8 @@ namespace geode
             attribute_properties.interpolable = false;
             attribute_properties.transferable = true;
             AttributeValues< double > distance_map_values;
-            distance_map_values.default_value =
-                std::numeric_limits< double >::max();
-            distance_map_values.no_value = std::numeric_limits< double >::max();
+            distance_map_values.default_value = NO_DISTANCE;
+            distance_map_values.no_value = NO_DISTANCE;
             const auto distance_map_id =
                 grid.cell_attribute_manager()
                     .template create_attribute< VariableAttribute, double >(
@@ -89,6 +93,12 @@ namespace geode
                             value = 0;
                             return;
                         }
+                        if( value >= NO_DISTANCE )
+                        {
+                            // No seed: keep the attribute no_value
+                            value = NO_DISTANCE;
+                            return;
+                        }
                         value = std::sqrt( value );
                     } );
                 } );
@@ -96,29 +106,122 @@ namespace geode
         }
 
     private:
-        void propagate_directional_squared_distance( const index_t direction );
-
-        double propagate_directional_step_squared_distance(
-            const Index& from_index,
-            const Index& to_index,
-            const index_t direction,
-            const double last_step_squared_distance )
+        /*!
+         * Apply func( first_cell_of_line ) to every line of cells along
+         * direction, in parallel (the range of lines is split in chunks).
+         */
+        template < typename Func >
+        void parallel_lines( index_t direction, const Func& func ) const
         {
-            const auto old_distance =
-                distance_map_->value( grid_.cell_index( from_index ) );
-            const auto step_squared_distance =
-                old_distance == 0 ? squared_cell_length_[direction]
-                                  : last_step_squared_distance
-                                        + 2 * squared_cell_length_[direction];
-            const auto new_distance = old_distance + step_squared_distance;
-            distance_map_->modify_value(
-                grid_.cell_index( to_index ), [new_distance]( double& value ) {
-                    value = std::min( value, new_distance );
+            index_t nb_lines{ 1 };
+            for( const auto d : LRange{ dimension } )
+            {
+                if( d != direction )
+                {
+                    nb_lines *= grid_.nb_cells_in_direction( d );
+                }
+            }
+            async::parallel_for( async::irange( index_t{ 0 }, nb_lines ),
+                [this, direction, &func]( index_t line ) {
+                    Index index;
+                    index[direction] = 0;
+                    for( const auto d : LRange{ dimension } )
+                    {
+                        if( d == direction )
+                        {
+                            continue;
+                        }
+                        index[d] = line % grid_.nb_cells_in_direction( d );
+                        line /= grid_.nb_cells_in_direction( d );
+                    }
+                    func( index );
                 } );
-            return step_squared_distance;
         }
 
-        void combine_squared_distance_components( const index_t direction );
+        /*!
+         * Replace the squared distances f along every line in direction by
+         * min_q( f(q) + (c - q)^2 * h^2 ), using the lower envelope of
+         * parabolas (Felzenszwalb & Huttenlocher, 2012) in O(n) per line.
+         * Cells with no distance (NO_DISTANCE) are ignored; a line without
+         * any distance is left unchanged.
+         */
+        void combine_squared_distance_components( index_t direction )
+        {
+            parallel_lines( direction, [this, direction]( Index index ) {
+                const auto nb_cells = grid_.nb_cells_in_direction( direction );
+                const auto squared_length = squared_cell_length_[direction];
+                thread_local std::vector< double > values;
+                thread_local std::vector< index_t > parabolas;
+                thread_local std::vector< double > boundaries;
+                values.resize( nb_cells );
+                parabolas.resize( nb_cells );
+                boundaries.resize( nb_cells + 1 );
+                for( const auto c : Range{ nb_cells } )
+                {
+                    index[direction] = c;
+                    values[c] =
+                        distance_map_->value( grid_.cell_index( index ) );
+                }
+                const auto intersection = [&squared_length]( index_t q,
+                                              double f_q, index_t p,
+                                              double f_p ) {
+                    const auto q_value = static_cast< double >( q );
+                    const auto p_value = static_cast< double >( p );
+                    return ( ( f_q + squared_length * q_value * q_value )
+                               - ( f_p + squared_length * p_value * p_value ) )
+                           / ( 2. * squared_length * ( q_value - p_value ) );
+                };
+                index_t nb_parabolas{ 0 };
+                for( const auto q : Range{ nb_cells } )
+                {
+                    if( values[q] >= NO_DISTANCE )
+                    {
+                        continue;
+                    }
+                    if( nb_parabolas == 0 )
+                    {
+                        parabolas[0] = q;
+                        boundaries[0] = -std::numeric_limits< double >::max();
+                        boundaries[1] = std::numeric_limits< double >::max();
+                        nb_parabolas = 1;
+                        continue;
+                    }
+                    auto last = nb_parabolas - 1;
+                    auto boundary = intersection( q, values[q], parabolas[last],
+                        values[parabolas[last]] );
+                    while( boundary <= boundaries[last] )
+                    {
+                        // boundaries[0] is -max, so last never underflows
+                        last--;
+                        boundary = intersection( q, values[q], parabolas[last],
+                            values[parabolas[last]] );
+                    }
+                    nb_parabolas = last + 2;
+                    parabolas[last + 1] = q;
+                    boundaries[last + 1] = boundary;
+                    boundaries[last + 2] = std::numeric_limits< double >::max();
+                }
+                if( nb_parabolas == 0 )
+                {
+                    return;
+                }
+                index_t current{ 0 };
+                for( const auto c : Range{ nb_cells } )
+                {
+                    while(
+                        boundaries[current + 1] < static_cast< double >( c ) )
+                    {
+                        current++;
+                    }
+                    const auto parabola = parabolas[current];
+                    index[direction] = c;
+                    distance_map_->set_value( grid_.cell_index( index ),
+                        values[parabola]
+                            + directional_squared_distance(
+                                c, parabola, direction ) );
+                }
+            } );
+        }
 
         double directional_squared_distance( const index_t from,
             const index_t to,
@@ -136,267 +239,17 @@ namespace geode
         std::shared_ptr< VariableAttribute< double > > distance_map_;
     };
 
-    template <>
-    void
-        EuclideanDistanceTransform< 2 >::propagate_directional_squared_distance(
-            const index_t d )
-    {
-        const auto d2 = d == 1 ? 0 : 1;
-        absl::FixedArray< async::task< void > > tasks(
-            grid_.nb_cells_in_direction( d2 ) );
-        index_t task_id{ 0 };
-        for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
-        {
-            tasks[task_id++] = async::spawn( [this, d, d2, c2] {
-                double step_squared_distance{ 0. };
-                for( const auto c :
-                    Range{ 1, grid_.nb_cells_in_direction( d ) } )
-                {
-                    Index index;
-                    index[d] = c;
-                    index[d2] = c2;
-                    auto prev_index = index;
-                    prev_index[d] = c - 1;
-                    step_squared_distance =
-                        propagate_directional_step_squared_distance(
-                            prev_index, index, d, step_squared_distance );
-                }
-                step_squared_distance = 0.;
-                for( const auto c :
-                    ReverseRange{ grid_.nb_cells_in_direction( d ) - 1 } )
-                {
-                    Index index;
-                    index[d] = c;
-                    index[d2] = c2;
-                    auto prev_index = index;
-                    prev_index[d] = c + 1;
-                    step_squared_distance =
-                        propagate_directional_step_squared_distance(
-                            prev_index, index, d, step_squared_distance );
-                }
-            } );
-        }
-        for( auto& task : async::when_all( tasks ).get() )
-        {
-            task.get();
-        }
-    }
-    template <>
-    void
-        EuclideanDistanceTransform< 3 >::propagate_directional_squared_distance(
-            const index_t d )
-    {
-        const auto d2 = d == 2 ? 0 : d + 1;
-        const auto d3 = d2 == 2 ? 0 : d2 + 1;
-        absl::FixedArray< async::task< void > > tasks(
-            grid_.nb_cells_in_direction( d2 )
-            * grid_.nb_cells_in_direction( d3 ) );
-        index_t task_id{ 0 };
-        for( const auto c3 : Range{ grid_.nb_cells_in_direction( d3 ) } )
-        {
-            for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
-            {
-                tasks[task_id++] = async::spawn( [this, d, d2, d3, c2, c3] {
-                    double step_squared_distance{ 0 };
-                    for( const auto c :
-                        Range{ 1, grid_.nb_cells_in_direction( d ) } )
-                    {
-                        Index index;
-                        index[d] = c;
-                        index[d2] = c2;
-                        index[d3] = c3;
-                        auto prev_index = index;
-                        prev_index[d] = c - 1;
-                        step_squared_distance =
-                            propagate_directional_step_squared_distance(
-                                prev_index, index, d, step_squared_distance );
-                    }
-                    step_squared_distance = 0;
-                    for( const auto c :
-                        ReverseRange{ grid_.nb_cells_in_direction( d ) - 1 } )
-                    {
-                        Index index;
-                        index[d] = c;
-                        index[d2] = c2;
-                        index[d3] = c3;
-                        auto prev_index = index;
-                        prev_index[d] = c + 1;
-                        step_squared_distance =
-                            propagate_directional_step_squared_distance(
-                                prev_index, index, d, step_squared_distance );
-                    }
-                } );
-            }
-        }
-        for( auto& task : async::when_all( tasks ).get() )
-        {
-            task.get();
-        }
-    }
-
-    template <>
-    void EuclideanDistanceTransform< 2 >::combine_squared_distance_components(
-        const index_t d )
-    {
-        const auto d2 = d == 1 ? 0 : 1;
-        absl::FixedArray< async::task< void > > tasks(
-            grid_.nb_cells_in_direction( d2 ) );
-        index_t task_id{ 0 };
-        for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
-        {
-            tasks[task_id++] = async::spawn( [this, d, d2, c2] {
-                absl::FixedArray< double > temps_dist(
-                    grid_.nb_cells_in_direction( d ) );
-                for( const auto c :
-                    Range{ 0, grid_.nb_cells_in_direction( d ) } )
-                {
-                    auto min_dist = std::numeric_limits< double >::max();
-                    for( const auto cf :
-                        Range{ c, grid_.nb_cells_in_direction( d ) } )
-                    {
-                        const auto step_squared_distance =
-                            directional_squared_distance( c, cf, d );
-                        if( min_dist < step_squared_distance )
-                        {
-                            break;
-                        }
-                        Index index;
-                        index[d] = cf;
-                        index[d2] = c2;
-                        min_dist = std::min( min_dist,
-                            distance_map_->value( grid_.cell_index( index ) )
-                                + step_squared_distance );
-                    }
-                    for( const auto cb : ReverseRange{ c, 0 } )
-                    {
-                        const auto step_squared_distance =
-                            directional_squared_distance( c, cb, d );
-                        if( min_dist < step_squared_distance )
-                        {
-                            break;
-                        }
-                        Index index;
-                        index[d] = cb;
-                        index[d2] = c2;
-                        min_dist = std::min( min_dist,
-                            distance_map_->value( grid_.cell_index( index ) )
-                                + step_squared_distance );
-                    }
-                    temps_dist[c] = min_dist;
-                }
-                for( const auto c :
-                    Range{ 0, grid_.nb_cells_in_direction( d ) } )
-                {
-                    Index index;
-                    index[d] = c;
-                    index[d2] = c2;
-                    distance_map_->set_value(
-                        grid_.cell_index( index ), temps_dist[c] );
-                }
-            } );
-        }
-        for( auto& task : async::when_all( tasks ).get() )
-        {
-            task.get();
-        }
-    }
-    template <>
-    void EuclideanDistanceTransform< 3 >::combine_squared_distance_components(
-        const index_t d )
-    {
-        const auto d2 = d == 2 ? 0 : d + 1;
-        const auto d3 = d2 == 2 ? 0 : d2 + 1;
-        absl::FixedArray< async::task< void > > tasks(
-            grid_.nb_cells_in_direction( d2 )
-            * grid_.nb_cells_in_direction( d3 ) );
-        index_t task_id{ 0 };
-        for( const auto c3 : Range{ grid_.nb_cells_in_direction( d3 ) } )
-        {
-            for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
-            {
-                tasks[task_id++] = async::spawn( [this, d, d2, d3, c2, c3] {
-                    absl::FixedArray< double > temps_dist(
-                        grid_.nb_cells_in_direction( d ) );
-                    for( const auto c :
-                        Range{ 0, grid_.nb_cells_in_direction( d ) } )
-                    {
-                        auto min_dist = std::numeric_limits< double >::max();
-                        for( const auto cf :
-                            Range{ c, grid_.nb_cells_in_direction( d ) } )
-                        {
-                            const auto step_squared_distance =
-                                directional_squared_distance( c, cf, d );
-                            if( min_dist < step_squared_distance )
-                            {
-                                break;
-                            }
-                            Index index;
-                            index[d] = cf;
-                            index[d2] = c2;
-                            index[d3] = c3;
-                            min_dist = std::min(
-                                min_dist, distance_map_->value(
-                                              grid_.cell_index( index ) )
-                                              + step_squared_distance );
-                        }
-                        for( const auto cb : ReverseRange{ c, 0 } )
-                        {
-                            const auto step_squared_distance =
-                                directional_squared_distance( c, cb, d );
-                            if( min_dist < step_squared_distance )
-                            {
-                                break;
-                            }
-                            Index index;
-                            index[d] = cb;
-                            index[d2] = c2;
-                            index[d3] = c3;
-                            min_dist = std::min(
-                                min_dist, distance_map_->value(
-                                              grid_.cell_index( index ) )
-                                              + step_squared_distance );
-                        }
-                        temps_dist[c] = min_dist;
-                    }
-                    for( const auto c :
-                        Range{ 0, grid_.nb_cells_in_direction( d ) } )
-                    {
-                        Index index;
-                        index[d] = c;
-                        index[d2] = c2;
-                        index[d3] = c3;
-                        distance_map_->set_value(
-                            grid_.cell_index( index ), temps_dist[c] );
-                    }
-                } );
-            }
-        }
-        for( auto& task : async::when_all( tasks ).get() )
-        {
-            task.get();
-        }
-    }
-    template <>
-    void EuclideanDistanceTransform< 2 >::compute_squared_distance_map()
+    template < index_t dimension >
+    void EuclideanDistanceTransform< dimension >::compute_squared_distance_map()
     {
         ProgressLogger logger{ Logger::LEVEL::info,
-            "Compute 2D euclidian distance", 2 };
-        propagate_directional_squared_distance( 0 );
-        logger.increment();
-        combine_squared_distance_components( 1 );
-        logger.increment();
-    }
-    template <>
-    void EuclideanDistanceTransform< 3 >::compute_squared_distance_map()
-    {
-        ProgressLogger logger{ Logger::LEVEL::info,
-            "Compute 3D euclidian distance", 3 };
-        propagate_directional_squared_distance( 0 );
-        logger.increment();
-        combine_squared_distance_components( 1 );
-        logger.increment();
-        combine_squared_distance_components( 2 );
-        logger.increment();
+            absl::StrCat( "Compute ", dimension, "D euclidian distance" ),
+            dimension };
+        for( const auto d : LRange{ dimension } )
+        {
+            combine_squared_distance_components( d );
+            logger.increment();
+        }
     }
 
     template < index_t dimension >

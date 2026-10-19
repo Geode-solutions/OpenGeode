@@ -25,6 +25,8 @@
 #include <geode/basic/variable_attribute.hpp>
 #include <iostream>
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/mesh/builder/geode/geode_graph_builder.hpp>
 #include <geode/mesh/core/geode/geode_graph.hpp>
 #include <geode/mesh/io/graph_input.hpp>
@@ -223,6 +225,45 @@ void test_backward_v18_5()
     check_v18_5( *geode::load_graph( filename ) );
 }
 
+void test_replace_vertex()
+{
+    auto graph =
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
+    auto builder = geode::GraphBuilder::create( *graph );
+    builder->create_vertices( 5 );
+    builder->create_edge( 0, 1 );
+    builder->create_edge( 0, 2 );
+    builder->create_edge( 3, 0 );
+    builder->replace_vertex( 0, 4 );
+    geode::OpenGeodeMeshException::test(
+        graph->edges_around_vertex( 0 ).empty(),
+        "[Test] No edge should remain around the replaced vertex" );
+    geode::OpenGeodeMeshException::test(
+        graph->edges_around_vertex( 4 ).size() == 3,
+        "[Test] All edges should be around the new vertex" );
+    geode::OpenGeodeMeshException::test(
+        graph->edge_vertex( { 0, 0 } ) == 4
+            && graph->edge_vertex( { 1, 0 } ) == 4
+            && graph->edge_vertex( { 2, 1 } ) == 4,
+        "[Test] Wrong edge vertices after replace_vertex" );
+}
+
+void test_edge_vertex_hash()
+{
+    absl::flat_hash_set< size_t > hashes;
+    for( const auto e : geode::Range{ 10 } )
+    {
+        for( const auto v : geode::LRange{ 2 } )
+        {
+            hashes.insert(
+                std::hash< geode::EdgeVertex >{}( geode::EdgeVertex{ e, v } ) );
+        }
+    }
+    geode::OpenGeodeMeshException::test( hashes.size() == 20,
+        "[Test] EdgeVertex hashes should not collide, got ", hashes.size(),
+        " different hashes for 20 EdgeVertex" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -241,6 +282,8 @@ void test()
     test_delete_edge( *graph, *builder );
     test_clone( *graph );
     test_delete_isolated_vertices( *graph, *builder );
+    test_replace_vertex();
+    test_edge_vertex_hash();
 
     const auto default_graph = geode::Graph::create();
     geode::OpenGeodeMeshException::test(

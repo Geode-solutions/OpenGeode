@@ -22,16 +22,18 @@
  */
 #include <geode/basic/logger.hpp>
 
+#include <geode/basic/logger.hpp>
+
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/helpers/build_grid.hpp>
 
 #include <geode/tests/common.hpp>
 
-void test()
+void test_2d()
 {
-    geode::OpenGeodeMeshLibrary::initialize();
     const geode::index_t max_nb_cells{ 100 };
     geode::BoundingBox2D bbox;
     bbox.add_point( geode::Point2D{ { 0, 0 } } );
@@ -57,7 +59,7 @@ void test()
     DEBUG( grid2.cell_length_in_direction( 0 ) );
     DEBUG( grid2.cell_length_in_direction( 1 ) );
     geode::OpenGeodeMeshException::test(
-        grid.nb_cells() <= max_nb_cells, "Too much cells in built grid2" );
+        grid2.nb_cells() <= max_nb_cells, "Too much cells in built grid2" );
 
     bbox.add_point( geode::Point2D{ { 3, 10 } } );
     const auto grid3 =
@@ -69,7 +71,59 @@ void test()
     DEBUG( grid3.cell_length_in_direction( 0 ) );
     DEBUG( grid3.cell_length_in_direction( 1 ) );
     geode::OpenGeodeMeshException::test(
-        grid.nb_cells() <= max_nb_cells, "Too much cells in built grid3" );
+        grid3.nb_cells() <= max_nb_cells, "Too much cells in built grid3" );
 }
 
-OPENGEODE_TEST( "graph" )
+void check_grid_3d( const geode::BoundingBox3D& bbox,
+    double target_cell_length,
+    geode::index_t max_nb_cells )
+{
+    const auto grid =
+        geode::build_grid_from_bbox_target_length_and_maximum_cell_number(
+            bbox, target_cell_length, max_nb_cells );
+    geode::Logger::info( "Grid ", grid.nb_cells_in_direction( 0 ), " x ",
+        grid.nb_cells_in_direction( 1 ), " x ", grid.nb_cells_in_direction( 2 ),
+        " = ", grid.nb_cells(), " cells (max ", max_nb_cells, ")" );
+    geode::OpenGeodeMeshException::test( grid.nb_cells() <= max_nb_cells,
+        "Too much cells in built 3D grid: ", grid.nb_cells(), " > ",
+        max_nb_cells );
+    geode::OpenGeodeMeshException::test( grid.nb_cells() >= max_nb_cells / 8,
+        "Too few cells in built 3D grid: ", grid.nb_cells() );
+    const auto diagonal = bbox.diagonal();
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        if( diagonal.value( d ) < geode::GLOBAL_EPSILON )
+        {
+            continue;
+        }
+        geode::OpenGeodeMeshException::test(
+            std::fabs( grid.nb_cells_in_direction( d )
+                           * grid.cell_length_in_direction( d )
+                       - diagonal.value( d ) )
+                < 1e-6 * diagonal.value( d ),
+            "Built 3D grid does not cover the bbox in direction ", d );
+    }
+}
+
+void test_3d()
+{
+    geode::BoundingBox3D thin_bbox;
+    thin_bbox.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    thin_bbox.add_point( geode::Point3D{ { 1000, 1000, 1 } } );
+    check_grid_3d( thin_bbox, 1, 10000 );
+
+    geode::BoundingBox3D bbox;
+    bbox.add_point( geode::Point3D{ { 0, 0, 0 } } );
+    bbox.add_point( geode::Point3D{ { 10, 10, 0.5 } } );
+    check_grid_3d( bbox, 0.37, 1000 );
+    check_grid_3d( bbox, 0.01, 1000 );
+}
+
+void test()
+{
+    geode::OpenGeodeMeshLibrary::initialize();
+    test_2d();
+    test_3d();
+}
+
+OPENGEODE_TEST( "build-grid" )
