@@ -33,6 +33,13 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * Compute the (vertex-sampled) Hausdorff distance between two surfaces:
+     * the maximum, over the vertices of each mesh, of the distance to the
+     * other mesh.
+     * @exception OpenGeodeException if one of the meshes has no polygon,
+     * since the distance to an empty set is undefined.
+     */
     [[nodiscard]] double opengeode_mesh_api hausdorff_distance(
         const TriangulatedSurface3D& mesh_A,
         const TriangulatedSurface3D& mesh_B );

@@ -151,6 +151,30 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
         "Object function value 3 is wrong." );
 }
 
+void test_flat_tetrahedron()
+{
+    auto solid = geode::TetrahedralSolid3D::create();
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    auto scalar_function = geode::TetrahedralSolidScalarFunction3D::create(
+        *solid, "flat_scalar_function", geode::uuid{}, 3 );
+    const geode::Point3D point{ { 0.25, 0.25, 0 } };
+    geode::OpenGeodeMeshException::test(
+        inexact_equal( scalar_function.value( point, 0 ), 3, 1e-7 ),
+        "Object function value on flat tetrahedron is wrong." );
+    auto point_function =
+        geode::TetrahedralSolidPointFunction< 3, 2 >::create( *solid,
+            "flat_point_function", geode::uuid{}, geode::Point2D{ { 1, -2 } } );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, 0 )
+            .inexact_equal( geode::Point2D{ { 1, -2 } } ),
+        "Point function value on flat tetrahedron is wrong." );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -158,6 +182,7 @@ void test()
     build_test_solid( *solid );
     test_scalar_function( *solid );
     test_point_function( *solid );
+    test_flat_tetrahedron();
 }
 
 OPENGEODE_TEST( "tetrahedral-solid-function" )
