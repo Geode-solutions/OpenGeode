@@ -46,7 +46,7 @@ namespace geode
                 RasterImageOutputFactory< dimension > >(
                 type, raster, filename );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& e )
         {
             Logger::error( e.what() );
             print_available_extensions< RasterImageOutputFactory< dimension > >(

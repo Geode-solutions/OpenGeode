@@ -22,6 +22,7 @@
  */
 
 #include <filesystem>
+#include <fstream>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
@@ -66,6 +67,22 @@ void test_save_failure( const geode::RasterImage2D& raster )
     }
     geode::OpenGeodeImageException::test(
         thrown, "[TEST] Saving into a directory should throw" );
+
+    const auto file = "raster_regular_file";
+    std::ofstream{ file };
+    thrown = false;
+    try
+    {
+        geode::save_raster_image(
+            raster, absl::StrCat( file, "/raster.og_img2d" ) );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeImageException::test( thrown,
+        "[TEST] Saving into a regular file folder should throw an "
+        "OpenGeodeException" );
 }
 
 void test_missing_colors()

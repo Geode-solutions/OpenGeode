@@ -58,7 +58,7 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                nullptr, OpenGeodeException::TYPE::internal,
+                nullptr, OpenGeodeException::TYPE::data,
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
             return image;

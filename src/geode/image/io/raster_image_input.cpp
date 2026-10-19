@@ -42,7 +42,7 @@ namespace geode
             Logger::info( type, " has: ", raster.nb_cells(), " cells" );
             return raster;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& e )
         {
             Logger::error( e.what() );
             throw OpenGeodeImageException{ nullptr,
