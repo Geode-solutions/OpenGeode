@@ -47,7 +47,8 @@ namespace geode
             Logger::error( e.what() );
             throw OpenGeodeImageException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot load RasterImage from file: ", filename };
+                "Cannot load RasterImage from file: ", filename, ": ",
+                e.what() };
         }
     }
 
