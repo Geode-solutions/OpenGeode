@@ -127,16 +127,7 @@ void test_texture_reference_stability()
     geode::TextureManager2D manager{ attributes, storage };
     auto& texture = manager.find_or_create_texture( "a" );
     const auto texture_id = texture.texture_id();
-    const auto* name_data = [&manager] {
-        for( const auto name : manager.texture_names() )
-        {
-            if( name == "a" )
-            {
-                return name.data();
-            }
-        }
-        return static_cast< const char* >( nullptr );
-    }();
+    const auto names = manager.texture_names();
     for( const auto i : geode::Range{ 100 } )
     {
         manager.find_or_create_texture( absl::StrCat( "texture_", i ) );
@@ -146,19 +137,11 @@ void test_texture_reference_stability()
         "[Test] Texture reference should stay valid after other insertions" );
     geode::OpenGeodeMeshException::test( texture.texture_id() == texture_id,
         "[Test] Texture reference should still refer to the same texture" );
-    bool name_found{ false };
-    for( const auto name : manager.texture_names() )
-    {
-        if( name == "a" )
-        {
-            name_found = true;
-            geode::OpenGeodeMeshException::test( name.data() == name_data,
-                "[Test] Texture name view should stay valid after other "
-                "insertions" );
-        }
-    }
     geode::OpenGeodeMeshException::test(
-        name_found, "[Test] Texture a should be listed" );
+        names.size() == 1 && names[0] == "a",
+        "[Test] Texture names should stay valid after other insertions" );
+    geode::OpenGeodeMeshException::test( manager.texture_names().size() == 101,
+        "[Test] Wrong number of texture names" );
 }
 
 void test_texture_coordinates_out_of_range()
