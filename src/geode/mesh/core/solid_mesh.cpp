@@ -70,10 +70,6 @@
 
 namespace
 {
-    /// Below this length, a facet normal is considered as undefined
-    /// (same threshold as Vector::normalize).
-    constexpr double MIN_NORMAL_LENGTH{ 1e-30 };
-
     template < geode::index_t dimension >
     void check_vertex_id( const geode::SolidMesh< dimension >& solid,
         const geode::index_t vertex_id )
@@ -387,8 +383,9 @@ namespace
                 normal += triangle_normal.value();
             }
         }
+        // Sum of unit normals: its length is scale independent
         const auto length = normal.length();
-        if( length <= MIN_NORMAL_LENGTH )
+        if( length <= geode::GLOBAL_EPSILON )
         {
             return std::nullopt;
         }

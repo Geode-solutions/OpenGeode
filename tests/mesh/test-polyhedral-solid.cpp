@@ -558,6 +558,26 @@ void test_normals()
         "1)" );
 }
 
+void test_folded_facet_normal()
+{
+    // Quad facet {0,1,2,3} folded along its diagonal (0,2): the normals of
+    // its two fan triangles almost cancel out, the facet has no normal.
+    auto polyhedral_solid = geode::PolyhedralSolid3D::create(
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
+    auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
+    builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
+    builder->create_point( geode::Point3D{ { 2, 1, 1e-9 } } );
+    builder->create_point( geode::Point3D{ { 0.5, 0.5, 1 } } );
+    builder->create_polyhedron(
+        { 0, 1, 2, 3, 4 }, { { 0, 1, 2, 3 }, { 0, 1, 4 }, { 1, 2, 4 },
+                               { 2, 3, 4 }, { 3, 0, 4 } } );
+    geode::OpenGeodeMeshException::test(
+        !polyhedral_solid->polyhedron_facet_normal( { 0, 0 } ),
+        "PolyhedralSolid folded facet should not have a normal" );
+}
+
 geode::uuid test_create_vertex_attribute(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
@@ -782,6 +802,7 @@ void test()
 
     test_barycenters();
     test_normals();
+    test_folded_facet_normal();
     test_propagate_around_edge_without_next_facet();
 }
 
