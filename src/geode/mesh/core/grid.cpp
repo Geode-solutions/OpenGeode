@@ -222,15 +222,6 @@ namespace geode
             return std::nullopt;
         }
 
-        /*!
-         * GLOBAL_EPSILON (world units) expressed in grid coordinates
-         * (cell units) along the given direction.
-         */
-        double epsilon_in_grid( local_index_t direction ) const
-        {
-            return GLOBAL_EPSILON / cells_length_[direction];
-        }
-
         bool contains( const Grid< dimension >& grid,
             const Point< dimension >& query ) const
         {
@@ -240,10 +231,9 @@ namespace geode
             {
                 // Negated form: a NaN coordinate is rejected
                 const auto value = query_in_grid.value( d );
-                const auto epsilon = epsilon_in_grid( d );
-                if( !( value >= -epsilon
-                        && value
-                               <= grid.nb_cells_in_direction( d ) + epsilon ) )
+                if( !( value >= -GLOBAL_EPSILON
+                        && value <= grid.nb_cells_in_direction( d )
+                                        + GLOBAL_EPSILON ) )
                 {
                     return false;
                 }
@@ -297,11 +287,10 @@ namespace geode
             for( const auto d : LRange{ dimension } )
             {
                 const auto value = query_in_grid.value( d );
-                const auto epsilon = epsilon_in_grid( d );
                 // Negated form: a NaN coordinate is rejected
-                if( !( value >= -epsilon
-                        && value
-                               <= grid.nb_cells_in_direction( d ) + epsilon ) )
+                if( !( value >= -GLOBAL_EPSILON
+                        && value <= grid.nb_cells_in_direction( d )
+                                        + GLOBAL_EPSILON ) )
                 {
                     return {};
                 }
@@ -319,11 +308,11 @@ namespace geode
                 min[d] = integer_floor;
                 max[d] = integer_floor;
                 const auto remainder = value - floating_floor;
-                if( remainder < epsilon )
+                if( remainder < GLOBAL_EPSILON )
                 {
                     min[d] = integer_floor > 0 ? integer_floor - 1 : 0;
                 }
-                else if( remainder > 1 - epsilon )
+                else if( remainder > 1 - GLOBAL_EPSILON )
                 {
                     max[d] = std::min( integer_floor + 1,
                         grid.nb_cells_in_direction( d ) - 1 );
