@@ -68,6 +68,44 @@ void test_save_failure( const geode::RasterImage2D& raster )
         thrown, "[TEST] Saving into a directory should throw" );
 }
 
+void test_missing_colors()
+{
+    const auto raster = geode::load_raster_image< 2 >(
+        absl::StrCat( geode::DATA_PATH, "raster_missing_colors.og_img2d" ) );
+    geode::OpenGeodeImageException::test(
+        raster.nb_cells() == 64, "[TEST] Wrong number of repaired cells" );
+    for( const auto i : geode::Range{ 16 } )
+    {
+        const geode::RGBColor color{
+            static_cast< geode::local_index_t >( i + 1 ), 0, 0
+        };
+        geode::OpenGeodeImageException::test(
+            raster.color( i ) == color, "[TEST] Wrong stored color for ", i );
+    }
+    for( const auto i : geode::Range{ 16, 64 } )
+    {
+        geode::OpenGeodeImageException::test(
+            raster.color( i ) == geode::RGBColor{},
+            "[TEST] Wrong repaired color for ", i );
+    }
+}
+
+void test_too_many_cells()
+{
+    bool thrown{ false };
+    try
+    {
+        const auto raster = geode::load_raster_image< 2 >( absl::StrCat(
+            geode::DATA_PATH, "raster_too_many_cells.og_img2d" ) );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeImageException::test(
+        thrown, "[TEST] Loading a raster with too many cells should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeImageLibrary::initialize();
@@ -83,6 +121,8 @@ void test()
     const auto reload = geode::load_raster_image< 2 >( filename_with_spaces );
     test_raster( reload );
     test_save_failure( raster );
+    test_missing_colors();
+    test_too_many_cells();
     auto raster2 = std::move( raster );
     geode::OpenGeodeImageException::test(
         raster2.nb_cells() == 100, "Wrong number of cells after move" );

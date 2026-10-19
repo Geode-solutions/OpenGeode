@@ -29,7 +29,7 @@
 namespace
 {
     template < geode::index_t dimension >
-    void check_cells_number(
+    std::uint64_t checked_nb_cells(
         const std::array< geode::index_t, dimension >& cells_number )
     {
         std::uint64_t result{ 1 };
@@ -43,6 +43,14 @@ namespace
                 "should be lower than ",
                 geode::NO_ID );
         }
+        return result;
+    }
+
+    template < geode::index_t dimension >
+    void check_cells_number(
+        const std::array< geode::index_t, dimension >& cells_number )
+    {
+        const auto result = checked_nb_cells< dimension >( cells_number );
         geode::OpenGeodeBasicException::check_exception( result != 0, nullptr,
             geode::OpenGeodeException::TYPE::data,
             "[CellArray] Creation of a array with no cells in one "
@@ -138,11 +146,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, Impl >{
-                           { []( Archive& local_archive, Impl& impl ) {
-                               local_archive.container4b( impl.cells_number_ );
-                           } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& local_archive, Impl& impl ) {
+                        local_archive.container4b( impl.cells_number_ );
+                        checked_nb_cells< dimension >( impl.cells_number_ );
+                    } } } );
         }
 
     private:

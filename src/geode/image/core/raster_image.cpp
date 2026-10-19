@@ -25,6 +25,7 @@
 
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/internal/array_impl.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/image/core/rgb_color.hpp>
@@ -52,6 +53,11 @@ namespace geode
                 "[RasterImage::set_color] Accessing a "
                 "cell that does not exist" );
             colors_[index] = std::move( color );
+        }
+
+        [[nodiscard]] index_t nb_colors() const
+        {
+            return static_cast< index_t >( colors_.size() );
         }
 
         void resize( index_t nb_cells )
@@ -139,6 +145,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    void RasterImage< dimension >::repair_colors()
+    {
+        const auto nb_colors = impl_->nb_colors();
+        const auto nb_cells = this->nb_cells();
+        if( nb_colors == nb_cells )
+        {
+            return;
+        }
+        Logger::warning( "[RasterImage] ", nb_colors, " colors stored for ",
+            nb_cells, " cells: colors are resized to the number of cells" );
+        impl_->resize( nb_cells );
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void RasterImage< dimension >::serialize( Archive& serializer )
     {
@@ -148,6 +168,7 @@ namespace geode
                     archive.ext( raster,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
                     archive.object( raster.impl_ );
+                    raster.repair_colors();
                 } } } );
     }
 
