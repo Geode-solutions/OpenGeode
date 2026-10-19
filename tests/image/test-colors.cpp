@@ -55,6 +55,20 @@ void test_rgb_addition()
         "[TEST] Wrong RGBColor addition assignment: ", color3.string() );
 }
 
+void test_greyscale_addition()
+{
+    const geode::GreyscaleColor one{ 1 };
+    geode::OpenGeodeImageException::test( one + one == one,
+        "[TEST] Wrong GreyscaleColor addition: ", ( one + one ).string() );
+    const geode::GreyscaleColor white{ 255 };
+    geode::OpenGeodeImageException::test( white + white == white,
+        "[TEST] Wrong GreyscaleColor addition: ", ( white + white ).string() );
+    auto color = white;
+    color += geode::GreyscaleColor{ 1 };
+    geode::OpenGeodeImageException::test( color == geode::GreyscaleColor{ 128 },
+        "[TEST] Wrong GreyscaleColor addition assignment: ", color.string() );
+}
+
 void test_color_attribute()
 {
     geode::AttributeManager manager;
@@ -98,6 +112,7 @@ void test()
 {
     test_comparison();
     test_rgb_addition();
+    test_greyscale_addition();
     test_color_attribute();
 }
 

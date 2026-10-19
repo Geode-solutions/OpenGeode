@@ -60,8 +60,9 @@ namespace geode
     GreyscaleColor GreyscaleColor::operator+(
         const GreyscaleColor &other ) const
     {
-        return GreyscaleColor{ static_cast< geode::local_index_t >(
-            value() / 2 + other.value() / 2 ) };
+        GreyscaleColor result{ *this };
+        result += other;
+        return result;
     }
 
     void GreyscaleColor::operator+=( const GreyscaleColor &other )
