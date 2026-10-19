@@ -238,7 +238,8 @@ namespace geode
         {
             return;
         }
-        const auto& edges_around = graph_.edges_around_vertex( old_vertex_id );
+        // Copy: set_edge_vertex removes each edge from old_vertex_id list
+        const auto edges_around = graph_.edges_around_vertex( old_vertex_id );
         for( const auto& edge_around : edges_around )
         {
             set_edge_vertex( edge_around, new_vertex_id );

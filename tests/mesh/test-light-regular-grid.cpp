@@ -21,17 +21,23 @@
  *
  */
 
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <limits>
+
+#include <absl/algorithm/container.h>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/grid_builder.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/io/light_regular_grid_input.hpp>
 #include <geode/mesh/io/light_regular_grid_output.hpp>
@@ -357,6 +363,121 @@ void test_attribute( const geode::LightRegularGrid3D& grid )
         "Wrong attribute value" );
 }
 
+void test_vertices_around_vertex( const geode::LightRegularGrid3D& grid )
+{
+    const auto vertex = grid.vertex_index( { 1, 1, 1 } );
+    const auto around = grid.vertices_around_vertex( vertex );
+    geode::OpenGeodeMeshException::test( around.size() == 6,
+        "Wrong number of vertices around an inner vertex: ", around.size() );
+    for( const auto& neighbor : std::array< geode::Grid3D::VertexIndices, 6 >{
+             { { 0, 1, 1 }, { 2, 1, 1 }, { 1, 0, 1 }, { 1, 2, 1 }, { 1, 1, 0 },
+                 { 1, 1, 2 } } } )
+    {
+        geode::OpenGeodeMeshException::test(
+            absl::c_linear_search( around, grid.vertex_index( neighbor ) ),
+            "Missing vertex around an inner vertex" );
+    }
+    const auto corner_around = grid.vertices_around_vertex( 0 );
+    geode::OpenGeodeMeshException::test( corner_around.size() == 3,
+        "Wrong number of vertices around a corner vertex" );
+}
+
+void test_set_grid_dimensions_failure()
+{
+    geode::LightRegularGrid3D grid{ geode::Point3D{ { 1.5, 0, 1 } },
+        { 5, 10, 15 }, { 1, 2, 3 } };
+    geode::GridBuilder3D builder{ grid };
+    const auto check_unchanged = [&grid]( std::string_view context ) {
+        geode::OpenGeodeMeshException::test(
+            grid.nb_cells_in_direction( 0 ) == 5
+                && grid.nb_cells_in_direction( 1 ) == 10
+                && grid.nb_cells_in_direction( 2 ) == 15,
+            "[Test] Cells number should be unchanged after a failed ",
+            context );
+        geode::OpenGeodeMeshException::test(
+            grid.cell_length_in_direction( 0 ) == 1
+                && grid.cell_length_in_direction( 1 ) == 2
+                && grid.cell_length_in_direction( 2 ) == 3,
+            "[Test] Cells length should be unchanged after a failed ",
+            context );
+        geode::OpenGeodeMeshException::test(
+            grid.grid_point( { 1, 1, 1 } ) == geode::Point3D{ { 2.5, 2, 4 } },
+            "[Test] Grid geometry should be unchanged after a failed ",
+            context );
+    };
+    bool thrown{ false };
+    try
+    {
+        builder.set_grid_dimensions( { 65535, 65535, 1 }, { 1, 1, 1 } );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] Too many vertices should throw" );
+    check_unchanged( "vertex overflow" );
+    thrown = false;
+    try
+    {
+        builder.set_grid_dimensions( { 6, 7, 8 }, { 1, 0, 3 } );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] Null cell length should throw" );
+    check_unchanged( "null length" );
+}
+
+void test_nan_query( const geode::LightRegularGrid3D& grid )
+{
+    const auto nan = std::numeric_limits< double >::quiet_NaN();
+    const geode::Point3D query{ { nan, 2, 2 } };
+    geode::OpenGeodeMeshException::test(
+        !grid.contains( query ), "[Test] NaN point should not be contained" );
+    geode::OpenGeodeMeshException::test(
+        grid.cells( query ).empty(), "[Test] NaN point should be in no cell" );
+    const auto closest = grid.closest_vertex( query );
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            closest[d] < grid.nb_vertices_in_direction( d ),
+            "[Test] Closest vertex of NaN point should be a valid vertex" );
+    }
+}
+
+void test_clone_exact_geometry()
+{
+    const geode::LightRegularGrid3D grid{
+        geode::Point3D{ { 1e6 + 0.1, -3e5 + 0.7, 12345.678 } }, { 3, 4, 5 },
+        { geode::Vector3D{ { 0.1, 0.2, 0.3 } },
+            geode::Vector3D{ { -0.7, 0.1 / 3, 0.3 } },
+            geode::Vector3D{ { 1.1, 0.9, -0.3 / 7 } } }
+    };
+    const auto clone = grid.clone();
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            clone.grid_coordinate_system().direction( d )
+                == grid.grid_coordinate_system().direction( d ),
+            "[Test] Cloned grid direction ", d, " should be identical: ",
+            clone.grid_coordinate_system().direction( d ).string(), " vs ",
+            grid.grid_coordinate_system().direction( d ).string() );
+        geode::OpenGeodeMeshException::test(
+            clone.cell_length_in_direction( d )
+                == grid.cell_length_in_direction( d ),
+            "[Test] Cloned grid cell length should be identical" );
+    }
+    for( const auto v : geode::Range{ grid.nb_grid_vertices() } )
+    {
+        geode::OpenGeodeMeshException::test(
+            clone.point( v ) == grid.point( v ),
+            "[Test] Cloned grid point should be identical" );
+    }
+}
+
 void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
@@ -407,6 +528,10 @@ void test()
     test_boundary_box( grid );
     test_closest_vertex( grid );
     test_attribute( grid );
+    test_vertices_around_vertex( grid );
+    test_set_grid_dimensions_failure();
+    test_nan_query( grid );
+    test_clone_exact_geometry();
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
     test_save_unwritable( grid );
 }

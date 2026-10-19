@@ -42,14 +42,7 @@ namespace geode::internal
         [[nodiscard]] index_t cell_index( const CellArray< dimension >& array,
             const CellIndices& index ) const
         {
-            index_t cell_id{ index[0] };
-            index_t offset{ 1 };
-            for( const auto d : LRange{ 1, dimension } )
-            {
-                offset *= array.nb_cells_in_direction( d - 1 );
-                cell_id += index[d] * offset;
-            }
-            return cell_id;
+            return flat_index( array.cell_strides(), index );
         }
 
         [[nodiscard]] CellIndices cell_indices(
@@ -57,14 +50,38 @@ namespace geode::internal
         {
             OpenGeodeBasicException::check_assertion( index < array.nb_cells(),
                 "[CellArray::cell_index] Invalid index" );
-            CellIndices cell_id;
+            return multi_index( array.cell_strides(), index );
+        }
+
+    protected:
+        [[nodiscard]] static const std::array< index_t, dimension >&
+            vertex_strides( const CellArray< dimension >& array )
+        {
+            return array.vertex_strides();
+        }
+
+        [[nodiscard]] static index_t flat_index(
+            const std::array< index_t, dimension >& strides,
+            const CellIndices& index )
+        {
+            index_t result{ 0 };
             for( const auto d : LRange{ dimension } )
             {
-                const auto nb_cells = array.nb_cells_in_direction( d );
-                cell_id[d] = index % nb_cells;
-                index /= nb_cells;
+                result += index[d] * strides[d];
             }
-            return cell_id;
+            return result;
+        }
+
+        [[nodiscard]] static CellIndices multi_index(
+            const std::array< index_t, dimension >& strides, index_t index )
+        {
+            CellIndices result;
+            for( local_index_t d = dimension; d-- > 0; )
+            {
+                result[d] = index / strides[d];
+                index -= result[d] * strides[d];
+            }
+            return result;
         }
 
     private:

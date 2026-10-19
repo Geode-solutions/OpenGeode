@@ -23,11 +23,14 @@
 
 #include <fstream>
 
+#include <absl/hash/hash.h>
+
 #include <geode/basic/logger.hpp>
 
 #include <geode/mesh/builder/geode/geode_vertex_set_builder.hpp>
 #include <geode/mesh/builder/vertex_set_builder.hpp>
 #include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/mesh_element.hpp>
 #include <geode/mesh/io/vertex_set_input.hpp>
 #include <geode/mesh/io/vertex_set_output.hpp>
 
@@ -95,6 +98,24 @@ void test_move( geode::OpenGeodeVertexSet& vertex_set )
         vertex_set_2.nb_vertices() == 5, "VertexSet2 should have 5 vertices" );
 }
 
+void test_mesh_element_hash()
+{
+    const geode::uuid mesh_id;
+    for( const auto e : geode::Range{ 10 } )
+    {
+        const geode::MeshElement element{ mesh_id, e };
+        geode::OpenGeodeMeshException::test(
+            std::hash< geode::MeshElement >{}( element )
+                == absl::Hash< geode::MeshElement >{}( element ),
+            "[Test] std::hash of MeshElement should combine its members like "
+            "absl::Hash" );
+        geode::OpenGeodeMeshException::test(
+            std::hash< geode::MeshVertex >{}( geode::MeshVertex{ mesh_id, e } )
+                == std::hash< geode::MeshElement >{}( element ),
+            "[Test] std::hash of MeshVertex should match MeshElement" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -107,6 +128,7 @@ void test()
     test_delete_vertex( vertex_set, *builder );
     test_clone( vertex_set );
     test_move( vertex_set );
+    test_mesh_element_hash();
 }
 
 OPENGEODE_TEST( "vertex-set" )
