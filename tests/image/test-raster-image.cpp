@@ -21,6 +21,8 @@
  *
  */
 
+#include <filesystem>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -49,6 +51,23 @@ void test_raster( const geode::RasterImage2D& raster )
     }
 }
 
+void test_save_failure( const geode::RasterImage2D& raster )
+{
+    const auto folder = "raster_folder.og_img2d";
+    std::filesystem::create_directory( folder );
+    bool thrown{ false };
+    try
+    {
+        geode::save_raster_image( raster, folder );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeImageException::test(
+        thrown, "[TEST] Saving into a directory should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeImageLibrary::initialize();
@@ -63,6 +82,7 @@ void test()
     geode::save_raster_image( raster, filename_with_spaces );
     const auto reload = geode::load_raster_image< 2 >( filename_with_spaces );
     test_raster( reload );
+    test_save_failure( raster );
     auto raster2 = std::move( raster );
     geode::OpenGeodeImageException::test(
         raster2.nb_cells() == 100, "Wrong number of cells after move" );
