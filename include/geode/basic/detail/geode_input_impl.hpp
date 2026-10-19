@@ -49,7 +49,10 @@ namespace geode::detail
             Factory::has_creator( extension ), nullptr,
             OpenGeodeException::TYPE::data, "Unknown extension \"", extension,
             "\" for file \"", filename, "\". Available extensions: ",
-            absl::StrJoin( Factory::list_creators(), ", " ) );
+            absl::StrJoin( Factory::list_creators(), ", " ),
+            ". Other formats are provided by IO libraries (e.g. OpenGeode-IO, "
+            "OpenGeode-GeosciencesIO) which must be initialized first (in "
+            "Python: import opengeode_io, opengeode_geosciencesio...)" );
         return Factory::create(
             extension, expand_predefined_folders( filename ) );
     }
