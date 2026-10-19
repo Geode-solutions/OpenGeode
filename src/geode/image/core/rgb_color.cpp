@@ -132,8 +132,6 @@ namespace std
     size_t hash< geode::RGBColor >::operator()(
         const geode::RGBColor &color ) const
     {
-        return absl::Hash< geode::local_index_t >()( color.red() )
-               ^ absl::Hash< geode::local_index_t >()( color.green() )
-               ^ absl::Hash< geode::local_index_t >()( color.blue() );
+        return absl::HashOf( color.red(), color.green(), color.blue() );
     }
 } // namespace std

@@ -21,6 +21,8 @@
  *
  */
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -174,6 +176,25 @@ void test_interpolation()
         manager, *rgb_attribute, *grey_attribute, {}, {}, DEFAULT );
 }
 
+void test_rgb_hash()
+{
+    const std::hash< geode::RGBColor > hash;
+    geode::OpenGeodeImageException::test(
+        hash( { 10, 20, 30 } ) != hash( { 30, 20, 10 } ),
+        "[TEST] Permuted channels should not share a hash" );
+    geode::OpenGeodeImageException::test(
+        hash( { 7, 7, 0 } ) != hash( { 9, 9, 0 } ),
+        "[TEST] Colors with equal red and green should not share a hash" );
+    absl::flat_hash_set< size_t > hashes;
+    for( const auto value : geode::Range{ 256 } )
+    {
+        const auto channel = static_cast< geode::local_index_t >( value );
+        hashes.insert( hash( { channel, channel, channel } ) );
+    }
+    geode::OpenGeodeImageException::test(
+        hashes.size() == 256, "[TEST] Grey colors should not share hashes" );
+}
+
 void test()
 {
     test_comparison();
@@ -181,6 +202,7 @@ void test()
     test_greyscale_addition();
     test_color_attribute();
     test_interpolation();
+    test_rgb_hash();
 }
 
 OPENGEODE_TEST( "colors" )
