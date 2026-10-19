@@ -156,7 +156,8 @@ namespace geode
                 index_t solid_id,
                 index_t polyhedron )
             {
-                const auto& solid = merger.meshes()[solid_id].get();
+                const auto& meshes = merger.meshes();
+                const auto& solid = meshes[solid_id].get();
                 auto facets_vertices =
                     solid.polyhedron_facets_vertices( polyhedron );
                 for( auto& facet_vertices : facets_vertices )
