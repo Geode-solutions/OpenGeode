@@ -21,11 +21,13 @@
  *
  */
 
-#include <geode/basic/mapping.hpp>
-
 #include <geode/mesh/helpers/internal/copy.hpp>
 
-#include <async++.h>
+#include <vector>
+
+#include <absl/algorithm/container.h>
+
+#include <geode/basic/attribute_manager.hpp>
 
 namespace geode
 {
@@ -34,13 +36,11 @@ namespace geode
         void copy_attributes(
             const AttributeManager& manager_in, AttributeManager& manager_out )
         {
-            GenericMapping< index_t > mapping;
-            for( const auto attribute_element :
-                geode::Range{ manager_in.nb_elements() } )
-            {
-                mapping.map( attribute_element, attribute_element );
-            }
-            manager_out.import( manager_in, mapping );
+            // Identity old2new array: a GenericMapping would build two hash
+            // maps of nb_elements entries for an element-to-element copy
+            std::vector< index_t > old2new( manager_in.nb_elements() );
+            absl::c_iota( old2new, 0 );
+            manager_out.import( manager_in, old2new );
         }
     } // namespace internal
 } // namespace geode

@@ -25,6 +25,8 @@
 
 #include <queue>
 
+#include <absl/functional/function_ref.h>
+
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
@@ -38,21 +40,17 @@
 
 namespace
 {
-    template < typename Mesh, typename Propagator >
+    template < typename Mesh >
     void add_adjacents( const Mesh& mesh,
-        const Propagator& propagator,
         geode::index_t element_id,
-        std::queue< geode::index_t >& queue )
+        absl::FunctionRef< void( geode::index_t ) > visit )
     {
         for( const auto f :
             geode::LRange{ mesh.nb_element_facets( element_id ) } )
         {
             if( const auto adj = mesh.element_adjacent( { element_id, f } ) )
             {
-                if( propagator.identifier( adj.value() ) == geode::NO_ID )
-                {
-                    queue.emplace( adj.value() );
-                }
+                visit( adj.value() );
             }
         }
     }
@@ -104,7 +102,12 @@ namespace geode
                     nb_components_ );
                 for( const auto p : Indices{ identification_ } )
                 {
-                    components[identifier( p )].push_back( p );
+                    const auto component = identifier( p );
+                    if( component == NO_ID )
+                    {
+                        continue;
+                    }
+                    components[component].push_back( p );
                 }
                 return components;
             }
@@ -124,25 +127,35 @@ namespace geode
             void propagate(
                 index_t element_from, index_t tag_id, index_t nb_max_elements )
             {
+                // Elements are tagged when queued, so each element is queued
+                // at most once (tagging when popped queued an element once
+                // per tagged neighbor: quadratic around high valence
+                // vertices). The queue order is unchanged, so the first
+                // nb_max_elements elements tagged are the same.
                 index_t counter{ 0 };
                 std::queue< index_t > queue;
-                queue.emplace( element_from );
+                const auto visit = [this, &counter, &queue, tag_id,
+                                       nb_max_elements]( index_t element ) {
+                    if( counter >= nb_max_elements
+                        || identifier( element ) != NO_ID )
+                    {
+                        return;
+                    }
+                    identification_[element] = tag_id;
+                    counter++;
+                    queue.emplace( element );
+                };
+                visit( element_from );
                 while( !queue.empty() && counter < nb_max_elements )
                 {
                     const auto cur_el = queue.front();
                     queue.pop();
-                    if( identifier( cur_el ) != NO_ID )
-                    {
-                        continue;
-                    }
-                    identification_[cur_el] = tag_id;
-                    counter++;
-                    add_adjacents( cur_el, queue );
+                    add_adjacents( cur_el, visit );
                 }
             }
 
-            virtual void add_adjacents(
-                index_t element_id, std::queue< index_t >& queue ) const = 0;
+            virtual void add_adjacents( index_t element_id,
+                absl::FunctionRef< void( index_t ) > visit ) const = 0;
 
         private:
             const Mesh& mesh_;
@@ -159,18 +172,13 @@ namespace geode
             }
 
         private:
-            void add_adjacents(
-                index_t vertex_id, std::queue< index_t >& queue ) const override
+            void add_adjacents( index_t vertex_id,
+                absl::FunctionRef< void( index_t ) > visit ) const override
             {
                 for( const auto& around :
                     this->mesh().edges_around_vertex( vertex_id ) )
                 {
-                    const auto other_vertex_id =
-                        this->mesh().edge_vertex( around.opposite() );
-                    if( this->identifier( other_vertex_id ) == NO_ID )
-                    {
-                        queue.emplace( other_vertex_id );
-                    }
+                    visit( this->mesh().edge_vertex( around.opposite() ) );
                 }
             }
         };
@@ -209,28 +217,37 @@ namespace geode
         public:
             explicit Impl( const EdgedCurve< dimension >& curve )
                 : Propagator< EdgedCurve< dimension > >(
-                      curve, curve.nb_edges() )
+                      curve, curve.nb_edges() ),
+                  vertex_scanned_( curve.nb_vertices(), false )
             {
             }
 
         private:
-            void add_adjacents(
-                index_t edge_id, std::queue< index_t >& queue ) const override
+            void add_adjacents( index_t edge_id,
+                absl::FunctionRef< void( index_t ) > visit ) const override
             {
                 for( const auto vertex_id :
                     this->mesh().edge_vertices( edge_id ) )
                 {
+                    // Edges are identified without size limit, so once the
+                    // edges around a vertex have been visited, they are all
+                    // identified: scanning them again from another edge
+                    // would be quadratic around high valence vertices.
+                    if( vertex_scanned_[vertex_id] )
+                    {
+                        continue;
+                    }
+                    vertex_scanned_[vertex_id] = true;
                     for( const auto& around :
                         this->mesh().edges_around_vertex( vertex_id ) )
                     {
-                        if( around.edge_id != edge_id
-                            && this->identifier( around.edge_id ) == NO_ID )
-                        {
-                            queue.emplace( around.edge_id );
-                        }
+                        visit( around.edge_id );
                     }
                 }
             }
+
+        private:
+            mutable std::vector< bool > vertex_scanned_;
         };
 
         template < index_t dimension >
@@ -277,12 +294,12 @@ namespace geode
 
         private:
             void add_adjacents( index_t polygon_id,
-                std::queue< index_t >& queue ) const override
+                absl::FunctionRef< void( index_t ) > visit ) const override
             {
                 ::add_adjacents(
                     GenericMeshAccessor< SurfaceMesh< dimension > >{
                         this->mesh() },
-                    *this, polygon_id, queue );
+                    polygon_id, visit );
             }
         };
 
@@ -327,11 +344,11 @@ namespace geode
 
         private:
             void add_adjacents( index_t polyhedron_id,
-                std::queue< index_t >& queue ) const override
+                absl::FunctionRef< void( index_t ) > visit ) const override
             {
                 ::add_adjacents(
-                    GenericMeshAccessor< SolidMesh3D >{ this->mesh() }, *this,
-                    polyhedron_id, queue );
+                    GenericMeshAccessor< SolidMesh3D >{ this->mesh() },
+                    polyhedron_id, visit );
             }
         };
 
