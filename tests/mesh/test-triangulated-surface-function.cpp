@@ -150,6 +150,29 @@ void test_point_function( geode::TriangulatedSurface2D& surface )
         "Point function value 3 is wrong." );
 }
 
+void test_flat_triangle()
+{
+    auto surface = geode::TriangulatedSurface2D::create();
+    auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
+    builder->create_point( geode::Point2D{ { 0, 0 } } );
+    builder->create_point( geode::Point2D{ { 1, 0 } } );
+    builder->create_point( geode::Point2D{ { 2, 0 } } );
+    builder->create_triangle( { 0, 1, 2 } );
+    auto scalar_function = geode::TriangulatedSurfaceScalarFunction2D::create(
+        *surface, "flat_scalar_function", geode::uuid{}, 3 );
+    const geode::Point2D point{ { 0.5, 0 } };
+    geode::OpenGeodeMeshException::test(
+        inexact_equal( scalar_function.value( point, 0 ), 3, 1e-7 ),
+        "Scalar function value on flat triangle is wrong." );
+    auto point_function =
+        geode::TriangulatedSurfacePointFunction< 2, 2 >::create( *surface,
+            "flat_point_function", geode::uuid{}, geode::Point2D{ { 1, -2 } } );
+    geode::OpenGeodeMeshException::test(
+        point_function.value( point, 0 )
+            .inexact_equal( geode::Point2D{ { 1, -2 } } ),
+        "Point function value on flat triangle is wrong." );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -157,6 +180,7 @@ void test()
     build_test_surface( *surface );
     test_scalar_function( *surface );
     test_point_function( *surface );
+    test_flat_triangle();
 }
 
 OPENGEODE_TEST( "triangulated-surface-function" )

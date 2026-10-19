@@ -92,88 +92,110 @@ namespace
         return mesh.edge_vertex( edge_vertex0 )
                == mesh.edge_vertex( edge_vertex1 );
     }
+} // namespace
 
-    bool test_vertex_mode( const geode::SurfaceMesh3D& mesh,
-        const geode::RayTracing3D::PolygonDistance& polygon0,
-        const geode::RayTracing3D::PolygonDistance& polygon1 )
+namespace geode
+{
+    namespace internal
     {
-        geode::PolygonVertex polygon_vertex0{ polygon0.polygon, geode::NO_LID };
-        if( polygon0.position == geode::POSITION::vertex0 )
+        /*!
+         * Polygon-local vertex or edge hit by a ray, if any.
+         * Not in an anonymous namespace: used as RayTracing3D::Impl member.
+         */
+        struct RayTracingPolygonFeature
         {
-            polygon_vertex0.vertex_id = 0;
-        }
-        else if( polygon0.position == geode::POSITION::vertex1 )
+            geode::local_index_t vertex{ geode::NO_LID };
+            geode::local_index_t edge{ geode::NO_LID };
+        };
+
+        struct RayTracingPolygonHit
         {
-            polygon_vertex0.vertex_id = 1;
-        }
-        else if( polygon0.position == geode::POSITION::vertex2 )
-        {
-            polygon_vertex0.vertex_id = 2;
-        }
-        else
-        {
-            return false;
-        }
-        geode::PolygonVertex polygon_vertex1{ polygon1.polygon, geode::NO_LID };
-        if( polygon1.position == geode::POSITION::vertex0 )
-        {
-            polygon_vertex1.vertex_id = 0;
-        }
-        else if( polygon1.position == geode::POSITION::vertex1 )
-        {
-            polygon_vertex1.vertex_id = 1;
-        }
-        else if( polygon1.position == geode::POSITION::vertex2 )
-        {
-            polygon_vertex1.vertex_id = 2;
-        }
-        else
-        {
-            return false;
-        }
-        return mesh.polygon_vertex( polygon_vertex0 )
-               == mesh.polygon_vertex( polygon_vertex1 );
+            geode::RayTracing3D::PolygonDistance distance;
+            RayTracingPolygonFeature feature;
+
+            bool operator<( const RayTracingPolygonHit& other ) const
+            {
+                return distance < other.distance;
+            }
+        };
+    } // namespace internal
+} // namespace geode
+
+namespace
+{
+    using PolygonFeature = geode::internal::RayTracingPolygonFeature;
+    using PolygonHit = geode::internal::RayTracingPolygonHit;
+
+    geode::POSITION polygon_vertex_position( geode::local_index_t vertex )
+    {
+        static constexpr std::array< geode::POSITION, 4 > POSITIONS{
+            geode::POSITION::vertex0, geode::POSITION::vertex1,
+            geode::POSITION::vertex2, geode::POSITION::vertex3
+        };
+        // POSITION cannot express vertices after the fourth one
+        return vertex < POSITIONS.size() ? POSITIONS[vertex]
+                                         : geode::POSITION::parallel;
     }
 
-    bool test_edge_mode( const geode::SurfaceMesh3D& mesh,
-        const geode::RayTracing3D::PolygonDistance& polygon0,
-        const geode::RayTracing3D::PolygonDistance& polygon1 )
+    geode::POSITION polygon_edge_position( geode::local_index_t edge )
     {
-        geode::PolygonEdge polygon_edge0{ polygon0.polygon, geode::NO_LID };
-        if( polygon0.position == geode::POSITION::edge0 )
+        static constexpr std::array< geode::POSITION, 3 > POSITIONS{
+            geode::POSITION::edge0, geode::POSITION::edge1,
+            geode::POSITION::edge2
+        };
+        // POSITION cannot express edges after the third one
+        return edge < POSITIONS.size() ? POSITIONS[edge]
+                                       : geode::POSITION::parallel;
+    }
+
+    /*!
+     * Convert a position in the fan triangle {0, fan_edge, fan_edge + 1} of
+     * a polygon into a position in the polygon.
+     */
+    std::tuple< geode::POSITION, PolygonFeature > polygon_position(
+        geode::POSITION fan_position,
+        geode::local_index_t fan_edge,
+        geode::local_index_t nb_polygon_vertices )
+    {
+        PolygonFeature feature;
+        switch( fan_position )
         {
-            polygon_edge0.edge_id = 0;
+            case geode::POSITION::vertex0:
+                feature.vertex = 0;
+                break;
+            case geode::POSITION::vertex1:
+                feature.vertex = fan_edge;
+                break;
+            case geode::POSITION::vertex2:
+                feature.vertex = fan_edge + 1;
+                break;
+            case geode::POSITION::edge0:
+                if( fan_edge != 1 )
+                {
+                    // Diagonal between two fan triangles
+                    return { geode::POSITION::inside, feature };
+                }
+                feature.edge = 0;
+                break;
+            case geode::POSITION::edge1:
+                feature.edge = fan_edge;
+                break;
+            case geode::POSITION::edge2:
+                if( fan_edge + 2 != nb_polygon_vertices )
+                {
+                    // Diagonal between two fan triangles
+                    return { geode::POSITION::inside, feature };
+                }
+                feature.edge = nb_polygon_vertices - 1;
+                break;
+            default:
+                return { fan_position, feature };
         }
-        else if( polygon0.position == geode::POSITION::edge1 )
+        if( feature.vertex != geode::NO_LID )
         {
-            polygon_edge0.edge_id = 1;
+            return { polygon_vertex_position( feature.vertex ), feature };
         }
-        else if( polygon0.position == geode::POSITION::edge2 )
-        {
-            polygon_edge0.edge_id = 2;
-        }
-        else
-        {
-            return false;
-        }
-        geode::PolygonEdge polygon_edge1{ polygon1.polygon, geode::NO_LID };
-        if( polygon1.position == geode::POSITION::edge0 )
-        {
-            polygon_edge1.edge_id = 0;
-        }
-        else if( polygon1.position == geode::POSITION::edge1 )
-        {
-            polygon_edge1.edge_id = 1;
-        }
-        else if( polygon1.position == geode::POSITION::edge2 )
-        {
-            polygon_edge1.edge_id = 2;
-        }
-        else
-        {
-            return false;
-        }
-        return mesh.polygon_adjacent_edge( polygon_edge0 ) == polygon_edge1;
+        return { polygon_edge_position( feature.edge ), feature };
     }
 
     bool are_equal( const geode::EdgedCurve2D& mesh,
@@ -199,29 +221,32 @@ namespace
     }
 
     bool are_equal( const geode::SurfaceMesh3D& mesh,
-        const geode::RayTracing3D::PolygonDistance& polygon0,
-        const geode::RayTracing3D::PolygonDistance& polygon1 )
+        const PolygonHit& hit0,
+        const PolygonHit& hit1 )
     {
-        if( std::fabs( polygon0.distance - polygon1.distance )
+        if( std::fabs( hit0.distance.distance - hit1.distance.distance )
             > geode::GLOBAL_EPSILON )
         {
             return false;
         }
-        if( polygon0.position == geode::POSITION::inside
-            || polygon0.position == geode::POSITION::parallel )
+        const auto& feature0 = hit0.feature;
+        const auto& feature1 = hit1.feature;
+        if( feature0.vertex != geode::NO_LID
+            && feature1.vertex != geode::NO_LID )
         {
-            return false;
+            return mesh.polygon_vertex(
+                       { hit0.distance.polygon, feature0.vertex } )
+                   == mesh.polygon_vertex(
+                       { hit1.distance.polygon, feature1.vertex } );
         }
-        if( polygon1.position == geode::POSITION::inside
-            || polygon1.position == geode::POSITION::parallel )
+        if( feature0.edge != geode::NO_LID && feature1.edge != geode::NO_LID )
         {
-            return false;
+            return mesh.polygon_adjacent_edge(
+                       { hit0.distance.polygon, feature0.edge } )
+                   == geode::PolygonEdge{ hit1.distance.polygon,
+                          feature1.edge };
         }
-        if( test_vertex_mode( mesh, polygon0, polygon1 ) )
-        {
-            return true;
-        }
-        return test_edge_mode( mesh, polygon0, polygon1 );
+        return false;
     }
 } // namespace
 
@@ -354,7 +379,7 @@ namespace geode
 
     private:
         const EdgedCurve2D& mesh_;
-        const Point2D& origin_;
+        Point2D origin_;
         OwnerSegment2D segment_;
         mutable std::vector< EdgeDistance > results_;
         mutable bool are_results_sorted_{ false };
@@ -460,7 +485,7 @@ namespace geode
                 return std::nullopt;
             }
             sort_results();
-            return results_.front();
+            return results_.front().distance;
         }
 
         std::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
@@ -476,7 +501,7 @@ namespace geode
                     size, static_cast< index_t >( results_.size() ) ) };
             for( const auto i : Indices{ closest_polygons.value() } )
             {
-                closest_polygons->at( i ) = results_[i];
+                closest_polygons->at( i ) = results_[i].distance;
             }
             return closest_polygons;
         }
@@ -488,13 +513,42 @@ namespace geode
                 return {};
             }
             sort_results();
-            return results_;
+            std::vector< PolygonDistance > intersections;
+            intersections.reserve( results_.size() );
+            for( const auto& result : results_ )
+            {
+                intersections.push_back( result.distance );
+            }
+            return intersections;
         }
 
         bool compute( index_t polygon_id )
         {
             const auto& point0 =
                 mesh_.point( mesh_.polygon_vertex( { polygon_id, 0 } ) );
+            // Closest contact found when the ray is coplanar to the polygon
+            // (or to a degenerate fan triangle): a single one is kept per
+            // polygon
+            std::optional<
+                std::tuple< double, POSITION, local_index_t, Point3D > >
+                coplanar_contact;
+            const auto add_coplanar_contact =
+                [this, &coplanar_contact]( const Point3D& ray_point,
+                    POSITION position, local_index_t edge ) {
+                    const Vector3D origin_target{ origin_, ray_point };
+                    auto distance = origin_target.length();
+                    if( origin_target.dot( segment_.direction() ) < 0 )
+                    {
+                        distance *= -1.;
+                    }
+                    if( !coplanar_contact
+                        || std::fabs( distance ) < std::fabs(
+                               std::get< 0 >( coplanar_contact.value() ) ) )
+                    {
+                        coplanar_contact.emplace(
+                            distance, position, edge, ray_point );
+                    }
+                };
             for( const auto edge :
                 LRange{ 1, mesh_.nb_polygon_edges( polygon_id ) - 1 } )
             {
@@ -521,9 +575,9 @@ namespace geode
                     {
                         distance *= -1.;
                     }
-                    results_.emplace_back( polygon_id, distance, result.second,
+                    add_result( polygon_id, distance, result.second, edge,
                         intersection_result );
-                    break;
+                    return false;
                 }
                 for( const auto edge2 : LRange{ 3 } )
                 {
@@ -531,39 +585,40 @@ namespace geode
                         _] = segment_segment_distance( Segment3D{ segment_ },
                         { triangle.vertices()[edge2].get(),
                             triangle.vertices()[( edge2 + 1 ) % 3].get() } );
-                    if( ray_edge_distance > GLOBAL_EPSILON )
+                    if( ray_edge_distance <= GLOBAL_EPSILON )
                     {
-                        continue;
+                        add_coplanar_contact( ray_point, result.second, edge );
                     }
-                    const Vector3D origin_target{ origin_, ray_point };
-                    auto distance = origin_target.length();
-                    if( origin_target.dot( segment_.direction() ) < 0 )
-                    {
-                        distance *= -1.;
-                    }
-                    results_.emplace_back(
-                        polygon_id, distance, result.second, ray_point );
                 }
                 const auto [triangle_distance, ray_point, _] =
                     segment_triangle_distance( segment_, triangle );
-                if( triangle_distance > GLOBAL_EPSILON )
+                if( triangle_distance <= GLOBAL_EPSILON )
                 {
-                    continue;
+                    add_coplanar_contact( ray_point, result.second, edge );
                 }
-                const Vector3D origin_target{ origin_, ray_point };
-                auto distance = origin_target.length();
-                if( origin_target.dot( segment_.direction() ) < 0 )
-                {
-                    distance *= -1.;
-                }
-                results_.emplace_back(
-                    polygon_id, distance, result.second, ray_point );
-                break;
+            }
+            if( coplanar_contact )
+            {
+                const auto& [distance, position, edge, point] =
+                    coplanar_contact.value();
+                add_result( polygon_id, distance, position, edge, point );
             }
             return false;
         }
 
     private:
+        void add_result( index_t polygon_id,
+            double distance,
+            POSITION fan_position,
+            local_index_t fan_edge,
+            const Point3D& point )
+        {
+            const auto [position, feature] = polygon_position( fan_position,
+                fan_edge, mesh_.nb_polygon_vertices( polygon_id ) );
+            results_.push_back(
+                { { polygon_id, distance, position, point }, feature } );
+        }
+
         void sort_results() const
         {
             if( are_results_sorted_ )
@@ -572,9 +627,8 @@ namespace geode
             }
             absl::c_sort( results_ );
             const auto last = std::unique( results_.begin(), results_.end(),
-                [this]( const PolygonDistance& polygon0,
-                    const PolygonDistance& polygon1 ) {
-                    return are_equal( this->mesh_, polygon0, polygon1 );
+                [this]( const PolygonHit& hit0, const PolygonHit& hit1 ) {
+                    return are_equal( this->mesh_, hit0, hit1 );
                 } );
             results_.erase( last, results_.end() );
             are_results_sorted_ = true;
@@ -582,9 +636,9 @@ namespace geode
 
     private:
         const SurfaceMesh3D& mesh_;
-        const Point3D& origin_;
+        Point3D origin_;
         OwnerSegment3D segment_;
-        mutable std::vector< PolygonDistance > results_;
+        mutable std::vector< PolygonHit > results_;
         mutable bool are_results_sorted_{ false };
     };
 
