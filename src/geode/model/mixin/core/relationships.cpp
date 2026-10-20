@@ -23,6 +23,7 @@
 
 #include <geode/model/mixin/core/relationships.hpp>
 
+#include <filesystem>
 #include <fstream>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -167,7 +168,11 @@ namespace geode
         void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
-            std::ofstream file{ filename, std::ofstream::binary };
+            std::ofstream file{ std::filesystem::u8path( filename ),
+                std::ofstream::binary };
+            OpenGeodeModelException::check_exception( file.is_open(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[Relationships::save] Cannot open file: ", filename );
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
                 std::get< 0 >( context ) );
@@ -175,7 +180,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OpenGeodeModelException::check_exception(
-                std::get< 1 >( context ).isValid(), nullptr,
+                file.good() && std::get< 1 >( context ).isValid(), nullptr,
                 OpenGeodeException::TYPE::internal,
                 "[Relationships::save] Error while writing file: ", filename );
         }
@@ -183,7 +188,8 @@ namespace geode
         void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
-            std::ifstream file{ filename, std::ifstream::binary };
+            std::ifstream file{ std::filesystem::u8path( filename ),
+                std::ifstream::binary };
             TContext context{};
             BitseryExtensions::register_deserialize_pcontext(
                 std::get< 0 >( context ) );

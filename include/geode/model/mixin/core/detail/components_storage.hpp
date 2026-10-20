@@ -141,7 +141,13 @@ namespace geode::detail
 
         void save_components( std::string_view filename ) const
         {
-            std::ofstream file{ to_string( filename ), std::ofstream::binary };
+            std::ofstream file{ std::filesystem::u8path(
+                                    to_string( filename ) ),
+                std::ofstream::binary };
+            OpenGeodeModelException::check_exception( file.is_open(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[ComponentsStorage::save_components] Cannot open file: ",
+                filename );
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
                 std::get< 0 >( context ) );
@@ -149,7 +155,7 @@ namespace geode::detail
             archive.object( *this );
             archive.adapter().flush();
             OpenGeodeModelException::check_exception(
-                std::get< 1 >( context ).isValid(), nullptr,
+                file.good() && std::get< 1 >( context ).isValid(), nullptr,
                 OpenGeodeException::TYPE::internal,
                 "[ComponentsStorage::save_components] Error while writing "
                 "file: ",
@@ -169,7 +175,8 @@ namespace geode::detail
          */
         void load_components( std::string_view filename, bool required = true )
         {
-            if( !std::filesystem::exists( to_string( filename ) ) )
+            const auto path = std::filesystem::u8path( to_string( filename ) );
+            if( !std::filesystem::exists( path ) )
             {
                 if( required )
                 {
@@ -179,7 +186,7 @@ namespace geode::detail
                 }
                 return;
             }
-            std::ifstream file{ to_string( filename ), std::ifstream::binary };
+            std::ifstream file{ path, std::ifstream::binary };
             TContext context{};
             BitseryExtensions::register_deserialize_pcontext(
                 std::get< 0 >( context ) );
@@ -201,15 +208,16 @@ namespace geode::detail
             file_mapping( std::string_view directory ) const
         {
             absl::flat_hash_map< std::string, std::string > mapping;
-            for( const auto& file :
-                std::filesystem::directory_iterator( to_string( directory ) ) )
+            for( const auto& file : std::filesystem::directory_iterator(
+                     std::filesystem::u8path( to_string( directory ) ) ) )
             {
                 auto path = file.path();
-                auto filename = path.replace_extension( "" ).string();
+                auto filename = path.replace_extension( "" ).u8string();
                 if( filename.size() > 36 )
                 {
                     auto uuid = filename.substr( filename.size() - 36 );
-                    mapping.emplace( std::move( uuid ), file.path().string() );
+                    mapping.emplace(
+                        std::move( uuid ), file.path().u8string() );
                 }
             }
             return mapping;

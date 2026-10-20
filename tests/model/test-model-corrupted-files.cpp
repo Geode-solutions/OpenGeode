@@ -623,6 +623,63 @@ namespace
             loaded_block.mesh().nb_polyhedra() == 24,
             "[Test] Wrong number of grid block cells" );
     }
+
+    template < typename Saver >
+    void check_save_failure( std::string_view what, const Saver& saver )
+    {
+        try
+        {
+            saver();
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::info( "Saving ", what,
+                " in a missing directory throws as expected: ",
+                exception.what() );
+            return;
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] Saving ", what,
+            " in a missing directory should throw" };
+    }
+
+    /*
+     * Saving model files in a directory that cannot be written throws.
+     */
+    void test_save_in_missing_directory()
+    {
+        const auto brep = geode::load_brep(
+            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+        const std::string directory{ "missing_directory/missing" };
+        check_save_failure( "relationships", [&] {
+            brep.save_relationships( directory );
+        } );
+        check_save_failure( "unique vertices", [&] {
+            brep.save_unique_vertices( directory );
+        } );
+        check_save_failure( "physical properties", [&] {
+            brep.save_physical_properties( directory );
+        } );
+        check_save_failure( "model boundaries", [&] {
+            brep.save_model_boundaries( directory );
+        } );
+    }
+
+    /*
+     * Model files are saved and loaded with UTF-8 paths.
+     */
+    void test_utf8_path()
+    {
+        const auto brep = geode::load_brep(
+            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+        const std::string filename{ "mod\xc3\xa8le_\xc3\xa9t\xc3\xa9.og_brep" };
+        geode::save_brep( brep, filename );
+        const auto loaded = geode::load_brep( filename );
+        geode::OpenGeodeModelException::test(
+            loaded.nb_surfaces() == brep.nb_surfaces(),
+            "[Test] Wrong number of surfaces with UTF-8 path" );
+        check_same_unique_vertices( brep, loaded );
+    }
 } // namespace
 
 void test()
@@ -637,6 +694,8 @@ void test()
     test_missing_mesh_file();
     test_unknown_mesh_impl();
     test_regular_grid_meshes();
+    test_save_in_missing_directory();
+    test_utf8_path();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )
