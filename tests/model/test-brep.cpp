@@ -1918,11 +1918,76 @@ std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
     return { std::move( other ), std::move( mapping ) };
 }
 
+template < typename Range >
+void save_unique_vertices( const geode::BRep& brep,
+    const Range& components,
+    std::vector< geode::index_t >& unique_vertices )
+{
+    for( const auto& component : components )
+    {
+        for( const auto v : geode::Range{ component.mesh().nb_vertices() } )
+        {
+            unique_vertices.push_back(
+                brep.unique_vertex( { component.component_id(), v } ) );
+        }
+    }
+}
+
+std::vector< geode::index_t > save_unique_vertices( const geode::BRep& brep )
+{
+    std::vector< geode::index_t > unique_vertices;
+    save_unique_vertices( brep, brep.corners(), unique_vertices );
+    save_unique_vertices( brep, brep.lines(), unique_vertices );
+    save_unique_vertices( brep, brep.surfaces(), unique_vertices );
+    save_unique_vertices( brep, brep.blocks(), unique_vertices );
+    return unique_vertices;
+}
+
+template < typename Range >
+void set_unique_vertices( geode::BRepBuilder& builder,
+    const Range& components,
+    geode::index_t nb_unique_vertices,
+    geode::index_t& count )
+{
+    for( const auto& component : components )
+    {
+        for( const auto v : geode::Range{ component.mesh().nb_vertices() } )
+        {
+            builder.set_unique_vertex(
+                { component.component_id(), v }, count++ % nb_unique_vertices );
+        }
+    }
+}
+
 void test_steal_mesh( geode::BRep& brep )
 {
-    auto [other, mapping] = copy_model( brep );
-    geode::BRepBuilder builder{ brep };
-    builder.replace_components_meshes_by_others( std::move( other ), mapping );
+    {
+        auto [other, mapping] = copy_model( brep );
+        geode::BRepBuilder builder{ brep };
+        builder.replace_components_meshes_by_others(
+            std::move( other ), mapping );
+    }
+
+    auto [model, model_mapping] = copy_model( brep );
+    geode::BRepBuilder model_builder{ model };
+    constexpr geode::index_t nb_unique_vertices{ 7 };
+    model_builder.create_unique_vertices( nb_unique_vertices );
+    geode::index_t count{ 0 };
+    set_unique_vertices(
+        model_builder, model.corners(), nb_unique_vertices, count );
+    set_unique_vertices(
+        model_builder, model.lines(), nb_unique_vertices, count );
+    set_unique_vertices(
+        model_builder, model.surfaces(), nb_unique_vertices, count );
+    set_unique_vertices(
+        model_builder, model.blocks(), nb_unique_vertices, count );
+    const auto unique_vertices = save_unique_vertices( model );
+    auto [other, mapping] = copy_model( model );
+    model_builder.replace_components_meshes_by_others(
+        std::move( other ), mapping );
+    geode::OpenGeodeModelException::test(
+        save_unique_vertices( model ) == unique_vertices,
+        "Unique vertices should be kept when replacing meshes" );
 }
 
 void test()

@@ -100,15 +100,51 @@ namespace
     }
 
     template < typename Model >
+    const geode::VertexSet& component_mesh(
+        const Model& model, const geode::ComponentID& component_id )
+    {
+        const auto& type = component_id.type;
+        const auto& id = component_id.id;
+        if( type == geode::Corner< Model::dim >::component_type_static() )
+        {
+            return model.corner( id ).mesh();
+        }
+        if( type == geode::Line< Model::dim >::component_type_static() )
+        {
+            return model.line( id ).mesh();
+        }
+        if( type == geode::Surface< Model::dim >::component_type_static() )
+        {
+            return model.surface( id ).mesh();
+        }
+        if constexpr( Model::dim == 3 )
+        {
+            if( type == geode::Block< Model::dim >::component_type_static() )
+            {
+                return model.block( id ).mesh();
+            }
+        }
+        throw geode::OpenGeodeModelException{ component_id,
+            geode::OpenGeodeException::TYPE::internal,
+            "[save_mesh_unique_vertices] Unsupported component type ",
+            type.get() };
+    }
+
+    template < typename Model >
     absl::FixedArray< geode::index_t > save_mesh_unique_vertices(
         const Model& model,
         geode::index_t nb_vertices,
         const geode::ComponentID& component_id )
     {
+        const auto unique_vertex_attribute =
+            component_mesh( model, component_id )
+                .vertex_attribute_manager()
+                .template find_read_only_attribute< geode::index_t >(
+                    model.unique_vertex_attribute_id() );
         absl::FixedArray< geode::index_t > unique_vertices( nb_vertices );
         for( const auto v : geode::Range{ nb_vertices } )
         {
-            unique_vertices[v] = model.unique_vertex( { component_id, v } );
+            unique_vertices[v] = unique_vertex_attribute->value( v );
         }
         return unique_vertices;
     }
