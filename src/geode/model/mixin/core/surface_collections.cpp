@@ -102,7 +102,7 @@ namespace geode
         std::string_view directory, SurfaceCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
-            absl::StrCat( directory, "/surface_collections" ) );
+            absl::StrCat( directory, "/surface_collections" ), false );
     }
 
     template < index_t dimension >

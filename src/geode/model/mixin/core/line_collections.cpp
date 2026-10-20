@@ -100,7 +100,7 @@ namespace geode
         std::string_view directory, LineCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
-            absl::StrCat( directory, "/line_collections" ) );
+            absl::StrCat( directory, "/line_collections" ), false );
     }
 
     template < index_t dimension >

@@ -35,6 +35,8 @@
 #include <absl/strings/match.h>
 
 #include <geode/basic/logger.hpp>
+#include <geode/basic/logger_client.hpp>
+#include <geode/basic/logger_manager.hpp>
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/zip_file.hpp>
 
@@ -53,6 +55,67 @@
 
 namespace
 {
+    /* Records warnings to check that repairs are reported */
+    class WarningRecorder : public geode::LoggerClient
+    {
+    public:
+        static void start()
+        {
+            static const auto registered = [] {
+                geode::LoggerManager::register_client(
+                    std::make_unique< WarningRecorder >() );
+                return true;
+            }();
+            geode_unused( registered );
+            std::lock_guard< std::mutex > lock{ mutex() };
+            warnings().clear();
+        }
+
+        static bool has_warning( std::string_view text )
+        {
+            std::lock_guard< std::mutex > lock{ mutex() };
+            for( const auto& warning : warnings() )
+            {
+                if( absl::StrContains( warning, text ) )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void trace( const std::string& /*message*/ ) override {}
+        void debug( const std::string& /*message*/ ) override {}
+        void info( const std::string& /*message*/ ) override {}
+        void warning( const std::string& message ) override
+        {
+            std::lock_guard< std::mutex > lock{ mutex() };
+            warnings().push_back( message );
+        }
+        void error( const std::string& /*message*/ ) override {}
+        void critical( const std::string& /*message*/ ) override {}
+
+    private:
+        static std::mutex& mutex()
+        {
+            static std::mutex mutex;
+            return mutex;
+        }
+
+        static std::vector< std::string >& warnings()
+        {
+            static std::vector< std::string > warnings;
+            return warnings;
+        }
+    };
+
+    void check_warning( std::string_view text )
+    {
+        geode::OpenGeodeModelException::test(
+            WarningRecorder::has_warning( text ),
+            "[Test] Missing warning: ", text );
+    }
+
     /* Files of a model archive: file name -> file content */
     using ArchiveFiles = absl::btree_map< std::string, std::string >;
 
@@ -315,6 +378,60 @@ namespace
         }
     }
 
+    /*
+     * The components file of each component type is always saved. A missing
+     * file is reported.
+     */
+    void test_missing_components_file()
+    {
+        saved_brep( "missing_components.og_brep" );
+        auto files = extract_archive( "missing_components.og_brep" );
+        files.erase( "lines" );
+        write_archive( files, "missing_components_file.og_brep" );
+
+        WarningRecorder::start();
+        const auto loaded =
+            geode::load_brep( "missing_components_file.og_brep" );
+        check_warning( "Missing file" );
+        geode::OpenGeodeModelException::test(
+            loaded.nb_lines() == 0, "[Test] No line should be loaded" );
+    }
+
+    /*
+     * Components are stored in a map: uuid -> component. A component stored
+     * under another uuid than its own is stored back under its own uuid.
+     */
+    void test_wrong_component_key()
+    {
+        const auto brep = saved_brep( "component_key.og_brep" );
+        const auto& corner_id = ( *brep.corners().begin() ).id();
+        auto files = extract_archive( "component_key.og_brep" );
+        auto& content = files.at( "corners" );
+        const auto key = serialized_uuid( corner_id );
+        const auto position = content.find( key );
+        geode::OpenGeodeModelException::test(
+            position != std::string::npos, "[Test] Corner key not found" );
+        content.replace(
+            position, key.size(), serialized_uuid( geode::uuid{} ) );
+        geode::OpenGeodeModelException::test(
+            content.find( key ) != std::string::npos,
+            "[Test] Corner id not found" );
+        write_archive( files, "wrong_component_key.og_brep" );
+
+        WarningRecorder::start();
+        const auto loaded = geode::load_brep( "wrong_component_key.og_brep" );
+        check_warning( "has id" );
+        geode::OpenGeodeModelException::test(
+            loaded.nb_corners() == brep.nb_corners(),
+            "[Test] Wrong number of corners" );
+        geode::OpenGeodeModelException::test( loaded.has_corner( corner_id ),
+            "[Test] Corner should be stored under its id" );
+        geode::OpenGeodeModelException::test(
+            loaded.corner( corner_id ).mesh().nb_vertices()
+                == brep.corner( corner_id ).mesh().nb_vertices(),
+            "[Test] Corner mesh should be loaded" );
+    }
+
 } // namespace
 
 void test()
@@ -323,6 +440,8 @@ void test()
     test_inconsistent_relationships_map();
     test_missing_unique_vertices_attribute();
     test_unknown_component_vertices();
+    test_missing_components_file();
+    test_wrong_component_key();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )

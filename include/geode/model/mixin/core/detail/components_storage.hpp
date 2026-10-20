@@ -35,6 +35,7 @@
 #include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/growable.hpp>
+#include <geode/basic/logger.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
 
@@ -120,10 +121,22 @@ namespace geode::detail
             components_.erase( components_.find( component_id ) );
         }
 
-        void load_components( std::string_view filename )
+        /*!
+         * Load the components stored in the given file.
+         * @param[in] required If false, a missing file is expected (e.g. for
+         * files written before this component type existed) and silently
+         * ignored. Otherwise a warning is emitted.
+         */
+        void load_components( std::string_view filename, bool required = true )
         {
             if( !std::filesystem::exists( to_string( filename ) ) )
             {
+                if( required )
+                {
+                    Logger::warning( "[ComponentsStorage::load_components] "
+                                     "Missing file: ",
+                        filename, ", no component loaded from it" );
+                }
                 return;
             }
             std::ifstream file{ to_string( filename ), std::ifstream::binary };
@@ -141,6 +154,7 @@ namespace geode::detail
                 "[ComponentsStorage::load_components] Error while reading "
                 "file: ",
                 filename );
+            repair_loaded_components( filename );
         }
 
         [[nodiscard]] absl::flat_hash_map< std::string, std::string >
@@ -179,6 +193,52 @@ namespace geode::detail
                                     item, bitsery::ext::StdSmartPtr{} );
                             } );
                     } } } );
+        }
+
+        void repair_loaded_components( std::string_view filename )
+        {
+            bool has_wrong_component{ false };
+            for( const auto& [component_id, component] : components_ )
+            {
+                if( !component || component->id() != component_id )
+                {
+                    has_wrong_component = true;
+                    break;
+                }
+            }
+            if( !has_wrong_component )
+            {
+                return;
+            }
+            ComponentsStore repaired;
+            repaired.reserve( components_.size() );
+            for( auto& [component_id, component] : components_ )
+            {
+                if( !component )
+                {
+                    Logger::warning( "[ComponentsStorage::load_components] "
+                                     "Removing null component ",
+                        component_id.string(), " from file: ", filename );
+                    continue;
+                }
+                auto id = component->id();
+                if( id != component_id )
+                {
+                    Logger::warning( "[ComponentsStorage::load_components] "
+                                     "Component stored with id ",
+                        component_id.string(), " has id ", id.string(),
+                        " in file: ", filename );
+                }
+                const auto [_, inserted] =
+                    repaired.emplace( id, std::move( component ) );
+                if( !inserted )
+                {
+                    Logger::warning( "[ComponentsStorage::load_components] "
+                                     "Removing duplicated component ",
+                        id.string(), " from file: ", filename );
+                }
+            }
+            components_ = std::move( repaired );
         }
 
         void check_matching_component_id( const uuid& component_id ) const
