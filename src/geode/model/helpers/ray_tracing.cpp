@@ -85,6 +85,10 @@ namespace
             const geode::EdgedCurve2D& curve,
             const geode::AABBTree2D& aabb )
     {
+        if( aabb.nb_bboxes() == 0 )
+        {
+            return {};
+        }
         geode::RayTracing2D ray_tracing{ curve, aabb.bounding_box(), ray };
         aabb.compute_ray_element_bbox_intersections( ray, ray_tracing );
         return ray_tracing.all_intersections();
@@ -95,6 +99,10 @@ namespace
             const geode::SurfaceMesh3D& surface,
             const geode::AABBTree3D& aabb )
     {
+        if( aabb.nb_bboxes() == 0 )
+        {
+            return {};
+        }
         geode::RayTracing3D ray_tracing{ surface, aabb.bounding_box(), ray };
         aabb.compute_ray_element_bbox_intersections( ray, ray_tracing );
         return ray_tracing.all_intersections();
@@ -249,11 +257,16 @@ namespace geode
             for( const auto& surface : brep_.boundaries( block ) )
             {
                 const auto& aabb = surface_aabb( surface );
+                auto& intersections = result[surface.id()];
+                if( aabb.nb_bboxes() == 0 )
+                {
+                    continue;
+                }
                 RayTracing3D ray_tracing{ surface.mesh(), aabb.bounding_box(),
                     infinite_line };
                 aabb.compute_line_element_bbox_intersections(
                     infinite_line, ray_tracing );
-                result[surface.id()] = ray_tracing.all_intersections();
+                intersections = ray_tracing.all_intersections();
             }
             return result;
         }
@@ -367,7 +380,8 @@ namespace geode
         const SurfaceMesh3D& surface,
         const AABBTree3D& surface_aabb )
     {
-        if( !surface_aabb.bounding_box().contains( point ) )
+        if( surface_aabb.nb_bboxes() == 0
+            || !surface_aabb.bounding_box().contains( point ) )
         {
             return { RayTracingResult::POSITION::outside };
         }
