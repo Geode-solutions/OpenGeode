@@ -432,6 +432,49 @@ namespace
             "[Test] Corner mesh should be loaded" );
     }
 
+    /*
+     * Relations referencing a component that does not exist in the model are
+     * removed.
+     */
+    void test_unknown_component_relations()
+    {
+        saved_brep( "relations_with_corner.og_brep" );
+        auto without_corner =
+            geode::load_brep( "relations_with_corner.og_brep" );
+        const auto& corner = *without_corner.corners().begin();
+        const auto corner_id = corner.id();
+        geode::BRepBuilder{ without_corner }.remove_corner( corner );
+        geode::save_brep( without_corner, "relations_without_corner.og_brep" );
+        auto files = extract_archive( "relations_without_corner.og_brep" );
+        files.at( "relationships" ) =
+            extract_archive( "relations_with_corner.og_brep" )
+                .at( "relationships" );
+        write_archive( files, "unknown_corner_relations.og_brep" );
+
+        WarningRecorder::start();
+        const auto loaded =
+            geode::load_brep( "unknown_corner_relations.og_brep" );
+        check_warning( "Removing relations of missing" );
+        geode::OpenGeodeModelException::test(
+            loaded.nb_relations( corner_id ) == 0,
+            "[Test] Removed corner should not have relations" );
+        for( const auto vertex :
+            geode::Range{ loaded.nb_components_with_relations() } )
+        {
+            const auto& component = loaded.component_with_relation( vertex );
+            geode::OpenGeodeModelException::test( component.id != corner_id,
+                "[Test] Removed corner should not be in relationships" );
+        }
+        for( const auto& line : loaded.lines() )
+        {
+            for( const auto& boundary : loaded.boundaries( line ) )
+            {
+                geode::OpenGeodeModelException::test(
+                    boundary.id() != corner_id,
+                    "[Test] Removed corner should not be a boundary" );
+            }
+        }
+    }
 } // namespace
 
 void test()
@@ -442,6 +485,7 @@ void test()
     test_unknown_component_vertices();
     test_missing_components_file();
     test_wrong_component_key();
+    test_unknown_component_relations();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )

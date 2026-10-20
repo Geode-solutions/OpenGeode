@@ -23,7 +23,9 @@
 
 #pragma once
 
+#include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
@@ -64,6 +66,19 @@ namespace geode
             }
         };
 
+        template < typename >
+        struct ComponentsExistenceChecker;
+
+        template < typename... Components >
+        struct ComponentsExistenceChecker< std::tuple< Components... > >
+        {
+            template < typename Model >
+            bool apply( const Model& model, const uuid& component_id ) const
+            {
+                return (
+                    model.Components::has_component( component_id ) || ... );
+            }
+        };
     } // namespace internal
 
     namespace detail
@@ -74,6 +89,9 @@ namespace geode
             typename Model::Builder builder{ model };
             const internal::ComponentsTypesChecker< typename Model::Components >
                 checker;
+            const internal::ComponentsExistenceChecker<
+                typename Model::Components >
+                existence_checker;
             std::vector< uuid > components_to_remove;
             for( const auto vertex :
                 Range{ model.nb_components_with_relations() } )
@@ -82,6 +100,13 @@ namespace geode
                     model.component_with_relation( vertex );
                 if( !checker.apply( component_id.type ) )
                 {
+                    components_to_remove.push_back( component_id.id );
+                }
+                else if( !existence_checker.apply( model, component_id.id ) )
+                {
+                    Logger::warning( "[filter_unsupported_components] "
+                                     "Removing relations of missing ",
+                        component_id.string() );
                     components_to_remove.push_back( component_id.id );
                 }
             }
