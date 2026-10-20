@@ -70,6 +70,13 @@ namespace geode
                 OpenGeodeException::TYPE::data,
                 "Cannot load BRep from file: ", filename };
         }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeModelException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load BRep from file: ", filename };
+        }
     }
 
     AdditionalFiles brep_additional_files( std::string_view filename )

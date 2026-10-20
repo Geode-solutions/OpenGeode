@@ -27,6 +27,7 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -63,6 +64,7 @@
 #include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 #include <geode/model/representation/io/brep_output.hpp>
+#include <geode/model/representation/io/brep_time_series_input.hpp>
 #include <geode/model/representation/io/section_input.hpp>
 #include <geode/model/representation/io/section_output.hpp>
 
@@ -749,6 +751,114 @@ namespace
             geode::OpenGeodeException::TYPE::internal,
             "[Test] Truncated relationships should not be loaded" };
     }
+
+    template < typename Base >
+    class ThrowingInput final : public Base
+    {
+    public:
+        explicit ThrowingInput( std::string_view filename ) : Base{ filename }
+        {
+        }
+
+        typename Base::InputData read() override
+        {
+            throw std::runtime_error{ "[Test] Not an OpenGeodeException" };
+        }
+
+        geode::AdditionalFiles additional_files() const override
+        {
+            return {};
+        }
+
+        geode::index_t object_priority() const override
+        {
+            return 0;
+        }
+
+        geode::Percentage is_loadable() const override
+        {
+            return geode::Percentage{ 1 };
+        }
+    };
+
+    class ThrowingTimeSeriesInput final : public geode::BRepTimeSeriesInput
+    {
+    public:
+        explicit ThrowingTimeSeriesInput( std::string_view filename )
+            : geode::BRepTimeSeriesInput{ filename }
+        {
+        }
+
+        void read( geode::BRep& /*brep*/ ) override
+        {
+            throw std::runtime_error{ "[Test] Not an OpenGeodeException" };
+        }
+
+        geode::AdditionalFiles additional_files() const override
+        {
+            return {};
+        }
+
+        geode::Percentage is_loadable() const override
+        {
+            return geode::Percentage{ 1 };
+        }
+    };
+
+    template < typename Function >
+    void check_opengeode_exception(
+        std::string_view what, const Function& function )
+    {
+        try
+        {
+            function();
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::info(
+                what, " throws as expected: ", exception.what() );
+            return;
+        }
+        catch( const std::exception& exception )
+        {
+            throw geode::OpenGeodeModelException{ nullptr,
+                geode::OpenGeodeException::TYPE::internal, "[Test] ", what,
+                " throws a std exception: ", exception.what() };
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] ", what,
+            " should throw" };
+    }
+
+    /*
+     * Std exceptions raised while loading a model are turned into
+     * OpenGeodeException.
+     */
+    void test_std_exceptions()
+    {
+        const std::string extension{ "throwing_input" };
+        const auto filename = absl::StrCat( "std_exception.", extension );
+        {
+            std::ofstream file{ filename };
+            file << "content";
+        }
+        geode::BRepInputFactory::register_creator<
+            ThrowingInput< geode::BRepInput > >( extension );
+        geode::SectionInputFactory::register_creator<
+            ThrowingInput< geode::SectionInput > >( extension );
+        geode::BRepTimeSeriesInputFactory::register_creator<
+            ThrowingTimeSeriesInput >( extension );
+        check_opengeode_exception( "Loading BRep", [&filename] {
+            geode_unused( geode::load_brep( filename ) );
+        } );
+        check_opengeode_exception( "Loading Section", [&filename] {
+            geode_unused( geode::load_section( filename ) );
+        } );
+        check_opengeode_exception( "Loading BRep time series", [&filename] {
+            geode::BRep brep;
+            geode::load_brep_time_series( brep, filename );
+        } );
+    }
 } // namespace
 
 void test()
@@ -767,6 +877,7 @@ void test()
     test_utf8_path();
     test_too_long_component_name();
     test_logger_level_restored();
+    test_std_exceptions();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )

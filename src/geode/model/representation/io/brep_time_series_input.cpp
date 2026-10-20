@@ -94,6 +94,13 @@ namespace geode
                 OpenGeodeException::TYPE::data,
                 "Cannot load BRep time series from file: ", filename };
         }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeModelException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load BRep time series from file: ", filename };
+        }
     }
 
     AdditionalFiles brep_time_series_additional_files(
