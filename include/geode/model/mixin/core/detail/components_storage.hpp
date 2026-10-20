@@ -40,6 +40,7 @@
 #include <geode/geometry/bitsery_archive.hpp>
 
 #include <geode/mesh/core/bitsery_archive.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/mesh_id.hpp>
 
 #include <geode/model/mixin/core/bitsery_archive.hpp>
@@ -47,6 +48,45 @@
 
 namespace geode::detail
 {
+    /*!
+     * Return the given mesh implementation if it is registered, otherwise
+     * the default implementation of the given mesh type (with a warning).
+     */
+    [[nodiscard]] inline MeshImpl loadable_mesh_impl( const MeshImpl& impl,
+        const MeshType& fallback_type,
+        std::string_view file )
+    {
+        if( MeshFactory::has_creator( impl ) )
+        {
+            return impl;
+        }
+        const auto& fallback = MeshFactory::default_impl( fallback_type );
+        Logger::warning( "[ComponentsStorage] Unknown mesh implementation ",
+            impl.get(), " for file ", file, ", loading it as ",
+            fallback.get() );
+        return fallback;
+    }
+
+    /*!
+     * Create an empty mesh for a component whose mesh file is missing, using
+     * the component mesh implementation if it is registered, otherwise the
+     * default implementation of the given mesh type.
+     */
+    template < typename Component >
+    [[nodiscard]] std::unique_ptr< typename Component::Mesh >
+        empty_mesh_of_missing_file(
+            const Component& component, const MeshType& fallback_type )
+    {
+        Logger::warning( "[ComponentsStorage] Missing mesh file of ",
+            component.component_id().string(), ", an empty mesh is used" );
+        if( MeshFactory::has_creator( component.mesh_type() ) )
+        {
+            return Component::Mesh::create( component.mesh_type() );
+        }
+        return Component::Mesh::create(
+            MeshFactory::default_impl( fallback_type ) );
+    }
+
     template < typename Component >
     class ComponentsStorage
     {

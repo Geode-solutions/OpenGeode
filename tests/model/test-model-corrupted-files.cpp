@@ -33,6 +33,7 @@
 #include <absl/container/btree_map.h>
 #include <absl/container/flat_hash_set.h>
 #include <absl/strings/match.h>
+#include <absl/strings/str_replace.h>
 
 #include <geode/basic/logger.hpp>
 #include <geode/basic/logger_client.hpp>
@@ -41,6 +42,7 @@
 #include <geode/basic/zip_file.hpp>
 
 #include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/corner.hpp>
@@ -475,6 +477,95 @@ namespace
             }
         }
     }
+
+    void replace_all( std::string& content,
+        std::string_view from,
+        std::string_view to,
+        std::string_view what )
+    {
+        geode::OpenGeodeModelException::test(
+            content.find( from ) != std::string::npos, "[Test] ", what,
+            " not found" );
+        content = absl::StrReplaceAll( content, { { from, to } } );
+    }
+
+    /*
+     * A component whose mesh file is missing gets an empty mesh.
+     */
+    void test_missing_mesh_file()
+    {
+        const auto brep = saved_brep( "missing_mesh.og_brep" );
+        auto files = extract_archive( "missing_mesh.og_brep" );
+        const auto surface_file = mesh_file_name( files, "Surface" );
+        const auto line_file = mesh_file_name( files, "Line" );
+        files.erase( surface_file );
+        files.erase( line_file );
+        write_archive( files, "missing_mesh_file.og_brep" );
+
+        WarningRecorder::start();
+        const auto loaded = geode::load_brep( "missing_mesh_file.og_brep" );
+        check_warning( "Missing mesh file" );
+        geode::OpenGeodeModelException::test(
+            loaded.nb_surfaces() == brep.nb_surfaces(),
+            "[Test] Wrong number of surfaces" );
+        geode::index_t nb_empty_surfaces{ 0 };
+        for( const auto& surface : loaded.surfaces() )
+        {
+            const auto& mesh = surface.mesh();
+            geode::OpenGeodeModelException::test(
+                surface.mesh_type() == mesh.impl_name(),
+                "[Test] Wrong surface mesh type" );
+            if( mesh.nb_vertices() == 0 )
+            {
+                nb_empty_surfaces++;
+                continue;
+            }
+            geode::OpenGeodeModelException::test(
+                mesh.nb_polygons()
+                    == brep.surface( surface.id() ).mesh().nb_polygons(),
+                "[Test] Wrong surface mesh" );
+        }
+        geode::OpenGeodeModelException::test(
+            nb_empty_surfaces == 1, "[Test] One surface should be empty" );
+        for( const auto unique_vertex :
+            geode::Range{ loaded.nb_unique_vertices() } )
+        {
+            for( const auto& vertex :
+                loaded.component_mesh_vertices( unique_vertex ) )
+            {
+                geode::OpenGeodeModelException::test(
+                    loaded.unique_vertex( vertex ) == unique_vertex,
+                    "[Test] Wrong unique vertex for component vertex" );
+            }
+        }
+    }
+
+    /*
+     * A component whose mesh implementation is not registered is loaded with
+     * the default implementation of the mesh type matching its file.
+     */
+    void test_unknown_mesh_impl()
+    {
+        const auto brep = saved_brep( "unknown_impl.og_brep" );
+        auto files = extract_archive( "unknown_impl.og_brep" );
+        replace_all( files.at( "surfaces" ), "OpenGeodeTriangulatedSurface3D",
+            "UnknownImplTriangulatedSurface", "Surface mesh type" );
+        write_archive( files, "unknown_mesh_impl.og_brep" );
+
+        WarningRecorder::start();
+        const auto loaded = geode::load_brep( "unknown_mesh_impl.og_brep" );
+        check_warning( "Unknown mesh implementation" );
+        for( const auto& surface : loaded.surfaces() )
+        {
+            geode::OpenGeodeModelException::test(
+                surface.mesh_type().get() == "OpenGeodeTriangulatedSurface3D",
+                "[Test] Wrong surface mesh type" );
+            geode::OpenGeodeModelException::test(
+                surface.mesh().nb_polygons()
+                    == brep.surface( surface.id() ).mesh().nb_polygons(),
+                "[Test] Wrong surface mesh" );
+        }
+    }
 } // namespace
 
 void test()
@@ -486,6 +577,8 @@ void test()
     test_missing_components_file();
     test_wrong_component_key();
     test_unknown_component_relations();
+    test_missing_mesh_file();
+    test_unknown_mesh_impl();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )

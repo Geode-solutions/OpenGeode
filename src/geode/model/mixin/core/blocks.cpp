@@ -26,6 +26,7 @@
 #include <async++.h>
 
 #include <geode/basic/detail/count_range_elements.hpp>
+#include <geode/basic/filename.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
@@ -43,6 +44,27 @@
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/detail/components_storage.hpp>
+
+namespace
+{
+    template < geode::index_t dimension >
+    geode::MeshType solid_type_from_file( std::string_view file )
+    {
+        const auto extension =
+            geode::to_string( geode::extension_from_filename( file ) );
+        if( geode::TetrahedralSolidInputFactory< dimension >::has_creator(
+                extension ) )
+        {
+            return geode::TetrahedralSolid< dimension >::type_name_static();
+        }
+        if( geode::HybridSolidInputFactory< dimension >::has_creator(
+                extension ) )
+        {
+            return geode::HybridSolid< dimension >::type_name_static();
+        }
+        return geode::PolyhedralSolid< dimension >::type_name_static();
+    }
+} // namespace
 
 namespace geode
 {
@@ -154,25 +176,35 @@ namespace geode
         for( auto& block : modifiable_blocks( builder_key ) )
         {
             tasks[count++] = async::spawn( [&block, &mapping] {
-                const auto file = mapping.at( block.id().string() );
-                if( MeshFactory::type( block.mesh_type() )
-                    == TetrahedralSolid< dimension >::type_name_static() )
+                const auto file = mapping.find( block.id().string() );
+                if( file == mapping.end() )
+                {
+                    block.set_mesh(
+                        detail::empty_mesh_of_missing_file( block,
+                            PolyhedralSolid< dimension >::type_name_static() ),
+                        typename Block< dimension >::BlocksKey{} );
+                    return;
+                }
+                const auto impl = detail::loadable_mesh_impl( block.mesh_type(),
+                    solid_type_from_file< dimension >( file->second ),
+                    file->second );
+                const auto& type = MeshFactory::type( impl );
+                if( type == TetrahedralSolid< dimension >::type_name_static() )
                 {
                     block.set_mesh( load_tetrahedral_solid< dimension >(
-                                        block.mesh_type(), file ),
+                                        impl, file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
-                else if( MeshFactory::type( block.mesh_type() )
-                         == HybridSolid< dimension >::type_name_static() )
+                else if( type == HybridSolid< dimension >::type_name_static() )
                 {
-                    block.set_mesh( load_hybrid_solid< dimension >(
-                                        block.mesh_type(), file ),
+                    block.set_mesh(
+                        load_hybrid_solid< dimension >( impl, file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else
                 {
                     block.set_mesh( load_polyhedral_solid< dimension >(
-                                        block.mesh_type(), file ),
+                                        impl, file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
             } );

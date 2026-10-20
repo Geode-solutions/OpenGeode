@@ -26,6 +26,7 @@
 #include <async++.h>
 
 #include <geode/basic/detail/count_range_elements.hpp>
+#include <geode/basic/filename.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
@@ -40,6 +41,20 @@
 
 #include <geode/model/mixin/core/detail/components_storage.hpp>
 #include <geode/model/mixin/core/surface.hpp>
+
+namespace
+{
+    template < geode::index_t dimension >
+    geode::MeshType surface_type_from_file( std::string_view file )
+    {
+        if( geode::TriangulatedSurfaceInputFactory< dimension >::has_creator(
+                geode::to_string( geode::extension_from_filename( file ) ) ) )
+        {
+            return geode::TriangulatedSurface< dimension >::type_name_static();
+        }
+        return geode::PolygonalSurface< dimension >::type_name_static();
+    }
+} // namespace
 
 namespace geode
 {
@@ -146,18 +161,30 @@ namespace geode
         for( auto& surface : modifiable_surfaces( key ) )
         {
             tasks[count++] = async::spawn( [&surface, &mapping] {
-                const auto file = mapping.at( surface.id().string() );
-                if( MeshFactory::type( surface.mesh_type() )
+                const auto file = mapping.find( surface.id().string() );
+                if( file == mapping.end() )
+                {
+                    surface.set_mesh(
+                        detail::empty_mesh_of_missing_file( surface,
+                            PolygonalSurface< dimension >::type_name_static() ),
+                        typename Surface< dimension >::SurfacesKey{} );
+                    return;
+                }
+                const auto impl =
+                    detail::loadable_mesh_impl( surface.mesh_type(),
+                        surface_type_from_file< dimension >( file->second ),
+                        file->second );
+                if( MeshFactory::type( impl )
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {
                     surface.set_mesh( load_triangulated_surface< dimension >(
-                                          surface.mesh_type(), file ),
+                                          impl, file->second ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
                 else
                 {
                     surface.set_mesh( load_polygonal_surface< dimension >(
-                                          surface.mesh_type(), file ),
+                                          impl, file->second ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
             } );
