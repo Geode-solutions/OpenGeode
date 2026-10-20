@@ -49,6 +49,13 @@ namespace geode
             boundaries.reserve( definitions.size() );
             for( const auto& definition : definitions )
             {
+                for( const auto line : definition.boundaries )
+                {
+                    check_index( line, lines.size(), "Line" );
+                }
+            }
+            for( const auto& definition : definitions )
+            {
                 const auto& bonudary_id = builder().add_model_boundary();
                 const auto& boundary = model().model_boundary( bonudary_id );
                 boundaries.push_back( bonudary_id );

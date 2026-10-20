@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <async++.h>
 
 #include <geode/basic/range.hpp>
@@ -420,20 +422,32 @@ namespace geode
             }
         }
 
+        /*!
+         * Copy the links between unique vertices and component vertices.
+         * Component vertices whose component type is not in the mapping
+         * (e.g. Block vertices when copying a BRep into a Section) are skipped.
+         * @return true if at least one component vertex was skipped
+         */
         template < typename Model, typename BuilderTo >
-        void copy_vertex_identifier_components( const Model& from,
+        bool copy_vertex_identifier_components( const Model& from,
             BuilderTo& builder_to,
             index_t first_new_unique_vertex_id,
             const ModelCopyMapping& mapping )
         {
+            std::atomic< bool > has_skipped_vertices{ false };
             async::parallel_for(
                 async::irange( index_t{ 0 }, from.nb_unique_vertices() ),
-                [&from, &builder_to, &first_new_unique_vertex_id, &mapping](
-                    index_t v ) {
+                [&from, &builder_to, &first_new_unique_vertex_id, &mapping,
+                    &has_skipped_vertices]( index_t v ) {
                     for( const auto& mesh_vertex :
                         from.component_mesh_vertices( v ) )
                     {
                         const auto& type = mesh_vertex.component_id.type;
+                        if( !mapping.has_mapping_type( type ) )
+                        {
+                            has_skipped_vertices = true;
+                            continue;
+                        }
                         builder_to.set_unique_vertex(
                             { { type, mapping.at( type ).in2out(
                                           mesh_vertex.component_id.id ) },
@@ -441,6 +455,7 @@ namespace geode
                             first_new_unique_vertex_id + v );
                     }
                 } );
+            return has_skipped_vertices;
         }
     } // namespace detail
 } // namespace geode
