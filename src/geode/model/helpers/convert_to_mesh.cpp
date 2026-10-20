@@ -64,18 +64,56 @@
 
 namespace
 {
+    /*!
+     * Replace model unique vertices by their output mesh vertices.
+     * Return false if one of them is not in the output mesh.
+     */
+    template < typename Container >
+    bool to_mesh_vertices(
+        const geode::ModelToMeshMappings& model2mesh, Container& vertices )
+    {
+        for( auto& vertex : vertices )
+        {
+            if( vertex == geode::NO_ID
+                || !model2mesh.unique_vertices_mapping.has_mapping_input(
+                    vertex ) )
+            {
+                return false;
+            }
+            vertex = model2mesh.unique_vertices_mapping.in2out( vertex );
+        }
+        return true;
+    }
+
     template < typename Model >
     void map_corner_vertices(
         Model& model, geode::ModelToMeshMappings& model2mesh )
     {
         for( const auto& corner : model.corners() )
         {
+            if( corner.mesh().nb_vertices() == 0 )
+            {
+                continue;
+            }
             const auto corner_uv =
                 model.unique_vertex( { corner.component_id(), 0 } );
-            const auto solid_uv =
+            if( corner_uv == geode::NO_ID
+                || !model2mesh.unique_vertices_mapping.has_mapping_input(
+                    corner_uv ) )
+            {
+                // Corner not in the output mesh
+                continue;
+            }
+            const auto mesh_vertex =
                 model2mesh.unique_vertices_mapping.in2out( corner_uv );
+            geode::OpenGeodeModelException::check_exception(
+                !model2mesh.corner_vertices_mapping.has_mapping_output(
+                    mesh_vertex ),
+                corner.id(), geode::OpenGeodeException::TYPE::data,
+                "[map_corner_vertices] Mesh vertex ", mesh_vertex,
+                " is already mapped to another Corner vertex." );
             model2mesh.corner_vertices_mapping.map(
-                { corner.id(), 0 }, solid_uv );
+                { corner.id(), 0 }, mesh_vertex );
         }
     }
 
@@ -224,24 +262,28 @@ namespace
             const auto& line_mesh = line.mesh();
             for( const auto line_edge : geode::Range{ line_mesh.nb_edges() } )
             {
-                auto unique_vertices =
+                auto vertices =
                     geode::edge_unique_vertices( model, line, line_edge );
-                for( const auto edge_vertex_id :
-                    geode::LRange{ unique_vertices.size() } )
+                if( !to_mesh_vertices( model2mesh, vertices ) )
                 {
-                    unique_vertices[edge_vertex_id] =
-                        model2mesh.unique_vertices_mapping.in2out(
-                            unique_vertices[edge_vertex_id] );
+                    // Line edge not in the output mesh
+                    continue;
                 }
-                const auto solid_edge =
-                    mesh.edges().edge_from_vertices( unique_vertices ).value();
-                geode::OpenGeodeModelException::check_assertion(
+                const auto mesh_edge =
+                    mesh.edges().edge_from_vertices( vertices );
+                if( !mesh_edge )
+                {
+                    // Line edge not in the output mesh
+                    continue;
+                }
+                geode::OpenGeodeModelException::check_exception(
                     !model2mesh.line_edges_mapping.has_mapping_output(
-                        solid_edge ),
-                    "[map_line_edges] Mesh edge ", solid_edge,
+                        mesh_edge.value() ),
+                    line.id(), geode::OpenGeodeException::TYPE::data,
+                    "[map_line_edges] Mesh edge ", mesh_edge.value(),
                     " is already mapped to another Line edge." );
                 model2mesh.line_edges_mapping.map(
-                    { line.id(), line_edge }, solid_edge );
+                    { line.id(), line_edge }, mesh_edge.value() );
             }
         }
     }
@@ -379,26 +421,29 @@ namespace
             for( const auto surface_polygon :
                 geode::Range{ surface_mesh.nb_polygons() } )
             {
-                auto unique_vertices = geode::polygon_unique_vertices(
+                auto vertices = geode::polygon_unique_vertices(
                     brep, surface, surface_polygon );
-                for( const auto polygon_vertex_id :
-                    geode::LRange{ unique_vertices.size() } )
+                if( !to_mesh_vertices( brep2mesh, vertices ) )
                 {
-                    unique_vertices[polygon_vertex_id] =
-                        brep2mesh.unique_vertices_mapping.in2out(
-                            unique_vertices[polygon_vertex_id] );
+                    // Surface polygon not in the output mesh
+                    continue;
                 }
                 const auto solid_facet =
-                    mesh.facets()
-                        .facet_from_vertices( unique_vertices )
-                        .value();
-                geode::OpenGeodeModelException::check_assertion(
+                    mesh.facets().facet_from_vertices( vertices );
+                if( !solid_facet )
+                {
+                    // Surface polygon not in the output mesh
+                    continue;
+                }
+                geode::OpenGeodeModelException::check_exception(
                     !brep2mesh.surface_polygons_mapping.has_mapping_output(
-                        solid_facet ),
-                    "[map_polygons_to_solid_facets] Solid facet ", solid_facet,
+                        solid_facet.value() ),
+                    surface.id(), geode::OpenGeodeException::TYPE::data,
+                    "[map_polygons_to_solid_facets] Solid facet ",
+                    solid_facet.value(),
                     " is already mapped to another Surface polygon." );
                 brep2mesh.surface_polygons_mapping.map(
-                    { surface.id(), surface_polygon }, solid_facet );
+                    { surface.id(), surface_polygon }, solid_facet.value() );
             }
         }
     }
