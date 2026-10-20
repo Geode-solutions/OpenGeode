@@ -35,6 +35,7 @@
 #include <absl/strings/match.h>
 #include <absl/strings/str_replace.h>
 
+#include <geode/basic/growable.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/logger_client.hpp>
 #include <geode/basic/logger_manager.hpp>
@@ -680,6 +681,45 @@ namespace
             "[Test] Wrong number of surfaces with UTF-8 path" );
         check_same_unique_vertices( brep, loaded );
     }
+
+    /*
+     * Names of old components are bounded by MAX_SERIALIZED_NAME_SIZE.
+     */
+    void test_too_long_component_name()
+    {
+        auto files = extract_archive(
+            absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
+        auto& content = files.at( "corners" );
+        const std::string name{ "\x07unknown" };
+        const auto position = content.find( name );
+        geode::OpenGeodeModelException::test(
+            position != std::string::npos, "[Test] Component name not found" );
+        // bitsery 4-byte size encoding: two high bytes, then a little endian
+        // 16-bit word
+        constexpr auto TOO_LONG = geode::MAX_SERIALIZED_NAME_SIZE + 1;
+        std::string too_long_name{ static_cast< char >(
+                                       0xC0u | ( TOO_LONG >> 24 ) ),
+            static_cast< char >( TOO_LONG >> 16 ),
+            static_cast< char >( TOO_LONG ),
+            static_cast< char >( TOO_LONG >> 8 ) };
+        too_long_name.append( TOO_LONG, 'a' );
+        content.replace( position, name.size(), too_long_name );
+        write_archive( files, "too_long_component_name.og_brep" );
+        try
+        {
+            geode_unused(
+                geode::load_brep( "too_long_component_name.og_brep" ) );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::info( "Too long component name throws as expected: ",
+                exception.what() );
+            return;
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal,
+            "[Test] Too long component name should not be loaded" };
+    }
 } // namespace
 
 void test()
@@ -696,6 +736,7 @@ void test()
     test_regular_grid_meshes();
     test_save_in_missing_directory();
     test_utf8_path();
+    test_too_long_component_name();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )
