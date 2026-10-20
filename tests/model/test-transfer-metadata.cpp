@@ -33,8 +33,9 @@
 
 #include <geode/tests/common.hpp>
 
-geode::uuid add_named_surface(
-    const geode::BRep& brep, geode::BRepBuilder& builder, std::string_view name )
+geode::uuid add_named_surface( const geode::BRep& brep,
+    geode::BRepBuilder& builder,
+    std::string_view name )
 {
     const auto& surface = brep.surface( builder.add_surface() );
     builder.set_surface_name( surface, name );
@@ -70,8 +71,8 @@ void test_merged_surface_names()
     surface_mapping.map( horizon, new_horizon );
     surface_mapping.map( unnamed, new_horizon );
     surface_mapping.map( unnamed, new_unnamed );
-    mapping.emplace(
-        geode::Surface3D::component_type_static(), std::move( surface_mapping ) );
+    mapping.emplace( geode::Surface3D::component_type_static(),
+        std::move( surface_mapping ) );
     geode::GenericMapping< geode::uuid > block_mapping;
     block_mapping.map( unnamed_block, new_block );
     mapping.emplace(
