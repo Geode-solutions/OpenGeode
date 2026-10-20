@@ -38,6 +38,10 @@
 #include <geode/model/mixin/core/surfaces.hpp>
 #include <geode/model/mixin/core/topology.hpp>
 #include <geode/model/mixin/core/vertex_identifier.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/brep_output.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -238,6 +242,135 @@ void test_update_unique_vertices()
     }
 }
 
+geode::index_t count_component_mesh_vertices(
+    const geode::VertexIdentifier& vertex_identifier,
+    const geode::uuid& component_id )
+{
+    geode::index_t count{ 0 };
+    for( const auto uv :
+        geode::Range{ vertex_identifier.nb_unique_vertices() } )
+    {
+        for( const auto& cmv : vertex_identifier.component_mesh_vertices( uv ) )
+        {
+            if( cmv.component_id.id == component_id )
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+const geode::uuid& add_surface_with_vertices( SurfaceProviderBuilder& builder,
+    const SurfaceProvider& provider,
+    absl::Span< const geode::index_t > unique_vertices )
+{
+    const auto& surface_id = builder.add_surface();
+    const auto& surface = provider.surface( surface_id );
+    auto mesh_builder = builder.surface_mesh_builder( surface );
+    for( const auto v : geode::Indices{ unique_vertices } )
+    {
+        mesh_builder->create_point( geode::Point2D{ { 1. * v, 0. } } );
+        builder.set_unique_vertex(
+            { surface.component_id(), v }, unique_vertices[v] );
+    }
+    return surface_id;
+}
+
+void test_unregister_mesh_component()
+{
+    SurfaceProvider provider;
+    SurfaceProviderBuilder builder( provider );
+    builder.create_unique_vertices( 6 );
+    const auto& surface0 = add_surface_with_vertices(
+        builder, provider, std::vector< geode::index_t >{ 0, 1, 2, 3, 4, 5 } );
+    const auto& surface1 = add_surface_with_vertices(
+        builder, provider, std::vector< geode::index_t >{ 0, 1, 2, 3, 4, 5 } );
+    const auto& surface2 = add_surface_with_vertices(
+        builder, provider, std::vector< geode::index_t >{ 0, 0, 1, 1, 2, 2 } );
+    const auto& surface3 = builder.add_surface();
+
+    builder.unregister_mesh_component( provider.surface( surface1 ) );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( provider, surface1 ) == 0,
+        "[unregister] Component mesh vertices of unregistered surface "
+        "should be removed" );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( provider, surface0 ) == 6
+            && count_component_mesh_vertices( provider, surface2 ) == 6,
+        "[unregister] Other component mesh vertices should be kept" );
+    const auto& uv0 = provider.component_mesh_vertices( 0 );
+    geode::OpenGeodeModelException::test(
+        uv0.size() == 3 && uv0[0].component_id.id == surface0
+            && uv0[1].component_id.id == surface2 && uv0[1].vertex == 0
+            && uv0[2].component_id.id == surface2 && uv0[2].vertex == 1,
+        "[unregister] Wrong component mesh vertices order on unique "
+        "vertex 0" );
+
+    builder.unregister_mesh_component( provider.surface( surface3 ) );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( provider, surface0 ) == 6
+            && count_component_mesh_vertices( provider, surface2 ) == 6,
+        "[unregister] Unregistering an empty component should not modify "
+        "other component mesh vertices" );
+
+    // Delete mesh vertices without updating the VertexIdentifier: the
+    // component attribute no longer references unique vertex 0.
+    auto mesh_builder =
+        builder.surface_mesh_builder( provider.surface( surface2 ) );
+    mesh_builder->create_polygon( { 2, 3, 4, 5 } );
+    mesh_builder->delete_isolated_vertices();
+    builder.unregister_mesh_component( provider.surface( surface2 ) );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( provider, surface2 ) == 0,
+        "[unregister] Component mesh vertices of unregistered surface "
+        "should be removed even if the VertexIdentifier is inconsistent" );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( provider, surface0 ) == 6,
+        "[unregister] Other component mesh vertices should be kept (2)" );
+}
+
+void test_unregister_after_load()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    const auto& surface0 = builder.add_surface();
+    const auto& surface1 = builder.add_surface();
+    builder.create_unique_vertices( 4 );
+    for( const auto& surface_id : { surface0, surface1 } )
+    {
+        const auto& surface = brep.surface( surface_id );
+        auto mesh_builder = builder.surface_mesh_builder( surface );
+        for( const auto v : geode::Range{ 4 } )
+        {
+            mesh_builder->create_point( geode::Point3D{ { 1. * v, 0., 0. } } );
+            builder.set_unique_vertex( { surface.component_id(), v }, v );
+        }
+    }
+    const auto filename =
+        absl::StrCat( "test_vertex_identifier.", brep.native_extension() );
+    geode::save_brep( brep, filename );
+    auto reloaded = geode::load_brep( filename );
+    geode::BRepBuilder reloaded_builder{ reloaded };
+    reloaded_builder.remove_surface( reloaded.surface( surface0 ) );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( reloaded, surface0 ) == 0,
+        "[unregister after load] Removed surface mesh vertices should be "
+        "removed" );
+    geode::OpenGeodeModelException::test(
+        count_component_mesh_vertices( reloaded, surface1 ) == 4,
+        "[unregister after load] Other surface mesh vertices should be "
+        "kept" );
+    for( const auto v : geode::Range{ 4 } )
+    {
+        geode::OpenGeodeModelException::test(
+            reloaded.unique_vertex(
+                { reloaded.surface( surface1 ).component_id(), v } )
+                == v,
+            "[unregister after load] Wrong unique vertex" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -274,6 +407,8 @@ void test()
     test_save_and_load_unique_vertices( vertex_identifier );
 
     test_update_unique_vertices();
+    test_unregister_mesh_component();
+    test_unregister_after_load();
 
     builder.unregister_mesh_component( provider.corner( corner2_id ) );
     builder.register_mesh_component( provider.corner( corner2_id ) );
