@@ -114,6 +114,14 @@ geode::BRep build_simple_brep()
 void test_partial_mesh_transfer()
 {
     auto model = build_simple_brep();
+    {
+        // This unique vertex is only used by a surface, which is not
+        // transferred: its copy in other should not end up isolated in model
+        geode::BRepBuilder builder{ model };
+        const auto& surface = *model.surfaces().begin();
+        builder.set_unique_vertex(
+            { surface.component_id(), 0 }, builder.create_unique_vertex() );
+    }
     geode::BRep other;
     geode::BRepBuilder other_builder{ other };
     const auto full_mapping = other_builder.copy( model );
@@ -158,6 +166,15 @@ void test_partial_mesh_transfer()
         geode::OpenGeodeModelException::test(
             model.unique_vertex( { corner.component_id(), 0 } ) != geode::NO_ID,
             "[Test] Transferred corner vertex should have a unique vertex" );
+    }
+    geode::OpenGeodeModelException::test( model.nb_unique_vertices() == 3,
+        "[Test] Wrong number of unique vertices after partial transfer" );
+    for( const auto uv : geode::Range{ model.nb_unique_vertices() } )
+    {
+        geode::OpenGeodeModelException::test(
+            !model.is_unique_vertex_isolated( uv ),
+            "[Test] No unique vertex should be isolated after partial "
+            "transfer" );
     }
 }
 

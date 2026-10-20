@@ -305,7 +305,6 @@ namespace geode
             remove_line_meshes_in_mapping( brep, brep_builder, mapping );
             remove_surface_meshes_in_mapping( brep, brep_builder, mapping );
             remove_block_meshes_in_mapping( brep, brep_builder, mapping );
-            brep_builder.delete_isolated_vertices();
             const auto first_new_unique_vertex_id =
                 brep_builder.create_unique_vertices(
                     other.nb_unique_vertices() );
@@ -318,6 +317,7 @@ namespace geode
                 other_builder, mapping, first_new_unique_vertex_id );
             set_block_meshes_in_mapping( brep, brep_builder, other,
                 other_builder, mapping, first_new_unique_vertex_id );
+            brep_builder.delete_isolated_vertices();
         }
 
         void transfer_section_meshes( const Section& section,
@@ -330,7 +330,6 @@ namespace geode
             remove_line_meshes_in_mapping( section, section_builder, mapping );
             remove_surface_meshes_in_mapping(
                 section, section_builder, mapping );
-            section_builder.delete_isolated_vertices();
             const auto first_new_unique_vertex_id =
                 section_builder.create_unique_vertices(
                     other.nb_unique_vertices() );
@@ -341,6 +340,7 @@ namespace geode
                 other_builder, mapping, first_new_unique_vertex_id );
             set_surface_meshes_in_mapping( section, section_builder, other,
                 other_builder, mapping, first_new_unique_vertex_id );
+            section_builder.delete_isolated_vertices();
         }
     } // namespace detail
 } // namespace geode
