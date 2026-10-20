@@ -24,6 +24,7 @@
 #include <geode/model/mixin/core/component_registry.hpp>
 
 #include <absl/algorithm/container.h>
+#include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
@@ -47,6 +48,24 @@ namespace geode
         void remove_mesh_component( const ComponentType& type, const uuid& id )
         {
             remove_component( mesh_components_, type, id );
+        }
+
+        void remove_mesh_components(
+            const ComponentType& type, absl::Span< const uuid > ids )
+        {
+            const auto type_it = mesh_components_.find( type );
+            if( type_it == mesh_components_.end() || ids.empty() )
+            {
+                return;
+            }
+            const absl::flat_hash_set< uuid > to_remove{ ids.begin(),
+                ids.end() };
+            auto& registry = type_it->second;
+            registry.erase( std::remove_if( registry.begin(), registry.end(),
+                                [&to_remove]( const uuid& id ) {
+                                    return to_remove.contains( id );
+                                } ),
+                registry.end() );
         }
 
         void remove_collection_component(
@@ -123,6 +142,13 @@ namespace geode
         const ComponentType& type, const uuid& id, RegistryBuilder )
     {
         impl_->remove_mesh_component( type, id );
+    }
+
+    void ComponentRegistry::remove_mesh_components( const ComponentType& type,
+        absl::Span< const uuid > ids,
+        RegistryBuilder )
+    {
+        impl_->remove_mesh_components( type, ids );
     }
 
     void ComponentRegistry::remove_collection_component(

@@ -394,6 +394,54 @@ namespace geode
         delete_block( block );
     }
 
+    void BRepBuilder::remove_corners( absl::Span< const uuid > corner_ids )
+    {
+        for( const auto* corner :
+            detail::remove_mesh_components< BRepBuilder, Corner3D >(
+                *this, corner_ids, [this]( const uuid& id ) -> const Corner3D& {
+                    return brep_.corner( id );
+                } ) )
+        {
+            delete_corner( *corner );
+        }
+    }
+
+    void BRepBuilder::remove_lines( absl::Span< const uuid > line_ids )
+    {
+        for( const auto* line :
+            detail::remove_mesh_components< BRepBuilder, Line3D >(
+                *this, line_ids, [this]( const uuid& id ) -> const Line3D& {
+                    return brep_.line( id );
+                } ) )
+        {
+            delete_line( *line );
+        }
+    }
+
+    void BRepBuilder::remove_surfaces( absl::Span< const uuid > surface_ids )
+    {
+        for( const auto* surface :
+            detail::remove_mesh_components< BRepBuilder, Surface3D >( *this,
+                surface_ids, [this]( const uuid& id ) -> const Surface3D& {
+                    return brep_.surface( id );
+                } ) )
+        {
+            delete_surface( *surface );
+        }
+    }
+
+    void BRepBuilder::remove_blocks( absl::Span< const uuid > block_ids )
+    {
+        for( const auto* block :
+            detail::remove_mesh_components< BRepBuilder, Block3D >(
+                *this, block_ids, [this]( const uuid& id ) -> const Block3D& {
+                    return brep_.block( id );
+                } ) )
+        {
+            delete_block( *block );
+        }
+    }
+
     void BRepBuilder::remove_model_boundary( const ModelBoundary3D& boundary )
     {
         detail::remove_collection_component( *this, boundary );

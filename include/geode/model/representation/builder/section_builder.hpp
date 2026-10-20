@@ -165,6 +165,22 @@ namespace geode
 
         void remove_surface( const Surface2D& surface );
 
+        /*!
+         * Remove several corners at once (faster than removing them one by one)
+         */
+        void remove_corners( absl::Span< const uuid > corner_ids );
+
+        /*!
+         * Remove several lines at once (faster than removing them one by one)
+         */
+        void remove_lines( absl::Span< const uuid > line_ids );
+
+        /*!
+         * Remove several surfaces at once (faster than removing them one by
+         * one)
+         */
+        void remove_surfaces( absl::Span< const uuid > surface_ids );
+
         void remove_model_boundary( const ModelBoundary2D& boundary );
 
         void remove_corner_collection( const CornerCollection2D& collection );
