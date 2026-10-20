@@ -205,8 +205,8 @@ void test_ranges( const geode::Relationships& relations,
     std::vector< geode::uuid > expected_boundaries{ uuids[1], uuids[3],
         uuids[5] };
     absl::c_sort( expected_boundaries );
-    geode::OpenGeodeModelException::test( boundary_ids == expected_boundaries,
-        "Wrong boundaries of uuids[0]" );
+    geode::OpenGeodeModelException::test(
+        boundary_ids == expected_boundaries, "Wrong boundaries of uuids[0]" );
 
     geode::index_t nb_pairs{ 0 };
     for( const auto& boundary0 : boundaries )
@@ -218,9 +218,9 @@ void test_ranges( const geode::Relationships& relations,
             nb_pairs++;
         }
     }
-    geode::OpenGeodeModelException::test(
-        nb_pairs == 9, "Nested iterations on the same range should be "
-                       "independent" );
+    geode::OpenGeodeModelException::test( nb_pairs == 9,
+        "Nested iterations on the same range should be "
+        "independent" );
 
     auto copy = boundaries;
     ++copy;
