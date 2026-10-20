@@ -117,7 +117,14 @@ namespace geode::detail
 
         void delete_component( const uuid& component_id )
         {
-            components_.erase( components_.find( component_id ) );
+            const auto it = components_.find( component_id );
+            OpenGeodeModelException::check_exception( it != components_.end(),
+                component_id, OpenGeodeException::TYPE::data,
+                "[ComponentsStorage::delete_component] Component with id ",
+                component_id.string(),
+                " does not exist (already removed or belongs to another "
+                "model)" );
+            components_.erase( it );
         }
 
         void load_components( std::string_view filename )
