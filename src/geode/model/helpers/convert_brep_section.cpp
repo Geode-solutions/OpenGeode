@@ -192,6 +192,11 @@ namespace
 
         void extrude_corner( const geode::Corner2D& section_corner )
         {
+            if( section_corner.mesh().nb_vertices() == 0 )
+            {
+                // Nothing to extrude
+                return;
+            }
             const auto& corner_slice0 =
                 brep_.corner( section_slice0_brep_mapping(
                     geode::Corner3D::component_type_static(),

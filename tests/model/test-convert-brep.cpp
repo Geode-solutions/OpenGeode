@@ -30,11 +30,13 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
 #include <geode/model/helpers/convert_brep_section.hpp>
 #include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
@@ -188,6 +190,28 @@ void test_extrusion_pentagon_section_to_brep()
         "Extruding a pentagon should throw an exception." );
 }
 
+void test_extrusion_section_with_empty_corner_to_brep()
+{
+    auto section = geode::load_section(
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
+    const auto nb_corners = section.nb_corners();
+    geode::SectionBuilder builder{ section };
+    builder.add_corner();
+    geode::SectionExtruderOptions options;
+    options.axis_to_extrude = 2;
+    options.min_coordinate = 0.;
+    options.max_coordinate = 10.;
+    const auto brep = geode::extrude_section_to_brep( section, options );
+    geode::OpenGeodeModelException::test(
+        brep.nb_lines() == 2 * section.nb_lines() + nb_corners,
+        "Extruded BRep with empty Corner - wrong number of lines." );
+    for( const auto& line : brep.lines() )
+    {
+        geode::OpenGeodeModelException::test( line.mesh().nb_edges() > 0,
+            "Extruded BRep with empty Corner - empty Line." );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -196,6 +220,7 @@ void test()
     test_extrusion_section_to_brep();
     test_extrusion_quad_section_to_brep();
     test_extrusion_pentagon_section_to_brep();
+    test_extrusion_section_with_empty_corner_to_brep();
 }
 
 OPENGEODE_TEST( "convert-brep" )
