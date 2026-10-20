@@ -292,12 +292,59 @@ void test_section()
     geode::save_section( section, "test_section.og_sctn" );
 }
 
+void test_create_in_non_empty_section()
+{
+    geode::Section section;
+    {
+        geode::SimplicialSectionCreator creator{ section,
+            { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } } } };
+        creator.create_corners( std::vector< geode::CornerDefinition >{
+            { 0 }, { 1 } } );
+    }
+    const auto nb_existing_vertices = section.nb_unique_vertices();
+    geode::SimplicialSectionCreator creator{ section,
+        { geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 3, 0 } },
+            geode::Point2D{ { 4, 0 } } } };
+    const std::vector< geode::CornerDefinition > corner_definitions{ { 0 },
+        { 1 }, { 2 } };
+    const auto corners = creator.create_corners( corner_definitions );
+    for( const auto c : geode::Indices{ corners } )
+    {
+        const auto& corner = section.corner( corners[c] );
+        geode::OpenGeodeModelException::test(
+            section.unique_vertex( { corner.component_id(), 0 } )
+                == nb_existing_vertices + corner_definitions[c].vertex,
+            "[non empty model] Wrong Corner unique vertex" );
+    }
+    const std::vector< geode::LineDefinition > line_definitions{ { { 0, 1,
+        2 } } };
+    const auto lines = creator.create_lines( corners, line_definitions );
+    const auto& line = section.line( lines.front() );
+    for( const auto v : geode::Range{ line.mesh().nb_vertices() } )
+    {
+        const auto unique_vertex =
+            section.unique_vertex( { line.component_id(), v } );
+        geode::OpenGeodeModelException::test(
+            unique_vertex
+                == nb_existing_vertices + line_definitions.front().vertices[v],
+            "[non empty model] Wrong Line unique vertex" );
+    }
+    for( const auto uv : geode::Range{ nb_existing_vertices } )
+    {
+        geode::OpenGeodeModelException::test(
+            section.component_mesh_vertices( uv ).size() == 1,
+            "[non empty model] Existing unique vertices should not be "
+            "modified" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_create_brep_from_bbox();
     test_create_brep_with_dangling_components();
     test_section();
+    test_create_in_non_empty_section();
 }
 
 OPENGEODE_TEST( "model-creator" )

@@ -54,9 +54,10 @@ namespace geode
                 Model& model, std::vector< Point< dimension > > unique_points )
                 : model_( model ),
                   builder_{ model },
-                  unique_points_{ std::move( unique_points ) }
+                  unique_points_{ std::move( unique_points ) },
+                  first_unique_vertex_{ builder_.create_unique_vertices(
+                      unique_points_.size() ) }
             {
-                builder_.create_unique_vertices( unique_points_.size() );
             }
 
             std::vector< uuid > create_corners(
@@ -173,8 +174,8 @@ namespace geode
             {
                 const auto id =
                     mesh_builder.create_point( unique_points_[vertex] );
-                builder_.set_unique_vertex(
-                    { component.component_id(), id }, vertex );
+                builder_.set_unique_vertex( { component.component_id(), id },
+                    first_unique_vertex_ + vertex );
             }
 
             const Model& model() const
@@ -191,6 +192,7 @@ namespace geode
             const Model& model_;
             ModelBuilder builder_;
             std::vector< Point< dimension > > unique_points_;
+            index_t first_unique_vertex_;
         };
     } // namespace internal
 } // namespace geode
