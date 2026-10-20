@@ -23,6 +23,8 @@
 
 #include <geode/model/helpers/component_mesh_vertices.hpp>
 
+#include <algorithm>
+
 #include <geode/basic/logger.hpp>
 
 namespace
@@ -47,11 +49,14 @@ namespace
         {
             if( compare( cmv, previous ) )
             {
-                geode::OpenGeodeModelException::check_exception(
-                    cmv.vertex != previous.vertex, nullptr,
-                    geode::OpenGeodeException::TYPE::data,
-                    "[component_mesh_vertex_pairs] Vertices should be "
-                    "different" );
+                // A component vertex used twice means a degenerate element:
+                // it cannot match any element, as for edges.
+                if( std::find( current_result.begin(),
+                        current_result.begin() + index, cmv.vertex )
+                    != current_result.begin() + index )
+                {
+                    continue;
+                }
                 auto temp_result = current_result;
                 temp_result[index] = cmv.vertex;
                 recursive_compare_unique_vertices< dimension, Compare >(

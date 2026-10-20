@@ -33,6 +33,7 @@
 #include <geode/mesh/core/surface_mesh.hpp>
 
 #include <geode/model/helpers/component_mesh_polygons.hpp>
+#include <geode/model/helpers/component_mesh_vertices.hpp>
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/surface.hpp>
@@ -271,12 +272,33 @@ void run_test_polygon_without_unique_vertex()
         "vertex without unique vertex" );
 }
 
+void run_test_degenerate_polygon()
+{
+    const auto model = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto& surface = *model.surfaces().begin();
+    auto unique_vertices = geode::polygon_unique_vertices( model, surface, 0 );
+    unique_vertices[1] = unique_vertices[0];
+    const auto polygons =
+        geode::component_mesh_polygons( model, unique_vertices );
+    geode::OpenGeodeModelException::test(
+        polygons.surface_polygons.empty() && polygons.block_polygons.empty(),
+        "No component mesh polygon should be found from degenerate unique "
+        "vertices" );
+    const auto& cmvs = model.component_mesh_vertices( unique_vertices[0] );
+    geode::OpenGeodeModelException::test(
+        geode::component_mesh_vertex_pairs( cmvs, cmvs ).empty(),
+        "No component mesh vertex pair should be found from the same unique "
+        "vertex" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     run_test_brep();
     run_test_section();
     run_test_polygon_without_unique_vertex();
+    run_test_degenerate_polygon();
 }
 
 OPENGEODE_TEST( "convert-mesh-polygons" )
