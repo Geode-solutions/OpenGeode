@@ -23,6 +23,10 @@
 
 #include <geode/model/helpers/convert_brep_section.hpp>
 
+#include <atomic>
+
+#include <async++.h>
+
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/geode/geode_edged_curve_builder.hpp>
@@ -74,8 +78,31 @@ namespace
     {
         const auto first_new_unique_vertex_id =
             builder_to.create_unique_vertices( from.nb_unique_vertices() );
-        geode::detail::copy_vertex_identifier_components(
-            from, builder_to, first_new_unique_vertex_id, mappings );
+        std::atomic< bool > has_skipped_vertices{ false };
+        async::parallel_for(
+            async::irange( geode::index_t{ 0 }, from.nb_unique_vertices() ),
+            [&]( geode::index_t v ) {
+                for( const auto& mesh_vertex :
+                    from.component_mesh_vertices( v ) )
+                {
+                    const auto& type = mesh_vertex.component_id.type;
+                    if( !mappings.has_mapping_type( type ) )
+                    {
+                        // e.g. Block vertices when converting into a Section
+                        has_skipped_vertices = true;
+                        continue;
+                    }
+                    builder_to.set_unique_vertex(
+                        { { type, mappings.at( type ).in2out(
+                                      mesh_vertex.component_id.id ) },
+                            mesh_vertex.vertex },
+                        first_new_unique_vertex_id + v );
+                }
+            } );
+        if( has_skipped_vertices )
+        {
+            builder_to.delete_isolated_vertices();
+        }
     }
 
     class SectionExtruder

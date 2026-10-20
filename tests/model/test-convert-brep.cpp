@@ -25,8 +25,10 @@
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/model/helpers/convert_brep_section.hpp>
+#include <geode/model/mixin/core/block.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -53,6 +55,47 @@ void test_convert_brep_section()
         brep2.nb_lines() == 288, "BRep should have 288 lines" );
     geode::OpenGeodeModelException::test(
         brep2.nb_surfaces() == 117, "BRep should have 117 surfaces" );
+}
+
+void test_convert_brep_with_blocks_into_section()
+{
+    const auto brep = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    geode::OpenGeodeModelException::test(
+        brep.nb_blocks() > 0, "BRep should have Blocks" );
+    geode::index_t nb_non_block_unique_vertices{ 0 };
+    for( const auto uv : geode::Range{ brep.nb_unique_vertices() } )
+    {
+        for( const auto& cmv : brep.component_mesh_vertices( uv ) )
+        {
+            if( cmv.component_id.type
+                != geode::Block3D::component_type_static() )
+            {
+                nb_non_block_unique_vertices++;
+                break;
+            }
+        }
+    }
+    const auto section =
+        std::get< 0 >( geode::convert_brep_into_section( brep, 2 ) );
+    geode::OpenGeodeModelException::test(
+        section.nb_corners() == brep.nb_corners(),
+        "Section from BRep with Blocks - wrong number of corners" );
+    geode::OpenGeodeModelException::test(
+        section.nb_lines() == brep.nb_lines(),
+        "Section from BRep with Blocks - wrong number of lines" );
+    geode::OpenGeodeModelException::test(
+        section.nb_surfaces() == brep.nb_surfaces(),
+        "Section from BRep with Blocks - wrong number of surfaces" );
+    geode::OpenGeodeModelException::test(
+        section.nb_unique_vertices() == nb_non_block_unique_vertices,
+        "Section from BRep with Blocks - wrong number of unique vertices" );
+    for( const auto uv : geode::Range{ section.nb_unique_vertices() } )
+    {
+        geode::OpenGeodeModelException::test(
+            !section.component_mesh_vertices( uv ).empty(),
+            "Section from BRep with Blocks - isolated unique vertex" );
+    }
 }
 
 void test_extrusion_section_to_brep()
@@ -82,6 +125,7 @@ void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_convert_brep_section();
+    test_convert_brep_with_blocks_into_section();
     test_extrusion_section_to_brep();
 }
 
