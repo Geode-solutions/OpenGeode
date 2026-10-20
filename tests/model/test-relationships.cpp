@@ -21,6 +21,9 @@
  *
  */
 
+#include <vector>
+
+#include <absl/algorithm/container.h>
 #include <absl/types/span.h>
 
 #include <geode/basic/assert.hpp>
@@ -189,6 +192,88 @@ void test_attributes( const geode::Relationships& relations,
         "Wrong relation attribute assignment" );
 }
 
+void test_ranges( const geode::Relationships& relations,
+    absl::Span< const geode::uuid > uuids )
+{
+    const auto boundaries = relations.boundaries( uuids[0] );
+    std::vector< geode::uuid > boundary_ids;
+    for( const auto& boundary : boundaries )
+    {
+        boundary_ids.push_back( boundary.id );
+    }
+    absl::c_sort( boundary_ids );
+    std::vector< geode::uuid > expected_boundaries{ uuids[1], uuids[3],
+        uuids[5] };
+    absl::c_sort( expected_boundaries );
+    geode::OpenGeodeModelException::test( boundary_ids == expected_boundaries,
+        "Wrong boundaries of uuids[0]" );
+
+    geode::index_t nb_pairs{ 0 };
+    for( const auto& boundary0 : boundaries )
+    {
+        for( const auto& boundary1 : boundaries )
+        {
+            geode_unused( boundary0 );
+            geode_unused( boundary1 );
+            nb_pairs++;
+        }
+    }
+    geode::OpenGeodeModelException::test(
+        nb_pairs == 9, "Nested iterations on the same range should be "
+                       "independent" );
+
+    auto copy = boundaries;
+    ++copy;
+    geode::index_t nb_boundaries{ 0 };
+    for( const auto& boundary : boundaries )
+    {
+        geode_unused( boundary );
+        nb_boundaries++;
+    }
+    geode::OpenGeodeModelException::test( nb_boundaries == 3,
+        "Advancing a range copy should not modify the original range" );
+    geode::index_t nb_remaining{ 0 };
+    for( ; copy != copy; ++copy )
+    {
+        nb_remaining++;
+    }
+    geode::OpenGeodeModelException::test(
+        nb_remaining == 2, "Range copy should keep its own state" );
+
+    const geode::uuid unknown;
+    geode::OpenGeodeModelException::test(
+        !( relations.relations( unknown ) != relations.relations( unknown ) ),
+        "Range of an unknown component should be empty" );
+    geode::OpenGeodeModelException::test(
+        relations.nb_boundaries( unknown ) == 0,
+        "Unknown component should have no boundary" );
+
+    geode::index_t nb_relations{ 0 };
+    for( const auto& relation : relations.relations( uuids[2] ) )
+    {
+        geode_unused( relation );
+        nb_relations++;
+    }
+    geode::OpenGeodeModelException::test(
+        nb_relations == relations.nb_relations( uuids[2] ),
+        "Wrong number of relations of uuids[2]" );
+    for( const auto& collection : relations.collections( uuids[2] ) )
+    {
+        geode::OpenGeodeModelException::test(
+            collection.id == uuids[4], "Wrong collection of uuids[2]" );
+    }
+    for( const auto& embedding : relations.embeddings( uuids[2] ) )
+    {
+        geode::OpenGeodeModelException::test(
+            embedding.id == uuids[0], "Wrong embedding of uuids[2]" );
+    }
+    for( const auto& internal : relations.internals( uuids[1] ) )
+    {
+        geode::OpenGeodeModelException::test(
+            internal.id == uuids[5], "Wrong internal of uuids[1]" );
+    }
+}
+
 void test_io(
     std::string_view directory, absl::Span< const geode::uuid > uuids )
 {
@@ -219,6 +304,7 @@ void test()
     add_items_in_collections( relationships, uuids );
     test_relations( relationships, uuids );
     test_attributes( relationships, uuids );
+    test_ranges( relationships, uuids );
     relationships.save_relationships( "." );
     test_io( absl::StrCat( geode::DATA_PATH, "relationships_v12" ), uuids );
     test_io( ".", uuids );

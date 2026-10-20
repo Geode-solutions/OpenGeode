@@ -89,6 +89,29 @@ std::array< geode::uuid, 6 > add_corners(
         model.nb_active_corners() == 4, "BRep should have 4 active corners" );
     geode::OpenGeodeModelException::test(
         model.nb_corners() == 6, "BRep should still have 6 corners" );
+    const auto active_corners = model.active_corners();
+    geode::index_t nb_active_pairs{ 0 };
+    for( const auto& corner0 : active_corners )
+    {
+        geode::OpenGeodeModelException::test(
+            corner0.id() != uuids[1] && corner0.id() != uuids[4],
+            "Active corner range should skip inactive corners" );
+        for( const auto& corner1 : active_corners )
+        {
+            geode_unused( corner1 );
+            nb_active_pairs++;
+        }
+    }
+    geode::OpenGeodeModelException::test( nb_active_pairs == 16,
+        "Nested iterations on the same active corner range should be "
+        "independent" );
+    auto corners_copy = model.corners();
+    const auto corners_range = corners_copy;
+    ++corners_copy;
+    geode::OpenGeodeModelException::test(
+        geode::detail::count_range_elements( corners_range ) == 6
+            && geode::detail::count_range_elements( corners_copy ) == 5,
+        "Corner range copies should be independent" );
     return uuids;
 }
 

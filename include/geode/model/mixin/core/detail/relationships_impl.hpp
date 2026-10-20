@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -48,8 +50,6 @@ namespace geode
         class opengeode_model_api RelationshipsImpl
         {
         public:
-            using Iterator = typename EdgesAroundVertex::const_iterator;
-
             RelationshipsImpl( BITSERY );
 
             [[nodiscard]] index_t nb_components_with_relations() const;
@@ -57,9 +57,12 @@ namespace geode
             [[nodiscard]] index_t nb_relations(
                 const uuid& component_id ) const;
 
-            [[nodiscard]] Iterator begin_edge( const uuid& component_id ) const;
-
-            [[nodiscard]] Iterator end_edge( const uuid& component_id ) const;
+            /*!
+             * Return the graph edges around the given component (empty if the
+             * component has no relation)
+             */
+            [[nodiscard]] absl::Span< const EdgeVertex > edges_around_component(
+                const uuid& component_id ) const;
 
             [[nodiscard]] const ComponentID& graph_component_id(
                 index_t graph_component ) const;

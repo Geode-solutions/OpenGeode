@@ -160,54 +160,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    class ModelBoundaries< dimension >::ModelBoundaryRangeBase::Impl
-        : public BaseRange<
-              typename ModelBoundaries< dimension >::Impl::Iterator >
-    {
-        using Iterator = typename ModelBoundaries< dimension >::Impl::Iterator;
-
-    public:
-        Impl( Iterator begin, Iterator end )
-            : BaseRange< Impl::Iterator >( begin, end )
-        {
-        }
-
-        ModelBoundary< dimension >& model_boundary() const
-        {
-            return *this->current()->second;
-        }
-
-        void set_active_only()
-        {
-            active_only_ = true;
-            next_model_boundary();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_model_boundary();
-        }
-
-    private:
-        void next_model_boundary()
-        {
-            while( this->operator!=( *this )
-                   && ( active_only_ && !model_boundary().is_active() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        bool active_only_{ false };
-    };
-
-    template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaryRangeBase::
         ModelBoundaryRangeBase( const ModelBoundaries& boundaries )
         : impl_( boundaries.impl_->begin(), boundaries.impl_->end() )
     {
+        static_assert( std::is_same_v< decltype( boundaries.impl_->begin() ),
+                           typename decltype( impl_ )::Iterator >,
+            "[ComponentRangeIterator] Iterator type mismatch" );
     }
 
     template < index_t dimension >
@@ -217,7 +176,7 @@ namespace geode
     template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaryRangeBase::
         ModelBoundaryRangeBase( const ModelBoundaryRangeBase& other )
-        : impl_( *other.impl_ )
+        : impl_( other.impl_ )
     {
     }
 
@@ -230,19 +189,19 @@ namespace geode
     bool ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator!=(
         const ModelBoundaryRangeBase& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return impl_.is_valid();
     }
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::ModelBoundaryRangeBase::set_active_only()
     {
-        impl_->set_active_only();
+        impl_.set_active_only();
     }
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator++()
     {
-        return impl_->next();
+        impl_.next();
     }
 
     template < index_t dimension >
@@ -281,7 +240,7 @@ namespace geode
     const ModelBoundary< dimension >&
         ModelBoundaries< dimension >::ModelBoundaryRange::operator*() const
     {
-        return this->impl_->model_boundary();
+        return this->impl_.component();
     }
 
     template < index_t dimension >
@@ -322,7 +281,7 @@ namespace geode
         ModelBoundaries< dimension >::ModifiableModelBoundaryRange::operator*()
             const
     {
-        return this->impl_->model_boundary();
+        return this->impl_.component();
     }
 
     template class opengeode_model_api ModelBoundaries< 2 >;
