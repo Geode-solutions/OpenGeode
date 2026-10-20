@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/component_registry.hpp>
 
+#include <absl/algorithm/container.h>
+
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -44,17 +46,13 @@ namespace geode
 
         void remove_mesh_component( const ComponentType& type, const uuid& id )
         {
-            auto& registry = mesh_components_[type];
-            registry.erase( std::remove( registry.begin(), registry.end(), id ),
-                registry.end() );
+            remove_component( mesh_components_, type, id );
         }
 
         void remove_collection_component(
             const ComponentType& type, const uuid& id )
         {
-            auto& registry = collection_components_[type];
-            registry.erase( std::remove( registry.begin(), registry.end(), id ),
-                registry.end() );
+            remove_component( collection_components_, type, id );
         }
 
         const Registry& mesh_components() const
@@ -65,6 +63,23 @@ namespace geode
         const Registry& collection_components() const
         {
             return collection_components_;
+        }
+
+    private:
+        static void remove_component(
+            Registry& registry, const ComponentType& type, const uuid& id )
+        {
+            const auto type_it = registry.find( type );
+            if( type_it == registry.end() )
+            {
+                return;
+            }
+            auto& ids = type_it->second;
+            const auto it = absl::c_find( ids, id );
+            if( it != ids.end() )
+            {
+                ids.erase( it );
+            }
         }
 
     private:

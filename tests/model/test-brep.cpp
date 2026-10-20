@@ -1796,6 +1796,28 @@ void test_backward_io()
     test_registry( brep_v18_0, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
 
+void test_registry_remove_unknown_type()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    builder.add_corner();
+    builder.remove_mesh_component(
+        geode::Block3D::component_type_static(), geode::uuid{} );
+    builder.remove_collection_component(
+        geode::BlockCollection3D::component_type_static(), geode::uuid{} );
+    geode::OpenGeodeModelException::test(
+        !brep.mesh_components().contains(
+            geode::Block3D::component_type_static() ),
+        "[Test] Removing a component of an unknown type should not add the "
+        "type to the mesh registry" );
+    geode::OpenGeodeModelException::test(
+        !brep.collection_components().contains(
+            geode::BlockCollection3D::component_type_static() ),
+        "[Test] Removing a component of an unknown type should not add the "
+        "type to the collection registry" );
+    test_registry( brep, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+}
+
 void test_components_filter()
 {
     const auto brep = geode::load_brep(
@@ -1975,6 +1997,7 @@ void test()
 
     test_backward_io();
     test_components_filter();
+    test_registry_remove_unknown_type();
 }
 
 OPENGEODE_TEST( "brep" )
