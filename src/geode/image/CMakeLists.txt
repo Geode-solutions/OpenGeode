@@ -39,6 +39,8 @@ add_geode_library(
         "io/raster_image_output.hpp"
         "io/geode/geode_bitsery_raster_input.hpp"
         "io/geode/geode_bitsery_raster_output.hpp"
+    ADVANCED_HEADERS
+        "core/detail/color_channel.hpp"
     PUBLIC_DEPENDENCIES
         ${PROJECT_NAME}::basic
 )
