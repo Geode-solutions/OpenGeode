@@ -31,52 +31,6 @@
 
 #include <geode/mesh/builder/mesh_builder_factory.hpp>
 
-namespace
-{
-    using geode::index_t;
-
-    void update_edge_vertices( const geode::Graph& graph,
-        geode::GraphBuilder& builder,
-        absl::Span< const index_t > old2new )
-    {
-        for( const auto e : geode::Range{ graph.nb_edges() } )
-        {
-            for( const auto v : geode::LRange{ 2 } )
-            {
-                const geode::EdgeVertex id{ e, v };
-                const auto new_vertex = old2new[graph.edge_vertex( id )];
-                geode::OpenGeodeMeshException::check_exception(
-                    new_vertex != geode::NO_ID, nullptr,
-                    geode::OpenGeodeException::TYPE::data,
-                    "[GraphBuilder::update_edge_vertices] Cannot remove vertex "
-                    "associated to an edge" );
-                builder.set_edge_vertex( id, new_vertex );
-            }
-        }
-    }
-
-    void update_edges_around( const geode::Graph& graph,
-        geode::GraphBuilder& builder,
-        absl::Span< const index_t > old2new )
-    {
-        for( const auto v : geode::Range{ graph.nb_vertices() } )
-        {
-            const auto& edges = graph.edges_around_vertex( v );
-            geode::EdgesAroundVertex new_edges;
-            new_edges.reserve( edges.size() );
-            for( const auto& edge : edges )
-            {
-                const auto edge_id = old2new[edge.edge_id];
-                if( edge_id != geode::NO_ID )
-                {
-                    new_edges.emplace_back( edge_id, edge.vertex_id );
-                }
-            }
-            builder.set_edges_around_vertex( v, std::move( new_edges ) );
-        }
-    }
-} // namespace
-
 namespace geode
 {
     GraphBuilder::GraphBuilder( Graph& mesh )
@@ -154,7 +108,7 @@ namespace geode
         absl::Span< const index_t > old2new )
     {
         graph_.delete_vertex_storage( to_delete, Graph::GraphKey{} );
-        update_edge_vertices( graph_, *this, old2new );
+        update_edge_vertices( old2new );
         do_delete_graph_vertices( to_delete, old2new );
     }
 
@@ -163,8 +117,32 @@ namespace geode
         absl::Span< const index_t > old2new )
     {
         graph_.permute_vertex_storage( permutation, Graph::GraphKey{} );
-        update_edge_vertices( graph_, *this, old2new );
+        update_edge_vertices( old2new );
         do_permute_graph_vertices( permutation, old2new );
+    }
+
+    void GraphBuilder::update_edge_vertices(
+        absl::Span< const index_t > old2new )
+    {
+        // Edges around vertices have already been moved with the vertex
+        // storage: only the edge vertices need to be updated.
+        for( const auto e : Range{ graph_.nb_edges() } )
+        {
+            for( const auto v : LRange{ 2 } )
+            {
+                const EdgeVertex id{ e, v };
+                const auto old_vertex = graph_.edge_vertex( id );
+                const auto new_vertex = old2new[old_vertex];
+                OpenGeodeMeshException::check_exception( new_vertex != NO_ID,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[GraphBuilder::update_edge_vertices] Cannot remove vertex "
+                    "associated to an edge" );
+                if( new_vertex != old_vertex )
+                {
+                    do_set_edge_vertex( id, new_vertex );
+                }
+            }
+        }
     }
 
     void GraphBuilder::do_resize_vertex_storage( index_t nb_vertices )
@@ -187,7 +165,7 @@ namespace geode
         {
             return old2new;
         }
-        update_edges_around( graph_, *this, old2new );
+        graph_.update_edges_around_vertices( old2new, Graph::GraphKey{} );
         graph_.edge_attribute_manager().delete_elements( to_delete );
         do_delete_edges( to_delete, old2new );
         return old2new;
@@ -197,7 +175,7 @@ namespace geode
         absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );
-        update_edges_around( graph_, *this, old2new );
+        graph_.update_edges_around_vertices( old2new, Graph::GraphKey{} );
         graph_.edge_attribute_manager().permute_elements( permutation );
         do_permute_edges( permutation, old2new );
         return old2new;
