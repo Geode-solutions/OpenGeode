@@ -67,6 +67,10 @@ namespace geode
                 corners.reserve( definitions.size() );
                 for( const auto& definition : definitions )
                 {
+                    check_unique_point( definition.vertex );
+                }
+                for( const auto& definition : definitions )
+                {
                     const auto& corner_id = builder_.add_corner();
                     const auto& corner = model_.corner( corner_id );
                     auto mesh_builder = builder_.corner_mesh_builder( corner );
@@ -81,6 +85,21 @@ namespace geode
             {
                 std::vector< uuid > lines;
                 lines.reserve( definitions.size() );
+                for( const auto& definition : definitions )
+                {
+                    const auto& vertices = definition.vertices;
+                    OpenGeodeModelException::check_exception(
+                        vertices.size() >= 2, nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[SimplicialModelCreator::create_lines] A Line "
+                        "definition should have at least 2 vertices" );
+                    for( const auto vertex : vertices )
+                    {
+                        check_unique_point( vertex );
+                    }
+                    check_index( vertices.front(), corners.size(), "Corner" );
+                    check_index( vertices.back(), corners.size(), "Corner" );
+                }
                 for( const auto& definition : definitions )
                 {
                     const auto& line_id = builder_.add_line();
@@ -112,6 +131,19 @@ namespace geode
             {
                 std::vector< uuid > surfaces;
                 surfaces.reserve( definitions.size() );
+                for( const auto& definition : definitions )
+                {
+                    check_simplices( definition.vertices, definition.triangles,
+                        3, "triangles" );
+                    for( const auto boundary : definition.boundaries )
+                    {
+                        check_index( boundary, lines.size(), "Line" );
+                    }
+                    for( const auto internal : definition.internals )
+                    {
+                        check_index( internal, lines.size(), "Line" );
+                    }
+                }
                 for( const auto& definition : definitions )
                 {
                     const auto& surface_id = builder_.add_surface(
@@ -152,6 +184,13 @@ namespace geode
                 absl::Span< const uuid > lines,
                 absl::Span< const SurfaceDefinition > definitions )
             {
+                for( const auto& definition : definitions )
+                {
+                    for( const auto internal : definition.internal_corners )
+                    {
+                        check_index( internal, corners.size(), "Corner" );
+                    }
+                }
                 const auto surfaces = create_surfaces( lines, definitions );
                 for( const auto d : Indices{ definitions } )
                 {
@@ -167,6 +206,42 @@ namespace geode
             }
 
         protected:
+            void check_index( index_t index,
+                std::size_t size,
+                std::string_view element ) const
+            {
+                OpenGeodeModelException::check_exception( index < size,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[SimplicialModelCreator] ", element, " index ", index,
+                    " is out of range (", size, " elements)" );
+            }
+
+            void check_unique_point( index_t vertex ) const
+            {
+                check_index( vertex, unique_points_.size(), "Unique point" );
+            }
+
+            void check_simplices( absl::Span< const index_t > vertices,
+                absl::Span< const index_t > simplices,
+                index_t nb_simplex_vertices,
+                std::string_view simplex_name ) const
+            {
+                for( const auto vertex : vertices )
+                {
+                    check_unique_point( vertex );
+                }
+                OpenGeodeModelException::check_exception(
+                    simplices.size() % nb_simplex_vertices == 0, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SimplicialModelCreator] The number of ", simplex_name,
+                    " vertices (", simplices.size(),
+                    ") should be a multiple of ", nb_simplex_vertices );
+                for( const auto vertex : simplices )
+                {
+                    check_index( vertex, vertices.size(), "Component vertex" );
+                }
+            }
+
             template < typename MeshBuilder, typename Component >
             void create_point( MeshBuilder& mesh_builder,
                 const Component& component,
