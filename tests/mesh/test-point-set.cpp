@@ -21,6 +21,7 @@
  *
  */
 
+#include <filesystem>
 #include <fstream>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -131,6 +132,26 @@ void test_io( const geode::PointSet3D& point_set, std::string_view filename )
     }
 }
 
+void test_save_unwritable( const geode::PointSet3D& point_set )
+{
+    const auto filename =
+        absl::StrCat( "unwritable.", point_set.native_extension() );
+    std::filesystem::create_directories( filename );
+    try
+    {
+        geode::save_point_set( point_set, filename );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        std::filesystem::remove_all( filename );
+        return;
+    }
+    std::filesystem::remove_all( filename );
+    throw geode::OpenGeodeMeshException{ nullptr,
+        geode::OpenGeodeException::TYPE::internal,
+        "[Test] Saving in a non writable file should throw" };
+}
+
 void test_backward_io(
     std::string_view filename, const geode::uuid& attribute_id )
 {
@@ -171,6 +192,7 @@ void test()
     const auto vertex_attribute_id = test_create_vertex_attribute( *point_set );
     test_io(
         *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
+    test_save_unwritable( *point_set );
     test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
                           point_set->native_extension() ),
         vertex_attribute_id );

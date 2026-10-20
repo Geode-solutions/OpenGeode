@@ -53,7 +53,7 @@ namespace geode
                 type );
             throw OpenGeodeImageException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save RasterImage in file: ", filename };
+                "Cannot save RasterImage in file: ", filename, ": ", e.what() };
         }
     }
 

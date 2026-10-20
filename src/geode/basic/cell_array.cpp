@@ -69,6 +69,7 @@ namespace geode
             : cells_number_( std::move( cells_number ) )
         {
             check_cells_number< dimension >( cells_number_ );
+            update_strides();
         }
 
         index_t nb_cells() const
@@ -134,11 +135,24 @@ namespace geode
         {
             check_cells_number< dimension >( cells_number );
             cells_number_ = std::move( cells_number );
+            update_strides();
         }
 
         void copy( const CellArray< dimension >::Impl& impl )
         {
             cells_number_ = impl.cells_number_;
+            cell_strides_ = impl.cell_strides_;
+            vertex_strides_ = impl.vertex_strides_;
+        }
+
+        const std::array< index_t, dimension >& cell_strides() const
+        {
+            return cell_strides_;
+        }
+
+        const std::array< index_t, dimension >& vertex_strides() const
+        {
+            return vertex_strides_;
         }
 
     private:
@@ -151,11 +165,27 @@ namespace geode
                     { []( Archive& local_archive, Impl& impl ) {
                         local_archive.container4b( impl.cells_number_ );
                         checked_nb_cells< dimension >( impl.cells_number_ );
+                        impl.update_strides();
                     } } } );
         }
 
+        void update_strides()
+        {
+            index_t cell_stride{ 1 };
+            index_t vertex_stride{ 1 };
+            for( const auto d : LRange{ dimension } )
+            {
+                cell_strides_[d] = cell_stride;
+                vertex_strides_[d] = vertex_stride;
+                cell_stride *= cells_number_[d];
+                vertex_stride *= cells_number_[d] + 1;
+            }
+        }
+
     private:
-        std::array< index_t, dimension > cells_number_;
+        std::array< index_t, dimension > cells_number_{};
+        std::array< index_t, dimension > cell_strides_{};
+        std::array< index_t, dimension > vertex_strides_{};
     };
 
     template < index_t dimension >
@@ -220,6 +250,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto CellArray< dimension >::cell_strides() const
+        -> const std::array< index_t, dimension >&
+    {
+        return impl_->cell_strides();
+    }
+
+    template < index_t dimension >
+    auto CellArray< dimension >::vertex_strides() const
+        -> const std::array< index_t, dimension >&
+    {
+        return impl_->vertex_strides();
+    }
+
+    template < index_t dimension >
     void CellArray< dimension >::copy( const CellArray< dimension >& array )
     {
         impl_->copy( *array.impl_ );
@@ -229,11 +273,25 @@ namespace geode
     template < typename Archive >
     void CellArray< dimension >::serialize( Archive& serializer )
     {
-        serializer.ext(
-            *this, Growable< Archive, CellArray >{
-                       { []( Archive& local_archive, CellArray& array ) {
-                           local_archive.object( array.impl_ );
-                       } } } );
+        serializer.ext( *this,
+            Growable< Archive, CellArray >{
+                { []( Archive& local_archive, CellArray& array ) {
+                    local_archive.object( array.impl_ );
+                    if constexpr( std::is_same_v< Archive, Deserializer > )
+                    {
+                        // Empty arrays (e.g. default images) are valid
+                        std::uint64_t nb_cells{ 1 };
+                        for( const auto d : LRange{ dimension } )
+                        {
+                            nb_cells *= array.nb_cells_in_direction( d );
+                            OpenGeodeBasicException::check_exception(
+                                nb_cells < NO_ID, nullptr,
+                                OpenGeodeException::TYPE::data,
+                                "[CellArray] Too many cells after "
+                                "deserialization: file may be corrupted" );
+                        }
+                    }
+                } } } );
     }
 
     template class opengeode_basic_api CellArray< 1 >;

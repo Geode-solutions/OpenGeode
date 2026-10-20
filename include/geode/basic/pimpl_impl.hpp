@@ -84,6 +84,11 @@ namespace geode
         serializer.ext( *this,
             Growable< Archive, PImpl >{ { []( Archive& archive2, PImpl& impl ) {
                 archive2.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
+                OpenGeodeBasicException::check_exception(
+                    impl.pimpl_ != nullptr, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[PImpl::serialize] Cannot deserialize implementation: "
+                    "file may be corrupted" );
             } } } );
     }
 } // namespace geode

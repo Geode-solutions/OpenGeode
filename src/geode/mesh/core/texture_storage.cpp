@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/texture_storage.hpp>
 
+#include <memory>
+
 #include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
@@ -52,10 +54,10 @@ namespace geode
         {
             if( !texture_exists( name ) )
             {
-                textures_.emplace(
-                    name, Texture< dimension >{ manager, name } );
+                textures_.emplace( name,
+                    std::make_unique< Texture< dimension > >( manager, name ) );
             }
-            return textures_.at( name );
+            return *textures_.at( name );
         }
 
         const Texture< dimension >& find_texture( std::string_view name ) const
@@ -64,12 +66,12 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::data,
                 "[TextureStorage::find_texture] Texture ", name,
                 " does not exists" );
-            return textures_.at( name );
+            return *textures_.at( name );
         }
 
-        absl::FixedArray< std::string_view > texture_names() const
+        absl::FixedArray< std::string > texture_names() const
         {
-            absl::FixedArray< std::string_view > names( textures_.size() );
+            absl::FixedArray< std::string > names( textures_.size() );
             index_t count{ 0 };
             for( const auto& it : textures_ )
             {
@@ -96,21 +98,32 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                        archive.ext( impl.textures_,
-                            bitsery::ext::StdMap{ impl.textures_.max_size() },
-                            []( Archive& archive2, std::string& name,
-                                Texture< dimension >& texture ) {
-                                archive2.text1b( name, name.max_size() );
-                                archive2.object( texture );
-                            } );
-                    } } } );
+            serializer.ext(
+                *this, Growable< Archive, Impl >{ { []( Archive& archive,
+                                                        Impl& impl ) {
+                    archive.ext( impl.textures_,
+                        bitsery::ext::StdMap{ impl.textures_.max_size() },
+                        []( Archive& archive2, std::string& name,
+                            std::unique_ptr< Texture< dimension > >& texture ) {
+                            archive2.text1b( name, MAX_SERIALIZED_NAME_SIZE );
+                            if( !texture )
+                            {
+                                texture =
+                                    std::make_unique< Texture< dimension > >(
+                                        bitsery::Access::create<
+                                            Texture< dimension > >() );
+                            }
+                            archive2.object( *texture );
+                        } );
+                } } } );
         }
 
     private:
-        absl::flat_hash_map< std::string, Texture< dimension > > textures_;
+        // unique_ptr: references to textures are handed out and must stay
+        // valid when other textures are inserted
+        absl::flat_hash_map< std::string,
+            std::unique_ptr< Texture< dimension > > >
+            textures_;
     };
 
     template < index_t dimension >
@@ -147,9 +160,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< std::string_view >
-        TextureStorage< dimension >::texture_names(
-            TextureManagerKey /*key*/ ) const
+    absl::FixedArray< std::string > TextureStorage< dimension >::texture_names(
+        TextureManagerKey /*key*/ ) const
     {
         return impl_->texture_names();
     }

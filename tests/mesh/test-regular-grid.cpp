@@ -28,8 +28,10 @@
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/coordinate_system.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/builder/grid_builder.hpp>
 #include <geode/mesh/builder/regular_grid_solid_builder.hpp>
 #include <geode/mesh/builder/regular_grid_surface_builder.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
@@ -482,6 +484,75 @@ void test_backward_io( std::string_view filename )
         "Wrong Backward grid nb_cells_in_direction(2)" );
 }
 
+void test_legacy_grid_origin()
+{
+    const auto grid_v12 = geode::load_regular_grid< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v12/test_v12.og_rgd3d" ) );
+    const geode::Point3D origin{ { 1.5, 0, 1 } };
+    geode::OpenGeodeMeshException::test(
+        grid_v12->point( 0 ) == origin, "[v12] Wrong point 0" );
+    geode::OpenGeodeMeshException::test(
+        grid_v12->grid_point( { 0, 0, 0 } ) == grid_v12->point( 0 ),
+        "[v12] Wrong grid origin" );
+    for( const auto& vertex : { geode::Grid3D::VertexIndices{ 1, 1, 1 },
+             geode::Grid3D::VertexIndices{ 5, 10, 15 } } )
+    {
+        geode::OpenGeodeMeshException::test(
+            grid_v12->grid_point( vertex ).inexact_equal(
+                grid_v12->point( grid_v12->vertex_index( vertex ) ) ),
+            "[v12] Wrong grid point" );
+    }
+
+    const auto grid_v13 = geode::load_regular_grid< 2 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v13/v13.og_rgd2d" ) );
+    geode::OpenGeodeMeshException::test(
+        grid_v13->nb_polygons() == 12, "[v13] Wrong number of cells" );
+    geode::OpenGeodeMeshException::test(
+        grid_v13->grid_point( { 0, 0 } ) == geode::Point2D{ { 1.5, 1 } },
+        "[v13] Wrong grid origin" );
+    for( const auto& vertex : { geode::Grid2D::VertexIndices{ 1, 1 },
+             geode::Grid2D::VertexIndices{ 3, 4 } } )
+    {
+        geode::OpenGeodeMeshException::test(
+            grid_v13->grid_point( vertex ).inexact_equal(
+                grid_v13->point( grid_v13->vertex_index( vertex ) ) ),
+            "[v13] Wrong grid point" );
+    }
+}
+
+void test_io_keeps_coordinate_system()
+{
+    auto grid = geode::RegularGrid3D::create();
+    auto builder = geode::RegularGridBuilder3D::create( *grid );
+    const std::array< geode::Vector3D, 3 > directions{ geode::Vector3D{
+                                                           { 0.1, 0.2, 0.3 } },
+        geode::Vector3D{ { -0.3, 0.1, 0.7 } },
+        geode::Vector3D{ { 0.7, -0.3, 0.1 } } };
+    builder->initialize_grid( geode::Point3D{ { 12345.678, -9876.54321, 0.3 } },
+        { 3, 3, 3 }, directions );
+    // Exact directions, differing from the vertex coordinate differences
+    // by rounding errors only
+    geode::GridBuilder3D{ *grid }.set_grid_directions( directions );
+    const auto filename =
+        absl::StrCat( "test_coordinate_system.", grid->native_extension() );
+    geode::save_regular_grid( *grid, filename );
+    const auto reload = geode::load_regular_grid< 3 >( filename );
+    const auto& coordinate_system = grid->grid_coordinate_system();
+    const auto& reload_coordinate_system = reload->grid_coordinate_system();
+    geode::OpenGeodeMeshException::test(
+        coordinate_system.origin() == reload_coordinate_system.origin(),
+        "Wrong reloaded grid origin" );
+    for( const auto d : geode::LRange{ 3 } )
+    {
+        geode::OpenGeodeMeshException::test(
+            coordinate_system.direction( d ) == directions[d],
+            "Saving should not modify grid direction ", d );
+        geode::OpenGeodeMeshException::test(
+            reload_coordinate_system.direction( d ) == directions[d],
+            "Wrong reloaded grid direction ", d );
+    }
+}
+
 void test_adjacencies2D()
 {
     auto grid = geode::RegularGrid2D::create();
@@ -586,6 +657,87 @@ void test_old_io()
         old_grid->native_extension() ) );
 }
 
+void test_update_origin_on_rotated_grid()
+{
+    auto grid3d = geode::RegularGrid3D::create();
+    auto builder3d = geode::RegularGridBuilder3D::create( *grid3d );
+    builder3d->initialize_grid( geode::Point3D{ { 1.5, 0, 1 } }, { 2, 3, 4 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } } );
+    builder3d->update_origin( geode::Point3D{ { -4, 7, 2 } } );
+    for( const auto v : geode::Range{ grid3d->nb_vertices() } )
+    {
+        const auto expected = grid3d->grid_point( grid3d->vertex_indices( v ) );
+        geode::OpenGeodeMeshException::test(
+            grid3d->point( v ).inexact_equal( expected ),
+            "[Test] Wrong 3D point after update_origin on a rotated grid: ",
+            grid3d->point( v ).string(), " instead of ", expected.string() );
+    }
+
+    auto grid2d = geode::RegularGrid2D::create();
+    auto builder2d = geode::RegularGridBuilder2D::create( *grid2d );
+    builder2d->initialize_grid( geode::Point2D{ { 1.5, 0 } }, { 3, 4 },
+        { geode::Vector2D{ { 1, 1 } }, geode::Vector2D{ { -2, 2 } } } );
+    builder2d->update_origin( geode::Point2D{ { -4, 7 } } );
+    for( const auto v : geode::Range{ grid2d->nb_vertices() } )
+    {
+        const auto expected = grid2d->grid_point( grid2d->vertex_indices( v ) );
+        geode::OpenGeodeMeshException::test(
+            grid2d->point( v ).inexact_equal( expected ),
+            "[Test] Wrong 2D point after update_origin on a rotated grid: ",
+            grid2d->point( v ).string(), " instead of ", expected.string() );
+    }
+}
+
+template < geode::index_t dimension >
+void test_initialize_grid_with_directions_failure(
+    const std::array< geode::index_t, dimension >& cells_number,
+    const std::array< geode::Vector< dimension >, dimension >& directions,
+    std::string_view context )
+{
+    auto grid = geode::RegularGrid< dimension >::create();
+    auto builder = geode::RegularGridBuilder< dimension >::create( *grid );
+    bool thrown{ false };
+    try
+    {
+        builder->initialize_grid(
+            geode::Point< dimension >{}, cells_number, directions );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] initialize_grid should throw with ", context );
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        geode::Vector< dimension > unit_direction;
+        unit_direction.set_value( d, 1 );
+        geode::OpenGeodeMeshException::test(
+            grid->cell_length_in_direction( d ) == 1
+                && grid->grid_coordinate_system().direction( d )
+                       == unit_direction,
+            "[Test] Grid directions should be unchanged after a failed "
+            "initialize_grid with ",
+            context );
+    }
+}
+
+void test_initialize_grid_with_directions_failures()
+{
+    test_initialize_grid_with_directions_failure< 3 >( { 2, 3, 4 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{},
+            geode::Vector3D{ { 0, -3, 0 } } },
+        "a null 3D direction" );
+    test_initialize_grid_with_directions_failure< 3 >( { 65535, 65535, 1 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } },
+        "a 3D vertex overflow" );
+    test_initialize_grid_with_directions_failure< 2 >( { 3, 4 },
+        { geode::Vector2D{ { 1, 1 } }, geode::Vector2D{} },
+        "a null 2D direction" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -597,7 +749,11 @@ void test()
             geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
     test_old_io();
+    test_legacy_grid_origin();
+    test_io_keeps_coordinate_system();
     test_adjacencies2D();
+    test_update_origin_on_rotated_grid();
+    test_initialize_grid_with_directions_failures();
 }
 
 OPENGEODE_TEST( "regular-grid" )

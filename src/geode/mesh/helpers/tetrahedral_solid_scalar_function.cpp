@@ -90,7 +90,7 @@ namespace geode
             const auto tetrahedron_vertices =
                 solid_.polyhedron_vertices( tetrahedron_id );
             const auto barycentric_coords =
-                tetrahedron_barycentric_coordinates( point, tetrahedron );
+                safe_tetrahedron_barycentric_coordinates( point, tetrahedron );
             for( const auto node_id : LIndices{ barycentric_coords } )
             {
                 point_value += barycentric_coords[node_id]

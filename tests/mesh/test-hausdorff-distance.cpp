@@ -27,6 +27,32 @@ void test()
     const auto hausdorff_distance =
         geode::hausdorff_distance( *mesh_A, *mesh_B );
     DEBUG( hausdorff_distance );
+    geode::OpenGeodeMeshException::test(
+        std::fabs( hausdorff_distance - 2.45089 ) < 1e-4,
+        "Wrong Hausdorff distance: ", hausdorff_distance );
+
+    const auto empty_mesh = geode::TriangulatedSurface3D::create();
+    const auto throws_with_empty_mesh =
+        []( const geode::TriangulatedSurface3D& lhs,
+            const geode::TriangulatedSurface3D& rhs ) {
+            try
+            {
+                const auto distance = geode::hausdorff_distance( lhs, rhs );
+                geode::Logger::error(
+                    "Hausdorff distance with empty mesh: ", distance );
+            }
+            catch( const geode::OpenGeodeException& )
+            {
+                return true;
+            }
+            return false;
+        };
+    geode::OpenGeodeMeshException::test(
+        throws_with_empty_mesh( *mesh_A, *empty_mesh ),
+        "Hausdorff distance to an empty mesh should throw" );
+    geode::OpenGeodeMeshException::test(
+        throws_with_empty_mesh( *empty_mesh, *mesh_A ),
+        "Hausdorff distance from an empty mesh should throw" );
 }
 
 OPENGEODE_TEST( "hausdorff-distance" )

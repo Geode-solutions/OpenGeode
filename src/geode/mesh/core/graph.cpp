@@ -114,6 +114,15 @@ namespace geode
             legacy_attributes_.remove_from( manager );
         }
 
+        void check_vertex_storage( index_t nb_vertices ) const
+        {
+            OpenGeodeMeshException::check_exception(
+                edges_around_vertex_.size() == nb_vertices, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[Graph] Wrong vertex storage size "
+                "after deserialization: file may be corrupted" );
+        }
+
     private:
         template < typename Archive >
         void deserialize_legacy_storage( Archive& archive )
@@ -155,18 +164,19 @@ namespace geode
     template < typename Archive >
     void EdgeVertex::serialize( Archive& serializer )
     {
-        serializer.ext(
-            *this, Growable< Archive, EdgeVertex >{
-                       { []( Archive& archive, EdgeVertex& edge_vertex ) {
-                            archive.value4b( edge_vertex.edge_id );
-                            index_t value{ NO_ID };
-                            archive.value4b( value );
-                            edge_vertex.vertex_id = value;
-                        },
-                           []( Archive& archive, EdgeVertex& edge_vertex ) {
-                               archive.value4b( edge_vertex.edge_id );
-                               archive.value1b( edge_vertex.vertex_id );
-                           } } } );
+        static const Growable< Archive, EdgeVertex > growable{
+            { []( Archive& archive, EdgeVertex& edge_vertex ) {
+                 archive.value4b( edge_vertex.edge_id );
+                 index_t value{ NO_ID };
+                 archive.value4b( value );
+                 edge_vertex.vertex_id = value;
+             },
+                []( Archive& archive, EdgeVertex& edge_vertex ) {
+                    archive.value4b( edge_vertex.edge_id );
+                    archive.value1b( edge_vertex.vertex_id );
+                } }
+        };
+        serializer.ext( *this, growable );
     }
 
     Graph::Graph() = default;
@@ -311,6 +321,7 @@ namespace geode
             Growable< Archive, Graph >{ { []( Archive& archive, Graph& graph ) {
                 archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( graph.impl_ );
+                graph.impl_->check_vertex_storage( graph.nb_vertices() );
                 graph.impl_->remove_legacy_attributes(
                     graph.vertex_attribute_manager() );
             } } } );
@@ -335,7 +346,6 @@ namespace std
     size_t hash< geode::EdgeVertex >::operator()(
         const geode::EdgeVertex& edge_vertex ) const
     {
-        return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
-               ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
+        return absl::HashOf( edge_vertex );
     }
 } // namespace std

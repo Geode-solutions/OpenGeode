@@ -73,5 +73,26 @@ namespace geode
             crs_manager_builder.set_active_coordinate_reference_system(
                 internal::PointsImpl< Mesh::dim >::POINTS_NAME );
         }
+
+        /*!
+         * Initialize the CRS of a mesh loaded from a legacy file, where the
+         * vertex coordinates are stored in the vertex attribute named
+         * PointsImpl::POINTS_NAME.
+         */
+        template < typename Mesh >
+        void initialize_legacy_crs( Mesh &mesh )
+        {
+            const auto attribute_ids =
+                mesh.vertex_attribute_manager().attribute_ids_matching_name(
+                    internal::PointsImpl< Mesh::dim >::POINTS_NAME );
+            OpenGeodeMeshException::check_exception(
+                attribute_ids.has_value() && !attribute_ids->empty(), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[initialize_legacy_crs] Cannot find vertex coordinates "
+                "attribute \"",
+                internal::PointsImpl< Mesh::dim >::POINTS_NAME,
+                "\" in legacy file: file may be corrupted" );
+            initialize_crs( mesh, attribute_ids->front() );
+        }
     } // namespace detail
 } // namespace geode

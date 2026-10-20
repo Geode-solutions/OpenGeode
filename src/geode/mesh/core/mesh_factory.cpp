@@ -42,12 +42,23 @@ namespace geode
 
         const MeshType& type( const MeshImpl& key ) const
         {
-            return types_.at( key );
+            const auto it = types_.find( key );
+            OpenGeodeMeshException::check_exception( it != types_.end(),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[MeshFactory::type] Unknown mesh implementation: ",
+                key.get() );
+            return it->second;
         }
 
         const MeshImpl& default_impl( const MeshType& type ) const
         {
-            return defaults_.at( type );
+            const auto it = defaults_.find( type );
+            OpenGeodeMeshException::check_exception( it != defaults_.end(),
+                nullptr, OpenGeodeException::TYPE::data,
+                "[MeshFactory::default_impl] No default implementation "
+                "registered for mesh type: ",
+                type.get() );
+            return it->second;
         }
 
     private:

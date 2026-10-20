@@ -32,6 +32,14 @@ namespace geode
         pybind11::class_< uuid >( module, "uuid" )
             .def( pybind11::init<>() )
             .def( pybind11::init< std::string_view >() )
-            .def( "string", &uuid::string );
+            .def( "string", &uuid::string )
+            .def( "__str__", &uuid::string )
+            .def( "__repr__", &uuid::string )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def( pybind11::self < pybind11::self )
+            .def( "__hash__", []( const uuid& id ) {
+                return std::hash< uuid >{}( id );
+            } );
     }
 } // namespace geode

@@ -59,8 +59,8 @@ namespace geode
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const
         {
-            geode::OpenGeodeMeshException::check_assertion(
-                active_crs_.use_count() > 1,
+            OpenGeodeMeshException::check_exception( active_crs_ != nullptr,
+                nullptr, OpenGeodeException::TYPE::data,
                 "[CoordinateReferenceSystemManager::active_coordinate_"
                 "reference_system] Active CRS not defined" );
             return *active_crs_;
@@ -71,10 +71,10 @@ namespace geode
             return active_crs_name_;
         }
 
-        absl::FixedArray< std::string_view >
+        absl::FixedArray< std::string >
             coordinate_reference_system_names() const
         {
-            absl::FixedArray< std::string_view > names( crss_.size() );
+            absl::FixedArray< std::string > names( crss_.size() );
             index_t count{ 0 };
             for( const auto& it : crss_ )
             {
@@ -150,6 +150,25 @@ namespace geode
         }
 
     private:
+        void check_active_crs() const
+        {
+            if( !active_crs_ )
+            {
+                OpenGeodeMeshException::check_exception(
+                    active_crs_name_.empty(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[CoordinateReferenceSystemManager] Active CRS name "
+                    "without active CRS: file may be corrupted" );
+                return;
+            }
+            const auto it = crss_.find( active_crs_name_ );
+            OpenGeodeMeshException::check_exception(
+                it != crss_.end() && it->second == active_crs_, nullptr,
+                OpenGeodeException::TYPE::data,
+                "[CoordinateReferenceSystemManager] Active CRS is not a "
+                "registered CRS: file may be corrupted" );
+        }
+
         template < typename Archive >
         void serialize( Archive& serializer )
         {
@@ -161,12 +180,13 @@ namespace geode
                     []( Archive& archive2, std::string& name,
                         std::shared_ptr<
                             CoordinateReferenceSystem< dimension > >& crs ) {
-                        archive2.text1b( name, name.max_size() );
+                        archive2.text1b( name, MAX_SERIALIZED_NAME_SIZE );
                         archive2.ext( crs, bitsery::ext::StdSmartPtr{} );
                     } );
                 archive.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
                 archive.text1b(
-                    impl.active_crs_name_, impl.active_crs_name_.max_size() );
+                    impl.active_crs_name_, MAX_SERIALIZED_NAME_SIZE );
+                impl.check_active_crs();
             } } } );
         }
 
@@ -222,7 +242,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< std::string_view > CoordinateReferenceSystemManager<
+    absl::FixedArray< std::string > CoordinateReferenceSystemManager<
         dimension >::coordinate_reference_system_names() const
     {
         return impl_->coordinate_reference_system_names();

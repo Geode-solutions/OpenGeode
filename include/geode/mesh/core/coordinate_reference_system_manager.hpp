@@ -68,7 +68,7 @@ namespace geode
         [[nodiscard]] std::string_view
             active_coordinate_reference_system_name() const;
 
-        [[nodiscard]] absl::FixedArray< std::string_view >
+        [[nodiscard]] absl::FixedArray< std::string >
             coordinate_reference_system_names() const;
 
         [[nodiscard]] bool coordinate_reference_system_exists(

@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/hausdorff_distance.hpp>
 
+#include <async++.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -43,19 +45,15 @@ namespace
     {
         const auto mesh_B_tree = geode::create_aabb_tree( mesh_B );
         const geode::DistanceToTriangle3D distance_action{ mesh_B };
-        double min_dist = 0;
-        for( auto v : geode::Range{ mesh_A.nb_vertices() } )
-        {
-            const auto& query = mesh_A.point( v );
-            const auto closest_element =
-                mesh_B_tree.closest_element_box( query, distance_action );
-            const auto distance = std::get< 1 >( closest_element );
-            if( distance > min_dist )
-            {
-                min_dist = distance;
-            }
-        }
-        return min_dist;
+        return async::parallel_map_reduce(
+            async::irange( geode::index_t{ 0 }, mesh_A.nb_vertices() ), 0.,
+            [&mesh_A, &mesh_B_tree, &distance_action]( geode::index_t v ) {
+                return std::get< 1 >( mesh_B_tree.closest_element_box(
+                    mesh_A.point( v ), distance_action ) );
+            },
+            []( double lhs, double rhs ) {
+                return std::max( lhs, rhs );
+            } );
     }
 } // namespace
 
@@ -64,6 +62,11 @@ namespace geode
     double hausdorff_distance( const TriangulatedSurface3D& mesh_A,
         const TriangulatedSurface3D& mesh_B )
     {
+        OpenGeodeMeshException::check_exception(
+            mesh_A.nb_polygons() > 0 && mesh_B.nb_polygons() > 0, nullptr,
+            OpenGeodeException::TYPE::data,
+            "[hausdorff_distance] Hausdorff distance is undefined for an "
+            "empty mesh" );
         return std::max( one_sided_hausdorff_distance( mesh_A, mesh_B ),
             one_sided_hausdorff_distance( mesh_B, mesh_A ) );
     }

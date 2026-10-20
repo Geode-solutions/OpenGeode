@@ -79,6 +79,11 @@ namespace geode
                 local_index_t vertex,
                 const Point< dimension >& coordinates ) const
             {
+                OpenGeodeMeshException::check_exception(
+                    element < coordinates_->size(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[Texture::set_texture_coordinates] Invalid element ",
+                    element, " (", coordinates_->size(), " elements)" );
                 coordinates_->modify_value(
                     element, [this, vertex, &coordinates](
                                  ElementTextureCoordinates& value ) {
@@ -118,6 +123,11 @@ namespace geode
                                    archive.object( impl.image_ );
                                    archive.ext( impl.coordinates_,
                                        bitsery::ext::StdSmartPtr{} );
+                                   OpenGeodeMeshException::check_exception(
+                                       impl.coordinates_ != nullptr, nullptr,
+                                       OpenGeodeException::TYPE::data,
+                                       "[Texture] Cannot deserialize texture "
+                                       "coordinates: file may be corrupted" );
                                } } } );
             }
 

@@ -91,7 +91,7 @@ namespace geode
             const auto triangle_vertices =
                 surface_.polygon_vertices( triangle_id );
             const auto barycentric_coords =
-                triangle_barycentric_coordinates( point, triangle );
+                safe_triangle_barycentric_coordinates( point, triangle );
             for( const auto node_id : LIndices{ barycentric_coords } )
             {
                 point_value +=

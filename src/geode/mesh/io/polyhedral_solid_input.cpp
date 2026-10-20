@@ -60,7 +60,16 @@ namespace geode
             print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeMeshException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot load PolyhedralSolid from file: ", filename };
+                "Cannot load PolyhedralSolid from file: ", filename, ": ",
+                e.what() };
+        }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load PolyhedralSolid from file: ", filename, ": ",
+                e.what() };
         }
     }
 

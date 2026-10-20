@@ -74,7 +74,9 @@
         .def( "smallest_edge_index",                                           \
             &Triangle##dimension##D::smallest_edge_index )                     \
         .def( "barycenter", &Triangle##dimension##D::barycenter )              \
-        .def( "string", &Triangle##dimension##D::string )
+        .def( "string", &Triangle##dimension##D::string )                      \
+        .def( "__str__", &Triangle##dimension##D::string )                     \
+        .def( "__repr__", &Triangle##dimension##D::string )
 
 #define PYTHON_SPHERE( dimension )                                             \
     const auto sphere##dimension =                                             \

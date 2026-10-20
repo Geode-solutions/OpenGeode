@@ -25,6 +25,7 @@
 
 #include <absl/algorithm/container.h>
 
+#include <geode/geometry/basic_objects/polygon.hpp>
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/information.hpp>
@@ -52,17 +53,45 @@ namespace
         return common_points;
     }
 
-    absl::InlinedVector< geode::PolygonVertices, 1 > fan_triangles(
-        const geode::PolygonVertices& polygon, geode::local_index_t apex )
+    using PolygonTriangles = absl::InlinedVector< geode::PolygonVertices, 2 >;
+
+    /*!
+     * Triangulate the polygon once (ear clipping, valid for non-convex
+     * polygons). Fall back to a fan from the first vertex if the
+     * triangulation fails (e.g. degenerated polygon).
+     */
+    template < typename Mesh >
+    PolygonTriangles polygon_triangles(
+        const Mesh& mesh, const geode::PolygonVertices& polygon )
     {
-        absl::InlinedVector< geode::PolygonVertices, 1 > triangles;
-        for( const auto edge : geode::LRange{ 1, polygon.size() - 1 } )
+        PolygonTriangles triangles;
+        if( polygon.size() == 3 )
         {
-            const auto next_apex = ( apex + edge ) % polygon.size();
-            const auto next_next_apex =
-                next_apex + 1 == polygon.size() ? 0U : next_apex + 1;
+            triangles.push_back( polygon );
+            return triangles;
+        }
+        std::vector< geode::RefPoint< Mesh::dim > > points;
+        points.reserve( polygon.size() );
+        for( const auto vertex : polygon )
+        {
+            points.emplace_back( mesh.point( vertex ) );
+        }
+        const auto local_triangles =
+            geode::Polygon< Mesh::dim >{ std::move( points ) }.triangulate();
+        if( local_triangles.size() + 2 == polygon.size() )
+        {
+            for( const auto& triangle : local_triangles )
+            {
+                triangles.emplace_back(
+                    geode::PolygonVertices{ polygon[triangle[0]],
+                        polygon[triangle[1]], polygon[triangle[2]] } );
+            }
+            return triangles;
+        }
+        for( const auto v : geode::LRange{ 1, polygon.size() - 1 } )
+        {
             triangles.emplace_back( geode::PolygonVertices{
-                polygon[apex], polygon[next_apex], polygon[next_next_apex] } );
+                polygon[0], polygon[v], polygon[v + 1] } );
         }
         return triangles;
     }
@@ -287,22 +316,17 @@ namespace geode
                 return triangles_intersection_detection(
                     mesh, polygon, other_polygon );
             }
-            for( const auto v : geode::LRange{ polygon.size() - 2 } )
+            const auto triangles = polygon_triangles( mesh, polygon );
+            const auto other_triangles =
+                polygon_triangles( mesh, other_polygon );
+            for( const auto& triangle : triangles )
             {
-                for( const auto& triangle : fan_triangles( polygon, v ) )
+                for( const auto& other_triangle : other_triangles )
                 {
-                    for( const auto other_v :
-                        geode::LRange{ other_polygon.size() - 2 } )
+                    if( triangles_intersection_detection(
+                            mesh, triangle, other_triangle ) )
                     {
-                        for( const auto& other_triangle :
-                            fan_triangles( other_polygon, other_v ) )
-                        {
-                            if( triangles_intersection_detection(
-                                    mesh, triangle, other_triangle ) )
-                            {
-                                return true;
-                            }
-                        }
+                        return true;
                     }
                 }
             }

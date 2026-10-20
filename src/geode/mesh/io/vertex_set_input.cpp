@@ -59,7 +59,14 @@ namespace geode
             print_available_extensions< VertexSetInputFactory >( TYPE );
             throw OpenGeodeMeshException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot load VertexSet from file: ", filename };
+                "Cannot load VertexSet from file: ", filename, ": ", e.what() };
+        }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeMeshException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load VertexSet from file: ", filename, ": ", e.what() };
         }
     }
 

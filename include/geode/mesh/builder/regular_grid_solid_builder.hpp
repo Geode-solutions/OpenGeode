@@ -75,6 +75,13 @@ namespace geode
         explicit RegularGridBuilder( RegularGrid3D& grid );
 
     private:
+        /*!
+         * Create the grid vertices and cells, and place the points from the
+         * origin, once the grid dimensions and directions are set
+         */
+        void initialize_grid_elements( const Point3D& origin );
+
+    private:
         RegularGrid3D& grid_;
     };
     ALIAS_3D( RegularGridBuilder );

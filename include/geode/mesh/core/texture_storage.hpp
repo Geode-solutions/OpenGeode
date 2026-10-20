@@ -65,7 +65,7 @@ namespace geode
         [[nodiscard]] const Texture< dimension >& find_texture(
             std::string_view name, TextureManagerKey /*key*/ ) const;
 
-        [[nodiscard]] absl::FixedArray< std::string_view > texture_names(
+        [[nodiscard]] absl::FixedArray< std::string > texture_names(
             TextureManagerKey /*key*/ ) const;
 
         [[nodiscard]] bool texture_exists(

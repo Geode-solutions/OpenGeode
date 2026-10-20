@@ -80,6 +80,10 @@ namespace geode
         void do_create_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< local_index_t > > facets ) final;
 
+        void check_polyhedron_definition( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< local_index_t > > facets )
+            const final;
+
         virtual void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) = 0;
 

@@ -1172,6 +1172,94 @@ void test_time_series()
     test_time_series_copy_step( manager );
 }
 
+void test_nan_compound_no_value()
+{
+    geode::AttributeManager manager;
+    manager.resize( 3 );
+    constexpr auto nan = std::numeric_limits< double >::quiet_NaN();
+    geode::AttributeValues< std::array< double, 2 > > values;
+    values.default_value = { nan, nan };
+    values.no_value = { nan, nan };
+    const auto variable_id = manager.create_attribute< geode::VariableAttribute,
+        std::array< double, 2 > >( "nan_variable", values, {} );
+    const auto sparse_id = manager.create_attribute< geode::SparseAttribute,
+        std::array< double, 2 > >( "nan_sparse", values, {} );
+    auto variable_attribute = manager.find_attribute< geode::VariableAttribute,
+        std::array< double, 2 > >( variable_id );
+    auto sparse_attribute = manager.find_attribute< geode::SparseAttribute,
+        std::array< double, 2 > >( sparse_id );
+    variable_attribute->set_value( 1, { 1., 2. } );
+    sparse_attribute->set_value( 1, { 1., 2. } );
+    variable_attribute->set_value( 2, { 0., nan } );
+    sparse_attribute->set_value( 2, { 0., nan } );
+    for( const auto element : geode::Range{ 3 } )
+    {
+        geode::OpenGeodeBasicException::test(
+            variable_attribute->has_value( element ) == ( element == 1 ),
+            "Wrong has_value for NaN compound variable attribute element ",
+            element );
+        geode::OpenGeodeBasicException::test(
+            sparse_attribute->has_value( element ) == ( element == 1 ),
+            "Wrong has_value for NaN compound sparse attribute element ",
+            element );
+    }
+}
+
+void test_import_manager_with_old2new_array()
+{
+    geode::AttributeManager from;
+    from.resize( 4 );
+    geode::AttributeValues< int > values;
+    values.default_value = -1;
+    values.no_value = -1;
+    geode::AttributeProperties properties;
+    properties.transferable = true;
+    const auto int_id = from.create_attribute< geode::VariableAttribute, int >(
+        "int", values, properties );
+    auto from_attribute =
+        from.find_attribute< geode::VariableAttribute, int >( int_id );
+    for( const auto e : geode::Range{ 4 } )
+    {
+        from_attribute->set_value( e, 10 * static_cast< int >( e ) );
+    }
+    const std::array< geode::index_t, 4 > old2new{ 2, geode::NO_ID, 0, 4 };
+
+    geode::AttributeManager to_new;
+    to_new.resize( 5 );
+    to_new.import( from, old2new );
+    const auto new_attribute = to_new.find_read_only_attribute< int >( int_id );
+    const std::array< int, 5 > expected_new{ 20, -1, 0, -1, 30 };
+    for( const auto e : geode::Range{ 5 } )
+    {
+        geode::OpenGeodeBasicException::test(
+            new_attribute->value( e ) == expected_new[e],
+            "Wrong imported value with old2new array (new attribute) for "
+            "element ",
+            e );
+    }
+
+    geode::AttributeManager to_existing;
+    to_existing.resize( 5 );
+    to_existing.create_attribute< geode::VariableAttribute, int >(
+        "int", int_id, values, properties );
+    auto existing_attribute =
+        to_existing.find_attribute< geode::VariableAttribute, int >( int_id );
+    for( const auto e : geode::Range{ 5 } )
+    {
+        existing_attribute->set_value( e, 100 );
+    }
+    to_existing.import( from, old2new );
+    const std::array< int, 5 > expected_existing{ 20, 100, 0, 100, 30 };
+    for( const auto e : geode::Range{ 5 } )
+    {
+        geode::OpenGeodeBasicException::test(
+            existing_attribute->value( e ) == expected_existing[e],
+            "Wrong imported value with old2new array (existing attribute) "
+            "for element ",
+            e );
+    }
+}
+
 void test()
 {
     geode::AttributeManager manager;
@@ -1212,7 +1300,9 @@ void test()
     test_import_manager( manager, bool_variable_attribute_id,
         array_double_attribute_id, double_sparse_attribute_id );
     test_multi_import_manager();
+    test_import_manager_with_old2new_array();
     test_no_value();
+    test_nan_compound_no_value();
     test_attribute_types( manager, bool_variable_attribute_id );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( bool_variable_attribute_id );

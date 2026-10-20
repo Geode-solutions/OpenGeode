@@ -64,7 +64,7 @@ namespace geode
                 typename TextureStorage< dimension >::TextureManagerKey{} );
         }
 
-        absl::FixedArray< std::string_view > texture_names() const
+        absl::FixedArray< std::string > texture_names() const
         {
             return textures_.texture_names(
                 typename TextureStorage< dimension >::TextureManagerKey{} );
@@ -126,7 +126,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< std::string_view >
+    absl::FixedArray< std::string >
         TextureManager< dimension >::texture_names() const
     {
         return impl_->texture_names();

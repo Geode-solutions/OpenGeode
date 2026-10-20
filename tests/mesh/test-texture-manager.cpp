@@ -119,6 +119,52 @@ geode::TextureStorage2D load( std::string_view filename )
     return storage;
 }
 
+void test_texture_reference_stability()
+{
+    geode::AttributeManager attributes;
+    attributes.resize( 42 );
+    geode::TextureStorage2D storage;
+    geode::TextureManager2D manager{ attributes, storage };
+    auto& texture = manager.find_or_create_texture( "a" );
+    const auto texture_id = texture.texture_id();
+    const auto names = manager.texture_names();
+    for( const auto i : geode::Range{ 100 } )
+    {
+        manager.find_or_create_texture( absl::StrCat( "texture_", i ) );
+    }
+    geode::OpenGeodeMeshException::test(
+        &manager.find_texture( "a" ) == &texture,
+        "[Test] Texture reference should stay valid after other insertions" );
+    geode::OpenGeodeMeshException::test( texture.texture_id() == texture_id,
+        "[Test] Texture reference should still refer to the same texture" );
+    geode::OpenGeodeMeshException::test( names.size() == 1 && names[0] == "a",
+        "[Test] Texture names should stay valid after other insertions" );
+    geode::OpenGeodeMeshException::test( manager.texture_names().size() == 101,
+        "[Test] Wrong number of texture names" );
+}
+
+void test_texture_coordinates_out_of_range()
+{
+    geode::AttributeManager attributes;
+    attributes.resize( 42 );
+    geode::TextureStorage2D storage;
+    geode::TextureManager2D manager{ attributes, storage };
+    auto& texture = manager.find_or_create_texture( "texture" );
+    bool thrown{ false };
+    try
+    {
+        texture.set_texture_coordinates(
+            { 42, 0 }, geode::Point2D{ { 1., 1. } } );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeMeshException::test( thrown,
+        "[Test] Setting texture coordinates of an unknown element should "
+        "throw" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -129,6 +175,8 @@ void test()
     save( storage, "storage" );
     auto reload = load( "storage" );
     check_texture( attributes, reload );
+    test_texture_reference_stability();
+    test_texture_coordinates_out_of_range();
 }
 
 OPENGEODE_TEST( "texture-manager" )

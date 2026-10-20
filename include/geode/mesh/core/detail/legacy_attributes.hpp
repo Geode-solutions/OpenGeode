@@ -33,6 +33,8 @@
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/mesh/common.hpp>
+
 namespace geode
 {
     namespace detail
@@ -85,6 +87,10 @@ namespace geode
             {
                 std::shared_ptr< VariableAttribute< T > > attribute;
                 archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
+                OpenGeodeMeshException::check_exception( attribute != nullptr,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[LegacyAttributes] Cannot deserialize legacy attribute: "
+                    "file may be corrupted" );
                 attribute_ids_.push_back( attribute->id() );
                 return attribute;
             }

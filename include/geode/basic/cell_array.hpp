@@ -33,6 +33,12 @@ namespace bitsery
     class Access;
 } // namespace bitsery
 
+namespace geode::internal
+{
+    template < index_t dimension >
+    class ArrayImpl;
+} // namespace geode::internal
+
 namespace geode
 {
     template < index_t dimension >
@@ -88,6 +94,21 @@ namespace geode
         void copy( const CellArray< dimension >& array );
 
     private:
+        friend class internal::ArrayImpl< dimension >;
+
+        /*!
+         * Index offset of one step along each direction of the cell array
+         */
+        [[nodiscard]] const std::array< index_t, dimension >&
+            cell_strides() const;
+
+        /*!
+         * Index offset of one step along each direction of the array of cell
+         * corners (nb_cells_in_direction + 1 corners per direction)
+         */
+        [[nodiscard]] const std::array< index_t, dimension >&
+            vertex_strides() const;
+
         template < typename Archive >
         void serialize( Archive& serializer );
 
