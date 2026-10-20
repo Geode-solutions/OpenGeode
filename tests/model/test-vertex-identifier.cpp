@@ -330,6 +330,60 @@ void test_unregister_mesh_component()
         "[unregister] Other component mesh vertices should be kept (2)" );
 }
 
+void check_vertex_identifier_consistency( const SurfaceProvider& provider )
+{
+    for( const auto uv : geode::Range{ provider.nb_unique_vertices() } )
+    {
+        for( const auto& cmv : provider.component_mesh_vertices( uv ) )
+        {
+            geode::OpenGeodeModelException::test(
+                provider.unique_vertex( cmv ) == uv,
+                "[delete_isolated_vertices] Wrong unique vertex for ",
+                cmv.string() );
+        }
+    }
+}
+
+void test_delete_isolated_vertices()
+{
+    SurfaceProvider provider;
+    SurfaceProviderBuilder builder( provider );
+    builder.create_unique_vertices( 6 );
+    const auto& surface0 = add_surface_with_vertices(
+        builder, provider, std::vector< geode::index_t >{ 0, 1, 2, 3, 4, 5 } );
+    const auto& surface1 = add_surface_with_vertices(
+        builder, provider, std::vector< geode::index_t >{ 5, 5, 3, 1 } );
+
+    const auto identity = builder.delete_isolated_vertices();
+    geode::OpenGeodeModelException::test(
+        identity == std::vector< geode::index_t >{ 0, 1, 2, 3, 4, 5 },
+        "[delete_isolated_vertices] Mapping should be identity when no "
+        "unique vertex is isolated" );
+    geode::OpenGeodeModelException::test( provider.nb_unique_vertices() == 6,
+        "[delete_isolated_vertices] No unique vertex should be deleted" );
+    check_vertex_identifier_consistency( provider );
+
+    builder.unregister_mesh_component( provider.surface( surface0 ) );
+    const auto old2new = builder.delete_isolated_vertices();
+    geode::OpenGeodeModelException::test(
+        old2new
+            == std::vector< geode::index_t >{ geode::NO_ID, 0, geode::NO_ID, 1,
+                geode::NO_ID, 2 },
+        "[delete_isolated_vertices] Wrong mapping" );
+    geode::OpenGeodeModelException::test( provider.nb_unique_vertices() == 3,
+        "[delete_isolated_vertices] Wrong number of unique vertices" );
+    check_vertex_identifier_consistency( provider );
+    const auto& surface = provider.surface( surface1 );
+    const std::array< geode::index_t, 4 > expected{ 2, 2, 1, 0 };
+    for( const auto v : geode::LRange{ 4 } )
+    {
+        geode::OpenGeodeModelException::test(
+            provider.unique_vertex( { surface.component_id(), v } )
+                == expected[v],
+            "[delete_isolated_vertices] Wrong unique vertex for vertex ", v );
+    }
+}
+
 void test_unregister_after_load()
 {
     geode::BRep brep;
@@ -409,6 +463,7 @@ void test()
     test_update_unique_vertices();
     test_unregister_mesh_component();
     test_unregister_after_load();
+    test_delete_isolated_vertices();
 
     builder.unregister_mesh_component( provider.corner( corner2_id ) );
     builder.register_mesh_component( provider.corner( corner2_id ) );

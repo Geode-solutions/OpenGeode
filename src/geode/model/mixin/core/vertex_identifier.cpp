@@ -297,15 +297,15 @@ namespace geode
                 "[VertexIdentifier::set_unique_vertex] Unique vertex ",
                 unique_vertex_id, " does not exist (nb=", nb_unique_vertices(),
                 ")" );
-            const auto& old_unique_id =
-                vertex2unique_vertex_.at( component_vertex_id.component_id.id )
-                    .attribute->value( component_vertex_id.vertex );
-            if( old_unique_id != NO_ID )
-            {
-                unset_unique_vertex( component_vertex_id, old_unique_id );
-            }
             auto& component =
                 vertex2unique_vertex_.at( component_vertex_id.component_id.id );
+            const auto old_unique_id =
+                component.attribute->value( component_vertex_id.vertex );
+            if( old_unique_id != NO_ID )
+            {
+                unset_unique_vertex(
+                    component, component_vertex_id, old_unique_id );
+            }
             component.attribute->set_value(
                 component_vertex_id.vertex, unique_vertex_id );
             component_vertices_->modify_value( unique_vertex_id,
@@ -325,8 +325,15 @@ namespace geode
             const ComponentMeshVertex& component_vertex_id,
             const index_t unique_vertex_id )
         {
-            auto& component =
-                vertex2unique_vertex_.at( component_vertex_id.component_id.id );
+            unset_unique_vertex(
+                vertex2unique_vertex_.at( component_vertex_id.component_id.id ),
+                component_vertex_id, unique_vertex_id );
+        }
+
+        void unset_unique_vertex( RegisteredComponent& component,
+            const ComponentMeshVertex& component_vertex_id,
+            const index_t unique_vertex_id )
+        {
             component.attribute->set_value( component_vertex_id.vertex, NO_ID );
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
@@ -405,37 +412,52 @@ namespace geode
 
         std::vector< index_t > delete_isolated_vertices()
         {
-            std::vector< bool > to_delete( nb_unique_vertices(), false );
-            absl::flat_hash_map< uuid, std::vector< index_t > >
-                components_vertices;
-            for( const auto v : Range{ nb_unique_vertices() } )
+            const auto nb_vertices = nb_unique_vertices();
+            std::vector< bool > to_delete( nb_vertices, false );
+            auto first_deleted = nb_vertices;
+            for( const auto v : Range{ nb_vertices } )
             {
                 if( is_unique_vertex_isolated( v ) )
                 {
                     to_delete[v] = true;
-                    continue;
+                    first_deleted = std::min( first_deleted, v );
                 }
-                for( const auto& cmv : component_mesh_vertices( v ) )
-                {
-                    components_vertices[cmv.component_id.id].emplace_back(
-                        cmv.vertex );
-                }
+            }
+            if( first_deleted == nb_vertices )
+            {
+                std::vector< index_t > old2new( nb_vertices );
+                absl::c_iota( old2new, index_t{ 0 } );
+                return old2new;
             }
             const auto old2new = VertexSetBuilder::create( unique_vertices_ )
                                      ->delete_vertices( to_delete );
-            for( const auto& component_vertices : components_vertices )
+            // Unique vertices before the first deleted one keep their index
+            const uuid* last_component{ nullptr };
+            VariableAttribute< index_t >* attribute{ nullptr };
+            for( const auto uv : Range{ first_deleted, nb_unique_vertices() } )
             {
-                auto& attribute =
-                    vertex2unique_vertex_.at( component_vertices.first )
-                        .attribute;
-                for( const auto v : component_vertices.second )
+                for( const auto& cmv : component_vertices_->value( uv ) )
                 {
-                    const auto value = attribute->value( v );
+                    if( !last_component
+                        || *last_component != cmv.component_id.id )
+                    {
+                        const auto it =
+                            vertex2unique_vertex_.find( cmv.component_id.id );
+                        last_component = &cmv.component_id.id;
+                        attribute = it == vertex2unique_vertex_.end()
+                                        ? nullptr
+                                        : it->second.attribute.get();
+                    }
+                    if( !attribute )
+                    {
+                        continue;
+                    }
+                    const auto value = attribute->value( cmv.vertex );
                     if( value == NO_ID )
                     {
                         continue;
                     }
-                    attribute->set_value( v, old2new[value] );
+                    attribute->set_value( cmv.vertex, old2new[value] );
                 }
             }
             return old2new;
