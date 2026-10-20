@@ -67,7 +67,7 @@ namespace geode
             print_available_extensions< SectionInputFactory >( TYPE );
             throw OpenGeodeModelException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot load Section from file: ", filename };
+                "Cannot load Section from file: ", filename, ": ", e.what() };
         }
         catch( const std::exception& e )
         {

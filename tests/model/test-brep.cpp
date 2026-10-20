@@ -1796,6 +1796,28 @@ void test_backward_io()
     test_registry( brep_v18_0, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
 
+void test_registry_remove_unknown_type()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    builder.add_corner();
+    builder.remove_mesh_component(
+        geode::Block3D::component_type_static(), geode::uuid{} );
+    builder.remove_collection_component(
+        geode::BlockCollection3D::component_type_static(), geode::uuid{} );
+    geode::OpenGeodeModelException::test(
+        !brep.mesh_components().contains(
+            geode::Block3D::component_type_static() ),
+        "[Test] Removing a component of an unknown type should not add the "
+        "type to the mesh registry" );
+    geode::OpenGeodeModelException::test(
+        !brep.collection_components().contains(
+            geode::BlockCollection3D::component_type_static() ),
+        "[Test] Removing a component of an unknown type should not add the "
+        "type to the collection registry" );
+    test_registry( brep, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+}
+
 void test_components_filter()
 {
     const auto brep = geode::load_brep(
@@ -1815,11 +1837,56 @@ std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
     return { std::move( other ), std::move( mapping ) };
 }
 
+std::vector< std::vector< geode::ComponentMeshVertex > > sorted_unique_vertices(
+    const geode::BRep& brep )
+{
+    std::vector< std::vector< geode::ComponentMeshVertex > > unique_vertices;
+    for( const auto uv : geode::Range{ brep.nb_unique_vertices() } )
+    {
+        auto cmvs = brep.component_mesh_vertices( uv );
+        for( const auto& cmv : cmvs )
+        {
+            geode::OpenGeodeModelException::test(
+                brep.unique_vertex( cmv ) == uv,
+                "[Test] Steal mesh: inconsistent unique vertex for ",
+                cmv.string() );
+        }
+        absl::c_sort( cmvs );
+        unique_vertices.emplace_back( std::move( cmvs ) );
+    }
+    absl::c_sort( unique_vertices );
+    return unique_vertices;
+}
+
+template < typename Range >
+void check_single_unique_vertices_attribute( const Range& components )
+{
+    for( const auto& component : components )
+    {
+        const auto ids = component.mesh()
+                             .vertex_attribute_manager()
+                             .attribute_ids_matching_name( "unique vertices" );
+        geode::OpenGeodeModelException::test(
+            ids.has_value() && ids->size() == 1,
+            "[Test] Steal mesh: component ", component.id().string(),
+            " mesh should have exactly one unique vertices attribute" );
+    }
+}
+
 void test_steal_mesh( geode::BRep& brep )
 {
+    const auto unique_vertices_before = sorted_unique_vertices( brep );
     auto [other, mapping] = copy_model( brep );
     geode::BRepBuilder builder{ brep };
     builder.replace_components_meshes_by_others( std::move( other ), mapping );
+    geode::OpenGeodeModelException::test(
+        sorted_unique_vertices( brep ) == unique_vertices_before,
+        "[Test] Steal mesh: unique vertices should be identical after "
+        "replacing meshes" );
+    check_single_unique_vertices_attribute( brep.corners() );
+    check_single_unique_vertices_attribute( brep.lines() );
+    check_single_unique_vertices_attribute( brep.surfaces() );
+    check_single_unique_vertices_attribute( brep.blocks() );
 }
 
 void test()
@@ -1930,6 +1997,7 @@ void test()
 
     test_backward_io();
     test_components_filter();
+    test_registry_remove_unknown_type();
 }
 
 OPENGEODE_TEST( "brep" )

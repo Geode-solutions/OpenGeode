@@ -39,6 +39,8 @@ namespace geode
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( "string", &PolygonVertex::string )
+            .def( "__str__", &PolygonVertex::string )
+            .def( "__repr__", &PolygonVertex::string )
             .def_readwrite( "polygon_id", &PolygonVertex::polygon_id )
             .def_readwrite( "vertex_id", &PolygonVertex::vertex_id );
 
@@ -48,6 +50,8 @@ namespace geode
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( "string", &PolygonEdge::string )
+            .def( "__str__", &PolygonEdge::string )
+            .def( "__repr__", &PolygonEdge::string )
             .def_readwrite( "polygon_id", &PolygonEdge::polygon_id )
             .def_readwrite( "edge_id", &PolygonEdge::edge_id );
     }

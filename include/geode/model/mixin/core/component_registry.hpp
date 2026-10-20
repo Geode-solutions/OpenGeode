@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/types/span.h>
 
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
@@ -64,6 +65,10 @@ namespace geode
 
         void remove_mesh_component(
             const ComponentType& type, const uuid& id, RegistryBuilder key );
+
+        void remove_mesh_components( const ComponentType& type,
+            absl::Span< const uuid > ids,
+            RegistryBuilder key );
 
         void remove_collection_component(
             const ComponentType& type, const uuid& id, RegistryBuilder key );

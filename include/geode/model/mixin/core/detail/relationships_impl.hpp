@@ -69,6 +69,11 @@ namespace geode
 
             void remove_component( const uuid& component_id );
 
+            /*!
+             * Remove several components and all their relations at once
+             */
+            void remove_components( absl::Span< const uuid > component_ids );
+
             index_t add_relation_edge(
                 const ComponentID& from, const ComponentID& to );
 
@@ -138,12 +143,15 @@ namespace geode
             [[nodiscard]] const ComponentID& component_from_index(
                 index_t id ) const;
 
-            index_t do_add_relation_edge(
-                const ComponentID& from, const ComponentID& to );
-
             index_t find_or_create_vertex_id( const ComponentID& id );
 
         protected:
+            /*!
+             * Create a relation edge without checking if it already exists
+             */
+            index_t do_add_relation_edge(
+                const ComponentID& from, const ComponentID& to );
+
             std::unique_ptr< Graph > graph_;
             detail::UuidToIndex uuid2index_;
             std::shared_ptr< VariableAttribute< ComponentID > > ids_;

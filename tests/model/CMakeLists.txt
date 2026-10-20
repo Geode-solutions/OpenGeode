@@ -143,6 +143,12 @@ add_geode_test(
 )
 
 add_geode_test(
+    SOURCE "test-transfer-metadata.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-vertex-identifier.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

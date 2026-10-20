@@ -67,6 +67,26 @@ namespace geode
             edges_around_vertex_[vertex_id] = std::move( edges );
         }
 
+        void update_edges_around_vertices( absl::Span< const index_t > old2new )
+        {
+            for( auto& edges : edges_around_vertex_ )
+            {
+                auto last = edges.begin();
+                for( const auto& edge : edges )
+                {
+                    const auto new_edge_id = old2new[edge.edge_id];
+                    if( new_edge_id == NO_ID )
+                    {
+                        continue;
+                    }
+                    last->edge_id = new_edge_id;
+                    last->vertex_id = edge.vertex_id;
+                    ++last;
+                }
+                edges.erase( last, edges.end() );
+            }
+        }
+
         void associate_edge_vertex_to_vertex( const Graph& graph,
             const EdgeVertex& edge_vertex,
             const index_t vertex_id )
@@ -295,6 +315,12 @@ namespace geode
             "[Graph::edges_around_vertex] Accessing an invalid vertex (",
             vertex_id, " but nb_vertices = ", this->nb_vertices(), ")" );
         return impl_->set_edges_around_vertex( vertex_id, std::move( edges ) );
+    }
+
+    void Graph::update_edges_around_vertices(
+        absl::Span< const index_t > old2new, GraphKey /*key*/ )
+    {
+        impl_->update_edges_around_vertices( old2new );
     }
 
     void Graph::associate_edge_vertex_to_vertex(

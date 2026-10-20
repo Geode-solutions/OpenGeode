@@ -188,6 +188,24 @@ def test_time_series():
         raise ValueError("[Test] Wrong step value")
 
 
+def test_simple_creation():
+    manager = basic.AttributeManager()
+    manager.resize(3)
+    variable_id = manager.create_attribute_variable_double("porosity", 0.2)
+    variable = manager.find_attribute_variable_double(variable_id)
+    variable.set_value(1, 0.3)
+    if variable.value(0) != 0.2 or variable.value(1) != 0.3:
+        raise ValueError("[Test] Wrong values in simple variable attribute")
+    constant_id = manager.create_attribute_constant_int("code", default_value=4)
+    if manager.find_read_only_attribute_int(constant_id).value(2) != 4:
+        raise ValueError("[Test] Wrong value in simple constant attribute")
+    properties = basic.AttributeProperties()
+    properties.interpolable = True
+    sparse_id = manager.create_attribute_sparse_double("confidence", 1.0, properties)
+    if not manager.find_attribute_sparse_double(sparse_id).properties().interpolable:
+        raise ValueError("[Test] Properties should be used")
+
+
 if __name__ == '__main__':
     manager = basic.AttributeManager()
     manager.resize(10)
@@ -210,3 +228,4 @@ if __name__ == '__main__':
     manager.clear()
     test_number_of_attributes(manager, 0)
     test_time_series()
+    test_simple_creation()

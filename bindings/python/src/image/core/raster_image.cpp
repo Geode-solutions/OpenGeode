@@ -35,12 +35,31 @@
         .def( pybind11::init< std::array< index_t, dimension > >() )           \
         .def(                                                                  \
             "native_extension", &RasterImage##dimension##D::native_extension ) \
-        .def( "color", &RasterImage##dimension##D::color )                     \
-        .def( "set_color", &RasterImage##dimension##D::set_color )             \
+        .def( "color",                                                         \
+            []( const RasterImage##dimension##D& raster, index_t index ) {     \
+                check_raster_cell( raster, index );                            \
+                return raster.color( index );                                  \
+            } )                                                                \
+        .def( "set_color",                                                     \
+            []( RasterImage##dimension##D& raster, index_t index,              \
+                RGBColor color ) {                                             \
+                check_raster_cell( raster, index );                            \
+                raster.set_color( index, std::move( color ) );                 \
+            } )                                                                \
         .def( "clone", &RasterImage##dimension##D::clone )
 
 namespace geode
 {
+    template < index_t dimension >
+    void check_raster_cell(
+        const RasterImage< dimension >& raster, index_t index )
+    {
+        OpenGeodeImageException::check_exception( index < raster.nb_cells(),
+            nullptr, OpenGeodeException::TYPE::data,
+            "[RasterImage] Invalid cell index ", index, " (", raster.nb_cells(),
+            " cells)" );
+    }
+
     void define_raster_image( pybind11::module& module )
     {
         PYTHON_RASTER_IMAGE( 1 );

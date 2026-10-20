@@ -64,29 +64,142 @@
 
 namespace
 {
+    class UniqueVertexToMeshVertex
+    {
+    public:
+        explicit UniqueVertexToMeshVertex( geode::index_t nb_unique_vertices )
+            : mesh_vertices_( nb_unique_vertices, geode::NO_ID )
+        {
+        }
+
+        [[nodiscard]] geode::index_t mesh_vertex(
+            geode::index_t unique_vertex ) const
+        {
+            if( unique_vertex == geode::NO_ID )
+            {
+                return geode::NO_ID;
+            }
+            return mesh_vertices_[unique_vertex];
+        }
+
+        void set_mesh_vertex(
+            geode::index_t unique_vertex, geode::index_t mesh_vertex )
+        {
+            mesh_vertices_[unique_vertex] = mesh_vertex;
+        }
+
+        void fill_mapping(
+            geode::BijectiveMapping< geode::index_t >& mapping ) const
+        {
+            mapping.reserve( mesh_vertices_.size() );
+            for( const auto unique_vertex : geode::Indices{ mesh_vertices_ } )
+            {
+                const auto mesh_vertex = mesh_vertices_[unique_vertex];
+                if( mesh_vertex != geode::NO_ID )
+                {
+                    mapping.map( unique_vertex, mesh_vertex );
+                }
+            }
+        }
+
+    private:
+        absl::FixedArray< geode::index_t > mesh_vertices_;
+    };
+
+    /*!
+     * Replace model unique vertices by their output mesh vertices.
+     * Return false if one of them is not in the output mesh.
+     */
+    template < typename Container >
+    bool to_mesh_vertices(
+        const UniqueVertexToMeshVertex& uv2mesh, Container& vertices )
+    {
+        for( auto& vertex : vertices )
+        {
+            vertex = uv2mesh.mesh_vertex( vertex );
+            if( vertex == geode::NO_ID )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*!
+     * Return the output mesh vertex of a component mesh vertex, creating it
+     * if needed. Component vertices not linked to a unique vertex are not
+     * merged with any other component vertex.
+     */
+    template < typename ComponentMesh, typename MeshBuilder >
+    geode::index_t find_or_create_mesh_vertex(
+        UniqueVertexToMeshVertex& uv2mesh,
+        absl::FixedArray< geode::index_t >& unlinked_vertices,
+        const ComponentMesh& component_mesh,
+        geode::index_t vertex,
+        geode::index_t unique_vertex,
+        MeshBuilder& mesh_builder )
+    {
+        if( unique_vertex == geode::NO_ID )
+        {
+            auto& mesh_vertex = unlinked_vertices[vertex];
+            if( mesh_vertex == geode::NO_ID )
+            {
+                mesh_vertex =
+                    mesh_builder.create_point( component_mesh.point( vertex ) );
+            }
+            return mesh_vertex;
+        }
+        const auto mesh_vertex = uv2mesh.mesh_vertex( unique_vertex );
+        if( mesh_vertex != geode::NO_ID )
+        {
+            return mesh_vertex;
+        }
+        const auto new_vertex_index =
+            mesh_builder.create_point( component_mesh.point( vertex ) );
+        uv2mesh.set_mesh_vertex( unique_vertex, new_vertex_index );
+        return new_vertex_index;
+    }
+
     template < typename Model >
-    void map_corner_vertices(
-        Model& model, geode::ModelToMeshMappings& model2mesh )
+    void map_corner_vertices( Model& model,
+        const UniqueVertexToMeshVertex& uv2mesh,
+        geode::ModelToMeshMappings& model2mesh )
     {
         for( const auto& corner : model.corners() )
         {
-            const auto corner_uv =
-                model.unique_vertex( { corner.component_id(), 0 } );
-            const auto solid_uv =
-                model2mesh.unique_vertices_mapping.in2out( corner_uv );
+            if( corner.mesh().nb_vertices() == 0 )
+            {
+                continue;
+            }
+            const auto mesh_vertex = uv2mesh.mesh_vertex(
+                model.unique_vertex( { corner.component_id(), 0 } ) );
+            if( mesh_vertex == geode::NO_ID )
+            {
+                // Corner not in the output mesh
+                continue;
+            }
+            geode::OpenGeodeModelException::check_exception(
+                !model2mesh.corner_vertices_mapping.has_mapping_output(
+                    mesh_vertex ),
+                corner.id(), geode::OpenGeodeException::TYPE::data,
+                "[map_corner_vertices] Mesh vertex ", mesh_vertex,
+                " is already mapped to another Corner vertex." );
             model2mesh.corner_vertices_mapping.map(
-                { corner.id(), 0 }, solid_uv );
+                { corner.id(), 0 }, mesh_vertex );
         }
     }
 
     template < typename Model >
     void build_edges_from_model( const Model& model,
+        UniqueVertexToMeshVertex& uv2mesh,
         geode::ModelToMeshMappings& model2mesh,
         geode::EdgedCurveBuilder< Model::dim >& mesh_builder )
     {
         for( const auto& line : model.lines() )
         {
             const auto& line_mesh = line.mesh();
+            absl::FixedArray< geode::index_t > unlinked_vertices(
+                line_mesh.nb_vertices(), geode::NO_ID );
             for( const auto& edge_id : geode::Range{ line_mesh.nb_edges() } )
             {
                 std::array< geode::index_t, 2 > vertices;
@@ -96,19 +209,9 @@ namespace
                         line_mesh.edge_vertex( { edge_id, edge_vertex_id } );
                     const auto unique_vertex =
                         model.unique_vertex( { line.component_id(), vertex } );
-                    if( model2mesh.unique_vertices_mapping.has_mapping_input(
-                            unique_vertex ) )
-                    {
-                        vertices[edge_vertex_id] =
-                            model2mesh.unique_vertices_mapping.in2out(
-                                unique_vertex );
-                        continue;
-                    }
-                    const auto new_vertex_index =
-                        mesh_builder.create_point( line_mesh.point( vertex ) );
-                    vertices[edge_vertex_id] = new_vertex_index;
-                    model2mesh.unique_vertices_mapping.map(
-                        unique_vertex, new_vertex_index );
+                    vertices[edge_vertex_id] =
+                        find_or_create_mesh_vertex( uv2mesh, unlinked_vertices,
+                            line_mesh, vertex, unique_vertex, mesh_builder );
                 }
                 const auto edge_index =
                     mesh_builder.create_edge( vertices[0], vertices[1] );
@@ -139,8 +242,10 @@ namespace
             meshes );
         auto mesh_builder =
             geode::EdgedCurveBuilder< Model::dim >::create( *mesh );
-        build_edges_from_model( model, model2mesh, *mesh_builder );
-        map_corner_vertices( model, model2mesh );
+        UniqueVertexToMeshVertex uv2mesh{ model.nb_unique_vertices() };
+        build_edges_from_model( model, uv2mesh, model2mesh, *mesh_builder );
+        map_corner_vertices( model, uv2mesh, model2mesh );
+        uv2mesh.fill_mapping( model2mesh.unique_vertices_mapping );
         return result;
     }
 
@@ -170,6 +275,7 @@ namespace
     template < typename Model >
     void build_polygons_from_model( const Model& model,
         geode::SurfaceMeshBuilder< Model::dim >& mesh_builder,
+        UniqueVertexToMeshVertex& uv2mesh,
         geode::ModelToMeshMappings& model2mesh )
     {
         for( const auto& surface : model.surfaces() )
@@ -177,6 +283,8 @@ namespace
             const auto& surface_mesh = surface.mesh();
             absl::FixedArray< geode::index_t > polygons(
                 surface_mesh.nb_polygons() );
+            absl::FixedArray< geode::index_t > unlinked_vertices(
+                surface_mesh.nb_vertices(), geode::NO_ID );
             for( const auto polygon_id :
                 geode::Range{ surface_mesh.nb_polygons() } )
             {
@@ -189,20 +297,9 @@ namespace
                         { polygon_id, polygon_vertex } );
                     const auto unique_vertex = model.unique_vertex(
                         { surface.component_id(), vertex } );
-                    if( model2mesh.unique_vertices_mapping.has_mapping_input(
-                            unique_vertex ) )
-                    {
-                        polygon_vertices[polygon_vertex] =
-                            model2mesh.unique_vertices_mapping.in2out(
-                                unique_vertex );
-                        continue;
-                    }
-
-                    const auto new_vertex_index = mesh_builder.create_point(
-                        surface_mesh.point( vertex ) );
-                    polygon_vertices[polygon_vertex] = new_vertex_index;
-                    model2mesh.unique_vertices_mapping.map(
-                        unique_vertex, new_vertex_index );
+                    polygon_vertices[polygon_vertex] =
+                        find_or_create_mesh_vertex( uv2mesh, unlinked_vertices,
+                            surface_mesh, vertex, unique_vertex, mesh_builder );
                 }
                 polygons[polygon_id] =
                     mesh_builder.create_polygon( polygon_vertices );
@@ -215,8 +312,10 @@ namespace
     }
 
     template < typename Model, typename MeshType >
-    void map_line_edges(
-        Model& model, geode::ModelToMeshMappings& model2mesh, MeshType& mesh )
+    void map_line_edges( Model& model,
+        const UniqueVertexToMeshVertex& uv2mesh,
+        geode::ModelToMeshMappings& model2mesh,
+        MeshType& mesh )
     {
         mesh.enable_edges();
         for( const auto& line : model.lines() )
@@ -224,24 +323,28 @@ namespace
             const auto& line_mesh = line.mesh();
             for( const auto line_edge : geode::Range{ line_mesh.nb_edges() } )
             {
-                auto unique_vertices =
+                auto vertices =
                     geode::edge_unique_vertices( model, line, line_edge );
-                for( const auto edge_vertex_id :
-                    geode::LRange{ unique_vertices.size() } )
+                if( !to_mesh_vertices( uv2mesh, vertices ) )
                 {
-                    unique_vertices[edge_vertex_id] =
-                        model2mesh.unique_vertices_mapping.in2out(
-                            unique_vertices[edge_vertex_id] );
+                    // Line edge not in the output mesh
+                    continue;
                 }
-                const auto solid_edge =
-                    mesh.edges().edge_from_vertices( unique_vertices ).value();
-                geode::OpenGeodeModelException::check_assertion(
+                const auto mesh_edge =
+                    mesh.edges().edge_from_vertices( vertices );
+                if( !mesh_edge )
+                {
+                    // Line edge not in the output mesh
+                    continue;
+                }
+                geode::OpenGeodeModelException::check_exception(
                     !model2mesh.line_edges_mapping.has_mapping_output(
-                        solid_edge ),
-                    "[map_line_edges] Mesh edge ", solid_edge,
+                        mesh_edge.value() ),
+                    line.id(), geode::OpenGeodeException::TYPE::data,
+                    "[map_line_edges] Mesh edge ", mesh_edge.value(),
                     " is already mapped to another Line edge." );
                 model2mesh.line_edges_mapping.map(
-                    { line.id(), line_edge }, solid_edge );
+                    { line.id(), line_edge }, mesh_edge.value() );
             }
         }
     }
@@ -267,10 +370,12 @@ namespace
             meshes );
         auto mesh_builder =
             geode::SurfaceMeshBuilder< Model::dim >::create( *mesh );
-        build_polygons_from_model( model, *mesh_builder, model2mesh );
+        UniqueVertexToMeshVertex uv2mesh{ model.nb_unique_vertices() };
+        build_polygons_from_model( model, *mesh_builder, uv2mesh, model2mesh );
         mesh_builder->compute_polygon_adjacencies();
-        map_line_edges( model, model2mesh, *mesh );
-        map_corner_vertices( model, model2mesh );
+        map_line_edges( model, uv2mesh, model2mesh, *mesh );
+        map_corner_vertices( model, uv2mesh, model2mesh );
+        uv2mesh.fill_mapping( model2mesh.unique_vertices_mapping );
         return result;
     }
 
@@ -298,13 +403,18 @@ namespace
 
     void build_polyhedra_from_model( const geode::BRep& brep,
         geode::SolidMeshBuilder3D& mesh_builder,
+        UniqueVertexToMeshVertex& uv2mesh,
         geode::ModelToMeshMappings& brep2mesh )
     {
+        absl::FixedArray< bool > is_point_set(
+            brep.nb_unique_vertices(), false );
         for( const auto& block : brep.blocks() )
         {
             const auto& block_mesh = block.mesh();
             absl::FixedArray< geode::index_t > polyhedra(
                 block_mesh.nb_polyhedra() );
+            absl::FixedArray< geode::index_t > unlinked_vertices(
+                block_mesh.nb_vertices(), geode::NO_ID );
             for( const auto polyhedron_id :
                 geode::Range{ block_mesh.nb_polyhedra() } )
             {
@@ -317,22 +427,17 @@ namespace
                         { polyhedron_id, polyhedron_vertex } );
                     const auto unique_vertex =
                         brep.unique_vertex( { block.component_id(), vertex } );
-                    if( brep2mesh.unique_vertices_mapping.has_mapping_input(
-                            unique_vertex ) )
+                    polyhedron_vertices[polyhedron_vertex] =
+                        find_or_create_mesh_vertex( uv2mesh, unlinked_vertices,
+                            block_mesh, vertex, unique_vertex, mesh_builder );
+                    if( unique_vertex != geode::NO_ID
+                        && !is_point_set[unique_vertex] )
                     {
-                        polyhedron_vertices[polyhedron_vertex] =
-                            brep2mesh.unique_vertices_mapping.in2out(
-                                unique_vertex );
                         mesh_builder.set_point(
                             polyhedron_vertices[polyhedron_vertex],
                             block_mesh.point( vertex ) );
-                        continue;
+                        is_point_set[unique_vertex] = true;
                     }
-                    auto new_vertex_index =
-                        mesh_builder.create_point( block_mesh.point( vertex ) );
-                    polyhedron_vertices[polyhedron_vertex] = new_vertex_index;
-                    brep2mesh.unique_vertices_mapping.map(
-                        unique_vertex, new_vertex_index );
                 }
                 absl::FixedArray< std::vector< geode::local_index_t > >
                     polyhedron_facet_vertices(
@@ -369,6 +474,7 @@ namespace
     }
 
     void map_polygons_to_solid_facets( const geode::BRep& brep,
+        const UniqueVertexToMeshVertex& uv2mesh,
         geode::ModelToMeshMappings& brep2mesh,
         geode::SolidMesh3D& mesh )
     {
@@ -379,26 +485,29 @@ namespace
             for( const auto surface_polygon :
                 geode::Range{ surface_mesh.nb_polygons() } )
             {
-                auto unique_vertices = geode::polygon_unique_vertices(
+                auto vertices = geode::polygon_unique_vertices(
                     brep, surface, surface_polygon );
-                for( const auto polygon_vertex_id :
-                    geode::LRange{ unique_vertices.size() } )
+                if( !to_mesh_vertices( uv2mesh, vertices ) )
                 {
-                    unique_vertices[polygon_vertex_id] =
-                        brep2mesh.unique_vertices_mapping.in2out(
-                            unique_vertices[polygon_vertex_id] );
+                    // Surface polygon not in the output mesh
+                    continue;
                 }
                 const auto solid_facet =
-                    mesh.facets()
-                        .facet_from_vertices( unique_vertices )
-                        .value();
-                geode::OpenGeodeModelException::check_assertion(
+                    mesh.facets().facet_from_vertices( vertices );
+                if( !solid_facet )
+                {
+                    // Surface polygon not in the output mesh
+                    continue;
+                }
+                geode::OpenGeodeModelException::check_exception(
                     !brep2mesh.surface_polygons_mapping.has_mapping_output(
-                        solid_facet ),
-                    "[map_polygons_to_solid_facets] Solid facet ", solid_facet,
+                        solid_facet.value() ),
+                    surface.id(), geode::OpenGeodeException::TYPE::data,
+                    "[map_polygons_to_solid_facets] Solid facet ",
+                    solid_facet.value(),
                     " is already mapped to another Surface polygon." );
                 brep2mesh.surface_polygons_mapping.map(
-                    { surface.id(), surface_polygon }, solid_facet );
+                    { surface.id(), surface_polygon }, solid_facet.value() );
             }
         }
     }
@@ -454,20 +563,23 @@ namespace geode
                 unique_vertex, OpenGeodeException::TYPE::data,
                 "The model contains a vertex not in a block." );
         }
+        UniqueVertexToMeshVertex uv2mesh{ brep.nb_unique_vertices() };
+        const auto first_vertex =
+            mesh_builder->create_vertices( brep.nb_unique_vertices() );
         for( const auto unique_vertex :
             geode::Range{ brep.nb_unique_vertices() } )
         {
-            const auto new_vertex_index = mesh_builder->create_vertex();
-            brep2mesh.unique_vertices_mapping.map(
-                unique_vertex, new_vertex_index );
+            uv2mesh.set_mesh_vertex(
+                unique_vertex, first_vertex + unique_vertex );
         }
-        build_polyhedra_from_model( brep, *mesh_builder, brep2mesh );
+        build_polyhedra_from_model( brep, *mesh_builder, uv2mesh, brep2mesh );
+        uv2mesh.fill_mapping( brep2mesh.unique_vertices_mapping );
         if( mesh->nb_polyhedra() != 0 )
         {
             mesh_builder->compute_polyhedron_adjacencies();
-            map_polygons_to_solid_facets( brep, brep2mesh, *mesh );
-            map_line_edges( brep, brep2mesh, *mesh );
-            map_corner_vertices( brep, brep2mesh );
+            map_polygons_to_solid_facets( brep, uv2mesh, brep2mesh, *mesh );
+            map_line_edges( brep, uv2mesh, brep2mesh, *mesh );
+            map_corner_vertices( brep, uv2mesh, brep2mesh );
         }
         return result;
     }

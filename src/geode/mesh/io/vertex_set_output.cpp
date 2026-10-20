@@ -49,7 +49,7 @@ namespace geode
             print_available_extensions< VertexSetOutputFactory >( TYPE );
             throw OpenGeodeMeshException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save VertexSet in file: ", filename };
+                "Cannot save VertexSet in file: ", filename, ": ", e.what() };
         }
     }
 

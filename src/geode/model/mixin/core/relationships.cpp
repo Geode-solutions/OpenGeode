@@ -154,7 +154,7 @@ namespace geode
                     from.string(), " and ", to.string(), ")" );
                 return component_id.value();
             }
-            const auto index = add_relation_edge( from, to );
+            const auto index = do_add_relation_edge( from, to );
             relation_type_->set_value( index, type );
             return index;
         }
@@ -311,6 +311,13 @@ namespace geode
         const uuid& component_id, RelationshipsBuilderKey /*unused*/ )
     {
         impl_->remove_component( component_id );
+    }
+
+    void Relationships::remove_components(
+        absl::Span< const uuid > component_ids,
+        RelationshipsBuilderKey /*unused*/ )
+    {
+        impl_->remove_components( component_ids );
     }
 
     index_t Relationships::nb_components_with_relations() const

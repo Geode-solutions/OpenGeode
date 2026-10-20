@@ -46,7 +46,7 @@ namespace geode
     void VertexIdentifierBuilder::set_unique_vertex(
         ComponentMeshVertex component_vertex_id, index_t unique_vertex_id )
     {
-        vertex_identifier_.set_unique_vertex( component_vertex_id,
+        vertex_identifier_.set_unique_vertex( std::move( component_vertex_id ),
             unique_vertex_id, VertexIdentifier::BuilderKey{} );
     }
 

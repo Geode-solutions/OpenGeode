@@ -46,14 +46,14 @@ namespace geode
                 RasterImageOutputFactory< dimension > >(
                 type, raster, filename );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& e )
         {
             Logger::error( e.what() );
             print_available_extensions< RasterImageOutputFactory< dimension > >(
                 type );
             throw OpenGeodeImageException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save RasterImage in file: ", filename };
+                "Cannot save RasterImage in file: ", filename, ": ", e.what() };
         }
     }
 
@@ -67,10 +67,14 @@ namespace geode
     }
 
     template std::vector< std::string > opengeode_image_api save_raster_image(
+        const RasterImage< 1 >&, std::string_view );
+    template std::vector< std::string > opengeode_image_api save_raster_image(
         const RasterImage< 2 >&, std::string_view );
     template std::vector< std::string > opengeode_image_api save_raster_image(
         const RasterImage< 3 >&, std::string_view );
 
+    template bool opengeode_image_api is_raster_image_saveable(
+        const RasterImage< 1 >&, std::string_view );
     template bool opengeode_image_api is_raster_image_saveable(
         const RasterImage< 2 >&, std::string_view );
     template bool opengeode_image_api is_raster_image_saveable(

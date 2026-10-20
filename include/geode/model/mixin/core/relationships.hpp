@@ -25,6 +25,8 @@
 
 #include <optional>
 
+#include <absl/types/span.h>
+
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
@@ -426,6 +428,14 @@ namespace geode
          */
         void remove_component(
             const uuid& component_id, RelationshipsBuilderKey /*key*/ );
+
+        /*!
+         * Remove several components from the set of components registered by
+         * the Relationships and all their associated relationships
+         * @param[in] component_ids Unique indices of the components to remove
+         */
+        void remove_components( absl::Span< const uuid > component_ids,
+            RelationshipsBuilderKey /*key*/ );
 
         /*!
          * Add a new relationship of type boundary-incidence between two
