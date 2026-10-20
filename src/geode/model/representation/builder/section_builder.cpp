@@ -65,7 +65,10 @@ namespace geode
     {
         auto nb_components =
             section_.nb_corners() + section_.nb_lines() + section_.nb_surfaces()
-            + section_.nb_model_boundaries() + section_.nb_unique_vertices();
+            + section_.nb_model_boundaries() + section_.nb_corner_collections()
+            + section_.nb_line_collections() + section_.nb_surface_collections()
+            + section_.nb_unique_vertices()
+            + section_.nb_components_with_relations();
         OpenGeodeModelException::check_exception( nb_components == 0, nullptr,
             OpenGeodeException::TYPE::data,
             "[SectionBuild::copy] Section should be empty before copy. To add "

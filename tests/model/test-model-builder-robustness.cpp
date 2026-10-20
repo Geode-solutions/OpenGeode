@@ -42,7 +42,9 @@
 #include <geode/model/mixin/core/relationships.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -195,12 +197,39 @@ void test_copy_relationships_into_non_empty()
         "[Test] Unmapped component should not be copied" );
 }
 
+template < typename Model >
+void test_copy_into_model_with_collection()
+{
+    const auto source = [] {
+        Model model;
+        typename Model::Builder builder{ model };
+        static_cast< void >( builder.add_corner() );
+        return model;
+    }();
+    Model model;
+    typename Model::Builder builder{ model };
+    static_cast< void >( builder.add_corner_collection() );
+    bool has_thrown{ false };
+    try
+    {
+        static_cast< void >( builder.copy( source ) );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeModelException::test(
+        has_thrown, "[Test] Copy into a model with collections should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_remove_foreign_component();
     test_partial_mesh_transfer();
     test_copy_relationships_into_non_empty();
+    test_copy_into_model_with_collection< geode::BRep >();
+    test_copy_into_model_with_collection< geode::Section >();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )
