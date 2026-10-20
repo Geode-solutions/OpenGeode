@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/core/detail/transfer_metadata.hpp>
 
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/small_set.hpp>
 
 #include <geode/mesh/core/edged_curve.hpp>
@@ -188,6 +190,54 @@ namespace
             builder.set_block_name( new_model.block( out_uuid ), out_name );
         }
     }
+
+    /*!
+     * Name each output component with the names of its input meshes.
+     */
+    template < typename Mesh, typename NameSetter >
+    void transfer_meshes_metadata(
+        absl::Span< const std::reference_wrapper< const Mesh > > meshes,
+        const geode::ModelGenericMapping& component_mapping,
+        const geode::ComponentType& component_type,
+        std::string_view function_name,
+        NameSetter&& set_name )
+    {
+        if( !component_mapping.has_mapping_type( component_type ) )
+        {
+            return;
+        }
+        absl::flat_hash_map< geode::uuid, const Mesh* > meshes_by_id;
+        meshes_by_id.reserve( meshes.size() );
+        for( const auto& mesh : meshes )
+        {
+            meshes_by_id.emplace( mesh.get().id(), &mesh.get() );
+        }
+        for( const auto& [out_uuid, in_uuids] :
+            component_mapping.at( component_type ).out2in_map() )
+        {
+            std::string out_name{ "" };
+            for( const auto& in_uuid : in_uuids )
+            {
+                if( !out_name.empty() )
+                {
+                    absl::StrAppend( &out_name, "+" );
+                }
+                const auto in_mesh = meshes_by_id.find( in_uuid );
+                geode::OpenGeodeModelException::check_exception(
+                    in_mesh != meshes_by_id.end(), in_uuid,
+                    geode::OpenGeodeException::TYPE::data, "[", function_name,
+                    "] Should have found input mesh from mapping" );
+                if( const auto& name = in_mesh->second->name() )
+                {
+                    absl::StrAppend( &out_name, name.value() );
+                }
+            }
+            if( !out_name.empty() )
+            {
+                set_name( out_uuid, out_name );
+            }
+        }
+    }
 } // namespace
 
 namespace geode
@@ -231,43 +281,14 @@ namespace geode
             typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type(
-                    geode::Corner< Model::dim >::component_type_static() ) )
-            {
-                return;
-            }
-            for( const auto& out2in_mapping : component_mapping
-                     .at( geode::Corner< Model::dim >::component_type_static() )
-                     .out2in_map() )
-            {
-                std::string out_name{ "" };
-                for( const auto& in_uuid : out2in_mapping.second )
-                {
-                    if( !out_name.empty() )
-                    {
-                        absl::StrAppend( &out_name, "+" );
-                    }
-                    const auto in_pointset = absl::c_find_if( pointsets,
-                        [&in_uuid]( const std::reference_wrapper<
-                            const PointSet< Model::dim > >& pointset_ref ) {
-                            return pointset_ref.get().id() == in_uuid;
-                        } );
-                    OpenGeodeModelException::check_exception(
-                        in_pointset != pointsets.end(), nullptr,
-                        OpenGeodeException::TYPE::data,
-                        "[transfer_pointsets_metadata] Should have found input "
-                        "pointset from mapping" );
-                    if( const auto name = in_pointset->get().name() )
-                    {
-                        absl::StrAppend( &out_name, name.value() );
-                    }
-                }
-                if( !out_name.empty() )
-                {
+            transfer_meshes_metadata( pointsets, component_mapping,
+                geode::Corner< Model::dim >::component_type_static(),
+                "transfer_pointsets_metadata",
+                [&model, &model_builder](
+                    const uuid& corner_id, std::string_view name ) {
                     model_builder.set_corner_name(
-                        model.corner( out2in_mapping.first ), out_name );
-                }
-            }
+                        model.corner( corner_id ), name );
+                } );
         }
 
         template < typename Model >
@@ -278,43 +299,13 @@ namespace geode
             typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type(
-                    geode::Line< Model::dim >::component_type_static() ) )
-            {
-                return;
-            }
-            for( const auto& out2in_mapping : component_mapping
-                     .at( geode::Line< Model::dim >::component_type_static() )
-                     .out2in_map() )
-            {
-                std::string out_name{ "" };
-                for( const auto& in_uuid : out2in_mapping.second )
-                {
-                    if( !out_name.empty() )
-                    {
-                        absl::StrAppend( &out_name, "+" );
-                    }
-                    const auto in_curve = absl::c_find_if( curves,
-                        [&in_uuid]( const std::reference_wrapper<
-                            const EdgedCurve< Model::dim > >& curve_ref ) {
-                            return curve_ref.get().id() == in_uuid;
-                        } );
-                    OpenGeodeModelException::check_exception(
-                        in_curve != curves.end(), nullptr,
-                        OpenGeodeException::TYPE::data,
-                        "[transfer_curves_metadata] Should have found input "
-                        "curve from mapping" );
-                    if( const auto name = in_curve->get().name() )
-                    {
-                        absl::StrAppend( &out_name, name.value() );
-                    }
-                }
-                if( !out_name.empty() )
-                {
-                    model_builder.set_line_name(
-                        model.line( out2in_mapping.first ), out_name );
-                }
-            }
+            transfer_meshes_metadata( curves, component_mapping,
+                geode::Line< Model::dim >::component_type_static(),
+                "transfer_curves_metadata",
+                [&model, &model_builder](
+                    const uuid& line_id, std::string_view name ) {
+                    model_builder.set_line_name( model.line( line_id ), name );
+                } );
         }
 
         template < typename Model >
@@ -325,44 +316,14 @@ namespace geode
             typename Model::Builder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type(
-                    geode::Surface< Model::dim >::component_type_static() ) )
-            {
-                return;
-            }
-            for( const auto& out2in_mapping :
-                component_mapping
-                    .at( geode::Surface< Model::dim >::component_type_static() )
-                    .out2in_map() )
-            {
-                std::string out_name{ "" };
-                for( const auto& in_uuid : out2in_mapping.second )
-                {
-                    if( !out_name.empty() )
-                    {
-                        absl::StrAppend( &out_name, "+" );
-                    }
-                    const auto in_surface = absl::c_find_if( surfaces,
-                        [&in_uuid]( const std::reference_wrapper<
-                            const SurfaceMesh< Model::dim > >& surface_ref ) {
-                            return surface_ref.get().id() == in_uuid;
-                        } );
-                    OpenGeodeModelException::check_exception(
-                        in_surface != surfaces.end(), nullptr,
-                        OpenGeodeException::TYPE::data,
-                        "[transfer_surfaces_metadata] Should have found input "
-                        "surface from mapping" );
-                    if( const auto name = in_surface->get().name() )
-                    {
-                        absl::StrAppend( &out_name, name.value() );
-                    }
-                }
-                if( !out_name.empty() )
-                {
+            transfer_meshes_metadata( surfaces, component_mapping,
+                geode::Surface< Model::dim >::component_type_static(),
+                "transfer_surfaces_metadata",
+                [&model, &model_builder](
+                    const uuid& surface_id, std::string_view name ) {
                     model_builder.set_surface_name(
-                        model.surface( out2in_mapping.first ), out_name );
-                }
-            }
+                        model.surface( surface_id ), name );
+                } );
         }
 
         void transfer_solids_metadata(
@@ -372,44 +333,14 @@ namespace geode
             BRepBuilder& model_builder,
             const ModelGenericMapping& component_mapping )
         {
-            if( !component_mapping.has_mapping_type(
-                    geode::Block3D::component_type_static() ) )
-            {
-                return;
-            }
-            for( const auto& out2in_mapping :
-                component_mapping.at( geode::Block3D::component_type_static() )
-                    .out2in_map() )
-            {
-                std::string out_name{ "" };
-                for( const auto& in_uuid : out2in_mapping.second )
-                {
-                    if( !out_name.empty() )
-                    {
-                        absl::StrAppend( &out_name, "+" );
-                    }
-                    const auto in_solid = absl::c_find_if( solids,
-                        [&in_uuid](
-                            const std::reference_wrapper< const SolidMesh3D >&
-                                solid_ref ) {
-                            return solid_ref.get().id() == in_uuid;
-                        } );
-                    OpenGeodeModelException::check_exception(
-                        in_solid != solids.end(), nullptr,
-                        OpenGeodeException::TYPE::data,
-                        "[transfer_solids_metadata] Should have found input "
-                        "solid from mapping" );
-                    if( const auto name = in_solid->get().name() )
-                    {
-                        absl::StrAppend( &out_name, name.value() );
-                    }
-                }
-                if( !out_name.empty() )
-                {
+            transfer_meshes_metadata( solids, component_mapping,
+                geode::Block3D::component_type_static(),
+                "transfer_solids_metadata",
+                [&model, &model_builder](
+                    const uuid& block_id, std::string_view name ) {
                     model_builder.set_block_name(
-                        model.block( out2in_mapping.first ), out_name );
-                }
-            }
+                        model.block( block_id ), name );
+                } );
         }
 
         template void opengeode_model_api transfer_pointsets_metadata(

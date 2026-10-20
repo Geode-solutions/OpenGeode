@@ -109,6 +109,13 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-model-transfer.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-ray-tracing-helpers.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
