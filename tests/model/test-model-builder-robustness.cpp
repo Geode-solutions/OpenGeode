@@ -222,6 +222,41 @@ void test_copy_into_model_with_collection()
         has_thrown, "[Test] Copy into a model with collections should throw" );
 }
 
+template < typename Function >
+bool throws_opengeode_exception( Function&& function )
+{
+    try
+    {
+        function();
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        return true;
+    }
+    return false;
+}
+
+void test_null_mesh_access()
+{
+    auto model = build_simple_brep();
+    geode::BRepBuilder builder{ model };
+    const auto& corner = *model.corners().begin();
+    const auto stolen_mesh = builder.steal_corner_mesh( corner );
+    geode::OpenGeodeModelException::test(
+        stolen_mesh != nullptr, "[Test] Stolen mesh should not be null" );
+    geode::OpenGeodeModelException::test(
+        throws_opengeode_exception( [&corner] {
+            static_cast< void >( corner.mesh() );
+        } ),
+        "[Test] Accessing a stolen mesh should throw" );
+    const auto& surface = *model.surfaces().begin();
+    geode::OpenGeodeModelException::test(
+        throws_opengeode_exception( [&builder, &surface] {
+            builder.update_surface_mesh( surface, nullptr );
+        } ),
+        "[Test] Setting a null mesh should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -230,6 +265,7 @@ void test()
     test_copy_relationships_into_non_empty();
     test_copy_into_model_with_collection< geode::BRep >();
     test_copy_into_model_with_collection< geode::Section >();
+    test_null_mesh_access();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )
