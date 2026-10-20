@@ -98,7 +98,13 @@ namespace geode
 
             [[nodiscard]] const Graph& graph() const;
 
-            void delete_isolated_vertices();
+            /*!
+             * Rebuild the uuid to graph vertex map from the ids stored on the
+             * graph vertices, after loading a file.
+             * Vertices without a valid or with a duplicated id are removed with
+             * their relations, as well as isolated vertices.
+             */
+            void repair_after_load();
 
         private:
             friend class bitsery::Access;
@@ -115,7 +121,7 @@ namespace geode
                              archive.object( impl.uuid2index_ );
                              archive.ext(
                                  impl.ids_, bitsery::ext::StdSmartPtr{} );
-                             impl.delete_isolated_vertices();
+                             impl.repair_after_load();
                          },
                             []( Archive& archive, RelationshipsImpl& impl ) {
                                 archive.ext(
@@ -123,7 +129,7 @@ namespace geode
                                 archive.object( impl.uuid2index_ );
                                 archive.ext(
                                     impl.ids_, bitsery::ext::StdSmartPtr{} );
-                                impl.delete_isolated_vertices();
+                                impl.repair_after_load();
                             } } } );
             }
 

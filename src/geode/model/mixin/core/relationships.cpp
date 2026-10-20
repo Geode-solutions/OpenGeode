@@ -216,7 +216,7 @@ namespace geode
                              std::move( graph ) );
                          impl.initialize_attributes();
                          impl.initialize_relation_attribute();
-                         impl.delete_isolated_vertices();
+                         impl.repair_after_load();
                      },
                         []( Archive& archive, Impl& impl ) {
                             impl.graph_ = std::make_unique< OpenGeodeGraph >(
@@ -228,7 +228,7 @@ namespace geode
                                 bitsery::ext::StdSmartPtr{} );
                             archive.ext(
                                 impl.ids_, bitsery::ext::StdSmartPtr{} );
-                            impl.delete_isolated_vertices();
+                            impl.repair_after_load();
                         },
                         []( Archive& archive, Impl& impl ) {
                             archive.ext(
