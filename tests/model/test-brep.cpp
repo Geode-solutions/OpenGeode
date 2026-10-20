@@ -34,10 +34,12 @@
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/geode/geode_edged_curve.hpp>
@@ -1909,6 +1911,60 @@ void test_is_closed()
         !model.is_closed( open_surface ), "Surface with boundary is open" );
 }
 
+void check_box( const geode::BoundingBox3D& box,
+    const geode::Point3D& min,
+    const geode::Point3D& max,
+    std::string_view message )
+{
+    geode::OpenGeodeModelException::test( box.min() == min && box.max() == max,
+        message, ": got ", box.string(), " instead of ", min.string(), " ",
+        max.string() );
+}
+
+void test_bounding_box()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    bool empty_exception{ false };
+    try
+    {
+        geode_unused( model.bounding_box() );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        empty_exception = true;
+    }
+    geode::OpenGeodeModelException::test(
+        empty_exception, "Bounding box of an empty BRep should throw" );
+
+    const auto& corner = model.corner( builder.add_corner() );
+    builder.corner_mesh_builder( corner )->create_point(
+        geode::Point3D{ { -5, 0, 0 } } );
+    const auto& line = model.line( builder.add_line() );
+    builder.line_mesh_builder( line )->create_point(
+        geode::Point3D{ { 0, 6, 0 } } );
+    for( const auto s : geode::Range{ 4 } )
+    {
+        const auto& surface = model.surface( builder.add_surface() );
+        auto mesh_builder = builder.surface_mesh_builder( surface );
+        mesh_builder->create_point( geode::Point3D{ { 1. * s, 0, 0 } } );
+        mesh_builder->create_point( geode::Point3D{ { 0, 0, -1. * s } } );
+    }
+    const auto& empty_surface = model.surface( builder.add_surface() );
+    geode_unused( empty_surface );
+    const auto& block = model.block( builder.add_block() );
+    builder.block_mesh_builder( block )->create_point(
+        geode::Point3D{ { 0, 0, 7 } } );
+    check_box( model.bounding_box(), geode::Point3D{ { -5, 0, -3 } },
+        geode::Point3D{ { 3, 6, 7 } }, "Wrong BRep bounding box" );
+
+    builder.set_corner_active( corner, false );
+    builder.set_block_active( block, false );
+    check_box( model.active_components_bounding_box(),
+        geode::Point3D{ { 0, 0, -3 } }, geode::Point3D{ { 3, 6, 0 } },
+        "Wrong BRep active components bounding box" );
+}
+
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
     geode::BRep& brep )
 {
@@ -2055,6 +2111,7 @@ void test()
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_unknown_components( model );
     test_is_closed();
+    test_bounding_box();
     const geode::uuid physical_attribute_id;
     geode::AttributeValues< double > porosity_values;
     porosity_values.default_value = 0.2;

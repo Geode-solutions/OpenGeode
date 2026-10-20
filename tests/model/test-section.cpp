@@ -27,6 +27,7 @@
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
@@ -987,6 +988,36 @@ void test_registry( const geode::Section& section )
     }
 }
 
+void test_bounding_box()
+{
+    geode::Section model;
+    geode::SectionBuilder builder{ model };
+    const auto& corner = model.corner( builder.add_corner() );
+    builder.corner_mesh_builder( corner )->create_point(
+        geode::Point2D{ { -5, 0 } } );
+    for( const auto s : geode::Range{ 4 } )
+    {
+        const auto& line = model.line( builder.add_line() );
+        builder.line_mesh_builder( line )->create_point(
+            geode::Point2D{ { 0, 2. * s } } );
+        const auto& surface = model.surface( builder.add_surface() );
+        builder.surface_mesh_builder( surface )->create_point(
+            geode::Point2D{ { 1. * s, -1. * s } } );
+    }
+    geode_unused( builder.add_surface() );
+    const auto box = model.bounding_box();
+    geode::OpenGeodeModelException::test(
+        box.min() == geode::Point2D{ { -5, -3 } }
+            && box.max() == geode::Point2D{ { 3, 6 } },
+        "Wrong Section bounding box: ", box.string() );
+    builder.set_corner_active( corner, false );
+    const auto active_box = model.active_components_bounding_box();
+    geode::OpenGeodeModelException::test(
+        active_box.min() == geode::Point2D{ { 0, -3 } }
+            && active_box.max() == geode::Point2D{ { 3, 6 } },
+        "Wrong Section active components bounding box: ", active_box.string() );
+}
+
 void test_is_closed()
 {
     geode::Section model;
@@ -1016,6 +1047,7 @@ void test()
     geode::Section model;
     geode::SectionBuilder builder( model );
     test_is_closed();
+    test_bounding_box();
 
     // This Section represents a house (with one triangle and one square as
     // in children sketches)

@@ -987,14 +987,9 @@ namespace geode
             bbox.add_box( box.value() );
             bbox_computed = true;
         }
-        for( const auto& block : blocks() )
+        if( const auto box = internal::meshes_bounding_box< 3 >( blocks() ) )
         {
-            const auto& block_mesh = block.mesh();
-            if( block_mesh.nb_vertices() == 0 )
-            {
-                continue;
-            }
-            bbox.add_box( block_mesh.bounding_box() );
+            bbox.add_box( box.value() );
             bbox_computed = true;
         }
         OpenGeodeModelException::check_exception( bbox_computed, nullptr,
