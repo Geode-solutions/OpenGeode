@@ -61,7 +61,7 @@ namespace geode::detail
         const Timer timer;
         auto output = geode_object_output_writer< Factory >( filename );
         const auto directories = filepath_without_filename(
-            std::filesystem::path{ expand_predefined_folders( filename ) } );
+            std::filesystem::u8path( expand_predefined_folders( filename ) ) );
         if( !directories.empty() )
         {
             std::filesystem::create_directories( directories );
