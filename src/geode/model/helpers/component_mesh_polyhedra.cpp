@@ -172,6 +172,10 @@ namespace geode
         unique_vertices_cmvs.reserve( unique_vertices.size() );
         for( const auto unique_vertex : unique_vertices )
         {
+            if( unique_vertex == NO_ID )
+            {
+                return {};
+            }
             unique_vertices_cmvs.emplace_back(
                 brep.component_mesh_vertices( unique_vertex ) );
         }

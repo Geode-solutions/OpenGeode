@@ -36,6 +36,7 @@
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -223,11 +224,59 @@ void run_test_section()
     }
 }
 
+void run_test_polygon_without_unique_vertex()
+{
+    auto model = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    geode::BRepBuilder builder{ model };
+    const auto& block = *model.blocks().begin();
+    const auto& surface = *model.boundaries( block ).begin();
+    const geode::ComponentMeshVertex surface_cmv{ surface.component_id(),
+        surface.mesh().polygon_vertex( { 0, 0 } ) };
+    builder.unset_unique_vertex(
+        surface_cmv, model.unique_vertex( surface_cmv ) );
+    const auto polygons = geode::component_mesh_polygons( model, surface, 0 );
+    geode::OpenGeodeModelException::test(
+        polygons.surface_polygons.empty() && polygons.block_polygons.empty(),
+        "No component mesh polygon should be found from a polygon with a "
+        "vertex without unique vertex" );
+    geode::OpenGeodeModelException::test(
+        geode::block_vertices_from_surface_polygon( model, block, surface, 0 )
+            .empty(),
+        "No block facet should be found from a polygon with a vertex without "
+        "unique vertex" );
+    geode::OpenGeodeModelException::test(
+        geode::oriented_block_vertices_from_surface_polygon(
+            model, block, surface, 0 )
+                .nb_facets()
+            == 0,
+        "No oriented block facet should be found from a polygon with a "
+        "vertex without unique vertex" );
+
+    const auto& line = *model.boundaries( surface ).begin();
+    const geode::ComponentMeshVertex line_cmv{ line.component_id(),
+        line.mesh().edge_vertex( { 0, 0 } ) };
+    builder.unset_unique_vertex( line_cmv, model.unique_vertex( line_cmv ) );
+    geode::OpenGeodeModelException::test(
+        geode::surface_vertices_from_line_edge( model, surface, line, 0 )
+            .empty(),
+        "No surface edge should be found from a line edge with a vertex "
+        "without unique vertex" );
+    geode::OpenGeodeModelException::test(
+        geode::oriented_surface_vertices_from_line_edge(
+            model, surface, line, 0 )
+                .nb_edges()
+            == 0,
+        "No oriented surface edge should be found from a line edge with a "
+        "vertex without unique vertex" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     run_test_brep();
     run_test_section();
+    run_test_polygon_without_unique_vertex();
 }
 
 OPENGEODE_TEST( "convert-mesh-polygons" )

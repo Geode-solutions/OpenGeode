@@ -39,9 +39,8 @@
 
 #include <geode/tests/common.hpp>
 
-void test()
+void test_radial_sort()
 {
-    geode::OpenGeodeModelLibrary::initialize();
     std::vector< geode::Point3D > points{ geode::Point3D{ { 0, 0, 0 } },
         geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0, 0, 1 } },
         geode::Point3D{ { -1, 0, -1 } }, geode::Point3D{ { 1, 0, -1 } } };
@@ -138,7 +137,45 @@ void test()
     geode::OpenGeodeModelException::test(
         sorted.surfaces[test2].side == geode::SidedSurface::POSITIVE,
         "Wrong side" );
+}
 
+void test_line_without_unique_vertex()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    builder.create_unique_vertices( 3 );
+    const auto line_id = builder.add_line();
+    const auto& line = brep.line( line_id );
+    auto line_builder = builder.line_mesh_builder( line );
+    line_builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    line_builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    line_builder->create_edge( 0, 1 );
+    // Only the first line vertex has a unique vertex
+    builder.set_unique_vertex( { line.component_id(), 0 }, 0 );
+
+    const auto surface_id = builder.add_surface();
+    const auto& surface = brep.surface( surface_id );
+    auto surface_builder = builder.surface_mesh_builder( surface );
+    surface_builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    surface_builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    surface_builder->create_point( geode::Point3D{ { 0, 0, 1 } } );
+    surface_builder->create_polygon( { 0, 1, 2 } );
+    for( const auto v : geode::LRange{ 3 } )
+    {
+        builder.set_unique_vertex( { surface.component_id(), v }, v );
+    }
+
+    const auto sorted = geode::surface_radial_sort( brep, line );
+    geode::OpenGeodeModelException::test( sorted.surfaces.empty(),
+        "No surface should be sorted around a line edge without unique "
+        "vertex" );
+}
+
+void test()
+{
+    geode::OpenGeodeModelLibrary::initialize();
+    test_radial_sort();
+    test_line_without_unique_vertex();
     geode::Logger::info( "TEST SUCCESS" );
 }
 
