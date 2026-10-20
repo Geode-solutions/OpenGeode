@@ -198,6 +198,117 @@ void test_io(
     test_relations( reloaded_relationships, uuids );
 }
 
+std::vector< std::pair< std::pair< geode::uuid, geode::uuid >, int > >
+    relation_values( const geode::Relationships& relations,
+        absl::Span< const geode::uuid > uuids )
+{
+    const auto attribute = relations.relation_attribute_manager()
+                               .find_attribute< geode::VariableAttribute, int >(
+                                   relations.relation_attribute_manager()
+                                       .attribute_ids_matching_name( "value" )
+                                       ->front() );
+    std::vector< std::pair< std::pair< geode::uuid, geode::uuid >, int > >
+        values;
+    for( const auto& uuid : uuids )
+    {
+        for( const auto& relation : relations.relations( uuid ) )
+        {
+            const auto index = relations.relation_index( uuid, relation.id );
+            geode::OpenGeodeModelException::test( index.has_value(),
+                "[remove components] Relation should exist" );
+            values.push_back(
+                { { uuid, relation.id }, attribute->value( index.value() ) } );
+        }
+    }
+    absl::c_sort( values );
+    return values;
+}
+
+void create_relation_values( const geode::Relationships& relations )
+{
+    geode::AttributeProperties attribute_properties;
+    attribute_properties.assignable = false;
+    attribute_properties.interpolable = false;
+    attribute_properties.transferable = true;
+    geode::AttributeValues< int > attribute_values;
+    attribute_values.default_value = -1;
+    attribute_values.no_value = -1;
+    const auto attribute_id =
+        relations.relation_attribute_manager()
+            .create_attribute< geode::VariableAttribute, int >(
+                "value", attribute_values, attribute_properties );
+    const auto attribute =
+        relations.relation_attribute_manager()
+            .find_attribute< geode::VariableAttribute, int >( attribute_id );
+    for( const auto r :
+        geode::Range{ relations.relation_attribute_manager().nb_elements() } )
+    {
+        attribute->set_value( r, static_cast< int >( r ) );
+    }
+}
+
+void test_remove_components( absl::Span< const geode::uuid > uuids )
+{
+    geode::Relationships one_by_one;
+    geode::Relationships batch;
+    for( auto* relations : { &one_by_one, &batch } )
+    {
+        add_boundary_relations( *relations, uuids );
+        add_internal_relations( *relations, uuids );
+        add_items_in_collections( *relations, uuids );
+        create_relation_values( *relations );
+    }
+    const auto values_before = relation_values( one_by_one, uuids );
+    geode::RelationshipsBuilder one_by_one_builder{ one_by_one };
+    one_by_one_builder.unregister_component( uuids[1] );
+    one_by_one_builder.unregister_component( uuids[3] );
+    geode::RelationshipsBuilder batch_builder{ batch };
+    batch_builder.unregister_components(
+        std::vector< geode::uuid >{ uuids[1], uuids[3], uuids[1] } );
+    for( const auto* relations : { &one_by_one, &batch } )
+    {
+        geode::OpenGeodeModelException::test(
+            relations->nb_components_with_relations() == 4,
+            "[remove components] Wrong number of components with relations" );
+        test_uuid( *relations, uuids[0], 1, 0, 1, 0, 0, 1 );
+        test_uuid( *relations, uuids[1], 0, 0, 0, 0, 0, 0 );
+        test_uuid( *relations, uuids[2], 0, 0, 0, 1, 0, 1 );
+        test_uuid( *relations, uuids[3], 0, 0, 0, 0, 0, 0 );
+        test_uuid( *relations, uuids[4], 0, 0, 0, 0, 3, 0 );
+        test_uuid( *relations, uuids[5], 0, 1, 0, 0, 0, 1 );
+        geode::OpenGeodeModelException::test(
+            relations->is_boundary( uuids[5], uuids[0] ),
+            "[remove components] uuids[5] should be boundary of uuids[0]" );
+        geode::OpenGeodeModelException::test(
+            relations->is_internal( uuids[2], uuids[0] ),
+            "[remove components] uuids[2] should be internal of uuids[0]" );
+        geode::OpenGeodeModelException::test(
+            relations->is_item( uuids[5], uuids[4] ),
+            "[remove components] uuids[5] should be item of uuids[4]" );
+        // Relation attribute values are kept for remaining relations
+        auto expected_values = values_before;
+        expected_values.erase(
+            std::remove_if( expected_values.begin(), expected_values.end(),
+                [&uuids]( const auto& value ) {
+                    const auto& [from, to] = value.first;
+                    return from == uuids[1] || from == uuids[3]
+                           || to == uuids[1] || to == uuids[3];
+                } ),
+            expected_values.end() );
+        geode::OpenGeodeModelException::test(
+            relation_values( *relations, uuids ) == expected_values,
+            "[remove components] Wrong relation attribute values" );
+    }
+
+    one_by_one_builder.remove_relation( uuids[0], uuids[2] );
+    test_uuid( one_by_one, uuids[0], 1, 0, 0, 0, 0, 1 );
+    test_uuid( one_by_one, uuids[2], 0, 0, 0, 0, 0, 1 );
+    test_uuid( one_by_one, uuids[5], 0, 1, 0, 0, 0, 1 );
+    geode::OpenGeodeModelException::test(
+        one_by_one.nb_components_with_relations() == 4,
+        "[remove relation] Wrong number of components with relations" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -222,6 +333,7 @@ void test()
     relationships.save_relationships( "." );
     test_io( absl::StrCat( geode::DATA_PATH, "relationships_v12" ), uuids );
     test_io( ".", uuids );
+    test_remove_components( uuids );
 }
 
 OPENGEODE_TEST( "relationships" )
