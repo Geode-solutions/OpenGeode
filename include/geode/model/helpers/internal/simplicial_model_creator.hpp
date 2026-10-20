@@ -108,10 +108,10 @@ namespace geode
                 line_corners.reserve( definitions.size() );
                 for( const auto& definition : definitions )
                 {
-                    line_corners.push_back(
-                        { find_corner( corner_set, definition.vertices.front() ),
-                            find_corner(
-                                corner_set, definition.vertices.back() ) } );
+                    line_corners.push_back( { find_corner( corner_set,
+                                                  definition.vertices.front() ),
+                        find_corner(
+                            corner_set, definition.vertices.back() ) } );
                 }
                 for( const auto d : Indices{ definitions } )
                 {
@@ -224,14 +224,13 @@ namespace geode
                 std::size_t size,
                 std::string_view element ) const
             {
-                OpenGeodeModelException::check_exception( index < size,
-                    nullptr, OpenGeodeException::TYPE::data,
-                    "[SimplicialModelCreator] ", element, " index ", index,
-                    " is out of range (", size, " elements)" );
+                OpenGeodeModelException::check_exception( index < size, nullptr,
+                    OpenGeodeException::TYPE::data, "[SimplicialModelCreator] ",
+                    element, " index ", index, " is out of range (", size,
+                    " elements)" );
             }
 
-            uuid find_corner(
-                const absl::flat_hash_set< uuid >& corners,
+            uuid find_corner( const absl::flat_hash_set< uuid >& corners,
                 index_t vertex ) const
             {
                 for( const auto& cmv : model_.component_mesh_vertices(

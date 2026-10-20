@@ -91,8 +91,7 @@ void test_convert_brep_with_blocks_into_section()
     geode::OpenGeodeModelException::test(
         section.nb_corners() == brep.nb_corners(),
         "Section from BRep with Blocks - wrong number of corners" );
-    geode::OpenGeodeModelException::test(
-        section.nb_lines() == brep.nb_lines(),
+    geode::OpenGeodeModelException::test( section.nb_lines() == brep.nb_lines(),
         "Section from BRep with Blocks - wrong number of lines" );
     geode::OpenGeodeModelException::test(
         section.nb_surfaces() == brep.nb_surfaces(),
@@ -140,8 +139,8 @@ void test_extrusion_quad_section_to_brep()
     options.min_coordinate = 0.;
     options.max_coordinate = 10.;
     const auto brep = geode::extrude_section_to_brep( section, options );
-    geode::OpenGeodeModelException::test( brep.nb_blocks() == 1,
-        "Extruded quad BRep - wrong number of blocks." );
+    geode::OpenGeodeModelException::test(
+        brep.nb_blocks() == 1, "Extruded quad BRep - wrong number of blocks." );
     for( const auto& block : brep.blocks() )
     {
         const auto& mesh = block.mesh();
@@ -186,8 +185,8 @@ void test_extrusion_pentagon_section_to_brep()
     {
         has_thrown = true;
     }
-    geode::OpenGeodeModelException::test( has_thrown,
-        "Extruding a pentagon should throw an exception." );
+    geode::OpenGeodeModelException::test(
+        has_thrown, "Extruding a pentagon should throw an exception." );
 }
 
 void test_extrusion_section_with_empty_corner_to_brep()

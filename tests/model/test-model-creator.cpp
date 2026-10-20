@@ -298,8 +298,8 @@ void test_create_in_non_empty_section()
     {
         geode::SimplicialSectionCreator creator{ section,
             { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } } } };
-        creator.create_corners( std::vector< geode::CornerDefinition >{
-            { 0 }, { 1 } } );
+        creator.create_corners(
+            std::vector< geode::CornerDefinition >{ { 0 }, { 1 } } );
     }
     const auto nb_existing_vertices = section.nb_unique_vertices();
     geode::SimplicialSectionCreator creator{ section,
@@ -316,8 +316,9 @@ void test_create_in_non_empty_section()
                 == nb_existing_vertices + corner_definitions[c].vertex,
             "[non empty model] Wrong Corner unique vertex" );
     }
-    const std::vector< geode::LineDefinition > line_definitions{ { { 0, 1,
-        2 } } };
+    const std::vector< geode::LineDefinition > line_definitions{
+        { { 0, 1, 2 } }
+    };
     const auto lines = creator.create_lines( corners, line_definitions );
     const auto& line = section.line( lines.front() );
     for( const auto v : geode::Range{ line.mesh().nb_vertices() } )
@@ -382,15 +383,15 @@ void test_invalid_section_definitions()
         "Line with one vertex" );
     expect_throw(
         [&creator, &corners] {
-            creator.create_lines( corners,
-                std::vector< geode::LineDefinition >{ { { 0, 5 } } } );
+            creator.create_lines(
+                corners, std::vector< geode::LineDefinition >{ { { 0, 5 } } } );
         },
         "Line vertex out of range" );
     geode::OpenGeodeModelException::test( section.nb_lines() == 0,
         "[invalid definitions] No Line should be created" );
-    const auto lines = creator.create_lines( corners,
-        std::vector< geode::LineDefinition >{
-            { { 0, 1 } }, { { 1, 2 } }, { { 2, 0 } } } );
+    const auto lines = creator.create_lines(
+        corners, std::vector< geode::LineDefinition >{
+                     { { 0, 1 } }, { { 1, 2 } }, { { 2, 0 } } } );
     expect_throw(
         [&creator, &lines] {
             creator.create_surfaces( lines,
@@ -431,16 +432,16 @@ void test_invalid_brep_definitions()
             geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0, 0, 1 } } } };
     expect_throw(
         [&creator] {
-            creator.create_blocks( {},
-                std::vector< geode::BlockDefinition >{
-                    { { 0, 1, 2, 3 }, { 0, 1, 2 }, {}, {}, {}, {} } } );
+            creator.create_blocks(
+                {}, std::vector< geode::BlockDefinition >{
+                        { { 0, 1, 2, 3 }, { 0, 1, 2 }, {}, {}, {}, {} } } );
         },
         "tetrahedra not multiple of 4" );
     expect_throw(
         [&creator] {
-            creator.create_blocks( {},
-                std::vector< geode::BlockDefinition >{
-                    { { 0, 1, 2, 3 }, { 0, 1, 2, 4 }, {}, {}, {}, {} } } );
+            creator.create_blocks(
+                {}, std::vector< geode::BlockDefinition >{
+                        { { 0, 1, 2, 3 }, { 0, 1, 2, 4 }, {}, {}, {}, {} } } );
         },
         "tetrahedron vertex out of range" );
     expect_throw(
@@ -465,7 +466,8 @@ void test_line_corners_from_unique_points()
     const auto lines = creator.create_lines(
         corners, std::vector< geode::LineDefinition >{ { { 3, 0, 1 } } } );
     const auto& line = section.line( lines.front() );
-    geode::OpenGeodeModelException::test( section.nb_boundaries( line.id() ) == 2,
+    geode::OpenGeodeModelException::test(
+        section.nb_boundaries( line.id() ) == 2,
         "[Line corners] Line should have 2 boundaries" );
     geode::OpenGeodeModelException::test(
         section.is_boundary( section.corner( corners[0] ), line )
@@ -473,8 +475,8 @@ void test_line_corners_from_unique_points()
         "[Line corners] Wrong Line boundaries" );
     expect_throw(
         [&creator, &corners] {
-            creator.create_lines( corners,
-                std::vector< geode::LineDefinition >{ { { 1, 2 } } } );
+            creator.create_lines(
+                corners, std::vector< geode::LineDefinition >{ { { 1, 2 } } } );
         },
         "Line extremity without Corner" );
 }

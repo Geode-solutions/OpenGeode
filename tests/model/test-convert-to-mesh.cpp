@@ -102,8 +102,8 @@ geode::Section create_section_with_dangling_components()
             geode::Point2D{ { 1, 1 } }, geode::Point2D{ { 0, 1 } },
             geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 3, 0 } },
             geode::Point2D{ { 5, 5 } } } };
-    const auto corners = creator.create_corners(
-        std::vector< geode::CornerDefinition >{
+    const auto corners =
+        creator.create_corners( std::vector< geode::CornerDefinition >{
             { 0 }, { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 } } );
     const auto lines = creator.create_lines( corners,
         std::vector< geode::LineDefinition >{ { { 0, 1 } }, { { 1, 2 } },
@@ -156,13 +156,12 @@ void run_test_brep_dangling_components()
         std::vector< geode::CornerDefinition >{ { 3 }, { 4 } } );
     const auto lines = creator.create_lines(
         corners, std::vector< geode::LineDefinition >{ { { 3, 4 } } } );
-    const auto surfaces = creator.create_surfaces( lines,
-        std::vector< geode::SurfaceDefinition >{
-            { { 0, 3, 4 }, { 0, 1, 2 }, {}, {}, {} } } );
+    const auto surfaces = creator.create_surfaces(
+        lines, std::vector< geode::SurfaceDefinition >{
+                   { { 0, 3, 4 }, { 0, 1, 2 }, {}, {}, {} } } );
     creator.create_blocks(
-        surfaces, std::vector< geode::BlockDefinition >{
-                      { { 0, 1, 2, 3, 4 }, { 0, 1, 2, 3, 0, 2, 1, 4 }, {}, {},
-                          {}, {} } } );
+        surfaces, std::vector< geode::BlockDefinition >{ { { 0, 1, 2, 3, 4 },
+                      { 0, 1, 2, 3, 0, 2, 1, 4 }, {}, {}, {}, {} } } );
     const auto [solid, mappings] = geode::convert_brep_into_solid( brep );
     geode::OpenGeodeModelException::test( solid->nb_polyhedra() == 2,
         "Dangling BRep - Wrong number of solid polyhedra" );
@@ -208,8 +207,8 @@ void run_test_unlinked_vertices()
 
     geode::BRep brep;
     geode::BRepBuilder brep_builder{ brep };
-    const auto& block = brep.block( brep_builder.add_block(
-        geode::MeshFactory::default_impl(
+    const auto& block =
+        brep.block( brep_builder.add_block( geode::MeshFactory::default_impl(
             geode::TetrahedralSolid3D::type_name_static() ) ) );
     auto block_builder =
         brep_builder.block_mesh_builder< geode::TetrahedralSolid3D >( block );
@@ -218,8 +217,7 @@ void run_test_unlinked_vertices()
     block_builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
     block_builder->create_point( geode::Point3D{ { 0, 0, 1 } } );
     block_builder->create_tetrahedron( { 0, 1, 2, 3 } );
-    const auto [solid, solid_mappings] =
-        geode::convert_brep_into_solid( brep );
+    const auto [solid, solid_mappings] = geode::convert_brep_into_solid( brep );
     geode::OpenGeodeModelException::test( solid->nb_vertices() == 4,
         "Unlinked vertices - Wrong number of solid vertices" );
     geode::OpenGeodeModelException::test(
