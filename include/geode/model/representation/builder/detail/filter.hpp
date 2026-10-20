@@ -66,6 +66,13 @@ namespace geode
             }
         };
 
+        template < typename Mixin, typename Model >
+        [[nodiscard]] bool has_mixin_component(
+            const Model& model, const uuid& component_id )
+        {
+            return model.Mixin::has_component( component_id );
+        }
+
         template < typename >
         struct ComponentsExistenceChecker;
 
@@ -76,7 +83,8 @@ namespace geode
             bool apply( const Model& model, const uuid& component_id ) const
             {
                 return (
-                    model.Components::has_component( component_id ) || ... );
+                    has_mixin_component< Components >( model, component_id )
+                    || ... );
             }
         };
     } // namespace internal
