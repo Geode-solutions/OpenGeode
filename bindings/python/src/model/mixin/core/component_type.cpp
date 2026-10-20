@@ -48,7 +48,9 @@ namespace geode
                 return std::hash< ComponentType >{}( type );
             } );
 
-        pybind11::class_< ComponentID >( module, "ComponentID" )
+        pybind11::class_< ComponentID >( module, "ComponentID",
+            "Hashable: do not modify type or id of a ComponentID used as a "
+            "dict key or in a set" )
             .def( pybind11::init<>() )
             .def( pybind11::init< ComponentType, uuid >() )
             .def( "string", &ComponentID::string )

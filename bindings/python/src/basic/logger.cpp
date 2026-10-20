@@ -48,41 +48,17 @@ namespace geode
                 "messages" )
             .def_static(
                 "is_enabled", &Logger::is_enabled, pybind11::arg( "level" ) )
-            .def_static(
-                "trace",
-                []( const std::string& message ) {
-                    Logger::trace( message );
-                },
+            .def_static( "trace", &Logger::trace< std::string >,
                 pybind11::arg( "message" ) )
-            .def_static(
-                "debug",
-                []( const std::string& message ) {
-                    Logger::debug( message );
-                },
+            .def_static( "debug", &Logger::debug< std::string >,
                 pybind11::arg( "message" ) )
-            .def_static(
-                "info",
-                []( const std::string& message ) {
-                    Logger::info( message );
-                },
+            .def_static( "info", &Logger::info< std::string >,
                 pybind11::arg( "message" ) )
-            .def_static(
-                "warning",
-                []( const std::string& message ) {
-                    Logger::warning( message );
-                },
+            .def_static( "warning", &Logger::warning< std::string >,
                 pybind11::arg( "message" ) )
-            .def_static(
-                "error",
-                []( const std::string& message ) {
-                    Logger::error( message );
-                },
+            .def_static( "error", &Logger::error< std::string >,
                 pybind11::arg( "message" ) )
-            .def_static(
-                "critical",
-                []( const std::string& message ) {
-                    Logger::critical( message );
-                },
+            .def_static( "critical", &Logger::critical< std::string >,
                 pybind11::arg( "message" ) );
     }
 } // namespace geode
