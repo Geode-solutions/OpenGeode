@@ -36,6 +36,10 @@
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
+#include <geode/model/helpers/detail/solid_mesh_validity_fix.hpp>
+#include <geode/model/helpers/detail/split_along_block_mesh_borders.hpp>
+#include <geode/model/helpers/detail/split_along_surface_mesh_borders.hpp>
+#include <geode/model/helpers/detail/surface_mesh_validity_fix.hpp>
 #include <geode/model/mixin/builder/relationships_builder.hpp>
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/corner.hpp>
@@ -301,6 +305,109 @@ void test_mesh_id_on_creation_with_uuid()
     check_mesh_id( model.block( block_impl_id ) );
 }
 
+// Two triangles sharing only one vertex, without any unique vertex
+const geode::Surface3D& add_bowtie_surface(
+    const geode::BRep& model, geode::BRepBuilder& builder )
+{
+    const auto& surface = model.surface( builder.add_surface() );
+    auto mesh_builder = builder.surface_mesh_builder( surface );
+    mesh_builder->create_point( geode::Point3D{ { 0., 0., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 1., 0., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 0., 1., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { -1., 0., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 0., -1., 0. } } );
+    mesh_builder->create_polygon( { 0, 1, 2 } );
+    mesh_builder->create_polygon( { 0, 3, 4 } );
+    mesh_builder->compute_polygon_adjacencies();
+    return surface;
+}
+
+// Two tetrahedra sharing only one vertex, without any unique vertex
+const geode::Block3D& add_bowtie_block(
+    const geode::BRep& model, geode::BRepBuilder& builder )
+{
+    const auto& block = model.block( builder.add_block() );
+    auto mesh_builder = builder.block_mesh_builder( block );
+    mesh_builder->create_point( geode::Point3D{ { 0., 0., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 1., 0., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 0., 1., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 0., 0., 1. } } );
+    mesh_builder->create_point( geode::Point3D{ { -1., 0., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 0., -1., 0. } } );
+    mesh_builder->create_point( geode::Point3D{ { 0., 0., -1. } } );
+    const std::vector< std::vector< geode::local_index_t > > facets{
+        { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 }
+    };
+    mesh_builder->create_polyhedron( { 0, 1, 2, 3 }, facets );
+    mesh_builder->create_polyhedron( { 0, 4, 5, 6 }, facets );
+    mesh_builder->compute_polyhedron_adjacencies();
+    return block;
+}
+
+template < typename Mapping >
+void check_no_unique_vertex( const geode::BRep& model, Mapping&& mapping )
+{
+    geode::OpenGeodeModelException::test(
+        !mapping.empty(), "[Test] Vertices should have been split" );
+    for( const auto& [_, out] : mapping )
+    {
+        geode::OpenGeodeModelException::test(
+            model.unique_vertex( out ) == geode::NO_ID,
+            "[Test] Split vertex should not have a unique vertex" );
+    }
+}
+
+void test_repair_surface_without_unique_vertices()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& surface = add_bowtie_surface( model, builder );
+    const auto mapping =
+        geode::detail::repair_non_manifold_vertices( model, builder, surface );
+    geode::OpenGeodeModelException::test( mapping.size_in() == 1,
+        "[Test] Surface non-manifold vertex should have been repaired" );
+    geode::OpenGeodeModelException::test(
+        surface.mesh().nb_vertices() == 6, "[Test] Wrong surface size" );
+    geode::OpenGeodeModelException::test(
+        model.unique_vertex( { surface.component_id(), 5 } ) == geode::NO_ID,
+        "[Test] Repaired surface vertex should not have a unique vertex" );
+}
+
+void test_repair_block_without_unique_vertices()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& block = add_bowtie_block( model, builder );
+    const auto mapping =
+        geode::detail::repair_non_manifold_vertices( model, builder, block );
+    geode::OpenGeodeModelException::test( mapping.size_in() == 1,
+        "[Test] Block non-manifold vertex should have been repaired" );
+    geode::OpenGeodeModelException::test(
+        block.mesh().nb_vertices() == 8, "[Test] Wrong block size" );
+    geode::OpenGeodeModelException::test(
+        model.unique_vertex( { block.component_id(), 7 } ) == geode::NO_ID,
+        "[Test] Repaired block vertex should not have a unique vertex" );
+}
+
+void test_split_surface_without_unique_vertices()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& surface = add_bowtie_surface( model, builder );
+    geode::detail::SplitAlongSurfaceMeshBorders< geode::BRep > splitter{ model,
+        builder };
+    check_no_unique_vertex( model, splitter.split_surface( surface ) );
+}
+
+void test_split_block_without_unique_vertices()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& block = add_bowtie_block( model, builder );
+    geode::detail::SplitAlongBlockMeshBorders splitter{ model, builder };
+    check_no_unique_vertex( model, splitter.split_block( block ) );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -311,6 +418,10 @@ void test()
     test_copy_into_model_with_collection< geode::Section >();
     test_null_mesh_access();
     test_mesh_id_on_creation_with_uuid();
+    test_repair_surface_without_unique_vertices();
+    test_repair_block_without_unique_vertices();
+    test_split_surface_without_unique_vertices();
+    test_split_block_without_unique_vertices();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )

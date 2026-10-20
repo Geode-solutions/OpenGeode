@@ -167,7 +167,11 @@ namespace geode
                         ComponentMeshVertex cmv_out{ block.component_id(),
                             vertex_out };
                         cmv_mapping.emplace_back( original_cmv, cmv_out );
-                        builder_.set_unique_vertex( cmv_out, unique_vertex_id );
+                        if( unique_vertex_id != NO_ID )
+                        {
+                            builder_.set_unique_vertex(
+                                cmv_out, unique_vertex_id );
+                        }
                     }
                 }
                 return cmv_mapping;
