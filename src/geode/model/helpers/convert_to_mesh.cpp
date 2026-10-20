@@ -85,6 +85,42 @@ namespace
         return true;
     }
 
+    /*!
+     * Return the output mesh vertex of a component mesh vertex, creating it
+     * if needed. Component vertices not linked to a unique vertex are not
+     * merged with any other component vertex.
+     */
+    template < typename ComponentMesh, typename MeshBuilder >
+    geode::index_t find_or_create_mesh_vertex(
+        geode::ModelToMeshMappings& model2mesh,
+        absl::FixedArray< geode::index_t >& unlinked_vertices,
+        const ComponentMesh& component_mesh,
+        geode::index_t vertex,
+        geode::index_t unique_vertex,
+        MeshBuilder& mesh_builder )
+    {
+        if( unique_vertex == geode::NO_ID )
+        {
+            auto& mesh_vertex = unlinked_vertices[vertex];
+            if( mesh_vertex == geode::NO_ID )
+            {
+                mesh_vertex =
+                    mesh_builder.create_point( component_mesh.point( vertex ) );
+            }
+            return mesh_vertex;
+        }
+        if( model2mesh.unique_vertices_mapping.has_mapping_input(
+                unique_vertex ) )
+        {
+            return model2mesh.unique_vertices_mapping.in2out( unique_vertex );
+        }
+        const auto new_vertex_index =
+            mesh_builder.create_point( component_mesh.point( vertex ) );
+        model2mesh.unique_vertices_mapping.map(
+            unique_vertex, new_vertex_index );
+        return new_vertex_index;
+    }
+
     template < typename Model >
     void map_corner_vertices(
         Model& model, geode::ModelToMeshMappings& model2mesh )
@@ -125,6 +161,8 @@ namespace
         for( const auto& line : model.lines() )
         {
             const auto& line_mesh = line.mesh();
+            absl::FixedArray< geode::index_t > unlinked_vertices(
+                line_mesh.nb_vertices(), geode::NO_ID );
             for( const auto& edge_id : geode::Range{ line_mesh.nb_edges() } )
             {
                 std::array< geode::index_t, 2 > vertices;
@@ -134,19 +172,9 @@ namespace
                         line_mesh.edge_vertex( { edge_id, edge_vertex_id } );
                     const auto unique_vertex =
                         model.unique_vertex( { line.component_id(), vertex } );
-                    if( model2mesh.unique_vertices_mapping.has_mapping_input(
-                            unique_vertex ) )
-                    {
-                        vertices[edge_vertex_id] =
-                            model2mesh.unique_vertices_mapping.in2out(
-                                unique_vertex );
-                        continue;
-                    }
-                    const auto new_vertex_index =
-                        mesh_builder.create_point( line_mesh.point( vertex ) );
-                    vertices[edge_vertex_id] = new_vertex_index;
-                    model2mesh.unique_vertices_mapping.map(
-                        unique_vertex, new_vertex_index );
+                    vertices[edge_vertex_id] = find_or_create_mesh_vertex(
+                        model2mesh, unlinked_vertices, line_mesh, vertex,
+                        unique_vertex, mesh_builder );
                 }
                 const auto edge_index =
                     mesh_builder.create_edge( vertices[0], vertices[1] );
@@ -215,6 +243,8 @@ namespace
             const auto& surface_mesh = surface.mesh();
             absl::FixedArray< geode::index_t > polygons(
                 surface_mesh.nb_polygons() );
+            absl::FixedArray< geode::index_t > unlinked_vertices(
+                surface_mesh.nb_vertices(), geode::NO_ID );
             for( const auto polygon_id :
                 geode::Range{ surface_mesh.nb_polygons() } )
             {
@@ -227,20 +257,10 @@ namespace
                         { polygon_id, polygon_vertex } );
                     const auto unique_vertex = model.unique_vertex(
                         { surface.component_id(), vertex } );
-                    if( model2mesh.unique_vertices_mapping.has_mapping_input(
-                            unique_vertex ) )
-                    {
-                        polygon_vertices[polygon_vertex] =
-                            model2mesh.unique_vertices_mapping.in2out(
-                                unique_vertex );
-                        continue;
-                    }
-
-                    const auto new_vertex_index = mesh_builder.create_point(
-                        surface_mesh.point( vertex ) );
-                    polygon_vertices[polygon_vertex] = new_vertex_index;
-                    model2mesh.unique_vertices_mapping.map(
-                        unique_vertex, new_vertex_index );
+                    polygon_vertices[polygon_vertex] =
+                        find_or_create_mesh_vertex( model2mesh,
+                            unlinked_vertices, surface_mesh, vertex,
+                            unique_vertex, mesh_builder );
                 }
                 polygons[polygon_id] =
                     mesh_builder.create_polygon( polygon_vertices );
@@ -347,6 +367,8 @@ namespace
             const auto& block_mesh = block.mesh();
             absl::FixedArray< geode::index_t > polyhedra(
                 block_mesh.nb_polyhedra() );
+            absl::FixedArray< geode::index_t > unlinked_vertices(
+                block_mesh.nb_vertices(), geode::NO_ID );
             for( const auto polyhedron_id :
                 geode::Range{ block_mesh.nb_polyhedra() } )
             {
@@ -359,6 +381,14 @@ namespace
                         { polyhedron_id, polyhedron_vertex } );
                     const auto unique_vertex =
                         brep.unique_vertex( { block.component_id(), vertex } );
+                    if( unique_vertex == geode::NO_ID )
+                    {
+                        polyhedron_vertices[polyhedron_vertex] =
+                            find_or_create_mesh_vertex( brep2mesh,
+                                unlinked_vertices, block_mesh, vertex,
+                                unique_vertex, mesh_builder );
+                        continue;
+                    }
                     if( brep2mesh.unique_vertices_mapping.has_mapping_input(
                             unique_vertex ) )
                     {
