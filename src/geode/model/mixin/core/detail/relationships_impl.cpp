@@ -191,6 +191,7 @@ namespace geode
             const RelationshipsImpl& impl, const ModelCopyMapping& mapping )
         {
             graph_ = impl.graph_->clone();
+            uuid2index_ = UuidToIndex{};
             initialize_attributes();
             std::vector< index_t > vertices_to_delete;
             for( const auto vertex_id : Range{ graph_->nb_vertices() } )

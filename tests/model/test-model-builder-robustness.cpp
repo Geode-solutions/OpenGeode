@@ -35,9 +35,11 @@
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
+#include <geode/model/mixin/builder/relationships_builder.hpp>
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/relationships.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
@@ -151,11 +153,54 @@ void test_partial_mesh_transfer()
     }
 }
 
+void test_copy_relationships_into_non_empty()
+{
+    const geode::ComponentType type{ "dummy" };
+    std::vector< geode::uuid > target_ids( 6 );
+    geode::Relationships target;
+    geode::RelationshipsBuilder target_builder{ target };
+    for( const auto i : geode::LRange{ 3 } )
+    {
+        target_builder.add_boundary_relation(
+            { type, target_ids[2 * i] }, { type, target_ids[2 * i + 1] } );
+    }
+    const geode::uuid x;
+    const geode::uuid y;
+    const geode::uuid unmapped;
+    geode::Relationships source;
+    geode::RelationshipsBuilder source_builder{ source };
+    source_builder.add_boundary_relation( { type, x }, { type, y } );
+    source_builder.add_boundary_relation( { type, unmapped }, { type, x } );
+    geode::ModelCopyMapping mapping;
+    auto& type_mapping = mapping[type];
+    type_mapping.map( x, x );
+    type_mapping.map( y, y );
+    target_builder.copy_relationships( mapping, source );
+
+    geode::OpenGeodeModelException::test(
+        target.nb_components_with_relations() == 2,
+        "[Test] Wrong number of components with relations after copy" );
+    for( const auto& id : target_ids )
+    {
+        geode::OpenGeodeModelException::test( target.nb_relations( id ) == 0,
+            "[Test] Previous components should have no relation after "
+            "copy" );
+    }
+    geode::OpenGeodeModelException::test(
+        target.nb_relations( x ) == 1 && target.nb_relations( y ) == 1,
+        "[Test] Copied components should have one relation" );
+    geode::OpenGeodeModelException::test( target.is_boundary( x, y ),
+        "[Test] Copied relation should be a boundary relation" );
+    geode::OpenGeodeModelException::test( target.nb_relations( unmapped ) == 0,
+        "[Test] Unmapped component should not be copied" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_remove_foreign_component();
     test_partial_mesh_transfer();
+    test_copy_relationships_into_non_empty();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )
