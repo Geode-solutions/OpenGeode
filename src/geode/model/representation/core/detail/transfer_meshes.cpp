@@ -48,6 +48,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Corner< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [in, _] :
             mapping.at( geode::Corner< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -62,6 +67,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Line< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& in2out :
             mapping.at( geode::Line< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -76,6 +86,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Surface< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& in2out :
             mapping.at( geode::Surface< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -90,6 +105,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Block< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& in2out :
             mapping.at( geode::Block< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -137,6 +157,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Corner< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [corner_id, other_corner_id] :
             mapping.at( geode::Corner< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -168,6 +193,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Line< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [line_id, other_line_id] :
             mapping.at( geode::Line< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -198,6 +228,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Surface< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [surface_id, other_surface_id] :
             mapping.at( geode::Surface< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -229,6 +264,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Block< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [block_id, other_block_id] :
             mapping.at( geode::Block< Model::dim >::component_type_static() )
                 .in2out_map() )

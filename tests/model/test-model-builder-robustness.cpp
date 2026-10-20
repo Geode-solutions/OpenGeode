@@ -23,9 +23,22 @@
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/geometry/point.hpp>
+
+#include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 
@@ -52,18 +65,97 @@ void test_remove_foreign_component()
     }
     geode::OpenGeodeModelException::test( has_thrown,
         "[Test] Removing a component from another model should throw" );
-    geode::OpenGeodeModelException::test( model.nb_corner_collections() == 1
-                                              && model.has_corner_collection(
-                                                  collection_id ),
+    geode::OpenGeodeModelException::test(
+        model.nb_corner_collections() == 1
+            && model.has_corner_collection( collection_id ),
         "[Test] Model should still have its corner collection" );
     geode::OpenGeodeModelException::test( other.nb_corner_collections() == 1,
         "[Test] Other model should still have its corner collection" );
+}
+
+geode::BRep build_simple_brep()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto first_unique_vertex = builder.create_unique_vertices( 2 );
+    for( const auto c : geode::LRange{ 2 } )
+    {
+        const auto& corner = model.corner( builder.add_corner() );
+        builder.corner_mesh_builder( corner )->create_point(
+            geode::Point3D{ { static_cast< double >( c ), 0., 0. } } );
+        builder.set_unique_vertex(
+            { corner.component_id(), 0 }, first_unique_vertex + c );
+    }
+    const auto& surface = model.surface( builder.add_surface() );
+    auto surface_builder = builder.surface_mesh_builder( surface );
+    surface_builder->create_point( geode::Point3D{ { 0., 0., 0. } } );
+    surface_builder->create_point( geode::Point3D{ { 1., 0., 0. } } );
+    surface_builder->create_point( geode::Point3D{ { 0., 1., 0. } } );
+    surface_builder->create_polygon( { 0, 1, 2 } );
+    const auto& block = model.block( builder.add_block() );
+    auto block_builder = builder.block_mesh_builder( block );
+    block_builder->create_point( geode::Point3D{ { 0., 0., 0. } } );
+    block_builder->create_point( geode::Point3D{ { 1., 0., 0. } } );
+    block_builder->create_point( geode::Point3D{ { 0., 1., 0. } } );
+    block_builder->create_point( geode::Point3D{ { 0., 0., 1. } } );
+    return model;
+}
+
+void test_partial_mesh_transfer()
+{
+    auto model = build_simple_brep();
+    geode::BRep other;
+    geode::BRepBuilder other_builder{ other };
+    const auto full_mapping = other_builder.copy( model );
+    absl::flat_hash_map< geode::uuid, geode::index_t > block_nb_vertices;
+    for( const auto& block : model.blocks() )
+    {
+        block_nb_vertices.emplace( block.id(), block.mesh().nb_vertices() );
+    }
+    absl::flat_hash_map< geode::uuid, geode::index_t > surface_nb_vertices;
+    for( const auto& surface : model.surfaces() )
+    {
+        surface_nb_vertices.emplace(
+            surface.id(), surface.mesh().nb_vertices() );
+    }
+    // Only corner meshes are transferred: other types are absent
+    geode::ModelCopyMapping partial_mapping;
+    partial_mapping.emplace( geode::Corner3D::component_type_static(),
+        full_mapping.at( geode::Corner3D::component_type_static() ) );
+    geode::BRepBuilder builder{ model };
+    builder.replace_components_meshes_by_others(
+        std::move( other ), partial_mapping );
+    for( const auto& block : model.blocks() )
+    {
+        geode::OpenGeodeModelException::test(
+            block.mesh().nb_vertices() == block_nb_vertices.at( block.id() ),
+            "[Test] Block mesh should not be modified by a partial transfer" );
+    }
+    for( const auto& surface : model.surfaces() )
+    {
+        geode::OpenGeodeModelException::test(
+            surface.mesh().nb_vertices()
+                == surface_nb_vertices.at( surface.id() ),
+            "[Test] Surface mesh should not be modified by a partial "
+            "transfer" );
+    }
+    for( const auto& corner : model.corners() )
+    {
+        geode::OpenGeodeModelException::test( corner.mesh().nb_vertices() == 1,
+            "[Test] Corner mesh should be transferred" );
+        geode::OpenGeodeModelException::test( corner.mesh().id() == corner.id(),
+            "[Test] Transferred corner mesh should have the corner id" );
+        geode::OpenGeodeModelException::test(
+            model.unique_vertex( { corner.component_id(), 0 } ) != geode::NO_ID,
+            "[Test] Transferred corner vertex should have a unique vertex" );
+    }
 }
 
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_remove_foreign_component();
+    test_partial_mesh_transfer();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )
