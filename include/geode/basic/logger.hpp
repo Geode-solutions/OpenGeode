@@ -142,6 +142,38 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
+
+    namespace detail
+    {
+        /*!
+         * Set the Logger level for the lifetime of this object and restore
+         * the previous level on destruction, even if an exception is thrown.
+         * The Logger level is global: scopes running concurrently in several
+         * threads may restore each other's level.
+         */
+        class ScopedLoggerLevel
+        {
+        public:
+            explicit ScopedLoggerLevel( Logger::LEVEL level )
+                : previous_level_{ Logger::level() }
+            {
+                Logger::set_level( level );
+            }
+
+            ~ScopedLoggerLevel()
+            {
+                Logger::set_level( previous_level_ );
+            }
+
+            ScopedLoggerLevel( const ScopedLoggerLevel & ) = delete;
+            ScopedLoggerLevel &operator=( const ScopedLoggerLevel & ) = delete;
+            ScopedLoggerLevel( ScopedLoggerLevel && ) = delete;
+            ScopedLoggerLevel &operator=( ScopedLoggerLevel && ) = delete;
+
+        private:
+            Logger::LEVEL previous_level_;
+        };
+    } // namespace detail
 } // namespace geode
 
 #include <geode/basic/detail/enable_debug_logger.hpp>

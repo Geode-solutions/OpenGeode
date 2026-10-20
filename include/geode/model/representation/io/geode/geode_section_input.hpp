@@ -70,8 +70,9 @@ namespace geode
         void load_section_files( Model& section, std::string_view directory )
         {
             SectionBuilder builder{ section };
-            const auto level = Logger::level();
-            Logger::set_level( Logger::LEVEL::warning );
+            const detail::ScopedLoggerLevel scoped_level{
+                Logger::LEVEL::warning
+            };
             async::parallel_invoke(
                 [&builder, &directory] {
                     builder.load_identifier( directory );
@@ -103,7 +104,6 @@ namespace geode
                 [&builder, &directory] {
                     builder.load_unique_vertices( directory );
                 } );
-            Logger::set_level( level );
             detail::register_all_components( section );
             detail::filter_unsupported_components( section );
             builder.repair_component_vertices();

@@ -720,6 +720,35 @@ namespace
             geode::OpenGeodeException::TYPE::internal,
             "[Test] Too long component name should not be loaded" };
     }
+
+    /*
+     * The Logger level changed while loading a model is restored when the
+     * loading fails.
+     */
+    void test_logger_level_restored()
+    {
+        saved_brep( "logger_level.og_brep" );
+        auto files = extract_archive( "logger_level.og_brep" );
+        auto& content = files.at( "relationships" );
+        content.resize( content.size() / 2 );
+        write_archive( files, "truncated_relationships.og_brep" );
+        geode::Logger::set_level( geode::Logger::LEVEL::info );
+        try
+        {
+            geode_unused(
+                geode::load_brep( "truncated_relationships.og_brep" ) );
+        }
+        catch( const geode::OpenGeodeException& /*unused*/ )
+        {
+            geode::OpenGeodeModelException::test(
+                geode::Logger::level() == geode::Logger::LEVEL::info,
+                "[Test] Logger level should be restored" );
+            return;
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal,
+            "[Test] Truncated relationships should not be loaded" };
+    }
 } // namespace
 
 void test()
@@ -737,6 +766,7 @@ void test()
     test_save_in_missing_directory();
     test_utf8_path();
     test_too_long_component_name();
+    test_logger_level_restored();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )
