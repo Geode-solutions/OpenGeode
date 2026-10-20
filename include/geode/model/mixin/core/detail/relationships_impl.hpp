@@ -146,7 +146,6 @@ namespace geode
             index_t do_add_relation_edge(
                 const ComponentID& from, const ComponentID& to );
 
-        protected:
             std::unique_ptr< Graph > graph_;
             detail::UuidToIndex uuid2index_;
             std::shared_ptr< VariableAttribute< ComponentID > > ids_;
