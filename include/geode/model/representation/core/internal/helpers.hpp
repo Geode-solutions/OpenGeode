@@ -56,6 +56,28 @@ namespace geode
             }
         }
 
+        /*!
+         * Return true if the component has at least the given number of
+         * boundaries. Stop iterating as soon as this number is reached.
+         */
+        template < typename Model >
+        [[nodiscard]] bool has_at_least_n_boundaries( const Model& model,
+            const uuid& component_id,
+            index_t nb_boundaries )
+        {
+            index_t count{ 0 };
+            for( const auto& boundary :
+                model.Relationships::boundaries( component_id ) )
+            {
+                geode_unused( boundary );
+                if( ++count >= nb_boundaries )
+                {
+                    return true;
+                }
+            }
+            return count >= nb_boundaries;
+        }
+
         template < index_t dimension, typename MeshComponentRange >
         [[nodiscard]] std::optional< BoundingBox< dimension > >
             meshes_bounding_box( MeshComponentRange range )

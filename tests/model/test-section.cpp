@@ -987,12 +987,35 @@ void test_registry( const geode::Section& section )
     }
 }
 
+void test_is_closed()
+{
+    geode::Section model;
+    geode::SectionBuilder builder{ model };
+    const auto& corner0 = model.corner( builder.add_corner() );
+    const auto& corner1 = model.corner( builder.add_corner() );
+    const auto& free_line = model.line( builder.add_line() );
+    const auto& loop_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, loop_line );
+    const auto& open_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, open_line );
+    builder.add_corner_line_boundary_relationship( corner1, open_line );
+    builder.add_line_surface_boundary_relationship(
+        open_line, model.surface( builder.add_surface() ) );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( free_line ), "Line without boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( loop_line ), "Line with one boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        !model.is_closed( open_line ), "Line with two boundaries is open" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
     geode::Section model;
     geode::SectionBuilder builder( model );
+    test_is_closed();
 
     // This Section represents a house (with one triangle and one square as
     // in children sketches)

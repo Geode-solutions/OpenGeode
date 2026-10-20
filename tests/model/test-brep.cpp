@@ -1880,6 +1880,35 @@ void test_unknown_components( const geode::BRep& model )
     } );
 }
 
+void test_is_closed()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& corner0 = model.corner( builder.add_corner() );
+    const auto& corner1 = model.corner( builder.add_corner() );
+    const auto& free_line = model.line( builder.add_line() );
+    const auto& loop_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, loop_line );
+    const auto& open_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, open_line );
+    builder.add_corner_line_boundary_relationship( corner1, open_line );
+    const auto& closed_surface = model.surface( builder.add_surface() );
+    builder.add_corner_surface_internal_relationship( corner1, closed_surface );
+    builder.add_line_surface_internal_relationship( free_line, closed_surface );
+    const auto& open_surface = model.surface( builder.add_surface() );
+    builder.add_line_surface_boundary_relationship( open_line, open_surface );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( free_line ), "Line without boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( loop_line ), "Line with one boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        !model.is_closed( open_line ), "Line with two boundaries is open" );
+    geode::OpenGeodeModelException::test( model.is_closed( closed_surface ),
+        "Surface without boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        !model.is_closed( open_surface ), "Surface with boundary is open" );
+}
+
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
     geode::BRep& brep )
 {
@@ -1960,6 +1989,7 @@ void test()
         model, surface_uuids, surface_collection_uuids );
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_unknown_components( model );
+    test_is_closed();
     const geode::uuid physical_attribute_id;
     geode::AttributeValues< double > porosity_values;
     porosity_values.default_value = 0.2;
