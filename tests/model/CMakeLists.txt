@@ -27,6 +27,14 @@ add_geode_test(
     ESSENTIAL
 )
 add_geode_test(
+    SOURCE "test-component-mensurations.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-component-mesh-edges.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
