@@ -24,6 +24,7 @@
 #include <geode/model/representation/core/detail/transfer_metadata.hpp>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/strings/str_join.h>
 
 #include <geode/basic/small_set.hpp>
 
@@ -192,7 +193,8 @@ namespace
     }
 
     /*!
-     * Name each output component with the names of its input meshes.
+     * Name each output component with the unique names of its input meshes,
+     * joined by '+' (in input order).
      */
     template < typename Mesh, typename NameSetter >
     void transfer_meshes_metadata(
@@ -215,13 +217,9 @@ namespace
         for( const auto& [out_uuid, in_uuids] :
             component_mapping.at( component_type ).out2in_map() )
         {
-            std::string out_name{ "" };
+            geode::SmallSet< std::string > unique_names;
             for( const auto& in_uuid : in_uuids )
             {
-                if( !out_name.empty() )
-                {
-                    absl::StrAppend( &out_name, "+" );
-                }
                 const auto in_mesh = meshes_by_id.find( in_uuid );
                 geode::OpenGeodeModelException::check_exception(
                     in_mesh != meshes_by_id.end(), in_uuid,
@@ -229,13 +227,14 @@ namespace
                     "] Should have found input mesh from mapping" );
                 if( const auto& name = in_mesh->second->name() )
                 {
-                    absl::StrAppend( &out_name, name.value() );
+                    unique_names.insert( name.value() );
                 }
             }
-            if( !out_name.empty() )
+            if( unique_names.empty() )
             {
-                set_name( out_uuid, out_name );
+                continue;
             }
+            set_name( out_uuid, absl::StrJoin( unique_names, "+" ) );
         }
     }
 } // namespace

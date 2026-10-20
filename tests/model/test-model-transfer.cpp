@@ -82,12 +82,13 @@ namespace
         const auto mesh_b = create_surface_mesh( "B" );
         const auto mesh_c = create_surface_mesh( "C" );
         const auto mesh_unnamed = create_surface_mesh( "" );
+        const auto mesh_a2 = create_surface_mesh( "A" );
         const std::vector<
             std::reference_wrapper< const geode::SurfaceMesh2D > >
-            meshes{ *mesh_a, *mesh_b, *mesh_c, *mesh_unnamed };
+            meshes{ *mesh_a, *mesh_b, *mesh_c, *mesh_unnamed, *mesh_a2 };
 
         std::vector< geode::uuid > surfaces;
-        for( const auto s : geode::Range{ 3 } )
+        for( const auto s : geode::Range{ 6 } )
         {
             geode_unused( s );
             surfaces.push_back( builder.add_surface() );
@@ -97,6 +98,16 @@ namespace
         mapping.map( mesh_b->id(), surfaces[0] );
         mapping.map( mesh_c->id(), surfaces[1] );
         mapping.map( mesh_unnamed->id(), surfaces[2] );
+        // Unnamed input between named ones
+        mapping.map( mesh_a->id(), surfaces[3] );
+        mapping.map( mesh_unnamed->id(), surfaces[3] );
+        mapping.map( mesh_b->id(), surfaces[3] );
+        // Unnamed last input
+        mapping.map( mesh_a->id(), surfaces[4] );
+        mapping.map( mesh_unnamed->id(), surfaces[4] );
+        // Duplicated names
+        mapping.map( mesh_a->id(), surfaces[5] );
+        mapping.map( mesh_a2->id(), surfaces[5] );
         geode::ModelGenericMapping component_mapping;
         component_mapping.emplace(
             geode::Surface2D::component_type_static(), std::move( mapping ) );
@@ -106,6 +117,9 @@ namespace
         check_name( section.surface( surfaces[0] ), "A+B" );
         check_name( section.surface( surfaces[1] ), "C" );
         check_name( section.surface( surfaces[2] ), std::nullopt );
+        check_name( section.surface( surfaces[3] ), "A+B" );
+        check_name( section.surface( surfaces[4] ), "A" );
+        check_name( section.surface( surfaces[5] ), "A" );
     }
 
     void test_solids_metadata()
