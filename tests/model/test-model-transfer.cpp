@@ -27,6 +27,8 @@
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/logger_client.hpp>
+#include <geode/basic/logger_manager.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -253,6 +255,94 @@ namespace
             new_builder, brep_unchanged_components( ids ) );
         check_brep_collections( new_model, ids );
     }
+    class WarningCounter : public geode::LoggerClient
+    {
+    public:
+        explicit WarningCounter( geode::index_t& nb_warnings )
+            : nb_warnings_( nb_warnings )
+        {
+        }
+
+        void trace( const std::string& /*unused*/ ) override {}
+
+        void debug( const std::string& /*unused*/ ) override {}
+
+        void info( const std::string& /*unused*/ ) override {}
+
+        void warning( const std::string& /*unused*/ ) override
+        {
+            nb_warnings_++;
+        }
+
+        void error( const std::string& /*unused*/ ) override {}
+
+        void critical( const std::string& /*unused*/ ) override {}
+
+    private:
+        geode::index_t& nb_warnings_;
+    };
+
+    geode::index_t& nb_warnings()
+    {
+        static geode::index_t counter{ 0 };
+        static const auto& client = geode::LoggerManager::register_client(
+            std::make_unique< WarningCounter >( counter ) );
+        geode_unused( client );
+        return counter;
+    }
+
+    void test_unchanged_collections_transfer_existing_relations()
+    {
+        geode::BRep old_model;
+        geode::BRepBuilder old_builder{ old_model };
+        const auto ids = create_brep_with_collections( old_model, old_builder );
+
+        auto new_model = old_model.clone();
+        geode::BRepBuilder new_builder{ new_model };
+        const auto nb_warnings_before = nb_warnings();
+        geode::detail::transfer_brep_collections( old_model, new_model,
+            new_builder, brep_unchanged_components( ids ) );
+        const auto nb_new_warnings = nb_warnings() - nb_warnings_before;
+        geode::OpenGeodeModelException::test( nb_new_warnings == 0,
+            "Existing collection relations should not be added again (",
+            nb_new_warnings, " warnings)" );
+        geode::OpenGeodeModelException::test(
+            new_model.nb_items( ids.corner_collection ) == 2
+                && new_model.nb_items( ids.line_collection ) == 1
+                && new_model.nb_items( ids.surface_collection ) == 1
+                && new_model.nb_items( ids.block_collection ) == 1
+                && new_model.nb_items( ids.model_boundary ) == 1,
+            "Wrong collections after transfer on existing relations" );
+    }
+    void test_section_unchanged_collections_transfer_existing_relations()
+    {
+        geode::Section old_model;
+        geode::SectionBuilder old_builder{ old_model };
+        const auto& line_id = old_builder.add_line();
+        const auto& collection_id = old_builder.add_line_collection();
+        const auto& boundary_id = old_builder.add_model_boundary();
+        old_builder.add_line_in_line_collection( old_model.line( line_id ),
+            old_model.line_collection( collection_id ) );
+        old_builder.add_line_in_model_boundary( old_model.line( line_id ),
+            old_model.model_boundary( boundary_id ) );
+
+        auto new_model = old_model.clone();
+        geode::SectionBuilder new_builder{ new_model };
+        geode::ModelUnchangedComponentMapping unchanged;
+        unchanged.emplace(
+            geode::Line2D::component_type_static(), { line_id } );
+        const auto nb_warnings_before = nb_warnings();
+        geode::detail::transfer_section_collections(
+            old_model, new_model, new_builder, unchanged );
+        geode::OpenGeodeModelException::test(
+            nb_warnings() == nb_warnings_before,
+            "Existing Section collection relations should not be added "
+            "again" );
+        geode::OpenGeodeModelException::test(
+            new_model.nb_items( collection_id ) == 1
+                && new_model.nb_items( boundary_id ) == 1,
+            "Wrong Section collections after transfer on existing relations" );
+    }
 } // namespace
 
 void test()
@@ -261,6 +351,8 @@ void test()
     test_surfaces_metadata();
     test_solids_metadata();
     test_unchanged_collections_transfer();
+    test_unchanged_collections_transfer_existing_relations();
+    test_section_unchanged_collections_transfer_existing_relations();
 }
 
 OPENGEODE_TEST( "model-transfer" )

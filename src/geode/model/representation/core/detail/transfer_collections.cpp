@@ -155,8 +155,13 @@ namespace
                 new_model.corner_collection( collection_in.id() );
             for( const auto& corner_id : corners_to_add )
             {
-                new_model_builder.add_corner_in_corner_collection(
-                    new_model.corner( corner_id ), new_collection );
+                const auto& corner = new_model.corner( corner_id );
+                if( !new_model.is_corner_collection_item(
+                        corner, new_collection ) )
+                {
+                    new_model_builder.add_corner_in_corner_collection(
+                        corner, new_collection );
+                }
             }
         }
     }
@@ -264,8 +269,12 @@ namespace
                 new_model.line_collection( collection_in.id() );
             for( const auto& line_id : lines_to_add )
             {
-                new_model_builder.add_line_in_line_collection(
-                    new_model.line( line_id ), new_collection );
+                const auto& line = new_model.line( line_id );
+                if( !new_model.is_line_collection_item( line, new_collection ) )
+                {
+                    new_model_builder.add_line_in_line_collection(
+                        line, new_collection );
+                }
             }
         }
     }
@@ -377,8 +386,13 @@ namespace
                 new_model.surface_collection( collection_in.id() );
             for( const auto& surface_id : surfaces_to_add )
             {
-                new_model_builder.add_surface_in_surface_collection(
-                    new_model.surface( surface_id ), new_collection );
+                const auto& surface = new_model.surface( surface_id );
+                if( !new_model.is_surface_collection_item(
+                        surface, new_collection ) )
+                {
+                    new_model_builder.add_surface_in_surface_collection(
+                        surface, new_collection );
+                }
             }
         }
     }
@@ -485,8 +499,13 @@ namespace
                 new_model.block_collection( collection_in.id() );
             for( const auto& block_id : blocks_to_add )
             {
-                new_model_builder.add_block_in_block_collection(
-                    new_model.block( block_id ), new_collection );
+                const auto& block = new_model.block( block_id );
+                if( !new_model.is_block_collection_item(
+                        block, new_collection ) )
+                {
+                    new_model_builder.add_block_in_block_collection(
+                        block, new_collection );
+                }
             }
         }
     }
@@ -595,8 +614,13 @@ namespace
                 new_model.model_boundary( model_bdry.id() );
             for( const auto& surface_id : surfaces_to_add )
             {
-                new_model_builder.add_surface_in_model_boundary(
-                    new_model.surface( surface_id ), new_model_bdry );
+                const auto& surface = new_model.surface( surface_id );
+                if( !new_model.is_model_boundary_item(
+                        surface, new_model_bdry ) )
+                {
+                    new_model_builder.add_surface_in_model_boundary(
+                        surface, new_model_bdry );
+                }
             }
         }
     }
@@ -703,8 +727,12 @@ namespace
                 new_model.model_boundary( model_bdry.id() );
             for( const auto& line_id : lines_to_add )
             {
-                new_model_builder.add_line_in_model_boundary(
-                    new_model.line( line_id ), new_model_bdry );
+                const auto& line = new_model.line( line_id );
+                if( !new_model.is_model_boundary_item( line, new_model_bdry ) )
+                {
+                    new_model_builder.add_line_in_model_boundary(
+                        line, new_model_bdry );
+                }
             }
         }
     }
