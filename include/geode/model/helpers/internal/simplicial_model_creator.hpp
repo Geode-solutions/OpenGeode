@@ -243,12 +243,11 @@ namespace geode
                         return cmv.component_id.id;
                     }
                 }
-                OpenGeodeModelException::check_exception( false, nullptr,
+                throw OpenGeodeModelException{ nullptr,
                     OpenGeodeException::TYPE::data,
                     "[SimplicialModelCreator::create_lines] No given Corner "
                     "on Line extremity unique point ",
-                    vertex );
-                return {};
+                    vertex };
             }
 
             void check_unique_point( index_t vertex ) const
