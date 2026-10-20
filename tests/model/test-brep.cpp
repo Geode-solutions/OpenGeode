@@ -24,6 +24,7 @@
 #include <tuple>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/strings/match.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/attribute_manager.hpp>
@@ -1829,6 +1830,56 @@ void test_components_filter()
         brep.nb_components_with_relations(), " instead of 9" );
 }
 
+template < typename Accessor >
+void test_unknown_component_access( Accessor&& accessor )
+{
+    const geode::uuid unknown_id;
+    try
+    {
+        geode_unused( accessor( unknown_id ) );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        geode::OpenGeodeModelException::test(
+            absl::StrContains( exception.what(), unknown_id.string() ),
+            "Exception message should contain the unknown component id" );
+        return;
+    }
+    geode::OpenGeodeModelException::test(
+        false, "Accessing an unknown component should throw" );
+}
+
+void test_unknown_components( const geode::BRep& model )
+{
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.corner( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.line( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.surface( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.block( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.model_boundary( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.corner_collection( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.line_collection( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.surface_collection( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.block_collection( id ).id();
+    } );
+}
+
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
     geode::BRep& brep )
 {
@@ -1908,6 +1959,7 @@ void test()
     test_surface_collection_ranges(
         model, surface_uuids, surface_collection_uuids );
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
+    test_unknown_components( model );
     const geode::uuid physical_attribute_id;
     geode::AttributeValues< double > porosity_values;
     porosity_values.default_value = 0.2;

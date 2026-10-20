@@ -67,14 +67,12 @@ namespace geode::detail
         [[nodiscard]] const Component& component(
             const uuid& component_id ) const
         {
-            check_matching_component_id( component_id );
-            return *components_.at( component_id );
+            return find_component( component_id );
         }
 
         [[nodiscard]] Component& component( const uuid& component_id )
         {
-            check_matching_component_id( component_id );
-            return *components_.at( component_id );
+            return find_component( component_id );
         }
 
         [[nodiscard]] Iterator begin() const
@@ -181,15 +179,22 @@ namespace geode::detail
                     } } } );
         }
 
-        void check_matching_component_id( const uuid& component_id ) const
+        [[nodiscard]] Component& find_component(
+            const uuid& component_id ) const
         {
+            const auto it = components_.find( component_id );
+            OpenGeodeModelException::check_exception( it != components_.end(),
+                component_id, OpenGeodeException::TYPE::data,
+                "[ComponentsStorage::component] Component with id ",
+                component_id.string(), " does not exist" );
+            auto& component = *it->second;
             OpenGeodeModelException::check_exception(
-                components_.at( component_id )->id() == component_id, nullptr,
+                component.id() == component_id, component_id,
                 OpenGeodeException::TYPE::data,
-                "[ComponentsStorage::check_matching_component_id] Component "
-                "with id ",
-                components_.at( component_id )->id().string(),
-                " does not match its stored id ", component_id.string() );
+                "[ComponentsStorage::component] Component with id ",
+                component.id().string(), " does not match its stored id ",
+                component_id.string() );
+            return component;
         }
 
     private:
