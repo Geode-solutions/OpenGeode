@@ -408,6 +408,21 @@ void test_split_block_without_unique_vertices()
     check_no_unique_vertex( model, splitter.split_block( block ) );
 }
 
+void test_split_all_blocks()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& block0 = add_bowtie_block( model, builder );
+    const auto& block1 = add_bowtie_block( model, builder );
+    geode::detail::SplitAlongBlockMeshBorders splitter{ model, builder };
+    const auto mapping = splitter.split_all_blocks();
+    geode::OpenGeodeModelException::test(
+        mapping.size() == 2, "[Test] Both blocks should have been split" );
+    geode::OpenGeodeModelException::test(
+        block0.mesh().nb_vertices() == 8 && block1.mesh().nb_vertices() == 8,
+        "[Test] Wrong number of block vertices after split" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -422,6 +437,7 @@ void test()
     test_repair_block_without_unique_vertices();
     test_split_surface_without_unique_vertices();
     test_split_block_without_unique_vertices();
+    test_split_all_blocks();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )
