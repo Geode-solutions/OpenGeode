@@ -31,6 +31,7 @@
 #include <geode/mesh/builder/point_set_builder.hpp>
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
@@ -39,6 +40,7 @@
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
+#include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/relationships.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
@@ -257,6 +259,48 @@ void test_null_mesh_access()
         "[Test] Setting a null mesh should throw" );
 }
 
+template < typename Component >
+void check_mesh_id( const Component& component )
+{
+    geode::OpenGeodeModelException::test(
+        component.mesh().id() == component.id(), "[Test] ",
+        component.component_type().get(),
+        " mesh should have the same id as the component" );
+}
+
+void test_mesh_id_on_creation_with_uuid()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const geode::uuid corner_id;
+    builder.add_corner( corner_id );
+    check_mesh_id( model.corner( corner_id ) );
+    const geode::uuid corner_impl_id;
+    builder.add_corner(
+        corner_impl_id, model.corner( corner_id ).mesh().impl_name() );
+    check_mesh_id( model.corner( corner_impl_id ) );
+    const geode::uuid line_id;
+    builder.add_line( line_id );
+    check_mesh_id( model.line( line_id ) );
+    const geode::uuid line_impl_id;
+    builder.add_line( line_impl_id, model.line( line_id ).mesh().impl_name() );
+    check_mesh_id( model.line( line_impl_id ) );
+    const geode::uuid surface_id;
+    builder.add_surface( surface_id );
+    check_mesh_id( model.surface( surface_id ) );
+    const geode::uuid surface_impl_id;
+    builder.add_surface(
+        surface_impl_id, model.surface( surface_id ).mesh().impl_name() );
+    check_mesh_id( model.surface( surface_impl_id ) );
+    const geode::uuid block_id;
+    builder.add_block( block_id );
+    check_mesh_id( model.block( block_id ) );
+    const geode::uuid block_impl_id;
+    builder.add_block(
+        block_impl_id, model.block( block_id ).mesh().impl_name() );
+    check_mesh_id( model.block( block_impl_id ) );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -266,6 +310,7 @@ void test()
     test_copy_into_model_with_collection< geode::BRep >();
     test_copy_into_model_with_collection< geode::Section >();
     test_null_mesh_access();
+    test_mesh_id_on_creation_with_uuid();
 }
 
 OPENGEODE_TEST( "model-builder-robustness" )

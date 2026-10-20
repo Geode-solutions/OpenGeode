@@ -186,6 +186,9 @@ namespace geode
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{ typename Line< dimension >::LinesKey{} }
         };
+        IdentifierBuilder{ line->modifiable_mesh(
+                               typename Line< dimension >::LinesKey{} ) }
+            .set_id( line_id );
         IdentifierBuilder{ *line }.set_id( std::move( line_id ) );
         impl_->add_component( std::move( line ) );
     }
@@ -198,6 +201,9 @@ namespace geode
             new Line< dimension >{
                 impl, typename Line< dimension >::LinesKey{} }
         };
+        IdentifierBuilder{ line->modifiable_mesh(
+                               typename Line< dimension >::LinesKey{} ) }
+            .set_id( line_id );
         IdentifierBuilder{ *line }.set_id( std::move( line_id ) );
         impl_->add_component( std::move( line ) );
     }

@@ -223,6 +223,9 @@ namespace geode
             new Surface< dimension >{
                 typename Surface< dimension >::SurfacesKey{} }
         };
+        IdentifierBuilder{ surface->modifiable_mesh(
+                               typename Surface< dimension >::SurfacesKey{} ) }
+            .set_id( surface_id );
         IdentifierBuilder{ *surface }.set_id( std::move( surface_id ) );
         impl_->add_component( std::move( surface ) );
     }
@@ -235,6 +238,9 @@ namespace geode
             new Surface< dimension >{
                 impl, typename Surface< dimension >::SurfacesKey{} }
         };
+        IdentifierBuilder{ surface->modifiable_mesh(
+                               typename Surface< dimension >::SurfacesKey{} ) }
+            .set_id( surface_id );
         IdentifierBuilder{ *surface }.set_id( std::move( surface_id ) );
         impl_->add_component( std::move( surface ) );
     }

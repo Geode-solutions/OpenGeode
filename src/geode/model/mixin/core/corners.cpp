@@ -190,6 +190,9 @@ namespace geode
             new Corner< dimension >{
                 typename Corner< dimension >::CornersKey{} }
         };
+        IdentifierBuilder{ corner->modifiable_mesh(
+                               typename Corner< dimension >::CornersKey{} ) }
+            .set_id( corner_id );
         IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
         impl_->add_component( std::move( corner ) );
     }
@@ -202,6 +205,9 @@ namespace geode
             new Corner< dimension >{
                 impl, typename Corner< dimension >::CornersKey{} }
         };
+        IdentifierBuilder{ corner->modifiable_mesh(
+                               typename Corner< dimension >::CornersKey{} ) }
+            .set_id( corner_id );
         IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
         impl_->add_component( std::move( corner ) );
     }

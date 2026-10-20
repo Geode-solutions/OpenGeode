@@ -214,6 +214,9 @@ namespace geode
         typename Blocks< dimension >::Impl::ComponentPtr block{
             new Block< dimension >{ typename Block< dimension >::BlocksKey{} }
         };
+        IdentifierBuilder{ block->modifiable_mesh(
+                               typename Block< dimension >::BlocksKey{} ) }
+            .set_id( block_id );
         IdentifierBuilder{ *block }.set_id( std::move( block_id ) );
         impl_->add_component( std::move( block ) );
     }
@@ -226,6 +229,9 @@ namespace geode
             new Block< dimension >{
                 impl, typename Block< dimension >::BlocksKey{} }
         };
+        IdentifierBuilder{ block->modifiable_mesh(
+                               typename Block< dimension >::BlocksKey{} ) }
+            .set_id( block_id );
         IdentifierBuilder{ *block }.set_id( std::move( block_id ) );
         impl_->add_component( std::move( block ) );
     }
