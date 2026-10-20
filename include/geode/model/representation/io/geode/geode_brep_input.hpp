@@ -115,6 +115,7 @@ namespace geode
             Logger::set_level( level );
             detail::register_all_components( brep );
             detail::filter_unsupported_components( brep );
+            builder.repair_component_vertices();
         }
     } // namespace detail
 } // namespace geode

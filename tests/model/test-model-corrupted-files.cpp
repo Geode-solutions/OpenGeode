@@ -205,12 +205,124 @@ namespace
         }
     }
 
+    bool has_mesh_component( const geode::BRep& brep, const geode::uuid& id )
+    {
+        return brep.has_corner( id ) || brep.has_line( id )
+               || brep.has_surface( id ) || brep.has_block( id );
+    }
+
+    std::string mesh_file_name(
+        const ArchiveFiles& files, std::string_view prefix )
+    {
+        for( const auto& file : files )
+        {
+            if( absl::StartsWith( file.first, prefix )
+                && file.first.size() > prefix.size() + 36 )
+            {
+                return file.first;
+            }
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] No ", prefix,
+            " mesh file" };
+    }
+
+    void check_same_unique_vertices(
+        const geode::BRep& brep, const geode::BRep& loaded )
+    {
+        geode::OpenGeodeModelException::test(
+            loaded.nb_unique_vertices() == brep.nb_unique_vertices(),
+            "[Test] Wrong number of unique vertices" );
+        for( const auto unique_vertex :
+            geode::Range{ brep.nb_unique_vertices() } )
+        {
+            const auto& vertices =
+                brep.component_mesh_vertices( unique_vertex );
+            geode::OpenGeodeModelException::test(
+                loaded.component_mesh_vertices( unique_vertex ).size()
+                    == vertices.size(),
+                "[Test] Wrong number of component vertices for unique vertex ",
+                unique_vertex );
+            for( const auto& vertex : vertices )
+            {
+                geode::OpenGeodeModelException::test(
+                    loaded.unique_vertex( vertex ) == unique_vertex,
+                    "[Test] Wrong unique vertex for component vertex" );
+            }
+        }
+    }
+
+    /*
+     * Mesh components have a "unique vertices" attribute linking their
+     * vertices to the model unique vertices. When this attribute is missing,
+     * it is restored from the unique vertices.
+     */
+    void test_missing_unique_vertices_attribute()
+    {
+        const auto brep = saved_brep( "unique_vertices.og_brep" );
+        auto files = extract_archive( "unique_vertices.og_brep" );
+        replace_unique( files.at( "vertices" ),
+            serialized_uuid( brep.unique_vertex_attribute_id() ),
+            serialized_uuid( geode::uuid{} ), "Unique vertex attribute id" );
+        for( const auto prefix : { "Corner", "Line", "Surface", "Block" } )
+        {
+            replace_unique( files.at( mesh_file_name( files, prefix ) ),
+                "unique vertices", "unique_vertices",
+                "Unique vertices attribute name" );
+        }
+        write_archive( files, "corrupted_unique_vertices.og_brep" );
+
+        const auto loaded =
+            geode::load_brep( "corrupted_unique_vertices.og_brep" );
+        check_same_unique_vertices( brep, loaded );
+    }
+
+    /*
+     * Unique vertices referencing a component that does not exist in the
+     * model are removed.
+     */
+    void test_unknown_component_vertices()
+    {
+        saved_brep( "with_corner.og_brep" );
+        auto without_corner = geode::load_brep( "with_corner.og_brep" );
+        const auto& corner = *without_corner.corners().begin();
+        const auto corner_id = corner.id();
+        geode::BRepBuilder{ without_corner }.remove_corner( corner );
+        geode::save_brep( without_corner, "without_corner.og_brep" );
+        auto files = extract_archive( "without_corner.og_brep" );
+        files.at( "vertices" ) =
+            extract_archive( "with_corner.og_brep" ).at( "vertices" );
+        write_archive( files, "unknown_corner_vertices.og_brep" );
+
+        const auto loaded =
+            geode::load_brep( "unknown_corner_vertices.og_brep" );
+        geode::OpenGeodeModelException::test( !loaded.has_corner( corner_id ),
+            "[Test] Removed corner should not be loaded" );
+        for( const auto unique_vertex :
+            geode::Range{ loaded.nb_unique_vertices() } )
+        {
+            for( const auto& vertex :
+                loaded.component_mesh_vertices( unique_vertex ) )
+            {
+                geode::OpenGeodeModelException::test(
+                    has_mesh_component( loaded, vertex.component_id.id ),
+                    "[Test] Unique vertex ", unique_vertex,
+                    " references an unknown component" );
+                geode::OpenGeodeModelException::test(
+                    loaded.unique_vertex( vertex ) == unique_vertex,
+                    "[Test] Wrong unique vertex for component vertex" );
+            }
+        }
+    }
+
 } // namespace
 
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_inconsistent_relationships_map();
+    test_missing_unique_vertices_attribute();
+    test_unknown_component_vertices();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )
