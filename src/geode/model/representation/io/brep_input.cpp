@@ -68,7 +68,7 @@ namespace geode
             print_available_extensions< BRepInputFactory >( TYPE );
             throw OpenGeodeModelException{ nullptr,
                 OpenGeodeException::TYPE::data,
-                "Cannot load BRep from file: ", filename };
+                "Cannot load BRep from file: ", filename, ": ", e.what() };
         }
     }
 

@@ -85,7 +85,8 @@ namespace geode
                 LightRegularGridOutputFactory< dimension > >( type );
             throw OpenGeodeMeshException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save LightRegularGrid in file: ", filename };
+                "Cannot save LightRegularGrid in file: ", filename, ": ",
+                e.what() };
         }
     }
 
