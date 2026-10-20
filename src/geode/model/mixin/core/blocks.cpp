@@ -34,11 +34,14 @@
 #include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
 #include <geode/mesh/io/hybrid_solid_input.hpp>
 #include <geode/mesh/io/hybrid_solid_output.hpp>
 #include <geode/mesh/io/polyhedral_solid_input.hpp>
 #include <geode/mesh/io/polyhedral_solid_output.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 #include <geode/mesh/io/tetrahedral_solid_input.hpp>
 #include <geode/mesh/io/tetrahedral_solid_output.hpp>
 
@@ -61,6 +64,11 @@ namespace
                 extension ) )
         {
             return geode::HybridSolid< dimension >::type_name_static();
+        }
+        if( geode::RegularGridInputFactory< dimension >::has_creator(
+                extension ) )
+        {
+            return geode::RegularGrid< dimension >::type_name_static();
         }
         return geode::PolyhedralSolid< dimension >::type_name_static();
     }
@@ -150,6 +158,12 @@ namespace geode
                 {
                     save_polyhedral_solid( *poly, file );
                 }
+                else if( const auto* grid =
+                             dynamic_cast< const RegularGrid< dimension >* >(
+                                 &mesh ) )
+                {
+                    save_regular_grid( *grid, file );
+                }
                 else
                 {
                     throw OpenGeodeModelException{ nullptr,
@@ -199,6 +213,12 @@ namespace geode
                 {
                     block.set_mesh(
                         load_hybrid_solid< dimension >( impl, file->second ),
+                        typename Block< dimension >::BlocksKey{} );
+                }
+                else if( type == RegularGrid< dimension >::type_name_static() )
+                {
+                    block.set_mesh(
+                        load_regular_grid< dimension >( impl, file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else

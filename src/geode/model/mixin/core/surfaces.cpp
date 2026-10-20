@@ -33,9 +33,12 @@
 
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/io/polygonal_surface_input.hpp>
 #include <geode/mesh/io/polygonal_surface_output.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
 #include <geode/mesh/io/triangulated_surface_output.hpp>
 
@@ -52,7 +55,48 @@ namespace
         {
             return geode::TriangulatedSurface< dimension >::type_name_static();
         }
+        if constexpr( dimension == 2 )
+        {
+            if( geode::RegularGridInputFactory< 2 >::has_creator(
+                    geode::to_string(
+                        geode::extension_from_filename( file ) ) ) )
+            {
+                return geode::RegularGrid< 2 >::type_name_static();
+            }
+        }
         return geode::PolygonalSurface< dimension >::type_name_static();
+    }
+
+    template < geode::index_t dimension >
+    bool save_grid_surface(
+        const geode::SurfaceMesh< dimension >& mesh, std::string_view file )
+    {
+        if constexpr( dimension == 2 )
+        {
+            if( const auto* grid =
+                    dynamic_cast< const geode::RegularGrid< 2 >* >( &mesh ) )
+            {
+                geode::save_regular_grid( *grid, file );
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template < geode::index_t dimension >
+    std::unique_ptr< geode::SurfaceMesh< dimension > > load_grid_surface(
+        const geode::MeshType& type,
+        const geode::MeshImpl& impl,
+        std::string_view file )
+    {
+        if constexpr( dimension == 2 )
+        {
+            if( type == geode::RegularGrid< 2 >::type_name_static() )
+            {
+                return geode::load_regular_grid< 2 >( impl, file );
+            }
+        }
+        return nullptr;
     }
 } // namespace
 
@@ -135,7 +179,7 @@ namespace geode
                 {
                     save_polygonal_surface( *polygonal, file );
                 }
-                else
+                else if( !save_grid_surface< dimension >( mesh, file ) )
                 {
                     throw OpenGeodeModelException{ nullptr,
                         OpenGeodeException::TYPE::data,
@@ -174,11 +218,18 @@ namespace geode
                     detail::loadable_mesh_impl( surface.mesh_type(),
                         surface_type_from_file< dimension >( file->second ),
                         file->second );
-                if( MeshFactory::type( impl )
+                const auto& type = MeshFactory::type( impl );
+                if( type
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {
                     surface.set_mesh( load_triangulated_surface< dimension >(
                                           impl, file->second ),
+                        typename Surface< dimension >::SurfacesKey{} );
+                }
+                else if( auto grid = load_grid_surface< dimension >(
+                             type, impl, file->second ) )
+                {
+                    surface.set_mesh( std::move( grid ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
                 else

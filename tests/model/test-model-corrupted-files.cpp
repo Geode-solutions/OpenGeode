@@ -41,7 +41,15 @@
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/zip_file.hpp>
 
+#include <geode/geometry/point.hpp>
+#include <geode/geometry/vector.hpp>
+
+#include <geode/mesh/builder/regular_grid_solid_builder.hpp>
+#include <geode/mesh/builder/regular_grid_surface_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/point_set.hpp>
+#include <geode/mesh/core/regular_grid_solid.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
@@ -49,9 +57,13 @@
 #include <geode/model/mixin/core/line.hpp>
 #include <geode/model/mixin/core/surface.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 #include <geode/model/representation/io/brep_output.hpp>
+#include <geode/model/representation/io/section_input.hpp>
+#include <geode/model/representation/io/section_output.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -566,6 +578,51 @@ namespace
                 "[Test] Wrong surface mesh" );
         }
     }
+
+    /*
+     * Surfaces and blocks may have a RegularGrid mesh.
+     */
+    void test_regular_grid_meshes()
+    {
+        geode::Section section;
+        geode::SectionBuilder section_builder{ section };
+        const auto& surface_id = section_builder.add_surface();
+        auto surface_grid = geode::RegularGrid2D::create();
+        geode::RegularGridBuilder2D::create( *surface_grid )
+            ->initialize_grid( geode::Point2D{ { 0., 0. } }, { 3, 4 }, 1 );
+        section_builder.update_surface_mesh(
+            section.surface( surface_id ), std::move( surface_grid ) );
+        geode::save_section( section, "grid.og_sctn" );
+        const auto loaded_section = geode::load_section( "grid.og_sctn" );
+        const auto& loaded_surface = loaded_section.surface( surface_id );
+        geode::OpenGeodeModelException::test(
+            geode::MeshFactory::type( loaded_surface.mesh_type() )
+                == geode::RegularGrid2D::type_name_static(),
+            "[Test] Surface mesh should be a RegularGrid" );
+        geode::OpenGeodeModelException::test(
+            loaded_surface.mesh().nb_polygons() == 12,
+            "[Test] Wrong number of grid surface cells" );
+
+        geode::BRep brep;
+        geode::BRepBuilder brep_builder{ brep };
+        const auto& block_id = brep_builder.add_block();
+        auto block_grid = geode::RegularGrid3D::create();
+        geode::RegularGridBuilder3D::create( *block_grid )
+            ->initialize_grid(
+                geode::Point3D{ { 0., 0., 0. } }, { 2, 3, 4 }, 1 );
+        brep_builder.update_block_mesh(
+            brep.block( block_id ), std::move( block_grid ) );
+        geode::save_brep( brep, "grid.og_brep" );
+        const auto loaded_brep = geode::load_brep( "grid.og_brep" );
+        const auto& loaded_block = loaded_brep.block( block_id );
+        geode::OpenGeodeModelException::test(
+            geode::MeshFactory::type( loaded_block.mesh_type() )
+                == geode::RegularGrid3D::type_name_static(),
+            "[Test] Block mesh should be a RegularGrid" );
+        geode::OpenGeodeModelException::test(
+            loaded_block.mesh().nb_polyhedra() == 24,
+            "[Test] Wrong number of grid block cells" );
+    }
 } // namespace
 
 void test()
@@ -579,6 +636,7 @@ void test()
     test_unknown_component_relations();
     test_missing_mesh_file();
     test_unknown_mesh_impl();
+    test_regular_grid_meshes();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )

@@ -105,6 +105,7 @@ add_geode_test(
     SOURCE "test-model-corrupted-files.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
         ${PROJECT_NAME}::model
 )
