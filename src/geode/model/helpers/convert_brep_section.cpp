@@ -368,20 +368,55 @@ namespace
             auto block_builder =
                 brep_builder_.block_mesh_builder< geode::HybridSolid3D >(
                     block );
-            for( const auto tgl_id :
-                geode::Range{ surface_slice0.mesh().nb_polygons() } )
+            const auto& slice0_mesh = surface_slice0.mesh();
+            for( const auto polygon_id :
+                geode::Range{ slice0_mesh.nb_polygons() } )
             {
-                std::array< geode::index_t, 6 > pointids;
-                for( const auto p0 : geode::LRange{ 3 } )
+                const auto nb_polygon_vertices =
+                    slice0_mesh.nb_polygon_vertices( polygon_id );
+                if( nb_polygon_vertices == 3 )
                 {
-                    pointids[p0] = find_or_create_block_vertex(
-                        surface_slice0, { tgl_id, p0 }, block );
-                    pointids[p0 + 3] = find_or_create_block_vertex(
-                        surface_slice1, { tgl_id, p0 }, block );
+                    block_builder->create_prism(
+                        extruded_polygon_vertices< 3 >( surface_slice0,
+                            surface_slice1, polygon_id, block ) );
                 }
-                block_builder->create_prism( pointids );
+                else if( nb_polygon_vertices == 4 )
+                {
+                    block_builder->create_hexahedron(
+                        extruded_polygon_vertices< 4 >( surface_slice0,
+                            surface_slice1, polygon_id, block ) );
+                }
+                else
+                {
+                    geode::OpenGeodeModelException::check_exception( false,
+                        section_surface.id(),
+                        geode::OpenGeodeException::TYPE::data,
+                        "[extrude_section_to_brep] Cannot extrude polygon ",
+                        polygon_id, " of Surface ",
+                        section_surface.id().string(), ": only triangles and "
+                        "quadrangles are supported, not polygons with ",
+                        nb_polygon_vertices, " vertices" );
+                }
             }
             block_builder->compute_polyhedron_adjacencies();
+        }
+
+        template < geode::local_index_t nb_polygon_vertices >
+        std::array< geode::index_t, 2 * nb_polygon_vertices >
+            extruded_polygon_vertices( const geode::Surface3D& surface_slice0,
+                const geode::Surface3D& surface_slice1,
+                geode::index_t polygon_id,
+                const geode::Block3D& block )
+        {
+            std::array< geode::index_t, 2 * nb_polygon_vertices > pointids;
+            for( const auto v : geode::LRange{ nb_polygon_vertices } )
+            {
+                pointids[v] = find_or_create_block_vertex(
+                    surface_slice0, { polygon_id, v }, block );
+                pointids[v + nb_polygon_vertices] = find_or_create_block_vertex(
+                    surface_slice1, { polygon_id, v }, block );
+            }
+            return pointids;
         }
 
         geode::index_t find_or_create_block_vertex(

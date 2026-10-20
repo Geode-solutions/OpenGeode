@@ -27,8 +27,16 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
 
+#include <geode/geometry/point.hpp>
+
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/geode/geode_polygonal_surface.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+
 #include <geode/model/helpers/convert_brep_section.hpp>
 #include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -121,12 +129,73 @@ void test_extrusion_section_to_brep()
         "Extruded BRep - wrong number of blocks." );
 }
 
+void test_extrusion_quad_section_to_brep()
+{
+    const auto section =
+        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    geode::SectionExtruderOptions options;
+    options.axis_to_extrude = 2;
+    options.min_coordinate = 0.;
+    options.max_coordinate = 10.;
+    const auto brep = geode::extrude_section_to_brep( section, options );
+    geode::OpenGeodeModelException::test( brep.nb_blocks() == 1,
+        "Extruded quad BRep - wrong number of blocks." );
+    for( const auto& block : brep.blocks() )
+    {
+        const auto& mesh = block.mesh();
+        geode::OpenGeodeModelException::test( mesh.nb_polyhedra() == 1,
+            "Extruded quad BRep - wrong number of polyhedra." );
+        geode::OpenGeodeModelException::test(
+            mesh.nb_polyhedron_vertices( 0 ) == 8,
+            "Extruded quad BRep - polyhedron should be an hexahedron." );
+        geode::OpenGeodeModelException::test( mesh.nb_vertices() == 8,
+            "Extruded quad BRep - wrong number of block vertices." );
+    }
+}
+
+void test_extrusion_pentagon_section_to_brep()
+{
+    geode::Section section;
+    geode::SectionBuilder builder{ section };
+    const auto& surface = section.surface( builder.add_surface(
+        geode::OpenGeodePolygonalSurface2D::impl_name_static() ) );
+    auto mesh_builder = builder.surface_mesh_builder( surface );
+    mesh_builder->create_point( geode::Point2D{ { 0, 0 } } );
+    mesh_builder->create_point( geode::Point2D{ { 1, 0 } } );
+    mesh_builder->create_point( geode::Point2D{ { 2, 1 } } );
+    mesh_builder->create_point( geode::Point2D{ { 1, 2 } } );
+    mesh_builder->create_point( geode::Point2D{ { 0, 1 } } );
+    mesh_builder->create_polygon( { 0, 1, 2, 3, 4 } );
+    builder.create_unique_vertices( 5 );
+    for( const auto v : geode::Range{ 5 } )
+    {
+        builder.set_unique_vertex( { surface.component_id(), v }, v );
+    }
+    geode::SectionExtruderOptions options;
+    options.axis_to_extrude = 2;
+    options.min_coordinate = 0.;
+    options.max_coordinate = 10.;
+    bool has_thrown{ false };
+    try
+    {
+        const auto brep = geode::extrude_section_to_brep( section, options );
+    }
+    catch( const geode::OpenGeodeException& /*unused*/ )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeModelException::test( has_thrown,
+        "Extruding a pentagon should throw an exception." );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_convert_brep_section();
     test_convert_brep_with_blocks_into_section();
     test_extrusion_section_to_brep();
+    test_extrusion_quad_section_to_brep();
+    test_extrusion_pentagon_section_to_brep();
 }
 
 OPENGEODE_TEST( "convert-brep" )
