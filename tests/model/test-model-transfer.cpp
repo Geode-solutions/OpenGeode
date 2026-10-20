@@ -124,10 +124,10 @@ namespace
 
         geode::detail::transfer_surfaces_metadata< geode::Section >(
             meshes, section, builder, component_mapping );
-        check_name( section.surface( surfaces[0] ), "A+B" );
+        check_name( section.surface( surfaces[0] ), "A__B" );
         check_name( section.surface( surfaces[1] ), "C" );
         check_name( section.surface( surfaces[2] ), std::nullopt );
-        check_name( section.surface( surfaces[3] ), "A+B" );
+        check_name( section.surface( surfaces[3] ), "A__B" );
         check_name( section.surface( surfaces[4] ), "A" );
         check_name( section.surface( surfaces[5] ), "A" );
     }

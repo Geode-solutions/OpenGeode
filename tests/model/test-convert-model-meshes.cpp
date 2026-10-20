@@ -68,11 +68,34 @@ void run_test_section()
     auto model2 = geode::load_section( file_io );
 }
 
+void run_test_unsupported_mesh_type()
+{
+    auto model =
+        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    geode::SectionBuilder builder{ model };
+    bool has_thrown{ false };
+    try
+    {
+        for( const auto& surface : model.surfaces() )
+        {
+            geode::convert_surface_mesh(
+                model, builder, surface, geode::MeshType{ "EdgedCurve2D" } );
+        }
+    }
+    catch( const geode::OpenGeodeException& /*unused*/ )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeModelException::test( has_thrown,
+        "Converting a Surface into an unsupported mesh type should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     run_test_brep();
     run_test_section();
+    run_test_unsupported_mesh_type();
 }
 
 OPENGEODE_TEST( "convert-model-meshes" )

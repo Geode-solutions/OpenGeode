@@ -53,7 +53,7 @@ namespace geode
             print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeMeshException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save Graph in file: ", filename };
+                "Cannot save Graph in file: ", filename, ": ", e.what() };
         }
     }
 

@@ -39,6 +39,8 @@
         .def( "set_origin", &CoordinateSystem##dimension##D::set_origin )      \
         .def( "coordinates", &CoordinateSystem##dimension##D::coordinates )    \
         .def( "string", &CoordinateSystem##dimension##D::string )              \
+        .def( "__str__", &CoordinateSystem##dimension##D::string )             \
+        .def( "__repr__", &CoordinateSystem##dimension##D::string )            \
         .def( "global_coordinates",                                            \
             &CoordinateSystem##dimension##D::global_coordinates )
 

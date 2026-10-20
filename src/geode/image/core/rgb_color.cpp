@@ -33,85 +33,6 @@
 
 namespace geode
 {
-    RGBColor::RGBColor()
-    {
-        values_.fill( 0 );
-    }
-
-    RGBColor::RGBColor(
-        local_index_t red, local_index_t green, local_index_t blue )
-        : values_( { red, green, blue } )
-    {
-    }
-
-    local_index_t RGBColor::red() const
-    {
-        return values_[0];
-    }
-
-    local_index_t RGBColor::green() const
-    {
-        return values_[1];
-    }
-
-    local_index_t RGBColor::blue() const
-    {
-        return values_[2];
-    }
-
-    void RGBColor::set_red( local_index_t red_scale )
-    {
-        values_[0] = red_scale;
-    }
-
-    void RGBColor::set_green( local_index_t green_scale )
-    {
-        values_[1] = green_scale;
-    }
-
-    void RGBColor::set_blue( local_index_t blue_scale )
-    {
-        values_[2] = blue_scale;
-    }
-
-    bool RGBColor::operator==( const RGBColor &other ) const
-    {
-        if( red() != other.red() )
-        {
-            return false;
-        }
-        if( green() != other.green() )
-        {
-            return false;
-        }
-        if( blue() != other.blue() )
-        {
-            return false;
-        }
-        return true;
-    }
-
-    bool RGBColor::operator!=( const RGBColor &other ) const
-    {
-        return !( *this == other );
-    }
-
-    RGBColor RGBColor::operator+( const RGBColor &other ) const
-    {
-        RGBColor result;
-        result.set_red( ( result.red() + other.red() ) / 2 );
-        result.set_green( ( result.green() + other.green() ) / 2 );
-        result.set_blue( ( result.blue() + other.blue() ) / 2 );
-        return result;
-    }
-
-    void RGBColor::operator+=( const RGBColor &other )
-    {
-        set_red( ( red() + other.red() ) / 2 );
-        set_green( ( green() + other.green() ) / 2 );
-        set_blue( ( blue() + other.blue() ) / 2 );
-    }
-
     std::string RGBColor::string() const
     {
         return absl::StrCat( values_[0], " ", values_[1], " ", values_[2] );
@@ -134,8 +55,6 @@ namespace std
     size_t hash< geode::RGBColor >::operator()(
         const geode::RGBColor &color ) const
     {
-        return absl::Hash< geode::local_index_t >()( color.red() )
-               ^ absl::Hash< geode::local_index_t >()( color.green() )
-               ^ absl::Hash< geode::local_index_t >()( color.blue() );
+        return absl::HashOf( color.red(), color.green(), color.blue() );
     }
 } // namespace std

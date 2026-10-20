@@ -62,6 +62,13 @@ def test_operators():
         raise ValueError("[Test] Points should be equal")
 
 
+def test_string():
+    p = geom.Point3D([1, 2, 3])
+    if str(p) != p.string() or repr(p) != p.string():
+        raise ValueError("[Test] str/repr of Point should return its string")
+
+
 if __name__ == '__main__':
     test_comparison()
     test_operators()
+    test_string()

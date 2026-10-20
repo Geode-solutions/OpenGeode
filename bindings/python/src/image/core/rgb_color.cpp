@@ -40,6 +40,8 @@ namespace geode
             .def( "set_green", &RGBColor::set_green )
             .def( "set_blue", &RGBColor::set_blue )
             .def( "string", &RGBColor::string )
+            .def( "__str__", &RGBColor::string )
+            .def( "__repr__", &RGBColor::string )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( pybind11::self + pybind11::self )

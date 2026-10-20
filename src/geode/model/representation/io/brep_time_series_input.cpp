@@ -92,7 +92,8 @@ namespace geode
             print_available_extensions< BRepTimeSeriesInputFactory >( TYPE );
             throw OpenGeodeModelException{ nullptr,
                 OpenGeodeException::TYPE::data,
-                "Cannot load BRep time series from file: ", filename };
+                "Cannot load BRep time series from file: ", filename, ": ",
+                e.what() };
         }
     }
 

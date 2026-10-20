@@ -30,7 +30,22 @@
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
+#include <geode/geometry/point.hpp>
+
+#include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
+#include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/tetrahedral_solid.hpp>
+
 #include <geode/model/helpers/convert_to_mesh.hpp>
+#include <geode/model/helpers/simplicial_brep_creator.hpp>
+#include <geode/model/helpers/simplicial_section_creator.hpp>
+#include <geode/model/mixin/core/block.hpp>
+#include <geode/model/mixin/core/line.hpp>
+#include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
+#include <geode/model/representation/builder/section_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -79,11 +94,145 @@ void run_test_section()
         "Section - Wrong number of surface polygons" );
 }
 
+geode::Section create_section_with_dangling_components()
+{
+    geode::Section section;
+    geode::SimplicialSectionCreator creator{ section,
+        { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } },
+            geode::Point2D{ { 1, 1 } }, geode::Point2D{ { 0, 1 } },
+            geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 3, 0 } },
+            geode::Point2D{ { 5, 5 } } } };
+    const auto corners =
+        creator.create_corners( std::vector< geode::CornerDefinition >{
+            { 0 }, { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 } } );
+    const auto lines = creator.create_lines( corners,
+        std::vector< geode::LineDefinition >{ { { 0, 1 } }, { { 1, 2 } },
+            { { 2, 3 } }, { { 3, 0 } }, { { 4, 5 } }, { { 0, 2 } } } );
+    creator.create_surfaces(
+        lines, std::vector< geode::SurfaceDefinition >{ { { 0, 1, 2, 3 },
+                   { 0, 1, 3, 1, 2, 3 }, { 0, 1, 2, 3 }, {}, {} } } );
+    geode::SectionBuilder builder{ section };
+    builder.add_corner();
+    return section;
+}
+
+void run_test_section_dangling_components()
+{
+    const auto section = create_section_with_dangling_components();
+    const auto [curve, curve_mappings] =
+        geode::convert_section_into_curve( section );
+    geode::OpenGeodeModelException::test( curve->nb_edges() == 6,
+        "Dangling Section - Wrong number of curve edges" );
+    geode::OpenGeodeModelException::test(
+        curve_mappings.corner_vertices_mapping.size() == 6,
+        "Dangling Section - Corners not on Lines should not be mapped in "
+        "curve" );
+    geode::OpenGeodeModelException::test(
+        curve_mappings.line_edges_mapping.size() == 6,
+        "Dangling Section - Wrong number of mapped curve edges" );
+
+    const auto [surface, surface_mappings] =
+        geode::convert_section_into_surface( section );
+    geode::OpenGeodeModelException::test( surface->nb_polygons() == 2,
+        "Dangling Section - Wrong number of surface polygons" );
+    geode::OpenGeodeModelException::test(
+        surface_mappings.corner_vertices_mapping.size() == 4,
+        "Dangling Section - Corners not on Surfaces should not be mapped "
+        "in surface" );
+    geode::OpenGeodeModelException::test(
+        surface_mappings.line_edges_mapping.size() == 4,
+        "Dangling Section - Lines not on Surface edges should not be "
+        "mapped in surface" );
+}
+
+void run_test_brep_dangling_components()
+{
+    geode::BRep brep;
+    geode::SimplicialBRepCreator creator{ brep,
+        { geode::Point3D{ { 0, 0, 0 } }, geode::Point3D{ { 1, 0, 0 } },
+            geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0, 0, 1 } },
+            geode::Point3D{ { 0, 0, -1 } } } };
+    const auto corners = creator.create_corners(
+        std::vector< geode::CornerDefinition >{ { 3 }, { 4 } } );
+    const auto lines = creator.create_lines(
+        corners, std::vector< geode::LineDefinition >{ { { 3, 4 } } } );
+    const auto surfaces = creator.create_surfaces(
+        lines, std::vector< geode::SurfaceDefinition >{
+                   { { 0, 3, 4 }, { 0, 1, 2 }, {}, {}, {} } } );
+    creator.create_blocks(
+        surfaces, std::vector< geode::BlockDefinition >{ { { 0, 1, 2, 3, 4 },
+                      { 0, 1, 2, 3, 0, 2, 1, 4 }, {}, {}, {}, {} } } );
+    const auto [solid, mappings] = geode::convert_brep_into_solid( brep );
+    geode::OpenGeodeModelException::test( solid->nb_polyhedra() == 2,
+        "Dangling BRep - Wrong number of solid polyhedra" );
+    geode::OpenGeodeModelException::test(
+        mappings.corner_vertices_mapping.size() == 2,
+        "Dangling BRep - Wrong number of mapped corners" );
+    geode::OpenGeodeModelException::test(
+        mappings.line_edges_mapping.size() == 0,
+        "Dangling BRep - Line not on solid edges should not be mapped" );
+    geode::OpenGeodeModelException::test(
+        mappings.surface_polygons_mapping.size() == 0,
+        "Dangling BRep - Surface not on solid facets should not be mapped" );
+}
+
+void run_test_unlinked_vertices()
+{
+    geode::Section section;
+    geode::SectionBuilder section_builder{ section };
+    const auto& line = section.line( section_builder.add_line() );
+    auto line_builder = section_builder.line_mesh_builder( line );
+    line_builder->create_point( geode::Point2D{ { 0, 0 } } );
+    line_builder->create_point( geode::Point2D{ { 1, 0 } } );
+    line_builder->create_point( geode::Point2D{ { 2, 0 } } );
+    line_builder->create_edge( 0, 1 );
+    line_builder->create_edge( 1, 2 );
+    const auto& surface = section.surface( section_builder.add_surface() );
+    auto surface_builder = section_builder.surface_mesh_builder( surface );
+    surface_builder->create_point( geode::Point2D{ { 0, 1 } } );
+    surface_builder->create_point( geode::Point2D{ { 1, 1 } } );
+    surface_builder->create_point( geode::Point2D{ { 0, 2 } } );
+    surface_builder->create_polygon( { 0, 1, 2 } );
+    const auto [curve, curve_mappings] =
+        geode::convert_section_into_curve( section );
+    geode::OpenGeodeModelException::test( curve->nb_vertices() == 3,
+        "Unlinked vertices - Wrong number of curve vertices" );
+    geode::OpenGeodeModelException::test(
+        curve->edge_vertex( { 0, 0 } ) != curve->edge_vertex( { 0, 1 } ),
+        "Unlinked vertices - Degenerated curve edge" );
+    const auto [surface_mesh, surface_mappings] =
+        geode::convert_section_into_surface( section );
+    geode::OpenGeodeModelException::test( surface_mesh->nb_vertices() == 3,
+        "Unlinked vertices - Wrong number of surface vertices" );
+
+    geode::BRep brep;
+    geode::BRepBuilder brep_builder{ brep };
+    const auto& block =
+        brep.block( brep_builder.add_block( geode::MeshFactory::default_impl(
+            geode::TetrahedralSolid3D::type_name_static() ) ) );
+    auto block_builder =
+        brep_builder.block_mesh_builder< geode::TetrahedralSolid3D >( block );
+    block_builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    block_builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    block_builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    block_builder->create_point( geode::Point3D{ { 0, 0, 1 } } );
+    block_builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    const auto [solid, solid_mappings] = geode::convert_brep_into_solid( brep );
+    geode::OpenGeodeModelException::test( solid->nb_vertices() == 4,
+        "Unlinked vertices - Wrong number of solid vertices" );
+    geode::OpenGeodeModelException::test(
+        solid_mappings.unique_vertices_mapping.size() == 0,
+        "Unlinked vertices - Unlinked vertices should not be mapped" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     run_test_brep();
     run_test_section();
+    run_test_section_dangling_components();
+    run_test_brep_dangling_components();
+    run_test_unlinked_vertices();
 }
 
 OPENGEODE_TEST( "convert-to-mesh" )

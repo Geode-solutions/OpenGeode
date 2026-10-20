@@ -23,6 +23,11 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_set.h>
+#include <absl/types/span.h>
+
+#include <geode/basic/uuid.hpp>
+
 #include <geode/model/common.hpp>
 
 namespace geode
@@ -55,6 +60,48 @@ namespace geode
             builder.unregister_mesh_component( component );
             builder.remove_mesh_component(
                 component.component_type(), component.id() );
+        }
+
+        /*!
+         * Remove several mesh components of the same type at once.
+         * Duplicated identifiers are ignored.
+         * @return the components to delete from the model storage
+         */
+        template < typename ModelBuilder,
+            typename MeshComponent,
+            typename GetComponent >
+        std::vector< const MeshComponent* > remove_mesh_components(
+            ModelBuilder& builder,
+            absl::Span< const uuid > component_ids,
+            const GetComponent& get_component )
+        {
+            std::vector< const MeshComponent* > components;
+            std::vector< uuid > ids;
+            components.reserve( component_ids.size() );
+            ids.reserve( component_ids.size() );
+            absl::flat_hash_set< uuid > visited;
+            visited.reserve( component_ids.size() );
+            for( const auto& id : component_ids )
+            {
+                if( !visited.insert( id ).second )
+                {
+                    continue;
+                }
+                components.push_back( &get_component( id ) );
+                ids.push_back( id );
+            }
+            if( components.empty() )
+            {
+                return components;
+            }
+            builder.unregister_components( ids );
+            for( const auto* component : components )
+            {
+                builder.unregister_mesh_component( *component );
+            }
+            builder.remove_mesh_components(
+                MeshComponent::component_type_static(), ids );
+            return components;
         }
 
         template < typename ModelBuilder, typename CollectionComponent >

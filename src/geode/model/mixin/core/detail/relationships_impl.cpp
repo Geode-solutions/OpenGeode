@@ -90,22 +90,37 @@ namespace geode
 
         void RelationshipsImpl::remove_component( const uuid& component_id )
         {
-            const auto index = vertex_id( component_id );
-            if( !index )
+            remove_components( { &component_id, 1 } );
+        }
+
+        void RelationshipsImpl::remove_components(
+            absl::Span< const uuid > component_ids )
+        {
+            std::vector< index_t > vertices;
+            vertices.reserve( component_ids.size() );
+            for( const auto& component_id : component_ids )
+            {
+                if( const auto index = vertex_id( component_id ) )
+                {
+                    vertices.push_back( index.value() );
+                    uuid2index_.erase( component_id );
+                }
+            }
+            if( vertices.empty() )
             {
                 return;
             }
-            uuid2index_.erase( component_id );
             std::vector< bool > edges_to_delete( graph_->nb_edges(), false );
-            for( const auto& edge :
-                graph_->edges_around_vertex( index.value() ) )
+            for( const auto vertex : vertices )
             {
-                edges_to_delete[edge.edge_id] = true;
+                for( const auto& edge : graph_->edges_around_vertex( vertex ) )
+                {
+                    edges_to_delete[edge.edge_id] = true;
+                }
             }
             auto builder = GraphBuilder::create( *graph_ );
             builder->delete_edges( edges_to_delete );
-            const auto old2new =
-                builder->delete_isolated_vertices( { index.value() } );
+            const auto old2new = builder->delete_isolated_vertices( vertices );
             uuid2index_.update( old2new );
         }
 
@@ -119,10 +134,15 @@ namespace geode
                     from.string(), " and ", to.string(), ")" );
                 return component_id.value();
             }
-            const auto index = GraphBuilder::create( *graph_ )->create_edge(
+            return do_add_relation_edge( from, to );
+        }
+
+        index_t RelationshipsImpl::do_add_relation_edge(
+            const ComponentID& from, const ComponentID& to )
+        {
+            return GraphBuilder::create( *graph_ )->create_edge(
                 find_or_create_vertex_id( from ),
                 find_or_create_vertex_id( to ) );
-            return index;
         }
 
         void RelationshipsImpl::remove_relation(
@@ -165,6 +185,13 @@ namespace geode
             if( !index2 )
             {
                 return std::nullopt;
+            }
+            // Scan the edges around the vertex with the lowest degree
+            if( graph_->edges_around_vertex( index2.value() ).size()
+                < graph_->edges_around_vertex( index1.value() ).size() )
+            {
+                return graph_->edge_from_vertices(
+                    index2.value(), index1.value() );
             }
             return graph_->edge_from_vertices( index1.value(), index2.value() );
         }

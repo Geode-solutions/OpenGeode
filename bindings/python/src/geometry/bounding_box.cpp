@@ -57,7 +57,9 @@
         .def( "smallest_length", &BoundingBox##dimension##D::smallest_length ) \
         .def( "largest_length", &BoundingBox##dimension##D::largest_length )   \
         .def( "n_volume", &BoundingBox##dimension##D::n_volume )               \
-        .def( "string", &BoundingBox##dimension##D::string )
+        .def( "string", &BoundingBox##dimension##D::string )                   \
+        .def( "__str__", &BoundingBox##dimension##D::string )                  \
+        .def( "__repr__", &BoundingBox##dimension##D::string )
 
 namespace geode
 {

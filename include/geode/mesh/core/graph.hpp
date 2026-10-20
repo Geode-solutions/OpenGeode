@@ -175,6 +175,15 @@ namespace geode
         void set_edges_around_vertex(
             index_t vertex_id, EdgesAroundVertex edges, GraphKey /*key*/ );
 
+        /*!
+         * Update in place the edges around every vertex after an edge
+         * deletion or permutation.
+         * @param[in] old2new Mapping between old edge indices to new ones.
+         * Deleted edges new index is NO_ID.
+         */
+        void update_edges_around_vertices(
+            absl::Span< const index_t > old2new, GraphKey /*key*/ );
+
         void associate_edge_vertex_to_vertex( const EdgeVertex& edge_vertex,
             index_t vertex_id,
             GraphKey /*key*/ );

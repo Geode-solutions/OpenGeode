@@ -24,9 +24,9 @@
 #include <geode/model/representation/core/detail/transfer_metadata.hpp>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/linked_hash_set.h>
 #include <absl/strings/str_join.h>
-
-#include <geode/basic/small_set.hpp>
+#include <absl/strings/str_split.h>
 
 #include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/point_set.hpp>
@@ -45,6 +45,27 @@
 
 namespace
 {
+    constexpr auto MERGED_NAME_SEPARATOR = "__";
+
+    std::optional< std::string > merge_names(
+        absl::Span< const std::string_view > names )
+    {
+        absl::linked_hash_set< std::string_view > name_parts;
+        for( const auto name : names )
+        {
+            for( const auto name_part :
+                absl::StrSplit( name, MERGED_NAME_SEPARATOR ) )
+            {
+                name_parts.insert( name_part );
+            }
+        }
+        if( name_parts.empty() )
+        {
+            return std::nullopt;
+        }
+        return absl::StrJoin( name_parts, MERGED_NAME_SEPARATOR );
+    }
+
     template < typename Model >
     void transfer_model_corner_metadata( const Model& old_model,
         const Model& new_model,
@@ -60,25 +81,19 @@ namespace
                  .at( geode::Corner< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            geode::SmallSet< std::string > unique_names;
+            std::vector< std::string_view > names;
             for( const auto& in_uuid : in_uuids )
             {
-                if( const auto name = old_model.corner( in_uuid ).name() )
+                if( const auto& name = old_model.corner( in_uuid ).name() )
                 {
-                    unique_names.insert( name.value() );
+                    names.emplace_back( name.value() );
                 }
             }
-            if( unique_names.empty() )
+            if( const auto out_name = merge_names( names ) )
             {
-                continue;
+                builder.set_corner_name(
+                    new_model.corner( out_uuid ), out_name.value() );
             }
-            std::string out_name{ "" };
-            for( const auto& corner_name : unique_names )
-            {
-                absl::StrAppend( &out_name, corner_name, "+" );
-            }
-            out_name.pop_back();
-            builder.set_corner_name( new_model.corner( out_uuid ), out_name );
         }
     }
 
@@ -97,25 +112,19 @@ namespace
                  .at( geode::Line< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            geode::SmallSet< std::string > unique_names;
+            std::vector< std::string_view > names;
             for( const auto& in_uuid : in_uuids )
             {
-                if( const auto name = old_model.line( in_uuid ).name() )
+                if( const auto& name = old_model.line( in_uuid ).name() )
                 {
-                    unique_names.insert( name.value() );
+                    names.emplace_back( name.value() );
                 }
             }
-            if( unique_names.empty() )
+            if( const auto out_name = merge_names( names ) )
             {
-                continue;
+                builder.set_line_name(
+                    new_model.line( out_uuid ), out_name.value() );
             }
-            std::string out_name{ "" };
-            for( const auto& line_name : unique_names )
-            {
-                absl::StrAppend( &out_name, line_name, "+" );
-            }
-            out_name.pop_back();
-            builder.set_line_name( new_model.line( out_uuid ), out_name );
         }
     }
 
@@ -134,25 +143,19 @@ namespace
                  .at( geode::Surface< Model::dim >::component_type_static() )
                  .out2in_map() )
         {
-            geode::SmallSet< std::string > unique_names;
+            std::vector< std::string_view > names;
             for( const auto& in_uuid : in_uuids )
             {
-                if( const auto name = old_model.surface( in_uuid ).name() )
+                if( const auto& name = old_model.surface( in_uuid ).name() )
                 {
-                    unique_names.insert( name.value() );
+                    names.emplace_back( name.value() );
                 }
             }
-            if( unique_names.empty() )
+            if( const auto out_name = merge_names( names ) )
             {
-                continue;
+                builder.set_surface_name(
+                    new_model.surface( out_uuid ), out_name.value() );
             }
-            std::string out_name{ "" };
-            for( const auto& surface_name : unique_names )
-            {
-                absl::StrAppend( &out_name, surface_name, "+" );
-            }
-            out_name.pop_back();
-            builder.set_surface_name( new_model.surface( out_uuid ), out_name );
         }
     }
 
@@ -170,31 +173,25 @@ namespace
             component_mapping.at( geode::Block3D::component_type_static() )
                 .out2in_map() )
         {
-            geode::SmallSet< std::string > unique_names;
+            std::vector< std::string_view > names;
             for( const auto& in_uuid : in_uuids )
             {
-                if( const auto name = old_model.block( in_uuid ).name() )
+                if( const auto& name = old_model.block( in_uuid ).name() )
                 {
-                    unique_names.insert( name.value() );
+                    names.emplace_back( name.value() );
                 }
             }
-            if( unique_names.empty() )
+            if( const auto out_name = merge_names( names ) )
             {
-                continue;
+                builder.set_block_name(
+                    new_model.block( out_uuid ), out_name.value() );
             }
-            std::string out_name{ "" };
-            for( const auto& surface_name : unique_names )
-            {
-                absl::StrAppend( &out_name, surface_name, "+" );
-            }
-            out_name.pop_back();
-            builder.set_block_name( new_model.block( out_uuid ), out_name );
         }
     }
 
     /*!
-     * Name each output component with the unique names of its input meshes,
-     * joined by '+' (in input order).
+     * Name each output component with the merged unique names of its input
+     * meshes (see merge_names).
      */
     template < typename Mesh, typename NameSetter >
     void transfer_meshes_metadata(
@@ -217,7 +214,7 @@ namespace
         for( const auto& [out_uuid, in_uuids] :
             component_mapping.at( component_type ).out2in_map() )
         {
-            geode::SmallSet< std::string > unique_names;
+            std::vector< std::string_view > names;
             for( const auto& in_uuid : in_uuids )
             {
                 const auto in_mesh = meshes_by_id.find( in_uuid );
@@ -227,14 +224,13 @@ namespace
                     "] Should have found input mesh from mapping" );
                 if( const auto& name = in_mesh->second->name() )
                 {
-                    unique_names.insert( name.value() );
+                    names.emplace_back( name.value() );
                 }
             }
-            if( unique_names.empty() )
+            if( const auto out_name = merge_names( names ) )
             {
-                continue;
+                set_name( out_uuid, out_name.value() );
             }
-            set_name( out_uuid, absl::StrJoin( unique_names, "+" ) );
         }
     }
 } // namespace
