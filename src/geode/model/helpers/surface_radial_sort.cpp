@@ -169,6 +169,10 @@ namespace geode
 
     index_t SortedSurfaces::opposite( index_t position ) const
     {
+        if( surfaces.empty() )
+        {
+            return NO_ID;
+        }
         const auto side_position = position % 2;
         if( side_position == 1 )
         {
@@ -179,6 +183,10 @@ namespace geode
 
     index_t SortedSurfaces::next( index_t position ) const
     {
+        if( surfaces.empty() )
+        {
+            return NO_ID;
+        }
         const auto side_position = position % 2;
         if( side_position == 1 )
         {

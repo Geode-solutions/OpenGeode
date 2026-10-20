@@ -171,11 +171,21 @@ void test_line_without_unique_vertex()
         "vertex" );
 }
 
+void test_empty_sorted_surfaces()
+{
+    const geode::SortedSurfaces sorted( 0 );
+    geode::OpenGeodeModelException::test( sorted.next( 0 ) == geode::NO_ID,
+        "Next position in empty SortedSurfaces should be NO_ID" );
+    geode::OpenGeodeModelException::test( sorted.opposite( 0 ) == geode::NO_ID,
+        "Opposite position in empty SortedSurfaces should be NO_ID" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_radial_sort();
     test_line_without_unique_vertex();
+    test_empty_sorted_surfaces();
     geode::Logger::info( "TEST SUCCESS" );
 }
 
