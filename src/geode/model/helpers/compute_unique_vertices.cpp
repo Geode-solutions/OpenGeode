@@ -204,7 +204,6 @@ namespace
                 } );
         }
 
-    private:
         const Model& model_;
         absl::flat_hash_map< geode::uuid, ComponentVertices > components_;
         std::vector< geode::index_t > colocated_mapping_;
