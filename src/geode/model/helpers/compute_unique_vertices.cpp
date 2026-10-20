@@ -227,6 +227,14 @@ namespace
         }
     }
 
+    /*!
+     * Maps each unique point to an existing unique vertex located at this
+     * point, or NO_ID if there is none.
+     * Isolated unique vertices (without any component mesh vertex) are
+     * ignored. If several existing unique vertices are located at the same
+     * point, they are kept distinct and the first one (lowest index) is used
+     * for the vertices without unique vertex located at this point.
+     */
     template < typename Model >
     std::vector< geode::index_t > compute_initial_uv_correspondance(
         const Model& model, const geode::NNSearch< Model::dim >& unique_nns )
@@ -235,12 +243,32 @@ namespace
             unique_nns.nb_points(), geode::NO_ID );
         for( const auto uv : geode::Range{ model.nb_unique_vertices() } )
         {
-            const auto& cmv = model.component_mesh_vertices( uv ).front();
-            const auto& point = get_point( model, cmv );
-            initial_uv_correspondance[unique_nns.closest_neighbor( point )] =
-                uv;
+            const auto& cmvs = model.component_mesh_vertices( uv );
+            if( cmvs.empty() )
+            {
+                continue;
+            }
+            const auto& point = get_point( model, cmvs.front() );
+            auto& correspondance =
+                initial_uv_correspondance[unique_nns.closest_neighbor(
+                    point )];
+            if( correspondance == geode::NO_ID )
+            {
+                correspondance = uv;
+            }
         }
-        geode::index_t new_uv = model.nb_unique_vertices();
+        return initial_uv_correspondance;
+    }
+
+    /*!
+     * Gives a new unique vertex index to the unique points without existing
+     * unique vertex and returns the number of new unique vertices.
+     */
+    geode::index_t assign_new_unique_vertices(
+        std::vector< geode::index_t >& initial_uv_correspondance,
+        geode::index_t nb_initial_unique_vertices )
+    {
+        auto new_uv = nb_initial_unique_vertices;
         for( auto& uv : initial_uv_correspondance )
         {
             if( uv == geode::NO_ID )
@@ -248,7 +276,7 @@ namespace
                 uv = new_uv++;
             }
         }
-        return initial_uv_correspondance;
+        return new_uv - nb_initial_unique_vertices;
     }
 
 } // namespace
@@ -265,10 +293,10 @@ namespace geode
             nns.colocated_index_mapping( GLOBAL_EPSILON );
         const auto nb_initial_unique_vertices = model.nb_unique_vertices();
         NNSearch< Model::dim > unique_nns{ colocated_info.unique_points };
-        const auto initial_uv_correspondance =
+        auto initial_uv_correspondance =
             compute_initial_uv_correspondance( model, unique_nns );
-        builder.create_unique_vertices(
-            colocated_info.nb_unique_points() - nb_initial_unique_vertices );
+        builder.create_unique_vertices( assign_new_unique_vertices(
+            initial_uv_correspondance, nb_initial_unique_vertices ) );
         set_unique_vertices(
             model, builder, initial_uv_correspondance, unique_nns );
     }
