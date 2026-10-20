@@ -136,6 +136,14 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-split-along-surface-mesh-borders.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-surface-radial-sort.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
