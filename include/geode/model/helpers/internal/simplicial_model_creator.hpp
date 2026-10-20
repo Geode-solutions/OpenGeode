@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/pimpl.hpp>
+#include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/point.hpp>
 
@@ -97,11 +101,21 @@ namespace geode
                     {
                         check_unique_point( vertex );
                     }
-                    check_index( vertices.front(), corners.size(), "Corner" );
-                    check_index( vertices.back(), corners.size(), "Corner" );
                 }
+                const absl::flat_hash_set< uuid > corner_set{ corners.begin(),
+                    corners.end() };
+                std::vector< std::array< uuid, 2 > > line_corners;
+                line_corners.reserve( definitions.size() );
                 for( const auto& definition : definitions )
                 {
+                    line_corners.push_back(
+                        { find_corner( corner_set, definition.vertices.front() ),
+                            find_corner(
+                                corner_set, definition.vertices.back() ) } );
+                }
+                for( const auto d : Indices{ definitions } )
+                {
+                    const auto& definition = definitions[d];
                     const auto& line_id = builder_.add_line();
                     const auto& line = model_.line( line_id );
                     auto mesh_builder = builder_.line_mesh_builder( line );
@@ -116,11 +130,11 @@ namespace geode
                     }
                     lines.push_back( line_id );
                     builder_.add_corner_line_boundary_relationship(
-                        model_.corner( corners[vertices.front()] ), line );
-                    if( vertices.front() != vertices.back() )
+                        model_.corner( line_corners[d][0] ), line );
+                    if( line_corners[d][0] != line_corners[d][1] )
                     {
                         builder_.add_corner_line_boundary_relationship(
-                            model_.corner( corners[vertices.back()] ), line );
+                            model_.corner( line_corners[d][1] ), line );
                     }
                 }
                 return lines;
@@ -214,6 +228,28 @@ namespace geode
                     nullptr, OpenGeodeException::TYPE::data,
                     "[SimplicialModelCreator] ", element, " index ", index,
                     " is out of range (", size, " elements)" );
+            }
+
+            uuid find_corner(
+                const absl::flat_hash_set< uuid >& corners,
+                index_t vertex ) const
+            {
+                for( const auto& cmv : model_.component_mesh_vertices(
+                         first_unique_vertex_ + vertex ) )
+                {
+                    if( cmv.component_id.type
+                            == Corner< dimension >::component_type_static()
+                        && corners.contains( cmv.component_id.id ) )
+                    {
+                        return cmv.component_id.id;
+                    }
+                }
+                OpenGeodeModelException::check_exception( false, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SimplicialModelCreator::create_lines] No given Corner "
+                    "on Line extremity unique point ",
+                    vertex );
+                return {};
             }
 
             void check_unique_point( index_t vertex ) const

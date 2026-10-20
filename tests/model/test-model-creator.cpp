@@ -454,6 +454,31 @@ void test_invalid_brep_definitions()
         "[invalid definitions] No Block should be created" );
 }
 
+void test_line_corners_from_unique_points()
+{
+    geode::Section section;
+    geode::SimplicialSectionCreator creator{ section,
+        { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } },
+            geode::Point2D{ { 1, 1 } }, geode::Point2D{ { 0, 1 } } } };
+    const auto corners = creator.create_corners(
+        std::vector< geode::CornerDefinition >{ { 3 }, { 1 } } );
+    const auto lines = creator.create_lines(
+        corners, std::vector< geode::LineDefinition >{ { { 3, 0, 1 } } } );
+    const auto& line = section.line( lines.front() );
+    geode::OpenGeodeModelException::test( section.nb_boundaries( line.id() ) == 2,
+        "[Line corners] Line should have 2 boundaries" );
+    geode::OpenGeodeModelException::test(
+        section.is_boundary( section.corner( corners[0] ), line )
+            && section.is_boundary( section.corner( corners[1] ), line ),
+        "[Line corners] Wrong Line boundaries" );
+    expect_throw(
+        [&creator, &corners] {
+            creator.create_lines( corners,
+                std::vector< geode::LineDefinition >{ { { 1, 2 } } } );
+        },
+        "Line extremity without Corner" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -463,6 +488,7 @@ void test()
     test_create_in_non_empty_section();
     test_invalid_section_definitions();
     test_invalid_brep_definitions();
+    test_line_corners_from_unique_points();
 }
 
 OPENGEODE_TEST( "model-creator" )
