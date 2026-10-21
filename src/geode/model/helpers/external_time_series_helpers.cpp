@@ -40,6 +40,40 @@
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 #include <geode/model/representation/core/brep.hpp>
 
+namespace
+{
+    void delete_replaced_steps( const geode::AttributeManager& from,
+        geode::AttributeManager& to,
+        std::string_view name )
+    {
+        for( const auto& step : from.time_steps( name ) )
+        {
+            const auto attribute =
+                from.find_generic_attribute( step.attribute_id );
+            if( !attribute->properties().transferable )
+            {
+                continue;
+            }
+            for( const auto& existing_step : to.time_steps( name ) )
+            {
+                if( existing_step.time == step.time )
+                {
+                    to.delete_attribute( existing_step.attribute_id );
+                }
+            }
+        }
+    }
+
+    void delete_replaced_steps(
+        const geode::AttributeManager& from, geode::AttributeManager& to )
+    {
+        for( const auto& name : from.time_series_names() )
+        {
+            delete_replaced_steps( from, to, name );
+        }
+    }
+} // namespace
+
 namespace geode
 {
     class ExternalTimeSeriesHelpers::Impl
@@ -178,15 +212,20 @@ namespace geode
                     unique2block.map( unique_vertex, vertex );
                 }
             }
-            mesh.vertex_attribute_manager().import(
-                unique_vertex_attributes_, unique2block );
+            auto& vertex_attributes = mesh.vertex_attribute_manager();
+            delete_replaced_steps(
+                unique_vertex_attributes_, vertex_attributes );
+            vertex_attributes.import( unique_vertex_attributes_, unique2block );
         }
 
         static void apply_polyhedra( const Block3D& block,
             const AttributeManager& polyhedron_attributes )
         {
-            block.mesh().polyhedron_attribute_manager().copy(
-                polyhedron_attributes );
+            auto& block_polyhedron_attributes =
+                block.mesh().polyhedron_attribute_manager();
+            delete_replaced_steps(
+                polyhedron_attributes, block_polyhedron_attributes );
+            block_polyhedron_attributes.copy( polyhedron_attributes );
         }
 
     private:

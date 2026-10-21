@@ -205,6 +205,9 @@ void test()
     helpers.apply_to( model );
     check_pressures( model );
     check_velocities( model, block_id );
+    create_helpers( model, block_id ).apply_to( model );
+    check_pressures( model );
+    check_velocities( model, block_id );
 
     auto reloaded_model =
         geode::load_brep( absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );

@@ -102,7 +102,8 @@ namespace geode
          * unique vertex attributes on each Block vertex, polyhedron attributes
          * on the matching Block polyhedra. Non-transferable attributes are
          * skipped. Attribute ids and properties (time steps included) are
-         * kept.
+         * kept. A Block time step with the same name and time as an applied
+         * one is replaced.
          * @exception OpenGeodeException if the model does not have the same
          * unique vertices or Block polyhedra as the one used for creation
          */
