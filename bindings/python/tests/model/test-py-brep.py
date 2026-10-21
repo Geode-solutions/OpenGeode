@@ -831,6 +831,20 @@ def test_registry(brep):
             raise ValueError("[Test] Wrong collection registry entry")
 
 
+def test_unknown_component_access():
+    brep = model.BRep()
+    unknown = basic.uuid()
+    try:
+        brep.surface(unknown)
+    except Exception as exception:
+        if f"Surface with id {unknown}" not in str(exception):
+            raise ValueError(
+                "[Test] Accessing an unknown Surface should name its type and id"
+            )
+    else:
+        raise ValueError("[Test] Accessing an unknown Surface should raise")
+
+
 def test_component_id_hash(brep, surface_uuids):
     surface = brep.surface(surface_uuids[0])
     same = model.ComponentID(
@@ -915,6 +929,7 @@ if __name__ == "__main__":
     test_physical_properties(brep, physical_attribute_id)
     test_clone(brep)
     test_component_id_hash(brep, surface_uuids)
+    test_unknown_component_access()
     brep_copy = model.BRep()
     model.BRepBuilder(brep_copy).copy(brep)
     test_physical_properties(brep_copy, physical_attribute_id)
