@@ -162,7 +162,9 @@ namespace geode::detail
 
         void delete_component( const uuid& component_id )
         {
-            components_.erase( components_.find( component_id ) );
+            const auto it = components_.find( component_id );
+            check_component_exists( it, component_id );
+            components_.erase( it );
         }
 
         /*!
@@ -287,14 +289,22 @@ namespace geode::detail
             components_ = std::move( repaired );
         }
 
+        void check_component_exists(
+            typename ComponentsStore::const_iterator it,
+            const uuid& component_id ) const
+        {
+            OpenGeodeModelException::check_exception( it != components_.end(),
+                component_id, OpenGeodeException::TYPE::data,
+                "[ComponentsStorage] ",
+                Component::component_type_static().get(), " with id ",
+                component_id.string(), " does not exist" );
+        }
+
         [[nodiscard]] Component& find_component(
             const uuid& component_id ) const
         {
             const auto it = components_.find( component_id );
-            OpenGeodeModelException::check_exception( it != components_.end(),
-                component_id, OpenGeodeException::TYPE::data,
-                "[ComponentsStorage::component] Component with id ",
-                component_id.string(), " does not exist" );
+            check_component_exists( it, component_id );
             auto& component = *it->second;
             OpenGeodeModelException::check_exception(
                 component.id() == component_id, component_id,
