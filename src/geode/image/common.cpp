@@ -37,7 +37,8 @@
         geode::OpenGeodeRasterImageInput##dimension##D >(                      \
         geode::RasterImage##dimension##D::native_extension_static() )
 
-#define BITSERY_INPUT_RASTER_REGISTER_2D_3D()                                  \
+#define BITSERY_INPUT_RASTER_REGISTER_1D_2D_3D()                               \
+    BITSERY_INPUT_RASTER_REGISTER_XD( 1 );                                     \
     BITSERY_INPUT_RASTER_REGISTER_XD( 2 );                                     \
     BITSERY_INPUT_RASTER_REGISTER_XD( 3 )
 
@@ -46,7 +47,8 @@
         geode::OpenGeodeRasterImageOutput##dimension##D >(                     \
         geode::RasterImage##dimension##D::native_extension_static() )
 
-#define BITSERY_OUTPUT_RASTER_REGISTER_2D_3D()                                 \
+#define BITSERY_OUTPUT_RASTER_REGISTER_1D_2D_3D()                              \
+    BITSERY_OUTPUT_RASTER_REGISTER_XD( 1 );                                    \
     BITSERY_OUTPUT_RASTER_REGISTER_XD( 2 );                                    \
     BITSERY_OUTPUT_RASTER_REGISTER_XD( 3 )
 
@@ -55,8 +57,8 @@ namespace geode
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeode, Image )
     {
         OpenGeodeBasicLibrary::initialize();
-        BITSERY_INPUT_RASTER_REGISTER_2D_3D();
-        BITSERY_OUTPUT_RASTER_REGISTER_2D_3D();
+        BITSERY_INPUT_RASTER_REGISTER_1D_2D_3D();
+        BITSERY_OUTPUT_RASTER_REGISTER_1D_2D_3D();
         BitseryExtensions::register_functions(
             register_image_serialize_pcontext,
             register_image_deserialize_pcontext );

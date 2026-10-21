@@ -329,6 +329,42 @@ namespace geode
         delete_surface( surface );
     }
 
+    void SectionBuilder::remove_corners( absl::Span< const uuid > corner_ids )
+    {
+        for( const auto* corner :
+            detail::remove_mesh_components< SectionBuilder, Corner2D >(
+                *this, corner_ids, [this]( const uuid& id ) -> const Corner2D& {
+                    return section_.corner( id );
+                } ) )
+        {
+            delete_corner( *corner );
+        }
+    }
+
+    void SectionBuilder::remove_lines( absl::Span< const uuid > line_ids )
+    {
+        for( const auto* line :
+            detail::remove_mesh_components< SectionBuilder, Line2D >(
+                *this, line_ids, [this]( const uuid& id ) -> const Line2D& {
+                    return section_.line( id );
+                } ) )
+        {
+            delete_line( *line );
+        }
+    }
+
+    void SectionBuilder::remove_surfaces( absl::Span< const uuid > surface_ids )
+    {
+        for( const auto* surface :
+            detail::remove_mesh_components< SectionBuilder, Surface2D >( *this,
+                surface_ids, [this]( const uuid& id ) -> const Surface2D& {
+                    return section_.surface( id );
+                } ) )
+        {
+            delete_surface( *surface );
+        }
+    }
+
     void SectionBuilder::remove_model_boundary(
         const ModelBoundary2D& boundary )
     {

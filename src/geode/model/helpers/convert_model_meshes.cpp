@@ -77,6 +77,17 @@ namespace
         const geode::Surface< Model::dim >& surface,
         const geode::MeshType& mesh_type )
     {
+        geode::OpenGeodeModelException::check_exception(
+            mesh_type
+                    == geode::TriangulatedSurface<
+                        Model::dim >::type_name_static()
+                || mesh_type
+                       == geode::PolygonalSurface<
+                           Model::dim >::type_name_static(),
+            nullptr, geode::OpenGeodeException::TYPE::data,
+            "[do_convert_surface] You can only convert surface mesh to "
+            "TriangulatedSurface or PolygonalSurface, not ",
+            mesh_type.get() );
         const auto& mesh = surface.mesh();
         if( mesh.type_name() == mesh_type )
         {

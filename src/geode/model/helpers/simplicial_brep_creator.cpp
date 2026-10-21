@@ -122,6 +122,19 @@ namespace geode
             blocks.reserve( definitions.size() );
             for( const auto& definition : definitions )
             {
+                check_simplices( definition.vertices, definition.tetrahedra, 4,
+                    "tetrahedra" );
+                for( const auto boundary : definition.boundaries )
+                {
+                    check_index( boundary, surfaces.size(), "Surface" );
+                }
+                for( const auto internal : definition.internals )
+                {
+                    check_index( internal, surfaces.size(), "Surface" );
+                }
+            }
+            for( const auto& definition : definitions )
+            {
                 const auto& block_id =
                     builder().add_block( MeshFactory::default_impl(
                         TetrahedralSolid3D::type_name_static() ) );
@@ -161,6 +174,17 @@ namespace geode
             absl::Span< const uuid > surfaces,
             absl::Span< const BlockDefinition > definitions )
         {
+            for( const auto& definition : definitions )
+            {
+                for( const auto internal : definition.internal_lines )
+                {
+                    check_index( internal, lines.size(), "Line" );
+                }
+                for( const auto internal : definition.internal_corners )
+                {
+                    check_index( internal, corners.size(), "Corner" );
+                }
+            }
             const auto blocks = create_blocks( surfaces, definitions );
             for( const auto d : Indices{ definitions } )
             {
@@ -187,6 +211,13 @@ namespace geode
         {
             std::vector< geode::uuid > boundaries;
             boundaries.reserve( definitions.size() );
+            for( const auto& definition : definitions )
+            {
+                for( const auto surface : definition.boundaries )
+                {
+                    check_index( surface, surfaces.size(), "Surface" );
+                }
+            }
             for( const auto& definition : definitions )
             {
                 const auto& bonudary_id = builder().add_model_boundary();

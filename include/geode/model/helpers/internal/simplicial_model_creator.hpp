@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/pimpl.hpp>
+#include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/point.hpp>
 
@@ -54,9 +58,10 @@ namespace geode
                 Model& model, std::vector< Point< dimension > > unique_points )
                 : model_( model ),
                   builder_{ model },
-                  unique_points_{ std::move( unique_points ) }
+                  unique_points_{ std::move( unique_points ) },
+                  first_unique_vertex_{ builder_.create_unique_vertices(
+                      unique_points_.size() ) }
             {
-                builder_.create_unique_vertices( unique_points_.size() );
             }
 
             std::vector< uuid > create_corners(
@@ -64,6 +69,10 @@ namespace geode
             {
                 std::vector< uuid > corners;
                 corners.reserve( definitions.size() );
+                for( const auto& definition : definitions )
+                {
+                    check_unique_point( definition.vertex );
+                }
                 for( const auto& definition : definitions )
                 {
                     const auto& corner_id = builder_.add_corner();
@@ -82,6 +91,31 @@ namespace geode
                 lines.reserve( definitions.size() );
                 for( const auto& definition : definitions )
                 {
+                    const auto& vertices = definition.vertices;
+                    OpenGeodeModelException::check_exception(
+                        vertices.size() >= 2, nullptr,
+                        OpenGeodeException::TYPE::data,
+                        "[SimplicialModelCreator::create_lines] A Line "
+                        "definition should have at least 2 vertices" );
+                    for( const auto vertex : vertices )
+                    {
+                        check_unique_point( vertex );
+                    }
+                }
+                const absl::flat_hash_set< uuid > corner_set{ corners.begin(),
+                    corners.end() };
+                std::vector< std::array< uuid, 2 > > line_corners;
+                line_corners.reserve( definitions.size() );
+                for( const auto& definition : definitions )
+                {
+                    line_corners.push_back( { find_corner( corner_set,
+                                                  definition.vertices.front() ),
+                        find_corner(
+                            corner_set, definition.vertices.back() ) } );
+                }
+                for( const auto d : Indices{ definitions } )
+                {
+                    const auto& definition = definitions[d];
                     const auto& line_id = builder_.add_line();
                     const auto& line = model_.line( line_id );
                     auto mesh_builder = builder_.line_mesh_builder( line );
@@ -96,11 +130,11 @@ namespace geode
                     }
                     lines.push_back( line_id );
                     builder_.add_corner_line_boundary_relationship(
-                        model_.corner( corners[vertices.front()] ), line );
-                    if( vertices.front() != vertices.back() )
+                        model_.corner( line_corners[d][0] ), line );
+                    if( line_corners[d][0] != line_corners[d][1] )
                     {
                         builder_.add_corner_line_boundary_relationship(
-                            model_.corner( corners[vertices.back()] ), line );
+                            model_.corner( line_corners[d][1] ), line );
                     }
                 }
                 return lines;
@@ -111,6 +145,19 @@ namespace geode
             {
                 std::vector< uuid > surfaces;
                 surfaces.reserve( definitions.size() );
+                for( const auto& definition : definitions )
+                {
+                    check_simplices( definition.vertices, definition.triangles,
+                        3, "triangles" );
+                    for( const auto boundary : definition.boundaries )
+                    {
+                        check_index( boundary, lines.size(), "Line" );
+                    }
+                    for( const auto internal : definition.internals )
+                    {
+                        check_index( internal, lines.size(), "Line" );
+                    }
+                }
                 for( const auto& definition : definitions )
                 {
                     const auto& surface_id = builder_.add_surface(
@@ -151,6 +198,13 @@ namespace geode
                 absl::Span< const uuid > lines,
                 absl::Span< const SurfaceDefinition > definitions )
             {
+                for( const auto& definition : definitions )
+                {
+                    for( const auto internal : definition.internal_corners )
+                    {
+                        check_index( internal, corners.size(), "Corner" );
+                    }
+                }
                 const auto surfaces = create_surfaces( lines, definitions );
                 for( const auto d : Indices{ definitions } )
                 {
@@ -166,6 +220,62 @@ namespace geode
             }
 
         protected:
+            void check_index( index_t index,
+                std::size_t size,
+                std::string_view element ) const
+            {
+                OpenGeodeModelException::check_exception( index < size, nullptr,
+                    OpenGeodeException::TYPE::data, "[SimplicialModelCreator] ",
+                    element, " index ", index, " is out of range (", size,
+                    " elements)" );
+            }
+
+            uuid find_corner( const absl::flat_hash_set< uuid >& corners,
+                index_t vertex ) const
+            {
+                for( const auto& cmv : model_.component_mesh_vertices(
+                         first_unique_vertex_ + vertex ) )
+                {
+                    if( cmv.component_id.type
+                            == Corner< dimension >::component_type_static()
+                        && corners.contains( cmv.component_id.id ) )
+                    {
+                        return cmv.component_id.id;
+                    }
+                }
+                throw OpenGeodeModelException{ nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SimplicialModelCreator::create_lines] No given Corner "
+                    "on Line extremity unique point ",
+                    vertex };
+            }
+
+            void check_unique_point( index_t vertex ) const
+            {
+                check_index( vertex, unique_points_.size(), "Unique point" );
+            }
+
+            void check_simplices( absl::Span< const index_t > vertices,
+                absl::Span< const index_t > simplices,
+                index_t nb_simplex_vertices,
+                std::string_view simplex_name ) const
+            {
+                for( const auto vertex : vertices )
+                {
+                    check_unique_point( vertex );
+                }
+                OpenGeodeModelException::check_exception(
+                    simplices.size() % nb_simplex_vertices == 0, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[SimplicialModelCreator] The number of ", simplex_name,
+                    " vertices (", simplices.size(),
+                    ") should be a multiple of ", nb_simplex_vertices );
+                for( const auto vertex : simplices )
+                {
+                    check_index( vertex, vertices.size(), "Component vertex" );
+                }
+            }
+
             template < typename MeshBuilder, typename Component >
             void create_point( MeshBuilder& mesh_builder,
                 const Component& component,
@@ -173,8 +283,8 @@ namespace geode
             {
                 const auto id =
                     mesh_builder.create_point( unique_points_[vertex] );
-                builder_.set_unique_vertex(
-                    { component.component_id(), id }, vertex );
+                builder_.set_unique_vertex( { component.component_id(), id },
+                    first_unique_vertex_ + vertex );
             }
 
             const Model& model() const
@@ -191,6 +301,7 @@ namespace geode
             const Model& model_;
             ModelBuilder builder_;
             std::vector< Point< dimension > > unique_points_;
+            index_t first_unique_vertex_;
         };
     } // namespace internal
 } // namespace geode

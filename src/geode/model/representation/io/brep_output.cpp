@@ -50,7 +50,7 @@ namespace geode
             print_available_extensions< BRepOutputFactory >( TYPE );
             throw OpenGeodeModelException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save BRep in file: ", filename };
+                "Cannot save BRep in file: ", filename, ": ", e.what() };
         }
     }
 

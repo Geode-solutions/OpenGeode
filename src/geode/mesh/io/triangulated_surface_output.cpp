@@ -59,7 +59,8 @@ namespace geode
             print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeMeshException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save TriangulatedSurface in file: ", filename };
+                "Cannot save TriangulatedSurface in file: ", filename, ": ",
+                e.what() };
         }
     }
 

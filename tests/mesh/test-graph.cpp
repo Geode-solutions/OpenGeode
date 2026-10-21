@@ -264,6 +264,74 @@ void test_edge_vertex_hash()
         " different hashes for 20 EdgeVertex" );
 }
 
+void check_edges_around_consistency( const geode::Graph& graph )
+{
+    geode::index_t nb_edge_vertices{ 0 };
+    for( const auto v : geode::Range{ graph.nb_vertices() } )
+    {
+        for( const auto& edge_vertex : graph.edges_around_vertex( v ) )
+        {
+            geode::OpenGeodeMeshException::test(
+                edge_vertex.edge_id < graph.nb_edges()
+                    && graph.edge_vertex( edge_vertex ) == v,
+                "[Test] Wrong edge around vertex ", v );
+            nb_edge_vertices++;
+        }
+    }
+    geode::OpenGeodeMeshException::test(
+        nb_edge_vertices == 2 * graph.nb_edges(),
+        "[Test] Each edge vertex should be around exactly one vertex" );
+}
+
+void test_delete_edges_and_vertices()
+{
+    auto graph =
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
+    auto builder = geode::GraphBuilder::create( *graph );
+    builder->create_vertices( 6 );
+    builder->create_edge( 0, 1 ); // 0
+    builder->create_edge( 1, 2 ); // 1
+    builder->create_edge( 2, 3 ); // 2
+    builder->create_edge( 3, 4 ); // 3
+    builder->create_edge( 4, 5 ); // 4
+    builder->create_edge( 5, 0 ); // 5
+    builder->create_edge( 1, 4 ); // 6
+    // Delete all the edges around vertex 2
+    const auto edges_old2new = builder->delete_edges(
+        { false, true, true, false, false, false, false } );
+    geode::OpenGeodeMeshException::test(
+        edges_old2new
+            == std::vector< geode::index_t >{ 0, geode::NO_ID, geode::NO_ID, 1,
+                2, 3, 4 },
+        "[Test] Wrong edge mapping" );
+    check_edges_around_consistency( *graph );
+    geode::OpenGeodeMeshException::test(
+        graph->edges_around_vertex( 2 ).empty(),
+        "[Test] Vertex 2 should be isolated" );
+    geode::OpenGeodeMeshException::test(
+        graph->edge_from_vertices( 1, 4 ) == 4
+            && graph->edge_from_vertices( 5, 0 ) == 3,
+        "[Test] Wrong edges after deletion" );
+    const auto vertices_old2new = builder->delete_isolated_vertices( { 2 } );
+    geode::OpenGeodeMeshException::test(
+        vertices_old2new
+            == std::vector< geode::index_t >{ 0, 1, geode::NO_ID, 2, 3, 4 },
+        "[Test] Wrong vertex mapping" );
+    check_edges_around_consistency( *graph );
+    geode::OpenGeodeMeshException::test(
+        graph->edge_from_vertices( 1, 3 ) == 4
+            && graph->edge_from_vertices( 2, 3 ) == 1
+            && graph->edge_from_vertices( 4, 0 ) == 3
+            && graph->edge_from_vertices( 0, 1 ) == 0,
+        "[Test] Wrong edges after vertex deletion" );
+    builder->permute_edges( { 4, 3, 2, 1, 0 } );
+    check_edges_around_consistency( *graph );
+    geode::OpenGeodeMeshException::test(
+        graph->edge_from_vertices( 1, 3 ) == 0
+            && graph->edge_from_vertices( 0, 1 ) == 4,
+        "[Test] Wrong edges after edge permutation" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -284,6 +352,7 @@ void test()
     test_delete_isolated_vertices( *graph, *builder );
     test_replace_vertex();
     test_edge_vertex_hash();
+    test_delete_edges_and_vertices();
 
     const auto default_graph = geode::Graph::create();
     geode::OpenGeodeMeshException::test(

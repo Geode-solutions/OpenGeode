@@ -102,7 +102,7 @@ namespace geode
         std::string_view directory, SurfaceCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
-            absl::StrCat( directory, "/surface_collections" ) );
+            absl::StrCat( directory, "/surface_collections" ), false );
     }
 
     template < index_t dimension >
@@ -164,55 +164,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    class SurfaceCollections< dimension >::SurfaceCollectionRangeBase::Impl
-        : public BaseRange<
-              typename SurfaceCollections< dimension >::Impl::Iterator >
-    {
-        using Iterator =
-            typename SurfaceCollections< dimension >::Impl::Iterator;
-
-    public:
-        Impl( Iterator begin, Iterator end )
-            : BaseRange< Impl::Iterator >( begin, end )
-        {
-        }
-
-        SurfaceCollection< dimension >& surface_collection() const
-        {
-            return *this->current()->second;
-        }
-
-        void set_active_only()
-        {
-            active_only_ = true;
-            next_surface_collection();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_surface_collection();
-        }
-
-    private:
-        void next_surface_collection()
-        {
-            while( this->operator!=( *this )
-                   && ( active_only_ && !surface_collection().is_active() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        bool active_only_{ false };
-    };
-
-    template < index_t dimension >
     SurfaceCollections< dimension >::SurfaceCollectionRangeBase::
         SurfaceCollectionRangeBase( const SurfaceCollections& collections )
         : impl_( collections.impl_->begin(), collections.impl_->end() )
     {
+        static_assert( std::is_same_v< decltype( collections.impl_->begin() ),
+                           typename decltype( impl_ )::Iterator >,
+            "[ComponentRangeIterator] Iterator type mismatch" );
     }
 
     template < index_t dimension >
@@ -223,7 +181,7 @@ namespace geode
     template < index_t dimension >
     SurfaceCollections< dimension >::SurfaceCollectionRangeBase::
         SurfaceCollectionRangeBase( const SurfaceCollectionRangeBase& other )
-        : impl_( *other.impl_ )
+        : impl_( other.impl_ )
     {
     }
 
@@ -237,21 +195,21 @@ namespace geode
         SurfaceCollections< dimension >::SurfaceCollectionRangeBase::operator!=(
             const SurfaceCollectionRangeBase& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return impl_.is_valid();
     }
 
     template < index_t dimension >
     void SurfaceCollections<
         dimension >::SurfaceCollectionRangeBase::set_active_only()
     {
-        impl_->set_active_only();
+        impl_.set_active_only();
     }
 
     template < index_t dimension >
     void SurfaceCollections<
         dimension >::SurfaceCollectionRangeBase::operator++()
     {
-        return impl_->next();
+        impl_.next();
     }
 
     template < index_t dimension >
@@ -292,7 +250,7 @@ namespace geode
         SurfaceCollections< dimension >::SurfaceCollectionRange::operator*()
             const
     {
-        return this->impl_->surface_collection();
+        return this->impl_.component();
     }
 
     template < index_t dimension >
@@ -335,7 +293,7 @@ namespace geode
     SurfaceCollection< dimension >& SurfaceCollections<
         dimension >::ModifiableSurfaceCollectionRange::operator*() const
     {
-        return this->impl_->surface_collection();
+        return this->impl_.component();
     }
 
     template class opengeode_model_api SurfaceCollections< 2 >;

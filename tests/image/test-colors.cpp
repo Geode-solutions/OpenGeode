@@ -21,6 +21,10 @@
  *
  */
 
+#include <type_traits>
+
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -29,6 +33,24 @@
 #include <geode/image/core/rgb_color.hpp>
 
 #include <geode/tests/common.hpp>
+
+void test_constexpr()
+{
+    static_assert( std::is_trivially_copyable_v< geode::RGBColor > );
+    static_assert( std::is_trivially_copyable_v< geode::GreyscaleColor > );
+    constexpr geode::RGBColor rgb{ 1, 2, 3 };
+    static_assert( rgb.red() == 1 && rgb.green() == 2 && rgb.blue() == 3 );
+    static_assert( rgb == geode::RGBColor{ 1, 2, 3 } );
+    static_assert( rgb != geode::RGBColor{} );
+    static_assert(
+        rgb + geode::RGBColor{ 3, 4, 5 } == geode::RGBColor{ 2, 3, 4 } );
+    constexpr geode::GreyscaleColor grey{ 4 };
+    static_assert( grey.value() == 4 );
+    static_assert( grey == geode::GreyscaleColor{ 4 } );
+    static_assert( grey != geode::GreyscaleColor{} );
+    static_assert(
+        grey + geode::GreyscaleColor{ 6 } == geode::GreyscaleColor{ 5 } );
+}
 
 void test_comparison()
 {
@@ -40,6 +62,33 @@ void test_comparison()
     const geode::RGBColor color3{ 4, 254, 68 };
     geode::OpenGeodeImageException::test(
         color1 != color3, "Colors should be different" );
+}
+
+void test_rgb_addition()
+{
+    const geode::RGBColor color1{ 200, 100, 0 };
+    const geode::RGBColor color2{ 100, 50, 255 };
+    const geode::RGBColor average{ 150, 75, 127 };
+    geode::OpenGeodeImageException::test( color1 + color2 == average,
+        "[TEST] Wrong RGBColor addition: ", ( color1 + color2 ).string() );
+    auto color3 = color1;
+    color3 += color2;
+    geode::OpenGeodeImageException::test( color3 == average,
+        "[TEST] Wrong RGBColor addition assignment: ", color3.string() );
+}
+
+void test_greyscale_addition()
+{
+    const geode::GreyscaleColor one{ 1 };
+    geode::OpenGeodeImageException::test( one + one == one,
+        "[TEST] Wrong GreyscaleColor addition: ", ( one + one ).string() );
+    const geode::GreyscaleColor white{ 255 };
+    geode::OpenGeodeImageException::test( white + white == white,
+        "[TEST] Wrong GreyscaleColor addition: ", ( white + white ).string() );
+    auto color = white;
+    color += geode::GreyscaleColor{ 1 };
+    geode::OpenGeodeImageException::test( color == geode::GreyscaleColor{ 128 },
+        "[TEST] Wrong GreyscaleColor addition assignment: ", color.string() );
 }
 
 void test_color_attribute()
@@ -81,10 +130,100 @@ void test_color_attribute()
         "[TEST] Wrong generic value" );
 }
 
+void check_interpolation( geode::AttributeManager& manager,
+    const geode::VariableAttribute< geode::RGBColor >& rgb_attribute,
+    const geode::VariableAttribute< geode::GreyscaleColor >& grey_attribute,
+    absl::Span< const geode::index_t > indices,
+    absl::Span< const double > lambdas,
+    geode::local_index_t expected )
+{
+    static constexpr geode::index_t TARGET{ 10 };
+    manager.interpolate_attribute_value( { indices, lambdas }, TARGET );
+    const geode::RGBColor expected_rgb{ expected, expected, expected };
+    geode::OpenGeodeImageException::test(
+        rgb_attribute.value( TARGET ) == expected_rgb,
+        "[TEST] Wrong RGBColor interpolation: ",
+        rgb_attribute.value( TARGET ).string(), " instead of ",
+        expected_rgb.string() );
+    const geode::GreyscaleColor expected_grey{ expected };
+    geode::OpenGeodeImageException::test(
+        grey_attribute.value( TARGET ) == expected_grey,
+        "[TEST] Wrong GreyscaleColor interpolation: ",
+        grey_attribute.value( TARGET ).string(), " instead of ",
+        expected_grey.string() );
+}
+
+void test_interpolation()
+{
+    geode::AttributeManager manager;
+    manager.resize( 11 );
+    geode::AttributeProperties properties;
+    properties.interpolable = true;
+    static constexpr geode::local_index_t DEFAULT{ 42 };
+    geode::AttributeValues< geode::RGBColor > rgb_values;
+    rgb_values.default_value = geode::RGBColor{ DEFAULT, DEFAULT, DEFAULT };
+    auto rgb_attribute =
+        manager.find_attribute< geode::VariableAttribute, geode::RGBColor >(
+            manager
+                .create_attribute< geode::VariableAttribute, geode::RGBColor >(
+                    "rgb", rgb_values, properties ) );
+    geode::AttributeValues< geode::GreyscaleColor > grey_values;
+    grey_values.default_value = geode::GreyscaleColor{ DEFAULT };
+    auto grey_attribute = manager.find_attribute< geode::VariableAttribute,
+        geode::GreyscaleColor >(
+        manager.create_attribute< geode::VariableAttribute,
+            geode::GreyscaleColor >( "grey", grey_values, properties ) );
+    const std::array< geode::local_index_t, 4 > values{ 255, 255, 100, 101 };
+    for( const auto v : geode::LIndices{ values } )
+    {
+        rgb_attribute->set_value( v, { values[v], values[v], values[v] } );
+        grey_attribute->set_value( v, geode::GreyscaleColor{ values[v] } );
+    }
+    const auto third = 1. / 3.;
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 0, 1 }, { 0.5, 0.5 }, 255 );
+    check_interpolation( manager, *rgb_attribute, *grey_attribute, { 2, 2, 2 },
+        { third, third, third }, 100 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 2, 3 }, { 0.5, 0.5 }, 101 );
+    check_interpolation( manager, *rgb_attribute, *grey_attribute, { 0, 2 },
+        { third, 2 * third }, 152 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 0, 2 }, { 2, -1 }, 255 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, { 2, 0 }, { 2, -1 }, 0 );
+    check_interpolation(
+        manager, *rgb_attribute, *grey_attribute, {}, {}, DEFAULT );
+}
+
+void test_rgb_hash()
+{
+    const std::hash< geode::RGBColor > hash;
+    geode::OpenGeodeImageException::test(
+        hash( { 10, 20, 30 } ) != hash( { 30, 20, 10 } ),
+        "[TEST] Permuted channels should not share a hash" );
+    geode::OpenGeodeImageException::test(
+        hash( { 7, 7, 0 } ) != hash( { 9, 9, 0 } ),
+        "[TEST] Colors with equal red and green should not share a hash" );
+    absl::flat_hash_set< size_t > hashes;
+    for( const auto value : geode::Range{ 256 } )
+    {
+        const auto channel = static_cast< geode::local_index_t >( value );
+        hashes.insert( hash( { channel, channel, channel } ) );
+    }
+    geode::OpenGeodeImageException::test(
+        hashes.size() == 256, "[TEST] Grey colors should not share hashes" );
+}
+
 void test()
 {
+    test_constexpr();
     test_comparison();
+    test_rgb_addition();
+    test_greyscale_addition();
     test_color_attribute();
+    test_interpolation();
+    test_rgb_hash();
 }
 
 OPENGEODE_TEST( "colors" )

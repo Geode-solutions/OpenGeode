@@ -23,12 +23,15 @@
 
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 
+#include <atomic>
+#include <filesystem>
 #include <fstream>
 
 #include <async++.h>
 
 #include <bitsery/ext/std_map.h>
 
+#include <absl/algorithm/container.h>
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -106,6 +109,23 @@ namespace geode
     {
         constexpr static auto UNIQUE_VERTICES_NAME = "unique vertices";
 
+        struct RegisteredComponent
+        {
+            explicit RegisteredComponent(
+                std::shared_ptr< VariableAttribute< index_t > > attribute_in )
+                : attribute( std::move( attribute_in ) )
+            {
+            }
+
+            std::shared_ptr< VariableAttribute< index_t > > attribute;
+            /*!
+             * Number of ComponentMeshVertex of this component stored in
+             * component_vertices_. Used to detect inconsistencies between
+             * the component mesh attribute and component_vertices_.
+             */
+            index_t nb_component_mesh_vertices{ 0 };
+        };
+
     public:
         Impl()
         {
@@ -155,7 +175,8 @@ namespace geode
         index_t unique_vertex(
             const uuid& component_id, const index_t vertex_id ) const
         {
-            return vertex2unique_vertex_.at( component_id )->value( vertex_id );
+            return vertex2unique_vertex_.at( component_id )
+                .attribute->value( vertex_id );
         }
 
         bool has_component_mesh_vertices(
@@ -208,7 +229,7 @@ namespace geode
                     UNIQUE_VERTICES_NAME, unique_vertex_id_,
                     unique_vertex_attribute_values, attribute_properties );
             const auto [_, inserted] =
-                vertex2unique_vertex_.emplace( component.id(),
+                vertex2unique_vertex_.try_emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_attribute< VariableAttribute, index_t >(
                             unique_vertex_id_ ) );
@@ -229,7 +250,7 @@ namespace geode
                     mesh.vertex_attribute_manager(), mesh.nb_vertices() );
             }
             const auto [_, inserted] =
-                vertex2unique_vertex_.emplace( component.id(),
+                vertex2unique_vertex_.try_emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_attribute< VariableAttribute, index_t >(
                             unique_vertex_id_ ) );
@@ -243,11 +264,17 @@ namespace geode
         void unregister_component( const MeshComponent& component )
         {
             const auto& mesh = component.mesh();
-            auto attribute = vertex2unique_vertex_.at( component.id() );
-            const auto attribute_id = attribute->id();
+            const auto it = vertex2unique_vertex_.find( component.id() );
+            OpenGeodeModelException::check_exception(
+                it != vertex2unique_vertex_.end(), component.component_id(),
+                OpenGeodeException::TYPE::data,
+                "[VertexIdentifier::unregister_component] Component ",
+                component.id().string(), " is not registered." );
+            remove_component_vertices(
+                component.id(), it->second, mesh.nb_vertices() );
+            const auto attribute_id = it->second.attribute->id();
             mesh.vertex_attribute_manager().delete_attribute( attribute_id );
-            vertex2unique_vertex_.erase( component.id() );
-            filter_component_vertices( component.id() );
+            vertex2unique_vertex_.erase( it );
         }
 
         index_t create_unique_vertex()
@@ -270,22 +297,25 @@ namespace geode
                 "[VertexIdentifier::set_unique_vertex] Unique vertex ",
                 unique_vertex_id, " does not exist (nb=", nb_unique_vertices(),
                 ")" );
-            const auto& old_unique_id =
-                vertex2unique_vertex_.at( component_vertex_id.component_id.id )
-                    ->value( component_vertex_id.vertex );
+            auto& component =
+                vertex2unique_vertex_.at( component_vertex_id.component_id.id );
+            const auto old_unique_id =
+                component.attribute->value( component_vertex_id.vertex );
             if( old_unique_id != NO_ID )
             {
-                unset_unique_vertex( component_vertex_id, old_unique_id );
+                unset_unique_vertex(
+                    component, component_vertex_id, old_unique_id );
             }
-            vertex2unique_vertex_.at( component_vertex_id.component_id.id )
-                ->set_value( component_vertex_id.vertex, unique_vertex_id );
+            component.attribute->set_value(
+                component_vertex_id.vertex, unique_vertex_id );
             component_vertices_->modify_value( unique_vertex_id,
-                [&component_vertex_id](
+                [&component_vertex_id, &component](
                     std::vector< ComponentMeshVertex >& value ) {
                     if( absl::c_find( value, component_vertex_id )
                         == value.end() )
                     {
                         value.emplace_back( std::move( component_vertex_id ) );
+                        component.nb_component_mesh_vertices++;
                     }
                 } );
         }
@@ -294,8 +324,16 @@ namespace geode
             const ComponentMeshVertex& component_vertex_id,
             const index_t unique_vertex_id )
         {
-            vertex2unique_vertex_.at( component_vertex_id.component_id.id )
-                ->set_value( component_vertex_id.vertex, NO_ID );
+            unset_unique_vertex(
+                vertex2unique_vertex_.at( component_vertex_id.component_id.id ),
+                component_vertex_id, unique_vertex_id );
+        }
+
+        void unset_unique_vertex( RegisteredComponent& component,
+            const ComponentMeshVertex& component_vertex_id,
+            const index_t unique_vertex_id )
+        {
+            component.attribute->set_value( component_vertex_id.vertex, NO_ID );
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
             const auto it = absl::c_find( vertices, component_vertex_id );
@@ -303,6 +341,7 @@ namespace geode
             {
                 return;
             }
+            component.nb_component_mesh_vertices--;
             component_vertices_->modify_value( unique_vertex_id,
                 [&it]( std::vector< ComponentMeshVertex >& value ) {
                     value.erase(
@@ -314,9 +353,10 @@ namespace geode
         void update_unique_vertices( const ComponentID& component_id,
             absl::Span< const index_t > old2new )
         {
+            std::atomic< index_t > nb_deleted{ 0 };
             async::parallel_for(
                 async::irange( index_t{ 0 }, nb_unique_vertices() ),
-                [this, &component_id, &old2new]( index_t uv ) {
+                [this, &component_id, &old2new, &nb_deleted]( index_t uv ) {
                     if( !has_component_mesh_vertices( uv, component_id.id ) )
                     {
                         return;
@@ -348,6 +388,10 @@ namespace geode
                     }
                     if( need_to_delete )
                     {
+                        nb_deleted.fetch_add(
+                            static_cast< index_t >(
+                                absl::c_count( to_delete, true ) ),
+                            std::memory_order_relaxed );
                         component_vertices_->modify_value( uv,
                             [&to_delete](
                                 std::vector< ComponentMeshVertex >& vertices ) {
@@ -355,49 +399,108 @@ namespace geode
                             } );
                     }
                 } );
+            const auto component_it =
+                vertex2unique_vertex_.find( component_id.id );
+            if( component_it != vertex2unique_vertex_.end() )
+            {
+                component_it->second.nb_component_mesh_vertices -=
+                    nb_deleted.load( std::memory_order_relaxed );
+            }
         }
 
         std::vector< index_t > delete_isolated_vertices()
         {
-            std::vector< bool > to_delete( nb_unique_vertices(), false );
-            absl::flat_hash_map< uuid, std::vector< index_t > >
-                components_vertices;
-            for( const auto v : Range{ nb_unique_vertices() } )
+            const auto nb_vertices = nb_unique_vertices();
+            std::vector< bool > to_delete( nb_vertices, false );
+            auto first_deleted = nb_vertices;
+            for( const auto v : Range{ nb_vertices } )
             {
                 if( is_unique_vertex_isolated( v ) )
                 {
                     to_delete[v] = true;
-                    continue;
+                    first_deleted = std::min( first_deleted, v );
                 }
-                for( const auto& cmv : component_mesh_vertices( v ) )
-                {
-                    components_vertices[cmv.component_id.id].emplace_back(
-                        cmv.vertex );
-                }
+            }
+            if( first_deleted == nb_vertices )
+            {
+                std::vector< index_t > old2new( nb_vertices );
+                absl::c_iota( old2new, index_t{ 0 } );
+                return old2new;
             }
             const auto old2new = VertexSetBuilder::create( unique_vertices_ )
                                      ->delete_vertices( to_delete );
-            for( const auto& component_vertices : components_vertices )
+            // Unique vertices before the first deleted one keep their index
+            const uuid* last_component{ nullptr };
+            VariableAttribute< index_t >* attribute{ nullptr };
+            for( const auto uv : Range{ first_deleted, nb_unique_vertices() } )
             {
-                auto& attribute =
-                    vertex2unique_vertex_.at( component_vertices.first );
-                for( const auto v : component_vertices.second )
+                for( const auto& cmv : component_vertices_->value( uv ) )
                 {
-                    const auto value = attribute->value( v );
+                    if( !last_component
+                        || *last_component != cmv.component_id.id )
+                    {
+                        const auto it =
+                            vertex2unique_vertex_.find( cmv.component_id.id );
+                        last_component = &cmv.component_id.id;
+                        attribute = it == vertex2unique_vertex_.end()
+                                        ? nullptr
+                                        : it->second.attribute.get();
+                    }
+                    if( !attribute )
+                    {
+                        continue;
+                    }
+                    const auto value = attribute->value( cmv.vertex );
                     if( value == NO_ID )
                     {
                         continue;
                     }
-                    attribute->set_value( v, old2new[value] );
+                    attribute->set_value( cmv.vertex, old2new[value] );
                 }
             }
             return old2new;
         }
 
+        void repair_component_vertices()
+        {
+            // Read-only parallel scan, nothing to repair in a valid model
+            std::vector< uint8_t > to_repair( nb_unique_vertices(), 0 );
+            async::parallel_for(
+                async::irange( index_t{ 0 }, nb_unique_vertices() ),
+                [this, &to_repair]( index_t unique_vertex ) {
+                    for( const auto& vertex :
+                        component_vertices_->value( unique_vertex ) )
+                    {
+                        if( !is_linked_to_unique_vertex(
+                                vertex, unique_vertex ) )
+                        {
+                            to_repair[unique_vertex] = 1;
+                            return;
+                        }
+                    }
+                } );
+            // Sequential repair: a component vertex may be listed in several
+            // unique vertices, the first one keeps it
+            ComponentVerticesRepair repair;
+            for( const auto unique_vertex : Range{ nb_unique_vertices() } )
+            {
+                if( to_repair[unique_vertex] != 0 )
+                {
+                    repair_unique_vertex( unique_vertex, repair );
+                    nb_component_mesh_vertices_up_to_date_ = false;
+                }
+            }
+            repair.log();
+        }
+
         void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
-            std::ofstream file{ filename, std::ofstream::binary };
+            std::ofstream file{ std::filesystem::u8path( filename ),
+                std::ofstream::binary };
+            OpenGeodeModelException::check_exception( file.is_open(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[VertexIdentifier::save] Cannot open file: ", filename );
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
                 std::get< 0 >( context ) );
@@ -405,7 +508,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OpenGeodeModelException::check_exception(
-                std::get< 1 >( context ).isValid(), nullptr,
+                file.good() && std::get< 1 >( context ).isValid(), nullptr,
                 OpenGeodeException::TYPE::internal,
                 "[VertexIdentifier::save] Error while writing file: ",
                 filename );
@@ -414,12 +517,14 @@ namespace geode
         void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
-            std::ifstream file{ filename, std::ifstream::binary };
+            std::ifstream file{ std::filesystem::u8path( filename ),
+                std::ifstream::binary };
             TContext context{};
             BitseryExtensions::register_deserialize_pcontext(
                 std::get< 0 >( context ) );
             Deserializer archive{ context, file };
             archive.object( *this );
+            nb_component_mesh_vertices_up_to_date_ = false;
             const auto& adapter = archive.adapter();
             OpenGeodeModelException::check_exception(
                 adapter.error() == bitsery::ReaderError::NoError
@@ -491,32 +596,115 @@ namespace geode
                         } } } );
         }
 
+        /*!
+         * Remove every ComponentMeshVertex of the given component from
+         * component_vertices_. Only the unique vertices referenced by the
+         * component mesh attribute are visited. If the number of removed
+         * ComponentMeshVertex does not match the number registered for this
+         * component (i.e. the attribute and component_vertices_ are not
+         * consistent), all the unique vertices are scanned.
+         */
+        void remove_component_vertices( const uuid& component_id,
+            RegisteredComponent& component,
+            index_t nb_component_vertices )
+        {
+            update_nb_component_mesh_vertices();
+            const auto nb_expected = component.nb_component_mesh_vertices;
+            if( nb_expected == 0 )
+            {
+                return;
+            }
+            std::vector< index_t > unique_vertices;
+            unique_vertices.reserve( nb_component_vertices );
+            const auto nb_uv = nb_unique_vertices();
+            for( const auto v : Range{ nb_component_vertices } )
+            {
+                const auto unique_vertex = component.attribute->value( v );
+                if( unique_vertex < nb_uv )
+                {
+                    unique_vertices.push_back( unique_vertex );
+                }
+            }
+            absl::c_sort( unique_vertices );
+            unique_vertices.erase(
+                std::unique( unique_vertices.begin(), unique_vertices.end() ),
+                unique_vertices.end() );
+            std::atomic< index_t > nb_removed{ 0 };
+            async::parallel_for(
+                async::irange( index_t{ 0 },
+                    static_cast< index_t >( unique_vertices.size() ) ),
+                [this, &component_id, &unique_vertices, &nb_removed](
+                    index_t i ) {
+                    nb_removed.fetch_add(
+                        filter_unique_vertex(
+                            unique_vertices[i], component_id ),
+                        std::memory_order_relaxed );
+                } );
+            if( nb_removed.load() != nb_expected )
+            {
+                filter_component_vertices( component_id );
+            }
+        }
+
+        index_t filter_unique_vertex(
+            index_t unique_vertex_id, const uuid& component_id )
+        {
+            const auto& component_mesh_vertices =
+                component_vertices_->value( unique_vertex_id );
+            const auto is_component = [&component_id](
+                                          const ComponentMeshVertex& cmv ) {
+                return cmv.component_id.id == component_id;
+            };
+            if( absl::c_none_of( component_mesh_vertices, is_component ) )
+            {
+                return 0;
+            }
+            index_t nb_removed{ 0 };
+            component_vertices_->modify_value( unique_vertex_id,
+                [&is_component, &nb_removed](
+                    std::vector< ComponentMeshVertex >& vertices ) {
+                    const auto old_size = vertices.size();
+                    vertices.erase( std::remove_if( vertices.begin(),
+                                        vertices.end(), is_component ),
+                        vertices.end() );
+                    nb_removed =
+                        static_cast< index_t >( old_size - vertices.size() );
+                } );
+            return nb_removed;
+        }
+
         void filter_component_vertices( const uuid& component_id )
         {
             async::parallel_for(
                 async::irange( index_t{ 0 }, nb_unique_vertices() ),
                 [this, &component_id]( index_t uv_id ) {
-                    const auto& component_mesh_vertices =
-                        component_vertices_->value( uv_id );
-                    std::vector< bool > to_keep(
-                        component_mesh_vertices.size(), true );
-                    bool update{ false };
-                    for( const auto i : Indices{ component_mesh_vertices } )
-                    {
-                        if( component_mesh_vertices[i].component_id.id
-                            == component_id )
-                        {
-                            to_keep[i] = false;
-                            update = true;
-                        }
-                    }
-                    if( update )
-                    {
-                        component_vertices_->set_value(
-                            uv_id, extract_vector_elements(
-                                       to_keep, component_mesh_vertices ) );
-                    }
+                    filter_unique_vertex( uv_id, component_id );
                 } );
+        }
+
+        void update_nb_component_mesh_vertices()
+        {
+            if( nb_component_mesh_vertices_up_to_date_ )
+            {
+                return;
+            }
+            for( auto& [_, component] : vertex2unique_vertex_ )
+            {
+                component.nb_component_mesh_vertices = 0;
+            }
+            for( const auto uv : Range{ nb_unique_vertices() } )
+            {
+                for( const auto& cmv : component_vertices_->value( uv ) )
+                {
+                    const auto it =
+                        vertex2unique_vertex_.find( cmv.component_id.id );
+                    if( it != vertex2unique_vertex_.end() )
+                    {
+                        it->second.nb_component_mesh_vertices++;
+                    }
+                }
+            }
+            nb_component_mesh_vertices_up_to_date_ = true;
         }
 
         void import_old_attribute_based_on_name(
@@ -526,16 +714,31 @@ namespace geode
             const auto unique_vertices_ids =
                 vertex_attribute_manager.attribute_ids_matching_name(
                     UNIQUE_VERTICES_NAME );
-            OpenGeodeModelException::check_exception(
-                unique_vertices_ids.has_value(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[VertexIdentifier::load_component] Unique vertices "
-                "attribute not found." );
-            OpenGeodeModelException::check_exception(
-                unique_vertices_ids.value().size() == 1, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[VertexIdentifier::load_component] Unique vertices "
-                "attribute is not unique." );
+            if( !unique_vertices_ids.has_value() )
+            {
+                Logger::warning(
+                    "[VertexIdentifier::load_component] Unique vertices "
+                    "attribute not found, it will be restored from the "
+                    "unique vertices" );
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< index_t > unique_vertex_attribute_values;
+                unique_vertex_attribute_values.default_value = NO_ID;
+                unique_vertex_attribute_values.no_value = NO_ID;
+                vertex_attribute_manager
+                    .template create_attribute< VariableAttribute, index_t >(
+                        UNIQUE_VERTICES_NAME, unique_vertex_id_,
+                        unique_vertex_attribute_values, attribute_properties );
+                return;
+            }
+            if( unique_vertices_ids.value().size() != 1 )
+            {
+                Logger::warning(
+                    "[VertexIdentifier::load_component] Unique vertices "
+                    "attribute is not unique, using the first one" );
+            }
             const auto old_attribute =
                 vertex_attribute_manager
                     .template find_attribute< VariableAttribute, index_t >(
@@ -554,19 +757,117 @@ namespace geode
                 new_attribute->set_value(
                     vertex, old_attribute->value( vertex ) );
             }
-            vertex_attribute_manager.delete_attribute(
-                unique_vertices_ids.value().front() );
+            for( const auto& old_id : unique_vertices_ids.value() )
+            {
+                vertex_attribute_manager.delete_attribute( old_id );
+            }
         }
 
     private:
+        struct ComponentVerticesRepair
+        {
+            void log() const
+            {
+                if( nb_unknown_components > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Removed ",
+                        nb_unknown_components,
+                        " component vertices of unknown components" );
+                }
+                if( nb_invalid_vertices > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Removed ",
+                        nb_invalid_vertices,
+                        " component vertices with invalid vertex index" );
+                }
+                if( nb_inconsistent_vertices > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Removed ",
+                        nb_inconsistent_vertices,
+                        " component vertices linked to another unique "
+                        "vertex" );
+                }
+                if( nb_restored_vertices > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Restored ",
+                        nb_restored_vertices,
+                        " component vertex links to their unique vertex" );
+                }
+            }
+
+            index_t nb_unknown_components{ 0 };
+            index_t nb_invalid_vertices{ 0 };
+            index_t nb_inconsistent_vertices{ 0 };
+            index_t nb_restored_vertices{ 0 };
+        };
+
+        [[nodiscard]] bool is_linked_to_unique_vertex(
+            const ComponentMeshVertex& vertex, index_t unique_vertex ) const
+        {
+            const auto it =
+                vertex2unique_vertex_.find( vertex.component_id.id );
+            if( it == vertex2unique_vertex_.end() )
+            {
+                return false;
+            }
+            const auto& attribute = *it->second.attribute;
+            return vertex.vertex < attribute.size()
+                   && attribute.value( vertex.vertex ) == unique_vertex;
+        }
+
+        void repair_unique_vertex(
+            index_t unique_vertex, ComponentVerticesRepair& repair )
+        {
+            const auto& vertices = component_vertices_->value( unique_vertex );
+            std::vector< bool > to_keep( vertices.size(), true );
+            bool update{ false };
+            for( const auto v : Indices{ vertices } )
+            {
+                const auto& vertex = vertices[v];
+                const auto it =
+                    vertex2unique_vertex_.find( vertex.component_id.id );
+                if( it == vertex2unique_vertex_.end() )
+                {
+                    to_keep[v] = false;
+                    update = true;
+                    repair.nb_unknown_components++;
+                    continue;
+                }
+                auto& attribute = *it->second.attribute;
+                if( vertex.vertex >= attribute.size() )
+                {
+                    to_keep[v] = false;
+                    update = true;
+                    repair.nb_invalid_vertices++;
+                    continue;
+                }
+                const auto value = attribute.value( vertex.vertex );
+                if( value == NO_ID )
+                {
+                    attribute.set_value( vertex.vertex, unique_vertex );
+                    repair.nb_restored_vertices++;
+                }
+                else if( value != unique_vertex )
+                {
+                    to_keep[v] = false;
+                    update = true;
+                    repair.nb_inconsistent_vertices++;
+                }
+            }
+            if( update )
+            {
+                component_vertices_->set_value( unique_vertex,
+                    extract_vector_elements( to_keep, vertices ) );
+            }
+        }
+
         OpenGeodeVertexSet unique_vertices_;
         std::shared_ptr<
             VariableAttribute< std::vector< ComponentMeshVertex > > >
             component_vertices_;
-        absl::flat_hash_map< uuid,
-            std::shared_ptr< VariableAttribute< index_t > > >
-            vertex2unique_vertex_;
+        absl::flat_hash_map< uuid, RegisteredComponent > vertex2unique_vertex_;
         geode::uuid unique_vertex_id_;
+        bool nb_component_mesh_vertices_up_to_date_{ true };
     };
 
     VertexIdentifier::VertexIdentifier() = default;
@@ -694,6 +995,11 @@ namespace geode
         BuilderKey /*key*/ )
     {
         return impl_->delete_isolated_vertices();
+    }
+
+    void VertexIdentifier::repair_component_vertices( BuilderKey /*key*/ )
+    {
+        impl_->repair_component_vertices();
     }
 
     template void opengeode_model_api VertexIdentifier::load_mesh_component(

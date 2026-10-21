@@ -122,9 +122,19 @@ namespace geode
         for( auto& line : modifiable_lines( key ) )
         {
             tasks[count++] = async::spawn( [&line, &mapping] {
-                const auto file = mapping.at( line.id().string() );
-                line.set_mesh(
-                    load_edged_curve< dimension >( line.mesh_type(), file ),
+                const auto& type = EdgedCurve< dimension >::type_name_static();
+                const auto file = mapping.find( line.id().string() );
+                if( file == mapping.end() )
+                {
+                    line.set_mesh(
+                        detail::empty_mesh_of_missing_file( line, type ),
+                        typename Line< dimension >::LinesKey{} );
+                    return;
+                }
+                line.set_mesh( load_edged_curve< dimension >(
+                                   detail::loadable_mesh_impl(
+                                       line.mesh_type(), type, file->second ),
+                                   file->second ),
                     typename Line< dimension >::LinesKey{} );
             } );
         }
@@ -216,52 +226,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    class Lines< dimension >::LineRangeBase::Impl
-        : public BaseRange< typename Lines< dimension >::Impl::Iterator >
-    {
-        using Iterator = typename Lines< dimension >::Impl::Iterator;
-
-    public:
-        Impl( Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end )
-        {
-        }
-
-        Line< dimension >& line() const
-        {
-            return *this->current()->second;
-        }
-
-        void set_active_only()
-        {
-            active_only_ = true;
-            next_line();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_line();
-        }
-
-    private:
-        void next_line()
-        {
-            while( this->operator!=( *this )
-                   && ( active_only_ && !line().is_active() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        bool active_only_{ false };
-    };
-
-    template < index_t dimension >
     Lines< dimension >::LineRangeBase::LineRangeBase( const Lines& lines )
         : impl_( lines.impl_->begin(), lines.impl_->end() )
     {
+        static_assert( std::is_same_v< decltype( lines.impl_->begin() ),
+                           typename decltype( impl_ )::Iterator >,
+            "[ComponentRangeIterator] Iterator type mismatch" );
     }
 
     template < index_t dimension >
@@ -271,7 +241,7 @@ namespace geode
     template < index_t dimension >
     Lines< dimension >::LineRangeBase::LineRangeBase(
         const LineRangeBase& other )
-        : impl_( *other.impl_ )
+        : impl_( other.impl_ )
     {
     }
 
@@ -282,19 +252,19 @@ namespace geode
     bool Lines< dimension >::LineRangeBase::operator!=(
         const LineRangeBase& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return impl_.is_valid();
     }
 
     template < index_t dimension >
     void Lines< dimension >::LineRangeBase::set_active_only()
     {
-        impl_->set_active_only();
+        impl_.set_active_only();
     }
 
     template < index_t dimension >
     void Lines< dimension >::LineRangeBase::operator++()
     {
-        return impl_->next();
+        impl_.next();
     }
 
     template < index_t dimension >
@@ -327,7 +297,7 @@ namespace geode
     template < index_t dimension >
     const Line< dimension >& Lines< dimension >::LineRange::operator*() const
     {
-        return this->impl_->line();
+        return this->impl_.component();
     }
 
     template < index_t dimension >
@@ -365,7 +335,7 @@ namespace geode
     Line< dimension >&
         Lines< dimension >::ModifiableLineRange::operator*() const
     {
-        return this->impl_->line();
+        return this->impl_.component();
     }
 
     template class opengeode_model_api Lines< 2 >;

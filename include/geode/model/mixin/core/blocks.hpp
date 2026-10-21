@@ -29,6 +29,7 @@
 #include <geode/mesh/core/mesh_id.hpp>
 
 #include <geode/model/common.hpp>
+#include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
 namespace geode
 {
@@ -75,7 +76,7 @@ namespace geode
             BlockRangeBase( const BlockRangeBase& other );
 
         protected:
-            IMPLEMENTATION_MEMBER( impl_ );
+            detail::ComponentRangeIterator< Block< dimension > > impl_;
         };
 
         /*!

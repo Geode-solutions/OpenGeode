@@ -56,13 +56,14 @@ namespace
         typename Model::Builder& filter,
         std::vector< geode::ComponentID >& removed_components )
     {
-        for( const auto& surface_uuid : find_components_to_delete(
-                 model, model.active_surfaces(), model.nb_active_surfaces() ) )
+        const auto to_delete = find_components_to_delete(
+            model, model.active_surfaces(), model.nb_active_surfaces() );
+        for( const auto& surface_uuid : to_delete )
         {
-            filter.remove_surface( model.surface( surface_uuid ) );
             removed_components.emplace_back(
                 geode::Surface3D::component_type_static(), surface_uuid );
         }
+        filter.remove_surfaces( to_delete );
     }
 
     template < typename Model >
@@ -70,13 +71,14 @@ namespace
         typename Model::Builder& filter,
         std::vector< geode::ComponentID >& removed_components )
     {
-        for( const auto& line_uuid : find_components_to_delete(
-                 model, model.active_lines(), model.nb_active_lines() ) )
+        const auto to_delete = find_components_to_delete(
+            model, model.active_lines(), model.nb_active_lines() );
+        for( const auto& line_uuid : to_delete )
         {
-            filter.remove_line( model.line( line_uuid ) );
             removed_components.emplace_back(
                 geode::Line3D::component_type_static(), line_uuid );
         }
+        filter.remove_lines( to_delete );
     }
 
     template < typename Model >
@@ -84,13 +86,14 @@ namespace
         typename Model::Builder& filter,
         std::vector< geode::ComponentID >& removed_components )
     {
-        for( const auto& corner_uuid : find_components_to_delete(
-                 model, model.active_corners(), model.nb_active_corners() ) )
+        const auto to_delete = find_components_to_delete(
+            model, model.active_corners(), model.nb_active_corners() );
+        for( const auto& corner_uuid : to_delete )
         {
-            filter.remove_corner( model.corner( corner_uuid ) );
             removed_components.emplace_back(
                 geode::Corner3D::component_type_static(), corner_uuid );
         }
+        filter.remove_corners( to_delete );
     }
 } // namespace
 

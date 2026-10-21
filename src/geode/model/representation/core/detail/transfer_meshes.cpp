@@ -23,6 +23,9 @@
 
 #include <geode/model/representation/core/detail/transfer_meshes.hpp>
 
+#include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/variable_attribute.hpp>
+
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/builder/point_set_builder.hpp>
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
@@ -119,17 +122,29 @@ namespace
         }
     }
 
-    template < typename Model >
-    absl::FixedArray< geode::index_t > save_mesh_unique_vertices(
-        const Model& model,
-        geode::index_t nb_vertices,
-        const geode::ComponentID& component_id )
+    /*!
+     * Read the unique vertices of an other model component mesh and remove the
+     * VertexIdentifier attribute from this mesh, so it can be stolen.
+     * The other model is about to be destroyed: its VertexIdentifier is not
+     * updated (no need to unregister the component).
+     */
+    template < typename Model, typename MeshComponent >
+    absl::FixedArray< geode::index_t > detach_mesh_unique_vertices(
+        const Model& other, const MeshComponent& other_component )
     {
-        absl::FixedArray< geode::index_t > unique_vertices( nb_vertices );
-        for( const auto v : geode::Range{ nb_vertices } )
+        const auto& mesh = other_component.mesh();
+        auto& attribute_manager = mesh.vertex_attribute_manager();
+        const auto& attribute_id = other.unique_vertex_attribute_id();
+        const auto attribute =
+            attribute_manager.template find_attribute< geode::VariableAttribute,
+                geode::index_t >( attribute_id );
+        absl::FixedArray< geode::index_t > unique_vertices(
+            mesh.nb_vertices() );
+        for( const auto v : geode::Indices{ unique_vertices } )
         {
-            unique_vertices[v] = model.unique_vertex( { component_id, v } );
+            unique_vertices[v] = attribute->value( v );
         }
+        attribute_manager.delete_attribute( attribute_id );
         return unique_vertices;
     }
 
@@ -167,11 +182,9 @@ namespace
                 .in2out_map() )
         {
             const auto& other_corner = other.corner( other_corner_id );
-            const auto corner_unique_vertices = save_mesh_unique_vertices(
-                other, other_corner.mesh().nb_vertices(),
-                other_corner.component_id() );
+            const auto corner_unique_vertices =
+                detach_mesh_unique_vertices( other, other_corner );
             const auto& corner = model.corner( corner_id );
-            other_builder.unregister_mesh_component( other_corner );
             builder.update_corner_mesh(
                 corner, other_builder.steal_corner_mesh( other_corner ) );
             auto mesh_builder = builder.corner_mesh_builder( corner );
@@ -203,10 +216,9 @@ namespace
                 .in2out_map() )
         {
             const auto& other_line = other.line( other_line_id );
-            const auto line_unique_vertices = save_mesh_unique_vertices( other,
-                other_line.mesh().nb_vertices(), other_line.component_id() );
+            const auto line_unique_vertices =
+                detach_mesh_unique_vertices( other, other_line );
             const auto& line = model.line( line_id );
-            other_builder.unregister_mesh_component( other_line );
             builder.update_line_mesh(
                 line, other_builder.steal_line_mesh( other_line ) );
             auto mesh_builder = builder.line_mesh_builder( line );
@@ -238,11 +250,9 @@ namespace
                 .in2out_map() )
         {
             const auto& other_surface = other.surface( other_surface_id );
-            const auto surface_unique_vertices = save_mesh_unique_vertices(
-                other, other_surface.mesh().nb_vertices(),
-                other_surface.component_id() );
+            const auto surface_unique_vertices =
+                detach_mesh_unique_vertices( other, other_surface );
             const auto& surface = model.surface( surface_id );
-            other_builder.unregister_mesh_component( other_surface );
             builder.update_surface_mesh(
                 surface, other_builder.steal_surface_mesh( other_surface ) );
             auto mesh_builder = builder.surface_mesh_builder( surface );
@@ -274,10 +284,9 @@ namespace
                 .in2out_map() )
         {
             const auto& other_block = other.block( other_block_id );
-            const auto block_unique_vertices = save_mesh_unique_vertices( other,
-                other_block.mesh().nb_vertices(), other_block.component_id() );
+            const auto block_unique_vertices =
+                detach_mesh_unique_vertices( other, other_block );
             const auto& block = model.block( block_id );
-            other_builder.unregister_mesh_component( other_block );
             builder.update_block_mesh(
                 block, other_builder.steal_block_mesh( other_block ) );
             auto mesh_builder = builder.block_mesh_builder( block );

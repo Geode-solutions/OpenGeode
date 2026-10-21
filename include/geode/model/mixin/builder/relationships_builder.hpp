@@ -44,6 +44,13 @@ namespace geode
         void unregister_component( const uuid& component_id );
 
         /*!
+         * Remove several components from the set of components registered by
+         * the Relationships and all their associated relationships
+         * @param[in] component_ids Unique indices of the components to remove
+         */
+        void unregister_components( absl::Span< const uuid > component_ids );
+
+        /*!
          * Add a new relationship of type boundary-incidence between two
          * components
          */

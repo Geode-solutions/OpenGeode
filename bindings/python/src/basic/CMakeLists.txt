@@ -28,6 +28,7 @@ add_geode_python_binding(
         "identifier.cpp"
         "identifier_builder.cpp"
         "input.cpp"
+        "logger.cpp"
         "mapping.cpp"
         "percentage.cpp"
         "uuid.cpp"

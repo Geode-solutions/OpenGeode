@@ -72,5 +72,5 @@ namespace geode
     template < index_t dimension >
     using RasterImageInputFactory =
         Factory< std::string, RasterImageInput< dimension >, std::string_view >;
-    ALIAS_2D_AND_3D( RasterImageInputFactory );
+    ALIAS_1D_AND_2D_AND_3D( RasterImageInputFactory );
 } // namespace geode

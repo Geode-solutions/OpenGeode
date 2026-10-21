@@ -24,6 +24,8 @@
 #include <tuple>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/strings/match.h>
+#include <absl/strings/str_cat.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/attribute_manager.hpp>
@@ -33,10 +35,12 @@
 #include <geode/basic/uuid.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/geode/geode_edged_curve.hpp>
@@ -89,6 +93,29 @@ std::array< geode::uuid, 6 > add_corners(
         model.nb_active_corners() == 4, "BRep should have 4 active corners" );
     geode::OpenGeodeModelException::test(
         model.nb_corners() == 6, "BRep should still have 6 corners" );
+    const auto active_corners = model.active_corners();
+    geode::index_t nb_active_pairs{ 0 };
+    for( const auto& corner0 : active_corners )
+    {
+        geode::OpenGeodeModelException::test(
+            corner0.id() != uuids[1] && corner0.id() != uuids[4],
+            "Active corner range should skip inactive corners" );
+        for( const auto& corner1 : active_corners )
+        {
+            geode_unused( corner1 );
+            nb_active_pairs++;
+        }
+    }
+    geode::OpenGeodeModelException::test( nb_active_pairs == 16,
+        "Nested iterations on the same active corner range should be "
+        "independent" );
+    auto corners_copy = model.corners();
+    const auto corners_range = corners_copy;
+    ++corners_copy;
+    geode::OpenGeodeModelException::test(
+        geode::detail::count_range_elements( corners_range ) == 6
+            && geode::detail::count_range_elements( corners_copy ) == 5,
+        "Corner range copies should be independent" );
     return uuids;
 }
 
@@ -1796,6 +1823,28 @@ void test_backward_io()
     test_registry( brep_v18_0, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
 }
 
+void test_registry_remove_unknown_type()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    builder.add_corner();
+    builder.remove_mesh_component(
+        geode::Block3D::component_type_static(), geode::uuid{} );
+    builder.remove_collection_component(
+        geode::BlockCollection3D::component_type_static(), geode::uuid{} );
+    geode::OpenGeodeModelException::test(
+        !brep.mesh_components().contains(
+            geode::Block3D::component_type_static() ),
+        "[Test] Removing a component of an unknown type should not add the "
+        "type to the mesh registry" );
+    geode::OpenGeodeModelException::test(
+        !brep.collection_components().contains(
+            geode::BlockCollection3D::component_type_static() ),
+        "[Test] Removing a component of an unknown type should not add the "
+        "type to the collection registry" );
+    test_registry( brep, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+}
+
 void test_components_filter()
 {
     const auto brep = geode::load_brep(
@@ -1804,6 +1853,162 @@ void test_components_filter()
         brep.nb_components_with_relations() == 9,
         "Wrong number of components with relations, there are ",
         brep.nb_components_with_relations(), " instead of 9" );
+}
+
+template < typename Accessor >
+void test_unknown_component_access( Accessor&& accessor )
+{
+    const geode::uuid unknown_id;
+    try
+    {
+        geode_unused( accessor( unknown_id ) );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        geode::OpenGeodeModelException::test(
+            absl::StrContains( exception.what(), unknown_id.string() ),
+            "Exception message should contain the unknown component id" );
+        return;
+    }
+    geode::OpenGeodeModelException::test(
+        false, "Accessing an unknown component should throw" );
+}
+
+void test_remove_unknown_component()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    builder.add_surface();
+    const geode::uuid unknown_id;
+    bool thrown{ false };
+    try
+    {
+        builder.remove_surfaces( { unknown_id } );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = absl::StrContains( exception.what(),
+            absl::StrCat( "Surface with id ", unknown_id.string() ) );
+    }
+    geode::OpenGeodeModelException::test( thrown,
+        "Removing an unknown Surface should throw an exception naming the "
+        "component type and id" );
+    geode::OpenGeodeModelException::test( brep.nb_surfaces() == 1,
+        "Removing an unknown Surface should not modify the model" );
+}
+
+void test_unknown_components( const geode::BRep& model )
+{
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.corner( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.line( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.surface( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.block( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.model_boundary( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.corner_collection( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.line_collection( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.surface_collection( id ).id();
+    } );
+    test_unknown_component_access( [&model]( const geode::uuid& id ) {
+        return model.block_collection( id ).id();
+    } );
+}
+
+void test_is_closed()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    const auto& corner0 = model.corner( builder.add_corner() );
+    const auto& corner1 = model.corner( builder.add_corner() );
+    const auto& free_line = model.line( builder.add_line() );
+    const auto& loop_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, loop_line );
+    const auto& open_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, open_line );
+    builder.add_corner_line_boundary_relationship( corner1, open_line );
+    const auto& closed_surface = model.surface( builder.add_surface() );
+    builder.add_corner_surface_internal_relationship( corner1, closed_surface );
+    builder.add_line_surface_internal_relationship( free_line, closed_surface );
+    const auto& open_surface = model.surface( builder.add_surface() );
+    builder.add_line_surface_boundary_relationship( open_line, open_surface );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( free_line ), "Line without boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( loop_line ), "Line with one boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        !model.is_closed( open_line ), "Line with two boundaries is open" );
+    geode::OpenGeodeModelException::test( model.is_closed( closed_surface ),
+        "Surface without boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        !model.is_closed( open_surface ), "Surface with boundary is open" );
+}
+
+void check_box( const geode::BoundingBox3D& box,
+    const geode::Point3D& min,
+    const geode::Point3D& max,
+    std::string_view message )
+{
+    geode::OpenGeodeModelException::test( box.min() == min && box.max() == max,
+        message, ": got ", box.string(), " instead of ", min.string(), " ",
+        max.string() );
+}
+
+void test_bounding_box()
+{
+    geode::BRep model;
+    geode::BRepBuilder builder{ model };
+    bool empty_exception{ false };
+    try
+    {
+        geode_unused( model.bounding_box() );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        empty_exception = true;
+    }
+    geode::OpenGeodeModelException::test(
+        empty_exception, "Bounding box of an empty BRep should throw" );
+
+    const auto& corner = model.corner( builder.add_corner() );
+    builder.corner_mesh_builder( corner )->create_point(
+        geode::Point3D{ { -5, 0, 0 } } );
+    const auto& line = model.line( builder.add_line() );
+    builder.line_mesh_builder( line )->create_point(
+        geode::Point3D{ { 0, 6, 0 } } );
+    for( const auto s : geode::Range{ 4 } )
+    {
+        const auto& surface = model.surface( builder.add_surface() );
+        auto mesh_builder = builder.surface_mesh_builder( surface );
+        mesh_builder->create_point( geode::Point3D{ { 1. * s, 0, 0 } } );
+        mesh_builder->create_point( geode::Point3D{ { 0, 0, -1. * s } } );
+    }
+    const auto& empty_surface = model.surface( builder.add_surface() );
+    geode_unused( empty_surface );
+    const auto& block = model.block( builder.add_block() );
+    builder.block_mesh_builder( block )->create_point(
+        geode::Point3D{ { 0, 0, 7 } } );
+    check_box( model.bounding_box(), geode::Point3D{ { -5, 0, -3 } },
+        geode::Point3D{ { 3, 6, 7 } }, "Wrong BRep bounding box" );
+
+    builder.set_corner_active( corner, false );
+    builder.set_block_active( block, false );
+    check_box( model.active_components_bounding_box(),
+        geode::Point3D{ { 0, 0, -3 } }, geode::Point3D{ { 3, 6, 0 } },
+        "Wrong BRep active components bounding box" );
 }
 
 std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
@@ -1815,11 +2020,121 @@ std::tuple< geode::BRep, geode::ModelCopyMapping > copy_model(
     return { std::move( other ), std::move( mapping ) };
 }
 
+template < typename Range >
+void save_unique_vertices( const geode::BRep& brep,
+    const Range& components,
+    std::vector< geode::index_t >& unique_vertices )
+{
+    for( const auto& component : components )
+    {
+        for( const auto v : geode::Range{ component.mesh().nb_vertices() } )
+        {
+            unique_vertices.push_back(
+                brep.unique_vertex( { component.component_id(), v } ) );
+        }
+    }
+}
+
+std::vector< geode::index_t > save_unique_vertices( const geode::BRep& brep )
+{
+    std::vector< geode::index_t > unique_vertices;
+    save_unique_vertices( brep, brep.corners(), unique_vertices );
+    save_unique_vertices( brep, brep.lines(), unique_vertices );
+    save_unique_vertices( brep, brep.surfaces(), unique_vertices );
+    save_unique_vertices( brep, brep.blocks(), unique_vertices );
+    return unique_vertices;
+}
+
+std::vector< std::vector< geode::ComponentMeshVertex > > sorted_unique_vertices(
+    const geode::BRep& brep )
+{
+    std::vector< std::vector< geode::ComponentMeshVertex > > unique_vertices;
+    for( const auto uv : geode::Range{ brep.nb_unique_vertices() } )
+    {
+        auto cmvs = brep.component_mesh_vertices( uv );
+        for( const auto& cmv : cmvs )
+        {
+            geode::OpenGeodeModelException::test(
+                brep.unique_vertex( cmv ) == uv,
+                "[Test] Steal mesh: inconsistent unique vertex for ",
+                cmv.string() );
+        }
+        absl::c_sort( cmvs );
+        unique_vertices.emplace_back( std::move( cmvs ) );
+    }
+    absl::c_sort( unique_vertices );
+    return unique_vertices;
+}
+
+template < typename Range >
+void set_unique_vertices( geode::BRepBuilder& builder,
+    const Range& components,
+    geode::index_t nb_unique_vertices,
+    geode::index_t& count )
+{
+    for( const auto& component : components )
+    {
+        for( const auto v : geode::Range{ component.mesh().nb_vertices() } )
+        {
+            builder.set_unique_vertex(
+                { component.component_id(), v }, count++ % nb_unique_vertices );
+        }
+    }
+}
+
+template < typename Range >
+void check_single_unique_vertices_attribute( const Range& components )
+{
+    for( const auto& component : components )
+    {
+        const auto ids = component.mesh()
+                             .vertex_attribute_manager()
+                             .attribute_ids_matching_name( "unique vertices" );
+        geode::OpenGeodeModelException::test(
+            ids.has_value() && ids->size() == 1,
+            "[Test] Steal mesh: component ", component.id().string(),
+            " mesh should have exactly one unique vertices attribute" );
+    }
+}
+
 void test_steal_mesh( geode::BRep& brep )
 {
-    auto [other, mapping] = copy_model( brep );
-    geode::BRepBuilder builder{ brep };
-    builder.replace_components_meshes_by_others( std::move( other ), mapping );
+    {
+        const auto unique_vertices_before = sorted_unique_vertices( brep );
+        auto [other, mapping] = copy_model( brep );
+        geode::BRepBuilder builder{ brep };
+        builder.replace_components_meshes_by_others(
+            std::move( other ), mapping );
+        geode::OpenGeodeModelException::test(
+            sorted_unique_vertices( brep ) == unique_vertices_before,
+            "[Test] Steal mesh: unique vertices should be identical after "
+            "replacing meshes" );
+        check_single_unique_vertices_attribute( brep.corners() );
+        check_single_unique_vertices_attribute( brep.lines() );
+        check_single_unique_vertices_attribute( brep.surfaces() );
+        check_single_unique_vertices_attribute( brep.blocks() );
+    }
+
+    auto [model, model_mapping] = copy_model( brep );
+    geode::BRepBuilder model_builder{ model };
+    constexpr geode::index_t nb_unique_vertices{ 7 };
+    model_builder.create_unique_vertices( nb_unique_vertices );
+    geode::index_t count{ 0 };
+    set_unique_vertices(
+        model_builder, model.corners(), nb_unique_vertices, count );
+    set_unique_vertices(
+        model_builder, model.lines(), nb_unique_vertices, count );
+    set_unique_vertices(
+        model_builder, model.surfaces(), nb_unique_vertices, count );
+    set_unique_vertices(
+        model_builder, model.blocks(), nb_unique_vertices, count );
+    const auto unique_vertices = save_unique_vertices( model );
+    auto [other, mapping] = copy_model( model );
+    model_builder.replace_components_meshes_by_others(
+        std::move( other ), mapping );
+    geode::OpenGeodeModelException::test(
+        save_unique_vertices( model ) == unique_vertices,
+        "Unique vertices should be kept when replacing meshes" );
 }
 
 void test()
@@ -1885,6 +2200,10 @@ void test()
     test_surface_collection_ranges(
         model, surface_uuids, surface_collection_uuids );
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
+    test_unknown_components( model );
+    test_remove_unknown_component();
+    test_is_closed();
+    test_bounding_box();
     const geode::uuid physical_attribute_id;
     geode::AttributeValues< double > porosity_values;
     porosity_values.default_value = 0.2;
@@ -1930,6 +2249,7 @@ void test()
 
     test_backward_io();
     test_components_filter();
+    test_registry_remove_unknown_type();
 }
 
 OPENGEODE_TEST( "brep" )

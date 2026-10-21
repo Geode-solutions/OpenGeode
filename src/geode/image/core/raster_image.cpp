@@ -25,6 +25,7 @@
 
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/internal/array_impl.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/image/core/rgb_color.hpp>
@@ -41,7 +42,7 @@ namespace geode
         const RGBColor& color( index_t index ) const
         {
             OpenGeodeImageException::check_assertion( index < colors_.size(),
-                "[RasterImage::set_color] Accessing a "
+                "[RasterImage::color] Accessing a "
                 "cell that does not exist" );
             return colors_[index];
         }
@@ -52,6 +53,16 @@ namespace geode
                 "[RasterImage::set_color] Accessing a "
                 "cell that does not exist" );
             colors_[index] = std::move( color );
+        }
+
+        [[nodiscard]] index_t nb_colors() const
+        {
+            return static_cast< index_t >( colors_.size() );
+        }
+
+        void set_max_nb_colors( index_t max_nb_colors )
+        {
+            max_nb_colors_ = max_nb_colors;
         }
 
         void resize( index_t nb_cells )
@@ -68,18 +79,22 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, Impl >{ { []( Archive& archive,
-                                                        Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  internal::ArrayImpl< dimension > >{} );
-                    archive.container( impl.colors_, impl.colors_.max_size() );
-                } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass<
+                                      internal::ArrayImpl< dimension > >{} );
+                        archive.container(
+                            impl.colors_, std::size_t{ impl.max_nb_colors_ } );
+                    } } } );
         }
 
     private:
         std::vector< RGBColor > colors_;
+        /// Bound of the serialized colors, prevents corrupted files from
+        /// requesting huge allocations. Not serialized.
+        index_t max_nb_colors_{ 0 };
     };
 
     template < index_t dimension >
@@ -107,6 +122,12 @@ namespace geode
     index_t RasterImage< dimension >::cell_index(
         const CellIndices& index ) const
     {
+        for( const auto d : LRange{ dimension } )
+        {
+            OpenGeodeImageException::check_assertion(
+                index[d] < this->nb_cells_in_direction( d ),
+                "[RasterImage::cell_index] Invalid index in direction ", d );
+        }
         return impl_->cell_index( *this, index );
     }
 
@@ -139,6 +160,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    void RasterImage< dimension >::repair_colors()
+    {
+        const auto nb_colors = impl_->nb_colors();
+        const auto nb_cells = this->nb_cells();
+        if( nb_colors == nb_cells )
+        {
+            return;
+        }
+        Logger::warning( "[RasterImage] ", nb_colors, " colors stored for ",
+            nb_cells, " cells: colors are resized to the number of cells" );
+        impl_->resize( nb_cells );
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void RasterImage< dimension >::serialize( Archive& serializer )
     {
@@ -147,7 +182,9 @@ namespace geode
                 { []( Archive& archive, RasterImage& raster ) {
                     archive.ext( raster,
                         bitsery::ext::BaseClass< CellArray< dimension > >{} );
+                    raster.impl_->set_max_nb_colors( raster.nb_cells() );
                     archive.object( raster.impl_ );
+                    raster.repair_colors();
                 } } } );
     }
 

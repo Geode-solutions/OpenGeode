@@ -74,6 +74,16 @@ namespace geode
                 uuid2index_[id] = index;
             }
 
+            void clear()
+            {
+                uuid2index_.clear();
+            }
+
+            void reserve( index_t capacity )
+            {
+                uuid2index_.reserve( capacity );
+            }
+
             void update( absl::Span< const index_t > old2new )
             {
                 for( auto& it : uuid2index_ )

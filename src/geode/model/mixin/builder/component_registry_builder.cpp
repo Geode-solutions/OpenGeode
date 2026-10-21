@@ -56,6 +56,13 @@ namespace geode
             type, id, ComponentRegistry::RegistryBuilder{} );
     }
 
+    void ComponentRegistryBuilder::remove_mesh_components(
+        const ComponentType& type, absl::Span< const uuid > ids )
+    {
+        registry_.remove_mesh_components(
+            type, ids, ComponentRegistry::RegistryBuilder{} );
+    }
+
     void ComponentRegistryBuilder::remove_collection_component(
         const ComponentType& type, const uuid& id )
     {
