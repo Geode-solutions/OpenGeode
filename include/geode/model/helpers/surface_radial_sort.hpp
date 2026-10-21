@@ -80,8 +80,16 @@ namespace geode
         [[nodiscard]] absl::InlinedVector< index_t, 1 > find(
             const SidedSurface& surface ) const;
 
+        /*!
+         * Returns the position of the opposite side of the surface at the
+         * given position, NO_ID if there is no surface.
+         */
         [[nodiscard]] index_t opposite( index_t position ) const;
 
+        /*!
+         * Returns the position of the next sided surface around the line,
+         * NO_ID if there is no surface.
+         */
         [[nodiscard]] index_t next( index_t position ) const;
 
         absl::FixedArray< SidedSurface > surfaces;

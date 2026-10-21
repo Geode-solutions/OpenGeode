@@ -250,15 +250,13 @@ namespace geode
                     const auto& mesh = line.mesh();
                     for( const auto edge_id : Range{ mesh.nb_edges() } )
                     {
-                        const auto model_edges =
-                            component_mesh_edges( model_, line, edge_id );
-                        const auto& surface_edges = model_edges.surface_edges;
-                        const auto it = surface_edges.find( surface.id() );
-                        if( it == surface_edges.end() )
-                        {
-                            continue;
-                        }
-                        for( auto& edge : it->second )
+                        // Only this surface is queried: the other surfaces
+                        // may be modified concurrently by their own task.
+                        const auto surface_edges =
+                            detail::surface_component_mesh_edges( model_,
+                                edge_unique_vertices( model_, line, edge_id ),
+                                surface );
+                        for( const auto& edge : surface_edges )
                         {
                             edges.push_back( edge );
                             if( const auto adj_edge =
