@@ -140,6 +140,12 @@ namespace geode
     absl::FixedArray< index_t > radial_sort(
         const Segment3D& segment, absl::Span< const Point3D > points )
     {
+        if( points.size() < 3 )
+        {
+            absl::FixedArray< index_t > identity( points.size() );
+            absl::c_iota( identity, 0 );
+            return identity;
+        }
         RadialSort radial_sort{ segment, points };
         return radial_sort.sort();
     }
