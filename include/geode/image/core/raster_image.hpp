@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/basic/cell_array.hpp>
 #include <geode/basic/identifier.hpp>
 #include <geode/basic/pimpl.hpp>
@@ -71,6 +73,17 @@ namespace geode
         [[nodiscard]] const RGBColor& color( index_t index ) const;
 
         void set_color( index_t index, RGBColor color );
+
+        /*!
+         * All the cell colors, stored contiguously in cell index order
+         */
+        [[nodiscard]] absl::Span< const RGBColor > colors() const;
+
+        /*!
+         * All the cell colors, stored contiguously in cell index order, for
+         * bulk modifications
+         */
+        [[nodiscard]] absl::Span< RGBColor > modifiable_colors();
 
         [[nodiscard]] RasterImage clone() const;
 
