@@ -28,6 +28,7 @@
 #include <bitsery/traits/string.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -66,7 +67,7 @@ namespace geode
                 Growable< Archive, Impl >{
                     { []( Archive& local_archive, Impl& impl ) {
                          local_archive.text1b( impl.backward_compatible_name_,
-                             impl.backward_compatible_name_.max_size() );
+                             MAX_SERIALIZED_NAME_SIZE );
                          local_archive.object( impl.backward_compatible_id_ );
                      },
                         []( Archive& local_archive, Impl& impl ) {

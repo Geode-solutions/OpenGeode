@@ -100,7 +100,7 @@ namespace geode
         std::string_view directory, LineCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
-            absl::StrCat( directory, "/line_collections" ) );
+            absl::StrCat( directory, "/line_collections" ), false );
     }
 
     template < index_t dimension >
@@ -160,54 +160,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    class LineCollections< dimension >::LineCollectionRangeBase::Impl
-        : public BaseRange<
-              typename LineCollections< dimension >::Impl::Iterator >
-    {
-        using Iterator = typename LineCollections< dimension >::Impl::Iterator;
-
-    public:
-        Impl( Iterator begin, Iterator end )
-            : BaseRange< Impl::Iterator >( begin, end )
-        {
-        }
-
-        LineCollection< dimension >& line_collection() const
-        {
-            return *this->current()->second;
-        }
-
-        void set_active_only()
-        {
-            active_only_ = true;
-            next_line_collection();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_line_collection();
-        }
-
-    private:
-        void next_line_collection()
-        {
-            while( this->operator!=( *this )
-                   && ( active_only_ && !line_collection().is_active() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        bool active_only_{ false };
-    };
-
-    template < index_t dimension >
     LineCollections< dimension >::LineCollectionRangeBase::
         LineCollectionRangeBase( const LineCollections& collections )
         : impl_( collections.impl_->begin(), collections.impl_->end() )
     {
+        static_assert( std::is_same_v< decltype( collections.impl_->begin() ),
+                           typename decltype( impl_ )::Iterator >,
+            "[ComponentRangeIterator] Iterator type mismatch" );
     }
 
     template < index_t dimension >
@@ -217,7 +176,7 @@ namespace geode
     template < index_t dimension >
     LineCollections< dimension >::LineCollectionRangeBase::
         LineCollectionRangeBase( const LineCollectionRangeBase& other )
-        : impl_( *other.impl_ )
+        : impl_( other.impl_ )
     {
     }
 
@@ -230,20 +189,20 @@ namespace geode
     bool LineCollections< dimension >::LineCollectionRangeBase::operator!=(
         const LineCollectionRangeBase& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return impl_.is_valid();
     }
 
     template < index_t dimension >
     void
         LineCollections< dimension >::LineCollectionRangeBase::set_active_only()
     {
-        impl_->set_active_only();
+        impl_.set_active_only();
     }
 
     template < index_t dimension >
     void LineCollections< dimension >::LineCollectionRangeBase::operator++()
     {
-        return impl_->next();
+        impl_.next();
     }
 
     template < index_t dimension >
@@ -282,7 +241,7 @@ namespace geode
     const LineCollection< dimension >&
         LineCollections< dimension >::LineCollectionRange::operator*() const
     {
-        return this->impl_->line_collection();
+        return this->impl_.component();
     }
 
     template < index_t dimension >
@@ -324,7 +283,7 @@ namespace geode
         LineCollections< dimension >::ModifiableLineCollectionRange::operator*()
             const
     {
-        return this->impl_->line_collection();
+        return this->impl_.component();
     }
 
     template class opengeode_model_api LineCollections< 2 >;

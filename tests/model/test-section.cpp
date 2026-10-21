@@ -27,6 +27,7 @@
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
@@ -987,12 +988,66 @@ void test_registry( const geode::Section& section )
     }
 }
 
+void test_bounding_box()
+{
+    geode::Section model;
+    geode::SectionBuilder builder{ model };
+    const auto& corner = model.corner( builder.add_corner() );
+    builder.corner_mesh_builder( corner )->create_point(
+        geode::Point2D{ { -5, 0 } } );
+    for( const auto s : geode::Range{ 4 } )
+    {
+        const auto& line = model.line( builder.add_line() );
+        builder.line_mesh_builder( line )->create_point(
+            geode::Point2D{ { 0, 2. * s } } );
+        const auto& surface = model.surface( builder.add_surface() );
+        builder.surface_mesh_builder( surface )->create_point(
+            geode::Point2D{ { 1. * s, -1. * s } } );
+    }
+    geode_unused( builder.add_surface() );
+    const auto box = model.bounding_box();
+    geode::OpenGeodeModelException::test(
+        box.min() == geode::Point2D{ { -5, -3 } }
+            && box.max() == geode::Point2D{ { 3, 6 } },
+        "Wrong Section bounding box: ", box.string() );
+    builder.set_corner_active( corner, false );
+    const auto active_box = model.active_components_bounding_box();
+    geode::OpenGeodeModelException::test(
+        active_box.min() == geode::Point2D{ { 0, -3 } }
+            && active_box.max() == geode::Point2D{ { 3, 6 } },
+        "Wrong Section active components bounding box: ", active_box.string() );
+}
+
+void test_is_closed()
+{
+    geode::Section model;
+    geode::SectionBuilder builder{ model };
+    const auto& corner0 = model.corner( builder.add_corner() );
+    const auto& corner1 = model.corner( builder.add_corner() );
+    const auto& free_line = model.line( builder.add_line() );
+    const auto& loop_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, loop_line );
+    const auto& open_line = model.line( builder.add_line() );
+    builder.add_corner_line_boundary_relationship( corner0, open_line );
+    builder.add_corner_line_boundary_relationship( corner1, open_line );
+    builder.add_line_surface_boundary_relationship(
+        open_line, model.surface( builder.add_surface() ) );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( free_line ), "Line without boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        model.is_closed( loop_line ), "Line with one boundary is closed" );
+    geode::OpenGeodeModelException::test(
+        !model.is_closed( open_line ), "Line with two boundaries is open" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
     geode::Section model;
     geode::SectionBuilder builder( model );
+    test_is_closed();
+    test_bounding_box();
 
     // This Section represents a house (with one triangle and one square as
     // in children sketches)

@@ -100,7 +100,7 @@ namespace geode
         std::string_view directory, BlockCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
-            absl::StrCat( directory, "/block_collections" ) );
+            absl::StrCat( directory, "/block_collections" ), false );
     }
 
     template < index_t dimension >
@@ -162,54 +162,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    class BlockCollections< dimension >::BlockCollectionRangeBase::Impl
-        : public BaseRange<
-              typename BlockCollections< dimension >::Impl::Iterator >
-    {
-        using Iterator = typename BlockCollections< dimension >::Impl::Iterator;
-
-    public:
-        Impl( Iterator begin, Iterator end )
-            : BaseRange< Impl::Iterator >( begin, end )
-        {
-        }
-
-        BlockCollection< dimension >& block_collection() const
-        {
-            return *this->current()->second;
-        }
-
-        void set_active_only()
-        {
-            active_only_ = true;
-            next_block_collection();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_block_collection();
-        }
-
-    private:
-        void next_block_collection()
-        {
-            while( this->operator!=( *this )
-                   && ( active_only_ && !block_collection().is_active() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        bool active_only_{ false };
-    };
-
-    template < index_t dimension >
     BlockCollections< dimension >::BlockCollectionRangeBase::
         BlockCollectionRangeBase( const BlockCollections& collections )
         : impl_( collections.impl_->begin(), collections.impl_->end() )
     {
+        static_assert( std::is_same_v< decltype( collections.impl_->begin() ),
+                           typename decltype( impl_ )::Iterator >,
+            "[ComponentRangeIterator] Iterator type mismatch" );
     }
 
     template < index_t dimension >
@@ -220,7 +179,7 @@ namespace geode
     template < index_t dimension >
     BlockCollections< dimension >::BlockCollectionRangeBase::
         BlockCollectionRangeBase( const BlockCollectionRangeBase& other )
-        : impl_( *other.impl_ )
+        : impl_( other.impl_ )
     {
     }
 
@@ -233,20 +192,20 @@ namespace geode
     bool BlockCollections< dimension >::BlockCollectionRangeBase::operator!=(
         const BlockCollectionRangeBase& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return impl_.is_valid();
     }
 
     template < index_t dimension >
     void BlockCollections<
         dimension >::BlockCollectionRangeBase::set_active_only()
     {
-        impl_->set_active_only();
+        impl_.set_active_only();
     }
 
     template < index_t dimension >
     void BlockCollections< dimension >::BlockCollectionRangeBase::operator++()
     {
-        return impl_->next();
+        impl_.next();
     }
 
     template < index_t dimension >
@@ -285,7 +244,7 @@ namespace geode
     const BlockCollection< dimension >&
         BlockCollections< dimension >::BlockCollectionRange::operator*() const
     {
-        return this->impl_->block_collection();
+        return this->impl_.component();
     }
 
     template < index_t dimension >
@@ -325,7 +284,7 @@ namespace geode
     BlockCollection< dimension >& BlockCollections<
         dimension >::ModifiableBlockCollectionRange::operator*() const
     {
-        return this->impl_->block_collection();
+        return this->impl_.component();
     }
 
     template class opengeode_model_api BlockCollections< 2 >;

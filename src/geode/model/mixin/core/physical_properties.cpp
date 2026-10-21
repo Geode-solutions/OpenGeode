@@ -98,7 +98,11 @@ namespace geode
         {
             const auto filename =
                 absl::StrCat( directory, "/physical_properties" );
-            std::ofstream file{ filename, std::ofstream::binary };
+            std::ofstream file{ std::filesystem::u8path( filename ),
+                std::ofstream::binary };
+            OpenGeodeModelException::check_exception( file.is_open(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[PhysicalProperties::save] Cannot open file: ", filename );
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
                 std::get< 0 >( context ) );
@@ -106,7 +110,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OpenGeodeModelException::check_exception(
-                std::get< 1 >( context ).isValid(), nullptr,
+                file.good() && std::get< 1 >( context ).isValid(), nullptr,
                 OpenGeodeException::TYPE::internal,
                 "[PhysicalProperties::save] Error while writing file: ",
                 filename );
@@ -116,11 +120,13 @@ namespace geode
         {
             const auto filename =
                 absl::StrCat( directory, "/physical_properties" );
-            if( !std::filesystem::exists( filename ) )
+            if( !std::filesystem::exists(
+                    std::filesystem::u8path( filename ) ) )
             {
                 return;
             }
-            std::ifstream file{ filename, std::ifstream::binary };
+            std::ifstream file{ std::filesystem::u8path( filename ),
+                std::ifstream::binary };
             TContext context{};
             BitseryExtensions::register_deserialize_pcontext(
                 std::get< 0 >( context ) );
