@@ -614,7 +614,7 @@ namespace geode
 
     bool Section::is_closed( const Line2D& line ) const
     {
-        return nb_boundaries( line.id() ) < 2;
+        return !internal::has_at_least_n_boundaries( *this, line.id(), 2 );
     }
 
     bool Section::is_boundary(

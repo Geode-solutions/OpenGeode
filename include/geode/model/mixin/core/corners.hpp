@@ -29,6 +29,7 @@
 #include <geode/mesh/core/mesh_id.hpp>
 
 #include <geode/model/common.hpp>
+#include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
 namespace geode
 {
@@ -74,7 +75,7 @@ namespace geode
             CornerRangeBase( const CornerRangeBase& other );
 
         protected:
-            IMPLEMENTATION_MEMBER( impl_ );
+            detail::ComponentRangeIterator< Corner< dimension > > impl_;
         };
 
         /*!

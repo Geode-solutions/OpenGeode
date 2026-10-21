@@ -29,6 +29,7 @@
 #include <geode/mesh/core/mesh_id.hpp>
 
 #include <geode/model/common.hpp>
+#include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
 namespace geode
 {
@@ -71,7 +72,8 @@ namespace geode
                 const SurfaceCollectionRangeBase& other );
 
         protected:
-            IMPLEMENTATION_MEMBER( impl_ );
+            detail::ComponentRangeIterator< SurfaceCollection< dimension > >
+                impl_;
         };
 
         class opengeode_model_api SurfaceCollectionRange

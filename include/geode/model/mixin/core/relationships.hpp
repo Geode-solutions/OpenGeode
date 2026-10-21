@@ -38,6 +38,7 @@
 namespace geode
 {
     class AttributeManager;
+    struct EdgeVertex;
     class RelationshipsBuilder;
     struct uuid;
 } // namespace geode
@@ -53,6 +54,8 @@ namespace geode
      */
     class opengeode_model_api Relationships
     {
+        class Impl;
+
     public:
         PASSKEY( RelationshipsBuilder, RelationshipsBuilderKey /*key*/ );
 
@@ -77,7 +80,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api RelationRange : public RelationRangeIterator
@@ -120,7 +125,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api BoundaryRange : public BoundaryRangeIterator
@@ -163,7 +170,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api IncidenceRange : public IncidenceRangeIterator
@@ -206,7 +215,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api InternalRange : public InternalRangeIterator
@@ -249,7 +260,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api EmbeddingRange : public EmbeddingRangeIterator
@@ -292,7 +305,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api ItemRange : public ItemRangeIterator
@@ -335,7 +350,9 @@ namespace geode
             [[nodiscard]] const ComponentID& operator*() const;
 
         private:
-            IMPLEMENTATION_MEMBER( impl_ );
+            const Impl* relationships_{ nullptr };
+            const EdgeVertex* current_{ nullptr };
+            const EdgeVertex* end_{ nullptr };
         };
 
         class opengeode_model_api CollectionRange
@@ -479,6 +496,6 @@ namespace geode
         Relationships& operator=( Relationships&& other ) noexcept;
 
     private:
-        IMPLEMENTATION_MEMBER( impl_ );
+        PImpl< Impl > impl_;
     };
 } // namespace geode

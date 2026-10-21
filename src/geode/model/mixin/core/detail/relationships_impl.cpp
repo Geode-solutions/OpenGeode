@@ -67,22 +67,13 @@ namespace geode
             return 0;
         }
 
-        RelationshipsImpl::Iterator RelationshipsImpl::begin_edge(
-            const uuid& component_id ) const
+        absl::Span< const EdgeVertex >
+            RelationshipsImpl::edges_around_component(
+                const uuid& component_id ) const
         {
             if( const auto index = vertex_id( component_id ) )
             {
-                return graph_->edges_around_vertex( index.value() ).begin();
-            }
-            return {};
-        }
-
-        RelationshipsImpl::Iterator RelationshipsImpl::end_edge(
-            const uuid& component_id ) const
-        {
-            if( const auto index = vertex_id( component_id ) )
-            {
-                return graph_->edges_around_vertex( index.value() ).end();
+                return graph_->edges_around_vertex( index.value() );
             }
             return {};
         }

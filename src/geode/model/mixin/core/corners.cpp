@@ -225,53 +225,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    class Corners< dimension >::CornerRangeBase::Impl
-        : public BaseRange< typename Corners< dimension >::Impl::Iterator >
-    {
-        using Iterator = typename Corners< dimension >::Impl::Iterator;
-
-    public:
-        Impl( Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end )
-        {
-        }
-
-        Corner< dimension >& corner() const
-        {
-            return *this->current()->second;
-        }
-
-        void set_active_only()
-        {
-            active_only_ = true;
-            next_corner();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_corner();
-        }
-
-    private:
-        void next_corner()
-        {
-            while( this->operator!=( *this )
-                   && ( active_only_ && !corner().is_active() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        bool active_only_{ false };
-    };
-
-    template < index_t dimension >
     Corners< dimension >::CornerRangeBase::CornerRangeBase(
         const Corners& corners )
         : impl_( corners.impl_->begin(), corners.impl_->end() )
     {
+        static_assert( std::is_same_v< decltype( corners.impl_->begin() ),
+                           typename decltype( impl_ )::Iterator >,
+            "[ComponentRangeIterator] Iterator type mismatch" );
     }
 
     template < index_t dimension >
@@ -281,7 +241,7 @@ namespace geode
     template < index_t dimension >
     Corners< dimension >::CornerRangeBase::CornerRangeBase(
         const CornerRangeBase& other )
-        : impl_( *other.impl_ )
+        : impl_( other.impl_ )
     {
     }
 
@@ -292,19 +252,19 @@ namespace geode
     bool Corners< dimension >::CornerRangeBase::operator!=(
         const CornerRangeBase& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return impl_.is_valid();
     }
 
     template < index_t dimension >
     void Corners< dimension >::CornerRangeBase::set_active_only()
     {
-        impl_->set_active_only();
+        impl_.set_active_only();
     }
 
     template < index_t dimension >
     void Corners< dimension >::CornerRangeBase::operator++()
     {
-        return impl_->next();
+        impl_.next();
     }
 
     template < index_t dimension >
@@ -338,7 +298,7 @@ namespace geode
     const Corner< dimension >&
         Corners< dimension >::CornerRange::operator*() const
     {
-        return this->impl_->corner();
+        return this->impl_.component();
     }
 
     template < index_t dimension >
@@ -377,7 +337,7 @@ namespace geode
     Corner< dimension >&
         Corners< dimension >::ModifiableCornerRange::operator*() const
     {
-        return this->impl_->corner();
+        return this->impl_.component();
     }
 
     template class opengeode_model_api Corners< 2 >;

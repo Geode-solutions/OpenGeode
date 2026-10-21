@@ -882,12 +882,12 @@ namespace geode
 
     bool BRep::is_closed( const Line3D& line ) const
     {
-        return nb_boundaries( line.id() ) < 2;
+        return !internal::has_at_least_n_boundaries( *this, line.id(), 2 );
     }
 
     bool BRep::is_closed( const Surface3D& surface ) const
     {
-        return nb_boundaries( surface.id() ) == 0;
+        return !internal::has_at_least_n_boundaries( *this, surface.id(), 1 );
     }
 
     bool BRep::is_boundary( const Corner3D& corner, const Line3D& line ) const
@@ -987,14 +987,9 @@ namespace geode
             bbox.add_box( box.value() );
             bbox_computed = true;
         }
-        for( const auto& block : blocks() )
+        if( const auto box = internal::meshes_bounding_box< 3 >( blocks() ) )
         {
-            const auto& block_mesh = block.mesh();
-            if( block_mesh.nb_vertices() == 0 )
-            {
-                continue;
-            }
-            bbox.add_box( block_mesh.bounding_box() );
+            bbox.add_box( box.value() );
             bbox_computed = true;
         }
         OpenGeodeModelException::check_exception( bbox_computed, nullptr,

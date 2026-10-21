@@ -71,6 +71,19 @@ namespace geode
             return relation_type_->value( edge_id );
         }
 
+        void skip_relation_edges( const RelationType type,
+            const local_index_t excluded_edge_vertex,
+            const EdgeVertex*& current,
+            const EdgeVertex* end ) const
+        {
+            while( current != end
+                   && ( relation_type( current->edge_id ) != type
+                        || current->vertex_id == excluded_edge_vertex ) )
+            {
+                ++current;
+            }
+        }
+
         bool is_boundary_relation( const index_t edge_id ) const
         {
             return relation_type_->value( edge_id ) == BOUNDARY_RELATION;
@@ -492,555 +505,255 @@ namespace geode
         return impl_->relation_components_from_index( component_id );
     }
 
-    class Relationships::RelationRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-        }
-
-        void next()
-        {
-            this->operator++();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
-
     Relationships::RelationRangeIterator::RelationRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
     }
 
     Relationships::RelationRangeIterator::RelationRangeIterator(
         RelationRangeIterator&& ) noexcept = default;
 
     Relationships::RelationRangeIterator::RelationRangeIterator(
-        const RelationRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const RelationRangeIterator& ) = default;
 
     Relationships::RelationRangeIterator::~RelationRangeIterator() = default;
 
     bool Relationships::RelationRangeIterator::operator!=(
         const RelationRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::RelationRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
     }
 
     const ComponentID& Relationships::RelationRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
-
-    class Relationships::BoundaryRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-            next_boundary_iterator();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_boundary_iterator();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        bool is_boundary_edge_vertex()
-        {
-            return this->current()->vertex_id
-                   == Relationships::Impl::BOUNDARY_EDGE_VERTEX;
-        }
-
-        void next_boundary_iterator()
-        {
-            while( this->operator!=( *this )
-                   && ( !relationships_.is_boundary_relation(
-                            this->current()->edge_id )
-                        || is_boundary_edge_vertex() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
 
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
+        relationships_->skip_relation_edges(
+            Relationships::Impl::BOUNDARY_RELATION,
+            Relationships::Impl::BOUNDARY_EDGE_VERTEX, current_, end_ );
     }
 
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         BoundaryRangeIterator&& ) noexcept = default;
 
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
-        const BoundaryRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const BoundaryRangeIterator& ) = default;
 
     Relationships::BoundaryRangeIterator::~BoundaryRangeIterator() = default;
 
     bool Relationships::BoundaryRangeIterator::operator!=(
         const BoundaryRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::BoundaryRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
+        relationships_->skip_relation_edges(
+            Relationships::Impl::BOUNDARY_RELATION,
+            Relationships::Impl::BOUNDARY_EDGE_VERTEX, current_, end_ );
     }
 
     const ComponentID& Relationships::BoundaryRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
-
-    class Relationships::IncidenceRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-            next_incidence_iterator();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_incidence_iterator();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        bool is_incident_edge_vertex()
-        {
-            return this->current()->vertex_id
-                   == Relationships::Impl::INCIDENT_EDGE_VERTEX;
-        }
-
-        void next_incidence_iterator()
-        {
-            while( this->operator!=( *this )
-                   && ( !relationships_.is_boundary_relation(
-                            this->current()->edge_id )
-                        || is_incident_edge_vertex() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
 
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
+        relationships_->skip_relation_edges(
+            Relationships::Impl::BOUNDARY_RELATION,
+            Relationships::Impl::INCIDENT_EDGE_VERTEX, current_, end_ );
     }
 
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         IncidenceRangeIterator&& ) noexcept = default;
 
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
-        const IncidenceRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const IncidenceRangeIterator& ) = default;
 
     Relationships::IncidenceRangeIterator::~IncidenceRangeIterator() = default;
 
     bool Relationships::IncidenceRangeIterator::operator!=(
         const IncidenceRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::IncidenceRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
+        relationships_->skip_relation_edges(
+            Relationships::Impl::BOUNDARY_RELATION,
+            Relationships::Impl::INCIDENT_EDGE_VERTEX, current_, end_ );
     }
 
     const ComponentID& Relationships::IncidenceRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
-
-    class Relationships::InternalRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-            next_internal_iterator();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_internal_iterator();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        bool is_internal_edge_vertex()
-        {
-            return this->current()->vertex_id
-                   == Relationships::Impl::INTERNAL_EDGE_VERTEX;
-        }
-
-        void next_internal_iterator()
-        {
-            while( this->operator!=( *this )
-                   && ( !relationships_.is_internal_relation(
-                            this->current()->edge_id )
-                        || is_internal_edge_vertex() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
 
     Relationships::InternalRangeIterator::InternalRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
+        relationships_->skip_relation_edges(
+            Relationships::Impl::INTERNAL_RELATION,
+            Relationships::Impl::INTERNAL_EDGE_VERTEX, current_, end_ );
     }
 
     Relationships::InternalRangeIterator::InternalRangeIterator(
         InternalRangeIterator&& ) noexcept = default;
 
     Relationships::InternalRangeIterator::InternalRangeIterator(
-        const InternalRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const InternalRangeIterator& ) = default;
 
     Relationships::InternalRangeIterator::~InternalRangeIterator() = default;
 
     bool Relationships::InternalRangeIterator::operator!=(
         const InternalRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::InternalRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
+        relationships_->skip_relation_edges(
+            Relationships::Impl::INTERNAL_RELATION,
+            Relationships::Impl::INTERNAL_EDGE_VERTEX, current_, end_ );
     }
 
     const ComponentID& Relationships::InternalRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
-
-    class Relationships::EmbeddingRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-            next_embedding_iterator();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_embedding_iterator();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        bool is_embedding_edge_vertex()
-        {
-            return this->current()->vertex_id
-                   == Relationships::Impl::EMBEDDING_EDGE_VERTEX;
-        }
-
-        void next_embedding_iterator()
-        {
-            while( this->operator!=( *this )
-                   && ( !relationships_.is_internal_relation(
-                            this->current()->edge_id )
-                        || is_embedding_edge_vertex() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
 
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
+        relationships_->skip_relation_edges(
+            Relationships::Impl::INTERNAL_RELATION,
+            Relationships::Impl::EMBEDDING_EDGE_VERTEX, current_, end_ );
     }
 
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         EmbeddingRangeIterator&& ) noexcept = default;
 
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
-        const EmbeddingRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const EmbeddingRangeIterator& ) = default;
 
     Relationships::EmbeddingRangeIterator::~EmbeddingRangeIterator() = default;
 
     bool Relationships::EmbeddingRangeIterator::operator!=(
         const EmbeddingRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::EmbeddingRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
+        relationships_->skip_relation_edges(
+            Relationships::Impl::INTERNAL_RELATION,
+            Relationships::Impl::EMBEDDING_EDGE_VERTEX, current_, end_ );
     }
 
     const ComponentID& Relationships::EmbeddingRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
-
-    class Relationships::ItemRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-            next_item_iterator();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_item_iterator();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        bool is_item_edge_vertex()
-        {
-            return this->current()->vertex_id
-                   == Relationships::Impl::ITEM_EDGE_VERTEX;
-        }
-
-        void next_item_iterator()
-        {
-            while( this->operator!=( *this )
-                   && ( !relationships_.is_item_relation(
-                            this->current()->edge_id )
-                        || is_item_edge_vertex() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
 
     Relationships::ItemRangeIterator::ItemRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
+        relationships_->skip_relation_edges( Relationships::Impl::ITEM_RELATION,
+            Relationships::Impl::ITEM_EDGE_VERTEX, current_, end_ );
     }
 
     Relationships::ItemRangeIterator::ItemRangeIterator(
         ItemRangeIterator&& ) noexcept = default;
 
     Relationships::ItemRangeIterator::ItemRangeIterator(
-        const ItemRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const ItemRangeIterator& ) = default;
 
     Relationships::ItemRangeIterator::~ItemRangeIterator() = default;
 
     bool Relationships::ItemRangeIterator::operator!=(
         const ItemRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::ItemRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
+        relationships_->skip_relation_edges( Relationships::Impl::ITEM_RELATION,
+            Relationships::Impl::ITEM_EDGE_VERTEX, current_, end_ );
     }
 
     const ComponentID& Relationships::ItemRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
-
-    class Relationships::CollectionRangeIterator::Impl
-        : public BaseRange< typename Relationships::Impl::Iterator >
-    {
-        using Iterator = typename Relationships::Impl::Iterator;
-
-    public:
-        Impl( const Relationships::Impl& relationships,
-            Iterator begin,
-            Iterator end )
-            : BaseRange< Iterator >( begin, end ),
-              relationships_( relationships )
-        {
-            next_collection_iterator();
-        }
-
-        void next()
-        {
-            this->operator++();
-            next_collection_iterator();
-        }
-
-        const ComponentID& graph_component_id() const
-        {
-            const auto iterator = this->current();
-            return relationships_.graph_component_id( iterator->opposite() );
-        }
-
-    private:
-        bool is_collection_edge_vertex()
-        {
-            return this->current()->vertex_id
-                   == Relationships::Impl::COLLECTION_EDGE_VERTEX;
-        }
-
-        void next_collection_iterator()
-        {
-            while( this->operator!=( *this )
-                   && ( !relationships_.is_item_relation(
-                            this->current()->edge_id )
-                        || is_collection_edge_vertex() ) )
-            {
-                this->operator++();
-            }
-        }
-
-    private:
-        const Relationships::Impl& relationships_;
-    };
 
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
         const Relationships& relationships, const uuid& component_id )
-        : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( component_id ),
-              relationships.impl_->end_edge( component_id ) )
+        : relationships_( &*relationships.impl_ )
     {
+        const auto edges =
+            relationships_->edges_around_component( component_id );
+        current_ = edges.data();
+        end_ = edges.data() + edges.size();
+        relationships_->skip_relation_edges( Relationships::Impl::ITEM_RELATION,
+            Relationships::Impl::COLLECTION_EDGE_VERTEX, current_, end_ );
     }
 
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
         CollectionRangeIterator&& ) noexcept = default;
 
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
-        const CollectionRangeIterator& other )
-        : impl_( *other.impl_ )
-    {
-    }
+        const CollectionRangeIterator& ) = default;
 
     Relationships::CollectionRangeIterator::~CollectionRangeIterator() =
         default;
@@ -1048,16 +761,18 @@ namespace geode
     bool Relationships::CollectionRangeIterator::operator!=(
         const CollectionRangeIterator& /*unused*/ ) const
     {
-        return impl_->operator!=( *impl_ );
+        return current_ != end_;
     }
 
     void Relationships::CollectionRangeIterator::operator++()
     {
-        impl_->next();
+        ++current_;
+        relationships_->skip_relation_edges( Relationships::Impl::ITEM_RELATION,
+            Relationships::Impl::COLLECTION_EDGE_VERTEX, current_, end_ );
     }
 
     const ComponentID& Relationships::CollectionRangeIterator::operator*() const
     {
-        return impl_->graph_component_id();
+        return relationships_->graph_component_id( current_->opposite() );
     }
 } // namespace geode
