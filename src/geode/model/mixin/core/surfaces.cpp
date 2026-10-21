@@ -26,20 +26,79 @@
 #include <async++.h>
 
 #include <geode/basic/detail/count_range_elements.hpp>
+#include <geode/basic/filename.hpp>
 #include <geode/basic/identifier_builder.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
 
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
+#include <geode/mesh/core/regular_grid_surface.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/io/polygonal_surface_input.hpp>
 #include <geode/mesh/io/polygonal_surface_output.hpp>
+#include <geode/mesh/io/regular_grid_input.hpp>
+#include <geode/mesh/io/regular_grid_output.hpp>
 #include <geode/mesh/io/triangulated_surface_input.hpp>
 #include <geode/mesh/io/triangulated_surface_output.hpp>
 
 #include <geode/model/mixin/core/detail/components_storage.hpp>
 #include <geode/model/mixin/core/surface.hpp>
+
+namespace
+{
+    template < geode::index_t dimension >
+    geode::MeshType surface_type_from_file( std::string_view file )
+    {
+        if( geode::TriangulatedSurfaceInputFactory< dimension >::has_creator(
+                geode::to_string( geode::extension_from_filename( file ) ) ) )
+        {
+            return geode::TriangulatedSurface< dimension >::type_name_static();
+        }
+        if constexpr( dimension == 2 )
+        {
+            if( geode::RegularGridInputFactory< 2 >::has_creator(
+                    geode::to_string(
+                        geode::extension_from_filename( file ) ) ) )
+            {
+                return geode::RegularGrid< 2 >::type_name_static();
+            }
+        }
+        return geode::PolygonalSurface< dimension >::type_name_static();
+    }
+
+    template < geode::index_t dimension >
+    bool save_grid_surface(
+        const geode::SurfaceMesh< dimension >& mesh, std::string_view file )
+    {
+        if constexpr( dimension == 2 )
+        {
+            if( const auto* grid =
+                    dynamic_cast< const geode::RegularGrid< 2 >* >( &mesh ) )
+            {
+                geode::save_regular_grid( *grid, file );
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template < geode::index_t dimension >
+    std::unique_ptr< geode::SurfaceMesh< dimension > > load_grid_surface(
+        const geode::MeshType& type,
+        const geode::MeshImpl& impl,
+        std::string_view file )
+    {
+        if constexpr( dimension == 2 )
+        {
+            if( type == geode::RegularGrid< 2 >::type_name_static() )
+            {
+                return geode::load_regular_grid< 2 >( impl, file );
+            }
+        }
+        return nullptr;
+    }
+} // namespace
 
 namespace geode
 {
@@ -120,7 +179,7 @@ namespace geode
                 {
                     save_polygonal_surface( *polygonal, file );
                 }
-                else
+                else if( !save_grid_surface< dimension >( mesh, file ) )
                 {
                     throw OpenGeodeModelException{ nullptr,
                         OpenGeodeException::TYPE::data,
@@ -146,18 +205,37 @@ namespace geode
         for( auto& surface : modifiable_surfaces( key ) )
         {
             tasks[count++] = async::spawn( [&surface, &mapping] {
-                const auto file = mapping.at( surface.id().string() );
-                if( MeshFactory::type( surface.mesh_type() )
+                const auto file = mapping.find( surface.id().string() );
+                if( file == mapping.end() )
+                {
+                    surface.set_mesh(
+                        detail::empty_mesh_of_missing_file( surface,
+                            PolygonalSurface< dimension >::type_name_static() ),
+                        typename Surface< dimension >::SurfacesKey{} );
+                    return;
+                }
+                const auto impl =
+                    detail::loadable_mesh_impl( surface.mesh_type(),
+                        surface_type_from_file< dimension >( file->second ),
+                        file->second );
+                const auto& type = MeshFactory::type( impl );
+                if( type
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {
                     surface.set_mesh( load_triangulated_surface< dimension >(
-                                          surface.mesh_type(), file ),
+                                          impl, file->second ),
+                        typename Surface< dimension >::SurfacesKey{} );
+                }
+                else if( auto grid = load_grid_surface< dimension >(
+                             type, impl, file->second ) )
+                {
+                    surface.set_mesh( std::move( grid ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
                 else
                 {
                     surface.set_mesh( load_polygonal_surface< dimension >(
-                                          surface.mesh_type(), file ),
+                                          impl, file->second ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
             } );

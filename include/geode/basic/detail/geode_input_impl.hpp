@@ -64,9 +64,10 @@ namespace geode::detail
         const Timer timer;
         auto input = geode_object_input_reader< Factory >( filename );
         OpenGeodeBasicException::check_exception(
-            std::filesystem::exists( input->filename() ), nullptr,
-            OpenGeodeException::TYPE::data, "[", type, "] File \"", filename,
-            "\" does not exist" );
+            std::filesystem::exists(
+                std::filesystem::u8path( to_string( input->filename() ) ) ),
+            nullptr, OpenGeodeException::TYPE::data, "[", type, "] File \"",
+            filename, "\" does not exist" );
         auto object = input->read( std::forward< Args >( args )... );
         Logger::info(
             type, " loaded from ", filename, " in ", timer.duration() );

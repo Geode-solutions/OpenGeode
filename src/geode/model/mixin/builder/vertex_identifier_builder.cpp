@@ -77,4 +77,10 @@ namespace geode
         return vertex_identifier_.delete_isolated_vertices(
             VertexIdentifier::BuilderKey{} );
     }
+
+    void VertexIdentifierBuilder::repair_component_vertices()
+    {
+        vertex_identifier_.repair_component_vertices(
+            VertexIdentifier::BuilderKey{} );
+    }
 } // namespace geode
