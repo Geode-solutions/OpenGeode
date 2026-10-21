@@ -39,6 +39,7 @@
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
+#include <geode/model/representation/io/brep_time_series_input.hpp>
 #include <geode/model/representation/io/external_time_series_helpers_input.hpp>
 #include <geode/model/representation/io/external_time_series_helpers_output.hpp>
 
@@ -204,6 +205,12 @@ void test()
     helpers.apply_to( model );
     check_pressures( model );
     check_velocities( model, block_id );
+
+    auto reloaded_model =
+        geode::load_brep( absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
+    geode::load_brep_time_series( reloaded_model, filename );
+    check_pressures( reloaded_model );
+    check_velocities( reloaded_model, block_id );
     check_other_model( helpers, model );
     check_wrong_extension( helpers );
 }

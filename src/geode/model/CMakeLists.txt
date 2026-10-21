@@ -105,6 +105,7 @@ add_geode_library(
         "representation/io/section_output.cpp"
         "representation/io/geode/geode_brep_input.cpp"
         "representation/io/geode/geode_brep_output.cpp"
+        "representation/io/geode/geode_brep_time_series_input.cpp"
         "representation/io/geode/geode_section_input.cpp"
         "representation/io/geode/geode_section_output.cpp"
     PUBLIC_HEADERS
@@ -185,6 +186,7 @@ add_geode_library(
         "representation/io/geode/geode_brep_input.hpp"
         "representation/io/geode/geode_section_input.hpp"
         "representation/io/geode/geode_brep_output.hpp"
+        "representation/io/geode/geode_brep_time_series_input.hpp"
         "representation/io/geode/geode_section_output.hpp"
     ADVANCED_HEADERS
         "helpers/detail/build_model_boundaries.hpp"

@@ -51,6 +51,7 @@ namespace geode
      * Time series are expected to be created as time step attributes (see
      * AttributeManager::create_time_step_attribute), but any transferable
      * attribute is stored and applied the same way.
+     * The native file can be loaded onto a BRep with load_brep_time_series.
      */
     class opengeode_model_api ExternalTimeSeriesHelpers
     {

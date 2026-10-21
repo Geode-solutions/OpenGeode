@@ -28,6 +28,7 @@
 #include <geode/model/mixin/core/bitsery_archive.hpp>
 #include <geode/model/representation/io/geode/geode_brep_input.hpp>
 #include <geode/model/representation/io/geode/geode_brep_output.hpp>
+#include <geode/model/representation/io/geode/geode_brep_time_series_input.hpp>
 #include <geode/model/representation/io/geode/geode_section_input.hpp>
 #include <geode/model/representation/io/geode/geode_section_output.hpp>
 
@@ -44,6 +45,13 @@ namespace
         geode::SectionInputFactory::register_creator<
             geode::OpenGeodeSectionInput >(
             geode::OpenGeodeSectionOutput::extension().data() );
+    }
+
+    void register_brep_time_series_input()
+    {
+        geode::BRepTimeSeriesInputFactory::register_creator<
+            geode::OpenGeodeBRepTimeSeriesInput >(
+            geode::OpenGeodeBRepTimeSeriesInput::extension().data() );
     }
 
     void register_brep_output()
@@ -68,6 +76,7 @@ namespace geode
         OpenGeodeMeshLibrary::initialize();
         register_brep_input();
         register_section_input();
+        register_brep_time_series_input();
         register_brep_output();
         register_section_output();
         BitseryExtensions::register_functions(
