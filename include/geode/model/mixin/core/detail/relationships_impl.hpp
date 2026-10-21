@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <bitsery/ext/std_smart_ptr.h>
 
 #include <geode/basic/attribute_manager.hpp>
@@ -48,8 +50,6 @@ namespace geode
         class opengeode_model_api RelationshipsImpl
         {
         public:
-            using Iterator = typename EdgesAroundVertex::const_iterator;
-
             RelationshipsImpl( BITSERY );
 
             [[nodiscard]] index_t nb_components_with_relations() const;
@@ -57,9 +57,12 @@ namespace geode
             [[nodiscard]] index_t nb_relations(
                 const uuid& component_id ) const;
 
-            [[nodiscard]] Iterator begin_edge( const uuid& component_id ) const;
-
-            [[nodiscard]] Iterator end_edge( const uuid& component_id ) const;
+            /*!
+             * Return the graph edges around the given component (empty if the
+             * component has no relation)
+             */
+            [[nodiscard]] absl::Span< const EdgeVertex > edges_around_component(
+                const uuid& component_id ) const;
 
             [[nodiscard]] const ComponentID& graph_component_id(
                 index_t graph_component ) const;
@@ -68,6 +71,11 @@ namespace geode
                 const EdgeVertex& graph_edge_vertex ) const;
 
             void remove_component( const uuid& component_id );
+
+            /*!
+             * Remove several components and all their relations at once
+             */
+            void remove_components( absl::Span< const uuid > component_ids );
 
             index_t add_relation_edge(
                 const ComponentID& from, const ComponentID& to );
@@ -98,7 +106,13 @@ namespace geode
 
             [[nodiscard]] const Graph& graph() const;
 
-            void delete_isolated_vertices();
+            /*!
+             * Rebuild the uuid to graph vertex map from the ids stored on the
+             * graph vertices, after loading a file.
+             * Vertices without a valid or with a duplicated id are removed with
+             * their relations, as well as isolated vertices.
+             */
+            void repair_after_load();
 
         private:
             friend class bitsery::Access;
@@ -115,7 +129,7 @@ namespace geode
                              archive.object( impl.uuid2index_ );
                              archive.ext(
                                  impl.ids_, bitsery::ext::StdSmartPtr{} );
-                             impl.delete_isolated_vertices();
+                             impl.repair_after_load();
                          },
                             []( Archive& archive, RelationshipsImpl& impl ) {
                                 archive.ext(
@@ -123,7 +137,7 @@ namespace geode
                                 archive.object( impl.uuid2index_ );
                                 archive.ext(
                                     impl.ids_, bitsery::ext::StdSmartPtr{} );
-                                impl.delete_isolated_vertices();
+                                impl.repair_after_load();
                             } } } );
             }
 
@@ -132,12 +146,15 @@ namespace geode
             [[nodiscard]] const ComponentID& component_from_index(
                 index_t id ) const;
 
-            index_t do_add_relation_edge(
-                const ComponentID& from, const ComponentID& to );
-
             index_t find_or_create_vertex_id( const ComponentID& id );
 
         protected:
+            /*!
+             * Create a relation edge without checking if it already exists
+             */
+            index_t do_add_relation_edge(
+                const ComponentID& from, const ComponentID& to );
+
             std::unique_ptr< Graph > graph_;
             detail::UuidToIndex uuid2index_;
             std::shared_ptr< VariableAttribute< ComponentID > > ids_;

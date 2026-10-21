@@ -70,8 +70,9 @@ namespace geode
         void load_brep_files( Model& brep, std::string_view directory )
         {
             BRepBuilder builder{ brep };
-            const auto level = Logger::level();
-            Logger::set_level( Logger::LEVEL::warning );
+            const detail::ScopedLoggerLevel scoped_level{
+                Logger::LEVEL::warning
+            };
             async::parallel_invoke(
                 [&builder, &directory] {
                     builder.load_identifier( directory );
@@ -112,9 +113,9 @@ namespace geode
                 [&builder, &directory] {
                     builder.load_unique_vertices( directory );
                 } );
-            Logger::set_level( level );
             detail::register_all_components( brep );
             detail::filter_unsupported_components( brep );
+            builder.repair_component_vertices();
         }
     } // namespace detail
 } // namespace geode

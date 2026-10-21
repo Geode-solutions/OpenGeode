@@ -74,8 +74,12 @@ namespace
     {
         const auto first_new_unique_vertex_id =
             builder_to.create_unique_vertices( from.nb_unique_vertices() );
-        geode::detail::copy_vertex_identifier_components(
-            from, builder_to, first_new_unique_vertex_id, mappings );
+        if( geode::detail::copy_vertex_identifier_components(
+                from, builder_to, first_new_unique_vertex_id, mappings ) )
+        {
+            // e.g. Block vertices when converting into a Section
+            builder_to.delete_isolated_vertices();
+        }
     }
 
     class SectionExtruder
@@ -165,6 +169,11 @@ namespace
 
         void extrude_corner( const geode::Corner2D& section_corner )
         {
+            if( section_corner.mesh().nb_vertices() == 0 )
+            {
+                // Nothing to extrude
+                return;
+            }
             const auto& corner_slice0 =
                 brep_.corner( section_slice0_brep_mapping(
                     geode::Corner3D::component_type_static(),
@@ -244,13 +253,13 @@ namespace
             {
                 std::array< geode::index_t, 4 > pointids;
                 pointids[0] = find_or_create_surface_vertex(
-                    line_slice0, { edge_id, 0 }, surface );
+                    line_slice0, { edge_id, 0 }, surface, *surface_builder );
                 pointids[1] = find_or_create_surface_vertex(
-                    line_slice1, { edge_id, 0 }, surface );
+                    line_slice1, { edge_id, 0 }, surface, *surface_builder );
                 pointids[2] = find_or_create_surface_vertex(
-                    line_slice1, { edge_id, 1 }, surface );
+                    line_slice1, { edge_id, 1 }, surface, *surface_builder );
                 pointids[3] = find_or_create_surface_vertex(
-                    line_slice0, { edge_id, 1 }, surface );
+                    line_slice0, { edge_id, 1 }, surface, *surface_builder );
                 surface_builder->create_polygon( pointids );
             }
             surface_builder->compute_polygon_adjacencies();
@@ -259,7 +268,8 @@ namespace
 
         geode::index_t find_or_create_surface_vertex( const geode::Line3D& line,
             const geode::EdgeVertex& e_vertex,
-            const geode::Surface3D& surface )
+            const geode::Surface3D& surface,
+            geode::SurfaceMeshBuilder3D& surface_builder )
         {
             const auto line_pointid = line.mesh().edge_vertex( e_vertex );
             const auto uvertex_id =
@@ -271,9 +281,7 @@ namespace
                     return cmv.vertex;
                 }
             }
-            auto surface_builder =
-                brep_builder_.surface_mesh_builder( surface );
-            auto pt_id = surface_builder->create_point(
+            auto pt_id = surface_builder.create_point(
                 line.mesh().point( line_pointid ) );
             brep_builder_.set_unique_vertex(
                 { surface.component_id(), pt_id }, uvertex_id );
@@ -341,26 +349,64 @@ namespace
             auto block_builder =
                 brep_builder_.block_mesh_builder< geode::HybridSolid3D >(
                     block );
-            for( const auto tgl_id :
-                geode::Range{ surface_slice0.mesh().nb_polygons() } )
+            const auto& slice0_mesh = surface_slice0.mesh();
+            for( const auto polygon_id :
+                geode::Range{ slice0_mesh.nb_polygons() } )
             {
-                std::array< geode::index_t, 6 > pointids;
-                for( const auto p0 : geode::LRange{ 3 } )
+                const auto nb_polygon_vertices =
+                    slice0_mesh.nb_polygon_vertices( polygon_id );
+                if( nb_polygon_vertices == 3 )
                 {
-                    pointids[p0] = find_or_create_block_vertex(
-                        surface_slice0, { tgl_id, p0 }, block );
-                    pointids[p0 + 3] = find_or_create_block_vertex(
-                        surface_slice1, { tgl_id, p0 }, block );
+                    block_builder->create_prism( extruded_polygon_vertices< 3 >(
+                        surface_slice0, surface_slice1, polygon_id, block,
+                        *block_builder ) );
                 }
-                block_builder->create_prism( pointids );
+                else if( nb_polygon_vertices == 4 )
+                {
+                    block_builder->create_hexahedron(
+                        extruded_polygon_vertices< 4 >( surface_slice0,
+                            surface_slice1, polygon_id, block,
+                            *block_builder ) );
+                }
+                else
+                {
+                    throw geode::OpenGeodeModelException{ section_surface.id(),
+                        geode::OpenGeodeException::TYPE::data,
+                        "[extrude_section_to_brep] Cannot extrude polygon ",
+                        polygon_id, " of Surface ",
+                        section_surface.id().string(),
+                        ": only triangles and "
+                        "quadrangles are supported, not polygons with ",
+                        nb_polygon_vertices, " vertices" };
+                }
             }
             block_builder->compute_polyhedron_adjacencies();
+        }
+
+        template < geode::local_index_t nb_polygon_vertices >
+        std::array< geode::index_t, 2 * nb_polygon_vertices >
+            extruded_polygon_vertices( const geode::Surface3D& surface_slice0,
+                const geode::Surface3D& surface_slice1,
+                geode::index_t polygon_id,
+                const geode::Block3D& block,
+                geode::HybridSolidBuilder3D& block_builder )
+        {
+            std::array< geode::index_t, 2 * nb_polygon_vertices > pointids;
+            for( const auto v : geode::LRange{ nb_polygon_vertices } )
+            {
+                pointids[v] = find_or_create_block_vertex(
+                    surface_slice0, { polygon_id, v }, block, block_builder );
+                pointids[v + nb_polygon_vertices] = find_or_create_block_vertex(
+                    surface_slice1, { polygon_id, v }, block, block_builder );
+            }
+            return pointids;
         }
 
         geode::index_t find_or_create_block_vertex(
             const geode::Surface3D& surface,
             const geode::PolygonVertex& p_vertex,
-            const geode::Block3D& block )
+            const geode::Block3D& block,
+            geode::HybridSolidBuilder3D& block_builder )
         {
             const auto surf_pointid = surface.mesh().polygon_vertex( p_vertex );
             const auto uvertex_id =
@@ -372,8 +418,7 @@ namespace
                     return cmv.vertex;
                 }
             }
-            auto block_builder = brep_builder_.block_mesh_builder( block );
-            auto pt_id = block_builder->create_point(
+            auto pt_id = block_builder.create_point(
                 surface.mesh().point( surf_pointid ) );
             brep_builder_.set_unique_vertex(
                 { block.component_id(), pt_id }, uvertex_id );

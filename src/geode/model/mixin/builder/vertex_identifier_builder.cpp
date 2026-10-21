@@ -46,7 +46,7 @@ namespace geode
     void VertexIdentifierBuilder::set_unique_vertex(
         ComponentMeshVertex component_vertex_id, index_t unique_vertex_id )
     {
-        vertex_identifier_.set_unique_vertex( component_vertex_id,
+        vertex_identifier_.set_unique_vertex( std::move( component_vertex_id ),
             unique_vertex_id, VertexIdentifier::BuilderKey{} );
     }
 
@@ -75,6 +75,12 @@ namespace geode
     std::vector< index_t > VertexIdentifierBuilder::delete_isolated_vertices()
     {
         return vertex_identifier_.delete_isolated_vertices(
+            VertexIdentifier::BuilderKey{} );
+    }
+
+    void VertexIdentifierBuilder::repair_component_vertices()
+    {
+        vertex_identifier_.repair_component_vertices(
             VertexIdentifier::BuilderKey{} );
     }
 } // namespace geode

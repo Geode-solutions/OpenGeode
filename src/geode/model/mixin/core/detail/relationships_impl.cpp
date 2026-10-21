@@ -25,7 +25,10 @@
 
 #include <fstream>
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
@@ -64,22 +67,13 @@ namespace geode
             return 0;
         }
 
-        RelationshipsImpl::Iterator RelationshipsImpl::begin_edge(
-            const uuid& component_id ) const
+        absl::Span< const EdgeVertex >
+            RelationshipsImpl::edges_around_component(
+                const uuid& component_id ) const
         {
             if( const auto index = vertex_id( component_id ) )
             {
-                return graph_->edges_around_vertex( index.value() ).begin();
-            }
-            return {};
-        }
-
-        RelationshipsImpl::Iterator RelationshipsImpl::end_edge(
-            const uuid& component_id ) const
-        {
-            if( const auto index = vertex_id( component_id ) )
-            {
-                return graph_->edges_around_vertex( index.value() ).end();
+                return graph_->edges_around_vertex( index.value() );
             }
             return {};
         }
@@ -99,22 +93,37 @@ namespace geode
 
         void RelationshipsImpl::remove_component( const uuid& component_id )
         {
-            const auto index = vertex_id( component_id );
-            if( !index )
+            remove_components( { &component_id, 1 } );
+        }
+
+        void RelationshipsImpl::remove_components(
+            absl::Span< const uuid > component_ids )
+        {
+            std::vector< index_t > vertices;
+            vertices.reserve( component_ids.size() );
+            for( const auto& component_id : component_ids )
+            {
+                if( const auto index = vertex_id( component_id ) )
+                {
+                    vertices.push_back( index.value() );
+                    uuid2index_.erase( component_id );
+                }
+            }
+            if( vertices.empty() )
             {
                 return;
             }
-            uuid2index_.erase( component_id );
             std::vector< bool > edges_to_delete( graph_->nb_edges(), false );
-            for( const auto& edge :
-                graph_->edges_around_vertex( index.value() ) )
+            for( const auto vertex : vertices )
             {
-                edges_to_delete[edge.edge_id] = true;
+                for( const auto& edge : graph_->edges_around_vertex( vertex ) )
+                {
+                    edges_to_delete[edge.edge_id] = true;
+                }
             }
             auto builder = GraphBuilder::create( *graph_ );
             builder->delete_edges( edges_to_delete );
-            const auto old2new =
-                builder->delete_isolated_vertices( { index.value() } );
+            const auto old2new = builder->delete_isolated_vertices( vertices );
             uuid2index_.update( old2new );
         }
 
@@ -128,10 +137,15 @@ namespace geode
                     from.string(), " and ", to.string(), ")" );
                 return component_id.value();
             }
-            const auto index = GraphBuilder::create( *graph_ )->create_edge(
+            return do_add_relation_edge( from, to );
+        }
+
+        index_t RelationshipsImpl::do_add_relation_edge(
+            const ComponentID& from, const ComponentID& to )
+        {
+            return GraphBuilder::create( *graph_ )->create_edge(
                 find_or_create_vertex_id( from ),
                 find_or_create_vertex_id( to ) );
-            return index;
         }
 
         void RelationshipsImpl::remove_relation(
@@ -175,6 +189,13 @@ namespace geode
             {
                 return std::nullopt;
             }
+            // Scan the edges around the vertex with the lowest degree
+            if( graph_->edges_around_vertex( index2.value() ).size()
+                < graph_->edges_around_vertex( index1.value() ).size() )
+            {
+                return graph_->edge_from_vertices(
+                    index2.value(), index1.value() );
+            }
             return graph_->edge_from_vertices( index1.value(), index2.value() );
         }
 
@@ -191,6 +212,7 @@ namespace geode
             const RelationshipsImpl& impl, const ModelCopyMapping& mapping )
         {
             graph_ = impl.graph_->clone();
+            uuid2index_ = UuidToIndex{};
             initialize_attributes();
             std::vector< index_t > vertices_to_delete;
             for( const auto vertex_id : Range{ graph_->nb_vertices() } )
@@ -288,18 +310,79 @@ namespace geode
             return register_component( component_id );
         }
 
-        void RelationshipsImpl::delete_isolated_vertices()
+        void RelationshipsImpl::repair_after_load()
         {
-            auto builder = GraphBuilder::create( *graph_ );
-            const auto old2new = builder->delete_isolated_vertices();
-            for( const auto v : Indices{ old2new } )
+            OpenGeodeModelException::check_exception( graph_ != nullptr,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[Relationships::load] Missing relationships graph" );
+            if( !ids_ )
             {
-                if( old2new[v] == NO_ID )
+                initialize_attributes();
+            }
+            const auto nb_vertices = graph_->nb_vertices();
+            const ComponentType undefined_type{ "undefined" };
+            std::vector< bool > vertices_to_delete( nb_vertices, false );
+            absl::flat_hash_set< uuid > valid_ids;
+            valid_ids.reserve( nb_vertices );
+            index_t nb_undefined{ 0 };
+            index_t nb_duplicated{ 0 };
+            index_t nb_wrong_mappings{ 0 };
+            for( const auto vertex : Range{ nb_vertices } )
+            {
+                const auto& component_id = ids_->value( vertex );
+                if( component_id.type == undefined_type )
                 {
-                    uuid2index_.erase( v );
+                    vertices_to_delete[vertex] = true;
+                    nb_undefined++;
+                    continue;
+                }
+                if( !valid_ids.emplace( component_id.id ).second )
+                {
+                    vertices_to_delete[vertex] = true;
+                    nb_duplicated++;
+                    continue;
+                }
+                if( uuid2index_.index( component_id.id ) != vertex )
+                {
+                    nb_wrong_mappings++;
                 }
             }
-            uuid2index_.update( old2new );
+            if( nb_wrong_mappings > 0
+                || uuid2index_.nb_mappings() != valid_ids.size() )
+            {
+                Logger::warning( "[Relationships::load] Inconsistent component "
+                                 "index, rebuilding it from component ids" );
+            }
+            if( nb_undefined > 0 || nb_duplicated > 0 )
+            {
+                Logger::warning( "[Relationships::load] Removing ",
+                    nb_undefined, " component(s) with undefined id and ",
+                    nb_duplicated,
+                    " duplicated component(s) with their relations" );
+                std::vector< bool > edges_to_delete(
+                    graph_->nb_edges(), false );
+                for( const auto vertex : Range{ nb_vertices } )
+                {
+                    if( !vertices_to_delete[vertex] )
+                    {
+                        continue;
+                    }
+                    for( const auto& edge :
+                        graph_->edges_around_vertex( vertex ) )
+                    {
+                        edges_to_delete[edge.edge_id] = true;
+                    }
+                }
+                GraphBuilder::create( *graph_ )->delete_edges(
+                    edges_to_delete );
+            }
+            GraphBuilder::create( *graph_ )->delete_isolated_vertices();
+            uuid2index_.clear();
+            uuid2index_.reserve( graph_->nb_vertices() );
+            for( const auto vertex : Range{ graph_->nb_vertices() } )
+            {
+                uuid2index_.set_new_mapping( ids_->value( vertex ).id, vertex );
+            }
         }
     } // namespace detail
 } // namespace geode

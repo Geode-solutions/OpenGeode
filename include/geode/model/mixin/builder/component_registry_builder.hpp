@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
@@ -46,6 +48,9 @@ namespace geode
             const ComponentType& type, const uuid& id );
 
         void remove_mesh_component( const ComponentType& type, const uuid& id );
+
+        void remove_mesh_components(
+            const ComponentType& type, absl::Span< const uuid > ids );
 
         void remove_collection_component(
             const ComponentType& type, const uuid& id );

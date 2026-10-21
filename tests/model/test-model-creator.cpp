@@ -292,12 +292,205 @@ void test_section()
     geode::save_section( section, "test_section.og_sctn" );
 }
 
+void test_create_in_non_empty_section()
+{
+    geode::Section section;
+    {
+        geode::SimplicialSectionCreator creator{ section,
+            { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } } } };
+        creator.create_corners(
+            std::vector< geode::CornerDefinition >{ { 0 }, { 1 } } );
+    }
+    const auto nb_existing_vertices = section.nb_unique_vertices();
+    geode::SimplicialSectionCreator creator{ section,
+        { geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 3, 0 } },
+            geode::Point2D{ { 4, 0 } } } };
+    const std::vector< geode::CornerDefinition > corner_definitions{ { 0 },
+        { 1 }, { 2 } };
+    const auto corners = creator.create_corners( corner_definitions );
+    for( const auto c : geode::Indices{ corners } )
+    {
+        const auto& corner = section.corner( corners[c] );
+        geode::OpenGeodeModelException::test(
+            section.unique_vertex( { corner.component_id(), 0 } )
+                == nb_existing_vertices + corner_definitions[c].vertex,
+            "[non empty model] Wrong Corner unique vertex" );
+    }
+    const std::vector< geode::LineDefinition > line_definitions{
+        { { 0, 1, 2 } }
+    };
+    const auto lines = creator.create_lines( corners, line_definitions );
+    const auto& line = section.line( lines.front() );
+    for( const auto v : geode::Range{ line.mesh().nb_vertices() } )
+    {
+        const auto unique_vertex =
+            section.unique_vertex( { line.component_id(), v } );
+        geode::OpenGeodeModelException::test(
+            unique_vertex
+                == nb_existing_vertices + line_definitions.front().vertices[v],
+            "[non empty model] Wrong Line unique vertex" );
+    }
+    for( const auto uv : geode::Range{ nb_existing_vertices } )
+    {
+        geode::OpenGeodeModelException::test(
+            section.component_mesh_vertices( uv ).size() == 1,
+            "[non empty model] Existing unique vertices should not be "
+            "modified" );
+    }
+}
+
+template < typename Function >
+void expect_throw( Function&& function, std::string_view message )
+{
+    bool has_thrown{ false };
+    try
+    {
+        function();
+    }
+    catch( const geode::OpenGeodeException& /*unused*/ )
+    {
+        has_thrown = true;
+    }
+    geode::OpenGeodeModelException::test(
+        has_thrown, "[invalid definitions] Should throw with ", message );
+}
+
+void test_invalid_section_definitions()
+{
+    geode::Section section;
+    geode::SimplicialSectionCreator creator{ section,
+        { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } },
+            geode::Point2D{ { 1, 1 } } } };
+    expect_throw(
+        [&creator] {
+            creator.create_corners(
+                std::vector< geode::CornerDefinition >{ { 3 } } );
+        },
+        "Corner vertex out of range" );
+    const auto corners = creator.create_corners(
+        std::vector< geode::CornerDefinition >{ { 0 }, { 1 }, { 2 } } );
+    expect_throw(
+        [&creator, &corners] {
+            creator.create_lines(
+                corners, std::vector< geode::LineDefinition >{ { {} } } );
+        },
+        "empty Line" );
+    expect_throw(
+        [&creator, &corners] {
+            creator.create_lines(
+                corners, std::vector< geode::LineDefinition >{ { { 0 } } } );
+        },
+        "Line with one vertex" );
+    expect_throw(
+        [&creator, &corners] {
+            creator.create_lines(
+                corners, std::vector< geode::LineDefinition >{ { { 0, 5 } } } );
+        },
+        "Line vertex out of range" );
+    geode::OpenGeodeModelException::test( section.nb_lines() == 0,
+        "[invalid definitions] No Line should be created" );
+    const auto lines = creator.create_lines(
+        corners, std::vector< geode::LineDefinition >{
+                     { { 0, 1 } }, { { 1, 2 } }, { { 2, 0 } } } );
+    expect_throw(
+        [&creator, &lines] {
+            creator.create_surfaces( lines,
+                std::vector< geode::SurfaceDefinition >{
+                    { { 0, 1, 2 }, { 0, 1, 2, 0 }, { 0, 1, 2 }, {}, {} } } );
+        },
+        "triangles not multiple of 3" );
+    expect_throw(
+        [&creator, &lines] {
+            creator.create_surfaces( lines,
+                std::vector< geode::SurfaceDefinition >{
+                    { { 0, 1, 2 }, { 0, 1, 3 }, { 0, 1, 2 }, {}, {} } } );
+        },
+        "triangle vertex out of range" );
+    expect_throw(
+        [&creator, &lines] {
+            creator.create_surfaces( lines,
+                std::vector< geode::SurfaceDefinition >{
+                    { { 0, 1, 4 }, { 0, 1, 2 }, { 0, 1, 2 }, {}, {} } } );
+        },
+        "Surface vertex out of range" );
+    expect_throw(
+        [&creator, &lines] {
+            creator.create_surfaces( lines,
+                std::vector< geode::SurfaceDefinition >{
+                    { { 0, 1, 2 }, { 0, 1, 2 }, { 0, 1, 3 }, {}, {} } } );
+        },
+        "Surface boundary out of range" );
+    geode::OpenGeodeModelException::test( section.nb_surfaces() == 0,
+        "[invalid definitions] No Surface should be created" );
+}
+
+void test_invalid_brep_definitions()
+{
+    geode::BRep brep;
+    geode::SimplicialBRepCreator creator{ brep,
+        { geode::Point3D{ { 0, 0, 0 } }, geode::Point3D{ { 1, 0, 0 } },
+            geode::Point3D{ { 0, 1, 0 } }, geode::Point3D{ { 0, 0, 1 } } } };
+    expect_throw(
+        [&creator] {
+            creator.create_blocks(
+                {}, std::vector< geode::BlockDefinition >{
+                        { { 0, 1, 2, 3 }, { 0, 1, 2 }, {}, {}, {}, {} } } );
+        },
+        "tetrahedra not multiple of 4" );
+    expect_throw(
+        [&creator] {
+            creator.create_blocks(
+                {}, std::vector< geode::BlockDefinition >{
+                        { { 0, 1, 2, 3 }, { 0, 1, 2, 4 }, {}, {}, {}, {} } } );
+        },
+        "tetrahedron vertex out of range" );
+    expect_throw(
+        [&creator] {
+            creator.create_blocks( {},
+                std::vector< geode::BlockDefinition >{
+                    { { 0, 1, 2, 3 }, { 0, 1, 2, 3 }, { 0 }, {}, {}, {} } } );
+        },
+        "Block boundary out of range" );
+    geode::OpenGeodeModelException::test( brep.nb_blocks() == 0,
+        "[invalid definitions] No Block should be created" );
+}
+
+void test_line_corners_from_unique_points()
+{
+    geode::Section section;
+    geode::SimplicialSectionCreator creator{ section,
+        { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } },
+            geode::Point2D{ { 1, 1 } }, geode::Point2D{ { 0, 1 } } } };
+    const auto corners = creator.create_corners(
+        std::vector< geode::CornerDefinition >{ { 3 }, { 1 } } );
+    const auto lines = creator.create_lines(
+        corners, std::vector< geode::LineDefinition >{ { { 3, 0, 1 } } } );
+    const auto& line = section.line( lines.front() );
+    geode::OpenGeodeModelException::test(
+        section.nb_boundaries( line.id() ) == 2,
+        "[Line corners] Line should have 2 boundaries" );
+    geode::OpenGeodeModelException::test(
+        section.is_boundary( section.corner( corners[0] ), line )
+            && section.is_boundary( section.corner( corners[1] ), line ),
+        "[Line corners] Wrong Line boundaries" );
+    expect_throw(
+        [&creator, &corners] {
+            creator.create_lines(
+                corners, std::vector< geode::LineDefinition >{ { { 1, 2 } } } );
+        },
+        "Line extremity without Corner" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_create_brep_from_bbox();
     test_create_brep_with_dangling_components();
     test_section();
+    test_create_in_non_empty_section();
+    test_invalid_section_definitions();
+    test_invalid_brep_definitions();
+    test_line_corners_from_unique_points();
 }
 
 OPENGEODE_TEST( "model-creator" )

@@ -18,4 +18,5 @@ jobs:
       branch: ${{ inputs.branch || 'next' }}
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
+      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -78,6 +78,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& serializer );
 
+        void repair_colors();
+
         using CellArray< dimension >::set_array_dimensions;
         using CellArray< dimension >::copy;
 

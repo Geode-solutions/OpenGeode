@@ -54,6 +54,10 @@ namespace geode
             {
                 const auto unique_vertex =
                     model.unique_vertex( { block.component_id(), old_vertex } );
+                if( unique_vertex == NO_ID )
+                {
+                    continue;
+                }
                 for( const auto new_vertex : new_vertices )
                 {
                     model_builder.set_unique_vertex(

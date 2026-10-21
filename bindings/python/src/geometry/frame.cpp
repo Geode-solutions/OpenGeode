@@ -36,6 +36,8 @@
         .def( "set_direction", &Frame##dimension##D::set_direction )           \
         .def( "inverse", &Frame##dimension##D::inverse )                       \
         .def( "string", &Frame##dimension##D::string )                         \
+        .def( "__str__", &Frame##dimension##D::string )                        \
+        .def( "__repr__", &Frame##dimension##D::string )                       \
         .def( "rescale", &Frame##dimension##D::rescale )
 
 namespace geode

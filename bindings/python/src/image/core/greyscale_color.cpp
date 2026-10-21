@@ -35,6 +35,8 @@ namespace geode
             .def( "value", &GreyscaleColor::value )
             .def( "set_value", &GreyscaleColor::set_value )
             .def( "string", &GreyscaleColor::string )
+            .def( "__str__", &GreyscaleColor::string )
+            .def( "__repr__", &GreyscaleColor::string )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( pybind11::self + pybind11::self )

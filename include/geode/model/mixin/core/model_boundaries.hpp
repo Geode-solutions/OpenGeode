@@ -29,6 +29,7 @@
 #include <geode/mesh/core/mesh_id.hpp>
 
 #include <geode/model/common.hpp>
+#include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
 namespace geode
 {
@@ -69,7 +70,7 @@ namespace geode
             ModelBoundaryRangeBase( const ModelBoundaryRangeBase& other );
 
         protected:
-            IMPLEMENTATION_MEMBER( impl_ );
+            detail::ComponentRangeIterator< ModelBoundary< dimension > > impl_;
         };
 
         class opengeode_model_api ModelBoundaryRange

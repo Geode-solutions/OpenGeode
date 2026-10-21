@@ -143,6 +143,10 @@ namespace geode
                 {
                     const auto unique_vertex_id =
                         model_.unique_vertex( cmv_mapping.first );
+                    if( unique_vertex_id == NO_ID )
+                    {
+                        continue;
+                    }
                     builder_.set_unique_vertex(
                         cmv_mapping.second, unique_vertex_id );
                 }

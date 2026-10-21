@@ -24,6 +24,7 @@
 #include "../common.hpp"
 
 #include <geode/basic/cell_array.hpp>
+#include <geode/basic/range.hpp>
 
 #define PYTHON_ARRAY( dimension )                                              \
     const auto name##dimension =                                               \
@@ -35,8 +36,27 @@
         .def( "nb_cells", &CellArray##dimension##D::nb_cells )                 \
         .def( "nb_cells_in_direction",                                         \
             &CellArray##dimension##D::nb_cells_in_direction )                  \
-        .def( "cell_index", &CellArray##dimension##D::cell_index )             \
-        .def( "cell_indices", &CellArray##dimension##D::cell_indices )         \
+        .def( "cell_index",                                                    \
+            []( const CellArray##dimension##D& array,                          \
+                const CellArray##dimension##D::CellIndices& index ) {          \
+                for( const auto d : LRange{ dimension } )                      \
+                {                                                              \
+                    OpenGeodeBasicException::check_exception(                  \
+                        index[d] < array.nb_cells_in_direction( d ), nullptr,  \
+                        OpenGeodeException::TYPE::data,                        \
+                        "[CellArray::cell_index] Invalid index ", index[d],    \
+                        " in direction ", d );                                 \
+                }                                                              \
+                return array.cell_index( index );                              \
+            } )                                                                \
+        .def( "cell_indices",                                                  \
+            []( const CellArray##dimension##D& array, index_t index ) {        \
+                OpenGeodeBasicException::check_exception(                      \
+                    index < array.nb_cells(), nullptr,                         \
+                    OpenGeodeException::TYPE::data,                            \
+                    "[CellArray::cell_indices] Invalid index ", index );       \
+                return array.cell_indices( index );                            \
+            } )                                                                \
         .def( "next_cell", &CellArray##dimension##D::next_cell )               \
         .def( "previous_cell", &CellArray##dimension##D::previous_cell )       \
         .def(                                                                  \

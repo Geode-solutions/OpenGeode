@@ -36,6 +36,13 @@ namespace geode
             component_id, Relationships::RelationshipsBuilderKey{} );
     }
 
+    void RelationshipsBuilder::unregister_components(
+        absl::Span< const uuid > component_ids )
+    {
+        relationships_.remove_components(
+            component_ids, Relationships::RelationshipsBuilderKey{} );
+    }
+
     index_t RelationshipsBuilder::add_boundary_relation(
         const ComponentID& boundary, const ComponentID& incidence )
     {

@@ -50,7 +50,7 @@ namespace geode
             print_available_extensions< SectionOutputFactory >( TYPE );
             throw OpenGeodeModelException{ nullptr,
                 OpenGeodeException::TYPE::internal,
-                "Cannot save Section in file: ", filename };
+                "Cannot save Section in file: ", filename, ": ", e.what() };
         }
     }
 

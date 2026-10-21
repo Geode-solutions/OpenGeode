@@ -29,35 +29,76 @@
 #include <geode/basic/range.hpp>
 
 #include <geode/image/common.hpp>
+#include <geode/image/core/detail/color_channel.hpp>
 
 namespace geode
 {
     class opengeode_image_api RGBColor
     {
     public:
-        RGBColor();
+        constexpr RGBColor() = default;
 
-        RGBColor( local_index_t red, local_index_t green, local_index_t blue );
+        constexpr RGBColor(
+            local_index_t red, local_index_t green, local_index_t blue )
+            : values_{ red, green, blue }
+        {
+        }
 
-        [[nodiscard]] local_index_t red() const;
+        [[nodiscard]] constexpr local_index_t red() const
+        {
+            return values_[0];
+        }
 
-        [[nodiscard]] local_index_t green() const;
+        [[nodiscard]] constexpr local_index_t green() const
+        {
+            return values_[1];
+        }
 
-        [[nodiscard]] local_index_t blue() const;
+        [[nodiscard]] constexpr local_index_t blue() const
+        {
+            return values_[2];
+        }
 
-        void set_red( local_index_t red_scale );
+        constexpr void set_red( local_index_t red_scale )
+        {
+            values_[0] = red_scale;
+        }
 
-        void set_green( local_index_t green_scale );
+        constexpr void set_green( local_index_t green_scale )
+        {
+            values_[1] = green_scale;
+        }
 
-        void set_blue( local_index_t blue_scale );
+        constexpr void set_blue( local_index_t blue_scale )
+        {
+            values_[2] = blue_scale;
+        }
 
-        [[nodiscard]] bool operator==( const RGBColor &other ) const;
+        [[nodiscard]] constexpr bool operator==( const RGBColor &other ) const
+        {
+            return red() == other.red() && green() == other.green()
+                   && blue() == other.blue();
+        }
 
-        [[nodiscard]] bool operator!=( const RGBColor &other ) const;
+        [[nodiscard]] constexpr bool operator!=( const RGBColor &other ) const
+        {
+            return !( *this == other );
+        }
 
-        [[nodiscard]] RGBColor operator+( const RGBColor &other ) const;
+        [[nodiscard]] constexpr RGBColor operator+(
+            const RGBColor &other ) const
+        {
+            RGBColor result{ *this };
+            result += other;
+            return result;
+        }
 
-        void operator+=( const RGBColor &other );
+        constexpr void operator+=( const RGBColor &other )
+        {
+            set_red( ( red() + other.red() ) / 2 );
+            set_green( ( green() + other.green() ) / 2 );
+            set_blue( ( blue() + other.blue() ) / 2 );
+        }
 
         [[nodiscard]] std::string string() const;
 
@@ -67,7 +108,7 @@ namespace geode
         void serialize( Archive &serializer );
 
     private:
-        std::array< local_index_t, 3 > values_;
+        std::array< local_index_t, 3 > values_{ 0, 0, 0 };
     };
 
     template <>
@@ -78,21 +119,34 @@ namespace geode
             const AttributeLinearInterpolation &interpolator,
             const Attribute< RGBColor > &attribute )
         {
-            RGBColor result;
+            if( interpolator.indices_.empty() )
+            {
+                return attribute.default_values().default_value;
+            }
+            std::array< double, 3 > result{ 0, 0, 0 };
+            bool is_same{ true };
+            const auto first_value =
+                attribute.value( interpolator.indices_[0] );
             for( const auto i : Indices{ interpolator.indices_ } )
             {
-                const auto &att_value =
+                const auto &i_value =
                     attribute.value( interpolator.indices_[i] );
-                result.set_red(
-                    result.red() + att_value.red() * interpolator.lambdas_[i] );
-                result.set_green(
-                    result.green()
-                    + att_value.green() * interpolator.lambdas_[i] );
-                result.set_blue(
-                    result.blue()
-                    + att_value.blue() * interpolator.lambdas_[i] );
+                if( is_same )
+                {
+                    is_same = i_value == first_value;
+                }
+                const auto lambda = interpolator.lambdas_[i];
+                result[0] += i_value.red() * lambda;
+                result[1] += i_value.green() * lambda;
+                result[2] += i_value.blue() * lambda;
             }
-            return result;
+            if( is_same )
+            {
+                return first_value;
+            }
+            return RGBColor{ detail::color_channel( result[0] ),
+                detail::color_channel( result[1] ),
+                detail::color_channel( result[2] ) };
         }
     };
 

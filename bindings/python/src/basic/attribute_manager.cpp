@@ -33,6 +33,27 @@
 
 namespace geode
 {
+    template < template < typename > class Attribute, typename type >
+    void python_attribute_creation_from_default_value(
+        pybind11::class_< AttributeManager >& manager, const std::string& name )
+    {
+        manager.def(
+            name.c_str(),
+            []( AttributeManager& attribute_manager,
+                std::string_view attribute_name, type default_value,
+                AttributeProperties properties ) {
+                AttributeValues< type > values;
+                values.default_value = std::move( default_value );
+                return attribute_manager.create_attribute< Attribute, type >(
+                    attribute_name, std::move( values ), properties );
+            },
+            pybind11::arg( "name" ), pybind11::arg( "default_value" ),
+            pybind11::arg_v(
+                "properties", AttributeProperties{}, "AttributeProperties()" ),
+            "Create an attribute from its name and default value and return "
+            "its uuid" );
+    }
+
     template < typename type >
     void python_attribute_class( pybind11::class_< AttributeManager >& manager,
         const std::string& suffix )
@@ -53,6 +74,8 @@ namespace geode
                 const uuid&, AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< ConstantAttribute,
                     type > ) );
+        python_attribute_creation_from_default_value< ConstantAttribute, type >(
+            manager, create_constant_suffix );
         const auto find_constant_suffix =
             absl::StrCat( "find_attribute_constant_", suffix );
         manager.def( find_constant_suffix.c_str(),
@@ -72,6 +95,8 @@ namespace geode
                 const uuid&, AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< VariableAttribute,
                     type > ) );
+        python_attribute_creation_from_default_value< VariableAttribute, type >(
+            manager, create_variable_suffix );
         const auto find_variable_suffix =
             absl::StrCat( "find_attribute_variable_", suffix );
         manager.def( find_variable_suffix.c_str(),
@@ -91,6 +116,8 @@ namespace geode
                 const uuid&, AttributeValues< type >, AttributeProperties ) >(
                 &AttributeManager::create_attribute< SparseAttribute,
                     type > ) );
+        python_attribute_creation_from_default_value< SparseAttribute, type >(
+            manager, create_sparse_suffix );
         const auto find_sparse_suffix =
             absl::StrCat( "find_attribute_sparse_", suffix );
         manager.def( find_sparse_suffix.c_str(),
