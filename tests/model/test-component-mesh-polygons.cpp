@@ -279,17 +279,20 @@ void run_test_degenerate_polygon()
     const auto& surface = *model.surfaces().begin();
     auto unique_vertices = geode::polygon_unique_vertices( model, surface, 0 );
     unique_vertices[1] = unique_vertices[0];
-    const auto polygons =
-        geode::component_mesh_polygons( model, unique_vertices );
-    geode::OpenGeodeModelException::test(
-        polygons.surface_polygons.empty() && polygons.block_polygons.empty(),
-        "No component mesh polygon should be found from degenerate unique "
-        "vertices" );
-    const auto& cmvs = model.component_mesh_vertices( unique_vertices[0] );
-    geode::OpenGeodeModelException::test(
-        geode::component_mesh_vertex_pairs( cmvs, cmvs ).empty(),
-        "No component mesh vertex pair should be found from the same unique "
-        "vertex" );
+    bool thrown{ false };
+    try
+    {
+        const auto polygons =
+            geode::component_mesh_polygons( model, unique_vertices );
+        geode_unused( polygons );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeModelException::test( thrown,
+        "Degenerate unique vertices should throw instead of being silently "
+        "skipped" );
 }
 
 void test()
