@@ -70,10 +70,12 @@ namespace geode
 
     ModelCopyMapping BRepBuilder::copy( const BRep& brep )
     {
-        auto nb_components = brep_.nb_corners() + brep_.nb_lines()
-                             + brep_.nb_surfaces() + brep_.nb_blocks()
-                             + brep_.nb_model_boundaries()
-                             + brep_.nb_unique_vertices();
+        auto nb_components =
+            brep_.nb_corners() + brep_.nb_lines() + brep_.nb_surfaces()
+            + brep_.nb_blocks() + brep_.nb_model_boundaries()
+            + brep_.nb_corner_collections() + brep_.nb_line_collections()
+            + brep_.nb_surface_collections() + brep_.nb_block_collections()
+            + brep_.nb_unique_vertices() + brep_.nb_components_with_relations();
         OpenGeodeModelException::check_exception( nb_components == 0, nullptr,
             OpenGeodeException::TYPE::data,
             "[BRepBuild::copy] BRep should be empty before copy. To add BRep "
