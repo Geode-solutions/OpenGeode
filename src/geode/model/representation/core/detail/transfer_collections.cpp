@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/core/detail/transfer_collections.hpp>
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/corner.hpp>
@@ -39,6 +41,14 @@
 
 namespace
 {
+    absl::flat_hash_set< geode::uuid > unchanged_components_set(
+        const geode::ModelUnchangedComponentMapping& unchanged_components,
+        const geode::ComponentType& type )
+    {
+        const auto& unchanged = unchanged_components.at( type );
+        return { unchanged.begin(), unchanged.end() };
+    }
+
     template < typename Model >
     void transfer_corner_collections( const Model& old_model,
         const Model& new_model,
@@ -114,16 +124,16 @@ namespace
         {
             return;
         }
-        const auto& unchanged_corners = unchanged_components.at(
-            geode::Corner< Model::dim >::component_type_static() );
+        const auto unchanged_corners =
+            unchanged_components_set( unchanged_components,
+                geode::Corner< Model::dim >::component_type_static() );
         for( const auto& collection_in : old_model.corner_collections() )
         {
             std::vector< geode::uuid > corners_to_add;
             for( const auto& corner_in_collection :
                 old_model.corner_collection_items( collection_in ) )
             {
-                if( absl::c_contains(
-                        unchanged_corners, corner_in_collection.id() ) )
+                if( unchanged_corners.contains( corner_in_collection.id() ) )
                 {
                     corners_to_add.push_back( corner_in_collection.id() );
                 }
@@ -145,8 +155,13 @@ namespace
                 new_model.corner_collection( collection_in.id() );
             for( const auto& corner_id : corners_to_add )
             {
-                new_model_builder.add_corner_in_corner_collection(
-                    new_model.corner( corner_id ), new_collection );
+                const auto& corner = new_model.corner( corner_id );
+                if( !new_model.is_corner_collection_item(
+                        corner, new_collection ) )
+                {
+                    new_model_builder.add_corner_in_corner_collection(
+                        corner, new_collection );
+                }
             }
         }
     }
@@ -223,16 +238,16 @@ namespace
         {
             return;
         }
-        const auto& unchanged_lines = unchanged_components.at(
-            geode::Line< Model::dim >::component_type_static() );
+        const auto unchanged_lines =
+            unchanged_components_set( unchanged_components,
+                geode::Line< Model::dim >::component_type_static() );
         for( const auto& collection_in : old_model.line_collections() )
         {
             std::vector< geode::uuid > lines_to_add;
             for( const auto& line_in_collection :
                 old_model.line_collection_items( collection_in ) )
             {
-                if( absl::c_contains(
-                        unchanged_lines, line_in_collection.id() ) )
+                if( unchanged_lines.contains( line_in_collection.id() ) )
                 {
                     lines_to_add.push_back( line_in_collection.id() );
                 }
@@ -254,8 +269,12 @@ namespace
                 new_model.line_collection( collection_in.id() );
             for( const auto& line_id : lines_to_add )
             {
-                new_model_builder.add_line_in_line_collection(
-                    new_model.line( line_id ), new_collection );
+                const auto& line = new_model.line( line_id );
+                if( !new_model.is_line_collection_item( line, new_collection ) )
+                {
+                    new_model_builder.add_line_in_line_collection(
+                        line, new_collection );
+                }
             }
         }
     }
@@ -336,16 +355,16 @@ namespace
         {
             return;
         }
-        const auto& unchanged_surfaces = unchanged_components.at(
-            geode::Surface< Model::dim >::component_type_static() );
+        const auto unchanged_surfaces =
+            unchanged_components_set( unchanged_components,
+                geode::Surface< Model::dim >::component_type_static() );
         for( const auto& collection_in : old_model.surface_collections() )
         {
             std::vector< geode::uuid > surfaces_to_add;
             for( const auto& surface_in_collection :
                 old_model.surface_collection_items( collection_in ) )
             {
-                if( absl::c_contains(
-                        unchanged_surfaces, surface_in_collection.id() ) )
+                if( unchanged_surfaces.contains( surface_in_collection.id() ) )
                 {
                     surfaces_to_add.push_back( surface_in_collection.id() );
                 }
@@ -367,8 +386,13 @@ namespace
                 new_model.surface_collection( collection_in.id() );
             for( const auto& surface_id : surfaces_to_add )
             {
-                new_model_builder.add_surface_in_surface_collection(
-                    new_model.surface( surface_id ), new_collection );
+                const auto& surface = new_model.surface( surface_id );
+                if( !new_model.is_surface_collection_item(
+                        surface, new_collection ) )
+                {
+                    new_model_builder.add_surface_in_surface_collection(
+                        surface, new_collection );
+                }
             }
         }
     }
@@ -445,16 +469,15 @@ namespace
         {
             return;
         }
-        const auto& unchanged_blocks =
-            unchanged_components.at( geode::Block3D::component_type_static() );
+        const auto unchanged_blocks = unchanged_components_set(
+            unchanged_components, geode::Block3D::component_type_static() );
         for( const auto& collection_in : old_model.block_collections() )
         {
             std::vector< geode::uuid > blocks_to_add;
             for( const auto& block_in_collection :
                 old_model.block_collection_items( collection_in ) )
             {
-                if( absl::c_contains(
-                        unchanged_blocks, block_in_collection.id() ) )
+                if( unchanged_blocks.contains( block_in_collection.id() ) )
                 {
                     blocks_to_add.push_back( block_in_collection.id() );
                 }
@@ -476,8 +499,13 @@ namespace
                 new_model.block_collection( collection_in.id() );
             for( const auto& block_id : blocks_to_add )
             {
-                new_model_builder.add_block_in_block_collection(
-                    new_model.block( block_id ), new_collection );
+                const auto& block = new_model.block( block_id );
+                if( !new_model.is_block_collection_item(
+                        block, new_collection ) )
+                {
+                    new_model_builder.add_block_in_block_collection(
+                        block, new_collection );
+                }
             }
         }
     }
@@ -556,16 +584,15 @@ namespace
         {
             return;
         }
-        const auto& unchanged_surfaces = unchanged_components.at(
-            geode::Surface3D::component_type_static() );
+        const auto unchanged_surfaces = unchanged_components_set(
+            unchanged_components, geode::Surface3D::component_type_static() );
         for( const auto& model_bdry : old_model.model_boundaries() )
         {
             std::vector< geode::uuid > surfaces_to_add;
             for( const auto& surface_in_bdry :
                 old_model.model_boundary_items( model_bdry ) )
             {
-                if( absl::c_contains(
-                        unchanged_surfaces, surface_in_bdry.id() ) )
+                if( unchanged_surfaces.contains( surface_in_bdry.id() ) )
                 {
                     surfaces_to_add.push_back( surface_in_bdry.id() );
                 }
@@ -587,8 +614,13 @@ namespace
                 new_model.model_boundary( model_bdry.id() );
             for( const auto& surface_id : surfaces_to_add )
             {
-                new_model_builder.add_surface_in_model_boundary(
-                    new_model.surface( surface_id ), new_model_bdry );
+                const auto& surface = new_model.surface( surface_id );
+                if( !new_model.is_model_boundary_item(
+                        surface, new_model_bdry ) )
+                {
+                    new_model_builder.add_surface_in_model_boundary(
+                        surface, new_model_bdry );
+                }
             }
         }
     }
@@ -665,15 +697,15 @@ namespace
         {
             return;
         }
-        const auto& unchanged_lines =
-            unchanged_components.at( geode::Line2D::component_type_static() );
+        const auto unchanged_lines = unchanged_components_set(
+            unchanged_components, geode::Line2D::component_type_static() );
         for( const auto& model_bdry : old_model.model_boundaries() )
         {
             std::vector< geode::uuid > lines_to_add;
             for( const auto& line_in_bdry :
                 old_model.model_boundary_items( model_bdry ) )
             {
-                if( absl::c_contains( unchanged_lines, line_in_bdry.id() ) )
+                if( unchanged_lines.contains( line_in_bdry.id() ) )
                 {
                     lines_to_add.push_back( line_in_bdry.id() );
                 }
@@ -695,8 +727,12 @@ namespace
                 new_model.model_boundary( model_bdry.id() );
             for( const auto& line_id : lines_to_add )
             {
-                new_model_builder.add_line_in_model_boundary(
-                    new_model.line( line_id ), new_model_bdry );
+                const auto& line = new_model.line( line_id );
+                if( !new_model.is_model_boundary_item( line, new_model_bdry ) )
+                {
+                    new_model_builder.add_line_in_model_boundary(
+                        line, new_model_bdry );
+                }
             }
         }
     }

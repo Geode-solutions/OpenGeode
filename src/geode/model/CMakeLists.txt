@@ -187,6 +187,7 @@ add_geode_library(
         "helpers/detail/split_along_surface_mesh_borders.hpp"
         "helpers/detail/split_along_block_mesh_borders.hpp"
         "helpers/detail/surface_mesh_validity_fix.hpp"
+        "mixin/core/detail/component_range_iterator.hpp"
         "mixin/core/detail/components_storage.hpp"
         "mixin/core/detail/mesh_storage.hpp"
         "mixin/core/detail/uuid_to_index.hpp"

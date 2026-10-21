@@ -42,6 +42,7 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > corner_clone_mapping;
+        corner_clone_mapping.reserve( model.nb_corners() );
         for( const auto& corner : model.corners() )
         {
             corner_clone_mapping.map( corner.id(), corner.id() );
@@ -54,6 +55,8 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > corner_collection_clone_mapping;
+        corner_collection_clone_mapping.reserve(
+            model.nb_corner_collections() );
         for( const auto& corner_collection : model.corner_collections() )
         {
             corner_collection_clone_mapping.map(
@@ -67,6 +70,7 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > line_clone_mapping;
+        line_clone_mapping.reserve( model.nb_lines() );
         for( const auto& line : model.lines() )
         {
             line_clone_mapping.map( line.id(), line.id() );
@@ -79,6 +83,7 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > line_collection_clone_mapping;
+        line_collection_clone_mapping.reserve( model.nb_line_collections() );
         for( const auto& line_collection : model.line_collections() )
         {
             line_collection_clone_mapping.map(
@@ -92,6 +97,7 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > surface_clone_mapping;
+        surface_clone_mapping.reserve( model.nb_surfaces() );
         for( const auto& surface : model.surfaces() )
         {
             surface_clone_mapping.map( surface.id(), surface.id() );
@@ -104,6 +110,8 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > surface_collection_clone_mapping;
+        surface_collection_clone_mapping.reserve(
+            model.nb_surface_collections() );
         for( const auto& surface_collection : model.surface_collections() )
         {
             surface_collection_clone_mapping.map(
@@ -117,6 +125,7 @@ namespace
         const Model& model )
     {
         geode::BijectiveMapping< geode::uuid > model_boundary_clone_mapping;
+        model_boundary_clone_mapping.reserve( model.nb_model_boundaries() );
         for( const auto& model_boundary : model.model_boundaries() )
         {
             model_boundary_clone_mapping.map(
@@ -129,6 +138,7 @@ namespace
         const geode::BRep& model )
     {
         geode::BijectiveMapping< geode::uuid > block_clone_mapping;
+        block_clone_mapping.reserve( model.nb_blocks() );
         for( const auto& block : model.blocks() )
         {
             block_clone_mapping.map( block.id(), block.id() );
@@ -140,6 +150,7 @@ namespace
         const geode::BRep& model )
     {
         geode::BijectiveMapping< geode::uuid > block_collection_clone_mapping;
+        block_collection_clone_mapping.reserve( model.nb_block_collections() );
         for( const auto& block_collection : model.block_collections() )
         {
             block_collection_clone_mapping.map(

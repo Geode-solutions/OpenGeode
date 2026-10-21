@@ -27,6 +27,7 @@
 #include <geode/basic/pimpl.hpp>
 
 #include <geode/model/common.hpp>
+#include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
 namespace geode
 {
@@ -68,7 +69,8 @@ namespace geode
             BlockCollectionRangeBase( const BlockCollectionRangeBase& other );
 
         protected:
-            IMPLEMENTATION_MEMBER( impl_ );
+            detail::ComponentRangeIterator< BlockCollection< dimension > >
+                impl_;
         };
 
         class opengeode_model_api BlockCollectionRange
