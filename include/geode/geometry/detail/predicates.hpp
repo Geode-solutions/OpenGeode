@@ -736,12 +736,17 @@ namespace GEO
          * if p4 is inside the circumsphere, negative if outside, zero if the
          * floating point evaluation cannot decide (then use in_sphere_3d_SOS).
          * When not zero, the result is the one of in_sphere_3d_SOS.
-         * Error bound: the determinant is evaluated with at most 13 roundings
-         * on any path from the coordinate differences, so its absolute error
-         * is below gamma_13 times the determinant evaluated with absolute
-         * values, itself below 54 e m^4 + 18 e^2 m^3 (m and e: largest
-         * absolute coordinate differences of p1, p2, p3 and of p4 to p0):
-         * gamma_13 * 54 < 8e-14 and gamma_13 * 18 < 2.7e-14. The range
+         * Error bound (first order forward error propagation, the model of
+         * the geogram filter generator, u = 2^-53): rounded differences have
+         * value <= m (tetrahedron) or e (query) and error <= u times that; a
+         * sum c = a + b has err(c) <= err(a) + err(b) + u |c|, a product
+         * c = a * b has err(c) <= |a| err(b) + |b| err(a) + u |c|, the
+         * coefficients and the query being one expression. Propagated: |det|
+         * <= 54 e m^4 + 18 e^2 m^3 and err(det) <= 864 u e m^4 + 258 u e^2 m^3
+         * = 9.592e-14 e m^4 + 2.865e-14 e^2 m^3. The second order terms, the
+         * bounds of the exact differences ((1 + u) times the computed ones)
+         * and the rounding of the eps computation (6 operations) are covered
+         * by the margins of 1.0e-13 (4%) and 3.0e-14 (4.7%). The range
          * [1e-30, 1e30] of m and e makes underflow and overflow harmless.
          */
         inline SIGN in_sphere_3d_coefficients_filter(
@@ -765,7 +770,7 @@ namespace GEO
             const double det =
                 ( ( ex * k[0] + ey * k[1] ) + ez * k[2] ) + le * k[3];
             const double m3 = m * m * m;
-            const double eps = e * m3 * ( 8e-14 * m + 2.7e-14 * e );
+            const double eps = e * m3 * ( 1.0e-13 * m + 3.0e-14 * e );
             if( det > eps )
             {
                 return negative;
@@ -788,6 +793,16 @@ namespace GEO
             const geode::Point3D& p2,
             const geode::Point3D& p3,
             const geode::Point3D& p4 );
+
+        /*!
+         * Floating point filter of in_circle_3d_SOS alone: its sign, or zero
+         * if the filter cannot decide. Used to test the filter.
+         */
+        opengeode_geometry_api SIGN in_circle_3d_SOS_filter(
+            const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 );
 
         opengeode_geometry_api SIGN in_circle_3d_SOS_exact(
             const geode::Point3D& p0,

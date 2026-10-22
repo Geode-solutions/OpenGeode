@@ -2484,6 +2484,7 @@ namespace
         geode::index_t nb_tested{ 0 };
         std::array< geode::index_t, 3 > nb_decided{ 0, 0, 0 };
         std::array< geode::index_t, 3 > nb_orient_decided{ 0, 0, 0 };
+        std::array< geode::index_t, 3 > nb_circle_decided{ 0, 0, 0 };
         for( const auto trial : geode::Range{ 60000 } )
         {
             const auto kind = trial % 3;
@@ -2549,6 +2550,12 @@ namespace
                     == GEO::PCK::in_circle_3d_SOS_exact(
                         planar[0], planar[1], planar[2], planar[3] ),
                 "[Test] Filtered and exact in_circle_3d_SOS differ" );
+            if( GEO::PCK::in_circle_3d_SOS_filter(
+                    planar[0], planar[1], planar[2], planar[3] )
+                != GEO::zero )
+            {
+                nb_circle_decided[kind]++;
+            }
             nb_tested++;
         }
         geode::OpenGeodeGeometryException::test(
@@ -2560,6 +2567,13 @@ namespace
         geode::OpenGeodeGeometryException::test( nb_orient_decided[0] > 9000,
             "[Test] Inline orient_3d filter should decide generic "
             "configurations" );
+        geode::OpenGeodeGeometryException::test( nb_circle_decided[0] > 9000,
+            "[Test] in_circle_3d filter should decide generic "
+            "configurations" );
+        geode::Logger::info( "in_circle_3d filter decided ",
+            nb_circle_decided[0], " generic, ", nb_circle_decided[1],
+            " nearly cocircular, ", nb_circle_decided[2],
+            " grid configurations" );
         geode::Logger::info( "Inline orient_3d filter decided ",
             nb_orient_decided[0], " generic, ", nb_orient_decided[1],
             " nearly cospherical, ", nb_orient_decided[2],

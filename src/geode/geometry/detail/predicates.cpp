@@ -2331,15 +2331,21 @@ namespace GEO
     //       - (w.v) |u|^2 (|v|^2 - u.v)
     // and Delta = 4 |u x v|^2, so that in_circle_3d = -sign( E ) when the
     // triangle is not degenerate.
-    // Error bound: E is evaluated with at most 9 roundings on any path (from
-    // the coordinate differences to the result), so the absolute error is
-    // below gamma_9 times E evaluated with absolute values, itself below
-    // 144 M^6 with M the largest absolute coordinate difference:
-    // 9 * 2^-53 * 144 / (1 - 9 * 2^-53) < 1.44e-13 < 1.5e-13. Likewise
-    // |u x v|^2 is evaluated with 6 roundings and is below 12 M^4:
-    // 6 * 2^-53 * 12 < 8e-15 < 1e-14.
+    // Error bound (first order forward error propagation, the model of the
+    // geogram filter generator, u = 2^-53): each rounded difference has
+    // value <= M and error <= 1 u M; a sum c = a + b has |c| <= |a| + |b|
+    // and err(c) <= err(a) + err(b) + u |c|; a product c = a * b has
+    // err(c) <= |a| err(b) + |b| err(a) + u |c|. Propagated through the
+    // expression of E below: |E| <= 144 M^6 and err(E) <= 2658 u M^6
+    // = 2.951e-13 M^6. The second order terms (products of two relative
+    // errors, below 1e-12 in relative value), the bound M of the exact
+    // differences (<= (1 + u) times the computed one) and the rounding of
+    // the eps computation (5 operations) are covered by the 1.6% margin of
+    // 3.0e-13. Likewise |u x v|^2 <= 12 M^4 with err <= 128 u M^4
+    // = 1.421e-14 M^4 < 1.5e-14 M^4: above this threshold, the exact
+    // |u x v|^2 is positive (the triangle is not degenerate).
     // Returns the sign of the result, or zero if it cannot be decided.
-    inline int in_circle_3d_filter( const geode::Point3D& p0,
+    static inline int in_circle_3d_filter( const geode::Point3D& p0,
         const geode::Point3D& p1,
         const geode::Point3D& p2,
         const geode::Point3D& p3 )
@@ -2373,7 +2379,7 @@ namespace GEO
         const double c2 = cx * cx + cy * cy + cz * cz;
         const double max2 = max_all * max_all;
         const double max4 = max2 * max2;
-        if( c2 <= 1e-14 * max4 )
+        if( c2 <= 1.5e-14 * max4 )
         {
             // Possibly degenerate triangle.
             return 0;
@@ -2387,7 +2393,7 @@ namespace GEO
         const double wv = wx * vx + wy * vy + wz * vz;
         const double E =
             c2 * ww - wu * ( vv * ( uu - uv ) ) - wv * ( uu * ( vv - uv ) );
-        const double eps = 1.5e-13 * ( max4 * max2 );
+        const double eps = 3.0e-13 * ( max4 * max2 );
         if( E > eps )
         {
             return -1;
@@ -2837,6 +2843,14 @@ namespace GEO
             const geode::Point3D& p4 )
         {
             return in_sphere_3d_exact_SOS( p0, p1, p2, p3, p4 );
+        }
+
+        SIGN in_circle_3d_SOS_filter( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            return SIGN( in_circle_3d_filter( p0, p1, p2, p3 ) );
         }
 
         SIGN in_circle_3d_SOS_exact( const geode::Point3D& p0,
