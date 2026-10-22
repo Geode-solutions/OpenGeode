@@ -98,6 +98,11 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
 endif()
 
 include(GNUInstallDirs)
+if(MSVC)
+    # nlohmann_json installs its natvis file at the root of the install directory
+    # and references it from its exported target
+    set(natvis_link COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/nlohmann_json.natvis ${PROJECT_BINARY_DIR}/nlohmann_json.natvis)
+endif()
 add_custom_target(post_install 
     ALL
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/bin ${PROJECT_BINARY_DIR}/bin
@@ -105,6 +110,7 @@ add_custom_target(post_install
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/cmake ${PROJECT_BINARY_DIR}/cmake
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/include ${PROJECT_BINARY_DIR}/include
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${OpenGeode_PATH_INSTALL}/share ${PROJECT_BINARY_DIR}/share
+    ${natvis_link}
     DEPENDS
         opengeode
 )
