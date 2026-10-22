@@ -43,14 +43,47 @@
 
 namespace
 {
-    template < typename Range >
-    geode::index_t count_non_empty_elements(
-        const Range& range, geode::index_t nb_elements )
+    template < geode::index_t dimension >
+    geode::index_t nb_mesh_elements(
+        const geode::EdgedCurve< dimension >& mesh )
+    {
+        return mesh.nb_edges();
+    }
+
+    template < geode::index_t dimension >
+    geode::index_t nb_mesh_elements(
+        const geode::SurfaceMesh< dimension >& mesh )
+    {
+        return mesh.nb_polygons();
+    }
+
+    template < geode::index_t dimension >
+    geode::index_t nb_mesh_elements( const geode::SolidMesh< dimension >& mesh )
+    {
+        return mesh.nb_polyhedra();
+    }
+
+    template < typename Component >
+    bool has_vertices( const Component& component )
+    {
+        return component.mesh().nb_vertices() > 0;
+    }
+
+    template < typename Component >
+    bool has_elements( const Component& component )
+    {
+        return nb_mesh_elements( component.mesh() ) > 0;
+    }
+
+    template < typename Range, typename Filter >
+    geode::index_t count_non_empty_elements( const Range& range,
+        geode::index_t nb_elements,
+        const Filter& is_non_empty )
     {
         geode::index_t nb_non_empty_elements{ 0 };
         for( const auto& element : range )
         {
-            if( element.mesh().nb_vertices() > 0 )
+            if( is_non_empty( element ) )
             {
                 nb_non_empty_elements++;
             }
@@ -69,8 +102,11 @@ namespace
     std::tuple< geode::AABBTree< dimension >, absl::FixedArray< geode::uuid > >
         create_aabb( const Range& range, geode::index_t nb_elements )
     {
+        const auto is_non_empty = []( const auto& element ) {
+            return has_vertices( element );
+        };
         const auto nb_non_empty_elements =
-            count_non_empty_elements( range, nb_elements );
+            count_non_empty_elements( range, nb_elements, is_non_empty );
         std::tuple< geode::AABBTree< dimension >,
             absl::FixedArray< geode::uuid > >
             result( geode::AABBTree< dimension >{},
@@ -82,7 +118,7 @@ namespace
         geode::index_t id{ 0 };
         for( const auto& element : range )
         {
-            if( element.mesh().nb_vertices() == 0 )
+            if( !is_non_empty( element ) )
             {
                 continue;
             }
@@ -105,8 +141,13 @@ namespace
     geode::ModelMeshesAABBTree< dimension > create_aabbs(
         const Range& range, geode::index_t nb_elements )
     {
+        // A mesh without elements gives an empty AABBTree without bounding
+        // box
+        const auto is_non_empty = []( const auto& element ) {
+            return has_elements( element );
+        };
         const auto nb_non_empty_elements =
-            count_non_empty_elements( range, nb_elements );
+            count_non_empty_elements( range, nb_elements, is_non_empty );
         geode::ModelMeshesAABBTree< dimension > result{ nb_non_empty_elements };
         absl::FixedArray< geode::BoundingBox< dimension > > boxes(
             nb_non_empty_elements );
@@ -114,7 +155,7 @@ namespace
         geode::index_t id{ 0 };
         for( const auto& element : range )
         {
-            if( element.mesh().nb_vertices() == 0 )
+            if( !is_non_empty( element ) )
             {
                 continue;
             }

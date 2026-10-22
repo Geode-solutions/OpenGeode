@@ -90,16 +90,14 @@ namespace geode
                         index_t duplicate_count{ 0 };
                         for( auto& task : all_adjacency_tasks )
                         {
-                            const auto result = task.get();
+                            auto result = task.get();
                             const auto& block = model_.block( result.first );
-                            const auto solid_info = result.second;
-                            duplicate_tasks[duplicate_count++] =
-                                async::spawn( [this, &block, solid_info] {
+                            duplicate_tasks[duplicate_count++] = async::spawn(
+                                [this, &block,
+                                    solid_info = std::move( result.second )] {
                                     const auto& mesh = block.mesh();
                                     auto builder =
                                         builder_.block_mesh_builder( block );
-                                    const auto facets_list =
-                                        mesh_border_facets( block );
                                     SplitAlongSolidFacets block_splitter{ mesh,
                                         *builder };
                                     std::pair< uuid, MeshesElementsMapping >
@@ -167,7 +165,11 @@ namespace geode
                         ComponentMeshVertex cmv_out{ block.component_id(),
                             vertex_out };
                         cmv_mapping.emplace_back( original_cmv, cmv_out );
-                        builder_.set_unique_vertex( cmv_out, unique_vertex_id );
+                        if( unique_vertex_id != NO_ID )
+                        {
+                            builder_.set_unique_vertex(
+                                cmv_out, unique_vertex_id );
+                        }
                     }
                 }
                 return cmv_mapping;

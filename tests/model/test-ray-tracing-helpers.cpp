@@ -24,10 +24,19 @@
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/aabb.hpp>
+#include <geode/geometry/basic_objects/infinite_line.hpp>
 #include <geode/geometry/bounding_box.hpp>
 
+#include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/helpers/aabb_surface_helpers.hpp>
+
+#include <geode/model/helpers/aabb_model_helpers.hpp>
 #include <geode/model/helpers/ray_tracing.hpp>
+#include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/surface.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -35,9 +44,53 @@
 
 #include <geode/tests/common.hpp>
 
+void test_surface_without_polygon()
+{
+    auto brep = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+    const auto nb_surfaces = brep.nb_surfaces();
+    geode::BRepBuilder builder{ brep };
+    // A boundary surface with vertices but without any polygon
+    const auto surface_id = builder.add_surface();
+    const auto& surface = brep.surface( surface_id );
+    builder.surface_mesh_builder( surface )->create_point(
+        geode::Point3D{ { 100., 100., 100. } } );
+    const auto& block = *brep.blocks().begin();
+    builder.add_surface_block_boundary_relationship( surface, block );
+
+    const auto trees = geode::create_surface_meshes_aabb_trees( brep );
+    geode::OpenGeodeModelException::test(
+        trees.mesh_trees_.size() == nb_surfaces,
+        "Surface without polygon should not be in the AABB trees" );
+    geode::OpenGeodeModelException::test(
+        !trees.mesh_tree_ids_.contains( surface_id ),
+        "Surface without polygon should not be in the AABB trees" );
+
+    geode::BRepRayTracing brep_ray_tracing{ brep };
+    const geode::Point3D center{ { 20., 20., 20. } };
+    geode::OpenGeodeModelException::test(
+        brep_ray_tracing.is_point_inside_block( center, block ), "Point [",
+        center.string(),
+        "] should be inside the block with a surface without polygon." );
+    const auto intersections =
+        brep_ray_tracing.find_intersections_with_boundaries(
+            geode::InfiniteLine3D{ geode::Vector3D{ { 1., 0., 0. } }, center },
+            block );
+    geode::OpenGeodeModelException::test(
+        intersections.at( surface_id ).empty(),
+        "Surface without polygon should not have intersections" );
+
+    const auto empty_tree = geode::create_aabb_tree( surface.mesh() );
+    geode::OpenGeodeModelException::test(
+        !geode::is_point_inside_closed_surface(
+            center, surface.mesh(), empty_tree ),
+        "Point should be outside a surface without polygon" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
+    test_surface_without_polygon();
 
     // load a 40x40x40 aligned cubic box brep
     auto brep = geode::load_brep(

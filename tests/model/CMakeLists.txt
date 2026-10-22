@@ -27,6 +27,14 @@ add_geode_test(
     ESSENTIAL
 )
 add_geode_test(
+    SOURCE "test-component-mensurations.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-component-mesh-edges.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -72,6 +80,14 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::model
     ESSENTIAL
+)
+add_geode_test(
+    SOURCE "test-model-builder-robustness.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
 )
 add_geode_test(
     SOURCE "test-model-component-filter.cpp"
@@ -140,6 +156,14 @@ add_geode_test(
     SOURCE "test-section.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-split-along-surface-mesh-borders.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
         ${PROJECT_NAME}::model
 )
 add_geode_test(
