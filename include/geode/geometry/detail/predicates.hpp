@@ -586,6 +586,30 @@ namespace GEO
             const geode::Point2D& p1,
             const geode::Point2D& p2 );
 
+        /*!
+         * Position of p4 with respect to the circumsphere of the positively
+         * oriented tetrahedron (p0, p1, p2, p3): positive if p4 is inside,
+         * negative if outside. Never returns zero: cospherical configurations
+         * are resolved by symbolic perturbation ordered by the points address
+         * (the points should be references into one contiguous array).
+         */
+        opengeode_geometry_api SIGN in_sphere_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3,
+            const geode::Point3D& p4 );
+
+        /*!
+         * Position of p3, coplanar with (p0, p1, p2), with respect to the
+         * circumcircle of the triangle (p0, p1, p2): positive if inside,
+         * negative if outside. Never returns zero: cocircular configurations
+         * are resolved by symbolic perturbation ordered by the points address.
+         */
+        opengeode_geometry_api SIGN in_circle_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 );
+
         opengeode_geometry_api void initialize();
     } // namespace PCK
 } // namespace GEO

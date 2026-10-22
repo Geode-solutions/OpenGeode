@@ -2158,6 +2158,238 @@ namespace
                 "[Test] Wrong dot_3d on case decided by ", test_case.stage );
         }
     }
+    void test_in_sphere()
+    {
+        // Positively oriented tetrahedron, all points in one contiguous array.
+        std::array< geode::Point3D, 6 > pts{ geode::Point3D{ { 0, 0, 0 } },
+            geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1, 0 } },
+            geode::Point3D{ { 0, 0, 1 } }, geode::Point3D{ { 0.5, 0.5, 0.5 } },
+            geode::Point3D{ { 10, 10, 10 } } };
+        if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
+            != GEO::positive )
+        {
+            std::swap( pts[1], pts[2] );
+        }
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
+                == GEO::positive,
+            "[Test] Tetrahedron should be positively oriented" );
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::in_sphere_3d_SOS( pts[0], pts[1], pts[2], pts[3], pts[4] )
+                == GEO::positive,
+            "[Test] Circumcenter should be inside the circumsphere" );
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::in_sphere_3d_SOS( pts[0], pts[1], pts[2], pts[3], pts[5] )
+                == GEO::negative,
+            "[Test] Far point should be outside the circumsphere" );
+
+        // Cospherical points: the 8 corners of the unit cube
+        std::array< geode::Point3D, 8 > cube;
+        for( const auto i : geode::Range{ 8 } )
+        {
+            cube[i] = geode::Point3D{ { double( i & 1 ),
+                double( ( i >> 1 ) & 1 ), double( ( i >> 2 ) & 1 ) } };
+        }
+        geode::index_t nb_tested{ 0 };
+        for( const auto a : geode::Range{ 8 } )
+        {
+            for( const auto b : geode::Range{ 8 } )
+            {
+                for( const auto c : geode::Range{ 8 } )
+                {
+                    for( const auto d : geode::Range{ 8 } )
+                    {
+                        for( const auto e : geode::Range{ 8 } )
+                        {
+                            if( a == b || a == c || a == d || a == e || b == c
+                                || b == d || b == e || c == d || c == e
+                                || d == e )
+                            {
+                                continue;
+                            }
+                            if( GEO::PCK::orient_3d(
+                                    cube[a], cube[b], cube[c], cube[d] )
+                                != GEO::positive )
+                            {
+                                continue;
+                            }
+                            const auto result = GEO::PCK::in_sphere_3d_SOS(
+                                cube[a], cube[b], cube[c], cube[d], cube[e] );
+                            geode::OpenGeodeGeometryException::test(
+                                result != GEO::zero, "[Test] in_sphere_3d_SOS "
+                                                     "should never be zero" );
+                            // Even permutations of the first four points
+                            // keep the tetrahedron positively oriented and
+                            // describe the same perturbed sphere.
+                            geode::OpenGeodeGeometryException::test(
+                                GEO::PCK::in_sphere_3d_SOS( cube[b], cube[a],
+                                    cube[d], cube[c], cube[e] )
+                                    == result,
+                                "[Test] Even permutation should not change "
+                                "the result" );
+                            geode::OpenGeodeGeometryException::test(
+                                GEO::PCK::in_sphere_3d_SOS( cube[b], cube[c],
+                                    cube[a], cube[d], cube[e] )
+                                    == result,
+                                "[Test] Even permutation should not change "
+                                "the result (2)" );
+                            geode::OpenGeodeGeometryException::test(
+                                GEO::PCK::in_sphere_3d_SOS( cube[d], cube[b],
+                                    cube[a], cube[c], cube[e] )
+                                    == result,
+                                "[Test] Even permutation should not change "
+                                "the result (3)" );
+                            nb_tested++;
+                        }
+                    }
+                }
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            nb_tested > 0, "[Test] No cospherical configuration tested" );
+    }
+
+    void test_in_sphere_random_integers()
+    {
+        // Small integer coordinates: the double evaluation is exact.
+        std::mt19937 gen( 42 );
+        std::uniform_int_distribution< int > dist( -20, 20 );
+        geode::index_t nb_tested{ 0 };
+        for( const auto trial : geode::Range{ 20000 } )
+        {
+            geode_unused( trial );
+            std::array< geode::Point3D, 5 > pts;
+            for( auto& point : pts )
+            {
+                point = geode::Point3D{ { double( dist( gen ) ),
+                    double( dist( gen ) ), double( dist( gen ) ) } };
+            }
+            if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
+                != GEO::positive )
+            {
+                std::swap( pts[0], pts[1] );
+                if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
+                    != GEO::positive )
+                {
+                    continue;
+                }
+            }
+            double det[4][4];
+            for( const auto i : geode::LRange{ 4 } )
+            {
+                double sq{ 0 };
+                for( const auto d : geode::LRange{ 3 } )
+                {
+                    det[i][d] = pts[i].value( d ) - pts[4].value( d );
+                    sq += det[i][d] * det[i][d];
+                }
+                det[i][3] = sq;
+            }
+            const auto minor3 = [&det]( int r0, int r1, int r2 ) {
+                return det[r0][0]
+                           * ( det[r1][1] * det[r2][2]
+                               - det[r1][2] * det[r2][1] )
+                       - det[r0][1]
+                             * ( det[r1][0] * det[r2][2]
+                                 - det[r1][2] * det[r2][0] )
+                       + det[r0][2]
+                             * ( det[r1][0] * det[r2][1]
+                                 - det[r1][1] * det[r2][0] );
+            };
+            // For a positively oriented tetrahedron, the point is inside the
+            // circumsphere iff this lifted determinant is negative.
+            const double value =
+                -det[0][3] * minor3( 1, 2, 3 ) + det[1][3] * minor3( 0, 2, 3 )
+                - det[2][3] * minor3( 0, 1, 3 ) + det[3][3] * minor3( 0, 1, 2 );
+            const auto result = GEO::PCK::in_sphere_3d_SOS(
+                pts[0], pts[1], pts[2], pts[3], pts[4] );
+            if( value < 0 )
+            {
+                geode::OpenGeodeGeometryException::test(
+                    result == GEO::positive, "[Test] Wrong inside result" );
+            }
+            else if( value > 0 )
+            {
+                geode::OpenGeodeGeometryException::test(
+                    result == GEO::negative, "[Test] Wrong outside result" );
+            }
+            else
+            {
+                geode::OpenGeodeGeometryException::test( result != GEO::zero,
+                    "[Test] Cospherical should not be zero" );
+            }
+            nb_tested++;
+        }
+        geode::OpenGeodeGeometryException::test(
+            nb_tested > 1000, "[Test] Too few random configurations tested" );
+    }
+
+    void test_in_circle()
+    {
+        std::array< geode::Point3D, 6 > pts{ geode::Point3D{ { 0, 0, 0 } },
+            geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 0, 1, 0 } },
+            geode::Point3D{ { 0.5, 0.5, 0 } }, geode::Point3D{ { 10, 10, 0 } },
+            geode::Point3D{ { 1, 1, 0 } } };
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::in_circle_3d_SOS( pts[0], pts[1], pts[2], pts[3] )
+                == GEO::positive,
+            "[Test] Circumcenter should be inside the circumcircle" );
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::in_circle_3d_SOS( pts[0], pts[1], pts[2], pts[4] )
+                == GEO::negative,
+            "[Test] Far point should be outside the circumcircle" );
+
+        // Same results with a tilted plane (not axis aligned)
+        std::array< geode::Point3D, 4 > tilted{ geode::Point3D{ { 0, 0, 0 } },
+            geode::Point3D{ { 2, 0, 2 } }, geode::Point3D{ { 0, 2, 0 } },
+            geode::Point3D{ { 1, 1, 1 } } };
+        geode::OpenGeodeGeometryException::test(
+            GEO::PCK::in_circle_3d_SOS(
+                tilted[0], tilted[1], tilted[2], tilted[3] )
+                == GEO::positive,
+            "[Test] Tilted plane: point inside the circumcircle" );
+
+        // Cocircular points: the 4 corners of the unit square (and a 3D
+        // variant). The result is never zero. In-circle is independent of the
+        // orientation of the triangle, so permuting the first three points
+        // keeps the result.
+        std::array< geode::Point3D, 4 > square{ geode::Point3D{ { 0, 0, 0 } },
+            geode::Point3D{ { 1, 0, 0 } }, geode::Point3D{ { 1, 1, 0 } },
+            geode::Point3D{ { 0, 1, 0 } } };
+        geode::index_t nb_tested{ 0 };
+        for( const auto a : geode::Range{ 4 } )
+        {
+            for( const auto b : geode::Range{ 4 } )
+            {
+                for( const auto c : geode::Range{ 4 } )
+                {
+                    const auto d = 6 - a - b - c;
+                    if( a == b || a == c || b == c || d > 3 )
+                    {
+                        continue;
+                    }
+                    const auto result = GEO::PCK::in_circle_3d_SOS(
+                        square[a], square[b], square[c], square[d] );
+                    geode::OpenGeodeGeometryException::test(
+                        result != GEO::zero,
+                        "[Test] in_circle_3d_SOS should never be zero" );
+                    geode::OpenGeodeGeometryException::test(
+                        GEO::PCK::in_circle_3d_SOS(
+                            square[b], square[a], square[c], square[d] )
+                            == result,
+                        "[Test] Orientation should not change in_circle" );
+                    geode::OpenGeodeGeometryException::test(
+                        GEO::PCK::in_circle_3d_SOS(
+                            square[c], square[b], square[a], square[d] )
+                            == result,
+                        "[Test] Orientation should not change in_circle (2)" );
+                    nb_tested++;
+                }
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            nb_tested > 0, "[Test] No cocircular configuration tested" );
+    }
 } // namespace
 
 void test()
@@ -2173,6 +2405,9 @@ void test()
     test_nearly_degenerate_consistency();
     test_integer_configurations();
     test_regression_cases();
+    test_in_sphere();
+    test_in_sphere_random_integers();
+    test_in_circle();
 
     geode::Logger::info( "TEST SUCCESS" );
 }

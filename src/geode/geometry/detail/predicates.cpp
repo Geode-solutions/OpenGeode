@@ -2247,6 +2247,384 @@ namespace GEO
 
         return Delta.sign();
     }
+    // Semi-static filter of in_sphere_3d, ported from geogram (hand optimized
+    // by Sylvain Pion). Requires orient_3d(p0,p1,p2,p3) > 0.
+    // Returns the sign of the result, or zero if it cannot be decided.
+    inline int in_sphere_3d_filter( const geode::Point3D& p0,
+        const geode::Point3D& p1,
+        const geode::Point3D& p2,
+        const geode::Point3D& p3,
+        const geode::Point3D& p4 )
+    {
+        const double ptx = p0.value( 0 ) - p4.value( 0 );
+        const double pty = p0.value( 1 ) - p4.value( 1 );
+        const double ptz = p0.value( 2 ) - p4.value( 2 );
+        const double pt2 = ptx * ptx + pty * pty + ptz * ptz;
+
+        const double qtx = p1.value( 0 ) - p4.value( 0 );
+        const double qty = p1.value( 1 ) - p4.value( 1 );
+        const double qtz = p1.value( 2 ) - p4.value( 2 );
+        const double qt2 = qtx * qtx + qty * qty + qtz * qtz;
+
+        const double rtx = p2.value( 0 ) - p4.value( 0 );
+        const double rty = p2.value( 1 ) - p4.value( 1 );
+        const double rtz = p2.value( 2 ) - p4.value( 2 );
+        const double rt2 = rtx * rtx + rty * rty + rtz * rtz;
+
+        const double stx = p3.value( 0 ) - p4.value( 0 );
+        const double sty = p3.value( 1 ) - p4.value( 1 );
+        const double stz = p3.value( 2 ) - p4.value( 2 );
+        const double st2 = stx * stx + sty * sty + stz * stz;
+
+        const double maxx =
+            std::max( std::max( std::fabs( ptx ), std::fabs( qtx ) ),
+                std::max( std::fabs( rtx ), std::fabs( stx ) ) );
+        const double maxy =
+            std::max( std::max( std::fabs( pty ), std::fabs( qty ) ),
+                std::max( std::fabs( rty ), std::fabs( sty ) ) );
+        const double maxz =
+            std::max( std::max( std::fabs( ptz ), std::fabs( qtz ) ),
+                std::max( std::fabs( rtz ), std::fabs( stz ) ) );
+
+        double eps = 1.2466136531027298e-13 * maxx * maxy * maxz;
+        const double min_max = std::min( std::min( maxx, maxy ), maxz );
+        const double max_max = std::max( std::max( maxx, maxy ), maxz );
+
+        // Determinant with rows (p,r,q,s), as in geogram.
+        const double m12 = rtx * pty - ptx * rty;
+        const double m13 = qtx * pty - ptx * qty;
+        const double m14 = stx * pty - ptx * sty;
+        const double m23 = qtx * rty - rtx * qty;
+        const double m24 = stx * rty - rtx * sty;
+        const double m34 = stx * qty - qtx * sty;
+        const double m123 = m23 * ptz - m13 * rtz + m12 * qtz;
+        const double m124 = m24 * ptz - m14 * rtz + m12 * stz;
+        const double m134 = m34 * ptz - m14 * qtz + m13 * stz;
+        const double m234 = m34 * rtz - m24 * qtz + m23 * stz;
+        const double det = m234 * pt2 - m134 * rt2 + m124 * qt2 - m123 * st2;
+
+        if( min_max < 1e-58 ) // sqrt^5(min_double/eps)
+        {
+            // Protect against underflow in the computation of eps.
+            return 0;
+        }
+        if( max_max < 1e61 ) // sqrt^5(max_double/4 [hadamard])
+        {
+            // Protect against overflow in the computation of det.
+            eps *= max_max * max_max;
+            if( det > eps )
+            {
+                return 1;
+            }
+            if( det < -eps )
+            {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    // ============ in_sphere / in_circle ================================
+
+    // Exact in_sphere_3d, ported from the side4_3d_exact_SOS() predicate of
+    // geogram (in_sphere_3d = -side4_3d), with symbolic perturbation based
+    // on the points addresses.
+    SIGN in_sphere_3d_exact_SOS( const geode::Point3D& p0,
+        const geode::Point3D& p1,
+        const geode::Point3D& p2,
+        const geode::Point3D& p3,
+        const geode::Point3D& p4 )
+    {
+        const expansion& a11 = expansion_diff( p1.value( 0 ), p0.value( 0 ) );
+        const expansion& a12 = expansion_diff( p1.value( 1 ), p0.value( 1 ) );
+        const expansion& a13 = expansion_diff( p1.value( 2 ), p0.value( 2 ) );
+        const expansion& a21 = expansion_diff( p2.value( 0 ), p0.value( 0 ) );
+        const expansion& a22 = expansion_diff( p2.value( 1 ), p0.value( 1 ) );
+        const expansion& a23 = expansion_diff( p2.value( 2 ), p0.value( 2 ) );
+        const expansion& a31 = expansion_diff( p3.value( 0 ), p0.value( 0 ) );
+        const expansion& a32 = expansion_diff( p3.value( 1 ), p0.value( 1 ) );
+        const expansion& a33 = expansion_diff( p3.value( 2 ), p0.value( 2 ) );
+        const expansion& a41 = expansion_diff( p4.value( 0 ), p0.value( 0 ) );
+        const expansion& a42 = expansion_diff( p4.value( 1 ), p0.value( 1 ) );
+        const expansion& a43 = expansion_diff( p4.value( 2 ), p0.value( 2 ) );
+
+        // Squared distances to p0
+        const expansion& l1_0 = expansion_product( a11, a11 );
+        const expansion& l1_1 = expansion_product( a12, a12 );
+        const expansion& l1_2 = expansion_product( a13, a13 );
+        const expansion& l1 = expansion_sum3( l1_0, l1_1, l1_2 );
+        const expansion& l2_0 = expansion_product( a21, a21 );
+        const expansion& l2_1 = expansion_product( a22, a22 );
+        const expansion& l2_2 = expansion_product( a23, a23 );
+        const expansion& l2 = expansion_sum3( l2_0, l2_1, l2_2 );
+        const expansion& l3_0 = expansion_product( a31, a31 );
+        const expansion& l3_1 = expansion_product( a32, a32 );
+        const expansion& l3_2 = expansion_product( a33, a33 );
+        const expansion& l3 = expansion_sum3( l3_0, l3_1, l3_2 );
+        const expansion& l4_0 = expansion_product( a41, a41 );
+        const expansion& l4_1 = expansion_product( a42, a42 );
+        const expansion& l4_2 = expansion_product( a43, a43 );
+        const expansion& l4 = expansion_sum3( l4_0, l4_1, l4_2 );
+
+        // 2x2 minors
+        const expansion& m12 = expansion_det2x2( a12, a13, a22, a23 );
+        const expansion& m13 = expansion_det2x2( a12, a13, a32, a33 );
+        const expansion& m14 = expansion_det2x2( a12, a13, a42, a43 );
+        const expansion& m23 = expansion_det2x2( a22, a23, a32, a33 );
+        const expansion& m24 = expansion_det2x2( a22, a23, a42, a43 );
+        const expansion& m34 = expansion_det2x2( a32, a33, a42, a43 );
+
+        const expansion& z11 = expansion_product( a21, m34 );
+        const expansion& z12 = expansion_product( a31, m24 );
+        const expansion& z13 = expansion_product( a41, m23 );
+        const expansion& z1a = expansion_sum( z11, z13 );
+        const expansion& Delta1 = expansion_diff( z1a, z12 );
+
+        const expansion& z21 = expansion_product( a11, m34 );
+        const expansion& z22 = expansion_product( a31, m14 );
+        const expansion& z23 = expansion_product( a41, m13 );
+        const expansion& z2a = expansion_sum( z21, z23 );
+        const expansion& Delta2 = expansion_diff( z2a, z22 );
+
+        const expansion& z31 = expansion_product( a11, m24 );
+        const expansion& z32 = expansion_product( a21, m14 );
+        const expansion& z33 = expansion_product( a41, m12 );
+        const expansion& z3a = expansion_sum( z31, z33 );
+        const expansion& Delta3 = expansion_diff( z3a, z32 );
+
+        const expansion& z41 = expansion_product( a11, m23 );
+        const expansion& z42 = expansion_product( a21, m13 );
+        const expansion& z43 = expansion_product( a31, m12 );
+        const expansion& z4a = expansion_sum( z41, z43 );
+        const expansion& Delta4 = expansion_diff( z4a, z42 );
+
+        const auto Delta4_sign = Delta4.sign();
+        geo_debug_assert( Delta4_sign != zero );
+
+        // r = Delta1*l1 - Delta2*l2 + Delta3*l3 - Delta4*l4
+        const expansion& r_1 = expansion_product( Delta1, l1 );
+        const expansion& r_2 = expansion_product( Delta2, l2 );
+        const expansion& r_3 = expansion_product( Delta3, l3 );
+        const expansion& r_4 = expansion_product( Delta4, l4 );
+        const expansion& r_13 = expansion_sum( r_1, r_3 );
+        const expansion& r_24 = expansion_sum( r_2, r_4 );
+        const expansion& r = expansion_diff( r_13, r_24 );
+        const auto r_sign = r.sign();
+        if( r_sign != zero )
+        {
+            return SIGN( Delta4_sign * r_sign );
+        }
+
+        // Simulation of Simplicity (symbolic perturbation)
+        const geode::Point3D* p_sort[5] = { &p0, &p1, &p2, &p3, &p4 };
+        std::sort( p_sort, p_sort + 5 );
+        for( int i = 0; i < 5; ++i )
+        {
+            if( p_sort[i] == &p0 )
+            {
+                const expansion& z1 = expansion_diff( Delta2, Delta1 );
+                const expansion& z2 = expansion_diff( Delta4, Delta3 );
+                const expansion& z = expansion_sum( z1, z2 );
+                const auto z_sign = z.sign();
+                if( z_sign != zero )
+                {
+                    return SIGN( -Delta4_sign * z_sign );
+                }
+            }
+            else if( p_sort[i] == &p1 )
+            {
+                const auto Delta1_sign = Delta1.sign();
+                if( Delta1_sign != zero )
+                {
+                    return SIGN( -Delta4_sign * Delta1_sign );
+                }
+            }
+            else if( p_sort[i] == &p2 )
+            {
+                const auto Delta2_sign = Delta2.sign();
+                if( Delta2_sign != zero )
+                {
+                    return SIGN( Delta4_sign * Delta2_sign );
+                }
+            }
+            else if( p_sort[i] == &p3 )
+            {
+                const auto Delta3_sign = Delta3.sign();
+                if( Delta3_sign != zero )
+                {
+                    return SIGN( -Delta4_sign * Delta3_sign );
+                }
+            }
+            else
+            {
+                return positive;
+            }
+        }
+        return zero;
+    }
+
+    // Exact in_circle_3d, ported from the side3_exact_SOS() predicate of
+    // geogram (in_circle_3d = -side3_3d(p0,p1,p2,p3,p0,p1,p2)), with symbolic
+    // perturbation based on the points addresses.
+    SIGN in_circle_3d_exact_SOS( const geode::Point3D& p0,
+        const geode::Point3D& p1,
+        const geode::Point3D& p2,
+        const geode::Point3D& p3 )
+    {
+        const expansion& d10 = expansion_diff( p1.value( 0 ), p0.value( 0 ) );
+        const expansion& d11 = expansion_diff( p1.value( 1 ), p0.value( 1 ) );
+        const expansion& d12 = expansion_diff( p1.value( 2 ), p0.value( 2 ) );
+        const expansion& d20 = expansion_diff( p2.value( 0 ), p0.value( 0 ) );
+        const expansion& d21 = expansion_diff( p2.value( 1 ), p0.value( 1 ) );
+        const expansion& d22 = expansion_diff( p2.value( 2 ), p0.value( 2 ) );
+        const expansion& d30 = expansion_diff( p3.value( 0 ), p0.value( 0 ) );
+        const expansion& d31 = expansion_diff( p3.value( 1 ), p0.value( 1 ) );
+        const expansion& d32 = expansion_diff( p3.value( 2 ), p0.value( 2 ) );
+
+        // Squared distances to p0
+        const expansion& l1_0 = expansion_product( d10, d10 );
+        const expansion& l1_1 = expansion_product( d11, d11 );
+        const expansion& l1_2 = expansion_product( d12, d12 );
+        const expansion& l1 = expansion_sum3( l1_0, l1_1, l1_2 );
+        const expansion& l2_0 = expansion_product( d20, d20 );
+        const expansion& l2_1 = expansion_product( d21, d21 );
+        const expansion& l2_2 = expansion_product( d22, d22 );
+        const expansion& l2 = expansion_sum3( l2_0, l2_1, l2_2 );
+        const expansion& l3_0 = expansion_product( d30, d30 );
+        const expansion& l3_1 = expansion_product( d31, d31 );
+        const expansion& l3_2 = expansion_product( d32, d32 );
+        const expansion& l3 = expansion_sum3( l3_0, l3_1, l3_2 );
+
+        // aij = 2 * (pi-p0).(qj-p0) with (q0,q1,q2) = (p0,p1,p2)
+        const expansion& a10 = expansion_create( 0.0 );
+        const expansion& a20 = expansion_create( 0.0 );
+        const expansion& a30 = expansion_create( 0.0 );
+        const expansion& u11_0 = expansion_product( d10, d10 );
+        const expansion& u11_1 = expansion_product( d11, d11 );
+        const expansion& u11_2 = expansion_product( d12, d12 );
+        const expansion& u11 = expansion_sum3( u11_0, u11_1, u11_2 );
+        const expansion& a11 = expansion_sum( u11, u11 );
+        const expansion& u12_0 = expansion_product( d10, d20 );
+        const expansion& u12_1 = expansion_product( d11, d21 );
+        const expansion& u12_2 = expansion_product( d12, d22 );
+        const expansion& u12 = expansion_sum3( u12_0, u12_1, u12_2 );
+        const expansion& a12 = expansion_sum( u12, u12 );
+        const expansion& u21_0 = expansion_product( d20, d10 );
+        const expansion& u21_1 = expansion_product( d21, d11 );
+        const expansion& u21_2 = expansion_product( d22, d12 );
+        const expansion& u21 = expansion_sum3( u21_0, u21_1, u21_2 );
+        const expansion& a21 = expansion_sum( u21, u21 );
+        const expansion& u22_0 = expansion_product( d20, d20 );
+        const expansion& u22_1 = expansion_product( d21, d21 );
+        const expansion& u22_2 = expansion_product( d22, d22 );
+        const expansion& u22 = expansion_sum3( u22_0, u22_1, u22_2 );
+        const expansion& a22 = expansion_sum( u22, u22 );
+        const expansion& u31_0 = expansion_product( d30, d10 );
+        const expansion& u31_1 = expansion_product( d31, d11 );
+        const expansion& u31_2 = expansion_product( d32, d12 );
+        const expansion& u31 = expansion_sum3( u31_0, u31_1, u31_2 );
+        const expansion& a31 = expansion_sum( u31, u31 );
+        const expansion& u32_0 = expansion_product( d30, d20 );
+        const expansion& u32_1 = expansion_product( d31, d21 );
+        const expansion& u32_2 = expansion_product( d32, d22 );
+        const expansion& u32 = expansion_sum3( u32_0, u32_1, u32_2 );
+        const expansion& a32 = expansion_sum( u32, u32 );
+
+        // [ b00 b01 b02 ]           [  1   1   1  ]-1
+        // [ b10 b11 b12 ] = Delta * [ a10 a11 a12 ]
+        // [ b20 b21 b22 ]           [ a20 a21 a22 ]
+        const expansion& b00 = expansion_det2x2( a11, a12, a21, a22 );
+        const expansion& b01 = expansion_diff( a21, a22 );
+        const expansion& b02 = expansion_diff( a12, a11 );
+        const expansion& b10 = expansion_det2x2( a12, a10, a22, a20 );
+        const expansion& b11 = expansion_diff( a22, a20 );
+        const expansion& b12 = expansion_diff( a10, a12 );
+        const expansion& b20 = expansion_det2x2( a10, a11, a20, a21 );
+        const expansion& b21 = expansion_diff( a20, a21 );
+        const expansion& b22 = expansion_diff( a11, a10 );
+
+        const expansion& Delta = expansion_sum3( b00, b10, b20 );
+        const auto Delta_sign = Delta.sign();
+        geo_debug_assert( Delta_sign != zero );
+
+        //       [ Lambda0 ]   [ b01 b02 ]   [ l1 ]   [ b00 ]
+        // Delta [ Lambda1 ] = [ b11 b12 ] * [    ] + [ b10 ]
+        //       [ Lambda2 ]   [ b21 b22 ]   [ l2 ]   [ b20 ]
+        const expansion& b01_l1 = expansion_product( b01, l1 );
+        const expansion& b02_l2 = expansion_product( b02, l2 );
+        const expansion& DeltaLambda0 = expansion_sum3( b01_l1, b02_l2, b00 );
+        const expansion& b11_l1 = expansion_product( b11, l1 );
+        const expansion& b12_l2 = expansion_product( b12, l2 );
+        const expansion& DeltaLambda1 = expansion_sum3( b11_l1, b12_l2, b10 );
+        const expansion& b21_l1 = expansion_product( b21, l1 );
+        const expansion& b22_l2 = expansion_product( b22, l2 );
+        const expansion& DeltaLambda2 = expansion_sum3( b21_l1, b22_l2, b20 );
+
+        // r = Delta*l3-(a30*DeltaLambda0+a31*DeltaLambda1+a32*DeltaLambda2)
+        const expansion& r0 = expansion_product( Delta, l3 );
+        const expansion& r1 = expansion_product( a30, DeltaLambda0 );
+        const expansion& r2 = expansion_product( a31, DeltaLambda1 );
+        const expansion& r3 = expansion_product( a32, DeltaLambda2 );
+        const expansion& r123 = expansion_sum3( r1, r2, r3 );
+        const expansion& r = expansion_diff( r0, r123 );
+        const auto r_sign = r.sign();
+        if( r_sign != zero )
+        {
+            return SIGN( -Delta_sign * r_sign );
+        }
+
+        // Simulation of Simplicity (symbolic perturbation)
+        const geode::Point3D* p_sort[4] = { &p0, &p1, &p2, &p3 };
+        std::sort( p_sort, p_sort + 4 );
+        for( int i = 0; i < 4; ++i )
+        {
+            if( p_sort[i] == &p0 )
+            {
+                const expansion& b0 = expansion_sum( b01, b02 );
+                const expansion& b1 = expansion_sum( b11, b12 );
+                const expansion& b2 = expansion_sum( b21, b22 );
+                const expansion& z1 = expansion_product( a30, b0 );
+                const expansion& z2 = expansion_product( a31, b1 );
+                const expansion& z3 = expansion_product( a32, b2 );
+                const expansion& z123 = expansion_sum3( z1, z2, z3 );
+                const expansion& z = expansion_diff( Delta, z123 );
+                const auto z_sign = z.sign();
+                if( z_sign != zero )
+                {
+                    return SIGN( -Delta_sign * z_sign );
+                }
+            }
+            else if( p_sort[i] == &p1 )
+            {
+                const expansion& z1 = expansion_product( a30, b01 );
+                const expansion& z2 = expansion_product( a31, b11 );
+                const expansion& z3 = expansion_product( a32, b21 );
+                const expansion& z = expansion_sum3( z1, z2, z3 );
+                const auto z_sign = z.sign();
+                if( z_sign != zero )
+                {
+                    return SIGN( -Delta_sign * z_sign );
+                }
+            }
+            else if( p_sort[i] == &p2 )
+            {
+                const expansion& z1 = expansion_product( a30, b02 );
+                const expansion& z2 = expansion_product( a31, b12 );
+                const expansion& z3 = expansion_product( a32, b22 );
+                const expansion& z = expansion_sum3( z1, z2, z3 );
+                const auto z_sign = z.sign();
+                if( z_sign != zero )
+                {
+                    return SIGN( -Delta_sign * z_sign );
+                }
+            }
+            else
+            {
+                return positive;
+            }
+        }
+        return zero;
+    }
 } // namespace GEO
 
 namespace GEO
@@ -2347,6 +2725,29 @@ namespace GEO
                 return zero;
             }
             return dot_2d_exact( p0, p1, p2 );
+        }
+
+        SIGN in_sphere_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3,
+            const geode::Point3D& p4 )
+        {
+            const auto result =
+                SIGN( in_sphere_3d_filter( p0, p1, p2, p3, p4 ) );
+            if( result != zero )
+            {
+                return result;
+            }
+            return in_sphere_3d_exact_SOS( p0, p1, p2, p3, p4 );
+        }
+
+        SIGN in_circle_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            return in_circle_3d_exact_SOS( p0, p1, p2, p3 );
         }
 
         void initialize()
