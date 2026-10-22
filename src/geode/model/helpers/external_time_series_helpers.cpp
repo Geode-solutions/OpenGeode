@@ -23,9 +23,11 @@
 
 #include <geode/model/helpers/external_time_series_helpers.hpp>
 
-#include <absl/container/flat_hash_map.h>
+#include <algorithm>
+#include <cmath>
+#include <vector>
 
-#include <bitsery/ext/std_map.h>
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
@@ -34,6 +36,12 @@
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
 
+#include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/distance.hpp>
+#include <geode/geometry/nn_search.hpp>
+#include <geode/geometry/point.hpp>
+
+#include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
@@ -42,8 +50,18 @@
 
 namespace
 {
+    // Point set vertex matched with each element of each Block, NO_ID if none
+    using BlocksMatches =
+        absl::flat_hash_map< geode::uuid, std::vector< geode::index_t > >;
+
+    struct BlockPolyhedron
+    {
+        geode::uuid block_id;
+        geode::index_t polyhedron;
+    };
+
     void delete_replaced_steps( const geode::AttributeManager& from,
-        geode::AttributeManager& to,
+        geode::AttributeManager& target,
         std::string_view name )
     {
         for( const auto& step : from.time_steps( name ) )
@@ -54,23 +72,187 @@ namespace
             {
                 continue;
             }
-            for( const auto& existing_step : to.time_steps( name ) )
+            for( const auto& existing_step : target.time_steps( name ) )
             {
                 if( existing_step.time == step.time )
                 {
-                    to.delete_attribute( existing_step.attribute_id );
+                    target.delete_attribute( existing_step.attribute_id );
                 }
             }
         }
     }
 
     void delete_replaced_steps(
-        const geode::AttributeManager& from, geode::AttributeManager& to )
+        const geode::AttributeManager& from, geode::AttributeManager& target )
     {
         for( const auto& name : from.time_series_names() )
         {
-            delete_replaced_steps( from, to, name );
+            delete_replaced_steps( from, target, name );
         }
+    }
+
+    // Coordinates are rounded relatively to their magnitude
+    double matching_tolerance( const geode::PointSet3D& point_set )
+    {
+        const auto box = point_set.bounding_box();
+        double largest_coordinate{ 1 };
+        for( const auto& point : { box.min(), box.max() } )
+        {
+            for( const auto axis : geode::LRange{ 3 } )
+            {
+                largest_coordinate = std::max(
+                    largest_coordinate, std::fabs( point.value( axis ) ) );
+            }
+        }
+        return geode::GLOBAL_EPSILON * largest_coordinate;
+    }
+
+    // Each point is matched with the closest element, elements without
+    // point (e.g. outside of the simulated domain) are not matched.
+    // Returns the point matched with each element, NO_ID if none.
+    std::vector< geode::index_t > match_points(
+        const geode::PointSet3D& point_set,
+        std::string_view point_set_name,
+        std::vector< geode::Point3D > element_points )
+    {
+        std::vector< geode::index_t > matches(
+            element_points.size(), geode::NO_ID );
+        if( point_set.nb_vertices() == 0 )
+        {
+            return matches;
+        }
+        geode::OpenGeodeModelException::check_exception(
+            !element_points.empty(), nullptr,
+            geode::OpenGeodeException::TYPE::data,
+            "[ExternalTimeSeriesHelpers::apply_to] No Block element to match "
+            "the ",
+            point_set_name, " with" );
+        const auto tolerance = matching_tolerance( point_set );
+        const geode::NNSearch3D search{ std::move( element_points ) };
+        for( const auto vertex : geode::Range{ point_set.nb_vertices() } )
+        {
+            const auto& point = point_set.point( vertex );
+            const auto element = search.closest_neighbor( point );
+            const auto distance =
+                geode::point_point_distance( point, search.point( element ) );
+            geode::OpenGeodeModelException::check_exception(
+                distance <= tolerance, nullptr,
+                geode::OpenGeodeException::TYPE::data,
+                "[ExternalTimeSeriesHelpers::apply_to] Point ", vertex,
+                " of the ", point_set_name, " [", point.string(),
+                "] is at distance ", distance,
+                " from the closest Block element, more than the tolerance ",
+                tolerance );
+            matches[element] = vertex;
+        }
+        return matches;
+    }
+
+    // Matching is done on the model unique vertices so that the colocated
+    // vertices of several Blocks get the same values
+    std::vector< geode::index_t > match_unique_vertices(
+        const geode::BRep& model, const geode::PointSet3D& unique_vertices )
+    {
+        std::vector< geode::Point3D > points;
+        std::vector< geode::index_t > model_unique_vertices;
+        std::vector< bool > visited( model.nb_unique_vertices(), false );
+        for( const auto& block : model.blocks() )
+        {
+            const auto& mesh = block.mesh();
+            for( const auto vertex : geode::Range{ mesh.nb_vertices() } )
+            {
+                const auto unique_vertex =
+                    model.unique_vertex( { block.component_id(), vertex } );
+                if( unique_vertex == geode::NO_ID || visited[unique_vertex] )
+                {
+                    continue;
+                }
+                visited[unique_vertex] = true;
+                points.push_back( mesh.point( vertex ) );
+                model_unique_vertices.push_back( unique_vertex );
+            }
+        }
+        const auto point_matches = match_points(
+            unique_vertices, "unique vertices", std::move( points ) );
+        std::vector< geode::index_t > matches(
+            model.nb_unique_vertices(), geode::NO_ID );
+        for( const auto index : geode::Indices{ model_unique_vertices } )
+        {
+            matches[model_unique_vertices[index]] = point_matches[index];
+        }
+        return matches;
+    }
+
+    BlocksMatches match_block_vertices(
+        const geode::BRep& model, const geode::PointSet3D& unique_vertices )
+    {
+        const auto unique_matches =
+            match_unique_vertices( model, unique_vertices );
+        BlocksMatches matches;
+        for( const auto& block : model.blocks() )
+        {
+            const auto& mesh = block.mesh();
+            auto& block_matches = matches[block.id()];
+            block_matches.resize( mesh.nb_vertices(), geode::NO_ID );
+            for( const auto vertex : geode::Range{ mesh.nb_vertices() } )
+            {
+                const auto unique_vertex =
+                    model.unique_vertex( { block.component_id(), vertex } );
+                if( unique_vertex != geode::NO_ID )
+                {
+                    block_matches[vertex] = unique_matches[unique_vertex];
+                }
+            }
+        }
+        return matches;
+    }
+
+    BlocksMatches match_block_polyhedra(
+        const geode::BRep& model, const geode::PointSet3D& cell_barycenters )
+    {
+        BlocksMatches matches;
+        std::vector< geode::Point3D > barycenters;
+        std::vector< BlockPolyhedron > polyhedra;
+        for( const auto& block : model.blocks() )
+        {
+            const auto& mesh = block.mesh();
+            matches[block.id()].resize( mesh.nb_polyhedra(), geode::NO_ID );
+            for( const auto polyhedron : geode::Range{ mesh.nb_polyhedra() } )
+            {
+                barycenters.push_back(
+                    mesh.polyhedron_barycenter( polyhedron ) );
+                polyhedra.push_back( { block.id(), polyhedron } );
+            }
+        }
+        const auto point_matches = match_points(
+            cell_barycenters, "cell barycenters", std::move( barycenters ) );
+        for( const auto index : geode::Indices{ polyhedra } )
+        {
+            const auto& block_polyhedron = polyhedra[index];
+            matches[block_polyhedron.block_id][block_polyhedron.polyhedron] =
+                point_matches[index];
+        }
+        return matches;
+    }
+
+    void apply_matches( const geode::AttributeManager& from,
+        absl::Span< const geode::index_t > matches,
+        geode::AttributeManager& target )
+    {
+        geode::GenericMapping< geode::index_t > point2element;
+        for( const auto element : geode::Indices{ matches } )
+        {
+            if( matches[element] != geode::NO_ID )
+            {
+                point2element.map( matches[element], element );
+            }
+        }
+        if( point2element.size_in() == 0 )
+        {
+            return;
+        }
+        delete_replaced_steps( from, target );
+        target.import( from, point2element );
     }
 } // namespace
 
@@ -81,57 +263,39 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Impl() = default;
-
-        explicit Impl( const BRep& model )
+        Impl()
+            : unique_vertices_{ PointSet3D::create() },
+              cell_barycenters_{ PointSet3D::create() }
         {
-            unique_vertex_attributes_.resize( model.nb_unique_vertices() );
-            for( const auto& block : model.blocks() )
-            {
-                block_polyhedron_attributes_[block.id()].resize(
-                    block.mesh().nb_polyhedra() );
-            }
         }
 
-        [[nodiscard]] AttributeManager& unique_vertex_attribute_manager()
+        void set_unique_vertices( std::unique_ptr< PointSet3D > vertices )
         {
-            return unique_vertex_attributes_;
+            check_point_set( vertices.get(), "unique vertices" );
+            unique_vertices_ = std::move( vertices );
         }
 
-        [[nodiscard]] const AttributeManager&
-            unique_vertex_attribute_manager() const
+        void set_cell_barycenters( std::unique_ptr< PointSet3D > barycenters )
         {
-            return unique_vertex_attributes_;
-        }
-
-        [[nodiscard]] AttributeManager& block_polyhedron_attribute_manager(
-            const uuid& block_id )
-        {
-            const auto it = block_polyhedron_attributes_.find( block_id );
-            check_block( it != block_polyhedron_attributes_.end(), block_id );
-            return it->second;
-        }
-
-        [[nodiscard]] const AttributeManager&
-            block_polyhedron_attribute_manager( const uuid& block_id ) const
-        {
-            const auto it = block_polyhedron_attributes_.find( block_id );
-            check_block( it != block_polyhedron_attributes_.end(), block_id );
-            return it->second;
+            check_point_set( barycenters.get(), "cell barycenters" );
+            cell_barycenters_ = std::move( barycenters );
         }
 
         void apply_to( const BRep& model ) const
         {
-            check_model( model );
+            const auto vertex_matches =
+                match_block_vertices( model, *unique_vertices_ );
+            const auto polyhedron_matches =
+                match_block_polyhedra( model, *cell_barycenters_ );
             for( const auto& block : model.blocks() )
             {
-                apply_vertices( model, block );
-            }
-            for( const auto& [block_id, polyhedron_attributes] :
-                block_polyhedron_attributes_ )
-            {
-                apply_polyhedra(
-                    model.block( block_id ), polyhedron_attributes );
+                const auto& mesh = block.mesh();
+                apply_matches( unique_vertices_->vertex_attribute_manager(),
+                    vertex_matches.at( block.id() ),
+                    mesh.vertex_attribute_manager() );
+                apply_matches( cell_barycenters_->vertex_attribute_manager(),
+                    polyhedron_matches.at( block.id() ),
+                    mesh.polyhedron_attribute_manager() );
             }
         }
 
@@ -139,107 +303,30 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& local_archive, Impl& impl ) {
-                        local_archive.object( impl.unique_vertex_attributes_ );
-                        local_archive.ext( impl.block_polyhedron_attributes_,
-                            bitsery::ext::StdMap{
-                                impl.block_polyhedron_attributes_.max_size() },
-                            []( Archive& map_archive, uuid& block_id,
-                                AttributeManager& polyhedron_attributes ) {
-                                map_archive.object( block_id );
-                                map_archive.object( polyhedron_attributes );
-                            } );
-                    } } } );
+            archive.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& local_archive, Impl& impl ) {
+                               local_archive.ext( impl.unique_vertices_,
+                                   bitsery::ext::StdSmartPtr{} );
+                               local_archive.ext( impl.cell_barycenters_,
+                                   bitsery::ext::StdSmartPtr{} );
+                           } } } );
         }
 
-        static void check_block( bool is_known, const uuid& block_id )
+        static void check_point_set(
+            const PointSet3D* point_set, std::string_view name )
         {
-            OpenGeodeModelException::check_exception( is_known, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers] Unknown Block ",
-                block_id.string() );
-        }
-
-        void check_model( const BRep& model ) const
-        {
-            OpenGeodeModelException::check_exception(
-                unique_vertex_attributes_.nb_elements()
-                    == model.nb_unique_vertices(),
+            OpenGeodeModelException::check_exception( point_set != nullptr,
                 nullptr, OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers::apply_to] Model has ",
-                model.nb_unique_vertices(), " unique vertices instead of ",
-                unique_vertex_attributes_.nb_elements() );
-            for( const auto& [block_id, polyhedron_attributes] :
-                block_polyhedron_attributes_ )
-            {
-                check_block_polyhedra( model, block_id, polyhedron_attributes );
-            }
-        }
-
-        static void check_block_polyhedra( const BRep& model,
-            const uuid& block_id,
-            const AttributeManager& polyhedron_attributes )
-        {
-            OpenGeodeModelException::check_exception(
-                model.has_block( block_id ), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers::apply_to] Model has no Block ",
-                block_id.string() );
-            const auto nb_polyhedra =
-                model.block( block_id ).mesh().nb_polyhedra();
-            OpenGeodeModelException::check_exception(
-                nb_polyhedra == polyhedron_attributes.nb_elements(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers::apply_to] Block ",
-                block_id.string(), " has ", nb_polyhedra,
-                " polyhedra instead of ", polyhedron_attributes.nb_elements() );
-        }
-
-        void apply_vertices( const BRep& model, const Block3D& block ) const
-        {
-            const auto& mesh = block.mesh();
-            GenericMapping< index_t > unique2block;
-            unique2block.reserve( mesh.nb_vertices() );
-            ComponentMeshVertex block_vertex{ block.component_id(), 0 };
-            for( const auto vertex : Range{ mesh.nb_vertices() } )
-            {
-                block_vertex.vertex = vertex;
-                const auto unique_vertex = model.unique_vertex( block_vertex );
-                if( unique_vertex != NO_ID )
-                {
-                    unique2block.map( unique_vertex, vertex );
-                }
-            }
-            auto& vertex_attributes = mesh.vertex_attribute_manager();
-            delete_replaced_steps(
-                unique_vertex_attributes_, vertex_attributes );
-            vertex_attributes.import( unique_vertex_attributes_, unique2block );
-        }
-
-        static void apply_polyhedra( const Block3D& block,
-            const AttributeManager& polyhedron_attributes )
-        {
-            auto& block_polyhedron_attributes =
-                block.mesh().polyhedron_attribute_manager();
-            delete_replaced_steps(
-                polyhedron_attributes, block_polyhedron_attributes );
-            block_polyhedron_attributes.copy( polyhedron_attributes );
+                "[ExternalTimeSeriesHelpers] Null ", name, " point set" );
         }
 
     private:
-        AttributeManager unique_vertex_attributes_;
-        absl::flat_hash_map< uuid, AttributeManager >
-            block_polyhedron_attributes_;
+        std::unique_ptr< PointSet3D > unique_vertices_;
+        std::unique_ptr< PointSet3D > cell_barycenters_;
     };
 
     ExternalTimeSeriesHelpers::ExternalTimeSeriesHelpers() = default;
-
-    ExternalTimeSeriesHelpers::ExternalTimeSeriesHelpers( const BRep& model )
-        : impl_{ model }
-    {
-    }
 
     ExternalTimeSeriesHelpers::ExternalTimeSeriesHelpers(
         ExternalTimeSeriesHelpers&& ) noexcept = default;
@@ -249,30 +336,16 @@ namespace geode
 
     ExternalTimeSeriesHelpers::~ExternalTimeSeriesHelpers() = default;
 
-    AttributeManager&
-        ExternalTimeSeriesHelpers::unique_vertex_attribute_manager()
+    void ExternalTimeSeriesHelpers::set_unique_vertices(
+        std::unique_ptr< PointSet3D > vertices )
     {
-        return impl_->unique_vertex_attribute_manager();
+        impl_->set_unique_vertices( std::move( vertices ) );
     }
 
-    const AttributeManager&
-        ExternalTimeSeriesHelpers::unique_vertex_attribute_manager() const
+    void ExternalTimeSeriesHelpers::set_cell_barycenters(
+        std::unique_ptr< PointSet3D > barycenters )
     {
-        return impl_->unique_vertex_attribute_manager();
-    }
-
-    AttributeManager&
-        ExternalTimeSeriesHelpers::block_polyhedron_attribute_manager(
-            const uuid& block_id )
-    {
-        return impl_->block_polyhedron_attribute_manager( block_id );
-    }
-
-    const AttributeManager&
-        ExternalTimeSeriesHelpers::block_polyhedron_attribute_manager(
-            const uuid& block_id ) const
-    {
-        return impl_->block_polyhedron_attribute_manager( block_id );
+        impl_->set_cell_barycenters( std::move( barycenters ) );
     }
 
     void ExternalTimeSeriesHelpers::apply_to( BRep& model ) const

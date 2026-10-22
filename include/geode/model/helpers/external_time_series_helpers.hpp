@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string_view>
 
 #include <geode/basic/pimpl.hpp>
@@ -36,9 +37,9 @@ namespace bitsery
 
 namespace geode
 {
-    class AttributeManager;
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    ALIAS_3D( PointSet );
     class BRep;
-    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -46,8 +47,10 @@ namespace geode
     /*!
      * Time series computed outside of a BRep (e.g. by a simulator), stored
      * apart from the model and written on it on demand.
-     * Vertex values are stored per unique vertex of the model and polyhedron
-     * values per polyhedron of each Block mesh.
+     * Values are stored as vertex attributes of two point sets: the
+     * simulation unique vertices (one point per colocated position) and the
+     * simulation cell barycenters. They are matched geometrically with the
+     * Block vertices and polyhedra of a BRep when applied.
      * Time series are expected to be created as time step attributes (see
      * AttributeManager::create_time_step_attribute), but any transferable
      * attribute is stored and applied the same way.
@@ -59,11 +62,6 @@ namespace geode
 
     public:
         ExternalTimeSeriesHelpers();
-        /*!
-         * Create empty attribute managers sized to the model unique vertices
-         * and to the polyhedra of its Blocks.
-         */
-        explicit ExternalTimeSeriesHelpers( const BRep& model );
         ExternalTimeSeriesHelpers( ExternalTimeSeriesHelpers&& other ) noexcept;
         ExternalTimeSeriesHelpers& operator=(
             ExternalTimeSeriesHelpers&& other ) noexcept;
@@ -80,32 +78,33 @@ namespace geode
         }
 
         /*!
-         * Attributes on the unique vertices of the model
+         * Set the simulation unique vertices, carrying the vertex values as
+         * vertex attributes
+         * @exception OpenGeodeException if the point set is null
          */
-        [[nodiscard]] AttributeManager& unique_vertex_attribute_manager();
-
-        [[nodiscard]] const AttributeManager&
-            unique_vertex_attribute_manager() const;
+        void set_unique_vertices( std::unique_ptr< PointSet3D > vertices );
 
         /*!
-         * Attributes on the polyhedra of a Block mesh
-         * @exception OpenGeodeException if the Block is unknown
+         * Set the simulation cell barycenters, carrying the cell values as
+         * vertex attributes
+         * @exception OpenGeodeException if the point set is null
          */
-        [[nodiscard]] AttributeManager& block_polyhedron_attribute_manager(
-            const uuid& block_id );
-
-        [[nodiscard]] const AttributeManager&
-            block_polyhedron_attribute_manager( const uuid& block_id ) const;
+        void set_cell_barycenters( std::unique_ptr< PointSet3D > barycenters );
 
         /*!
          * Write the transferable attributes on the Block meshes of the model:
-         * unique vertex attributes on each Block vertex, polyhedron attributes
-         * on the matching Block polyhedra. Non-transferable attributes are
-         * skipped. Attribute ids and properties (time steps included) are
-         * kept. A Block time step with the same name and time as an applied
-         * one is replaced.
-         * @exception OpenGeodeException if the model does not have the same
-         * unique vertices or Block polyhedra as the one used for creation
+         * each unique vertex on the closest model unique vertex (on all its
+         * Block vertices), each cell barycenter on the Block polyhedron with
+         * the closest barycenter. Block elements matched with no point keep
+         * no value, Blocks matched with no point are left untouched.
+         * Attribute ids and properties (time steps included) are kept. A
+         * Block time step with the same name and time as an applied one is
+         * replaced.
+         * The matching tolerance is GLOBAL_EPSILON relative to the largest
+         * absolute coordinate of the points (when larger than 1), to accept
+         * points rounded by the simulator (e.g. stored in single precision).
+         * @exception OpenGeodeException if a point is farther than the
+         * tolerance from its closest Block element
          */
         void apply_to( BRep& model ) const;
 
