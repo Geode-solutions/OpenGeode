@@ -2483,6 +2483,7 @@ namespace
         FilterStress stress{ 7 };
         geode::index_t nb_tested{ 0 };
         std::array< geode::index_t, 3 > nb_decided{ 0, 0, 0 };
+        std::array< geode::index_t, 3 > nb_orient_decided{ 0, 0, 0 };
         for( const auto trial : geode::Range{ 60000 } )
         {
             const auto kind = trial % 3;
@@ -2494,8 +2495,19 @@ namespace
                         : kind == 1 ? stress.near_sphere( false )
                                     : stress.grid( false );
             }
-            if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
-                == GEO::negative )
+            const auto orientation =
+                GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] );
+            const auto inline_orientation = GEO::PCK::orient_3d_inline_filter(
+                pts[0], pts[1], pts[2], pts[3] );
+            geode::OpenGeodeGeometryException::test(
+                inline_orientation == GEO::zero
+                    || inline_orientation == orientation,
+                "[Test] Inline filter and orient_3d differ" );
+            if( inline_orientation != GEO::zero )
+            {
+                nb_orient_decided[kind]++;
+            }
+            if( orientation == GEO::negative )
             {
                 std::swap( pts[0], pts[1] );
             }
@@ -2545,6 +2557,13 @@ namespace
         // ones (exactly cospherical or with exact zero determinant) are not.
         geode::OpenGeodeGeometryException::test( nb_decided[0] > 9000,
             "[Test] Coefficient filter should decide generic configurations" );
+        geode::OpenGeodeGeometryException::test( nb_orient_decided[0] > 9000,
+            "[Test] Inline orient_3d filter should decide generic "
+            "configurations" );
+        geode::Logger::info( "Inline orient_3d filter decided ",
+            nb_orient_decided[0], " generic, ", nb_orient_decided[1],
+            " nearly cospherical, ", nb_orient_decided[2],
+            " grid configurations" );
         geode::Logger::info( "Coefficient filter decided ", nb_decided[0],
             " generic, ", nb_decided[1], " nearly cospherical, ", nb_decided[2],
             " grid configurations" );

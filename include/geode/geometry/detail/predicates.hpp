@@ -615,6 +615,61 @@ namespace GEO
             const geode::Point3D& p3 );
 
         /*!
+         * Inline floating point filter of orient_3d, with the semi-static
+         * error bound of the orient_3d filter: returns the sign of
+         * orient_3d( p0, p1, p2, p3 ), or zero if the filter cannot decide
+         * (then use orient_3d).
+         */
+        inline SIGN orient_3d_inline_filter( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            const double a11 = p1.value( 0 ) - p0.value( 0 );
+            const double a12 = p1.value( 1 ) - p0.value( 1 );
+            const double a13 = p1.value( 2 ) - p0.value( 2 );
+            const double a21 = p2.value( 0 ) - p0.value( 0 );
+            const double a22 = p2.value( 1 ) - p0.value( 1 );
+            const double a23 = p2.value( 2 ) - p0.value( 2 );
+            const double a31 = p3.value( 0 ) - p0.value( 0 );
+            const double a32 = p3.value( 1 ) - p0.value( 1 );
+            const double a33 = p3.value( 2 ) - p0.value( 2 );
+            const double delta =
+                ( ( ( a11 * ( ( a22 * a33 ) - ( a23 * a32 ) ) )
+                      - ( a21 * ( ( a12 * a33 ) - ( a13 * a32 ) ) ) )
+                    + ( a31 * ( ( a12 * a23 ) - ( a13 * a22 ) ) ) );
+            const double max1 =
+                std::fmax( std::fmax( std::fabs( a11 ), std::fabs( a21 ) ),
+                    std::fabs( a31 ) );
+            const double max2 =
+                std::fmax( std::fmax( std::fabs( a12 ), std::fabs( a13 ) ),
+                    std::fmax( std::fabs( a22 ), std::fabs( a23 ) ) );
+            const double max3 =
+                std::fmax( std::fmax( std::fabs( a22 ), std::fabs( a23 ) ),
+                    std::fmax( std::fabs( a32 ), std::fabs( a33 ) ) );
+            const double lower_bound =
+                std::fmin( std::fmin( max1, max2 ), max3 );
+            const double upper_bound =
+                std::fmax( std::fmax( max1, max2 ), max3 );
+            if( !( lower_bound >= 1.63288018496748314939e-98 )
+                || !( upper_bound <= 5.59936185544450928309e+101 ) )
+            {
+                return zero;
+            }
+            const double eps =
+                5.11071278299732992696e-15 * ( ( max2 * max3 ) * max1 );
+            if( delta > eps )
+            {
+                return positive;
+            }
+            if( delta < -eps )
+            {
+                return negative;
+            }
+            return zero;
+        }
+
+        /*!
          * Floating point data of a tetrahedron (p0, p1, p2, p3) used to filter
          * many in_sphere_3d queries against it: the cofactors of the
          * in_sphere_3d determinant (relative to p0) along the row of the
