@@ -135,6 +135,36 @@ void test_extra_colors()
         "[TEST] Loading more colors than cells should throw" );
 }
 
+void test_colors_access()
+{
+    geode::RasterImage2D raster{ { 4, 3 } };
+    auto colors = raster.modifiable_colors();
+    geode::OpenGeodeImageException::test( colors.size() == raster.nb_cells(),
+        "[TEST] Wrong number of modifiable colors" );
+    for( const auto i : geode::Indices{ colors } )
+    {
+        const auto value = static_cast< geode::local_index_t >( 10 * i );
+        colors[i] = { value, static_cast< geode::local_index_t >( value + 1 ),
+            static_cast< geode::local_index_t >( value + 2 ) };
+    }
+    const auto& const_raster = raster;
+    const auto stored_colors = const_raster.colors();
+    geode::OpenGeodeImageException::test(
+        stored_colors.size() == raster.nb_cells(),
+        "[TEST] Wrong number of colors" );
+    for( const auto i : geode::Range{ raster.nb_cells() } )
+    {
+        const auto value = static_cast< geode::local_index_t >( 10 * i );
+        const geode::RGBColor expected{ value,
+            static_cast< geode::local_index_t >( value + 1 ),
+            static_cast< geode::local_index_t >( value + 2 ) };
+        geode::OpenGeodeImageException::test( raster.color( i ) == expected,
+            "[TEST] Wrong color set through modifiable colors for ", i );
+        geode::OpenGeodeImageException::test(
+            stored_colors[i] == expected, "[TEST] Wrong stored color for ", i );
+    }
+}
+
 template < geode::index_t dimension >
 void test_io( std::array< geode::index_t, dimension > cells_number )
 {
@@ -190,6 +220,7 @@ void test()
     test_missing_colors();
     test_too_many_cells();
     test_extra_colors();
+    test_colors_access();
     auto raster2 = std::move( raster );
     geode::OpenGeodeImageException::test(
         raster2.nb_cells() == 100, "Wrong number of cells after move" );
