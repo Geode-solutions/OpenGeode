@@ -97,6 +97,10 @@ namespace
     {
         const auto line_v0 = brep.unique_vertex( { line.component_id(), e0 } );
         const auto line_v1 = brep.unique_vertex( { line.component_id(), e1 } );
+        if( line_v0 == geode::NO_ID || line_v1 == geode::NO_ID )
+        {
+            return { true, {} };
+        }
         const auto& vertices0 = brep.component_mesh_vertices( line_v0 );
         const auto& vertices1 = brep.component_mesh_vertices( line_v1 );
         std::vector< BorderPolygon > polygons;
@@ -165,6 +169,10 @@ namespace geode
 
     index_t SortedSurfaces::opposite( index_t position ) const
     {
+        if( surfaces.empty() )
+        {
+            return NO_ID;
+        }
         const auto side_position = position % 2;
         if( side_position == 1 )
         {
@@ -175,6 +183,10 @@ namespace geode
 
     index_t SortedSurfaces::next( index_t position ) const
     {
+        if( surfaces.empty() )
+        {
+            return NO_ID;
+        }
         const auto side_position = position % 2;
         if( side_position == 1 )
         {

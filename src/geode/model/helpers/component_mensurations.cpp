@@ -74,7 +74,8 @@ namespace
             {
                 const auto& other_surface_itr =
                     processed.find( other_surface.id() );
-                if( other_surface_itr == processed.end() )
+                if( other_surface_itr == processed.end()
+                    || line.mesh().nb_edges() == 0 )
                 {
                     continue;
                 }
@@ -83,11 +84,19 @@ namespace
                 const auto& surfaces_cmes =
                     geode::detail::surface_component_mesh_edges(
                         brep, unique_vertices );
+                const auto surface_edges = surfaces_cmes.find( surface_uuid );
+                const auto other_surface_edges =
+                    surfaces_cmes.find( other_surface.id() );
+                if( surface_edges == surfaces_cmes.end()
+                    || other_surface_edges == surfaces_cmes.end() )
+                {
+                    continue;
+                }
                 const geode::PolygonVertex polygon_vertex{
-                    surfaces_cmes.at( surface_uuid ).front()
+                    surface_edges->second.front()
                 };
                 const geode::PolygonVertex other_polygon_vertex{
-                    surfaces_cmes.at( other_surface.id() ).front()
+                    other_surface_edges->second.front()
                 };
                 const auto different_orientation =
                     brep.unique_vertex( { surface.component_id(),
@@ -197,12 +206,24 @@ namespace
         const geode::BRep& brep, const std::vector< SidedSurface >& surfaces )
     {
         double group_volume{ 0 };
-        const auto& anchor =
-            brep.surface( surfaces.front().surface_id ).mesh().point( 0 );
+        const geode::Point3D* anchor{ nullptr };
+        for( const auto& surface : surfaces )
+        {
+            const auto& mesh = brep.surface( surface.surface_id ).mesh();
+            if( mesh.nb_vertices() != 0 )
+            {
+                anchor = &mesh.point( 0 );
+                break;
+            }
+        }
+        if( !anchor )
+        {
+            return 0;
+        }
         for( const auto& surface : surfaces )
         {
             const auto volume = surface_volume(
-                brep.surface( surface.surface_id ).mesh(), anchor );
+                brep.surface( surface.surface_id ).mesh(), *anchor );
             if( surface.side )
             {
                 group_volume += volume;
@@ -239,6 +260,10 @@ namespace geode
             return block_mesh_volume( block.mesh() );
         }
         const auto& grouped_surfaces = sided_surfaces( brep, block );
+        if( grouped_surfaces.empty() )
+        {
+            return 0;
+        }
         std::vector< double > volumes( grouped_surfaces.size() );
         index_t biggest_volume_id{ 0 };
         for( const auto group_id : geode::Indices{ grouped_surfaces } )
@@ -262,6 +287,10 @@ namespace geode
         BoundingBox3D result;
         for( const auto& surface : brep.boundaries( block ) )
         {
+            if( surface.mesh().nb_vertices() == 0 )
+            {
+                continue;
+            }
             result.add_box( surface.mesh().bounding_box() );
         }
         return result;

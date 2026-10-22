@@ -51,6 +51,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Corner< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [in, _] :
             mapping.at( geode::Corner< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -65,6 +70,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Line< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& in2out :
             mapping.at( geode::Line< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -79,6 +89,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Surface< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& in2out :
             mapping.at( geode::Surface< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -93,6 +108,11 @@ namespace
         typename Model::Builder& builder,
         const geode::ModelCopyMapping& mapping )
     {
+        if( !mapping.has_mapping_type(
+                geode::Block< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& in2out :
             mapping.at( geode::Block< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -152,6 +172,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Corner< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [corner_id, other_corner_id] :
             mapping.at( geode::Corner< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -181,6 +206,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Line< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [line_id, other_line_id] :
             mapping.at( geode::Line< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -210,6 +240,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Surface< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [surface_id, other_surface_id] :
             mapping.at( geode::Surface< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -239,6 +274,11 @@ namespace
         const geode::ModelCopyMapping& mapping,
         geode::index_t first_new_unique_vertex_id )
     {
+        if( !mapping.has_mapping_type(
+                geode::Block< Model::dim >::component_type_static() ) )
+        {
+            return;
+        }
         for( const auto& [block_id, other_block_id] :
             mapping.at( geode::Block< Model::dim >::component_type_static() )
                 .in2out_map() )
@@ -274,7 +314,6 @@ namespace geode
             remove_line_meshes_in_mapping( brep, brep_builder, mapping );
             remove_surface_meshes_in_mapping( brep, brep_builder, mapping );
             remove_block_meshes_in_mapping( brep, brep_builder, mapping );
-            brep_builder.delete_isolated_vertices();
             const auto first_new_unique_vertex_id =
                 brep_builder.create_unique_vertices(
                     other.nb_unique_vertices() );
@@ -287,6 +326,7 @@ namespace geode
                 other_builder, mapping, first_new_unique_vertex_id );
             set_block_meshes_in_mapping( brep, brep_builder, other,
                 other_builder, mapping, first_new_unique_vertex_id );
+            brep_builder.delete_isolated_vertices();
         }
 
         void transfer_section_meshes( const Section& section,
@@ -299,7 +339,6 @@ namespace geode
             remove_line_meshes_in_mapping( section, section_builder, mapping );
             remove_surface_meshes_in_mapping(
                 section, section_builder, mapping );
-            section_builder.delete_isolated_vertices();
             const auto first_new_unique_vertex_id =
                 section_builder.create_unique_vertices(
                     other.nb_unique_vertices() );
@@ -310,6 +349,7 @@ namespace geode
                 other_builder, mapping, first_new_unique_vertex_id );
             set_surface_meshes_in_mapping( section, section_builder, other,
                 other_builder, mapping, first_new_unique_vertex_id );
+            section_builder.delete_isolated_vertices();
         }
     } // namespace detail
 } // namespace geode

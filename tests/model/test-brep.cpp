@@ -25,6 +25,7 @@
 
 #include <absl/container/flat_hash_map.h>
 #include <absl/strings/match.h>
+#include <absl/strings/str_cat.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/attribute_manager.hpp>
@@ -1873,6 +1874,29 @@ void test_unknown_component_access( Accessor&& accessor )
         false, "Accessing an unknown component should throw" );
 }
 
+void test_remove_unknown_component()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    builder.add_surface();
+    const geode::uuid unknown_id;
+    bool thrown{ false };
+    try
+    {
+        builder.remove_surfaces( { unknown_id } );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = absl::StrContains( exception.what(),
+            absl::StrCat( "Surface with id ", unknown_id.string() ) );
+    }
+    geode::OpenGeodeModelException::test( thrown,
+        "Removing an unknown Surface should throw an exception naming the "
+        "component type and id" );
+    geode::OpenGeodeModelException::test( brep.nb_surfaces() == 1,
+        "Removing an unknown Surface should not modify the model" );
+}
+
 void test_unknown_components( const geode::BRep& model )
 {
     test_unknown_component_access( [&model]( const geode::uuid& id ) {
@@ -2177,6 +2201,7 @@ void test()
         model, surface_uuids, surface_collection_uuids );
     test_block_collection_ranges( model, block_uuid, block_collection_uuid );
     test_unknown_components( model );
+    test_remove_unknown_component();
     test_is_closed();
     test_bounding_box();
     const geode::uuid physical_attribute_id;
