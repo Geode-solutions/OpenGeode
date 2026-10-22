@@ -2482,6 +2482,7 @@ namespace
     {
         FilterStress stress{ 7 };
         geode::index_t nb_tested{ 0 };
+        std::array< geode::index_t, 3 > nb_decided{ 0, 0, 0 };
         for( const auto trial : geode::Range{ 60000 } )
         {
             const auto kind = trial % 3;
@@ -2501,12 +2502,26 @@ namespace
             if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
                 == GEO::positive )
             {
+                const auto exact = GEO::PCK::in_sphere_3d_SOS_exact(
+                    pts[0], pts[1], pts[2], pts[3], pts[4] );
                 geode::OpenGeodeGeometryException::test(
                     GEO::PCK::in_sphere_3d_SOS(
                         pts[0], pts[1], pts[2], pts[3], pts[4] )
-                        == GEO::PCK::in_sphere_3d_SOS_exact(
-                            pts[0], pts[1], pts[2], pts[3], pts[4] ),
+                        == exact,
                     "[Test] Filtered and exact in_sphere_3d_SOS differ" );
+                const auto coefficients = GEO::PCK::in_sphere_3d_coefficients(
+                    pts[0], pts[1], pts[2], pts[3] );
+                const auto filtered =
+                    GEO::PCK::in_sphere_3d_coefficients_filter(
+                        coefficients, pts[0], pts[4] );
+                geode::OpenGeodeGeometryException::test(
+                    filtered == GEO::zero || filtered == exact,
+                    "[Test] Coefficient filter and exact in_sphere_3d_SOS "
+                    "differ" );
+                if( filtered != GEO::zero )
+                {
+                    nb_decided[kind]++;
+                }
                 nb_tested++;
             }
             std::array< geode::Point3D, 4 > planar;
@@ -2526,6 +2541,13 @@ namespace
         }
         geode::OpenGeodeGeometryException::test(
             nb_tested > 60000, "[Test] Not enough filter configurations" );
+        // Generic configurations are decided by the coefficient filter, grid
+        // ones (exactly cospherical or with exact zero determinant) are not.
+        geode::OpenGeodeGeometryException::test( nb_decided[0] > 9000,
+            "[Test] Coefficient filter should decide generic configurations" );
+        geode::Logger::info( "Coefficient filter decided ", nb_decided[0],
+            " generic, ", nb_decided[1], " nearly cospherical, ", nb_decided[2],
+            " grid configurations" );
     }
 } // namespace
 

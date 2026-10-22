@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <array>
+#include <cmath>
+
 #include <geode/geometry/common.hpp>
+#include <geode/geometry/point.hpp>
 
 #define GEOGRAM_PSM
 #ifndef GEO_STATIC_LIBS
@@ -609,6 +613,114 @@ namespace GEO
             const geode::Point3D& p1,
             const geode::Point3D& p2,
             const geode::Point3D& p3 );
+
+        /*!
+         * Floating point data of a tetrahedron (p0, p1, p2, p3) used to filter
+         * many in_sphere_3d queries against it: the cofactors of the
+         * in_sphere_3d determinant (relative to p0) along the row of the
+         * tested point, and the largest absolute coordinate difference to p0
+         * (zero if out of the range supported by the filter).
+         */
+        struct InSphereCoefficients
+        {
+            std::array< double, 4 > cofactors;
+            double max_difference;
+        };
+
+        /*!
+         * Compute the InSphereCoefficients of the tetrahedron (p0, p1, p2,
+         * p3).
+         */
+        inline InSphereCoefficients in_sphere_3d_coefficients(
+            const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            const double bx = p1.value( 0 ) - p0.value( 0 );
+            const double by = p1.value( 1 ) - p0.value( 1 );
+            const double bz = p1.value( 2 ) - p0.value( 2 );
+            const double cx = p2.value( 0 ) - p0.value( 0 );
+            const double cy = p2.value( 1 ) - p0.value( 1 );
+            const double cz = p2.value( 2 ) - p0.value( 2 );
+            const double dx = p3.value( 0 ) - p0.value( 0 );
+            const double dy = p3.value( 1 ) - p0.value( 1 );
+            const double dz = p3.value( 2 ) - p0.value( 2 );
+            const double lb = bx * bx + by * by + bz * bz;
+            const double lc = cx * cx + cy * cy + cz * cz;
+            const double ld = dx * dx + dy * dy + dz * dz;
+            // 2x2 minors of the coordinate columns of rows c and d
+            const double xy = cx * dy - cy * dx;
+            const double xz = cx * dz - cz * dx;
+            const double yz = cy * dz - cz * dy;
+            // 2x2 minors of a coordinate column and the lifted column
+            const double xl = cx * ld - lc * dx;
+            const double yl = cy * ld - lc * dy;
+            const double zl = cz * ld - lc * dz;
+            InSphereCoefficients result;
+            result.cofactors[0] = -( by * zl - bz * yl + lb * yz );
+            result.cofactors[1] = bx * zl - bz * xl + lb * xz;
+            result.cofactors[2] = -( bx * yl - by * xl + lb * xy );
+            result.cofactors[3] = bx * yz - by * xz + bz * xy;
+            const double max_difference = std::fmax(
+                std::fmax( std::fmax( std::fabs( bx ), std::fabs( by ) ),
+                    std::fmax( std::fabs( bz ), std::fabs( cx ) ) ),
+                std::fmax( std::fmax( std::fabs( cy ), std::fabs( cz ) ),
+                    std::fmax( std::fmax( std::fabs( dx ), std::fabs( dy ) ),
+                        std::fabs( dz ) ) ) );
+            result.max_difference =
+                max_difference >= 1e-30 && max_difference <= 1e30
+                    ? max_difference
+                    : 0.;
+            return result;
+        }
+
+        /*!
+         * Filtered in_sphere_3d of p4 against the positively oriented
+         * tetrahedron (p0, p1, p2, p3) whose coefficients are given: positive
+         * if p4 is inside the circumsphere, negative if outside, zero if the
+         * floating point evaluation cannot decide (then use in_sphere_3d_SOS).
+         * When not zero, the result is the one of in_sphere_3d_SOS.
+         * Error bound: the determinant is evaluated with at most 13 roundings
+         * on any path from the coordinate differences, so its absolute error
+         * is below gamma_13 times the determinant evaluated with absolute
+         * values, itself below 54 e m^4 + 18 e^2 m^3 (m and e: largest
+         * absolute coordinate differences of p1, p2, p3 and of p4 to p0):
+         * gamma_13 * 54 < 8e-14 and gamma_13 * 18 < 2.7e-14. The range
+         * [1e-30, 1e30] of m and e makes underflow and overflow harmless.
+         */
+        inline SIGN in_sphere_3d_coefficients_filter(
+            const InSphereCoefficients& tet,
+            const geode::Point3D& p0,
+            const geode::Point3D& p4 )
+        {
+            const double ex = p4.value( 0 ) - p0.value( 0 );
+            const double ey = p4.value( 1 ) - p0.value( 1 );
+            const double ez = p4.value( 2 ) - p0.value( 2 );
+            const double m = tet.max_difference;
+            const double e =
+                std::fmax( std::fmax( std::fabs( ex ), std::fabs( ey ) ),
+                    std::fabs( ez ) );
+            if( !( m > 0. ) || !( e >= 1e-30 ) || !( e <= 1e30 ) )
+            {
+                return zero;
+            }
+            const double le = ex * ex + ey * ey + ez * ez;
+            const auto& k = tet.cofactors;
+            const double det =
+                ( ( ex * k[0] + ey * k[1] ) + ez * k[2] ) + le * k[3];
+            const double m3 = m * m * m;
+            const double eps = e * m3 * ( 8e-14 * m + 2.7e-14 * e );
+            if( det > eps )
+            {
+                return negative;
+            }
+            if( det < -eps )
+            {
+                return positive;
+            }
+            return zero;
+        }
 
         /*!
          * Same results as in_sphere_3d_SOS and in_circle_3d_SOS, always
