@@ -610,6 +610,24 @@ namespace GEO
             const geode::Point3D& p2,
             const geode::Point3D& p3 );
 
+        /*!
+         * Same results as in_sphere_3d_SOS and in_circle_3d_SOS, always
+         * evaluated with exact arithmetic (no floating point filter). Used to
+         * validate the filters.
+         */
+        opengeode_geometry_api SIGN in_sphere_3d_SOS_exact(
+            const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3,
+            const geode::Point3D& p4 );
+
+        opengeode_geometry_api SIGN in_circle_3d_SOS_exact(
+            const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 );
+
         opengeode_geometry_api void initialize();
     } // namespace PCK
 } // namespace GEO

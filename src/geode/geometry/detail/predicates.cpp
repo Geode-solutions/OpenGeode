@@ -2324,6 +2324,81 @@ namespace GEO
         return 0;
     }
 
+    // Semi-static filter of in_circle_3d. With u = p1 - p0, v = p2 - p0 and
+    // w = p3 - p0, the determinant of in_circle_3d_exact_SOS() simplifies to
+    // r = 4 * E with
+    //   E = |u x v|^2 |w|^2 - (w.u) |v|^2 (|u|^2 - u.v)
+    //       - (w.v) |u|^2 (|v|^2 - u.v)
+    // and Delta = 4 |u x v|^2, so that in_circle_3d = -sign( E ) when the
+    // triangle is not degenerate.
+    // Error bound: E is evaluated with at most 9 roundings on any path (from
+    // the coordinate differences to the result), so the absolute error is
+    // below gamma_9 times E evaluated with absolute values, itself below
+    // 144 M^6 with M the largest absolute coordinate difference:
+    // 9 * 2^-53 * 144 / (1 - 9 * 2^-53) < 1.44e-13 < 1.5e-13. Likewise
+    // |u x v|^2 is evaluated with 6 roundings and is below 12 M^4:
+    // 6 * 2^-53 * 12 < 8e-15 < 1e-14.
+    // Returns the sign of the result, or zero if it cannot be decided.
+    inline int in_circle_3d_filter( const geode::Point3D& p0,
+        const geode::Point3D& p1,
+        const geode::Point3D& p2,
+        const geode::Point3D& p3 )
+    {
+        const double ux = p1.value( 0 ) - p0.value( 0 );
+        const double uy = p1.value( 1 ) - p0.value( 1 );
+        const double uz = p1.value( 2 ) - p0.value( 2 );
+        const double vx = p2.value( 0 ) - p0.value( 0 );
+        const double vy = p2.value( 1 ) - p0.value( 1 );
+        const double vz = p2.value( 2 ) - p0.value( 2 );
+        const double wx = p3.value( 0 ) - p0.value( 0 );
+        const double wy = p3.value( 1 ) - p0.value( 1 );
+        const double wz = p3.value( 2 ) - p0.value( 2 );
+
+        const double max_u = std::max(
+            std::max( std::fabs( ux ), std::fabs( uy ) ), std::fabs( uz ) );
+        const double max_v = std::max(
+            std::max( std::fabs( vx ), std::fabs( vy ) ), std::fabs( vz ) );
+        const double max_w = std::max(
+            std::max( std::fabs( wx ), std::fabs( wy ) ), std::fabs( wz ) );
+        const double max_all = std::max( std::max( max_u, max_v ), max_w );
+        if( max_all < 1e-40 || max_all > 1e50 )
+        {
+            // Protect against underflow and overflow.
+            return 0;
+        }
+
+        const double cx = uy * vz - uz * vy;
+        const double cy = uz * vx - ux * vz;
+        const double cz = ux * vy - uy * vx;
+        const double c2 = cx * cx + cy * cy + cz * cz;
+        const double max2 = max_all * max_all;
+        const double max4 = max2 * max2;
+        if( c2 <= 1e-14 * max4 )
+        {
+            // Possibly degenerate triangle.
+            return 0;
+        }
+
+        const double uu = ux * ux + uy * uy + uz * uz;
+        const double vv = vx * vx + vy * vy + vz * vz;
+        const double ww = wx * wx + wy * wy + wz * wz;
+        const double uv = ux * vx + uy * vy + uz * vz;
+        const double wu = wx * ux + wy * uy + wz * uz;
+        const double wv = wx * vx + wy * vy + wz * vz;
+        const double E =
+            c2 * ww - wu * ( vv * ( uu - uv ) ) - wv * ( uu * ( vv - uv ) );
+        const double eps = 1.5e-13 * ( max4 * max2 );
+        if( E > eps )
+        {
+            return -1;
+        }
+        if( E < -eps )
+        {
+            return 1;
+        }
+        return 0;
+    }
+
     // ============ in_sphere / in_circle ================================
 
     // Exact in_sphere_3d, ported from the side4_3d_exact_SOS() predicate of
@@ -2743,6 +2818,28 @@ namespace GEO
         }
 
         SIGN in_circle_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            const auto result = SIGN( in_circle_3d_filter( p0, p1, p2, p3 ) );
+            if( result != zero )
+            {
+                return result;
+            }
+            return in_circle_3d_exact_SOS( p0, p1, p2, p3 );
+        }
+
+        SIGN in_sphere_3d_SOS_exact( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3,
+            const geode::Point3D& p4 )
+        {
+            return in_sphere_3d_exact_SOS( p0, p1, p2, p3, p4 );
+        }
+
+        SIGN in_circle_3d_SOS_exact( const geode::Point3D& p0,
             const geode::Point3D& p1,
             const geode::Point3D& p2,
             const geode::Point3D& p3 )

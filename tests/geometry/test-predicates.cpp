@@ -2390,6 +2390,143 @@ namespace
         geode::OpenGeodeGeometryException::test(
             nb_tested > 0, "[Test] No cocircular configuration tested" );
     }
+
+    // Configurations stressing the floating point filters: generic points,
+    // nearly cospherical/cocircular points (rounded from points on a sphere
+    // or circle, then moved by a few ulps), exactly cospherical/cocircular
+    // grid points, at several scales and offsets. The SOS predicates must
+    // give the same sign as their exact-only evaluation.
+    class FilterStress
+    {
+    public:
+        explicit FilterStress( unsigned seed ) : gen_( seed ) {}
+
+        geode::Point3D generic()
+        {
+            return transform(
+                { uniform_( gen_ ), uniform_( gen_ ), uniform_( gen_ ) } );
+        }
+
+        // Point near the unit sphere or (if planar) the unit circle of the
+        // plane spanned by axes_.
+        geode::Point3D near_sphere( bool planar )
+        {
+            std::array< double, 3 > d{ uniform_( gen_ ), uniform_( gen_ ),
+                planar ? 0. : uniform_( gen_ ) };
+            const auto norm =
+                std::sqrt( d[0] * d[0] + d[1] * d[1] + d[2] * d[2] );
+            std::array< double, 3 > p{ 0, 0, 0 };
+            for( const auto i : geode::LRange{ 3 } )
+            {
+                for( const auto j : geode::LRange{ 3 } )
+                {
+                    p[j] += d[i] / norm * axes_[i][j];
+                }
+            }
+            for( auto& coordinate : p )
+            {
+                const auto ulps = ulps_( gen_ );
+                for( const auto u : geode::Range{ std::abs( ulps ) } )
+                {
+                    geode_unused( u );
+                    coordinate =
+                        std::nextafter( coordinate, ulps > 0 ? 1e300 : -1e300 );
+                }
+            }
+            return transform( p );
+        }
+
+        // Point of a small integer grid, on a plane if planar.
+        geode::Point3D grid( bool planar )
+        {
+            return transform(
+                { double( grid_( gen_ ) ), double( grid_( gen_ ) ),
+                    planar ? 0. : double( grid_( gen_ ) ) } );
+        }
+
+        void new_frame( bool tilted )
+        {
+            scale_ = std::ldexp( 1., scale_exponent_( gen_ ) );
+            offset_ = offsets_[offset_index_( gen_ )];
+            if( tilted )
+            {
+                axes_ = { { { 1, 1, 0 }, { -1, 1, 1 }, { 1, -1, 2 } } };
+            }
+            else
+            {
+                axes_ = { { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } } };
+            }
+        }
+
+    private:
+        geode::Point3D transform( const std::array< double, 3 >& p ) const
+        {
+            return geode::Point3D{ { offset_ + scale_ * p[0],
+                offset_ + scale_ * p[1], offset_ + scale_ * p[2] } };
+        }
+
+    private:
+        std::mt19937 gen_;
+        std::uniform_real_distribution< double > uniform_{ -1., 1. };
+        std::uniform_int_distribution< int > ulps_{ -3, 3 };
+        std::uniform_int_distribution< int > grid_{ -3, 3 };
+        std::uniform_int_distribution< int > scale_exponent_{ -40, 40 };
+        std::uniform_int_distribution< int > offset_index_{ 0, 3 };
+        std::array< double, 4 > offsets_{ 0., 1., 626461.048828125, -1e9 };
+        double scale_{ 1 };
+        double offset_{ 0 };
+        std::array< std::array< double, 3 >, 3 > axes_{};
+    };
+
+    void test_in_sphere_in_circle_filters()
+    {
+        FilterStress stress{ 7 };
+        geode::index_t nb_tested{ 0 };
+        for( const auto trial : geode::Range{ 60000 } )
+        {
+            const auto kind = trial % 3;
+            stress.new_frame( trial % 2 == 0 );
+            std::array< geode::Point3D, 5 > pts;
+            for( auto& point : pts )
+            {
+                point = kind == 0   ? stress.generic()
+                        : kind == 1 ? stress.near_sphere( false )
+                                    : stress.grid( false );
+            }
+            if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
+                == GEO::negative )
+            {
+                std::swap( pts[0], pts[1] );
+            }
+            if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
+                == GEO::positive )
+            {
+                geode::OpenGeodeGeometryException::test(
+                    GEO::PCK::in_sphere_3d_SOS(
+                        pts[0], pts[1], pts[2], pts[3], pts[4] )
+                        == GEO::PCK::in_sphere_3d_SOS_exact(
+                            pts[0], pts[1], pts[2], pts[3], pts[4] ),
+                    "[Test] Filtered and exact in_sphere_3d_SOS differ" );
+                nb_tested++;
+            }
+            std::array< geode::Point3D, 4 > planar;
+            for( auto& point : planar )
+            {
+                point = kind == 0   ? stress.generic()
+                        : kind == 1 ? stress.near_sphere( true )
+                                    : stress.grid( true );
+            }
+            geode::OpenGeodeGeometryException::test(
+                GEO::PCK::in_circle_3d_SOS(
+                    planar[0], planar[1], planar[2], planar[3] )
+                    == GEO::PCK::in_circle_3d_SOS_exact(
+                        planar[0], planar[1], planar[2], planar[3] ),
+                "[Test] Filtered and exact in_circle_3d_SOS differ" );
+            nb_tested++;
+        }
+        geode::OpenGeodeGeometryException::test(
+            nb_tested > 60000, "[Test] Not enough filter configurations" );
+    }
 } // namespace
 
 void test()
@@ -2408,6 +2545,7 @@ void test()
     test_in_sphere();
     test_in_sphere_random_integers();
     test_in_circle();
+    test_in_sphere_in_circle_filters();
 
     geode::Logger::info( "TEST SUCCESS" );
 }
