@@ -124,10 +124,38 @@ void test_flat_morton_mapping()
     check_permutation< 3 >( geode::morton_mapping< 3 >( same_points ) );
 }
 
+void test_mapping_order()
+{
+    // Orders are part of the results of their users (e.g. tetrahedral mesh
+    // numbering): they must not change with the implementation. Grid with
+    // ties and duplicated points.
+    const std::vector< geode::Point3D > points{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 1 } }, geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 1, 1, 1 } }, geode::Point3D{ { 0, 2, 0 } },
+        geode::Point3D{ { 1, 2, 1 } }, geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 2, 0, 1 } }, geode::Point3D{ { 1, 1, 0 } },
+        geode::Point3D{ { 2, 1, 1 } }, geode::Point3D{ { 1, 2, 0 } },
+        geode::Point3D{ { 2, 2, 1 } }, geode::Point3D{ { 2, 0, 0 } },
+        geode::Point3D{ { 0, 0, 1 } }, geode::Point3D{ { 2, 1, 0 } },
+        geode::Point3D{ { 0, 1, 1 } }, geode::Point3D{ { 2, 2, 0 } },
+        geode::Point3D{ { 0, 2, 1 } }, geode::Point3D{ { 0, 2, 0 } },
+        geode::Point3D{ { 0, 0, 0 } } };
+    const std::vector< geode::index_t > hilbert{ 11, 3, 16, 9, 10, 7, 1, 14, 12,
+        6, 5, 17, 18, 4, 2, 15, 13, 8, 0, 19 };
+    const std::vector< geode::index_t > morton{ 19, 0, 13, 15, 3, 4, 10, 2, 18,
+        17, 6, 12, 1, 7, 9, 8, 16, 14, 5, 11 };
+    geode::OpenGeodeGeometryException::test(
+        geode::hilbert_mapping< 3 >( points ) == hilbert,
+        "Wrong Hilbert order" );
+    geode::OpenGeodeGeometryException::test(
+        geode::morton_mapping< 3 >( points ) == morton, "Wrong Morton order" );
+}
+
 void test()
 {
     test_lexicographic_mapping();
     test_flat_morton_mapping();
+    test_mapping_order();
 }
 
 OPENGEODE_TEST( "points_sort" )
