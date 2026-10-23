@@ -27,6 +27,7 @@ if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
         os.add_dll_directory(path)
 
 import opengeode_py_basic as basic
+import opengeode_py_mesh as mesh
 import opengeode_py_model as model
 
 
@@ -436,6 +437,37 @@ def test_clone(section):
         raise ValueError("[Test] Section should have 2 surface collections")
 
 
+def test_add_component_with_mesh_impl():
+    section = model.Section()
+    builder = model.SectionBuilder(section)
+    triangulated_impl = mesh.MeshImpl("OpenGeodeTriangulatedSurface2D")
+    polygonal_impl = mesh.MeshImpl("OpenGeodePolygonalSurface2D")
+    if mesh.MeshFactory.type(triangulated_impl) != mesh.MeshType(
+        "TriangulatedSurface2D"
+    ):
+        raise ValueError("[Test] Wrong mesh type for triangulated impl")
+    triangulated_uuid = builder.add_surface(triangulated_impl)
+    polygonal_uuid = builder.add_surface(polygonal_impl)
+    default_uuid = builder.add_surface()
+    if section.surface(triangulated_uuid).mesh().impl_name() != triangulated_impl:
+        raise ValueError("[Test] Surface should be a TriangulatedSurface")
+    if section.surface(polygonal_uuid).mesh().impl_name() != polygonal_impl:
+        raise ValueError("[Test] Surface should be a PolygonalSurface")
+    if section.surface(default_uuid).mesh().impl_name() != mesh.MeshFactory.default_impl(
+        mesh.MeshType("PolygonalSurface2D")
+    ):
+        raise ValueError("[Test] Surface should have the default mesh")
+    section.surface(triangulated_uuid).triangulated_mesh()
+    corner_impl = mesh.MeshImpl("OpenGeodePointSet2D")
+    corner_uuid = builder.add_corner(corner_impl)
+    if section.corner(corner_uuid).mesh().impl_name() != corner_impl:
+        raise ValueError("[Test] Wrong Corner mesh impl")
+    line_impl = mesh.MeshImpl("OpenGeodeEdgedCurve2D")
+    line_uuid = builder.add_line(line_impl)
+    if section.line(line_uuid).mesh().impl_name() != line_impl:
+        raise ValueError("[Test] Wrong Line mesh impl")
+
+
 if __name__ == '__main__':
     model.OpenGeodeModelLibrary.initialize()
     section = model.Section()
@@ -480,3 +512,4 @@ if __name__ == '__main__':
     model.save_section(section, file_io)
 
     section2 = model.load_section(file_io)
+    test_add_component_with_mesh_impl()
