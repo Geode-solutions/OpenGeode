@@ -267,6 +267,30 @@ namespace
             "should throw" );
     }
 
+    // Values of colocated points cannot be told apart
+    void check_colocated_points( const geode::uuid& block_id )
+    {
+        auto model = geode::load_brep(
+            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+        auto barycenters =
+            create_cell_barycenters( model, block_id, geode::Vector3D{} );
+        geode::PointSetBuilder3D::create( *barycenters )
+            ->create_point( barycenters->point( 0 ) );
+        geode::ExternalTimeSeriesHelpers helpers;
+        helpers.set_cell_barycenters( std::move( barycenters ) );
+        bool thrown{ false };
+        try
+        {
+            helpers.apply_to( model );
+        }
+        catch( const geode::OpenGeodeException& )
+        {
+            thrown = true;
+        }
+        geode::OpenGeodeModelException::test(
+            thrown, "[Test] Applying colocated barycenters should throw" );
+    }
+
     void check_null_point_set()
     {
         geode::ExternalTimeSeriesHelpers helpers;
@@ -329,6 +353,7 @@ void test()
     check_velocities( reloaded_model, block_id );
     check_other_model( helpers );
     check_tolerance( block_id );
+    check_colocated_points( block_id );
     check_null_point_set();
     check_wrong_extension( helpers );
 }

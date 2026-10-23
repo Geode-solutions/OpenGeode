@@ -104,7 +104,9 @@ namespace geode
          * absolute coordinate of the points (when larger than 1), to accept
          * points rounded by the simulator (e.g. stored in single precision).
          * @exception OpenGeodeException if a point is farther than the
-         * tolerance from its closest Block element
+         * tolerance from its closest Block element, if several points are
+         * matched with the same Block element, or if a point is matched with
+         * colocated Block elements
          */
         void apply_to( BRep& model ) const;
 

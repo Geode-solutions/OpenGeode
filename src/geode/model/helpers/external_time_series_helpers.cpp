@@ -109,6 +109,8 @@ namespace
 
     // Each point is matched with the closest element, elements without
     // point (e.g. outside of the simulated domain) are not matched.
+    // Matching is rejected when ambiguous: several points matched with the
+    // same element, or a point matched with colocated elements.
     // Returns the point matched with each element, NO_ID if none.
     std::vector< geode::index_t > match_points(
         const geode::PointSet3D& point_set,
@@ -132,7 +134,8 @@ namespace
         for( const auto vertex : geode::Range{ point_set.nb_vertices() } )
         {
             const auto& point = point_set.point( vertex );
-            const auto element = search.closest_neighbor( point );
+            const auto closest = search.neighbors( point, 2 );
+            const auto element = closest.front();
             const auto distance =
                 geode::point_point_distance( point, search.point( element ) );
             geode::OpenGeodeModelException::check_exception(
@@ -143,6 +146,22 @@ namespace
                 "] is at distance ", distance,
                 " from the closest Block element, more than the tolerance ",
                 tolerance );
+            geode::OpenGeodeModelException::check_exception(
+                closest.size() < 2
+                    || geode::point_point_distance(
+                           search.point( element ), search.point( closest[1] ) )
+                           > geode::GLOBAL_EPSILON,
+                nullptr, geode::OpenGeodeException::TYPE::data,
+                "[ExternalTimeSeriesHelpers::apply_to] Point ", vertex,
+                " of the ", point_set_name, " [", point.string(),
+                "] is matched with colocated Block elements" );
+            geode::OpenGeodeModelException::check_exception(
+                matches[element] == geode::NO_ID, nullptr,
+                geode::OpenGeodeException::TYPE::data,
+                "[ExternalTimeSeriesHelpers::apply_to] Points ",
+                matches[element], " and ", vertex, " of the ", point_set_name,
+                " are matched with the same Block element [",
+                search.point( element ).string(), "]" );
             matches[element] = vertex;
         }
         return matches;
@@ -235,24 +254,53 @@ namespace
         return matches;
     }
 
-    void apply_matches( const geode::AttributeManager& from,
-        absl::Span< const geode::index_t > matches,
-        geode::AttributeManager& target )
+    // A point fills several elements of a Block only when its unique vertex
+    // has several vertices in the Block mesh (e.g. mesh cut along an
+    // internal Surface): a GenericMapping is then needed
+    geode::GenericMapping< geode::index_t > point_to_elements(
+        absl::Span< const geode::index_t > matches )
     {
-        geode::GenericMapping< geode::index_t > point2element;
+        geode::GenericMapping< geode::index_t > point2elements;
         for( const auto element : geode::Indices{ matches } )
         {
             if( matches[element] != geode::NO_ID )
             {
-                point2element.map( matches[element], element );
+                point2elements.map( matches[element], element );
             }
         }
-        if( point2element.size_in() == 0 )
+        return point2elements;
+    }
+
+    void apply_matches( const geode::AttributeManager& from,
+        absl::Span< const geode::index_t > matches,
+        geode::AttributeManager& target )
+    {
+        std::vector< geode::index_t > point2element(
+            from.nb_elements(), geode::NO_ID );
+        bool matched{ false };
+        bool one_to_one{ true };
+        for( const auto element : geode::Indices{ matches } )
+        {
+            const auto point = matches[element];
+            if( point == geode::NO_ID )
+            {
+                continue;
+            }
+            matched = true;
+            one_to_one = one_to_one && point2element[point] == geode::NO_ID;
+            point2element[point] = element;
+        }
+        if( !matched )
         {
             return;
         }
         delete_replaced_steps( from, target );
-        target.import( from, point2element );
+        if( one_to_one )
+        {
+            target.import( from, point2element );
+            return;
+        }
+        target.import( from, point_to_elements( matches ) );
     }
 } // namespace
 
