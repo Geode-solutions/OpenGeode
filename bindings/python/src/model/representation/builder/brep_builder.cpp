@@ -23,6 +23,8 @@
 
 #include "../../../common.hpp"
 
+#include <geode/mesh/core/mesh_id.hpp>
+
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/corner.hpp>
@@ -55,6 +57,18 @@ namespace geode
                                      &BRepBuilder::add_surface ) )
             .def( "add_block", static_cast< const uuid& (BRepBuilder::*) () >(
                                    &BRepBuilder::add_block ) )
+            .def( "add_corner",
+                static_cast< const uuid& (BRepBuilder::*) ( const MeshImpl& ) >(
+                    &BRepBuilder::add_corner ) )
+            .def( "add_line",
+                static_cast< const uuid& (BRepBuilder::*) ( const MeshImpl& ) >(
+                    &BRepBuilder::add_line ) )
+            .def( "add_surface",
+                static_cast< const uuid& (BRepBuilder::*) ( const MeshImpl& ) >(
+                    &BRepBuilder::add_surface ) )
+            .def( "add_block",
+                static_cast< const uuid& (BRepBuilder::*) ( const MeshImpl& ) >(
+                    &BRepBuilder::add_block ) )
             .def( "add_model_boundary",
                 static_cast< const uuid& (BRepBuilder::*) () >(
                     &BRepBuilder::add_model_boundary ) )

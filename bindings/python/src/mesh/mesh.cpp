@@ -34,6 +34,7 @@ namespace geode
     void define_crs_manager_builder( pybind11::module& );
     void define_crs_managers_builder( pybind11::module& );
 
+    void define_mesh_id( pybind11::module& );
     void define_vertex_set( pybind11::module& );
     void define_graph( pybind11::module& );
     void define_graph_elements( pybind11::module& );
@@ -127,6 +128,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_texture( module );
     geode::define_texture_manager( module );
 
+    geode::define_mesh_id( module );
     geode::define_vertex_set( module );
     geode::define_graph( module );
     geode::define_edged_curve( module );
