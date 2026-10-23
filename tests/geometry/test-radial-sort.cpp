@@ -64,10 +64,23 @@ void test_2()
         sorted == answer, "Wrong radial sorting" );
 }
 
+void test_degenerated_segment()
+{
+    geode::Point3D s0{ { 0, 0, 1 } };
+    geode::Point3D a{ { 0, 0.5, 1.5 } };
+    geode::Point3D b{ { 0, 0, 0.5 } };
+
+    const auto sorted = geode::radial_sort( { s0, s0 }, { a, b } );
+    const absl::FixedArray< geode::index_t > answer{ 0, 1 };
+    geode::OpenGeodeGeometryException::test(
+        sorted == answer, "Wrong radial sorting on degenerated segment" );
+}
+
 void test()
 {
     test_1();
     test_2();
+    test_degenerated_segment();
 
     geode::Logger::info( "TEST SUCCESS" );
 }

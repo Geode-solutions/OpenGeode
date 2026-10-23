@@ -106,14 +106,19 @@ namespace
             return max_abs_axis( normal.value() );
         }
         const auto& vertices = triangle.vertices();
+        const auto& segment_vertices = segment.vertices();
+        const geode::Vector3D segment_direction{ segment_vertices[0],
+            segment_vertices[1] };
         const auto longest_edge = triangle.longest_edge_index();
+        if( longest_edge == geode::NO_LID )
+        {
+            return coplanar_projection_axis(
+                segment_vertices[0], segment_direction, { vertices[0] } );
+        }
         const geode::Point3D& origin = vertices[longest_edge];
         const geode::Point3D& next =
             vertices[longest_edge == 2 ? 0 : longest_edge + 1];
         const geode::Vector3D direction{ origin, next };
-        const auto& segment_vertices = segment.vertices();
-        const geode::Vector3D segment_direction{ segment_vertices[0],
-            segment_vertices[1] };
         if( segment_direction.length2() > direction.length2() )
         {
             return coplanar_projection_axis( segment_vertices[0],
