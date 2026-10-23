@@ -31,6 +31,8 @@
 
 #include <geode/mesh/core/mesh_id.hpp>
 
+#include <geode/model/common.hpp>
+
 namespace geode
 {
     namespace detail
@@ -43,6 +45,11 @@ namespace geode
 
             void set_mesh( uuid new_mesh_uuid, std::unique_ptr< Mesh > mesh )
             {
+                OpenGeodeModelException::check_exception( mesh != nullptr,
+                    new_mesh_uuid, OpenGeodeException::TYPE::data,
+                    "[MeshStorage::set_mesh] Cannot set a null mesh to "
+                    "component ",
+                    new_mesh_uuid.string() );
                 mesh_type_ = mesh->impl_name();
                 mesh_ = std::move( mesh );
                 IdentifierBuilder mesh_builder{ *mesh_ };
@@ -51,16 +58,19 @@ namespace geode
 
             [[nodiscard]] const Mesh& mesh() const
             {
+                check_mesh();
                 return *mesh_;
             }
 
             [[nodiscard]] Mesh& modifiable_mesh()
             {
+                check_mesh();
                 return *mesh_;
             }
 
             [[nodiscard]] std::unique_ptr< Mesh > steal_mesh()
             {
+                mesh_type_ = MeshImpl{ "" };
                 return std::move( mesh_ );
             }
 
@@ -77,6 +87,15 @@ namespace geode
                                { []( Archive& archive, MeshStorage& storage ) {
                                    archive.object( storage.mesh_type_ );
                                } } } );
+            }
+
+        private:
+            void check_mesh() const
+            {
+                OpenGeodeModelException::check_exception( mesh_ != nullptr,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[MeshStorage] Component has no mesh (it may have been "
+                    "stolen)" );
             }
 
         private:

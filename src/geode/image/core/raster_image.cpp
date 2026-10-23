@@ -55,6 +55,16 @@ namespace geode
             colors_[index] = std::move( color );
         }
 
+        [[nodiscard]] absl::Span< const RGBColor > colors() const
+        {
+            return colors_;
+        }
+
+        [[nodiscard]] absl::Span< RGBColor > modifiable_colors()
+        {
+            return absl::MakeSpan( colors_ );
+        }
+
         [[nodiscard]] index_t nb_colors() const
         {
             return static_cast< index_t >( colors_.size() );
@@ -148,6 +158,18 @@ namespace geode
     void RasterImage< dimension >::set_color( index_t index, RGBColor color )
     {
         impl_->set_color( index, std::move( color ) );
+    }
+
+    template < index_t dimension >
+    absl::Span< const RGBColor > RasterImage< dimension >::colors() const
+    {
+        return impl_->colors();
+    }
+
+    template < index_t dimension >
+    absl::Span< RGBColor > RasterImage< dimension >::modifiable_colors()
+    {
+        return impl_->modifiable_colors();
     }
 
     template < index_t dimension >

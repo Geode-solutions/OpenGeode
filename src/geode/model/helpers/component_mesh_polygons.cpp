@@ -66,6 +66,10 @@ namespace
         for( const auto polygon_vertex_id :
             geode::LIndices{ facet_unique_vertices } )
         {
+            if( facet_unique_vertices[polygon_vertex_id] == geode::NO_ID )
+            {
+                continue;
+            }
             for( const auto& cmv : model.component_mesh_vertices(
                      facet_unique_vertices[polygon_vertex_id] ) )
             {
@@ -308,6 +312,10 @@ namespace
             surface_edge_from_unique_vertices;
         for( const auto edge_vertex_id : geode::LRange{ 2 } )
         {
+            if( edge_unique_vertices[edge_vertex_id] == geode::NO_ID )
+            {
+                continue;
+            }
             for( const auto& cmv : model.component_mesh_vertices(
                      edge_unique_vertices[edge_vertex_id] ) )
             {
@@ -564,6 +572,10 @@ namespace
         unique_vertices.reserve( polygon_unique_vertices.size() );
         for( const auto polygon_unique_vertex : polygon_unique_vertices )
         {
+            if( polygon_unique_vertex == geode::NO_ID )
+            {
+                return {};
+            }
             unique_vertices.emplace_back(
                 model.component_mesh_vertices( polygon_unique_vertex ) );
         }
@@ -582,6 +594,10 @@ namespace
         unique_vertices.reserve( polygon_unique_vertices.size() );
         for( const auto polygon_unique_vertex : polygon_unique_vertices )
         {
+            if( polygon_unique_vertex == geode::NO_ID )
+            {
+                return {};
+            }
             unique_vertices.emplace_back(
                 model.component_mesh_vertices( polygon_unique_vertex ) );
         }

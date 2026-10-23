@@ -124,9 +124,20 @@ namespace geode
         for( auto& corner : modifiable_corners( key ) )
         {
             tasks[count++] = async::spawn( [&corner, &mapping] {
-                const auto file = mapping.at( corner.id().string() );
+                const auto& type = PointSet< dimension >::type_name_static();
+                const auto file = mapping.find( corner.id().string() );
+                if( file == mapping.end() )
+                {
+                    corner.set_mesh(
+                        detail::empty_mesh_of_missing_file( corner, type ),
+                        typename Corner< dimension >::CornersKey{} );
+                    return;
+                }
                 corner.set_mesh(
-                    load_point_set< dimension >( corner.mesh_type(), file ),
+                    load_point_set< dimension >(
+                        detail::loadable_mesh_impl(
+                            corner.mesh_type(), type, file->second ),
+                        file->second ),
                     typename Corner< dimension >::CornersKey{} );
             } );
         }
@@ -190,6 +201,9 @@ namespace geode
             new Corner< dimension >{
                 typename Corner< dimension >::CornersKey{} }
         };
+        IdentifierBuilder{ corner->modifiable_mesh(
+                               typename Corner< dimension >::CornersKey{} ) }
+            .set_id( corner_id );
         IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
         impl_->add_component( std::move( corner ) );
     }
@@ -202,6 +216,9 @@ namespace geode
             new Corner< dimension >{
                 impl, typename Corner< dimension >::CornersKey{} }
         };
+        IdentifierBuilder{ corner->modifiable_mesh(
+                               typename Corner< dimension >::CornersKey{} ) }
+            .set_id( corner_id );
         IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
         impl_->add_component( std::move( corner ) );
     }

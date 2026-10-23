@@ -34,6 +34,7 @@
 
 #include <geode/model/helpers/component_mesh_polyhedra.hpp>
 #include <geode/model/mixin/core/block.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 
@@ -65,10 +66,32 @@ void test_component_mesh_polyhedra()
     }
 }
 
+void test_polyhedron_without_unique_vertex()
+{
+    auto model = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    geode::BRepBuilder builder{ model };
+    const auto& block = *model.blocks().begin();
+    const geode::ComponentMeshVertex cmv{ block.component_id(),
+        block.mesh().polyhedron_vertex( { 0, 0 } ) };
+    builder.unset_unique_vertex( cmv, model.unique_vertex( cmv ) );
+    const auto polyhedron_unique_vertices =
+        geode::polyhedron_unique_vertices( model, block, 0 );
+    geode::OpenGeodeModelException::test(
+        absl::c_count( polyhedron_unique_vertices, geode::NO_ID ) == 1,
+        "[TEST] Polyhedron should have a vertex without unique vertex" );
+    geode::OpenGeodeModelException::test(
+        geode::component_mesh_polyhedra( model, polyhedron_unique_vertices )
+            .empty(),
+        "[TEST] No polyhedron should be found from unique vertices "
+        "containing NO_ID" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
     test_component_mesh_polyhedra();
+    test_polyhedron_without_unique_vertex();
 }
 
 OPENGEODE_TEST( "convert-mesh-polygons" )

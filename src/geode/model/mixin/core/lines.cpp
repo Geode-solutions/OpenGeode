@@ -122,9 +122,19 @@ namespace geode
         for( auto& line : modifiable_lines( key ) )
         {
             tasks[count++] = async::spawn( [&line, &mapping] {
-                const auto file = mapping.at( line.id().string() );
-                line.set_mesh(
-                    load_edged_curve< dimension >( line.mesh_type(), file ),
+                const auto& type = EdgedCurve< dimension >::type_name_static();
+                const auto file = mapping.find( line.id().string() );
+                if( file == mapping.end() )
+                {
+                    line.set_mesh(
+                        detail::empty_mesh_of_missing_file( line, type ),
+                        typename Line< dimension >::LinesKey{} );
+                    return;
+                }
+                line.set_mesh( load_edged_curve< dimension >(
+                                   detail::loadable_mesh_impl(
+                                       line.mesh_type(), type, file->second ),
+                                   file->second ),
                     typename Line< dimension >::LinesKey{} );
             } );
         }
@@ -186,6 +196,9 @@ namespace geode
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{ typename Line< dimension >::LinesKey{} }
         };
+        IdentifierBuilder{ line->modifiable_mesh(
+                               typename Line< dimension >::LinesKey{} ) }
+            .set_id( line_id );
         IdentifierBuilder{ *line }.set_id( std::move( line_id ) );
         impl_->add_component( std::move( line ) );
     }
@@ -198,6 +211,9 @@ namespace geode
             new Line< dimension >{
                 impl, typename Line< dimension >::LinesKey{} }
         };
+        IdentifierBuilder{ line->modifiable_mesh(
+                               typename Line< dimension >::LinesKey{} ) }
+            .set_id( line_id );
         IdentifierBuilder{ *line }.set_id( std::move( line_id ) );
         impl_->add_component( std::move( line ) );
     }

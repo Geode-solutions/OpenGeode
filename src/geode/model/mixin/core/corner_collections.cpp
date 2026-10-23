@@ -101,7 +101,7 @@ namespace geode
         std::string_view directory, CornerCollectionsBuilderKey /*key*/ )
     {
         impl_->load_components(
-            absl::StrCat( directory, "/corner_collections" ) );
+            absl::StrCat( directory, "/corner_collections" ), false );
     }
 
     template < index_t dimension >

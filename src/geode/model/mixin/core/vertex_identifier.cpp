@@ -24,6 +24,7 @@
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 
 #include <atomic>
+#include <filesystem>
 #include <fstream>
 
 #include <async++.h>
@@ -460,10 +461,46 @@ namespace geode
             return old2new;
         }
 
+        void repair_component_vertices()
+        {
+            // Read-only parallel scan, nothing to repair in a valid model
+            std::vector< uint8_t > to_repair( nb_unique_vertices(), 0 );
+            async::parallel_for(
+                async::irange( index_t{ 0 }, nb_unique_vertices() ),
+                [this, &to_repair]( index_t unique_vertex ) {
+                    for( const auto& vertex :
+                        component_vertices_->value( unique_vertex ) )
+                    {
+                        if( !is_linked_to_unique_vertex(
+                                vertex, unique_vertex ) )
+                        {
+                            to_repair[unique_vertex] = 1;
+                            return;
+                        }
+                    }
+                } );
+            // Sequential repair: a component vertex may be listed in several
+            // unique vertices, the first one keeps it
+            ComponentVerticesRepair repair;
+            for( const auto unique_vertex : Range{ nb_unique_vertices() } )
+            {
+                if( to_repair[unique_vertex] != 0 )
+                {
+                    repair_unique_vertex( unique_vertex, repair );
+                    nb_component_mesh_vertices_up_to_date_ = false;
+                }
+            }
+            repair.log();
+        }
+
         void save( std::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
-            std::ofstream file{ filename, std::ofstream::binary };
+            std::ofstream file{ std::filesystem::u8path( filename ),
+                std::ofstream::binary };
+            OpenGeodeModelException::check_exception( file.is_open(), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[VertexIdentifier::save] Cannot open file: ", filename );
             TContext context{};
             BitseryExtensions::register_serialize_pcontext(
                 std::get< 0 >( context ) );
@@ -471,7 +508,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OpenGeodeModelException::check_exception(
-                std::get< 1 >( context ).isValid(), nullptr,
+                file.good() && std::get< 1 >( context ).isValid(), nullptr,
                 OpenGeodeException::TYPE::internal,
                 "[VertexIdentifier::save] Error while writing file: ",
                 filename );
@@ -480,7 +517,8 @@ namespace geode
         void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
-            std::ifstream file{ filename, std::ifstream::binary };
+            std::ifstream file{ std::filesystem::u8path( filename ),
+                std::ifstream::binary };
             TContext context{};
             BitseryExtensions::register_deserialize_pcontext(
                 std::get< 0 >( context ) );
@@ -676,16 +714,31 @@ namespace geode
             const auto unique_vertices_ids =
                 vertex_attribute_manager.attribute_ids_matching_name(
                     UNIQUE_VERTICES_NAME );
-            OpenGeodeModelException::check_exception(
-                unique_vertices_ids.has_value(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[VertexIdentifier::load_component] Unique vertices "
-                "attribute not found." );
-            OpenGeodeModelException::check_exception(
-                unique_vertices_ids.value().size() == 1, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[VertexIdentifier::load_component] Unique vertices "
-                "attribute is not unique." );
+            if( !unique_vertices_ids.has_value() )
+            {
+                Logger::warning(
+                    "[VertexIdentifier::load_component] Unique vertices "
+                    "attribute not found, it will be restored from the "
+                    "unique vertices" );
+                AttributeProperties attribute_properties;
+                attribute_properties.assignable = false;
+                attribute_properties.interpolable = false;
+                attribute_properties.transferable = false;
+                AttributeValues< index_t > unique_vertex_attribute_values;
+                unique_vertex_attribute_values.default_value = NO_ID;
+                unique_vertex_attribute_values.no_value = NO_ID;
+                vertex_attribute_manager
+                    .template create_attribute< VariableAttribute, index_t >(
+                        UNIQUE_VERTICES_NAME, unique_vertex_id_,
+                        unique_vertex_attribute_values, attribute_properties );
+                return;
+            }
+            if( unique_vertices_ids.value().size() != 1 )
+            {
+                Logger::warning(
+                    "[VertexIdentifier::load_component] Unique vertices "
+                    "attribute is not unique, using the first one" );
+            }
             const auto old_attribute =
                 vertex_attribute_manager
                     .template find_attribute< VariableAttribute, index_t >(
@@ -704,11 +757,110 @@ namespace geode
                 new_attribute->set_value(
                     vertex, old_attribute->value( vertex ) );
             }
-            vertex_attribute_manager.delete_attribute(
-                unique_vertices_ids.value().front() );
+            for( const auto& old_id : unique_vertices_ids.value() )
+            {
+                vertex_attribute_manager.delete_attribute( old_id );
+            }
         }
 
     private:
+        struct ComponentVerticesRepair
+        {
+            void log() const
+            {
+                if( nb_unknown_components > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Removed ",
+                        nb_unknown_components,
+                        " component vertices of unknown components" );
+                }
+                if( nb_invalid_vertices > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Removed ",
+                        nb_invalid_vertices,
+                        " component vertices with invalid vertex index" );
+                }
+                if( nb_inconsistent_vertices > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Removed ",
+                        nb_inconsistent_vertices,
+                        " component vertices linked to another unique "
+                        "vertex" );
+                }
+                if( nb_restored_vertices > 0 )
+                {
+                    Logger::warning( "[VertexIdentifier::load] Restored ",
+                        nb_restored_vertices,
+                        " component vertex links to their unique vertex" );
+                }
+            }
+
+            index_t nb_unknown_components{ 0 };
+            index_t nb_invalid_vertices{ 0 };
+            index_t nb_inconsistent_vertices{ 0 };
+            index_t nb_restored_vertices{ 0 };
+        };
+
+        [[nodiscard]] bool is_linked_to_unique_vertex(
+            const ComponentMeshVertex& vertex, index_t unique_vertex ) const
+        {
+            const auto it =
+                vertex2unique_vertex_.find( vertex.component_id.id );
+            if( it == vertex2unique_vertex_.end() )
+            {
+                return false;
+            }
+            const auto& attribute = *it->second.attribute;
+            return vertex.vertex < attribute.size()
+                   && attribute.value( vertex.vertex ) == unique_vertex;
+        }
+
+        void repair_unique_vertex(
+            index_t unique_vertex, ComponentVerticesRepair& repair )
+        {
+            const auto& vertices = component_vertices_->value( unique_vertex );
+            std::vector< bool > to_keep( vertices.size(), true );
+            bool update{ false };
+            for( const auto v : Indices{ vertices } )
+            {
+                const auto& vertex = vertices[v];
+                const auto it =
+                    vertex2unique_vertex_.find( vertex.component_id.id );
+                if( it == vertex2unique_vertex_.end() )
+                {
+                    to_keep[v] = false;
+                    update = true;
+                    repair.nb_unknown_components++;
+                    continue;
+                }
+                auto& attribute = *it->second.attribute;
+                if( vertex.vertex >= attribute.size() )
+                {
+                    to_keep[v] = false;
+                    update = true;
+                    repair.nb_invalid_vertices++;
+                    continue;
+                }
+                const auto value = attribute.value( vertex.vertex );
+                if( value == NO_ID )
+                {
+                    attribute.set_value( vertex.vertex, unique_vertex );
+                    repair.nb_restored_vertices++;
+                }
+                else if( value != unique_vertex )
+                {
+                    to_keep[v] = false;
+                    update = true;
+                    repair.nb_inconsistent_vertices++;
+                }
+            }
+            if( update )
+            {
+                component_vertices_->set_value( unique_vertex,
+                    extract_vector_elements( to_keep, vertices ) );
+            }
+        }
+
         OpenGeodeVertexSet unique_vertices_;
         std::shared_ptr<
             VariableAttribute< std::vector< ComponentMeshVertex > > >
@@ -843,6 +995,11 @@ namespace geode
         BuilderKey /*key*/ )
     {
         return impl_->delete_isolated_vertices();
+    }
+
+    void VertexIdentifier::repair_component_vertices( BuilderKey /*key*/ )
+    {
+        impl_->repair_component_vertices();
     }
 
     template void opengeode_model_api VertexIdentifier::load_mesh_component(

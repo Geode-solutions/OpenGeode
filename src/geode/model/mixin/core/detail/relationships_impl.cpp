@@ -25,7 +25,10 @@
 
 #include <fstream>
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/logger.hpp>
 #include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
@@ -209,6 +212,7 @@ namespace geode
             const RelationshipsImpl& impl, const ModelCopyMapping& mapping )
         {
             graph_ = impl.graph_->clone();
+            uuid2index_ = UuidToIndex{};
             initialize_attributes();
             std::vector< index_t > vertices_to_delete;
             for( const auto vertex_id : Range{ graph_->nb_vertices() } )
@@ -306,18 +310,79 @@ namespace geode
             return register_component( component_id );
         }
 
-        void RelationshipsImpl::delete_isolated_vertices()
+        void RelationshipsImpl::repair_after_load()
         {
-            auto builder = GraphBuilder::create( *graph_ );
-            const auto old2new = builder->delete_isolated_vertices();
-            for( const auto v : Indices{ old2new } )
+            OpenGeodeModelException::check_exception( graph_ != nullptr,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[Relationships::load] Missing relationships graph" );
+            if( !ids_ )
             {
-                if( old2new[v] == NO_ID )
+                initialize_attributes();
+            }
+            const auto nb_vertices = graph_->nb_vertices();
+            const ComponentType undefined_type{ "undefined" };
+            std::vector< bool > vertices_to_delete( nb_vertices, false );
+            absl::flat_hash_set< uuid > valid_ids;
+            valid_ids.reserve( nb_vertices );
+            index_t nb_undefined{ 0 };
+            index_t nb_duplicated{ 0 };
+            index_t nb_wrong_mappings{ 0 };
+            for( const auto vertex : Range{ nb_vertices } )
+            {
+                const auto& component_id = ids_->value( vertex );
+                if( component_id.type == undefined_type )
                 {
-                    uuid2index_.erase( v );
+                    vertices_to_delete[vertex] = true;
+                    nb_undefined++;
+                    continue;
+                }
+                if( !valid_ids.emplace( component_id.id ).second )
+                {
+                    vertices_to_delete[vertex] = true;
+                    nb_duplicated++;
+                    continue;
+                }
+                if( uuid2index_.index( component_id.id ) != vertex )
+                {
+                    nb_wrong_mappings++;
                 }
             }
-            uuid2index_.update( old2new );
+            if( nb_wrong_mappings > 0
+                || uuid2index_.nb_mappings() != valid_ids.size() )
+            {
+                Logger::warning( "[Relationships::load] Inconsistent component "
+                                 "index, rebuilding it from component ids" );
+            }
+            if( nb_undefined > 0 || nb_duplicated > 0 )
+            {
+                Logger::warning( "[Relationships::load] Removing ",
+                    nb_undefined, " component(s) with undefined id and ",
+                    nb_duplicated,
+                    " duplicated component(s) with their relations" );
+                std::vector< bool > edges_to_delete(
+                    graph_->nb_edges(), false );
+                for( const auto vertex : Range{ nb_vertices } )
+                {
+                    if( !vertices_to_delete[vertex] )
+                    {
+                        continue;
+                    }
+                    for( const auto& edge :
+                        graph_->edges_around_vertex( vertex ) )
+                    {
+                        edges_to_delete[edge.edge_id] = true;
+                    }
+                }
+                GraphBuilder::create( *graph_ )->delete_edges(
+                    edges_to_delete );
+            }
+            GraphBuilder::create( *graph_ )->delete_isolated_vertices();
+            uuid2index_.clear();
+            uuid2index_.reserve( graph_->nb_vertices() );
+            for( const auto vertex : Range{ graph_->nb_vertices() } )
+            {
+                uuid2index_.set_new_mapping( ids_->value( vertex ).id, vertex );
+            }
         }
     } // namespace detail
 } // namespace geode

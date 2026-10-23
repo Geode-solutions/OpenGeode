@@ -23,6 +23,10 @@
 
 #include <geode/model/helpers/compute_unique_vertices.hpp>
 
+#include <type_traits>
+
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/geometry/nn_search.hpp>
 
 #include <geode/mesh/core/edged_curve.hpp>
@@ -41,216 +45,171 @@
 
 namespace
 {
-    template < typename Model >
-    std::vector< geode::Point< Model::dim > > get_all_points_base(
-        const Model& model )
-    {
-        std::vector< geode::Point< Model::dim > > points;
-        for( const auto& corner : model.corners() )
-        {
-            for( const auto v : geode::Range{ corner.mesh().nb_vertices() } )
-            {
-                points.emplace_back( corner.mesh().point( v ) );
-            }
-        }
-        for( const auto& line : model.lines() )
-        {
-            for( const auto v : geode::Range{ line.mesh().nb_vertices() } )
-            {
-                points.emplace_back( line.mesh().point( v ) );
-            }
-        }
-        for( const auto& surface : model.surfaces() )
-        {
-            for( const auto v : geode::Range{ surface.mesh().nb_vertices() } )
-            {
-                points.emplace_back( surface.mesh().point( v ) );
-            }
-        }
-        return points;
-    }
-
-    std::vector< geode::Point2D > get_all_points( const geode::Section& model )
-    {
-        return get_all_points_base< geode::Section >( model );
-    }
-
-    std::vector< geode::Point3D > get_all_points( const geode::BRep& model )
-    {
-        auto points = get_all_points_base< geode::BRep >( model );
-        for( const auto& block : model.blocks() )
-        {
-            for( const auto v : geode::Range{ block.mesh().nb_vertices() } )
-            {
-                points.emplace_back( block.mesh().point( v ) );
-            }
-        }
-        return points;
-    }
-
-    template < typename Model >
-    const geode::Point< Model::dim >& get_point_base(
-        const Model& model, const geode::ComponentMeshVertex& cmv )
-    {
-        if( cmv.component_id.type
-            == geode::Surface< Model::dim >::component_type_static() )
-        {
-            const auto& surface = model.surface( cmv.component_id.id );
-            return surface.mesh().point( cmv.vertex );
-        }
-        if( cmv.component_id.type
-            == geode::Line< Model::dim >::component_type_static() )
-        {
-            const auto& line = model.line( cmv.component_id.id );
-            return line.mesh().point( cmv.vertex );
-        }
-        if( cmv.component_id.type
-            == geode::Corner< Model::dim >::component_type_static() )
-        {
-            const auto& corner = model.corner( cmv.component_id.id );
-            return corner.mesh().point( cmv.vertex );
-        }
-        throw geode::OpenGeodeModelException{ nullptr,
-            geode::OpenGeodeException::TYPE::data,
-            "[compute_unique_vertices::get_point] Unknown component type: ",
-            cmv.component_id.string() };
-        const auto& corner = model.corner( cmv.component_id.id );
-        return corner.mesh().point( cmv.vertex );
-    }
-
-    const geode::Point2D& get_point(
-        const geode::Section& model, const geode::ComponentMeshVertex& cmv )
-    {
-        return get_point_base< geode::Section >( model, cmv );
-    }
-
-    const geode::Point3D& get_point(
-        const geode::BRep& model, const geode::ComponentMeshVertex& cmv )
-    {
-        if( cmv.component_id.type
-            == geode::Block< 3 >::component_type_static() )
-        {
-            const auto& block = model.block( cmv.component_id.id );
-            return block.mesh().point( cmv.vertex );
-        }
-        return get_point_base< geode::BRep >( model, cmv );
-    }
-
-    template < typename Model >
-    void set_unique_vertices_base( const Model& model,
-        typename Model::Builder& builder,
-        absl::Span< const geode::index_t > initial_uv_correspondance,
-        const geode::NNSearch< Model::dim >& unique_nns )
+    /*!
+     * Calls func( component_id, mesh ) on all the mesh components of the
+     * model, always in the same order: corners, lines, surfaces, blocks.
+     */
+    template < typename Model, typename Func >
+    void for_each_component_mesh( const Model& model, Func&& func )
     {
         for( const auto& corner : model.corners() )
         {
-            for( const auto v : geode::Range{ corner.mesh().nb_vertices() } )
-            {
-                geode::ComponentMeshVertex cmv{ corner.component_id(), v };
-                if( model.unique_vertex( { corner.component_id(), v } )
-                    != geode::NO_ID )
-                {
-                    continue;
-                }
-                const auto& point = corner.mesh().point( v );
-                const auto unique_vertex_id =
-                    unique_nns.closest_neighbor( point );
-                builder.set_unique_vertex(
-                    cmv, initial_uv_correspondance[unique_vertex_id] );
-            }
+            func( corner.component_id(), corner.mesh() );
         }
         for( const auto& line : model.lines() )
         {
-            for( const auto v : geode::Range{ line.mesh().nb_vertices() } )
-            {
-                geode::ComponentMeshVertex cmv{ line.component_id(), v };
-                if( model.unique_vertex( cmv ) != geode::NO_ID )
-                {
-                    continue;
-                }
-                const auto& point = line.mesh().point( v );
-                const auto unique_vertex_id =
-                    unique_nns.closest_neighbor( point );
-                builder.set_unique_vertex(
-                    cmv, initial_uv_correspondance[unique_vertex_id] );
-            }
+            func( line.component_id(), line.mesh() );
         }
         for( const auto& surface : model.surfaces() )
         {
-            for( const auto v : geode::Range{ surface.mesh().nb_vertices() } )
-            {
-                geode::ComponentMeshVertex cmv{ surface.component_id(), v };
-                if( model.unique_vertex( cmv ) != geode::NO_ID )
-                {
-                    continue;
-                }
-                const auto& point = surface.mesh().point( v );
-                const auto unique_vertex_id =
-                    unique_nns.closest_neighbor( point );
-                builder.set_unique_vertex(
-                    cmv, initial_uv_correspondance[unique_vertex_id] );
-            }
+            func( surface.component_id(), surface.mesh() );
         }
-    }
-
-    void set_unique_vertices( const geode::Section& model,
-        geode::SectionBuilder& builder,
-        absl::Span< const geode::index_t > initial_uv_correspondance,
-        const geode::NNSearch2D& unique_nns )
-    {
-        set_unique_vertices_base(
-            model, builder, initial_uv_correspondance, unique_nns );
-    }
-
-    void set_unique_vertices( const geode::BRep& model,
-        geode::BRepBuilder& builder,
-        absl::Span< const geode::index_t > initial_uv_correspondance,
-        const geode::NNSearch3D& unique_nns )
-    {
-        set_unique_vertices_base(
-            model, builder, initial_uv_correspondance, unique_nns );
-        for( const auto& block : model.blocks() )
+        if constexpr( std::is_same_v< Model, geode::BRep > )
         {
-            for( const auto v : geode::Range{ block.mesh().nb_vertices() } )
+            for( const auto& block : model.blocks() )
             {
-                geode::ComponentMeshVertex cmv{ block.component_id(), v };
-                if( model.unique_vertex( cmv ) != geode::NO_ID )
-                {
-                    continue;
-                }
-                const auto& point = block.mesh().point( v );
-                const auto unique_vertex_id =
-                    unique_nns.closest_neighbor( point );
-                builder.set_unique_vertex(
-                    cmv, initial_uv_correspondance[unique_vertex_id] );
+                func( block.component_id(), block.mesh() );
             }
         }
     }
 
     template < typename Model >
-    std::vector< geode::index_t > compute_initial_uv_correspondance(
-        const Model& model, const geode::NNSearch< Model::dim >& unique_nns )
+    class UniqueVerticesComputer
     {
-        std::vector< geode::index_t > initial_uv_correspondance(
-            unique_nns.nb_points(), geode::NO_ID );
-        for( const auto uv : geode::Range{ model.nb_unique_vertices() } )
+        struct ComponentVertices
         {
-            const auto& cmv = model.component_mesh_vertices( uv ).front();
-            const auto& point = get_point( model, cmv );
-            initial_uv_correspondance[unique_nns.closest_neighbor( point )] =
-                uv;
+            geode::index_t offset;
+            geode::index_t nb_vertices;
+        };
+
+    public:
+        explicit UniqueVerticesComputer( const Model& model ) : model_( model )
+        {
+            geode::index_t nb_vertices{ 0 };
+            for_each_component_mesh(
+                model_, [this, &nb_vertices](
+                            const geode::ComponentID& id, const auto& mesh ) {
+                    components_.emplace( id.id,
+                        ComponentVertices{ nb_vertices, mesh.nb_vertices() } );
+                    nb_vertices += mesh.nb_vertices();
+                } );
+            std::vector< geode::Point< Model::dim > > points;
+            points.reserve( nb_vertices );
+            for_each_component_mesh(
+                model_, [&points]( const geode::ComponentID& /*unused*/,
+                            const auto& mesh ) {
+                    for( const auto v : geode::Range{ mesh.nb_vertices() } )
+                    {
+                        points.emplace_back( mesh.point( v ) );
+                    }
+                } );
+            const geode::NNSearch< Model::dim > nns{ std::move( points ) };
+            auto colocated_info =
+                nns.colocated_index_mapping( geode::GLOBAL_EPSILON );
+            unique_point_uvs_.assign(
+                colocated_info.nb_unique_points(), geode::NO_ID );
+            colocated_mapping_ = std::move( colocated_info.colocated_mapping );
         }
-        geode::index_t new_uv = model.nb_unique_vertices();
-        for( auto& uv : initial_uv_correspondance )
+
+        /*!
+         * Maps each unique point to an existing unique vertex located at
+         * this point. Isolated unique vertices (without any component mesh
+         * vertex) are ignored. If several existing unique vertices are
+         * located at the same point, they are kept distinct and the first
+         * one (lowest index) is used for the vertices without unique vertex
+         * located at this point.
+         */
+        void map_initial_unique_vertices()
         {
-            if( uv == geode::NO_ID )
+            for( const auto uv : geode::Range{ model_.nb_unique_vertices() } )
             {
-                uv = new_uv++;
+                const auto& cmvs = model_.component_mesh_vertices( uv );
+                if( cmvs.empty() )
+                {
+                    continue;
+                }
+                const auto& cmv = cmvs.front();
+                const auto it = components_.find( cmv.component_id.id );
+                if( it == components_.end()
+                    || cmv.vertex >= it->second.nb_vertices )
+                {
+                    continue;
+                }
+                auto& unique_point_uv =
+                    unique_point_uvs_[colocated_mapping_[it->second.offset
+                                                         + cmv.vertex]];
+                if( unique_point_uv == geode::NO_ID )
+                {
+                    unique_point_uv = uv;
+                }
             }
         }
-        return initial_uv_correspondance;
-    }
 
+        /*!
+         * Gives a new unique vertex index to the unique points without
+         * existing unique vertex but with vertices to assign, and returns the
+         * number of new unique vertices.
+         */
+        geode::index_t number_new_unique_vertices()
+        {
+            std::vector< bool > needed( unique_point_uvs_.size(), false );
+            for_each_vertex_without_unique_vertex(
+                [this, &needed]( const geode::ComponentMeshVertex& /*unused*/,
+                    geode::index_t unique_point ) {
+                    if( unique_point_uvs_[unique_point] == geode::NO_ID )
+                    {
+                        needed[unique_point] = true;
+                    }
+                } );
+            const auto nb_initial_unique_vertices = model_.nb_unique_vertices();
+            auto new_uv = nb_initial_unique_vertices;
+            for( const auto unique_point : geode::Indices{ needed } )
+            {
+                if( needed[unique_point] )
+                {
+                    unique_point_uvs_[unique_point] = new_uv++;
+                }
+            }
+            return new_uv - nb_initial_unique_vertices;
+        }
+
+        void set_unique_vertices( typename Model::Builder& builder ) const
+        {
+            for_each_vertex_without_unique_vertex(
+                [this, &builder]( const geode::ComponentMeshVertex& cmv,
+                    geode::index_t unique_point ) {
+                    builder.set_unique_vertex(
+                        cmv, unique_point_uvs_[unique_point] );
+                } );
+        }
+
+    private:
+        template < typename Func >
+        void for_each_vertex_without_unique_vertex( Func&& func ) const
+        {
+            geode::index_t global_vertex{ 0 };
+            for_each_component_mesh(
+                model_, [this, &func, &global_vertex](
+                            const geode::ComponentID& id, const auto& mesh ) {
+                    geode::ComponentMeshVertex cmv{ id, 0 };
+                    for( const auto v : geode::Range{ mesh.nb_vertices() } )
+                    {
+                        cmv.vertex = v;
+                        if( model_.unique_vertex( cmv ) == geode::NO_ID )
+                        {
+                            func( cmv, colocated_mapping_[global_vertex] );
+                        }
+                        global_vertex++;
+                    }
+                } );
+        }
+
+    private:
+        const Model& model_;
+        absl::flat_hash_map< geode::uuid, ComponentVertices > components_;
+        std::vector< geode::index_t > colocated_mapping_;
+        std::vector< geode::index_t > unique_point_uvs_;
+    };
 } // namespace
 
 namespace geode
@@ -259,18 +218,10 @@ namespace geode
     void compute_model_unique_vertices(
         const Model& model, typename Model::Builder& builder )
     {
-        auto all_vertices = get_all_points( model );
-        NNSearch< Model::dim > nns{ all_vertices };
-        const auto colocated_info =
-            nns.colocated_index_mapping( GLOBAL_EPSILON );
-        const auto nb_initial_unique_vertices = model.nb_unique_vertices();
-        NNSearch< Model::dim > unique_nns{ colocated_info.unique_points };
-        const auto initial_uv_correspondance =
-            compute_initial_uv_correspondance( model, unique_nns );
-        builder.create_unique_vertices(
-            colocated_info.nb_unique_points() - nb_initial_unique_vertices );
-        set_unique_vertices(
-            model, builder, initial_uv_correspondance, unique_nns );
+        UniqueVerticesComputer< Model > computer{ model };
+        computer.map_initial_unique_vertices();
+        builder.create_unique_vertices( computer.number_new_unique_vertices() );
+        computer.set_unique_vertices( builder );
     }
 
     template void opengeode_model_api compute_model_unique_vertices(

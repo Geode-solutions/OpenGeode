@@ -214,6 +214,13 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_vertices( BuilderKey /*key*/ );
 
+        /*!
+         * Remove component vertices referencing an unregistered component or
+         * an invalid vertex, and restore missing links from component vertices
+         * to their unique vertex. Used after loading a model.
+         */
+        void repair_component_vertices( BuilderKey /*key*/ );
+
     protected:
         VertexIdentifier( VertexIdentifier&& other ) noexcept;
         VertexIdentifier& operator=( VertexIdentifier&& other ) noexcept;

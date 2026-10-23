@@ -69,6 +69,13 @@ namespace geode
                 OpenGeodeException::TYPE::internal,
                 "Cannot load Section from file: ", filename, ": ", e.what() };
         }
+        catch( const std::exception& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeModelException{ nullptr,
+                OpenGeodeException::TYPE::internal,
+                "Cannot load Section from file: ", filename };
+        }
     }
 
     AdditionalFiles section_additional_files( std::string_view filename )
