@@ -43,8 +43,7 @@ namespace
             std::ofstream::binary };
         geode::OpenGeodeModelException::check_exception( !file.fail(), nullptr,
             geode::OpenGeodeException::TYPE::data,
-            "[save_external_time_series] Failed to open file: ",
-            filename );
+            "[save_external_time_series] Failed to open file: ", filename );
         geode::TContext context{};
         geode::BitseryExtensions::register_serialize_pcontext(
             std::get< 0 >( context ) );
@@ -69,9 +68,8 @@ namespace geode
             extension_from_filename( filename )
                 == ExternalTimeSeries::native_extension_static(),
             nullptr, OpenGeodeException::TYPE::data,
-            "[save_external_time_series] Wrong extension for file ",
-            filename, ", only ",
-            ExternalTimeSeries::native_extension_static(),
+            "[save_external_time_series] Wrong extension for file ", filename,
+            ", only ", ExternalTimeSeries::native_extension_static(),
             " is supported" );
         try
         {

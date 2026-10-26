@@ -34,23 +34,20 @@
 
 namespace geode
 {
-    ExternalTimeSeries load_external_time_series(
-        std::string_view filename )
+    ExternalTimeSeries load_external_time_series( std::string_view filename )
     {
         const Timer timer;
         OpenGeodeModelException::check_exception(
             extension_from_filename( filename )
                 == ExternalTimeSeries::native_extension_static(),
             nullptr, OpenGeodeException::TYPE::data,
-            "[load_external_time_series] Wrong extension for file ",
-            filename, ", only ",
-            ExternalTimeSeries::native_extension_static(),
+            "[load_external_time_series] Wrong extension for file ", filename,
+            ", only ", ExternalTimeSeries::native_extension_static(),
             " is supported" );
         std::ifstream file{ to_string( filename ), std::ifstream::binary };
         OpenGeodeModelException::check_exception( !file.fail(), nullptr,
             OpenGeodeException::TYPE::data,
-            "[load_external_time_series] Failed to open file: ",
-            filename );
+            "[load_external_time_series] Failed to open file: ", filename );
         TContext context{};
         BitseryExtensions::register_deserialize_pcontext(
             std::get< 0 >( context ) );
@@ -65,8 +62,8 @@ namespace geode
             nullptr, OpenGeodeException::TYPE::internal,
             "[load_external_time_series] Error while reading file: ",
             filename );
-        Logger::info( "ExternalTimeSeries loaded from ", filename,
-            " in ", timer.duration() );
+        Logger::info( "ExternalTimeSeries loaded from ", filename, " in ",
+            timer.duration() );
         return time_series;
     }
 } // namespace geode

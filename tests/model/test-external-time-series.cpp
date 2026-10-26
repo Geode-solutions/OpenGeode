@@ -43,10 +43,10 @@
 #include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
-#include <geode/model/representation/core/external_time_series.hpp>
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 #include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/external_time_series.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 #include <geode/model/representation/io/brep_time_series_input.hpp>
 #include <geode/model/representation/io/external_time_series_input.hpp>
@@ -307,8 +307,7 @@ namespace
             thrown, "[Test] Setting a null point set should throw" );
     }
 
-    void check_wrong_extension(
-        const geode::ExternalTimeSeries& time_series )
+    void check_wrong_extension( const geode::ExternalTimeSeries& time_series )
     {
         bool thrown{ false };
         try

@@ -255,7 +255,8 @@ namespace
         for( const auto& block : model.blocks() )
         {
             const auto& mesh = block.mesh();
-            const auto block_index = static_cast< geode::index_t >( matches.size() );
+            const auto block_index =
+                static_cast< geode::index_t >( matches.size() );
             matches.emplace_back( mesh.nb_polyhedra(), geode::NO_ID );
             for( const auto polyhedron : geode::Range{ mesh.nb_polyhedra() } )
             {
@@ -321,11 +322,10 @@ namespace
         absl::Span< const geode::index_t > matches,
         geode::AttributeManager& target )
     {
-        const auto nb_matched =
-            static_cast< geode::index_t >( absl::c_count_if(
-                matches, []( geode::index_t point ) {
-                    return point != geode::NO_ID;
-                } ) );
+        const auto nb_matched = static_cast< geode::index_t >(
+            absl::c_count_if( matches, []( geode::index_t point ) {
+                return point != geode::NO_ID;
+            } ) );
         if( nb_matched == 0 )
         {
             return;

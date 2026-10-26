@@ -63,8 +63,7 @@ namespace geode
     public:
         ExternalTimeSeries();
         ExternalTimeSeries( ExternalTimeSeries&& other ) noexcept;
-        ExternalTimeSeries& operator=(
-            ExternalTimeSeries&& other ) noexcept;
+        ExternalTimeSeries& operator=( ExternalTimeSeries&& other ) noexcept;
         ~ExternalTimeSeries();
 
         [[nodiscard]] static std::string_view native_extension_static()
