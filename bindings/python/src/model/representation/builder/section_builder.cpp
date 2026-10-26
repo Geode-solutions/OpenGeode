@@ -23,6 +23,8 @@
 
 #include "../../../common.hpp"
 
+#include <geode/mesh/core/mesh_id.hpp>
+
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
 #include <geode/model/mixin/core/line.hpp>
@@ -52,6 +54,15 @@ namespace geode
             .def( "add_surface",
                 static_cast< const uuid& (SectionBuilder::*) () >(
                     &SectionBuilder::add_surface ) )
+            .def( "add_corner", static_cast< const uuid& (
+                                    SectionBuilder::*) ( const MeshImpl& ) >(
+                                    &SectionBuilder::add_corner ) )
+            .def( "add_line", static_cast< const uuid& (
+                                  SectionBuilder::*) ( const MeshImpl& ) >(
+                                  &SectionBuilder::add_line ) )
+            .def( "add_surface", static_cast< const uuid& (
+                                     SectionBuilder::*) ( const MeshImpl& ) >(
+                                     &SectionBuilder::add_surface ) )
             .def( "add_model_boundary",
                 static_cast< const uuid& (SectionBuilder::*) () >(
                     &SectionBuilder::add_model_boundary ) )

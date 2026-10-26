@@ -28,6 +28,7 @@ if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
         os.add_dll_directory(path)
 
 import opengeode_py_basic as basic
+import opengeode_py_mesh as mesh
 import opengeode_py_model as model
 
 
@@ -864,6 +865,41 @@ def test_component_id_hash(brep, surface_uuids):
         raise ValueError("[Test] uuid should be usable in a set")
 
 
+def test_add_component_with_mesh_impl():
+    brep = model.BRep()
+    builder = model.BRepBuilder(brep)
+    triangulated_impl = mesh.MeshImpl("OpenGeodeTriangulatedSurface3D")
+    polygonal_impl = mesh.MeshImpl("OpenGeodePolygonalSurface3D")
+    if mesh.MeshFactory.type(triangulated_impl) != mesh.MeshType(
+        "TriangulatedSurface3D"
+    ):
+        raise ValueError("[Test] Wrong mesh type for triangulated impl")
+    triangulated_uuid = builder.add_surface(triangulated_impl)
+    polygonal_uuid = builder.add_surface(polygonal_impl)
+    default_uuid = builder.add_surface()
+    if brep.surface(triangulated_uuid).mesh().impl_name() != triangulated_impl:
+        raise ValueError("[Test] Surface should be a TriangulatedSurface")
+    if brep.surface(polygonal_uuid).mesh().impl_name() != polygonal_impl:
+        raise ValueError("[Test] Surface should be a PolygonalSurface")
+    if brep.surface(default_uuid).mesh().impl_name() != mesh.MeshFactory.default_impl(
+        mesh.MeshType("PolygonalSurface3D")
+    ):
+        raise ValueError("[Test] Surface should have the default mesh")
+    brep.surface(triangulated_uuid).triangulated_mesh()
+    corner_impl = mesh.MeshImpl("OpenGeodePointSet3D")
+    corner_uuid = builder.add_corner(corner_impl)
+    if brep.corner(corner_uuid).mesh().impl_name() != corner_impl:
+        raise ValueError("[Test] Wrong Corner mesh impl")
+    line_impl = mesh.MeshImpl("OpenGeodeEdgedCurve3D")
+    line_uuid = builder.add_line(line_impl)
+    if brep.line(line_uuid).mesh().impl_name() != line_impl:
+        raise ValueError("[Test] Wrong Line mesh impl")
+    block_impl = mesh.MeshImpl("OpenGeodeTetrahedralSolid3D")
+    block_uuid = builder.add_block(block_impl)
+    if brep.block(block_uuid).mesh().impl_name() != block_impl:
+        raise ValueError("[Test] Wrong Block mesh impl")
+
+
 if __name__ == "__main__":
     model.OpenGeodeModelLibrary.initialize()
     brep = model.BRep()
@@ -940,3 +976,4 @@ if __name__ == "__main__":
     brep2 = model.load_brep(file_io)
     test_reloaded_brep(brep2)
     test_physical_properties(brep2, physical_attribute_id)
+    test_add_component_with_mesh_impl()
