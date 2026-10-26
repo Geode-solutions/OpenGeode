@@ -56,16 +56,16 @@ namespace geode
      * attribute is stored and applied the same way.
      * The native file can be loaded onto a BRep with load_brep_time_series.
      */
-    class opengeode_model_api ExternalTimeSeriesHelpers
+    class opengeode_model_api ExternalTimeSeries
     {
-        OPENGEODE_DISABLE_COPY( ExternalTimeSeriesHelpers );
+        OPENGEODE_DISABLE_COPY( ExternalTimeSeries );
 
     public:
-        ExternalTimeSeriesHelpers();
-        ExternalTimeSeriesHelpers( ExternalTimeSeriesHelpers&& other ) noexcept;
-        ExternalTimeSeriesHelpers& operator=(
-            ExternalTimeSeriesHelpers&& other ) noexcept;
-        ~ExternalTimeSeriesHelpers();
+        ExternalTimeSeries();
+        ExternalTimeSeries( ExternalTimeSeries&& other ) noexcept;
+        ExternalTimeSeries& operator=(
+            ExternalTimeSeries&& other ) noexcept;
+        ~ExternalTimeSeries();
 
         [[nodiscard]] static std::string_view native_extension_static()
         {
@@ -105,8 +105,8 @@ namespace geode
          * points rounded by the simulator (e.g. stored in single precision).
          * @exception OpenGeodeException if a point is farther than the
          * tolerance from its closest Block element, if several points are
-         * matched with the same Block element, or if a point is matched with
-         * colocated Block elements
+         * matched with the same Block element, or if a point is within the
+         * tolerance of several Block elements
          */
         void apply_to( BRep& model ) const;
 

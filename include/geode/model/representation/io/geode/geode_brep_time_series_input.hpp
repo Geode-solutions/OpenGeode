@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <geode/model/helpers/external_time_series_helpers.hpp>
+#include <geode/model/representation/core/external_time_series.hpp>
 #include <geode/model/representation/io/brep_time_series_input.hpp>
 
 namespace geode
@@ -39,7 +39,7 @@ namespace geode
 
         [[nodiscard]] static std::string_view extension()
         {
-            return ExternalTimeSeriesHelpers::native_extension_static();
+            return ExternalTimeSeries::native_extension_static();
         }
 
         [[nodiscard]] AdditionalFiles additional_files() const final

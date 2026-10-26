@@ -43,14 +43,14 @@
 #include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
-#include <geode/model/helpers/external_time_series_helpers.hpp>
+#include <geode/model/representation/core/external_time_series.hpp>
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 #include <geode/model/representation/io/brep_time_series_input.hpp>
-#include <geode/model/representation/io/external_time_series_helpers_input.hpp>
-#include <geode/model/representation/io/external_time_series_helpers_output.hpp>
+#include <geode/model/representation/io/external_time_series_input.hpp>
+#include <geode/model/representation/io/external_time_series_output.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -143,21 +143,21 @@ namespace
         return barycenters;
     }
 
-    geode::ExternalTimeSeriesHelpers create_helpers( const geode::BRep& model,
+    geode::ExternalTimeSeries create_time_series( const geode::BRep& model,
         const geode::uuid& block_id,
         const geode::Vector3D& translation )
     {
-        geode::ExternalTimeSeriesHelpers helpers;
-        helpers.set_unique_vertices( create_unique_vertices( model ) );
-        helpers.set_cell_barycenters(
+        geode::ExternalTimeSeries time_series;
+        time_series.set_unique_vertices( create_unique_vertices( model ) );
+        time_series.set_cell_barycenters(
             create_cell_barycenters( model, block_id, translation ) );
-        return helpers;
+        return time_series;
     }
 
-    geode::ExternalTimeSeriesHelpers create_helpers(
+    geode::ExternalTimeSeries create_time_series(
         const geode::BRep& model, const geode::uuid& block_id )
     {
-        return create_helpers( model, block_id, geode::Vector3D{} );
+        return create_time_series( model, block_id, geode::Vector3D{} );
     }
 
     void check_pressures( const geode::BRep& model )
@@ -223,14 +223,14 @@ namespace
         }
     }
 
-    void check_other_model( const geode::ExternalTimeSeriesHelpers& helpers )
+    void check_other_model( const geode::ExternalTimeSeries& time_series )
     {
         auto other = geode::load_brep(
             absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
         bool thrown{ false };
         try
         {
-            helpers.apply_to( other );
+            time_series.apply_to( other );
         }
         catch( const geode::OpenGeodeException& )
         {
@@ -247,16 +247,16 @@ namespace
     {
         auto model = geode::load_brep(
             absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
-        create_helpers(
+        create_time_series(
             model, block_id, geode::Vector3D{ { ROUNDING_TRANSLATION, 0, 0 } } )
             .apply_to( model );
         check_velocities( model, block_id );
-        const auto wrong_helpers = create_helpers(
+        const auto wrong_time_series = create_time_series(
             model, block_id, geode::Vector3D{ { WRONG_TRANSLATION, 0, 0 } } );
         bool thrown{ false };
         try
         {
-            wrong_helpers.apply_to( model );
+            wrong_time_series.apply_to( model );
         }
         catch( const geode::OpenGeodeException& )
         {
@@ -276,12 +276,12 @@ namespace
             create_cell_barycenters( model, block_id, geode::Vector3D{} );
         geode::PointSetBuilder3D::create( *barycenters )
             ->create_point( barycenters->point( 0 ) );
-        geode::ExternalTimeSeriesHelpers helpers;
-        helpers.set_cell_barycenters( std::move( barycenters ) );
+        geode::ExternalTimeSeries time_series;
+        time_series.set_cell_barycenters( std::move( barycenters ) );
         bool thrown{ false };
         try
         {
-            helpers.apply_to( model );
+            time_series.apply_to( model );
         }
         catch( const geode::OpenGeodeException& )
         {
@@ -293,11 +293,11 @@ namespace
 
     void check_null_point_set()
     {
-        geode::ExternalTimeSeriesHelpers helpers;
+        geode::ExternalTimeSeries time_series;
         bool thrown{ false };
         try
         {
-            helpers.set_cell_barycenters( nullptr );
+            time_series.set_cell_barycenters( nullptr );
         }
         catch( const geode::OpenGeodeException& )
         {
@@ -308,13 +308,13 @@ namespace
     }
 
     void check_wrong_extension(
-        const geode::ExternalTimeSeriesHelpers& helpers )
+        const geode::ExternalTimeSeries& time_series )
     {
         bool thrown{ false };
         try
         {
-            geode::save_external_time_series_helpers(
-                helpers, "test_external_time_series.txt" );
+            geode::save_external_time_series(
+                time_series, "test_external_time_series.txt" );
         }
         catch( const geode::OpenGeodeException& )
         {
@@ -334,15 +334,15 @@ void test()
         model.nb_blocks() > 0, "[Test] Model has no Block" );
     const auto block_id = ( *model.blocks().begin() ).id();
     const auto filename = absl::StrCat( "test_external_time_series.",
-        geode::ExternalTimeSeriesHelpers::native_extension_static() );
-    geode::save_external_time_series_helpers(
-        create_helpers( model, block_id ), filename );
-    const auto helpers = geode::load_external_time_series_helpers( filename );
+        geode::ExternalTimeSeries::native_extension_static() );
+    geode::save_external_time_series(
+        create_time_series( model, block_id ), filename );
+    const auto time_series = geode::load_external_time_series( filename );
 
-    helpers.apply_to( model );
+    time_series.apply_to( model );
     check_pressures( model );
     check_velocities( model, block_id );
-    create_helpers( model, block_id ).apply_to( model );
+    create_time_series( model, block_id ).apply_to( model );
     check_pressures( model );
     check_velocities( model, block_id );
 
@@ -351,11 +351,11 @@ void test()
     geode::load_brep_time_series( reloaded_model, filename );
     check_pressures( reloaded_model );
     check_velocities( reloaded_model, block_id );
-    check_other_model( helpers );
+    check_other_model( time_series );
     check_tolerance( block_id );
     check_colocated_points( block_id );
     check_null_point_set();
-    check_wrong_extension( helpers );
+    check_wrong_extension( time_series );
 }
 
-OPENGEODE_TEST( "external-time-series-helpers" )
+OPENGEODE_TEST( "external-time-series" )

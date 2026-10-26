@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/representation/io/external_time_series_helpers_output.hpp>
+#include <geode/model/representation/io/external_time_series_output.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -31,58 +31,58 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
-#include <geode/model/helpers/external_time_series_helpers.hpp>
+#include <geode/model/representation/core/external_time_series.hpp>
 
 namespace
 {
-    void write_external_time_series_helpers(
-        const geode::ExternalTimeSeriesHelpers& helpers,
+    void write_external_time_series(
+        const geode::ExternalTimeSeries& time_series,
         std::string_view filename )
     {
         std::ofstream file{ geode::to_string( filename ),
             std::ofstream::binary };
         geode::OpenGeodeModelException::check_exception( !file.fail(), nullptr,
             geode::OpenGeodeException::TYPE::data,
-            "[save_external_time_series_helpers] Failed to open file: ",
+            "[save_external_time_series] Failed to open file: ",
             filename );
         geode::TContext context{};
         geode::BitseryExtensions::register_serialize_pcontext(
             std::get< 0 >( context ) );
         geode::Serializer archive{ context, file };
-        archive.object( helpers );
+        archive.object( time_series );
         archive.adapter().flush();
         geode::OpenGeodeModelException::check_exception(
             std::get< 1 >( context ).isValid(), nullptr,
             geode::OpenGeodeException::TYPE::internal,
-            "[save_external_time_series_helpers] Error while writing file: ",
+            "[save_external_time_series] Error while writing file: ",
             filename );
     }
 } // namespace
 
 namespace geode
 {
-    void save_external_time_series_helpers(
-        const ExternalTimeSeriesHelpers& helpers, std::string_view filename )
+    void save_external_time_series(
+        const ExternalTimeSeries& time_series, std::string_view filename )
     {
         const Timer timer;
         OpenGeodeModelException::check_exception(
             extension_from_filename( filename )
-                == ExternalTimeSeriesHelpers::native_extension_static(),
+                == ExternalTimeSeries::native_extension_static(),
             nullptr, OpenGeodeException::TYPE::data,
-            "[save_external_time_series_helpers] Wrong extension for file ",
+            "[save_external_time_series] Wrong extension for file ",
             filename, ", only ",
-            ExternalTimeSeriesHelpers::native_extension_static(),
+            ExternalTimeSeries::native_extension_static(),
             " is supported" );
         try
         {
-            write_external_time_series_helpers( helpers, filename );
+            write_external_time_series( time_series, filename );
         }
         catch( ... )
         {
             std::filesystem::remove( to_string( filename ) );
             throw;
         }
-        Logger::info( "ExternalTimeSeriesHelpers saved in ", filename, " in ",
+        Logger::info( "ExternalTimeSeries saved in ", filename, " in ",
             timer.duration() );
     }
 } // namespace geode

@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/model/helpers/external_time_series_helpers.hpp>
+#include <geode/model/representation/core/external_time_series.hpp>
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
 #include <vector>
 
-#include <absl/container/flat_hash_map.h>
+#include <absl/algorithm/container.h>
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/mapping.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/range.hpp>
-#include <geode/basic/uuid.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
@@ -50,13 +50,12 @@
 
 namespace
 {
-    // Point set vertex matched with each element of each Block, NO_ID if none
-    using BlocksMatches =
-        absl::flat_hash_map< geode::uuid, std::vector< geode::index_t > >;
+    // One index per element of each Block, Blocks in model.blocks() order
+    using BlocksIndices = std::vector< std::vector< geode::index_t > >;
 
     struct BlockPolyhedron
     {
-        geode::uuid block_id;
+        geode::index_t block;
         geode::index_t polyhedron;
     };
 
@@ -110,7 +109,7 @@ namespace
     // Each point is matched with the closest element, elements without
     // point (e.g. outside of the simulated domain) are not matched.
     // Matching is rejected when ambiguous: several points matched with the
-    // same element, or a point matched with colocated elements.
+    // same element, or a point within the tolerance of several elements.
     // Returns the point matched with each element, NO_ID if none.
     std::vector< geode::index_t > match_points(
         const geode::PointSet3D& point_set,
@@ -126,8 +125,7 @@ namespace
         geode::OpenGeodeModelException::check_exception(
             !element_points.empty(), nullptr,
             geode::OpenGeodeException::TYPE::data,
-            "[ExternalTimeSeriesHelpers::apply_to] No Block element to match "
-            "the ",
+            "[ExternalTimeSeries::apply_to] No Block element to match the ",
             point_set_name, " with" );
         const auto tolerance = matching_tolerance( point_set );
         const geode::NNSearch3D search{ std::move( element_points ) };
@@ -141,25 +139,26 @@ namespace
             geode::OpenGeodeModelException::check_exception(
                 distance <= tolerance, nullptr,
                 geode::OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers::apply_to] Point ", vertex,
-                " of the ", point_set_name, " [", point.string(),
-                "] is at distance ", distance,
+                "[ExternalTimeSeries::apply_to] Point ", vertex, " of the ",
+                point_set_name, " [", point.string(), "] is at distance ",
+                distance,
                 " from the closest Block element, more than the tolerance ",
                 tolerance );
             geode::OpenGeodeModelException::check_exception(
                 closest.size() < 2
                     || geode::point_point_distance(
-                           search.point( element ), search.point( closest[1] ) )
-                           > geode::GLOBAL_EPSILON,
+                           point, search.point( closest[1] ) )
+                           > tolerance,
                 nullptr, geode::OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers::apply_to] Point ", vertex,
-                " of the ", point_set_name, " [", point.string(),
-                "] is matched with colocated Block elements" );
+                "[ExternalTimeSeries::apply_to] Point ", vertex, " of the ",
+                point_set_name, " [", point.string(),
+                "] is within the tolerance ", tolerance,
+                " of several Block elements" );
             geode::OpenGeodeModelException::check_exception(
                 matches[element] == geode::NO_ID, nullptr,
                 geode::OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers::apply_to] Points ",
-                matches[element], " and ", vertex, " of the ", point_set_name,
+                "[ExternalTimeSeries::apply_to] Points ", matches[element],
+                " and ", vertex, " of the ", point_set_name,
                 " are matched with the same Block element [",
                 search.point( element ).string(), "]" );
             matches[element] = vertex;
@@ -167,21 +166,42 @@ namespace
         return matches;
     }
 
-    // Matching is done on the model unique vertices so that the colocated
-    // vertices of several Blocks get the same values
+    // Unique vertex of each Block vertex, NO_ID if none
+    BlocksIndices block_unique_vertices( const geode::BRep& model )
+    {
+        BlocksIndices unique_vertices;
+        unique_vertices.reserve( model.nb_blocks() );
+        for( const auto& block : model.blocks() )
+        {
+            const auto& mesh = block.mesh();
+            auto& block_vertices =
+                unique_vertices.emplace_back( mesh.nb_vertices() );
+            for( const auto vertex : geode::Range{ mesh.nb_vertices() } )
+            {
+                block_vertices[vertex] =
+                    model.unique_vertex( { block.component_id(), vertex } );
+            }
+        }
+        return unique_vertices;
+    }
+
+    // Point matched with each model unique vertex, NO_ID if none
     std::vector< geode::index_t > match_unique_vertices(
-        const geode::BRep& model, const geode::PointSet3D& unique_vertices )
+        const geode::BRep& model,
+        const BlocksIndices& block_unique_vertices,
+        const geode::PointSet3D& unique_vertices )
     {
         std::vector< geode::Point3D > points;
         std::vector< geode::index_t > model_unique_vertices;
         std::vector< bool > visited( model.nb_unique_vertices(), false );
+        geode::index_t block_index{ 0 };
         for( const auto& block : model.blocks() )
         {
             const auto& mesh = block.mesh();
-            for( const auto vertex : geode::Range{ mesh.nb_vertices() } )
+            const auto& block_vertices = block_unique_vertices[block_index++];
+            for( const auto vertex : geode::Indices{ block_vertices } )
             {
-                const auto unique_vertex =
-                    model.unique_vertex( { block.component_id(), vertex } );
+                const auto unique_vertex = block_vertices[vertex];
                 if( unique_vertex == geode::NO_ID || visited[unique_vertex] )
                 {
                     continue;
@@ -202,45 +222,46 @@ namespace
         return matches;
     }
 
-    BlocksMatches match_block_vertices(
+    // Matching is done on the model unique vertices so that the colocated
+    // vertices of several Blocks get the same values.
+    // Returns the point matched with each Block vertex, NO_ID if none.
+    BlocksIndices match_block_vertices(
         const geode::BRep& model, const geode::PointSet3D& unique_vertices )
     {
+        auto matches = block_unique_vertices( model );
         const auto unique_matches =
-            match_unique_vertices( model, unique_vertices );
-        BlocksMatches matches;
-        for( const auto& block : model.blocks() )
+            match_unique_vertices( model, matches, unique_vertices );
+        for( auto& block_matches : matches )
         {
-            const auto& mesh = block.mesh();
-            auto& block_matches = matches[block.id()];
-            block_matches.resize( mesh.nb_vertices(), geode::NO_ID );
-            for( const auto vertex : geode::Range{ mesh.nb_vertices() } )
+            for( auto& match : block_matches )
             {
-                const auto unique_vertex =
-                    model.unique_vertex( { block.component_id(), vertex } );
-                if( unique_vertex != geode::NO_ID )
+                if( match != geode::NO_ID )
                 {
-                    block_matches[vertex] = unique_matches[unique_vertex];
+                    match = unique_matches[match];
                 }
             }
         }
         return matches;
     }
 
-    BlocksMatches match_block_polyhedra(
+    // Returns the point matched with each Block polyhedron, NO_ID if none
+    BlocksIndices match_block_polyhedra(
         const geode::BRep& model, const geode::PointSet3D& cell_barycenters )
     {
-        BlocksMatches matches;
+        BlocksIndices matches;
+        matches.reserve( model.nb_blocks() );
         std::vector< geode::Point3D > barycenters;
         std::vector< BlockPolyhedron > polyhedra;
         for( const auto& block : model.blocks() )
         {
             const auto& mesh = block.mesh();
-            matches[block.id()].resize( mesh.nb_polyhedra(), geode::NO_ID );
+            const auto block_index = static_cast< geode::index_t >( matches.size() );
+            matches.emplace_back( mesh.nb_polyhedra(), geode::NO_ID );
             for( const auto polyhedron : geode::Range{ mesh.nb_polyhedra() } )
             {
                 barycenters.push_back(
                     mesh.polyhedron_barycenter( polyhedron ) );
-                polyhedra.push_back( { block.id(), polyhedron } );
+                polyhedra.push_back( { block_index, polyhedron } );
             }
         }
         const auto point_matches = match_points(
@@ -248,10 +269,32 @@ namespace
         for( const auto index : geode::Indices{ polyhedra } )
         {
             const auto& block_polyhedron = polyhedra[index];
-            matches[block_polyhedron.block_id][block_polyhedron.polyhedron] =
+            matches[block_polyhedron.block][block_polyhedron.polyhedron] =
                 point_matches[index];
         }
         return matches;
+    }
+
+    // Element filled by each point, std::nullopt if a point fills several
+    // elements
+    std::optional< std::vector< geode::index_t > > point_to_element(
+        geode::index_t nb_points, absl::Span< const geode::index_t > matches )
+    {
+        std::vector< geode::index_t > point2element( nb_points, geode::NO_ID );
+        for( const auto element : geode::Indices{ matches } )
+        {
+            const auto point = matches[element];
+            if( point == geode::NO_ID )
+            {
+                continue;
+            }
+            if( point2element[point] != geode::NO_ID )
+            {
+                return std::nullopt;
+            }
+            point2element[point] = element;
+        }
+        return point2element;
     }
 
     // A point fills several elements of a Block only when its unique vertex
@@ -271,34 +314,31 @@ namespace
         return point2elements;
     }
 
+    // Importing with a point2element array iterates over all the points: it
+    // is only worth it when the Block is matched with most of them, the
+    // GenericMapping only stores the matched ones
     void apply_matches( const geode::AttributeManager& from,
         absl::Span< const geode::index_t > matches,
         geode::AttributeManager& target )
     {
-        std::vector< geode::index_t > point2element(
-            from.nb_elements(), geode::NO_ID );
-        bool matched{ false };
-        bool one_to_one{ true };
-        for( const auto element : geode::Indices{ matches } )
-        {
-            const auto point = matches[element];
-            if( point == geode::NO_ID )
-            {
-                continue;
-            }
-            matched = true;
-            one_to_one = one_to_one && point2element[point] == geode::NO_ID;
-            point2element[point] = element;
-        }
-        if( !matched )
+        const auto nb_matched =
+            static_cast< geode::index_t >( absl::c_count_if(
+                matches, []( geode::index_t point ) {
+                    return point != geode::NO_ID;
+                } ) );
+        if( nb_matched == 0 )
         {
             return;
         }
         delete_replaced_steps( from, target );
-        if( one_to_one )
+        if( 2 * nb_matched >= from.nb_elements() )
         {
-            target.import( from, point2element );
-            return;
+            if( const auto point2element =
+                    point_to_element( from.nb_elements(), matches ) )
+            {
+                target.import( from, point2element.value() );
+                return;
+            }
         }
         target.import( from, point_to_elements( matches ) );
     }
@@ -306,7 +346,7 @@ namespace
 
 namespace geode
 {
-    class ExternalTimeSeriesHelpers::Impl
+    class ExternalTimeSeries::Impl
     {
         friend class bitsery::Access;
 
@@ -335,15 +375,17 @@ namespace geode
                 match_block_vertices( model, *unique_vertices_ );
             const auto polyhedron_matches =
                 match_block_polyhedra( model, *cell_barycenters_ );
+            index_t block_index{ 0 };
             for( const auto& block : model.blocks() )
             {
                 const auto& mesh = block.mesh();
                 apply_matches( unique_vertices_->vertex_attribute_manager(),
-                    vertex_matches.at( block.id() ),
+                    vertex_matches[block_index],
                     mesh.vertex_attribute_manager() );
                 apply_matches( cell_barycenters_->vertex_attribute_manager(),
-                    polyhedron_matches.at( block.id() ),
+                    polyhedron_matches[block_index],
                     mesh.polyhedron_attribute_manager() );
+                block_index++;
             }
         }
 
@@ -366,7 +408,7 @@ namespace geode
         {
             OpenGeodeModelException::check_exception( point_set != nullptr,
                 nullptr, OpenGeodeException::TYPE::data,
-                "[ExternalTimeSeriesHelpers] Null ", name, " point set" );
+                "[ExternalTimeSeries] Null ", name, " point set" );
         }
 
     private:
@@ -374,42 +416,42 @@ namespace geode
         std::unique_ptr< PointSet3D > cell_barycenters_;
     };
 
-    ExternalTimeSeriesHelpers::ExternalTimeSeriesHelpers() = default;
+    ExternalTimeSeries::ExternalTimeSeries() = default;
 
-    ExternalTimeSeriesHelpers::ExternalTimeSeriesHelpers(
-        ExternalTimeSeriesHelpers&& ) noexcept = default;
+    ExternalTimeSeries::ExternalTimeSeries(
+        ExternalTimeSeries&& ) noexcept = default;
 
-    ExternalTimeSeriesHelpers& ExternalTimeSeriesHelpers::operator=(
-        ExternalTimeSeriesHelpers&& ) noexcept = default;
+    ExternalTimeSeries& ExternalTimeSeries::operator=(
+        ExternalTimeSeries&& ) noexcept = default;
 
-    ExternalTimeSeriesHelpers::~ExternalTimeSeriesHelpers() = default;
+    ExternalTimeSeries::~ExternalTimeSeries() = default;
 
-    void ExternalTimeSeriesHelpers::set_unique_vertices(
+    void ExternalTimeSeries::set_unique_vertices(
         std::unique_ptr< PointSet3D > vertices )
     {
         impl_->set_unique_vertices( std::move( vertices ) );
     }
 
-    void ExternalTimeSeriesHelpers::set_cell_barycenters(
+    void ExternalTimeSeries::set_cell_barycenters(
         std::unique_ptr< PointSet3D > barycenters )
     {
         impl_->set_cell_barycenters( std::move( barycenters ) );
     }
 
-    void ExternalTimeSeriesHelpers::apply_to( BRep& model ) const
+    void ExternalTimeSeries::apply_to( BRep& model ) const
     {
         impl_->apply_to( model );
     }
 
     template < typename Archive >
-    void ExternalTimeSeriesHelpers::serialize( Archive& archive )
+    void ExternalTimeSeries::serialize( Archive& archive )
     {
-        archive.ext( *this, Growable< Archive, ExternalTimeSeriesHelpers >{
+        archive.ext( *this, Growable< Archive, ExternalTimeSeries >{
                                 { []( Archive& local_archive,
-                                      ExternalTimeSeriesHelpers& helpers ) {
-                                    local_archive.object( helpers.impl_ );
+                                      ExternalTimeSeries& time_series ) {
+                                    local_archive.object( time_series.impl_ );
                                 } } } );
     }
 
-    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ExternalTimeSeriesHelpers );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ExternalTimeSeries );
 } // namespace geode

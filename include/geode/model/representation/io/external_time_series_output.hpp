@@ -29,20 +29,20 @@
 
 namespace geode
 {
-    class ExternalTimeSeriesHelpers;
+    class ExternalTimeSeries;
 } // namespace geode
 
 namespace geode
 {
     /*!
-     * Save an ExternalTimeSeriesHelpers in a native file
-     * (ExternalTimeSeriesHelpers::native_extension_static()).
-     * @param[in] helpers ExternalTimeSeriesHelpers to save.
+     * Save an ExternalTimeSeries in a native file
+     * (ExternalTimeSeries::native_extension_static()).
+     * @param[in] time_series ExternalTimeSeries to save.
      * @param[in] filename Path to the file where save the
-     * ExternalTimeSeriesHelpers.
+     * ExternalTimeSeries.
      * @exception OpenGeodeException if the file has another extension or
      * cannot be written
      */
-    void opengeode_model_api save_external_time_series_helpers(
-        const ExternalTimeSeriesHelpers& helpers, std::string_view filename );
+    void opengeode_model_api save_external_time_series(
+        const ExternalTimeSeries& time_series, std::string_view filename );
 } // namespace geode

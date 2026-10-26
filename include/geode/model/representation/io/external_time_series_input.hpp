@@ -29,18 +29,18 @@
 
 namespace geode
 {
-    class ExternalTimeSeriesHelpers;
+    class ExternalTimeSeries;
 } // namespace geode
 
 namespace geode
 {
     /*!
-     * Load an ExternalTimeSeriesHelpers from a native file
-     * (ExternalTimeSeriesHelpers::native_extension_static()).
+     * Load an ExternalTimeSeries from a native file
+     * (ExternalTimeSeries::native_extension_static()).
      * @param[in] filename Path to the file to load.
      * @exception OpenGeodeException if the file has another extension or
      * cannot be read
      */
-    [[nodiscard]] ExternalTimeSeriesHelpers opengeode_model_api
-        load_external_time_series_helpers( std::string_view filename );
+    [[nodiscard]] ExternalTimeSeries opengeode_model_api
+        load_external_time_series( std::string_view filename );
 } // namespace geode

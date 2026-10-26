@@ -82,7 +82,7 @@ add_geode_test(
     ESSENTIAL
 )
 add_geode_test(
-    SOURCE "test-external-time-series-helpers.cpp"
+    SOURCE "test-external-time-series.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh

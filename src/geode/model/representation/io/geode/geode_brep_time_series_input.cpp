@@ -23,12 +23,12 @@
 
 #include <geode/model/representation/io/geode/geode_brep_time_series_input.hpp>
 
-#include <geode/model/representation/io/external_time_series_helpers_input.hpp>
+#include <geode/model/representation/io/external_time_series_input.hpp>
 
 namespace geode
 {
     void OpenGeodeBRepTimeSeriesInput::read( BRep& brep )
     {
-        load_external_time_series_helpers( filename() ).apply_to( brep );
+        load_external_time_series( filename() ).apply_to( brep );
     }
 } // namespace geode

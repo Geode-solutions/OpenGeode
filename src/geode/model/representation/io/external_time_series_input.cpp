@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/representation/io/external_time_series_helpers_input.hpp>
+#include <geode/model/representation/io/external_time_series_input.hpp>
 
 #include <fstream>
 
@@ -30,43 +30,43 @@
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
-#include <geode/model/helpers/external_time_series_helpers.hpp>
+#include <geode/model/representation/core/external_time_series.hpp>
 
 namespace geode
 {
-    ExternalTimeSeriesHelpers load_external_time_series_helpers(
+    ExternalTimeSeries load_external_time_series(
         std::string_view filename )
     {
         const Timer timer;
         OpenGeodeModelException::check_exception(
             extension_from_filename( filename )
-                == ExternalTimeSeriesHelpers::native_extension_static(),
+                == ExternalTimeSeries::native_extension_static(),
             nullptr, OpenGeodeException::TYPE::data,
-            "[load_external_time_series_helpers] Wrong extension for file ",
+            "[load_external_time_series] Wrong extension for file ",
             filename, ", only ",
-            ExternalTimeSeriesHelpers::native_extension_static(),
+            ExternalTimeSeries::native_extension_static(),
             " is supported" );
         std::ifstream file{ to_string( filename ), std::ifstream::binary };
         OpenGeodeModelException::check_exception( !file.fail(), nullptr,
             OpenGeodeException::TYPE::data,
-            "[load_external_time_series_helpers] Failed to open file: ",
+            "[load_external_time_series] Failed to open file: ",
             filename );
         TContext context{};
         BitseryExtensions::register_deserialize_pcontext(
             std::get< 0 >( context ) );
         Deserializer archive{ context, file };
-        ExternalTimeSeriesHelpers helpers;
-        archive.object( helpers );
+        ExternalTimeSeries time_series;
+        archive.object( time_series );
         const auto& adapter = archive.adapter();
         OpenGeodeModelException::check_exception(
             adapter.error() == bitsery::ReaderError::NoError
                 && adapter.isCompletedSuccessfully()
                 && std::get< 1 >( context ).isValid(),
             nullptr, OpenGeodeException::TYPE::internal,
-            "[load_external_time_series_helpers] Error while reading file: ",
+            "[load_external_time_series] Error while reading file: ",
             filename );
-        Logger::info( "ExternalTimeSeriesHelpers loaded from ", filename,
+        Logger::info( "ExternalTimeSeries loaded from ", filename,
             " in ", timer.duration() );
-        return helpers;
+        return time_series;
     }
 } // namespace geode
