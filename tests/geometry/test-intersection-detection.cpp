@@ -224,6 +224,16 @@ void test_segment_degenerated_triangle_intersection_detection()
                 geode::POSITION::parallel, geode::POSITION::parallel ),
         "Wrong result for segment_triangle_intersection_detection with "
         "segment crossing a cap triangle in its plane" );
+
+    const geode::Triangle3D point_triangle{ c, c, c };
+    const auto far_from_point = geode::segment_triangle_intersection_detection(
+        geode::Segment3D{ d, e }, point_triangle );
+    geode::OpenGeodeGeometryException::test(
+        far_from_point
+            == std::make_pair(
+                geode::POSITION::outside, geode::POSITION::outside ),
+        "Wrong result for segment_triangle_intersection_detection with "
+        "triangle collapsed to a point far from the segment" );
 }
 
 void test_segment_line_intersection_detection()
