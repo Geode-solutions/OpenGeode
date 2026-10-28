@@ -38,6 +38,8 @@ namespace geode
                               &VertexSet::create ) )
             .def( "clone", &VertexSet::clone )
             .def( "native_extension", &VertexSet::native_extension )
+            .def( "impl_name", &VertexSet::impl_name )
+            .def( "type_name", &VertexSet::type_name )
             .def( "nb_vertices", &VertexSet::nb_vertices )
             .def( "vertex_attribute_manager",
                 &VertexSet::vertex_attribute_manager,
