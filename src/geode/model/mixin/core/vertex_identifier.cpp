@@ -117,13 +117,21 @@ namespace geode
             {
             }
 
+            RegisteredComponent( RegisteredComponent&& other ) noexcept
+                : attribute( std::move( other.attribute ) ),
+                  nb_component_mesh_vertices(
+                      other.nb_component_mesh_vertices.load(
+                          std::memory_order_relaxed ) )
+            {
+            }
+
             std::shared_ptr< VariableAttribute< index_t > > attribute;
             /*!
              * Number of ComponentMeshVertex of this component stored in
              * component_vertices_. Used to detect inconsistencies between
              * the component mesh attribute and component_vertices_.
              */
-            index_t nb_component_mesh_vertices{ 0 };
+            std::atomic< index_t > nb_component_mesh_vertices{ 0 };
         };
 
     public:
@@ -315,7 +323,8 @@ namespace geode
                         == value.end() )
                     {
                         value.emplace_back( std::move( component_vertex_id ) );
-                        component.nb_component_mesh_vertices++;
+                        component.nb_component_mesh_vertices.fetch_add(
+                            1, std::memory_order_relaxed );
                     }
                 } );
         }
@@ -341,7 +350,8 @@ namespace geode
             {
                 return;
             }
-            component.nb_component_mesh_vertices--;
+            component.nb_component_mesh_vertices.fetch_sub(
+                1, std::memory_order_relaxed );
             component_vertices_->modify_value( unique_vertex_id,
                 [&it]( std::vector< ComponentMeshVertex >& value ) {
                     value.erase(
@@ -403,8 +413,9 @@ namespace geode
                 vertex2unique_vertex_.find( component_id.id );
             if( component_it != vertex2unique_vertex_.end() )
             {
-                component_it->second.nb_component_mesh_vertices -=
-                    nb_deleted.load( std::memory_order_relaxed );
+                component_it->second.nb_component_mesh_vertices.fetch_sub(
+                    nb_deleted.load( std::memory_order_relaxed ),
+                    std::memory_order_relaxed );
             }
         }
 
@@ -609,7 +620,8 @@ namespace geode
             index_t nb_component_vertices )
         {
             update_nb_component_mesh_vertices();
-            const auto nb_expected = component.nb_component_mesh_vertices;
+            const auto nb_expected = component.nb_component_mesh_vertices.load(
+                std::memory_order_relaxed );
             if( nb_expected == 0 )
             {
                 return;
@@ -690,7 +702,8 @@ namespace geode
             }
             for( auto& [_, component] : vertex2unique_vertex_ )
             {
-                component.nb_component_mesh_vertices = 0;
+                component.nb_component_mesh_vertices.store(
+                    0, std::memory_order_relaxed );
             }
             for( const auto uv : Range{ nb_unique_vertices() } )
             {
@@ -700,7 +713,8 @@ namespace geode
                         vertex2unique_vertex_.find( cmv.component_id.id );
                     if( it != vertex2unique_vertex_.end() )
                     {
-                        it->second.nb_component_mesh_vertices++;
+                        it->second.nb_component_mesh_vertices.fetch_add(
+                            1, std::memory_order_relaxed );
                     }
                 }
             }
