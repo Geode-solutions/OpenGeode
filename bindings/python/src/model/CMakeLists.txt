@@ -74,9 +74,11 @@ add_geode_python_binding(
         "representation/builder/brep_builder.cpp"
         "representation/builder/section_builder.cpp"
         "representation/core/brep.cpp"
+        "representation/core/external_time_series.cpp"
         "representation/core/mapping.cpp"
         "representation/core/section.cpp"
         "representation/io/brep.cpp"
+        "representation/io/external_time_series.cpp"
         "representation/io/section.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::model
