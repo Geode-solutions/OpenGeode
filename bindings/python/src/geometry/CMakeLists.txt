@@ -38,6 +38,7 @@ add_geode_python_binding(
         "points_sort.cpp"
         "position.cpp"
         "projection.cpp"
+        "quality.cpp"
         "rotation.cpp"
         "sign.cpp"
         "vector.cpp"

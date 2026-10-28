@@ -42,6 +42,7 @@ namespace geode
     void define_points_sort( pybind11::module& );
     void define_position( pybind11::module& );
     void define_projection( pybind11::module& );
+    void define_quality( pybind11::module& );
     void define_rotation( pybind11::module& );
     void define_sign( pybind11::module& );
     void define_vector( pybind11::module& );
@@ -72,6 +73,7 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_points_sort( module );
     geode::define_position( module );
     geode::define_projection( module );
+    geode::define_quality( module );
     geode::define_rotation( module );
     geode::define_sign( module );
     geode::define_coordinate_system( module );
