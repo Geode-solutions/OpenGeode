@@ -40,12 +40,14 @@ function(add_geode_python_test)
     )
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${absolute_path})
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 300) 
-    _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
+    _find_dependency_directories(directories ${GEODE_TEST_DEPENDENCIES})
     if(WIN32)
         list(JOIN directories "\\;" directories)
+        _escaped_environment_variable(path Path)
+        _escaped_environment_variable(python_path PYTHONPATH)
         set_tests_properties(${test_name}
             PROPERTIES
-                ENVIRONMENT "Path=${directories}\\;$ENV{Path};PYTHONPATH=${directories}\\;$ENV{PYTHONPATH}"
+                ENVIRONMENT "Path=${directories}\\;${path};PYTHONPATH=${directories}\\;${python_path}"
         )
     else()
         list(JOIN directories ":" directories)
