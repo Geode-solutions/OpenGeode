@@ -54,7 +54,7 @@
             static_cast< const SolidEdges##dimension##D& (                     \
                 SolidMesh##dimension##D::*) () const >(                        \
                 &SolidMesh##dimension##D::edges ),                             \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "are_facets_enabled",                                            \
             &SolidMesh##dimension##D::are_facets_enabled )                     \
         .def( "enable_facets", &SolidMesh##dimension##D::enable_facets )       \
@@ -63,7 +63,7 @@
             static_cast< const SolidFacets##dimension##D& (                    \
                 SolidMesh##dimension##D::*) () const >(                        \
                 &SolidMesh##dimension##D::facets ),                            \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "nb_polyhedron_vertices",                                        \
             &SolidMesh##dimension##D::nb_polyhedron_vertices )                 \
         .def( "nb_polyhedron_facets",                                          \
@@ -120,10 +120,10 @@
             &SolidMesh##dimension##D::polyhedra_from_facet_vertices )          \
         .def( "polyhedron_attribute_manager",                                  \
             &SolidMesh##dimension##D::polyhedron_attribute_manager,            \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )         \
         .def( "texture_manager", &SolidMesh##dimension##D::texture_manager,    \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "edge_vertices_in_polyhedron",                                   \
             &SolidMesh##dimension##D::edge_vertices_in_polyhedron )            \
         .def( "is_vertex_on_border",                                           \

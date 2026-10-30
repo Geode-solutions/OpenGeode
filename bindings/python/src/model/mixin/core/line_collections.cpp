@@ -35,7 +35,7 @@
             &LineCollections##dimension##D::nb_line_collections )              \
         .def( "line_collection",                                               \
             &LineCollections##dimension##D::line_collection,                   \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "line_collections",                                                \
             []( const LineCollections##dimension##D& self ) {                  \
@@ -46,7 +46,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

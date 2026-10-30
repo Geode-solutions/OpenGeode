@@ -53,7 +53,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "boundary_lines",
                 []( const Section& section, const Surface2D& surface ) {
@@ -64,7 +64,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "incident_lines",
                 []( const Section& section, const Corner2D& corner ) {
@@ -75,7 +75,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "incident_surfaces",
                 []( const Section& section, const Line2D& line ) {
@@ -86,7 +86,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_corners_of_line",
                 static_cast< index_t ( Section::* )( const Line2D& ) const >(
                     &Section::nb_internal_corners ) )
@@ -101,7 +101,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_corners_of_surface",
                 static_cast< index_t ( Section::* )( const Surface2D& ) const >(
                     &Section::nb_internal_corners ) )
@@ -116,7 +116,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_lines_of_surface", &Section::nb_internal_lines )
             .def(
                 "internal_lines_of_surface",
@@ -129,7 +129,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_lines_of_corner",
                 static_cast< index_t ( Section::* )( const Corner2D& ) const >(
                     &Section::nb_embedding_lines ) )
@@ -144,7 +144,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_surfaces_of_corner",
                 static_cast< index_t ( Section::* )( const Corner2D& ) const >(
                     &Section::nb_embedding_surfaces ) )
@@ -159,7 +159,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_surfaces_of_line",
                 static_cast< index_t ( Section::* )( const Line2D& ) const >(
                     &Section::nb_embedding_surfaces ) )
@@ -174,7 +174,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "model_boundary_items",
                 []( const Section& section, const ModelBoundary2D& boundary ) {
@@ -186,7 +186,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "corner_collection_items",
                 []( const Section& section,
@@ -199,7 +199,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "line_collection_items",
                 []( const Section& section,
@@ -212,7 +212,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "surface_collection_items",
                 []( const Section& section,
@@ -225,7 +225,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "is_line_closed", &Section::is_closed )
             .def( "is_line_boundary",
                 static_cast< bool ( Section::* )( const Corner2D&,
@@ -251,6 +251,6 @@ namespace geode
             .def( "bounding_box", &Section::bounding_box )
             .def( "native_extension", &Section::native_extension )
             .def( "section_component", &Section::component,
-                pybind11::return_value_policy::reference );
+                pybind11::return_value_policy::reference_internal );
     }
 } // namespace geode

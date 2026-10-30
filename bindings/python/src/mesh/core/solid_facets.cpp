@@ -38,7 +38,7 @@
             &SolidFacets##dimension##D::facet_from_vertices )                  \
         .def( "facet_attribute_manager",                                       \
             &SolidFacets##dimension##D::facet_attribute_manager,               \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

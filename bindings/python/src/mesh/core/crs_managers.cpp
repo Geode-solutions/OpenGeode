@@ -39,21 +39,21 @@
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     coordinate_reference_system_manager1D ),                   \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "coordinate_reference_system_manager2D",                         \
             static_cast< const CoordinateReferenceSystemManager2D& (           \
                 CoordinateReferenceSystemManagers##dimension##D::*) ()         \
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     coordinate_reference_system_manager2D ),                   \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "coordinate_reference_system_manager3D",                         \
             static_cast< const CoordinateReferenceSystemManager3D& (           \
                 CoordinateReferenceSystemManagers##dimension##D::*) ()         \
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     coordinate_reference_system_manager3D ),                   \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "main_coordinate_reference_system_manager",                      \
             static_cast<                                                       \
                 const CoordinateReferenceSystemManager##dimension##D& (        \
@@ -61,7 +61,7 @@
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     main_coordinate_reference_system_manager ),                \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "point", &CoordinateReferenceSystemManagers##dimension##D::point )
 

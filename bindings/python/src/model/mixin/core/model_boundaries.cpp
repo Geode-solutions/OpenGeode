@@ -35,7 +35,7 @@
             &ModelBoundaries##dimension##D::nb_model_boundaries )              \
         .def( "model_boundary",                                                \
             &ModelBoundaries##dimension##D::model_boundary,                    \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "model_boundaries",                                                \
             []( const ModelBoundaries##dimension##D& self ) {                  \
@@ -46,7 +46,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

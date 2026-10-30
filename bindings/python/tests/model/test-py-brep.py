@@ -20,9 +20,13 @@
 # SOFTWARE.
 
 
+import gc
+import weakref
+
 import geode_test_env
 
 import opengeode_py_basic as basic
+import opengeode_py_geometry as geometry
 import opengeode_py_mesh as mesh
 import opengeode_py_model as model
 
@@ -895,6 +899,35 @@ def test_add_component_with_mesh_impl():
         raise ValueError("[Test] Wrong Block mesh impl")
 
 
+def test_components_keep_brep_alive():
+    box = geometry.BoundingBox3D()
+    box.add_point(geometry.Point3D([0.0, 0.0, 0.0]))
+    box.add_point(geometry.Point3D([1.0, 1.0, 1.0]))
+    brep = model.create_brep_from_bounding_box(box)
+    brep_ref = weakref.ref(brep)
+    surface = brep.surfaces()[0]
+    del brep
+    gc.collect()
+    if brep_ref() is None:
+        raise ValueError("[Test] Surface should keep its BRep alive")
+    surface_mesh = surface.mesh()
+    del surface
+    gc.collect()
+    if brep_ref() is None:
+        raise ValueError("[Test] Surface mesh should keep its BRep alive")
+    attribute_manager = surface_mesh.vertex_attribute_manager()
+    del surface_mesh
+    gc.collect()
+    if brep_ref() is None:
+        raise ValueError("[Test] Attribute manager should keep its BRep alive")
+    if attribute_manager.nb_elements() != 4:
+        raise ValueError("[Test] Surface mesh should have 4 vertices")
+    del attribute_manager
+    gc.collect()
+    if brep_ref() is not None:
+        raise ValueError("[Test] BRep should be released with its components")
+
+
 if __name__ == "__main__":
     model.OpenGeodeModelLibrary.initialize()
     brep = model.BRep()
@@ -972,3 +1005,4 @@ if __name__ == "__main__":
     test_reloaded_brep(brep2)
     test_physical_properties(brep2, physical_attribute_id)
     test_add_component_with_mesh_impl()
+    test_components_keep_brep_alive()

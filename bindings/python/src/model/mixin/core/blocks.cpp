@@ -32,7 +32,7 @@
         module, name##dimension.c_str() )                                      \
         .def( "nb_blocks", &Blocks##dimension##D::nb_blocks )                  \
         .def( "block", &Blocks##dimension##D::block,                           \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "blocks",                                                          \
             []( const Blocks##dimension##D& self ) {                           \
@@ -43,7 +43,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

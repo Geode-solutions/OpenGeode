@@ -63,10 +63,10 @@
         .def( "cells", &Grid##dimension##D::cells )                            \
         .def( "cell_attribute_manager",                                        \
             &Grid##dimension##D::cell_attribute_manager,                       \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "grid_vertex_attribute_manager",                                 \
             &Grid##dimension##D::grid_vertex_attribute_manager,                \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "grid_bounding_box", &Grid##dimension##D::grid_bounding_box )
 
 namespace geode
