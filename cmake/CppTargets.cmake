@@ -222,14 +222,8 @@ endfunction()
 
 # List properties (such as ENVIRONMENT) split values on semicolons:
 # escape them to keep the whole environment variable.
-# Missing directories are removed: os.add_dll_directory fails on them in Python tests.
 function(_escaped_environment_variable output name)
-    set(directories)
-    foreach(directory $ENV{${name}})
-        if(IS_DIRECTORY "${directory}")
-            list(APPEND directories "${directory}")
-        endif()
-    endforeach()
+    set(directories $ENV{${name}})
     list(JOIN directories "\\;" value)
     set(${output} "${value}" PARENT_SCOPE)
 endfunction()
