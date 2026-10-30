@@ -41,3 +41,14 @@ add_geode_python_wheel(
     SUPERBUILD
     LICENSE "MIT"
 )
+
+# Imported by the Python tests of OpenGeode and of its dependents (see add_geode_python_test),
+# next to the Python modules, in the build tree and in the installation
+if(WIN32)
+    set(test_env_folder "${CMAKE_INSTALL_BINDIR}")
+else()
+    set(test_env_folder "${CMAKE_INSTALL_LIBDIR}")
+endif()
+foreach(prefix "${PROJECT_BINARY_DIR}" "${CMAKE_INSTALL_PREFIX}")
+    configure_file(geode_test_env.py "${prefix}/${test_env_folder}/geode_test_env.py" COPYONLY)
+endforeach()

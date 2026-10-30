@@ -45,9 +45,10 @@ function(add_geode_python_test)
         list(JOIN directories "\\;" directories)
         _escaped_environment_variable(path Path)
         _escaped_environment_variable(python_path PYTHONPATH)
+        # Python does not search the Path for DLLs: geode_test_env adds these directories only
         set_tests_properties(${test_name}
             PROPERTIES
-                ENVIRONMENT "Path=${directories}\\;${path};PYTHONPATH=${directories}\\;${python_path}"
+                ENVIRONMENT "Path=${directories}\\;${path};PYTHONPATH=${directories}\\;${python_path};GEODE_DLL_DIRECTORIES=${directories}"
         )
     else()
         list(JOIN directories ":" directories)
