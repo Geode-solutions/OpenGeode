@@ -1411,6 +1411,22 @@ void test_physical_properties( const geode::BRep& model,
             && surface_info.attribute_id == surface_attribute_id,
         context, " Wrong surface physical property info." );
     test_surface_physical_attribute( model, surface_attribute_id, context );
+    geode::OpenGeodeModelException::test(
+        model.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::boundary_displacement )
+            && model.physical_property_info(
+                        geode::PHYSICAL_PROPERTY_NAME::boundary_displacement )
+                       .component_type
+                   == geode::Surface3D::component_type_static(),
+        context, " Wrong displacement physical property." );
+    geode::OpenGeodeModelException::test(
+        model.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::initial_stress )
+            && model.physical_property_info(
+                        geode::PHYSICAL_PROPERTY_NAME::initial_stress )
+                       .component_type
+                   == geode::Block3D::component_type_static(),
+        context, " Wrong initial stress physical property." );
 }
 
 void test_clone( const geode::BRep& brep,
@@ -2263,6 +2279,26 @@ void test()
     builder.set_physical_property(
         geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
         geode::Surface3D::component_type_static(), boundary_attribute_id );
+    const geode::uuid displacement_attribute_id;
+    geode::AttributeValues< std::array< double, 3 > > displacement_values;
+    displacement_values.default_value = { 0., 0., 0. };
+    displacement_values.no_value = { 0., 0., 0. };
+    builder.create_surfaces_attribute< geode::VariableAttribute,
+        std::array< double, 3 > >(
+        "displacement", displacement_attribute_id, displacement_values, {} );
+    builder.set_physical_property(
+        geode::PHYSICAL_PROPERTY_NAME::boundary_displacement,
+        geode::Surface3D::component_type_static(), displacement_attribute_id );
+    const geode::uuid stress_attribute_id;
+    geode::AttributeValues< std::array< double, 3 > > stress_values;
+    stress_values.default_value = { 1e7, 1e7, 2e7 };
+    stress_values.no_value = { 0., 0., 0. };
+    builder.create_blocks_attribute< geode::VariableAttribute,
+        std::array< double, 3 > >(
+        "initial_stress", stress_attribute_id, stress_values, {} );
+    builder.set_physical_property(
+        geode::PHYSICAL_PROPERTY_NAME::initial_stress,
+        geode::Block3D::component_type_static(), stress_attribute_id );
     test_physical_properties( model.clone(), physical_attribute_id,
         boundary_attribute_id, "[Test] clone" );
     test_clone( model, physical_attribute_id, boundary_attribute_id );
