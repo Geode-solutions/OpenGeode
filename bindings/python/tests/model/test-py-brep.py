@@ -644,6 +644,18 @@ def test_item_ranges(brep, surface_uuids, boundary_uuids):
         )
 
 
+def test_remove_relation(brep, builder, surface_uuids, boundary_uuids):
+    boundary = brep.model_boundary(boundary_uuids[1])
+    nb_collections = brep.nb_collections(surface_uuids[1])
+    builder.remove_relation(surface_uuids[1], boundary_uuids[1])
+    if brep.nb_collections(surface_uuids[1]) != nb_collections - 1:
+        raise ValueError("[Test] Surface should be in one less collection")
+    if brep.is_model_boundary_item(brep.surface(surface_uuids[1]), boundary):
+        raise ValueError("[Test] Surface should not be item of ModelBoundary")
+    if len(brep.model_boundary_items(boundary)) != 2:
+        raise ValueError("[Test] ModelBoundary should have 2 Surfaces")
+
+
 def test_corner_item_ranges(brep, corner_uuids, collection_uuids):
     collection_item_count = 0
     for collection_item in brep.corner_collection_items(
@@ -972,3 +984,4 @@ if __name__ == "__main__":
     test_reloaded_brep(brep2)
     test_physical_properties(brep2, physical_attribute_id)
     test_add_component_with_mesh_impl()
+    test_remove_relation(brep, builder, surface_uuids, model_boundary_uuids)
