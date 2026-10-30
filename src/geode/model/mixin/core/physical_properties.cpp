@@ -32,7 +32,6 @@
 
 #include <bitsery/ext/std_map.h>
 
-#include <absl/algorithm/container.h>
 #include <absl/container/flat_hash_map.h>
 #include <absl/strings/str_cat.h>
 
@@ -128,31 +127,35 @@ namespace
 
     std::string_view property_file_name( geode::PHYSICAL_PROPERTY_NAME name )
     {
-        const auto* const property = absl::c_find_if(
-            PROPERTY_FILE_NAMES, [name]( const auto& property_name ) {
-                return property_name.first == name;
-            } );
-        geode::OpenGeodeModelException::check_exception(
-            property != PROPERTY_FILE_NAMES.end(), nullptr,
+        // Range-for rather than find_if: std::array iterators are not pointers
+        // on MSVC
+        for( const auto& [property, property_file_name] : PROPERTY_FILE_NAMES )
+        {
+            if( property == name )
+            {
+                return property_file_name;
+            }
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
             geode::OpenGeodeException::TYPE::internal,
             "[PhysicalProperties] Physical property ",
-            static_cast< int >( name ), " has no file name" );
-        return property->second;
+            static_cast< int >( name ), " has no file name" };
     }
 
     geode::PHYSICAL_PROPERTY_NAME property_from_file_name(
         std::string_view file_name )
     {
-        const auto* const property = absl::c_find_if(
-            PROPERTY_FILE_NAMES, [file_name]( const auto& property_name ) {
-                return property_name.second == file_name;
-            } );
-        geode::OpenGeodeModelException::check_exception(
-            property != PROPERTY_FILE_NAMES.end(), nullptr,
+        for( const auto& [property, property_file_name] : PROPERTY_FILE_NAMES )
+        {
+            if( property_file_name == file_name )
+            {
+                return property;
+            }
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
             geode::OpenGeodeException::TYPE::data,
             "[PhysicalProperties] Unknown physical property \"", file_name,
-            "\": file may be written by a newer release" );
-        return property->first;
+            "\": file may be written by a newer release" };
     }
 
     geode::PHYSICAL_PROPERTY_NAME version_1_property( geode::index_t value )
