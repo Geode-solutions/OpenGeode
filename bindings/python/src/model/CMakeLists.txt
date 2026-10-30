@@ -22,6 +22,7 @@ add_geode_python_binding(
     NAME "py_model"
     SOURCES
         "model.cpp"
+        "helpers/component_mensurations.cpp"
         "helpers/component_mesh_polygons.cpp"
         "helpers/convert_brep_section.cpp"
         "helpers/convert_model_meshes.cpp"

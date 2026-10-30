@@ -86,6 +86,7 @@ namespace geode
     void define_convert_brep_section( pybind11::module& );
     void define_convert_model_meshes( pybind11::module& );
     void define_convert_to_mesh( pybind11::module& );
+    void define_component_mensurations( pybind11::module& );
     void define_component_mesh_polygons( pybind11::module& );
     void define_model_component_filter( pybind11::module& );
     void define_model_concatener( pybind11::module& );
@@ -168,6 +169,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_convert_brep_section( module );
     geode::define_convert_model_meshes( module );
     geode::define_convert_to_mesh( module );
+    geode::define_component_mensurations( module );
     geode::define_component_mesh_polygons( module );
     geode::define_model_component_filter( module );
     geode::define_model_concatener( module );
