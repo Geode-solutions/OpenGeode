@@ -23,8 +23,12 @@
 
 #include <geode/model/mixin/core/physical_properties.hpp>
 
+#include <array>
 #include <filesystem>
 #include <fstream>
+#include <string>
+#include <string_view>
+#include <utility>
 
 #include <bitsery/ext/std_map.h>
 
@@ -32,11 +36,137 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
 #include <geode/model/mixin/core/bitsery_archive.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
+
+namespace
+{
+    // Names written in the files: never rename them
+    constexpr std::array<
+        std::pair< geode::PHYSICAL_PROPERTY_NAME, std::string_view >,
+        15 >
+        PROPERTY_FILE_NAMES{ {
+            { geode::PHYSICAL_PROPERTY_NAME::porosity, "porosity" },
+            { geode::PHYSICAL_PROPERTY_NAME::permeability, "permeability" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
+                "boundary_pressure" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_temperature,
+                "boundary_temperature" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_oil_fraction,
+                "boundary_oil_fraction" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_gas_fraction,
+                "boundary_gas_fraction" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_water_fraction,
+                "boundary_water_fraction" },
+            { geode::PHYSICAL_PROPERTY_NAME::bulk_modulus, "bulk_modulus" },
+            { geode::PHYSICAL_PROPERTY_NAME::shear_modulus, "shear_modulus" },
+            { geode::PHYSICAL_PROPERTY_NAME::density, "density" },
+            { geode::PHYSICAL_PROPERTY_NAME::initial_stress, "initial_stress" },
+            { geode::PHYSICAL_PROPERTY_NAME::initial_shear_stress,
+                "initial_shear_stress" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_displacement,
+                "boundary_displacement" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_traction,
+                "boundary_traction" },
+            { geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction,
+                "boundary_normal_traction" },
+        } };
+
+    constexpr std::size_t nb_file_name_entries(
+        geode::PHYSICAL_PROPERTY_NAME name )
+    {
+        std::size_t nb_entries{ 0 };
+        for( const auto& property : PROPERTY_FILE_NAMES )
+        {
+            if( property.first == name )
+            {
+                nb_entries++;
+            }
+        }
+        return nb_entries;
+    }
+
+    // As many distinct entries as properties up to the last one: each
+    // property has a file name
+    constexpr bool has_all_property_file_names()
+    {
+        constexpr auto LAST_PROPERTY =
+            geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction;
+        if( PROPERTY_FILE_NAMES.size()
+            != static_cast< std::size_t >( LAST_PROPERTY ) + 1 )
+        {
+            return false;
+        }
+        for( const auto& property : PROPERTY_FILE_NAMES )
+        {
+            if( property.first > LAST_PROPERTY
+                || nb_file_name_entries( property.first ) != 1 )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    static_assert( has_all_property_file_names(),
+        "Each PHYSICAL_PROPERTY_NAME needs a PROPERTY_FILE_NAMES entry, and "
+        "boundary_normal_traction must be updated to the last enum value" );
+
+    // The first file version stored the enum values in this order
+    constexpr std::array< geode::PHYSICAL_PROPERTY_NAME, 7 >
+        VERSION_1_PROPERTIES{ geode::PHYSICAL_PROPERTY_NAME::porosity,
+            geode::PHYSICAL_PROPERTY_NAME::permeability,
+            geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
+            geode::PHYSICAL_PROPERTY_NAME::boundary_temperature,
+            geode::PHYSICAL_PROPERTY_NAME::boundary_oil_fraction,
+            geode::PHYSICAL_PROPERTY_NAME::boundary_gas_fraction,
+            geode::PHYSICAL_PROPERTY_NAME::boundary_water_fraction };
+
+    std::string_view property_file_name( geode::PHYSICAL_PROPERTY_NAME name )
+    {
+        // Range-for rather than find_if: std::array iterators are not pointers
+        // on MSVC
+        for( const auto& [property, property_file_name] : PROPERTY_FILE_NAMES )
+        {
+            if( property == name )
+            {
+                return property_file_name;
+            }
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal,
+            "[PhysicalProperties] Physical property ",
+            static_cast< int >( name ), " has no file name" };
+    }
+
+    geode::PHYSICAL_PROPERTY_NAME property_from_file_name(
+        std::string_view file_name )
+    {
+        for( const auto& [property, property_file_name] : PROPERTY_FILE_NAMES )
+        {
+            if( property_file_name == file_name )
+            {
+                return property;
+            }
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::data,
+            "[PhysicalProperties] Unknown physical property \"", file_name,
+            "\": file may be written by a newer release" };
+    }
+
+    geode::PHYSICAL_PROPERTY_NAME version_1_property( geode::index_t value )
+    {
+        geode::OpenGeodeModelException::check_exception(
+            value < VERSION_1_PROPERTIES.size(), nullptr,
+            geode::OpenGeodeException::TYPE::data,
+            "[PhysicalProperties] Unknown physical property value ", value );
+        return VERSION_1_PROPERTIES[value];
+    }
+} // namespace
 
 namespace geode
 {
@@ -148,15 +278,33 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl.properties_,
-                        bitsery::ext::StdMap{ impl.properties_.max_size() },
-                        []( Archive& a2, PHYSICAL_PROPERTY_NAME& name,
-                            Info& info ) {
-                            a2.value4b( name );
-                            a2.object( info );
-                        } );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive& local_archive, Impl& impl ) {
+                         local_archive.ext( impl.properties_,
+                             bitsery::ext::StdMap{
+                                 impl.properties_.max_size() },
+                             []( Archive& map_archive,
+                                 PHYSICAL_PROPERTY_NAME& name, Info& info ) {
+                                 index_t value{ 0 };
+                                 map_archive.value4b( value );
+                                 name = version_1_property( value );
+                                 map_archive.object( info );
+                             } );
+                     },
+                        []( Archive& local_archive, Impl& impl ) {
+                            local_archive.ext( impl.properties_,
+                                bitsery::ext::StdMap{
+                                    impl.properties_.max_size() },
+                                []( Archive& map_archive,
+                                    PHYSICAL_PROPERTY_NAME& name, Info& info ) {
+                                    std::string file_name{ property_file_name(
+                                        name ) };
+                                    map_archive.text1b(
+                                        file_name, MAX_SERIALIZED_NAME_SIZE );
+                                    name = property_from_file_name( file_name );
+                                    map_archive.object( info );
+                                } );
+                        } } } );
         }
 
     private:

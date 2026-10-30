@@ -43,6 +43,18 @@ namespace geode
                 PHYSICAL_PROPERTY_NAME::boundary_gas_fraction )
             .value( "boundary_water_fraction",
                 PHYSICAL_PROPERTY_NAME::boundary_water_fraction )
+            .value( "bulk_modulus", PHYSICAL_PROPERTY_NAME::bulk_modulus )
+            .value( "shear_modulus", PHYSICAL_PROPERTY_NAME::shear_modulus )
+            .value( "density", PHYSICAL_PROPERTY_NAME::density )
+            .value( "initial_stress", PHYSICAL_PROPERTY_NAME::initial_stress )
+            .value( "initial_shear_stress",
+                PHYSICAL_PROPERTY_NAME::initial_shear_stress )
+            .value( "boundary_displacement",
+                PHYSICAL_PROPERTY_NAME::boundary_displacement )
+            .value(
+                "boundary_traction", PHYSICAL_PROPERTY_NAME::boundary_traction )
+            .value( "boundary_normal_traction",
+                PHYSICAL_PROPERTY_NAME::boundary_normal_traction )
             .export_values();
 
         pybind11::class_< PhysicalProperties::Info >( module, "Info" )
