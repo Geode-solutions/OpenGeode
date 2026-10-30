@@ -133,9 +133,36 @@ geode::Section build_section()
     return section;
 }
 
+void test_stale_vertex_identifier()
+{
+    auto section = build_section();
+    geode::SectionBuilder builder{ section };
+    for( const auto& surface : section.surfaces() )
+    {
+        auto mesh_builder = builder.surface_mesh_builder( surface );
+        mesh_builder->delete_polygons(
+            std::vector< bool >( surface.mesh().nb_polygons(), true ) );
+        mesh_builder->delete_isolated_vertices();
+    }
+    bool thrown{ false };
+    try
+    {
+        const auto edges = geode::component_mesh_edges( section, { 0, 1 } );
+        geode_unused( edges );
+    }
+    catch( const geode::OpenGeodeException& )
+    {
+        thrown = true;
+    }
+    geode::OpenGeodeModelException::test( thrown,
+        "Deleted Surface mesh vertices still in the VertexIdentifier should "
+        "throw instead of being read out of range" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
+    test_stale_vertex_identifier();
     const auto section = build_section();
     const auto surface_edges = geode::component_mesh_edges(
         section, *section.surfaces().begin(), { 1, 0 } );
