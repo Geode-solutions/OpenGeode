@@ -41,7 +41,8 @@ namespace geode
 
 namespace geode
 {
-
+    // New values need a file name in PROPERTY_FILE_NAMES
+    // (physical_properties.cpp)
     enum struct PHYSICAL_PROPERTY_NAME
     {
         porosity,

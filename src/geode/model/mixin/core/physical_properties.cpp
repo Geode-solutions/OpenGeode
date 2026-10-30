@@ -37,6 +37,7 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -75,6 +76,45 @@ namespace
             { geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction,
                 "boundary_normal_traction" },
         } };
+
+    constexpr std::size_t nb_file_name_entries(
+        geode::PHYSICAL_PROPERTY_NAME name )
+    {
+        std::size_t nb_entries{ 0 };
+        for( const auto& property : PROPERTY_FILE_NAMES )
+        {
+            if( property.first == name )
+            {
+                nb_entries++;
+            }
+        }
+        return nb_entries;
+    }
+
+    // As many distinct entries as properties up to the last one: each
+    // property has a file name
+    constexpr bool has_all_property_file_names()
+    {
+        constexpr auto LAST_PROPERTY =
+            geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction;
+        if( PROPERTY_FILE_NAMES.size()
+            != static_cast< std::size_t >( LAST_PROPERTY ) + 1 )
+        {
+            return false;
+        }
+        for( const auto& property : PROPERTY_FILE_NAMES )
+        {
+            if( property.first > LAST_PROPERTY
+                || nb_file_name_entries( property.first ) != 1 )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    static_assert( has_all_property_file_names(),
+        "Each PHYSICAL_PROPERTY_NAME needs a PROPERTY_FILE_NAMES entry, and "
+        "boundary_normal_traction must be updated to the last enum value" );
 
     // The first file version stored the enum values in this order
     constexpr std::array< geode::PHYSICAL_PROPERTY_NAME, 7 >
@@ -257,7 +297,7 @@ namespace geode
                                     std::string file_name{ property_file_name(
                                         name ) };
                                     map_archive.text1b(
-                                        file_name, file_name.max_size() );
+                                        file_name, MAX_SERIALIZED_NAME_SIZE );
                                     name = property_from_file_name( file_name );
                                     map_archive.object( info );
                                 } );
