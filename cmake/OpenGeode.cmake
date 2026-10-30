@@ -93,6 +93,7 @@ install(
         "cmake/ProjectOptions.cmake"
         "cmake/CppTargets.cmake"
         "cmake/PythonTargets.cmake"
+        "cmake/geode_test_env.py"
     DESTINATION 
         ${CMAKE_CONFIG_DESTINATION}
     COMPONENT
