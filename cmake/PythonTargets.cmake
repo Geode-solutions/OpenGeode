@@ -40,18 +40,25 @@ function(add_geode_python_test)
     )
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${absolute_path})
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 300) 
-    _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
+    _find_dependency_directories(directories ${GEODE_TEST_DEPENDENCIES})
+    # Module imported by the tests before any binding, shipped with these CMake files
+    set(test_env_directory "${PROJECT_BINARY_DIR}/geode_test_env")
+    configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/geode_test_env.py"
+        "${test_env_directory}/geode_test_env.py" COPYONLY)
     if(WIN32)
         list(JOIN directories "\\;" directories)
+        _escaped_environment_variable(path Path)
+        _escaped_environment_variable(python_path PYTHONPATH)
+        # Python does not search the Path for DLLs: geode_test_env adds these directories only
         set_tests_properties(${test_name}
             PROPERTIES
-                ENVIRONMENT "Path=${directories}\\;$ENV{Path};PYTHONPATH=${directories}\\;$ENV{PYTHONPATH}"
+                ENVIRONMENT "Path=${directories}\\;${path};PYTHONPATH=${test_env_directory}\\;${directories}\\;${python_path};GEODE_DLL_DIRECTORIES=${directories}"
         )
     else()
         list(JOIN directories ":" directories)
         set_tests_properties(${test_name}
             PROPERTIES
-                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${directories}:$ENV{PYTHONPATH}"
+                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${test_env_directory}:${directories}:$ENV{PYTHONPATH}"
         )
     endif()
 endfunction()
