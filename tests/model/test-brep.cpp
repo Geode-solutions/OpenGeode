@@ -1709,6 +1709,48 @@ void test_registry( const geode::BRep& brep,
     }
 }
 
+void check_version_1_physical_properties(
+    const geode::BRep& brep, std::string_view context )
+{
+    for( const auto& [property, component_type, attribute_id] :
+        { std::tuple{ geode::PHYSICAL_PROPERTY_NAME::porosity,
+              geode::Block3D::component_type_static(),
+              "01a18752-1cb1-7ddd-b74f-92ee7ab5ee3c" },
+            std::tuple{ geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
+                geode::Surface3D::component_type_static(),
+                "01a18752-1cb1-7ddf-9b23-1cb0e3316dd2" },
+            std::tuple{ geode::PHYSICAL_PROPERTY_NAME::boundary_water_fraction,
+                geode::Surface3D::component_type_static(),
+                "01a18752-1cb2-7866-bb89-4d82b762d455" } } )
+    {
+        geode::OpenGeodeModelException::test(
+            brep.has_physical_property( property ), context,
+            " Missing physical property" );
+        const auto& info = brep.physical_property_info( property );
+        geode::OpenGeodeModelException::test(
+            info.component_type == component_type
+                && info.attribute_id.string() == attribute_id,
+            context, " Wrong physical property info" );
+    }
+    geode::OpenGeodeModelException::test(
+        !brep.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::permeability ),
+        context, " Unexpected permeability" );
+}
+
+// The first physical properties files stored the enum values
+void test_physical_properties_backward_io()
+{
+    const auto brep = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "physical_properties_v1.og_brep" ) );
+    check_version_1_physical_properties( brep, "[Backward_IO]" );
+    const auto file_io = absl::StrCat(
+        "physical_properties_v2.", geode::BRep::native_extension_static() );
+    geode::save_brep( brep, file_io );
+    check_version_1_physical_properties(
+        geode::load_brep( file_io ), "[Backward_IO] reload" );
+}
+
 void test_backward_io()
 {
     auto brep = geode::load_brep(
@@ -2248,6 +2290,7 @@ void test()
     test_compare_brep( model, model3 );
 
     test_backward_io();
+    test_physical_properties_backward_io();
     test_components_filter();
     test_registry_remove_unknown_type();
 }
