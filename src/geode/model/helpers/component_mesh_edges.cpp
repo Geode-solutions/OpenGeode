@@ -128,6 +128,8 @@ namespace
             const auto& mesh = line.mesh();
             for( const auto& pair : edge_pairs )
             {
+                geode::detail::check_component_mesh_vertices(
+                    component_id, pair, mesh.nb_vertices() );
                 for( const auto& edge_vertex :
                     mesh.edges_around_vertex( pair[0] ) )
                 {
@@ -161,6 +163,8 @@ namespace
             const auto& mesh = surface.mesh();
             for( const auto& pair : edge_pairs )
             {
+                geode::detail::check_component_mesh_vertices(
+                    component_id, pair, mesh.nb_vertices() );
                 if( auto edge =
                         mesh.polygon_edge_from_vertices( pair[0], pair[1] ) )
                 {
@@ -195,6 +199,8 @@ namespace
             const auto& mesh = block.mesh();
             for( const auto& pair : edge_pairs )
             {
+                geode::detail::check_component_mesh_vertices(
+                    component_id, pair, mesh.nb_vertices() );
                 if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                         { pair[0], pair[1] } ) )
                 {
@@ -261,6 +267,8 @@ namespace geode
                 const auto& mesh = line.mesh();
                 for( const auto& pair : line_pair.second )
                 {
+                    geode::detail::check_component_mesh_vertices(
+                        line_pair.first, pair, mesh.nb_vertices() );
                     for( const auto& edge_vertex :
                         mesh.edges_around_vertex( pair[0] ) )
                     {
@@ -298,6 +306,8 @@ namespace geode
             const auto& mesh = line.mesh();
             for( const auto& pair : line_pairs.at( line.component_id() ) )
             {
+                geode::detail::check_component_mesh_vertices(
+                    line.component_id(), pair, mesh.nb_vertices() );
                 for( const auto& edge_vertex :
                     mesh.edges_around_vertex( pair[0] ) )
                 {
@@ -338,6 +348,8 @@ namespace geode
                 const auto& mesh = surface.mesh();
                 for( const auto& pair : edge_pairs )
                 {
+                    geode::detail::check_component_mesh_vertices(
+                        surface_id, pair, mesh.nb_vertices() );
                     if( auto edge = mesh.polygon_edge_from_vertices(
                             pair[0], pair[1] ) )
                     {
@@ -378,6 +390,8 @@ namespace geode
             const auto& mesh = surface.mesh();
             for( const auto& pair : surface_pairs.at( surface.component_id() ) )
             {
+                geode::detail::check_component_mesh_vertices(
+                    surface.component_id(), pair, mesh.nb_vertices() );
                 if( auto edge =
                         mesh.polygon_edge_from_vertices( pair[0], pair[1] ) )
                 {
@@ -417,6 +431,8 @@ namespace geode
                 const auto& mesh = block.mesh();
                 for( const auto& pair : block_pair.second )
                 {
+                    geode::detail::check_component_mesh_vertices(
+                        block_pair.first, pair, mesh.nb_vertices() );
                     if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                             { pair[0], pair[1] } ) )
                     {
@@ -448,6 +464,8 @@ namespace geode
             const auto& mesh = block.mesh();
             for( const auto& pair : block_pairs.at( block.component_id() ) )
             {
+                geode::detail::check_component_mesh_vertices(
+                    block.component_id(), pair, mesh.nb_vertices() );
                 if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
                         { pair[0], pair[1] } ) )
                 {

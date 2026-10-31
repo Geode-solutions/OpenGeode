@@ -261,4 +261,27 @@ namespace geode
         opengeode_model_api component_mesh_vertex_generic< 4 >(
             absl::Span< const absl::Span< const ComponentMeshVertex > >,
             const ComponentID& );
+
+    namespace detail
+    {
+        void check_component_mesh_vertices( const ComponentID& component_id,
+            absl::Span< const index_t > vertices,
+            index_t nb_vertices )
+        {
+            for( const auto vertex : vertices )
+            {
+                if( vertex >= nb_vertices )
+                {
+                    throw OpenGeodeModelException{ component_id,
+                        OpenGeodeException::TYPE::data,
+                        "[check_component_mesh_vertices] The VertexIdentifier "
+                        "refers to vertex ",
+                        vertex, " of ", component_id.string(),
+                        " but its mesh has only ", nb_vertices,
+                        " vertices: call update_unique_vertices after deleting "
+                        "vertices of a component mesh" };
+                }
+            }
+        }
+    } // namespace detail
 } // namespace geode
