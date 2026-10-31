@@ -126,4 +126,12 @@ namespace geode
                 unique_vertices... ),
             component );
     }
+
+    namespace detail
+    {
+        void opengeode_model_api check_component_mesh_vertices(
+            const ComponentID& component_id,
+            absl::Span< const index_t > vertices,
+            index_t nb_vertices );
+    } // namespace detail
 } // namespace geode

@@ -79,6 +79,9 @@ namespace
                         .emplace_back( cmv.vertex );
                 }
             }
+            geode::detail::check_component_mesh_vertices( block.component_id(),
+                block_facet_from_unique_vertices[polygon_vertex_id],
+                block.mesh().nb_vertices() );
         }
         return block_facet_from_unique_vertices;
     }
@@ -325,6 +328,10 @@ namespace
                         .emplace_back( cmv.vertex );
                 }
             }
+            geode::detail::check_component_mesh_vertices(
+                surface.component_id(),
+                surface_edge_from_unique_vertices[edge_vertex_id],
+                surface.mesh().nb_vertices() );
         }
         return surface_edge_from_unique_vertices;
     }
@@ -663,6 +670,8 @@ namespace geode
                 const auto& mesh = surface.mesh();
                 for( auto& pair : surface_pair.second )
                 {
+                    geode::detail::check_component_mesh_vertices(
+                        surface_pair.first, pair, mesh.nb_vertices() );
                     absl::c_sort( pair );
                     for( const auto& polygon_vertex :
                         mesh.polygons_around_vertex( pair[0] ) )
@@ -700,6 +709,8 @@ namespace geode
                 const auto& mesh = block.mesh();
                 for( const auto& pair : block_pair.second )
                 {
+                    geode::detail::check_component_mesh_vertices(
+                        block_pair.first, pair, mesh.nb_vertices() );
                     if( auto facet =
                             mesh.polyhedron_facet_from_vertices( pair ) )
                     {
@@ -733,6 +744,8 @@ namespace geode
             const auto& mesh = block.mesh();
             for( const auto& pair : block_pairs.at( block.component_id() ) )
             {
+                geode::detail::check_component_mesh_vertices(
+                    block.component_id(), pair, mesh.nb_vertices() );
                 if( auto facet = mesh.polyhedron_facet_from_vertices( pair ) )
                 {
                     facets.emplace_back( std::move( facet.value() ) );

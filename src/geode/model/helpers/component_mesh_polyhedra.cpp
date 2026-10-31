@@ -188,6 +188,8 @@ namespace geode
         {
             const auto& block = brep.block( block_vertices.first );
             const auto& block_mesh = block.mesh();
+            detail::check_component_mesh_vertices( block.component_id(),
+                block_vertices.second, block_mesh.nb_vertices() );
             absl::c_sort( block_vertices.second );
             for( const auto& polyhedron_vertex :
                 block_mesh.polyhedra_around_vertex( block_vertices.second[0] ) )
