@@ -39,6 +39,7 @@ namespace geode
             .def( "add_internal_relation",
                 &RelationshipsBuilder::add_internal_relation )
             .def( "add_item_in_collection",
-                &RelationshipsBuilder::add_item_in_collection );
+                &RelationshipsBuilder::add_item_in_collection )
+            .def( "remove_relation", &RelationshipsBuilder::remove_relation );
     }
 } // namespace geode
