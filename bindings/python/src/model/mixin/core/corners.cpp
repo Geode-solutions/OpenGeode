@@ -33,7 +33,7 @@
         module, name##dimension.c_str() )                                      \
         .def( "nb_corners", &Corners##dimension##D::nb_corners )               \
         .def( "corner", &Corners##dimension##D::corner,                        \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "corners",                                                         \
             []( const Corners##dimension##D& self ) {                          \
@@ -44,7 +44,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

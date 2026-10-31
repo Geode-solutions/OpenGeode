@@ -35,7 +35,7 @@
             &BlockCollections##dimension##D::nb_block_collections )            \
         .def( "block_collection",                                              \
             &BlockCollections##dimension##D::block_collection,                 \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "block_collections",                                               \
             []( const BlockCollections##dimension##D& self ) {                 \
@@ -47,7 +47,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

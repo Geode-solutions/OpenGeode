@@ -34,16 +34,16 @@
     pybind11::class_< Block##dimension##D, Component##dimension##D,            \
         pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "mesh", &Block##dimension##D::mesh< SolidMesh##dimension##D >,   \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "polyhedral_mesh",                                               \
             &Block##dimension##D::mesh< PolyhedralSolid##dimension##D >,       \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "tetrahedral_mesh",                                              \
             &Block##dimension##D::mesh< TetrahedralSolid##dimension##D >,      \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "hybrid_mesh",                                                   \
             &Block##dimension##D::mesh< HybridSolid##dimension##D >,           \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "component_id", &Block##dimension##D::component_id )             \
         .def_static( "component_type_static",                                  \
             &Block##dimension##D::component_type_static )

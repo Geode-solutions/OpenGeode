@@ -35,7 +35,7 @@
             &CornerCollections##dimension##D::nb_corner_collections )          \
         .def( "corner_collection",                                             \
             &CornerCollections##dimension##D::corner_collection,               \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "corner_collections",                                              \
             []( const CornerCollections##dimension##D& self ) {                \
@@ -47,7 +47,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

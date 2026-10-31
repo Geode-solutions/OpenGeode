@@ -37,11 +37,11 @@
         .def( "find_coordinate_reference_system",                              \
             &CoordinateReferenceSystemManager<                                 \
                 dimension >::find_coordinate_reference_system,                 \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "active_coordinate_reference_system",                            \
             &CoordinateReferenceSystemManager<                                 \
                 dimension >::active_coordinate_reference_system,               \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "active_coordinate_reference_system_name",                       \
             &CoordinateReferenceSystemManager<                                 \
                 dimension >::active_coordinate_reference_system_name )         \

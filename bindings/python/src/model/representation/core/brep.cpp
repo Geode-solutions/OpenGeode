@@ -55,7 +55,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "boundary_lines",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -66,7 +66,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "boundary_surfaces",
                 []( const BRep& brep, const Block3D& block ) {
@@ -77,7 +77,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "incident_lines",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -88,7 +88,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "incident_surfaces",
                 []( const BRep& brep, const Line3D& line ) {
@@ -99,7 +99,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "incident_blocks",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -110,7 +110,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_corners_of_line",
                 static_cast< index_t ( BRep::* )( const Line3D& ) const >(
                     &BRep::nb_internal_corners ) )
@@ -124,7 +124,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_corners_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
                     &BRep::nb_internal_corners ) )
@@ -139,7 +139,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_lines_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
                     &BRep::nb_internal_lines ) )
@@ -154,7 +154,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_corners_of_block",
                 static_cast< index_t ( BRep::* )( const Block3D& ) const >(
                     &BRep::nb_internal_corners ) )
@@ -169,7 +169,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_lines_of_block",
                 static_cast< index_t ( BRep::* )( const Block3D& ) const >(
                     &BRep::nb_internal_lines ) )
@@ -183,7 +183,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_internal_surfaces_of_block", &BRep::nb_internal_surfaces )
             .def(
                 "internal_surfaces_of_block",
@@ -196,7 +196,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_lines_of_corner",
                 static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
                     &BRep::nb_embedding_lines ) )
@@ -211,7 +211,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_surfaces_of_corner",
                 static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
                     &BRep::nb_embedding_surfaces ) )
@@ -226,7 +226,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_surfaces_of_line",
                 static_cast< index_t ( BRep::* )( const Line3D& ) const >(
                     &BRep::nb_embedding_surfaces ) )
@@ -241,7 +241,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_blocks_of_corner",
                 static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
                     &BRep::nb_embedding_blocks ) )
@@ -256,7 +256,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_blocks_of_line",
                 static_cast< index_t ( BRep::* )( const Line3D& ) const >(
                     &BRep::nb_embedding_blocks ) )
@@ -270,7 +270,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "nb_embedding_blocks_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
                     &BRep::nb_embedding_blocks ) )
@@ -285,7 +285,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "model_boundary_items",
                 []( const BRep& brep, const ModelBoundary3D& boundary ) {
@@ -297,7 +297,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "corner_collection_items",
                 []( const BRep& brep, const CornerCollection3D& collection ) {
@@ -309,7 +309,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "line_collection_items",
                 []( const BRep& brep, const LineCollection3D& collection ) {
@@ -321,7 +321,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "surface_collection_items",
                 []( const BRep& brep, const SurfaceCollection3D& collection ) {
@@ -333,7 +333,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def(
                 "block_collection_items",
                 []( const BRep& brep, const BlockCollection3D& collection ) {
@@ -345,7 +345,7 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference )
+                pybind11::return_value_policy::reference_internal )
             .def( "is_line_closed",
                 static_cast< bool ( BRep::* )( const Line3D& ) const >(
                     &BRep::is_closed ) )
@@ -389,6 +389,6 @@ namespace geode
             .def( "bounding_box", &BRep::bounding_box )
             .def( "native_extension", &BRep::native_extension )
             .def( "brep_component", &BRep::component,
-                pybind11::return_value_policy::reference );
+                pybind11::return_value_policy::reference_internal );
     }
 } // namespace geode

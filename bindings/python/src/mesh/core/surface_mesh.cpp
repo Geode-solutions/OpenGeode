@@ -47,7 +47,7 @@
             static_cast< const SurfaceEdges##dimension##D& (                   \
                 SurfaceMesh##dimension##D::*) () const >(                      \
                 &SurfaceMesh##dimension##D::edges ),                           \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "nb_polygons", &SurfaceMesh##dimension##D::nb_polygons )         \
         .def( "nb_polygon_vertices",                                           \
             &SurfaceMesh##dimension##D::nb_polygon_vertices )                  \
@@ -113,11 +113,11 @@
             &SurfaceMesh##dimension##D::polygons_from_edge_vertices )          \
         .def( "polygon_attribute_manager",                                     \
             &SurfaceMesh##dimension##D::polygon_attribute_manager,             \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "is_vertex_on_border",                                           \
             &SurfaceMesh##dimension##D::is_vertex_on_border )                  \
         .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager,  \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "bounding_box", &SurfaceMesh##dimension##D::bounding_box )       \
         .def_static( "create",                                                 \
             static_cast<                                                       \

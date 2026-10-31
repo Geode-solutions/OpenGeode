@@ -35,13 +35,13 @@
         pybind11::smart_holder >( module, name##dimension.c_str() )            \
         .def( "mesh",                                                          \
             &Surface##dimension##D::mesh< SurfaceMesh##dimension##D >,         \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "polygonal_mesh",                                                \
             &Surface##dimension##D::mesh< PolygonalSurface##dimension##D >,    \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "triangulated_mesh",                                             \
             &Surface##dimension##D::mesh< TriangulatedSurface##dimension##D >, \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "component_id", &Surface##dimension##D::component_id )           \
         .def_static( "component_type_static",                                  \
             &Surface##dimension##D::component_type_static )

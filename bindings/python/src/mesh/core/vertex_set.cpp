@@ -43,6 +43,6 @@ namespace geode
             .def( "nb_vertices", &VertexSet::nb_vertices )
             .def( "vertex_attribute_manager",
                 &VertexSet::vertex_attribute_manager,
-                pybind11::return_value_policy::reference );
+                pybind11::return_value_policy::reference_internal );
     }
 } // namespace geode

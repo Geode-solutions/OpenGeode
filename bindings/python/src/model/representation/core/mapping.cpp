@@ -38,7 +38,7 @@ namespace geode
                 static_cast< ModelCopyMapping::Mapping& (
                     ModelCopyMapping::*) ( const ComponentType& ) >(
                     &ModelCopyMapping::at ),
-                pybind11::return_value_policy::reference );
+                pybind11::return_value_policy::reference_internal );
     }
     void define_generic_mapping( pybind11::module& module )
     {
@@ -51,6 +51,6 @@ namespace geode
                 static_cast< ModelGenericMapping::Mapping& (
                     ModelGenericMapping::*) ( const ComponentType& ) >(
                     &ModelGenericMapping::at ),
-                pybind11::return_value_policy::reference );
+                pybind11::return_value_policy::reference_internal );
     }
 } // namespace geode

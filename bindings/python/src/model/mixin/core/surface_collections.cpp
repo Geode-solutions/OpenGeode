@@ -35,7 +35,7 @@
             &SurfaceCollections##dimension##D::nb_surface_collections )        \
         .def( "surface_collection",                                            \
             &SurfaceCollections##dimension##D::surface_collection,             \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "surface_collections",                                             \
             []( const SurfaceCollections##dimension##D& self ) {               \
@@ -47,7 +47,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

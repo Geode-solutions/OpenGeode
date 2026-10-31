@@ -46,7 +46,7 @@
         .def( "vertices_around_vertex",                                        \
             &EdgedCurve##dimension##D::vertices_around_vertex )                \
         .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager,   \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

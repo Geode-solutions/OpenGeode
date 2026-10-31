@@ -38,7 +38,7 @@
             &SolidEdges##dimension##D::edge_from_vertices )                    \
         .def( "edge_attribute_manager",                                        \
             &SolidEdges##dimension##D::edge_attribute_manager,                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

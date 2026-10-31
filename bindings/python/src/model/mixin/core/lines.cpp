@@ -32,7 +32,7 @@
         module, name##dimension.c_str() )                                      \
         .def( "nb_lines", &Lines##dimension##D::nb_lines )                     \
         .def( "line", &Lines##dimension##D::line,                              \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "lines",                                                           \
             []( const Lines##dimension##D& self ) {                            \
@@ -43,7 +43,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

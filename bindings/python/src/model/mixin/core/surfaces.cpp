@@ -33,7 +33,7 @@
         module, name##dimension.c_str() )                                      \
         .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces )            \
         .def( "surface", &Surfaces##dimension##D::surface,                     \
-            pybind11::return_value_policy::reference )                         \
+            pybind11::return_value_policy::reference_internal )                \
         .def(                                                                  \
             "surfaces",                                                        \
             []( const Surfaces##dimension##D& self ) {                         \
@@ -44,7 +44,7 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference )
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {
