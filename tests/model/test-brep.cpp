@@ -1411,6 +1411,22 @@ void test_physical_properties( const geode::BRep& model,
             && surface_info.attribute_id == surface_attribute_id,
         context, " Wrong surface physical property info." );
     test_surface_physical_attribute( model, surface_attribute_id, context );
+    geode::OpenGeodeModelException::test(
+        model.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::boundary_displacement )
+            && model.physical_property_info(
+                        geode::PHYSICAL_PROPERTY_NAME::boundary_displacement )
+                       .component_type
+                   == geode::Surface3D::component_type_static(),
+        context, " Wrong displacement physical property." );
+    geode::OpenGeodeModelException::test(
+        model.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::initial_stress )
+            && model.physical_property_info(
+                        geode::PHYSICAL_PROPERTY_NAME::initial_stress )
+                       .component_type
+                   == geode::Block3D::component_type_static(),
+        context, " Wrong initial stress physical property." );
 }
 
 void test_clone( const geode::BRep& brep,
@@ -1707,6 +1723,48 @@ void test_registry( const geode::BRep& brep,
             collection_answer.at( type ) == ids.size(),
             "Wrong collection registry entry" );
     }
+}
+
+void check_version_1_physical_properties(
+    const geode::BRep& brep, std::string_view context )
+{
+    for( const auto& [property, component_type, attribute_id] :
+        { std::tuple{ geode::PHYSICAL_PROPERTY_NAME::porosity,
+              geode::Block3D::component_type_static(),
+              "01a18752-1cb1-7ddd-b74f-92ee7ab5ee3c" },
+            std::tuple{ geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
+                geode::Surface3D::component_type_static(),
+                "01a18752-1cb1-7ddf-9b23-1cb0e3316dd2" },
+            std::tuple{ geode::PHYSICAL_PROPERTY_NAME::boundary_water_fraction,
+                geode::Surface3D::component_type_static(),
+                "01a18752-1cb2-7866-bb89-4d82b762d455" } } )
+    {
+        geode::OpenGeodeModelException::test(
+            brep.has_physical_property( property ), context,
+            " Missing physical property" );
+        const auto& info = brep.physical_property_info( property );
+        geode::OpenGeodeModelException::test(
+            info.component_type == component_type
+                && info.attribute_id.string() == attribute_id,
+            context, " Wrong physical property info" );
+    }
+    geode::OpenGeodeModelException::test(
+        !brep.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::permeability ),
+        context, " Unexpected permeability" );
+}
+
+// The first physical properties files stored the enum values
+void test_physical_properties_backward_io()
+{
+    const auto brep = geode::load_brep(
+        absl::StrCat( geode::DATA_PATH, "physical_properties_v1.og_brep" ) );
+    check_version_1_physical_properties( brep, "[Backward_IO]" );
+    const auto file_io = absl::StrCat(
+        "physical_properties_v2.", geode::BRep::native_extension_static() );
+    geode::save_brep( brep, file_io );
+    check_version_1_physical_properties(
+        geode::load_brep( file_io ), "[Backward_IO] reload" );
 }
 
 void test_backward_io()
@@ -2221,6 +2279,26 @@ void test()
     builder.set_physical_property(
         geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
         geode::Surface3D::component_type_static(), boundary_attribute_id );
+    const geode::uuid displacement_attribute_id;
+    geode::AttributeValues< std::array< double, 3 > > displacement_values;
+    displacement_values.default_value = { 0., 0., 0. };
+    displacement_values.no_value = { 0., 0., 0. };
+    builder.create_surfaces_attribute< geode::VariableAttribute,
+        std::array< double, 3 > >(
+        "displacement", displacement_attribute_id, displacement_values, {} );
+    builder.set_physical_property(
+        geode::PHYSICAL_PROPERTY_NAME::boundary_displacement,
+        geode::Surface3D::component_type_static(), displacement_attribute_id );
+    const geode::uuid stress_attribute_id;
+    geode::AttributeValues< std::array< double, 3 > > stress_values;
+    stress_values.default_value = { 1e7, 1e7, 2e7 };
+    stress_values.no_value = { 0., 0., 0. };
+    builder.create_blocks_attribute< geode::VariableAttribute,
+        std::array< double, 3 > >(
+        "initial_stress", stress_attribute_id, stress_values, {} );
+    builder.set_physical_property(
+        geode::PHYSICAL_PROPERTY_NAME::initial_stress,
+        geode::Block3D::component_type_static(), stress_attribute_id );
     test_physical_properties( model.clone(), physical_attribute_id,
         boundary_attribute_id, "[Test] clone" );
     test_clone( model, physical_attribute_id, boundary_attribute_id );
@@ -2248,6 +2326,7 @@ void test()
     test_compare_brep( model, model3 );
 
     test_backward_io();
+    test_physical_properties_backward_io();
     test_components_filter();
     test_registry_remove_unknown_type();
 }
