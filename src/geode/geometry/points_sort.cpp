@@ -88,9 +88,10 @@ namespace
         bool operator()( const SortedPoint< dimension >& box1,
             const SortedPoint< dimension >& box2 ) const
         {
-            // Bitwise operators: branchless, faster in std::nth_element
             const auto value1 = box1.coordinates[coord_];
             const auto value2 = box2.coordinates[coord_];
+            // Bitwise operators on bool: branchless, faster in
+            // std::nth_element than the logical ones (or a ternary)
             return ( value1 < value2 )
                    | ( ( value1 == value2 ) & ( box1.index < box2.index ) );
         }
@@ -109,9 +110,10 @@ namespace
         bool operator()( const SortedPoint< dimension >& box1,
             const SortedPoint< dimension >& box2 ) const
         {
-            // Bitwise operators: branchless, faster in std::nth_element
             const auto value1 = box1.coordinates[coord_];
             const auto value2 = box2.coordinates[coord_];
+            // Bitwise operators on bool: branchless, faster in
+            // std::nth_element than the logical ones (or a ternary)
             return ( value1 > value2 )
                    | ( ( value1 == value2 ) & ( box1.index < box2.index ) );
         }
@@ -141,7 +143,7 @@ namespace
         {
             return begin;
         }
-        const Iterator middle = begin + ( end - begin ) / 2;
+        const Iterator middle = begin + ( ( end - begin ) / 2 );
         std::nth_element( begin, middle, end, cmp );
         return middle;
     }

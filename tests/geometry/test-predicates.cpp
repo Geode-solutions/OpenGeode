@@ -2187,8 +2187,9 @@ namespace
         std::array< geode::Point3D, 8 > cube;
         for( const auto i : geode::Range{ 8 } )
         {
-            cube[i] = geode::Point3D{ { double( i & 1 ),
-                double( ( i >> 1 ) & 1 ), double( ( i >> 2 ) & 1 ) } };
+            cube[i] = geode::Point3D{ { static_cast< double >( i & 1U ),
+                static_cast< double >( ( i >> 1U ) & 1U ),
+                static_cast< double >( ( i >> 2U ) & 1U ) } };
         }
         geode::index_t nb_tested{ 0 };
         for( const auto a : geode::Range{ 8 } )
@@ -2261,8 +2262,9 @@ namespace
             std::array< geode::Point3D, 5 > pts;
             for( auto& point : pts )
             {
-                point = geode::Point3D{ { double( dist( gen ) ),
-                    double( dist( gen ) ), double( dist( gen ) ) } };
+                point = geode::Point3D{ { static_cast< double >( dist( gen ) ),
+                    static_cast< double >( dist( gen ) ),
+                    static_cast< double >( dist( gen ) ) } };
             }
             if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
                 != GEO::positive )
@@ -2274,7 +2276,7 @@ namespace
                     continue;
                 }
             }
-            double det[4][4];
+            std::array< std::array< double, 4 >, 4 > det{};
             for( const auto i : geode::LRange{ 4 } )
             {
                 double sq{ 0 };
@@ -2286,21 +2288,22 @@ namespace
                 det[i][3] = sq;
             }
             const auto minor3 = [&det]( int r0, int r1, int r2 ) {
-                return det[r0][0]
+                return ( det[r0][0]
                            * ( det[r1][1] * det[r2][2]
-                               - det[r1][2] * det[r2][1] )
-                       - det[r0][1]
-                             * ( det[r1][0] * det[r2][2]
-                                 - det[r1][2] * det[r2][0] )
-                       + det[r0][2]
-                             * ( det[r1][0] * det[r2][1]
-                                 - det[r1][1] * det[r2][0] );
+                               - det[r1][2] * det[r2][1] ) )
+                       - ( det[r0][1]
+                           * ( det[r1][0] * det[r2][2]
+                               - det[r1][2] * det[r2][0] ) )
+                       + ( det[r0][2]
+                           * ( det[r1][0] * det[r2][1]
+                               - det[r1][1] * det[r2][0] ) );
             };
             // For a positively oriented tetrahedron, the point is inside the
             // circumsphere iff this lifted determinant is negative.
-            const double value =
-                -det[0][3] * minor3( 1, 2, 3 ) + det[1][3] * minor3( 0, 2, 3 )
-                - det[2][3] * minor3( 0, 1, 3 ) + det[3][3] * minor3( 0, 1, 2 );
+            const double value = ( -det[0][3] * minor3( 1, 2, 3 ) )
+                                 + ( det[1][3] * minor3( 0, 2, 3 ) )
+                                 - ( det[2][3] * minor3( 0, 1, 3 ) )
+                                 + ( det[3][3] * minor3( 0, 1, 2 ) );
             const auto result = GEO::PCK::in_sphere_3d_SOS(
                 pts[0], pts[1], pts[2], pts[3], pts[4] );
             if( value < 0 )
@@ -2413,8 +2416,8 @@ namespace
         {
             std::array< double, 3 > d{ uniform_( gen_ ), uniform_( gen_ ),
                 planar ? 0. : uniform_( gen_ ) };
-            const auto norm =
-                std::sqrt( d[0] * d[0] + d[1] * d[1] + d[2] * d[2] );
+            const auto norm = std::sqrt(
+                ( d[0] * d[0] ) + ( d[1] * d[1] ) + ( d[2] * d[2] ) );
             std::array< double, 3 > p{ 0, 0, 0 };
             for( const auto i : geode::LRange{ 3 } )
             {
@@ -2439,9 +2442,9 @@ namespace
         // Point of a small integer grid, on a plane if planar.
         geode::Point3D grid( bool planar )
         {
-            return transform(
-                { double( grid_( gen_ ) ), double( grid_( gen_ ) ),
-                    planar ? 0. : double( grid_( gen_ ) ) } );
+            return transform( { static_cast< double >( grid_( gen_ ) ),
+                static_cast< double >( grid_( gen_ ) ),
+                planar ? 0. : static_cast< double >( grid_( gen_ ) ) } );
         }
 
         void new_frame( bool tilted )
@@ -2459,10 +2462,11 @@ namespace
         }
 
     private:
-        geode::Point3D transform( const std::array< double, 3 >& p ) const
+        [[nodiscard]] geode::Point3D transform(
+            const std::array< double, 3 >& p ) const
         {
-            return geode::Point3D{ { offset_ + scale_ * p[0],
-                offset_ + scale_ * p[1], offset_ + scale_ * p[2] } };
+            return geode::Point3D{ { offset_ + ( scale_ * p[0] ),
+                offset_ + ( scale_ * p[1] ), offset_ + ( scale_ * p[2] ) } };
         }
 
     private:

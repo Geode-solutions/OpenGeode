@@ -81,13 +81,13 @@
  * some doxygen commands that we use (retval, copydoc) and
  * generates many warnings for them...
  */
-#    if defined( __clang__ )
+#    ifdef __clang__
 #        pragma clang diagnostic ignored "-Wunknown-pragmas"
 #        pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #    endif
 
-#    if defined( GEO_DYNAMIC_LIBS )
-#        if defined( _MSC_VER )
+#    ifdef GEO_DYNAMIC_LIBS
+#        ifdef _MSC_VER
 #            define GEO_IMPORT __declspec( dllimport )
 #            define GEO_EXPORT __declspec( dllexport )
 #        elif defined( __GNUC__ )
@@ -166,11 +166,11 @@ enum
 
 // =============================== LINUX defines ===========================
 
-#    if defined( __ANDROID__ )
+#    ifdef __ANDROID__
 #        define GEO_OS_ANDROID
 #    endif
 
-#    if defined( __linux__ )
+#    ifdef __linux__
 
 #        define GEO_OS_LINUX
 #        define GEO_OS_UNIX
@@ -179,11 +179,11 @@ enum
 #            define GEO_OS_X11
 #        endif
 
-#        if defined( _OPENMP )
+#        ifdef _OPENMP
 #            define GEO_OPENMP
 #        endif
 
-#        if defined( __INTEL_COMPILER )
+#        ifdef __INTEL_COMPILER
 #            define GEO_COMPILER_INTEL
 #        elif defined( __clang__ )
 #            define GEO_COMPILER_CLANG
@@ -194,7 +194,7 @@ enum
 #        endif
 
 // The following works on GCC and ICC
-#        if defined( __x86_64 )
+#        ifdef __x86_64
 #            define GEO_ARCH_64
 #        else
 #            define GEO_ARCH_32
@@ -206,17 +206,17 @@ enum
 
 #        define GEO_OS_WINDOWS
 
-#        if defined( _OPENMP )
+#        ifdef _OPENMP
 #            define GEO_OPENMP
 #        endif
 
-#        if defined( _MSC_VER )
+#        ifdef _MSC_VER
 #            define GEO_COMPILER_MSVC
 #        elif defined( __MINGW32__ ) || defined( __MINGW64__ )
 #            define GEO_COMPILER_MINGW
 #        endif
 
-#        if defined( _WIN64 )
+#        ifdef _WIN64
 #            define GEO_ARCH_64
 #        else
 #            define GEO_ARCH_32
@@ -229,11 +229,11 @@ enum
 #        define GEO_OS_APPLE
 #        define GEO_OS_UNIX
 
-#        if defined( _OPENMP )
+#        ifdef _OPENMP
 #            define GEO_OPENMP
 #        endif
 
-#        if defined( __clang__ )
+#        ifdef __clang__
 #            define GEO_COMPILER_CLANG
 #        elif defined( __GNUC__ )
 #            define GEO_COMPILER_GCC
@@ -281,7 +281,7 @@ enum
 
 #    define CPP_CONCAT( A, B ) CPP_CONCAT_( A, B )
 
-#    if defined( GOMGEN )
+#    ifdef GOMGEN
 #        define GEO_NORETURN
 #    elif defined( GEO_COMPILER_GCC_FAMILY ) || defined( GEO_COMPILER_INTEL )
 #        define GEO_NORETURN __attribute__( ( noreturn ) )
@@ -289,7 +289,7 @@ enum
 #        define GEO_NORETURN
 #    endif
 
-#    if defined( GOMGEN )
+#    ifdef GOMGEN
 #        define GEO_NORETURN_DECL
 #    elif defined( GEO_COMPILER_MSVC )
 #        define GEO_NORETURN_DECL __declspec( noreturn )
@@ -701,22 +701,25 @@ namespace GEO
             const double dx = p3.value( 0 ) - p0.value( 0 );
             const double dy = p3.value( 1 ) - p0.value( 1 );
             const double dz = p3.value( 2 ) - p0.value( 2 );
-            const double lb = bx * bx + by * by + bz * bz;
-            const double lc = cx * cx + cy * cy + cz * cz;
-            const double ld = dx * dx + dy * dy + dz * dz;
+            const double lb = ( bx * bx ) + ( by * by ) + ( bz * bz );
+            const double lc = ( cx * cx ) + ( cy * cy ) + ( cz * cz );
+            const double ld = ( dx * dx ) + ( dy * dy ) + ( dz * dz );
             // 2x2 minors of the coordinate columns of rows c and d
-            const double xy = cx * dy - cy * dx;
-            const double xz = cx * dz - cz * dx;
-            const double yz = cy * dz - cz * dy;
+            const double xy = ( cx * dy ) - ( cy * dx );
+            const double xz = ( cx * dz ) - ( cz * dx );
+            const double yz = ( cy * dz ) - ( cz * dy );
             // 2x2 minors of a coordinate column and the lifted column
-            const double xl = cx * ld - lc * dx;
-            const double yl = cy * ld - lc * dy;
-            const double zl = cz * ld - lc * dz;
-            InSphereCoefficients result;
-            result.cofactors[0] = -( by * zl - bz * yl + lb * yz );
-            result.cofactors[1] = bx * zl - bz * xl + lb * xz;
-            result.cofactors[2] = -( bx * yl - by * xl + lb * xy );
-            result.cofactors[3] = bx * yz - by * xz + bz * xy;
+            const double x_lifted = ( cx * ld ) - ( lc * dx );
+            const double y_lifted = ( cy * ld ) - ( lc * dy );
+            const double z_lifted = ( cz * ld ) - ( lc * dz );
+            InSphereCoefficients result{};
+            result.cofactors[0] =
+                -( ( by * z_lifted ) - ( bz * y_lifted ) + ( lb * yz ) );
+            result.cofactors[1] =
+                ( bx * z_lifted ) - ( bz * x_lifted ) + ( lb * xz );
+            result.cofactors[2] =
+                -( ( bx * y_lifted ) - ( by * x_lifted ) + ( lb * xy ) );
+            result.cofactors[3] = ( bx * yz ) - ( by * xz ) + ( bz * xy );
             const double max_difference = std::fmax(
                 std::fmax( std::fmax( std::fabs( bx ), std::fabs( by ) ),
                     std::fmax( std::fabs( bz ), std::fabs( cx ) ) ),
@@ -765,10 +768,10 @@ namespace GEO
             {
                 return zero;
             }
-            const double le = ex * ex + ey * ey + ez * ez;
+            const double le = ( ex * ex ) + ( ey * ey ) + ( ez * ez );
             const auto& k = tet.cofactors;
             const double det =
-                ( ( ex * k[0] + ey * k[1] ) + ez * k[2] ) + le * k[3];
+                ( ( ex * k[0] + ey * k[1] ) + ez * k[2] ) + ( le * k[3] );
             const double m3 = m * m * m;
             const double eps = e * m3 * ( 1.0e-13 * m + 3.0e-14 * e );
             if( det > eps )
