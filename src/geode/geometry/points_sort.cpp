@@ -37,6 +37,10 @@ namespace
     // The sorts move copies of the points coordinates with their index
     // (instead of indices into the points) for memory locality. The
     // comparisons are the same, so the resulting order is the same.
+    // Ties are broken by index: the comparators are strict total orders, so
+    // the set of elements std::nth_element puts on each side of the middle is
+    // unique and the recursion goes down to ranges of size <= 1. The order is
+    // therefore the same whatever the standard library implementation.
     template < geode::index_t dimension >
     struct SortedPoint
     {
@@ -84,7 +88,11 @@ namespace
         bool operator()( const SortedPoint< dimension >& box1,
             const SortedPoint< dimension >& box2 ) const
         {
-            return box1.coordinates[coord_] < box2.coordinates[coord_];
+            // Bitwise operators: branchless, faster in std::nth_element
+            const auto value1 = box1.coordinates[coord_];
+            const auto value2 = box2.coordinates[coord_];
+            return ( value1 < value2 )
+                   | ( ( value1 == value2 ) & ( box1.index < box2.index ) );
         }
 
     private:
@@ -101,7 +109,11 @@ namespace
         bool operator()( const SortedPoint< dimension >& box1,
             const SortedPoint< dimension >& box2 ) const
         {
-            return box1.coordinates[coord_] > box2.coordinates[coord_];
+            // Bitwise operators: branchless, faster in std::nth_element
+            const auto value1 = box1.coordinates[coord_];
+            const auto value2 = box2.coordinates[coord_];
+            return ( value1 > value2 )
+                   | ( ( value1 == value2 ) & ( box1.index < box2.index ) );
         }
 
     private:
@@ -194,7 +206,13 @@ namespace
         }
         if( max_extent == 0 )
         {
-            // All points are colocated: any order is fine
+            // All points are colocated: order them by index so that the order
+            // does not depend on the previous std::nth_element calls
+            std::sort( begin, end,
+                []( const SortedPoint< 3 >& point1,
+                    const SortedPoint< 3 >& point2 ) {
+                    return point1.index < point2.index;
+                } );
             return true;
         }
         absl::InlinedVector< geode::local_index_t, 3 > kept_axes;
@@ -341,7 +359,9 @@ namespace geode
     {
         std::vector< index_t > mapping( points.size() );
         absl::c_iota( mapping, index_t{ 0 } );
-        absl::c_sort( mapping, [&points]( index_t i, index_t j ) {
+        // Stable sort: identical points stay ordered by index, whatever the
+        // standard library implementation
+        absl::c_stable_sort( mapping, [&points]( index_t i, index_t j ) {
             return lexicographic_compare( points[i], points[j] );
         } );
         return mapping;
