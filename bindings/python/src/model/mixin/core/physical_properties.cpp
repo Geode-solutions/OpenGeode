@@ -46,6 +46,11 @@ namespace geode
             .value( "bulk_modulus", PHYSICAL_PROPERTY_NAME::bulk_modulus )
             .value( "shear_modulus", PHYSICAL_PROPERTY_NAME::shear_modulus )
             .value( "density", PHYSICAL_PROPERTY_NAME::density )
+            .value(
+                "biot_coefficient", PHYSICAL_PROPERTY_NAME::biot_coefficient )
+            .value( "grain_density", PHYSICAL_PROPERTY_NAME::grain_density )
+            .value( "thermal_expansion_coefficient",
+                PHYSICAL_PROPERTY_NAME::thermal_expansion_coefficient )
             .value( "initial_stress", PHYSICAL_PROPERTY_NAME::initial_stress )
             .value( "initial_shear_stress",
                 PHYSICAL_PROPERTY_NAME::initial_shear_stress )

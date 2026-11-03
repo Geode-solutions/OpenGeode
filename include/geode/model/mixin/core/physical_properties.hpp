@@ -49,7 +49,13 @@ namespace geode
         permeability,
         bulk_modulus,
         shear_modulus,
+        // Bulk density, used without flow
         density,
+        // Coupled to flow: Biot coefficient (0 < b <= 1), density of the
+        // grains and drained linear thermal expansion coefficient
+        biot_coefficient,
+        grain_density,
+        thermal_expansion_coefficient,
         // std::array< double, 3 > (xx, yy, zz), the simulation problem gives
         // the sign convention
         initial_stress,

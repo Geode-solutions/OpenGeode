@@ -48,7 +48,7 @@ namespace
     // Names written in the files: never rename them
     constexpr std::array<
         std::pair< geode::PHYSICAL_PROPERTY_NAME, std::string_view >,
-        15 >
+        18 >
         PROPERTY_FILE_NAMES{ {
             { geode::PHYSICAL_PROPERTY_NAME::porosity, "porosity" },
             { geode::PHYSICAL_PROPERTY_NAME::permeability, "permeability" },
@@ -74,6 +74,11 @@ namespace
                 "boundary_traction" },
             { geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction,
                 "boundary_normal_traction" },
+            { geode::PHYSICAL_PROPERTY_NAME::biot_coefficient,
+                "biot_coefficient" },
+            { geode::PHYSICAL_PROPERTY_NAME::grain_density, "grain_density" },
+            { geode::PHYSICAL_PROPERTY_NAME::thermal_expansion_coefficient,
+                "thermal_expansion_coefficient" },
         } };
 
     constexpr std::size_t nb_file_name_entries(
