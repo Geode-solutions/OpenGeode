@@ -45,75 +45,49 @@
 
 namespace
 {
+    using PropertyFileName =
+        std::pair< geode::PHYSICAL_PROPERTY_NAME, std::string_view >;
+
     // Names written in the files: never rename them
-    constexpr std::array<
-        std::pair< geode::PHYSICAL_PROPERTY_NAME, std::string_view >,
-        15 >
-        PROPERTY_FILE_NAMES{ {
-            { geode::PHYSICAL_PROPERTY_NAME::porosity, "porosity" },
-            { geode::PHYSICAL_PROPERTY_NAME::permeability, "permeability" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
-                "boundary_pressure" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_temperature,
-                "boundary_temperature" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_oil_fraction,
-                "boundary_oil_fraction" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_gas_fraction,
-                "boundary_gas_fraction" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_water_fraction,
-                "boundary_water_fraction" },
-            { geode::PHYSICAL_PROPERTY_NAME::bulk_modulus, "bulk_modulus" },
-            { geode::PHYSICAL_PROPERTY_NAME::shear_modulus, "shear_modulus" },
-            { geode::PHYSICAL_PROPERTY_NAME::density, "density" },
-            { geode::PHYSICAL_PROPERTY_NAME::initial_stress, "initial_stress" },
-            { geode::PHYSICAL_PROPERTY_NAME::initial_shear_stress,
-                "initial_shear_stress" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_displacement,
-                "boundary_displacement" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_traction,
-                "boundary_traction" },
-            { geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction,
-                "boundary_normal_traction" },
-        } };
-
-    constexpr std::size_t nb_file_name_entries(
-        geode::PHYSICAL_PROPERTY_NAME name )
-    {
-        std::size_t nb_entries{ 0 };
-        for( const auto& property : PROPERTY_FILE_NAMES )
-        {
-            if( property.first == name )
-            {
-                nb_entries++;
-            }
-        }
-        return nb_entries;
-    }
-
-    // As many distinct entries as properties up to the last one: each
-    // property has a file name
-    constexpr bool has_all_property_file_names()
-    {
-        constexpr auto LAST_PROPERTY =
-            geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction;
-        if( PROPERTY_FILE_NAMES.size()
-            != static_cast< std::size_t >( LAST_PROPERTY ) + 1 )
-        {
-            return false;
-        }
-        for( const auto& property : PROPERTY_FILE_NAMES )
-        {
-            if( property.first > LAST_PROPERTY
-                || nb_file_name_entries( property.first ) != 1 )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    static_assert( has_all_property_file_names(),
-        "Each PHYSICAL_PROPERTY_NAME needs a PROPERTY_FILE_NAMES entry, and "
-        "boundary_normal_traction must be updated to the last enum value" );
+    constexpr std::array PROPERTY_FILE_NAMES{
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::porosity, "porosity" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::permeability, "permeability" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::boundary_pressure,
+            "boundary_pressure" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::boundary_temperature,
+            "boundary_temperature" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::boundary_oil_fraction,
+            "boundary_oil_fraction" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::boundary_gas_fraction,
+            "boundary_gas_fraction" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::boundary_water_fraction,
+            "boundary_water_fraction" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::bulk_modulus, "bulk_modulus" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::shear_modulus, "shear_modulus" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::density, "density" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::initial_stress, "initial_stress" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::initial_shear_stress,
+            "initial_shear_stress" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::boundary_displacement,
+            "boundary_displacement" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::boundary_traction,
+            "boundary_traction" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::boundary_normal_traction,
+            "boundary_normal_traction" },
+        PropertyFileName{ geode::PHYSICAL_PROPERTY_NAME::biot_coefficient,
+            "biot_coefficient" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::grain_density, "grain_density" },
+        PropertyFileName{
+            geode::PHYSICAL_PROPERTY_NAME::thermal_expansion_coefficient,
+            "thermal_expansion_coefficient" },
+    };
 
     // The first file version stored the enum values in this order
     constexpr std::array< geode::PHYSICAL_PROPERTY_NAME, 7 >

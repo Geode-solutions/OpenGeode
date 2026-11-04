@@ -1427,6 +1427,14 @@ void test_physical_properties( const geode::BRep& model,
                        .component_type
                    == geode::Block3D::component_type_static(),
         context, " Wrong initial stress physical property." );
+    geode::OpenGeodeModelException::test(
+        model.has_physical_property(
+            geode::PHYSICAL_PROPERTY_NAME::biot_coefficient )
+            && model.physical_property_info(
+                        geode::PHYSICAL_PROPERTY_NAME::biot_coefficient )
+                       .component_type
+                   == geode::Block3D::component_type_static(),
+        context, " Wrong Biot coefficient physical property." );
 }
 
 void test_clone( const geode::BRep& brep,
@@ -2299,6 +2307,15 @@ void test()
     builder.set_physical_property(
         geode::PHYSICAL_PROPERTY_NAME::initial_stress,
         geode::Block3D::component_type_static(), stress_attribute_id );
+    const geode::uuid biot_attribute_id;
+    geode::AttributeValues< double > biot_values;
+    biot_values.default_value = 0.8;
+    biot_values.no_value = 1.;
+    builder.create_blocks_attribute< geode::VariableAttribute, double >(
+        "biot_coefficient", biot_attribute_id, biot_values, {} );
+    builder.set_physical_property(
+        geode::PHYSICAL_PROPERTY_NAME::biot_coefficient,
+        geode::Block3D::component_type_static(), biot_attribute_id );
     test_physical_properties( model.clone(), physical_attribute_id,
         boundary_attribute_id, "[Test] clone" );
     test_clone( model, physical_attribute_id, boundary_attribute_id );
