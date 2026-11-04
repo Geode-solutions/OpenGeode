@@ -41,16 +41,32 @@ namespace geode
 
 namespace geode
 {
-
+    // New values need a file name in PROPERTY_FILE_NAMES
+    // (physical_properties.cpp)
     enum struct PHYSICAL_PROPERTY_NAME
     {
         porosity,
         permeability,
+        bulk_modulus,
+        shear_modulus,
+        density,
+        // std::array< double, 3 > (xx, yy, zz), the simulation problem gives
+        // the sign convention
+        initial_stress,
+        // std::array< double, 3 > (yz, xz, xy), same sign as initial_stress
+        initial_shear_stress,
         boundary_pressure,
         boundary_temperature,
         boundary_oil_fraction,
         boundary_gas_fraction,
-        boundary_water_fraction
+        boundary_water_fraction,
+        // std::array< double, 3 > uniform on each Surface, NaN components are
+        // free
+        boundary_displacement,
+        // std::array< double, 3 >
+        boundary_traction,
+        // Along the Surface normal, same sign as initial_stress
+        boundary_normal_traction
     };
 
     class opengeode_model_api PhysicalProperties

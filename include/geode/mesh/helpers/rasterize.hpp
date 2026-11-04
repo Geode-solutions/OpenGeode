@@ -39,16 +39,31 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * Rasterize the segment in the grid cells. The segment may extend outside
+     * the grid: only its part inside the grid is rasterized, and the result is
+     * empty if the segment is fully outside.
+     */
     template < index_t dimension >
     [[nodiscard]] std::vector< typename Grid< dimension >::CellIndices >
         rasterize_segment( const Grid< dimension >& grid,
             const Segment< dimension >& segment );
 
+    /*!
+     * Conservatively rasterize the segment in the grid cells. The segment may
+     * extend outside the grid: only its part inside the grid is rasterized, and
+     * the result is empty if the segment is fully outside.
+     */
     template < index_t dimension >
     [[nodiscard]] std::vector< typename Grid< dimension >::CellIndices >
         conservative_rasterize_segment( const Grid< dimension >& grid,
             const Segment< dimension >& segment );
 
+    /*!
+     * Conservatively rasterize the triangle in the grid cells. The triangle
+     * may extend outside the grid: only its part inside the grid is
+     * rasterized, and the result is empty if the triangle is fully outside.
+     */
     template < index_t dimension >
     [[nodiscard]] std::vector< typename Grid< dimension >::CellIndices >
         conservative_rasterize_triangle( const Grid< dimension >& grid,
