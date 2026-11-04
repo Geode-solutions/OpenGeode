@@ -1107,22 +1107,6 @@ namespace
         return cells;
     }
 
-    template < geode::index_t dimension >
-    bool is_inside_grid( const geode::Grid< dimension >& grid,
-        const geode::Point< dimension >& coordinates )
-    {
-        for( const auto d : geode::LRange{ dimension } )
-        {
-            const auto max =
-                static_cast< double >( grid.nb_cells_in_direction( d ) );
-            if( coordinates.value( d ) < 0 || coordinates.value( d ) > max )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /*!
      * Clip the polygon with the grid box (Sutherland-Hodgman). Points are in
      * grid coordinates (cell length unit) and the result is too.
@@ -1238,120 +1222,153 @@ namespace
 
 namespace geode
 {
+    namespace
+    {
+        template < index_t dimension >
+        std::vector< CellIndices< dimension > > rasterize_segment_in_grid(
+            const Grid< dimension >& grid, const Segment< dimension >& segment )
+        {
+            const auto start = grid.cells( segment.vertices().front() );
+            const auto end = grid.cells( segment.vertices().back() );
+            OpenGeodeMeshException::check_exception(
+                !start.empty() && !end.empty(), segment.barycenter(),
+                OpenGeodeException::TYPE::data,
+                "[rasterize_segment] Segment is not included in the given "
+                "Grid" );
+            if( start == end )
+            {
+                return { start.begin(), start.end() };
+            }
+
+            std::vector< CellIndices< dimension > > cells;
+            for( const auto& start_id : start )
+            {
+                for( const auto& end_id : end )
+                {
+                    for( const auto& cell :
+                        paint_segment< dimension >( start_id, end_id ) )
+                    {
+                        cells.push_back( cell );
+                    }
+                }
+            }
+            sort_unique( cells );
+            return cells;
+        }
+
+        template < index_t dimension >
+        std::vector< CellIndices< dimension > >
+            conservative_rasterize_segment_in_grid(
+                const Grid< dimension >& grid,
+                const Segment< dimension >& segment )
+        {
+            std::array< typename Grid< dimension >::CellsAroundVertex, 2 >
+                vertex_cells;
+            const auto& vertices = segment.vertices();
+            for( const auto v : LRange{ 2 } )
+            {
+                vertex_cells[v] = grid.cells( vertices[v] );
+                OpenGeodeMeshException::check_exception(
+                    !vertex_cells[v].empty(), segment.barycenter(),
+                    OpenGeodeException::TYPE::data,
+                    "[conservative_rasterize_segment] Segment is "
+                    "not included in the given Grid" );
+            }
+            if( vertex_cells[0] == vertex_cells[1] )
+            {
+                return { vertex_cells[0].begin(), vertex_cells[0].end() };
+            }
+            return conservative_voxelization_segment(
+                grid, segment, vertex_cells );
+        }
+
+        template < index_t dimension >
+        std::vector< CellIndices< dimension > >
+            conservative_rasterize_triangle_in_grid(
+                const Grid< dimension >& grid,
+                const Triangle< dimension >& triangle )
+        {
+            std::array< typename Grid< dimension >::CellsAroundVertex, 3 >
+                vertex_cells;
+            const auto& vertices = triangle.vertices();
+            for( const auto v : LRange{ 3 } )
+            {
+                vertex_cells[v] = grid.cells( vertices[v].get() );
+                OpenGeodeMeshException::check_exception(
+                    !vertex_cells[v].empty(), triangle.barycenter(),
+                    OpenGeodeException::TYPE::data,
+                    "[conservative_rasterize_triangle] Triangle is not "
+                    "included in "
+                    "the given Grid" );
+            }
+            if( vertex_cells[0] == vertex_cells[1]
+                && vertex_cells[1] == vertex_cells[2] )
+            {
+                return { vertex_cells[0].begin(), vertex_cells[0].end() };
+            }
+            return conservative_voxelization_triangle(
+                grid, triangle, vertex_cells );
+        }
+    } // namespace
+
     template < index_t dimension >
     std::vector< CellIndices< dimension > > rasterize_segment(
         const Grid< dimension >& grid, const Segment< dimension >& segment )
     {
-        const auto start = grid.cells( segment.vertices().front() );
-        const auto end = grid.cells( segment.vertices().back() );
-        OpenGeodeMeshException::check_exception( !start.empty() && !end.empty(),
-            segment.barycenter(), OpenGeodeException::TYPE::data,
-            "[rasterize_segment] Segment is not included in the given Grid" );
-        if( start == end )
-        {
-            return { start.begin(), start.end() };
-        }
-
-        std::vector< CellIndices< dimension > > cells;
-        for( const auto& start_id : start )
-        {
-            for( const auto& end_id : end )
-            {
-                for( const auto& cell :
-                    paint_segment< dimension >( start_id, end_id ) )
-                {
-                    cells.push_back( cell );
-                }
-            }
-        }
-        sort_unique( cells );
-        return cells;
-    }
-
-    template < index_t dimension >
-    std::vector< CellIndices< dimension > > conservative_rasterize_segment(
-        const Grid< dimension >& grid, const Segment< dimension >& segment )
-    {
-        std::array< typename Grid< dimension >::CellsAroundVertex, 2 >
-            vertex_cells;
         const auto& vertices = segment.vertices();
-        for( const auto v : LRange{ 2 } )
+        if( grid.contains( vertices[0] ) && grid.contains( vertices[1] ) )
         {
-            vertex_cells[v] = grid.cells( vertices[v] );
-            OpenGeodeMeshException::check_exception( !vertex_cells[v].empty(),
-                segment.barycenter(), OpenGeodeException::TYPE::data,
-                "[conservative_rasterize_segment] Segment is "
-                "not included in the given Grid" );
+            return rasterize_segment_in_grid( grid, segment );
         }
-        if( vertex_cells[0] == vertex_cells[1] )
-        {
-            return { vertex_cells[0].begin(), vertex_cells[0].end() };
-        }
-        return conservative_voxelization_segment( grid, segment, vertex_cells );
-    }
-
-    template < index_t dimension >
-    std::vector< CellIndices< dimension > > conservative_rasterize_triangle(
-        const Grid< dimension >& grid, const Triangle< dimension >& triangle )
-    {
-        std::array< typename Grid< dimension >::CellsAroundVertex, 3 >
-            vertex_cells;
-        const auto& vertices = triangle.vertices();
-        for( const auto v : LRange{ 3 } )
-        {
-            vertex_cells[v] = grid.cells( vertices[v].get() );
-            OpenGeodeMeshException::check_exception( !vertex_cells[v].empty(),
-                triangle.barycenter(), OpenGeodeException::TYPE::data,
-                "[conservative_rasterize_triangle] Triangle is not included in "
-                "the given Grid" );
-        }
-        if( vertex_cells[0] == vertex_cells[1]
-            && vertex_cells[1] == vertex_cells[2] )
-        {
-            return { vertex_cells[0].begin(), vertex_cells[0].end() };
-        }
-        return conservative_voxelization_triangle(
-            grid, triangle, vertex_cells );
-    }
-
-    template < index_t dimension >
-    std::vector< CellIndices< dimension > > rasterize_clipped_segment(
-        const Grid< dimension >& grid, const Segment< dimension >& segment )
-    {
-        const auto& coordinate_system = grid.grid_coordinate_system();
-        auto start = coordinate_system.coordinates( segment.vertices()[0] );
-        auto end = coordinate_system.coordinates( segment.vertices()[1] );
-        if( is_inside_grid( grid, start ) && is_inside_grid( grid, end ) )
-        {
-            return rasterize_segment( grid, segment );
-        }
+        auto start = grid.grid_coordinate_system().coordinates( vertices[0] );
+        auto end = grid.grid_coordinate_system().coordinates( vertices[1] );
         if( !clip_segment( grid, start, end ) )
         {
             return {};
         }
         const auto clipped_start = clamped_global_coordinates( grid, start );
         const auto clipped_end = clamped_global_coordinates( grid, end );
-        return rasterize_segment(
+        return rasterize_segment_in_grid(
             grid, Segment< dimension >{ clipped_start, clipped_end } );
     }
 
     template < index_t dimension >
-    std::vector< CellIndices< dimension > >
-        conservative_rasterize_clipped_triangle( const Grid< dimension >& grid,
-            const Triangle< dimension >& triangle )
+    std::vector< CellIndices< dimension > > conservative_rasterize_segment(
+        const Grid< dimension >& grid, const Segment< dimension >& segment )
+    {
+        const auto& vertices = segment.vertices();
+        if( grid.contains( vertices[0] ) && grid.contains( vertices[1] ) )
+        {
+            return conservative_rasterize_segment_in_grid( grid, segment );
+        }
+        auto start = grid.grid_coordinate_system().coordinates( vertices[0] );
+        auto end = grid.grid_coordinate_system().coordinates( vertices[1] );
+        if( !clip_segment( grid, start, end ) )
+        {
+            return {};
+        }
+        const auto clipped_start = clamped_global_coordinates( grid, start );
+        const auto clipped_end = clamped_global_coordinates( grid, end );
+        return conservative_rasterize_segment_in_grid(
+            grid, Segment< dimension >{ clipped_start, clipped_end } );
+    }
+
+    template < index_t dimension >
+    std::vector< CellIndices< dimension > > conservative_rasterize_triangle(
+        const Grid< dimension >& grid, const Triangle< dimension >& triangle )
     {
         const auto& coordinate_system = grid.grid_coordinate_system();
         std::vector< Point< dimension > > polygon;
-        bool inside{ true };
         for( const auto v : LRange{ 3 } )
         {
             polygon.push_back(
                 coordinate_system.coordinates( triangle.vertices()[v].get() ) );
-            inside = inside && is_inside_grid( grid, polygon.back() );
         }
-        if( inside )
+        if( grid.contains( triangle.vertices()[0] )
+            && grid.contains( triangle.vertices()[1] )
+            && grid.contains( triangle.vertices()[2] ) )
         {
-            return conservative_rasterize_triangle( grid, triangle );
+            return conservative_rasterize_triangle_in_grid( grid, triangle );
         }
         polygon = clip_polygon( grid, std::move( polygon ) );
         if( polygon.empty() )
@@ -1373,16 +1390,17 @@ namespace geode
         }
         else if( points.size() == 2 )
         {
-            cells = conservative_rasterize_segment(
+            cells = conservative_rasterize_segment_in_grid(
                 grid, Segment< dimension >{ points[0], points[1] } );
         }
         else
         {
             for( const auto p : Range{ 1, points.size() - 1 } )
             {
-                const auto triangle_cells = conservative_rasterize_triangle(
-                    grid, Triangle< dimension >{
-                              points[0], points[p], points[p + 1] } );
+                const auto triangle_cells =
+                    conservative_rasterize_triangle_in_grid(
+                        grid, Triangle< dimension >{
+                                  points[0], points[p], points[p + 1] } );
                 cells.insert(
                     cells.end(), triangle_cells.begin(), triangle_cells.end() );
             }
@@ -1411,20 +1429,6 @@ namespace geode
 
     template std::vector< CellIndices< 3 > > opengeode_mesh_api
         rasterize_segment< 3 >( const Grid3D&, const Segment3D& );
-
-    template std::vector< CellIndices< 2 > > opengeode_mesh_api
-        rasterize_clipped_segment< 2 >( const Grid2D&, const Segment2D& );
-
-    template std::vector< CellIndices< 3 > > opengeode_mesh_api
-        rasterize_clipped_segment< 3 >( const Grid3D&, const Segment3D& );
-
-    template std::vector< CellIndices< 2 > >
-        opengeode_mesh_api conservative_rasterize_clipped_triangle< 2 >(
-            const Grid2D&, const Triangle2D& );
-
-    template std::vector< CellIndices< 3 > >
-        opengeode_mesh_api conservative_rasterize_clipped_triangle< 3 >(
-            const Grid3D&, const Triangle3D& );
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api
         conservative_rasterize_segment< 2 >( const Grid2D&, const Segment2D& );

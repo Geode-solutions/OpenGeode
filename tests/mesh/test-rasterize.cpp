@@ -607,7 +607,7 @@ std::unique_ptr< geode::RegularGrid< dimension > > create_grid(
 // The cells of a clipped rasterization must be the cells of the same
 // rasterization on a larger grid that are inside the grid.
 template < geode::index_t dimension >
-void test_conservative_rasterize_clipped_triangle()
+void test_conservative_rasterize_outside_triangle()
 {
     constexpr geode::index_t nb_cells{ 10 };
     constexpr geode::index_t margin{ 5 };
@@ -648,16 +648,16 @@ void test_conservative_rasterize_clipped_triangle()
             }
         }
         const auto cells =
-            geode::conservative_rasterize_clipped_triangle( *grid, triangle );
+            geode::conservative_rasterize_triangle( *grid, triangle );
         absl::flat_hash_set< geode::index_t > result;
         for( const auto& cell : cells )
         {
             result.insert( grid->cell_index( cell ) );
         }
         geode::OpenGeodeMeshException::test( result.size() == cells.size(),
-            "Duplicated cells (conservative_rasterize_clipped_triangle)" );
+            "Duplicated cells (conservative_rasterize_triangle)" );
         geode::OpenGeodeMeshException::test( result == answer,
-            "Wrong result cells (conservative_rasterize_clipped_triangle): ",
+            "Wrong result cells (conservative_rasterize_triangle): ",
             result.size(), " instead of ", answer.size() );
         if( !answer.empty() )
         {
@@ -668,14 +668,14 @@ void test_conservative_rasterize_clipped_triangle()
         nb_partial > 20, "Not enough triangles crossing the grid in the test" );
 }
 
-void test_conservative_rasterize_clipped_triangle_cases()
+void test_conservative_rasterize_outside_triangle_cases()
 {
     const auto grid = create_grid< 2 >( 0, 10 );
     const geode::Point2D outside0{ { -20., -20. } };
     const geode::Point2D outside1{ { -10., -20. } };
     const geode::Point2D outside2{ { -20., -10. } };
     geode::OpenGeodeMeshException::test(
-        geode::conservative_rasterize_clipped_triangle(
+        geode::conservative_rasterize_triangle(
             *grid, { outside0, outside1, outside2 } )
             .empty(),
         "A triangle outside the grid must give no cells" );
@@ -685,35 +685,33 @@ void test_conservative_rasterize_clipped_triangle_cases()
     const geode::Point2D big1{ { 50., -30. } };
     const geode::Point2D big2{ { -30., 50. } };
     geode::OpenGeodeMeshException::test(
-        geode::conservative_rasterize_clipped_triangle(
-            *grid, { big0, big1, big2 } )
+        geode::conservative_rasterize_triangle( *grid, { big0, big1, big2 } )
                 .size()
             == grid->nb_cells(),
         "A triangle containing the grid must give all the cells" );
 }
 
-void test_rasterize_clipped_segment()
+void test_rasterize_outside_segment()
 {
     const auto grid = create_grid< 2 >( 0, 10 );
     // Crosses the whole grid along the row 4
-    auto cells = geode::rasterize_clipped_segment( *grid,
+    auto cells = geode::rasterize_segment( *grid,
         { geode::Point2D{ { -5., 4.5 } }, geode::Point2D{ { 15., 4.5 } } } );
     geode::OpenGeodeMeshException::test( cells.size() == 10,
-        "Wrong number of cells (rasterize_clipped_segment): ", cells.size() );
+        "Wrong number of cells (rasterize_segment): ", cells.size() );
     for( const auto& cell : cells )
     {
         geode::OpenGeodeMeshException::test(
-            cell[1] == 4, "Wrong cell row (rasterize_clipped_segment)" );
+            cell[1] == 4, "Wrong cell row (rasterize_segment)" );
     }
     // Starts outside, ends inside
-    cells = geode::rasterize_clipped_segment( *grid,
+    cells = geode::rasterize_segment( *grid,
         { geode::Point2D{ { -5., 4.5 } }, geode::Point2D{ { 2.5, 4.5 } } } );
     geode::OpenGeodeMeshException::test( cells.size() == 3,
-        "Wrong number of cells (rasterize_clipped_segment, partial): ",
-        cells.size() );
+        "Wrong number of cells (rasterize_segment, partial): ", cells.size() );
     // Fully outside, with a bounding box overlapping the grid
     geode::OpenGeodeMeshException::test(
-        geode::rasterize_clipped_segment( *grid,
+        geode::rasterize_segment( *grid,
             { geode::Point2D{ { -5., 8. } }, geode::Point2D{ { 2., 15. } } } )
             .empty(),
         "A segment outside the grid must give no cells" );
@@ -722,9 +720,26 @@ void test_rasterize_clipped_segment()
     const geode::Point2D inside1{ { 7.5, 4.5 } };
     const geode::Segment2D inside{ inside0, inside1 };
     geode::OpenGeodeMeshException::test(
-        geode::rasterize_clipped_segment( *grid, inside )
+        geode::rasterize_segment( *grid, inside )
             == geode::rasterize_segment( *grid, inside ),
         "An inside segment must give the rasterize_segment cells" );
+}
+
+void test_conservative_rasterize_outside_segment()
+{
+    const auto grid = create_grid< 2 >( 0, 10 );
+    // Crosses the whole grid along the row 4
+    auto cells = geode::conservative_rasterize_segment( *grid,
+        { geode::Point2D{ { -5., 4.5 } }, geode::Point2D{ { 15., 4.5 } } } );
+    geode::OpenGeodeMeshException::test( cells.size() == 10,
+        "Wrong number of cells (conservative_rasterize_segment): ",
+        cells.size() );
+    // Fully outside, with a bounding box overlapping the grid
+    geode::OpenGeodeMeshException::test(
+        geode::conservative_rasterize_segment( *grid,
+            { geode::Point2D{ { -5., 8. } }, geode::Point2D{ { 2., 15. } } } )
+            .empty(),
+        "A segment outside the grid must give no cells" );
 }
 
 void test()
@@ -753,10 +768,11 @@ void test()
     test_rasterize_tetrahedron_rotated();
     test_rasterize_random_triangles();
     test_conservative_rasterize_short_segment();
-    test_conservative_rasterize_clipped_triangle< 2 >();
-    test_conservative_rasterize_clipped_triangle< 3 >();
-    test_conservative_rasterize_clipped_triangle_cases();
-    test_rasterize_clipped_segment();
+    test_conservative_rasterize_outside_triangle< 2 >();
+    test_conservative_rasterize_outside_triangle< 3 >();
+    test_conservative_rasterize_outside_triangle_cases();
+    test_rasterize_outside_segment();
+    test_conservative_rasterize_outside_segment();
 }
 
 OPENGEODE_TEST( "rasterize" )

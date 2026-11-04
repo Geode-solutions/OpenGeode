@@ -46,14 +46,6 @@ namespace geode
             &conservative_rasterize_triangle< 2 > );
         module.def( "conservative_rasterize_triangle3D",
             &conservative_rasterize_triangle< 3 > );
-        module.def(
-            "rasterize_clipped_segment2D", &rasterize_clipped_segment< 2 > );
-        module.def(
-            "rasterize_clipped_segment3D", &rasterize_clipped_segment< 3 > );
-        module.def( "conservative_rasterize_clipped_triangle2D",
-            &conservative_rasterize_clipped_triangle< 2 > );
-        module.def( "conservative_rasterize_clipped_triangle3D",
-            &conservative_rasterize_clipped_triangle< 3 > );
         module.def( "rasterize_tetrahedron", &rasterize_tetrahedron );
         module.def( "rasterize_closed_surface", &rasterize_closed_surface );
     }
