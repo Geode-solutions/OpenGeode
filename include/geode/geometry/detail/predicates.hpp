@@ -81,13 +81,13 @@
  * some doxygen commands that we use (retval, copydoc) and
  * generates many warnings for them...
  */
-#    ifdef __clang__
+#    if defined( __clang__ )
 #        pragma clang diagnostic ignored "-Wunknown-pragmas"
 #        pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #    endif
 
-#    ifdef GEO_DYNAMIC_LIBS
-#        ifdef _MSC_VER
+#    if defined( GEO_DYNAMIC_LIBS )
+#        if defined( _MSC_VER )
 #            define GEO_IMPORT __declspec( dllimport )
 #            define GEO_EXPORT __declspec( dllexport )
 #        elif defined( __GNUC__ )
@@ -166,11 +166,11 @@ enum
 
 // =============================== LINUX defines ===========================
 
-#    ifdef __ANDROID__
+#    if defined( __ANDROID__ )
 #        define GEO_OS_ANDROID
 #    endif
 
-#    ifdef __linux__
+#    if defined( __linux__ )
 
 #        define GEO_OS_LINUX
 #        define GEO_OS_UNIX
@@ -179,11 +179,11 @@ enum
 #            define GEO_OS_X11
 #        endif
 
-#        ifdef _OPENMP
+#        if defined( _OPENMP )
 #            define GEO_OPENMP
 #        endif
 
-#        ifdef __INTEL_COMPILER
+#        if defined( __INTEL_COMPILER )
 #            define GEO_COMPILER_INTEL
 #        elif defined( __clang__ )
 #            define GEO_COMPILER_CLANG
@@ -194,7 +194,7 @@ enum
 #        endif
 
 // The following works on GCC and ICC
-#        ifdef __x86_64
+#        if defined( __x86_64 )
 #            define GEO_ARCH_64
 #        else
 #            define GEO_ARCH_32
@@ -206,17 +206,17 @@ enum
 
 #        define GEO_OS_WINDOWS
 
-#        ifdef _OPENMP
+#        if defined( _OPENMP )
 #            define GEO_OPENMP
 #        endif
 
-#        ifdef _MSC_VER
+#        if defined( _MSC_VER )
 #            define GEO_COMPILER_MSVC
 #        elif defined( __MINGW32__ ) || defined( __MINGW64__ )
 #            define GEO_COMPILER_MINGW
 #        endif
 
-#        ifdef _WIN64
+#        if defined( _WIN64 )
 #            define GEO_ARCH_64
 #        else
 #            define GEO_ARCH_32
@@ -229,11 +229,11 @@ enum
 #        define GEO_OS_APPLE
 #        define GEO_OS_UNIX
 
-#        ifdef _OPENMP
+#        if defined( _OPENMP )
 #            define GEO_OPENMP
 #        endif
 
-#        ifdef __clang__
+#        if defined( __clang__ )
 #            define GEO_COMPILER_CLANG
 #        elif defined( __GNUC__ )
 #            define GEO_COMPILER_GCC
@@ -281,7 +281,7 @@ enum
 
 #    define CPP_CONCAT( A, B ) CPP_CONCAT_( A, B )
 
-#    ifdef GOMGEN
+#    if defined( GOMGEN )
 #        define GEO_NORETURN
 #    elif defined( GEO_COMPILER_GCC_FAMILY ) || defined( GEO_COMPILER_INTEL )
 #        define GEO_NORETURN __attribute__( ( noreturn ) )
@@ -289,7 +289,7 @@ enum
 #        define GEO_NORETURN
 #    endif
 
-#    ifdef GOMGEN
+#    if defined( GOMGEN )
 #        define GEO_NORETURN_DECL
 #    elif defined( GEO_COMPILER_MSVC )
 #        define GEO_NORETURN_DECL __declspec( noreturn )
@@ -594,8 +594,14 @@ namespace GEO
          * Position of p4 with respect to the circumsphere of the positively
          * oriented tetrahedron (p0, p1, p2, p3): positive if p4 is inside,
          * negative if outside. Never returns zero: cospherical configurations
-         * are resolved by symbolic perturbation ordered by the points address
-         * (the points should be references into one contiguous array).
+         * are resolved by symbolic perturbation ordered by the points address.
+         * The points must therefore be references to distinct elements of one
+         * stable contiguous array, whose element order is the perturbation
+         * order (e.g. the mesh points, in vertex order). Never pass copies or
+         * temporaries: their addresses depend on the stack, which makes the
+         * result of the degenerate cases arbitrary and not reproducible. The
+         * order is only used for degenerate cases, a non degenerate result
+         * does not depend on it.
          */
         opengeode_geometry_api SIGN in_sphere_3d_SOS( const geode::Point3D& p0,
             const geode::Point3D& p1,
@@ -607,7 +613,8 @@ namespace GEO
          * Position of p3, coplanar with (p0, p1, p2), with respect to the
          * circumcircle of the triangle (p0, p1, p2): positive if inside,
          * negative if outside. Never returns zero: cocircular configurations
-         * are resolved by symbolic perturbation ordered by the points address.
+         * are resolved by symbolic perturbation ordered by the points address:
+         * same requirements as in_sphere_3d_SOS on the points.
          */
         opengeode_geometry_api SIGN in_circle_3d_SOS( const geode::Point3D& p0,
             const geode::Point3D& p1,
@@ -786,32 +793,43 @@ namespace GEO
         }
 
         /*!
-         * Same results as in_sphere_3d_SOS and in_circle_3d_SOS, always
-         * evaluated with exact arithmetic (no floating point filter). Used to
-         * validate the filters.
+         * Entry points exposed only to validate the filters of the
+         * predicates above in the tests: not for production code.
          */
-        opengeode_geometry_api SIGN in_sphere_3d_SOS_exact(
-            const geode::Point3D& p0,
-            const geode::Point3D& p1,
-            const geode::Point3D& p2,
-            const geode::Point3D& p3,
-            const geode::Point3D& p4 );
+        namespace testing
+        {
+            /*!
+             * Same results as in_sphere_3d_SOS and in_circle_3d_SOS, always
+             * evaluated with exact arithmetic (no floating point filter). Used
+             * to validate the filters.
+             */
+            opengeode_geometry_api SIGN in_sphere_3d_SOS_exact(
+                const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3,
+                const geode::Point3D& p4 );
 
-        /*!
-         * Floating point filter of in_circle_3d_SOS alone: its sign, or zero
-         * if the filter cannot decide. Used to test the filter.
-         */
-        opengeode_geometry_api SIGN in_circle_3d_SOS_filter(
-            const geode::Point3D& p0,
-            const geode::Point3D& p1,
-            const geode::Point3D& p2,
-            const geode::Point3D& p3 );
+            /*!
+             * Floating point filter of in_circle_3d_SOS alone: its sign, or
+             * zero if the filter cannot decide. Used to test the filter.
+             */
+            opengeode_geometry_api SIGN in_circle_3d_SOS_filter(
+                const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3 );
 
-        opengeode_geometry_api SIGN in_circle_3d_SOS_exact(
-            const geode::Point3D& p0,
-            const geode::Point3D& p1,
-            const geode::Point3D& p2,
-            const geode::Point3D& p3 );
+            /*!
+             * Same results as in_circle_3d_SOS, always evaluated with exact
+             * arithmetic.
+             */
+            opengeode_geometry_api SIGN in_circle_3d_SOS_exact(
+                const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3 );
+        } // namespace testing
 
         opengeode_geometry_api void initialize();
     } // namespace PCK

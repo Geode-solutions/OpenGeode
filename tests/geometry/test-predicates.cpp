@@ -2327,6 +2327,64 @@ namespace
             nb_tested > 1000, "[Test] Too few random configurations tested" );
     }
 
+    void test_sos_depends_on_array_order_only()
+    {
+        // Cospherical points (cube corners): the perturbation is ordered by
+        // the points address, so the result only depends on the order of the
+        // points in their array, not on where the array is.
+        const auto make_cube = [] {
+            std::vector< geode::Point3D > cube( 8 );
+            for( const auto i : geode::Range{ 8 } )
+            {
+                cube[i] = geode::Point3D{ { static_cast< double >( i & 1U ),
+                    static_cast< double >( ( i >> 1U ) & 1U ),
+                    static_cast< double >( ( i >> 2U ) & 1U ) } };
+            }
+            return cube;
+        };
+        const auto first = make_cube();
+        const auto second = make_cube();
+        geode::index_t nb_tested{ 0 };
+        for( const auto a : geode::Range{ 8 } )
+        {
+            for( const auto b : geode::Range{ 8 } )
+            {
+                for( const auto c : geode::Range{ 8 } )
+                {
+                    for( const auto d : geode::Range{ 8 } )
+                    {
+                        for( const auto e : geode::Range{ 8 } )
+                        {
+                            if( a == b || a == c || a == d || a == e || b == c
+                                || b == d || b == e || c == d || c == e
+                                || d == e )
+                            {
+                                continue;
+                            }
+                            if( GEO::PCK::orient_3d(
+                                    first[a], first[b], first[c], first[d] )
+                                != GEO::positive )
+                            {
+                                continue;
+                            }
+                            geode::OpenGeodeGeometryException::test(
+                                GEO::PCK::in_sphere_3d_SOS( first[a], first[b],
+                                    first[c], first[d], first[e] )
+                                    == GEO::PCK::in_sphere_3d_SOS( second[a],
+                                        second[b], second[c], second[d],
+                                        second[e] ),
+                                "[Test] in_sphere_3d_SOS should only depend "
+                                "on the order of the points in their array" );
+                            nb_tested++;
+                        }
+                    }
+                }
+            }
+        }
+        geode::OpenGeodeGeometryException::test(
+            nb_tested > 0, "[Test] No cospherical configuration tested" );
+    }
+
     void test_in_circle()
     {
         std::array< geode::Point3D, 6 > pts{ geode::Point3D{ { 0, 0, 0 } },
@@ -2519,7 +2577,7 @@ namespace
             if( GEO::PCK::orient_3d( pts[0], pts[1], pts[2], pts[3] )
                 == GEO::positive )
             {
-                const auto exact = GEO::PCK::in_sphere_3d_SOS_exact(
+                const auto exact = GEO::PCK::testing::in_sphere_3d_SOS_exact(
                     pts[0], pts[1], pts[2], pts[3], pts[4] );
                 geode::OpenGeodeGeometryException::test(
                     GEO::PCK::in_sphere_3d_SOS(
@@ -2551,10 +2609,10 @@ namespace
             geode::OpenGeodeGeometryException::test(
                 GEO::PCK::in_circle_3d_SOS(
                     planar[0], planar[1], planar[2], planar[3] )
-                    == GEO::PCK::in_circle_3d_SOS_exact(
+                    == GEO::PCK::testing::in_circle_3d_SOS_exact(
                         planar[0], planar[1], planar[2], planar[3] ),
                 "[Test] Filtered and exact in_circle_3d_SOS differ" );
-            if( GEO::PCK::in_circle_3d_SOS_filter(
+            if( GEO::PCK::testing::in_circle_3d_SOS_filter(
                     planar[0], planar[1], planar[2], planar[3] )
                 != GEO::zero )
             {
@@ -2603,6 +2661,7 @@ void test()
     test_regression_cases();
     test_in_sphere();
     test_in_sphere_random_integers();
+    test_sos_depends_on_array_order_only();
     test_in_circle();
     test_in_sphere_in_circle_filters();
 

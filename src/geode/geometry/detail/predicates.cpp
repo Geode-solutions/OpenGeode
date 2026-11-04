@@ -2517,6 +2517,8 @@ namespace GEO
             std::array< const geode::Point3D*, 5 > p_sort{ &p0, &p1, &p2, &p3,
                 &p4 };
             std::sort( p_sort.begin(), p_sort.end() );
+            geo_debug_assert( std::adjacent_find( p_sort.begin(), p_sort.end() )
+                              == p_sort.end() );
             for( const auto* point : p_sort )
             {
                 if( point == &p0 )
@@ -2687,6 +2689,8 @@ namespace GEO
             // Simulation of Simplicity (symbolic perturbation)
             std::array< const geode::Point3D*, 4 > p_sort{ &p0, &p1, &p2, &p3 };
             std::sort( p_sort.begin(), p_sort.end() );
+            geo_debug_assert( std::adjacent_find( p_sort.begin(), p_sort.end() )
+                              == p_sort.end() );
             for( const auto* point : p_sort )
             {
                 if( point == &p0 )
@@ -2867,30 +2871,33 @@ namespace GEO
             return in_circle_3d_exact_SOS( p0, p1, p2, p3 );
         }
 
-        SIGN in_sphere_3d_SOS_exact( const geode::Point3D& p0,
-            const geode::Point3D& p1,
-            const geode::Point3D& p2,
-            const geode::Point3D& p3,
-            const geode::Point3D& p4 )
+        namespace testing
         {
-            return in_sphere_3d_exact_SOS( p0, p1, p2, p3, p4 );
-        }
+            SIGN in_sphere_3d_SOS_exact( const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3,
+                const geode::Point3D& p4 )
+            {
+                return in_sphere_3d_exact_SOS( p0, p1, p2, p3, p4 );
+            }
 
-        SIGN in_circle_3d_SOS_filter( const geode::Point3D& p0,
-            const geode::Point3D& p1,
-            const geode::Point3D& p2,
-            const geode::Point3D& p3 )
-        {
-            return SIGN( in_circle_3d_filter( p0, p1, p2, p3 ) );
-        }
+            SIGN in_circle_3d_SOS_filter( const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3 )
+            {
+                return SIGN( in_circle_3d_filter( p0, p1, p2, p3 ) );
+            }
 
-        SIGN in_circle_3d_SOS_exact( const geode::Point3D& p0,
-            const geode::Point3D& p1,
-            const geode::Point3D& p2,
-            const geode::Point3D& p3 )
-        {
-            return in_circle_3d_exact_SOS( p0, p1, p2, p3 );
-        }
+            SIGN in_circle_3d_SOS_exact( const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3 )
+            {
+                return in_circle_3d_exact_SOS( p0, p1, p2, p3 );
+            }
+        } // namespace testing
 
         void initialize()
         {
