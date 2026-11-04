@@ -1107,6 +1107,133 @@ namespace
         return cells;
     }
 
+    template < geode::index_t dimension >
+    bool is_inside_grid( const geode::Grid< dimension >& grid,
+        const geode::Point< dimension >& coordinates )
+    {
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            const auto max =
+                static_cast< double >( grid.nb_cells_in_direction( d ) );
+            if( coordinates.value( d ) < 0 || coordinates.value( d ) > max )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*!
+     * Clip the polygon with the grid box (Sutherland-Hodgman). Points are in
+     * grid coordinates (cell length unit) and the result is too.
+     */
+    template < geode::index_t dimension >
+    std::vector< geode::Point< dimension > > clip_polygon(
+        const geode::Grid< dimension >& grid,
+        std::vector< geode::Point< dimension > > polygon )
+    {
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            const auto max =
+                static_cast< double >( grid.nb_cells_in_direction( d ) );
+            for( const auto side : geode::LRange{ 2 } )
+            {
+                const auto bound = side == 0 ? 0. : max;
+                const auto sign = side == 0 ? 1. : -1.;
+                const auto signed_distance =
+                    [&]( const geode::Point< dimension >& point ) {
+                        return sign * ( point.value( d ) - bound );
+                    };
+                std::vector< geode::Point< dimension > > clipped;
+                for( const auto p : geode::Indices{ polygon } )
+                {
+                    const auto& current = polygon[p];
+                    const auto& next = polygon[( p + 1 ) % polygon.size()];
+                    const auto current_distance = signed_distance( current );
+                    const auto next_distance = signed_distance( next );
+                    if( current_distance >= 0 )
+                    {
+                        clipped.push_back( current );
+                    }
+                    if( ( current_distance < 0 && next_distance > 0 )
+                        || ( current_distance > 0 && next_distance < 0 ) )
+                    {
+                        const auto t = current_distance
+                                       / ( current_distance - next_distance );
+                        auto point = current + ( next - current ) * t;
+                        point.set_value( d, bound );
+                        clipped.push_back( point );
+                    }
+                }
+                polygon = std::move( clipped );
+                if( polygon.empty() )
+                {
+                    return polygon;
+                }
+            }
+        }
+        return polygon;
+    }
+
+    /*!
+     * Clip the segment with the grid box (Liang-Barsky in grid coordinates).
+     * Returns false if the segment is outside the grid.
+     */
+    template < geode::index_t dimension >
+    bool clip_segment( const geode::Grid< dimension >& grid,
+        geode::Point< dimension >& start,
+        geode::Point< dimension >& end )
+    {
+        double t_min{ 0 };
+        double t_max{ 1 };
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            const auto origin = start.value( d );
+            const auto delta = end.value( d ) - origin;
+            const auto max =
+                static_cast< double >( grid.nb_cells_in_direction( d ) );
+            if( delta == 0 )
+            {
+                if( origin < 0 || origin > max )
+                {
+                    return false;
+                }
+                continue;
+            }
+            const auto t0 = ( 0 - origin ) / delta;
+            const auto t1 = ( max - origin ) / delta;
+            t_min = std::max( t_min, std::min( t0, t1 ) );
+            t_max = std::min( t_max, std::max( t0, t1 ) );
+        }
+        if( !( t_min <= t_max ) )
+        {
+            return false;
+        }
+        const auto direction = end - start;
+        const auto clipped_end = start + direction * t_max;
+        start = start + direction * t_min;
+        end = clipped_end;
+        return true;
+    }
+
+    /*!
+     * Point in the grid box with the given grid coordinates, to the
+     * precision of the grid coordinate system round trip.
+     */
+    template < geode::index_t dimension >
+    geode::Point< dimension > clamped_global_coordinates(
+        const geode::Grid< dimension >& grid,
+        const geode::Point< dimension >& coordinates )
+    {
+        auto clamped = coordinates;
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            const auto max =
+                static_cast< double >( grid.nb_cells_in_direction( d ) );
+            clamped.set_value( d, std::clamp( clamped.value( d ), 0., max ) );
+        }
+        return grid.grid_coordinate_system().global_coordinates( clamped );
+    }
 } // namespace
 
 namespace geode
@@ -1187,6 +1314,83 @@ namespace geode
             grid, triangle, vertex_cells );
     }
 
+    template < index_t dimension >
+    std::vector< CellIndices< dimension > > rasterize_clipped_segment(
+        const Grid< dimension >& grid, const Segment< dimension >& segment )
+    {
+        const auto& coordinate_system = grid.grid_coordinate_system();
+        auto start = coordinate_system.coordinates( segment.vertices()[0] );
+        auto end = coordinate_system.coordinates( segment.vertices()[1] );
+        if( is_inside_grid( grid, start ) && is_inside_grid( grid, end ) )
+        {
+            return rasterize_segment( grid, segment );
+        }
+        if( !clip_segment( grid, start, end ) )
+        {
+            return {};
+        }
+        const auto clipped_start = clamped_global_coordinates( grid, start );
+        const auto clipped_end = clamped_global_coordinates( grid, end );
+        return rasterize_segment(
+            grid, Segment< dimension >{ clipped_start, clipped_end } );
+    }
+
+    template < index_t dimension >
+    std::vector< CellIndices< dimension > >
+        conservative_rasterize_clipped_triangle( const Grid< dimension >& grid,
+            const Triangle< dimension >& triangle )
+    {
+        const auto& coordinate_system = grid.grid_coordinate_system();
+        std::vector< Point< dimension > > polygon;
+        bool inside{ true };
+        for( const auto v : LRange{ 3 } )
+        {
+            polygon.push_back(
+                coordinate_system.coordinates( triangle.vertices()[v].get() ) );
+            inside = inside && is_inside_grid( grid, polygon.back() );
+        }
+        if( inside )
+        {
+            return conservative_rasterize_triangle( grid, triangle );
+        }
+        polygon = clip_polygon( grid, std::move( polygon ) );
+        if( polygon.empty() )
+        {
+            return {};
+        }
+        std::vector< Point< dimension > > points;
+        points.reserve( polygon.size() );
+        for( const auto& coordinates : polygon )
+        {
+            points.push_back( clamped_global_coordinates( grid, coordinates ) );
+        }
+        std::vector< CellIndices< dimension > > cells;
+        if( points.size() == 1 )
+        {
+            const auto vertex_cells = grid.cells( points.front() );
+            cells.insert(
+                cells.end(), vertex_cells.begin(), vertex_cells.end() );
+        }
+        else if( points.size() == 2 )
+        {
+            cells = conservative_rasterize_segment(
+                grid, Segment< dimension >{ points[0], points[1] } );
+        }
+        else
+        {
+            for( const auto p : Range{ 1, points.size() - 1 } )
+            {
+                const auto triangle_cells = conservative_rasterize_triangle(
+                    grid, Triangle< dimension >{
+                              points[0], points[p], points[p + 1] } );
+                cells.insert(
+                    cells.end(), triangle_cells.begin(), triangle_cells.end() );
+            }
+        }
+        sort_unique( cells );
+        return cells;
+    }
+
     std::vector< typename Grid3D::CellIndices > rasterize_tetrahedron(
         const Grid3D& grid, const Tetrahedron& tetrahedron )
     {
@@ -1207,6 +1411,20 @@ namespace geode
 
     template std::vector< CellIndices< 3 > > opengeode_mesh_api
         rasterize_segment< 3 >( const Grid3D&, const Segment3D& );
+
+    template std::vector< CellIndices< 2 > > opengeode_mesh_api
+        rasterize_clipped_segment< 2 >( const Grid2D&, const Segment2D& );
+
+    template std::vector< CellIndices< 3 > > opengeode_mesh_api
+        rasterize_clipped_segment< 3 >( const Grid3D&, const Segment3D& );
+
+    template std::vector< CellIndices< 2 > >
+        opengeode_mesh_api conservative_rasterize_clipped_triangle< 2 >(
+            const Grid2D&, const Triangle2D& );
+
+    template std::vector< CellIndices< 3 > >
+        opengeode_mesh_api conservative_rasterize_clipped_triangle< 3 >(
+            const Grid3D&, const Triangle3D& );
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api
         conservative_rasterize_segment< 2 >( const Grid2D&, const Segment2D& );

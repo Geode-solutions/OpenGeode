@@ -587,6 +587,146 @@ namespace
     }
 } // namespace
 
+template < geode::index_t dimension >
+std::unique_ptr< geode::RegularGrid< dimension > > create_grid(
+    double origin, geode::index_t nb_cells )
+{
+    auto grid = geode::RegularGrid< dimension >::create();
+    auto builder = geode::RegularGridBuilder< dimension >::create( *grid );
+    geode::Point< dimension > grid_origin;
+    std::array< geode::index_t, dimension > dimensions;
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        grid_origin.set_value( d, origin );
+        dimensions[d] = nb_cells;
+    }
+    builder->initialize_grid( grid_origin, dimensions, 1 );
+    return grid;
+}
+
+// The cells of a clipped rasterization must be the cells of the same
+// rasterization on a larger grid that are inside the grid.
+template < geode::index_t dimension >
+void test_conservative_rasterize_clipped_triangle()
+{
+    constexpr geode::index_t nb_cells{ 10 };
+    constexpr geode::index_t margin{ 5 };
+    const auto grid = create_grid< dimension >( 0, nb_cells );
+    const auto large_grid = create_grid< dimension >(
+        -static_cast< double >( margin ), nb_cells + 2 * margin );
+    std::mt19937 generator{ 42 };
+    std::uniform_real_distribution< double > distribution{ -4.9, 14.9 };
+    geode::index_t nb_partial{ 0 };
+    for( const auto t : geode::Range{ 200 } )
+    {
+        geode_unused( t );
+        std::array< geode::Point< dimension >, 3 > points;
+        for( auto& point : points )
+        {
+            for( const auto d : geode::LRange{ dimension } )
+            {
+                point.set_value( d, distribution( generator ) );
+            }
+        }
+        const geode::Triangle< dimension > triangle{ points[0], points[1],
+            points[2] };
+        absl::flat_hash_set< geode::index_t > answer;
+        for( const auto& cell :
+            geode::conservative_rasterize_triangle( *large_grid, triangle ) )
+        {
+            auto shifted = cell;
+            bool inside{ true };
+            for( const auto d : geode::LRange{ dimension } )
+            {
+                inside =
+                    inside && cell[d] >= margin && cell[d] < margin + nb_cells;
+                shifted[d] = cell[d] - margin;
+            }
+            if( inside )
+            {
+                answer.insert( grid->cell_index( shifted ) );
+            }
+        }
+        const auto cells =
+            geode::conservative_rasterize_clipped_triangle( *grid, triangle );
+        absl::flat_hash_set< geode::index_t > result;
+        for( const auto& cell : cells )
+        {
+            result.insert( grid->cell_index( cell ) );
+        }
+        geode::OpenGeodeMeshException::test( result.size() == cells.size(),
+            "Duplicated cells (conservative_rasterize_clipped_triangle)" );
+        geode::OpenGeodeMeshException::test( result == answer,
+            "Wrong result cells (conservative_rasterize_clipped_triangle): ",
+            result.size(), " instead of ", answer.size() );
+        if( !answer.empty() )
+        {
+            nb_partial++;
+        }
+    }
+    geode::OpenGeodeMeshException::test(
+        nb_partial > 20, "Not enough triangles crossing the grid in the test" );
+}
+
+void test_conservative_rasterize_clipped_triangle_cases()
+{
+    const auto grid = create_grid< 2 >( 0, 10 );
+    const geode::Point2D outside0{ { -20., -20. } };
+    const geode::Point2D outside1{ { -10., -20. } };
+    const geode::Point2D outside2{ { -20., -10. } };
+    geode::OpenGeodeMeshException::test(
+        geode::conservative_rasterize_clipped_triangle(
+            *grid, { outside0, outside1, outside2 } )
+            .empty(),
+        "A triangle outside the grid must give no cells" );
+
+    // Triangle containing the whole grid: all the cells are intersected
+    const geode::Point2D big0{ { -30., -30. } };
+    const geode::Point2D big1{ { 50., -30. } };
+    const geode::Point2D big2{ { -30., 50. } };
+    geode::OpenGeodeMeshException::test(
+        geode::conservative_rasterize_clipped_triangle(
+            *grid, { big0, big1, big2 } )
+                .size()
+            == grid->nb_cells(),
+        "A triangle containing the grid must give all the cells" );
+}
+
+void test_rasterize_clipped_segment()
+{
+    const auto grid = create_grid< 2 >( 0, 10 );
+    // Crosses the whole grid along the row 4
+    auto cells = geode::rasterize_clipped_segment( *grid,
+        { geode::Point2D{ { -5., 4.5 } }, geode::Point2D{ { 15., 4.5 } } } );
+    geode::OpenGeodeMeshException::test( cells.size() == 10,
+        "Wrong number of cells (rasterize_clipped_segment): ", cells.size() );
+    for( const auto& cell : cells )
+    {
+        geode::OpenGeodeMeshException::test(
+            cell[1] == 4, "Wrong cell row (rasterize_clipped_segment)" );
+    }
+    // Starts outside, ends inside
+    cells = geode::rasterize_clipped_segment( *grid,
+        { geode::Point2D{ { -5., 4.5 } }, geode::Point2D{ { 2.5, 4.5 } } } );
+    geode::OpenGeodeMeshException::test( cells.size() == 3,
+        "Wrong number of cells (rasterize_clipped_segment, partial): ",
+        cells.size() );
+    // Fully outside, with a bounding box overlapping the grid
+    geode::OpenGeodeMeshException::test(
+        geode::rasterize_clipped_segment( *grid,
+            { geode::Point2D{ { -5., 8. } }, geode::Point2D{ { 2., 15. } } } )
+            .empty(),
+        "A segment outside the grid must give no cells" );
+    // Fully inside: same as rasterize_segment
+    const geode::Point2D inside0{ { 1.5, 1.5 } };
+    const geode::Point2D inside1{ { 7.5, 4.5 } };
+    const geode::Segment2D inside{ inside0, inside1 };
+    geode::OpenGeodeMeshException::test(
+        geode::rasterize_clipped_segment( *grid, inside )
+            == geode::rasterize_segment( *grid, inside ),
+        "An inside segment must give the rasterize_segment cells" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -613,6 +753,10 @@ void test()
     test_rasterize_tetrahedron_rotated();
     test_rasterize_random_triangles();
     test_conservative_rasterize_short_segment();
+    test_conservative_rasterize_clipped_triangle< 2 >();
+    test_conservative_rasterize_clipped_triangle< 3 >();
+    test_conservative_rasterize_clipped_triangle_cases();
+    test_rasterize_clipped_segment();
 }
 
 OPENGEODE_TEST( "rasterize" )
