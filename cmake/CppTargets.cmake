@@ -153,12 +153,21 @@ function(add_geode_library)
         COMPONENT public
         PATTERN "*/internal" EXCLUDE
     )
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
-        COMPONENT private
-        FILES_MATCHING
-        PATTERN "*/internal/*"
+    # Internal headers at any depth below an internal folder, matched on
+    # the path relative to the library folder (which may itself contain
+    # an internal folder)
+    set(include_folder "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}")
+    file(GLOB_RECURSE internal_files CONFIGURE_DEPENDS
+        RELATIVE "${include_folder}" "${include_folder}/*"
     )
+    list(FILTER internal_files INCLUDE REGEX "(^|/)internal/")
+    foreach(file ${internal_files})
+        get_filename_component(file_folder "${file}" DIRECTORY)
+        install(FILES "${include_folder}/${file}"
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}/${file_folder}
+            COMPONENT private
+        )
+    endforeach()
     if(MSVC AND BUILD_SHARED_LIBS AND NOT ${GEODE_LIB_STATIC})
         install(FILES $<TARGET_PDB_FILE:${GEODE_LIB_NAME}> 
             DESTINATION bin 
