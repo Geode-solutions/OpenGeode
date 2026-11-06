@@ -31,6 +31,9 @@
 #include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/grid_builder.hpp>
+#include <geode/mesh/builder/grid_coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/core/grid_coordinate_reference_system.hpp>
+#include <geode/mesh/core/grid_coordinate_reference_system_manager.hpp>
 #include <geode/mesh/core/internal/grid_impl.hpp>
 
 namespace geode
@@ -59,23 +62,54 @@ namespace geode
             vertex_attribute_manager_.resize( nb_vertices );
         }
 
+        const GridCoordinateReferenceSystemManager< dimension >&
+            crs_manager() const
+        {
+            return crs_manager_;
+        }
+
+        GridCoordinateReferenceSystemManager< dimension >& crs_manager()
+        {
+            return crs_manager_;
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext(
-                *this, Growable< Archive, Impl >{
-                           { []( Archive& archive, Impl& impl ) {
-                               archive.object( impl.cell_attribute_manager_ );
-                               archive.object( impl.vertex_attribute_manager_ );
-                           } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.object( impl.cell_attribute_manager_ );
+                         archive.object( impl.vertex_attribute_manager_ );
+                     },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.cell_attribute_manager_ );
+                            archive.object( impl.vertex_attribute_manager_ );
+                            archive.object( impl.crs_manager_ );
+                        } } } );
         }
 
     private:
         mutable AttributeManager cell_attribute_manager_;
         mutable AttributeManager vertex_attribute_manager_;
+        GridCoordinateReferenceSystemManager< dimension > crs_manager_;
     };
+
+    template < index_t dimension >
+    void initialize_grid_crs( LightRegularGrid< dimension >& grid )
+    {
+        GridCoordinateReferenceSystemManagerBuilder< dimension > builder{
+            grid
+        };
+        builder.register_coordinate_reference_system(
+            internal::PointsImpl< dimension >::POINTS_NAME,
+            std::make_shared< GridCoordinateReferenceSystem< dimension > >(
+                grid.grid_coordinate_system() ) );
+        builder.set_active_coordinate_reference_system(
+            internal::PointsImpl< dimension >::POINTS_NAME );
+    }
 
     template < index_t dimension >
     LightRegularGrid< dimension >::LightRegularGrid( Point< dimension > origin,
@@ -88,6 +122,7 @@ namespace geode
             std::move( cells_number ), std::move( cells_length ) );
         impl_->initialize_attribute_managers(
             this->nb_cells(), this->nb_grid_vertices() );
+        initialize_grid_crs( *this );
     }
 
     template < index_t dimension >
@@ -107,6 +142,7 @@ namespace geode
         builder.set_grid_directions( std::move( directions ) );
         impl_->initialize_attribute_managers(
             this->nb_cells(), this->nb_grid_vertices() );
+        initialize_grid_crs( *this );
     }
 
     template < index_t dimension >
@@ -216,32 +252,70 @@ namespace geode
         clone.grid_vertex_attribute_manager().copy(
             this->grid_vertex_attribute_manager() );
         clone.cell_attribute_manager().copy( this->cell_attribute_manager() );
+        clone.impl_->crs_manager().copy(
+            impl_->crs_manager(), typename GridCoordinateReferenceSystemManager<
+                                      dimension >::LightRegularGridKey{} );
         return clone;
+    }
+
+    template < index_t dimension >
+    const GridCoordinateReferenceSystemManager< dimension >& LightRegularGrid<
+        dimension >::grid_coordinate_reference_system_manager() const
+    {
+        return impl_->crs_manager();
+    }
+
+    template < index_t dimension >
+    GridCoordinateReferenceSystemManager< dimension >&
+        LightRegularGrid< dimension >::
+            modifiable_grid_coordinate_reference_system_manager(
+                GridCRSManagerBuilderKey /*key*/ )
+    {
+        return impl_->crs_manager();
+    }
+
+    template < index_t dimension >
+    void LightRegularGrid< dimension >::grid_coordinate_system_changed()
+    {
+        impl_->crs_manager().set_active_coordinate_system(
+            this->grid_coordinate_system(),
+            typename GridCoordinateReferenceSystemManager<
+                dimension >::LightRegularGridKey{} );
     }
 
     template < index_t dimension >
     template < typename Archive >
     void LightRegularGrid< dimension >::serialize( Archive& serializer )
     {
-        serializer.ext(
-            *this, Growable< Archive, LightRegularGrid >{
-                       { []( Archive& archive, LightRegularGrid& grid ) {
-                           archive.ext( grid,
-                               bitsery::ext::BaseClass< Grid< dimension > >{} );
-                           archive.ext(
-                               grid, bitsery::ext::BaseClass< Identifier >{} );
-                           archive.object( grid.impl_ );
-                           OpenGeodeMeshException::check_exception(
-                               grid.cell_attribute_manager().nb_elements()
-                                       == grid.nb_cells()
-                                   && grid.grid_vertex_attribute_manager()
-                                              .nb_elements()
-                                          == grid.nb_grid_vertices(),
-                               nullptr, OpenGeodeException::TYPE::data,
-                               "[LightRegularGrid] Wrong attribute manager "
-                               "sizes after deserialization: file may be "
-                               "corrupted" );
-                       } } } );
+        serializer.ext( *this,
+            Growable< Archive, LightRegularGrid >{
+                { []( Archive& archive, LightRegularGrid& grid ) {
+                    archive.ext(
+                        grid, bitsery::ext::BaseClass< Grid< dimension > >{} );
+                    archive.ext(
+                        grid, bitsery::ext::BaseClass< Identifier >{} );
+                    archive.object( grid.impl_ );
+                    OpenGeodeMeshException::check_exception(
+                        grid.cell_attribute_manager().nb_elements()
+                                == grid.nb_cells()
+                            && grid.grid_vertex_attribute_manager()
+                                       .nb_elements()
+                                   == grid.nb_grid_vertices(),
+                        nullptr, OpenGeodeException::TYPE::data,
+                        "[LightRegularGrid] Wrong attribute manager "
+                        "sizes after deserialization: file may be "
+                        "corrupted" );
+                    if constexpr( std::is_same_v< Archive, Deserializer > )
+                    {
+                        if( grid.grid_coordinate_reference_system_manager()
+                                .nb_coordinate_reference_systems()
+                            == 0 )
+                        {
+                            initialize_grid_crs( grid );
+                        }
+                        grid.grid_coordinate_system_changed();
+                    }
+                } } } );
     }
 
     template class opengeode_mesh_api LightRegularGrid< 2 >;

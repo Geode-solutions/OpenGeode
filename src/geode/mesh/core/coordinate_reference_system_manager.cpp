@@ -23,179 +23,30 @@
 
 #include <geode/mesh/core/coordinate_reference_system_manager.hpp>
 
-#include <bitsery/ext/std_map.h>
-
-#include <absl/container/flat_hash_map.h>
-
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/mesh/core/coordinate_reference_system.hpp>
+#include <geode/mesh/core/internal/coordinate_reference_system_manager_impl.hpp>
 
 namespace geode
 {
     template < index_t dimension >
     class CoordinateReferenceSystemManager< dimension >::Impl
+        : public internal::CoordinateReferenceSystemManagerImpl<
+              CoordinateReferenceSystem< dimension > >
     {
         friend class bitsery::Access;
 
-    public:
-        index_t nb_coordinate_reference_systems() const
-        {
-            return crss_.size();
-        }
-
-        const CoordinateReferenceSystem< dimension >&
-            find_coordinate_reference_system( std::string_view name ) const
-        {
-            const auto it = crss_.find( name );
-            OpenGeodeMeshException::check_exception( it != crss_.end(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager::find_coordinate_reference_"
-                "system] Unknown CRS :",
-                name );
-            return *it->second;
-        }
-
-        const CoordinateReferenceSystem< dimension >&
-            active_coordinate_reference_system() const
-        {
-            OpenGeodeMeshException::check_exception( active_crs_ != nullptr,
-                nullptr, OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager::active_coordinate_"
-                "reference_system] Active CRS not defined" );
-            return *active_crs_;
-        }
-
-        std::string_view active_coordinate_reference_system_name() const
-        {
-            return active_crs_name_;
-        }
-
-        absl::FixedArray< std::string >
-            coordinate_reference_system_names() const
-        {
-            absl::FixedArray< std::string > names( crss_.size() );
-            index_t count{ 0 };
-            for( const auto& it : crss_ )
-            {
-                names[count++] = it.first;
-            }
-            return names;
-        }
-
-        bool coordinate_reference_system_exists( std::string_view name ) const
-        {
-            return crss_.find( name ) != crss_.end();
-        }
-
-        void register_coordinate_reference_system( std::string_view name,
-            std::shared_ptr< CoordinateReferenceSystem< dimension > >&& crs )
-        {
-            const auto status =
-                crss_.emplace( to_string( name ), std::move( crs ) );
-            OpenGeodeMeshException::check_exception( status.second, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager::register_coordinate_"
-                "reference_system] CRS named ",
-                name, " already exists" );
-        }
-
-        void delete_coordinate_reference_system( std::string_view name )
-        {
-            const auto it = crss_.find( name );
-            if( it != crss_.end() )
-            {
-                crss_.erase( it );
-            }
-            if( name == active_crs_name_ )
-            {
-                active_crs_name_.clear();
-                active_crs_.reset();
-            }
-        }
-
-        void set_active_coordinate_reference_system( std::string_view name )
-        {
-            const auto it = crss_.find( name );
-            OpenGeodeMeshException::check_exception( it != crss_.end(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager::set_active_coordinate_"
-                "reference_system] Unknown CRS :",
-                name );
-            active_crs_ = it->second;
-            active_crs_name_ = to_string( name );
-        }
-
-        CoordinateReferenceSystem< dimension >&
-            modifiable_active_coordinate_reference_system()
-        {
-            OpenGeodeMeshException::check_exception(
-                active_crs_.use_count() > 0, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager::modifiable_active_"
-                "coordinate_reference_system] Active CRS not defined" );
-            return *active_crs_;
-        }
-
-        CoordinateReferenceSystem< dimension >&
-            modifiable_coordinate_reference_system( std::string_view name )
-        {
-            const auto it = crss_.find( name );
-            OpenGeodeMeshException::check_exception( it != crss_.end(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager::find_coordinate_reference_"
-                "system] Unknown CRS :",
-                name );
-            return *it->second;
-        }
-
     private:
-        void check_active_crs() const
-        {
-            if( !active_crs_ )
-            {
-                OpenGeodeMeshException::check_exception(
-                    active_crs_name_.empty(), nullptr,
-                    OpenGeodeException::TYPE::data,
-                    "[CoordinateReferenceSystemManager] Active CRS name "
-                    "without active CRS: file may be corrupted" );
-                return;
-            }
-            const auto it = crss_.find( active_crs_name_ );
-            OpenGeodeMeshException::check_exception(
-                it != crss_.end() && it->second == active_crs_, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[CoordinateReferenceSystemManager] Active CRS is not a "
-                "registered CRS: file may be corrupted" );
-        }
-
         template < typename Archive >
         void serialize( Archive& serializer )
         {
-            serializer.ext( *this, Growable< Archive,
-                                       Impl >{ { []( Archive& archive,
-                                                     Impl& impl ) {
-                archive.ext( impl.crss_,
-                    bitsery::ext::StdMap{ impl.crss_.max_size() },
-                    []( Archive& archive2, std::string& name,
-                        std::shared_ptr<
-                            CoordinateReferenceSystem< dimension > >& crs ) {
-                        archive2.text1b( name, MAX_SERIALIZED_NAME_SIZE );
-                        archive2.ext( crs, bitsery::ext::StdSmartPtr{} );
-                    } );
-                archive.ext( impl.active_crs_, bitsery::ext::StdSmartPtr{} );
-                archive.text1b(
-                    impl.active_crs_name_, MAX_SERIALIZED_NAME_SIZE );
-                impl.check_active_crs();
-            } } } );
+            serializer.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                        impl.serialize_coordinate_reference_systems( archive );
+                    } } } );
         }
-
-    private:
-        absl::flat_hash_map< std::string,
-            std::shared_ptr< CoordinateReferenceSystem< dimension > > >
-            crss_;
-        std::shared_ptr< CoordinateReferenceSystem< dimension > > active_crs_;
-        std::string active_crs_name_;
     };
 
     template < index_t dimension >

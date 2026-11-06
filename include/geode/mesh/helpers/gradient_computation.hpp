@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/mesh/common.hpp>
 
 namespace geode

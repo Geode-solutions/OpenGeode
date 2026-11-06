@@ -26,6 +26,7 @@
 #include <absl/algorithm/container.h>
 
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/vector.hpp>
 
 namespace geode
 {
