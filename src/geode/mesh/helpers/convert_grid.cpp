@@ -24,6 +24,7 @@
 #include <geode/mesh/helpers/convert_grid.hpp>
 
 #include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/coordinate_system.hpp>
 
