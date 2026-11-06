@@ -42,9 +42,9 @@ namespace geode
      * API function for loading a Section.
      * The adequate loader is called depending on the filename extension.
      * @param[in] filename Path to the file to load.
-     * @return Loaded Section.
+     * @return All the Sections held by the file.
      */
-    [[nodiscard]] Section opengeode_model_api load_section(
+    [[nodiscard]] std::vector< Section > opengeode_model_api load_section(
         std::string_view filename );
 
     class SectionInput : public Input< Section >

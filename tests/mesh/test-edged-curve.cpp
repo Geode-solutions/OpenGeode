@@ -253,10 +253,13 @@ void test_io(
     const geode::EdgedCurve3D& edged_curve, const std::string& filename )
 {
     geode::save_edged_curve( edged_curve, filename );
-    const auto reload = geode::load_edged_curve< 3 >( filename );
+    const auto reload =
+        geode::load_one( geode::load_edged_curve< 3 >( filename ), filename );
     geode_unused( reload );
-    const auto edged_curve2 = geode::load_edged_curve< 3 >(
-        geode::OpenGeodeEdgedCurve3D::impl_name_static(), filename );
+    const auto edged_curve2 = geode::load_one(
+        geode::load_edged_curve< 3 >(
+            geode::OpenGeodeEdgedCurve3D::impl_name_static(), filename ),
+        filename );
     geode::OpenGeodeMeshException::test(
         edged_curve2->nb_edges() == edged_curve.nb_edges(),
         "Reload EdgedCurve has wrong number of edges" );
@@ -280,7 +283,8 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    const auto curve = geode::load_edged_curve< 3 >( filename );
+    const auto curve =
+        geode::load_one( geode::load_edged_curve< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test( curve->nb_edges() == 4,
         "Backward EdgedCurve has wrong number of edges" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
@@ -405,13 +409,16 @@ void check_v18_5( const geode::EdgedCurve3D& curve )
 
 void test_backward_v18_5()
 {
-    const auto curve = geode::load_edged_curve< 3 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_edc3d" ) );
+    const auto curve_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_edc3d" );
+    const auto curve = geode::load_one(
+        geode::load_edged_curve< 3 >( curve_filename ), curve_filename );
     check_v18_5( *curve );
     const auto filename =
         absl::StrCat( "v18_5_reload.", curve->native_extension() );
     geode::save_edged_curve( *curve, filename );
-    check_v18_5( *geode::load_edged_curve< 3 >( filename ) );
+    check_v18_5( *geode::load_one(
+        geode::load_edged_curve< 3 >( filename ), filename ) );
 }
 
 void test_replace_vertex()

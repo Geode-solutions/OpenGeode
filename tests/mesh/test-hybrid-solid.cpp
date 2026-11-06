@@ -391,10 +391,13 @@ void test_io(
     const geode::HybridSolid3D& hybrid_solid, const std::string& filename )
 {
     geode::save_hybrid_solid( hybrid_solid, filename );
-    const auto reload = geode::load_hybrid_solid< 3 >( filename );
+    const auto reload =
+        geode::load_one( geode::load_hybrid_solid< 3 >( filename ), filename );
     geode_unused( reload );
-    const auto new_hybrid_solid = geode::load_hybrid_solid< 3 >(
-        geode::OpenGeodeHybridSolid3D::impl_name_static(), filename );
+    const auto new_hybrid_solid = geode::load_one(
+        geode::load_hybrid_solid< 3 >(
+            geode::OpenGeodeHybridSolid3D::impl_name_static(), filename ),
+        filename );
 
     geode::OpenGeodeMeshException::test( new_hybrid_solid->nb_vertices() == 11,
         "Reloaded HybridSolid should have 11 vertices" );
@@ -416,7 +419,8 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    const auto solid = geode::load_hybrid_solid< 3 >( filename );
+    const auto solid =
+        geode::load_one( geode::load_hybrid_solid< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test( solid->nb_vertices() == 11,
         "Backward HybridSolid should have 11 vertices" );
     geode::OpenGeodeMeshException::test(

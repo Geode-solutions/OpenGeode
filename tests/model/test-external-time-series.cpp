@@ -225,8 +225,10 @@ namespace
 
     void check_other_model( const geode::ExternalTimeSeries& time_series )
     {
-        auto other = geode::load_brep(
-            absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
+        const auto other_filename =
+            absl::StrCat( geode::DATA_PATH, "layers.og_brep" );
+        auto other = geode::load_one(
+            geode::load_brep( other_filename ), other_filename );
         bool thrown{ false };
         try
         {
@@ -245,8 +247,10 @@ namespace
     // they are rejected
     void check_tolerance( const geode::uuid& block_id )
     {
-        auto model = geode::load_brep(
-            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+        const auto model_filename =
+            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+        auto model = geode::load_one(
+            geode::load_brep( model_filename ), model_filename );
         create_time_series(
             model, block_id, geode::Vector3D{ { ROUNDING_TRANSLATION, 0, 0 } } )
             .apply_to( model );
@@ -270,8 +274,10 @@ namespace
     // Values of colocated points cannot be told apart
     void check_colocated_points( const geode::uuid& block_id )
     {
-        auto model = geode::load_brep(
-            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+        const auto model_filename =
+            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+        auto model = geode::load_one(
+            geode::load_brep( model_filename ), model_filename );
         auto barycenters =
             create_cell_barycenters( model, block_id, geode::Vector3D{} );
         geode::PointSetBuilder3D::create( *barycenters )
@@ -327,8 +333,10 @@ namespace
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
-    auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
     geode::OpenGeodeModelException::test(
         model.nb_blocks() > 0, "[Test] Model has no Block" );
     const auto block_id = ( *model.blocks().begin() ).id();
@@ -345,8 +353,10 @@ void test()
     check_pressures( model );
     check_velocities( model, block_id );
 
-    auto reloaded_model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto reloaded_model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto reloaded_model = geode::load_one(
+        geode::load_brep( reloaded_model_filename ), reloaded_model_filename );
     geode::load_brep_time_series( reloaded_model, filename );
     check_pressures( reloaded_model );
     check_velocities( reloaded_model, block_id );

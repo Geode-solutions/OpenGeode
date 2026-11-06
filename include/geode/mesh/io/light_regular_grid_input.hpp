@@ -43,8 +43,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    [[nodiscard]] LightRegularGrid< dimension > load_light_regular_grid(
-        std::string_view filename );
+    [[nodiscard]] std::vector< LightRegularGrid< dimension > >
+        load_light_regular_grid( std::string_view filename );
 
     template < index_t dimension >
     class LightRegularGridInput : public Input< LightRegularGrid< dimension > >

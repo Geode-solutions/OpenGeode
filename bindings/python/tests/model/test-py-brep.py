@@ -29,6 +29,7 @@ import opengeode_py_basic as basic
 import opengeode_py_geometry as geometry
 import opengeode_py_mesh as mesh
 import opengeode_py_model as model
+import opengeode
 
 
 def find_uuid_in_list(uuids, uuid):
@@ -1013,7 +1014,7 @@ if __name__ == "__main__":
     file_io = "test." + brep.native_extension()
     model.save_brep(brep, file_io)
 
-    brep2 = model.load_brep(file_io)
+    brep2 = opengeode.load_one(model.load_brep(file_io), file_io)
     test_reloaded_brep(brep2)
     test_physical_properties(brep2, physical_attribute_id)
     test_add_component_with_mesh_impl()

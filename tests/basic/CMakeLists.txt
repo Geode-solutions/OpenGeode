@@ -56,6 +56,11 @@ add_geode_test(
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
+    SOURCE "test-input.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
     SOURCE "test-logger.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

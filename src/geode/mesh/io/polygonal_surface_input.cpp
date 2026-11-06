@@ -38,18 +38,23 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        const MeshImpl& impl, std::string_view filename )
+    std::vector< std::unique_ptr< PolygonalSurface< dimension > > >
+        load_polygonal_surface(
+            const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "PolygonalSurface", dimension, "D" );
         try
         {
-            auto polygonal_surface = detail::geode_object_input_impl<
+            auto polygonal_surfaces = detail::geode_object_input_impl<
                 PolygonalSurfaceInputFactory< dimension > >(
                 type, filename, impl );
-            Logger::info( type, " has: ", polygonal_surface->nb_vertices(),
-                " vertices, ", polygonal_surface->nb_polygons(), " polygons" );
-            return polygonal_surface;
+            for( const auto& polygonal_surface : polygonal_surfaces )
+            {
+                Logger::info( type, " has: ", polygonal_surface->nb_vertices(),
+                    " vertices, ", polygonal_surface->nb_polygons(),
+                    " polygons" );
+            }
+            return polygonal_surfaces;
         }
         catch( const OpenGeodeException& e )
         {
@@ -74,8 +79,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        std::string_view filename )
+    std::vector< std::unique_ptr< PolygonalSurface< dimension > > >
+        load_polygonal_surface( std::string_view filename )
     {
         return load_polygonal_surface< dimension >(
             MeshFactory::default_impl(
@@ -115,14 +120,16 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api
-        load_polygonal_surface( const MeshImpl&, std::string_view );
-    template std::unique_ptr< PolygonalSurface< 3 > > opengeode_mesh_api
-        load_polygonal_surface( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< PolygonalSurface< 2 > > >
+        opengeode_mesh_api load_polygonal_surface(
+            const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< PolygonalSurface< 3 > > >
+        opengeode_mesh_api load_polygonal_surface(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< PolygonalSurface< 2 > >
+    template std::vector< std::unique_ptr< PolygonalSurface< 2 > > >
         opengeode_mesh_api load_polygonal_surface( std::string_view );
-    template std::unique_ptr< PolygonalSurface< 3 > >
+    template std::vector< std::unique_ptr< PolygonalSurface< 3 > > >
         opengeode_mesh_api load_polygonal_surface( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

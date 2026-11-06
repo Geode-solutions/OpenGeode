@@ -1096,9 +1096,12 @@ void test()
 
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_section( model, file_io );
-    auto backward_model = geode::load_section( absl::StrCat(
-        geode::DATA_PATH, "backward_io/v17/v17.", model.native_extension() ) );
-    auto model2 = geode::load_section( file_io );
+    const auto backward_model_filename = absl::StrCat(
+        geode::DATA_PATH, "backward_io/v17/v17.", model.native_extension() );
+    auto backward_model =
+        geode::load_one( geode::load_section( backward_model_filename ),
+            backward_model_filename );
+    auto model2 = geode::load_one( geode::load_section( file_io ), file_io );
     test_compare_section( model, model2 );
 
     geode::Section model3{ std::move( model2 ) };

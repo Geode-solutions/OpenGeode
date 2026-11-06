@@ -46,8 +46,10 @@
 
 void test_surface_without_polygon()
 {
-    auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     const auto nb_surfaces = brep.nb_surfaces();
     geode::BRepBuilder builder{ brep };
     // A boundary surface with vertices but without any polygon
@@ -93,8 +95,10 @@ void test()
     test_surface_without_polygon();
 
     // load a 40x40x40 aligned cubic box brep
-    auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     geode::Point3D center{ { 20., 20., 20. } };
 
     //  get the block
@@ -117,8 +121,10 @@ void test()
         "Point [", outside.string(), "] should be outside the block." );
 
     // load a section with various surfaces to test 2D
-    auto section = geode::load_section(
-        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
+    const auto section_filename =
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" );
+    auto section = geode::load_one(
+        geode::load_section( section_filename ), section_filename );
     geode::Point2D section_center{ { 230., 240. } };
 
     geode::SectionRayTracing section_ray_tracing{ section };

@@ -38,20 +38,24 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< TriangulatedSurface< dimension > >
+    std::vector< std::unique_ptr< TriangulatedSurface< dimension > > >
         load_triangulated_surface(
             const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "TriangulatedSurface", dimension, "D" );
         try
         {
-            auto triangulated_surface = detail::geode_object_input_impl<
+            auto triangulated_surfaces = detail::geode_object_input_impl<
                 TriangulatedSurfaceInputFactory< dimension > >(
                 type, filename, impl );
-            Logger::info( type, " has: ", triangulated_surface->nb_vertices(),
-                " vertices, ", triangulated_surface->nb_polygons(),
-                " triangles" );
-            return triangulated_surface;
+            for( const auto& triangulated_surface : triangulated_surfaces )
+            {
+                Logger::info( type,
+                    " has: ", triangulated_surface->nb_vertices(),
+                    " vertices, ", triangulated_surface->nb_polygons(),
+                    " triangles" );
+            }
+            return triangulated_surfaces;
         }
         catch( const OpenGeodeException& e )
         {
@@ -76,7 +80,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< TriangulatedSurface< dimension > >
+    std::vector< std::unique_ptr< TriangulatedSurface< dimension > > >
         load_triangulated_surface( std::string_view filename )
     {
         return load_triangulated_surface< dimension >(
@@ -117,14 +121,16 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< TriangulatedSurface< 2 > > opengeode_mesh_api
-        load_triangulated_surface( const MeshImpl&, std::string_view );
-    template std::unique_ptr< TriangulatedSurface< 3 > > opengeode_mesh_api
-        load_triangulated_surface( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< TriangulatedSurface< 2 > > >
+        opengeode_mesh_api load_triangulated_surface(
+            const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< TriangulatedSurface< 3 > > >
+        opengeode_mesh_api load_triangulated_surface(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< TriangulatedSurface< 2 > >
+    template std::vector< std::unique_ptr< TriangulatedSurface< 2 > > >
         opengeode_mesh_api load_triangulated_surface( std::string_view );
-    template std::unique_ptr< TriangulatedSurface< 3 > >
+    template std::vector< std::unique_ptr< TriangulatedSurface< 3 > > >
         opengeode_mesh_api load_triangulated_surface( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

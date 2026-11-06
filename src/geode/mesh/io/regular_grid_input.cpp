@@ -39,16 +39,19 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        const MeshImpl& impl, std::string_view filename )
+    std::vector< std::unique_ptr< RegularGrid< dimension > > >
+        load_regular_grid( const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
         try
         {
-            auto grid = detail::geode_object_input_impl<
+            auto grids = detail::geode_object_input_impl<
                 RegularGridInputFactory< dimension > >( type, filename, impl );
-            Logger::info( type, " has: ", grid->nb_cells(), " cells" );
-            return grid;
+            for( const auto& grid : grids )
+            {
+                Logger::info( type, " has: ", grid->nb_cells(), " cells" );
+            }
+            return grids;
         }
         catch( const OpenGeodeException& e )
         {
@@ -73,8 +76,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        std::string_view filename )
+    std::vector< std::unique_ptr< RegularGrid< dimension > > >
+        load_regular_grid( std::string_view filename )
     {
         return load_regular_grid< dimension >(
             MeshFactory::default_impl(
@@ -113,14 +116,16 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< RegularGrid< 2 > > opengeode_mesh_api
-        load_regular_grid( const MeshImpl&, std::string_view );
-    template std::unique_ptr< RegularGrid< 3 > > opengeode_mesh_api
-        load_regular_grid( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< RegularGrid< 2 > > >
+        opengeode_mesh_api load_regular_grid(
+            const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< RegularGrid< 3 > > >
+        opengeode_mesh_api load_regular_grid(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< RegularGrid< 2 > >
+    template std::vector< std::unique_ptr< RegularGrid< 2 > > >
         opengeode_mesh_api load_regular_grid( std::string_view );
-    template std::unique_ptr< RegularGrid< 3 > >
+    template std::vector< std::unique_ptr< RegularGrid< 3 > > >
         opengeode_mesh_api load_regular_grid( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

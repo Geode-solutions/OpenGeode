@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <string_view>
+#include <vector>
+
 #include <absl/algorithm/container.h>
 
 #include <geode/basic/common.hpp>
@@ -72,7 +75,8 @@ namespace geode
 
         [[nodiscard]] virtual Percentage is_loadable() const = 0;
 
-        [[nodiscard]] virtual Object read( const Args&... args ) = 0;
+        [[nodiscard]] virtual std::vector< Object > read(
+            const Args&... args ) = 0;
 
         ~Input()
         {
@@ -102,4 +106,21 @@ namespace geode
     private:
         bool inspect_required_{ false };
     };
+
+    /*!
+     * Extract the single object loaded from a file.
+     * @param[in] objects Objects returned by a load function.
+     * @param[in] filename Path to the loaded file, used in the error message.
+     * @exception OpenGeodeException if the file does not hold exactly one
+     * object.
+     */
+    template < typename Object >
+    [[nodiscard]] Object load_one(
+        std::vector< Object >&& objects, std::string_view filename )
+    {
+        OpenGeodeBasicException::check_exception( objects.size() == 1, nullptr,
+            OpenGeodeException::TYPE::data, "[load_one] File \"", filename,
+            "\" holds ", objects.size(), " objects, expected exactly one" );
+        return std::move( objects.front() );
+    }
 } // namespace geode

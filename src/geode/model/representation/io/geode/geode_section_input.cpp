@@ -40,12 +40,14 @@
 
 namespace geode
 {
-    Section OpenGeodeSectionInput::read()
+    std::vector< Section > OpenGeodeSectionInput::read()
     {
         const UnzipFile zip_reader{ filename(), uuid{}.string() };
         zip_reader.extract_all();
         Section section{ BITSERY::constructor };
         detail::load_section_files( section, zip_reader.directory() );
-        return section;
+        std::vector< Section > sections;
+        sections.emplace_back( std::move( section ) );
+        return sections;
     }
 } // namespace geode

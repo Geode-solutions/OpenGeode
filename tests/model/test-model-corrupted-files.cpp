@@ -217,8 +217,10 @@ namespace
 
     geode::BRep saved_brep( std::string_view filename )
     {
-        auto brep = geode::load_brep(
-            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+        const auto brep_filename =
+            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" );
+        auto brep =
+            geode::load_one( geode::load_brep( brep_filename ), brep_filename );
         geode::save_brep( brep, filename );
         return brep;
     }
@@ -258,8 +260,9 @@ namespace
             "Second uuid mapping" );
         write_archive( files, "corrupted_relationships.og_brep" );
 
-        const auto loaded =
-            geode::load_brep( "corrupted_relationships.og_brep" );
+        const auto loaded = geode::load_one(
+            geode::load_brep( "corrupted_relationships.og_brep" ),
+            "corrupted_relationships.og_brep" );
         geode::OpenGeodeModelException::test(
             loaded.nb_components_with_relations()
                 == brep.nb_components_with_relations(),
@@ -352,8 +355,9 @@ namespace
         }
         write_archive( files, "corrupted_unique_vertices.og_brep" );
 
-        const auto loaded =
-            geode::load_brep( "corrupted_unique_vertices.og_brep" );
+        const auto loaded = geode::load_one(
+            geode::load_brep( "corrupted_unique_vertices.og_brep" ),
+            "corrupted_unique_vertices.og_brep" );
         check_same_unique_vertices( brep, loaded );
     }
 
@@ -364,7 +368,8 @@ namespace
     void test_unknown_component_vertices()
     {
         saved_brep( "with_corner.og_brep" );
-        auto without_corner = geode::load_brep( "with_corner.og_brep" );
+        auto without_corner = geode::load_one(
+            geode::load_brep( "with_corner.og_brep" ), "with_corner.og_brep" );
         const auto& corner = *without_corner.corners().begin();
         const auto corner_id = corner.id();
         geode::BRepBuilder{ without_corner }.remove_corner( corner );
@@ -374,8 +379,9 @@ namespace
             extract_archive( "with_corner.og_brep" ).at( "vertices" );
         write_archive( files, "unknown_corner_vertices.og_brep" );
 
-        const auto loaded =
-            geode::load_brep( "unknown_corner_vertices.og_brep" );
+        const auto loaded = geode::load_one(
+            geode::load_brep( "unknown_corner_vertices.og_brep" ),
+            "unknown_corner_vertices.og_brep" );
         geode::OpenGeodeModelException::test( !loaded.has_corner( corner_id ),
             "[Test] Removed corner should not be loaded" );
         for( const auto unique_vertex :
@@ -407,8 +413,9 @@ namespace
         write_archive( files, "missing_components_file.og_brep" );
 
         WarningRecorder::start();
-        const auto loaded =
-            geode::load_brep( "missing_components_file.og_brep" );
+        const auto loaded = geode::load_one(
+            geode::load_brep( "missing_components_file.og_brep" ),
+            "missing_components_file.og_brep" );
         check_warning( "Missing file" );
         geode::OpenGeodeModelException::test(
             loaded.nb_lines() == 0, "[Test] No line should be loaded" );
@@ -436,7 +443,9 @@ namespace
         write_archive( files, "wrong_component_key.og_brep" );
 
         WarningRecorder::start();
-        const auto loaded = geode::load_brep( "wrong_component_key.og_brep" );
+        const auto loaded =
+            geode::load_one( geode::load_brep( "wrong_component_key.og_brep" ),
+                "wrong_component_key.og_brep" );
         check_warning( "has id" );
         geode::OpenGeodeModelException::test(
             loaded.nb_corners() == brep.nb_corners(),
@@ -456,8 +465,9 @@ namespace
     void test_unknown_component_relations()
     {
         saved_brep( "relations_with_corner.og_brep" );
-        auto without_corner =
-            geode::load_brep( "relations_with_corner.og_brep" );
+        auto without_corner = geode::load_one(
+            geode::load_brep( "relations_with_corner.og_brep" ),
+            "relations_with_corner.og_brep" );
         const auto& corner = *without_corner.corners().begin();
         const auto corner_id = corner.id();
         geode::BRepBuilder{ without_corner }.remove_corner( corner );
@@ -469,8 +479,9 @@ namespace
         write_archive( files, "unknown_corner_relations.og_brep" );
 
         WarningRecorder::start();
-        const auto loaded =
-            geode::load_brep( "unknown_corner_relations.og_brep" );
+        const auto loaded = geode::load_one(
+            geode::load_brep( "unknown_corner_relations.og_brep" ),
+            "unknown_corner_relations.og_brep" );
         check_warning( "Removing relations of missing" );
         geode::OpenGeodeModelException::test(
             loaded.nb_relations( corner_id ) == 0,
@@ -518,7 +529,9 @@ namespace
         write_archive( files, "missing_mesh_file.og_brep" );
 
         WarningRecorder::start();
-        const auto loaded = geode::load_brep( "missing_mesh_file.og_brep" );
+        const auto loaded =
+            geode::load_one( geode::load_brep( "missing_mesh_file.og_brep" ),
+                "missing_mesh_file.og_brep" );
         check_warning( "Missing mesh file" );
         geode::OpenGeodeModelException::test(
             loaded.nb_surfaces() == brep.nb_surfaces(),
@@ -568,7 +581,9 @@ namespace
         write_archive( files, "unknown_mesh_impl.og_brep" );
 
         WarningRecorder::start();
-        const auto loaded = geode::load_brep( "unknown_mesh_impl.og_brep" );
+        const auto loaded =
+            geode::load_one( geode::load_brep( "unknown_mesh_impl.og_brep" ),
+                "unknown_mesh_impl.og_brep" );
         check_warning( "Unknown mesh implementation" );
         for( const auto& surface : loaded.surfaces() )
         {
@@ -596,7 +611,8 @@ namespace
         section_builder.update_surface_mesh(
             section.surface( surface_id ), std::move( surface_grid ) );
         geode::save_section( section, "grid.og_sctn" );
-        const auto loaded_section = geode::load_section( "grid.og_sctn" );
+        const auto loaded_section = geode::load_one(
+            geode::load_section( "grid.og_sctn" ), "grid.og_sctn" );
         const auto& loaded_surface = loaded_section.surface( surface_id );
         geode::OpenGeodeModelException::test(
             geode::MeshFactory::type( loaded_surface.mesh_type() )
@@ -616,7 +632,8 @@ namespace
         brep_builder.update_block_mesh(
             brep.block( block_id ), std::move( block_grid ) );
         geode::save_brep( brep, "grid.og_brep" );
-        const auto loaded_brep = geode::load_brep( "grid.og_brep" );
+        const auto loaded_brep = geode::load_one(
+            geode::load_brep( "grid.og_brep" ), "grid.og_brep" );
         const auto& loaded_block = loaded_brep.block( block_id );
         geode::OpenGeodeModelException::test(
             geode::MeshFactory::type( loaded_block.mesh_type() )
@@ -651,8 +668,10 @@ namespace
      */
     void test_save_in_missing_directory()
     {
-        const auto brep = geode::load_brep(
-            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+        const auto brep_filename =
+            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" );
+        const auto brep =
+            geode::load_one( geode::load_brep( brep_filename ), brep_filename );
         const std::string directory{ "missing_directory/missing" };
         check_save_failure( "relationships", [&] {
             brep.save_relationships( directory );
@@ -673,11 +692,14 @@ namespace
      */
     void test_utf8_path()
     {
-        const auto brep = geode::load_brep(
-            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" ) );
+        const auto brep_filename =
+            absl::StrCat( geode::DATA_PATH, "box_brep.og_brep" );
+        const auto brep =
+            geode::load_one( geode::load_brep( brep_filename ), brep_filename );
         const std::string filename{ "mod\xc3\xa8le_\xc3\xa9t\xc3\xa9.og_brep" };
         geode::save_brep( brep, filename );
-        const auto loaded = geode::load_brep( filename );
+        const auto loaded =
+            geode::load_one( geode::load_brep( filename ), filename );
         geode::OpenGeodeModelException::test(
             loaded.nb_surfaces() == brep.nb_surfaces(),
             "[Test] Wrong number of surfaces with UTF-8 path" );
@@ -762,7 +784,7 @@ namespace
         {
         }
 
-        typename Base::InputData read() override
+        std::vector< typename Base::InputData > read() override
         {
             throw std::runtime_error{ "[Test] Not an OpenGeodeException" };
         }

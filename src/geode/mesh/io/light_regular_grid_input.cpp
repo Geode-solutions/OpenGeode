@@ -38,16 +38,19 @@
 namespace geode
 {
     template < index_t dimension >
-    LightRegularGrid< dimension > load_light_regular_grid(
+    std::vector< LightRegularGrid< dimension > > load_light_regular_grid(
         std::string_view filename )
     {
         const auto type = absl::StrCat( "LightRegularGrid", dimension, "D" );
         try
         {
-            auto grid = detail::geode_object_input_impl<
+            auto grids = detail::geode_object_input_impl<
                 LightRegularGridInputFactory< dimension > >( type, filename );
-            Logger::info( type, " has: ", grid.nb_cells(), " cells" );
-            return grid;
+            for( const auto& grid : grids )
+            {
+                Logger::info( type, " has: ", grid.nb_cells(), " cells" );
+            }
+            return grids;
         }
         catch( const OpenGeodeException& e )
         {
@@ -101,10 +104,10 @@ namespace geode
         return input->object_priority();
     }
 
-    template LightRegularGrid< 2 > opengeode_mesh_api load_light_regular_grid(
-        std::string_view );
-    template LightRegularGrid< 3 > opengeode_mesh_api load_light_regular_grid(
-        std::string_view );
+    template std::vector< LightRegularGrid< 2 > >
+        opengeode_mesh_api load_light_regular_grid( std::string_view );
+    template std::vector< LightRegularGrid< 3 > >
+        opengeode_mesh_api load_light_regular_grid( std::string_view );
 
     template class opengeode_mesh_api LightRegularGridInput< 2 >;
     template class opengeode_mesh_api LightRegularGridInput< 3 >;

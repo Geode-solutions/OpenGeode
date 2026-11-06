@@ -44,8 +44,8 @@ namespace geode
      * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
-    [[nodiscard]] std::unique_ptr< Graph > opengeode_mesh_api load_graph(
-        const MeshImpl& impl, std::string_view filename );
+    [[nodiscard]] std::vector< std::unique_ptr< Graph > > opengeode_mesh_api
+        load_graph( const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an Graph.
@@ -53,8 +53,8 @@ namespace geode
      * Default data structure implémentation is used.
      * @param[in] filename Path to the file to load.
      */
-    [[nodiscard]] std::unique_ptr< Graph > opengeode_mesh_api load_graph(
-        std::string_view filename );
+    [[nodiscard]] std::vector< std::unique_ptr< Graph > >
+        opengeode_mesh_api load_graph( std::string_view filename );
 
     class GraphInput : public Input< std::unique_ptr< Graph >, MeshImpl >
     {

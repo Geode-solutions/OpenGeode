@@ -39,8 +39,10 @@
 
 void test_brep()
 {
-    auto brep = geode::load_brep( absl::StrCat(
-        geode::DATA_PATH, "rectangular_cuboid_without_uv.og_brep" ) );
+    const auto brep_filename = absl::StrCat(
+        geode::DATA_PATH, "rectangular_cuboid_without_uv.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     geode::BRepBuilder brep_builder{ brep };
     geode::compute_model_unique_vertices( brep, brep_builder );
     geode::OpenGeodeModelException::test(

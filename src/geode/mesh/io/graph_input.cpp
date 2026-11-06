@@ -35,17 +35,20 @@
 
 namespace geode
 {
-    std::unique_ptr< Graph > load_graph(
+    std::vector< std::unique_ptr< Graph > > load_graph(
         const MeshImpl& impl, std::string_view filename )
     {
         constexpr auto TYPE = "Graph";
         try
         {
-            auto graph = detail::geode_object_input_impl< GraphInputFactory >(
+            auto graphs = detail::geode_object_input_impl< GraphInputFactory >(
                 TYPE, filename, impl );
-            Logger::info( TYPE, " has: ", graph->nb_vertices(), " vertices, ",
-                graph->nb_edges(), " edges" );
-            return graph;
+            for( const auto& graph : graphs )
+            {
+                Logger::info( TYPE, " has: ", graph->nb_vertices(),
+                    " vertices, ", graph->nb_edges(), " edges" );
+            }
+            return graphs;
         }
         catch( const OpenGeodeException& e )
         {
@@ -66,7 +69,8 @@ namespace geode
         }
     }
 
-    std::unique_ptr< Graph > load_graph( std::string_view filename )
+    std::vector< std::unique_ptr< Graph > > load_graph(
+        std::string_view filename )
     {
         return load_graph(
             MeshFactory::default_impl( Graph::type_name_static() ), filename );

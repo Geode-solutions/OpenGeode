@@ -36,31 +36,36 @@
 
 namespace geode
 {
-    BRep load_brep( std::string_view filename )
+    std::vector< BRep > load_brep( std::string_view filename )
     {
         constexpr auto TYPE = "BRep";
         try
         {
-            auto brep = detail::geode_object_input_impl< BRepInputFactory >(
+            auto breps = detail::geode_object_input_impl< BRepInputFactory >(
                 TYPE, filename );
-            auto message = absl::StrCat( TYPE, " has: " );
-            detail::add_to_message( message, brep.nb_blocks(), " Blocks, " );
-            detail::add_to_message(
-                message, brep.nb_surfaces(), " Surfaces, " );
-            detail::add_to_message( message, brep.nb_lines(), " Lines, " );
-            detail::add_to_message( message, brep.nb_corners(), " Corners, " );
-            detail::add_to_message(
-                message, brep.nb_model_boundaries(), " ModelBoundaries, " );
-            detail::add_to_message(
-                message, brep.nb_corner_collections(), " CornerCollections, " );
-            detail::add_to_message(
-                message, brep.nb_line_collections(), " LineCollections, " );
-            detail::add_to_message( message, brep.nb_surface_collections(),
-                " SurfaceCollections, " );
-            detail::add_to_message(
-                message, brep.nb_block_collections(), " BlockCollections" );
-            Logger::info( message );
-            return brep;
+            for( const auto& brep : breps )
+            {
+                auto message = absl::StrCat( TYPE, " has: " );
+                detail::add_to_message(
+                    message, brep.nb_blocks(), " Blocks, " );
+                detail::add_to_message(
+                    message, brep.nb_surfaces(), " Surfaces, " );
+                detail::add_to_message( message, brep.nb_lines(), " Lines, " );
+                detail::add_to_message(
+                    message, brep.nb_corners(), " Corners, " );
+                detail::add_to_message(
+                    message, brep.nb_model_boundaries(), " ModelBoundaries, " );
+                detail::add_to_message( message, brep.nb_corner_collections(),
+                    " CornerCollections, " );
+                detail::add_to_message(
+                    message, brep.nb_line_collections(), " LineCollections, " );
+                detail::add_to_message( message, brep.nb_surface_collections(),
+                    " SurfaceCollections, " );
+                detail::add_to_message(
+                    message, brep.nb_block_collections(), " BlockCollections" );
+                Logger::info( message );
+            }
+            return breps;
         }
         catch( const OpenGeodeException& e )
         {

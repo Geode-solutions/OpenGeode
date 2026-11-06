@@ -242,15 +242,19 @@ void test_io(
     const geode::TriangulatedSurface3D& surface, std::string_view filename )
 {
     geode::save_triangulated_surface( surface, filename );
-    const auto relaod = geode::load_triangulated_surface< 3 >( filename );
+    const auto relaod = geode::load_one(
+        geode::load_triangulated_surface< 3 >( filename ), filename );
     const auto point_attributes =
         relaod->vertex_attribute_manager().attribute_ids_matching_name(
             "points" );
     geode::OpenGeodeMeshException::test( point_attributes.has_value(),
         "TriangulatedSurface should have points attribute" );
     geode_unused( relaod );
-    const auto surface2 = geode::load_triangulated_surface< 3 >(
-        geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
+    const auto surface2 = geode::load_one(
+        geode::load_triangulated_surface< 3 >(
+            geode::OpenGeodeTriangulatedSurface3D::impl_name_static(),
+            filename ),
+        filename );
     for( const auto vertex_id : geode::Range{ surface.nb_vertices() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -262,7 +266,8 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    const auto surface = geode::load_triangulated_surface< 3 >( filename );
+    const auto surface = geode::load_one(
+        geode::load_triangulated_surface< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test( surface->nb_vertices() == 5,
         "Backward TriangulatedSurface should have 5 vertices" );
     geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
@@ -462,13 +467,17 @@ void check_v18_5( const geode::TriangulatedSurface3D& surface )
 
 void test_backward_v18_5()
 {
-    const auto surface = geode::load_triangulated_surface< 3 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tsf3d" ) );
+    const auto surface_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tsf3d" );
+    const auto surface = geode::load_one(
+        geode::load_triangulated_surface< 3 >( surface_filename ),
+        surface_filename );
     check_v18_5( *surface );
     const auto filename =
         absl::StrCat( "v18_5_reload.", surface->native_extension() );
     geode::save_triangulated_surface( *surface, filename );
-    check_v18_5( *geode::load_triangulated_surface< 3 >( filename ) );
+    check_v18_5( *geode::load_one(
+        geode::load_triangulated_surface< 3 >( filename ), filename ) );
 }
 
 void test_set_polygon_vertex_keeps_old_vertex_link()

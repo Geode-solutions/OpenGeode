@@ -38,17 +38,20 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
-        const MeshImpl& impl, std::string_view filename )
+    std::vector< std::unique_ptr< HybridSolid< dimension > > >
+        load_hybrid_solid( const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
         {
-            auto hybrid_solid = detail::geode_object_input_impl<
+            auto hybrid_solids = detail::geode_object_input_impl<
                 HybridSolidInputFactory< dimension > >( type, filename, impl );
-            Logger::info( type, " has: ", hybrid_solid->nb_vertices(),
-                " vertices, ", hybrid_solid->nb_polyhedra(), " polyhedra" );
-            return hybrid_solid;
+            for( const auto& hybrid_solid : hybrid_solids )
+            {
+                Logger::info( type, " has: ", hybrid_solid->nb_vertices(),
+                    " vertices, ", hybrid_solid->nb_polyhedra(), " polyhedra" );
+            }
+            return hybrid_solids;
         }
         catch( const OpenGeodeException& e )
         {
@@ -73,8 +76,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
-        std::string_view filename )
+    std::vector< std::unique_ptr< HybridSolid< dimension > > >
+        load_hybrid_solid( std::string_view filename )
     {
         return load_hybrid_solid< dimension >(
             MeshFactory::default_impl(
@@ -113,10 +116,11 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< HybridSolid< 3 > > opengeode_mesh_api
-        load_hybrid_solid( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< HybridSolid< 3 > > >
+        opengeode_mesh_api load_hybrid_solid(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< HybridSolid< 3 > >
+    template std::vector< std::unique_ptr< HybridSolid< 3 > > >
         opengeode_mesh_api load_hybrid_solid( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

@@ -87,8 +87,10 @@ void test_save_failure( const geode::RasterImage2D& raster )
 
 void test_missing_colors()
 {
-    const auto raster = geode::load_raster_image< 2 >(
-        absl::StrCat( geode::DATA_PATH, "raster_missing_colors.og_img2d" ) );
+    const auto raster_filename =
+        absl::StrCat( geode::DATA_PATH, "raster_missing_colors.og_img2d" );
+    const auto raster = geode::load_one(
+        geode::load_raster_image< 2 >( raster_filename ), raster_filename );
     geode::OpenGeodeImageException::test(
         raster.nb_cells() == 64, "[TEST] Wrong number of repaired cells" );
     for( const auto i : geode::Range{ 16 } )
@@ -111,8 +113,9 @@ bool load_throws( std::string_view filename )
 {
     try
     {
-        const auto raster = geode::load_raster_image< 2 >(
-            absl::StrCat( geode::DATA_PATH, filename ) );
+        const auto raster_filename = absl::StrCat( geode::DATA_PATH, filename );
+        const auto raster = geode::load_one(
+            geode::load_raster_image< 2 >( raster_filename ), raster_filename );
     }
     catch( const geode::OpenGeodeException& )
     {
@@ -178,7 +181,8 @@ void test_io( std::array< geode::index_t, dimension > cells_number )
     }
     const auto filename = absl::StrCat( "test.", raster.native_extension() );
     geode::save_raster_image( raster, filename );
-    const auto reload = geode::load_raster_image< dimension >( filename );
+    const auto reload = geode::load_one(
+        geode::load_raster_image< dimension >( filename ), filename );
     geode::OpenGeodeImageException::test(
         reload.nb_cells() == raster.nb_cells(),
         "[TEST] Wrong number of cells "
@@ -212,7 +216,9 @@ void test()
     test_raster( raster.clone() );
     const auto filename_with_spaces = absl::StrCat( " ", "test.og_img2d", " " );
     geode::save_raster_image( raster, filename_with_spaces );
-    const auto reload = geode::load_raster_image< 2 >( filename_with_spaces );
+    const auto reload =
+        geode::load_one( geode::load_raster_image< 2 >( filename_with_spaces ),
+            filename_with_spaces );
     test_raster( reload );
     test_save_failure( raster );
     test_io< 1 >( { 7 } );

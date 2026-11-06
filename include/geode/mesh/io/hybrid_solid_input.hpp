@@ -45,8 +45,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    [[nodiscard]] std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
-        const MeshImpl& impl, std::string_view filename );
+    [[nodiscard]] std::vector< std::unique_ptr< HybridSolid< dimension > > >
+        load_hybrid_solid( const MeshImpl& impl, std::string_view filename );
 
     /*!
      * API function for loading an HybridSolid.
@@ -55,8 +55,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    [[nodiscard]] std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
-        std::string_view filename );
+    [[nodiscard]] std::vector< std::unique_ptr< HybridSolid< dimension > > >
+        load_hybrid_solid( std::string_view filename );
 
     template < index_t dimension >
     class HybridSolidInput
