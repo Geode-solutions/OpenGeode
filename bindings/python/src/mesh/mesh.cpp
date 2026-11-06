@@ -33,6 +33,8 @@ namespace geode
     void define_crs_managers( pybind11::module& );
     void define_crs_manager_builder( pybind11::module& );
     void define_crs_managers_builder( pybind11::module& );
+    void define_grid_crs( pybind11::module& );
+    void define_grid_crs_manager_builder( pybind11::module& );
 
     void define_mesh_id( pybind11::module& );
     void define_vertex_set( pybind11::module& );
@@ -141,7 +143,9 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_solid_edges( module );
     geode::define_solid_facets( module );
     geode::define_solid_mesh( module );
+    geode::define_grid_crs( module );
     geode::define_light_regular_grid( module );
+    geode::define_grid_crs_manager_builder( module );
     geode::define_regular_grid( module );
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );

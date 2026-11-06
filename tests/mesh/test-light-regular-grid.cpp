@@ -38,6 +38,9 @@
 #include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/grid_builder.hpp>
+#include <geode/mesh/builder/grid_coordinate_reference_system_manager_builder.hpp>
+#include <geode/mesh/core/grid_coordinate_reference_system.hpp>
+#include <geode/mesh/core/grid_coordinate_reference_system_manager.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/io/light_regular_grid_input.hpp>
 #include <geode/mesh/io/light_regular_grid_output.hpp>
@@ -512,6 +515,180 @@ void test_save_unwritable( const geode::LightRegularGrid3D& grid )
         "[Test] Saving in a non writable file should throw" };
 }
 
+template < geode::index_t dimension >
+bool same_coordinate_system( const geode::CoordinateSystem< dimension >& lhs,
+    const geode::CoordinateSystem< dimension >& rhs )
+{
+    if( lhs.origin() != rhs.origin() )
+    {
+        return false;
+    }
+    for( const auto d : geode::LRange{ dimension } )
+    {
+        if( lhs.direction( d ) != rhs.direction( d ) )
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template < geode::index_t dimension >
+void check_active_crs_is_grid_geometry(
+    const geode::LightRegularGrid< dimension >& grid, std::string_view name )
+{
+    const auto& crs_manager = grid.grid_coordinate_reference_system_manager();
+    geode::OpenGeodeMeshException::test(
+        crs_manager.active_coordinate_reference_system_name() == name,
+        "[Test] Wrong active grid CRS name: ",
+        crs_manager.active_coordinate_reference_system_name() );
+    geode::OpenGeodeMeshException::test(
+        same_coordinate_system( crs_manager.active_coordinate_reference_system()
+                                    .coordinate_system(),
+            grid.grid_coordinate_system() ),
+        "[Test] Active grid CRS should match the grid geometry" );
+}
+
+void test_coordinate_reference_systems()
+{
+    geode::LightRegularGrid3D grid{ geode::Point3D{ { 1.5, 0, 1 } },
+        { 5, 10, 15 }, { 1, 2, 3 } };
+    const auto& crs_manager = grid.grid_coordinate_reference_system_manager();
+    geode::OpenGeodeMeshException::test(
+        crs_manager.nb_coordinate_reference_systems() == 1,
+        "[Test] A new grid should have one CRS" );
+    check_active_crs_is_grid_geometry( grid, "points" );
+    const auto initial_coordinate_system = grid.grid_coordinate_system();
+
+    const geode::CoordinateSystem3D shifted{
+        { geode::Vector3D{ { 0, 2, 0 } }, geode::Vector3D{ { -1, 0, 0 } },
+            geode::Vector3D{ { 0, 0, 0.5 } } },
+        geode::Point3D{ { 100, 200, 300 } }
+    };
+    geode::GridCoordinateReferenceSystemManagerBuilder3D crs_builder{ grid };
+    crs_builder.register_coordinate_reference_system( "shifted",
+        std::make_shared< geode::GridCoordinateReferenceSystem3D >( shifted ) );
+    geode::OpenGeodeMeshException::test(
+        crs_manager.nb_coordinate_reference_systems() == 2,
+        "[Test] Grid should have two CRSs" );
+    geode::OpenGeodeMeshException::test(
+        same_coordinate_system(
+            grid.grid_coordinate_system(), initial_coordinate_system ),
+        "[Test] Registering a CRS should not move the grid" );
+
+    crs_builder.set_active_coordinate_reference_system( "shifted" );
+    check_active_crs_is_grid_geometry( grid, "shifted" );
+    geode::OpenGeodeMeshException::test(
+        same_coordinate_system( grid.grid_coordinate_system(), shifted ),
+        "[Test] Grid geometry should be the active CRS one" );
+    geode::OpenGeodeMeshException::test(
+        grid.point( grid.vertex_index( { 1, 1, 1 } ) )
+            == geode::Point3D{ { 99, 202, 300.5 } },
+        "[Test] Wrong grid point in shifted CRS" );
+    geode::OpenGeodeMeshException::test(
+        grid.cell_length_in_direction( 0 ) == 2
+            && grid.cell_length_in_direction( 1 ) == 1
+            && grid.cell_length_in_direction( 2 ) == 0.5,
+        "[Test] Wrong cell lengths in shifted CRS" );
+
+    geode::GridBuilder3D{ grid }.set_grid_origin(
+        geode::Point3D{ { 0, 0, 0 } } );
+    check_active_crs_is_grid_geometry( grid, "shifted" );
+
+    crs_builder.set_active_coordinate_reference_system( "points" );
+    check_active_crs_is_grid_geometry( grid, "points" );
+    geode::OpenGeodeMeshException::test(
+        same_coordinate_system(
+            grid.grid_coordinate_system(), initial_coordinate_system ),
+        "[Test] Grid geometry should be restored with the first CRS" );
+    geode::OpenGeodeMeshException::test(
+        crs_manager.find_coordinate_reference_system( "shifted" )
+                .coordinate_system()
+                .origin()
+            == geode::Point3D{ { 0, 0, 0 } },
+        "[Test] Inactive CRS should keep the last active geometry" );
+
+    auto clone = grid.clone();
+    geode::GridCoordinateReferenceSystemManagerBuilder3D{ clone }
+        .set_active_coordinate_reference_system( "shifted" );
+    check_active_crs_is_grid_geometry( clone, "shifted" );
+    check_active_crs_is_grid_geometry( grid, "points" );
+    geode::GridBuilder3D{ clone }.set_grid_origin(
+        geode::Point3D{ { 1, 1, 1 } } );
+    geode::OpenGeodeMeshException::test(
+        crs_manager.find_coordinate_reference_system( "shifted" )
+                .coordinate_system()
+                .origin()
+            == geode::Point3D{ { 0, 0, 0 } },
+        "[Test] Cloned grid CRSs should be independent" );
+
+    const auto filename = absl::StrCat( "crs.", grid.native_extension() );
+    geode::save_light_regular_grid( clone, filename );
+    auto reloaded = geode::load_light_regular_grid< 3 >( filename );
+    geode::OpenGeodeMeshException::test(
+        reloaded.grid_coordinate_reference_system_manager()
+                .nb_coordinate_reference_systems()
+            == 2,
+        "[Test] Reloaded grid should have two CRSs" );
+    check_active_crs_is_grid_geometry( reloaded, "shifted" );
+    geode::GridCoordinateReferenceSystemManagerBuilder3D{ reloaded }
+        .set_active_coordinate_reference_system( "points" );
+    geode::OpenGeodeMeshException::test(
+        same_coordinate_system(
+            reloaded.grid_coordinate_system(), initial_coordinate_system ),
+        "[Test] Reloaded grid should keep the inactive CRS geometry" );
+
+    crs_builder.delete_coordinate_reference_system( "points" );
+    geode::OpenGeodeMeshException::test(
+        crs_manager.active_coordinate_reference_system_name().empty(),
+        "[Test] Deleting the active CRS should leave no active CRS" );
+    geode::OpenGeodeMeshException::test(
+        same_coordinate_system(
+            grid.grid_coordinate_system(), initial_coordinate_system ),
+        "[Test] Deleting the active CRS should not move the grid" );
+}
+
+void test_backward_io()
+{
+    const auto grid3d = geode::load_light_regular_grid< 3 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v19_8/v19_8.og_lrgd3d" ) );
+    test_cell_number( grid3d );
+    test_cell_geometry( grid3d );
+    check_active_crs_is_grid_geometry( grid3d, "points" );
+    geode::OpenGeodeMeshException::test(
+        grid3d.grid_coordinate_reference_system_manager()
+                .nb_coordinate_reference_systems()
+            == 1,
+        "[Test] Legacy grid should have one CRS" );
+    const auto attribute_ids =
+        grid3d.cell_attribute_manager().attribute_ids_matching_name(
+            "cell_value" );
+    geode::OpenGeodeMeshException::test(
+        attribute_ids && attribute_ids->size() == 1,
+        "[Test] Legacy grid should keep its cell attribute" );
+    geode::OpenGeodeMeshException::test(
+        grid3d.cell_attribute_manager()
+                .find_attribute< geode::VariableAttribute, double >(
+                    attribute_ids->front() )
+                ->value( 10 )
+            == 42,
+        "[Test] Legacy grid should keep its cell attribute values" );
+
+    const auto grid2d = geode::load_light_regular_grid< 2 >(
+        absl::StrCat( geode::DATA_PATH, "backward_io/v19_8/v19_8.og_lrgd2d" ) );
+    check_active_crs_is_grid_geometry( grid2d, "points" );
+    geode::OpenGeodeMeshException::test(
+        grid2d.point( grid2d.vertex_index( { 1, 1 } ) )
+            == geode::Point2D{ { 0.5, 4 } },
+        "[Test] Wrong legacy 2D grid point" );
+
+    const auto filename =
+        absl::StrCat( "backward.", grid2d.native_extension() );
+    geode::save_light_regular_grid( grid2d, filename );
+    const auto reloaded = geode::load_light_regular_grid< 2 >( filename );
+    check_active_crs_is_grid_geometry( reloaded, "points" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -534,6 +711,8 @@ void test()
     test_clone_exact_geometry();
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
     test_save_unwritable( grid );
+    test_coordinate_reference_systems();
+    test_backward_io();
 }
 
 OPENGEODE_TEST( "light-regular-grid" )
