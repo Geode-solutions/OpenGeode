@@ -175,6 +175,11 @@ namespace geode
         Grid( Grid&& other ) noexcept;
         Grid& operator=( Grid&& other ) noexcept;
 
+        /*!
+         * Called after any modification of the grid coordinate system
+         */
+        virtual void grid_coordinate_system_changed() {}
+
     private:
         template < typename Archive >
         void serialize( Archive& serializer );

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/identifier.hpp>
+#include <geode/basic/passkey.hpp>
 #include <geode/basic/pimpl.hpp>
 
 #include <geode/mesh/common.hpp>
@@ -32,6 +33,9 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( GridCoordinateReferenceSystemManager );
+    FORWARD_DECLARATION_DIMENSION_CLASS(
+        GridCoordinateReferenceSystemManagerBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     class AttributeManager;
@@ -43,6 +47,9 @@ namespace geode
     class LightRegularGrid : public Grid< dimension >, public Identifier
     {
     public:
+        PASSKEY( GridCoordinateReferenceSystemManagerBuilder< dimension >,
+            GridCRSManagerBuilderKey );
+
         static constexpr auto dim = dimension;
         using CellIndices = typename Grid< dimension >::CellIndices;
         using VertexIndices = typename Grid< dimension >::VertexIndices;
@@ -95,6 +102,17 @@ namespace geode
         [[nodiscard]] BoundingBox< dimension > bounding_box() const;
 
         [[nodiscard]] LightRegularGrid< dimension > clone() const;
+
+        [[nodiscard]] const GridCoordinateReferenceSystemManager< dimension >&
+            grid_coordinate_reference_system_manager() const;
+
+    public:
+        [[nodiscard]] GridCoordinateReferenceSystemManager< dimension >&
+            modifiable_grid_coordinate_reference_system_manager(
+                GridCRSManagerBuilderKey /*key*/ );
+
+    private:
+        void grid_coordinate_system_changed() override;
 
     private:
         friend class bitsery::Access;

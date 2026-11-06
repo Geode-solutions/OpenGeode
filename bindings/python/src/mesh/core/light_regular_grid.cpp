@@ -28,6 +28,7 @@
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
+#include <geode/mesh/core/grid_coordinate_reference_system_manager.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 
 namespace
@@ -47,7 +48,11 @@ namespace
                 std::array< geode::index_t, dimension >,
                 std::array< geode::Vector< dimension >, dimension > >() )
             .def( "native_extension",
-                &geode::LightRegularGrid< dimension >::native_extension );
+                &geode::LightRegularGrid< dimension >::native_extension )
+            .def( "grid_coordinate_reference_system_manager",
+                &geode::LightRegularGrid<
+                    dimension >::grid_coordinate_reference_system_manager,
+                pybind11::return_value_policy::reference_internal );
     }
 } // namespace
 

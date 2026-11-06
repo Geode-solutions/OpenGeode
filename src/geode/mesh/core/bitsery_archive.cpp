@@ -42,6 +42,7 @@
 #include <geode/mesh/core/geode/geode_tetrahedral_solid.hpp>
 #include <geode/mesh/core/geode/geode_triangulated_surface.hpp>
 #include <geode/mesh/core/geode/geode_vertex_set.hpp>
+#include <geode/mesh/core/grid_coordinate_reference_system.hpp>
 #include <geode/mesh/core/internal/solid_mesh_impl.hpp>
 #include <geode/mesh/core/internal/surface_mesh_impl.hpp>
 #include <geode/mesh/core/mesh_element.hpp>
@@ -229,6 +230,10 @@ namespace bitsery
             "AttributeCoordinateReferenceSystem2D" );
         BITSERY_CLASS_NAME( geode::AttributeCoordinateReferenceSystem3D,
             "AttributeCoordinateReferenceSystem3D" );
+        BITSERY_CLASS_NAME( geode::GridCoordinateReferenceSystem2D,
+            "GridCoordinateReferenceSystem2D" );
+        BITSERY_CLASS_NAME( geode::GridCoordinateReferenceSystem3D,
+            "GridCoordinateReferenceSystem3D" );
     } // namespace ext
 } // namespace bitsery
 
@@ -273,6 +278,14 @@ namespace
             register_coordinate_reference_system_type<
                 geode::AttributeCoordinateReferenceSystem3D, Serializer >(
                 context, "AttributeCoordinateReferenceSystem3D" );
+        geode::GridCoordinateReferenceSystem2D::
+            register_grid_coordinate_reference_system_type<
+                geode::GridCoordinateReferenceSystem2D, Serializer >(
+                context, "GridCoordinateReferenceSystem2D" );
+        geode::GridCoordinateReferenceSystem3D::
+            register_grid_coordinate_reference_system_type<
+                geode::GridCoordinateReferenceSystem3D, Serializer >(
+                context, "GridCoordinateReferenceSystem3D" );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
     }

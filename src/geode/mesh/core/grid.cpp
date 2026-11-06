@@ -644,6 +644,7 @@ namespace geode
         Point< dimension > origin, GridKey /*key*/ )
     {
         impl_->set_grid_origin( std::move( origin ) );
+        grid_coordinate_system_changed();
     }
 
     template < index_t dimension >
@@ -655,6 +656,7 @@ namespace geode
         Impl::check_grid_dimensions( cells_number, cells_length );
         set_array_dimensions( std::move( cells_number ) );
         impl_->set_grid_dimensions( std::move( cells_length ) );
+        grid_coordinate_system_changed();
     }
 
     template < index_t dimension >
@@ -663,6 +665,7 @@ namespace geode
         GridKey /*key*/ )
     {
         impl_->set_grid_directions( std::move( directions ) );
+        grid_coordinate_system_changed();
     }
 
     template < index_t dimension >
@@ -671,6 +674,7 @@ namespace geode
     {
         CellArray< dimension >::copy( grid );
         impl_->copy( *grid.impl_ );
+        grid_coordinate_system_changed();
     }
 
     template < index_t dimension >

@@ -367,6 +367,39 @@ def test_io(grid, filename):
     mesh.load_light_regular_grid3D(filename)
 
 
+def test_coordinate_reference_systems():
+    grid = mesh.LightRegularGrid3D(
+        geom.Point3D([1.5, 0, 1]), [5, 10, 15], [1.0, 2.0, 3.0]
+    )
+    crs_manager = grid.grid_coordinate_reference_system_manager()
+    if crs_manager.nb_coordinate_reference_systems() != 1:
+        raise ValueError("[Test] A new grid should have one CRS")
+    if crs_manager.active_coordinate_reference_system_name() != "points":
+        raise ValueError("[Test] Wrong default grid CRS name")
+    shifted = geom.CoordinateSystem3D(
+        [
+            geom.Vector3D([0, 2, 0]),
+            geom.Vector3D([-1, 0, 0]),
+            geom.Vector3D([0, 0, 0.5]),
+        ],
+        geom.Point3D([100, 200, 300]),
+    )
+    builder = mesh.GridCoordinateReferenceSystemManagerBuilder3D(grid)
+    builder.register_coordinate_reference_system(
+        "shifted", mesh.GridCoordinateReferenceSystem3D(shifted)
+    )
+    if not crs_manager.coordinate_reference_system_exists("shifted"):
+        raise ValueError("[Test] Registered grid CRS should exist")
+    builder.set_active_coordinate_reference_system("shifted")
+    if crs_manager.active_coordinate_reference_system_name() != "shifted":
+        raise ValueError("[Test] Wrong active grid CRS name")
+    if grid.grid_point([1, 1, 1]) != geom.Point3D([99, 202, 300.5]):
+        raise ValueError("[Test] Wrong grid point in shifted CRS")
+    builder.set_active_coordinate_reference_system("points")
+    if grid.grid_point([1, 1, 1]) != geom.Point3D([2.5, 2, 4]):
+        raise ValueError("[Test] Wrong grid point in initial CRS")
+
+
 if __name__ == "__main__":
     mesh.OpenGeodeMeshLibrary.initialize()
     grid = mesh.LightRegularGrid3D(
@@ -384,3 +417,4 @@ if __name__ == "__main__":
     test_attribute_3d(grid)
     test_attribute_2d()
     test_io(grid, "test." + grid.native_extension())
+    test_coordinate_reference_systems()
