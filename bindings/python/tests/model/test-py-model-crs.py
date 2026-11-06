@@ -25,6 +25,7 @@ import geode_test_env
 
 import opengeode_py_basic as basic
 import opengeode_py_model as model
+import opengeode
 
 
 def check_result(crss):
@@ -41,8 +42,10 @@ if __name__ == "__main__":
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
 
-    brep = model.load_brep(os.path.join(data_dir, "random_dfn.og_brep"))
+    brep_filename = os.path.join(data_dir, "random_dfn.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
     check_result(model.brep_coordinate_reference_systems(brep))
 
-    section = model.load_section(os.path.join(data_dir, "fractures.og_sctn"))
+    section_filename = os.path.join(data_dir, "fractures.og_sctn")
+    section = opengeode.load_one(model.load_section(section_filename), section_filename)
     check_result(model.section_coordinate_reference_systems(section))

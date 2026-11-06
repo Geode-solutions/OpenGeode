@@ -457,7 +457,8 @@ void test_clone( const geode::RegularGrid3D& grid )
 void test_io( const geode::RegularGrid3D& grid, std::string_view filename )
 {
     geode::save_regular_grid( grid, filename );
-    const auto reload = geode::load_regular_grid< 3 >( filename );
+    const auto reload =
+        geode::load_one( geode::load_regular_grid< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test(
         grid.nb_cells() == reload->nb_cells(), "Wrong reload nb_cells()" );
     geode::OpenGeodeMeshException::test(
@@ -473,7 +474,8 @@ void test_io( const geode::RegularGrid3D& grid, std::string_view filename )
 
 void test_backward_io( std::string_view filename )
 {
-    const auto grid = geode::load_regular_grid< 3 >( filename );
+    const auto grid =
+        geode::load_one( geode::load_regular_grid< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test(
         grid->nb_cells() == 750, "Wrong Backward grid nb_cells()" );
     geode::OpenGeodeMeshException::test( grid->nb_cells_in_direction( 0 ) == 5,
@@ -486,8 +488,10 @@ void test_backward_io( std::string_view filename )
 
 void test_legacy_grid_origin()
 {
-    const auto grid_v12 = geode::load_regular_grid< 3 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v12/test_v12.og_rgd3d" ) );
+    const auto grid_v12_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v12/test_v12.og_rgd3d" );
+    const auto grid_v12 = geode::load_one(
+        geode::load_regular_grid< 3 >( grid_v12_filename ), grid_v12_filename );
     const geode::Point3D origin{ { 1.5, 0, 1 } };
     geode::OpenGeodeMeshException::test(
         grid_v12->point( 0 ) == origin, "[v12] Wrong point 0" );
@@ -503,8 +507,10 @@ void test_legacy_grid_origin()
             "[v12] Wrong grid point" );
     }
 
-    const auto grid_v13 = geode::load_regular_grid< 2 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v13/v13.og_rgd2d" ) );
+    const auto grid_v13_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v13/v13.og_rgd2d" );
+    const auto grid_v13 = geode::load_one(
+        geode::load_regular_grid< 2 >( grid_v13_filename ), grid_v13_filename );
     geode::OpenGeodeMeshException::test(
         grid_v13->nb_polygons() == 12, "[v13] Wrong number of cells" );
     geode::OpenGeodeMeshException::test(
@@ -536,7 +542,8 @@ void test_io_keeps_coordinate_system()
     const auto filename =
         absl::StrCat( "test_coordinate_system.", grid->native_extension() );
     geode::save_regular_grid( *grid, filename );
-    const auto reload = geode::load_regular_grid< 3 >( filename );
+    const auto reload =
+        geode::load_one( geode::load_regular_grid< 3 >( filename ), filename );
     const auto& coordinate_system = grid->grid_coordinate_system();
     const auto& reload_coordinate_system = reload->grid_coordinate_system();
     geode::OpenGeodeMeshException::test(
@@ -629,8 +636,10 @@ void test_grid( const geode::RegularGrid3D& grid )
 void test_old_io()
 {
     geode::Logger::debug( "Reading old grid." );
-    const auto old_grid = geode::load_regular_grid< 3 >(
-        absl::StrCat( geode::DATA_PATH, "old_grid.og_rgd3d" ) );
+    const auto old_grid_filename =
+        absl::StrCat( geode::DATA_PATH, "old_grid.og_rgd3d" );
+    const auto old_grid = geode::load_one(
+        geode::load_regular_grid< 3 >( old_grid_filename ), old_grid_filename );
     const auto bbox = old_grid->bounding_box();
     const auto grid_bbox = old_grid->grid_bounding_box();
     geode::OpenGeodeMeshException::test(
@@ -642,9 +651,10 @@ void test_old_io()
         grid_point == point, "Different results for grid_point and point" );
 
     geode::Logger::debug( "Reading v12." );
-    auto grid_v12 =
-        geode::load_regular_grid< 3 >( absl::StrCat( geode::DATA_PATH,
-            "backward_io/v12/test_v12.", old_grid->native_extension() ) );
+    const auto grid_v12_filename = absl::StrCat( geode::DATA_PATH,
+        "backward_io/v12/test_v12.", old_grid->native_extension() );
+    auto grid_v12 = geode::load_one(
+        geode::load_regular_grid< 3 >( grid_v12_filename ), grid_v12_filename );
     geode::Logger::debug( "Reading v12 point." );
     SDEBUG( grid_v12->point( 0 ) );
     auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );

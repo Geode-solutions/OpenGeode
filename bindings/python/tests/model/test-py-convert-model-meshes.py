@@ -24,33 +24,36 @@ import geode_test_env
 
 import opengeode_py_basic as basic
 import opengeode_py_model as model
+import opengeode
 
 
 def run_test_brep():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))
-    brep = model.load_brep(os.path.join(data_dir, "layers.og_brep"))
+    brep_filename = os.path.join(data_dir, "layers.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
     model.triangulate_brep_surface_meshes(brep)
     model.convert_brep_surface_meshes_into_triangulated_surfaces(brep)
     model.convert_brep_block_meshes_into_tetrahedral_solids(brep)
 
     file_io = "test_triangulated_surfaces." + brep.native_extension()
     model.save_brep(brep, file_io)
-    brep2 = model.load_brep(file_io)
+    brep2 = opengeode.load_one(model.load_brep(file_io), file_io)
 
 
 def run_test_section():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))
-    section = model.load_section(os.path.join(data_dir, "quad.og_sctn"))
+    section_filename = os.path.join(data_dir, "quad.og_sctn")
+    section = opengeode.load_one(model.load_section(section_filename), section_filename)
     model.triangulate_section_surface_meshes(section)
     model.convert_section_surface_meshes_into_triangulated_surfaces(section)
 
     file_io = "test_triangulated_surfaces." + section.native_extension()
     model.save_section(section, file_io)
-    section2 = model.load_section(file_io)
+    section2 = opengeode.load_one(model.load_section(file_io), file_io)
 
 
 if __name__ == '__main__':

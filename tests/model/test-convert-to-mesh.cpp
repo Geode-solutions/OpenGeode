@@ -55,8 +55,10 @@
 
 void run_test_brep()
 {
-    auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
     const auto curve = std::get< 0 >( geode::convert_brep_into_curve( model ) );
     geode::OpenGeodeModelException::test(
         curve->nb_vertices() == 154, "BRep - Wrong number of curve vertices" );
@@ -77,8 +79,10 @@ void run_test_brep()
 
 void run_test_section()
 {
-    const auto model =
-        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "quad.og_sctn" );
+    const auto model = geode::load_one(
+        geode::load_section( model_filename ), model_filename );
 
     const auto curve =
         std::get< 0 >( geode::convert_section_into_curve( model ) );

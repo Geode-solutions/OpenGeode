@@ -45,7 +45,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    [[nodiscard]] std::unique_ptr< TriangulatedSurface< dimension > >
+    [[nodiscard]] std::vector<
+        std::unique_ptr< TriangulatedSurface< dimension > > >
         load_triangulated_surface(
             const MeshImpl& impl, std::string_view filename );
 
@@ -56,7 +57,8 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    [[nodiscard]] std::unique_ptr< TriangulatedSurface< dimension > >
+    [[nodiscard]] std::vector<
+        std::unique_ptr< TriangulatedSurface< dimension > > >
         load_triangulated_surface( std::string_view filename );
 
     template < index_t dimension >

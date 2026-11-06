@@ -38,8 +38,8 @@
     const auto load##dimension =                                               \
         "load_triangulated_surface" + std::to_string( dimension ) + "D";       \
     module.def( load##dimension.c_str(),                                       \
-        static_cast< std::unique_ptr<                                          \
-            TriangulatedSurface< dimension > > ( * )( std::string_view ) >(    \
+        static_cast< std::vector< std::unique_ptr<                             \
+            TriangulatedSurface< dimension > > > ( * )( std::string_view ) >(  \
             &load_triangulated_surface< dimension > ) );                       \
     const auto priority##dimension = "triangulated_surface_object_priority"    \
                                      + std::to_string( dimension ) + "D";      \

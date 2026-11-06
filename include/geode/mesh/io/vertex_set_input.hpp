@@ -44,7 +44,7 @@ namespace geode
      * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
-    [[nodiscard]] std::unique_ptr< VertexSet > opengeode_mesh_api
+    [[nodiscard]] std::vector< std::unique_ptr< VertexSet > > opengeode_mesh_api
         load_vertex_set( const MeshImpl& impl, std::string_view filename );
 
     /*!
@@ -53,7 +53,7 @@ namespace geode
      * Default data structure implémentation is used.
      * @param[in] filename Path to the file to load.
      */
-    [[nodiscard]] std::unique_ptr< VertexSet >
+    [[nodiscard]] std::vector< std::unique_ptr< VertexSet > >
         opengeode_mesh_api load_vertex_set( std::string_view filename );
 
     class VertexSetInput

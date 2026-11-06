@@ -24,6 +24,7 @@ import geode_test_env
 
 import opengeode_py_basic as basic
 import opengeode_py_model as model
+import opengeode
 
 
 def check_brep_prism(brep):
@@ -61,10 +62,12 @@ if __name__ == '__main__':
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))
-    brep = model.load_brep(os.path.join(data_dir, "prism_curve.og_brep"))
+    brep_filename = os.path.join(data_dir, "prism_curve.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
     model.filter_brep_components_with_regards_to_blocks(brep)
     check_brep_prism(brep)
 
-    brep2 = model.load_brep(os.path.join(data_dir, "dangling.og_brep"))
+    brep2_filename = os.path.join(data_dir, "dangling.og_brep")
+    brep2 = opengeode.load_one(model.load_brep(brep2_filename), brep2_filename)
     model.filter_brep_components_with_regards_to_blocks(brep2)
     check_brep_dangling(brep2)

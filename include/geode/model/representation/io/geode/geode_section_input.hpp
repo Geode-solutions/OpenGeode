@@ -46,7 +46,7 @@ namespace geode
             return Section::native_extension_static();
         }
 
-        [[nodiscard]] Section read() final;
+        [[nodiscard]] std::vector< Section > read() final;
 
         [[nodiscard]] AdditionalFiles additional_files() const final
         {

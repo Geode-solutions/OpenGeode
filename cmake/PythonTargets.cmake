@@ -45,6 +45,13 @@ function(add_geode_python_test)
     set(test_env_directory "${PROJECT_BINARY_DIR}/geode_test_env")
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/geode_test_env.py"
         "${test_env_directory}/geode_test_env.py" COPYONLY)
+    # Pure-Python modules (e.g. basic.py) copied by add_geode_python_wheel
+    get_property(python_modules_directory
+        GLOBAL PROPERTY ${PROJECT_NAME}_PYTHON_MODULES_DIRECTORY
+    )
+    if(python_modules_directory)
+        list(APPEND directories "${python_modules_directory}")
+    endif()
     if(WIN32)
         list(JOIN directories "\\;" directories)
         _escaped_environment_variable(path Path)
@@ -92,15 +99,22 @@ function(add_geode_python_wheel)
         file(APPEND ${wheel_init} "import os, pathlib\n")
         file(APPEND ${wheel_init} "os.add_dll_directory(pathlib.Path(__file__).parent.resolve().joinpath('bin'))\n\n")
     endif()
+    # Build-tree copy of the pure-Python modules, imported by the Python tests
+    set(python_modules_directory "${PROJECT_BINARY_DIR}/python_modules")
+    set_property(GLOBAL PROPERTY
+        ${PROJECT_NAME}_PYTHON_MODULES_DIRECTORY "${python_modules_directory}"
+    )
     foreach(module ${GEODE_WHEEL_MODULES})
         string(REPLACE ".py" "" module_name "${module}")
         file(APPEND ${wheel_init} "from .${module_name} import *\n")
         file(APPEND ${wheel_import} "from ${module_name} import *\n")
         configure_file("${module}" "${wheel_build_directory}/${binary_folder}/${module}" COPYONLY)
+        configure_file("${module}" "${python_modules_directory}/${module}" COPYONLY)
         file(READ "${module}" FILE_CONTENTS)
         string(REPLACE "from ${project_name}" "from .${binary_folder}.${project_name}" FILE_CONTENTS "${FILE_CONTENTS}")
         file(WRITE "${wheel_output_directory}/${module}" ${FILE_CONTENTS})
     endforeach()
+    configure_file("${wheel_import}" "${python_modules_directory}/${project_name}.py" COPYONLY)
     if(NOT WHEEL_VERSION)
         set(WHEEL_VERSION "0.0.0")
     endif()

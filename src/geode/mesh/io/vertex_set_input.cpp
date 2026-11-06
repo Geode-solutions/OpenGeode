@@ -33,25 +33,29 @@
 
 namespace geode
 {
-    std::unique_ptr< VertexSet > load_vertex_set( std::string_view filename )
+    std::vector< std::unique_ptr< VertexSet > > load_vertex_set(
+        std::string_view filename )
     {
         return load_vertex_set(
             MeshFactory::default_impl( VertexSet::type_name_static() ),
             filename );
     }
 
-    std::unique_ptr< VertexSet > load_vertex_set(
+    std::vector< std::unique_ptr< VertexSet > > load_vertex_set(
         const MeshImpl& impl, std::string_view filename )
     {
         constexpr auto TYPE = "VertexSet";
         try
         {
-            auto vertex_set =
+            auto vertex_sets =
                 detail::geode_object_input_impl< VertexSetInputFactory >(
                     TYPE, filename, impl );
-            Logger::info(
-                TYPE, " has: ", vertex_set->nb_vertices(), " vertices" );
-            return vertex_set;
+            for( const auto& vertex_set : vertex_sets )
+            {
+                Logger::info(
+                    TYPE, " has: ", vertex_set->nb_vertices(), " vertices" );
+            }
+            return vertex_sets;
         }
         catch( const OpenGeodeException& e )
         {

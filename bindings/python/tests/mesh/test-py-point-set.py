@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(point_set, builder):
@@ -80,7 +81,7 @@ def test_delete_vertex(point_set, builder):
 
 def test_io(point_set, filename):
     mesh.save_point_set3D(point_set, filename)
-    new_point_set = mesh.load_point_set3D(filename)
+    new_point_set = opengeode.load_one(mesh.load_point_set3D(filename), filename)
 
 
 def test_clone(point_set, attribute_id):

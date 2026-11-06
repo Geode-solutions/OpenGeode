@@ -76,10 +76,13 @@ void test_delete_vertex(
 void test_io( const geode::VertexSet& vertex_set, std::string_view filename )
 {
     geode::save_vertex_set( vertex_set, filename );
-    const auto reload = geode::load_vertex_set( filename );
+    const auto reload =
+        geode::load_one( geode::load_vertex_set( filename ), filename );
     geode_unused( reload );
-    const auto vertex_set2 = geode::load_vertex_set(
-        geode::OpenGeodeVertexSet::impl_name_static(), filename );
+    const auto vertex_set2 = geode::load_one(
+        geode::load_vertex_set(
+            geode::OpenGeodeVertexSet::impl_name_static(), filename ),
+        filename );
     geode::OpenGeodeMeshException::test( vertex_set2->nb_vertices() == 6,
         "Reloaded VertexSet should have 6 vertices" );
 }

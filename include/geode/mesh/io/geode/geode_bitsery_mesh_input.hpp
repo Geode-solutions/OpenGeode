@@ -32,8 +32,8 @@
 #include <geode/mesh/core/bitsery_archive.hpp>
 
 #define BITSERY_READ( Mesh )                                                   \
-    [[nodiscard]] std::unique_ptr< Mesh > read( const MeshImpl& /*impl*/ )     \
-        final                                                                  \
+    [[nodiscard]] std::vector< std::unique_ptr< Mesh > > read(                 \
+        const MeshImpl& /*impl*/ ) final                                       \
     {                                                                          \
         std::ifstream file{ to_string( this->filename() ),                     \
             std::ifstream::binary };                                           \
@@ -69,7 +69,9 @@
                 && std::get< 1 >( context ).isValid(),                         \
             nullptr, geode::OpenGeodeException::TYPE::internal,                \
             "[Bitsery::read] Error while reading file: ", this->filename() );  \
-        return mesh;                                                           \
+        std::vector< std::unique_ptr< Mesh > > meshes;                         \
+        meshes.emplace_back( std::move( mesh ) );                              \
+        return meshes;                                                         \
     }                                                                          \
                                                                                \
     index_t object_priority() const final                                      \

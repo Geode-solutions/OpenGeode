@@ -22,6 +22,7 @@
 import geode_test_env
 
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(graph, builder):
@@ -105,7 +106,7 @@ def test_delete_edge(graph, builder):
 
 def test_io(graph, filename):
     mesh.save_graph(graph, filename)
-    new_graph = mesh.load_graph(filename)
+    new_graph = opengeode.load_one(mesh.load_graph(filename), filename)
 
 
 def test_clone(graph):

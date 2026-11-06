@@ -38,8 +38,9 @@
     const auto load##dimension =                                               \
         "load_regular_grid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
-        static_cast< std::unique_ptr< RegularGrid< dimension > > ( * )(        \
-            std::string_view ) >( &load_regular_grid< dimension > ) );         \
+        static_cast<                                                           \
+            std::vector< std::unique_ptr< RegularGrid< dimension > > > ( * )(  \
+                std::string_view ) >( &load_regular_grid< dimension > ) );     \
     const auto priority##dimension =                                           \
         "regular_grid_object_priority" + std::to_string( dimension ) + "D";    \
     module.def( priority##dimension.c_str(),                                   \

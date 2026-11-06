@@ -24,6 +24,7 @@ import geode_test_env
 
 import opengeode_py_basic as basic
 import opengeode_py_model as model
+import opengeode
 
 
 def check_concatenation(
@@ -44,8 +45,10 @@ if __name__ == '__main__':
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))
-    brep = model.load_brep(os.path.join(data_dir, "prism_curve.og_brep"))
-    brep2 = model.load_brep(os.path.join(data_dir, "dangling.og_brep" ) )
+    brep_filename = os.path.join(data_dir, "prism_curve.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
+    brep2_filename = os.path.join(data_dir, "dangling.og_brep" )
+    brep2 = opengeode.load_one(model.load_brep(brep2_filename), brep2_filename)
     nb_components = [ brep.nb_corners() + brep2.nb_corners(), brep.nb_lines() + brep2.nb_lines(), brep.nb_surfaces() + brep2.nb_surfaces(), brep.nb_blocks() + brep2.nb_blocks(), brep.nb_model_boundaries() + brep2.nb_model_boundaries() ]
     concatener = model.BRepConcatener( brep )
     concatener.concatenate( brep2 )

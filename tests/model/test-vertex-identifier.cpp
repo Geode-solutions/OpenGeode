@@ -404,7 +404,7 @@ void test_unregister_after_load()
     const auto filename =
         absl::StrCat( "test_vertex_identifier.", brep.native_extension() );
     geode::save_brep( brep, filename );
-    auto reloaded = geode::load_brep( filename );
+    auto reloaded = geode::load_one( geode::load_brep( filename ), filename );
     geode::BRepBuilder reloaded_builder{ reloaded };
     reloaded_builder.remove_surface( reloaded.surface( surface0 ) );
     geode::OpenGeodeModelException::test(

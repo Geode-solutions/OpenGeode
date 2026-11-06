@@ -26,6 +26,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geometry
 import opengeode_py_model as model
+import opengeode
 
 
 def check_value(value, expected, message):
@@ -41,7 +42,8 @@ def check_point(point, expected, message):
 
 
 def run_test_meshed_blocks(data_dir):
-    brep = model.load_brep(os.path.join(data_dir, "test_mesh3.og_brep"))
+    brep_filename = os.path.join(data_dir, "test_mesh3.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
     for block in brep.blocks():
         mesh = block.mesh()
         mesh_volume = sum(mesh.polyhedron_volume(p) for p in range(mesh.nb_polyhedra()))
@@ -58,7 +60,8 @@ def run_test_meshed_blocks(data_dir):
 
 
 def run_test_block_boundaries(data_dir):
-    brep = model.load_brep(os.path.join(data_dir, "box_brep.og_brep"))
+    brep_filename = os.path.join(data_dir, "box_brep.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
     if brep.nb_blocks() != 1:
         raise ValueError("[Test] Wrong number of blocks")
     for block in brep.blocks():
@@ -73,7 +76,8 @@ def run_test_block_boundaries(data_dir):
 
 
 def run_test_section(data_dir):
-    section = model.load_section(os.path.join(data_dir, "fractures.og_sctn"))
+    section_filename = os.path.join(data_dir, "fractures.og_sctn")
+    section = opengeode.load_one(model.load_section(section_filename), section_filename)
     for surface in section.surfaces():
         mesh = surface.mesh()
         mesh_area = sum(mesh.polygon_area(p) for p in range(mesh.nb_polygons()))

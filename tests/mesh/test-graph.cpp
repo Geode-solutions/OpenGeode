@@ -127,14 +127,16 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
 void test_io( const geode::Graph& graph, const std::string& filename )
 {
     geode::save_graph( graph, filename );
-    const auto graph2 = geode::load_graph(
-        geode::OpenGeodeGraph::impl_name_static(), filename );
+    const auto graph2 = geode::load_one(
+        geode::load_graph(
+            geode::OpenGeodeGraph::impl_name_static(), filename ),
+        filename );
     geode_unused( graph2 );
 }
 
 void test_backward_io( const std::string& filename )
 {
-    auto graph = geode::load_graph( filename );
+    auto graph = geode::load_one( geode::load_graph( filename ), filename );
 
     geode::OpenGeodeMeshException::test(
         graph->edges_around_vertex( 2 ).size() == 3,
@@ -216,13 +218,15 @@ void check_v18_5( const geode::Graph& graph )
 
 void test_backward_v18_5()
 {
-    const auto graph = geode::load_graph(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_grp" ) );
+    const auto graph_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_grp" );
+    const auto graph =
+        geode::load_one( geode::load_graph( graph_filename ), graph_filename );
     check_v18_5( *graph );
     const auto filename =
         absl::StrCat( "v18_5_reload.", graph->native_extension() );
     geode::save_graph( *graph, filename );
-    check_v18_5( *geode::load_graph( filename ) );
+    check_v18_5( *geode::load_one( geode::load_graph( filename ), filename ) );
 }
 
 void test_replace_vertex()

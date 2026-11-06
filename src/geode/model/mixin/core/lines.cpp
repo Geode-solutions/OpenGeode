@@ -131,10 +131,12 @@ namespace geode
                         typename Line< dimension >::LinesKey{} );
                     return;
                 }
-                line.set_mesh( load_edged_curve< dimension >(
-                                   detail::loadable_mesh_impl(
-                                       line.mesh_type(), type, file->second ),
-                                   file->second ),
+                line.set_mesh(
+                    load_one( load_edged_curve< dimension >(
+                                  detail::loadable_mesh_impl(
+                                      line.mesh_type(), type, file->second ),
+                                  file->second ),
+                        file->second ),
                     typename Line< dimension >::LinesKey{} );
             } );
         }

@@ -47,8 +47,10 @@
 
 void run_test_brep()
 {
-    auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
 
     for( const auto& block : model.blocks() )
     {
@@ -166,8 +168,10 @@ void run_test_brep()
 }
 void run_test_section()
 {
-    auto model =
-        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "quad.og_sctn" );
+    auto model = geode::load_one(
+        geode::load_section( model_filename ), model_filename );
 
     for( const auto& surface : model.surfaces() )
     {
@@ -227,8 +231,10 @@ void run_test_section()
 
 void run_test_polygon_without_unique_vertex()
 {
-    auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
     geode::BRepBuilder builder{ model };
     const auto& block = *model.blocks().begin();
     const auto& surface = *model.boundaries( block ).begin();
@@ -274,8 +280,10 @@ void run_test_polygon_without_unique_vertex()
 
 void run_test_degenerate_polygon()
 {
-    const auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    const auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
     const auto& surface = *model.surfaces().begin();
     auto unique_vertices = geode::polygon_unique_vertices( model, surface, 0 );
     unique_vertices[1] = unique_vertices[0];

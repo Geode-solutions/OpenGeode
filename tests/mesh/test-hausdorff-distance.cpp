@@ -17,12 +17,14 @@ void test()
     geode::Logger::set_level( geode::Logger::LEVEL::debug );
     const auto initial_mesh_filename =
         absl::StrCat( geode::DATA_PATH, "Armadillo.og_tsf3d" );
-    const auto mesh_A =
-        geode::load_triangulated_surface< 3 >( initial_mesh_filename );
+    const auto mesh_A = geode::load_one(
+        geode::load_triangulated_surface< 3 >( initial_mesh_filename ),
+        initial_mesh_filename );
     const auto simplified_mesh_filename =
         absl::StrCat( geode::DATA_PATH, "modified_Armadillo.og_tsf3d" );
-    const auto mesh_B =
-        geode::load_triangulated_surface< 3 >( simplified_mesh_filename );
+    const auto mesh_B = geode::load_one(
+        geode::load_triangulated_surface< 3 >( simplified_mesh_filename ),
+        simplified_mesh_filename );
 
     const auto hausdorff_distance =
         geode::hausdorff_distance( *mesh_A, *mesh_B );

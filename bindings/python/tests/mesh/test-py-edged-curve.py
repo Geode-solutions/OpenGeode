@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(edged_curve, builder):
@@ -105,7 +106,7 @@ def test_delete_edge(edged_curve, builder):
 
 def test_io(edged_curve, filename):
     mesh.save_edged_curve3D(edged_curve, filename)
-    new_edged_curve = mesh.load_edged_curve3D(filename)
+    new_edged_curve = opengeode.load_one(mesh.load_edged_curve3D(filename), filename)
 
 
 def test_edge_requests(edged_curve, builder):

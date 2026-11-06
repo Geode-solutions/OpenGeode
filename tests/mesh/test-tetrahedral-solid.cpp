@@ -329,10 +329,13 @@ void test_io(
     const geode::TetrahedralSolid3D& solid, const std::string& filename )
 {
     geode::save_tetrahedral_solid( solid, filename );
-    const auto reloaded = geode::load_tetrahedral_solid< 3 >( filename );
+    const auto reloaded = geode::load_one(
+        geode::load_tetrahedral_solid< 3 >( filename ), filename );
     geode_unused( reloaded );
-    const auto new_solid = geode::load_tetrahedral_solid< 3 >(
-        geode::OpenGeodeTetrahedralSolid3D::impl_name_static(), filename );
+    const auto new_solid = geode::load_one(
+        geode::load_tetrahedral_solid< 3 >(
+            geode::OpenGeodeTetrahedralSolid3D::impl_name_static(), filename ),
+        filename );
     geode::OpenGeodeMeshException::test( new_solid->nb_vertices() == 6,
         "Reloaded TetrahedralSolid should have 6 vertices" );
     for( const auto vertex_id : geode::Range{ solid.nb_vertices() } )
@@ -352,7 +355,8 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    const auto solid = geode::load_tetrahedral_solid< 3 >( filename );
+    const auto solid = geode::load_one(
+        geode::load_tetrahedral_solid< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test( solid->nb_vertices() == 6,
         "Backward TetrahedralSolid should have 6 vertices" );
     geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 3,
@@ -591,13 +595,16 @@ void check_v18_5( const geode::TetrahedralSolid3D& solid )
 
 void test_backward_v18_5()
 {
-    const auto solid = geode::load_tetrahedral_solid< 3 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tso3d" ) );
+    const auto solid_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_tso3d" );
+    const auto solid = geode::load_one(
+        geode::load_tetrahedral_solid< 3 >( solid_filename ), solid_filename );
     check_v18_5( *solid );
     const auto filename =
         absl::StrCat( "v18_5_reload.", solid->native_extension() );
     geode::save_tetrahedral_solid( *solid, filename );
-    check_v18_5( *geode::load_tetrahedral_solid< 3 >( filename ) );
+    check_v18_5( *geode::load_one(
+        geode::load_tetrahedral_solid< 3 >( filename ), filename ) );
 }
 
 std::unique_ptr< geode::TetrahedralSolid3D > create_solid_with_points(

@@ -46,7 +46,7 @@ namespace geode
             return BRep::native_extension_static();
         }
 
-        [[nodiscard]] BRep read() final;
+        [[nodiscard]] std::vector< BRep > read() final;
 
         [[nodiscard]] AdditionalFiles additional_files() const final
         {

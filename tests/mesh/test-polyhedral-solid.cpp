@@ -418,10 +418,13 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     const geode::uuid& facet_attribute_id )
 {
     geode::save_polyhedral_solid( polyhedral_solid, filename );
-    const auto reloaded = geode::load_polyhedral_solid< 3 >( filename );
+    const auto reloaded = geode::load_one(
+        geode::load_polyhedral_solid< 3 >( filename ), filename );
     geode_unused( reloaded );
-    const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
-        geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
+    const auto new_polyhedral_solid = geode::load_one(
+        geode::load_polyhedral_solid< 3 >(
+            geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename ),
+        filename );
 
     geode::OpenGeodeMeshException::test(
         new_polyhedral_solid->nb_vertices() == 8,
@@ -468,8 +471,8 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
 
 void test_backward_io( const std::string& filename )
 {
-    const auto new_polyhedral_solid =
-        geode::load_polyhedral_solid< 3 >( filename );
+    const auto new_polyhedral_solid = geode::load_one(
+        geode::load_polyhedral_solid< 3 >( filename ), filename );
 
     geode::OpenGeodeMeshException::test(
         new_polyhedral_solid->nb_vertices() == 8,

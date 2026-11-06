@@ -205,26 +205,32 @@ namespace geode
                 const auto& type = MeshFactory::type( impl );
                 if( type == TetrahedralSolid< dimension >::type_name_static() )
                 {
-                    block.set_mesh( load_tetrahedral_solid< dimension >(
-                                        impl, file->second ),
+                    block.set_mesh(
+                        load_one( load_tetrahedral_solid< dimension >(
+                                      impl, file->second ),
+                            file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else if( type == HybridSolid< dimension >::type_name_static() )
                 {
-                    block.set_mesh(
-                        load_hybrid_solid< dimension >( impl, file->second ),
+                    block.set_mesh( load_one( load_hybrid_solid< dimension >(
+                                                  impl, file->second ),
+                                        file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else if( type == RegularGrid< dimension >::type_name_static() )
                 {
-                    block.set_mesh(
-                        load_regular_grid< dimension >( impl, file->second ),
+                    block.set_mesh( load_one( load_regular_grid< dimension >(
+                                                  impl, file->second ),
+                                        file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else
                 {
-                    block.set_mesh( load_polyhedral_solid< dimension >(
-                                        impl, file->second ),
+                    block.set_mesh(
+                        load_one( load_polyhedral_solid< dimension >(
+                                      impl, file->second ),
+                            file->second ),
                         typename Block< dimension >::BlocksKey{} );
                 }
             } );
