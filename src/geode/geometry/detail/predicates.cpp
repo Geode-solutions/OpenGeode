@@ -271,6 +271,7 @@ namespace GEO
         {
             set_length( 2 );
             two_sum( a, b, x_[1], x_[0] );
+            remove_zero_tail();
             return *this;
         }
 
@@ -285,6 +286,7 @@ namespace GEO
         {
             set_length( 2 );
             two_diff( a, b, x_[1], x_[0] );
+            remove_zero_tail();
             return *this;
         }
 
@@ -299,6 +301,7 @@ namespace GEO
         {
             set_length( 2 );
             two_product( a, b, x_[1], x_[0] );
+            remove_zero_tail();
             return *this;
         }
 
@@ -437,6 +440,40 @@ namespace GEO
         }
 
         // =============== some general purpose functions =========
+
+        /*!
+         * A length 2 expansion (head x_[1], tail x_[0]) whose tail is zero is
+         * the length 1 expansion of its head: the shorter expansions make the
+         * next operations cheaper (exact differences and products of the
+         * coordinates are frequent).
+         */
+        void remove_zero_tail()
+        {
+            if( x_[0] == 0.0 )
+            {
+                x_[0] = x_[1];
+                set_length( 1 );
+            }
+        }
+
+        /// Remove the zero components, keeping the order of the others
+        void remove_zeros()
+        {
+            index_t count{ 0 };
+            for( index_t i = 0; i < length(); i++ )
+            {
+                if( x_[i] != 0.0 )
+                {
+                    x_[count++] = x_[i];
+                }
+            }
+            if( count == 0 )
+            {
+                x_[0] = 0.0;
+                count = 1;
+            }
+            set_length( count );
+        }
 
         SIGN sign() const
         {
@@ -951,6 +988,7 @@ namespace GEO
         {
             two_product( a[0], b[0], x_[1], x_[0] );
             set_length( 2 );
+            remove_zero_tail();
         }
         else if( a.length() == 1 )
         {
@@ -964,6 +1002,7 @@ namespace GEO
         {
             two_two_product( a.data(), b.data(), x_ );
             set_length( 8 );
+            remove_zeros();
         }
         else
         {
