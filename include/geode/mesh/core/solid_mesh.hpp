@@ -695,13 +695,6 @@ namespace geode
         [[nodiscard]] virtual std::optional< PolyhedronVertex >
             get_polyhedron_around_vertex( index_t vertex_id ) const;
 
-        /*!
-         * Vertices of the polyhedron, by default from get_polyhedron_vertex
-         * (one call by vertex).
-         */
-        [[nodiscard]] virtual PolyhedronVertices get_polyhedron_vertices(
-            index_t polyhedron_id ) const;
-
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

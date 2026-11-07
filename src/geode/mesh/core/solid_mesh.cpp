@@ -1096,14 +1096,6 @@ namespace geode
     PolyhedronVertices SolidMesh< dimension >::polyhedron_vertices(
         index_t polyhedron_id ) const
     {
-        check_polyhedron_id( *this, polyhedron_id );
-        return get_polyhedron_vertices( polyhedron_id );
-    }
-
-    template < index_t dimension >
-    PolyhedronVertices SolidMesh< dimension >::get_polyhedron_vertices(
-        index_t polyhedron_id ) const
-    {
         const auto nb_vertices = nb_polyhedron_vertices( polyhedron_id );
         PolyhedronVertices vertices( nb_vertices );
         for( const auto v : LRange{ nb_vertices } )

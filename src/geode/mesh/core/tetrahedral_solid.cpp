@@ -308,6 +308,27 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedronVertices TetrahedralSolid< dimension >::polyhedron_vertices(
+        index_t polyhedron_id ) const
+    {
+        OpenGeodeMeshException::check_assertion(
+            polyhedron_id < this->nb_polyhedra(),
+            "[TetrahedralSolid::polyhedron_vertices] Trying to access an "
+            "invalid polyhedron" );
+        return get_polyhedron_vertices( polyhedron_id );
+    }
+
+    template < index_t dimension >
+    PolyhedronVertices TetrahedralSolid< dimension >::get_polyhedron_vertices(
+        index_t polyhedron_id ) const
+    {
+        return { this->polyhedron_vertex( { polyhedron_id, 0 } ),
+            this->polyhedron_vertex( { polyhedron_id, 1 } ),
+            this->polyhedron_vertex( { polyhedron_id, 2 } ),
+            this->polyhedron_vertex( { polyhedron_id, 3 } ) };
+    }
+
+    template < index_t dimension >
     Tetrahedron TetrahedralSolid< dimension >::tetrahedron(
         index_t tetrahedron_id ) const
     {
