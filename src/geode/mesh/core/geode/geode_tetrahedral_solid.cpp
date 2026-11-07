@@ -67,6 +67,13 @@ namespace geode
                                         [polyhedron_vertex.vertex_id];
         }
 
+        PolyhedronVertices get_polyhedron_vertices(
+            index_t polyhedron_id ) const
+        {
+            const auto& vertices = tetrahedron_vertices_[polyhedron_id];
+            return { vertices[0], vertices[1], vertices[2], vertices[3] };
+        }
+
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
@@ -224,6 +231,14 @@ namespace geode
         const PolyhedronVertex& polyhedron_vertex ) const
     {
         return impl_->get_polyhedron_vertex( polyhedron_vertex );
+    }
+
+    template < index_t dimension >
+    PolyhedronVertices
+        OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_vertices(
+            index_t polyhedron_id ) const
+    {
+        return impl_->get_polyhedron_vertices( polyhedron_id );
     }
 
     template < index_t dimension >
