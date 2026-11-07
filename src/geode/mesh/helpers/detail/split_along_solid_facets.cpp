@@ -158,7 +158,7 @@ namespace geode
                         "[SplitAlongSolidFacets] Wrong size comparison" );
                     /// Already processed polyhedra
                     PolyhedraAroundVertex processed_polyhedra;
-                    while( nb_polyhedra_around != all_polyhedra_around.size() )
+                    while( nb_polyhedra_around < all_polyhedra_around.size() )
                     {
                         for( const auto& polyhedron : polyhedra_around )
                         {
@@ -169,6 +169,12 @@ namespace geode
                                 all_polyhedra_around ) );
                         polyhedra_around =
                             solid_.polyhedra_around_vertex( vertex_id );
+                        OpenGeodeMeshException::check_exception(
+                            !polyhedra_around.empty(), vertex_id,
+                            OpenGeodeException::TYPE::internal,
+                            "[SplitAlongSolidFacets] No polyhedron processed "
+                            "while duplicating vertex ",
+                            vertex_id );
                         /// Add new number of polyhedra around to nb processed
                         nb_polyhedra_around += polyhedra_around.size();
                     }

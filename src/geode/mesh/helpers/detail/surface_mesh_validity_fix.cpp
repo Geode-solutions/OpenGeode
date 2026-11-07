@@ -62,7 +62,7 @@ namespace geode
                 }
                 std::vector< index_t > new_values;
                 PolygonsAroundVertex total_polygons;
-                while( nb_polygons_around != polygon_vertices.size() )
+                while( nb_polygons_around < polygon_vertices.size() )
                 {
                     for( auto&& polygon : polygons_around )
                     {
@@ -85,6 +85,12 @@ namespace geode
                     }
                     vertex_mappings.map( vertex_id, new_vertex_id );
                     polygons_around = mesh.polygons_around_vertex( vertex_id );
+                    OpenGeodeMeshException::check_exception(
+                        !polygons_around.empty(), vertex_id,
+                        OpenGeodeException::TYPE::internal,
+                        "[repair_non_manifold_vertices] No polygon processed "
+                        "while duplicating vertex ",
+                        vertex_id );
                     nb_polygons_around += polygons_around.size();
                 }
             }
