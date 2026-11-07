@@ -78,3 +78,24 @@ namespace pybind11
         };
     } // namespace detail
 } // namespace pybind11
+
+namespace geode
+{
+    template < typename Class, typename Getter, typename... Options >
+    pybind11::class_< Class, Options... > define_string_representation(
+        pybind11::class_< Class, Options... > python_class, Getter&& getter )
+    {
+        python_class.def( "__str__", getter )
+            .def( "__repr__", std::forward< Getter >( getter ) );
+        return python_class;
+    }
+
+    template < typename Class, typename... Options >
+    pybind11::class_< Class, Options... > define_string_representation(
+        pybind11::class_< Class, Options... > python_class )
+    {
+        python_class.def( "string", &Class::string );
+        return define_string_representation(
+            std::move( python_class ), &Class::string );
+    }
+} // namespace geode

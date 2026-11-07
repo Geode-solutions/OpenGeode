@@ -28,16 +28,14 @@
 
 #define PYTHON_FRAME( dimension )                                              \
     const auto name##dimension = "Frame" + std::to_string( dimension ) + "D";  \
-    pybind11::class_< Frame##dimension##D >( module, name##dimension.c_str() ) \
+    define_string_representation( pybind11::class_< Frame##dimension##D >(     \
+                                      module, name##dimension.c_str() ) )      \
         .def( pybind11::init<>() )                                             \
         .def(                                                                  \
             pybind11::init< std::array< Vector< dimension >, dimension > >() ) \
         .def( "direction", &Frame##dimension##D::direction )                   \
         .def( "set_direction", &Frame##dimension##D::set_direction )           \
         .def( "inverse", &Frame##dimension##D::inverse )                       \
-        .def( "string", &Frame##dimension##D::string )                         \
-        .def( "__str__", &Frame##dimension##D::string )                        \
-        .def( "__repr__", &Frame##dimension##D::string )                       \
         .def( "rescale", &Frame##dimension##D::rescale )
 
 namespace geode

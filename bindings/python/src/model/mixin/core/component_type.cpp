@@ -29,18 +29,14 @@ namespace geode
 {
     void define_component_type( pybind11::module& module )
     {
-        pybind11::class_< ComponentType >( module, "ComponentType" )
+        define_string_representation(
+            pybind11::class_< ComponentType >( module, "ComponentType" ),
+            []( const ComponentType& type ) {
+                return std::string{ type.get() };
+            } )
             .def( pybind11::init<>() )
             .def( pybind11::init< std::string >() )
             .def( "get", &ComponentType::get )
-            .def( "__str__",
-                []( const ComponentType& type ) {
-                    return std::string{ type.get() };
-                } )
-            .def( "__repr__",
-                []( const ComponentType& type ) {
-                    return std::string{ type.get() };
-                } )
             .def( "matches", &ComponentType::operator== )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
@@ -48,14 +44,12 @@ namespace geode
                 return std::hash< ComponentType >{}( type );
             } );
 
-        pybind11::class_< ComponentID >( module, "ComponentID",
-            "Hashable: do not modify type or id of a ComponentID used as a "
-            "dict key or in a set" )
+        define_string_representation(
+            pybind11::class_< ComponentID >( module, "ComponentID",
+                "Hashable: do not modify type or id of a ComponentID used as a "
+                "dict key or in a set" ) )
             .def( pybind11::init<>() )
             .def( pybind11::init< ComponentType, uuid >() )
-            .def( "string", &ComponentID::string )
-            .def( "__str__", &ComponentID::string )
-            .def( "__repr__", &ComponentID::string )
             .def_readwrite( "type", &ComponentID::type )
             .def_readwrite( "id", &ComponentID::id )
             .def( pybind11::self == pybind11::self )

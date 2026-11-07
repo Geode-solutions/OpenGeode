@@ -29,12 +29,10 @@ namespace geode
 {
     void define_uuid( pybind11::module& module )
     {
-        pybind11::class_< uuid >( module, "uuid" )
+        define_string_representation(
+            pybind11::class_< uuid >( module, "uuid" ) )
             .def( pybind11::init<>() )
             .def( pybind11::init< std::string_view >() )
-            .def( "string", &uuid::string )
-            .def( "__str__", &uuid::string )
-            .def( "__repr__", &uuid::string )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( pybind11::self < pybind11::self )

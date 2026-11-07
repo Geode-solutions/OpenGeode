@@ -31,8 +31,9 @@
 #define PYTHON_BOUNDING_BOX( dimension )                                       \
     const auto name##dimension =                                               \
         "BoundingBox" + std::to_string( dimension ) + "D";                     \
-    pybind11::class_< BoundingBox##dimension##D >(                             \
-        module, name##dimension.c_str() )                                      \
+    define_string_representation(                                              \
+        pybind11::class_< BoundingBox##dimension##D >(                         \
+            module, name##dimension.c_str() ) )                                \
         .def( pybind11::init<>() )                                             \
         .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
         .def( "add_point", &BoundingBox##dimension##D::add_point )             \
@@ -56,10 +57,7 @@
         .def( "diagonal", &BoundingBox##dimension##D::diagonal )               \
         .def( "smallest_length", &BoundingBox##dimension##D::smallest_length ) \
         .def( "largest_length", &BoundingBox##dimension##D::largest_length )   \
-        .def( "n_volume", &BoundingBox##dimension##D::n_volume )               \
-        .def( "string", &BoundingBox##dimension##D::string )                   \
-        .def( "__str__", &BoundingBox##dimension##D::string )                  \
-        .def( "__repr__", &BoundingBox##dimension##D::string )
+        .def( "n_volume", &BoundingBox##dimension##D::n_volume )
 
 namespace geode
 {

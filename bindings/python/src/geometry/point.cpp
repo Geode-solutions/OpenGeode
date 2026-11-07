@@ -27,7 +27,8 @@
 
 #define PYTHON_POINT( dimension )                                              \
     const auto name##dimension = "Point" + std::to_string( dimension ) + "D";  \
-    pybind11::class_< Point##dimension##D >( module, name##dimension.c_str() ) \
+    define_string_representation( pybind11::class_< Point##dimension##D >(     \
+                                      module, name##dimension.c_str() ) )      \
         .def( pybind11::init<>() )                                             \
         .def( pybind11::init< std::array< double, dimension > >() )            \
         .def( "inexact_equal", &Point##dimension##D::inexact_equal )           \
@@ -42,9 +43,6 @@
         .def( pybind11::self += pybind11::self )                               \
         .def( pybind11::self -= pybind11::self )                               \
         .def( "value", &Point##dimension##D::value )                           \
-        .def( "string", &Point##dimension##D::string )                         \
-        .def( "__str__", &Point##dimension##D::string )                        \
-        .def( "__repr__", &Point##dimension##D::string )                       \
         .def( "set_value", &Point##dimension##D::set_value )
 
 namespace geode

@@ -31,14 +31,12 @@ namespace geode
 {
     void define_graph_elements( pybind11::module& module )
     {
-        pybind11::class_< EdgeVertex >( module, "EdgeVertex" )
+        define_string_representation(
+            pybind11::class_< EdgeVertex >( module, "EdgeVertex" ) )
             .def( pybind11::init<>() )
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "string", &EdgeVertex::string )
-            .def( "__str__", &EdgeVertex::string )
-            .def( "__repr__", &EdgeVertex::string )
             .def_readwrite( "edge_id", &EdgeVertex::edge_id )
             .def_readwrite( "vertex_id", &EdgeVertex::vertex_id );
     }
