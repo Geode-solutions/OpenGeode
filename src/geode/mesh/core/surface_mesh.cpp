@@ -1031,6 +1031,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::optional< PolygonEdge >
+        SurfaceMesh< dimension >::polygon_edge_from_edge_vertices(
+            const std::array< index_t, 2 >& edge_vertices ) const
+    {
+        if( auto polygon_edge = polygon_edge_from_vertices(
+                edge_vertices[0], edge_vertices[1] ) )
+        {
+            return polygon_edge;
+        }
+        return polygon_edge_from_vertices( edge_vertices[1], edge_vertices[0] );
+    }
+
+    template < index_t dimension >
     Segment< dimension > SurfaceMesh< dimension >::segment(
         const PolygonEdge& polygon_edge ) const
     {
