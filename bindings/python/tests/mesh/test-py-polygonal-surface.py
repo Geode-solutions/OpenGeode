@@ -111,6 +111,16 @@ def test_polygon_edges_on_borders(polygonal_surface):
             "[Test] Number of polygon edges on border index is not correct")
 
 
+def test_polygon_edge_from_edge_vertices(polygonal_surface):
+    if polygonal_surface.polygon_edge_from_edge_vertices([0, 1]) != mesh.PolygonEdge(0, 0):
+        raise ValueError("[Test] Polygon edge from edge vertices is not correct")
+    if polygonal_surface.polygon_edge_from_edge_vertices([1, 0]) != mesh.PolygonEdge(0, 0):
+        raise ValueError(
+            "[Test] Polygon edge from reversed edge vertices is not correct")
+    if polygonal_surface.polygon_edge_from_edge_vertices([0, 4]) is not None:
+        raise ValueError("[Test] Polygon edge from edge vertices should not exist")
+
+
 def test_previous_next_on_border(polygonal_surface):
     if polygonal_surface.previous_on_border(mesh.PolygonEdge(0, 0)) != mesh.PolygonEdge(0, 2):
         raise ValueError("[Test] Previous edge on border index is not correct")
@@ -374,6 +384,7 @@ if __name__ == '__main__':
     test_polygon_adjacencies(polygonal_surface, builder)
     test_polygon_edges_on_borders(polygonal_surface)
     test_previous_next_on_border(polygonal_surface)
+    test_polygon_edge_from_edge_vertices(polygonal_surface)
     test_polygon_barycenter(polygonal_surface)
     test_polygon_area()
     test_polygon_normal()

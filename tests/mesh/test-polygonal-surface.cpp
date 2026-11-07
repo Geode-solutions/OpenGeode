@@ -355,6 +355,20 @@ void test_polygon_edge_requests(
     polygon_edge = polygonal_surface.polygon_edge_from_vertices( 1, 0 );
     geode::OpenGeodeMeshException::test(
         !polygon_edge, "Polygon edge from vertices is not correct" );
+    polygon_edge =
+        polygonal_surface.polygon_edge_from_edge_vertices( { 0, 1 } );
+    geode::OpenGeodeMeshException::test(
+        polygon_edge == geode::PolygonEdge( 0, 0 ),
+        "Polygon edge from edge vertices is not correct" );
+    polygon_edge =
+        polygonal_surface.polygon_edge_from_edge_vertices( { 1, 0 } );
+    geode::OpenGeodeMeshException::test(
+        polygon_edge == geode::PolygonEdge( 0, 0 ),
+        "Polygon edge from reversed edge vertices is not correct" );
+    polygon_edge =
+        polygonal_surface.polygon_edge_from_edge_vertices( { 3, 5 } );
+    geode::OpenGeodeMeshException::test(
+        !polygon_edge, "Polygon edge from edge vertices is not correct" );
     const auto polygon_edges =
         polygonal_surface.polygons_from_edge_vertices( { { 1, 2 } } );
     geode::OpenGeodeMeshException::test( polygon_edges.size() == 2,
