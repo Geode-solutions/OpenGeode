@@ -43,6 +43,26 @@ namespace
         const geode::PolyhedronVertices& vertices_adj,
         geode::index_t polyhedron_adj )
     {
+        // Two adjacent tetrahedra share the three facet vertices: the facet
+        // of the adjacent tetrahedron is opposite to its only other vertex
+        const auto vertices = solid.polyhedron_vertices( facet.polyhedron_id );
+        geode::local_index_t nb_others{ 0 };
+        geode::local_index_t other{ geode::NO_LID };
+        for( const auto v : geode::LRange{ 4 } )
+        {
+            if( absl::c_find( vertices, vertices_adj[v] ) == vertices.end() )
+            {
+                nb_others++;
+                other = v;
+            }
+        }
+        if( nb_others == 1
+            && solid.polyhedron_adjacent( { polyhedron_adj, other } )
+                   == facet.polyhedron_id )
+        {
+            return std::optional< geode::PolyhedronFacet >{ std::in_place,
+                polyhedron_adj, other };
+        }
         geode::PolyhedronFacetVertices facet_vertices;
         for( const auto v : geode::LRange{ 3 } )
         {

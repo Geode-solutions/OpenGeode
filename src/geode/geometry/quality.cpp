@@ -210,11 +210,6 @@ namespace geode
 
     double tetrahedron_volume_to_edge_ratio( const Tetrahedron& tetra )
     {
-        const auto signed_volume = tetrahedron_signed_volume( tetra );
-        if( signed_volume < 0. || tetra.is_degenerated() )
-        {
-            return 0.;
-        }
         const auto& vertices = tetra.vertices();
         const Vector3D edge01{ vertices[0], vertices[1] };
         const Vector3D edge02{ vertices[0], vertices[2] };
@@ -222,9 +217,40 @@ namespace geode
         const Vector3D edge12{ vertices[1], vertices[2] };
         const Vector3D edge13{ vertices[1], vertices[3] };
         const Vector3D edge23{ vertices[2], vertices[3] };
-        const auto sq_len = edge01.length2() + edge02.length2()
-                            + edge03.length2() + edge12.length2()
-                            + edge13.length2() + edge23.length2();
+        const auto length01 = edge01.length2();
+        const auto length02 = edge02.length2();
+        const auto length03 = edge03.length2();
+        const auto length12 = edge12.length2();
+        const auto length13 = edge13.length2();
+        const auto length23 = edge23.length2();
+        // is_degenerated compares the squared 6 * volume to GLOBAL_EPSILON^2
+        // times squared edge cross products, which are at most the squared
+        // longest edge length to the square: above twice this bound, the
+        // tetrahedron is not degenerated
+        const auto max_length = std::max(
+            { length01, length02, length03, length12, length13, length23 } );
+        // same computation as tetrahedron_signed_volume, whose flat test
+        // (squared 6 * volume against GLOBAL_EPSILON^2 times the largest
+        // squared facet cross product) cannot succeed above the same bound
+        const auto volume6 = edge01.dot( edge02.cross( edge03 ) );
+        const auto signed_volume =
+            volume6 * volume6 > 2. * GLOBAL_EPSILON * GLOBAL_EPSILON
+                                    * max_length * max_length
+                ? volume6 / 6.
+                : tetrahedron_signed_volume( tetra );
+        if( signed_volume < 0. )
+        {
+            return 0.;
+        }
+        const auto six_volume = 6. * signed_volume;
+        if( six_volume * six_volume <= 2. * GLOBAL_EPSILON * GLOBAL_EPSILON
+                                           * max_length * max_length
+            && tetra.is_degenerated() )
+        {
+            return 0.;
+        }
+        const auto sq_len =
+            length01 + length02 + length03 + length12 + length13 + length23;
         const auto l_rms = std::sqrt( sq_len / 6 );
         return 6 * std::sqrt( 2 ) * signed_volume / ( l_rms * l_rms * l_rms );
     }
