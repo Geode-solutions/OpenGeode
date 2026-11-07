@@ -29,11 +29,8 @@ namespace geode
 {
     void define_component_mesh_element( pybind11::module& module )
     {
-        pybind11::class_< ComponentMeshElement >(
-            module, "ComponentMeshElement" )
-            .def( pybind11::init< ComponentID, index_t >() )
-            .def( "string", &ComponentMeshElement::string )
-            .def( "__str__", &ComponentMeshElement::string )
-            .def( "__repr__", &ComponentMeshElement::string );
+        define_string_representation( pybind11::class_< ComponentMeshElement >(
+                                          module, "ComponentMeshElement" ) )
+            .def( pybind11::init< ComponentID, index_t >() );
     }
 } // namespace geode

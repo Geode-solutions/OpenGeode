@@ -28,8 +28,9 @@
 #define PYTHON_COORDINATE_SYSTEM( dimension )                                  \
     const auto name##dimension =                                               \
         "CoordinateSystem" + std::to_string( dimension ) + "D";                \
-    pybind11::class_< CoordinateSystem##dimension##D,                          \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+    define_string_representation(                                              \
+        pybind11::class_< CoordinateSystem##dimension##D,                      \
+            pybind11::smart_holder >( module, name##dimension.c_str() ) )      \
         .def( pybind11::init<>() )                                             \
         .def( pybind11::init< std::array< Vector< dimension >, dimension >,    \
             Point< dimension > >() )                                           \
@@ -38,9 +39,6 @@
         .def( "origin", &CoordinateSystem##dimension##D::origin )              \
         .def( "set_origin", &CoordinateSystem##dimension##D::set_origin )      \
         .def( "coordinates", &CoordinateSystem##dimension##D::coordinates )    \
-        .def( "string", &CoordinateSystem##dimension##D::string )              \
-        .def( "__str__", &CoordinateSystem##dimension##D::string )             \
-        .def( "__repr__", &CoordinateSystem##dimension##D::string )            \
         .def( "global_coordinates",                                            \
             &CoordinateSystem##dimension##D::global_coordinates )
 

@@ -29,14 +29,12 @@ namespace geode
 {
     void define_greyscale_color( pybind11::module& module )
     {
-        pybind11::class_< GreyscaleColor >( module, "GreyscaleColor" )
+        define_string_representation(
+            pybind11::class_< GreyscaleColor >( module, "GreyscaleColor" ) )
             .def( pybind11::init<>() )
             .def( pybind11::init< local_index_t >() )
             .def( "value", &GreyscaleColor::value )
             .def( "set_value", &GreyscaleColor::set_value )
-            .def( "string", &GreyscaleColor::string )
-            .def( "__str__", &GreyscaleColor::string )
-            .def( "__repr__", &GreyscaleColor::string )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( pybind11::self + pybind11::self )
