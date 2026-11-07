@@ -234,9 +234,8 @@ namespace geode
         // squared facet cross product) cannot succeed above the same bound
         const auto volume6 = edge01.dot( edge02.cross( edge03 ) );
         const auto signed_volume =
-            volume6 * volume6
-                    > 2. * GLOBAL_EPSILON * GLOBAL_EPSILON * max_length
-                          * max_length
+            volume6 * volume6 > 2. * GLOBAL_EPSILON * GLOBAL_EPSILON
+                                    * max_length * max_length
                 ? volume6 / 6.
                 : tetrahedron_signed_volume( tetra );
         if( signed_volume < 0. )
