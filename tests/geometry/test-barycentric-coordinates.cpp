@@ -261,7 +261,7 @@ void test_tetrahedron_barycentric_coordinates()
         "with query point q2" );
 }
 
-// Previous exception-based safe implementations
+// Reference safe implementations
 std::array< double, 2 > reference_safe_segment(
     const geode::Point3D& point, const geode::Segment3D& segment )
 {
@@ -291,31 +291,21 @@ std::array< double, 2 > reference_safe_segment(
 std::array< double, 3 > reference_safe_triangle(
     const geode::Point3D& point, const geode::Triangle3D& triangle )
 {
-    const auto& vertices = triangle.vertices();
-    const geode::Vector3D v0{ vertices[0], vertices[1] };
-    const geode::Vector3D v1{ vertices[0], vertices[2] };
-    const geode::Vector3D v2{ vertices[0], point };
-    const auto d00 = v0.dot( v0 );
-    const auto d01 = v0.dot( v1 );
-    const auto d11 = v1.dot( v1 );
-    const auto d20 = v2.dot( v0 );
-    const auto d21 = v2.dot( v1 );
-    const auto denom = d00 * d11 - d01 * d01;
-    if( denom != 0 )
+    if( !triangle.is_degenerated() )
     {
-        const auto lambda1 = ( d11 * d20 - d01 * d21 ) / denom;
-        const auto lambda2 = ( d00 * d21 - d01 * d20 ) / denom;
-        return { { 1. - lambda1 - lambda2, lambda1, lambda2 } };
+        return geode::triangle_barycentric_coordinates( point, triangle );
     }
+    const auto& vertices = triangle.vertices();
     auto edge = geode::NO_LID;
     double best_length{ 0 };
-    for( const auto e : geode::LRange{ 3 } )
+    for( const auto edge_id : geode::LRange{ 3 } )
     {
-        const auto length = geode::point_point_distance(
-            vertices[e].get(), vertices[e == 2 ? 0 : e + 1].get() );
+        const auto length =
+            geode::point_point_distance( vertices[edge_id].get(),
+                vertices[edge_id == 2 ? 0 : edge_id + 1].get() );
         if( length >= best_length )
         {
-            edge = e;
+            edge = edge_id;
             best_length = length;
         }
     }
@@ -326,6 +316,42 @@ std::array< double, 3 > reference_safe_triangle(
     lambdas.fill( 0 );
     lambdas[edge] = segment_lambdas[0];
     lambdas[next] = segment_lambdas[1];
+    return lambdas;
+}
+
+std::array< double, 4 > reference_safe_tetrahedron(
+    const geode::Point3D& point, const geode::Tetrahedron& tetra )
+{
+    if( !tetra.is_degenerated() )
+    {
+        return geode::tetrahedron_barycentric_coordinates( point, tetra );
+    }
+    const auto& vertices = tetra.vertices();
+    std::array< geode::local_index_t, 3 > best_facet_vertices{};
+    double best_area{ 0 };
+    for( const auto facet : geode::LRange{ 4 } )
+    {
+        const geode::local_index_t vertex0 = facet == 3 ? 0 : facet + 1;
+        const geode::local_index_t vertex1 = vertex0 == 3 ? 0 : vertex0 + 1;
+        const geode::local_index_t vertex2 = vertex1 == 3 ? 0 : vertex1 + 1;
+        const auto area = geode::triangle_area( geode::Triangle3D{
+            vertices[vertex0], vertices[vertex1], vertices[vertex2] } );
+        if( area >= best_area )
+        {
+            best_area = area;
+            best_facet_vertices = { vertex0, vertex1, vertex2 };
+        }
+    }
+    const auto triangle_lambdas = reference_safe_triangle(
+        point, geode::Triangle3D{ vertices[best_facet_vertices[0]],
+                   vertices[best_facet_vertices[1]],
+                   vertices[best_facet_vertices[2]] } );
+    std::array< double, 4 > lambdas;
+    lambdas.fill( 0 );
+    for( const auto vertex : geode::LRange{ 3 } )
+    {
+        lambdas[best_facet_vertices[vertex]] = triangle_lambdas[vertex];
+    }
     return lambdas;
 }
 
@@ -376,29 +402,53 @@ void test_safe_barycentric_coordinates_without_exceptions()
                 == reference_safe_triangle( query, triangle ),
             "[Test] Wrong safe triangle barycentric coordinates" );
         const geode::Tetrahedron tetra{ p0, p1, p2, p3 };
-        const auto safe_lambdas =
-            geode::safe_tetrahedron_barycentric_coordinates( query, tetra );
-        try
-        {
-            geode::OpenGeodeGeometryException::test(
-                safe_lambdas
-                    == geode::tetrahedron_barycentric_coordinates(
-                        query, tetra ),
-                "[Test] Wrong safe tetrahedron barycentric coordinates" );
-        }
-        catch( const geode::OpenGeodeException& )
-        {
-            double sum{ 0 };
-            for( const auto lambda : safe_lambdas )
-            {
-                sum += lambda;
-            }
-            geode::OpenGeodeGeometryException::test(
-                std::fabs( sum - 1 ) < 1e-12,
-                "[Test] Wrong degenerated tetrahedron barycentric "
-                "coordinates" );
-        }
+        geode::OpenGeodeGeometryException::test(
+            geode::safe_tetrahedron_barycentric_coordinates( query, tetra )
+                == reference_safe_tetrahedron( query, tetra ),
+            "[Test] Wrong safe tetrahedron barycentric coordinates" );
     }
+}
+
+void test_sliver_barycentric_coordinates()
+{
+    const geode::Point3D origin{ { 600000, 7000000, -2000 } };
+    const geode::Point3D edge0{ { 1000, 2000, -1500 } };
+    const geode::Point3D edge1{ { -700, 1300, 900 } };
+    const geode::Point3D thickness{ { 0, 0, 0.0009765625 } };
+
+    const auto vertex1 = origin + edge0;
+    const auto vertex2 = origin + edge1;
+    const auto vertex3 = origin + edge0 + edge1 + thickness;
+    const geode::Tetrahedron tetra{ origin, vertex1, vertex2, vertex3 };
+    const auto tetra_query = ( origin + vertex1 + vertex2 + vertex3 ) / 4.;
+    geode::OpenGeodeGeometryException::test(
+        check_bary_coords< 4 >(
+            geode::tetrahedron_barycentric_coordinates( tetra_query, tetra ),
+            { 0.25, 0.25, 0.25, 0.25 } ),
+        "Wrong result for tetrahedron_barycentric_coordinates "
+        "on a sliver" );
+
+    const auto apex = origin + edge0 / 2. + thickness;
+    const geode::Triangle3D triangle3d{ origin, vertex1, apex };
+    const auto triangle3d_query = ( origin + vertex1 + apex * 2. ) / 4.;
+    geode::OpenGeodeGeometryException::test(
+        check_bary_coords< 3 >( geode::triangle_barycentric_coordinates(
+                                    triangle3d_query, triangle3d ),
+            { 0.25, 0.25, 0.5 } ),
+        "Wrong result for triangle_barycentric_coordinates_3D "
+        "on a sliver" );
+
+    const geode::Point2D origin2d{ { 600000, 7000000 } };
+    const geode::Point2D vertex2d{ { 601000, 7002000 } };
+    const geode::Point2D apex2d{ { 600500, 7001000.0009765625 } };
+    const geode::Triangle2D triangle2d{ origin2d, vertex2d, apex2d };
+    const auto triangle2d_query = ( origin2d + vertex2d + apex2d * 2. ) / 4.;
+    geode::OpenGeodeGeometryException::test(
+        check_bary_coords< 3 >( geode::triangle_barycentric_coordinates(
+                                    triangle2d_query, triangle2d ),
+            { 0.25, 0.25, 0.5 } ),
+        "Wrong result for triangle_barycentric_coordinates_2D "
+        "on a sliver" );
 }
 
 void test()
@@ -407,6 +457,7 @@ void test()
     test_triangle_barycentric_coordinates();
     test_tetrahedron_barycentric_coordinates();
     test_safe_barycentric_coordinates_without_exceptions();
+    test_sliver_barycentric_coordinates();
 }
 
 OPENGEODE_TEST( "barycentric-coordinates" )

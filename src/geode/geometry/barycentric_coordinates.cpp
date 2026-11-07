@@ -30,6 +30,7 @@
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/mensuration.hpp>
+#include <geode/geometry/perpendicular.hpp>
 
 namespace
 {
@@ -40,34 +41,19 @@ namespace
     {
         using geode::Vector3D;
         const auto& vertices = tetra.vertices();
-        const Vector3D v0{ vertices[0], vertices[1] };
-        const Vector3D v1{ vertices[0], vertices[2] };
-        const Vector3D v2{ vertices[0], vertices[3] };
-        const Vector3D v3{ vertices[0], point };
-        const auto a = v0.dot( v3 );
-        const auto b = v0.dot( v0 );
-        const auto c = v0.dot( v1 );
-        const auto d = v0.dot( v2 );
-        const auto e = v1.dot( v3 );
-        const auto f = v1.dot( v1 );
-        const auto g = v1.dot( v2 );
-        const auto h = v2.dot( v3 );
-        const auto i = v2.dot( v2 );
-        const auto denom =
-            2 * c * d * g - b * g * g + i * b * f - i * c * c - d * d * f;
-        if( denom == 0 )
+        const Vector3D edge01{ vertices[0], vertices[1] };
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
+        const auto normal1 = edge02.cross( edge03 );
+        const auto six_volume = edge01.dot( normal1 );
+        if( six_volume == 0 )
         {
             return std::nullopt;
         }
-        const auto dg_ci = d * g - c * i;
-        const auto cg_df = c * g - d * f;
-        const auto cd_bg = c * d - b * g;
-        const auto lambda1 =
-            ( a * ( i * f - g * g ) + e * dg_ci + h * cg_df ) / denom;
-        const auto lambda2 =
-            ( a * dg_ci + e * ( -d * d + b * i ) + h * cd_bg ) / denom;
-        const auto lambda3 =
-            ( a * cg_df + e * cd_bg + h * ( b * f - c * c ) ) / denom;
+        const Vector3D edge0p{ vertices[0], point };
+        const auto lambda1 = edge0p.dot( normal1 ) / six_volume;
+        const auto lambda2 = edge0p.dot( edge03.cross( edge01 ) ) / six_volume;
+        const auto lambda3 = edge0p.dot( edge01.cross( edge02 ) ) / six_volume;
         const auto lambda0 = 1. - lambda1 - lambda2 - lambda3;
         return std::array< double, 4 >{ { lambda0, lambda1, lambda2,
             lambda3 } };
@@ -79,21 +65,34 @@ namespace
         const geode::Triangle< dimension >& triangle )
     {
         const auto& vertices = triangle.vertices();
-        const geode::Vector< dimension > v0{ vertices[0], vertices[1] };
-        const geode::Vector< dimension > v1{ vertices[0], vertices[2] };
-        const geode::Vector< dimension > v2{ vertices[0], point };
-        const auto d00 = v0.dot( v0 );
-        const auto d01 = v0.dot( v1 );
-        const auto d11 = v1.dot( v1 );
-        const auto d20 = v2.dot( v0 );
-        const auto d21 = v2.dot( v1 );
-        const auto denom = d00 * d11 - d01 * d01;
-        if( denom == 0 )
+        const geode::Vector< dimension > edge01{ vertices[0], vertices[1] };
+        const geode::Vector< dimension > edge02{ vertices[0], vertices[2] };
+        const geode::Vector< dimension > edge0p{ vertices[0], point };
+        double lambda1;
+        double lambda2;
+        if constexpr( dimension == 2 )
         {
-            return std::nullopt;
+            const auto double_area = geode::dot_perpendicular( edge01, edge02 );
+            if( double_area == 0 )
+            {
+                return std::nullopt;
+            }
+            lambda1 = geode::dot_perpendicular( edge0p, edge02 ) / double_area;
+            lambda2 = geode::dot_perpendicular( edge01, edge0p ) / double_area;
         }
-        const auto lambda1 = ( d11 * d20 - d01 * d21 ) / denom;
-        const auto lambda2 = ( d00 * d21 - d01 * d20 ) / denom;
+        else
+        {
+            const auto normal = edge01.cross( edge02 );
+            const auto squared_double_area = normal.length2();
+            if( squared_double_area == 0 )
+            {
+                return std::nullopt;
+            }
+            lambda1 =
+                normal.dot( edge0p.cross( edge02 ) ) / squared_double_area;
+            lambda2 =
+                normal.dot( edge01.cross( edge0p ) ) / squared_double_area;
+        }
         const auto lambda0 = 1. - lambda1 - lambda2;
         return std::array< double, 3 >{ { lambda0, lambda1, lambda2 } };
     }
@@ -142,10 +141,13 @@ namespace geode
     std::array< double, 4 > safe_tetrahedron_barycentric_coordinates(
         const Point3D& point, const Tetrahedron& tetrahedron ) noexcept
     {
-        if( const auto result =
-                try_tetrahedron_barycentric( point, tetrahedron ) )
+        if( !tetrahedron.is_degenerated() )
         {
-            return result.value();
+            if( const auto result =
+                    try_tetrahedron_barycentric( point, tetrahedron ) )
+            {
+                return result.value();
+            }
         }
         const auto& vertices = tetrahedron.vertices();
         auto facet = NO_LID;
@@ -194,9 +196,13 @@ namespace geode
         const Point< dimension >& point,
         const Triangle< dimension >& triangle ) noexcept
     {
-        if( const auto result = try_triangle_barycentric( point, triangle ) )
+        if( !triangle.is_degenerated() )
         {
-            return result.value();
+            if( const auto result =
+                    try_triangle_barycentric( point, triangle ) )
+            {
+                return result.value();
+            }
         }
         const auto& vertices = triangle.vertices();
         auto edge = NO_LID;
